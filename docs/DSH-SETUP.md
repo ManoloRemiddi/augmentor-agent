@@ -44,6 +44,15 @@ presets now reports that integration installation is required. Check does not
 replace files or save settings. Changing the selected source root can require an
 explicit integration refresh even when the product version is unchanged.
 
+The October 4 correction keeps generated preset text separate from the existing
+profile text during installation. The preceding source revision's Debian CI
+exposed a variable collision that replaced the profile composition. Two regression
+cases now verify preservation of existing comments/plugins on fresh installation
+and the entire profile on refresh; all 21 focused setup tests pass. The actual
+Qt/DSH setup proof remains a required CI gate. The host-only attempt stopped at
+the missing QtTest import before starting DSH; installed owner dependencies were
+not changed to run it.
+
 This source correction follows read-only inspection of the published Debian
 0.2.12 and 0.2.13 bundles. Published 0.2.13's check only required the live version,
 pairing identity and usable preset IDs, so it could accept retained 0.2.12

@@ -288,7 +288,7 @@ class Setup:
                 if not previous:made.append(directory)
                 # JSON is a YAML subset and preserves arbitrary paths without
                 # shell expansion, YAML tags or manual quoting.
-                for filename,text in preset_documents(surface).items():atomic(directory/filename,text)
+                for filename,preset_text in preset_documents(surface).items():atomic(directory/filename,preset_text)
             secret=home/'augmentor-product-token'
             if secret.exists() or secret.is_symlink():product_token(secret)
             else:product_token(secret,create=True);made.append(secret)

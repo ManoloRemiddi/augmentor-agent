@@ -178,6 +178,27 @@ class OwnedIntegrationCheckTests(unittest.TestCase):
         return {str(p.relative_to(self.home)):(p.read_bytes(),p.stat().st_ino,p.stat().st_mtime_ns,p.stat().st_mode)
                 for p in self.home.rglob('*') if p.is_file() and not p.is_symlink()}
 
+    def test_fresh_install_preserves_existing_profile_comments_and_composition(self):
+        home=self.home.parent/'existing-profile';profile=home/'profiles/web';profile.mkdir(parents=True)
+        original='# Existing unrelated plugin and settings\n- insert: [{id: external-plugin, name: external-plugin}]\n'
+        composition=profile/'cordis.patch.yml';composition.write_text(original)
+        checked=self.integration.check({'endpoint':'http://127.0.0.1:3080','home':str(home)})
+        self.integration.install(checked['token'])
+        installed=composition.read_text()
+        self.assertTrue(installed.startswith(original),installed)
+        self.assertEqual(installed.count('external-plugin, name: external-plugin'),1)
+        self.assertEqual(next(profile.glob('cordis.patch.yml.before-augmentor-*')).read_text(),original)
+        owned=json.loads((profile/'augmentor-product/ownership.json').read_text())
+        self.assertEqual(installed.count(owned['patchEntry']),1)
+
+    def test_refresh_preserves_entire_existing_profile_and_owned_entry(self):
+        composition=self.home/'profiles/web/cordis.patch.yml'
+        original=composition.read_text()+'# Later unrelated customization\n- insert: [{id: later-plugin, name: later-plugin}]\n'
+        composition.write_text(original)
+        checked=self.check();self.integration.install(checked['token'])
+        self.assertEqual(composition.read_text(),original)
+        self.assertTrue(setup.current_owned_integration(self.home))
+
     def test_current_normal_install_is_accepted_without_writing_or_dispatching(self):
         before=self.snapshot()
         with patch.object(setup,'atomic',side_effect=AssertionError('Check wrote a file')), \
