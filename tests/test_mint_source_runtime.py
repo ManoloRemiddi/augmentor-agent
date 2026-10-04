@@ -144,7 +144,7 @@ class MintContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             app=Path(folder)/'app';app.mkdir();(app/'linux-python-runtime.json').write_bytes(POLICY.read_bytes())
             python=str(Path(folder)/'runtime/bin/python3')
-            with patch.object(runtime,'resolve',return_value=python):
+            with patch.object(runtime,'resolve_official',return_value=python):
                 env=runtime.environment(app,python,{'DISPLAY':':17','QT_PLUGIN_PATH':'/foreign','QT_QPA_PLATFORMTHEME':'foreign'})
                 self.assertEqual(env['DISPLAY'],':17')
                 self.assertEqual(env['QT_PLUGIN_PATH'],str(Path(folder)/'runtime/qt/plugins'))

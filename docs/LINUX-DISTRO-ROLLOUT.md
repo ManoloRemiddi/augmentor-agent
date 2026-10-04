@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 recipient validation correction
+
+[Hosted run 37199257072](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37199257072)
+failed four existing environment tests at bf6c50a after running 1,424 Python
+cases (39 skips). Those synthetic fixtures still patched `resolve` after launch
+moved official verification to `resolve_official`; the production verifier was
+not replaced by their mocks. Both complete-proof and Mint fixtures now patch the
+correct official boundary while preserving loader, inventory-refusal and
+unchanged-environment assertions. All 85 related source checks pass locally.
+Dependent package jobs were skipped in the failed run; fresh hosted validation
+is required. Source tests do not qualify installed recipient replacements.
+
 ## October 4 observer replacement and reboot transport
 
 [Fresh observer replacement](../release/qualification/next-targets/20261004-gnome562-observer-replacement-reboot-transport.json)

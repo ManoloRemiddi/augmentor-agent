@@ -39,7 +39,7 @@ class CompleteProofEnvironment(unittest.TestCase):
         stack=ExitStack()
         stack.enter_context(patch.object(proof.importlib.util,'spec_from_file_location',return_value=spec))
         stack.enter_context(patch.object(proof.importlib.util,'module_from_spec',return_value=runtime))
-        verified=stack.enter_context(patch.object(runtime,'resolve',return_value=str(python),side_effect=refused))
+        verified=stack.enter_context(patch.object(runtime,'resolve_official',return_value=str(python),side_effect=refused))
         stack.enter_context(patch.object(runtime,'policy',return_value={'profile':profile}))
         stack.enter_context(patch.object(runtime,'source_qt',return_value=source_qt))
         return stack,verified
