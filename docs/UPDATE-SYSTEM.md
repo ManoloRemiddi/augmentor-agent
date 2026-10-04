@@ -12,9 +12,9 @@ customer distribution. Older checkpoints retain their source-specific history.
 
 | Installation | Implemented controller | Latest qualified scope and remaining boundary |
 | --- | --- | --- |
-| Windows per-user Inno, x64/ARM64 | Independent retained observer, complete component graph, Inno apply, offline completion and captured reopening | `c40926b` full run 37170465430 passes all 24 stages on both CPUs. Later `07c05af` desktop run passes junction/session admission. Signed forward N-to-N+1 remains unqualified. |
-| Linux managed per-user Desktop, x64/ARM64 | Immutable staging/selection, owned registrations and user services, completion and reopening | `0bc9639` complete native archive/relocation/Qt/portal/Handy proof passes both CPUs; service migration has separate native evidence. New full-observer cleanup at `b438ad8` passes host tests; fresh native bundle run 37174399503 is executing. |
-| Mac per-user Desktop bundle | Whole-bundle staging/replacement, persistent startup barrier, independent health and captured reopening | Prior Mac 14/26 bundle/controller evidence passes at `69477f8`; native follow-up 37174398113 at `b438ad8` is executing. Shared/system/Companion coordination and signed forward delivery remain open. |
+| Windows per-user Inno, x64/ARM64 | Independent retained observer, complete component graph, Inno apply, offline completion and captured reopening | `c40926b` full run 37170465430 passes all 24 stages on both CPUs. `40af948` full run and `0cb79e0` desktop run also pass both CPUs. Actual publisher checks pass at `79c5e58`; overall desktop ordering correction needs fresh qualification. Signed forward N-to-N+1 remains unqualified. |
+| Linux managed per-user Desktop, x64/ARM64 | Immutable staging/selection, owned registrations and user services, completion and reopening | `d8de284` complete native archive/relocation/Qt/portal/Handy proof and ten new retention/handoff/signed-authority cases pass both CPUs; service migration has separate native evidence. Main integration exposed an ARM toolchain map omission; corrected `f061593` run 37176868726 is dispatched. |
+| Mac per-user Desktop bundle | Whole-bundle staging/replacement, persistent startup barrier, independent health and captured reopening | Merged `0cb79e0` full run 37175652699 passes macOS 14; macOS 26 remains live. Earlier retention fixture failures are preserved below with their corrections. Shared/system/Companion coordination and signed forward delivery remain open. |
 | Package-managed Linux, shared/system installations, custom profiles, SDK-owned hosts | Compatible discovery/manual download; installation defers where ownership cannot be coordinated | Privileged/shared-user and SDK owner lifecycle adapters require further work. A running SDK owner is preserved before any shutdown. |
 
 Real signed metadata and inert HTTP downloads now join Python installation
@@ -2172,3 +2172,18 @@ but complete two-CPU bundles were skipped after the ARM prerequisite failure.
 Fresh native Linux execution must qualify the corrected source; earlier
 `d8de284` successes do not qualify this merge. No production eligibility/feed,
 signing credential or owner installation was changed.
+
+Native Windows signing run
+[37176579974](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37176579974)
+at `79c5e58` passes actual timestamped Node inspection, matching/wrong-key fixture
+pins, damaged-copy refusal and unchanged original bytes on x64 and ARM64.
+Both overall desktop jobs then fail at the early-launcher fixture: the earlier
+trust step has created `scripts/`, correctly rejected by its untouched-runtime
+precondition. The workflow now runs trust inspection after the early-launcher
+fixture. Production verifier and fixture safety precondition are unchanged;
+fresh desktop qualification must verify the complete corrected ordering.
+No failed overall workflow is presented as successful.
+
+Merged Mac run 37175652699 at `0cb79e0` has completed macOS 14 successfully;
+macOS 26 remains live. Corrected Linux run 37176868726 at `f061593` is dispatched.
+These pending outcomes do not inherit earlier source qualification.

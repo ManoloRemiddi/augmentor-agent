@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+Native publisher run 37176579974 at `79c5e58` passes the actual timestamped
+Node/wrong-pin/damaged-copy checks on Windows x64 and ARM64. Its overall jobs fail
+later because staging the verifier creates `scripts/` before the early-launcher
+fixture requires an untouched bootstrap runtime. The trust step now runs after
+that fixture; its safety check remains unchanged. Fresh desktop qualification is
+required for this ordering correction. Merged full Mac 37175652699 has passed
+macOS 14, while macOS 26 remains live. Corrected Linux `f061593` run 37176868726
+is dispatched. Full Windows 37175650042 remains live; no passing result is inferred.
+
+
 Merged source `0cb79e0`: Windows desktop run 37175651402 passes both CPUs,
 including the actual default-state/read-only scope check. Prior full login-guard
 run 37172411318 at `40af948` is terminal success on both CPUs. New full Windows
