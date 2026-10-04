@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import importlib.util
 import io
+import errno
 import json
 import os
 import tempfile
@@ -198,6 +199,72 @@ class OwnedIntegrationCheckTests(unittest.TestCase):
         checked=self.check();self.integration.install(checked['token'])
         self.assertEqual(composition.read_text(),original)
         self.assertTrue(setup.current_owned_integration(self.home))
+
+    def test_exdev_before_backup_keeps_original_and_cleans_owned_stage(self):
+        original=self.snapshot();checked=self.check();rename=Path.rename;attempts=[]
+        def refuse(path,destination):
+            attempts.append((path,Path(destination)))
+            if path==self.target:raise OSError(errno.EXDEV,'synthetic lower-directory rename refusal')
+            return rename(path,destination)
+        with patch.object(Path,'rename',refuse),self.assertRaises(OSError) as failure:
+            self.integration.install(checked['token'])
+        self.assertEqual(failure.exception.errno,errno.EXDEV)
+        self.assertEqual(attempts[0][0],self.target);self.assertEqual(len(attempts),1)
+        self.assertEqual(self.snapshot(),original)
+        self.assertFalse(list(self.target.parent.glob('.augmentor-stage-*')))
+        self.assertFalse(list(self.target.parent.glob('augmentor-product.before-*')))
+
+    def test_restore_failure_preserves_original_cause_and_still_cleans_stage(self):
+        original=self.ownership.read_bytes();checked=self.check();rename=Path.rename
+        problem=RuntimeError('synthetic stage activation failure')
+        def refuse(path,destination):
+            if path.name.startswith('.augmentor-stage-'):raise problem
+            if path.name.startswith('augmentor-product.before-'):raise PermissionError('synthetic restore refusal')
+            return rename(path,destination)
+        with patch.object(Path,'rename',refuse),self.assertRaises(RuntimeError) as failure:
+            self.integration.install(checked['token'])
+        self.assertIs(failure.exception,problem)
+        self.assertTrue(any('Restoring previous integration failed: PermissionError' in note for note in failure.exception.__notes__))
+        self.assertFalse(list(self.target.parent.glob('.augmentor-stage-*')))
+        backups=list(self.target.parent.glob('augmentor-product.before-*'));self.assertEqual(len(backups),1)
+        self.assertEqual((backups[0]/'ownership.json').read_bytes(),original)
+
+    def test_cleanup_failure_is_reported_without_masking_exdev(self):
+        checked=self.check();rename=Path.rename;remove=setup.shutil.rmtree
+        def refuse(path,destination):
+            if path==self.target:raise OSError(errno.EXDEV,'synthetic rename refusal')
+            return rename(path,destination)
+        def refuse_cleanup(path,*args,**kwargs):
+            if Path(path).name.startswith('.augmentor-stage-'):raise PermissionError('synthetic stage cleanup refusal')
+            return remove(path,*args,**kwargs)
+        with patch.object(Path,'rename',refuse),patch.object(setup.shutil,'rmtree',refuse_cleanup),self.assertRaises(OSError) as failure:
+            self.integration.install(checked['token'])
+        self.assertEqual(failure.exception.errno,errno.EXDEV)
+        self.assertTrue(any('Removing owned integration stage failed: PermissionError' in note for note in failure.exception.__notes__))
+        self.assertTrue(self.target.is_dir())
+
+    def test_later_install_failure_restores_owned_plugin_and_presets(self):
+        original_plugin=(self.target/'browser/dist/index.js').read_bytes();original_owned=self.ownership.read_bytes()
+        patch_path=self.target.parent/'cordis.patch.yml';original_patch=patch_path.read_bytes()
+        preset_files={path:path.read_bytes() for name in setup.PRESETS.values() for path in (self.home/'.agent-presets'/name).iterdir()}
+        foreign=self.target.parent/'foreign.yml';foreign.write_bytes(b'foreign unchanged\n')
+        (self.source/'apps/browser/plugin/dist/index.js').write_bytes(b'// synthetic replacement\n')
+        checked=self.check();write=setup.atomic;failed=False;problem=RuntimeError('synthetic preset write failure')
+        def refuse_once(path,value):
+            nonlocal failed
+            if path.parent.parent==self.home/'.agent-presets' and not failed:
+                failed=True;raise problem
+            return write(path,value)
+        with patch.object(setup,'atomic',refuse_once),self.assertRaises(RuntimeError) as failure:
+            self.integration.install(checked['token'])
+        self.assertIs(failure.exception,problem)
+        self.assertEqual((self.target/'browser/dist/index.js').read_bytes(),original_plugin)
+        self.assertEqual(self.ownership.read_bytes(),original_owned)
+        self.assertEqual(patch_path.read_bytes(),original_patch)
+        for path,contents in preset_files.items():self.assertEqual(path.read_bytes(),contents)
+        self.assertEqual(foreign.read_bytes(),b'foreign unchanged\n')
+        self.assertFalse(list(self.target.parent.glob('.augmentor-stage-*')))
+        self.assertFalse(list(self.target.parent.glob('augmentor-product.before-*')))
 
     def test_current_normal_install_is_accepted_without_writing_or_dispatching(self):
         before=self.snapshot()

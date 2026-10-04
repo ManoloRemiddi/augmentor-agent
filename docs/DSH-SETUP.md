@@ -67,6 +67,23 @@ installation, stale owned versions/content, missing or duplicated ownership,
 source changes, unchanged live identity requirements and read-only checking.
 No product-version upgrade or rollback execution is claimed by these tests.
 
+The October 4 staged-integration attempt exposed a separate failure in the
+historical published setup: its container's layered filesystem rejected an old
+directory rename with `EXDEV`, then error handling tried to restore a backup that
+had never been created and skipped temporary-stage cleanup. Maintained source now
+records a backup only after its rename succeeds, attempts stage cleanup separately
+from restoration, and preserves the original error with restoration/cleanup
+diagnostics. 25 focused setup tests pass, including synthetic rename, restoration
+and cleanup failures and normal rollback of owned plugin/preset content.
+
+[Linux's overlayfs documentation](https://docs.kernel.org/filesystems/overlayfs.html#renaming-directories)
+documents this lower/merged-directory rename restriction. The correction keeps
+that filesystem refusal explicit; it adds no copy-and-delete fallback and does
+not change published 0.2.13. The actual failed163 action remains pending and must
+not be replayed. A separate volume-backed synthetic home and freshly reviewed
+qualification scope are proposed for coherent published upgrade/rollback; no
+volume creation, installation or new integration run has occurred.
+
 DSH holds a runtime lifetime lease while this integration is loaded. Close DSH
 before package maintenance, even if its chats are idle. Reopen it afterwards and
 refresh/check the integration when Augmentor requests matching versions. An

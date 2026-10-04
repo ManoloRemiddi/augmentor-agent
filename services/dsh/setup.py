@@ -280,7 +280,9 @@ class Setup:
             for name in ('dsh-tools','schemastery'):link_directory(dependency/'@deepseek-ai'/name,Path(p['modules'])/'@deepseek-ai'/name)
             link_directory(dependency/'ws',ROOT/'node_modules/ws')
             if previous:
-                old_target=profile/('augmentor-product.before-'+uuid.uuid4().hex);target.rename(old_target)
+                backup_target=profile/('augmentor-product.before-'+uuid.uuid4().hex)
+                target.rename(backup_target)
+                old_target=backup_target
                 for old_path,value in old_presets.items():atomic(old_target/'presets'/old_path.parent.name/old_path.name,value)
             stage.rename(target);made.append(target)
             for surface,name in PRESETS.items():
@@ -304,13 +306,26 @@ class Setup:
             atomic(patch,text.replace(previous['patchEntry'],entry) if previous else text.rstrip()+'\n'+HEADER+entry+'\n')
             self.pending=None
             return {'installed':True,'restartRequired':True,'message':'Integration installed. Restart DSH, then check the connection again.'}
-        except Exception:
-            for path in reversed(made):shutil.rmtree(path) if path.is_dir() else path.unlink(missing_ok=True)
+        except Exception as error:
+            def restore(label,operation):
+                try:operation()
+                except Exception as secondary:
+                    error.add_note(label+' failed: '+type(secondary).__name__+': '+str(secondary))
+                    return False
+                return True
+            for path in reversed(made):
+                restore('Removing new integration path',lambda path=path:shutil.rmtree(path) if path.is_dir() else path.unlink(missing_ok=True))
             if old_target:
-                old_target.rename(target)
-                for path,value in old_presets.items():atomic(path,value)
-            if stage.exists():shutil.rmtree(stage)
+                if restore('Restoring previous integration',lambda:old_target.rename(target)):
+                    for path,value in old_presets.items():restore('Restoring previous preset',lambda path=path,value=value:atomic(path,value))
             raise
+        finally:
+            original=sys.exc_info()[1]
+            try:
+                if stage.exists():shutil.rmtree(stage)
+            except Exception as cleanup_error:
+                if original is None:raise
+                original.add_note('Removing owned integration stage failed: '+type(cleanup_error).__name__+': '+str(cleanup_error))
     def save(self,token,managed=None):
         p=self.checked(token)
         if not p['installed']:raise ValueError('Install the integration and check the running DSH host before saving.')
