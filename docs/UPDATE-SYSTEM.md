@@ -1777,6 +1777,21 @@ scope against a real retained peer; it does not launch a second Windows login.
 No microphone, model download, actual Handy component or signed forward N→N+1
 installation is exercised by these new cases. Native results are pending here.
 
+The broader local updater suite passes 258 cases (six explicit platform skips),
+existing dictation passes fourteen and Windows preparation passes seven. The
+first invocation used system Qt without QtTest and failed that import; rerunning
+in the isolated environment with the repository-pinned complete Qt essentials
+passes. No system Python or operating-system package was changed.
+
+The full actual Inno fixture now also keeps an installed disabled broker alive,
+proves an accepted microphone owner defers the real coordinator without clearing
+the owner, records actual dictation drain/exit before replacement, verifies that
+the installed target broker refuses the retained pending transaction, then
+requires a new ready broker after live independent completion and unchanged saved
+dictation preferences. Its final graph drain includes that reopened broker. This
+remains same-build repair with a synthetic unsigned catalog, not signed forward
+acceptance. The two-CPU full installation run is pending for this extension.
+
 All public signing/feed/automatic-install/distribution flags remain false. The
 remaining package/global-user, shared Mac/Companion, SDK owner teardown,
 interrupted recovery/retention, actual desktop/DSH, signed forward and legacy bridge

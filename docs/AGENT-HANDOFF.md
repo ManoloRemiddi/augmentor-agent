@@ -20,6 +20,16 @@ feed or automatic-install flag was enabled, and no owner install/profile/model/G
 was changed. The complete cross-platform goal remains active; this is one remaining
 runtime participant, not production automatic-update qualification.
 
+Implementation source `eddaf37` is pushed. Host updater tests pass 258 (six explicit
+platform skips), existing dictation fourteen and Windows preparation seven; the
+system QtTest import gap was repaired only in the isolated test environment.
+Native desktop run
+[37169461358](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37169461358)
+is in progress; x64 has passed, ARM64 is qualifying the final native launcher.
+The follow-up full Inno fixture now keeps a real installed broker across busy
+deferral, drain, pending-start refusal and verified reopening; full results remain
+pending, and its same-build synthetic catalog does not prove signed forward updates.
+
 ## Corrected native Linux checkpoint — October 4, full goal still active
 
 Source `0bc9639` is committed/pushed. Focused native

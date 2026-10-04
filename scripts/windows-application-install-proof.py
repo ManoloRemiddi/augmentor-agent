@@ -41,7 +41,10 @@ def main():
     sentinel_bytes = sentinel.read_bytes()
     registry = 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\'+report['applicationId']+'_is1'
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
-    child = None; removal = None; stages = [];live_observer=None;coordinator=None
+    child = None; removal = None; stages = [];live_observer=None;coordinator=None;broker_child=None;observed_broker=None
+    dictation_state=private_directory(data/'dictation')
+    previous_environment={key:os.environ.get(key) for key in ('AUGMENTOR_DICTATION_STATE','XDG_RUNTIME_DIR')}
+    os.environ.update(AUGMENTOR_DICTATION_STATE=str(dictation_state),XDG_RUNTIME_DIR=str(private_directory(data/'run')))
     def run(command, *, success=True, timeout=900):
         argv = list(map(str,command))
         process = OwnedProcess(argv, stdin=subprocess.DEVNULL)
@@ -218,6 +221,32 @@ def main():
         # Exercise the exact installer-created command without a command shell.
         subprocess.run(startup_command,check=True,timeout=30)
         child=open_preview();ready()
+        from augmentor_linux import dictation
+        from lifecycle.windows_dictation import discover_dictation
+        # Observe only this compiled-in fixture's broker; a new interpreter is
+        # launched only if no private registration already exists.
+        brokers=discover_dictation(install/'current',data/'run')
+        if not brokers:
+            broker_child=subprocess.Popen([str(install/'current/python/python.exe'),'-I','-Xutf8','-B',
+                str(install/'current/services/dictation/server.py')],stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+            deadline=time.monotonic()+30
+            while not brokers:
+                if broker_child.poll() is not None and broker_child.returncode!=0:
+                    raise AssertionError(broker_child.stderr.read().decode('utf-8','replace'))
+                try:brokers=discover_dictation(install/'current',data/'run')
+                except FileNotFoundError:brokers=[]
+                if time.monotonic()>=deadline:raise AssertionError('The actual installed private broker did not register.')
+                time.sleep(.05)
+        assert len(brokers)==1
+        observed_broker=brokers[0]
+        deadline=time.monotonic()+30
+        while not observed_broker.exchange(json.dumps({'protocol':'augmentor-dictation-maintenance/1','kind':'describe'}))['ready']:
+            if time.monotonic()>=deadline:raise AssertionError('The installed dictation endpoint did not become ready.')
+            time.sleep(.05)
+        assert dictation.request('status',start=False)['enabled'] is False
+        broker_preferences=(dictation_state/'preferences.json').read_bytes() if (dictation_state/'preferences.json').exists() else None
+        stages.append('actual-installed-disabled-broker-observed-and-installation-leased')
         from lifecycle.observer_runtime import verify_observer_runtime
         from lifecycle.windows_installer_process import InstallerProcess
         from lifecycle.windows_update_observer import ObservationServer
@@ -241,6 +270,23 @@ def main():
         assert sentinel.read_bytes()==sentinel_bytes
         command('ui-test:'+json.dumps({'action':'draft','expected':'Preserve this deferred update draft','text':''}))
         stages.append('live-busy-update-deferral-with-cancelled-reservations-and-draft-preserved')
+        # With the surface idle, an accepted microphone owner must independently
+        # defer the full updater, retaining both broker and original owner token.
+        dictation.request('conversation.acquire',{'token':'b'*32,'pid':os.getpid()},start=False)
+        with ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size) as deferred:
+            with InstallerProcess(staged_observer/'python/python.exe',python_digest,
+                ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
+                 '--root',str(install/'current'),'--data',str(data),'--installer',str(artifact),
+                 '--sha256',report['sha256'],'--expect-deferred',*deferred.arguments()],
+                    qualification_outer_job=True,allow_child_breakaway=True) as busy_worker:
+                deferred.bind(busy_worker);assert deferred.receive(timeout=120) is None
+                deferred.verify_deferred(transaction,source_identity,source_identity)
+        assert not (transaction/'active.json').exists() and not observed_broker.exited()
+        try:dictation.request('conversation.acquire',{'token':'c'*32,'pid':os.getpid()},start=False)
+        except RuntimeError:pass
+        else:raise AssertionError('A deferred update released the accepted microphone owner.')
+        dictation.request('conversation.release',{'token':'b'*32},start=False)
+        stages.append('actual-installed-broker-owner-defers-whole-installer-with-capture-preserved')
         live_observer=ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size)
         coordinator=InstallerProcess(staged_observer/'python/python.exe',python_digest,
             ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
@@ -259,12 +305,21 @@ def main():
         assert child.wait(timeout=10)==0;child=None
         journal=read_json(transaction/'active.json')
         assert journal['phase']=='apply-acknowledged'
-        assert {'WindowParticipant','OwnerParticipant'} <= {step['kind'] for step in journal['steps']}, journal['steps']
+        assert {'WindowParticipant','DictationParticipant','OwnerParticipant'} <= {step['kind'] for step in journal['steps']}, journal['steps']
+        assert observed_broker.exited(timeout=10)
+        if broker_child is not None:assert broker_child.wait(timeout=10)==0
+        original_broker_pid=observed_broker.pid;observed_broker.close();observed_broker=None
+        assert live_observer.reopen_plan['hadDictation'] is True
         assert journal['steps'][-1]['kind']=='OwnerParticipant' and journal['steps'][-1]['phase']=='exited'
         stages.append('full-graph-apply-with-separate-live-observer-and-whole-setup-job-exit')
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
         assert sentinel.read_bytes()==sentinel_bytes
         pending_bytes=(transaction/'active.json').read_bytes()
+        blocked=subprocess.run([str(install/'current/python/python.exe'),'-I','-Xutf8','-B',
+            str(install/'current/services/dictation/server.py')],stdin=subprocess.DEVNULL,capture_output=True,timeout=15)
+        assert blocked.returncode!=0 and b'unfinished Augmentor update' in blocked.stderr,blocked.stderr[-4096:]
+        assert (transaction/'active.json').read_bytes()==pending_bytes
+        stages.append('actual-target-broker-refuses-unfinished-transaction-with-record-preserved')
         backups=list((data/'payload-backups').iterdir())
         assert len(backups)==1
         placement=backups[0];intent=read_json(placement/'intent.json')
@@ -345,7 +400,16 @@ def main():
         stages.append('live-independent-target-inventory-health-and-exact-build-completion')
         from updates.windows_reopen import reopen_windows
         reopened=reopen_windows(live_observer,install/'current',data,candidate,completion,qualification=True)
-        assert reopened=={'instances':['main'],'browserReloadRequired':False}, reopened
+        assert reopened=={'instances':['main'],'browserReloadRequired':False,'dictationReopened':True}, reopened
+        brokers=discover_dictation(install/'current',data/'run')
+        try:
+            assert len(brokers)==1 and brokers[0].pid!=original_broker_pid
+            assert brokers[0].initial['ready'] and brokers[0].control('status')['phase']=='ready'
+        finally:
+            for broker in brokers:broker.close()
+        assert dictation.request('status',start=False)['enabled'] is False
+        assert ((dictation_state/'preferences.json').read_bytes() if (dictation_state/'preferences.json').exists() else None)==broker_preferences
+        stages.append('actual-completed-target-broker-reopened-with-new-peer-and-settings-preserved')
         ready();close_preview()
         # Close the newly restored idle owner normally before the later damage
         # fixture. These are live reservations, never saved commands or PIDs.
@@ -474,6 +538,19 @@ def main():
     finally:
         if live_observer is not None:live_observer.close()
         if coordinator is not None:coordinator.close()
+        if observed_broker is not None:observed_broker.close()
+        try:
+            from augmentor_linux import dictation
+            dictation.request('conversation.release',{'token':'b'*32},start=False)
+            dictation.request('shutdown',start=False)
+        except (RuntimeError,OSError,TimeoutError):pass
+        if broker_child is not None:
+            try:broker_child.wait(timeout=10)
+            except subprocess.TimeoutExpired:pass  # Retain uncertain fixture work; no force shutdown.
+            if broker_child.stderr is not None:broker_child.stderr.close()
+        for key,value in previous_environment.items():
+            if value is None:os.environ.pop(key,None)
+            else:os.environ[key]=value
         # Only this disposable preview may be closed on failure. Never clean a
         # personal app or force-stop a test whose accepted work is unknown.
         if child is not None and child.poll() is None:
