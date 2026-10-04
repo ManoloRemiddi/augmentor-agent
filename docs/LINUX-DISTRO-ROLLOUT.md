@@ -38,8 +38,12 @@ preservation passes. A separate read-only diagnosis confirms rpm cannot open
 the inherited working directory as the ordinary user. A fresh attempt changes
 only the child working directory to that user's HOME. Package verification then
 passes and normal setup enters, but exits1 because npm is absent. Full ending
-preservation and the independent ending pass. Complete-installer dependencies
-and partial setup state are under review; managed stage/activation have not run.
+preservation and the independent ending pass. A separate read-only inspection
+confirms the fixture skipped declared complete-setup dependencies: npm,
+python3-pip and portaudio are absent. A matching preparing receipt and staged
+DSH lock/plugins remain, with no settings/selector/history. The supported normal
+resume is held for an authenticated dependency transaction; managed stage and
+activation have not run.
 GUI input acceptance still requires a genuine unlocked session; no lock-policy
 change, forced daemon stop or package replay occurred.
 
@@ -62,10 +66,14 @@ The first raw export exits0 and produces a12.16GB archive. A separate linear
 read verifies all130422 entries, content hashes, ownership, permissions, links
 and hardlink classes; scalar verification refuses fractional-second timestamp
 loss in30253 entries. The tested [Docker export source](https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/vendor/github.com/moby/go-archive/archive.go#L236-L254)
-explicitly truncates modification time to whole seconds; the narrow transport
-contract is under review. The original
-failed export record remains intact; no process interruption or second copy
-occurred. A clean d6 Noble diagnostic candidate now passes all five dependency,
+explicitly truncates modification time to whole seconds. A separate narrow
+continuation now passes: every timestamp equals exact source time truncated to
+seconds, every other portable field matches, both source trees stay byte-exact,
+and all 72 native members authenticate from the two archives. The first archive
+was reused; one second-tree copy exits0. Original nanosecond metadata is retained
+separately; restoration and normal replacement remain open. The original failed
+export record stays intact and no process interruption occurred. A clean d6
+Noble diagnostic candidate now passes all five dependency,
 source-check, build, package and artifact-review commands. A separate read-only
 completion audit binds the actual outputs after the runner's receipt filename
 collisions. The original failures remain intact; no completed command was
