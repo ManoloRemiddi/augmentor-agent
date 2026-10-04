@@ -45,8 +45,12 @@ DSH lock/plugins remain, with no settings/selector/history. The supported normal
 resume is held for an authenticated dependency transaction. A separate normal
 six-primitive preview selects only 19 additions, including the default npm
 command, with no upgrade/removal. All 19 archives pass actual Fedora signature,
-hash/size/identity checks. Installation, managed stage and activation have not
-run.
+hash/size/identity checks. The final fixed preview passes with 19 local additions
+and zero downloads. One installation exits zero and reports all 19 installed,
+but its original ending check refuses. The signed jack package reports creating
+its declared system group. Exact group changes and the full
+installed inventory are under separate read-only verification; no package
+reinstallation or SDK resume has followed. Managed activation remains open.
 GUI input acceptance still requires a genuine unlocked session; no lock-policy
 change, forced daemon stop or package replay occurred.
 
@@ -63,8 +67,15 @@ commands exist ([CMake source](https://github.com/Kitware/CMake/blob/v3.28.3/Sou
 A narrow separate post-build continuation passes12 focused checks and actual
 admission/collection. It stages all72 expected native members, retains24 Ninja
 build directories and146 original notice files. The original full build tree
-stays byte-exact; no compiler rerun or original-record rewrite occurred. Full
-object/source/notice attribution and recipient replacement remain open.
+stays byte-exact; no compiler rerun or original-record rewrite occurred. A
+read-only graph now resolves all 72 linker targets and 1770 direct object/source
+occurrences, including 235 generated translation units. It authenticates all
+146 notices. A separate finite comparison now reproduces all 72 installed
+ELFs byte-for-byte from the linker artifacts using only each authenticated CMake
+install script's recorded RPATH change. The [pinned CMake source](https://github.com/Kitware/CMake/blob/v3.28.3/Source/cmSystemTools.cxx#L2703-L2716)
+uses the observed null-padded replacement. Generated inputs, transitive
+dependencies and file-level notice attribution remain open, as does actual
+recipient replacement.
 The first raw export exits0 and produces a12.16GB archive. A separate linear
 read verifies all130422 entries, content hashes, ownership, permissions, links
 and hardlink classes; scalar verification refuses fractional-second timestamp
@@ -89,7 +100,16 @@ installed; marked-runtime replacement remains open. A fresh offline APT
 admission now passes against authenticated retained metadata: 611 repository
 additions plus two application packages, zero upgrades/removals, all original
 410 compiler package versions preserved. The exact six complete-setup primitives
-are included. Signed dependency acquisition precedes native installation.
+are included. All 611 downloads pass independent size/hash checks. The first
+offline installation refuses before any native package action: 34 repository
+filenames differ from APT cache names for epoch-bearing package versions. The
+authenticated Ubuntu APT2.8.3 source confirms the naming rule and pre-install
+refusal. The original failed run and independent ending stay intact; a separate
+naming-only installation reuses the same signed bytes. It resolves the cache
+problem and begins native installation, then exits100 on a relative pathname for
+one local Augmentor package. Its failed container and logs remain retained; no
+installed image or qualified runtime resulted. The local-package path is under
+separate diagnosis. Normal replacement entrypoints remain open.
 [Hosted validation37219196306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37219196306)
 passes all11 jobs atd6c2d3c. Physical audio, licensing and the unwaived GitGuardian
 gate remain open. No public release is qualified.

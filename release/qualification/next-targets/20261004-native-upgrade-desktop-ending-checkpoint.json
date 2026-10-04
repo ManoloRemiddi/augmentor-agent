@@ -122,14 +122,22 @@
     "completeInstallerDependencyDiagnosisReceiptSha256": "6ecb1db9c3ff43da9803c17cb42ac9c5f8734a0bd6475000e82bbf13d74a07f6",
     "partialSetupState": "MATCHING_PREPARING_NORMAL_RESUME_SUPPORTED",
     "partialSetupReceiptSha256": "92495c75857f76821fb054fc6f150cc51384fb846df1b41684132beaae81731d",
-    "completeSetupDependenciesInstalled": false,
+    "completeSetupDependenciesInstalled": true,
     "completeSetupDependencyPreview": "PASS_NORMAL_SIX_PRIMITIVE_PLAN",
     "proposedCompleteSetupDependencyAdditions": 19,
     "proposedCompleteSetupDependencyRemovals": 0,
     "proposedCompleteSetupDependencyUpgrades": 0,
     "authenticatedCompleteSetupDependencyArchives": 19,
     "authenticatedCompleteSetupDependencyArchiveBytes": 42663494,
-    "completeSetupDependencyAuthenticationReceiptSha256": "93c5f73b6289757bb70baee7ecacaf888cf596f660a201c1ffc3feff4250106b"
+    "completeSetupDependencyAuthenticationReceiptSha256": "93c5f73b6289757bb70baee7ecacaf888cf596f660a201c1ffc3feff4250106b",
+    "completeSetupDependencyFixedPreview": "PASS_LOCAL_19_ZERO_DOWNLOADS",
+    "completeSetupDependencyFixedPreviewReceiptSha256": "d475a24818dde25dfce685f1aebd75b609c56fbb6b1fe11a39f3371c57d6b4bb",
+    "completeSetupDependencyInstall": "KNOWN_DNF_EXIT_ZERO_ORIGINAL_ENDING_REFUSED_ACCOUNT_STATE",
+    "completeSetupDependencyInstallExitCode": 0,
+    "completeSetupDependencyInstallReceiptSha256": "daf6f1d422a5dc830d4e64c55741d535060de9c388114a1a2570bdd6694b428a",
+    "originalDependencyInstallEndingFailurePreserved": true,
+    "dependencyInstallEndingDiagnosis": "IN_PROGRESS_EXACT_SIGNED_PACKAGE_GROUP_DELTA",
+    "completeSetupDependenciesIndependentVerification": "OPEN"
   },
   "gnome50": {
     "nativeProtectedCacheExtensionAndPointersAudit": "PASS",
@@ -264,7 +272,29 @@
     },
     "hostDerivedSourceIdentityRestored": false,
     "recipientPrefixesCreated": false,
-    "secondRawArchiveBytes": 192485888
+    "secondRawArchiveBytes": 192485888,
+    "directLinkerSourceMapping": {
+      "status": "PASS_DIRECT_EXPLICIT_OBJECTS_ONLY",
+      "receiptSha256": "89518afa677a842b08e88cc8a9b3b43ce71588cae3f6907c494b702409e90da8",
+      "linkerTargets": 72,
+      "authenticatedDirectObjectOccurrences": 1770,
+      "distinctCompiledSourcePaths": 1768,
+      "generatedObjectOccurrences": 235,
+      "authenticatedOriginalNotices": 146,
+      "fullGeneratedTransformNoticeClosure": "OPEN",
+      "normalReplacementEntrypointsQualified": false,
+      "licenseReviewComplete": false
+    },
+    "installedElfTransformation": {
+      "status": "PASS_EXACT_RPATH_ONLY_ALL_72",
+      "reviewReceiptSha256": "d1de0ca5444f5bf6afcddc44b44fbc1e37d499d591aa99cef96e14c5b6ce98e1",
+      "actualMapSha256": "f823411a1094472eaef4ab949367dec7766a2755c6a0c8f06cf72fa94edc4a40",
+      "matchingAuthenticatedInstallScripts": 72,
+      "compilerReplayed": false,
+      "compiledCodeExecuted": false,
+      "generatedTransitiveAndNoticeClosure": "OPEN",
+      "licenseReviewComplete": false
+    }
   },
   "hostedValidation": {
     "sourceRevision": "d6c2d3ca64e3d3950a05386d12e5a3fb95f764b6",
@@ -300,6 +330,22 @@
     "proposedRemovals": 0,
     "proposedUpgrades": 0,
     "completeSetupDependenciesIncluded": true,
-    "repositoryDependenciesInstalled": false
+    "repositoryDependenciesInstalled": false,
+    "repositoryDependencyAcquisition": "PASS_ALL_611_SIZE_SHA",
+    "repositoryDependencyAcquisitionReceiptSha256": "2acf2c766061973d6f7dcde2bf55e233d35d36823d3d1472fa7dd315c7e3a652",
+    "repositoryDependencyArchiveBytes": 227112976,
+    "originalOfflineInstall": "KNOWN_EXIT100_BEFORE_NATIVE_INSTALL",
+    "originalOfflineInstallReceiptSha256": "670a83dbb6c169b49af437507c74d82056c34ba3e55413be791e6610c3afda02",
+    "failedInstallIndependentEndingReceiptSha256": "002cdaaac7f6bd5340c91e08157b457fb30c136456172eb4dab609f0f5f86325",
+    "aptCacheEpochFilenameCorrections": 34,
+    "namingOnlyOfflineInstallation": "KNOWN_EXIT100_AFTER_NATIVE_BEGIN_LOCAL_APPLICATION_RELATIVE_PATH",
+    "originalFailedInstallPreserved": true,
+    "namingOnlyOfflineInstallationReceiptSha256": "9d1544ade2a9b2d640a5686367b9e4c67b19ba21d6be11b77d9749b39c6b78e7",
+    "namingOnlyNativePackageActionsBegan": true,
+    "namingOnlyInstalledImageProduced": false,
+    "localApplicationPathDiagnosis": "CONFIRMED_APT_CACHED_ARCHIVE_ABSOLUTE_STORE_FILENAME",
+    "namingOnlyUnknownOutcome": false,
+    "localApplicationPathCorrection": "IN_PROGRESS_EXACT_TWO_APPLICATION_DEBS_IN_ABSOLUTE_APT_CACHE",
+    "firstPartialFailureBaseReused": false
   }
 }
