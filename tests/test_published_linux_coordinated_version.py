@@ -190,7 +190,10 @@ class RealProfileTests(unittest.TestCase):
         with self.assertRaises(ValueError):module.integration_preserved(self.before,module.integration_snapshot(self.home,'0.2.13',self.app))
 
     def test_foreign_directory_permission_change_refuses(self):
-        self.upgrade();(self.presets/'foreign').chmod(0o700)
+        self.upgrade()
+        # A private077 umask already creates0700 directories. Change the
+        # captured mode instead of assuming a particular inherited umask.
+        (self.presets/'foreign').chmod(self.before['presets']['foreign']['mode'] ^ 0o050)
         with self.assertRaises(ValueError):module.integration_preserved(self.before,module.integration_snapshot(self.home,'0.2.13',self.app))
 
     def test_old_owned_backup_tamper_refuses(self):
