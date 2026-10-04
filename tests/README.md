@@ -926,3 +926,9 @@ ELF handoff test also verifies production observer refusal before network/apply,
 then collection after actual exit without changing the selected source. No model,
 installer or private user profile is exercised; Mac bundle signing/forward
 integration is a separate native qualification gate.
+
+The additional redirected-parent refusal case makes five retention cases. The
+fixture factory canonicalizes only macOS's own temporary-directory alias; the
+collector still refuses redirected inputs. Managed Linux x64/ARM64 builds now run
+all five retention, three copied-ELF handoff and two real signed-authority cases on
+the native host after locked Node dependencies are installed, before packaging.

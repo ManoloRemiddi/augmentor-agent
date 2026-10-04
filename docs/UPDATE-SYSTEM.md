@@ -2026,3 +2026,11 @@ a redirected parent and requires refusal with unchanged code. Both real TUF/sign
 authority bridge tests already pass on each Mac in the failed run; that is limited
 evidence and does not turn the overall run green. Fresh full Mac qualification is
 required after the fixture correction. No release/feed/eligibility changed.
+
+Managed Linux qualification additionally invokes the five native retention cases,
+three handoff cases (including actual copied ELF refusal/exit/collection), and two
+actual signed-authority cases after locked Node dependencies and before packaging.
+Both x64 and ARM64 use their native runner kernel/interpreter. The copied code is
+an isolated test fixture, not an actual automatic upgrade, and the signed payload
+is inert. This new pipeline step requires fresh execution; earlier bundle runs
+cannot be cited as evidence for these added native cases.
