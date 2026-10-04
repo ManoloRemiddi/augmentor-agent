@@ -102,8 +102,23 @@
     "normalLockPreservedBeforeAndAfter": true,
     "transactionPeersBeforeAndAfter": [],
     "independentHeadlessEndingKnown": true,
-    "ordinaryComplete": "RUNNING",
-    "earlierDependencyOnlyNativePackageCount": 1331
+    "ordinaryComplete": "FAILED_BEFORE_SETUP_ORDINARY_RPM_VERIFY",
+    "earlierDependencyOnlyNativePackageCount": 1331,
+    "ordinaryCompleteReceiptSha256": "04ae4dd84b34a1dcd76ca7d7e9682a9fb391df571e9996a3a0b33e9f51912f6c",
+    "ordinaryProofChildSeconds": 0.6697479510003177,
+    "ordinarySetupOrSdkDispatched": false,
+    "ordinaryFailureEndingPreservation": "PASS",
+    "ordinaryRpmVerifyDiagnosis": "CONFIRMED_INACCESSIBLE_INHERITED_WORKING_DIRECTORY",
+    "ordinaryRpmVerifyDiagnosisReceiptSha256": "95159d474338019377298b5ebaeef451621ec096652896199f49b17cf644a2bc",
+    "cwdFixedOrdinary": "PACKAGE_VERIFY_PASS_SETUP_ENTERED_MISSING_NPM",
+    "cwdFixedOrdinarySourceIndexSha256": "9240d443127b6f5d5b8e0da75e7494c92423ee6fd75a84b2c3acddfc10600d51",
+    "cwdFixedOrdinaryReceiptSha256": "fae23c443364327782fce6ec1a07c114448a42238fbe7b0e68dac67fc430a11f",
+    "cwdFixedOrdinaryChildSeconds": 48.41846067900042,
+    "cwdFixedOrdinaryEndingPreservation": "PASS",
+    "cwdFixedOrdinarySetupEntered": true,
+    "cwdFixedOrdinaryDshSdkCompleted": false,
+    "completeInstallerDependencyDiagnosis": "UNDER_REVIEW",
+    "managed205And206Dispatched": false
   },
   "gnome50": {
     "nativeProtectedCacheExtensionAndPointersAudit": "PASS",
@@ -190,7 +205,25 @@
     "originalBuildTreeBeforeAndAfter": "BYTE_EXACT",
     "compiledFileNoticeMappingComplete": false,
     "postBuildFocusedTestsPass": 12,
-    "originalMarkedBuildWrapperStatus": "FAILED_POST_BUILD_EVIDENCE"
+    "originalMarkedBuildWrapperStatus": "FAILED_POST_BUILD_EVIDENCE",
+    "rawExport": "FIRST_COPY_EXIT_ZERO_SCALAR_VERIFICATION_REFUSED",
+    "rawExportAdmissionReceiptSha256": "d2c3c87cf3cca1a482a0d3b8cc62c56e5b6cbec4dac477539ce9f5ef855252b8",
+    "rawExportSourceSha256": "d90044c7653c5db8e8456370470a8e0fac2b5a8b8d10a50b2786aa5e387677a1",
+    "rawExportFocusedTestsPass": 9,
+    "rawExportReservedPeakBytes": 14535823077,
+    "rawExportReceiptSha256": "0d8e14df7e332b99e64c73ec4c06e4716240b4cf8a03c57068ca989203434663",
+    "firstRawArchiveSha256": "28a60ca6a89e514294fe7f264b2ced84b6a9e024599a4ac7cc57ddc2524acc10",
+    "firstRawArchiveBytes": 12159571456,
+    "firstRawArchiveMembers": 130422,
+    "firstRawArchiveMissingMembers": 0,
+    "firstRawArchiveExtraMembers": 0,
+    "firstRawArchiveHardlinkClasses": "PASS",
+    "firstRawArchiveScalarMismatchFields": {
+      "mtimeNs": 30253
+    },
+    "firstRawArchiveReadOnlyDiffReceiptSha256": "ea7fe39ba607be44ed589502e2c33d1923d36632f6c06c08360f67a1a8a30fdf",
+    "firstRawExportProcessInterrupted": false,
+    "secondRawTreeCopied": false
   },
   "hostedValidation": {
     "sourceRevision": "d6c2d3ca64e3d3950a05386d12e5a3fb95f764b6",
@@ -199,5 +232,22 @@
     "status": "PASS",
     "successfulJobs": 11,
     "remainingGitGuardianUnwaived": true
+  },
+  "currentNobleDiagnosticCandidate": {
+    "sourceRevision": "d6c2d3ca64e3d3950a05386d12e5a3fb95f764b6",
+    "originalBuild": "FAILED_BEFORE_NPM_CONFIG_RESOLUTION",
+    "originalFailureReceiptSha256": "bba26003caf844b509ee93c5449ac83125761379374c3c48942cfc961475efa4",
+    "correctedBuild": "ALL_FIVE_COMMANDS_PASS_SEPARATE_READONLY_COMPLETION_AUDIT",
+    "correctedPlanSha256": "3690891bb7fe2e0df57d233c475acd6ba614b20b3b93d4ad34502e21acf612b0",
+    "correction": "Distinct empty private user and global npm config files; original failure retained.",
+    "candidateOnly": true,
+    "installed": false,
+    "completionReadOnlyAuditReceiptSha256": "25453a5c2520d37597674c8f8f532c8fa817fc06fd5640a27210dbe1dbe28575",
+    "artifactReviewReceiptSha256": "31f9b96cb86273a0be43fb37f89349d26f7832c1dd3589caa5624b24de613bbd",
+    "runtimeDebSha256": "a29ac544f2984071e0f3193812fd9938d2d7e970ac864d02271e5d35a9716304",
+    "desktopDebSha256": "28b54e3c49c6d54cbbbcf0ce84a5a16eeb0b179452c94d1fe182998d48bcffd9",
+    "originalRunnerFileNamingFailuresPreserved": true,
+    "completedCommandsReplayed": false,
+    "markedExportUsed": false
   }
 }

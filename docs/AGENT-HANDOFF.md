@@ -32,7 +32,14 @@ idle locking. Source review confirms the ordinary proof uses offscreen Qt and
 skips desktop startup, shortcuts and services. A separate headless read now
 passes exact native1356, HOME, cache, metadata, account, owners/runtime and
 empty peer checks before and after, preserving the actual locked state. Its
-independent ending also passes. The unchanged ordinary-user proof is running.
+independent ending also passes. The unchanged ordinary-user proof then refuses
+its ordinary-user rpm verification before setup or SDK work; full ending
+preservation passes. A separate read-only diagnosis confirms rpm cannot open
+the inherited working directory as the ordinary user. A fresh attempt changes
+only the child working directory to that user's HOME. Package verification then
+passes and normal setup enters, but exits1 because npm is absent. Full ending
+preservation and the independent ending pass. Complete-installer dependencies
+and partial setup state are under review; managed stage/activation have not run.
 GUI input acceptance still requires a genuine unlocked session; no lock-policy
 change, forced daemon stop or package replay occurred.
 
@@ -50,8 +57,20 @@ A narrow separate post-build continuation passes12 focused checks and actual
 admission/collection. It stages all72 expected native members, retains24 Ninja
 build directories and146 original notice files. The original full build tree
 stays byte-exact; no compiler rerun or original-record rewrite occurred. Full
-object/source/notice attribution, raw export and recipient replacement remain
-open.
+object/source/notice attribution and recipient replacement remain open.
+The first raw export exits0 and produces a12.16GB archive. A separate linear
+read verifies all130422 entries, content hashes, ownership, permissions, links
+and hardlink classes; scalar verification refuses fractional-second timestamp
+loss in30253 entries. The tested [Docker export source](https://github.com/moby/moby/blob/8af9fe3a36bab3e039862a2ab1cef1880c9b4d03/vendor/github.com/moby/go-archive/archive.go#L236-L254)
+explicitly truncates modification time to whole seconds; the narrow transport
+contract is under review. The original
+failed export record remains intact; no process interruption or second copy
+occurred. A clean d6 Noble diagnostic candidate now passes all five dependency,
+source-check, build, package and artifact-review commands. A separate read-only
+completion audit binds the actual outputs after the runner's receipt filename
+collisions. The original failures remain intact; no completed command was
+repeated. This candidate uses the existing official Qt runtime and has not been
+installed; marked-runtime replacement remains open.
 [Hosted validation37219196306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37219196306)
 passes all11 jobs atd6c2d3c. Physical audio, licensing and the unwaived GitGuardian
 gate remain open. No public release is qualified.
