@@ -4,6 +4,17 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+Source `d0fad01` is committed/pushed for this broker checkpoint. Local actual
+Handy maintenance passes with isolated display/D-Bus/state and no microphone/model
+work; the final real-broker case also proves other-session refusal, startup-writer
+exclusion and immutable source bytes across reopening. Full shared/Linux CI is
+running in [37165335018](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165335018),
+including x64/ARM64 Handy, actual native broker admission and complete bundles.
+Mac 14/26 qualification is running in
+[37165336524](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165336524).
+Handy Mac/Windows also run the actual native CAS/broker proof. Preserve those live
+runs; no CI success or installed/signed-forward update is claimed yet.
+
 ## Dictation participation in automatic updates — October 4, in progress
 
 The persistent broker now exposes a private same-user Unix maintenance endpoint
