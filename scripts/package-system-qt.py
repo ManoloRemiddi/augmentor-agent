@@ -243,7 +243,7 @@ def prepare(debian, wheelhouse, out, target, release=1):
             raise ValueError('Input payload identity differs or already declares a Python runtime.')
         if (payload/'usr/share/augmentor/desktop-version').read_text().strip() != version:
             raise ValueError('Desktop/runtime package versions differ.')
-        for file in ('scripts/linux-python-runtime.py', 'scripts/linux-system-qt.py', 'scripts/run-component.py', 'services/lifecycle/lease.py'):
+        for file in ('scripts/linux-python-runtime.py', 'scripts/linux-recipient-runtime.py', 'scripts/linux-system-qt.py', 'scripts/run-component.py', 'services/lifecycle/lease.py'):
             if digest(app/file) != digest(ROOT/file):
                 raise ValueError('Rebuild the payload with the current runtime/lifecycle adapter: '+file)
         product.update(target=target, pythonRuntime=contract, candidateOnly=True)

@@ -400,7 +400,7 @@ def runtime_store():
     return data/'augmentor/python-runtimes'
 
 
-def resolve(app, python=None):
+def resolve_official(app, python=None):
     """Validate a declared runtime without preparing or changing selection."""
     app = Path(app).absolute()
     marker = app/POLICY_FILE
@@ -422,31 +422,59 @@ def resolve(app, python=None):
     return str(chosen)
 
 
-def environment(app, python=None, inherited=None):
-    """Verify the selected runtime and return the environment for its next exec."""
-    chosen = resolve(app, python)
+def launch(app, python=None, inherited=None):
+    """Resolve the executable and environment together before Python or Node exec."""
     env = dict(os.environ if inherited is None else inherited)
-    marker = Path(app)/POLICY_FILE
-    if marker.exists():
-        value = policy(marker)
-        env['AUGMENTOR_PYTHON'] = chosen
-        if value['profile'] in SOURCE_PROFILES:
-            env = source_qt().environment(Path(chosen).parent.parent, env)
-    return env
+    data = Path(env.get('XDG_DATA_HOME', str(Path(env.get('HOME', str(Path.home())))/'.local/share')))
+    selection = data/'augmentor/recipient-runtimes'/('selection-'+hashlib.sha256(str(Path(app).absolute()).encode()).hexdigest()+'.json')
+    if not os.path.lexists(selection):
+        chosen = resolve_official(app, python)
+        for name in ('AUGMENTOR_RECIPIENT_RECEIPT','AUGMENTOR_RECIPIENT_RECEIPT_SHA256',
+                     'AUGMENTOR_RECIPIENT_SELECTION_SHA256','AUGMENTOR_OFFICIAL_PYTHON'):
+            env.pop(name, None)
+        marker = Path(app)/POLICY_FILE
+        if marker.exists():
+            value = policy(marker); env['AUGMENTOR_PYTHON'] = chosen
+            if value['profile'] in SOURCE_PROFILES:
+                env = source_qt().environment(Path(chosen).parent.parent, env)
+        return chosen, env
+    spec = importlib.util.spec_from_file_location('linux_recipient_runtime', Path(__file__).with_name('linux-recipient-runtime.py'))
+    recipient = importlib.util.module_from_spec(spec); spec.loader.exec_module(recipient)
+    # Passing this module avoids an import cycle and preserves the official verifier.
+    import sys
+    module = sys.modules.get(__name__)
+    if module is None:
+        from types import SimpleNamespace
+        module = SimpleNamespace(**globals())
+    return recipient.launch(app, python, env, module)
+
+
+def resolve(app, python=None):
+    # Preparation/staging select the official base; recipient choice is private launch state.
+    return resolve_official(app, python)
+
+
+def environment(app, python=None, inherited=None):
+    return launch(app, python, inherited)[1]
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('download', 'prepare', 'verify', 'resolve'))
+    parser.add_argument('command', choices=('download', 'prepare', 'verify', 'resolve', 'exec'))
     parser.add_argument('--policy', type=Path)
     parser.add_argument('--wheelhouse', type=Path)
     parser.add_argument('--store', type=Path)
     parser.add_argument('--runtime', type=Path)
     parser.add_argument('--app-root', type=Path)
     parser.add_argument('--python', type=Path)
+    parser.add_argument('--exec-args', nargs=argparse.REMAINDER)
     args = parser.parse_args()
-    if args.command == 'resolve':
+    if args.command in ('resolve','exec'):
         if args.app_root is None:parser.error('--app-root is required')
+        if args.command == 'exec':
+            if not args.exec_args:parser.error('--exec-args is required')
+            chosen, env = launch(args.app_root, args.python or os.environ.get('AUGMENTOR_PYTHON'))
+            os.execve(chosen, [chosen,*args.exec_args], env)
         print(resolve(args.app_root, args.python or os.environ.get('AUGMENTOR_PYTHON')))
         return
     if args.policy is None:parser.error('--policy is required')

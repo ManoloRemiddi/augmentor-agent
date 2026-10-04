@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import time
 import uuid
@@ -80,10 +81,12 @@ def check(config, connected=False):
     env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'),
            'PYTHONDONTWRITEBYTECODE':'1', 'QT_QPA_PLATFORM':'offscreen',
            'AUGMENTOR_PI_NODE':config['node'], 'AUGMENTOR_PYTHON':config['python']}
-    if (root/'linux-python-runtime.json').exists() or (root/'linux-python-runtime.json').is_symlink():
+    if (sys.platform == 'linux' and (root/'scripts/linux-python-runtime.py').is_file()) or (root/'linux-python-runtime.json').exists() or (root/'linux-python-runtime.json').is_symlink():
         spec = importlib.util.spec_from_file_location('candidate_linux_python', root/'scripts/linux-python-runtime.py')
         runtime = importlib.util.module_from_spec(spec); spec.loader.exec_module(runtime)
-        env = runtime.environment(root, config['python'], env)
+        python, env = runtime.launch(root, config['python'], env)
+    else:
+        python = config['python']
     code = 'from augmentor_linux import window, controller\n'
     if connected and config.get('dshService'):
         # This reads the matching product identity and model catalog. No prompts,
@@ -94,7 +97,7 @@ def check(config, connected=False):
             code += ('if adapter.base != '+repr(config['dshEndpoint'])+' or str(adapter.home) != '+repr(config['dshHome'])+
                      ': raise RuntimeError("The runtime configuration changed; refresh the startup registry before staging.")\n')
         code += 'adapter.call("host.describe")\n'
-    result = subprocess.run([config['python'], '-c', code], cwd=root, env=env,
+    result = subprocess.run([python, '-c', code], cwd=root, env=env,
                             capture_output=True, text=True, timeout=60)
     if result.returncode:
         raise RuntimeError('Candidate import/connection check failed:\n'+result.stderr[-3000:])

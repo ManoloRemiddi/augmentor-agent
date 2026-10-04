@@ -162,7 +162,7 @@ class SourceQtTests(unittest.TestCase):
         vendor=runtime.policy(ROOT/'release/ubuntu24.04-python-voice.json')
         app=self.home/'app';app.mkdir();(app/runtime.POLICY_FILE).write_text(json.dumps(vendor))
         inherited={'LD_LIBRARY_PATH':'/owner/paths','QT_QPA_PLATFORM':'xcb'}
-        with patch.object(runtime,'resolve',return_value='/existing/bin/python3'):
+        with patch.object(runtime,'resolve_official',return_value='/existing/bin/python3'):
             env=runtime.environment(app,'/existing/bin/python3',inherited)
         for key,val in inherited.items():self.assertEqual(env[key],val)
         altered=copy.deepcopy(vendor);altered['sourceQt']=self.value['sourceQt']

@@ -4,6 +4,7 @@ import {createHash} from 'node:crypto';
 import {lstatSync,readFileSync,realpathSync} from 'node:fs';
 import {homedir,userInfo} from 'node:os';
 import {dirname,isAbsolute,join,resolve,basename} from 'node:path';
+import {selectedRecipientPython} from './recipient.js';
 
 type Wheel={name:string,version:string,file:string,sha256:string,bytes:number,source?:string,url?:string};
 type Policy={format:string,profile:string,target:string,python:string,pythonAbi:number[],architecture:string,systemSitePackages:boolean,wheels:Wheel[],sourceQt?:Record<string,unknown>,systemQtStack?:Record<string,unknown>,qualified?:boolean,licenseReviewComplete?:boolean,embeddedSourceCoverageComplete?:boolean};
@@ -39,8 +40,12 @@ export function pythonRuntimeIdentity(value:Policy):string {
   if(value.systemQtStack!==undefined)contract.systemQtStack=value.systemQtStack;
   return sha(pythonJson(contract));
 }
-export function declaredLinuxPython(app:string,env:NodeJS.ProcessEnv=process.env):string|undefined {
+export function declaredLinuxPython(app:string,env:NodeJS.ProcessEnv=process.env,officialOnly=false):string|undefined {
   if(process.platform!=='linux')return undefined;
+  if(!officialOnly){
+    const recipient=selectedRecipientPython(app,env,baseEnv=>declaredLinuxPython(app,baseEnv,true));
+    if(recipient)return recipient;
+  }
   const marker=join(resolve(app),'linux-python-runtime.json');
   let markerInfo;
   try{markerInfo=lstatSync(marker);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return undefined;throw error;}

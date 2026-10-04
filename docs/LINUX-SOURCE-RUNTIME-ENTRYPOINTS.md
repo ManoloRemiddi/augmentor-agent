@@ -201,3 +201,74 @@ Debian13, Ubuntu26.04 and Fedora43/44 each run787 native tests:785 pass and two
 Mac-only skips. The Node SDK suite runs517 cases:515 pass/two skips. These are
 configured hosted source checks; they do not replace the separate installed Noble
 fixture or establish its remaining native-session/product/license gates.
+
+## Explicit recipient runtime selection: source candidate
+
+The new [selection helper](../scripts/linux-recipient-runtime.py) is a source-only
+engineering candidate for the existing Noble and Mint source-Qt profiles. It
+does not change their official policy, wheel hashes, native manifest, preparation,
+staging or stored Desktop selection. With no explicit recipient selection,
+the original official verification applies. No modified Core, PySide or shiboken
+build or real product entrypoint has yet been qualified with this new path.
+
+An ordinary user can choose a separate private runtime at its final path:
+
+```sh
+/usr/bin/python3 /path/to/app/scripts/linux-recipient-runtime.py select \
+  --app-root /path/to/app --official-python /path/to/official-runtime/bin/python3 \
+  --recipient-root /path/to/separate-private-recipient-runtime
+```
+
+Selection intentionally executes the recipient's QtCore/PySide/shiboken version
+probe after checking its files. Choose only code you intend to run. The runtime
+must retain the official file/link set, interpreter links and every non-Qt/binding
+hash. Only existing `qt/`, `PySide6/`, `shiboken6/` and their exact versioned
+metadata-directory regular files may differ. The candidate must omit bytecode
+caches: `-B` prevents cache writes but does not prevent Python reading an existing
+unbound `.pyc`. Roots are private, user-owned ordinary directories; changed file
+types, special files, hardlinks and writable file/directory metadata refuse.
+
+The measured versions must remain Python3.12, Qt6.8.2, PySide6/shiboken6 6.8.2.1,
+with QtCore and both bindings originating in that recipient prefix. This is a
+finite compatibility gate; equal version strings do not establish that every
+possible modification preserves ABI or application behavior. Actual marked
+modified-library rebuilds and full Desktop/Browser acceptance remain required.
+
+The separate `augmentor-recipient-runtime.json` binds the application absolute
+root, exact `release.json` and Python policy bytes, official runtime receipt/hash
+and lock identity, recipient inventory, executable and versions. It preserves
+the official receipt and records recipient hashes independently. Normal native
+package/deployment identity and lifetime guards still apply; these application
+identity markers do not replace their full application inventory audit.
+
+An exclusive fsynced selection under
+`$XDG_DATA_HOME/augmentor/recipient-runtimes/selection-<app-path-sha256>.json`
+pins that receipt. Each actual application root has its own explicit selection;
+a native Browser root and a managed Desktop root require separate choices when
+their roots differ. Receipt or app updates are refused, never silently adopted.
+To retire a selection, including an app-stale selection, use:
+
+```sh
+/usr/bin/python3 /path/to/app/scripts/linux-recipient-runtime.py clear --app-root /path/to/app
+```
+
+Clearing removes only the private choice, preserving both runtimes. Selecting a
+new modified inventory requires a new recipient prefix/receipt. No user UI,
+models, settings, installed files or official artifact are rewritten by launch.
+
+The shared `launch()` returns executable and environment together. Desktop
+service/menu/shortcut launch, shell Desktop pre-exec, deployment import checks,
+native Browser's leased component wrapper and embedded Browser apply that pair
+before Python/Node starts. The component wrapper substitutes the verified
+recipient Python for an official Python command argument. Node's fast selector
+checks the exact selection/receipt/app/official-base identities and native paths;
+it refuses a direct Node launch lacking the cold verified environment. Full
+recipient byte validation and the bounded version probe occur in the Python
+pre-exec guard, with changed inventory refused before recipient code executes.
+
+Focused synthetic Python/Node cases cover fresh explicit choice, wrong versions,
+malformed/stale/changed receipts, selection changes during validation, non-Qt and
+link changes, unsafe metadata/cache bytes and actual shell launch routing. These
+are source tests, not modified-library or installed-product qualification. The
+[frozen 22-file license proposal](RECIPIENT-SOURCE-CONTROLS-LICENSE-PROPOSAL.md)
+and root LICENSE remain unchanged; no permission or legal acceptance is inferred.
