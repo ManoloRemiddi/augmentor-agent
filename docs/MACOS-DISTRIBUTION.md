@@ -14,6 +14,41 @@ The owner authorized implementation and isolated testing on the network Macs on
 product foundation. This work supersedes the old Mac packaging baseline for the
 files it changes; historical acceptance records remain evidence of their own builds.
 
+## Update coordination under implementation — October 3
+
+The per-user shortcut service now supports reversible maintenance reservations
+without changing saved keys or the LaunchAgent registration. Accepted saves and
+activations refuse preparation; a prepared service refuses new work, cancellation
+restores it, and acknowledged commit exits through normal helper cleanup. Eleven
+focused fixture tests pass; native Mac and complete update qualification remain
+required. Kernel peer/process observation is added separately. Read the
+[shared update checkpoint](UPDATE-SYSTEM.md#unix-coordination-checkpoint) before
+enabling any automatic installation flag. No installed Mac app is changed.
+
+New source adds startup exclusion to Desktop/helpers/SDK launches and holds native
+Mach-O installation/startup leases before Python initialization. Installed DSH and
+Browser expose private Unix control for the existing graceful maintenance protocol;
+Python discovers and reserves only exact-root/kernel-executable peers. Eight real
+Node graph/startup/exec cases pass locally. Mac 14/26 qualifies the preceding
+`9bce979` peer/shortcut checkpoint, not this newer native launcher. launchd pause,
+independent bundle replacement/health and reopen still need complete qualification.
+See [the current graph contract](UPDATE-SYSTEM.md#unix-startup-and-graph-preparation).
+
+Whole-bundle signature/content inspection and a final-lease, one-shot native
+replacement backend are now source-ready. The hosted payload proof retains the
+complete development bundle, refuses native signature damage and executes an
+isolated same-build shared-journal replacement with the old bundle/user sentinel
+preserved. Native execution is pending. This backend does not supply automatic
+publisher authority, target health/reopen or launchd recovery. Read the
+[Mac checkpoint](UPDATE-SYSTEM.md#mac-retained-bundle-and-native-apply-checkpoint).
+
+The target's fixed offline health action now renders the shared preview in an
+isolated temporary profile, observes actual successful probe exit, binds metadata
+identity and rechecks full bundle/signature integrity. Two portable report and two
+shared-render tests pass. Native execution is pending. It starts no user/model
+services and does not establish Cocoa permissions, provider readiness or normal
+reopening; see [health contract](UPDATE-SYSTEM.md#mac-offline-target-health).
+
 ## Delivery contract and sequencing
 
 ### September 26 publication audit
@@ -467,3 +502,23 @@ Work still required before public release:
 
 The build and runtime proofs reduce uncertainty without changing those release
 requirements. A screenshot or an ad-hoc signed ZIP is not a completed installer.
+
+
+The updater's persistent startup barrier and live target-completion path are
+specified in [the update guide](UPDATE-SYSTEM.md#unix-persistent-barrier-and-mac-completion).
+Native startup refuses an unfinished transaction before initializing Python;
+normal bundled launch paths also refuse it. Only independently verified completion
+archives the active record. This source addition is behind the existing disabled
+automatic qualification gates; native completion, signed forward upgrades and
+owned launchd/reopening remain separately required.
+
+
+The [retained update controller](UPDATE-SYSTEM.md#mac-retained-controller-checkpoint)
+now connects the shared controls to exact-source exec, bounded ZIP staging,
+normal graph shutdown, atomic replacement, offline health and observed captured
+instance reopening. Automatic eligibility currently requires a private per-user
+Applications/profile location. Shared/system and companion installations remain
+manual until their ownership/coordination is qualified. Existing login registrations
+and user profiles are preserved; no model/GPU setting is changed. Native controller
+acceptance, signed forward release, retention/recovery and publisher provisioning
+remain open; customer automatic flags/feed are disabled.

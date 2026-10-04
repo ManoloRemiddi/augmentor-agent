@@ -712,6 +712,260 @@ CPU, current animated palette, no tray and no standalone autostart. Source
 qualification, this installed composition and customer-release gates remain
 explicitly distinct. Documentation-only follow-ups retain tested source `81a2bba`.
 
+## Dictation participation in automatic updates — October 4, in progress
+
+The persistent broker now exposes a private same-user Unix maintenance endpoint
+bound to its actual interpreter/PID, installation root and current login/state
+scope. Startup exclusion covers publication of both control endpoints. Its
+installation lease lasts for the broker process, including disabled Handy.
+Unix preparation captures/reserves it after surface admission closes and drains
+it before downstream services. Another session/state/root is refused, preserving
+its work. Original captured broker presence is an optional boolean reopening
+field; no saved command, environment, path or PID can grant restart authority.
+
+Broker admission fences ordinary requests and external shortcut callbacks. Idle
+preparation acquires Handy's existing atomic microphone CAS without changing
+enablement, shortcut, model or palette. A live voice owner, recording,
+transcription, model operation/download or unknown model outcome defers. Download
+admission is tracked across the native asynchronous reply gap. Cancellation/expiry
+releases only the matching native token before restoring normal admission.
+An unknown native acquire/release retains closed admission and original evidence;
+late acquire requests carry a two-second native admission deadline. Commit is
+one-shot; owned native stdin closes only after idle reservation, child exit is
+observed without termination/kill escalation. A child shutdown timeout keeps the
+broker alive/closing and prevents apply.
+
+Linux/Mac reopening within the original verified completion starts only the fixed
+target broker once, checks the new actual socket process/readiness and unchanged
+target, then allows normal captured-window startup. This also restores an
+original broker without reopening an uncaptured window. A failed start is not
+retried or stopped; the installed target remains selected for manual reopening.
+Windows shares broker admission but still needs its broker discovery/startup/
+lifetime/reopening adapter before full parity. Old uncoordinated broker builds
+require manual bridge delivery; public automatic eligibility/feed remain false.
+
+Local evidence: ten broker cases pass, including an actual disabled broker,
+authenticated voice owner, kernel socket pidfd, busy cancellation, complete real
+graph drain and one-shot target process reopening in isolated state. Native
+recording/download/unknown cases use declared backend mocks. Existing fourteen
+dictation cases pass; combined host updater/dictation checks pass 261 total,
+258 passed/three OS skips in 8.044 seconds. Settings Qt cases are outside this
+host run. An actual copied Handy executable separately proves native-owner
+exclusion, CAS reservation, broker fencing, reversible cancellation, settings
+preservation and ordinary native child exit without audio capture/model download.
+Native CI and shipped-bundle/signed-forward acceptance remain pending; this is
+not qualification of an installed customer update.
+
+Source `d0fad01` is committed/pushed for this broker checkpoint. Local actual
+Handy maintenance passes with isolated display/D-Bus/state and no microphone/model
+work; the final real-broker case also proves other-session refusal, startup-writer
+exclusion and immutable source bytes across reopening. Full shared/Linux CI is
+running in [37165335018](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165335018),
+including x64/ARM64 Handy, actual native broker admission and complete bundles.
+Mac 14/26 qualification is running in
+[37165336524](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165336524).
+Handy Mac/Windows also run the actual native CAS/broker proof. Preserve those live
+runs; no CI success or installed/signed-forward update is claimed yet.
+
+Native run `d0fad01` passes actual Handy maintenance on Linux x64
+(job 111326987805), Linux ARM64 (111326987814) and Windows (111326987824), plus
+Linux owned-service and ten broker cases (111326987941) in 37165335018. Its Mac
+job 111326987806 and separate Mac dependency 111326969946 in 37165336524 fail
+on the first broker-to-Handy status request: cold native startup exceeds the
+ordinary 15-second RPC deadline. The existing component proof passes with its
+90-second startup allowance. Backend startup now uses that same bounded
+90-second allowance only for its first status; subsequent RPC limits/replay
+policy are unchanged. Both runs are terminal. Native Mac proof and skipped
+broader bundle jobs need qualification at corrected source.
+
+Corrected native source `69477f8` passes Handy lifecycle plus actual broker/CAS
+maintenance on Mac 14 (111327429133), Windows (111327429134), Linux ARM64
+(111327429137) and Linux x64 (111327429183), and actual owned Linux service plus
+broker graph checks (111327429178), in
+[37165487146](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165487146).
+Separate Mac Handy job 111327415330 also passes in
+[37165488998](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165488998).
+This supersedes the cold-handshake failure for native broker/CAS proof only.
+Debian/shared tests and complete Linux x64/ARM64 bundles remain live, as do full
+Mac 14/26 jobs 111327575462/111327575502. Do not restart or cancel those handles.
+Public flags/feed stay disabled and the complete cross-platform goal stays active.
+
+## Linux portal dependency closure — October 4, candidate
+
+This follow-up to `62c15cd` adds PyGObject **3.52.4** and Pycairo **1.28.0**
+to the exact standalone Python 3.12.13 runtime graph (24 packages). Official
+source archives and six isolated build tools are pinned by SHA-256. Native
+wheels are built outside the product runtime; their source/wheel identities,
+build-tool versions, build-lock digest and native library versions are retained
+in `licenses/linux-portal-build.json`. Build tools do not enter runtime inventory.
+The existing portal protocol is retained. Both CPU candidates now declare glibc
+2.39 and GLib/GIRepository 2.80; Ubuntu 24.04 and Debian 13 remain candidates,
+with distribution qualification and automatic installation explicitly false.
+
+The fixed offline health action emits schema `/2` only for receipts declaring
+portal requirements. It imports the bundled bindings and checks their pinned
+version/GLib floor. The retained consumer requires those exact fields, a real
+boolean and integer version components, and agreement with bundled pins. Legacy
+receipts retain their exact `/1` report. New targets run this private-profile
+health action before maintenance and during immutable preflight, so unavailable
+libraries refuse before stopping the current app. Ordinary dictation-client
+startup now explicitly passes `-B`; an actual copied-interpreter/broker test
+removes inherited bytecode guards and verifies unchanged release bytes.
+
+Actual local native compilation/installation passed in isolated Ubuntu image
+`ubuntu@sha256:008173c23f95b170204355c12626cb5a965d779a7e1283b09e9cffbb1bf33ca3`.
+The staged interpreter imported PyGObject 3.52.4 with GLib 2.80.0. Its real
+isolated D-Bus fixture passed both cases, exercising early Response, shortcut
+press/release and denied rebinding without compositor consent or audio capture.
+This local build preceded the added interpreter/provenance assertions; final
+producer qualification is assigned to native x64/ARM64 CI. The complete archive
+proof now runs that same two-case fixture through the relocated bundled Python,
+requiring no skips and checking source/target immutability afterwards.
+Original source notices are inventoried; the build proof deliberately retains
+`sourceLicenseReviewComplete: false`. No distribution, physical compositor,
+production signing/feed or signed forward installation is qualified here.
+
+The preceding source `69477f8` has now completed the entire broad/shared/Linux
+workflow successfully in
+[37165487146](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165487146),
+including complete x64/ARM64 bundles and installed packages. Those artifacts
+precede this portal closure. Full Mac 14 job 111327575462 succeeds in
+[37165488998](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165488998);
+Mac 26 job 111327575502 remains live at the latest observation. These results
+supersede the earlier live statuses without implying final cross-platform
+qualification. The original Mac run is retained; no customer install changed.
+
+Local follow-up checks pass: 15 managed-selection/health cases (including dependency refusal before maintenance), 11 producer/archive cases, 11 broker-maintenance cases and 14 existing dictation cases. The two-case actual bundled-interpreter D-Bus fixture also passes. These are source/private fixture checks, with the native complete two-CPU build still pending.
+
+### Fresh-host Qt and native component requirements
+
+The actual `/2` health consumer at `799f7f7` passed against the newly built
+standalone runtime in the minimal pinned Ubuntu container after installing
+`libgssapi-krb5-2`. Its first minimal-host attempt failed at the actual QtNetwork
+import because that library was absent; hosted build runners had masked this
+host dependency. The successful isolated check rendered 424×484 with font coverage,
+verified portal bindings and retained identical payload bytes. No app/service or
+provider was started. This is an actual consumer check with a synthetic receipt,
+not a complete produced archive or an installed customer update.
+
+The follow-up records `requiredSystemPackages` in the build configuration and
+receipt, including Qt networking and the existing Handy GTK/WebKit/ASR dependencies.
+Native bundle CI installs that same declared list, with build/fixture tools kept
+separate. The relocated archive proof additionally starts the exact staged Handy
+component through the bundled Python broker in a disposable copy/profile/display
+and bus, exercising microphone reservation, busy-owner preservation, cancellation,
+settings preservation and ordinary child exit without capture or model download.
+The source/target snapshots still must remain unchanged afterwards. Native
+qualification of this newer follow-up remains pending; preserve the original
+`799f7f7` run 37166969159 rather than cancelling it. Distribution eligibility stays
+false, and this user-local updater does not run a privileged package installer.
+
+The declared-package follow-up also passes actual native Handy/broker maintenance
+inside the same minimal Ubuntu container through the staged Python 3.12.13:
+native owner preservation, CAS reservation, admission fencing, cancellation,
+settings preservation and ordinary child exit all pass. The component is the
+locally validated public Linux x64 build copied into this isolated fixture.
+This verifies the declared host dependencies and real native protocol, but does
+not stand in for the exact newer CI-produced archive or physical input acceptance.
+The isolated container installs only declared runtime packages plus Xvfb/xauth
+fixture tools; no owner host packages, application/profile or model are changed.
+
+### Complete portal bundles at 799f7f7 and retained Mac results
+
+[Native Linux run 37166969159](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37166969159)
+is entirely successful at `799f7f718b91409292c0f9f8534331e995b85039`:
+x64 job 111331994133 and ARM64 job 111331994069 each build the complete
+24-package runtime and exercise the actual ZIP consumer, interpreter relocation,
+`/2` Qt/font/portal health, real private D-Bus fixture, unchanged selection and
+immutable payload. Both report PyGObject 3.52.4 and GLib 2.80.0. Hosted x64
+build provenance confirms all six pinned tools, build-lock SHA-256
+`fd809128ba91e5ee22ec074b6cdce2b0ea7903e1c2fc671b2c8686db63a11dba`,
+GLib/GIRepository 2.80.0 and Cairo 1.18.0. Native wheel hashes differ from the
+local build; pinned source/tool inputs and each output's recorded inventory do
+not imply bit-identical native compilation across builders.
+
+| Target | ZIP bytes | ZIP SHA-256 |
+| --- | ---: | --- |
+| linux-x64 | 649138497 | `7e9c7250370f2d22da7fce13999ceab510a36b9a8ed9e231b307057f68be7c91` |
+| linux-arm64 | 614736381 | `82508fd753bfbcc8b30b280d67088099983b066f782330751604496dd91851a4` |
+
+These artifacts precede the declared full host-package/native-Handy follow-up
+`a285350762b2ebdf181b67b737eb597411df77cb`, now qualifying in
+[37167426017](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37167426017).
+Preserve that run; no passing exact newer archive is inferred from the older one.
+The original [Mac run 37165488998](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165488998)
+also finished entirely successfully at `69477f8`, including full Mac 14 and 26
+jobs 111327575462/111327575502. It supersedes the earlier live Mac statuses and
+qualifies that earlier source only. None of these runs are physical compositor,
+real customer DSH/provider, signed forward installation or production feed proof.
+The full cross-platform goal remains active and public eligibility stays false.
+
+### Linux service wiring and native report correction
+
+The shared manager now discovers/launches the existing managed Linux bootstrap
+only for the exact selected canonical release, matching update profile, bundled
+interpreter paths, writable release store and fixed shipped entrypoints. Its
+installation results come from the persistent state directory; an old manager
+can still collect its original attempt after selection changes. Debian/Fedora,
+source/custom profiles and missing/changed selections remain manual. Existing
+signed-feed, qualified-source/target, automatic-download/install consent and
+fresh independent authority gates remain enforced. This fixes the service-wiring
+gap: previously Linux could never reach its existing external controller.
+
+Follow-up host manager/Linux/authority/Mac-location checks pass **103 cases**
+(101 passed, two explicit native-service skips). Actual private files/profile
+selection are used; the dispatch call is deliberately mocked and no installer,
+network, graph shutdown or owner application is started by these tests.
+
+At `a285350`, [37167426017](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37167426017)
+is terminal: complete x64 archive/staging/Qt/portal plus staged native maintenance
+passes (111333376400); ARM64 (111333376398) builds and passes Qt/portal and its
+native helper exits zero, but parsing the captured native-wrapper stdout fails
+with `JSONDecodeError`. This is not an overall ARM64 pass. The helper now writes
+a dedicated exclusive UTF-8 report file in the private proof directory; the
+consumer bounds it to 4096 bytes and verifies every declared native proof flag.
+Stdout is no longer installation/test evidence. Ordinary helper CLI stdout is
+preserved. Native nonzero exits expose bounded private-fixture diagnostics.
+The corrected actual local report-file proof passes in the isolated Ubuntu fixture
+with unchanged target bytes, native owner/CAS/admission/cancellation/settings checks
+and ordinary native exit. Fresh native two-CPU qualification remains required;
+no gates are waived.
+
+### Corrected full native Linux follow-up at 0bc9639
+
+[Focused native run 37168003800](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37168003800)
+is entirely successful at `0bc96393f1d95723a0475ee167ea91fa725bd536`.
+Complete x64 job 111335079309 and ARM64 job 111335079276 each produce the actual
+24-package, host-dependency-declared archive, then pass ZIP staging, relocated
+bundled `/2` Qt/font/portal health, real private D-Bus and actual staged Handy/broker
+maintenance through the bundled Python. The dedicated bounded UTF-8 native report
+passes all owner/CAS/admission/cancellation/settings/ordinary-exit flags on both
+CPUs. Exact source/target payloads and selection stay unchanged. No microphone,
+model download, provider, physical compositor or actual installation is exercised.
+This supersedes the ARM stdout-parser failure for this fixture only.
+
+| Target | ZIP bytes | ZIP SHA-256 |
+| --- | ---: | --- |
+| linux-x64 | 649144736 | `ba333a9b2fa72804482b1ced8cba95c777d9849d6f293bca46cb50c9402810d9` |
+| linux-arm64 | 614742619 | `615ac8a9d6da2ba5892e075f0764c54a1f1c6c899dc30a54128e381895eacd1f` |
+
+The focused workflow deliberately skips Debian/broad suites, installed packages,
+Browser package, Home and owned-service jobs; their earlier results do not become
+new source qualification. Host related manager/Linux/authority/Mac-location checks
+pass 103 cases (two explicit native-service skips). Current broad/Mac evidence
+remains source `69477f8`; Windows native full acceptance retains its own earlier
+record. Every public automatic-install/distribution/feed flag remains false.
+
+Next required work remains Windows persistent-broker discovery/startup/lifetime/
+reopening (the current actual Handy/CAS Windows proof calls Backend directly),
+normal desktop/DSH and signed forward acceptance, privileged package-managed Linux,
+shared/system/companion Mac coordination, SDK owner teardown, verified interrupted
+recovery and safe retention, legacy first bridge delivery, and owner-provisioned
+production signing/feed. In particular, `server.main` currently registers broker
+maintenance only on Linux/Mac, and `WindowsPreparation` has no dictation discovery.
+Do not infer Windows broker participation from its passing native component proof.
+No owner install, account/profile, live model or GPU settings changed. The complete
+cross-platform goal remains active; this passing checkpoint is not completion.
 ### October 3 exact Windows intake diagnosis
 
 The x64 intake report from [run 37122854272](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37122854272)

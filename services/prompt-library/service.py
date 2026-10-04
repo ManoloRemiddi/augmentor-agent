@@ -38,8 +38,9 @@ def paths():
 class Conflict(ValueError):pass
 
 class Library:
-    def __init__(self,path):
+    def __init__(self,path,admission=None):
         self.path=path;self.changed=threading.Condition()
+        self.update_admission=admission;self.updates=None;self.update_lock=threading.Lock()
         self.memory=Memory(Path(path).parent/'memory.sqlite3');self.dsh=DshSetup()
         with self.connect() as db:
             db.executescript('''
@@ -116,6 +117,8 @@ class Library:
         else:raise ValueError('Unsupported prompt operation')
         return self.snapshot(db)
     def call(self,method,p,request_id):
+        if isinstance(method,str) and method.startswith('updates.'):
+            return self.update_manager().call(method,p)
         if isinstance(method,str) and method.startswith('home.connection.'):return home_connection_call(method,p)
         if method=='support.report':return support_report()
         if isinstance(method,str) and method.startswith('dsh.'):return self.dsh.call(method,p)
@@ -147,6 +150,13 @@ class Library:
         with self.changed:self.changed.notify_all()
         return result
 
+    def update_manager(self):
+        with self.update_lock:
+            if self.updates is None:
+                from updates.manager import UpdateManager
+                self.updates=UpdateManager(Path(self.path).parent/'updates',admission=self.update_admission)
+            return self.updates
+
 class Handler(socketserver.StreamRequestHandler):
     def handle(self):
         self.connection.settimeout(20);identity=None;shutdown=False
@@ -167,6 +177,8 @@ class Handler(socketserver.StreamRequestHandler):
                 with self.server.admission.work():
                     result=self.server.library.call(method,params,identity)
             response={'id':identity,'result':result}
+            if isinstance(method,str) and method in MAINTENANCE_METHODS:
+                response.update({'pid':os.getpid(),'buildRoot':str(Path(__file__).resolve().parents[2]),'maintenanceAdmission':1})
         except Exception as error:
             response={'id':identity,'error':{'code':'maintenance' if isinstance(error,MaintenanceBusy) else 'conflict' if isinstance(error,Conflict) else 'invalid','message':str(error)}}
         raw=(json.dumps(response,ensure_ascii=False)+'\n').encode()
@@ -184,6 +196,10 @@ class Server(ThreadingLocalServer):
         super().__init__(*args,**kwargs)
 
 if __name__=='__main__':
+    startup=None
+    if sys.platform in ('linux','darwin'):
+        from lifecycle.posix_startup import Startup
+        startup=Startup()
     sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'lifecycle'))
     from lease import hold
     hold('runtime')
@@ -194,8 +210,15 @@ if __name__=='__main__':
     except BlockingIOError:raise SystemExit(0)
     endpoint=state/'prompts.sock'
     prepare_endpoint(endpoint)
-    server=Server(str(endpoint),Handler);server.library=Library(data/'prompts.sqlite3')
+    server=Server(str(endpoint),Handler);server.library=Library(data/'prompts.sqlite3',admission=server.admission)
+    if startup is not None:startup.ready()
+    try:server.library.update_manager().start_scheduler()
+    except Exception as error:
+        # An updater recovery error cannot take conversations or prompts offline.
+        print('Update service unavailable: '+str(error),file=sys.stderr)
     def stop(*_):threading.Thread(target=server.shutdown,daemon=True).start()
     signal.signal(signal.SIGTERM,stop);signal.signal(signal.SIGINT,stop)
     try:server.serve_forever(poll_interval=.2)
-    finally:server.server_close();cleanup_endpoint(endpoint)
+    finally:
+        if server.library.updates is not None:server.library.updates.close()
+        server.server_close();cleanup_endpoint(endpoint)

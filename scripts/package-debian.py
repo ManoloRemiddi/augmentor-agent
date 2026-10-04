@@ -20,6 +20,8 @@ import tempfile
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'services'))
+from updates.packaging import build_receipt, stage_repository, source_revision
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
 
 
@@ -127,13 +129,14 @@ Description: {description}
           'Complete component notices: /usr/lib/augmentor/licenses/\n\n' + (ROOT / 'LICENSE').read_text())
 
 
-def build(output):
+def build(output, update_build=0):
     subprocess.run([sys.executable,str(ROOT/'scripts/sync-version.py'),'--check'],check=True)
     version = json.loads((ROOT / 'package.json').read_text())['version']
     product = json.loads((ROOT / 'release/product.json').read_text())
-    source = {'commit':subprocess.check_output(['git','-c',f'safe.directory={ROOT}','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
-              'dirty':bool(subprocess.check_output(['git','-c',f'safe.directory={ROOT}','status','--porcelain'],cwd=ROOT,text=True).strip())}
+    source = source_revision(ROOT,build=update_build)
     configuration = json.loads((ROOT / 'release/runtime.json').read_text())
+    update = build_receipt(version=version, source_commit=source['commit'], target='linux-x64',
+                           channel=product['channel'], build=update_build)
     if not (ROOT / 'dist/runtime/src/main.js').exists():
         raise ValueError('Run npm run build before packaging')
     output.mkdir(parents=True, exist_ok=True)
@@ -148,9 +151,10 @@ def build(output):
             copy(ROOT / 'release/dsh' / name, app / 'release/dsh' / name)
         subprocess.run([sys.executable,str(ROOT/'scripts/stage-handy.py'),str(app)],check=True)
         node_runtime(app, configuration, cache)
+        stage_repository(ROOT, app, node=app/'node/bin/node')
         native_notices(app, configuration)
         write(app / 'release.json', json.dumps({**product,'source':source,'target': configuration['target'],
-                                               'node': configuration['node'], 'pi': configuration['pi']}, indent=2) + '\n')
+                                               'node': configuration['node'], 'pi': configuration['pi'], 'update': update}, indent=2) + '\n')
         launcher = '#!/bin/sh\n' + HEADER + 'export AUGMENTOR_PI_NODE=/usr/lib/augmentor/node/bin/node\nexport PI_TELEMETRY=0 PI_SKIP_VERSION_CHECK=1\n'
         lease='exec /usr/bin/python3 /usr/lib/augmentor/scripts/run-component.py runtime "$AUGMENTOR_PI_NODE" '
         write(runtime / 'usr/bin/augmentor-browser-host', launcher + lease + '/usr/lib/augmentor/apps/browser/native-host.mjs "$@"\n', True)
@@ -192,12 +196,13 @@ StartupWMClass=Augmentor Agent
                            env={**os.environ, 'SOURCE_DATE_EPOCH': str(epoch)}, check=True)
             with artifact.open('rb') as stream: sha = hashlib.file_digest(stream, 'sha256').hexdigest()
             results.append({'file': artifact.name, 'sha256': sha, 'bytes': artifact.stat().st_size})
-        write(output / 'artifacts.json', json.dumps({'version': version, 'source':source,'target': configuration['target'], 'artifacts': results}, indent=2) + '\n')
+        write(output / 'artifacts.json', json.dumps({'version': version, 'source':source,'target': configuration['target'], 'update':update, 'artifacts': results}, indent=2) + '\n')
         print(json.dumps(results))
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--out', type=Path, default=ROOT / 'outputs/debian')
+    parser.add_argument('--update-build', type=int, default=0, help='Reviewed per-version build sequence; zero is an unnumbered candidate')
     args = parser.parse_args()
-    build(args.out.resolve())
+    build(args.out.resolve(), args.update_build)

@@ -21,7 +21,9 @@ class PackageTests(unittest.TestCase):
         for name in ('Augmentor.exe','AugmentorBrowserHost.exe','python/python.exe','node/node.exe',
                      'powershell/pwsh.exe','updater/WinSparkle.dll','dsh/payload.json','scripts/launch-windows.py',
                      'scripts/windows-local-health.py','scripts/windows-inspect-payload.py',
-                     'scripts/windows-recover-source.py','services/lifecycle/source_restoration.py',
+                     'scripts/windows-recover-source.py','scripts/verify-windows-publisher.ps1',
+                     'release/windows/signing.json','services/updates/windows_signing.py',
+                     'services/lifecycle/source_restoration.py',
                      'services/lifecycle/payload_integrity.py','services/lifecycle/recovery_source.py',
                      'services/lifecycle/health_report.py',
                      'components/handy/runtime/bin/handy.exe','components/handy/runtime/BUILD.json',
@@ -58,6 +60,25 @@ class PackageTests(unittest.TestCase):
     def test_dictation_is_a_required_part_of_complete_windows_payload(self):
         (self.root/'components/handy/runtime/bin/handy.exe').unlink()
         with self.assertRaisesRegex(ValueError,'Incomplete.*handy.exe'):package.candidate(self.root,'arm64')
+
+    def test_fresh_build_cannot_omit_publisher_verifier_even_with_valid_inventory(self):
+        from lifecycle.payload_integrity import seal_payload, verify_payload
+        for name in ('scripts/verify-windows-publisher.ps1', 'release/windows/signing.json',
+                     'services/updates/windows_signing.py'):
+            with self.subTest(name=name):
+                # Simulate a producer omission in a new disposable build, not
+                # alteration/resealing of an installed customer payload.
+                path=self.root/name; original=path.read_bytes();path.unlink()
+                (self.root/'payload-integrity.json').unlink()
+                self.release.pop('payloadSHA256');self.write_release()
+                self.release=seal_payload(self.root)
+                verify_payload(self.root,(self.root/'release.json').read_bytes())
+                with self.assertRaisesRegex(ValueError,'Incomplete shared application payload'):
+                    package.candidate(self.root,'arm64')
+                path.write_bytes(original)
+                (self.root/'payload-integrity.json').unlink()
+                self.release.pop('payloadSHA256');self.write_release()
+                self.release=seal_payload(self.root)
 
     def test_changed_or_extra_build_files_cannot_silently_reseal(self):
         (self.root/'node/node.exe').write_text('changed')

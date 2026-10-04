@@ -1,0 +1,52 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+name: Linux update user service
+on:
+  workflow_dispatch:
+  workflow_call:
+permissions:
+  contents: read
+concurrency:
+  group: linux-update-service-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: true
+jobs:
+  owned-service:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - name: Reject private source in the tree and branch history
+        run: python3 scripts/check-private-source-boundary.py
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+      - name: Qualify original user-service ownership and managed migration
+        shell: bash
+        run: |
+          if id augupdatefixture >/dev/null 2>&1; then exit 1; fi
+          sudo useradd --create-home augupdatefixture
+          touch "$RUNNER_TEMP/augmentor-created-service-user"
+          sudo loginctl enable-linger augupdatefixture
+          task_uid=$(id -u augupdatefixture)
+          sudo systemctl start "user@$task_uid.service"
+          sudo runuser -u augupdatefixture -- env XDG_RUNTIME_DIR="/run/user/$task_uid" \
+            DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$task_uid/bus" \
+            /usr/bin/systemctl --user import-environment XDG_RUNTIME_DIR
+          sudo install -d -m 0700 -o augupdatefixture -g augupdatefixture /home/augupdatefixture/source
+          git archive --format=tar HEAD | sudo runuser -u augupdatefixture -- tar -x -C /home/augupdatefixture/source
+          sudo install -m 0755 -o augupdatefixture -g augupdatefixture "$(command -v node)" /home/augupdatefixture/qualification-node
+          sudo runuser -u augupdatefixture -- env CI=true HOME=/home/augupdatefixture \
+            XDG_RUNTIME_DIR="/run/user/$task_uid" DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$task_uid/bus" \
+            AUGMENTOR_SYSTEMD_QUALIFICATION=1 AUGMENTOR_QUALIFICATION_NODE=/home/augupdatefixture/qualification-node \
+            /bin/sh -c 'cd /home/augupdatefixture/source && /usr/bin/python3 -B -m unittest discover -s tests -p test_update_linux_service_native.py -v && exec /usr/bin/python3 -B -m unittest discover -s tests -p test_update_dictation.py -v'
+      - name: Remove only the dedicated fixture account
+        if: always()
+        shell: bash
+        run: |
+          if test -f "$RUNNER_TEMP/augmentor-created-service-user"; then
+            task_uid=$(id -u augupdatefixture)
+            sudo loginctl disable-linger augupdatefixture
+            sudo systemctl stop "user@$task_uid.service"
+            sudo userdel --remove augupdatefixture
+          fi

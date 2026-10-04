@@ -25,6 +25,7 @@ class CodexMaintenanceTests(unittest.TestCase):
             'AUGMENTOR_SHARED_CONFIG': str(self.root/'config/shared'),
             'AUGMENTOR_CODEX_STATE': str(self.root/'codex'),
             'AUGMENTOR_CODEX_SOCKET': str(self.root/'codex.sock'),
+            'AUGMENTOR_DICTATION_STATE': str(self.root/'dictation'),
         }))
         self.stack.enter_context(patch.object(maintenance, 'browser_processes', return_value=[]))
         self.desktop = self.stack.enter_context(patch.object(maintenance, 'desktop_call', return_value=None))

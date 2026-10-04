@@ -78,6 +78,11 @@ def main():
         node = os.environ.get('AUGMENTOR_PI_NODE') or shutil.which('node')
         if not node:raise RuntimeError('The bundled Node runtime is missing.')
         script = ROOT/('apps/browser/native-host.mjs' if component=='browser' else 'dist/runtime/src/main.js')
+        if component=='browser' and sys.platform in ('linux','darwin') and (ROOT/'release.json').is_file():
+            from lifecycle.posix_startup import Startup
+            with Startup() as startup:
+                os.environ['AUGMENTOR_UNIX_STARTUP_FD']=str(startup.handoff())
+                os.execv(node,[node,str(script),*sys.argv[2:]])
         os.execv(node, [node, str(script), *sys.argv[2:]])
 
 

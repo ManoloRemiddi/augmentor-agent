@@ -18,6 +18,7 @@ from .windows_startup import Startup
 from .windows_components import discover_owner,discover_windows,discover_browsers,discover_companions
 from .windows_dsh import discover_dsh
 from .windows_voice import discover_voice
+from .windows_dictation import discover_dictation
 
 
 class WindowsPreparation:
@@ -25,7 +26,7 @@ class WindowsPreparation:
         self.root,self.runtime,self.shared,self.state=root,runtime,shared,state
         self.reservations=Reservations()
         self.gate=None;self.observations=[];self.owner=None
-        self.windows=[];self.browsers=[];self.companions=[];self.dsh=None;self.voice=None
+        self.windows=[];self.browsers=[];self.dictation=[];self.companions=[];self.dsh=None;self.voice=None
         self.entered=False;self.closed=False;self.cleanup_thread=None
 
     def reserve(self,items):
@@ -39,6 +40,8 @@ class WindowsPreparation:
         self.entered=True
         try:
             self.gate=Startup(self.runtime,maintenance=True)
+            from .sdk_launch_lease import require_closed
+            require_closed(self.runtime)
             self.owner=discover_owner(self.root,self.runtime)
             if self.owner is None:raise MaintenanceBusy('The owned background service is not running. No component was changed.')
             self.reserve([self.owner])
@@ -46,6 +49,7 @@ class WindowsPreparation:
             # monitors stop reconnecting while the owner also refuses starts.
             self.windows=self.reserve(discover_windows(self.root,self.runtime))
             self.browsers=self.reserve(discover_browsers(self.root,self.runtime))
+            self.dictation=self.reserve(discover_dictation(self.root,self.runtime))
             self.dsh=discover_dsh(self.root,self.state,self.owner)
             if self.dsh is not None:self.reserve([self.dsh])
             self.voice=discover_voice(self.root,self.owner)
@@ -62,6 +66,21 @@ class WindowsPreparation:
         if not self.entered or self.gate is None or self.gate.fd is None:
             raise MaintenanceBusy('Startup exclusion is no longer held.')
 
+    def reopen_plan(self):
+        """Names only, derived from this actual reserved kernel-bound graph."""
+        self.check()
+        from .windows_update_observer import validate_reopen_plan
+        prefix='augmentor-linux-pi'
+        names=[]
+        for window in self.windows:
+            name=window.endpoint.stem
+            if name==prefix:names.append('main')
+            elif name.startswith(prefix+'-'):names.append(name[len(prefix)+1:])
+            else:raise ValueError('The observed window has an unsupported instance endpoint.')
+        plan={'instances':names,'hadBrowser':bool(self.browsers)}
+        if self.dictation:plan['hadDictation']=True
+        return validate_reopen_plan(plan)
+
     def drain(self,*,checkpoint):
         """Close idle surfaces first and their background owner last.
 
@@ -70,7 +89,7 @@ class WindowsPreparation:
         to apply files: the installer needs the final exclusive lifetime lease.
         """
         self.check()
-        order=[*self.windows,*self.browsers,
+        order=[*self.windows,*self.browsers,*self.dictation,
             *([self.dsh] if self.dsh is not None else []),
             *([self.voice] if self.voice is not None else []),*self.companions,self.owner]
         for participant in order:

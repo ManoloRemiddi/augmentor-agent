@@ -36,12 +36,13 @@ try{
  const composition=JSON.parse(readFileSync(join(dsh,'.agent-presets',profile.preset,'agent.cordis.yml')));
  assert.match(composition.find(row=>row.id==='persona').config.prefix,/SYNTHETIC_SDK_BUNDLE_ROLE/);
  assert.ok(composition.some(row=>row.id==='augmentor-workspace-policy'));
- child=spawn(python,['-I','-B',join(product,'scripts/app-sdk-launch.py'),'native'],{env:{...env,AUGMENTOR_WORKSPACE_PROFILE:profile.id},stdio:['pipe','pipe','ignore'],windowsHide:true});
+ child=spawn(python,['-I','-B',join(product,'scripts/app-sdk-launch.py'),'native'],{env:{...env,AUGMENTOR_WORKSPACE_PROFILE:profile.id},stdio:['pipe','pipe','pipe'],windowsHide:true});
+ let nativeErrors='';child.stderr.on('data',chunk=>{nativeErrors=(nativeErrors+String(chunk)).slice(-8192)});
  closed=new Promise((resolve,reject)=>{child.on('error',reject);child.on('exit',code=>resolve(code));});
  let buffer=Buffer.alloc(0);const pending=new Map();
  child.stdout.on('data',chunk=>{buffer=Buffer.concat([buffer,chunk]);while(buffer.length>=4){const n=buffer.readUInt32LE(0);assert.ok(n>0&&n<=20*1024*1024);if(buffer.length<n+4)return;const frame=JSON.parse(buffer.subarray(4,n+4));buffer=buffer.subarray(n+4);pending.get(frame.id)?.(frame);pending.delete(frame.id);}});
  const call=(method,params={})=>new Promise((resolve,reject)=>{
-  const id=randomUUID(),timer=setTimeout(()=>{pending.delete(id);reject(Error('Native response was lost; no request was replayed'));},10000);
+  const id=randomUUID(),timer=setTimeout(()=>{pending.delete(id);reject(Error('Native response was lost; no request was replayed. '+nativeErrors));},10000);
   pending.set(id,frame=>{clearTimeout(timer);resolve(frame);});const body=Buffer.from(JSON.stringify({id,method,params})),header=Buffer.alloc(4);header.writeUInt32LE(body.length);child.stdin.write(Buffer.concat([header,body]));
  });
  const description=(await call('workspace.describe',{protocol:'augmentor-app/1'})).result;

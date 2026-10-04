@@ -74,10 +74,15 @@ ad-hoc preview. See [library replacement](MACOS-LIBRARY-REPLACEMENT.md).
 
 Use a fresh build environment with `release/macos-requirements.txt`. Prepare the
 sources outside the checkout, then build on ARM64 macOS from the exact source
-commit using `package-macos.py --preview --source-commit COMMIT --source-notices
+commit using `package-macos.py --preview --update-build BUILD --source-commit COMMIT --source-notices
 NOTICES --dmg --out NEW_DIRECTORY`. The source-notice manifest must match every
 copied file. All generated apps stay under a private `.noindex` cache until an
 explicit installation. The app includes a readable Start here guide on its DMG.
+`BUILD` is the reviewed positive per-version sequence shared by the Desktop and
+Companion release set. Unnumbered development candidates use zero. The new
+[shared updater receipt and trust inputs](UPDATE-SYSTEM.md#release-build-receipts-and-packaging)
+are staged before application inventory/signing; they do not enable automatic
+installation or qualify a public feed.
 
 Run managed setup, actual Qt composer, browser native-host and post-use signature
 checks on the candidate. Keep deterministic model and live provider evidence

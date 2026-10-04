@@ -2,6 +2,947 @@
 
 # Start here: agent handoff
 
+Latest executable checkpoint: Windows desktop 37176951136 at `2ccb7a0` is
+terminal success on x64/ARM64, including corrected early-launcher ordering and
+actual publisher trust/wrong-pin/damage checks. Package intake addition `a37d5e0`
+passes seven host cases. Fresh combined full Windows 37177293646 is dispatched
+at `8c5f1ca`; older merged full 37175650042 remains live and predates signing.
+Corrected Linux 37176868726 at `f061593` has passed both native Handy prerequisites
+and is now building both complete managed bundles. No pending result is inferred.
+
+Production release inputs remain unresolved: routine signing-key custody versus
+owner-controlled offline root custody; Apple Developer/Windows signing provider
+availability and identity; and whether first automatic installation scope is
+per-user only or also includes shared/system/package-managed methods. Existing
+questions remain pending. The production signed feed and automatic-install
+qualification are disabled; no production key, certificate, trust-store entry,
+release/tag, owner installation or private profile has been changed. Complete
+signed forward/customer acceptance and other recorded full-goal gaps remain.
+
+
+Merged full Mac 37175652699 at `0cb79e0` is terminal success on macOS 14/26.
+Both downloaded updater reports pass actual retained exec/development-signing
+refusal, same-build apply, persistent pending-start refusal, offline health and
+archived completion. They explicitly exclude signed forward installation,
+observed reopening and normal user/publisher acceptance. Exact report digests are
+recorded in UPDATE-SYSTEM.md; later Windows-only changes are outside this ref.
+
+
+Windows package intake now requires the source publisher policy, fixed verifier
+script and verifier module even when a producer seals an otherwise consistent
+fresh inventory. Seven package cases pass, including valid-inventory omission
+refusal. Existing staging already copies these paths and seals their bytes;
+policy enablement remains a separate owner-controlled production gate. The live
+merged full Windows run predates this intake/signing addition.
+
+
+Native publisher run 37176579974 at `79c5e58` passes the actual timestamped
+Node/wrong-pin/damaged-copy checks on Windows x64 and ARM64. Its overall jobs fail
+later because staging the verifier creates `scripts/` before the early-launcher
+fixture requires an untouched bootstrap runtime. The trust step now runs after
+that fixture; its safety check remains unchanged. Fresh desktop qualification is
+required for this ordering correction. Merged full Mac 37175652699 has passed
+macOS 14, while macOS 26 remains live. Corrected Linux `f061593` run 37176868726
+is dispatched. Full Windows 37175650042 remains live; no passing result is inferred.
+
+
+Merged source `0cb79e0`: Windows desktop run 37175651402 passes both CPUs,
+including the actual default-state/read-only scope check. Prior full login-guard
+run 37172411318 at `40af948` is terminal success on both CPUs. New full Windows
+37175650042 and Mac 37175652699 remain live; no result is inferred. Merged Linux
+37175654420 fails before ARM Rust compilation: the incoming host-selector map
+omitted `linux-aarch64`. Its exact native GNU host entry is restored; x64 Handy
+had passed, but complete bundles skipped because ARM failed. Fresh native Linux
+qualification is required. The superseded 8e0d472 full Windows run 37174066782 was
+cancelled while pending with zero started jobs; no live evidence was discarded.
+
+Windows automatic installation now additionally requires valid timestamped embedded
+Authenticode and an explicit source-payload SHA-256 public-key pin. Fixed bundled
+PowerShell performs read-only OS verification with user module/profile injection
+removed; fresh metadata, source and consent are rechecked after this bounded work.
+The service refuses automatic capability when publisher policy is missing/disabled.
+The checked-in signing policy is disabled with no keys; no account/certificate is
+created or guessed. Source pins permit planned key rollover, but rotating-key
+signing services need an appropriate verified profile adapter once the owner
+selects a provider. Native Node signer/wrong-pin/damage inspection is a dedicated
+Windows fixture, never Augmentor publisher provisioning or target execution.
+Portable signing three cases and broad updater 269 (seven explicit skips) pass;
+fresh native signer qualification is pending. New source requires its signing
+module in retained observers. All production automatic/feed flags remain false.
+
+Before merged native qualification: full Mac correction run 37174632213 at
+`54a988d` is terminal failure on both versions after passing all 265 updater cases,
+including five actual native retention cases and real signed authority. Full
+bundle/atomic apply/health progresses to retained-exec negative acceptance, where
+the handoff fixture recursively created an intermediate observer cache with broad
+permissions. It now creates the cache explicitly private, matching bootstrap;
+production admission remains strict. Fixture failures now include bounded actual
+error text. Linux native run 37174794763 at `d8de284` is entirely successful on both
+CPUs, including all ten new native retention/handoff/signed-authority cases and
+complete archive/relocation/portal/Handy proof. Earlier b438ad8 Linux run also passes
+its narrower scope. All results precede the new main integration.
+
+Current source alignment: main advanced to `b3c5aca` with public Handy preview-2
+downloads, app-local Windows WebView/VC runtime and voice/colour fixes. This updater
+branch integrates that public history, preserving exact previous CI scopes.
+Windows client and maintenance scope now share the incoming standard-data default
+through a read-only selector, with explicit state overrides and raw junction
+refusal intact. Broker lifetime admission already covers disabled/native work;
+the tested 90-second cold-start allowance is retained. Main's bounded recovery
+helper is retained, with this branch's 20-minute outer observer/21-minute fixture
+bounds, and its more precise private modal cleanup keeps a 60-second fixture bound.
+Public preview dispatch requires a reviewed positive build. Automatic PR builds
+remain unnumbered development candidates in disposable Windows locations; they
+cannot silently assign public version/build identities. Matched manual Linux/Mac
+previews also require/propagate a reviewed build; Browser extension ordering remains
+its existing browser-managed product-version contract. No release/tag is published.
+Host combined-source updater 265 (six skips), dictation sixteen and recovery three
+pass; native Windows default-path/source composition and complete merged bundles
+require fresh qualification. No owner install/profile/model/GPU was changed.
+
+Mac retention run 37174398113 at `b438ad8` fails on both Mac 14/26 solely in the
+new fixture's aliased temporary ancestor (`/var` to `/private/var`). The fixture
+factory now selects its actual temporary root; production input validation remains
+strict. A fifth case explicitly refuses a redirected collector parent without
+following/deleting its code. The real signed-authority cases pass on both Macs in
+that failed run, but overall/native retention qualification remains pending after
+this fixture correction. Preserve this failed evidence and require a fresh run.
+
+Full Unix observer retention now covers the complete copied Linux runtime and
+Mac bundle. A shared kernel lease remains open until actual process exit; only
+verified deferred or completed outcomes publish cleanup hints. A later bootstrap,
+under its original exclusion and with no pending transaction, can collect exact
+unchanged code. Unknown/old unleased observers, changed files, foreign links and
+extra contents survive. Source releases, stages, backups and private data are
+outside this collector. Four actual Unix lock/file cases and the copied Linux
+ELF refusal/exit/collection case pass; broad host updater tests pass 264 with six
+explicit platform/context skips. Mac native qualification is pending for this
+follow-up. No source/customer eligibility, trust configuration or owner install
+was changed. See UPDATE-SYSTEM.md for the exact limited retention scope.
+
+Current October 4 evidence: corrected full Windows run
+[37170465430](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170465430)
+at `c40926b` is terminal success on x64/ARM64. Both downloaded installed reports
+pass all 24 stages, including actual installed broker capture deferral, ordinary
+exit, replacement, pending-start refusal, target completion/reopening and source
+restoration/removal. This is same-build repair with a synthetic unsigned catalog;
+it does not qualify signed forward updates. Later desktop run 37172698677 at
+`07c05af` passes both CPUs for actual junction refusal and login admission.
+Full login-guard run 37172411318 at `40af948` is now executing, not queued.
+
+New `test_update_signed_authority.py` joins real ephemeral Ed25519 metadata,
+loopback HTTP/catalog verification and actual inert download bytes to the existing
+Python installation authority. Two host cases pass: fresh signed withdrawal and
+damaged timestamp signature refuse authorization after download. No installer is
+executed; source identity and qualification flags remain synthetic. Full Windows
+builds run these cases after locked Node dependencies are installed. Public feed,
+signing and eligibility flags remain false; full-goal gaps and owner signing
+questions remain. The following older entries retain their dated evidence.
+
+Latest native checkpoint: `07c05af` desktop run 37172698677 passes both Windows
+CPUs, including actual junction/key preservation and login-session admission.
+Eleven Linux broker regressions pass. Corrected full x64 installer job 111344879337
+at `c40926b` passes all 24 stages, including actual broker completion/reopening,
+source restoration and removal; ARM64 111344879344 remains live. Full guard
+follow-up 37172411318 at `40af948` is queued. Preserve these exact source/scope
+limits; production flags and the complete goal remain unfinished.
+
+Windows dictation now validates the supplied state hierarchy before path resolution
+could hide a junction. Native qualification adds an actual redirected-path refusal
+with unchanged authentication bytes; maintenance scope creates no state/key.
+This and the generic login-session guard require fresh native qualification; all
+production/full-goal boundaries remain active.
+
+Generic Windows maintenance now additionally defers another login session of the
+same user before sending any request, so captured windows cannot reopen into the
+wrong login. The actual retained-broker case checks synthetic alternate-session
+refusal leaves real admission ready. Native/full qualification is pending for
+this follow-up; the running `c40926b` full run predates this guard. See the owning
+UPDATE-SYSTEM.md section; no production flag or owner state changed.
+
+## Windows persistent dictation coordination — October 4, candidate
+
+The updater now discovers the persistent Windows broker through its private
+named-pipe peer, retained process handle, fixed installed Python, actual login
+session and independently selected state identity. Capture defers before any
+drain; an idle broker reserves/cancels/commits through the existing admission
+contract. Startup now refuses any persistent unfinished update and the broker
+holds an installation lease even when disabled. Verified live completion captures
+only an optional Boolean and starts the fixed target broker once, checking its
+actual readiness and unchanged payload. Old reopen plans retain their shape.
+
+[The owning update record](UPDATE-SYSTEM.md#windows-persistent-dictation-coordination--october-4-candidate)
+distinguishes portable tests from the newly added actual Windows x64/ARM64 private
+broker qualification. Both native desktop CPUs pass at `eddaf37`; full Inno results
+remain pending. No signing,
+feed or automatic-install flag was enabled, and no owner install/profile/model/GPU
+was changed. The complete cross-platform goal remains active; this is one remaining
+runtime participant, not production automatic-update qualification.
+
+Implementation source `eddaf37` is pushed. Host updater tests pass 258 (six explicit
+platform skips), existing dictation fourteen and Windows preparation seven; the
+system QtTest import gap was repaired only in the isolated test environment.
+Native desktop run
+[37169461358](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37169461358)
+is entirely successful on x64 and ARM64, including all three actual broker cases
+and final compiled-launcher qualification.
+The follow-up full Inno fixture now keeps a real installed broker across busy
+deferral, drain, pending-start refusal and verified reopening; full results remain
+pending in [37169658310](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37169658310)
+at `c8b73e3`, and its same-build synthetic catalog does not prove signed forward updates.
+
+The full x64 job now fails after actual broker capture deferral, normal drain,
+replacement and pending-target refusal: the blanket startup pending check also
+blocked read-only target-health observation. The correction restores the kernel
+startup primitive to exclusion only, while normal installed lifetime admission
+retains persistent refusal. ARM64 is still live at this record; fresh full/native
+qualification is required after the correction. See the owning failed/corrected
+scope in UPDATE-SYSTEM.md. No production flag or owner state was changed.
+
+Correction `c40926b` is pushed; full native desktop run
+[37170463612](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170463612)
+passes x64/ARM64 including the revised real pending/health-admission boundary.
+Corrected full installer [37170465430](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37170465430)
+is queued behind the older still-live ARM64 job; no live job was cancelled. Continue
+waiting for the complete old/native outcomes, inspect actual failed-job evidence,
+and qualify completion/reopening/recovery before calling the Windows broker
+installer integration complete. All production and full-goal boundaries remain.
+
+The old run is now terminal failure on both CPUs with the same pending-health
+regression; corrected full run 37170465430 has started x64/ARM64 jobs
+111344879337/111344879344. A read-only GitHub metadata audit finds no repository
+Actions secrets, variables or environments. This does not establish credential
+availability elsewhere; owner custody/platform-signing answers remain pending.
+No credential contents were read and no signing/feed configuration was changed.
+
+## Corrected native Linux checkpoint — October 4, full goal still active
+
+Source `0bc9639` is committed/pushed. Focused native
+[37168003800](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37168003800)
+passes complete x64/ARM64 archives, relocated `/2` Qt/portal health, real D-Bus and
+actual staged Handy/broker maintenance, dedicated bounded reports and immutable
+selection/payload. Host related checks pass 103 (two explicit native-service skips).
+[Exact artifact identities and remaining scope](UPDATE-SYSTEM.md#corrected-full-native-linux-follow-up-at-0bc9639)
+record that no real provider, physical input, signed forward or installation was
+exercised. The prior ARM stdout-parser failure is superseded for this fixture.
+
+Historical next work at this Linux checkpoint: Windows broker participation
+still needs its native adapter: `server.main` control/startup registration is
+Linux/Mac only, and Windows graph discovery has no dictation participant. Other
+required platform/package/SDK/recovery/retention/forward/bridge and production
+signing gates remain. Previous broad/Mac `69477f8` and Windows results apply only
+to their own source/scope. No runs remain live for this checkpoint, no public
+feed/eligibility was enabled, and no owner installation/profile/model/GPU changed.
+
+## Managed Linux dispatch and ARM fixture correction — October 4, in progress
+
+The shared update service now connects to the existing retained managed Linux
+controller for its exact canonical selection/profile; signed-feed/consent and
+qualification gates remain unchanged. Host related manager/Linux/authority/Mac
+location checks pass 103 cases (two explicit native-service skips), with dispatch
+mocked and no installed state changed.
+
+Run 37167426017 at `a285350` is terminal: full x64 including staged native Handy
+passes; ARM64 native helper exits zero after Qt/portal success, but report parsing
+fails. The corrected helper uses an exclusive private UTF-8 report file and a
+bounded consumer, with all native proof flags required. Fresh native two-CPU
+qualification must pass this newer source; preserve failed evidence. See
+[the correction and service boundary](UPDATE-SYSTEM.md#linux-service-wiring-and-native-report-correction).
+Production feed/eligibility remain false and the full goal remains active.
+
+## Portal bundle and Mac completion — October 4, in progress
+
+Complete portal-enabled Linux x64/ARM64 candidates at `799f7f7` pass actual archive
+staging, relocated `/2` UI/portal health, real D-Bus fixture and immutable selection
+in [37166969159](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37166969159).
+[Scoped artifact identities](UPDATE-SYSTEM.md#complete-portal-bundles-at-799f7f7-and-retained-mac-results)
+retain exact SHA-256/bytes and native build provenance. The original full Mac
+14/26 run 37165488998 at `69477f8` also finished entirely successfully.
+
+The newer full host-package and staged Handy/broker proof source `a285350` is
+committed/pushed and live in
+[37167426017](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37167426017).
+Preserve it and do not inherit older artifact qualification. Actual isolated
+Ubuntu source/runtime/Handy dependencies pass locally; production feed/flags,
+normal installed/signed forward acceptance and the full goal remain unfinished.
+
+## Fresh-host Linux updater qualification — October 4, in progress
+
+Source `799f7f7` is committed/pushed. Native x64/ARM64 bundle qualification is live
+in [37166969159](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37166969159);
+preserve that original run. Its isolated bundled-interpreter `/2` health consumer
+passes after a minimal-host check identified missing Qt Kerberos libraries.
+The follow-up declares the full Qt/Handy host package list and extends relocated
+archive proof to actual bundled Handy/broker maintenance without audio/model work.
+Seventy-four related host Linux updater cases pass (two explicit skips).
+See [the scoped evidence](UPDATE-SYSTEM.md#fresh-host-qt-and-native-component-requirements).
+New follow-up native qualification remains pending. Customer feed/flags stay false.
+
+## Linux portal updater follow-up — October 4, in progress
+
+The candidate following `62c15cd` bundles pinned PyGObject/Pycairo, uses a private
+native build environment and declares GLib/GIRepository 2.80 plus glibc 2.39.
+Actual standalone Python 3.12.13 compilation/import and the two-case isolated
+portal D-Bus fixture pass on x64 Ubuntu. New-receipt `/2` health checks run before
+maintenance; legacy `/1` reports remain supported. Normal broker startup now
+explicitly suppresses bytecode, with actual immutable copied-release evidence.
+See [the scoped record](UPDATE-SYSTEM.md#linux-portal-dependency-closure--october-4-candidate)
+for pins, provenance, checks and remaining distribution/physical acceptance.
+
+Broad source `69477f8` run 37165487146 is entirely successful, including both
+complete Linux bundles (before portal closure). Full Mac 14 job 111327575462
+also succeeds; Mac 26 job 111327575502 in 37165488998 is still live at the latest
+observation. Preserve that original run. The dated live-status paragraphs below
+are superseded by these results. Public feed/automatic eligibility remain false;
+this checkpoint does not complete the full cross-platform goal.
+
+## Automatic updates implementation — October 3, in progress
+
+Real Linux desktop acceptance also needs the Wayland portal dependency closure:
+`services/dictation/portal.py` imports `gi`/Gio/GLib, while the actual `42e2e05`
+pinned standalone runtime reports `giAvailable: false`. The unchanged Linux
+wheel lock does not include PyGObject. Native CAS/offline Qt/X11 proofs do not
+cover GNOME portal operation; keep distribution eligibility false and resolve/
+qualify this before a normal Wayland target is offered. Separately audit broker
+spawn bytecode: `dictation.request` currently launches `sys.executable` without
+explicit no-bytecode flags; the installed desktop launcher propagates its guard,
+but Browser/other caller paths still need direct immutable-artifact evidence.
+Preserve live broad 37165487146 and Mac 37165488998 while progressing these gates.
+
+Corrected native source `69477f8` passes Handy lifecycle plus actual broker/CAS
+maintenance on Mac 14 (111327429133), Windows (111327429134), Linux ARM64
+(111327429137) and Linux x64 (111327429183), and actual owned Linux service plus
+broker graph checks (111327429178), in
+[37165487146](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165487146).
+Separate Mac Handy job 111327415330 also passes in
+[37165488998](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165488998).
+This supersedes the cold-handshake failure for native broker/CAS proof only.
+Debian/shared tests and complete Linux x64/ARM64 bundles remain live, as do full
+Mac 14/26 jobs 111327575462/111327575502. Do not restart or cancel those handles.
+Public flags/feed stay disabled and the complete cross-platform goal stays active.
+
+Native run `d0fad01` passes actual Handy maintenance on Linux x64
+(job 111326987805), Linux ARM64 (111326987814) and Windows (111326987824), plus
+Linux owned-service and ten broker cases (111326987941) in 37165335018. Its Mac
+job 111326987806 and separate Mac dependency 111326969946 in 37165336524 fail
+on the first broker-to-Handy status request: cold native startup exceeds the
+ordinary 15-second RPC deadline. The existing component proof passes with its
+90-second startup allowance. Backend startup now uses that same bounded
+90-second allowance only for its first status; subsequent RPC limits/replay
+policy are unchanged. Both runs are terminal. Native Mac proof and skipped
+broader bundle jobs need qualification at corrected source.
+
+Source `d0fad01` is committed/pushed for this broker checkpoint. Local actual
+Handy maintenance passes with isolated display/D-Bus/state and no microphone/model
+work; the final real-broker case also proves other-session refusal, startup-writer
+exclusion and immutable source bytes across reopening. Full shared/Linux CI is
+running in [37165335018](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165335018),
+including x64/ARM64 Handy, actual native broker admission and complete bundles.
+Mac 14/26 qualification is running in
+[37165336524](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165336524).
+Handy Mac/Windows also run the actual native CAS/broker proof. Preserve those live
+runs; no CI success or installed/signed-forward update is claimed yet.
+
+## Dictation participation in automatic updates — October 4, in progress
+
+The persistent broker now exposes a private same-user Unix maintenance endpoint
+bound to its actual interpreter/PID, installation root and current login/state
+scope. Startup exclusion covers publication of both control endpoints. Its
+installation lease lasts for the broker process, including disabled Handy.
+Unix preparation captures/reserves it after surface admission closes and drains
+it before downstream services. Another session/state/root is refused, preserving
+its work. Original captured broker presence is an optional boolean reopening
+field; no saved command, environment, path or PID can grant restart authority.
+
+Broker admission fences ordinary requests and external shortcut callbacks. Idle
+preparation acquires Handy's existing atomic microphone CAS without changing
+enablement, shortcut, model or palette. A live voice owner, recording,
+transcription, model operation/download or unknown model outcome defers. Download
+admission is tracked across the native asynchronous reply gap. Cancellation/expiry
+releases only the matching native token before restoring normal admission.
+An unknown native acquire/release retains closed admission and original evidence;
+late acquire requests carry a two-second native admission deadline. Commit is
+one-shot; owned native stdin closes only after idle reservation, child exit is
+observed without termination/kill escalation. A child shutdown timeout keeps the
+broker alive/closing and prevents apply.
+
+Linux/Mac reopening within the original verified completion starts only the fixed
+target broker once, checks the new actual socket process/readiness and unchanged
+target, then allows normal captured-window startup. This also restores an
+original broker without reopening an uncaptured window. A failed start is not
+retried or stopped; the installed target remains selected for manual reopening.
+Windows shares broker admission but still needs its broker discovery/startup/
+lifetime/reopening adapter before full parity. Old uncoordinated broker builds
+require manual bridge delivery; public automatic eligibility/feed remain false.
+
+Local evidence: ten broker cases pass, including an actual disabled broker,
+authenticated voice owner, kernel socket pidfd, busy cancellation, complete real
+graph drain and one-shot target process reopening in isolated state. Native
+recording/download/unknown cases use declared backend mocks. Existing fourteen
+dictation cases pass; combined host updater/dictation checks pass 261 total,
+258 passed/three OS skips in 8.044 seconds. Settings Qt cases are outside this
+host run. An actual copied Handy executable separately proves native-owner
+exclusion, CAS reservation, broker fencing, reversible cancellation, settings
+preservation and ordinary native child exit without audio capture/model download.
+Native CI and shipped-bundle/signed-forward acceptance remain pending; this is
+not qualification of an installed customer update.
+
+Native complete managed Linux producer/consumer qualification **passes on both
+CPUs** at `42e2e05` in
+[37163782548](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37163782548):
+x64 job 111322629852 and ARM64 job 111322629828. Both real pinned application,
+Python/Qt/Node, Handy and DSH/speech assemblies pass fixed offline UI health;
+complete exported ZIPs pass the bounded parser and actual archive consumer.
+Bundled runtimes relocate, original selection stays unchanged, and original/final
+payloads stay immutable. Downloaded CI reports independently match exact artifact
+hashes and source revision, with all public/automatic eligibility flags false.
+This supersedes the export failures/pending statements above for this producer
+and staging scope only. It does not exercise live providers, normal windows,
+an installed update, signing trust, N-to-N+1, other distributions or older Pi OS.
+Only JSON reports are retained publicly; no product archive is released.
+
+CI x64 archive: 648,682,096 bytes, SHA256 `1c9e7084f0dd0a7dec4f8c9fb430a2dfa6436977335901f140084aa5b1b4778a`.
+CI ARM64 archive: 614,281,445 bytes, SHA256 `0290f4712b394f4d06019155905cdac1c87f0da81cb907f78509ebd6d1492750`.
+Local and CI artifact bytes differ; deterministic export is asserted only for
+identical input trees, not complete reproducible upstream builds. The native
+producer receipts retain distribution/source-license/production/feed/bridge
+and installed acceptance gates. Continue dictation-broker coordination and real
+DSH/desktop/signed-forward qualification, plus the remaining cross-platform work;
+the complete updater goal remains active.
+
+At `42e2e05`, complete local Linux x64 production assembly/export and the real
+`stage_download` consumer pass. The ZIP is 648,425,856 bytes, expands to
+1,491,989,961 bytes, and has SHA256
+`d4ae8da4ed0b64379d5b2f75a9bca804f91f5ae9f70635cc8cdf21ac60071628`.
+Bundled Python/Node paths relocate; fixed offscreen Qt renders at 424 × 484 with
+fonts; original/final payloads remain immutable; the isolated existing selection
+is unchanged. No installed controller, live provider, normal GUI, or signed
+forward update is exercised. Native both-CPU run 37163782548 remains pending.
+Eleven Linux producer and seven Mac archive cases pass. Host core updater checks
+pass 237 total/234 passed/three OS skips in 7.114 seconds; the two Qt settings
+cases pass separately on pinned bundled Python/Qt. Host full discovery initially
+fails because system PySide lacks QtTest; bundled-Python full discovery instead
+fails the host-only copied-ELF fixture, which copies an interpreter without its
+standalone libraries. These environment-specific runs are not recorded as full
+suite passes. Final core/settings checks use their appropriate interpreters.
+
+A concrete remaining real-desktop gate is the persistent dictation broker:
+`services/dictation/server.py` holds the Unix runtime installation lease after
+starting Handy. `PosixPreparation` discovers windows, shortcuts, Browser, DSH and
+companions, but not this authenticated broker. Window maintenance closes directly
+without the interactive Quit path's broker shutdown. Real broker reservation,
+active dictation/model-work deferral, observed normal exit, startup exclusion and
+safe reopening need qualification before automatic eligibility. Preserve the
+owner's active broker; inert window/service fixtures do not cover this gap.
+
+The local complete ZIP at `0663a6f` exports but its parser rejects bundled Python
+terminfo names that legitimately differ by case (`A/a`, `Eterm/eterm`). The Linux
+bundle now uses case-sensitive normalized path identity; fixed Mac `.app` bundles
+retain case-folded collision rejection. Duplicate paths, link-ancestor writes,
+unsafe paths and bounds remain rejected; Linux extraction uses exclusive file
+creation. Actual local ZIP inspection passes 72,403 entries / 1,491,988,463 expanded
+bytes with ZIP64 after this correction, but its producer run did not complete a
+manifest and no staging/installation qualification is claimed. Eleven Linux
+producer cases and seven existing Mac archive cases pass. The corrected full
+producer/consumer qualification remains pending.
+
+Managed run [37163111736](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37163111736)
+at `2799ef3` passes both Handy lifecycle jobs. Complete bundle jobs on ARM64
+(111320650528) and x64 (111320650556) assemble the locked runtimes, application,
+Handy and DSH/speech, then pass immutable offline Qt health. Both fail at the
+final ZIP path expression before export; local x64 reproduces the same failure.
+The path construction is corrected. Archive staging/relocation remains pending;
+these assembly results do not qualify installation, signed updates or a public
+release. All automatic/public/distribution flags remain false.
+
+
+
+
+
+
+Managed run 37161745635 at `2bd7759` completes both Handy CPU builds successfully
+(x64 job 111316467327, ARM64 111316467332). Both bundle jobs then fail before
+assembly on a nonexistent `apps/browser` build script. The browser plugin's
+compiled dist is tracked; the workflow now follows existing packaging inputs and
+omits that invalid command. No complete bundle is qualified yet. Dispatch the
+corrected managed scope; both component caches are now available and verified.
+
+Producer source privacy now freezes only exact tracked Git application files;
+ignored state with arbitrary names cannot enter the application snapshot. Native
+and generated JS inputs remain separate. A real synthetic Git boundary test passes,
+bringing producer cases to nine. The checkout is rechecked before final export;
+full clean-build/upstream provenance remains an explicit review gate. Preserve
+managed run 37161745635 while its ARM64 component builds; do not cancel it to
+qualify this source privacy refinement.
+
+At `10fdece`, both complete Mac 14/26 jobs pass in 37160188044. All broad jobs
+(Debian source/build/tests, installed packages, Browser package, Home, Handy
+Linux/Mac/Windows and privacy) pass in 37160189535; its overall failure is only
+the earlier missing-directory native fixture, corrected/passed at `d1ec492`.
+At `2bd7759`, the actual pinned Linux x64 interpreter and all 22 locked packages
+install in an isolated directory, pass dependency checks and imports, and render
+the fixed offline Qt health action with unchanged bytes (424 × 484, fonts pass).
+This is runtime/UI input evidence, not a complete bundle/installation/provider
+qualification. Managed-bundle run 37161745635 is live: x64 Handy passes; first
+ARM64 Handy build is running. Full native bundles wait for that workflow dependency.
+Source copying additionally excludes local dotenv/output/trace material.
+
+October 4 producer checkpoint adds complete native Linux x64/ARM64 candidate
+assembly with hash-pinned standalone Python/Node, locked Linux wheels, production
+JS, matching Handy and prepared DSH/speech. It runs actual offline Qt health and
+exports a parser-verified deterministic ZIP without local selection files.
+Eight synthetic boundary/real consumer roundtrip cases pass. A reusable two-CPU
+workflow and `managed_linux_only` dispatch scope are added; native full-bundle
+execution is pending. All automatic/public/distribution qualification flags stay
+false. ARM64 Qt requires glibc 2.39, so older Pi OS is not implied compatible.
+See [producer scope](UPDATE-SYSTEM.md#complete-managed-linux-candidate-producer--october-4).
+
+Native Linux desktop/service qualification passes at `d1ec492` in
+[37160517109](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37160517109),
+job 111312847964: both actual CI cases pass in 25.028 seconds. The original DSH
+busy/normal-exit/migration/reopen proof still passes. The added actual installed
+launcher, copied Python, user desktop service, named secondary process, shipped
+startup/lifetime/admission, sockets and pidfds prove original owner binding,
+normal window exits, launcher migration, selection/archival, target main/secondary
+reopening and preserved enablement. Reopening replay refuses. Source/target
+artifacts stay unchanged, including no-bytecode startup. Both window participants
+are inert; real GUI/provider/conversation and connected/import/offline health
+remain mocked. Focused updater 228/225/three and 31 startup/service/desktop tests
+pass at this source. Public eligibility stays disabled. Continue full release
+producer/real DSH/GUI/signed-forward qualification and remaining platforms/package
+controllers; keep the original cross-platform goal active. This supersedes the
+fixture failures below for this scoped native path only.
+
+At `134d561`, focused 37160387066 passes DSH and reaches actual desktop update
+completion; its assertion incorrectly requires main-before-secondary, whereas
+actual socket discovery sorts secondary first. The fixture now compares captured
+membership, preserving the original order used for authority. Normal launcher
+exec now passes `-B` and forces no-bytecode writes, preventing Python import caches
+from changing a verified immutable target when reopening. Existing startup tests
+cover that invocation. New focused/native qualification is required for reopening.
+
+Native job 111311878502 at `10fdece` in 37160189535 passes the original DSH
+service proof, but the added desktop test stops before coordinator preparation:
+its fresh persistent transaction directory was not created. The fixture now
+creates that actual private directory before use, matching normal startup/lease
+checks. Source guards are unchanged. Re-run focused native qualification; preserve
+the live broad/Mac jobs. The desktop native path is still unqualified.
+
+Source `10fdece` passes full local Python: 1007 total, 965 passed, 42 skips,
+in 65.802 seconds, including focused updater 228/225/three. Broad validation
+37160189535 and Mac 14/26 validation 37160188044 are running at this exact source.
+The earlier focused 37160143263 was canceled when broad validation reused the
+native workflow's ref-only concurrency group. The reusable group now includes
+run ID; parent focused/full separation alone was insufficient. Cancellation is
+not a native test result. Keep the live broad run and record actual outcomes.
+
+October 4 checkpoint adds exact installed Linux desktop launcher/unit ownership,
+original reserved main-window process binding, normal-exit migration and one-shot
+captured main/secondary reopening after healthy completion and DSH reopening.
+The target socket peers must match their actual new owners and report connection
+and successful restoration. Ten new portable cases pass; focused updater checks
+pass 228 (225 passed, three skips). Actual files/archives/backups are exercised;
+systemd/window/graph/health are explicit mocks in local tests. The isolated native
+fixture now also uses the actual launcher/user desktop service/copied Python and
+inert named windows. Native/full-suite execution remains pending. No production
+eligibility, feed, owner deployment or GUI/provider claim is enabled. Continue the
+cross-platform goal and record native evidence at the exact tested source. See
+[desktop reopening](UPDATE-SYSTEM.md#owned-desktop-migration-and-observed-reopening--october-4).
+
+Broader source/build/package checks at `bc8b256` pass all their jobs in 37156960807:
+Debian, installed packages, Browser package, Home, Handy all platforms and privacy.
+The workflow's overall failure is only the older native runtime fixture, now
+corrected and passed at `0ed4a1b` in focused 37158631483. The preceding `76462aa`
+broad jobs likewise all pass except its checkout-access native fixture. This
+supersedes the transient dual-memory startup failure at `8bc5bfb`; no unrelated
+memory code was changed. Focused native green plus older broad green is scoped
+evidence, not signed forward or whole installed-product qualification.
+
+Native Linux user-service qualification passes at `0ed4a1b` in
+[37158631483](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37158631483).
+The actual disposable systemd/Node/pidfd/graph proof passes busy deferral,
+original normal exit, owned registration/unit migration, daemon reload,
+selection/archival, preserved credentials/enablement and actual target-service
+reopening. Its connected/provider/import and offline UI actions remain mocked;
+desktop/background-owner/windows, signed producer/forward and real DSH health are
+not qualified. The runtime isolation fix supersedes the failures below. Focused
+mode skips broader builds/packages by design; this is not full validation. Public
+Linux eligibility stays disabled. Continue desktop ownership/reopening and full
+release qualification; keep the original cross-platform goal active.
+
+Focused native `dc0c634` fails 37157951783 before socket registration. Its diagnostic
+proves the process UID is the disposable user 1002 while inherited runtime is
+`/run/user/1001`, owned by the runner. The workflow now explicitly imports the
+fresh user's runtime into its own user manager, and the fixture uses that actual
+private runtime for graph discovery. Source privacy/focused-mode skips work; the
+private-directory guard is unchanged. New native qualification is required.
+
+Corrected isolated-source execution at `bc8b256` reaches the actual Node unit, but
+native job 111302228170 in 37156960807 fails its strict runtime ownership/mode
+check before socket registration. The fixture now emits only synthetic runtime
+path/UID/mode diagnostics on that refusal; do not relax the control-server guard.
+Remaining broad jobs in that run were live at the last successful observation.
+Native migration/reopening is still unqualified, and production eligibility is off.
+
+Linux DSH reopening now requires the original live healthy backend/completed
+archive, unchanged selection/artifacts/registrations and inactive migrated unit.
+It starts that fixed unit once, binds the fresh actual target socket peer to its
+live service report and checks target connected health. Unknown start outcomes
+cannot replay. Six local cases pass with actual backend/archives/files and explicit
+graph/systemd/peer/health mocks. Focused checks before the final case pass 216
+(214 passed, two skips); full Python passes 995 (954 passed, 41 skips). The final
+pending-attempt case also passes. Native fixture is extended to service reopening
+but needs the corrected isolated-source workflow run. Desktop/background-owner
+and captured-window reopening remain open; Linux public eligibility stays disabled.
+GitHub status observation of 37155477755 is timing out; keep its still-unverified
+remaining jobs intact, do not restart based on an observation timeout.
+
+The first native user-service job at `76462aa` (111297907075 in 37155477755)
+fails before test import: the disposable account cannot access the runner's
+checkout. The workflow now archives only privacy-checked tracked source and copies
+the pinned Node binary into that account's private home; no checkout Git metadata
+or credentials are copied. Native retry is required. The earlier `8bc5bfb` full
+validation 37154936597 fails an unchanged dual-memory prompt-service restart test
+before Python updater checks; newer validation is still running. Do not count
+either failed checkpoint as updater/service qualification.
+
+Native Linux user-service qualification is now authored in
+`test_update_linux_service_native.py` and the reusable `linux-update-service.yml`
+workflow, called from validation. It creates only a disposable CI account, runs
+the exact user unit with a copied Node executable and inert real control socket,
+and tests busy deferral plus observed normal exit/migration/reload/completion.
+Imports/connection and UI health are explicitly mocked. Local execution skips
+without its dedicated CI prerequisites; native results are pending. No owner
+service/profile or production update flag is changed.
+
+Managed Linux now attaches the exact `augmentor-dsh.service` and shared
+`harnesses.json` to the same flushed registration backups. Source service ownership
+must agree with the live reserved socket peer; only original normal exit allows
+migration and one-shot daemon reload. Credentials, other harnesses, model/voice
+settings and user enablement are preserved. Ten explicit simulated-systemd/peer
+cases pass with actual files/journals. Focused updater checks pass 210 cases
+(209 passed, one OS skip); full Python passes 989 cases (949 passed, 40 explicit
+skips) with isolated dictation/Qt state. Actual user-systemd and target live health/
+reopen qualification remain open. The controller does not start or enable services
+yet. Public flags remain disabled. See [service migration](UPDATE-SYSTEM.md#managed-linux-owned-user-service-migration).
+All Linux/shared validation jobs at `f89b6fc` pass 37153955607. Fresh service-source
+checkpoint `8bc5bfb` validation is running in 37154936597; results are pending.
+
+Owned Linux DSH preset/browser/host registration migration now composes with the
+original managed selection and offline completion. Nine isolated migration cases
+pass, including a 1.0.0→2.0.0 registration/selection transaction and preserved
+model/token/conversation/voice settings. Focused updater checks pass 200 cases
+(199 passed, one skip); full Python passes 979 cases (939 passed, 40 skips) with
+isolated dictation/Qt state. Owned service units, shared harness registration and
+observed background/window reopening remain required before public eligibility.
+The fresh native workflows at `3374580` all pass: Mac 14/26 37151926643,
+Linux/shared 37151929120 and Windows Desktop both CPUs 37151931306. This supersedes
+their pending status below. Newer Linux dependency/registration changes still
+need their own qualification. See [owned migration](UPDATE-SYSTEM.md#managed-linux-owned-registration-migration).
+
+The latest Linux correction preserves the complete `dsh/` and speech payload in
+immutable staging, and requires those public dependency entrypoints before
+candidate imports. Twelve deployment and nine archive cases pass. DSH profile/
+service migration and observed reopening remain required; no manager flag is
+enabled. Fresh `3374580` native workflows are live: Mac 37151926643, Linux/shared
+37151929120 and Windows Desktop 37151931306. Their results are not yet known.
+The newer Linux allowlist/completeness correction requires its own qualification.
+
+Linux now has authentic one-bundle ZIP staging and retained bootstrap/observer
+exec composed with its live selection controller. Eight archive/selection/space
+cases and two actual location/ELF exec cases pass; the negative production
+handoff refuses unqualified source before network/drain/apply. Public eligibility
+remains gated for service/preset/reopen/retention/producer/forward qualification.
+Mac driver discovery now uses the actual shared prompt/memory state directory.
+Fresh authority pins bundled Node. Focused updater checks pass 190 (189 passed,
+one skip); full Python before the final two cases passes 966 (926 passed, 40 skips).
+See [the exact staging/handoff contract](UPDATE-SYSTEM.md#managed-linux-exact-bundle-and-retained-handoff--october-3).
+
+Both complete Mac 14/26 workflows pass at `cde75ee` in
+[37149226481](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37149226481).
+Actual ZIP: 66,643 records, EOCD 1,107, no ZIP64, exact 16-bit wrap. Native retained
+exec/lock/refusal, same-build coordinator/completion and offline health pass.
+The full retried Linux/shared validation at `882dd23` passes 37147851279. These
+newer results supersede the pending/failure status below while preserving history.
+The newer shared ZIP/Mac discovery/controller changes require fresh native runs.
+No customer flag/feed or owner installed application is changed.
+
+Managed Linux now has a live preflight/graph/selection/offline-completion controller,
+with 12 isolated cases including real Qt target subprocess rendering and unknown
+post-replace flush preservation. Focused updater checks pass 177 (176 passed, one
+OS skip), over `cde75ee`. Full Python passes 954 (914 passed, 40 skips) before the final
+added real same-build/empty-graph controller case, which also passes separately.
+Public eligibility remains disabled pending authentic
+bundle/retained exec/service ownership/reopen integration. Debian/RPM controllers,
+coordinated DSH migrations and production signing/feed remain open. See
+[the controller contract](UPDATE-SYSTEM.md#managed-linux-live-selection-controller--october-3).
+
+Mac correction `cde75ee` is running in
+[37149226481](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37149226481).
+The broader `882dd23` validation failed on Mac Handy dependency tarball integrity;
+its dependent Linux packaging jobs did not execute. The failed job is rerunning;
+do not count this as updater or packaging qualification.
+
+At controller checkpoint `882dd23`, Windows Desktop both CPUs passes
+37147849267 and SDK contracts pass 37147853195. Mac 14/26 fails the new produced
+ZIP boundary: the end counter differs from the actual parsed directory
+(37147847618). The parser now walks/counts bounded central records before
+allocation, independently limits actual count and accepts only an exact 16-bit
+wrap when ZIP64 is absent. A real 65,536-entry fixture passes; wrong counters are
+refused. Native rerun must confirm the produced format and later coordinator/exec
+steps. Focused checks pass 165 cases (164 passed, one OS skip). Earlier broad 942
+cases pass at the controller checkpoint. No customer flag/feed is enabled.
+
+
+New Mac controller source now connects the manager to fixed bootstrap/retained
+observer entrypoints, actual exec/code/lock checks, exact one-bundle ZIP staging,
+live reservation/apply/completion and captured-name reopening. It currently
+supports only private per-user Desktop installs; shared/system/companion paths
+remain manual pending their coordination. Public flags/feed are disabled. Native
+coordinator/ZIP/exec refusal qualification is added and pending; the native fixture
+never opens a normal user app or touches an installed profile. Local focused tests
+pass 164 cases (163 passed, one skip); full Python passes 942 (902 passed, 40 skips).
+The earlier `b285823` barrier/completion passes both Mac versions (37143117713),
+and `56a8f17` shared/Linux packaging passes (37142662036). Read
+[the controller contract and remaining full scope](UPDATE-SYSTEM.md#mac-retained-controller-checkpoint).
+
+
+Latest qualification record: `faca8b5` passes the entire Mac 14/26 workflow,
+including packaged offline target health, in 37141250126. Newer persistent Unix
+barrier, live Mac completion and managed Linux changes are pushed through code
+checkpoint `b285823`; native Mac qualification is queued in 37143117713.
+`56a8f17` SDK contracts pass in 37142662043 and shared/Linux validation is running
+in 37142662036. Local focused updater checks pass 155 cases (154 passed, one
+OS skip), all eleven deployment checks pass, and the preceding broad Python
+checkpoint passes 929 cases (889 passed, 40 skips). These source/native fixtures
+are not signed N-to-N+1 or installed owner adoption. Independent Mac bootstrap,
+registration/reopen coordination, complete Linux controllers/recovery, signing
+custody and public feed/bridge delivery remain in the authorized full scope.
+An asynchronous question about existing Apple/Windows production signing accounts
+is pending in addition to the earlier online-key custody preference; do not
+repeat these questions or infer account availability from elapsed time.
+
+
+Packaged offline target health at `faca8b5` now passes on both Mac 14/26 in
+37141250126: the package/retention/apply/health step succeeds on both, Mac 14's
+complete job succeeds, and Mac 26's remaining distribution checks are running.
+The newer persistent barrier/completion and managed Linux changes require their
+own native checks. Public Mac apply additionally requires the exact persistent
+transaction directory used by ordinary startup; fixture/custom directories cannot
+bypass that barrier. Focused updater qualification still passes 155 cases.
+
+
+Managed Linux staging now copies an included Python runtime and retains its
+immutable path/inventory. Installed managed receipts use private lifetime locks
+and the persistent pending barrier, with moved-root refusal, instead of OS package
+queries. Three actual Linux lease cases and all eleven deployment cases pass;
+the focused updater set passes 155 cases (154 passed, one OS skip). The full Linux
+controller remains open; no installed selection has changed. See
+[managed artifact evidence](UPDATE-SYSTEM.md#managed-linux-artifact-retention-and-lifetime).
+
+Current native checkpoint `641d4ed` passes Mac 14/26 whole-bundle retention and
+same-build atomic apply (37138674288), all shared/Linux packaging validation
+(37138676353), SDK platform contracts (37138678547), and Windows Desktop both
+CPUs (37138680350). Full Windows at `9bce979` passes both CPUs including busy
+deferral, target health, reopening and repair/remove (37134219949). Earlier
+failure/pending observations below are historical; the current Mac health and
+completion additions still need their own native qualification.
+
+Focused updater qualification passes 152 cases (151 passed, one OS skip) with
+isolated Qt state. Native Mac compilation/completion remains pending.
+The broad Python checkpoint passes 929 cases (889 passed, 40 explicit skips)
+using an isolated dictation state directory. Completion also validates the
+actual source/target build receipts; public qualification is read from the
+checked nested update receipt, rather than an unbound version label.
+
+Unix normal startup now refuses any persistent active transaction outside the
+socket runtime, including malformed records and after runtime recreation. The
+Mac native launcher refuses it before Python initialization. A successful live
+Mac backend can bind its exact acknowledged journal and complete it only after
+fresh exclusive admission, exact retained-source inspection and offline target
+health. The disposable same-build native proof now exercises pending restart
+refusal, wrong-identity preservation, archival and replay refusal. This is not
+signed N-to-N+1 qualification or a complete Mac controller: independent bootstrap,
+owned launchd pause/reopen and publisher provisioning remain open. No customer
+flag/feed or installed owner application is changed. Read
+[Unix persistent barrier and Mac completion](UPDATE-SYSTEM.md#unix-persistent-barrier-and-mac-completion).
+
+Windows full at `9bce979` now passes both CPUs, including busy deferral, target
+health, reopen and later repair/remove (37134219949); all six workflows pass that
+head. Newer Unix source is separate. A fixed offline Mac target render/identity
+observer is added and hooked into the retained-copy proof. Two report and two
+shared render cases pass locally; native action execution is pending. The fixture
+keeps its shared transaction pending and supplies no production completion/reopen
+or signed forward authority. Read [offline health](UPDATE-SYSTEM.md#mac-offline-target-health).
+
+Whole Mac bundle inspection and one-shot final-lease native replacement are now
+added. Two inert whole-bundle/link cases pass; 147 focused updater cases pass
+with one OS skip. A new hosted same-build retained-copy/journal/graph apply proof
+is pending and does not claim health/reopen or signed forward installation.
+Full Windows x64 at `9bce979` passes actual busy deferral, complete target health
+and captured-instance reopen (37134219949); ARM64 remains pending. See
+[Mac native apply checkpoint](UPDATE-SYSTEM.md#mac-retained-bundle-and-native-apply-checkpoint).
+
+Native Mac 14/26 at `000fb62` passes compiled launcher lock/export and Unix graph
+cases, then fails packaged SDK native-description qualification. SDK hosts now
+retain their busy registration without the Browser document control endpoint;
+source Linux SDK proof passes and bounded native diagnostics are preserved. Fresh
+combined Mac qualification is required; no customer flag/app is deployed.
+
+Unix source now has startup exclusion, SDK registration surviving exec, and
+private installed DSH/Browser endpoints bound to their original kernel-observed
+Node processes. `PosixPreparation` reserves and normally drains exact-source
+components with durable checkpoints; five real Node/graph and three startup/exec
+fixtures pass. Broad source checks pass 922 Python/40 skips, 531 Node/two skips,
+92 Browser, type/build. Mac 14/26 passes earlier `9bce979` peer/shortcut changes;
+new compiled-launcher leases and combined graph code require native CI. Complete
+Unix external apply/health/reopen and registration coordination remain open.
+Read [Unix graph contract](UPDATE-SYSTEM.md#unix-startup-and-graph-preparation).
+
+Mac shortcut admission and kernel-bound Unix peer observation are now added;
+Linux real-peer checks pass three cases and focused Mac shortcut checks pass eleven.
+Native Mac qualification and the complete Unix installation adapter remain open.
+At `d34b60d`, Windows Desktop native ACL checks pass both CPUs. Full x64 reaches
+target reopening but fails its later fixture checkpoint in a nonprivate evidence
+folder; the source corrects the checkpoint to the private runtime. Fresh full
+qualification is required. See [Unix checkpoint](UPDATE-SYSTEM.md#unix-coordination-checkpoint).
+
+The signing tool now prepares offline root replacement with both old/new
+two-of-three signatures, then activates an exact pinned next root through one
+atomic publisher-state selection. It retains immutable root history and burned
+metadata/artifact identities. Real producer/client tests pass 23 cases, including
+an actual HTTP client advancing roots 1→2→3 and downloading inert bytes. Online
+key migration/custody/public provisioning remain unfinished; see
+[offline root replacement](UPDATE-SYSTEM.md#offline-root-replacement).
+At `5891eef`, Mac 14/26, shared validation, SDK platform contracts and installer
+feasibility pass. Windows Desktop fails the new lease fixture's temporary-parent
+ACL. Full x64 completes busy-draft deferral and target health, then fails reopen
+on normal installed-code ownership/read grants. The source now separates public
+installed-code read-only validation from private cache validation and corrects
+the fixture parent; new native ACL/reopen qualification is required. Do not treat
+the failed x64 run as a successful reopening proof.
+
+Latest controller integration connects qualified Windows downloads to the fixed
+supervisor/bootstrap, outside the shared service's work admission. Fresh launch
+identifiers/results report status only; actual cancelled preparation can defer
+five minutes, while uncertain outcomes block replay. The original live observer
+captures instance names and reopens the health-verified target/background owner.
+SDK server kernel leases defer preparation before desktop shutdown. Completed
+temporary runtimes are cleaned only after actual holders exit; unknown attempts
+are preserved. Focused updater checks pass 134 cases (one OS skip). New full
+Windows fixtures cover busy-draft deferral and reopening and await native CI.
+Read [current controller evidence and remaining work](UPDATE-SYSTEM.md#live-installation-controller-deferral-and-reopening).
+The prior combined source `4327ffd` passes all six hosted workflows, including
+full Windows installation on both CPUs and Mac 14/26. Those passes qualify the
+earlier completion/log/exit-fence changes, not this newer controller or signed
+N-to-N+1. Automatic flags/public feed remain disabled; Linux/Mac adapters, SDK
+graceful maintenance, verified controller recovery reset and signing/publication
+remain unfinished. Nothing has been deployed to installed apps.
+
+`feat/automatic-updates` starts from main `c7f895d416e6b94ca601b66a09caf4846a64b907`.
+The branch now incorporates main `550e274d9f0c01f35c0e3b4d7d3743fed4899971`
+(dictation isolation/readiness, approved Handy and SDK alignment). All owning records
+are retained below; new combined native checks are required. A preexisting local
+dictation variant is preserved in Git stash `99373c252a1dcd0588c57c63e8477ac5fa2c95bc`;
+main already includes equivalent offscreen isolation with fuller explanation.
+Code checkpoint `dc814c224c8d37e740d2806372bfb9ee61fb49b0` passes the documented
+Linux/source and synthetic suites. The owner authorizes autonomous implementation of the complete update system,
+including optional automatic installation. [The owning guide](UPDATE-SYSTEM.md)
+records the shared scheduler, exact identity/compatibility policy, Desktop/Browser
+controls, manual downloads and TUF client integration. Automatic installation
+and public signed-feed provisioning are unfinished. The publisher now has
+two-of-three root initialization, online-only refresh and a real producer/client
+transfer proof. Initial Mac bundled-runtime checks pass; Windows desktop CI found
+a download fixture/ACL boundary issue now corrected and passing native x64/ARM64
+desktop CI at `632c2f3` (shared validation also passes; existing full Windows
+same-build installer fixtures pass earlier `ae8595f`). New producer recovery
+preserves partial attempts, burns uncertain versions and retains withdrawn asset
+identities. Debian/Mac/Windows builders now stamp reviewed build/component
+identities and public trust inputs; these newer packaging changes require fresh
+native CI. Native Windows desktop checks also pass `8d7f500`; Mac native updater
+tests pass, but packaging at that head caught a source-record variable collision
+corrected in both Mac/Windows builders at `97837de`; macOS 14/26 bundled-runtime,
+Windows Desktop x64/ARM64 and shared validation pass that head. The shared
+coordinator has explicit final-authority hooks. Its independent live guard now
+requires qualified source, fresh publisher verification, live consent/selection
+and retained exact downloads, with bounded shared helper transport. External
+apply/target-observer composition and fresh native qualification of these additions
+remain required. Mac companion
+selection cannot receive a desktop bundle. Windows independent inspection now
+has exact proposed-target assessment and isolated target health, kept separate
+from source restoration. Eight portable assessment tests and native template
+target-health checks on both CPUs pass at `1882338` (37115087292); full-application
+target health remains pending. These read-only actions preserve the active journal
+and grant no apply/completion authority. External observer-runtime staging now
+copies/rechecks exact source Python/services/scripts into private nonreplacement
+directories (five inert tests); native relocation/identity-import proofs are added
+and pending. Repository helpers now serialize the shared TUF cache through a
+bounded cancellable kernel writer; focused updater tests pass 104 cases (one OS
+skip). `97837de` full Windows qualification passes x64, but ARM64 recovery exceeded
+its five-minute observer limit despite Setup finishing immediately afterward.
+Inner/outer observation bounds are corrected; fresh native recovery is required.
+Read-only actual installer process/Job/artifact transfer and receiver validation
+now support an external observer. Native template relocation and same-process
+sender-close proofs pass both CPUs at `536e875` (37118685817); Windows Desktop also
+passes both CPUs (37118685782). Combined Linux/source checks at that head pass
+519 JavaScript tests/2 skips and 834 Python/Qt tests/39 skips, plus build/type checks.
+Mac checks failed only the new observer fixture's unnormalized `/var` alias;
+that fixture is corrected without relaxing production ancestor validation.
+The newer private live observer channel binds the actual separately launched
+coordinator process/Job, transfers read-only Setup observations, requires parent
+retention/liveness before APPLY, and observes complete actual Jobs after child
+exit. Both template/full-application fixtures now use this real separate-process
+channel; those newer native checks remain pending. A fixed external production
+coordinator composes fresh TUF/consent authority, exact current source/recovery,
+journal, graph drain and observed native APPLY with no arbitrary installer/command.
+Its worker Job permits separately observed Setup breakaway without kill-on-close.
+Five portable fault cases and the focused updater set pass (109 tests, one skip).
+The service/supervisor still must launch the independent parent and complete target
+health/restart; the fixed worker is not a complete production update controller.
+At `5d9c0ef`, separate-process template observation passes both CPUs (sixteen
+recorded stages in 37119738791); the overall x64 workflow fails later in a separate
+negative WinSparkle callback's modal cleanup. Recorded progress confirms refusal;
+continuous own-process-only dismissal now addresses that fixture race. macOS 14/26
+and Windows Desktop both CPUs pass that head (37119738882/37119738796).
+The newer target completion composes actual live Setup/coordinator exit with
+independent exact-target inventory/Qt health, current candidate build/selection and
+fresh admission/writer. Native reports now bind inventory digest, and the live
+coordinator forwards its acknowledged journal ID/hash to prevent completing a
+replacement same-pair record. Focused updater tests pass 116 cases (one skip),
+including four target report and three snapshot failures. The full native fixture
+now uses this path with sequence 1 only for an unpublished development artifact;
+customer distribution/automatic qualification stay false. Do not publish its
+number or treat it as signed N-to-N+1. Fresh native completion qualification,
+supervisor/service launch, appropriate reopen and the other platforms remain open.
+The next source checkpoint adds the fixed supervisor/bootstrap/external-parent
+launch handoff. The external parent authenticates and observes the actual source
+bootstrap's successful kernel exit before coordination; source readers and the
+supervisor's source executable pin end before replacement. Signed target catalogs
+must also explicitly qualify automatic installation; signed manual downloads
+cannot inherit that authority. The new inert native exit-fence proof is pending.
+`2ac4f16` passes Windows Desktop/installer feasibility, Mac 14/26 and shared
+validation. Its full x64 completion found the reader's 1 MiB extraction-log bound
+too small. Streaming diagnostics now have independent total/line bounds while the
+typed health report retains its 64 KiB and exact-identity checks. Fresh native
+completion is required. Focused updater tests pass 120 cases (one OS skip),
+portable supervisor tests pass seven (two native skips), and Node publisher/client
+tests pass 19. The manager's installation scheduling, result/deferral reporting,
+reopen/retention and other platform adapters remain open; no customer flag/feed
+is enabled. Read [the latest launch/completion record](UPDATE-SYSTEM.md#source-launch-handoff-and-completion-log-correction)
+before interpreting earlier pending evidence.
+The main `550e274` integration preserves SDK source qualification and excludes
+shared Updates administration from SDK settings. Combined build/type/privacy,
+527 Node tests/two skips, 92 Browser cases and 855 Python/Qt tests/39 skips pass
+with locked test dependencies and isolated dictation state; new native checks
+remain required on this combined source. The initial broad Node invocation with
+missing qualification dependencies was stopped and is not passing evidence.
+Root
+rotation/CI custody, public feed provisioning, external installation adapters,
+final consent/revocation and N-to-N+1 health/recovery remain open. Do not narrow the goal to
+notification/downloads or mark it complete based on this checkpoint. Nothing
+has been deployed into existing installed apps. Preserve the canonical checkout’s
+existing dirty work; implementation is in a separate feature checkout.
+
 ## Application SDK alignment source — October 3
 
 The owner-authorized source integration is complete: product PR #34 merged on

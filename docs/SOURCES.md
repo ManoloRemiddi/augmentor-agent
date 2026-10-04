@@ -2,6 +2,37 @@
 
 # Source baselines and migration inventory
 
+## Managed Linux portal bindings — October 4 candidate
+
+[PyGObject 3.52.4](https://pypi.org/project/PyGObject/3.52.4/) and
+[Pycairo 1.28.0](https://pypi.org/project/pycairo/1.28.0/) official source
+archives are SHA-256/length pinned in `release/linux-managed.json`. Their native
+build tools are separately hash locked in `release/linux-portal-build.txt`.
+[GNOME packaging requirements](https://pygobject.gnome.org/devguide/packagingguide.html)
+require GLib/GIRepository 2.80 for this binding generation. The builder records
+source/wheel hashes and actual native/build-tool versions, and the runtime notice
+inventory retains original license texts (PyGObject LGPL-2.1-or-later; Pycairo
+LGPL-2.1-only OR MPL-1.1). Redistribution review stays unqualified. Actual
+isolated x64 native compilation, imports and portal D-Bus fixture pass; final
+native two-CPU bundles and real compositor acceptance remain separate. See
+[scope and evidence](UPDATE-SYSTEM.md#linux-portal-dependency-closure--october-4-candidate).
+
+## Update repository client — October 3
+
+[`tuf-js`](https://github.com/theupdateframework/tuf-js) **6.0.0** and
+`@tufjs/models` **5.0.0** are pinned and locked. Both declare MIT; transitive
+`@tufjs/canonical-json` 2.0.0, `@gar/promise-retry` 1.0.3, minimatch 10.2.6
+and their dependencies retain their upstream licenses (including BlueOak-1.0.0
+for minimatch). The existing release notice inventory collects original texts.
+Node 24.19.0 exercises real Ed25519/TUF verification and bounded transfer on Linux.
+The engines range now follows the actual TUF dependency requirement: Node
+22.22.2+, supported 24.15.0+ or 26+. Existing release runtimes pin 24.19.0.
+The cache adapter overrides the pinned client’s metadata persistence method
+without changing verification, and preserves its internal `DownloadHTTPError`
+class for missing-next-root handling. Upgrade these together and rerun trust,
+rotation, cache and transfer tests. No published feed or installed automatic
+update is claimed; see [update implementation](UPDATE-SYSTEM.md).
+
 ## Embedded Handy — 2 October 2026
 
 [Handy v0.9.7](https://github.com/cjpais/Handy/tree/05e0aedd2906f0d82722735f930465950c476b90)

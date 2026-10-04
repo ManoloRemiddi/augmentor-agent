@@ -2,7 +2,7 @@
 /** Shared installation administration is owned by standalone Augmentor. */
 export function settingsSections(definitions, workspace) {
   if (!workspace?.sdkProtocol) return definitions
-  return definitions.filter(([id]) => !['dictation', 'harnesses', 'home', 'support'].includes(id))
+  return definitions.filter(([id]) => !['dictation', 'harnesses', 'home', 'support', 'updates'].includes(id))
 }
 
 export const appearancePreferenceKeys=['augmentor-theme','augmentor-neut-hue','augmentor-neut-bright','augmentor-accent-hue','augmentor-accent-bright','augmentor-format-colours','augmentor-expand-thinking']

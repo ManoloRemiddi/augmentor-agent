@@ -18,6 +18,7 @@ import { submitDraft } from './prompt-send.mjs'
 import { attachVoice } from './voice.mjs'
 import { attachPromptLibrary } from './prompt-library.mjs'
 import { attachPageMaintenance } from './maintenance-page.mjs'
+import {attachUpdateNotice} from './update-settings.mjs'
 
 let surfaceCapabilities={branch:false,edit:false},editingMessage=null
 const answeredInteractions=new Set()
@@ -80,6 +81,7 @@ const openSettings=async(section)=>{
 // The same More menu entry point as the floating window.
 import {attachSurface} from './surface.mjs'
 const surface=attachSurface({send,openSettings,onError:message=>ui.sendFail(message),approval:()=>openAccessMenu(),state:()=>ui.state})
+if(!chrome.runtime.getManifest?.().augmentorWorkspace)attachUpdateNotice({document,send,openSettings,paused:()=>maintenance.paused})
 let refreshSerial=0
 const setupNotice=document.createElement('button');setupNotice.id='setup-notice';setupNotice.hidden=true
 setupNotice.textContent='Connect a model in Settings';setupNotice.onclick=()=>openSettings('models')

@@ -14,6 +14,7 @@ import {promptEditor} from './prompt-editor.mjs'
 import {supportDialog} from './support.mjs'
 import {attachPageMaintenance, registerMaintenanceState} from './maintenance-page.mjs'
 import {dictationSettings} from './dictation-settings.mjs'
+import {updateSettings} from './update-settings.mjs'
 import {settingsSections} from './workspace-settings.mjs'
 
 const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:()=>checking||mounting>0})
@@ -37,6 +38,7 @@ const definitions=[
   ['home','Home','Connect your NAS and use Home in your Augmentor conversations.','M3 10l9-7 9 7v11H3z'],
   ['memory','Memories',chrome.runtime.getManifest().augmentorWorkspace?'Dedicated to '+chrome.runtime.getManifest().augmentorWorkspace.name+'.':'Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
   ['support','Support','Version information and a report you can review before sharing.','M12 11v6m0-10v1M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0'],
+  ['updates','Updates','New versions, downloads and shared update preferences.','M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4'],
 ]
 for(const [id,label,description,path] of settingsSections(definitions,chrome.runtime.getManifest().augmentorWorkspace)){
   const link=make('a');link.href='#'+id;link.id='nav-'+id
@@ -170,7 +172,7 @@ async function showVoice(container){
 }
 function mount(id){
   const row=sections.get(id);if(row.mounted)return
-  if(!['appearance','dictation'].includes(id)&&!['ready','needs-setup'].includes(state.phase)){
+  if(!['appearance','dictation','updates'].includes(id)&&!['ready','needs-setup'].includes(state.phase)){
     row.body.textContent=state.error||'Connecting to the Augmentor companion… Settings will appear here when it is available.'
     return
   }
@@ -188,6 +190,7 @@ function mount(id){
   if(id==='memory')showMemory(row.body)
   if(id==='voice')void mountAsync(()=>showVoice(row.body))
   if(id==='dictation')void dictationSettings(row.body,send).catch(fail)
+  if(id==='updates')void mountAsync(()=>updateSettings(row.body,send,{registerDirty:registerMaintenanceState}))
   if(id==='support'){
     const version=make('div');version.className='card';version.append(make('h2','Augmentor '+chrome.runtime.getManifest().version),make('p','This preview is updated with the Augmentor installer. The companion and extension must use matching versions.'));row.body.append(version)
     void mountAsync(()=>supportDialog(document,send,row.body))

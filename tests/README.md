@@ -51,6 +51,13 @@ DSH installation/environment and package acceptance steps.
 | Maintenance | `python3 -m unittest discover -s tests -p test_lifecycle.py` | Lifetime locks, preserved backups, real temporary memory service shutdown |
 | Durable update record | `python3 -m unittest discover -s tests -p test_update_journal.py` | Real private-file writes, independent writer exclusion, child-process crash, lost flush/acknowledgment and preserved recovery state. Native Inno handoff uses it in disposable repair fixtures; no automatic recovery or customer-update claim. |
 | Update decisions | `python3 -m unittest discover -s tests -p test_update_coordinator.py` | Real journal/admission with fixture graph and installer. Busy work, failed drain, readiness failure, durable intent and one-shot APPLY. Product backend/UI and recovery remain separate gates. |
+| Update controller and runtime leases | `python3 -m unittest discover -s tests -p 'test_update*.py'` | Controller uses an inert launch adapter; scheduling, consent and unknown-outcome refusal are separate from native apply authority. Actual child-process tests verify SDK busy deferral and cleanup only after kernel lease release. Full Windows installed fixtures additionally exercise live busy-draft cancellation and captured-instance reopening. See [current evidence](../docs/UPDATE-SYSTEM.md#live-installation-controller-deferral-and-reopening). |
+| Mac offline target health | `python3 -m unittest discover -s tests -p test_update_macos_health.py`; `test_local_health.py`; hosted retained-copy proof | Typed exact-metadata/font/render evidence and existing real shared preview pass locally. Sealed bundled target/actual successful process exit is pending native qualification. No model/services, transaction completion, permissions or normal reopen claim. |
+| Mac whole-bundle retention/apply | `python3 -m unittest discover -s tests -p test_update_macos_payload.py`; `scripts/macos-update-payload-proof.py --app <development-bundle> --out <empty-private-folder>` in hosted Mac workflow | Inert link/relocation boundaries pass locally. Native signatures, full runtime copy, actual kernel reader refusal and shared journal/graph same-build retained-copy apply are pending. Original artifact, source backup and synthetic state must remain. No public signing, target health/reopen or customer install claim. |
+| Unix startup and graph | `python3 -m unittest discover -s tests -p 'test_update_posix*.py'`; Mac native launcher/workflow | Actual kernel reader/writer exclusion, SDK exec survival, real Node control/graph busy cancellation and checkpointed normal exit. Native Mac C lock/export tests are pending; complete installer/launchd/health qualification remains separate. |
+| Unix update process identity | `python3 -m unittest discover -s tests -p test_update_peer_process.py`; Mac workflow | Three actual inert Unix peers: exact executable, retained process exit, refusal after exit and closing observation preserves peer. Linux passes; native Mac remains required. No process signals or installer authority. |
+| Mac shortcut maintenance | `python3 -m unittest discover -s tests -p test_macos_shortcut_service.py` | Eleven cases including actual IPC/helper fixtures, busy admission, cancel, saved-binding preservation and normal committed shutdown. No owner keyboard hook or launchd deployment. |
+| Publisher root replacement | `node --test tests/updates-publisher.test.mjs tests/updates-repository.test.mjs` | Temporary two-of-three authorities; actual HTTP TUF root 1→2→3 and inert transfer, interrupted publisher-state commit, immutable history and refusal cases. Does not generate production keys, migrate online keys, publish a feed or qualify installation. |
 | Release delivery and retained source | `python3 -m unittest discover -s tests -p test_update_release.py`; `python3 -m unittest discover -s tests -p test_update_installed_source.py` | Real Ed25519/private files with fixture keys and inert EXE bytes; forward-delivery vs recorded-recovery policy, exact native selection format and held-file ownership. Native publication/readback uses the application-template proof; complete cached-source application remains a separate installed proof. |
 | DSH approval / questions / forks | `scripts/dsh-setup-proof.py` with workflow flags | Actual DSH and Qt, deterministic model |
 | Native pointer / clipboard | `bash scripts/native-x11-proof.sh` | Isolated X11 desktop, actual input/clipboard |
@@ -801,3 +808,142 @@ and parent-scoped branch status through the packed SDK/native host. Browser
 limits. Full local source qualification uses
 `AUGMENTOR_PYTHON=/absolute/isolated/Qt/python node --test --test-concurrency=4 tests/*.test.mjs`;
 hosted default-concurrency checks remain an independent gate.
+
+
+`test_update_posix_startup.py` checks that a persistent active record blocks normal
+startup after runtime recreation, preserves malformed/linked records, and allows
+only maintenance inspection. `test_macos_native_launcher.py` checks real native
+refusal before Python output. The hosted `macos-update-payload-proof.py` exercises
+live same-build completion, wrong-target preservation, exact offline health,
+archival and replay refusal in disposable bundles. It does not qualify a public
+signed forward update or launchd/reopening.
+
+`test_update_managed_lease.py` uses actual Linux private kernel leases and
+isolated state to check installed managed lifetime, persistent pending refusal
+and moved-root refusal without OS package operations. The bundled-interpreter
+case in `test_desktop_deployment.py` verifies retained bytes, fixed immutable
+paths and damaged-artifact refusal without changing the selected build.
+
+
+`test_update_macos_staging.py` exercises actual ZIP/ZIP64 directories, internal
+framework links/resource sidecars, local-versus-central path mismatch, traversal,
+link writes, collisions and opening-plan names. `test_update_macos_locations.py`
+checks actual POSIX private-home modes, per-user versus shared locations and
+explicit profile/runtime boundaries (skipped on Windows). The native Mac payload
+proof uses the actual coordinator and produced ZIP; its handoff helper execs the
+retained interpreter with the original lock and requires production refusal of an
+unqualified development bundle before source work. These fixtures do not claim
+signed forward or normal captured-window/login-service acceptance.
+
+
+The Mac ZIP fixture also constructs a real 65,536-entry directory and checks its
+exact native-style 16-bit end-count representation, plus malformed-counter
+refusal. Entry limits are enforced by walking central records before the standard
+parser allocates them. Hosted output reports the actual/end counts and ZIP64
+format; fixture compatibility is not native produced-archive qualification.
+
+
+Managed Linux owned registration: `test_update_linux_registration.py` exercises
+actual preset/browser/composition files, bundled module links and flushed private
+backups. Cases preserve model/token/chat/voice settings, refuse edits, ambiguous
+composition and unrelated journal pairs, and retain partial unknown writes. Its
+1.0.0→2.0.0 controller composition uses actual selection/journal/archive operations
+with mocked imports/connection and health; it does not prove installed DSH service
+migration or reopening. Run with `python3 -B -m unittest discover -s tests -p
+test_update_linux_registration.py`. Nine cases pass; the complete focused updater
+set passes 200 cases (199 passed, one OS skip).
+
+`test_update_linux_services.py` adds ten actual-file/journal unit/shared-registration
+cases with explicitly simulated systemd and retained peer observations. They cover
+complete-installer grammar, customized/drop-in/stale ownership refusal, preserved
+credentials/enablement/other harnesses, normal-exit requirements, unknown daemon
+reload refusal and a version-changing controller composition. Graph drain, imports
+and offline health are mocked in that composition. This is not an installed
+user-systemd or reopening proof.
+
+`test_update_linux_service_native.py` is the separate actual user-systemd fixture.
+Run through `.github/workflows/linux-update-service.yml` (also called by validation),
+which provisions and removes its disposable CI account. It checks actual service
+ownership, original socket pidfd, busy deferral, normal drain, file/selection
+migration, reload and completion while preserving synthetic credentials/settings.
+The Node participant is an inert maintenance fixture; connected/import and UI
+health actions are mocked. Native qualification is pending. Ordinary discovery
+skips this test without its dedicated CI user and explicit qualification flag.
+
+`test_update_linux_reopen.py` checks original-backend/archive/selection authority
+and one-shot migrated DSH start. Six cases cover successful target health with
+preserved settings, changed archive/target, new pending attempt, uncertain start,
+wrong peer and changed target during health. Graph/systemd/peer/health actions are
+explicitly simulated; actual files/journal/completion are composed. The native
+fixture is separately extended to target-service reopening with real OS/kernel
+observations, pending execution. Neither set qualifies desktop/window reopening.
+
+Native fixture at `0ed4a1b` passes focused workflow 37158631483: actual systemd/Node/
+pidfd/graph, busy deferral, normal exit, owned migration/reload/selection/archive and
+target-service reopening, with preserved synthetic credentials and enablement.
+Connected/provider/import/UI actions remain mocked. Focused mode skips broad
+build/package jobs; it does not qualify desktop windows or a signed forward update.
+
+Managed Linux updates: `test_update_linux_managed.py` covers real isolated locks,
+journals and immutable selections, compatibility before drain, changed content/
+modes/selection, live authority revocation, lifetime contention, failed health and
+unknown post-replace namespace flush. Its separate subprocess case renders the
+actual copied shared Qt UI with a disposable profile. Import/health mocks in the
+selection fixtures are explicit; this is not installed signed forward qualification.
+
+`test_update_linux_staging.py` checks real fixed-name ZIP bytes, paths/links/modes,
+identity/public qualification, publisher selection refusal, private configuration
+and interpreter relocation, import failure and separate extraction/immutable-copy
+space requirements. `test_update_linux_handoff.py` execs an actual copied ELF
+runtime with a real inherited flock and verifies fixed production refusal before
+network/drain/apply. `test_update_posix_paths.py` checks actual prompt/memory state
+location conventions. These do not qualify public automatic installation.
+
+Managed staging additionally retains the complete packaged DSH/speech directory:
+`test_desktop_deployment.py` checks unchanged source isolation and retained speech
+damage refusal. Public bundle staging refuses missing DSH/speech even when its
+synthetic receipt claims qualification, before importing candidate code.
+
+`test_update_signed_authority.py` requires locked Node/TUF dependencies (`npm ci`)
+and exercises real ephemeral Ed25519 signatures, loopback HTTP and an actual inert
+download together with Python's live installation authority. Fresh signed release
+withdrawal and a damaged timestamp signature refuse authorization after download.
+The artifact is never executed; machine/source identity and qualification flags
+are synthetic. Windows uses the bundled Node/Python and seals the downloaded
+fixture's ACL before binding its retained descriptor. Run with `python3 -B -m
+unittest discover -s tests -p test_update_signed_authority.py -v`; absence of the
+locked dependencies is an explicit skip. Full Windows builds invoke it after
+dependency installation. This is authorization evidence, not OS forward-update
+qualification or production signing/feed provisioning.
+
+`test_update_posix_observer_retention.py` uses actual Unix file locks and a normally
+exiting inert child to ensure complete retained update runtimes survive until
+process exit. Four cases cover unchanged completed collection, unknown/unleased
+and foreign hints, changed/hardlinked/external-link/extra contents preservation,
+and a Mac-shaped internal framework link with an untouched selected release.
+This runs on Linux/macOS and explicitly skips Windows. The existing copied Linux
+ELF handoff test also verifies production observer refusal before network/apply,
+then collection after actual exit without changing the selected source. No model,
+installer or private user profile is exercised; Mac bundle signing/forward
+integration is a separate native qualification gate.
+
+The additional redirected-parent refusal case makes five retention cases. The
+fixture factory canonicalizes only macOS's own temporary-directory alias; the
+collector still refuses redirected inputs. Managed Linux x64/ARM64 builds now run
+all five retention, three copied-ELF handoff and two real signed-authority cases on
+the native host after locked Node dependencies are installed, before packaging.
+
+`test_update_windows_signing.py` has three portable publisher-policy/report cases
+and one separately gated native case. Native desktop/full builds explicitly set
+`AUGMENTOR_WINDOWS_SIGNING_PROOF_ROOT` to their hash-locked disposable runtime;
+the fixed verifier inspects Node's real timestamped Authenticode signature,
+matching/wrong qualification pins and damaged copied bytes. It never executes
+Node as a target, creates a certificate or changes the disabled Augmentor policy.
+Without that dedicated Windows root the native case explicitly skips. This is
+OS verification evidence, not signed Augmentor installer/forward qualification.
+
+Windows package intake also requires the disabled source publisher policy,
+fixed PowerShell verifier and Python verifier module. Seven package cases include
+fresh producer omissions: each incomplete disposable build has a consistent
+sealed inventory but is still refused before installer construction. No installed
+payload is resealed and no production publisher is provisioned by these tests.

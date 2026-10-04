@@ -5,10 +5,21 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      native_service_only:
+        description: Run only privacy and native Linux service qualification
+        type: boolean
+        required: false
+        default: false
+      managed_linux_only:
+        description: Run only privacy and complete Linux managed bundle qualification
+        type: boolean
+        required: false
+        default: false
 permissions:
   contents: read
 concurrency:
-  group: validation-${{ github.ref }}
+  group: validation-${{ github.ref }}${{ inputs.native_service_only && '-native-service' || inputs.managed_linux_only && '-managed-linux' || '' }}
   cancel-in-progress: true
 jobs:
   source-boundary:
@@ -18,11 +29,26 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
+      - name: Refuse incompatible focused scopes
+        if: ${{ inputs.native_service_only && inputs.managed_linux_only }}
+        run: exit 1
       - run: python3 scripts/check-private-source-boundary.py
   handy:
+    if: ${{ inputs.native_service_only != true }}
     needs: source-boundary
     uses: ./.github/workflows/handy.yml
+    with:
+      platforms: ${{ inputs.managed_linux_only && '["ubuntu-24.04", "ubuntu-24.04-arm"]' || '["ubuntu-24.04", "ubuntu-24.04-arm", "macos-14", "windows-2022"]' }}
+  linux-managed-bundle:
+    if: ${{ inputs.native_service_only != true }}
+    needs: [source-boundary, handy]
+    uses: ./.github/workflows/linux-managed-bundle.yml
+  linux-owned-service:
+    if: ${{ inputs.managed_linux_only != true }}
+    needs: source-boundary
+    uses: ./.github/workflows/linux-update-service.yml
   home-runtime:
+    if: ${{ inputs.native_service_only != true && inputs.managed_linux_only != true }}
     needs: source-boundary
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -41,6 +67,7 @@ jobs:
           -e AUGMENTOR_SHARED_DATA=/tmp/data augmentor-home:ci
           node --input-type=module -e 'import {promptCall} from "../../dist/prompt-library/src/client.js"; const r=await promptCall("prompts.list"); if(!Array.isArray(r.prompts))process.exit(1);'
   debian:
+    if: ${{ inputs.native_service_only != true && inputs.managed_linux_only != true }}
     needs: [source-boundary, handy]
     runs-on: ubuntu-24.04
     container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f

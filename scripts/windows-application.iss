@@ -114,6 +114,8 @@ function PrepareInspection(Temporary: String): BOOL;
   external 'AugmentorInspectionPrepare@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function RunInspection(Installed, ReleaseDigest: String): BOOL;
   external 'AugmentorInspectionRun@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
+function RunTargetInspection(Installed, ReleaseDigest: String): BOOL;
+  external 'AugmentorInspectionTargetRun@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function InspectionStage: Cardinal;
   external 'AugmentorInspectionStage@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 function InspectionDetail: Cardinal;
@@ -130,7 +132,7 @@ function PrepareSourceRestoration(Application: String): BOOL;
 function ObserveSourceRecovery(Installed, ReleaseDigest, HelperDigest, InstallationKey, ApplicationId, Qualification: String): BOOL;
   external 'AugmentorRecoveryObserve@files:augmentor-installer-handoff.dll stdcall delayload setuponly';
 
-function PrepareIndependentAssessment(AssessSource: Boolean): Boolean;
+function PrepareIndependentAssessment(AssessRecord, TargetRecord: Boolean): Boolean;
 var Ready: Boolean; ReportText: AnsiString;
 begin
   Result := False;
@@ -147,7 +149,7 @@ begin
   end;
   Ready := PrepareInspection(ExpandConstant('{tmp}'));
   if not Ready then begin Log('Augmentor independent inspection: scratch creation failed.'); exit; end;
-  if AssessSource then begin
+  if AssessRecord then begin
     Ready := SnapshotUpdate(Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}'))));
     if not Ready then begin Log('Augmentor independent inspection: exclusive private update snapshot unavailable.'); exit; end;
   end;
@@ -157,7 +159,10 @@ begin
   ExtractTemporaryFiles('{app}\current\services\lifecycle\*.py');
   ExtractTemporaryFiles('{app}\current\services\platform_adapters\*.py');
   ExtractTemporaryFiles('{app}\current\python\*');
-  Ready := RunInspection(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}');
+  if TargetRecord then
+    Ready := RunTargetInspection(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}')
+  else
+    Ready := RunInspection(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}');
   if not Ready then begin
     Log('Augmentor independent inspection: worker failed; stage=' + IntToStr(InspectionStage) +
       ', detail=' + IntToStr(InspectionDetail) + '; installation preserved.'); exit;
@@ -168,12 +173,12 @@ begin
   Result := True;
 end;
 
-procedure InspectIndependentPayload(AssessSource, ObserveHealth: Boolean);
+procedure InspectIndependentPayload(AssessRecord, ObserveHealth, TargetRecord: Boolean);
 var Ready: Boolean; ReportText: AnsiString;
 begin
   { Returning False from InitializeSetup prevents all installation sections. }
   try
-    if not PrepareIndependentAssessment(AssessSource) then exit;
+    if not PrepareIndependentAssessment(AssessRecord, TargetRecord) then exit;
     if ObserveHealth then begin
       Ready := InspectHealth(ExpandConstant('{#InstallDirectory}\current'), '{#ReleaseDigest}', '{#QualificationBase}');
       if not Ready then begin
@@ -194,7 +199,7 @@ procedure RecoverPreviousSource;
 var Ready: Boolean; ReportText: AnsiString; Digest: String;
 begin
   try
-    if not PrepareIndependentAssessment(True) then exit;
+    if not PrepareIndependentAssessment(True, False) then exit;
     Digest := Lowercase(GetSHA256OfFile(ExpandConstant('{srcexe}')));
     Ready := RetainInstaller(ExpandConstant('{srcexe}'), Digest, '{#ReleaseDigest}');
     if not Ready then begin Log('Augmentor recovery: exact source retention failed.'); exit; end;
@@ -304,9 +309,11 @@ begin
     exit;
   end;
   if Inspection <> '' then begin
-    if ((Inspection <> '1') and (Inspection <> 'source') and (Inspection <> 'health')) or
+    if ((Inspection <> '1') and (Inspection <> 'source') and (Inspection <> 'health') and
+        (Inspection <> 'target') and (Inspection <> 'target-health')) or
         (Pipe <> '') or (CoordinatorText <> '') then exit;
-    InspectIndependentPayload(Inspection <> '1', Inspection = 'health');
+    InspectIndependentPayload(Inspection <> '1', (Inspection = 'health') or (Inspection = 'target-health'),
+      (Inspection = 'target') or (Inspection = 'target-health'));
     exit;
   end;
   if (Pipe <> '') or (CoordinatorText <> '') then begin
@@ -334,7 +341,7 @@ begin
       exit;
     end;
     SourceAssessmentAttempted := True;
-    SourceAssessmentReady := PrepareIndependentAssessment(True);
+    SourceAssessmentReady := PrepareIndependentAssessment(True, False);
     if not SourceAssessmentReady then begin
       Result := 'This installer could not verify the exact previous Augmentor version. Your installation and update record were preserved.';
       exit;

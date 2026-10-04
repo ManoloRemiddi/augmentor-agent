@@ -33,7 +33,7 @@ class SupervisorSafetyTests(unittest.TestCase):
         supervisor.child=Mock();supervisor.child.poll.return_value=None
         supervisor.child.drained.return_value=False
         self.assertEqual(control('prepare')['phase'],'prepared')
-        for action in ('start-dsh','start-voice','start-prompts','start-memory','stop-failed-setup','exit-if-empty'):
+        for action in ('start-dsh','start-voice','start-prompts','start-memory','start-update','stop-failed-setup','exit-if-empty'):
             with self.assertRaises(owner.MaintenanceBusy):supervisor.dispatch({'action':action})
         with self.assertRaises(owner.MaintenanceBusy):
             supervisor.dispatch({'action':'shortcut-save','instance':'main','sequence':'Ctrl+Alt+Space'})
@@ -45,6 +45,16 @@ class SupervisorSafetyTests(unittest.TestCase):
         self.assertEqual(control('prepare')['phase'],'prepared')
         self.assertEqual(control('commit')['phase'],'closing')
         self.assertFalse(supervisor.shutdown.is_set(),'dispatch must not exit before the handler acknowledges')
+
+    def test_update_rpc_accepts_only_the_fixed_launch_and_ends_its_admission(self):
+        supervisor=owner.Supervisor()
+        with patch('updates.windows_bootstrap.launch',return_value={'started':True}) as launch:
+            for fields in ({'installer':'untrusted.exe'},{'command':'shell'},{'pid':23}):
+                with self.assertRaises(ValueError):supervisor.dispatch({'action':'start-update',**fields})
+            launch.assert_not_called()
+            self.assertEqual(supervisor.dispatch({'action':'start-update'}),{'update':{'started':True}})
+            launch.assert_called_once_with(supervisor.root)
+        self.assertEqual(supervisor.admission.control('host.maintenance.status',{})['active'],0)
 
     def test_published_profile_cannot_be_stopped_as_failed_setup(self):
         supervisor = owner.Supervisor()

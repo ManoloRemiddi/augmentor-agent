@@ -85,11 +85,10 @@ __declspec(dllexport) BOOL WINAPI AugmentorRecoveryObserve(const wchar_t *instal
     if (ResumeThread(process.hThread) != 1) goto done;
     started = TRUE;
     inspection_stage = 26;
-    /* Ten minutes for the larger source installer, plus five for admission,
-     * source verification and independent health. Expiry preserves Setup. */
-    const DWORD observation_timeout = 15UL * 60UL * 1000UL;
-    ULONGLONG deadline = GetTickCount64() + observation_timeout;
-    if (WaitForSingleObject(process.hProcess, observation_timeout) != WAIT_OBJECT_0) goto done;
+    /* The observer has a ten-minute actual-Setup bound plus inventory/health.
+     * This outer bound must not terminate it at its inner observation limit. */
+    ULONGLONG deadline = GetTickCount64() + 1200000;
+    if (WaitForSingleObject(process.hProcess, 1200000) != WAIT_OBJECT_0) goto done;
     inspection_stage = 27;
     if (!GetExitCodeProcess(process.hProcess, &code)) goto done;
     if (code) { inspection_detail = code; goto done; }

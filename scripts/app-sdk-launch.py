@@ -22,7 +22,18 @@ def main():
     launcher.configure()
     sys.path.insert(0, str(ROOT/'services/lifecycle'))
     from lease import hold
-    hold('runtime')
+    if sys.platform in ('win32','linux','darwin'):
+        sys.path.insert(0,str(ROOT/'services'))
+        if sys.platform=='win32':from lifecycle.windows_startup import Startup
+        else:from lifecycle.posix_startup import Startup
+        from lifecycle.sdk_launch_lease import retain
+        from platform_adapters.paths import runtime_directory
+        # Reader covers lease registration. A maintenance writer cannot miss
+        # a new SDK server between discovery and desktop shutdown.
+        with Startup():
+            hold('runtime')
+            retain(runtime_directory(),ROOT,sys.argv[1])
+    else:hold('runtime')
     node = os.environ.get('AUGMENTOR_PI_NODE')
     if not node:
         raise SystemExit('The selected managed Node runtime is required.')

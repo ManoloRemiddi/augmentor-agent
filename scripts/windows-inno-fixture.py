@@ -51,7 +51,7 @@ def dismiss_fixture_windows(stop, observations, destination):
             owned.append((window,name.value))
         return True
     callback = callback_type(collect)
-    deadline = time.monotonic()+20
+    deadline = time.monotonic()+60
     while not stop.is_set() and time.monotonic() < deadline:
         owned.clear(); user.EnumWindows(callback,0)
         modal = [(window,name) for window,name in owned if name == '#32770']

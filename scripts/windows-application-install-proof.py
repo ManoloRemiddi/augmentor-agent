@@ -54,8 +54,11 @@ def main():
     sentinel_bytes = sentinel.read_bytes()
     registry = 'Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\'+report['applicationId']+'_is1'
     flags = ['/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-']
-    child = None; removal = None; stages = []
-    def run(command, *, success=True, timeout=300):
+    child = None; removal = None; stages = [];live_observer=None;coordinator=None;broker_child=None;observed_broker=None
+    dictation_state=private_directory(data/'dictation')
+    previous_environment={key:os.environ.get(key) for key in ('AUGMENTOR_DICTATION_STATE','XDG_RUNTIME_DIR')}
+    os.environ.update(AUGMENTOR_DICTATION_STATE=str(dictation_state),XDG_RUNTIME_DIR=str(private_directory(data/'run')))
+    def run(command, *, success=True, timeout=900):
         argv = list(map(str,command))
         process = OwnedProcess(argv, stdin=subprocess.DEVNULL)
         try:
@@ -70,10 +73,10 @@ def main():
         return result
     def setup(label, *extra, success=True):
         return run([report['installer'],*flags,'/LOG='+str(out/(label+'.log')),*extra], success=success)
-    def independent_inspection(label,*,source=False,health=False):
+    def independent_inspection(label,*,source=False,health=False,target=False):
         log=out/(label+'.log')
-        run([cached_installer,*flags,'/LOG='+str(log),
-             '/augmentorinspect='+('health' if health else 'source' if source else '1')],success=False)
+        mode=('target-health' if health else 'target') if target else ('health' if health else 'source' if source else '1')
+        run([cached_installer,*flags,'/LOG='+str(log),'/augmentorinspect='+mode],success=False)
         marker='Augmentor independent health result: ' if health else 'Augmentor independent inspection result: '
         rows=[line.split(marker,1)[1] for line in log.read_text(encoding='utf-8-sig').splitlines() if marker in line]
         assert len(rows)==1, log.read_text(encoding='utf-8-sig')[-8192:]
@@ -91,7 +94,7 @@ def main():
     def ready():
         deadline = time.monotonic()+30
         while time.monotonic()<deadline:
-            assert child.poll() is None, 'Installed Augmentor exited before readiness.'
+            if child is not None:assert child.poll() is None, 'Installed Augmentor exited before readiness.'
             try:
                 state = inspect()
                 if state['visible']: return state
@@ -103,9 +106,14 @@ def main():
             env={**os.environ,'QT_QPA_PLATFORM':'windows','QSG_RHI_PREFER_SOFTWARE_RENDERER':'1'},
             stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     def close_preview():
-        result = command('maintenance.close')
-        assert result.get('accepted'), result
-        assert child.wait(timeout=20)==0
+        from lifecycle.windows_components import WindowParticipant
+        observed=WindowParticipant(data/'run'/(ipc_basename('main')+'.sock'),install/'current')
+        try:
+            result = command('maintenance.close')
+            assert result.get('accepted'), result
+            assert observed.exited(timeout=20), 'The observed installed window did not exit.'
+            if child is not None:assert child.wait(timeout=20)==0
+        finally:observed.close()
     try:
         setup('initial')
         cached_installer = data/'recovery'/(report['sha256']+'.exe')
@@ -120,6 +128,12 @@ def main():
             source_identity=source.identity
         selection_bytes=(data/'recovery/selected-installer').read_bytes()
         stages.append('original-full-installer-retained')
+        observer_spec=importlib.util.spec_from_file_location('observer_runtime_proof',ROOT/'scripts/windows-observer-runtime-proof.py')
+        observer_proof=importlib.util.module_from_spec(observer_spec);observer_spec.loader.exec_module(observer_proof)
+        staged_observer,observer_result=observer_proof.prove(install/'current',data,
+            (args.root/'release.json').read_bytes(),(args.root/'payload-integrity.json').read_bytes())
+        report['observerRuntime']=observer_result
+        stages.append('full-private-external-observer-runtime-and-native-identity-import')
         assert (install/'current/release.json').read_bytes() == (args.root/'release.json').read_bytes()
         assert not any((install/'current').glob('*.lib')) and not any((install/'current').glob('*.exp'))
         assert not (install/'current/launcher.obj').exists()
@@ -220,37 +234,105 @@ def main():
         # Exercise the exact installer-created command without a command shell.
         subprocess.run(startup_command,check=True,timeout=30)
         child=open_preview();ready()
-        coordinator_log=(out/'coordinator.log').open('w',encoding='utf-8')
-        coordinator=subprocess.Popen([str(install/'current/python/python.exe'),'-I','-Xutf8','-B',
-            str(ROOT/'scripts/windows-application-update-proof.py'),'--root',str(install/'current'),
-            '--data',str(data),'--installer',str(artifact),'--sha256',report['sha256']],
-            stdout=subprocess.DEVNULL,stderr=coordinator_log)
-        coordinator_log.close()
-        transaction=data/'updates';result_path=transaction/'coordinator-result.json'
-        deadline=time.monotonic()+90
-        while not result_path.exists():
-            assert coordinator.poll() is None, 'The installed coordinator failed; inspect coordinator.log.'
-            if time.monotonic()>=deadline:raise TimeoutError('The installed coordinator did not authorize Setup.')
+        from augmentor_linux import dictation
+        from lifecycle.windows_dictation import discover_dictation
+        # Observe only this compiled-in fixture's broker; a new interpreter is
+        # launched only if no private registration already exists.
+        brokers=discover_dictation(install/'current',data/'run')
+        if not brokers:
+            broker_child=subprocess.Popen([str(install/'current/python/python.exe'),'-I','-Xutf8','-B',
+                str(install/'current/services/dictation/server.py')],stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+            deadline=time.monotonic()+30
+            while not brokers:
+                if broker_child.poll() is not None and broker_child.returncode!=0:
+                    raise AssertionError(broker_child.stderr.read().decode('utf-8','replace'))
+                try:brokers=discover_dictation(install/'current',data/'run')
+                except FileNotFoundError:brokers=[]
+                if time.monotonic()>=deadline:raise AssertionError('The actual installed private broker did not register.')
+                time.sleep(.05)
+        assert len(brokers)==1
+        observed_broker=brokers[0]
+        deadline=time.monotonic()+30
+        while not observed_broker.exchange(json.dumps({'protocol':'augmentor-dictation-maintenance/1','kind':'describe'}))['ready']:
+            if time.monotonic()>=deadline:raise AssertionError('The installed dictation endpoint did not become ready.')
             time.sleep(.05)
+        assert dictation.request('status',start=False)['enabled'] is False
+        broker_preferences=(dictation_state/'preferences.json').read_bytes() if (dictation_state/'preferences.json').exists() else None
+        stages.append('actual-installed-disabled-broker-observed-and-installation-leased')
+        from lifecycle.observer_runtime import verify_observer_runtime
+        from lifecycle.windows_installer_process import InstallerProcess
+        from lifecycle.windows_update_observer import ObservationServer
+        source_release=(args.root/'release.json').read_bytes();source_inventory=(args.root/'payload-integrity.json').read_bytes()
+        verify_observer_runtime(staged_observer,source_release,source_inventory)
+        python_digest=json.loads(source_inventory)['files']['python/python.exe']['sha256']
+        transaction=data/'updates';result_path=transaction/'coordinator-result.json'
+        command('ui-test:'+json.dumps({'action':'draft','expected':'','text':'Preserve this deferred update draft'}))
+        with ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size) as deferred:
+            with InstallerProcess(staged_observer/'python/python.exe',python_digest,
+                ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
+                 '--root',str(install/'current'),'--data',str(data),'--installer',str(artifact),
+                 '--sha256',report['sha256'],'--expect-deferred',*deferred.arguments()],
+                    qualification_outer_job=True,allow_child_breakaway=True) as busy_worker:
+                deferred.bind(busy_worker)
+                assert deferred.receive(timeout=120) is None
+                cancelled=deferred.verify_deferred(transaction,source_identity,source_identity)
+                assert read_json(transaction/('cancelled-'+cancelled+'.json'))['phase']=='cancelled'
+        assert not (transaction/'active.json').exists()
+        assert child.poll() is None and inspect()['draft']=='Preserve this deferred update draft'
+        assert sentinel.read_bytes()==sentinel_bytes
+        command('ui-test:'+json.dumps({'action':'draft','expected':'Preserve this deferred update draft','text':''}))
+        stages.append('live-busy-update-deferral-with-cancelled-reservations-and-draft-preserved')
+        # With the surface idle, an accepted microphone owner must independently
+        # defer the full updater, retaining both broker and original owner token.
+        dictation.request('conversation.acquire',{'token':'b'*32,'pid':os.getpid()},start=False)
+        with ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size) as deferred:
+            with InstallerProcess(staged_observer/'python/python.exe',python_digest,
+                ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
+                 '--root',str(install/'current'),'--data',str(data),'--installer',str(artifact),
+                 '--sha256',report['sha256'],'--expect-deferred',*deferred.arguments()],
+                    qualification_outer_job=True,allow_child_breakaway=True) as busy_worker:
+                deferred.bind(busy_worker);assert deferred.receive(timeout=120) is None
+                deferred.verify_deferred(transaction,source_identity,source_identity)
+        assert not (transaction/'active.json').exists() and not observed_broker.exited()
+        try:dictation.request('conversation.acquire',{'token':'c'*32,'pid':os.getpid()},start=False)
+        except RuntimeError:pass
+        else:raise AssertionError('A deferred update released the accepted microphone owner.')
+        dictation.request('conversation.release',{'token':'b'*32},start=False)
+        stages.append('actual-installed-broker-owner-defers-whole-installer-with-capture-preserved')
+        live_observer=ObservationServer(private_directory(data/'update-observation'),report['sha256'],artifact.stat().st_size)
+        coordinator=InstallerProcess(staged_observer/'python/python.exe',python_digest,
+            ['-I','-Xutf8','-B',str(staged_observer/'scripts/windows-application-update-proof.py'),
+             '--root',str(install/'current'),'--data',str(data),'--installer',str(artifact),
+             '--sha256',report['sha256'],*live_observer.arguments()],qualification_outer_job=True,allow_child_breakaway=True)
+        live_observer.bind(coordinator)
+        setup_observation=live_observer.receive(timeout=120)
+        try:setup_observation.wait(timeout=.01)
+        except TimeoutError:pass
+        else:raise AssertionError('The real Setup exited before native APPLY.')
+        live_observer.receive_apply()
+        assert live_observer.wait_installer(timeout=900)==0
         result=read_json(result_path)
         assert result['coordinatorMustExit'] and not result['installationComplete']
+        assert result['independentObservationTransfer'] is True
         assert child.wait(timeout=10)==0;child=None
         journal=read_json(transaction/'active.json')
         assert journal['phase']=='apply-acknowledged'
-        assert {'WindowParticipant','OwnerParticipant'} <= {step['kind'] for step in journal['steps']}, journal['steps']
+        assert {'WindowParticipant','DictationParticipant','OwnerParticipant'} <= {step['kind'] for step in journal['steps']}, journal['steps']
+        assert observed_broker.exited(timeout=10)
+        if broker_child is not None:assert broker_child.wait(timeout=10)==0
+        original_broker_pid=observed_broker.pid;observed_broker.close();observed_broker=None
+        assert live_observer.reopen_plan['hadDictation'] is True
         assert journal['steps'][-1]['kind']=='OwnerParticipant' and journal['steps'][-1]['phase']=='exited'
-        import win32api,win32con,win32event,win32process
-        setup_process=win32api.OpenProcess(win32con.SYNCHRONIZE|win32con.PROCESS_QUERY_INFORMATION,False,result['setupPid'])
-        try:
-            assert win32event.WaitForSingleObject(setup_process,0)==win32event.WAIT_TIMEOUT
-            (transaction/'observer-ready').touch()
-            assert coordinator.wait(timeout=30)==0
-            assert win32event.WaitForSingleObject(setup_process,300000)==win32event.WAIT_OBJECT_0
-            assert win32process.GetExitCodeProcess(setup_process)==0
-        finally:setup_process.Close()
+        stages.append('full-graph-apply-with-separate-live-observer-and-whole-setup-job-exit')
         assert (install/'current/release.json').read_bytes()==(args.root/'release.json').read_bytes()
         assert sentinel.read_bytes()==sentinel_bytes
         pending_bytes=(transaction/'active.json').read_bytes()
+        blocked=subprocess.run([str(install/'current/python/python.exe'),'-I','-Xutf8','-B',
+            str(install/'current/services/dictation/server.py')],stdin=subprocess.DEVNULL,capture_output=True,timeout=15)
+        assert blocked.returncode!=0 and b'unfinished Augmentor update' in blocked.stderr,blocked.stderr[-4096:]
+        assert (transaction/'active.json').read_bytes()==pending_bytes
+        stages.append('actual-target-broker-refuses-unfinished-transaction-with-record-preserved')
         backups=list((data/'payload-backups').iterdir())
         assert len(backups)==1
         placement=backups[0];intent=read_json(placement/'intent.json')
@@ -273,6 +355,15 @@ def main():
         report['independentLocalHealth']=assessed['localHealth']
         assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
         stages.append('independent-source-health-with-pending-record-preserved')
+        target_assessed=independent_inspection('independent-pending-target-health',health=True,target=True)
+        assert target_assessed['complete'] and target_assessed['updateTarget']['recordedTargetMatches']
+        assert target_assessed['updateTarget']['applyAuthorized'] is False
+        assert target_assessed['updateTarget']['recordSHA256']==package.digest(transaction/'active.json')
+        assert target_assessed['updateTarget']['installerSHA256']==report['sha256']
+        assert target_assessed['localHealth']['releaseSHA256']==package.digest(args.root/'release.json')
+        assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
+        report['independentTargetHealth']=target_assessed['localHealth']
+        stages.append('independent-target-payload-health-with-pending-record-preserved')
         for application in (executable, install/'current/AugmentorBrowserHost.exe'):
             blocked = subprocess.run([str(application),'--qualification-root',str(data),'--preview'],
                 stdin=subprocess.DEVNULL, capture_output=True, timeout=10,
@@ -301,20 +392,56 @@ def main():
         from lifecycle.update_journal import UpdateJournal
         from lifecycle.payload_integrity import inspect_payload
         inventory=(args.root/'payload-integrity.json').read_bytes()
-        def local_health(_record):
-            assert package.digest(artifact)==report['sha256']
-            integrity=inspect_payload(install/'current',metadata,inventory)
-            assert integrity['complete'],integrity
-            report['payloadIntegrity']=integrity
-            health=verify_local_health(install/'current',metadata,qualification=data)
-            assert (transaction/'active.json').read_bytes()==pending_bytes and sentinel.read_bytes()==sentinel_bytes
-            assert not list((data/'health-probes').iterdir())
-            report['localHealth']=health
-            return True
-        archive=UpdateJournal.complete_verified(transaction,source_identity,source_identity,local_health)
+        from updates.windows_completion import complete_observed
+        # This same-build catalog is synthetic and never signed/published. Only
+        # the read-only completion boundary is qualified here; forward publisher
+        # authority and N-to-N+1 are separate remaining proofs.
+        fixture_release=json.loads(metadata)
+        candidate={key:fixture_release[key] for key in
+            ('version','sourceCommit','target','channel','protocols','dataSchema','readableDataSchemas')}
+        candidate.update({'build':fixture_release['update']['build'],'installType':'windows-inno',
+            'releaseUrl':'https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/development-completion-fixture',
+            'minimumOS':'26200','artifacts':[{'role':'installer',
+                'targetPath':'releases/download/development-completion-fixture/installer.exe',
+                'bytes':artifact.stat().st_size,'sha256':report['sha256']}]})
+        completion=complete_observed(live_observer,install/'current',data,source_identity,candidate,qualification=True)
+        archive=transaction/completion['archive'];report['localHealth']=completion['localHealth']
+        report['payloadIntegrity']=inspect_payload(install/'current',metadata,inventory)
+        assert report['payloadIntegrity']['complete'] and sentinel.read_bytes()==sentinel_bytes
         assert read_json(archive)['phase']=='complete' and not (transaction/'active.json').exists()
         report['archivedUpdate']=archive.name
-        child=open_preview();ready();close_preview();child=None
+        stages.append('live-independent-target-inventory-health-and-exact-build-completion')
+        from updates.windows_reopen import reopen_windows
+        reopened=reopen_windows(live_observer,install/'current',data,candidate,completion,qualification=True)
+        assert reopened=={'instances':['main'],'browserReloadRequired':False,'dictationReopened':True}, reopened
+        brokers=discover_dictation(install/'current',data/'run')
+        try:
+            assert len(brokers)==1 and brokers[0].pid!=original_broker_pid
+            assert brokers[0].initial['ready'] and brokers[0].control('status')['phase']=='ready'
+        finally:
+            for broker in brokers:broker.close()
+        assert dictation.request('status',start=False)['enabled'] is False
+        assert ((dictation_state/'preferences.json').read_bytes() if (dictation_state/'preferences.json').exists() else None)==broker_preferences
+        stages.append('actual-completed-target-broker-reopened-with-new-peer-and-settings-preserved')
+        ready();close_preview()
+        # Close the newly restored idle owner normally before the later damage
+        # fixture. These are live reservations, never saved commands or PIDs.
+        from lifecycle.windows_preparation import WindowsPreparation
+        from lifecycle.admission import MaintenanceBusy
+        deadline=time.monotonic()+60
+        while True:
+            reopened_graph=WindowsPreparation(install/'current',data/'run',data/'run/shared',data/'data/augmentor/managed-dsh')
+            try:reopened_graph.__enter__()
+            except MaintenanceBusy:
+                if not reopened_graph.preparation_released or time.monotonic()>=deadline:raise
+                time.sleep(.1)
+            else:break
+        try:
+            reopened_graph.drain(checkpoint=lambda phase,participant:atomic_json(data/'run/reopened-drain.json',
+                {'phase':phase,'kind':type(participant).__name__}))
+        finally:reopened_graph.close()
+        live_observer.close();coordinator.close()
+        stages.append('live-completed-target-reopens-captured-window-and-background-owner')
         with winreg.OpenKey(winreg.HKEY_CURRENT_USER,report['startupKey'],0,winreg.KEY_READ|winreg.KEY_SET_VALUE) as key:
             try: winreg.QueryValueEx(key,'Augmentor Agent')
             except FileNotFoundError: pass
@@ -338,7 +465,7 @@ def main():
         prior_backups=set((data/'payload-backups').iterdir())
         recovery_log=out/'independent-source-recovery.log'
         try:
-            run([cached_installer,*flags,'/LOG='+str(recovery_log),'/augmentorrecover=previous'],success=False,timeout=1200)
+            run([cached_installer,*flags,'/LOG='+str(recovery_log),'/augmentorrecover=previous'],success=False,timeout=1260)
         finally:
             for inner_log in transaction.glob('recovery-*.log'):shutil.copy2(inner_log,out/inner_log.name)
         marker='Augmentor recovery result: '
@@ -422,6 +549,21 @@ def main():
         for key_path in report['browserKeys']:winreg.DeleteKey(winreg.HKEY_CURRENT_USER,key_path)
         report.update(passed=True,stages=stages,scope='Full installed payload and native Qt preview; no model, physical input, signed update or rollback claim.')
     finally:
+        if live_observer is not None:live_observer.close()
+        if coordinator is not None:coordinator.close()
+        if observed_broker is not None:observed_broker.close()
+        try:
+            from augmentor_linux import dictation
+            dictation.request('conversation.release',{'token':'b'*32},start=False)
+            dictation.request('shutdown',start=False)
+        except (RuntimeError,OSError,TimeoutError):pass
+        if broker_child is not None:
+            try:broker_child.wait(timeout=10)
+            except subprocess.TimeoutExpired:pass  # Retain uncertain fixture work; no force shutdown.
+            if broker_child.stderr is not None:broker_child.stderr.close()
+        for key,value in previous_environment.items():
+            if value is None:os.environ.pop(key,None)
+            else:os.environ[key]=value
         # Only this disposable preview may be closed on failure. Never clean a
         # personal app or force-stop a test whose accepted work is unknown.
         if child is not None and child.poll() is None:
@@ -431,6 +573,10 @@ def main():
                 close_preview()
             except Exception: pass
         report.setdefault('passed',False);report['stages']=stages
+        # Preserve this disposable fixture's independent inspector evidence,
+        # including failures before completion; these are not customer logs.
+        for path in (data/'updates').glob('target-health-*.log'):
+            shutil.copy2(path,out/path.name)
         if not report['passed']:
             # Only logs from this compiled-in, disposable preview. Preserve a
             # bounded stack/error sample when its process fails to exit.

@@ -23,6 +23,15 @@ def current_sid():
         token.Close()
 
 
+def default_owner_sid():
+    """The OS token's default owner can be Administrators for elevated Node."""
+    token = win32security.OpenProcessToken(win32api.GetCurrentProcess(), win32con.TOKEN_QUERY)
+    try:
+        return win32security.GetTokenInformation(token, win32security.TokenOwner)
+    finally:
+        token.Close()
+
+
 def sid_string():
     return win32security.ConvertSidToStringSid(current_sid())
 
@@ -30,6 +39,22 @@ def sid_string():
 def identity_key():
     # A name collision cannot confer permission; the ACL authenticates access.
     return hashlib.sha256(sid_string().encode('ascii')).hexdigest()[:24]
+
+
+def process_session_id(pid=None):
+    """Use the process's actual login/RDS session, including non-console users."""
+    pid=os.getpid() if pid is None else pid
+    if type(pid) is not int or not 0<pid<=0xffffffff:raise ValueError('Invalid Windows process identity.')
+    function=ctypes.WinDLL('kernel32',use_last_error=True).ProcessIdToSessionId
+    function.argtypes=[ctypes.c_uint32,ctypes.POINTER(ctypes.c_uint32)]
+    function.restype=ctypes.c_int
+    session=ctypes.c_uint32()
+    if not function(pid,ctypes.byref(session)):raise ctypes.WinError(ctypes.get_last_error())
+    return session.value
+
+
+def dictation_session_key(pid=None):
+    return hashlib.sha256(('windows:'+str(process_session_id(pid))).encode('ascii')).hexdigest()[:12]
 
 
 def local_app_data():
@@ -74,14 +99,20 @@ def require_private_directory(path):
 
 
 def require_private_descriptor(descriptor):
-    if descriptor.GetSecurityDescriptorOwner() != current_sid():
+    require_private_grants(descriptor)
+    control, _revision = descriptor.GetSecurityDescriptorControl()
+    if not control & win32security.SE_DACL_PROTECTED:
+        raise PermissionError('The Augmentor directory must not inherit broader access from its parent.')
+
+
+def require_private_grants(descriptor, *, download_default_owner=False):
+    """Validate the exact owner/user/SYSTEM allow-list without changing an ACL."""
+    owner = descriptor.GetSecurityDescriptorOwner()
+    if owner != current_sid() and not (download_default_owner and owner == default_owner_sid()):
         raise PermissionError('The Augmentor directory belongs to another Windows identity.')
     acl = descriptor.GetSecurityDescriptorDacl()
     if acl is None:
         raise PermissionError('The Augmentor directory has no access restrictions.')
-    control, _revision = descriptor.GetSecurityDescriptorControl()
-    if not control & win32security.SE_DACL_PROTECTED:
-        raise PermissionError('The Augmentor directory must not inherit broader access from its parent.')
     allowed = {sid_string(), 'S-1-5-18'}
     user_access = False
     for index in range(acl.GetAceCount()):
@@ -101,6 +132,50 @@ def require_private_descriptor(descriptor):
 def private_lock_descriptor(path):
     """Open a private, regular, single-link lease file without following a reparse."""
     return private_file_descriptor(path, writable=True, create=True)
+
+
+def require_payload_grants(descriptor):
+    """Public installed code may be readable broadly, but never writable broadly.
+
+    Inno's per-user payload can inherit the token's Administrators owner and
+    ordinary read grants. This is deliberately separate from private state and
+    download validation; it never changes an ACL or creates a file.
+    """
+    trusted={sid_string(),'S-1-5-18','S-1-5-32-544'}
+    if win32security.ConvertSidToStringSid(descriptor.GetSecurityDescriptorOwner()) not in trusted:
+        raise PermissionError('The installed payload belongs to an unexpected Windows identity.')
+    acl=descriptor.GetSecurityDescriptorDacl()
+    if acl is None:raise PermissionError('The installed payload has unrestricted access.')
+    write=(ntsecuritycon.FILE_WRITE_DATA|ntsecuritycon.FILE_APPEND_DATA|ntsecuritycon.FILE_WRITE_EA|
+           ntsecuritycon.FILE_WRITE_ATTRIBUTES|ntsecuritycon.FILE_DELETE_CHILD|ntsecuritycon.DELETE|
+           ntsecuritycon.WRITE_DAC|ntsecuritycon.WRITE_OWNER|win32con.GENERIC_WRITE|win32con.GENERIC_ALL)
+    for index in range(acl.GetAceCount()):
+        (kind,flags),mask,sid=acl.GetAce(index)
+        if flags & win32security.INHERIT_ONLY_ACE:continue
+        if kind!=win32security.ACCESS_ALLOWED_ACE_TYPE:
+            raise PermissionError('The installed payload has unsupported access rules.')
+        if mask & write and win32security.ConvertSidToStringSid(sid) not in trusted:
+            raise PermissionError('The installed payload is writable by another Windows identity.')
+
+
+def payload_file_descriptor(path):
+    """Pin existing installed code read-only; retain normal installation ACLs."""
+    import msvcrt
+    path=reject_reparse_ancestors(path)
+    security=win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION
+    require_payload_grants(win32security.GetFileSecurity(str(path.parent),security))
+    try:
+        handle=win32file.CreateFile(str(path),win32con.GENERIC_READ,win32con.FILE_SHARE_READ,None,
+            win32con.OPEN_EXISTING,win32file.FILE_FLAG_OPEN_REPARSE_POINT,None)
+    except pywintypes.error as error:raise ctypes.WinError(error.winerror) from None
+    try:
+        info=win32file.GetFileInformationByHandle(handle)
+        if info[0] & (stat.FILE_ATTRIBUTE_REPARSE_POINT|stat.FILE_ATTRIBUTE_DIRECTORY) or info[7]!=1:
+            raise PermissionError('The installed executable must be an ordinary single-link file.')
+        require_payload_grants(win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,security))
+        return msvcrt.open_osfhandle(handle.Detach(),os.O_RDONLY|os.O_BINARY)
+    except pywintypes.error as error:raise ctypes.WinError(error.winerror) from None
+    finally:handle.Close()
 
 
 def private_file_descriptor(path, *, writable=False, create=False, exclusive=False, private_parent=True, share_write=True):
@@ -145,6 +220,43 @@ def private_directory(path):
         if getattr(error, 'winerror', None) != 183:
             raise
     return require_private_directory(path)
+
+
+def protect_inherited_download(path):
+    """Protect a Node-produced file that already has the exact private allow-list.
+
+    The known private download parent and opened single-link file are verified
+    first. This cannot repair a public/foreign ACL or follow a reparse object.
+    Windows Node inherits safe grants but does not set SE_DACL_PROTECTED on files.
+    Elevated Node can use the token's default group owner; only that exact OS
+    identity may be normalized to the current user, after the grants check.
+    """
+    path=reject_reparse_ancestors(path)
+    require_private_directory(path.parent)
+    try:
+        handle=win32file.CreateFile(str(path),win32con.GENERIC_READ|win32con.READ_CONTROL|win32con.WRITE_DAC|win32con.WRITE_OWNER,
+            win32con.FILE_SHARE_READ,None,win32con.OPEN_EXISTING,win32file.FILE_FLAG_OPEN_REPARSE_POINT,None)
+    except pywintypes.error as error:
+        raise ctypes.WinError(error.winerror) from None
+    try:
+        info=win32file.GetFileInformationByHandle(handle)
+        if info[0] & (stat.FILE_ATTRIBUTE_REPARSE_POINT|stat.FILE_ATTRIBUTE_DIRECTORY) or info[7]!=1:
+            raise PermissionError('The download must be an ordinary single-link file.')
+        observed=win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
+            win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION)
+        require_private_grants(observed, download_default_owner=True)
+        control,_=observed.GetSecurityDescriptorControl()
+        if observed.GetSecurityDescriptorOwner() != current_sid() or not control & win32security.SE_DACL_PROTECTED:
+            selected=security_attributes().SECURITY_DESCRIPTOR
+            win32security.SetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
+                win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION|win32security.PROTECTED_DACL_SECURITY_INFORMATION,
+                current_sid(),None,selected.GetSecurityDescriptorDacl(),None)
+        require_private_descriptor(win32security.GetSecurityInfo(handle,win32security.SE_FILE_OBJECT,
+            win32security.OWNER_SECURITY_INFORMATION|win32security.DACL_SECURITY_INFORMATION))
+    except pywintypes.error as error:
+        raise ctypes.WinError(error.winerror) from None
+    finally:
+        handle.Close()
 
 
 def process_sid(pid):

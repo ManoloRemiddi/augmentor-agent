@@ -49,6 +49,18 @@ def windows_environment():
             'AUGMENTOR_SHARED_STATE': str(folders['run']/'shared')}
 
 
+def windows_dictation_state():
+    """Select the normal Windows state path without creating folders or keys."""
+    if sys.platform != 'win32':
+        raise RuntimeError('Windows dictation paths require Windows identity verification.')
+    supplied = os.environ.get('AUGMENTOR_DICTATION_STATE')
+    if supplied:
+        return Path(supplied)
+    from .windows_identity import local_app_data
+    data = Path(os.environ['XDG_DATA_HOME']) if os.environ.get('XDG_DATA_HOME') else local_app_data()/'Augmentor/data'
+    return data/'augmentor/dictation'
+
+
 def runtime_directory():
     supplied = os.environ.get('XDG_RUNTIME_DIR')
     if sys.platform == 'win32':
@@ -59,5 +71,7 @@ def runtime_directory():
     if sys.platform == 'darwin':
         return Path(f'/tmp/augmentor-{os.getuid()}')
     if sys.platform == 'linux':
-        return Path(f'/run/user/{os.getuid()}')
+        # Preserve the desktop's standalone fallback when no login runtime is
+        # supplied. A headless/package test user cannot create /run/user/UID.
+        return Path(f'/tmp/augmentor-linux-pi-{os.getuid()}')
     raise RuntimeError('This operating system has no Augmentor runtime path adapter.')

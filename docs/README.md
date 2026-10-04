@@ -4,6 +4,8 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [Shared application updates](UPDATE-SYSTEM.md): daily/two-day checks, shared controls, bounded downloads, signed repository integration and remaining automatic-installation qualification.
+
 - [Published Handy downloads — October 3](HANDY-DOWNLOADS-2026-10-03.md): matched Linux/Mac/Windows preview 2, verified public bytes, qualification and physical acceptance boundaries.
 - [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, themed recording pill, settings, OS adapters, licensing, build and qualification boundaries.
 - [Approved Handy integration plan](HANDY-INTEGRATION-PLAN.md).

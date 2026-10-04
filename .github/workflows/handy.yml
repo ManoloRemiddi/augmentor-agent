@@ -49,7 +49,7 @@ jobs:
         if: steps.component-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          host=$(python -c "import platform,sys; print({'linux-x86_64':'x86_64-unknown-linux-gnu','darwin-arm64':'aarch64-apple-darwin','win32-AMD64':'x86_64-pc-windows-msvc','win32-ARM64':'aarch64-pc-windows-msvc'}[sys.platform+'-'+platform.machine()])")
+          host=$(python -c "import platform,sys; print({'linux-x86_64':'x86_64-unknown-linux-gnu','linux-aarch64':'aarch64-unknown-linux-gnu','darwin-arm64':'aarch64-apple-darwin','win32-AMD64':'x86_64-pc-windows-msvc','win32-ARM64':'aarch64-pc-windows-msvc'}[sys.platform+'-'+platform.machine()])")
           rustup set default-host "$host"
           rustup toolchain install "1.97.1-$host" --profile minimal --component rustfmt,clippy,rust-docs
           rustup default "1.97.1-$host"
@@ -102,6 +102,12 @@ jobs:
       - name: Verify the embedded lifecycle (Mac and Windows)
         if: runner.os != 'Linux'
         run: python scripts/proof-handy-component.py
+      - name: Qualify actual broker and native microphone maintenance (Linux)
+        if: runner.os == 'Linux'
+        run: dbus-run-session -- xvfb-run -a python3 -B scripts/proof-dictation-maintenance.py
+      - name: Qualify actual broker and native microphone maintenance (Mac and Windows)
+        if: runner.os != 'Linux'
+        run: python -B scripts/proof-dictation-maintenance.py
       - name: Name the platform artifact
         if: always()
         id: target

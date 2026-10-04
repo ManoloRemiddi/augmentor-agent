@@ -13,6 +13,7 @@ static wchar_t inspection_installer[65];
 static DWORD inspection_stage = 0, inspection_detail = 0;
 static BOOL inspection_health_attempted = FALSE;
 static BOOL inspection_source_verified = FALSE;
+static BOOL inspection_target_verified = FALSE;
 static wchar_t inspection_release[65];
 
 __declspec(dllexport) DWORD WINAPI AugmentorInspectionStage(void) { return inspection_stage; }
@@ -26,6 +27,7 @@ static void augmentor_inspection_close(void) {
     inspection_installer[0] = 0;
     inspection_health_attempted = FALSE;
     inspection_source_verified = FALSE;
+    inspection_target_verified = FALSE;
     inspection_release[0] = 0;
     if (inspection_report != INVALID_HANDLE_VALUE) CloseHandle(inspection_report);
     if (inspection_root != INVALID_HANDLE_VALUE) CloseHandle(inspection_root);
@@ -135,7 +137,7 @@ done:
 }
 
 static BOOL inspection_worker(const wchar_t *installed, const wchar_t *release_digest,
-        BOOL health, const wchar_t *qualification) {
+        BOOL health, BOOL target, const wchar_t *qualification) {
     HANDLE metadata = INVALID_HANDLE_VALUE, job = NULL;
     PROCESS_INFORMATION process = {0}; STARTUPINFOW startup_info = {sizeof(startup_info)};
     wchar_t executable[32768], script[32768], path[32768], *command = NULL;
@@ -159,7 +161,8 @@ static BOOL inspection_worker(const wchar_t *installed, const wchar_t *release_d
     if (!command || swprintf_s(command, 32768, L"\"%ls\" -I -B -X utf8 \"%ls\" \"%ls\" %ls %ls %ls \"%ls\"",
             executable, script, installed, release_digest,
             inspection_installer[0] ? inspection_installer : L"-",
-            health ? L"health" : L"inspect", qualification ? qualification : L"-") < 0) goto done;
+            health ? (target ? L"health-target" : L"health") : (target ? L"inspect-target" : L"inspect"),
+            qualification ? qualification : L"-") < 0) goto done;
     inspection_stage = 4;
     job = CreateJobObjectW(NULL, NULL);
     JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits = {0};
@@ -213,15 +216,24 @@ done:
 
 __declspec(dllexport) BOOL WINAPI AugmentorInspectionRun(const wchar_t *installed,
         const wchar_t *release_digest) {
-    if (inspection_health_attempted) return FALSE;
-    BOOL ok = inspection_worker(installed, release_digest, FALSE, NULL);
+    if (inspection_health_attempted || inspection_target_verified) return FALSE;
+    BOOL ok = inspection_worker(installed, release_digest, FALSE, FALSE, NULL);
     inspection_source_verified = ok && inspection_installer[0] &&
         inspection_writer != INVALID_HANDLE_VALUE && inspection_record != INVALID_HANDLE_VALUE &&
         wcscpy_s(inspection_release, 65, release_digest) == 0;
     return ok;
 }
 
-/* Observe the fixed, isolated source-health action after independent source
+__declspec(dllexport) BOOL WINAPI AugmentorInspectionTargetRun(const wchar_t *installed,
+        const wchar_t *release_digest) {
+    if (inspection_health_attempted || inspection_source_verified || !inspection_installer[0] ||
+            inspection_writer == INVALID_HANDLE_VALUE || inspection_record == INVALID_HANDLE_VALUE) return FALSE;
+    BOOL ok = inspection_worker(installed, release_digest, FALSE, TRUE, NULL);
+    inspection_target_verified = ok && wcscpy_s(inspection_release, 65, release_digest) == 0;
+    return ok;
+}
+
+/* Observe the fixed, isolated health action after independent source or target
  * assessment. Keep the writer and active-record pins throughout. Exchange the
  * exclusive installation/startup handles for ordinary read admission so the
  * native probe can start. An active journal still blocks normal app startup;
@@ -235,7 +247,8 @@ __declspec(dllexport) BOOL WINAPI AugmentorInspectionHealth(const wchar_t *insta
     if (authorized || manual.file == INVALID_HANDLE_VALUE || manual.startup == INVALID_HANDLE_VALUE ||
             inspection_record == INVALID_HANDLE_VALUE || inspection_writer == INVALID_HANDLE_VALUE ||
             inspection_report == INVALID_HANDLE_VALUE || !inspection_installer[0] ||
-            inspection_health_attempted) return FALSE;
+            inspection_health_attempted || (!inspection_source_verified && !inspection_target_verified) ||
+            !release_digest || wcscmp(release_digest, inspection_release)) return FALSE;
     inspection_health_attempted = TRUE;
     count = GetFinalPathNameByHandleW(manual.base, base, 32768, FILE_NAME_NORMALIZED | VOLUME_NAME_DOS);
     if (!count || count >= 32768 || wcsncmp(base, L"\\\\?\\", 4)) return FALSE;
@@ -259,5 +272,5 @@ __declspec(dllexport) BOOL WINAPI AugmentorInspectionHealth(const wchar_t *insta
     CloseHandle(manual.run); CloseHandle(manual.base);
     manual = reader;
     CloseHandle(inspection_report); inspection_report = INVALID_HANDLE_VALUE;
-    return inspection_worker(installed, release_digest, TRUE, qualification);
+    return inspection_worker(installed, release_digest, TRUE, inspection_target_verified, qualification);
 }

@@ -53,6 +53,9 @@ class WindowParticipant:
                     raise ValueError('The window is running a different executable. Its work was preserved.')
             elif pid!=self.pid or win32event.WaitForSingleObject(self.process,0)!=win32event.WAIT_TIMEOUT:
                 raise ValueError('The observed window exited or changed. No request was sent to a replacement.')
+            from platform_adapters.windows_identity import process_session_id
+            if process_session_id(pid)!=process_session_id():
+                raise ValueError('The component belongs to another Windows login session. Its work was preserved.')
             self.before_send()
             peer.sendall(command.encode('utf-8')+b'\n')
             with peer.makefile('rb') as stream:raw=stream.readline(262145)

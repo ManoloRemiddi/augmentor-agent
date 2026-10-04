@@ -2,6 +2,26 @@
 
 # Consistent installed desktop releases
 
+## Managed update source checkpoint — October 3
+
+Staging now retains an included `python/` runtime alongside the existing Node,
+application and dependency trees. A candidate interpreter path inside the source
+follows the new immutable release path and is included in the full inventory;
+later source edits cannot alter it. Eleven deployment fixtures pass, including
+damaged retained-interpreter refusal before selection changes.
+
+An installed managed Linux artifact with both `release.json` and its bound
+`desktop-release.json` takes the private per-user installation lifetime lease.
+It uses the persistent unfinished-update barrier and refuses a moved artifact;
+it is not treated as an OS package. Three real Linux lock/pending fixtures pass.
+Debian/RPM installations continue their package-owned checks and locks. Legacy
+managed overlays without a reviewed release receipt remain unqualified for
+automatic installation. The independent automatic controller, matching DSH and
+voice coordination, target health and verified reopening remain required; this
+source checkpoint does not select a release or update the owner's installation.
+
+See [the shared update guide](UPDATE-SYSTEM.md#managed-linux-artifact-retention-and-lifetime).
+
 ## October 1: browser evidence recovery
 
 [Browser observation repair](BROWSER-OBSERVATION-REPAIR.md#installed-linux-evidence--1-october-2026)
@@ -340,3 +360,53 @@ source `85034ac`. Both windows closed only while idle; the primary launcher was
 invoked after its old service had exited. Desktop/Mobile report online and no
 pending update. This supersedes the preceding installed root without altering
 its preserved product, DSH or speech contract.
+
+
+## Automatic managed selection controller — October 3
+
+The update branch now has an independent live managed transaction using this same
+immutable selection contract. It retains the deployment lock, exact source/target
+inventories plus modes, and checks the candidate against the live DSH integration
+before reserving or closing work. After observed drain it checks offline imports,
+takes the final installation writer, preserves the previous selection and atomically
+selects the target. Fixed isolated Qt health completes only the original successful
+transaction. Unknown replacement/flush or failed health retains the persistent
+startup barrier and both releases. There is no automatic rollback/replay.
+
+The [shared updater guide](UPDATE-SYSTEM.md#managed-linux-live-selection-controller--october-3)
+records 12 isolated fixtures and remaining integration. This has not enabled
+customer automatic installation or changed the owner's selection. DSH/preset or
+service migrations remain explicit; Debian/RPM follow their package manager.
+
+
+The retained Linux observer now stages an exact publisher-held fixed-name ZIP,
+rejects any downloaded local selection records and creates the target through the
+existing staging tool with the current private deployment configuration. Source,
+selection and model/profile/service choices survive staging. Actual copied ELF
+exec and inherited-lock refusal fixtures pass. Manager eligibility stays disabled
+until producer, owned service/preset/reopening, retention and signed forward
+qualification are complete; the [shared guide](UPDATE-SYSTEM.md#managed-linux-exact-bundle-and-retained-handoff--october-3)
+records exact scope and evidence.
+
+
+The immutable staging allowlist now also includes the complete `dsh/` payload,
+not just the root Node executable and development `release/dsh` inputs. A fixture
+retains inert DSH and matching speech bytes, confirms later source edits do not
+change the release, and refuses damaged retained speech before activation. The
+public managed download path requires bundled DSH/speech entrypoints and payload
+metadata before imports; a qualification flag alone cannot compensate for a
+missing dependency tree. Twelve deployment cases and nine archive cases pass.
+
+
+## Managed bundle production — October 4
+
+The complete native Linux candidate builder is
+`scripts/package-linux-managed.py --out <new-directory>`. It bundles pinned
+Python/Node, locked Linux GUI/runtime wheels, production JS, matching Handy and
+prepared DSH/speech, then requires actual immutable offline Qt health and exports
+an exact ZIP. A preview also requires `--channel preview --update-build <reviewed-positive-build>
+--source-commit <exact-clean-commit>`; CI's build 1 is an unpublished test candidate.
+It does not install or select a deployment. Qualification flags remain disabled.
+Native x64/ARM64 workflow execution, signed forward installation, real desktop/DSH,
+distribution and sources/notices qualification remain necessary. See
+[the full scope and evidence](UPDATE-SYSTEM.md#complete-managed-linux-candidate-producer--october-4).

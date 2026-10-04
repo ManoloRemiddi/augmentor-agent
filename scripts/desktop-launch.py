@@ -103,11 +103,11 @@ def main(args):
         if not (root/'apps/native/augmentor_linux/window.py').is_file():
             raise RuntimeError('The selected desktop release is missing.')
     env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'), 'AUGMENTOR_PI_NODE':config['node'],
-           'PI_TELEMETRY':'0', 'PI_SKIP_VERSION_CHECK':'1'}
+           'PI_TELEMETRY':'0', 'PI_SKIP_VERSION_CHECK':'1', 'PYTHONDONTWRITEBYTECODE':'1'}
     if config.get('dshService'): env['AUGMENTOR_DSH_SERVICE'] = config['dshService']
     if not env.get('QT_QPA_PLATFORM') and env.get('XDG_SESSION_TYPE') == 'wayland' and env.get('DISPLAY'):
         env['QT_QPA_PLATFORM'] = 'xcb'
-    os.execve(config['python'], [config['python'], '-m', 'augmentor_linux', *(['--ensure-running'] if service_run else args)], env)
+    os.execve(config['python'], [config['python'], '-B', '-m', 'augmentor_linux', *(['--ensure-running'] if service_run else args)], env)
 
 
 if __name__ == '__main__':

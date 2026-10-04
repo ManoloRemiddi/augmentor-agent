@@ -68,6 +68,8 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p 'test_update_*.py' -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_identity.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_payload_integrity.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_recovery_source.py -v
@@ -126,6 +128,16 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B scripts/windows-launcher-lease-proof.py --runtime outputs/payload --arch ${{ matrix.arch }} --out outputs/evidence
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify native publisher signature and pinned-key refusal
+        if: ${{ !cancelled() && steps.bootstrap.outcome == 'success' }}
+        env:
+          AUGMENTOR_WINDOWS_SIGNING_PROOF_ROOT: outputs/payload
+        run: |
+          # Read-only trust fixture; no app receipt, policy, certificate or target execution.
+          New-Item -ItemType Directory -Force outputs/payload/scripts | Out-Null
+          Copy-Item scripts/verify-windows-publisher.ps1 outputs/payload/scripts/
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_update_windows_signing.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()

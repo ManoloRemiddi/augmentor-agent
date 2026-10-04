@@ -25,6 +25,9 @@ class DictationTests(unittest.TestCase):
         if os.name=='nt':
             from platform_adapters.windows_identity import private_directory
             self.base=private_directory(self.base/'private')
+        environment=patch.dict(os.environ,{'XDG_RUNTIME_DIR':str(self.base/'run'),
+            'XDG_STATE_HOME':str(self.base/'state')})
+        environment.start();self.addCleanup(environment.stop)
         self.backend=broker.Backend(self.base)
 
     @contextmanager
@@ -55,7 +58,7 @@ class DictationTests(unittest.TestCase):
         from unittest.mock import Mock
         with patch.object(broker.sys,'platform','fixture'),patch.object(self.backend,'binary',return_value=self.base/'handy'),patch.object(broker.subprocess,'Popen',return_value=Mock()),patch.object(broker.threading.Thread,'start'),patch.object(self.backend,'call',return_value={}) as call:
             self.backend.start()
-            call.assert_called_once_with('status',{},timeout=60)
+            call.assert_called_once_with('status',{},timeout=90)
 
     def test_warm_status_keeps_its_short_response_deadline(self):
         from unittest.mock import Mock
@@ -157,7 +160,8 @@ class DictationTests(unittest.TestCase):
 
     def test_incomplete_checkout_cannot_own_an_enabled_session(self):
         checkout=self.base/'checkout'
-        for relative in ('services/dictation/server.py','services/dictation/portal.py','apps/native/augmentor_linux/dictation.py'):
+        for relative in ('services/dictation/server.py','services/dictation/portal.py',
+                'services/dictation/maintenance.py','services/lifecycle/admission.py','apps/native/augmentor_linux/dictation.py'):
             target=checkout/relative;target.parent.mkdir(parents=True,exist_ok=True)
             shutil.copy2(ROOT/relative,target)
         if os.name=='nt':

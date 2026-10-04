@@ -99,6 +99,12 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/node/node.exe --test tests/updates-repository.test.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_update_packaging.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_update_signed_authority.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise Python and Node shared prompt clients and durable restart
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         env:
@@ -127,15 +133,23 @@ jobs:
         with:
           name: handy-win32-${{ matrix.arch == 'x64' && 'AMD64' || 'ARM64' }}
           path: components/handy/runtime
-      - name: Assemble shared Windows application and native launcher
+      - name: Assemble numbered disposable Windows application and native launcher
         id: application
         if: ${{ !cancelled() && steps.dsh.outcome == 'success' }}
         run: |
-          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }}
+          # Build 1 is this unpublished fixture only; public/automatic flags remain false.
+          & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} --update-build 1
       - name: Verify bounded source-recovery observation
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_recovery_observer.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify actual Windows publisher trust without executing the target
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        env:
+          AUGMENTOR_WINDOWS_SIGNING_PROOF_ROOT: outputs/payload
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_update_windows_signing.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise the actual bundled dictation broker and private state
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}

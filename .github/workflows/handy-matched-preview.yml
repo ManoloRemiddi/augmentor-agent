@@ -2,6 +2,11 @@
 name: Matched Handy Linux and macOS previews
 on:
   workflow_dispatch:
+    inputs:
+      update_build:
+        description: Reviewed positive per-version build shared by all published platform artifacts
+        required: true
+        type: string
   pull_request:
     paths:
       - 'docs/MACOS-PREVIEW.html'
@@ -14,6 +19,8 @@ on:
       - 'scripts/*handy*.py'
 permissions:
   contents: read
+env:
+  AUGMENTOR_RELEASE_BUILD: ${{ inputs.update_build || '0' }}
 concurrency:
   group: handy-matched-preview-${{ github.ref }}
   cancel-in-progress: true
@@ -38,6 +45,9 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24.19.0'
+      - name: Require reviewed public release numbering
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: python3 -c 'import os; from pathlib import Path; import sys; sys.path.insert(0,str(Path.cwd()/"services")); from updates.packaging import source_revision; source_revision(Path.cwd(),build=int(os.environ["AUGMENTOR_RELEASE_BUILD"])); assert 1<=int(os.environ["AUGMENTOR_RELEASE_BUILD"])<=2147483647'
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
           name: handy-linux-x86_64
@@ -50,7 +60,7 @@ jobs:
           npm run build
           python3 -m unittest discover -s tests -p test_complete_sources.py -v
           python3 scripts/package-browser.py
-          python3 scripts/package-debian.py
+          python3 scripts/package-debian.py --update-build "$AUGMENTOR_RELEASE_BUILD"
           python3 scripts/review-artifacts.py --debian outputs/debian --browser outputs/browser --output outputs/debian/review.json
       - name: Assemble the complete fresh-user bundle
         run: |
@@ -119,7 +129,12 @@ jobs:
       - name: Build the exact ad-hoc preview app and DMG
         run: |
           ref=$(git rev-parse HEAD)
-          .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos-preview --preview --dmg --source-commit "$ref" --source-notices outputs/macos-sources/notices
+          preview_args=()
+          if [ "${{ github.event_name }}" = workflow_dispatch ]; then
+            [[ "$AUGMENTOR_RELEASE_BUILD" =~ ^[1-9][0-9]*$ ]] && [ "$AUGMENTOR_RELEASE_BUILD" -le 2147483647 ]
+            preview_args=(--preview)
+          fi
+          .macos-build-env/bin/python3 scripts/package-macos.py --out outputs/macos-preview "${preview_args[@]}" --dmg --update-build "$AUGMENTOR_RELEASE_BUILD" --source-commit "$ref" --source-notices outputs/macos-sources/notices
           .macos-build-env/bin/python3 scripts/verify-macos-application-inventory.py outputs/macos-preview
           app="$PWD/outputs/macos-preview/Augmentor Agent Desktop.app"
           project="$app/Contents/Resources/app"

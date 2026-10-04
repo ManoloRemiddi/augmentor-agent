@@ -62,6 +62,8 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           npm run check
           npm run build
+          node --test tests/updates-repository.test.mjs tests/updates-publisher.test.mjs
+          .macos-build-env/bin/python3 -B -m unittest discover -s tests -p 'test_update_*.py' -v
           AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node --test tests/codex-*.test.mjs
           .macos-build-env/bin/python3 -m unittest discover -s tests -p test_codex_credentials.py -v
           AUGMENTOR_PYTHON="$PWD/.macos-build-env/bin/python3" node scripts/proof-codex-credentials.mjs
@@ -99,6 +101,7 @@ jobs:
           codesign --verify --deep --strict "$app"
           "$project/python/bin/python3" -I -B scripts/proof-handy-component.py --runtime "$project/components/handy/runtime"
           "$project/node/bin/node" scripts/app-sdk-bundle-proof.mjs "$project"
+          "$project/python/bin/python3" -I -B scripts/macos-update-payload-proof.py --app "$app" --out outputs/macos-update-source --artifact outputs/macos/augmentor-desktop-*-macos-arm64-development.zip
           codesign --verify --deep --strict "$app"
       - name: Exercise bundled DSH and Qt with an isolated model fixture
         env:
@@ -145,5 +148,6 @@ jobs:
             outputs/macos-companion/*.json
             outputs/macos-managed/report.json
             outputs/macos-engine-first/report.json
+            outputs/macos-update-source/report.json
           retention-days: 7
           if-no-files-found: warn
