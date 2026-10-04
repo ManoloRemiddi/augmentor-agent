@@ -1,0 +1,68 @@
+{
+  "format": "augmentor-published-fresh-managed012/1",
+  "date": "2026-10-04",
+  "status": "PASS_GENUINE_FRESH_MANAGED012_UPGRADE_ROLLBACK_OPEN",
+  "scope": "Published Debian13 product012 in a separate inert namespace with full HOME on a dedicated ext4 volume.",
+  "evidence": {
+    "source": "e02731023153e3b2e1440e50b8c14b64ad0a82e5",
+    "workerSha256": "6b91fbf0c2406923d8d634e90a0dc0badeebd540f24890ad4c447fee9973ba3a",
+    "workerExitCode": 0,
+    "actualFreshRunSha256": "d8819753165675606b7e4833384e420ea5ab79a27f33d6d47ad69747ebb04036",
+    "aggregateEndingSha256": "cc83cccd0ee8eb93277279fde8aa13d01ba2157aa753293f024e272f691ac29c",
+    "selectedArtifactSha256": "9cda9c487524c472576be2fb86d70cfea8e370ecbe54ad9694e848d406a8c816",
+    "workerSeconds": 10.163433,
+    "modelRequests": 0,
+    "fullNativeUnchangedAndManagedInventoryVerified": true,
+    "historicalJournalsAndThreeCompressedHistoriesPreserved": true,
+    "foreignAliasGroupsPreserved": 127,
+    "actualHomeMembers": 63620,
+    "boundedReadOnlyEndingLimit": 63699,
+    "processesSocketsListenersAbsentAndNativeLeasesIdle": true,
+    "originalUnknownInstallAndAllSixOriginalJournalsUnchanged": true,
+    "wholeHomeDeltaReviewed": true,
+    "knownNormalMetadataEffects": [
+      {
+        "path": ".local/share/augmentor",
+        "changedFields": [
+          "mtimeNs",
+          "nlink"
+        ]
+      },
+      {
+        "path": ".local/share/augmentor/desktop.json",
+        "changedFields": [
+          "bytes",
+          "inode",
+          "mtimeNs",
+          "sha256"
+        ]
+      },
+      {
+        "path": ".local/share/augmentor/dsh-home",
+        "changedFields": [
+          "mtimeNs"
+        ]
+      },
+      {
+        "path": ".local/share/augmentor/dsh-home/profiles/web/cordis.yml",
+        "changedFields": [
+          "mtimeNs"
+        ]
+      },
+      {
+        "path": ".local/state",
+        "changedFields": [
+          "mtimeNs",
+          "nlink"
+        ]
+      }
+    ],
+    "normalMemoryDatabaseAndLockCreated": true
+  },
+  "limits": [
+    "First ending scanner retained its40000-member refusal after legitimate managed copying. Separate finite63699-member read completed; worker was not replayed.",
+    "Configuration cordis.yml contents/owner/mode/device/inode/link count stayed exact; normal SDK start changed its mtime. Declared ancestor directories changed mtime/link counts during store/journal growth.",
+    "Older frozen worker/coordinator evidence is not relabelled; the actual new run has a distinct hash.",
+    "Native013 upgrade, normal integration install/save/selection, idempotence and genuine product rollback remain open."
+  ]
+}

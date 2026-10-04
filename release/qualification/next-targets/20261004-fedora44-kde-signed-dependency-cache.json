@@ -1,0 +1,33 @@
+{
+  "format": "augmentor-fedora44-kde-signed-dependency-cache/1",
+  "date": "2026-10-04",
+  "status": "PASS_SIGNED_CACHE_DEPENDENCY_INSTALL_OPEN",
+  "scope": "Fresh authenticated Fedora44 cloud-derived KDE qualification fixture; download and key authentication only.",
+  "evidence": {
+    "officialRepositoryDownloadExitCode": 0,
+    "downloadedRpmFiles": 924,
+    "oneExistingOfficialKeyImportExitCode": 0,
+    "fullSigningFingerprint": "36F612DCF27F7D1A48A835E4DBFCF71C6D9F90A6",
+    "certificateSha256": "93642aec521a1e5e96dd715f7ae0ec0850ebc9de09a94ce03cae5263f26cc18a",
+    "supportedExportFullFingerprintAndAllPublicPacketBodiesExact": true,
+    "all924SignaturesAndDigestsVerified": true,
+    "allCachedFileHashesMetadataAndExactPackageIdentitiesUnchanged": true,
+    "native427ExistingPackageRowsAndTestHomeUnchanged": true,
+    "soleAddedRpmRecord": "gpg-pubkey full-fingerprint VERSION; RELEASE6786af3b; BUILDTIME1736879931",
+    "SELinux": "Enforcing",
+    "actualImportAndEndingReceiptSha256": "952163e5f5558ecc32fa4895f4a1207282c7e8ad98480b3b5900bccd9ef1576b",
+    "rootSourceTests": 53,
+    "dependencyOrProductInstallExecuted": false
+  },
+  "limits": [
+    "Original download-only phase signature failure/NOKEY remains retained; downloading alone did not establish signature authenticity.",
+    "Cloud-init empty group schema warning remains retained; actual locked nonadmin account was independently checked.",
+    "Dependency install, KDE login/session, matching product artifact installation, saved text, active-input Stop and no replay remain open."
+  ],
+  "sources": [
+    "https://fedoraproject.org/security/",
+    "https://rpm.org/docs/6.0.x/man/rpmkeys.8",
+    "https://raw.githubusercontent.com/rpm-software-management/rpm/rpm-6.0.1-release/lib/keystore.cc",
+    "https://dnf5.readthedocs.io/en/latest/commands/install.8.html"
+  ]
+}

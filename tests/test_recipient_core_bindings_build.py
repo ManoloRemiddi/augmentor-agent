@@ -51,16 +51,17 @@ class RecipientBuildTests(unittest.TestCase):
         self.addCleanup(folder.cleanup)
         self.tmp_path = Path(folder.name)
 
-    def daemon_fixture(self):
-        plan = build.docker_plan(build.SECONDARY / 'marked-private-test', Path('/run/marked-test/docker.sock'))
-        raw = b'\0'.join(arg.encode() for arg in plan['expectedDaemonArgv']) + b'\0'
+    def daemon_fixture(self, kind='docker'):
+        containerd = kind == 'containerd'
+        plan = build.docker_plan(build.SECONDARY / 'marked-private-test', Path('/run/augmentor-marked-test/docker.sock'))
+        raw = b'\0'.join(arg.encode() for arg in plan['expectedContainerdArgv' if containerd else 'expectedDaemonArgv']) + b'\0'
         record = {'pid': 7777, 'startTicks': '900', 'argvSha256': build.digest(raw),
                   'executableSha256': 'a' * 64, 'networkNamespaceInode': 123,
-                  'socket': '/run/marked-test/docker.sock', 'paths': {}}
-        for number, path in enumerate((str(build.SECONDARY / 'marked-private-test/daemon-data'),
-                                       str(build.SECONDARY / 'marked-private-test/daemon-exec'),
+                  'socket': '/run/augmentor-marked-test/' + ('containerd.sock' if containerd else 'docker.sock'), 'paths': {}}
+        for number, path in enumerate((str(build.SECONDARY / ('marked-private-test/containerd-data' if containerd else 'marked-private-test/daemon-data')),
+                                       '/run/augmentor-marked-test/' + ('containerd-state' if containerd else 'docker-exec'),
                                        str(build.SECONDARY / 'marked-private-test/daemon-tmp'),
-                                       '/run/marked-test', '/run/marked-test/docker.sock')):
+                                       '/run/augmentor-marked-test', record['socket'])):
             socket_path = path.endswith('.sock')
             record['paths'][path] = {'identity': [8, number + 100, 0, 0, 0o660 if socket_path else 0o700],
                                       'kind': 'socket' if socket_path else 'directory'}
@@ -74,8 +75,8 @@ class RecipientBuildTests(unittest.TestCase):
             if str(path).endswith('cmdline'):
                 return raw
             if str(path).endswith('environ'):
-                return b'\0'.join((key + '=' + value).encode() for key, value in plan['daemonEnvironment'].items()) + b'\0'
-            return b'{}\n'
+                return b'\0'.join((key + '=' + value).encode() for key, value in plan['containerdEnvironment' if containerd else 'daemonEnvironment'].items()) + b'\0'
+            return build.containerd_config(build.SECONDARY / 'marked-private-test', Path('/run/augmentor-marked-test/docker.sock')) if containerd else b'{}\n'
         self.enterContext(mock.patch.object(Path, 'read_bytes', autospec=True, side_effect=content))
         net_read = self.enterContext(mock.patch.object(Path, 'read_text', return_value='header\nheader\n lo: 0 0\n'))
         self.enterContext(mock.patch.object(Path, 'stat', autospec=True,
@@ -123,7 +124,7 @@ class RecipientBuildTests(unittest.TestCase):
 
     def test_daemon_record_must_include_both_actual_storage_directories(self):
         plan, record, connection, _ = self.daemon_fixture()
-        del record['paths'][str(build.SECONDARY / 'marked-private-test/daemon-exec')]
+        del record['paths']['/run/augmentor-marked-test/docker-exec']
         with self.assertRaisesRegex(ValueError, 'omits storage'):
             build.verify_private_daemon(record, plan)
         connection.connect.assert_not_called()
@@ -137,6 +138,53 @@ class RecipientBuildTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'environment differs'):
             build.verify_private_daemon(record, plan)
         connection.connect.assert_not_called()
+
+    def test_private_containerd_binds_own_peer_and_never_sends_messages(self):
+        plan, record, connection, _ = self.daemon_fixture('containerd')
+        build.verify_private_daemon(record, plan, kind='containerd')
+        connection.connect.assert_called_once_with('/run/augmentor-marked-test/containerd.sock')
+        connection.close.assert_called_once(); connection.send.assert_not_called()
+
+    def test_containerd_host_config_import_is_refused_before_connect(self):
+        plan, record, connection, _ = self.daemon_fixture('containerd')
+        original = Path.read_bytes.mock.side_effect
+        Path.read_bytes.mock.side_effect = lambda p: b'imports=["/etc/containerd/conf.d/*"]\n' if str(p).endswith('containerd.toml') else original(p)
+        with self.assertRaisesRegex(ValueError, 'configuration'):
+            build.verify_private_daemon(record, plan, kind='containerd')
+        connection.connect.assert_not_called()
+
+    def test_containerd_foreign_peer_and_replacement_are_terminal(self):
+        plan, record, connection, _ = self.daemon_fixture('containerd')
+        connection.getsockopt.return_value = struct.pack('3i', 8888, 0, 0)
+        with self.assertRaisesRegex(ValueError, 'exact new private daemon'):
+            build.verify_private_daemon(record, plan, kind='containerd')
+        connection.close.assert_called_once()
+
+    def test_containerd_lifetime_replacement_after_peer_refuses(self):
+        plan, record, connection, _ = self.daemon_fixture('containerd')
+        with mock.patch.object(build, 'process_start', side_effect=['900', '901']):
+            with self.assertRaisesRegex(ValueError, 'replaced'):
+                build.verify_private_daemon(record, plan, kind='containerd')
+        connection.close.assert_called_once()
+
+    def test_containerd_config_is_private_without_imports_or_external_plugins(self):
+        import tomllib
+        directory = build.SECONDARY / 'new-long-retained-build'
+        address = Path('/run/augmentor-marked-review/docker.sock')
+        value = tomllib.loads(build.containerd_config(directory, address).decode())
+        assert value['imports'] == []
+        assert len(value['stream_processors']) == 2
+        assert all(row == {'accepts': [], 'returns': '', 'path': '', 'args': [], 'env': []}
+                   for row in value['stream_processors'].values())
+        assert 'io.containerd.internal.v1.opt' in value['disabled_plugins']
+        assert 'io.containerd.nri.v1.nri' in value['disabled_plugins']
+        assert value['root'] == str(directory / 'containerd-data')
+        assert value['state'] == '/run/augmentor-marked-review/containerd-state'
+        assert len((value['grpc']['address'] + '.ttrpc').encode()) < 108
+        shim_dir = value['plugins']['io.containerd.shim.v1.manager']['socket_dir']
+        assert shim_dir == '/run/augmentor-marked-review/s'
+        assert len((shim_dir + '/' + 'a' * 64).encode()) <= 106
+        assert len((str(address.parent / 'docker-exec') + '/containerd/containerd-debug.sock').encode()) < 108
 
     def test_conservative_whole_build_budget_refuses_before_allocation(self):
         for root, secondary in [(4 * build.GIB - 1, 30 * build.GIB), (5 * build.GIB, 29 * build.GIB - 1)]:
@@ -265,7 +313,9 @@ class RecipientBuildTests(unittest.TestCase):
         assert plan['daemonProvisioning'][:3] == ['/usr/bin/unshare', '--net', '--']
         assert '--bridge=none' in plan['expectedDaemonArgv']
         assert '--data-root=' + str(directory / 'daemon-data') in plan['expectedDaemonArgv']
-        assert '--exec-root=' + str(directory / 'daemon-exec') in plan['expectedDaemonArgv']
+        assert '--exec-root=/run/augmentor-marked-review/docker-exec' in plan['expectedDaemonArgv']
+        assert '--containerd=/run/augmentor-marked-review/containerd.sock' in plan['expectedDaemonArgv']
+        assert plan['containerdProvisioning'][:3] == ['/usr/bin/unshare', '--net', '--']
         assert all(('/var/run/docker.sock' not in arg for argv in plan['commands'] for arg in argv))
         assert all((arg not in ('--volume', '--mount', '--privileged', '--device') for argv in plan['commands'] for arg in argv))
         assert '--network=none' in plan['commands'][1] and '--pull=false' in plan['commands'][1]

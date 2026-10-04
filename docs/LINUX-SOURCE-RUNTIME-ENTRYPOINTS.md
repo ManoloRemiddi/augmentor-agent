@@ -306,13 +306,37 @@ retain their reviewed error handling. The new producer wheel receives its own
 hash and derivation receipt; the original CLI's two-producer allowlist remains
 unchanged.
 
-The command plan requires a fresh Docker daemon, data/exec directories and
-container on the secondary filesystem, in a separate network namespace with
-only its loopback interface. The read-only daemon fence binds its executable,
-exact arguments, PID/start, storage/socket metadata and socket peer without
-sending API messages. A subsequent, separately reviewed host controller must
-pin that provisioning record and control plan; a caller-supplied daemon record
-alone is not authority. No provisioning or command execution has occurred.
+The corrected source-only command plan starts an explicitly addressed private
+containerd before Docker. Its data root remains on the secondary filesystem;
+containerd state, both sockets and Docker exec-root use a short new root-private
+`/run/augmentor-*` directory. Each process has its own isolated network namespace
+with only loopback, exact clean environment, pinned executable/arguments,
+PID/start, config/storage/socket metadata and zero-message socket peer check.
+The separately reviewed controller must pin both provisioning records and check
+both before every Docker API call. Caller-supplied process records alone are not
+authority. No provisioning or command execution has occurred.
+
+The earlier905fa9 plan is historical source evidence and remains unqualified for
+execution: [Moby27.5.1](https://github.com/moby/moby/blob/v27.5.1/cmd/dockerd/daemon_unix.go#L112-L132)
+can discover a system containerd when an explicit address is absent, and a long
+exec-root also produces an oversized Unix socket pathname. The correction uses
+Docker's supported [standalone containerd address](https://docs.docker.com/reference/cli/dockerd/#run-containerd-standalone)
+and a fixed private TOML with no imports, disabled CRI/NRI/opt plugins and
+explicit inert entries for both built-in encrypted-layer decoders. Empty maps do
+not clear containerd's defaults; its [merge code](https://github.com/containerd/containerd/blob/ee2735368117d2eb259779949d5e75cdafec9761/cmd/containerd/server/config/config.go#L563-L580)
+replaces these named processor sections. Their accepted media types, command,
+arguments and environment are all empty. Disabling the
+[opt plugin](https://github.com/containerd/containerd/blob/ee2735368117d2eb259779949d5e75cdafec9761/plugins/services/opt/service.go#L31-L53)
+also prevents its default `/opt/containerd` directories and PATH/loader changes. [Containerd2.2 source](https://github.com/containerd/containerd/blob/v2.2.0/cmd/containerd/command/main.go#L124-L145)
+documents explicit config, root/state/address overrides and the derived TTRPC
+socket. Installed host package metadata reports Docker29.8.2/containerd2.3.6;
+the installed containerd/shim binaries expose source revision
+`ee2735368117d2eb259779949d5e75cdafec9761`, which was read directly upstream.
+Its [shim manager](https://github.com/containerd/containerd/blob/ee2735368117d2eb259779949d5e75cdafec9761/core/runtime/v2/shim_manager.go#L44-L55)
+supports an explicit private `socket_dir`; the config binds that directory too.
+The exact Docker source tag was unavailable. Actual pinned binary/config behavior
+remains a separate qualification gate.
+
 Root must retain4GiB available space and secondary must retain a conservative
 25GiB build allowance plus4GiB before each allocation. Actual host
 `MemAvailable` must cover the8GiB builder limit plus2GiB headroom. The actual

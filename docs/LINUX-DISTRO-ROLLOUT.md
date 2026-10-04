@@ -1,5 +1,38 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 normal close, genuine baseline and signed cache
+
+[The genuine fresh managed012 baseline](../release/qualification/next-targets/20261004-published-fresh-managed012-acceptance.json)
+completed in10.16seconds with zero model requests. A separate bounded ending
+read verifies the full managed inventory, unchanged native files, three histories
+and127 closed foreign alias groups. All six original protected journals and the
+original unknown install remain unchanged. Normal SDK startup changed only the
+recorded configuration timestamp and declared store/journal metadata. The first
+40000-member ending refusal is preserved; a63699-member independent reader
+completed without replaying the worker. Coordinated product upgrade/rollback
+remain open.
+
+[One normal GNOME close](../release/qualification/next-targets/20261004-gnome562-normal-close-postboot-cache.json)
+passes app/child absence, inactive unit and socket removal. Its typed empty
+ExecStop and normal systemd cleanup policy were verified. The full ending audit
+then refused three boot-local Btrfs device changes; all cache contents and other
+recorded metadata stayed exact. The actual filesystem UUID/root256 pass, while
+a file-rootid utility read refused permission. Full ending/control acceptance is
+still open; no cache cancellation, OS update or audit waiver occurred.
+
+[The Fedora44 dependency cache](../release/qualification/next-targets/20261004-fedora44-kde-signed-dependency-cache.json)
+now passes all924 RPM signatures/digests after one authenticated existing Fedora
+key import. Supported export and complete fingerprint/packet bodies match the
+trusted certificate. Native427 existing rows and test HOME stay exact; only the
+expected key record was added. The original NOKEY failure is preserved.
+Dependency and product installation, KDE saved text and active Stop remain open.
+
+[Hosted validation37202688444](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37202688444)
+passes all11 jobs at905fa9d. Later source remains separately qualified. The
+corrected private containerd/Docker plan passes34 maintained,13 private controller
+and14 existing source checks; no daemon/build has run. Public release, physical
+audio and the owner license decision remain open; GitGuardian is unwaived.
+
 [The corrected bounded GNOME read](../release/qualification/next-targets/20261004-gnome562-postboot-session-child-observation.json)
 now records the active unlocked Wayland session and attributes the extra runtime
 READ lock to Augmentor's prompt-library child. Only that child and the dictation

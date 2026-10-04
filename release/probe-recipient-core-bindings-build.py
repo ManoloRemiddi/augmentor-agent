@@ -268,23 +268,49 @@ def authenticate_kit(kit):
             'freshEmptyDaemonBaseImportQualified': False, 'detachedQtSignaturesVerified': False}
 
 
+def containerd_config(directory, socket_path):
+    """Explicit private v3 config: no host include, CRI/NRI/opt or decoder inputs."""
+    return ('version = 3\nimports = []\n'
+            'disabled_plugins = ["io.containerd.grpc.v1.cri", "io.containerd.cri.v1.images", '
+            '"io.containerd.cri.v1.runtime", "io.containerd.nri.v1.nri", "io.containerd.internal.v1.opt"]\n'
+            'stream_processors = {"io.containerd.ocicrypt.decoder.v1.tar.gzip" = {accepts = [], returns = "", path = "", args = [], env = []}, '
+            '"io.containerd.ocicrypt.decoder.v1.tar" = {accepts = [], returns = "", path = "", args = [], env = []}}\nroot = ' + json.dumps(str(directory / 'containerd-data')) + '\n'
+            'state = ' + json.dumps(str(socket_path.parent / 'containerd-state')) + '\n'
+            '[grpc]\naddress = ' + json.dumps(str(socket_path.parent / 'containerd.sock')) + '\n'
+            'uid = 0\ngid = 0\n'
+            '[plugins."io.containerd.shim.v1.manager"]\nsocket_dir = '
+            + json.dumps(str(socket_path.parent / 's')) + '\n').encode()
+
+
 def docker_plan(directory, socket_path):
     """Commands for review only: provisioning is separately authorized/root-owned."""
     if (not directory.is_absolute() or not directory.is_relative_to(SECONDARY) or directory == SECONDARY
             or '..' in directory.parts or not re.fullmatch('[a-z][a-z0-9-]{1,60}', directory.name)):
         raise ValueError('Use new secondary-only daemon/storage/control paths.')
     if (not socket_path.is_absolute() or len(str(socket_path).encode()) > 90
-            or socket_path.name != 'docker.sock' or '..' in socket_path.parts):
+            or socket_path.name != 'docker.sock' or '..' in socket_path.parts
+            or socket_path.parent.parent != Path('/run')
+            or not re.fullmatch('augmentor-[a-z0-9-]{1,25}', socket_path.parent.name)):
         raise ValueError('Require a short, separately private daemon socket path.')
     docker = ['/usr/bin/docker', '--config', str(directory / 'client-config'), '--host', 'unix://' + str(socket_path)]
     controls = directory / 'controls'; context = directory / 'context'
     daemon = ['/usr/bin/dockerd', '--config-file=' + str(controls / 'daemon.json'),
                                '--data-root=' + str(directory / 'daemon-data'),
-                               '--exec-root=' + str(directory / 'daemon-exec'),
+                               '--exec-root=' + str(socket_path.parent / 'docker-exec'),
+                               '--containerd=' + str(socket_path.parent / 'containerd.sock'),
                                '--pidfile=' + str(directory / 'daemon.pid'),
                                '--host=unix://' + str(socket_path), '--bridge=none', '--iptables=false',
                                '--ip-forward=false', '--ip-masq=false', '--userland-proxy=false', '--storage-driver=vfs']
+    containerd = ['/usr/bin/containerd', '--config=' + str(controls / 'containerd.toml'),
+                  '--root=' + str(directory / 'containerd-data'),
+                  '--state=' + str(socket_path.parent / 'containerd-state'),
+                  '--address=' + str(socket_path.parent / 'containerd.sock')]
     return {
+        'expectedContainerdArgv': containerd,
+        'containerdProvisioning': ['/usr/bin/unshare', '--net', '--', *containerd],
+        'containerdEnvironment': {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin',
+                                 'TMPDIR': str(directory / 'daemon-tmp')},
+        'containerdConfigSha256': digest(containerd_config(directory, socket_path)),
         'expectedDaemonArgv': daemon,
         'daemonProvisioning': ['/usr/bin/unshare', '--net', '--', *daemon],
         'daemonEnvironment': {'PATH': '/usr/sbin:/usr/bin:/sbin:/bin',
@@ -332,7 +358,7 @@ def process_start(pid):
     return Path('/proc', str(pid), 'stat').read_text().rsplit(')', 1)[1].split()[19]
 
 
-def verify_private_daemon(record, command_plan):
+def verify_private_daemon(record, command_plan, *, kind='docker'):
     """Read-only future host fence. Provisioning record must be root-reviewed.
 
     No caller here dispatches Docker commands. Connecting to its explicit new
@@ -340,19 +366,24 @@ def verify_private_daemon(record, command_plan):
     this record's exact hash in the separately reviewed host controller before
     using this function; a caller-chosen PID record alone is not authority.
     """
+    if kind not in ('docker', 'containerd'):
+        raise ValueError('Unsupported private process role.')
+    containerd = kind == 'containerd'
+    expected_argv = command_plan['expectedContainerdArgv' if containerd else 'expectedDaemonArgv']
+    expected_env = command_plan['containerdEnvironment' if containerd else 'daemonEnvironment']
     pid = record['pid']; start = record['startTicks']
     if type(pid) is not int or pid <= 1 or process_start(pid) != start:
         raise ValueError('Daemon lifetime differs.')
     argv = Path('/proc', str(pid), 'cmdline').read_bytes().split(b'\0')
     argv = [part.decode() for part in argv if part]
-    if argv != command_plan['expectedDaemonArgv'] or digest(Path('/proc', str(pid), 'cmdline').read_bytes()) != record['argvSha256']:
+    if argv != expected_argv or digest(Path('/proc', str(pid), 'cmdline').read_bytes()) != record['argvSha256']:
         raise ValueError('Daemon arguments differ from separate storage/offline plan.')
     if sha(Path('/proc', str(pid), 'exe')) != record['executableSha256']:
         raise ValueError('Daemon executable changed.')
     environment = Path('/proc', str(pid), 'environ').read_bytes()
     pairs = [part.decode().split('=', 1) for part in environment.split(b'\0') if part]
     if (any(len(part) != 2 for part in pairs) or len(dict(pairs)) != len(pairs)
-            or dict(pairs) != command_plan['daemonEnvironment']):
+            or dict(pairs) != expected_env):
         raise ValueError('Daemon environment differs from the clean private plan.')
     network = Path('/proc', str(pid), 'ns/net').stat().st_ino
     interfaces = sorted(line.split(':', 1)[0].strip() for line in Path('/proc', str(pid), 'net/dev').read_text().splitlines()[2:])
@@ -360,11 +391,15 @@ def verify_private_daemon(record, command_plan):
             or interfaces != ['lo']):
         raise ValueError('Daemon must occupy the new isolated network namespace with onlylo.')
     values = {arg.split('=', 1)[0]: arg.split('=', 1)[1] for arg in argv[1:] if '=' in arg}
-    required_paths = {values['--data-root'], values['--exec-root'], command_plan['daemonEnvironment']['DOCKER_TMPDIR'],
+    required_paths = {values['--root' if containerd else '--data-root'],
+                      values['--state' if containerd else '--exec-root'],
+                      expected_env['TMPDIR' if containerd else 'DOCKER_TMPDIR'],
                       str(Path(record['socket']).parent), record['socket']}
     if set(record['paths']) != required_paths:
         raise ValueError('Daemon record omits storage/socket topology or adds unrelated paths.')
-    if Path(values['--config-file']).read_bytes() != b'{}\n':
+    config = Path(values['--config' if containerd else '--config-file'])
+    expected_config = containerd_config(Path(values['--root']).parent, Path(record['socket']).with_name('docker.sock')) if containerd else b'{}\n'
+    if config.read_bytes() != expected_config:
         raise ValueError('Daemon must use the exact empty private configuration.')
     before = {}
     for name, row in record['paths'].items():
@@ -384,8 +419,8 @@ def verify_private_daemon(record, command_plan):
             raise ValueError('Daemon socket type changed.')
         before[name] = metadata
     sock_path = Path(record['socket'])
-    expected_socket = next(arg[7:] for arg in argv if arg.startswith('--host='))
-    if expected_socket != 'unix://' + str(sock_path) or str(sock_path) not in before:
+    expected_socket = values['--address' if containerd else '--host']
+    if expected_socket != ('' if containerd else 'unix://') + str(sock_path) or str(sock_path) not in before:
         raise ValueError('Daemon socket differs from exact planned address.')
     connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     try:
@@ -400,6 +435,8 @@ def verify_private_daemon(record, command_plan):
     if (digest(Path('/proc', str(pid), 'cmdline').read_bytes()) != record['argvSha256']
             or sha(Path('/proc', str(pid), 'exe')) != record['executableSha256']):
         raise ValueError('Daemon executable/arguments changed during attribution.')
+    if config.read_bytes() != expected_config:
+        raise ValueError('Private process configuration changed during attribution.')
     for name, identity in before.items():
         info = Path(name).lstat()
         if [info.st_dev, info.st_ino, info.st_uid, info.st_gid, stat.S_IMODE(info.st_mode)] != identity:
@@ -434,6 +471,7 @@ def prepare(kit, plan_directory, destination, socket_path):
     controls['marked-wrapper.py'] = Path(__file__).read_bytes()
     controls['marked-builder.py'] = derived_builder(controls['build-linux-lgpl-runtime.py'], digest(controls['marked-wrapper.py']))
     controls['daemon.json'] = b'{}\n'
+    controls['containerd.toml'] = containerd_config(destination, socket_path)
     command_plan = docker_plan(destination, socket_path)
     # No large inputs are copied here. Recheck immediately before small controls.
     measure_budget(); destination.mkdir(mode=0o700); (destination / 'controls').mkdir(mode=0o700)

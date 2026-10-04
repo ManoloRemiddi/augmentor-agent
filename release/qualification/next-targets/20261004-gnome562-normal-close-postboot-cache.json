@@ -1,0 +1,35 @@
+{
+  "format": "augmentor-gnome-normal-close-postboot-cache/1",
+  "date": "2026-10-04",
+  "status": "PASS_NORMAL_CLOSE_FULL_POSTBOOT_AUDIT_OPEN",
+  "source": "56251697f2d2f87c3c1be04130751426940df198",
+  "evidence": {
+    "oneNormalMaintenanceClose": true,
+    "sameBootExpectedAppAndBothChildrenAbsent": true,
+    "unitInactiveAndSocketAbsent": true,
+    "manualSignalsServiceStopCaptureInputModelSdk": false,
+    "typedExecStopEmpty": true,
+    "unitNormalCleanupPolicy": "Type=exec; ExitType=main; Restart=on-failure; KillMode=control-group; TERM15 then configured KILL9 after15s",
+    "closeOutcomeSha256": "72e03d008a10341b382370a792b337901ef20ee3af01bb03b8069434be02031f",
+    "unarmedOfflineCacheFiles": 228,
+    "offlineCacheBytes": 245575012,
+    "cacheContentsAndEveryOtherRecordedMetadataFieldUnchanged": true,
+    "exactThreeDeviceChanges": {
+      "before": 34,
+      "after": 33
+    },
+    "originalCacheFingerprint": "9008934ae5e7bf9cb7ce314e6fc1c8c2ef268e4f951a0d35fde504bbb28c7a3e",
+    "observedCacheFingerprint": "e2744c9b550b3a2906b8b8d70fdb58bfbc57784a75166bfe1f86e5bfdc01d9d9",
+    "currentFilesystemUuidAndRoot256Observed": true
+  },
+  "limits": [
+    "Initial empty ExecStop output refusal retained; separate typed D-Bus array established real empty ExecStop before successful close.",
+    "Unchanged full ending reader refused boot-local Btrfs device reassignment; no audit waiver, native update or cache cancellation.",
+    "Mount-number equality assumption refused; corrected source independently binds superblock0:32 and path stat33. Actual root directory rootid256 and filesystem UUID passed; utility file-rootid read refused Permission denied.",
+    "Full ending native/managed/protected/cache acceptance and GNOME input consent/Stop remain open."
+  ],
+  "sources": [
+    "https://raw.githubusercontent.com/torvalds/linux/v6.19/fs/proc_namespace.c",
+    "https://raw.githubusercontent.com/torvalds/linux/v6.19/fs/btrfs/inode.c"
+  ]
+}
