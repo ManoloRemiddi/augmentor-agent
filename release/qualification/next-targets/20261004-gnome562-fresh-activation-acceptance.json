@@ -1,0 +1,36 @@
+{
+  "format": "augmentor-gnome-fresh-activation-acceptance/1",
+  "date": "2026-10-04",
+  "status": "PASS_ACTIVATION_ONLY",
+  "scope": "One fresh isolated Fedora 44 GNOME 50.5 activation-only run; explicit 180-second proof budget. Original timeout and later admission refusal remain retained.",
+  "source": "56251697f2d2f87c3c1be04130751426940df198",
+  "artifactSha256": "9dc380d3d579ee66b1c3fe6caf2f15df351c015ebfc7942181e1cc66de00f606",
+  "evidence": {
+    "actualOutcomeSha256": "df21ed568b2c0e0b5a7d9e16823d19d4f3ab530a1e66b48b5209a08fcb70da3f",
+    "normalUpdaterExitCode": 0,
+    "normalUpdaterSeconds": 65.2690949569951,
+    "outerBudgetSeconds": 180,
+    "exactCandidateSelected": true,
+    "currentSelectorSha256": "10798675cea201fd227f18057bc39c27f6d408c464bed5a85371230097ad2a92",
+    "previousSelectorSha256": "2286b529b497c4991be7646f8fb94fc922b2a16e8f4f61ee0189b9c4b0a624ee",
+    "nativePackageSourceInventory": "PASS",
+    "fullSelectedCandidateInventory": "PASS",
+    "candidateFileCount": 28059,
+    "protected20": "PASS",
+    "cachedOfflineSnapshot": "EXACT_MATCH_UNARMED",
+    "originalObserverAndEnabledExtensions": "PASS",
+    "sameBootShellPortalOwners": "PASS",
+    "processAdmission": "PASS",
+    "candidateRelatedProcesses": "NONE_MATCHED",
+    "unknownProcessEntries": 0,
+    "lockAdmission": "PASS",
+    "extensionRebootLaunchCaptureInputDispatched": false,
+    "productionGnomeInputAndDiscoveryDisabled": true
+  },
+  "limits": [
+    "Only activation is qualified; extension replacement, reboot, capture, input and full GNOME support remain open.",
+    "65.27 seconds exceeds the original 60-second proof budget; this does not establish the exact original timeout position.",
+    "Process and lock observations are bounded point-in-time evidence.",
+    "Historical timeout and refusal receipts are not rewritten or resumed."
+  ]
+}

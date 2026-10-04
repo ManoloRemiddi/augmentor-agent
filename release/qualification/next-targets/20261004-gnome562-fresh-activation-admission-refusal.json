@@ -1,0 +1,33 @@
+{
+  "format": "augmentor-gnome-fresh-activation-admission/1",
+  "date": "2026-10-04",
+  "status": "KNOWN_REFUSAL_BEFORE_ACTIVATION",
+  "scope": "Isolated Fedora44 GNOME50.5 clone; fresh activation-only admission for existing source562 stage, separate from original60-second activation timeout.",
+  "source": "56251697f2d2f87c3c1be04130751426940df198",
+  "artifactSha256": "9dc380d3d579ee66b1c3fe6caf2f15df351c015ebfc7942181e1cc66de00f606",
+  "evidence": {
+    "bothOriginalSelectorBytes": "PASS",
+    "fullCandidateFileInventory": "PASS",
+    "candidateFileCount": 28059,
+    "nativePackageSourceInventory": "PASS",
+    "protected20": "PASS",
+    "originalObserverAndEnabledExtensions": "PASS",
+    "sameBootShellPortalOwners": "PASS",
+    "unlockedNoVisibleFocus": "PASS",
+    "cachedOfflineSnapshot": "EXACT_MATCH_UNARMED",
+    "foreignNativeOrDeploymentLocks": "NONE_OBSERVED",
+    "packagePendingMarkers": "NONE_OBSERVED",
+    "processAdmission": "REFUSED",
+    "refusalReason": "Current direct SSH transport parent was opaque to cwd inspection and did not match the shell-only parent rule.",
+    "candidateRelatedProcesses": "NONE_MATCHED",
+    "updaterDispatch": false,
+    "freshGuestPhaseCreated": false,
+    "extensionRebootLaunchCaptureInputDispatched": false
+  },
+  "limits": [
+    "This actual refusal does not qualify activation, GNOME input or public support.",
+    "Original timeout and all later refusal receipts remain immutable; no updater was retried in this namespace.",
+    "A separately bounded direct-parent metadata observation confirms sshd-session ordinary/root-peer forms; any source correction requires a fresh namespace and exact identity checks.",
+    "Process and lock observations are bounded point-in-time evidence."
+  ]
+}

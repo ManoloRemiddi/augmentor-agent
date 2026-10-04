@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 verified GNOME activation and build validation
+
+[Fresh GNOME activation](../release/qualification/next-targets/20261004-gnome562-fresh-activation-acceptance.json)
+passes normal updater execution in 65.27 seconds under an explicit 180-second
+proof budget. The exact verified source562 candidate is selected and the previous
+selector contains the original selection. Full candidate/native inventories,
+20 protected files, cached unarmed updates, original observer and enabled list,
+same boot/session, process and lock ending checks pass. The
+[earlier admission refusal](../release/qualification/next-targets/20261004-gnome562-fresh-activation-admission-refusal.json)
+and original 60-second timeout remain retained. The fresh budget result does
+not establish the original timeout position. Extension replacement, reboot and
+control acceptance remain open; production GNOME input/discovery remain disabled.
+
+[Validate run 37197599079](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37197599079)
+passes all 11 jobs at c16cb9b: Debian, Browser/installed packages, Ubuntu 26.04,
+Fedora 43/44, Home, source boundary and Handy on Linux/macOS/Windows. Later source
+changes require their own validation and installed artifacts.
+
 ## October 4 KDE pointer and partial consent results
 
 [The actual Fedora 44 KDE checkpoint](../release/qualification/next-targets/20261004-kde-pointer-consent-partial-save-failure.json)
