@@ -8,8 +8,8 @@ entrypoints: Desktop, native Browser preferences and embedded Browser preference
 Each starts a new process with the marked Core library, then restores the official
 runtime and starts another process with the marker absent. All six closures pass;
 no model or voice starts occur. All four replacement variants now pass native
-ABI, full inventory and official-runtime preservation. The other nine application
-slots are running; graphical Browser and full release qualification remain open.
+ABI, full inventory and official-runtime preservation. All other nine application
+slots and final independent preservation/closure now pass; graphical Browser and full release qualification remain open.
 A separate exact PySide RECORD continuation preserves two historical duplicate
 cache rows and every unrelated raw line; changed native rows remain unique.
 Original derivation failures and partial outputs remain separate.
@@ -26,7 +26,9 @@ CPP inputs, 2700 distinct actual CPP paths overall, exact reconstruction of thre
 configured QtQml plugin sources, six indirect generated-source routes, and
 retained legacy IBus CPP/XML/control inputs. The 96 source license texts are
 hash-authenticated separately from the original 146 notices. File-level license
-applicability, exception conditions and system-provider scope remain open. The
+applicability, exception conditions remain open. The 52 direct and 79 transitive shared-library
+providers now join exact retained DEB bytes, signed binary/source versions and
+retained source descriptors; runtime dynamic loading remains outside that map. The
 22-file licensing proposal is still awaiting the owner; no license changed.
 All five rollout points remain active. No binary publication or PR merge.
 
@@ -172,7 +174,7 @@ to the ordinary fixture user, with ownership/hash/nonwritable ancestry unchanged
 The normal caller also separately corrects its Git-commit check to 40 characters
 while leaving all SHA256 checks unchanged. Original sources/refusals remain
 intact. The subsequent Core results above now pass all three normal entrypoints;
-the other replacement variants are running.
+all twelve slots and final independent preservation/closure now pass.
 [Hosted validation37219196306](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37219196306)
 passes all11 jobs atd6c2d3c. Physical audio, licensing and the unwaived GitGuardian
 gate remain open. No public release is qualified.

@@ -1,5 +1,30 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 actual application replacement progress
+
+[The current checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
+extends the retained source rebuild with installed Ubuntu Noble application tests.
+All four marked replacement variants pass native ABI, complete file inventory and
+official-runtime preservation. Core passes Desktop and both normal Browser
+preference-child entrypoints; each loads the marked library, restores the official
+runtime and starts another process with the marker absent. All twelve slots
+and final independent preservation/closure now pass: all 32319 installed
+application members, official/four recipient inventories and selector/process
+ending checks remain exact. No model or voice starts occur in these checks. Graphical Browser,
+other distribution ABIs, final corresponding-source/notice review and public
+release remain open.
+
+Exact source correspondence now covers all 72 linker/install transformations,
+1770 direct object/compile joins, 68 Unity units with 932 additional CPP inputs,
+and named generated-source controls. The 96 additional SPDX license texts are
+separately authenticated. The generated QtQml grammar carries the Qt GPL
+exception; its exact retained text matches the
+[upstream 6.8.2 exception](https://github.com/qt/qtbase/blob/v6.8.2/LICENSES/Qt-GPL-exception-1.0.txt).
+That exception describes conditions for generator output in a larger work;
+applicability remains a recorded review, rather than a blanket GPL-only runtime
+conclusion. The owner has not approved the 22-file licensing proposal. No license
+or original build control changed. Historical failures below remain unchanged.
+
 # Linux Qt/PySide source runtime work
 
 The [source policy](../release/linux-lgpl-runtime-sources.json) pins seven official

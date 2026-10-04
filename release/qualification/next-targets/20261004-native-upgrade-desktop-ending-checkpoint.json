@@ -193,7 +193,7 @@
   "limitations": [
     "Desktop/control acceptance remains open for current Fedora fixtures.",
     "The published upgrade and coherent rollback pass after a separate reviewed legacy-API continuation; original failures remain unchanged.",
-    "Recipient source rebuild, physical audio and owner license decision remain open.",
+    "Final corresponding-source/notice review, physical audio and owner license decision remain open.",
     "GitGuardian is unwaived; draft PR is not a release."
   ],
   "sourceRebuild": {
@@ -204,7 +204,7 @@
     "failureCauseUnderReview": "Launcher PATH omits installed /usr/sbin/sysctl; actual child exited127.",
     "originalFailureReceiptSha256": "475e47450a0a6beaf13046250421a643ee727c470f27392b5313b68fadd35551",
     "originalFailurePreserved": true,
-    "normalReplacementEntrypointsQualified": false,
+    "normalReplacementEntrypointsQualified": true,
     "isolatedLauncher189": "RUNNING_PRIVATE_DOCKER_AND_CONTAINERD",
     "independentAdmission190": "PASS",
     "originalBaseImageImportExitCode": 0,
@@ -316,7 +316,7 @@
       "generatedObjectOccurrences": 235,
       "authenticatedOriginalNotices": 146,
       "fullGeneratedTransformNoticeClosure": "OPEN",
-      "normalReplacementEntrypointsQualified": false,
+      "normalReplacementEntrypointsQualified": true,
       "licenseReviewComplete": false
     },
     "installedElfTransformation": {
@@ -355,7 +355,7 @@
       "modelRequests": 0,
       "voiceStarts": 0,
       "graphicalBrowserAcceptance": false,
-      "allTwelveReplacementEntrypointsQualified": false
+      "allTwelveReplacementEntrypointsQualified": true
     },
     "generatedTechnicalCorrespondence": {
       "status": "PASS_NAMED_GENERATED_SOURCE_ROUTES_AND_EXACT_CONFIGURE_TRANSFORMS",
@@ -368,6 +368,49 @@
       "indirectGeneratedCppRoutes": 6,
       "legacyIbusCompiledCppsRetained": 3,
       "systemProviderAndLicenseScope": "OPEN",
+      "licenseApplicabilityChosen": false
+    },
+    "actualAllReplacementEntrypoints": {
+      "status": "PASS_ALL_TWELVE_AND_FINAL_INDEPENDENT_ENDING",
+      "variants": [
+        "core",
+        "pyside",
+        "shiboken",
+        "combined"
+      ],
+      "entrypoints": [
+        "Desktop",
+        "native Browser preference child",
+        "embedded Browser preference child"
+      ],
+      "freshApplicationProcessRounds": 24,
+      "selectionAndOfficialRestoration": "PASS_EACH_SLOT",
+      "modelRequests": 0,
+      "voiceStarts": 0,
+      "graphicalBrowserAcceptance": false,
+      "otherDistributionAbisQualified": false,
+      "resultSha256": "299bcada64b4677092cc56671c41e097f5f9b6e345a1d409620322bab9ba3821",
+      "remainingSlotsResultSha256": "71d77d95d7442e5bad4f7ccc91e1112b48bf257dcffb4817ccfd2397631d88e4",
+      "independentEndingRawSha256": "9da221c726440ed8728cd8518ed25acaade0784b9b150caacf6564ad255713d8",
+      "normalClosureCount": 24,
+      "all12SelectionAbsent": true,
+      "officialAndFourRecipientInventoriesUnchanged": true,
+      "full32319ApplicationBytesMatched": true,
+      "noProductOrCompanionProcess": true
+    },
+    "systemDependencyCorrespondence": {
+      "status": "PASS_DIRECT_AND_TRANSITIVE_NEEDED_PROVIDER_SOURCE_DESCRIPTOR_MAP",
+      "mapSha256": "15a2ffc20aa86cb8cf2a340d1fbe5a262f8c9923c9ed60cabcac7e1aa3d017d1",
+      "directNeededNames": 52,
+      "directResolved": 52,
+      "transitiveProviders": 79,
+      "unresolved": 0,
+      "soleExplicitStaticOperand": "librt.a",
+      "staticArchiveBytes": 8,
+      "staticArchiveMembers": 0,
+      "sourceObjectHashesPreviouslyAuthenticatedByRetainedKit": true,
+      "sourceObjectsRehashedDuringThisRead": false,
+      "runtimeDlopenCoverageClaimed": false,
       "licenseApplicabilityChosen": false
     }
   },
@@ -459,6 +502,6 @@
     "originalDuplicateRecordAssertionFailurePreserved": true,
     "unrelatedDuplicateRecordCacheRowsPreservedByteExactly": true,
     "normalEntrypointCoreResults": "PASS_ALL_THREE_TWO_ROUNDS_EACH",
-    "normalEntrypointRemainingVariants": "RUNNING"
+    "normalEntrypointRemainingVariants": "PASS_ALL_NINE_AND_INDEPENDENT_ENDING"
   }
 }

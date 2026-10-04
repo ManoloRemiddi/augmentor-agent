@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 current GNOME ending boundary
+
+[The current rollout checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
+records successful normal app/child closure and the later native, protected,
+cache, extension and selected-pointer audit. Full process admission still refuses
+its scene expectation and two inaccessible working-directory observations.
+Production input remains disabled and unqualified. The owned fixture subsequently
+exited normally. A future fresh boot must establish its actual scene, process
+identities and consent/Stop state before input; the earlier refusals do not
+permit a scene or process exemption. Dated observations below retain their
+original, narrower outcomes.
+
 [The corrected bounded GNOME read](../release/qualification/next-targets/20261004-gnome562-postboot-session-child-observation.json)
 now records the active unlocked Wayland session and attributes the extra runtime
 READ lock to Augmentor's prompt-library child. Only that child and the dictation
