@@ -1,6 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-## October 4 native upgrade and desktop ending checkpoint
+## October 4 rollback compatibility and current execution checkpoint
+
+[The current fixture checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
+records successful native and ordinary published0.2.12→0.2.13 upgrade. Native
+rollback also passes. Ordinary rollback refused before the older save method
+entered: published0.2.12 accepts a token alone, while the proof supplied a managed
+argument. Its original unknown record stays intact. The fixture currently has
+native/integration012 and selected013; complete rollback remains unqualified.
+A separate continuation is being reviewed without repeating installation.
+
+KDE has a verified active Wayland session, currently locked. The supported fixture
+unlock preflight refused a native ScreenSaver owner's executable permission before
+sending an unlock request. Full ending preservation passes; application/input and
+password acceptance remain open. The isolated source build kit prepares correctly,
+but its launcher exited before Docker startup; actual compilation has not begun.
+[Hosted validation37212960848](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37212960848)
+passes all11 jobs at8528697. Source rebuild, physical audio, licensing and the
+unwaived GitGuardian gate remain open. No public release is qualified.
+
+## October 4 earlier native upgrade and desktop ending checkpoint
 
 [The latest actual fixture checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
 records the successful fresh native012→013 transaction, exactly two application

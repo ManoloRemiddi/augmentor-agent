@@ -20,7 +20,17 @@
     "fullIntegration": "PASS",
     "integrationReceiptSha256": "e0ef79e63375b8f7421dbe65fffa0485f7643b52d3e0751c6accaf2b6e0ee47d",
     "integrationSeconds": 15.826541938004084,
-    "rollbackPreflightRefusalPreserved": true
+    "rollbackPreflightRefusalPreserved": true,
+    "nativeRollback": "PASS",
+    "nativeRollbackReceiptSha256": "ddb741158062e50938b43fcd1f65ed0fb9f846cdf2346801fd529a55ef3e688a",
+    "ordinaryRollback": "REFUSED_BEFORE_LEGACY_SAVE_BODY",
+    "legacySaveRefusal": "Published0.2.12 Setup.save accepts token only; the coordinator supplied managed.",
+    "currentNativeVersion": "0.2.12",
+    "currentManagedSelectedVersion": "0.2.13",
+    "currentMatchingIntegrationVersion": "0.2.12",
+    "originalUnknownSaveRecordPreserved": true,
+    "completeRollbackQualified": false,
+    "ordinaryRollbackRunSha256": "1dbc7a0f51c3f95eccaeb915c89cec40c71ccd76afe5270fff20286ee84097e6"
   },
   "fedora44Kde": {
     "nativeDependencyInstallExitCode": 0,
@@ -29,12 +39,20 @@
     "readReceiptSha256": "4ab80cef198d7f84c6df407fc6ea688760d4673d5beea707e8ae47ecc128229c",
     "originalConfigClassificationRefusalPreserved": true,
     "normalGraphicalStartExitCode": 0,
-    "ordinaryWaylandSessionReady": "READ_ONLY_VERIFICATION_OPEN",
+    "ordinaryWaylandSessionReady": "LOCKED_SESSION_VERIFIED",
     "readinessReceiptSha256": "e1c5117ddb34aea8e2320e3c471d68ec30767409f346df65f931a43784517068",
     "endingPreservationErrors": [],
     "applicationAndControlAcceptance": "OPEN",
     "actualUid1001Seat0SessionListed": true,
-    "originalCommaPropertyReaderRefusalPreserved": true
+    "originalCommaPropertyReaderRefusalPreserved": true,
+    "correctedReadReceiptSha256": "270aa86e4672756603a12c2aca8b8f19757713a2d21bc8e40b0955b916d52ca5",
+    "sessionType": "wayland",
+    "sessionUid": 1001,
+    "screenLocked": true,
+    "supportedFixtureUnlock": "REFUSED_BEFORE_DISPATCH_NATIVE_OWNER_EXE_PERMISSION",
+    "unlockPreflightReceiptSha256": "00032b1be0630bdf4d52a81e5c69dc09a49c2e72b873dd9c8c570884188ce849",
+    "unlockRequestDispatched": false,
+    "passwordAuthenticationTested": false
   },
   "gnome50": {
     "nativeProtectedCacheExtensionAndPointersAudit": "PASS",
@@ -58,5 +76,23 @@
     "Integration passes; complete product rollback is still open.",
     "Recipient source rebuild, physical audio and owner license decision remain open.",
     "GitGuardian is unwaived; draft PR is not a release."
-  ]
+  ],
+  "sourceRebuild": {
+    "authenticatedTools": "PASS",
+    "authenticatedKitPreparation": "PASS",
+    "actualCompilationStarted": false,
+    "isolatedLauncher187": "FAILED_BEFORE_CONTAINERD_DOCKER",
+    "failureCauseUnderReview": "Launcher PATH omits installed /usr/sbin/sysctl; actual child exited127.",
+    "originalFailureReceiptSha256": "475e47450a0a6beaf13046250421a643ee727c470f27392b5313b68fadd35551",
+    "originalFailurePreserved": true,
+    "normalReplacementEntrypointsQualified": false
+  },
+  "hostedValidation": {
+    "sourceRevision": "852869705c2459254e05b6270f1fdb18c4615348",
+    "runId": 37212960848,
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37212960848",
+    "status": "PASS",
+    "successfulJobs": 11,
+    "remainingGitGuardianUnwaived": true
+  }
 }
