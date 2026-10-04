@@ -12,8 +12,8 @@ customer distribution. Older checkpoints retain their source-specific history.
 
 | Installation | Implemented controller | Latest qualified scope and remaining boundary |
 | --- | --- | --- |
-| Windows per-user Inno, x64/ARM64 | Independent retained observer, complete component graph, Inno apply, offline completion and captured reopening | `c40926b` full run 37170465430 passes all 24 stages on both CPUs. `40af948` full run and `0cb79e0` desktop run also pass both CPUs. Actual publisher checks pass at `79c5e58`; overall desktop ordering correction needs fresh qualification. Signed forward N-to-N+1 remains unqualified. |
-| Linux managed per-user Desktop, x64/ARM64 | Immutable staging/selection, owned registrations and user services, completion and reopening | `d8de284` complete native archive/relocation/Qt/portal/Handy proof and ten new retention/handoff/signed-authority cases pass both CPUs; service migration has separate native evidence. Main integration exposed an ARM toolchain map omission; corrected `f061593` run 37176868726 is dispatched. |
+| Windows per-user Inno, x64/ARM64 | Independent retained observer, complete component graph, Inno apply, offline completion and captured reopening | `c40926b` full run 37170465430 passes all 24 stages on both CPUs. `40af948` full run and `0cb79e0` desktop run also pass both CPUs. Corrected `2ccb7a0` desktop run 37176951136 passes both CPUs, including actual publisher trust/wrong-pin/damage checks. Combined full signing/intake run 37177293646 is dispatched at `8c5f1ca`. Signed forward N-to-N+1 remains unqualified. |
+| Linux managed per-user Desktop, x64/ARM64 | Immutable staging/selection, owned registrations and user services, completion and reopening | `d8de284` complete native archive/relocation/Qt/portal/Handy proof and ten new retention/handoff/signed-authority cases pass both CPUs; service migration has separate native evidence. Main integration exposed an ARM toolchain map omission; corrected `f061593` run 37176868726 has passed both Handy prerequisites; complete managed bundles remain live. |
 | Mac per-user Desktop bundle | Whole-bundle staging/replacement, persistent startup barrier, independent health and captured reopening | Merged `0cb79e0` full run 37175652699 passes macOS 14 and 26; both downloaded updater reports pass. Earlier retention fixture failures are preserved below with their corrections. Shared/system/Companion coordination and signed forward delivery remain open. |
 | Package-managed Linux, shared/system installations, custom profiles, SDK-owned hosts | Compatible discovery/manual download; installation defers where ownership cannot be coordinated | Privileged/shared-user and SDK owner lifecycle adapters require further work. A running SDK owner is preserved before any shutdown. |
 
@@ -2213,3 +2213,16 @@ The reports explicitly exclude signed forward installation, observed reopening,
 normal login/user installation and automatic publisher authority; passing workflow
 status does not waive those limits. Subsequent Windows-only changes are outside
 this source ref. No owner installation or publisher configuration changed.
+
+Corrected Windows desktop
+[37176951136](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37176951136)
+at `2ccb7a0` is entirely successful on x64 and ARM64, including actual publisher
+inspection and the unchanged early-launcher safety precondition. Fresh combined
+full Windows [37177293646](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37177293646)
+is dispatched at `8c5f1ca` to qualify the assembled signing/intake contract;
+37175650042 remains live at older merged source. Corrected Linux 37176868726 at
+`f061593` has passed both Handy prerequisites and is building both managed
+bundles. Pending outcomes do not establish qualification. Production custody,
+platform publisher accounts/provider identity and first automatic installation
+scope still require the owner's answers to the existing questions. Feed and
+automatic eligibility remain disabled; published previews do not waive these gates.

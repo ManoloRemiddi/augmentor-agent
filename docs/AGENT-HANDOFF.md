@@ -2,6 +2,24 @@
 
 # Start here: agent handoff
 
+Latest executable checkpoint: Windows desktop 37176951136 at `2ccb7a0` is
+terminal success on x64/ARM64, including corrected early-launcher ordering and
+actual publisher trust/wrong-pin/damage checks. Package intake addition `a37d5e0`
+passes seven host cases. Fresh combined full Windows 37177293646 is dispatched
+at `8c5f1ca`; older merged full 37175650042 remains live and predates signing.
+Corrected Linux 37176868726 at `f061593` has passed both native Handy prerequisites
+and is now building both complete managed bundles. No pending result is inferred.
+
+Production release inputs remain unresolved: routine signing-key custody versus
+owner-controlled offline root custody; Apple Developer/Windows signing provider
+availability and identity; and whether first automatic installation scope is
+per-user only or also includes shared/system/package-managed methods. Existing
+questions remain pending. The production signed feed and automatic-install
+qualification are disabled; no production key, certificate, trust-store entry,
+release/tag, owner installation or private profile has been changed. Complete
+signed forward/customer acceptance and other recorded full-goal gaps remain.
+
+
 Merged full Mac 37175652699 at `0cb79e0` is terminal success on macOS 14/26.
 Both downloaded updater reports pass actual retained exec/development-signing
 refusal, same-build apply, persistent pending-start refusal, offline health and
