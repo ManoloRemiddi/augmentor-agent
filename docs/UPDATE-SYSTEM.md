@@ -1655,3 +1655,34 @@ jobs 111327575462/111327575502. It supersedes the earlier live Mac statuses and
 qualifies that earlier source only. None of these runs are physical compositor,
 real customer DSH/provider, signed forward installation or production feed proof.
 The full cross-platform goal remains active and public eligibility stays false.
+
+### Linux service wiring and native report correction
+
+The shared manager now discovers/launches the existing managed Linux bootstrap
+only for the exact selected canonical release, matching update profile, bundled
+interpreter paths, writable release store and fixed shipped entrypoints. Its
+installation results come from the persistent state directory; an old manager
+can still collect its original attempt after selection changes. Debian/Fedora,
+source/custom profiles and missing/changed selections remain manual. Existing
+signed-feed, qualified-source/target, automatic-download/install consent and
+fresh independent authority gates remain enforced. This fixes the service-wiring
+gap: previously Linux could never reach its existing external controller.
+
+Follow-up host manager/Linux/authority/Mac-location checks pass **103 cases**
+(101 passed, two explicit native-service skips). Actual private files/profile
+selection are used; the dispatch call is deliberately mocked and no installer,
+network, graph shutdown or owner application is started by these tests.
+
+At `a285350`, [37167426017](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37167426017)
+is terminal: complete x64 archive/staging/Qt/portal plus staged native maintenance
+passes (111333376400); ARM64 (111333376398) builds and passes Qt/portal and its
+native helper exits zero, but parsing the captured native-wrapper stdout fails
+with `JSONDecodeError`. This is not an overall ARM64 pass. The helper now writes
+a dedicated exclusive UTF-8 report file in the private proof directory; the
+consumer bounds it to 4096 bytes and verifies every declared native proof flag.
+Stdout is no longer installation/test evidence. Ordinary helper CLI stdout is
+preserved. Native nonzero exits expose bounded private-fixture diagnostics.
+The corrected actual local report-file proof passes in the isolated Ubuntu fixture
+with unchanged target bytes, native owner/CAS/admission/cancellation/settings checks
+and ordinary native exit. Fresh native two-CPU qualification remains required;
+no gates are waived.

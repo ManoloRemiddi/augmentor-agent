@@ -16,10 +16,45 @@ from lifecycle.macos_payload import snapshot
 from platform_adapters.private_files import atomic_json,read_json
 from updates.linux_managed import load_deployment
 from updates.linux_bootstrap import locations
+from updates.manager import UpdateManager
 
 
 @unittest.skipUnless(sys.platform=='linux','Actual copied ELF interpreter, exec and inherited Unix lock.')
 class LinuxHandoffTests(unittest.TestCase):
+    def test_manager_uses_only_selected_managed_profile_and_fixed_installer(self):
+        with tempfile.TemporaryDirectory(prefix='augmentor-linux-manager-profile-') as temporary:
+            base=Path(temporary);data=base/'data/augmentor';runtime=base/'run';state=base/'state'
+            for path in (data,runtime,state):path.mkdir(parents=True,mode=0o700)
+            root=data/'releases/source';root.mkdir(parents=True,mode=0o700);(root/'scripts').mkdir(mode=0o700)
+            for name in ('linux-update-bootstrap.py','linux-update-observer.py'):
+                (root/'scripts'/name).write_text('# Inert entrypoint fixture.\n')
+            selected={'root':str(root),'python':str(root/'python/bin/python3'),'node':str(root/'node/bin/node')}
+            atomic_json(data/'desktop.json',selected)
+            manager=UpdateManager.__new__(UpdateManager);manager.root=root;manager.base=data/'updates'
+            manager.current={'installType':'managed-linux','component':'desktop'}
+            with patch.dict(os.environ,{'XDG_DATA_HOME':str(base/'data'),'XDG_RUNTIME_DIR':str(runtime),
+                    'XDG_STATE_HOME':str(state)}):
+                self.assertTrue(manager.installer_available())
+                self.assertEqual(manager.installation_directory(),state/'augmentor/updates')
+                expected={'started':True,'attempt':'a'*48}
+                with patch('updates.linux_bootstrap.launch',return_value=expected) as launch:
+                    self.assertEqual(manager.launch_installer(),expected);launch.assert_called_once_with(root)
+                manager.base=base/'another-profile';self.assertFalse(manager.installer_available())
+                manager.base=data/'updates'
+                atomic_json(data/'desktop.json',{**selected,'root':str(data/'releases/new-selection')})
+                self.assertFalse(manager.installer_available())
+                # An old running manager still needs to collect the original
+                # independent attempt result after the selection changes.
+                self.assertEqual(manager.installation_directory(),state/'augmentor/updates')
+                atomic_json(data/'desktop.json',{**selected,'python':'/usr/bin/python3'})
+                self.assertFalse(manager.installer_available())
+                atomic_json(data/'desktop.json',selected)
+                (root/'scripts/linux-update-observer.py').unlink()
+                self.assertFalse(manager.installer_available())
+                for kind in ('debian','fedora','development'):
+                    manager.current['installType']=kind
+                    self.assertFalse(manager.installer_available());self.assertIsNone(manager.installation_directory())
+
     def test_actual_retained_observer_exec_refuses_unqualified_source_before_network_or_apply(self):
         with tempfile.TemporaryDirectory(prefix='augmentor-linux-exec-proof-') as temporary:
             base=Path(temporary);data=base/'data/augmentor';runtime=base/'runtime';state=base/'state'

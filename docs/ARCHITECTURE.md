@@ -39,6 +39,9 @@ The [shared update service](UPDATE-SYSTEM.md) runs under prompt-service ownershi
 independent of model availability. Both surfaces share schedules, consent and
 notification state. Signed delivery and manual downloads do not authorize file
 replacement; qualified installation must compose the maintenance/recovery graph.
+Managed Linux dispatch binds the actual canonical selected release and update
+profile to its retained external controller. Package-managed and custom installs
+retain manual paths, and public automatic eligibility/feed remain disabled.
 
 ## Product and runtime ownership
 

@@ -2,6 +2,22 @@
 
 # Start here: agent handoff
 
+## Managed Linux dispatch and ARM fixture correction — October 4, in progress
+
+The shared update service now connects to the existing retained managed Linux
+controller for its exact canonical selection/profile; signed-feed/consent and
+qualification gates remain unchanged. Host related manager/Linux/authority/Mac
+location checks pass 103 cases (two explicit native-service skips), with dispatch
+mocked and no installed state changed.
+
+Run 37167426017 at `a285350` is terminal: full x64 including staged native Handy
+passes; ARM64 native helper exits zero after Qt/portal success, but report parsing
+fails. The corrected helper uses an exclusive private UTF-8 report file and a
+bounded consumer, with all native proof flags required. Fresh native two-CPU
+qualification must pass this newer source; preserve failed evidence. See
+[the correction and service boundary](UPDATE-SYSTEM.md#linux-service-wiring-and-native-report-correction).
+Production feed/eligibility remain false and the full goal remains active.
+
 ## Portal bundle and Mac completion — October 4, in progress
 
 Complete portal-enabled Linux x64/ARM64 candidates at `799f7f7` pass actual archive

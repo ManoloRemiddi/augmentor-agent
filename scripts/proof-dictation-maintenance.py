@@ -87,4 +87,9 @@ def prove(runtime):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime',type=Path,default=ROOT/'components/handy/runtime')
-    args=parser.parse_args();print(json.dumps(prove(args.runtime.resolve())))
+    parser.add_argument('--out',type=Path)
+    args=parser.parse_args();report=prove(args.runtime.resolve())
+    if args.out is not None:
+        with args.out.open('x',encoding='utf-8') as output:json.dump(report,output);output.write('\n')
+        args.out.chmod(0o600)
+    print(json.dumps(report))

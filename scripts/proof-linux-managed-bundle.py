@@ -64,12 +64,21 @@ def prove(directory):
                 'sys.exit(0 if result.wasSuccessful() and result.testsRun==2 and not result.skipped else 1)')
             subprocess.run(['dbus-run-session','--',configuration['python'],'-I','-B','-c',portal_code],
                 env={**os.environ,'AUGMENTOR_PORTAL_PROOF':'1'},check=True,timeout=60)
-            native=subprocess.run(['xvfb-run','-a','dbus-run-session','--',configuration['python'],'-I','-B',
-                str(target/'scripts/proof-dictation-maintenance.py'),'--runtime',str(target/'components/handy/runtime')],
-                capture_output=True,check=True,timeout=180)
-            dictation=json.loads(native.stdout)
-            if (dictation.get('actualHandy') is not True or dictation.get('ordinaryChildExit') is not True
-                    or dictation.get('microphoneCapture') is not False or dictation.get('modelDownload') is not False):
+            native_report=base/'dictation-proof.json'
+            try:
+                subprocess.run(['xvfb-run','-a','dbus-run-session','--',configuration['python'],'-I','-B',
+                    str(target/'scripts/proof-dictation-maintenance.py'),'--runtime',str(target/'components/handy/runtime'),
+                    '--out',str(native_report)],capture_output=True,check=True,timeout=180)
+            except subprocess.CalledProcessError as error:
+                sys.stderr.write(error.stderr[-4096:].decode('utf-8',errors='replace'));raise
+            with native_report.open('rb') as stream:record=stream.read(4097)
+            if len(record)>4096:raise ValueError('The staged native fixture report exceeded its bound.')
+            dictation=json.loads(record)
+            if (not isinstance(dictation,dict) or dictation.get('schema')!='augmentor-dictation-maintenance-proof/1'
+                    or any(dictation.get(key) is not True for key in ('actualHandy','nativeOwnerPreserved',
+                        'nativeAtomicReservation','brokerAdmissionFenced','cancellationRestoredAdmission',
+                        'settingsPreserved','ordinaryChildExit'))
+                    or any(dictation.get(key) is not False for key in ('microphoneCapture','modelDownload','automaticInstallQualified'))):
                 raise ValueError('The staged native dictation component did not pass its bounded private fixture.')
             if (health!=report['offlineHealth'] or snapshot(target)!=payload or snapshot(project)!=original
                     or read_json(data/'desktop.json')!=previous):
