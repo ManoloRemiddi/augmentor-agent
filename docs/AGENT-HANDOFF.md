@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 current filesystem and dependency checkpoint
+
+[The post-reboot filesystem read](../release/qualification/next-targets/20261004-gnome562-filesystem-pass-scene-refusal.json)
+passes all three cached paths on the expected Btrfs filesystem and root subvolume.
+The complete cache comparison permits exactly the three verified boot-local device
+changes and preserves every other recorded field. The fresh full ending attempt
+then refused the unchanged empty-scene expectation. GNOME control acceptance
+remains open; no input or scene bypass followed.
+
+[The exact nine Debian dependencies](../release/qualification/next-targets/20261004-published-freshhome-signed-nine-dependencies.json)
+pass archive signature, canonical index checksum, downloaded file hash/size and
+package control identity. The isolated fixture retains its network-none policy.
+Normal native product upgrade and complete rollback remain open. This is evidence
+for the fixed qualification cohort, rather than current security-update coverage.
+
+
 ## October 4 normal close, genuine baseline and signed cache
 
 [The genuine fresh managed012 baseline](../release/qualification/next-targets/20261004-published-fresh-managed012-acceptance.json)

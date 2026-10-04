@@ -1,0 +1,28 @@
+{
+  "format": "augmentor-published-freshhome-authenticated-native-dependencies/1",
+  "date": "2026-10-04",
+  "status": "PASS_SIGNATURE_INDEX_AND_EXACT9_DOWNLOADS_NATIVE_TRANSACTION_OPEN",
+  "scope": "Published012-to013 isolated Debian13 fixture; authenticated historical package metadata and host downloads only.",
+  "evidence": {
+    "publicInReleaseSignatureVerified": true,
+    "archiveKeyringSha256": "506b815cbb32d9b6066b4a2aa524071e071761e7e7f68c3ac74f3061ba852017",
+    "canonicalPackagesIndexBytes": 56620099,
+    "canonicalIndexMatchesSignedSha256AndBytes": true,
+    "dependencyDebCount": 9,
+    "dependencyDebBytes": 2137428,
+    "everyDebExactSignedSha256BytesAndControlIdentity": true,
+    "authenticatedIndexReceiptSha256": "e5679a22a004721a42651f543bd836f3826e67e7a73c1f3ce2031809c23a6925",
+    "downloadReceiptSha256": "63309c8aee6b0c636ee3d7144930d8ea1c99dbeb5c081e729087921843249c88",
+    "guestNetworkMode": "none",
+    "guestNativeTransactionExecuted": false
+  },
+  "limits": [
+    "This authenticates the exact retained package cohort for product-version qualification; it does not refresh the guest repository or establish current security-update coverage.",
+    "Normal native installation, complete upgrade and rollback remain open.",
+    "Original historical unknown integration163 and protected journals remain unchanged."
+  ],
+  "sources": [
+    "https://manpages.debian.org/trixie/apt/apt-secure.8.en.html",
+    "https://manpages.debian.org/trixie/apt/apt-get.8.en.html"
+  ]
+}
