@@ -25,17 +25,26 @@ add the scope/license declaration alongside the headers, preserving the root
 LICENSE for all other Augmentor-authored files. Preserve historical receipts and
 kit manifests; newly assembled controls need their own byte identities/checks.
 
-The current private kit18 and source/runtime proofs are review candidates, not a
-binary release or a complete legal/source-kit acceptance.
+The original private kit18, proposed hash snapshot and header draft remain
+historical review artifacts. Subsequent engineering changes updated the source
+runtime guide and notice collector, while preserving their existing license
+terms. The two current hashes below supersede only those original hash entries;
+the proposed 22-path permission scope is unchanged and remains unapproved. The refreshed current scope and header-only draft are retained privately as
+qt-recipient-point5-research162/recipient-controls-current-scope224.json.draft
+and recipient-controls-current-header224.patch.draft; neither is applied. The
+separate current-control kit220 has its own manifest and omits the prior bound
+Python bytecode cache; no historical kit or receipt was rewritten. These source
+kits and runtime proofs are review candidates, not a binary release or complete
+legal/source-kit acceptance.
 
 | Proposed file | Current SHA256 | Header change |
 | --- | --- | --- |
-| docs/LINUX-LGPL-SOURCE-RUNTIME.md | 2e26e2d736a6d2c793ee38aae40563415e14ef0bf0756b0e3f2037e180085d7b | MIT |
+| docs/LINUX-LGPL-SOURCE-RUNTIME.md | 38d03003f8af5f09626c67f3faeac753553bafa8de9737e8d89fd40af3d57420 | MIT |
 | release/acquire-linux-lgpl-runtime-sources.py | f889871a8d77be2ed4946a637be9e8eb89aab5e94dbccfab3e1475a4cdab6e0d | MIT |
 | release/acquire-ubuntu-toolchain-sources.py | 0d098d6cdaba46718057e7886dbebafd70aba5ca67ac9531457cb8a0d6238791 | MIT |
 | release/acquire-ubuntu-toolchain.py | bafb64db71aa312c3e2f9e5bfe0d77e33640a886128ddbe2bfeb3fbc8c2dce40 | MIT |
 | release/build-linux-lgpl-runtime.py | 9594c4439638cccb8f3bb91b34848cb95169d075aa61ab614171fd066c41dac7 | MIT |
-| release/collect-source-qt-notices.py | 38b58e8c29b658fa3b5fec8f8b177fc5027436531e4db44cb3fd7ca8f88cde1f | MIT |
+| release/collect-source-qt-notices.py | ad711cf7ab4e56fe5f054469124f4970b678ef81ae82eb8220013b43f55acf4c | MIT |
 | release/derive-source-pyside-wheel.py | 50c2ec4720dd784a0a408845a934bc622ed679c7404a6668d997e0710cf7b7eb | MIT |
 | release/linux-lgpl-runtime-sources.json | 969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e | JSON scope declaration |
 | release/probe-source-plasma-shader.py | 65d05f5e8d45bc3dad571098a3e6f10f971bd1add6278e0a02e9099afb992a54 | MIT |

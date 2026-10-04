@@ -33,7 +33,8 @@ def collect(policy_path,archives,destination):
         with tarfile.open(archives/row['file'],'r:xz') as archive:
             for member in archive:
                 path=PurePosixPath(member.name)
-                if not (path.name=='qt_attribution.json' or re.match(r'^(LICENSE|LICENCE|COPYING|COPYRIGHT|NOTICE)(?:$|[._-])',path.name,re.I)):
+                if not (path.name=='qt_attribution.json' or (path.parent.name=='LICENSES' and path.suffix=='.txt')
+                        or re.match(r'^(LICENSE|LICENCE|COPYING|COPYRIGHT|NOTICE)(?:$|[._-])',path.name,re.I)):
                     continue
                 if member.isdir():continue
                 if (not member.isfile() or path.is_absolute() or '..' in path.parts or len(path.parts)<2

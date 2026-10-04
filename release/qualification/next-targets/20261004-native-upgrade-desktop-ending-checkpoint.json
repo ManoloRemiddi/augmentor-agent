@@ -170,8 +170,26 @@
     "normalManagedStage": "PASS",
     "normalManagedStageReceiptSha256": "90dbe85b109db3da9e300877bcc235bd739fe18c80e3d45539f6b73c5f323c8c",
     "normalManagedStageSeconds": 316.789,
-    "normalManagedActivation": "ORIGINAL_ARGV_SIZE_REFUSAL_BEFORE_PRODUCT_DISPATCH_SEPARATE_TRANSPORT_CORRECTION",
-    "normalManagedActivationOriginalFailurePreserved": true
+    "normalManagedActivation": "PRODUCT_CHILD_PASS_ORIGINAL_ENDING_METADATA_TIMESTAMP_REFUSAL",
+    "normalManagedActivationOriginalFailurePreserved": true,
+    "normalManagedActivationOriginalReceiptSha256": "4009573a24fa8a00ca00a5696c95ae8832904b8890fc1a487172efd0842144e3",
+    "normalManagedActivationRepeated": false,
+    "normalManagedActivationCurrentRead": "PASS_NATIVE_ACCOUNT_CACHE_SELECTOR_METADATA_BYTE_EQUALITY",
+    "normalManagedActivationCurrentReadReceiptSha256": "a167d6a0b2254420ccf1d3e0673881fcc334d603028686a768f4e49ce3249de3",
+    "normalManagedActivationCurrentReadSeconds": 167.7,
+    "normalManagedActivationMetadataDifference": {
+      "paths": 1,
+      "fields": [
+        "mtimeNs",
+        "ctimeNs"
+      ],
+      "bytesIdentityOwnershipPermissionsAndLinksUnchanged": true,
+      "normalDnfMakecacheJournalAttribution": true
+    },
+    "normalManagedActivationIndependentAcceptedEnding": "PREPARING_EXACT_CURRENT_TWO_TIMESTAMP_BASELINE",
+    "normalPamProviders": "PASS_NATIVE_INSTALLED_PROVIDER_IDENTITIES_AND_PACKAGE_VERIFICATION",
+    "normalPamProvidersReceiptSha256": "130b5ca225ac82ec40e913d70890092f2dfedcd88bed8a7c8fae483f246f428d",
+    "temporaryOwnedPasswordAcceptance": "RUNNING_WITH_ORIGINAL_MARKER_RESTORATION_REQUIRED"
   },
   "gnome50": {
     "nativeProtectedCacheExtensionAndPointersAudit": "PASS",
@@ -412,6 +430,49 @@
       "sourceObjectsRehashedDuringThisRead": false,
       "runtimeDlopenCoverageClaimed": false,
       "licenseApplicabilityChosen": false
+    },
+    "compiledCorrespondenceIndex": {
+      "status": "PASS_ACTUAL_RECORDED_NATIVE_COMPILE_INSTALL_AND_SOURCE_ROUTES",
+      "privateIndexSha256": "b7da613c801d86034e0fe834d17bcdaa7de43201c43f2fb5b0a6143bb2a5b198",
+      "members": 72,
+      "directObjectsAndCompilerRecords": 1770,
+      "directAndUnityDistinctCpps": 2700,
+      "systemBinaryPackages": 70,
+      "systemSourcePackageVersionPairs": 48,
+      "recordedNeededProvidersUnresolved": 0,
+      "allOriginalSourceArchivesRetained": true,
+      "everyTransitiveGeneratedHeaderIndividuallyReplayedOrReMapped": false,
+      "fullGeneratorToolSourceClosureClaimed": false,
+      "perFileNoticeApplicabilityChosen": false,
+      "runtimeDlopenCoverage": false,
+      "licenseOwnerApproval": false,
+      "publicReleaseQualified": false
+    },
+    "finalSourceGuardScope": "Retained private inputs, original native/compiler controls and exact installed application/official/recipient bytes; current public documentation is a later revision.",
+    "maintainedEvidenceCorrections": {
+      "status": "PASS_FOCUSED_AND_ACTUAL_RETAINED_INPUTS_CURRENT_KIT_PREPARATION",
+      "collectorSourceSha256": "ad711cf7ab4e56fe5f054469124f4970b678ef81ae82eb8220013b43f55acf4c",
+      "probeSourceSha256": "c487564ba2bf9d3a18a9709fd39861516c587dc324a6f07b6d3026f459800f6f",
+      "focusedNewTestsPass": 12,
+      "existingSourceBuildTestsPass": 34,
+      "actualSevenArchiveNoticeFiles": 242,
+      "originalNoticeFilesUnchanged": 146,
+      "supplementaryTextsExact": 96,
+      "noticeBytes": 1298576,
+      "originalKitManifestSha256": "0770ed3ccab87552b65c5c43fab77118f889f2019ef70a68ef076a43296d2229",
+      "originalKitUnchanged": true,
+      "currentKitManifestSha256": "2212181bc0822f58004d8949f11bfdb94fc25ca8978267d3ab4dd99f1074ce8f",
+      "currentKitFiles": 1711,
+      "boundBytecodeEntriesOmitted": 1,
+      "currentKitCopyReceiptSha256": "e9405a2bf6c4e3651f3cdbb4e65a3ed41f2c7bf273ff0f3ae3eb8e98b5db11c5",
+      "currentNormalPreparationReceiptSha256": "e1b5ee01d69a9f60b55cd69ea4c303e0fc0232e598fcbb279c94e98453a8ab75",
+      "currentControlPlanSha256": "151c55dbae97ed52b257f19e652cf1a235534b7c40e5cfef9f5bfa18559f2311",
+      "actualUtilityInputClassificationReceiptSha256": "b3901e5f1284f284f7e8ed2bd9b380c8623734ddef27a6620ceed0a0ac0d4914",
+      "actualUtilityCacheSourceHomeRebasedOnlyForHostObservation": true,
+      "newCompilationExecuted": false,
+      "licenseTermsChanged": false,
+      "sourcePermissionsAccepted": false,
+      "publicReleaseQualified": false
     }
   },
   "hostedValidation": {

@@ -30,7 +30,9 @@ GIB = 1024 ** 3
 RESERVE = 25 * GIB  # Conservative allowance; measured build peak is still unknown.
 FLOOR = 4 * GIB
 SECONDARY = Path('/media/manolo/DATA/augmentor-linux-rollout-retained-20261003')
-MANIFEST = '0770ed3ccab87552b65c5c43fab77118f889f2019ef70a68ef076a43296d2229'
+# Separate current-control kit; the original 1712-file kit remains unchanged.
+MANIFEST = '2212181bc0822f58004d8949f11bfdb94fc25ca8978267d3ab4dd99f1074ce8f'
+KIT_FILES = 1711  # The prior bound Python bytecode cache is deliberately omitted.
 PLAN = '1ec7cbaaec7c52f402c5d98ad46ab9480b5c295b9e9b4cfe8ac21cdaa0401f0f'
 POLICY = '969dca5093394282eef5517ade6e0bcb31d1a9ceb1b22513d213aa9ef434196e'
 INVENTORY = 'bc6cd4560d3d984dc11e2b2faceb1b1b2fcf73440fad5a4d9c6a8f76a594b7b3'
@@ -40,7 +42,7 @@ TOOLS = {
     'build-linux-lgpl-runtime.py': '9594c4439638cccb8f3bb91b34848cb95169d075aa61ab614171fd066c41dac7',
     'stage-source-qt-runtime.py': '3dc1cd88387cdb0afa49ef9a68f44e4a0591fac80860a4f5c78adf6c27fd9049',
     'derive-source-pyside-wheel.py': '50c2ec4720dd784a0a408845a934bc622ed679c7404a6668d997e0710cf7b7eb',
-    'collect-source-qt-notices.py': '38b58e8c29b658fa3b5fec8f8b177fc5027436531e4db44cb3fd7ca8f88cde1f',
+    'collect-source-qt-notices.py': 'ad711cf7ab4e56fe5f054469124f4970b678ef81ae82eb8220013b43f55acf4c',
     'verify-ubuntu-base-archive.py': 'f8eff4c75bccacd3db07191dd9b30f79ea6c9dbd3c82eee2e355983aa11eed35',
     'acquire-ubuntu-toolchain.py': 'bafb64db71aa312c3e2f9e5bfe0d77e33640a886128ddbe2bfeb3fbc8c2dce40',
     'acquire-ubuntu-toolchain-sources.py': '0d098d6cdaba46718057e7886dbebafd70aba5ca67ac9531457cb8a0d6238791',
@@ -219,7 +221,7 @@ def derived_builder(original, wrapper_sha):
 def authenticate_kit(kit):
     manifest_path = checked(kit, 'kit-manifest.json', MANIFEST)
     manifest = json.loads(manifest_path.read_text())
-    if manifest['format'] != 'augmentor-private-qt-recipient-source-kit/2' or len(manifest['files']) != 1712:
+    if manifest['format'] != 'augmentor-private-qt-recipient-source-kit/2' or len(manifest['files']) != KIT_FILES:
         raise ValueError('Wrong retained kit inventory.')
     names = set()
     for row in manifest['files']:
@@ -487,11 +489,60 @@ def prepare(kit, plan_directory, destination, socket_path):
     return report
 
 
-def cache_verified(path):
+def install_only_pyside_evidence(path, root, values):
+    source = root / 'sources/pyside-setup-everywhere-src-6.8.2/sources/pyside-tools'
+    pins = {'CMakeLists.txt': '6217df28415fdc905c2820218b9b5519940387241268382bef21513f349231c3',
+            'cmake/PySideToolsSetup.cmake': '19cc310475a5b3a9ed6c6dbbbee06d35effdf09b7d3663402382bdada8cb436a',
+            'cmake/PySideToolsHelpers.cmake': 'dc00f72ed09daab0ac716ba59d48a09d92277927587ac11c0d8390d645a30c32'}
+    if (path.parent.name != 'pyside-tools'
+            or not path.parent.is_relative_to(source.parent.parent / 'build')
+            or values.get('CMAKE_HOME_DIRECTORY:INTERNAL') != str(source)):
+        raise ValueError('Wrong install-only PySide project identity.')
+    for name, expected in pins.items():
+        checked(source, name, expected)
+    ninja = checked(path.parent, 'build.ninja').read_text()
+    rules_path = checked(path.parent, 'CMakeFiles/rules.ninja')
+    rules = rules_path.read_text()
+    names = set(re.findall(r'^rule (\S+)', rules, re.M))
+    if (not names or not names <= {'CUSTOM_COMMAND', 'RERUN_CMAKE', 'CLEAN', 'HELP'}
+            or not re.search(r'^build all: phony\s*$', ninja, re.M)
+            or re.search(r'^build .*: .*?(?:COMPILER|LINKER|ARCHIVER)', ninja, re.M)
+            or (path.parent / 'compile_commands.json').exists()
+            or (path.parent / 'compile_commands.json').is_symlink()
+            or (path.parent / '.ninja_deps').exists()
+            or (path.parent / '.ninja_deps').is_symlink()):
+        raise ValueError('Install-only project contains compilation or unexpected compiler evidence.')
+    return {'directory': str(path.parent), 'cacheSha256': sha(path),
+            'compileCommandsSha256': None, 'translationUnits': 0,
+            'evidenceKind': 'install-only-pyside-tools', 'sourceHashes': pins,
+            'rulesSha256': sha(rules_path)}
+
+
+def retained_ninja_inputs(directory, install_only=False):
+    names = ['build.ninja', 'CMakeFiles/rules.ninja', '.ninja_log', '.ninja_deps']
+    if install_only:
+        names += ['cmake_install.cmake', 'install_manifest.txt']
+    rows = {}
+    for name in names:
+        path = directory / name
+        if install_only and name == '.ninja_deps':
+            if path.exists() or path.is_symlink():
+                raise ValueError('Unexpected dependency log for install-only project.')
+            rows[name] = None
+        else:
+            rows[name] = sha(checked(directory, name))
+    return rows
+
+
+def cache_verified(path, root=None):
     values = dict(line.split('=', 1) for line in path.read_text().splitlines()
                   if '=' in line and not line.startswith(('#', '//')))
     if values.get('CMAKE_EXPORT_COMPILE_COMMANDS:BOOL') != 'ON' or values.get('CMAKE_GENERATOR:INTERNAL') != 'Ninja':
         raise ValueError('Missing explicit compiler-command export/Ninja configuration.')
+    if values.get('CMAKE_PROJECT_NAME:STATIC') == 'pyside-tools':
+        if root is None:
+            raise ValueError('Install-only project requires the verified build root.')
+        return install_only_pyside_evidence(path, root, values)
     database = path.parent / 'compile_commands.json'
     commands = json.loads(database.read_text())
     if not commands or any(not isinstance(row, dict) or not {'directory', 'file'} <= row.keys()
@@ -511,9 +562,9 @@ def collect_build_evidence(root):
     evidence = root / 'compile-evidence'; evidence.mkdir(mode=0o700)
     rows = []
     for number, cache in enumerate(caches):
-        row = cache_verified(cache); row['tools'] = {}
-        row['retainedNinjaInputs'] = {name: sha(checked(cache.parent, name))
-                                    for name in ('build.ninja', '.ninja_log', '.ninja_deps')}
+        row = cache_verified(cache, root); row['tools'] = {}
+        install_only = row.get('evidenceKind') == 'install-only-pyside-tools'
+        row['retainedNinjaInputs'] = retained_ninja_inputs(cache.parent, install_only)
         for tool in ('targets', 'commands', 'deps', 'graph'):
             output = evidence / (str(number) + '-' + tool + '.txt')
             # Ninja1.11 AFTER_LOGS tools ordinarily open logs for writing;
@@ -526,7 +577,7 @@ def collect_build_evidence(root):
             if result.returncode:
                 raise RuntimeError('Ninja evidence command failed; retain partial evidence.')
             row['tools'][tool] = {'argv': argv, 'sha256': sha(output), 'bytes': output.stat().st_size}
-        if {name: sha(checked(cache.parent, name)) for name in row['retainedNinjaInputs']} != row['retainedNinjaInputs']:
+        if retained_ninja_inputs(cache.parent, install_only) != row['retainedNinjaInputs']:
             raise ValueError('Ninja evidence collection changed original build inputs/logs.')
         rows.append(row)
     # Sources, build trees, .ninja_deps/.ninja_log, objects, generated files and

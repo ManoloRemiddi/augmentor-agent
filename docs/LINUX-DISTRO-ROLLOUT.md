@@ -1,5 +1,28 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 4 maintained source evidence tools
+
+The notice collector now includes SPDX-named LICENSES/*.txt files. Its actual
+rerun against all seven authenticated archives retains the original 146 notices
+and adds exactly the 96 verified supplementary texts: 242 files, 1298576 bytes,
+zero skipped candidates. The build probe now recognizes the verified Linux
+install-only pyside-tools project with zero translation units; other projects
+still require nonempty compiler databases and dependency logs. Twelve new and
+34 existing tests pass. Classification against nine retained real build/source
+inputs also passes, with only CMAKE_HOME_DIRECTORY rebased for the host copy;
+original cache/rule/source hashes and the transport difference remain recorded.
+
+A separate 1711-file current-control source kit preserves the original 1712-file
+kit and omits its bound Python bytecode cache. Normal authentication and control
+preparation pass for all 410 signed binary packages, 180 source versions and 565
+source objects. The new manifest/control hashes are recorded in the
+[current checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json).
+No compiler or daemon was started. The original marked build and all twelve
+application replacement results retain their original controls; these source
+fixes are subsequent engineering work. License terms are unchanged and the
+22-path licensing proposal remains unapproved. No release qualification follows
+from kit preparation alone.
+
 ## October 4 installed runtime and managed staging progress
 
 The [current checkpoint](../release/qualification/next-targets/20261004-native-upgrade-desktop-ending-checkpoint.json)
@@ -18,7 +41,12 @@ Fedora KDE passes the generated DSH service's normal readiness check without
 enabling the unit, then normal managed staging in 316.79 seconds. Settings,
 history, native/cache/account state and the original selector stay preserved.
 The first activation runner refuses an oversized command argument before calling
-the product; a separate bounded transport correction is underway. Graphical
+the product. A separate transport correction now reaches normal activation and
+the product child passes. Its original ending refuses one metadata timestamp
+change. Independent reading verifies identical authenticated bytes and every
+other file field, unchanged native/cache/account/settings/history/selector state,
+and the normal dnf-makecache journal event. A separately recorded exact current
+two-timestamp baseline is being admitted; activation was not replayed. Graphical
 control, saved text, visible Stop and password authentication remain open.
 
 Source correspondence now includes 68 real Unity units and their 932 additional
