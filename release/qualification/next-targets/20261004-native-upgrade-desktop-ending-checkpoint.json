@@ -189,7 +189,16 @@
     "normalManagedActivationIndependentAcceptedEnding": "PREPARING_EXACT_CURRENT_TWO_TIMESTAMP_BASELINE",
     "normalPamProviders": "PASS_NATIVE_INSTALLED_PROVIDER_IDENTITIES_AND_PACKAGE_VERIFICATION",
     "normalPamProvidersReceiptSha256": "130b5ca225ac82ec40e913d70890092f2dfedcd88bed8a7c8fae483f246f428d",
-    "temporaryOwnedPasswordAcceptance": "RUNNING_WITH_ORIGINAL_MARKER_RESTORATION_REQUIRED"
+    "temporaryOwnedPasswordAcceptance": "ORIGINAL_ACCOUNT_RESTORED_AUTHENTICATION_OPEN_NO_PASSWORD_ENTRY",
+    "temporaryOwnedPasswordRestoration": {
+      "status": "PASS_WHOLE_ORIGINAL_SHADOW_NATIVE_ACCOUNT_CACHE_AND_PROTECTED_ENDING",
+      "receiptSha256": "b6ebaf7b4cc9932d2f38c1f304d5eeee6e70b385f8b328ff39549ae7a7761192",
+      "seconds": 168.195,
+      "temporaryPlaintextDeleted": true,
+      "passwordDigitsEntered": false,
+      "normalPasswordAuthenticationQualified": false,
+      "lockPolicyChanged": false
+    }
   },
   "gnome50": {
     "nativeProtectedCacheExtensionAndPointersAudit": "PASS",
@@ -605,5 +614,44 @@
     "unrelatedDuplicateRecordCacheRowsPreservedByteExactly": true,
     "normalEntrypointCoreResults": "PASS_ALL_THREE_TWO_ROUNDS_EACH",
     "normalEntrypointRemainingVariants": "PASS_ALL_NINE_AND_INDEPENDENT_ENDING"
+  },
+  "gitGuardianCurrentReview": {
+    "headRevision": "85187cd87ed7498a48d9853c7106035d4b52d2b4",
+    "checkRunId": 111534689886,
+    "status": "FAILURE_UNRESOLVED",
+    "reportedFindings": 13,
+    "referencedHistoricalProofReports": 4,
+    "publicAnnotations": 0,
+    "readOnlyHistoricalFieldShapeReviewSha256": "6e7cf6ef7e65a13f55e75b2e728f99b697a9e6fdeccba74b71a5ab4d1aba58cd",
+    "credentialNamedStringFieldsInspectedContainOnlyDigestsOrSourceCommitIds": true,
+    "exactDetectorMatchesVerified": false,
+    "availableBrowserRequiresSignIn": true,
+    "findingsDismissed": false,
+    "gateWaived": false,
+    "historyRewritten": false
+  },
+  "mint223Graphical": {
+    "status": "RUNNING_SEPARATE_CORRECTED_EXTERNAL_PROOF",
+    "nativeBrowserInstall": "PASS_AUTHENTICATED_OFFLINE_EXACT_ONE_PACKAGE",
+    "nativeBrowserVersion": "153.0.8010.52~linuxmint1+mint22.3",
+    "nativeBrowserDebSha256": "9f1151d39cf1bf5956d0f3a6234a229eb68e39a6264f92c75b519a2762729983",
+    "nativeBrowserInstallReceiptSha256": "31908cdf226d93a7c01eaf775d47da6a93cece8dc3d5fd20c7083da9c37dc744",
+    "installedAugmentorPackageUnchanged": true,
+    "savedFilesPreserved": 57,
+    "installEndingNativeProtectedAndIdle": "PASS",
+    "networkAcquisitionTimeoutsPreserved": 2,
+    "firstGraphicalAttempt": "REFUSED_MISSING_MINT_TEST_MARKER_BEFORE_EXTENSION_OR_PROMPT",
+    "firstGraphicalReceiptSha256": "22bf99c336bfd9c531141a1b23c79e431c34dc216fd45a0d5998ada5e347c76d",
+    "firstGraphicalIndependentEndingSha256": "bea2365dbba1d3af9fc9f3d8ef2e81ceef737eddd9e5fd212a1a5362502e1abf",
+    "sourceQtOrdinaryVerification": "PASS",
+    "sourceQtVerificationReceiptSha256": "e8874661ff7dbcbe24f9e7343fed8955c53784bcc5e4a761ba96dcc737fdfd81",
+    "maintainedCollectorSourceSha256": "c3d6f098e84d1e2e57ef8ed0f09a2b448381a5aabe660e0ae6cc9cd218df30c1",
+    "focusedCollectorTestsPass": 11,
+    "externalProofOnly": true,
+    "installedApplicationNativeAndExtensionOverlay": false,
+    "startupBudgetSeconds": 60,
+    "reconnectBudgetSeconds": 30,
+    "graphicalAcceptanceQualified": false,
+    "physicalAudioQualified": false
   }
 }

@@ -77,6 +77,15 @@ collector. Chromium rewrites Linux process titles into one space-joined string;
 the collector labels those flag tokens separately from original NUL-separated
 arguments, and requires a whitespace-free fixture profile.
 
+The October4 maintained collector accepts the exact existing Mint22.3 Cinnamon
+ISO fixture marker alongside the Ubuntu24 and Leap16 markers. Eleven focused
+tests cover admission, approximate/foreign marker refusal and unchanged QEMU and
+ordinary-caller requirements. Mint's original omitted-marker failure occurred
+before extension loading or any prompt; its separate external corrected helper
+does not modify the installed365 application. Current Mint graphical acceptance
+still requires its actual headed run with the published60-second startup and
+30-second reconnect limits.
+
 This proof remains separate from manual Load unpacked, branded Chrome,
 Snap/Flatpak native messaging, audio and desktop consent/input acceptance.
 

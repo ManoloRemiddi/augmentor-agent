@@ -14,8 +14,15 @@ the dated records that follow retain their original outcomes and tested revision
 | Source, notices, rebuild, replacement and qualified release | Retained independent builds, authenticated kit preparation, exact72-member correspondence and all12 current Noble replacement paths pass; maintained notice/build fixes pass focused and actual-input checks. | Matching source-runtime ABIs on other release targets; concrete source/notice delivery and license review, owner22-path control-permission decision, physical/desktop gates and unwaived GitGuardian before release. |
 
 The active graphical cases use separate owned Fedora KDE, Fedora GNOME and Mint
-fixtures. Mint's first browser-package download timed out before installation;
-a separate authenticated acquisition is in progress. GNOME's observed connection
+fixtures. Mint's two network acquisition attempts ended before package changes;
+the separately authenticated offline transaction now adds exactly one native
+Chromium package, preserving the Augmentor package and all57 saved files. Its
+first graphical attempt refuses the proof collector's omitted Mint fixture
+marker before extension load or any prompt. The maintained collector now admits
+the exact existing Mint marker alongside Ubuntu/Leap, with all11 focused tests
+passing and unchanged QEMU/ordinary-caller checks. A separate external proof
+uses the unchanged installed365 application and the corrected read-only helper;
+graphical acceptance remains open. GNOME's observed connection
 dialog was dismissed normally, and its supported close was acknowledged with all
 three processes absent. A separate corrected read-only Fedora package audit now
 passes, preserving selected/protected/cache state without repeating the close. These intermediate observations are not graphical
@@ -27,6 +34,13 @@ The draft PR remains unmerged and no candidate binary has been released.
 passes all11 jobs at039b041 for the maintained source-tool fixes, including Fedora43/44,
 Ubuntu26.04, Debian installed/Browser packages, Home and Handy across three platforms.
 Later documentation does not relabel that tested source revision.
+
+The current GitGuardian check still reports13 findings in four historical public
+proof reports. Read-only inspection of the credential-named fields at those exact
+commits finds digests, source identifiers and test outcomes; GitHub does not expose
+the exact detector matches. The available dashboard requires sign-in. Findings
+have not been dismissed, historical receipts have not been rewritten and the
+security gate remains unwaived.
 
 ## October 4 maintained source evidence tools
 

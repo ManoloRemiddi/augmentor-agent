@@ -161,7 +161,8 @@ def main():
         # called by their ordinary fixture user. No writes or process signals.
         marker = Path('/etc/augmentor-test-vm').read_text()
         assert marker in ('Isolated Augmentor openSUSE Leap 16.0 GNOME qualification VM\n',
-                          'Isolated Augmentor Ubuntu 24.04 GNOME qualification VM\n')
+                          'Isolated Augmentor Ubuntu 24.04 GNOME qualification VM\n',
+                          'Isolated Augmentor Linux Mint 22.3 Cinnamon ISO qualification VM\n')
         assert subprocess.check_output(['systemd-detect-virt'], text=True).strip() == 'qemu'
         assert int(os.environ['SUDO_UID']) == args.uid > 0
     else:

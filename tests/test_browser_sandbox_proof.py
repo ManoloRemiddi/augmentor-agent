@@ -6,6 +6,7 @@ import os
 import socket
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('sandbox_proof', Path(__file__).resolve().parents[1] / 'scripts/proof_browser_sandbox.py')
 proof = importlib.util.module_from_spec(spec)
@@ -13,6 +14,37 @@ spec.loader.exec_module(proof)
 
 
 class SandboxEvidenceTests(unittest.TestCase):
+    def privileged_collector(self, marker, virt='qemu', uid='1000'):
+        argv = ['sandbox-proof', '--browser', '12', '--profile', '/tmp/augmentor-browser-proof-owned/profile',
+                '--uid', '1000', '--renderers', '[13]']
+        with patch.object(proof.sys, 'argv', argv), patch.object(proof.os, 'geteuid', return_value=0), \
+                patch.object(proof.Path, 'read_text', return_value=marker), \
+                patch.object(proof.subprocess, 'check_output', return_value=virt), \
+                patch.dict(proof.os.environ, {'SUDO_UID': uid}), \
+                patch.object(proof, 'collect', return_value={'readOnly': True}) as collect, \
+                patch('builtins.print'):
+            proof.main()
+            collect.assert_called_once_with(12, [13], Path(argv[4]), 1000)
+
+    def test_privileged_reader_admits_exact_mint_and_existing_fixture_markers(self):
+        for marker in ('Isolated Augmentor Linux Mint 22.3 Cinnamon ISO qualification VM\n',
+                       'Isolated Augmentor Ubuntu 24.04 GNOME qualification VM\n',
+                       'Isolated Augmentor openSUSE Leap 16.0 GNOME qualification VM\n'):
+            with self.subTest(marker=marker): self.privileged_collector(marker)
+
+    def test_privileged_reader_refuses_foreign_or_approximate_mint_marker(self):
+        for marker in ('Isolated Augmentor Linux Mint 22.3 Cinnamon ISO qualification VM',
+                       'Isolated Augmentor Linux Mint 22.2 Cinnamon ISO qualification VM\n',
+                       'Owner Linux Mint 22.3 desktop\n'):
+            with self.subTest(marker=marker), self.assertRaises(AssertionError):
+                self.privileged_collector(marker)
+
+    def test_mint_marker_does_not_bypass_qemu_or_ordinary_caller_guard(self):
+        marker = 'Isolated Augmentor Linux Mint 22.3 Cinnamon ISO qualification VM\n'
+        for virt, uid in [('none', '1000'), ('qemu', '0'), ('qemu', '1001')]:
+            with self.subTest(virt=virt, uid=uid), self.assertRaises(AssertionError):
+                self.privileged_collector(marker, virt, uid)
+
     def test_wayland_uses_owned_socket_with_private_fixture_runtime_and_no_x_fallback(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'wayland-test'
