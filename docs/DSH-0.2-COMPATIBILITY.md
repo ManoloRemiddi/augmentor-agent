@@ -153,3 +153,16 @@ focused native voice/prompt/improvement/startup/shared-prompt cases pass. TypeSc
 check/build passes. Hosted platform/package validation remains the merge gate
 and tests the locked 0.1.5 installer contract separately. This does not upgrade
 customer installer pins, alter installed runtime/configuration, or restart apps.
+
+### Frozen Browser-plugin dependency lock correction
+
+The first current hosted Linux run at `99fe90c` refused the outdated pnpm lock
+before building: the npm manifest/lock already selected Cordis 4.0.4 and DSH tools
+0.2.0-rc.2, while pnpm still selected the older dev dependencies. Regenerating
+pnpm's lock from the reviewed npm lock with qualified pnpm 11.23.0 preserves
+those exact versions. A fresh frozen install and plugin preparation now pass.
+The complete Node suite on the separately locked DSH 0.1.5 environment passes
+516 cases (512 passed, four explicit skips), and the real workspace SDK DSH proof
+passes allowed/denied tool and unrelated-agent preservation checks. The 80-test
+0.2 qualification above remains separate. The failed hosted run is retained; a
+new hosted run must qualify this correction before merge.
