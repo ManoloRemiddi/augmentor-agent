@@ -10,6 +10,21 @@ portal.py constructs KWin and rejects non-KDE sessions; service.py runs backend
 calls on the GUI GLib loop. Both still need integration and KDE regression before
 enabling GNOME input.
 
+## October 4 post-timeout read-only observation
+
+[One actual read-only observation](../release/qualification/next-targets/20261004-gnome562-post-timeout-readonly-observation.json)
+passed in 4.74 seconds. The exact original release remains selected; the staged
+manifest header matches the candidate. No process matched the bounded exact
+activation/import classifier and no matching kernel lock or package pending
+marker was observed. Three process entries exited or were inaccessible during
+inspection; this is point-in-time evidence, not arbitrary-descendant absence.
+All 20 protected files, pinned native bootstrap/controller hashes, original
+observer files, approved cached-update snapshot and boot match. Full staged/native
+inventory revalidation and live owner/observer readings were not performed.
+No guest writes, updater execution, signals, capture or input occurred. Original
+activation uncertainty stays retained; exact child coverage and timing diagnosis
+precede a separately reviewed next deployment scope.
+
 ## October 4 observer562 deployment stopped at activation
 
 [The actual checkpoint](../release/qualification/next-targets/20261004-gnome562-activation-unknown.json)
