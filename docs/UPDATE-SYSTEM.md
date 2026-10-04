@@ -1397,3 +1397,14 @@ final ZIP path expression before export; local x64 reproduces the same failure.
 The path construction is corrected. Archive staging/relocation remains pending;
 these assembly results do not qualify installation, signed updates or a public
 release. All automatic/public/distribution flags remain false.
+
+The local complete ZIP at `0663a6f` exports but its parser rejects bundled Python
+terminfo names that legitimately differ by case (`A/a`, `Eterm/eterm`). The Linux
+bundle now uses case-sensitive normalized path identity; fixed Mac `.app` bundles
+retain case-folded collision rejection. Duplicate paths, link-ancestor writes,
+unsafe paths and bounds remain rejected; Linux extraction uses exclusive file
+creation. Actual local ZIP inspection passes 72,403 entries / 1,491,988,463 expanded
+bytes with ZIP64 after this correction, but its producer run did not complete a
+manifest and no staging/installation qualification is claimed. Eleven Linux
+producer cases and seven existing Mac archive cases pass. The corrected full
+producer/consumer qualification remains pending.

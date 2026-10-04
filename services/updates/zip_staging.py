@@ -68,6 +68,12 @@ def bounded_zip(stream):
 def validate_zip(stream,bundle_name):
     if bundle_name not in ('Augmentor Agent Desktop.app','Augmentor Agent Browser Companion.app','Augmentor Agent Desktop'):
         raise ValueError('Use a fixed product bundle name.')
+    # Linux's pinned terminfo tree contains legitimate A/a directory names.
+    # Keep Mac's case-insensitive collision policy; Linux extraction still
+    # creates files exclusively and refuses aliases on the destination volume.
+    def path_key(name):
+        normalized=unicodedata.normalize('NFC',name)
+        return normalized.casefold() if bundle_name.endswith('.app') else normalized
     seen=set();links=set();paths=[];total=0;payload=False
     with bounded_zip(stream) as bundle:
         directory=dict(bundle.augmentor_directory)
@@ -80,7 +86,7 @@ def validate_zip(stream,bundle_name):
             if (not name or any(not part or part in ('.','..') or ':' in part or '\\' in part
                     or any(ord(c)<32 for c in part) for part in parts)):
                 raise ValueError('The release ZIP contains an unsafe path.')
-            folded=unicodedata.normalize('NFC',name).casefold()
+            folded=path_key(name)
             if folded in seen:raise ValueError('The release ZIP contains a duplicate or colliding path.')
             seen.add(folded)
             mode=entry.external_attr>>16;kind=stat.S_IFMT(mode)
@@ -109,6 +115,6 @@ def validate_zip(stream,bundle_name):
                 links.add(folded)
         if not payload:raise ValueError('The ZIP contains no product bundle.')
         for folded,parts in paths:
-            if any(unicodedata.normalize('NFC','/'.join(parts[:index])).casefold() in links for index in range(1,len(parts))):
+            if any(path_key('/'.join(parts[:index])) in links for index in range(1,len(parts))):
                 raise ValueError('The ZIP writes through a symbolic link.')
     return {'entries':len(seen),'bytes':total,'bundle':bundle_name,'directory':directory}

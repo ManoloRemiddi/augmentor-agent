@@ -10,6 +10,7 @@ import subprocess
 import tarfile
 import tempfile
 import unittest
+import zipfile
 
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('linux_managed_producer',ROOT/'scripts/package-linux-managed.py')
@@ -83,6 +84,32 @@ class ProducerTests(unittest.TestCase):
         first=self.base/'first.zip';second=self.base/'second.zip'
         producer.export(project,first);producer.export(project,second)
         self.assertEqual(first.read_bytes(),second.read_bytes());self.assertEqual(producer.snapshot(project),before)
+
+    def test_linux_terminfo_case_distinct_paths_survive_actual_roundtrip(self):
+        project=self.tree()
+        for name in ('A/ANSI','a/ansi'):
+            path=project/'python/share/terminfo'/name
+            path.parent.mkdir(parents=True);path.write_text(name)
+        archive=self.base/'bundle.zip';producer.export(project,archive)
+        stage=self.base/'stage';stage.mkdir(mode=0o700)
+        root,payload=extract(archive,stage)
+        self.assertEqual(payload,producer.snapshot(project))
+        self.assertEqual((root/'python/share/terminfo/A/ANSI').read_text(),'A/ANSI')
+        self.assertEqual((root/'python/share/terminfo/a/ansi').read_text(),'a/ansi')
+
+    def test_linux_duplicate_and_link_ancestor_are_still_refused(self):
+        for rows in (
+                [('same',stat.S_IFREG,b'one'),('same',stat.S_IFREG,b'two')],
+                [('A',stat.S_IFLNK,b'elsewhere'),('A/file',stat.S_IFREG,b'unsafe')]):
+            with self.subTest(rows=rows):
+                archive=self.base/'unsafe.zip'
+                with zipfile.ZipFile(archive,'w') as bundle:
+                    for name,kind,content in rows:
+                        entry=zipfile.ZipInfo(producer.NAME+'/'+name)
+                        entry.create_system=3;entry.external_attr=(kind|0o755)<<16
+                        bundle.writestr(entry,content)
+                with archive.open('rb') as stream,self.assertRaises(ValueError):
+                    producer.validate_zip(stream,producer.NAME)
 
     def test_machine_selection_or_external_product_link_cannot_publish(self):
         project=self.tree();selection=project/'desktop.json';selection.write_text('{"private":"synthetic"}')

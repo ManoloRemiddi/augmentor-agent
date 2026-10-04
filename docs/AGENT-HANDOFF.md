@@ -4,6 +4,17 @@
 
 ## Automatic updates implementation — October 3, in progress
 
+The local complete ZIP at `0663a6f` exports but its parser rejects bundled Python
+terminfo names that legitimately differ by case (`A/a`, `Eterm/eterm`). The Linux
+bundle now uses case-sensitive normalized path identity; fixed Mac `.app` bundles
+retain case-folded collision rejection. Duplicate paths, link-ancestor writes,
+unsafe paths and bounds remain rejected; Linux extraction uses exclusive file
+creation. Actual local ZIP inspection passes 72,403 entries / 1,491,988,463 expanded
+bytes with ZIP64 after this correction, but its producer run did not complete a
+manifest and no staging/installation qualification is claimed. Eleven Linux
+producer cases and seven existing Mac archive cases pass. The corrected full
+producer/consumer qualification remains pending.
+
 Managed run [37163111736](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37163111736)
 at `2799ef3` passes both Handy lifecycle jobs. Complete bundle jobs on ARM64
 (111320650528) and x64 (111320650556) assemble the locked runtimes, application,
