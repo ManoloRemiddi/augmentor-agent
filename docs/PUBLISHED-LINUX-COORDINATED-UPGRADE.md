@@ -153,6 +153,10 @@ creates `published-product-staged-integration163`; failed161 is never resumed.
 No APT or updater-stage dispatch occurs in this branch. The pinned normal verifier
 must return the complete retained staged013 deployment, file inventory and
 artifact identity before any owned process starts, and again before installation.
+The retained manifest is4,232,400bytes. Only that exact historical file receives
+a stable8MiB read allowance with its fixed size/hash; generic profile and owned
+proof members retain their4MiB limit. The new journal writes a compact reuse
+receipt pointing to the preserved manifest, rather than duplicating its inventory.
 
 The format is `augmentor-published-staged-integration-binding/1`, mode
 `upgrade-after-known-stage`. Alongside the unchanged baseline/native/settings/

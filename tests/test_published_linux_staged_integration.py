@@ -219,5 +219,29 @@ class StagedAdmissionTests(unittest.TestCase):
         self.assertFalse(any(isinstance(x, ast.Call) and isinstance(x.func, ast.Attribute) and x.func.attr == 'transaction'
                              for x in ast.walk(ast.Module(body=arms[0].body, type_ignores=[]))))
 
+    @fixture_uid
+    def test_exact_retained_large_manifest_has_narrow_stable_read_exception(self):
+        with tempfile.TemporaryDirectory() as name:
+            root = Path(name); prior = root/'published-product-coordinated-upgrade161'; prior.mkdir()
+            file = prior/'stage-verified.json'; raw = b'x'*4232400; file.write_bytes(raw); file.chmod(0o600)
+            with patch.object(module, 'STAGE_161_SHA', hashlib.sha256(raw).hexdigest()):
+                with self.assertRaises(ValueError): module.tree(prior)
+                rows = module.tree(prior, retained_staged_inventory=True)
+                self.assertEqual(rows['stage-verified.json']['bytes'], 4232400)
+                self.assertEqual(rows['stage-verified.json']['inode'], file.lstat().st_ino)
+                self.assertEqual(rows, module.tree(prior, retained_staged_inventory=True))
+                file.rename(prior/'foreign-large.json')
+                with self.assertRaises(ValueError): module.tree(prior, retained_staged_inventory=True)
+                (prior/'foreign-large.json').rename(file)
+                prior.rename(root/'foreign-folder')
+                with self.assertRaises(ValueError): module.tree(root/'foreign-folder', retained_staged_inventory=True)
+                (root/'foreign-folder').rename(prior)
+                file.write_bytes(b'y'*4232400)
+                with self.assertRaises(ValueError): module.tree(prior, retained_staged_inventory=True)
+                file.write_bytes(raw+b'extra')
+                with self.assertRaises(ValueError): module.tree(prior, retained_staged_inventory=True)
+                file.unlink(); file.symlink_to(root/'missing')
+                with self.assertRaises(ValueError): module.tree(prior, retained_staged_inventory=True)
+
 
 if __name__ == '__main__': unittest.main()

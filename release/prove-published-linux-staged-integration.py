@@ -12,7 +12,7 @@ from pathlib import Path
 import stat
 import sys
 
-COORDINATOR_SHA = '2c2e66353766e11bec58217832636e2699afd1012a694c4bf3bb89114354ab7a'
+COORDINATOR_SHA = 'dfe89a104202b5a493a39af181b56c6853300852378d4d190011b7037247ac76'
 
 
 def prove():

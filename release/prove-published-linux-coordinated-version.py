@@ -230,7 +230,7 @@ def hardlink_row(file, info):
         os.close(fd)
 
 
-def tree(path, foreign_node_modules=False):
+def tree(path, foreign_node_modules=False, retained_staged_inventory=False):
     """Bounded byte/metadata snapshot; preserve link strings without following them."""
     if path.is_symlink() or not path.is_dir():
         raise ValueError('A profile snapshot root is missing or linked.')
@@ -239,12 +239,23 @@ def tree(path, foreign_node_modules=False):
         if len(result) >= 10000:
             raise ValueError('Profile snapshot exceeds its bounded fixture scope.')
         info = file.lstat(); name = str(file.relative_to(path))
+        is_retained_stage = (retained_staged_inventory and path.name == 'published-product-coordinated-upgrade161'
+                             and name == 'stage-verified.json')
+        if is_retained_stage and not stat.S_ISREG(info.st_mode):
+            raise ValueError('The retained stage receipt changed its regular-file topology.')
         if stat.S_ISDIR(info.st_mode):
             result[name] = {'directory': True, 'uid': info.st_uid, 'gid': info.st_gid, 'mode': stat.S_IMODE(info.st_mode)}
             continue
         row = {'uid': info.st_uid, 'gid': info.st_gid, 'mode': stat.S_IMODE(info.st_mode), 'mtimeNs': info.st_mtime_ns}
         if stat.S_ISLNK(info.st_mode):
             row['link'] = os.readlink(file)
+        elif is_retained_stage:
+            # Only the already verified4,232,400-byte receipt is above the
+            # generic4MiB preservation limit. Never extend profile allowances.
+            _, retained = stable_owned_read(file, 8*1024*1024)
+            if retained['sha256'] != STAGE_161_SHA or retained['bytes'] != 4232400 or retained['mode'] & 0o077:
+                raise ValueError('The exact large historical stage receipt differs.')
+            row.update(retained); total += retained['bytes']
         elif stat.S_ISREG(info.st_mode) and info.st_size <= 4194304:
             if info.st_nlink == 1:
                 row.update(bytes=info.st_size, sha256=hashlib.sha256(file.read_bytes()).hexdigest())
@@ -515,7 +526,8 @@ def prove(mode, *, integration_after_stage=False, proof_path=None):
                          'published-product-cold-history158', 'published-product-managed-baseline160']
     if mode == 'rollback': protected_folders.append('published-product-coordinated-upgrade161')
     if integration_after_stage: protected_folders.append('published-product-coordinated-upgrade161')
-    protected_before = {n: tree(base.HOME/'.local/state'/n) for n in protected_folders}
+    protected_before = {n: tree(base.HOME/'.local/state'/n, retained_staged_inventory=integration_after_stage)
+                        for n in protected_folders}
     folder = base.HOME/'.local/state'/('published-product-staged-integration163' if integration_after_stage
                                       else 'published-product-coordinated-'+mode+'161')
     helper.private_parents(folder.parent); folder.mkdir(mode=0o700, exist_ok=False)
@@ -549,7 +561,10 @@ def prove(mode, *, integration_after_stage=False, proof_path=None):
             # again immediately before installation without invoking stage.
             if deployment.verify(staged_root) != staged_existing:
                 raise ValueError('The existing stage changed before integration.')
-            base.atomic(folder/'reused-stage-verified.json', staged_existing)
+            base.atomic(folder/'reused-stage-verified.json', {
+                'priorManifestPath': str(base.HOME/'.local/state/published-product-coordinated-upgrade161/stage-verified.json'),
+                'priorManifestSha256': STAGE_161_SHA, 'deployment': chosen,
+                'artifactSha256': staged_existing['artifactSha256'], 'fullInventoryVerified': True})
         elif mode == 'upgrade':
             managed.transaction(base, folder, record, 'stage', [updater, 'stage', str(base.APP), '--source-ref', SOURCES[version],
                                 '--python', selected_before['python'], '--node', str(base.APP/'node/bin/node')], env)
@@ -613,7 +628,8 @@ def prove(mode, *, integration_after_stage=False, proof_path=None):
             info = token.lstat()
             if (sha(token), info.st_mode, info.st_mtime_ns, info.st_uid, info.st_gid, info.st_nlink, info.st_dev, info.st_ino) != token_before:
                 raise ValueError('The existing product token changed.')
-            if protected_before != {n: tree(base.HOME/'.local/state'/n) for n in protected_folders}:
+            if protected_before != {n: tree(base.HOME/'.local/state'/n, retained_staged_inventory=integration_after_stage)
+                                    for n in protected_folders}:
                 raise ValueError('A historical failure, baseline or prior upgrade file changed.')
             if record.get('integrationAndSelectionVerified'):
                 integration_preserved(profile_before, integration_snapshot(home, version, base.APP, foreign_hardlinks))
