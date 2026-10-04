@@ -2,6 +2,25 @@
 
 # Start here: agent handoff
 
+## Corrected native Linux checkpoint — October 4, full goal still active
+
+Source `0bc9639` is committed/pushed. Focused native
+[37168003800](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37168003800)
+passes complete x64/ARM64 archives, relocated `/2` Qt/portal health, real D-Bus and
+actual staged Handy/broker maintenance, dedicated bounded reports and immutable
+selection/payload. Host related checks pass 103 (two explicit native-service skips).
+[Exact artifact identities and remaining scope](UPDATE-SYSTEM.md#corrected-full-native-linux-follow-up-at-0bc9639)
+record that no real provider, physical input, signed forward or installation was
+exercised. The prior ARM stdout-parser failure is superseded for this fixture.
+
+Continue the full cross-platform implementation. Windows broker participation
+still needs its native adapter: `server.main` control/startup registration is
+Linux/Mac only, and Windows graph discovery has no dictation participant. Other
+required platform/package/SDK/recovery/retention/forward/bridge and production
+signing gates remain. Previous broad/Mac `69477f8` and Windows results apply only
+to their own source/scope. No runs remain live for this checkpoint, no public
+feed/eligibility was enabled, and no owner installation/profile/model/GPU changed.
+
 ## Managed Linux dispatch and ARM fixture correction — October 4, in progress
 
 The shared update service now connects to the existing retained managed Linux

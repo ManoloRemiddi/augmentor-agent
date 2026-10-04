@@ -786,3 +786,39 @@ The corrected actual local report-file proof passes in the isolated Ubuntu fixtu
 with unchanged target bytes, native owner/CAS/admission/cancellation/settings checks
 and ordinary native exit. Fresh native two-CPU qualification remains required;
 no gates are waived.
+
+### Corrected full native Linux follow-up at 0bc9639
+
+[Focused native run 37168003800](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37168003800)
+is entirely successful at `0bc96393f1d95723a0475ee167ea91fa725bd536`.
+Complete x64 job 111335079309 and ARM64 job 111335079276 each produce the actual
+24-package, host-dependency-declared archive, then pass ZIP staging, relocated
+bundled `/2` Qt/font/portal health, real private D-Bus and actual staged Handy/broker
+maintenance through the bundled Python. The dedicated bounded UTF-8 native report
+passes all owner/CAS/admission/cancellation/settings/ordinary-exit flags on both
+CPUs. Exact source/target payloads and selection stay unchanged. No microphone,
+model download, provider, physical compositor or actual installation is exercised.
+This supersedes the ARM stdout-parser failure for this fixture only.
+
+| Target | ZIP bytes | ZIP SHA-256 |
+| --- | ---: | --- |
+| linux-x64 | 649144736 | `ba333a9b2fa72804482b1ced8cba95c777d9849d6f293bca46cb50c9402810d9` |
+| linux-arm64 | 614742619 | `615ac8a9d6da2ba5892e075f0764c54a1f1c6c899dc30a54128e381895eacd1f` |
+
+The focused workflow deliberately skips Debian/broad suites, installed packages,
+Browser package, Home and owned-service jobs; their earlier results do not become
+new source qualification. Host related manager/Linux/authority/Mac-location checks
+pass 103 cases (two explicit native-service skips). Current broad/Mac evidence
+remains source `69477f8`; Windows native full acceptance retains its own earlier
+record. Every public automatic-install/distribution/feed flag remains false.
+
+Next required work remains Windows persistent-broker discovery/startup/lifetime/
+reopening (the current actual Handy/CAS Windows proof calls Backend directly),
+normal desktop/DSH and signed forward acceptance, privileged package-managed Linux,
+shared/system/companion Mac coordination, SDK owner teardown, verified interrupted
+recovery and safe retention, legacy first bridge delivery, and owner-provisioned
+production signing/feed. In particular, `server.main` currently registers broker
+maintenance only on Linux/Mac, and `WindowsPreparation` has no dictation discovery.
+Do not infer Windows broker participation from its passing native component proof.
+No owner install, account/profile, live model or GPU settings changed. The complete
+cross-platform goal remains active; this passing checkpoint is not completion.
