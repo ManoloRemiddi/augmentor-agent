@@ -9,10 +9,26 @@ import shutil
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+from functools import wraps
 
 spec = importlib.util.spec_from_file_location('coordinated', Path(__file__).resolve().parents[1]/'release/prove-published-linux-coordinated-version.py')
 module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+
+
+def fixture_uid(test):
+    """Model the pinned ordinary UID/GID on CI runners with other identities."""
+    @wraps(test)
+    def run(self):
+        original_lstat=Path.lstat;original_fstat=os.fstat
+        def owner(info):
+            values={n:getattr(info,n) for n in dir(info) if n.startswith('st_')}
+            values.update(st_uid=1000,st_gid=1000)
+            return SimpleNamespace(**values)
+        with patch.object(Path,'lstat',lambda path,*a,**k:owner(original_lstat(path,*a,**k))), \
+                patch.object(module.os,'fstat',lambda fd:owner(original_fstat(fd))):
+            return test(self)
+    return run
 
 
 class AdmissionTests(unittest.TestCase):
@@ -200,6 +216,93 @@ class RealProfileTests(unittest.TestCase):
         with self.assertRaises(ValueError):module.tree(self.profile)
         alias=self.root/'alias'; alias.symlink_to(self.profile, target_is_directory=True)
         with self.assertRaises(ValueError):module.tree(alias)
+
+    def foreign_link(self, root='ws', count=2, mode=0o600):
+        file=self.profile/('node_modules/'+root+'/fixture.js');file.parent.mkdir(parents=True,exist_ok=True)
+        file.write_bytes(b'foreign dependency bytes');file.chmod(mode)
+        for number in range(count-1):os.link(file,self.root/(root.replace('/','-')+'-alias-'+str(number)))
+        return file
+
+    @fixture_uid
+    def test_known_seven_roots_two_and_three_links_are_read_only_and_bound(self):
+        for index,root in enumerate(module.FOREIGN_NODE_ROOTS):
+            self.foreign_link(root,3 if root=='@standard-schema/spec' else 2,0o755 if index==0 else 0o600)
+        rows=module.tree(self.profile,foreign_node_modules=True)
+        bound={n:r for n,r in rows.items() if 'nlink' in r};self.assertEqual(len(bound),7)
+        self.assertEqual({r['nlink'] for r in bound.values()},{2,3})
+        for name,row in bound.items():
+            info=(self.profile/name).lstat()
+            self.assertEqual((row['device'],row['inode'],row['nlink']),(info.st_dev,info.st_ino,info.st_nlink))
+        before=module.integration_snapshot(self.home,'0.2.12',foreign_hardlinks=bound)
+        self.upgrade();after=module.integration_snapshot(self.home,'0.2.13',self.app,bound)
+        module.integration_preserved(before,after)
+        self.assertEqual(bound,{n:r for n,r in module.tree(self.profile,True).items() if 'nlink' in r})
+        with self.assertRaises(ValueError):module.integration_snapshot(self.home,'0.2.13',self.app)
+        wrong=copy.deepcopy(bound);next(iter(wrong.values()))['inode']+=1
+        with self.assertRaises(ValueError):module.integration_snapshot(self.home,'0.2.13',self.app,wrong)
+
+    @fixture_uid
+    def test_retained_128_file_topology_shape_and_generic_refusal(self):
+        counts={'dsh-resonant-voice':60,'ws':19,'dsh-adaptive-reasoning':14,'cosmokit':14,
+                'schemastery':8,'@standard-schema/spec':7,'dsh-model-picker-augmented':6}
+        for root,count in counts.items():
+            for number in range(count):
+                self.foreign_link(root+'/'+str(number),3 if root=='@standard-schema/spec' and number<2 else 2,
+                                  0o755 if root=='dsh-resonant-voice' and number==0 else 0o600)
+        with self.assertRaises(ValueError):module.tree(self.profile)
+        rows=[r for r in module.tree(self.profile,True).values() if 'nlink' in r]
+        self.assertEqual(len(rows),128)
+        self.assertEqual(sum(r['nlink']==3 for r in rows),2)
+        self.assertEqual(sum(r['mode']==0o755 for r in rows),1)
+
+    @fixture_uid
+    def test_wrong_dependency_root_count_mode_and_owned_target_refuse(self):
+        for root in ('augmentor-product','@standard-schema/foreign','ws-foreign'):
+            with self.subTest(root=root):
+                file=self.foreign_link(root)
+                with self.assertRaises(ValueError):module.tree(self.profile,True)
+                file.unlink()
+        file=self.foreign_link('ws',4)
+        with self.assertRaises(ValueError):module.tree(self.profile,True)
+        file.unlink()
+        file=self.foreign_link('schemastery',2,0o644)
+        with self.assertRaises(ValueError):module.tree(self.profile,True)
+        file.unlink()
+        owned=self.target/'browser/package.json';os.link(owned,self.root/'owned-alias')
+        with self.assertRaises(ValueError):module.tree(self.target,True)
+        with self.assertRaises(ValueError):module.tree(self.target)
+
+    def test_foreign_wrong_owner_refuses_before_open(self):
+        file=self.foreign_link();info=file.lstat()
+        values={name:getattr(info,name) for name in ('st_uid','st_gid','st_nlink','st_mode')}
+        for key in ('st_uid','st_gid'):
+            with self.subTest(key=key),patch.object(module.os,'open') as opening:
+                with self.assertRaises(ValueError):module.hardlink_row(file,SimpleNamespace(**{**values,key:1001}))
+                opening.assert_not_called()
+
+    @fixture_uid
+    def test_foreign_path_replacement_during_read_refuses_and_closes_fd(self):
+        file=self.foreign_link();real_read=os.read;fds=[]
+        def replace(fd,size):
+            fds.append(fd);data=real_read(fd,size)
+            if len(fds)==1:
+                file.unlink();file.write_bytes(b'replaced foreign dependency')
+            return data
+        with patch.object(module.os,'read',side_effect=replace):
+            with self.assertRaises(ValueError):module.tree(self.profile,True)
+        self.assertTrue(fds)
+        with self.assertRaises(OSError):os.fstat(fds[0])
+
+    @fixture_uid
+    def test_foreign_link_count_change_during_read_refuses(self):
+        file=self.foreign_link();real_read=os.read;changed=False
+        def relink(fd,size):
+            nonlocal changed
+            data=real_read(fd,size)
+            if not changed:os.link(file,self.root/'new-alias');changed=True
+            return data
+        with patch.object(module.os,'read',side_effect=relink):
+            with self.assertRaises(ValueError):module.tree(self.profile,True)
 
 
 if __name__=='__main__': unittest.main()

@@ -53,6 +53,28 @@ binds the exact successful upgrade run SHA. Root must derive those fields from
 actual retained receipts after the guarded native transaction. A binding is not
 permission to replay a pending action or adopt another run.
 
+The first root read-only admission refused existing foreign `node_modules`
+hardlinks before source staging, packages or worker execution. A separate
+metadata-only inspection found 128 regular files: 126 with two links and two
+with three links, all UID/GID 1000, with mode 0600 except one mode 0755 program.
+They belong to seven foreign dependency roots: `ws`, `schemastery`, `cosmokit`,
+`@standard-schema/spec`, `dsh-resonant-voice`, `dsh-adaptive-reasoning` and
+`dsh-model-picker-augmented`. That refusal remains retained; neither coordinated
+mode has executed.
+
+The candidate can read hardlinks only under those exact foreign dependency
+prefixes, with the observed owner, group, link-count and mode constraints. It
+records `sha256`, `bytes`, `uid`, `gid`, `mode`, `mtimeNs`, `device`, `inode` and
+`nlink`. An immutable binding's `foreignHardlinks` map must equal every observed
+hardlink row before journalling and in subsequent integration snapshots. Root
+must derive that map from a fresh successful read-only profile audit and retain
+its equality across pre/post-native and ending audits. Descriptor identity and
+path identity must remain stable during each bounded read. No aliases, caches,
+ownership or permissions are changed. Generic owned integration, preset and
+historical-journal snapshots continue to refuse hardlinks. These are read-time
+and checkpoint comparisons; they do not enumerate every external alias or
+promise continuous monitoring between checkpoints.
+
 The binding's `nativeAudit` object uses `status: "pass"`, the exact native
 `version` and public `source`, `pending: null`, `unknownOutcome: false`, and
 `leasesIdle`, `processesAbsent`, `socketAbsent` and `portsIdle` all true. Its

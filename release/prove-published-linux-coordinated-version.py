@@ -32,6 +32,8 @@ NEW_DEPENDENCIES = frozenset(('libqt6quickwidgets6', 'python3-pyside6.qtopengl',
     'qml6-module-qtqml-models', 'qml6-module-qtqml-workerscript', 'qml6-module-qtquick'))
 SELECTOR = '.local/share/augmentor/desktop.json'
 HARNESS = '.config/augmentor/harnesses.json'
+FOREIGN_NODE_ROOTS = ('ws', 'schemastery', 'cosmokit', '@standard-schema/spec',
+                      'dsh-resonant-voice', 'dsh-adaptive-reasoning', 'dsh-model-picker-augmented')
 
 
 def known_pass(record):
@@ -83,7 +85,38 @@ def action(base, folder, record, label, invoke):
     return result
 
 
-def tree(path):
+def foreign_node_path(name):
+    return any(name.startswith('node_modules/'+root+'/') for root in FOREIGN_NODE_ROOTS)
+
+
+def hardlink_row(file, info):
+    """Read a known foreign dependency without writing any inode or alias."""
+    if (info.st_uid != 1000 or info.st_gid != 1000 or info.st_nlink not in (2, 3)
+            or stat.S_IMODE(info.st_mode) not in (0o600, 0o755)):
+        raise ValueError('The foreign dependency hardlink metadata differs.')
+    def identity(value):
+        return (value.st_dev, value.st_ino, value.st_mode, value.st_uid, value.st_gid,
+                value.st_nlink, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
+    fd = os.open(file, os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC | os.O_NONBLOCK)
+    try:
+        if identity(os.fstat(fd)) != identity(info):
+            raise ValueError('A foreign dependency changed before its read.')
+        chunks = []; count = 0
+        while count <= 4194304:
+            chunk = os.read(fd, min(65536, 4194305-count))
+            if not chunk:
+                break
+            chunks.append(chunk); count += len(chunk)
+        if (count != info.st_size or count > 4194304 or identity(os.fstat(fd)) != identity(info)
+                or identity(file.lstat()) != identity(info)):
+            raise ValueError('A foreign dependency changed during its read.')
+        return {'bytes': count, 'sha256': hashlib.sha256(b''.join(chunks)).hexdigest(),
+                'device': info.st_dev, 'inode': info.st_ino, 'nlink': info.st_nlink}
+    finally:
+        os.close(fd)
+
+
+def tree(path, foreign_node_modules=False):
     """Bounded byte/metadata snapshot; preserve link strings without following them."""
     if path.is_symlink() or not path.is_dir():
         raise ValueError('A profile snapshot root is missing or linked.')
@@ -98,8 +131,14 @@ def tree(path):
         row = {'uid': info.st_uid, 'gid': info.st_gid, 'mode': stat.S_IMODE(info.st_mode), 'mtimeNs': info.st_mtime_ns}
         if stat.S_ISLNK(info.st_mode):
             row['link'] = os.readlink(file)
-        elif stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and info.st_size <= 4194304:
-            total += info.st_size; row.update(bytes=info.st_size, sha256=hashlib.sha256(file.read_bytes()).hexdigest())
+        elif stat.S_ISREG(info.st_mode) and info.st_size <= 4194304:
+            if info.st_nlink == 1:
+                row.update(bytes=info.st_size, sha256=hashlib.sha256(file.read_bytes()).hexdigest())
+            elif foreign_node_modules and foreign_node_path(name):
+                row.update(hardlink_row(file, info))
+            else:
+                raise ValueError('A profile hardlink is outside the known foreign dependency scope.')
+            total += info.st_size
         else:
             raise ValueError('A profile member is linked, unsupported or oversized.')
         result[name] = row
@@ -108,13 +147,16 @@ def tree(path):
     return result
 
 
-def integration_snapshot(home, version, app=None):
+def integration_snapshot(home, version, app=None, foreign_hardlinks=None):
     profile = home/'profiles/web'; target = profile/'augmentor-product'; presets = home/'.agent-presets'
     owned = json.loads((target/'ownership.json').read_text())
     if (owned.get('version') != version or set(owned.get('files', {})) != {'browser/dist/index.js', 'browser/package.json'}
             or set(owned.get('presets', {})) != set(PRESETS)):
         raise ValueError('The known owned integration version or file set differs.')
-    target_rows = tree(target); preset_rows = tree(presets); profile_rows = tree(profile)
+    target_rows = tree(target); preset_rows = tree(presets); profile_rows = tree(profile, foreign_node_modules=True)
+    actual_hardlinks = {name: row for name, row in profile_rows.items() if 'nlink' in row}
+    if actual_hardlinks != (foreign_hardlinks or {}):
+        raise ValueError('The foreign hardlink topology differs from the immutable root snapshot.')
     for name, digest in owned['files'].items():
         if target_rows.get(name, {}).get('sha256') != digest:
             raise ValueError('An owned plugin was edited.')
@@ -305,7 +347,8 @@ def prove(mode):
     if persistence != managed.retained_json(baseline_folder/'persistence-before.json', managed.COLD_PERSISTENCE_SHA, helper, sha):
         raise ValueError('The three compressed histories differ from the cold baseline.')
     expected = managed.retained_json(base.HOME/'.local/state/published-product-first-use-history157/history-before.json', cold.EXPECTED_SHA, helper, sha)
-    profile_before = integration_snapshot(home, prior_version)
+    foreign_hardlinks = binding.get('foreignHardlinks', {})
+    profile_before = integration_snapshot(home, prior_version, foreign_hardlinks=foreign_hardlinks)
     token = home/'augmentor-product-token'; helper.private_parents(token.parent)
     token_info = token.lstat()
     if not stat.S_ISREG(token_info.st_mode) or token_info.st_uid != 1000 or token_info.st_nlink != 1 or token_info.st_mode & 0o077:
@@ -353,7 +396,7 @@ def prove(mode):
         result = action(base, folder, record, 'normal-setup-install', lambda: setup.install(checked['token']))
         if result.get('installed') is not True or result.get('restartRequired') is not True:
             raise ValueError('Normal integration install returned an unexpected outcome.')
-        profile_after = integration_snapshot(home, version, base.APP); integration_preserved(profile_before, profile_after)
+        profile_after = integration_snapshot(home, version, base.APP, foreign_hardlinks); integration_preserved(profile_before, profile_after)
         base.atomic(folder/'integration-after.json', profile_after)
         node.stop(); node = base.OwnedNode(folder, record, env); adapter = node.start(DshAdapter, log)
         checked = setup.check({'endpoint': env['DSH_AUGMENTOR_URL'], 'home': str(home)})
@@ -400,7 +443,7 @@ def prove(mode):
             if protected_before != {n: tree(base.HOME/'.local/state'/n) for n in protected_folders}:
                 raise ValueError('A historical failure, baseline or prior upgrade file changed.')
             if record.get('integrationAndSelectionVerified'):
-                integration_preserved(profile_before, integration_snapshot(home, version, base.APP))
+                integration_preserved(profile_before, integration_snapshot(home, version, base.APP, foreign_hardlinks))
                 saved_transition(saved_before, json.loads((base.HOME/HARNESS).read_text()), version)
                 if (base.HOME/HARNESS).read_bytes() != expected_saved_bytes:
                     raise ValueError('Ending saved configuration formatting differs.')
