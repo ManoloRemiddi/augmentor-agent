@@ -69,6 +69,8 @@ def run(observer,source_root,release_digest,payload_digest,attempt,bootstrap_fd)
                 stages=require_directory(private_directory(data/'updates/stages'))
                 stage=stages/('linux-'+attempt);stage.mkdir(mode=0o700)
                 target,_,_=stage_download(authority.files[0],stage,candidate,data)
+                from .components import verify_target
+                verify_target(target,candidate)
             plan=held.enter_context(ManagedPlan(data,source,target))
             coordinator=LinuxCoordinator(plan,runtime_directory(),shared_state_directory(),transactions)
             result=coordinator.run(authority.check)

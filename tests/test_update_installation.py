@@ -29,6 +29,9 @@ class InstallationAuthorityTests(unittest.TestCase):
         stamp['automaticInstallQualified']=True # Qualification fixture only, never a packaged default.
         self.receipt={**self.product,'target':'windows-x64','sourceCommit':'a'*40,'update':stamp}
         self.write_receipt()
+        self.component_contract={key:{'version':'1.0.0','sha256':'e'*64,'ownership':'external' if key=='codex' else 'bundled'} for key in ('dsh','pi','codex')}
+        (self.root/'release/update-components.json').write_text(json.dumps({'schema':'augmentor-update-components/1','components':self.component_contract}))
+
         self.updates=private_directory(self.base/'private');cache=private_directory(self.updates/'repository')
         payload=b'MZ inert installer fixture; never executed'
         artifact={'role':'installer','targetPath':'releases/download/v1.1.0-windows-preview.1/app.exe',
@@ -37,9 +40,9 @@ class InstallationAuthorityTests(unittest.TestCase):
         with os.fdopen(descriptor(self.file,writable=True,create=True),'wb') as stream:stream.write(payload)
         self.release={**self.product,'version':'1.1.0','build':1,'sourceCommit':'b'*40,'target':'windows-x64',
             'installType':'windows-inno','minimumOS':'26200','releaseUrl':'https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v1.1.0-windows-preview.1',
-            'artifacts':[artifact],'automaticInstallQualified':True}
+            'artifacts':[artifact],'automaticInstallQualified':True,'updateComponents':deepcopy(self.component_contract)}
         self.state={'schema':'augmentor-update-state/1','authenticated':True,'phase':'ready','candidate':self.release,
-            'preferences':{'automaticChecks':True,'automaticDownload':True,'automaticInstall':True,'channel':'preview','intervalHours':24},
+            'preferences':{'automaticChecks':True,'automaticDownload':True,'automaticInstall':True,'components':{'augmentor':True,'dsh':False,'pi':False,'codex':False},'channel':'preview','intervalHours':24},
             'postponedUntil':0,'skippedRelease':None,'downloads':[{**artifact,'file':str(self.file)}]}
         self.save();self.calls=0
 

@@ -31,6 +31,10 @@ class PackageTests(unittest.TestCase):
                      'services/lifecycle/update_journal.py','services/platform_adapters/private_files.py',
                      'services/platform_adapters/locks.py'):
             path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_text('fixture')
+        from updates.components import SCHEMA
+        (self.root/'release/update-components.json').write_text(json.dumps({'schema':SCHEMA,'components':{
+            key:{'version':'1.0.0','sha256':'e'*64,'ownership':'external' if key=='codex' else 'bundled'}
+            for key in ('dsh','pi','codex')}}))
         from lifecycle.payload_integrity import seal_payload
         self.release=seal_payload(self.root)
 
@@ -63,7 +67,7 @@ class PackageTests(unittest.TestCase):
 
     def test_fresh_build_cannot_omit_publisher_verifier_even_with_valid_inventory(self):
         from lifecycle.payload_integrity import seal_payload, verify_payload
-        for name in ('scripts/verify-windows-publisher.ps1', 'release/windows/signing.json',
+        for name in ('release/update-components.json','scripts/verify-windows-publisher.ps1', 'release/windows/signing.json',
                      'services/updates/windows_signing.py'):
             with self.subTest(name=name):
                 # Simulate a producer omission in a new disposable build, not

@@ -17,6 +17,8 @@ from platform_adapters.paths import private_directory
 from platform_adapters.private_files import atomic_json, read_json, require_directory, descriptor, replace_file
 from .policy import CHANNELS, installed_identity, select_release, version, canonical_release_url, target_path, HEX, MAX_ARTIFACT
 
+from .components import defaults as component_defaults
+
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = 'augmentor-update-state/1'
 
@@ -51,10 +53,14 @@ class UpdateManager:
         else:
             self.state = {'schema': SCHEMA, 'revision': 0, 'preferences': {
                 'automaticChecks': self.current['installType'] != 'development' and self.current['channel'] in CHANNELS, 'intervalHours': 24,
-                'automaticDownload': False, 'automaticInstall': False, 'channel': self.current['channel'] if self.current['channel'] in CHANNELS else 'preview'},
+                'automaticDownload': False, 'automaticInstall': False, 'components': component_defaults(), 'channel': self.current['channel'] if self.current['channel'] in CHANNELS else 'preview'},
                 'phase': 'idle', 'candidate': None, 'authenticated': False, 'error': None,
                 'lastAttempt': None, 'lastSuccessfulCheck': None, 'nextCheck': 0,
                 'notifiedRelease': None, 'skippedRelease': None, 'postponedUntil': 0, 'downloads': []}
+        if 'components' not in self.state['preferences']:
+            # Existing bundle-wide consent cannot silently opt in harnesses.
+            self.state['preferences']['components'] = component_defaults()
+            self.state['preferences']['automaticInstall'] = False
         self.state['revision'] = self.state.get('revision', 0)
         identity = {k: self.current[k] for k in ('version', 'build', 'target', 'installType', 'sourceCommit', 'component', 'releaseId')}
         observed = self.state.get('observedInstallation')
@@ -78,14 +84,22 @@ class UpdateManager:
     @staticmethod
     def validate_preferences(values):
         expected = {'automaticChecks', 'intervalHours', 'automaticDownload', 'automaticInstall', 'channel'}
-        if set(values) != expected or any(type(values[k]) is not bool for k in expected - {'intervalHours', 'channel'}):
+        if (not isinstance(values,dict) or set(values) not in (expected, expected | {'components'})
+                or any(type(values[k]) is not bool for k in expected - {'intervalHours', 'channel'})):
             raise ValueError('Invalid update preferences.')
         if type(values['intervalHours']) is not int or values['intervalHours'] not in (24, 48) or values['channel'] not in CHANNELS:
             raise ValueError('Choose daily or every two days and a supported update channel.')
+        if 'components' in values:
+            from .components import validate_choices
+            validate_choices(values['components'])
         if values['automaticInstall'] and not values['automaticDownload']:
             raise ValueError('Automatic installation also needs automatic downloads enabled.')
 
     def automatic_capability(self):
+        from .components import installed as installed_components
+        try:
+            if installed_components(self.root) is None:return False
+        except (OSError,ValueError):return False
         configuration = self.root / 'release/updates.json'
         enabled = configuration.is_file() and json.loads(configuration.read_text()).get('enabled') is True
         return (enabled and self.current['automaticInstallQualified'] and self.installer_available()
@@ -154,6 +168,13 @@ class UpdateManager:
                     not self.state['preferences']['automaticDownload'] or not self.automatic_capability() or
                     self.release_id()==self.state['skippedRelease'] or self.clock()<self.state['postponedUntil'] or
                     self.clock()<self.state['nextInstallAttempt']):return False
+            from .components import refusal
+            reason = refusal(self.root, candidate, self.state['preferences'].get('components'))
+            if reason:
+                self.state['error'] = reason
+                self.state['nextInstallAttempt'] = self.clock()+300
+                self.save()
+                return False
             if self.admission:
                 status=self.admission.control('host.maintenance.status',{})
                 if status['phase']!='ready' or status['active']:
@@ -245,6 +266,10 @@ class UpdateManager:
             value = deepcopy(self.state)
             value['installed'] = deepcopy(self.current)
             value['automaticInstallAvailable'] = self.automatic_capability()
+            from .components import rows, refusal
+            value['updateComponents'] = rows(self.root, self.current)
+            value['componentUpdateBlockedReason'] = (refusal(self.root, self.state['candidate'],
+                self.state['preferences']['components']) if self.state.get('candidate') else None)
             value['busy'] = self.state['phase']=='installing' or self.job is not None and self.job.is_alive()
             # Local paths are returned only to a requested download/open action.
             value['downloads'] = [{k: v for k, v in row.items() if k != 'file'} for row in value['downloads']]
@@ -263,10 +288,13 @@ class UpdateManager:
                 raise ValueError('Update settings changed elsewhere. Reload before saving.')
             if values['automaticInstall'] and not self.automatic_capability():
                 raise ValueError('Automatic installation is not qualified for this installed build yet.')
+            previous_components = deepcopy(self.state['preferences']['components'])
             channel_changed = values['channel'] != self.state['preferences']['channel']
             if channel_changed and self.state['phase']=='installing':
                 raise ValueError('Wait for the observed installation result before changing channels.')
+            # An older surface cannot erase newer component choices.
             self.state['preferences'] = deepcopy(values)
+            self.state['preferences'].setdefault('components', previous_components)
             self.state['nextCheck'] = 0
             if channel_changed:
                 self.state.update(candidate=None, authenticated=False, downloads=[], phase='idle',

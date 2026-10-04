@@ -59,7 +59,10 @@ def _schemas(value):
 def validate_release(value):
     _keys(value, ('version', 'build', 'sourceCommit', 'channel', 'target', 'installType', 'releaseUrl',
                   'protocols', 'dataSchema', 'readableDataSchemas', 'minimumOS', 'artifacts'),
-          ('revoked', 'notes', 'minimumUpdater', 'distributions', 'component', 'automaticInstallQualified'))
+          ('revoked', 'notes', 'minimumUpdater', 'distributions', 'component', 'automaticInstallQualified', 'updateComponents'))
+    if 'updateComponents' in value:
+        from .components import validate_contract
+        validate_contract(value['updateComponents'])
     version(value['version'])
     if type(value['build']) is not int or not 1 <= value['build'] <= 2**31 - 1:
         raise ValueError('Invalid release build sequence.')

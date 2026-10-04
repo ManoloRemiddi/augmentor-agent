@@ -53,6 +53,18 @@ class UpdateSettingsTests(unittest.TestCase):
         self.assertEqual(self.client.calls[-1][1]['revision'],1)
         # Polling a dirty editor should retain the revision of its draft.
 
+    def test_information_remains_readable_in_compact_component_settings(self):
+        self.assertGreaterEqual(self.dialog.info.height(),self.dialog.info.heightForWidth(self.dialog.info.width()))
+
+    def test_component_choices_are_separate_and_saved_without_model_connection(self):
+        self.assertTrue(self.dialog.components['augmentor'].isChecked())
+        self.assertFalse(self.dialog.components['dsh'].isChecked())
+        self.dialog.components['dsh'].click();self.dialog.components['codex'].click()
+        self.dialog.save();self.wait()
+        self.assertEqual(self.client.state['preferences']['components'],
+            {'augmentor':True,'dsh':True,'pi':False,'codex':True})
+        self.assertFalse(self.client.state['preferences']['automaticInstall'])
+
     def test_slow_update_transport_does_not_block_the_dialog(self):
         entered=threading.Event();finish=threading.Event();self.addCleanup(finish.set)
         def slow(*_):entered.set();finish.wait(2);return deepcopy(self.client.state)

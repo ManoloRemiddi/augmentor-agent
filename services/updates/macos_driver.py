@@ -71,6 +71,8 @@ def run(observer,source_bundle,release_digest,payload_digest,attempt,bootstrap_f
                 stages=require_directory(private_directory(bundle.parent/('.augmentor-stage-'+attempt)))
                 target_bundle,target_release,target_payload=stage_download(
                     next(item for item in authority.files if item['artifact']['role']=='bundle'),stages,candidate,team=payload['team'])
+                from .components import verify_target
+                verify_target(target_bundle/'Contents/Resources/app',candidate)
             source={key:authority.current[key] for key in ('version','sourceCommit','target','channel','dataSchema','readableDataSchemas')}
             source['sha256']=payload_digest
             item=next(row for row in candidate['artifacts'] if row['role']=='bundle')

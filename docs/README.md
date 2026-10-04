@@ -38,6 +38,8 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 [installer safety findings and replacement qualification](WINDOWS-INSTALLER-DECISION.md),
 [signed Windows update delivery](WINDOWS-UPDATE-DELIVERY.md).
 
+[Component update controls and release process](COMPONENT-UPDATES.md) covers per-component consent, bundled/external ownership and remaining independent harness adapters.
+
 ## Start and understand the product
 
 - [Codex integration build plan: Desktop, Browser and connection profiles](CODEX-INTEGRATION-PLAN.md) — full C0–C9 scope and acceptance gates.

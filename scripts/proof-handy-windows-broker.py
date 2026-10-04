@@ -27,7 +27,9 @@ def main():
     from platform_adapters.windows_identity import private_directory
     with tempfile.TemporaryDirectory(prefix='augmentor-dictation-windows-') as temporary:
         base=private_directory(Path(temporary)/'private');fixture=base/'project'
-        for name in ('services/dictation','services/lifecycle','services/platform_adapters','components/handy/runtime'):
+        # Copy the complete public staged service graph: lifecycle IPC also
+        # needs root helpers such as platform_support.py. No user state is copied.
+        for name in ('services','components/handy/runtime'):
             shutil.copytree(project/name,fixture/name,ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
         target=fixture/'apps/native/augmentor_linux/dictation.py';target.parent.mkdir(parents=True)
         shutil.copy2(project/'apps/native/augmentor_linux/dictation.py',target)

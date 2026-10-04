@@ -6,7 +6,7 @@ import threading
 from PySide6.QtCore import QObject, QTimer, Signal, QUrl
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
-                              QCheckBox, QComboBox, QSystemTrayIcon, QToolTip)
+                              QCheckBox, QComboBox, QSystemTrayIcon, QToolTip, QScrollArea, QWidget, QLayout)
 from .prompt_client import PromptClient
 from .ui_scale import px
 from .instances import current_name
@@ -46,8 +46,12 @@ class UpdatesDialog(QDialog):
     def __init__(self, window, client=None):
         super().__init__(window)
         self.state = None; self.dirty = False; self.draft_revision = None
-        self.setWindowTitle('Versions & updates'); self.resize(px(self, 480), px(self, 500))
-        layout = QVBoxLayout(self)
+        self.setWindowTitle('Versions & updates'); self.resize(px(self, 480), px(self, 640))
+        outer = QVBoxLayout(self)
+        scroll = QScrollArea(); scroll.setWidgetResizable(True)
+        body = QWidget(); layout = QVBoxLayout(body)
+        layout.setSizeConstraint(QLayout.SetMinimumSize)
+        scroll.setWidget(body); outer.addWidget(scroll)
         self.info = QLabel('Loading update information…'); self.info.setWordWrap(True)
         layout.addWidget(self.info)
         self.checks = QCheckBox('Check for updates automatically'); layout.addWidget(self.checks)
@@ -57,6 +61,13 @@ class UpdatesDialog(QDialog):
         self.channel.setAccessibleName('Update channel'); layout.addWidget(self.channel)
         self.downloads = QCheckBox('Download new versions automatically'); layout.addWidget(self.downloads)
         self.installs = QCheckBox('Install automatically when Augmentor is idle'); layout.addWidget(self.installs)
+        self.components = {}
+        for key, name in (('augmentor','Augmentor Agent'), ('dsh','DSH'), ('pi','Pi'), ('codex','Codex')):
+            control = QCheckBox(name)
+            control.setAccessibleName('Automatically update '+name)
+            layout.addWidget(control); self.components[key] = control
+        self.component_note = QLabel('Select which components may update automatically. Bundled harnesses update with Augmentor; unchecked changes wait for your approval. Codex is managed separately.')
+        self.component_note.setWordWrap(True); layout.addWidget(self.component_note)
         self.explanation = QLabel(); self.explanation.setWordWrap(True); layout.addWidget(self.explanation)
         self.note = QLabel(); self.note.setWordWrap(True); layout.addWidget(self.note)
         self.save_button = QPushButton('Save update preferences'); self.save_button.clicked.connect(self.save); layout.addWidget(self.save_button)
@@ -70,8 +81,8 @@ class UpdatesDialog(QDialog):
         reminders = QHBoxLayout(); layout.addLayout(reminders)
         self.remind_button = QPushButton('Remind me tomorrow'); self.remind_button.clicked.connect(lambda: self.perform('postpone', {'hours': 24})); reminders.addWidget(self.remind_button)
         self.skip_button = QPushButton('Skip this release'); self.skip_button.clicked.connect(lambda: self.perform('skip')); reminders.addWidget(self.skip_button)
-        close = QPushButton('Done'); close.clicked.connect(self.accept); layout.addWidget(close)
-        self.controls = (self.checks, self.interval, self.channel, self.downloads, self.installs)
+        close = QPushButton('Done'); close.clicked.connect(self.accept); outer.addWidget(close)
+        self.controls = (self.checks, self.interval, self.channel, self.downloads, self.installs, *self.components.values())
         for control in self.controls:
             control.setEnabled(False)
             if isinstance(control, QCheckBox): control.clicked.connect(self.edited)
@@ -108,7 +119,8 @@ class UpdatesDialog(QDialog):
         elif value['phase'] == 'current': text += '\nNo newer compatible release was found.'
         if value['phase'] == 'ready': text += '\nDownload ready. Open the release instructions to install.'
         if value['phase'] == 'downloading': text += f"\nDownloading: {value.get('bytesDownloaded', 0) / 1024**2:.1f} MB"
-        self.info.setText(text); self.note.setText(value.get('error') or '')
+        self.info.setText(text); self.note.setText(value.get('error') or value.get('componentUpdateBlockedReason') or '')
+        self.info.setMinimumHeight(self.info.heightForWidth(max(1,self.width()-62)))
         self.explanation.setText('Downloads use your internet connection and disk space. Settings are shared with the browser. '
             + ('Automatic installation waits for all Augmentor work to finish.' if value['automaticInstallAvailable'] else
                'Automatic installation is not available for this installed build. Use the release installation instructions.'))
@@ -118,6 +130,16 @@ class UpdatesDialog(QDialog):
             self.checks.setChecked(prefs['automaticChecks']); self.interval.setCurrentIndex(self.interval.findData(prefs['intervalHours']))
             self.channel.setCurrentIndex(self.channel.findData(prefs['channel']))
             self.downloads.setChecked(prefs['automaticDownload']); self.installs.setChecked(prefs['automaticInstall'])
+            choices = prefs.get('components', {'augmentor':True,'dsh':False,'pi':False,'codex':False})
+            for key, control in self.components.items(): control.setChecked(choices[key])
+
+        for row in value.get('updateComponents', []):
+            control = self.components.get(row['id'])
+            if control:
+                version = row.get('version')
+                control.setText(row['name'] + (' · '+version if version else ''))
+                if row.get('requiredVersion'):
+                    control.setToolTip('Required version: '+row['requiredVersion']+'. Uses its separate installation method.')
         busy = value['busy']
         for control in self.controls: control.setEnabled(not busy)
         self.installs.setEnabled(value['automaticInstallAvailable'] and not busy)
@@ -134,7 +156,8 @@ class UpdatesDialog(QDialog):
         if not self.state: return
         prefs = {'automaticChecks': self.checks.isChecked(), 'intervalHours': self.interval.currentData(),
                  'channel': self.channel.currentData(), 'automaticDownload': self.downloads.isChecked(),
-                 'automaticInstall': self.installs.isChecked()}
+                 'automaticInstall': self.installs.isChecked(),
+                 'components': {key: control.isChecked() for key, control in self.components.items()}}
         if self.client.call('configure', {'revision': self.draft_revision, 'preferences': prefs}):
             for control in self.controls: control.setEnabled(False)
 

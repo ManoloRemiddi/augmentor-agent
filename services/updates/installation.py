@@ -23,6 +23,7 @@ class AutomaticInstallAuthority:
         self.os_version=os_version;self.distribution=distribution;self.clock=clock
         self.repository=repository or self.refresh
         self.current=None;self.selected=None;self.files=[];self.entered=False;self.closed=False
+        self.component_contract=None
 
     def refresh(self):
         return repository_request(self.root,self.base/'repository',{'operation':'discover',
@@ -42,6 +43,10 @@ class AutomaticInstallAuthority:
         if not prefs['automaticInstall'] or not prefs['automaticDownload']:
             raise ValueError('Automatic installation consent was revoked.')
         selected=state.get('candidate');validate_release(selected)
+        from .components import refusal
+        reason = refusal(self.root, selected, prefs.get('components'))
+        if reason:
+            raise ValueError(reason)
         if selected.get('automaticInstallQualified') is not True:
             raise ValueError('The publisher offers this release for manual installation only.')
         if self.selected is not None and selected!=self.selected:
@@ -57,6 +62,10 @@ class AutomaticInstallAuthority:
         return state
 
     def installed(self):
+        from .components import installed as installed_components
+        contract=installed_components(self.root)
+        if self.component_contract is not None and contract!=self.component_contract:
+            raise ValueError('The installed harness identities changed during authorization.')
         current=installed_identity(self.root)
         if (not current['automaticInstallQualified'] or not current['buildKnown'] or current['installType']=='development'
                 or current['channel'] not in ('stable','preview') or not current['sourceCommit']):
@@ -112,6 +121,8 @@ class AutomaticInstallAuthority:
         if self.entered or self.closed:raise ValueError('Use a new live installation authority; never replay one.')
         self.entered=True
         try:
+            from .components import installed as installed_components
+            self.component_contract=deepcopy(installed_components(self.root))
             self.current=self.installed()
             state=self.state();self.selected=deepcopy(state['candidate'])
             if not self.os_version:raise ValueError('Verify the actual operating system before installation.')

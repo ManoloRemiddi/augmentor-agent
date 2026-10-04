@@ -2,6 +2,19 @@
 
 # Shared application updates
 
+## User-directed component scope — October 4, 2026
+
+Automatic installation remains opt-in, with individual Augmentor Agent, DSH, Pi
+and Codex choices shared by Desktop/Browser and rechecked at installation boundaries.
+Unchecked bundled harness changes defer the complete release; separate Codex
+ownership is preserved. Legacy bundle-wide consent does not opt in harnesses.
+[The component contract and release process](COMPONENT-UPDATES.md) records the
+implementation and remaining independent harness-only delivery work. The user
+confirmed no Apple/Windows signing account/service and delegated the secure,
+low-friction process choice: GitHub Actions with offline root custody is selected.
+This answer supersedes earlier unanswered-account/custody questions; actual owner
+account/key provisioning and signed forward qualification remain unfinished.
+
 ## Current status — October 4, 2026
 
 The shared check/notification/download service and external installation
@@ -2226,3 +2239,14 @@ bundles. Pending outcomes do not establish qualification. Production custody,
 platform publisher accounts/provider identity and first automatic installation
 scope still require the owner's answers to the existing questions. Feed and
 automatic eligibility remain disabled; published previews do not waive these gates.
+
+Current follow-up verification: corrected Linux 37176868726 at `f061593` is
+terminal success on x64/ARM64 for both complete bundles and native prerequisites;
+broad Debian/installed/Browser/Home/service jobs are explicitly skipped in that
+focused run. Full Windows 37177293646 at `8c5f1ca` and merged 37175650042 fail.
+The downloaded x64 startup log identifies the actual cause in the new incoming
+Handy broker fixture: its partial service copy omits `platform_support.py`, now
+required by lifecycle IPC. The fixture now copies the complete public staged
+service graph, with private disposable state unchanged. Production contains that
+helper already; no admission guard is relaxed. Fresh native full qualification is
+required, together with the new component contracts; earlier passes do not apply.

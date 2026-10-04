@@ -84,3 +84,9 @@ for(const role of ['targets','snapshot','timestamp'])if(root.signed.roles[role].
         target = destination/'release/updates/root.json'
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(root_bytes)
+
+    if (source/'package.json').is_file():
+        from .components import SCHEMA as COMPONENT_SCHEMA, build_contract
+        contract = {'schema': COMPONENT_SCHEMA, 'components': build_contract(source)}
+        (destination/'release/update-components.json').write_text(
+            json.dumps(contract, sort_keys=True, indent=2)+'\n', encoding='utf-8')

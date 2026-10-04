@@ -947,3 +947,11 @@ fixed PowerShell verifier and Python verifier module. Seven package cases includ
 fresh producer omissions: each incomplete disposable build has a consistent
 sealed inventory but is still refused before installer construction. No installed
 payload is resealed and no production publisher is provisioned by these tests.
+
+Component update consent: `test_update_components.py` covers actual private
+consent/source files at live authorization boundaries, changed bundled inputs,
+network-time revocation, external Codex refusal, valid staged identities and
+legacy settings migration. `test_update_settings.py` and Browser update-settings
+checks cover independent choices and compact UI readability. These are permission
+and source contracts, not independent harness installers or signed OS forward proof.
+See [component updates](../docs/COMPONENT-UPDATES.md).

@@ -56,3 +56,19 @@ test('notification is nonmodal, deduplicated by the service and opens the update
  button.click();assert.deepEqual(opened,['updates']);assert.equal(button.hidden,true)
  await notice.poll();assert.equal(button.hidden,true)
 })
+
+
+test('component choices are independent and persist through shared service',async t=>{
+ const dom=new JSDOM('<main></main>');t.after(()=>dom.window.close())
+ const doc=dom.window.document;let state=snapshot()
+ const view=await updateSettings(doc.querySelector('main'),async(type,{method,params})=>{
+  if(method==='configure'){state.preferences=params.preferences;state.revision++}
+  return {ok:true,result:structuredClone(state)}
+ });t.after(view.close)
+ const control=name=>doc.querySelector(`[aria-label="Automatically update ${name}"]`)
+ assert.equal(control('Augmentor Agent').checked,true);assert.equal(control('DSH').checked,false)
+ for(const name of ['DSH','Codex']){control(name).checked=true;control(name).dispatchEvent(new dom.window.Event('input'))}
+ [...doc.querySelectorAll('button')].find(b=>b.textContent==='Save update preferences').click();await delay(10)
+ assert.deepEqual(state.preferences.components,{augmentor:true,dsh:true,pi:false,codex:true})
+ assert.equal(state.preferences.automaticInstall,false)
+})

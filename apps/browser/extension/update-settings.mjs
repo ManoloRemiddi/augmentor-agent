@@ -15,15 +15,21 @@ export async function updateSettings(container,send,{registerDirty=()=>{}}={}){
   for(const [value,text] of [['stable','Stable releases'],['preview','Preview releases']]){const option=make('option',text);option.value=value;channel.append(option)}
   const downloads=label('Download new versions automatically',make('input'));downloads.type='checkbox'
   const installs=label('Install automatically when Augmentor is idle',make('input'));installs.type='checkbox'
+  const components={}
+  for(const [id,name] of Object.entries({augmentor:'Augmentor Agent',dsh:'DSH',pi:'Pi',codex:'Codex'})){
+    const input=label(name,make('input'));input.type='checkbox';input.setAttribute('aria-label',`Automatically update ${name}`);components[id]=input
+  }
+  container.append(make('p','Select which components may update automatically. Bundled harnesses update with Augmentor; unchecked changes wait for your approval. Codex is managed separately.'))
   const explanation=make('p');container.append(explanation)
   const note=make('p');note.setAttribute('role','status');container.append(note)
   const release=make('a','Open release and installation instructions');release.target='_blank';release.rel='noopener noreferrer';release.hidden=true
   let state=null,busy=false,closed=false,dirty=false,revision=null
-  const controls=[checks,interval,channel,downloads,installs]
+  const controls=[checks,interval,channel,downloads,installs,...Object.values(components)]
   for(const control of controls)control.addEventListener('input',()=>{dirty=true;enable()})
   registerDirty(container,()=>dirty)
   const values=()=>({automaticChecks:checks.checked,intervalHours:Number(interval.value),channel:channel.value,
-                     automaticDownload:downloads.checked,automaticInstall:installs.checked})
+                     automaticDownload:downloads.checked,automaticInstall:installs.checked,
+                     components:Object.fromEntries(Object.entries(components).map(([id,input])=>[id,input.checked]))})
   const button=(text,fn)=>{const b=make('button',text);b.type='button';b.onclick=()=>void operate(fn);container.append(b);return b}
   const save=button('Save update preferences',async()=>{await call('configure',{revision,preferences:values()});dirty=false})
   const reload=button('Reload saved preferences',async()=>{dirty=false})
@@ -41,10 +47,17 @@ export async function updateSettings(container,send,{registerDirty=()=>{}}={}){
     else if(state.phase==='current')text+='\nNo newer compatible release was found.'
     if(state.phase==='ready')text+='\nDownload ready. Open the release instructions to install.'
     if(state.phase==='downloading')text+=`\nDownloading: ${((state.bytesDownloaded||0)/1024**2).toFixed(1)} MB`
-    info.textContent=text;note.textContent=state.error||''
+    info.textContent=text;note.textContent=state.error||state.componentUpdateBlockedReason||''
     explanation.textContent='Downloads use your internet connection and disk space. Settings are shared with Desktop. '+
       (state.automaticInstallAvailable?'Automatic installation waits for all Augmentor work to finish.':'Automatic installation is not available for this installed build. Use the release installation instructions. Reload the browser extension after updating its companion.')
-    if(!dirty){const p=state.preferences;checks.checked=p.automaticChecks;interval.value=String(p.intervalHours);channel.value=p.channel;downloads.checked=p.automaticDownload;installs.checked=p.automaticInstall;revision=state.revision}
+    if(!dirty){const p=state.preferences;checks.checked=p.automaticChecks;interval.value=String(p.intervalHours);channel.value=p.channel;downloads.checked=p.automaticDownload;installs.checked=p.automaticInstall;revision=state.revision
+      const choices=p.components??{augmentor:true,dsh:false,pi:false,codex:false};for(const [id,input] of Object.entries(components))input.checked=choices[id]
+    }
+    for(const row of state.updateComponents??[]){
+      const input=components[row.id];if(!input)continue
+      input.parentElement.firstChild.textContent=row.name+(row.version?` · ${row.version}`:'')
+      if(row.requiredVersion)input.title=`Required version: ${row.requiredVersion}. Uses its separate installation method.`
+    }
     release.hidden=!candidate
     if(candidate)release.href=candidate.releaseUrl;else release.removeAttribute('href')
   }

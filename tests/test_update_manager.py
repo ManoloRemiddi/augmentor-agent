@@ -176,6 +176,9 @@ class InstallationControllerTests(unittest.TestCase):
         (root/'release/product.json').write_text(json.dumps({'version':'1.0.0','channel':'preview',
             'protocols':{'product':'augmentor/1'},'dataSchema':1,'readableDataSchemas':[1]}))
         self.now=1000000;self.admission=Admission()
+        self.component_contract={key:{'version':'1.0.0','sha256':'e'*64,'ownership':'external' if key=='codex' else 'bundled'} for key in ('dsh','pi','codex')}
+        (root/'release/update-components.json').write_text(json.dumps({'schema':'augmentor-update-components/1','components':self.component_contract}))
+
         self.manager=UpdateManager(self.base/'state',root=root,admission=self.admission,clock=lambda:self.now)
         self.addCleanup(self.manager.close)
         self.receipts=private_directory(self.base/'receipts')
@@ -190,7 +193,7 @@ class InstallationControllerTests(unittest.TestCase):
         self.candidate={'version':'1.1.0','build':2,'sourceCommit':'b'*40,'channel':'preview','target':'windows-x64',
             'installType':'windows-inno','releaseUrl':'https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v1.1.0',
             'protocols':{'product':'augmentor/1'},'dataSchema':1,'readableDataSchemas':[1],'minimumOS':'26200',
-            'automaticInstallQualified':True,'artifacts':[artifact]}
+            'automaticInstallQualified':True,'artifacts':[artifact],'updateComponents':deepcopy(self.component_contract)}
         folder=private_directory(self.manager.base/'repository');file=folder/(digest+'.download')
         file.write_bytes(payload)
         self.manager.state.update(phase='ready',candidate=deepcopy(self.candidate),authenticated=True,

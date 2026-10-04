@@ -43,6 +43,7 @@ def candidate(root, arch, *, public_preview=False):
                  'dsh/payload.json', 'scripts/launch-windows.py', 'scripts/windows-local-health.py',
                  'scripts/windows-inspect-payload.py', 'scripts/windows-recover-source.py',
                  'scripts/verify-windows-publisher.ps1', 'release/windows/signing.json',
+                 'release/update-components.json',
                  'services/updates/windows_signing.py',
                  'services/lifecycle/source_restoration.py', 'services/lifecycle/payload_integrity.py',
                  'services/lifecycle/recovery_source.py', 'services/lifecycle/health_report.py',
@@ -54,6 +55,8 @@ def candidate(root, arch, *, public_preview=False):
         if not (root/name).is_file(): raise ValueError('Incomplete shared application payload: '+name)
     # Includes aliases/redirects and stale build output. Never reseal here: a
     # mutated staged runtime must fail intake rather than become a new baseline.
+    from updates.components import installed as installed_components
+    installed_components(root)
     verify_payload(root,(root/'release.json').read_bytes())
     return release
 

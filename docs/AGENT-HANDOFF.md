@@ -2,6 +2,35 @@
 
 # Start here: agent handoff
 
+Component follow-up host evidence: updater 280 cases (seven explicit skips),
+Node repository/Browser sixteen, Windows package seven and type checks pass.
+Native settings render was inspected after correcting clipped information through
+a scrolling body with fixed Done. Component contracts now include Pi runtime
+closure inputs; missing nested npm integrity binds the whole reviewed lock, not
+an invented supplier digest. Fresh native producer/installer checks are required;
+this is permission enforcement, not independent harness-only update qualification.
+
+
+Latest prior-source CI: focused Linux 37176868726 at `f061593` passes both complete
+native bundles. Full Windows 37177293646 (`8c5f1ca`) and 37175650042 fail. Downloaded
+broker startup evidence identifies a missing `platform_support.py` in the incoming
+fixture's partial service copy. It now copies all public staged services into its
+private disposable project. Production already has the helper; fresh native full
+qualification of this correction plus component contracts remains required.
+
+
+New user direction supersedes the old unanswered account/process questions:
+automatic install is opt-in with individual Augmentor Agent/DSH/Pi/Codex choices;
+no Apple Developer or Windows signing account/service exists; choose a secure,
+stable process with low friction. GitHub Actions with offline root custody is the
+selected recommendation. Source now adds shared choices, conservative migration,
+reviewed component input contracts and fresh installation-boundary consent checks.
+Unchecked bundled changes defer; external Codex remains separately managed.
+Independent harness-only installation is still unimplemented. See
+COMPONENT-UPDATES.md for exact scope, qualification limits and remaining work.
+Production signing/feed/automatic qualification and owner installs are unchanged.
+
+
 Latest executable checkpoint: Windows desktop 37176951136 at `2ccb7a0` is
 terminal success on x64/ARM64, including corrected early-launcher ordering and
 actual publisher trust/wrong-pin/damage checks. Package intake addition `a37d5e0`
