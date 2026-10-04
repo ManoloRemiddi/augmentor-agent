@@ -622,3 +622,14 @@ Mac 14/26 qualification is running in
 [37165336524](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37165336524).
 Handy Mac/Windows also run the actual native CAS/broker proof. Preserve those live
 runs; no CI success or installed/signed-forward update is claimed yet.
+
+Native run `d0fad01` passes actual Handy maintenance on Linux x64
+(job 111326987805), Linux ARM64 (111326987814) and Windows (111326987824), plus
+Linux owned-service and ten broker cases (111326987941) in 37165335018. Its Mac
+job 111326987806 and separate Mac dependency 111326969946 in 37165336524 fail
+on the first broker-to-Handy status request: cold native startup exceeds the
+ordinary 15-second RPC deadline. The existing component proof passes with its
+90-second startup allowance. Backend startup now uses that same bounded
+90-second allowance only for its first status; subsequent RPC limits/replay
+policy are unchanged. Both runs are terminal. Native Mac proof and skipped
+broader bundle jobs need qualification at corrected source.
