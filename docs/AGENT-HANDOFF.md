@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+Pushed component source `1f15271`: fresh native Windows desktop 37187282810,
+full Windows 37187284824, Mac 37187286385 and focused managed Linux 37187288120
+are executing. They qualify the new component producer/consent/UI contracts and
+Windows broker fixture correction; pending results must not be inferred from
+older passed sources. No release/tag, production signing/feed or installed owner
+application was changed. Independent harness-only delivery remains unfinished.
+
+
 Component follow-up host evidence: updater 280 cases (seven explicit skips),
 Node repository/Browser sixteen, Windows package seven and type checks pass.
 Native settings render was inspected after correcting clipped information through

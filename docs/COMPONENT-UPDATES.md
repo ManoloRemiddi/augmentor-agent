@@ -99,3 +99,10 @@ No owner's running application, harness installation, profile, model or GPU has 
 
 See [the full updater record](UPDATE-SYSTEM.md) for exact tested refs and prior
 platform evidence; earlier native passes do not qualify this component follow-up.
+
+Implementation source `1f15271` is pushed. Fresh native qualification is running:
+[Windows desktop](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37187282810),
+[full Windows](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37187284824),
+[Mac](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37187286385) and
+[focused managed Linux](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37187288120).
+These results remain pending; earlier native evidence is tied to its older refs.
