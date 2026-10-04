@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Editable targets for text input
+
+Maintained KDE text input now requires exactly one currently focused, showing,
+editable, nonpassword accessible control matching the captured observation.
+Focused file lists and document tabs refuse text before dispatch. Command key
+chords retain their existing policy; GNOME retains its stricter editable and
+sensitive-target checks. Focus changes consume the observation and stop partial
+text without replay. 108 focused portal, GNOME, tracing and accessibility checks
+pass. This is source validation: the rebuilt installed KDE save/Stop proof still
+needs to pass, and the later noneditable snapshot does not establish the earlier
+save failure's cause.
+
 ## October 4 KDE pointer and partial consent results
 
 [The actual Fedora 44 KDE checkpoint](../release/qualification/next-targets/20261004-kde-pointer-consent-partial-save-failure.json)

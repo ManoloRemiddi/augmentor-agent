@@ -482,12 +482,12 @@ def dispatch_traced_controller(base,trace):
                     if had_request:helper.request=prior_request
                     else:del helper.request
 
-        def keyboard_target(self,snapshot):
-            if threading.get_ident()!=self._dispatch_thread:return super().keyboard_target(snapshot)
+        def keyboard_target(self,snapshot,*,typing=False):
+            if threading.get_ident()!=self._dispatch_thread:return super().keyboard_target(snapshot,typing=typing)
             prior_snapshot=getattr(self,'_dispatch_keyboard_snapshot',None);self._dispatch_keyboard_snapshot=snapshot
             with self.trace_scope({**self._dispatch_phase,'phase':'keyboard-target'}):
                 error=None
-                try:return super().keyboard_target(snapshot)
+                try:return super().keyboard_target(snapshot,typing=typing)
                 except BaseException as failure:error=failure;raise
                 finally:
                     dispatch_record(trace,lambda:{**self.trace_context(),'event':'keyboard-guard','outcome':'error' if error else 'reply',

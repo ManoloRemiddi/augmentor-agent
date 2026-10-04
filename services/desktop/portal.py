@@ -154,7 +154,7 @@ class Portal:
                 if node is None:continue
                 try:
                     state=node.get_state_set()
-                    if state.contains(Atspi.StateType.FOCUSED) and state.contains(Atspi.StateType.SHOWING):focused.append({'path':path,'role':node.get_role_name(),'password':node.get_role()==Atspi.Role.PASSWORD_TEXT})
+                    if state.contains(Atspi.StateType.FOCUSED) and state.contains(Atspi.StateType.SHOWING):focused.append({'path':path,'role':node.get_role_name(),'password':node.get_role()==Atspi.Role.PASSWORD_TEXT,'editable':state.contains(Atspi.StateType.EDITABLE)})
                     # Hidden menus can contain hundreds of irrelevant descendants.
                     if len(path)<16 and (len(path)<2 or state.contains(Atspi.StateType.SHOWING)):
                         for j in range(min(node.get_child_count(),100)):stack.append((node.get_child_at_index(j),path+[j]))
@@ -165,11 +165,13 @@ class Portal:
         return focused
     def focus_changed(self,event,*_):
         if event.detail1:self.focus_serial+=1
-    def keyboard_target(self,snapshot):
+    def keyboard_target(self,snapshot,*,typing=False):
         focused=self.focus_info(snapshot['scene']['window']['pid'])
         if not focused:raise RuntimeError(self.focus_failure)
         if focused!=snapshot['focus']:raise RuntimeError('The focused control changed. Observe again before keyboard input.')
         if any(f['password'] for f in focused):raise RuntimeError('Password-field input is unavailable.')
+        if typing and (len(focused)!=1 or focused[0].get('editable') is not True):
+            raise RuntimeError('Text input requires one focused editable nonpassword control. No text was sent.')
     def action(self,owner,p):
         snapshot=self.target(owner,p.get('token'));scene=snapshot['scene'];window=scene['window'];kind=p.get('kind')
         try:
@@ -196,7 +198,7 @@ class Portal:
             elif kind=='type':
                 text=p.get('text')
                 if not isinstance(text,str) or not 1<=len(text)<=256 or any((ord(c)<32 and c!='\n') or ord(c)>126 for c in text):raise RuntimeError('This preview supports 1–256 ASCII characters. Unicode text requires a structured file tool.')
-                self.keyboard_target(snapshot)
+                self.keyboard_target(snapshot,typing=True)
                 for character in text:
                     # Check the actual compositor before every character, so a
                     # changed target stops a partial write instead of continuing.

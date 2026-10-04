@@ -125,7 +125,7 @@ class GnomeControl(Portal):
             self.a11y.close();return []
         return [{key:value[key] for key in ('targetPid','targetStart','epoch','pins','selectedOwner','serial','focus')}]
 
-    def keyboard_target(self,snapshot):
+    def keyboard_target(self,snapshot,*,typing=False):
         try:
             recorded=snapshot.get('focus')
             if (not isinstance(recorded,list) or len(recorded)!=1 or self.a11y is None or self.a11y.closed
