@@ -2,6 +2,29 @@
 
 # Shared application updates
 
+## Current status — October 4, 2026
+
+The shared check/notification/download service and external installation
+controllers are implemented on `feat/automatic-updates` in draft PR 32. Public
+feed and automatic-install eligibility remain disabled; no owner installation
+has been updated. Disposable installed-app evidence below is separate from
+customer distribution. Older checkpoints retain their source-specific history.
+
+| Installation | Implemented controller | Latest qualified scope and remaining boundary |
+| --- | --- | --- |
+| Windows per-user Inno, x64/ARM64 | Independent retained observer, complete component graph, Inno apply, offline completion and captured reopening | `c40926b` full run 37170465430 passes all 24 stages on both CPUs. Later `07c05af` desktop run passes junction/session admission. Signed forward N-to-N+1 remains unqualified. |
+| Linux managed per-user Desktop, x64/ARM64 | Immutable staging/selection, owned registrations and user services, completion and reopening | `0bc9639` complete native archive/relocation/Qt/portal/Handy proof passes both CPUs; service migration has separate native evidence. New full-observer cleanup at `b438ad8` passes host tests; fresh native bundle run 37174399503 is executing. |
+| Mac per-user Desktop bundle | Whole-bundle staging/replacement, persistent startup barrier, independent health and captured reopening | Prior Mac 14/26 bundle/controller evidence passes at `69477f8`; native follow-up 37174398113 at `b438ad8` is executing. Shared/system/Companion coordination and signed forward delivery remain open. |
+| Package-managed Linux, shared/system installations, custom profiles, SDK-owned hosts | Compatible discovery/manual download; installation defers where ownership cannot be coordinated | Privileged/shared-user and SDK owner lifecycle adapters require further work. A running SDK owner is preserved before any shutdown. |
+
+Real signed metadata and inert HTTP downloads now join Python installation
+authority in two passing host tests: fresh withdrawal and damaged signatures
+prevent installation. Complete Unix observer cleanup also has real kernel/file
+and copied-ELF exit evidence. These checks do not substitute for distinct signed
+forward releases, legacy bridge delivery, recovery/stage/backup retention or
+production signing/feed provisioning. See the latest detailed sections for exact
+refs, artifacts, fixture limits and pending native results.
+
 ## Implementation checkpoint — October 3, 2026
 
 This feature is under implementation on `feat/automatic-updates`, based on

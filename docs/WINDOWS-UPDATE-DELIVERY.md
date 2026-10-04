@@ -9,9 +9,20 @@ and one-shot completed-target reopening. Old Windows dictation state with inheri
 authentication grants needs manual migration; this source refuses to rewrite it.
 
 Development implementation; no customer updater or signing identity is enabled.
-Inno remains the installer and WinSparkle 0.9.4 remains the downloader and update
-notification framework. See [installer ownership](WINDOWS-INSTALLER-DECISION.md)
-and [the shared coordinator](LIFECYCLE.md). No package is executed by this layer.
+The current Desktop/Browser update service uses the shared TUF repository client
+for verified metadata/downloads and shared notifications. Its independent Windows
+controller retains Inno for installation, then verifies offline health and reopens
+captured components. Full disposable installation/repair/recovery/removal at
+`c40926b` passes both CPUs; signed forward delivery remains unqualified. See
+[current cross-platform status](UPDATE-SYSTEM.md#current-status--october-4-2026),
+[installer ownership](WINDOWS-INSTALLER-DECISION.md) and
+[the shared coordinator](LIFECYCLE.md).
+
+The following WinSparkle 0.9.4 callback/runtime evidence is historical for its
+isolated handled-download layer. It does not describe the current shared service
+or grant customer automatic-installation eligibility. That isolated callback
+never executes a package; only the qualified external controller can authorize
+Inno apply after live preparation.
 
 Bootstrap now includes the hash-pinned native WinSparkle DLL and license notices
 for each CPU. Its staged manifest records that customer checks are disabled.
