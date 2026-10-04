@@ -14,7 +14,7 @@ customer distribution. Older checkpoints retain their source-specific history.
 | --- | --- | --- |
 | Windows per-user Inno, x64/ARM64 | Independent retained observer, complete component graph, Inno apply, offline completion and captured reopening | `c40926b` full run 37170465430 passes all 24 stages on both CPUs. `40af948` full run and `0cb79e0` desktop run also pass both CPUs. Actual publisher checks pass at `79c5e58`; overall desktop ordering correction needs fresh qualification. Signed forward N-to-N+1 remains unqualified. |
 | Linux managed per-user Desktop, x64/ARM64 | Immutable staging/selection, owned registrations and user services, completion and reopening | `d8de284` complete native archive/relocation/Qt/portal/Handy proof and ten new retention/handoff/signed-authority cases pass both CPUs; service migration has separate native evidence. Main integration exposed an ARM toolchain map omission; corrected `f061593` run 37176868726 is dispatched. |
-| Mac per-user Desktop bundle | Whole-bundle staging/replacement, persistent startup barrier, independent health and captured reopening | Merged `0cb79e0` full run 37175652699 passes macOS 14; macOS 26 remains live. Earlier retention fixture failures are preserved below with their corrections. Shared/system/Companion coordination and signed forward delivery remain open. |
+| Mac per-user Desktop bundle | Whole-bundle staging/replacement, persistent startup barrier, independent health and captured reopening | Merged `0cb79e0` full run 37175652699 passes macOS 14 and 26; both downloaded updater reports pass. Earlier retention fixture failures are preserved below with their corrections. Shared/system/Companion coordination and signed forward delivery remain open. |
 | Package-managed Linux, shared/system installations, custom profiles, SDK-owned hosts | Compatible discovery/manual download; installation defers where ownership cannot be coordinated | Privileged/shared-user and SDK owner lifecycle adapters require further work. A running SDK owner is preserved before any shutdown. |
 
 Real signed metadata and inert HTTP downloads now join Python installation
@@ -2197,3 +2197,19 @@ verification succeeds on each disposable incomplete build while package intake
 refuses. Policy enablement/pins remain separately required for automatic
 installation. The live `0cb79e0` full Windows run predates this addition and the
 publisher gate, so cannot qualify their combined installed execution.
+
+Merged full Mac
+[37175652699](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37175652699)
+at `0cb79e0` is now terminal success on macOS 14 and 26. Both independently
+downloaded `augmentor-macos-source-proof/1` reports have `passed: true`, actual
+retained exec, inherited bootstrap lock, production refusal for development
+signing, unchanged source/backup, same-build atomic fixture apply, persistent
+pending-start refusal, offline target health and one-shot archived completion.
+Payload SHA-256 is `d4ac2c6a7b4f86c6d6e9ac82145f785cde63096051540cff959e143893b42ca5`
+(Mac 14) and `ad7b898c73a460c061273a109a6551c39d4a4a0bea9bca96e893f79dea189056`
+(Mac 26); common release SHA-256 is
+`6d08c89c8de3bbb8a2cb13b1a8ea2ba24e5e9f2f19fed09c49bb31b7ca1a71cd`.
+The reports explicitly exclude signed forward installation, observed reopening,
+normal login/user installation and automatic publisher authority; passing workflow
+status does not waive those limits. Subsequent Windows-only changes are outside
+this source ref. No owner installation or publisher configuration changed.

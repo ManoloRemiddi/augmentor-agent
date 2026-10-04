@@ -2,6 +2,14 @@
 
 # Start here: agent handoff
 
+Merged full Mac 37175652699 at `0cb79e0` is terminal success on macOS 14/26.
+Both downloaded updater reports pass actual retained exec/development-signing
+refusal, same-build apply, persistent pending-start refusal, offline health and
+archived completion. They explicitly exclude signed forward installation,
+observed reopening and normal user/publisher acceptance. Exact report digests are
+recorded in UPDATE-SYSTEM.md; later Windows-only changes are outside this ref.
+
+
 Windows package intake now requires the source publisher policy, fixed verifier
 script and verifier module even when a producer seals an otherwise consistent
 fresh inventory. Seven package cases pass, including valid-inventory omission
