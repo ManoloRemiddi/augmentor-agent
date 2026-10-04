@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+Merged source `0cb79e0`: Windows desktop run 37175651402 passes both CPUs,
+including the actual default-state/read-only scope check. Prior full login-guard
+run 37172411318 at `40af948` is terminal success on both CPUs. New full Windows
+37175650042 and Mac 37175652699 remain live; no result is inferred. Merged Linux
+37175654420 fails before ARM Rust compilation: the incoming host-selector map
+omitted `linux-aarch64`. Its exact native GNU host entry is restored; x64 Handy
+had passed, but complete bundles skipped because ARM failed. Fresh native Linux
+qualification is required. The superseded 8e0d472 full Windows run 37174066782 was
+cancelled while pending with zero started jobs; no live evidence was discarded.
+
 Windows automatic installation now additionally requires valid timestamped embedded
 Authenticode and an explicit source-payload SHA-256 public-key pin. Fixed bundled
 PowerShell performs read-only OS verification with user module/profile injection

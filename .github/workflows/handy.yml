@@ -49,7 +49,7 @@ jobs:
         if: steps.component-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          host=$(python -c "import platform,sys; print({'linux-x86_64':'x86_64-unknown-linux-gnu','darwin-arm64':'aarch64-apple-darwin','win32-AMD64':'x86_64-pc-windows-msvc','win32-ARM64':'aarch64-pc-windows-msvc'}[sys.platform+'-'+platform.machine()])")
+          host=$(python -c "import platform,sys; print({'linux-x86_64':'x86_64-unknown-linux-gnu','linux-aarch64':'aarch64-unknown-linux-gnu','darwin-arm64':'aarch64-apple-darwin','win32-AMD64':'x86_64-pc-windows-msvc','win32-ARM64':'aarch64-pc-windows-msvc'}[sys.platform+'-'+platform.machine()])")
           rustup set default-host "$host"
           rustup toolchain install "1.97.1-$host" --profile minimal --component rustfmt,clippy,rust-docs
           rustup default "1.97.1-$host"

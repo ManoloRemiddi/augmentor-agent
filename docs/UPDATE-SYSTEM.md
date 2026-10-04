@@ -2153,3 +2153,22 @@ workflows invoke the dedicated case with an explicit fixture root; execution is
 pending for this source. Mac/Linux signature policies are unchanged. Feed and
 automatic eligibility remain disabled, and owner installations/settings are
 untouched.
+
+Merged-source qualification at `0cb79e0`: Windows desktop run 37175651402 is
+terminal success on x64 and ARM64, including actual fixed-client/private
+authentication, default standard-data scope without state creation, junction
+refusal and broker lease/cancel/drain/reopen cases. Earlier full Windows
+37172411318 at `40af948` is also terminal success on both CPUs, independently
+qualifying the generic login guard with the full installed application. New full
+Windows 37175650042 and full Mac 37175652699 remain live for the merged source.
+Superseded full Windows 37174066782 at `8e0d472` was cancelled only while pending
+with no started jobs, before dispatching the merged source; no live job was
+cancelled. It contributes no native signature bridge evidence.
+
+Merged Linux run 37175654420 fails before compiling ARM Handy: the incoming Rust
+host-selection map omits `linux-aarch64` and raises that exact KeyError. The
+explicit `aarch64-unknown-linux-gnu` host mapping is restored. x64 Handy passed,
+but complete two-CPU bundles were skipped after the ARM prerequisite failure.
+Fresh native Linux execution must qualify the corrected source; earlier
+`d8de284` successes do not qualify this merge. No production eligibility/feed,
+signing credential or owner installation was changed.
