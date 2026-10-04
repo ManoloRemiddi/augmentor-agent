@@ -9,6 +9,9 @@ All 80 DSH 0.2 contracts, 96 Browser and 28 focused native cases pass, as do
 type/build checks. [DSH compatibility](DSH-0.2-COMPATIBILITY.md#october-4-integrated-source-merge-qualification)
 records scope; hosted platform/package checks remain the merge gate. Public
 installer pins and installed applications are unchanged.
+The first hosted Linux run found a stale Browser-plugin pnpm lock. Its exact-version
+correction, passing frozen install, 516-case locked-DSH Node suite and real SDK
+proof are recorded in the compatibility guide; fresh hosted validation is required.
 
 ## October 3 DSH 0.2 compatibility
 
