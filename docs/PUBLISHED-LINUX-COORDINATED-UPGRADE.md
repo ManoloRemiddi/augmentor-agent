@@ -205,3 +205,75 @@ remain unchanged. Historical161 files are included in ending preservation checks
 An independent full root ending audit remains mandatory. The actual run failed at installation
 and does not qualify upgrade or rollback; a later rollback needs its own
 reviewed binding to an actually successful new integration outcome.
+
+## October 4 fresh ext4 baseline and separate source candidate
+
+A separate ordinary home on an owned ext4 volume now has an actual successful
+published 0.2.12 managed adoption: the unchanged managed worker exited successfully
+in 10.16 seconds, with zero model requests and all three Page histories and their
+compressed snapshots preserved. The initial ending scanner refused its old
+40,000-member limit; that refusal remains retained. A separate bounded read-only
+ending audit checked the actual 63,620-member home, full native and managed
+inventories, idle processes/sockets/ports/leases, the retained journals and all
+127 closed foreign hardlink groups. Its reviewed aggregate receipt identifies
+actual run `d8819753…`, managed artifact `9cda9c48…` and ending receipt
+`cc83cccd…`. This qualifies the fresh baseline, not an upgrade or rollback.
+
+The new **source-only** entrypoint is
+[`release/prove-published-linux-freshhome-coordinated.py`](../release/prove-published-linux-freshhome-coordinated.py),
+with explicit `upgrade` and `rollback` modes. It leaves the executed historical
+coordinator byte-identical and imports only its hash-pinned preservation and
+normal action helpers. It never calls the historical default or staged-failure
+entrypoints, substitutes their constants, or adopts the old container's pending
+integration. No new native transaction or integration has executed for this entry.
+
+Root authority is separate under `/opt/augmentor-freshhome-coordinated174/`:
+`admission.json`, the exact genuine `baseline-ending.json`, and a fresh
+`upgrade-binding.json` or `rollback-binding.json`. Every file and ancestor must
+be root-owned, nonlinked and unwritable by the ordinary user. Input reads are
+bounded and descriptor/path identity checked before and after reading. Reviewed
+helper bytes are checked before import; the worker holds both normal native
+shared leases before package audits through normal child cleanup and exit.
+
+Admission format `augmentor-published-freshhome-admission/1` identifies the actual
+fresh container/image, named ext4 home volume, fresh root marker, seed/export
+receipts, baseline run, complete selected012 object and exact current/original
+selector hashes, reviewed whole-home delta and genuine aggregate ending receipt.
+`foreignHomeAliasGroups` binds the actual 127 groups/255 paths by a fixed topology
+hash. `foreignHomeAliasRows` binds each path's SHA, bytes, UID/GID, mode, device,
+inode, link count, modification time and actual change time. Only the seven existing foreign profile
+dependency prefixes and their exact closed pnpm cache aliases can be read; no
+cache scan or modification occurs. All 255 paths are reread at entry and ending
+with stable descriptor/path identity, including change time during each read.
+`historicalJournals` binds the exact snapshots of the three retained history
+journals and the genuinely new managed baseline journal.
+
+Phase binding format `augmentor-published-freshhome-coordinated-binding/1` adds
+`admissionSha256`, `coordinatorSha256`, the new `proofSha256` and unique 64-hex
+`runToken`. It retains the same 300-second age, native audit and separately known
+APT transaction predicates, exact five `settingsBefore` hashes, profile
+`foreignHardlinks` rows and `dshCli` topology. Rollback additionally binds an
+actually successful upgrade run produced by this same new entry and admission,
+with a different token. The two new journals are
+`published-product-freshhome-coordinated-{upgrade,rollback}174`; preexisting
+folders refuse. Normal stage/install/restart/check/save/activate or rollback is
+still once-only and durably journalled; an unknown outcome is terminal.
+
+Normal SDK startup in the actual fresh baseline changed only the timestamps of
+`profiles/web/cordis.yml`. The explicit fresh-only predicate permits that known
+mtime/ctime movement while stable SHA/bytes/UID/GID/mode/device/inode/link count
+remain exact. All other foreign profile rows, owned backups, preset content,
+provider/token/settings preservation, Page histories and no-replay rules retain
+the historical strict checks. A compact new stage receipt records the full
+normal verifier result's hash and deployment identity; it avoids duplicating a
+large inventory inside the new journal. Full managed inventory verification
+still uses the unchanged normal verifier.
+
+The 19 new source/disposable-file tests and 27 existing coordinator tests pass.
+They cover foreign/stale/unknown authority, separate native cohorts, actual
+namespace/mount predicates, exact closed alias reads, immutable source topology,
+rollback admission, compact inventory receipts and refusal of every material
+`cordis.yml` change. They do not qualify a native transaction, SDK integration,
+model use or actual upgrade/rollback. Root must stage genuine immutable authority
+and perform independent ending audits after separately reviewed transactions;
+a source draft or component-only ending receipt cannot satisfy admission.
