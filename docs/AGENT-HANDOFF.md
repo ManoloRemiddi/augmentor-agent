@@ -2,6 +2,20 @@
 
 # Start here: agent handoff
 
+Windows automatic installation now additionally requires valid timestamped embedded
+Authenticode and an explicit source-payload SHA-256 public-key pin. Fixed bundled
+PowerShell performs read-only OS verification with user module/profile injection
+removed; fresh metadata, source and consent are rechecked after this bounded work.
+The service refuses automatic capability when publisher policy is missing/disabled.
+The checked-in signing policy is disabled with no keys; no account/certificate is
+created or guessed. Source pins permit planned key rollover, but rotating-key
+signing services need an appropriate verified profile adapter once the owner
+selects a provider. Native Node signer/wrong-pin/damage inspection is a dedicated
+Windows fixture, never Augmentor publisher provisioning or target execution.
+Portable signing three cases and broad updater 269 (seven explicit skips) pass;
+fresh native signer qualification is pending. New source requires its signing
+module in retained observers. All production automatic/feed flags remain false.
+
 Before merged native qualification: full Mac correction run 37174632213 at
 `54a988d` is terminal failure on both versions after passing all 265 updater cases,
 including five actual native retention cases and real signed authority. Full

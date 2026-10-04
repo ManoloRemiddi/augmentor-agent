@@ -932,3 +932,12 @@ fixture factory canonicalizes only macOS's own temporary-directory alias; the
 collector still refuses redirected inputs. Managed Linux x64/ARM64 builds now run
 all five retention, three copied-ELF handoff and two real signed-authority cases on
 the native host after locked Node dependencies are installed, before packaging.
+
+`test_update_windows_signing.py` has three portable publisher-policy/report cases
+and one separately gated native case. Native desktop/full builds explicitly set
+`AUGMENTOR_WINDOWS_SIGNING_PROOF_ROOT` to their hash-locked disposable runtime;
+the fixed verifier inspects Node's real timestamped Authenticode signature,
+matching/wrong qualification pins and damaged copied bytes. It never executes
+Node as a target, creates a certificate or changes the disabled Augmentor policy.
+Without that dedicated Windows root the native case explicitly skips. This is
+OS verification evidence, not signed Augmentor installer/forward qualification.

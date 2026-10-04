@@ -59,6 +59,11 @@ def coordinate(root, base, updates, shared, managed, peer, release_bytes, invent
         def revalidate(stage):
             peer.live()
             authority.check(stage)
+            # Current source is inspected and held against replacement; the
+            # retained candidate descriptor prevents mutation during OS trust.
+            from .windows_signing import verify
+            verify(root,candidate['path'])
+            authority.check(stage)  # Recheck consent/source/metadata after bounded OS trust work.
             peer.live()
             return True
         graph=WindowsPreparation(root,runtime,require_directory(Path(shared)),Path(managed))

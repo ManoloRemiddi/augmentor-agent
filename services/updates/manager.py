@@ -109,6 +109,9 @@ class UpdateManager:
             except (OSError,ValueError):return False
         if sys.platform!='win32' or self.current['installType']!='windows-inno':return False
         from platform_adapters.windows_identity import local_app_data
+        from .windows_signing import policy
+        try:policy(self.root)
+        except (OSError,ValueError):return False
         base=local_app_data()/'Augmentor'
         # Source checkouts, custom data/installation locations and older bridge
         # builds retain manual downloads until their adapter is qualified.

@@ -2104,3 +2104,52 @@ archives and actual relocation/Qt/portal/Handy verification. Earlier narrower
 (ARM64). Those two reports independently mark `installationExercised: false` and
 `automaticInstallQualified: false`. Neither source includes the latest main
 integration; no owner installation or signing/feed configuration changed.
+
+### Windows OS publisher identity gate
+
+The production Windows controller now supplements fresh TUF signatures and exact
+retained installer bytes with the native Windows publisher trust decision. Its
+original inspected source payload supplies an explicit policy of up to three
+SHA-256 X.509 SubjectPublicKeyInfo pins. Candidate metadata, filenames, signer
+display names and environment variables cannot supply that policy. The default
+`release/windows/signing.json` is disabled with no pins; missing, disabled or
+malformed policy removes automatic-install capability and refuses before target
+inspection. No certificate, private key, trust-store entry or account is created.
+
+The fixed bundled PowerShell/verifier script reads the exact held candidate path,
+requires a Valid embedded Authenticode signature and timestamp certificate,
+exports the actual signing public key, and returns a bounded typed report. User
+profiles and external module directories are excluded; diagnostics are not echoed.
+Wrong publisher keys, unsigned/damaged/untrusted/untimestamped payloads, unknown
+reports and changed source policy refuse. Production revalidation checks the OS
+signature before any shutdown and again at later authority boundaries, then
+refreshes signed metadata and current consent/source/bytes after bounded trust
+work. No inspected target is executed by this verifier. The retained observer
+requires its public Python signing module; the verifier/runtime/policy remain
+part of the held, completely inspected original installation before APPLY.
+
+The API behavior follows Microsoft’s
+[Authenticode inspection](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/get-authenticodesignature?view=powershell-7.6),
+[timestamp certificate property](https://learn.microsoft.com/en-us/dotnet/api/system.management.automation.signature.timestampercertificate?view=powershellsdk-7.4.0)
+and [public-key SPKI export](https://learn.microsoft.com/dotnet/api/system.security.cryptography.x509certificates.publickey).
+Catalog-only signatures are conservatively refused for the downloaded installer.
+Pins require planned rollover in a still-trusted source build before changing
+signing keys; same-key certificate renewal retains its pin. A provider that rotates
+keys automatically requires a qualified stable publisher/profile identity adapter
+rather than silently accepting a new key from online release metadata. The owner’s
+signing provider/custody answers remain required before choosing that policy or
+promoting automatic eligibility. This default does not claim cloud-signing
+compatibility or provision a production identity.
+
+Three portable cases pass for policy refusal, exact pins/source immutability and
+fixed bounded inspection with module-injection refusal. Broad host updater tests
+pass 269 with seven explicit platform/context skips. Dedicated Windows native
+qualification reads the actual hash-locked bundled Node executable’s timestamped
+signature, tests matching/wrong fixture pins and damaged copied bytes, and verifies
+the original hash is unchanged. Those pins belong only to an independently
+observed stock Node fixture; no Augmentor policy/certificate is installed or
+enabled, and the target is never executed. Native desktop and full Windows
+workflows invoke the dedicated case with an explicit fixture root; execution is
+pending for this source. Mac/Linux signature policies are unchanged. Feed and
+automatic eligibility remain disabled, and owner installations/settings are
+untouched.

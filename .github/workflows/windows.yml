@@ -144,6 +144,13 @@ jobs:
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_recovery_observer.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify actual Windows publisher trust without executing the target
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        env:
+          AUGMENTOR_WINDOWS_SIGNING_PROOF_ROOT: outputs/payload
+        run: |
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_update_windows_signing.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise the actual bundled dictation broker and private state
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         env:

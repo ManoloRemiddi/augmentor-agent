@@ -1,0 +1,5 @@
+{
+  "schema": "augmentor-windows-signing/1",
+  "enabled": false,
+  "publicKeySHA256": []
+}
