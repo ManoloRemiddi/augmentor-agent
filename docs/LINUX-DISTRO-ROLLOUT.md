@@ -1,5 +1,24 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 host recovery
+
+The host crashed after the October4 test round. Source, raw reports, native/source
+artifacts and all five reusable VM disks survived. The [persistent test lab](LINUX-TEST-LAB.md)
+now owns separate standalone checkpoints, registered libvirt machines and fresh
+working generations. Old active-fixture/PID/session statements below are dated
+pre-crash observations, not instructions to restart old controllers. Arch's completed
+environments are containers, with no retained Arch desktop VM. See the
+[recovery record](../release/qualification/next-targets/20261005-persistent-linux-test-lab.json).
+
+GNOME218's recovered actual evidence passes center/edge clicks, exact text, save,
+stale-token refusal, visible Stop and full independent preservation/cleanup. Its
+password/focus-race cases remain open and production input remains disabled.
+Mint's renderer sandbox passes while normal readiness fails before a prompt; the
+original failure and final guest-only diagnostic remain retained. KDE's normal
+hide247 passed; complete graphical/password acceptance remains open. Hosted
+validation37236980122 passes all11 jobs at eb33120; it precedes this infrastructure
+change and does not qualify the recovered machines or a release.
+
 ## Current five-point acceptance status — October 4
 
 The entries below summarize the completed evidence and remaining acceptance work;

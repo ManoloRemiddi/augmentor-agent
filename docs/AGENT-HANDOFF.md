@@ -1,5 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 host crash and persistent test machines
+
+[Persistent Linux test machines](LINUX-TEST-LAB.md) owns recovery, local controls,
+checkpoints, update-test generations and independent backups. Five installations
+survived: Ubuntu, Fedora GNOME/KDE, Mint and Leap. Arch's retained environments
+are containers. New libvirt user-session definitions and standalone checkpoints
+use separate DATA storage and writable working generations; autostart is disabled.
+The original disks and reports remain historical evidence. Old PID/session/token
+controls must not be replayed after a host reboot. See the
+[actual recovery record](../release/qualification/next-targets/20261005-persistent-linux-test-lab.json)
+for disk checks, restore observations and remaining backup/release limits.
+
+GNOME218's recovered report passes finite center/edge clicks, exact ASCII text,
+one save, stale-token refusal, visible Stop and independent preservation/cleanup.
+Production input remains disabled; password/focus-race gates and the recorded
+visual target-cleanup limitation remain. Fedora's normal hide247 passed before
+the crash; full KDE input/password acceptance is still open. Mint Browser readiness
+is still unqualified. All11 hosted checks passed at eb33120 before this subsequent
+test-infrastructure change; they do not qualify new VM definitions or releases.
+
 ## Current acceptance summary — October 4
 
 Use the [five-point status table](LINUX-DISTRO-ROLLOUT.md#current-five-point-acceptance-status--october-4)

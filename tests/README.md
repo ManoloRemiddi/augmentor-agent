@@ -43,6 +43,13 @@ live-model vision quality or installed/macOS qualification.
 
 # Verification map
 
+`python3 -m unittest discover -s tests -p test_linux_test_lab.py -v` checks the
+[persistent Linux test lab](../docs/LINUX-TEST-LAB.md): actual QEMU disk bytes and
+source preservation, rejected damaged images, changed domain/backing identities,
+resource admission, saved-memory refusal, interrupted registration and shutdown
+without force. The two image-tool cases require QEMU and are explicitly skipped
+when unavailable; unit checks are separate from actual guest boot/login evidence.
+
 Run from the repository root. The [agent handoff](../docs/AGENT-HANDOFF.md)
 records the last qualified implementation and CI URL. The
 [workflow](../.github/workflows/validate.yml) specifies clean Debian dependencies,

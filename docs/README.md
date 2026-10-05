@@ -89,6 +89,8 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 
 ## Setup, operations and distribution
 
+- [Persistent Linux test machines](LINUX-TEST-LAB.md): retained OS checkpoints,
+  libvirt restart controls, update testing and host-crash recovery.
 - [Published Linux coordinated upgrade and rollback](PUBLISHED-LINUX-COORDINATED-UPGRADE.md): actual managed 0.2.12 baseline acceptance; separate native/integration/selection candidate remains source-only.
 - [Linux distribution rollout: implementation order and qualification gates](LINUX-DISTRO-ROLLOUT.md)
 - [Owned GNOME shortcut qualification](LINUX-GNOME-SHORTCUT-PROOF.md): selected-runtime guards, actual two-window Settings and separate native-delivery phases.

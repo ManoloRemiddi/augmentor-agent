@@ -198,6 +198,12 @@
       "passwordDigitsEntered": false,
       "normalPasswordAuthenticationQualified": false,
       "lockPolicyChanged": false
+    },
+    "recoveredNormalHide247": {
+      "status": "PASS_BEFORE_HOST_CRASH",
+      "receiptSha256": "828c571e4b885cd4a6f214e9ee14a181dc6f8731c8feb2af273a9b83b6db5d4f",
+      "completeGraphicalInputQualified": false,
+      "passwordAuthenticationQualified": false
     }
   },
   "gnome50": {
@@ -222,6 +228,22 @@
       "wholeCacheUnchanged": true,
       "inputQualified": false,
       "productionInputEnabled": false
+    },
+    "recoveredFinitePositive218": {
+      "summarySha256": "4f9a6f16e7718e0425734b99df54e9fe9ffd51c4210bfe31ca3fbea33c317127",
+      "actualCenterCount": 1,
+      "actualEdgeCount": 1,
+      "actualSavedChordCount": 1,
+      "exactAsciiTextObserved": true,
+      "staleCaptureTokenRefused": true,
+      "actualVisibleStopRequestedAndClosed": true,
+      "cleanupSeconds": 0.08798524500025451,
+      "probeHelperAndTargetAbsent": true,
+      "fullNativeSelectedProtected20PointersAndCacheExact": true,
+      "productionInputEnabled": false,
+      "passwordAndFocusRaceCasesComplete": false,
+      "visualTargetCleanupAdmissionIncomplete": true,
+      "noAutomaticReplayAfterCrash": true
     }
   },
   "ubuntu24": {
@@ -631,7 +653,7 @@
     "historyRewritten": false
   },
   "mint223Graphical": {
-    "status": "RUNNING_SEPARATE_CORRECTED_EXTERNAL_PROOF",
+    "status": "SANDBOX_PASS_NORMAL_READINESS_FAIL_DIAGNOSTIC_RETAINED_AFTER_HOST_CRASH",
     "nativeBrowserInstall": "PASS_AUTHENTICATED_OFFLINE_EXACT_ONE_PACKAGE",
     "nativeBrowserVersion": "153.0.8010.52~linuxmint1+mint22.3",
     "nativeBrowserDebSha256": "9f1151d39cf1bf5956d0f3a6234a229eb68e39a6264f92c75b519a2762729983",
@@ -652,6 +674,39 @@
     "startupBudgetSeconds": 60,
     "reconnectBudgetSeconds": 30,
     "graphicalAcceptanceQualified": false,
-    "physicalAudioQualified": false
+    "physicalAudioQualified": false,
+    "correctedGraphicalAttempt": {
+      "status": "FAIL_NORMAL_READINESS_BEFORE_PROMPT",
+      "outcomeSha256": "b1c34fada265282e1101e851453e452e39fd648f6bfd31de396f82dc7e62d896",
+      "independentEndingSha256": "2cd4255f9f3ea81c372ad1ea9d60013cb7d00a23328af5f52f89ecf8cb031b9a",
+      "rendererSandbox": "PASS_ACTUAL_FIVE_RENDERER_DESCENDANTS",
+      "rendererSeccompFilterMode": 2,
+      "rendererNoNewPrivileges": true,
+      "rendererDistinctPidAndNetworkNamespaces": true,
+      "normalSandboxFlags": true,
+      "extensionLoaded": true,
+      "ordinaryStartupBudgetSeconds": 60,
+      "nativeRpcBudgetSeconds": 20,
+      "exactTimedOutRpcEstablished": false,
+      "promptOrSessionActionsStarted": false,
+      "saved57AndNativeIdleEnding": "PASS",
+      "productBudgetsWidened": false,
+      "graphicalStopAndReconnectQualified": false,
+      "originalWrapperUnknownOutcomePreserved": true
+    },
+    "maintainedCollectorHostedValidation": {
+      "sourceRevision": "eb33120bb03babf5b885d5a2b8bc79959af74067",
+      "runId": 37236980122,
+      "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37236980122",
+      "status": "PASS",
+      "successfulJobs": 11
+    }
+  },
+  "hostCrashRecovery": {
+    "date": "2026-10-05",
+    "historicalVmPidSessionAndActionControlsReusable": false,
+    "newInfrastructureRecord": "20261005-persistent-linux-test-lab.json",
+    "originalReportsAndDisksSurvived": true,
+    "applicationReleaseQualifiedByRecovery": false
   }
 }
