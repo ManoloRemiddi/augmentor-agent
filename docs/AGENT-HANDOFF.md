@@ -2,14 +2,19 @@
 
 # Start here: agent handoff
 
-## October 5 merge and publication request
+## October 5 dictation repair downloads — live
 
-The owner confirms the recording overlay is fixed and authorizes merge/publication
-for everyone downloading Augmentor. PR #39 merged as `ea1c620` after 28 checks
-passed. [The preview-3 release ledger](HANDY-DOWNLOADS-2026-10-05.md) tracks matched
-Linux/Mac/Windows source, required qualification, publication and website adoption.
-Prepare all platforms before publishing any; preserve immutable earlier assets
-and the owner's compatible installed 0.2.11 build/open chats.
+The owner confirmed the recording overlay and authorized publication. PR #39
+is merged; release preparation PR #40 is merged as `a45a4dc821e0e8ca744f81452025c3ddc807898b`.
+Linux, Apple-silicon Mac and Windows x64/ARM64 preview 3 all retain source
+`3d1e6153f1e3aed86f56d915d60cd1d55ea49190`. Eight exact-source workflows pass; all 35 public
+assets pass anonymous full-byte hashing. The live website selects this cohort;
+[the October 5 release ledger](HANDY-DOWNLOADS-2026-10-05.md) records sizes, digests,
+qualification, deployed website/copy binding and physical acceptance boundaries.
+Preserve immutable older assets, the owner’s compatible installed 0.2.11 build and
+open conversations. Owner-reported restart restores the compatible installed native component before
+a status probe; it reports enabled/ready on Ctrl+Space with no tray/error.
+Mac/Windows physical microphone acceptance remains separate from package checks.
 
 ## October 5 animated dictation overlay
 
@@ -23,8 +28,9 @@ and without legacy rendering flags. Compatible 0.2.11 release `20261005-095559-8
 selected, and its automatically started dictation component is enabled/ready in
 the unchanged Wayland session. Sealed inventories verify and settings remain
 unchanged. Login startup is enabled/active; existing Desktop/Mobile chats retain
-their earlier running build. Owner visual acceptance and an actual reboot remain
-separate checks. Preserve open conversations; public download bytes are unchanged.
+their earlier running build. At this adoption checkpoint, owner visual/reboot
+acceptance and customer publication were pending. The confirmed repair, observed
+restart recovery and live preview-3 downloads are recorded above.
 
 ## October 5 dictation reboot recovery
 
@@ -121,7 +127,7 @@ this pair. The alignment guide records exact run URLs, the requirement audit
 and four inspected Chromium component
 renders. These source checks do not promote a release or migrate an app.
 
-## October 3 Handy publication — current
+## October 3 Handy publication — historical preview 2
 
 PR #30, icon/session-isolation PR #33 and matched packaging/lifecycle PR #35
 are merged. PR #35 squash is `5d4ab848e2d8e1e49a030fa2c139e6b7d65ce009`;

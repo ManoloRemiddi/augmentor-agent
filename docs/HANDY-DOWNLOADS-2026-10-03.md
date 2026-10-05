@@ -2,6 +2,8 @@
 
 # October 3 matched downloads with embedded Handy
 
+Historical immutable preview-2 cohort. Current website downloads and repaired startup/overlay are recorded in [October 5 preview 3](HANDY-DOWNLOADS-2026-10-05.md).
+
 All three preview-2 releases include system dictation powered by Handy, configured
 inside Augmentor and available to the focused OS application. No separate Handy
 installation or tray is required. Settings select/download the transcription

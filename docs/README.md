@@ -4,7 +4,7 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
-- [Handy repair downloads — October 5](HANDY-DOWNLOADS-2026-10-05.md): preview-3 preparation, merged startup/rendering repair, matched qualification/publication and website adoption.
+- [Handy repair downloads — October 5](HANDY-DOWNLOADS-2026-10-05.md): published preview 3, merged startup/rendering repair, all-platform qualification, full-byte verification and live website adoption.
 - [Historical published Handy downloads — October 3](HANDY-DOWNLOADS-2026-10-03.md): matched Linux/Mac/Windows preview 2, verified public bytes, qualification and physical acceptance boundaries.
 
 See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualified Linux upgrade and temporary history bridge.

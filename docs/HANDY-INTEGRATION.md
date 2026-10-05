@@ -2,16 +2,19 @@
 
 # Embedded Handy dictation
 
-## October 5 confirmed repair and matched release preparation
+## October 5 confirmed repair and published matching downloads
 
 The owner confirms the installed overlay repair works. PR #39 is merged as
 `ea1c620569f98a8a72b8682fc647b4c476ecd7ac`; all 28 checks pass at reviewed head
 `08510c30b043490da05ec34bcede696d3842f66f`, with an identical merge tree.
-[The October 5 release ledger](HANDY-DOWNLOADS-2026-10-05.md) owns preparing and
-qualifying preview 3 on Linux, Mac and both Windows CPUs before publication.
+[The October 5 release ledger](HANDY-DOWNLOADS-2026-10-05.md) records published
+preview 3 on Linux, Mac and both Windows CPUs, eight passing source/package
+workflows, anonymous full-byte verification of all 35 assets and live website adoption.
 The earlier implementation/adoption evidence below is historical; owner visual
-acceptance is now confirmed, while actual reboot acceptance remains separate.
-Existing public preview-2 bytes stay immutable until the new cohort is published.
+acceptance is confirmed. After the owner reported a physical restart, native Handy
+was already running before a status probe and reported enabled/ready on Ctrl+Space
+with no tray/error. Fresh microphone/visual acceptance after restart is separate.
+Earlier public preview-2 bytes remain immutable; current website downloads use preview 3.
 
 ## October 5 animated overlay rendering
 
@@ -62,11 +65,13 @@ no error and no tray. It retains the owner's Wayland backend with no WebKit/GL
 environment override. Desktop and Mobile chats remain online/voice-available on
 their earlier build, with an update pending; neither was restarted. The stable
 login service is enabled/active and reads the selected release on next login.
-The prior reboot recovery is carried forward. No actual reboot or owner-session
-physical microphone/visual acceptance is claimed; these remain owner retests.
+The prior reboot recovery is carried forward. At this earlier adoption checkpoint,
+actual reboot and owner-session microphone/visual acceptance were pending.
+The subsequent confirmed overlay repair and observed restart recovery are recorded above.
 
-Public preview-2 downloads retain their prior immutable bytes. PR #39 is a source
-candidate; this repair does not imply a merged PR or updated public downloads.
+At this installed checkpoint, public preview-2 bytes were unchanged and PR #39
+was a source candidate. Its subsequent merge and public preview-3 adoption are
+recorded above and in the October 5 release ledger.
 
 ## October 5 reboot startup recovery
 
