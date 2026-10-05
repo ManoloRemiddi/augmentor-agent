@@ -49,6 +49,83 @@ class DictationTests(unittest.TestCase):
         self.backend.owner=None
         self.assertTrue(self.backend.idle_ready())
 
+    def test_saved_enabled_startup_retries_without_status_or_settings_requests(self):
+        self.backend.preferences['enabled']=True;self.backend.save()
+        before=self.backend.statefile.read_bytes()
+        with patch.object(broker.time,'monotonic',return_value=100),patch.object(self.backend,'start',side_effect=[TimeoutError('Cold startup'),None]) as start,patch.object(broker.sys,'stderr'):
+            self.backend.restore_enabled()
+            self.backend.restore_enabled()
+            self.assertEqual(start.call_count,1)
+            self.assertEqual(self.backend.statefile.read_bytes(),before)
+            with patch.object(broker.time,'monotonic',return_value=110):self.backend.restore_enabled()
+            self.assertEqual(start.call_count,2)
+
+    def test_disabled_or_running_component_is_not_automatically_started(self):
+        from unittest.mock import Mock
+        with patch.object(self.backend,'start') as start:
+            self.backend.restore_enabled();start.assert_not_called()
+            self.backend.preferences['enabled']=True
+            self.backend.child=Mock();self.backend.child.poll.return_value=None
+            self.backend.restore_enabled();start.assert_not_called()
+
+    def test_exited_component_releases_resources_before_replacement(self):
+        from unittest.mock import Mock
+        self.backend.preferences['enabled']=True
+        self.backend.child=Mock();self.backend.child.poll.return_value=1
+        order=[]
+        with patch.object(self.backend,'stop',side_effect=lambda:order.append('stop')),patch.object(self.backend,'start',side_effect=lambda:order.append('start')):
+            self.backend.restore_enabled()
+        self.assertEqual(order,['stop','start']);self.assertTrue(self.backend.preferences['enabled'])
+
+    @unittest.skipIf(os.name=='nt','Fixture executable uses a POSIX interpreter shebang')
+    def test_broker_login_and_child_recovery_enable_without_client_probe(self):
+        import time
+        checkout=self.base/'checkout'
+        for relative in ('services/dictation/server.py','services/dictation/portal.py','services/lifecycle/idle.py','services/lifecycle/lease.py','apps/native/augmentor_linux/dictation.py'):
+            target=checkout/relative;target.parent.mkdir(parents=True,exist_ok=True)
+            shutil.copy2(ROOT/relative,target)
+        if (ROOT/'services/platform_adapters').is_dir():
+            shutil.copytree(ROOT/'services/platform_adapters',checkout/'services/platform_adapters',ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+        binary=checkout/'components/handy/runtime/bin/handy';binary.parent.mkdir(parents=True)
+        receipt=self.base/'enabled.json'
+        binary.write_text('#!'+sys.executable+'\n'+'''import json,os,sys
+from pathlib import Path
+enabled=False
+for line in sys.stdin:
+ request=json.loads(line)
+ if request['method']=='enable':
+  enabled=request['params']['enabled']
+  Path('''+repr(str(receipt))+''').write_text(json.dumps({'pid':os.getpid(),'enabled':enabled}))
+ result={'enabled':enabled,'phase':'ready','revision':0,'settings':{'shortcut':'ctrl+space'}} if request['method']=='status' else {}
+ print(json.dumps({'id':request['id'],'result':result}),flush=True)
+''');binary.chmod(0o700)
+        state=self.base/'login';state.mkdir(mode=0o700)
+        original=b'{"enabled": true}\n';(state/'preferences.json').write_bytes(original)
+        env={**os.environ,'AUGMENTOR_DICTATION_STATE':str(state),'XDG_SESSION_TYPE':'x11','PYTHONPATH':str(checkout/'apps/native'),'PYTHONDONTWRITEBYTECODE':'1'}
+        process=subprocess.Popen([sys.executable,'-B',str(checkout/'services/dictation/server.py')],env=env,stdout=subprocess.DEVNULL,stderr=subprocess.PIPE)
+        try:
+            def await_native(previous=None):
+                deadline=time.monotonic()+15
+                while time.monotonic()<deadline:
+                    if process.poll() is not None:self.fail(process.stderr.read().decode())
+                    try:
+                        value=json.loads(receipt.read_text())
+                        if value['enabled'] and value['pid']!=previous:return value['pid']
+                    except (FileNotFoundError,ValueError):pass
+                    time.sleep(.05)
+                self.fail('Saved dictation was not enabled without a client probe')
+            first=await_native()
+            # This PID belongs only to the synthetic child just launched above.
+            import signal
+            os.kill(first,signal.SIGTERM)
+            self.assertNotEqual(await_native(first),first)
+            self.assertEqual((state/'preferences.json').read_bytes(),original)
+        finally:
+            with patch.dict(os.environ,env):
+                try:dictation.request('shutdown',start=False,timeout=5)
+                except RuntimeError:process.terminate()
+            process.wait(timeout=10);process.stderr.close()
+
     def test_disabled_native_child_needs_idle_and_no_download_evidence(self):
         from unittest.mock import Mock
         self.backend.child=Mock();self.backend.child.poll.return_value=None

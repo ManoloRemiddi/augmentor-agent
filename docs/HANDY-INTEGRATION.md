@@ -2,6 +2,40 @@
 
 # Embedded Handy dictation
 
+## October 5 reboot startup recovery
+
+After the owner's reboot, Augmentor's dictation broker was running with saved
+`enabled: true`, but neither Handy nor its private input helper was running.
+A status request started both and reported ready on the unchanged Ctrl+Space.
+The desktop's initialize request is a single attempt with discarded errors; the
+broker previously had no enabled-component recovery loop. The exact earlier
+startup exception was not retained, so a cold-start timeout is not asserted as
+its proven cause. The installed compatible 0.2.11 backport also lacked the
+already-qualified separate 60-second first-response budget.
+
+The existing broker now restores saved enabled dictation automatically, without
+waiting for a client/status/settings read. A failed component start retries no
+more often than ten seconds after the previous attempt finishes. An exited
+component releases its input helper and leases before replacement. Disabled
+settings stay off, existing live components are retained, microphone ownership
+is preserved, and consent/binding refusals retain their existing disable policy.
+No separate tray, login service or OS-wide monitoring service is introduced.
+
+Validation: 22 broker cases, three off/settings data cases and thirteen shared
+companion lifetime cases pass. A real private broker/synthetic component proves
+startup from saved-on state and recovery after child exit, before any client
+probe. A real native Handy proof on a private Xvfb/session bus starts automatically
+in approximately 1.1 seconds and reaches enabled/setup-needed without a model,
+then turns off and remains off. No owner's display, microphone or audio setup
+was used for those fixtures. The compatible installed candidate passes all 22
+broker cases independently; its narrow patch includes the existing qualified
+startup timeout interface and leaves warm response bounds unchanged.
+
+Installed adoption is recorded below after staged activation and broker restart.
+Source/platform checks and the owner's installed mixed 0.2.11 artifact are
+separate. Published preview-2 binaries retain their immutable earlier source;
+this new source fix does not silently replace those downloads.
+
 ## Current matched download publication — October 3
 
 [The preview-2 release ledger](HANDY-DOWNLOADS-2026-10-03.md) records the

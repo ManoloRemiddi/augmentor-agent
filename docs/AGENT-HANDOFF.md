@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+## October 5 dictation reboot recovery
+
+[The Handy startup recovery record](HANDY-INTEGRATION.md#october-5-reboot-startup-recovery)
+owns the observed saved-on broker without its native component, automatic
+restoration/retry, off-state and resource cleanup tests, and compatible installed
+adoption. The precise initial startup exception was not captured. Source and
+installed artifacts remain separate; the owner's working DSH/speech, settings
+and conversation windows must be preserved. Public preview-2 bytes are unchanged.
+
+
 ## October 4 Codex native launch merge candidate
 
 PR #28 integrates current main and browser/prompt/DSH candidates while preserving
