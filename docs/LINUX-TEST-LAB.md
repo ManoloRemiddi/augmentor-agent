@@ -248,17 +248,29 @@ augmentor-test-vm shutdown ubuntu24-gnome
 augmentor-test-vm backup ubuntu24-gnome --destination /mounted/independent-backups
 ```
 
-Backup refuses a destination on the same filesystem device. It creates a new
-standalone image of the current working disk, verifies its contents, and copies
-firmware, private launch assets and an import specification with a file-hash
-inventory. Keep the backup private. On another host, install QEMU/libvirt/passt,
+Backup refuses a destination unless Linux sysfs can prove that it resides on a
+different physical block device. This follows partitions and stacked-device
+slaves, so a second partition on the same disk is not treated as independent. It
+creates a new standalone image of the current working disk, verifies its
+contents, and copies firmware, private launch assets and an import specification
+with a file-hash inventory. Keep the backup private. On another host, install QEMU/libvirt/passt,
 verify that inventory, adjust the import specification's paths to the mounted
 backup in a separate copy of the specification, and import into a new private lab
 directory. Do not edit the disk's backing
 header or reuse stale process/session identifiers.
 
-An independent backup destination has been requested; none is assumed. A complete
-off-device restore drill remains separate from the local disk-preservation checks.
+No independent backup destination has been verified. A candidate local
+partition shares the same physical device as the VM store, and the separate
+system disk does not currently have sufficient space for these VM backups.
+Connect or designate a separate physical drive or NAS before running the backup.
+A complete off-device restore drill remains separate from the local
+disk-preservation checks.
+
+On October 5, the backup admission was tightened after observing that comparing
+filesystem device numbers accepts sibling partitions on one disk. Source tests
+exercise partition-parent and stacked-device resolution and verify that a
+same-device refusal creates no destination. The current host's DATA and
+NETWORK-HD partitions both resolve to the same NVMe; no backup was attempted.
 
 ## Reproduce and maintain the helper
 

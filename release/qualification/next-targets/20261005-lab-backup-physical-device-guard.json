@@ -1,0 +1,33 @@
+{
+  "format": "augmentor-linux-test-lab-backup-device-guard/1",
+  "date": "2026-10-05",
+  "scope": "Local backup destination safety only; no VM backup or restore performed",
+  "observedStorage": {
+    "labAndCandidateLocalPartitionsSharePhysicalDevice": true,
+    "samePhysicalDevice": true,
+    "independentDestinationMounted": false,
+    "systemDiskHasInsufficientFreeSpaceForVmBackup": true
+  },
+  "implementation": {
+    "filesystemDeviceNumberAloneAcceptedSiblingPartition": true,
+    "backupNowRequiresPhysicalBlockDeviceResolution": true,
+    "partitionParentsAndStackedSlavesFollowed": true,
+    "unprovableDeviceIdentityRefused": true,
+    "sameDeviceRefusalOccursBeforeDestinationCreation": true
+  },
+  "validation": {
+    "focusedTestCommand": "python3 -m unittest tests.test_linux_test_lab -v",
+    "focusedTestsPassed": 21,
+    "sameNvmePartitionResolution": "PASS",
+    "stackedDeviceSlaveResolution": "PASS",
+    "samePhysicalDeviceBackupRefusal": "PASS",
+    "destinationCreatedOnRefusal": false,
+    "hostStorageIdentity": "Exact volume names, capacities and block identifiers retained only in private handoff"
+  },
+  "boundaries": {
+    "vmFilesModified": false,
+    "backupCreated": false,
+    "restoreDrillPerformed": false,
+    "requiredNext": "Connect or designate a separate physical drive or NAS with sufficient free space; then perform the guarded backup and restore drill."
+  }
+}

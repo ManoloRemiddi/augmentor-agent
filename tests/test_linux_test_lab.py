@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -29,6 +30,43 @@ class AdmissionTests(unittest.TestCase):
         for root, data in [(3 * lab.GIB, 100 * lab.GIB), (10 * lab.GIB, 19 * lab.GIB)]:
             with self.assertRaises(ValueError):
                 lab.resource_admission(4096, 40 * lab.GIB, root, data, [])
+
+    def test_physical_device_walk_collapses_partitions_to_one_disk(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); sysdev = root / 'sys/dev/block'; nvme = root / 'sys/devices/nvme/nvme1n1'
+            partition1 = nvme / 'nvme1n1p1'; partition2 = nvme / 'nvme1n1p2'
+            for item, device, part in [(nvme, '259:0', None), (partition1, '259:1', '1'),
+                                       (partition2, '259:2', '2')]:
+                item.mkdir(parents=True, exist_ok=True); (item / 'dev').write_text(device)
+                if part: (item / 'partition').write_text(part)
+            sysdev.mkdir(parents=True)
+            (sysdev / '259:0').symlink_to(nvme); (sysdev / '259:1').symlink_to(partition1)
+            (sysdev / '259:2').symlink_to(partition2)
+            self.assertEqual(lab.block_device_leaves(os.makedev(259, 1), sysdev), {'259:0'})
+            self.assertEqual(lab.block_device_leaves(os.makedev(259, 2), sysdev), {'259:0'})
+
+    def test_stacked_volume_tracks_all_physical_slaves(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); sysdev = root / 'sys/dev/block'; devices = root / 'sys/devices'
+            leaves = []
+            for name, device in [('sda', '8:0'), ('sdb', '8:16')]:
+                node = devices / name; node.mkdir(parents=True); (node / 'dev').write_text(device)
+                leaves.append(node)
+            dm = devices / 'dm-0'; (dm / 'slaves').mkdir(parents=True); (dm / 'dev').write_text('253:0')
+            for name, node in zip(('sda', 'sdb'), leaves): (dm / 'slaves' / name).symlink_to(node)
+            sysdev.mkdir(parents=True); (sysdev / '253:0').symlink_to(dm)
+            self.assertEqual(lab.block_device_leaves(os.makedev(253, 0), sysdev), {'8:0', '8:16'})
+
+    def test_backup_refuses_same_physical_device_before_creating_destination(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary); owner = lab.Lab(base / 'lab'); destination = base / 'new-backup'
+            with patch.object(owner, 'entry', return_value=(base, {'name': 'guest'})), \
+                 patch.object(owner, 'inactive'), patch.object(owner, 'validate_domain'), \
+                 patch.object(owner, 'no_saved_memory'), patch.object(owner, 'verify_generation', return_value={}), \
+                 patch.object(lab, 'physical_devices', return_value=frozenset({'259:0'})):
+                with self.assertRaisesRegex(ValueError, 'different physical device'):
+                    owner.backup('guest', destination)
+            self.assertFalse(destination.exists())
 
     def test_unsafe_name(self):
         for name in ['../guest', '/root', 'name with spaces', 'UPPER']:

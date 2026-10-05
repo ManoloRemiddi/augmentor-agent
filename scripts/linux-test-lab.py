@@ -22,6 +22,7 @@ import xml.etree.ElementTree as ET
 GIB = 1024 ** 3
 URI = 'qemu:///session'
 PREFIX = 'augmentor-lab-'
+SYS_BLOCK_DEVICES = Path('/sys/dev/block')
 
 
 def run(args, *, timeout=120, allowed=(0,)):
@@ -109,6 +110,49 @@ def regular(path):
     if path.is_symlink() or not path.is_file():
         raise ValueError(f'Expected an existing regular file: {path}')
     return path
+
+
+def block_device_leaves(device, sysfs_root=SYS_BLOCK_DEVICES):
+    """Resolve a filesystem device number to its physical block-device leaves."""
+    entry = Path(sysfs_root) / f'{os.major(device)}:{os.minor(device)}'
+    try:
+        node = entry.resolve(strict=True)
+    except OSError as error:
+        raise ValueError('Cannot prove which physical device stores this path.') from error
+
+    def leaves(current, active):
+        current = current.resolve(strict=True)
+        key = str(current)
+        if key in active:
+            raise ValueError('The physical storage device graph contains a cycle.')
+        dev_file = current / 'dev'
+        if not dev_file.is_file():
+            raise ValueError('Cannot prove which physical device stores this path.')
+        active = {*active, key}
+        slaves = current / 'slaves'
+        if slaves.is_dir():
+            rows = list(slaves.iterdir())
+            if rows:
+                result = set()
+                for slave in rows:
+                    result.update(leaves(slave, active))
+                return result
+        if (current / 'partition').exists():
+            parent = current.parent
+            if not (parent / 'dev').is_file():
+                raise ValueError('Cannot resolve a partition to its physical device.')
+            return leaves(parent, active)
+        return {dev_file.read_text().strip()}
+
+    result = leaves(node, set())
+    if not result or any(not re.fullmatch(r'\d+:\d+', item) for item in result):
+        raise ValueError('Cannot prove which physical device stores this path.')
+    return frozenset(result)
+
+
+def physical_devices(path):
+    device = Path(path).stat().st_dev
+    return block_device_leaves(device)
 
 
 def image_chain(path):
@@ -514,9 +558,20 @@ class Lab:
         if any(row['exitCode'] != 0 for row in self.verify_generation(folder, spec).values()):
             raise ValueError('Working generation failed its disk checks.')
         destination = Path(destination).absolute()
+        ancestor = destination
+        while not ancestor.exists():
+            parent = ancestor.parent
+            if parent == ancestor:
+                raise ValueError('Backup destination has no existing parent directory.')
+            ancestor = parent
+        if not ancestor.is_dir():
+            raise ValueError('Backup destination parent must be a directory.')
+        lab_devices = physical_devices(self.root)
+        if physical_devices(ancestor) & lab_devices:
+            raise ValueError('Choose storage on a different physical device for an independent backup.')
         destination.mkdir(parents=True, mode=0o700, exist_ok=True)
-        if destination.stat().st_dev == self.root.stat().st_dev:
-            raise ValueError('Choose storage on a different device for an independent backup.')
+        if physical_devices(destination) & lab_devices:
+            raise ValueError('Backup destination resolves to the lab physical device.')
         output = destination / (name + '-' + time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()))
         output.mkdir(mode=0o700)
         sync_directory(destination)
