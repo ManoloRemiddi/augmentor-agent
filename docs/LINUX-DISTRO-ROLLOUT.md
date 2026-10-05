@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint normal native installation passes
+
+The [cache-backed native observation](../release/qualification/next-targets/20261005-mint-cache-backed-native-install.json)
+passes one normal two-package transaction and its full independent ending. Mint
+now has clean a118 native files: all29,336 regular files/links and32,365 members
+verify. All four old account/HOME states, other cache members, sources/keyrings
+and package map remain exact; only the two explicitly recorded normal APT
+directory change times differ, with both raw digests retained. The measured legacy
+directory baseline remains unchanged and is not claimed to match archive modes.
+The original exit100 failure remains historical. The separate ordinary account
+phase is running; no graphical acceptance or release is claimed. Its finite outer
+SSH observation allows1,800 seconds for the measured full snapshots, while guest
+operations and product startup/RPC limits are unchanged. Keep one VM with64 GB.
+
 ## October 5 Mint cache-backed plan passes
 
 The [fresh read-only observation](../release/qualification/next-targets/20261005-mint-cache-backed-native-plan.json)
@@ -142,7 +156,7 @@ the dated records that follow retain their original outcomes and tested revision
 | --- | --- | --- |
 | Ubuntu/Fedora Settings, shortcuts, reboot and password lock | Ubuntu24 passes these cases and normal app/child/machine closure. Fedora44 passes native/complete setup, both SDK fixture roles, service readiness and managed staging; activation child passes with a separately diagnosed metadata ending. Fedora KDE two-window Settings Saves/conflicts and separate restoration pass at e9. | Fedora password authentication, physical shortcut/reboot cases and GNOME Settings. |
 | GNOME/KDE consent, owned selection, visible Stop and input | GNOME218's recorded composite passes observed consent, center/edge clicks, exact ASCII, save, stale-token refusal, visible Stop and independent preservation/cleanup. KDE has native session/owner evidence and the maintained owned-target adapter. | GNOME password/focus-race/lock/revocation and remaining owner/refusal cases; production integration stays disabled. KDE actual consent/text/save/Stop. New boots require fresh session admission. |
-| Mint complete and matching SUSE/Arch dependencies | Mint22.3 complete setup and SDKs pass under its declared emulated120-second profile. Arch/Leap matching native/complete installers and SDKs pass at their recorded revisions. | Mint public60-second graphical profile and current desktop acceptance; retain matching package/dependency maintenance. |
+| Mint complete and matching SUSE/Arch dependencies | Mint22.3 complete setup and SDKs pass under its declared emulated120-second profile. Its current a118 normal native replacement and full independent ending pass. Arch/Leap matching native/complete installers and SDKs pass at their recorded revisions. | Mint public60-second graphical profile and current desktop acceptance; retain matching package/dependency maintenance. |
 | Graphical Browser, physical audio, upgrade/rollback | Published0.2.12→0.2.13→0.2.12 passes with the separately recorded legacy save continuation. Earlier graphical Browser evidence keeps its own tested scope. | Current Mint graphical Browser/reconnect/Stop; physical microphone/speaker acceptance. Browser preference-child runtime checks do not qualify its graphical surface. |
 | Source, notices, rebuild, replacement and qualified release | Retained independent builds, authenticated kit preparation, exact72-member correspondence and all12 current Noble replacement paths pass; maintained notice/build fixes pass focused and actual-input checks. | Matching source-runtime ABIs on other release targets; concrete source/notice delivery and license review, owner22-path control-permission decision, physical/desktop gates and unwaived GitGuardian before release. |
 

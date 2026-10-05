@@ -75,6 +75,13 @@ original failed APT attempt. A retained ordinary management session
 keeps its existing user manager alive without changing services or audio routing;
 normal session closure and VM shutdown remain separate endings.
 
+The subsequent [normal native transaction](../release/qualification/next-targets/20261005-mint-cache-backed-native-install.json)
+and full independent ending pass at a118, retaining all old accounts/HOMEs and
+the explicitly observed two normal APT directory change-time effects. The original
+failed transaction is preserved. New-account/login and graphical testing remain
+separate; only Mint is running. Account observation allows a finite1,800 seconds
+for its measured full snapshots, without changing guest or product deadlines.
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private

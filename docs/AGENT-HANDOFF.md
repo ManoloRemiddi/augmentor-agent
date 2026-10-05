@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint normal native installation passes
+
+The [cache-backed native observation](../release/qualification/next-targets/20261005-mint-cache-backed-native-install.json)
+passes one normal two-package transaction and its full independent ending. Mint
+now has clean a118 native files: all29,336 regular files/links and32,365 members
+verify. All four old account/HOME states, other cache members, sources/keyrings
+and package map remain exact; only the two explicitly recorded normal APT
+directory change times differ, with both raw digests retained. The measured legacy
+directory baseline remains unchanged and is not claimed to match archive modes.
+The original exit100 failure remains historical. The separate ordinary account
+phase is running; no graphical acceptance or release is claimed. Its finite outer
+SSH observation allows1,800 seconds for the measured full snapshots, while guest
+operations and product startup/RPC limits are unchanged. Keep one VM with64 GB.
+
 ## October 5 Mint cache-backed plan passes
 
 The [fresh read-only observation](../release/qualification/next-targets/20261005-mint-cache-backed-native-plan.json)

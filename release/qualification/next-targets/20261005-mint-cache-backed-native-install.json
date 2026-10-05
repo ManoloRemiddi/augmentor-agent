@@ -1,0 +1,83 @@
+{
+  "format": "augmentor-mint-cache-backed-native-install/1",
+  "status": "NORMAL_NATIVE_INSTALL_AND_FULL_INDEPENDENT_ENDING_PASS",
+  "target": "linuxmint22.3-amd64",
+  "version": "0.2.13",
+  "previousInstalledSourceCommit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+  "installedSourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "normalPackageTransaction": {
+    "exitCode": 0,
+    "sameVersionReinstalls": [
+      "augmentor-runtime",
+      "augmentor-desktop"
+    ],
+    "canonicalCandidateCacheVerified": true,
+    "networkDownloads": false,
+    "noOtherPackageChanges": true,
+    "oneJournaledTransactionNoReplay": true
+  },
+  "nativeEnding": {
+    "allRegularFilesAndLinksVerified": true,
+    "directoryArchiveModesMatched": false,
+    "retainedExistingRootGroupDirectories": 2956,
+    "archiveModeDirectories": 42,
+    "directoryBaselineSha256": "ebdc6057aaf054ae2df83b82675dff1f1a568444f08dd7d88e129c7730e395ce",
+    "members": 32365,
+    "regularFiles": 29336
+  },
+  "preservation": {
+    "allFourOldAccountsAndHomesExact": true,
+    "allOtherPreservationFieldsExact": true,
+    "packageMapExact": true,
+    "historicalBaselineUnchanged": true,
+    "addedOrRemovedCachedCandidates": false,
+    "explicitNormalAPTMetadataDelta": {
+      "addedCandidateArchives": [],
+      "normalAPTMetadataEffects": [
+        {
+          "path": "/var/lib/apt/lists/auxfiles",
+          "field": "ctimeNs",
+          "before": 1791206826758743406,
+          "after": 1791211744479183425,
+          "operation": "APT2.8.3 pkgAcquire::GetLock/SetupAPTPartialDirectory chown/chmod",
+          "attribution": "source-supported normal phase effect; not historical writer identity"
+        },
+        {
+          "path": "/var/cache/apt/archives/partial",
+          "field": "ctimeNs",
+          "before": 1791206826757743409,
+          "after": 1791211744477183435,
+          "operation": "APT2.8.3 pkgAcquire::GetLock/SetupAPTPartialDirectory chown/chmod",
+          "attribution": "source-supported normal phase effect; not historical writer identity"
+        }
+      ],
+      "beforeRawSnapshotSha256": "3d9c82ca209e8988ed6158eb73e69ed5fcab7ed05ba49664c2cd3f8533dca242",
+      "afterRawSnapshotSha256": "db85eb1a4535140850d9ecc6d8792ce993d1c69fc1f73cdd9f73088c72e075fa",
+      "allOtherPreservationFieldsExact": true,
+      "historicalBaselineUnchanged": true
+    }
+  },
+  "controls": {
+    "fullHostEndingPass": true,
+    "oneActiveVMAndExisting64GBPolicy": true,
+    "guestInstallerSha256": "7541784b6c2adfc8636c4135fea81c61ec3daaee73bca48f133f4971c38c747a",
+    "rootIndependentRawDeltaAndInventoryReview": true,
+    "oldCheckpointAndWorkingGenerationRetained": true,
+    "normalAccountPhaseSeparatelyDispatchedNotYetAccepted": true,
+    "accountOuterSSHObservationSeconds": 1800,
+    "accountGuestOperationDeadlinesUnchanged": true,
+    "graphicalStartupAndRPCDeadlinesUnchanged": true
+  },
+  "actualOutcomeSha256": "3a9a8b26ce024739bd1c10853c7df239d007edcc705b6f20f22f197d3e95a37b",
+  "stdoutSha256": "730ffa4d7dba517fc8ad6e4d3ea836bc2486072574ee869a84ff8f486e2d20ed",
+  "completedTimeNs": 1791212248001402661,
+  "originalKnownAPTFailureAndEndingRefusalsPreserved": true,
+  "remaining": [
+    "Separate ordinary account and normal password login",
+    "Normal setup in the admitted native graphical session",
+    "Graphical Browser and visible Stop with independent endings",
+    "Remaining five-point release gates"
+  ],
+  "graphicalAcceptance": false,
+  "releaseQualified": false
+}
