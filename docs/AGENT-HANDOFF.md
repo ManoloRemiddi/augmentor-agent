@@ -2,6 +2,21 @@
 
 ## October 5 resumed with the existing 64 GB
 
+Latest [held-session admission](../release/qualification/next-targets/20261005-mint-held-session-admission.json):
+the first cross-phase plan refuses before simulation because four timestamps changed
+in two background audio-state entries. A later read finds a changed file inode too;
+the proposed timestamp-only receipt correctly refuses. No metadata exception or
+normalization is added. A retained ordinary management SSH/PAM session, with actual
+native session/process admission and no service/routing changes, now supports a new
+full strict before/after audit. The sequential strict package plan is pending. The
+old-to-new full snapshot differs in only those five recorded fields; historical writer
+attribution is unproven. A separate normal-tool prefix preview passes with all live
+account databases/logs/defaults/skel/tools exact; it derives the new rows without
+creating a live account. Exact Ubuntu patched-source review admits its disclosed
+audit/syslog/cache effects and requires absent live hooks/zsys. Native installation,
+live account and graphical qualification are still pending. Finish acceptance while
+the retained session remains open; normal session exit/logout needs a separate ending.
+
 The owner resumed work and decided against installing additional RAM. Keep one
 lab machine active at a time, the existing full guest allocation, 8 GiB available
 host reserve and 1 GiB overhead. Mint's normal offline checkpoint and new writable

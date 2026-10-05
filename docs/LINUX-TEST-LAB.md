@@ -25,6 +25,15 @@ preservation audit and staging of two matching packages now pass; see the
 Mint is the sole active lab VM at that observation. Native adoption and graphical
 acceptance are still pending; the previous generation and checkpoint are retained.
 
+The subsequent [held-session admission](../release/qualification/next-targets/20261005-mint-held-session-admission.json)
+records a strict fresh full audit after a cross-phase background-state refusal.
+Keeping an ordinary management SSH/PAM session open avoids relying on a user
+manager's lifetime between commands; it does not guarantee that background state
+will remain unchanged. No service, routing, linger or metadata-comparison policy
+changes. Actual before/after equality remains mandatory. Record normal control
+session exit separately from the held-session full audit; logout/reboot is a new
+scope. A private prefix account preview passes without changing any live account.
+
 This is test infrastructure. A recovered OS disk does not certify a new Augmentor
 release. Existing compatibility limits remain in [Linux rollout](LINUX-DISTRO-ROLLOUT.md).
 

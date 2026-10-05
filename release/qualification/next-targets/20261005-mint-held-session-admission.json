@@ -1,0 +1,57 @@
+{
+  "format": "augmentor-mint-held-management-session-admission/1",
+  "status": "FRESH_STRICT_READ_ONLY_AUDIT_AND_ACCOUNT_PREFIX_PREVIEW_PASS",
+  "target": "linuxmint22.3-amd64",
+  "nativeSourceCommit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+  "candidateSourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "historicalRefusal": {
+    "aptPlanKnownReadOnlyFailureBeforeSimulation": true,
+    "nativeTransactionDispatched": false,
+    "firstRefusalDifferentTimestampFields": 4,
+    "laterDifferentInodeFields": 1,
+    "changedStateEntries": 2,
+    "allOtherSnapshotFieldsExact": true,
+    "historicalWriterAttributionProven": false,
+    "originalReportsPreserved": true,
+    "timestampOrInodeExceptionAdded": false
+  },
+  "currentAdmission": {
+    "ordinaryManagementSSHSessionHeld": true,
+    "actualNativeSessionAndProcessIdentityVerified": true,
+    "serviceConfigurationChanged": false,
+    "audioRoutingChanged": false,
+    "fullBeforeAndAfterSnapshotsExact": true,
+    "fourExistingAccountsAndHomesVerified": true,
+    "cacheSourcesListsKeyringsVerified": true,
+    "nativeInventory": {
+      "allRegularFilesAndLinksVerified": true,
+      "directoryArchiveModesMatched": false,
+      "retainedExistingRootGroupDirectories": 2956,
+      "archiveModeDirectories": 42,
+      "directoryBaselineSha256": "ebdc6057aaf054ae2df83b82675dff1f1a568444f08dd7d88e129c7730e395ce",
+      "members": 32357,
+      "regularFiles": 29328
+    },
+    "outcomeSha256": "b99c55ef2cb6abe93c17abf70462558f1fd07dbe25c59e9497ed03c3d6ca1e1d",
+    "scope": "Held management-session admission. Later logout/reboot is separate."
+  },
+  "accountPrefixPreview": {
+    "pass": true,
+    "liveAccountCreated": false,
+    "liveAccountDatabasesAndLoginLogsUnchanged": true,
+    "defaultsSkelAndToolsUnchanged": true,
+    "normalSyslogCacheAndAuditEffectsDisclosed": true,
+    "exactUbuntuPatchedSourceReviewed": true,
+    "liveZsysAndUseraddHooksAbsent": true,
+    "expectedNewAccountRowsDerivedFromActualTools": true,
+    "actualTargetHomeAndShellVerified": true,
+    "outcomeSha256": "5742ea3087bed064daaa510b4bcceedd90b9eacceabd8d058ae18ed473412547"
+  },
+  "remaining": {
+    "strictTwoPackagePlanPending": true,
+    "nativeInstallationPending": true,
+    "liveAccountCreationPending": true,
+    "graphicalQualificationPending": true,
+    "releaseQualified": false
+  }
+}

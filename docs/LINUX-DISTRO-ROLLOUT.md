@@ -55,6 +55,15 @@ existing root-group directory modes without changing installed permissions or
 claiming their provenance. Keep the one-machine/reserve guards and fresh boot/session
 admissions. Software emulation and the outstanding release gates remain.
 
+The [later strict admission](../release/qualification/next-targets/20261005-mint-held-session-admission.json)
+retains an original cross-phase timestamp refusal and a later file-identity change
+in background state. A new full audit passes while an ordinary management session
+is held open; every raw comparison remains strict, with no metadata exception or
+service/routing change. A normal prefix preview derives the proposed new account's
+rows while preserving live databases/logs/defaults/skel/tools. This creates no live
+account and qualifies no installed update or graphical case. The exact package plan
+and normal native adoption remain pending at that record.
+
 ## October 5 Fedora KDE Settings
 
 The [two-window Settings observation](../release/qualification/next-targets/20261005-kde-settings-two-window.json)
