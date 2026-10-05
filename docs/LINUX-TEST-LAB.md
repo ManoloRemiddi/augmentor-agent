@@ -87,6 +87,15 @@ also passes: all old rows/HOMEs and other snapshot fields stay exact, while only
 the reviewed synthetic account rows are added and its HOME is private0700.
 Password provisioning and graphical authentication require separate known outcomes.
 
+The subsequent [new-user password provisioning](../release/qualification/next-targets/20261005-mint-new-user-password-provisioning.json)
+passes its one native update and full independent ending. All old account rows/HOMEs,
+the new HOME and other preservation fields remain exact. Only the new account's
+password and change-day fields may change, with normal shadow replacement
+metadata recorded and no normalization. Credentials and raw shadow data remain private;
+the additional review reads retained hash/snapshot evidence only. This is password
+provisioning evidence. Normal graphical authentication, setup, Browser and visible
+Stop still require their separate outcomes; no release is qualified.
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private

@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint new-user password provisioning passes
+
+The [password-provisioning ending](../release/qualification/next-targets/20261005-mint-new-user-password-provisioning.json)
+passes one normal native password update for the new ordinary UID1004 and its
+full independent ending on the a118 installation. All old account rows, all four
+old HOMEs, the new HOME, package map and other preservation fields remain exact.
+The password update is confined to the new account's password and change-day
+fields. Actual shadow-file replacement metadata and both raw snapshot digests
+are retained without normalization. Native checks and the host ending pass.
+A separate retained-evidence review confirms the snapshot comparisons; raw shadow semantics and full native/new
+HOME checks remain source-bound guest checks. Credentials and raw shadow data stay
+private. Graphical login, normal setup, Browser and visible Stop remain open;
+password provisioning does not qualify a release. The original action is not replayed.
+
 ## October 5 Mint ordinary account passes
 
 The [ordinary-account ending](../release/qualification/next-targets/20261005-mint-ordinary-account-ending.json)
