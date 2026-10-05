@@ -37,6 +37,23 @@ locked/offline optimized Linux native build succeeds. All 22 broker cases pass.
 No physical microphone was used. Installed adoption is recorded below; the
 owner's Wayland pixels remain a separate acceptance check.
 
+Installed compatible Linux adoption is complete through stage/activate. Native
+UI source `2ec7265` is rebuilt over the prior immutable recovery artifact
+`33b94ac55d72a41c7090303b0c5d8c0e07b7c9085e8978f54561ee56fdb1332a`.
+Selected release is `20261005-095559-8aa03c9b`, artifact SHA-256
+`d0f0386d4b37cc41dbcf53d3ecf49be33e1b583b13afe15bf57d46fc73b002a8`. Both sealed inventories verify after use; changes are confined
+to Handy runtime/build metadata and matching notices. The broker, original input
+helper bytes, 0.2.11 product, DSH/speech and saved broker preferences are retained.
+
+Only idle dictation was gracefully replaced. Its rebuilt native Handy starts
+before the first status probe and reports enabled/ready, unchanged Ctrl+Space,
+no error and no tray. It retains the owner's Wayland backend with no WebKit/GL
+environment override. Desktop and Mobile chats remain online/voice-available on
+their earlier build, with an update pending; neither was restarted. The stable
+login service is enabled/active and reads the selected release on next login.
+The prior reboot recovery is carried forward. No actual reboot or owner-session
+physical microphone/visual acceptance is claimed; these remain owner retests.
+
 Public preview-2 downloads retain their prior immutable bytes. PR #39 is a source
 candidate; this repair does not imply a merged PR or updated public downloads.
 
