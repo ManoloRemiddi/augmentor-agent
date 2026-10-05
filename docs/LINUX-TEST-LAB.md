@@ -268,10 +268,13 @@ write route is not yet verified: a read-only rsync dry run was rejected by the
 NAS's forced-command wrapper, and the supported admin page presented an
 untrusted certificate in the in-app browser. SMB remains disabled; the existing
 broad share configuration was not activated. Do not bypass the browser warning
-or activate generated Samba configuration. The owner was asked for a trusted NAS
-URL or to verify the certificate in their browser. The SMB-mount acceptance
-path is source-tested only; it has not been exercised against the NAS. No VM
-data has been copied.
+or activate generated Samba configuration. When trusted admin access is restored,
+configure SMB through the official [UGOS File Service controls](https://support.ugnas.com/detail/article/en-US/77)
+and apply access only to the intended backup folder using
+[UGOS shared-folder permissions](https://support.ugnas.com/detail/article/en-US/494).
+The owner was asked for a trusted NAS URL or to verify the certificate in their
+browser. The SMB-mount acceptance path is source-tested only; it has not been
+exercised against the NAS. No VM data has been copied.
 The helper currently requires a mounted local path so it can prove physical-
 storage identity; it accepts either a verified separate local block device or
 a verified remote CIFS mount, but does not support a remote SSH destination. Keep the
