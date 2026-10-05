@@ -2,6 +2,17 @@
 
 # Embedded Handy dictation
 
+## October 5 confirmed repair and matched release preparation
+
+The owner confirms the installed overlay repair works. PR #39 is merged as
+`ea1c620569f98a8a72b8682fc647b4c476ecd7ac`; all 28 checks pass at reviewed head
+`08510c30b043490da05ec34bcede696d3842f66f`, with an identical merge tree.
+[The October 5 release ledger](HANDY-DOWNLOADS-2026-10-05.md) owns preparing and
+qualifying preview 3 on Linux, Mac and both Windows CPUs before publication.
+The earlier implementation/adoption evidence below is historical; owner visual
+acceptance is now confirmed, while actual reboot acceptance remains separate.
+Existing public preview-2 bytes stay immutable until the new cohort is published.
+
 ## October 5 animated overlay rendering
 
 The owner reports opaque black rectangles behind the animated circle and

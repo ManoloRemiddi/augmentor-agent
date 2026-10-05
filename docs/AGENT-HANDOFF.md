@@ -2,6 +2,15 @@
 
 # Start here: agent handoff
 
+## October 5 merge and publication request
+
+The owner confirms the recording overlay is fixed and authorizes merge/publication
+for everyone downloading Augmentor. PR #39 merged as `ea1c620` after 28 checks
+passed. [The preview-3 release ledger](HANDY-DOWNLOADS-2026-10-05.md) tracks matched
+Linux/Mac/Windows source, required qualification, publication and website adoption.
+Prepare all platforms before publishing any; preserve immutable earlier assets
+and the owner's compatible installed 0.2.11 build/open chats.
+
 ## October 5 animated dictation overlay
 
 [The Handy rendering record](HANDY-INTEGRATION.md#october-5-animated-overlay-rendering)
