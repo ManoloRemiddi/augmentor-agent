@@ -1,0 +1,72 @@
+{
+  "format": "augmentor-private-mint-browser-candidate-build/1",
+  "status": "PRIVATE_BUILD_AND_INSPECTION_PASS_NOT_INSTALLED",
+  "sourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "sourceClean": true,
+  "target": "linuxmint22.3-amd64",
+  "version": "0.2.13",
+  "artifactId": "0.2.13-linuxmint22.3-amd64-complete-preview.1-a118bf69b353",
+  "artifacts": [
+    {
+      "file": "augmentor-desktop_0.2.13_amd64.deb",
+      "sha256": "714b4bf71907fd3d7a824e0e4fe6081aac1c0a1bce726ad1290e346c0d853830",
+      "bytes": 5388,
+      "regularFileCount": 5,
+      "allFileHashesVerifiedDuringRead": true,
+      "metadataNormalized": true
+    },
+    {
+      "file": "augmentor-runtime_0.2.13_amd64.deb",
+      "sha256": "f12154e0a72b02b69a8dcaa42fdd99f4ca3c38fdae90d0dfd5f0c3a0911f3061",
+      "bytes": 352953672,
+      "regularFileCount": 29331,
+      "allFileHashesVerifiedDuringRead": true,
+      "metadataNormalized": true
+    },
+    {
+      "file": "augmentor-browser-0.2.13.zip",
+      "sha256": "63d6c01e53115c7b5a884887e689313f713a6bb2265b77bcb688683bd638b6f6",
+      "bytes": 218890
+    },
+    {
+      "file": "complete.tar.gz",
+      "sha256": "e9128d11239e53a17532d26786830cb11ce29d01d5b4699401ffe80ddb8465c5",
+      "bytes": 372005991
+    }
+  ],
+  "completeManifestSha256": "9e506679a0691123aa7467d198b8c959781f42fee153fc84d7ccf0505186f476",
+  "completionReceiptSha256": "025e8e0e4b58820b43564863f13a430622205bb36d7fcc7f07e64677f60846d7",
+  "inspectionReceiptSha256": "cecf174ea69e1ecc8759abd0b5a246466ad5b5b99aebf5b08d8ab4d63e137c54",
+  "sourceFixSha256": "9bc968260ff7d359a5e36d2c9ecbff13200617b590a0913c9b970922d8c98ea5",
+  "inputs": {
+    "allHandyFilesVerified": 1182,
+    "allCurrentHandyBuildPinsMatch": true,
+    "wheelsVerified": 7,
+    "sourceQtInputsVerified": true,
+    "nodeArchiveVerified": true,
+    "inputReceiptSha256": "ba4868119fa21dfc56c691e880b09495796d782cc94be9074786cd9a2ece457b"
+  },
+  "compilerAndPreservation": {
+    "qtRebuilt": false,
+    "handyRebuilt": false,
+    "privateSourceExportUsed": false,
+    "original365BuilderAndOutputsRetained": true,
+    "oldSourceCommit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+    "installedPayloadChanged": false,
+    "guestAccessed": false
+  },
+  "hostedValidation": {
+    "sourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37285454512",
+    "jobsPassed": 11
+  },
+  "qualification": {
+    "normalAdoptionPending": true,
+    "graphicalAcceptancePass": false,
+    "licensingApproval": false,
+    "sourceCoverageComplete": false,
+    "binaryPublished": false,
+    "releaseQualified": false
+  },
+  "nextAdmission": "Preserve the original installation in an offline checkpoint and new writable generation; a fresh synthetic account or reviewed coordinated migration must use normal matching installation/staging. Existing receipt cannot adopt the new bundle. Native replacement changes the shared native prefix, so unchanged old settings must not be described as old-source preservation."
+}

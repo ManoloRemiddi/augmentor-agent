@@ -26,6 +26,8 @@ cases pass, while ten fail against the original installed source. This supersede
 the earlier protocol-first startup proposal. The existing runtime verification and
 startup deadlines stay intact; a new installed graphical run remains required.
 See the [source checkpoint](../release/qualification/next-targets/20261005-browser-port-generation-source.json).
+All11 [hosted checks](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37285454512)
+pass at a118bf6; source and installation fixtures remain distinct from graphical acceptance.
 KDE's normal hide247 passed; complete graphical/password
 acceptance remains open. [Hosted validation37279685573](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37279685573)
 passes all11 jobs at1ffb509, including the maintained test infrastructure. It does

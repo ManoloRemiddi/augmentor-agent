@@ -7,13 +7,26 @@ operation, immediately after every await and in both error handlers. An obsolete
 startup cannot disconnect its replacement, send requests through it or publish
 stale results. Twelve new regression cases pass; ten fail against the exact
 installed365 source. Root independently passes25 focused checks, and the researcher
-passes35 Node plus19 recipient-runtime Python checks. See the
+passes35 Node plus19 recipient-runtime Python checks. All11
+[hosted checks](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37285454512)
+pass at a118bf6, including Fedora43/44 and Ubuntu26.04 installation fixtures.
+See the
 [source checkpoint](../release/qualification/next-targets/20261005-browser-port-generation-source.json)
 and [owning Browser guide](BROWSER-DISTRIBUTION.md#october-5-connection-replacement-during-startup).
 This supersedes the earlier speculative protocol-first proposal. Full runtime
 verification, maintenance leases and existing deadlines remain unchanged. No
 installed payload was patched; a matching staged artifact and actual graphical
 acceptance remain required on Mint and other applicable platforms.
+
+A separate private clean a118 Mint candidate now builds and passes streaming
+native hash/permission and complete/Browser inventory checks. It reuses revalidated
+dependency inputs without Qt/Handy recompilation and preserves original365 source
+and outputs. See its [build record](../release/qualification/next-targets/20261005-mint-browser-candidate-build.json).
+No guest installation or graphical qualification occurred. Normal adoption
+requires a preserved offline checkpoint/new generation plus a fresh account or
+reviewed coordinated migration; the old receipt remains tied to its artifact.
+Native replacement changes the shared native source, even with old settings
+preserved. Licensing/source coverage and binary release stay open.
 
 ## October 5 host crash and persistent test machines
 

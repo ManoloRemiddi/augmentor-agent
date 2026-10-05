@@ -118,6 +118,20 @@ Mint Browser run. The recovered diagnostic remains a readiness failure, with
 zero model POSTs and no session/prompt/history mutations. It does not establish
 that this race accounts for every later cold-runtime delay.
 
+All11 [hosted checks](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37285454512)
+pass at a118bf6. A separate clean a118 Mint build now produces matching native
+packages, Browser ZIP and complete bundle. Streaming native file/hash/permission
+checks and complete inventory checks pass; the packaged fix matches the reviewed
+source hash. Authenticated dependency inputs were revalidated and reused without
+another Qt/Handy compiler run. Original365 source and outputs remain intact.
+See the [private candidate build record](../release/qualification/next-targets/20261005-mint-browser-candidate-build.json).
+No guest was changed, no binary published, and licensing/source-coverage flags
+remain incomplete. Normal adoption needs an offline checkpoint/new working
+generation and a fresh fixture account or reviewed coordinated migration;
+the original install receipt cannot adopt this new bundle. Native replacement
+changes the shared native prefix even when old account settings are preserved.
+Actual graphical readiness, reconnect and Stop remain open.
+
 ### October 3 installed XWayland command acceptance
 
 [The current checkpoint](../release/qualification/next-targets/20261003-installed-browser-xwayland-and-clean-artifacts.json)

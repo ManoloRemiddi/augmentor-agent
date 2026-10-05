@@ -63,5 +63,12 @@
     "installedSourceUnchanged": true,
     "platforms": "Shared extension; new installed Linux and macOS behavior remains unqualified",
     "releaseQualified": false
+  },
+  "hostedValidation": {
+    "sourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37285454512",
+    "conclusion": "success",
+    "jobsPassed": 11,
+    "scope": "Source/runtime/package and Fedora43/44/Ubuntu26.04 installation fixtures; graphical Mint/macOS and physical audio remain separate"
   }
 }
