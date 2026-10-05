@@ -90,7 +90,8 @@ Installed adoption is complete through the canonical stage/activate procedure:
 source implementation `e9faf1898b48990006a05505e7eb50ec343b2d0e` is narrowly
 backported over immutable artifact
 `ee648609533909b614be9345f2efb78eeb87f7fe9124a0e990e1ba383dfc9d7a`.
-Selected compatible release is `20261005-085541-c8193467`, artifact SHA-256
+Recovery-stage release (superseded by the rendering repair above) was
+`20261005-085541-c8193467`, artifact SHA-256
 `33b94ac55d72a41c7090303b0c5d8c0e07b7c9085e8978f54561ee56fdb1332a`.
 Both old/new inventories verify after use; only `services/dictation/server.py`
 differs. Matching 0.2.11 product/DSH/speech and native Handy bytes are retained.
