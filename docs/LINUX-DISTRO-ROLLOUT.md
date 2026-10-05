@@ -13,13 +13,20 @@ environments are containers, with no retained Arch desktop VM. See the
 GNOME218's recovered actual evidence passes center/edge clicks, exact text, save,
 stale-token refusal, visible Stop and full independent preservation/cleanup. Its
 password/focus-race cases remain open and production input remains disabled.
-Mint's renderer sandbox passes while normal readiness fails before a prompt; the
-original failure and final guest-only diagnostic remain retained. KDE's normal
-hide247 passed; complete graphical/password acceptance remains open. Hosted
-validation37236980122 passes all11 jobs at eb33120; it precedes this infrastructure
-change and does not qualify the recovered machines or a release.
+Mint's renderer sandbox passes while normal readiness fails before a prompt. The
+final diagnostic has now been recovered from the guest: multiple handshakes precede
+the first native response, and a separate full runtime validation takes 14.87 seconds
+in the software-emulated fixture. These are diagnostics, not graphical acceptance;
+the original additional-memory admission refusal and dispatch mistake remain explicit.
+See the [startup diagnostic](../release/qualification/next-targets/20261005-mint-browser-startup-diagnostic.json).
+No timeout or product code changed. KDE's normal hide247 passed; complete graphical/password
+acceptance remains open. [Hosted validation37279685573](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37279685573)
+passes all11 jobs at1ffb509, including the maintained test infrastructure. It does
+not qualify graphical guest behavior or a release.
 
-## Current five-point acceptance status — October 4
+<a id="current-five-point-acceptance-status--october-4"></a>
+
+## Current five-point acceptance status — October 5
 
 The entries below summarize the completed evidence and remaining acceptance work;
 the dated records that follow retain their original outcomes and tested revisions.
@@ -27,13 +34,14 @@ the dated records that follow retain their original outcomes and tested revision
 | Authorized point | Completed evidence | Remaining acceptance |
 | --- | --- | --- |
 | Ubuntu/Fedora Settings, shortcuts, reboot and password lock | Ubuntu24 passes these cases and normal app/child/machine closure. Fedora44 passes native/complete setup, both SDK fixture roles, service readiness and managed staging; activation child passes with a separately diagnosed metadata ending. | Fedora actual password authentication/restoration and desktop Settings/shortcut/reboot cases. |
-| GNOME/KDE consent, owned selection, visible Stop and input | Fedora GNOME activation and read-only observer pass; KDE has native session/owner evidence and the maintained owned-target adapter. | Actual consent/input/Stop and preserved target text in both current sessions. GNOME production input remains disabled. |
+| GNOME/KDE consent, owned selection, visible Stop and input | GNOME218's recorded composite passes observed consent, center/edge clicks, exact ASCII, save, stale-token refusal, visible Stop and independent preservation/cleanup. KDE has native session/owner evidence and the maintained owned-target adapter. | GNOME password/focus-race/lock/revocation and remaining owner/refusal cases; production integration stays disabled. KDE actual consent/text/save/Stop. New boots require fresh session admission. |
 | Mint complete and matching SUSE/Arch dependencies | Mint22.3 complete setup and SDKs pass under its declared emulated120-second profile. Arch/Leap matching native/complete installers and SDKs pass at their recorded revisions. | Mint public60-second graphical profile and current desktop acceptance; retain matching package/dependency maintenance. |
 | Graphical Browser, physical audio, upgrade/rollback | Published0.2.12→0.2.13→0.2.12 passes with the separately recorded legacy save continuation. Earlier graphical Browser evidence keeps its own tested scope. | Current Mint graphical Browser/reconnect/Stop; physical microphone/speaker acceptance. Browser preference-child runtime checks do not qualify its graphical surface. |
 | Source, notices, rebuild, replacement and qualified release | Retained independent builds, authenticated kit preparation, exact72-member correspondence and all12 current Noble replacement paths pass; maintained notice/build fixes pass focused and actual-input checks. | Matching source-runtime ABIs on other release targets; concrete source/notice delivery and license review, owner22-path control-permission decision, physical/desktop gates and unwaived GitGuardian before release. |
 
-The active graphical cases use separate owned Fedora KDE, Fedora GNOME and Mint
-fixtures. Mint's two network acquisition attempts ended before package changes;
+The graphical cases use separate owned Fedora KDE, Fedora GNOME and Mint
+fixtures. Pre-crash process/session statements are historical; new libvirt generations
+require fresh transport and native identity checks. Mint's two network acquisition attempts ended before package changes;
 the separately authenticated offline transaction now adds exactly one native
 Chromium package, preserving the Augmentor package and all57 saved files. Its
 first graphical attempt refuses the proof collector's omitted Mint fixture

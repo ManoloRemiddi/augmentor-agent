@@ -17,14 +17,19 @@ one save, stale-token refusal, visible Stop and independent preservation/cleanup
 Production input remains disabled; password/focus-race gates and the recorded
 visual target-cleanup limitation remain. Fedora's normal hide247 passed before
 the crash; full KDE input/password acceptance is still open. Mint Browser readiness
-is still unqualified. All11 hosted checks passed at eb33120 before this subsequent
-test-infrastructure change; they do not qualify new VM definitions or releases.
+is still unqualified. Its final pre-crash diagnostic is now recovered; separate
+strict full runtime validation passes in14.87 seconds on software emulation.
+See the [actual startup diagnostic](../release/qualification/next-targets/20261005-mint-browser-startup-diagnostic.json)
+for original admission limitations and exact scope. No product or timeout changed.
+All11 [hosted checks](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37279685573)
+pass at1ffb509, including the test-infrastructure source; graphical guest behavior
+and releases remain separate. Mint was shut down normally after collection.
 
-## Current acceptance summary — October 4
+## Current acceptance summary — October 5
 
-Use the [five-point status table](LINUX-DISTRO-ROLLOUT.md#current-five-point-acceptance-status--october-4)
+Use the [five-point status table](LINUX-DISTRO-ROLLOUT.md#current-five-point-acceptance-status--october-5)
 for completed versus remaining acceptance, and the [finite source-license review](LICENSING.md#october-4-current-source-runtime-review-scope)
-for the actual2700-CPP scope and recommended alternatives. The three active
+for the actual2700-CPP scope and recommended alternatives. The three retained
 graphical fixtures and pending owner/audio decisions remain distinct from the
 completed twelve Noble replacement paths. No additional compiler run or replay
 of a successful installation/close is required by those recorded results.

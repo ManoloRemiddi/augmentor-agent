@@ -20,6 +20,17 @@ application acceptance. All machines are left off.
 This is test infrastructure. A recovered OS disk does not certify a new Augmentor
 release. Existing compatibility limits remain in [Linux rollout](LINUX-DISTRO-ROLLOUT.md).
 
+Subsequent October5 collection recovered Mint's existing startup diagnostic and
+ran one separate strict runtime-validation timing check, then shut it down normally.
+The [diagnostic record](../release/qualification/next-targets/20261005-mint-browser-startup-diagnostic.json)
+retains the original failed graphical scope; it is not a new acceptance run.
+All11 hosted checks pass at1ffb509. To restore the host root-space reserve, three
+completed build archives were copied to DATA with content, mode, owner, modification
+time and extended-attribute verification, retaining their old paths as symlinks.
+Their detailed migration receipts remain private; no VM disk moved. Original
+inode/change-time identities differ, so historical physical-file identity checks
+must not be relabelled as current observations.
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private

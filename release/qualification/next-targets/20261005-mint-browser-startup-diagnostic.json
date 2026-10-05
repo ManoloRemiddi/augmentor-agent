@@ -1,0 +1,102 @@
+{
+  "format": "augmentor-linux-browser-startup-diagnostic/1",
+  "date": "2026-10-05",
+  "status": "diagnostic-collected",
+  "installedSource": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+  "maintainedSourceBase": "1ffb509e1e6a8e06b191c24ede74fe4a843a6063",
+  "target": "linuxmint22.3-amd64",
+  "graphicalReadinessQualified": false,
+  "productChangesMade": false,
+  "budgetsChanged": false,
+  "recoveredHistoricalDiagnostic": {
+    "originalAdditional512MiBAdmission": "refused",
+    "dispatchAfterRefusalPreservedAsMistake": true,
+    "acceptanceEvidence": false,
+    "outerExitCode": 0,
+    "innerStatus": "failed",
+    "phase": "connecting",
+    "harness": "pi",
+    "readyObservationElapsedSeconds": 62.195760275999874,
+    "readinessBudgetSeconds": 60,
+    "productRpcBudgetMs": 20000,
+    "handshakeRequestsObserved": 4,
+    "firstResponseAfterFirstHandshakeSeconds": 43.584,
+    "harnessSelectObserved": true,
+    "modelCatalogRequestObserved": true,
+    "modelPostCount": 0,
+    "sdkSessionPromptHistoryCalls": 0,
+    "requestResponseIdsRedacted": true,
+    "exactOriginalTimedOutRpcIdentified": false,
+    "receiptSha256": "c4d3a90cec0397908ddfe6333d02ff6cae116446701738e7a9e0dba7e6370abe",
+    "processTimingSha256": "b9ff4e9aadf09cf68f3162fa23d05ab7558d5b46264516d19bb34048a92f66a5"
+  },
+  "freshValidationDiagnostic": {
+    "status": "pass",
+    "fullValidationCalls": 1,
+    "elapsedSeconds": 14.870691741999963,
+    "phases": [
+      {
+        "phase": "inventory",
+        "elapsedSeconds": 6.645732251000027,
+        "status": "pass"
+      },
+      {
+        "phase": "host",
+        "elapsedSeconds": 0.19733785100004297,
+        "status": "pass"
+      },
+      {
+        "phase": "probe",
+        "elapsedSeconds": 6.995406592999984,
+        "status": "pass"
+      },
+      {
+        "phase": "verify",
+        "elapsedSeconds": 14.805602585000088,
+        "status": "pass"
+      },
+      {
+        "phase": "resolve",
+        "elapsedSeconds": 14.839084644000081,
+        "status": "pass"
+      }
+    ],
+    "notGraphicalReadinessAcceptance": true,
+    "noProductWorkDispatched": true,
+    "selectionAbsentBeforeAfter": true,
+    "installedControlSha256": "aeb207f2a428cb1db96955f5d345637e8043f7d0694e74deeb98e33177549019",
+    "collectorSha256": "da77dcf75ed27c68506a9a7c4d3029122563cf2a11dfc7cd49b0704679409bd8",
+    "receiptSha256": "6edfacedb2083bea4d92f376d66e0bb9ee2d204b13b2e65f6916eeaf0e3c0b41",
+    "firstCollectorRefusal": "Installed365 lacks current resolve_official/launch API. Collector refused before validation; separate exact resolve/environment adaptation used."
+  },
+  "sourceAudit": {
+    "packagedNativeHostValidatesBeforeHandshake": true,
+    "coldPiRuntimeValidatesAgain": true,
+    "inventoryAndImportsBothMaterialInObservedCheck": true,
+    "proposalOnly": "Separate the exact native Browser protocol handshake from full runtime work admission; retain package leases and strict official/recipient verification before work. Evaluate hardware acceleration before choosing an implementation or claiming performance.",
+    "currentTwelveReplacementResultsRemainHistorical": true
+  },
+  "hostProfile": {
+    "managedDomains": "qemu TCG",
+    "kvmDeviceObserved": false,
+    "cpuAdvertisesAmdV": true,
+    "kernelOrFirmwareChanged": false,
+    "accelerationReferences": [
+      "https://www.qemu.org/docs/master/system/introduction.html",
+      "https://libvirt.org/formatdomain.html"
+    ],
+    "matchingKernelKvmAmdModuleObserved": true,
+    "kvmModuleLoaded": false,
+    "modprobeDryRunOnly": true
+  },
+  "ending": {
+    "mintNormalShutdown": "pass",
+    "forced": false,
+    "noOriginalControllerReplayed": true
+  },
+  "remaining": [
+    "Exact original RPC correlation is unavailable in sanitized wire evidence.",
+    "Source/transport proposal requires review and actual normal startup/reconnect/Stop after deployment.",
+    "Software-emulation measurements do not establish native hardware performance."
+  ]
+}
