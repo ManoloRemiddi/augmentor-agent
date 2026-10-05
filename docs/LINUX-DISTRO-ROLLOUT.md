@@ -24,6 +24,12 @@ acceptance remains open. [Hosted validation37279685573](https://github.com/Manol
 passes all11 jobs at1ffb509, including the maintained test infrastructure. It does
 not qualify graphical guest behavior or a release.
 
+The [KDE transport observation](../release/qualification/next-targets/20261005-kde-libvirt-transport-readonly.json)
+passes actual read-only libvirt monitor identity/status and dedicated test-user SSH,
+following24 synthetic refusal/interface checks. It establishes the recovered transport,
+not Settings/input/password acceptance. Public proof/helper/controller bytes remain
+unchanged, and all five VMs are off after normal closure.
+
 <a id="current-five-point-acceptance-status--october-4"></a>
 
 ## Current five-point acceptance status — October 5

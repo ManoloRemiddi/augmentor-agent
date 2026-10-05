@@ -25,6 +25,13 @@ All11 [hosted checks](https://github.com/ManoloRemiddi/augmentor-agent/actions/r
 pass at1ffb509, including the test-infrastructure source; graphical guest behavior
 and releases remain separate. Mint was shut down normally after collection.
 
+A private KDE libvirt transport candidate now passes24 synthetic refusal/interface
+checks and actual read-only monitor name/status plus ordinary proof-user SSH with
+the preserved host-key alias. The public proof/helper/controller remain unchanged.
+Its [actual transport observation](../release/qualification/next-targets/20261005-kde-libvirt-transport-readonly.json)
+does not establish desktop input or product-source admission; those remain fresh
+cohorts. KDE was shut down normally afterward. All five lab machines are off.
+
 ## Current acceptance summary — October 5
 
 Use the [five-point status table](LINUX-DISTRO-ROLLOUT.md#current-five-point-acceptance-status--october-5)

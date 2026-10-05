@@ -31,6 +31,14 @@ Their detailed migration receipts remain private; no VM disk moved. Original
 inode/change-time identities differ, so historical physical-file identity checks
 must not be relabelled as current observations.
 
+The separately reviewed private KDE proof transport passes actual libvirt monitor
+name/status and dedicated proof-user SSH with the preserved host-key alias. Its24
+synthetic checks cover refusal/interface behavior. The [transport observation](../release/qualification/next-targets/20261005-kde-libvirt-transport-readonly.json)
+records the source and boundary: no input or product work, public controllers unchanged,
+normal shutdown afterward. A new graphical cohort still needs fresh installed-source,
+native-session and consent admission. Old direct-QEMU wrappers cannot be replayed
+against these libvirt machines.
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private

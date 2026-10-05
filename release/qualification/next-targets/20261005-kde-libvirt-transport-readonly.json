@@ -1,0 +1,48 @@
+{
+  "format": "augmentor-linux-lab-transport-observation/1",
+  "date": "2026-10-05",
+  "status": "pass",
+  "scope": "KDE recovered lab, read-only QMP/SSH transport; private fixture adapter only",
+  "maintainedSourceBase": "5cd2c6e172f09c13f46b788a39c14f196d74e3f9",
+  "adapterSha256": "dd57096c2173e6f6204b71849082e59389f0564d7620355dcb1e9fcaa41a0e43",
+  "bindingSha256": "28462c85a4220fbc28169557fffa1608a92ef3c80da0ac20420b8a95e83cac3c",
+  "indexSha256": "5c8214b5015b663f2cb9bf640483ce9d50d8190d2cded4c5f83f7ae286a024c3",
+  "syntheticTests": {
+    "count": 24,
+    "status": "pass",
+    "scope": "Refusal/interface only; no real input"
+  },
+  "actualObservation": {
+    "liveAndPersistentDomainContract": true,
+    "currentCatalogGenerationUuidDiskAssets": "bound and verified",
+    "queryNameMatches": true,
+    "queryStatusRunning": true,
+    "proofUserUid": 1001,
+    "ordinaryProofUserSsh": "pass",
+    "strictPreservedHostKeyAlias": true,
+    "noInput": true,
+    "noProductOrModelWork": true,
+    "receiptSha256": "767ae104e727e5885108bcda8680745a4d6924d1160fd8014415d04e7367eb54"
+  },
+  "reviewCorrections": {
+    "v1Retained": true,
+    "v2AddsRetainedHostKeyAlias": true,
+    "publicSessionGuardUnchanged": true,
+    "publicGuardReturnSchemaConfirmed": true
+  },
+  "acceptance": {
+    "guestDesktopOrProduct": false,
+    "consentInputPasswordSettingsReboot": false,
+    "selectedProductSourceRechecked": false,
+    "publicProofControllerOverlay": false
+  },
+  "ending": {
+    "normalConfiguredSshPoweroff": "pass",
+    "forced": false
+  },
+  "remaining": [
+    "Integrate reviewed transport with exact installed/source admission and fresh native unlocked session.",
+    "Execute finite Settings/input/password/reboot cohorts once prerequisites are observed.",
+    "No release qualification follows from monitor/SSH observations."
+  ]
+}
