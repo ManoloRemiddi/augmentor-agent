@@ -39,6 +39,10 @@ native-host handshake. The exact failed RPC/timing remains unknown. Its guest
 journal retains
 `unknownOutcome=true`; no model interaction or visible Stop is claimed, and the
 intent is not replayed. The underlying startup/connection cause is unestablished.
+A source-only proof-driver follow-up now refuses a readiness reply whose read
+finishes after its monotonic deadline and stores only allowlisted status fields
+plus elapsed time at this failure boundary. Four focused clock/privacy checks
+pass; no installed payload changed and this does not qualify a new guest run.
 A separate full preservation ending after this attempt and removal of the
 temporary collector rule are still required. Keep one VM, existing 64 GB and the
 8 GiB host reserve. No release is qualified.

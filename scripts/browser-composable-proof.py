@@ -15,6 +15,30 @@ import time
 import urllib.request
 import websocket
 root=Path(__file__).resolve().parents[1]
+
+def wait_for_browser_ready(send,harness,timeout=60,poll_interval=.15,clock=time.monotonic,sleep=time.sleep):
+    """Wait for the selected harness without accepting a reply completed late."""
+    started=clock();deadline=started+timeout;last_status=None
+    while clock()<deadline:
+        last_status=send('log')
+        observed=clock()
+        if observed>=deadline:break
+        if last_status and last_status.get('harness')==harness and last_status.get('phase') in ('ready','needs-setup'):
+            return last_status,observed-started
+        remaining=deadline-observed
+        if remaining<=0:break
+        sleep(min(poll_interval,remaining))
+    raise TimeoutError(json.dumps({'status':last_status,'elapsedSeconds':clock()-started}))
+
+def safe_readiness_status(status):
+    """Keep failure receipts useful without writing IDs, paths or raw errors."""
+    if not isinstance(status,dict):return None
+    result={}
+    for key in ('phase','harness','running','modelSelected','portConnectEvents'):
+        value=status.get(key)
+        if isinstance(value,(str,bool,int)) or value is None:result[key]=value
+    return result
+
 # macOS's default per-user temporary path leaves too little room for Unix
 # sockets. Match the short runtime location used by the packaged launcher.
 temp=Path(tempfile.mkdtemp(prefix='augmentor-browser-proof-',dir='/tmp' if sys.platform=='darwin' else None)).resolve()
@@ -170,13 +194,19 @@ try:
     # Fresh profiles now default to the shared DSH agent. This fixture explicitly
     # qualifies Pi before its later DSH setup/switch assertions.
     assert send('harness/select',{'harness':harness})['ok']
-    end=time.monotonic()+60
-    while time.monotonic()<end:
-        status=send('log')
-        if status and status.get('harness')==harness and status.get('phase') in ('ready','needs-setup'):break
-        time.sleep(.15)
-    assert status.get('phase') in ('ready','needs-setup'),status
-    assert status.get('harness')==harness,status
+    try:
+        status,readiness_elapsed=wait_for_browser_ready(send,harness)
+    except TimeoutError as error:
+        diagnostic=json.loads(str(error))
+        (root/'outputs').mkdir(exist_ok=True)
+        (root/'outputs/browser-readiness-failure.json').write_text(json.dumps({
+            'stage':'selected-harness-readiness','waitSeconds':60,
+            'elapsedSeconds':diagnostic.get('elapsedSeconds'),
+            'expectedHarness':harness,
+            'status':safe_readiness_status(diagnostic.get('status')),
+            'modelRequests':len(requests),'setupRequests':len(setup_requests),
+        },indent=2)+'\n')
+        raise AssertionError('Timed out waiting for selected browser harness readiness: '+json.dumps(safe_readiness_status(diagnostic.get('status')))) from error
     def click(selector,scroll=True):
         rect=evaluate("(()=>{const e=document.querySelector("+json.dumps(selector)+");if(!e)throw Error('Missing '+"+json.dumps(selector)+");"+("e.scrollIntoView({block:'center'});" if scroll else "")+"const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()",panel)
         cdp('Input.dispatchMouseEvent',{'type':'mousePressed','button':'left','clickCount':1,**rect},panel)
@@ -434,7 +464,7 @@ try:
     if normal_sandbox:
         sandbox_evidence=prove_sandbox(cdp,sandbox_evaluate,chrome.pid,temp/'profile',os.environ.get('AUGMENTOR_PROOF_SANDBOX_SUDO_PROC')=='1')
     shot=cdp('Page.captureScreenshot' ,{},panel)['data'];(root/'outputs').mkdir(exist_ok=True);(root/'outputs/browser-composable.png').write_bytes(base64.b64decode(shot))
-    proof={'engine':'real Pi SDK','model':'deterministic local fixture','browser':info['Browser'],'navigateSnapshotTypeClick':True,'actualPageResultVerified':True,'dshRealLocalModelBrowser':dsh_verified,'copyClipboardAndScroll':True,'reconnectWithoutReplay':True,'branchToolContext':True,'editResubmitsOnce':True,'sharedPromptsConflictAndClipboard':True,'memory':memory_verified,'appRoot':str(app_root),'extensionRoot':str(extension),'supportReportDownloadedAndPrivate':True,'promptRefreshDuringClick':bool(os.environ.get('AUGMENTOR_PROOF_PROMPT_REFRESH')),'freshBrowserSetup':bool(os.environ.get('AUGMENTOR_PROOF_FRESH')),'setupRequests':len(setup_requests),'modelRequests':len(requests),'isolatedState':str(temp)}
+    proof={'engine':'real Pi SDK','model':'deterministic local fixture','browser':info['Browser'],'navigateSnapshotTypeClick':True,'actualPageResultVerified':True,'dshRealLocalModelBrowser':dsh_verified,'copyClipboardAndScroll':True,'reconnectWithoutReplay':True,'branchToolContext':True,'editResubmitsOnce':True,'sharedPromptsConflictAndClipboard':True,'memory':memory_verified,'selectedHarnessReadinessSeconds':round(readiness_elapsed,3),'appRoot':str(app_root),'extensionRoot':str(extension),'supportReportDownloadedAndPrivate':True,'promptRefreshDuringClick':bool(os.environ.get('AUGMENTOR_PROOF_PROMPT_REFRESH')),'freshBrowserSetup':bool(os.environ.get('AUGMENTOR_PROOF_FRESH')),'setupRequests':len(setup_requests),'modelRequests':len(requests),'isolatedState':str(temp)}
     proof.update(debuggingEndpointBudgetSeconds=60,debuggingEndpointElapsedSeconds=debugging_endpoint_elapsed,normalLinuxSandboxRequested=normal_sandbox,linuxBrowserFlags=linux_flags,rendererSandbox=sandbox_evidence,displayBackend=display_evidence,reconnectBudgetSeconds=reconnect_budget,reconnectElapsedSeconds=reconnect_elapsed,waylandInputObservationPauseSeconds=int(wayland_input_wait))
     (root/'outputs/browser-composable-proof.json').write_text(json.dumps(proof,indent=2));print(json.dumps(proof),flush=True)
 finally:

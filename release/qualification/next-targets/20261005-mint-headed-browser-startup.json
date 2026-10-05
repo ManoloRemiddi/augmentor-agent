@@ -84,6 +84,13 @@
     "packageLauncherRunsRuntimeVerificationBeforeNativeHostHandshake": true,
     "rootCause": "UNESTABLISHED"
   },
+  "futureProofDriverCorrection": {
+    "status": "SOURCE_TESTED_NOT_REPLAYED_ON_GUEST",
+    "readinessReplyMustCompleteBeforeDeadline": true,
+    "sanitizedReadinessFailureReceipt": true,
+    "focusedClockAndPrivacyChecksPassed": 4,
+    "installedPayloadChanged": false
+  },
   "remaining": {
     "independentFullEndingAfterBrowserFailure": "REQUIRED",
     "separateVisibleStop": "NOT_DISPATCHED",
