@@ -1,5 +1,34 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint native password authentication and normal setup
+
+The [native authentication and setup checkpoint](../release/qualification/next-targets/20261005-mint-native-password-and-normal-setup.json)
+records an accepted normal Cinnamon X11 login and genuine password unlock after
+normal idle locking. The original login composite checker remains failed with
+its cause unproven; a separate full after-login ending passes. An earlier unlock
+preflight refuses before secret access or input because it expects an optional
+QMP field. The corrected private query helper passes 18 focused source checks;
+one normal password unlock then passes, including the same ScreenSaver owner
+changing from active to inactive and the full after-unlock preservation ending.
+No failed action is relabelled or replayed.
+
+Normal ordinary-user complete setup passes at clean a118 with its matching Mint
+preview bundle: exit0, installed receipt, child absent and no pending/unknown
+outcome. Its separate full ending and root review also pass, preserving all four
+old HOMEs, six account databases, APT state, package map, native files and protected
+historical records. Total installation time is about 400 seconds; the product
+startup bound remains 120 seconds. This setup configures the synthetic provider;
+it makes no model request and does not qualify a reply, speech or memory engine.
+
+The separate pre-Browser reader refuses because its account-name substring test
+matches native IBus sockets. Read-only process/descriptor observations identify
+the normal input-service owner and find no product process. Preserve that refusal
+and require a separately corrected semantic socket reader before any Browser
+phase. Current headed Browser/reconnect and visible Stop remain untested. No
+installed payload, production input or lock policy changes. Keep the existing 64 GB
+one-VM guard; physical audio, source/license/security and off-device backup gates
+remain open, and no release is qualified.
+
 ## October 5 Mint new-user password provisioning passes
 
 The [password-provisioning ending](../release/qualification/next-targets/20261005-mint-new-user-password-provisioning.json)

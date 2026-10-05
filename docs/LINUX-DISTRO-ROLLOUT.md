@@ -1,5 +1,34 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint native password authentication and normal setup
+
+The [native authentication and setup checkpoint](../release/qualification/next-targets/20261005-mint-native-password-and-normal-setup.json)
+records an accepted normal Cinnamon X11 login and genuine password unlock after
+normal idle locking. The original login composite checker remains failed with
+its cause unproven; a separate full after-login ending passes. An earlier unlock
+preflight refuses before secret access or input because it expects an optional
+QMP field. The corrected private query helper passes 18 focused source checks;
+one normal password unlock then passes, including the same ScreenSaver owner
+changing from active to inactive and the full after-unlock preservation ending.
+No failed action is relabelled or replayed.
+
+Normal ordinary-user complete setup passes at clean a118 with its matching Mint
+preview bundle: exit0, installed receipt, child absent and no pending/unknown
+outcome. Its separate full ending and root review also pass, preserving all four
+old HOMEs, six account databases, APT state, package map, native files and protected
+historical records. Total installation time is about 400 seconds; the product
+startup bound remains 120 seconds. This setup configures the synthetic provider;
+it makes no model request and does not qualify a reply, speech or memory engine.
+
+The separate pre-Browser reader refuses because its account-name substring test
+matches native IBus sockets. Read-only process/descriptor observations identify
+the normal input-service owner and find no product process. Preserve that refusal
+and require a separately corrected semantic socket reader before any Browser
+phase. Current headed Browser/reconnect and visible Stop remain untested. No
+installed payload, production input or lock policy changes. Keep the existing 64 GB
+one-VM guard; physical audio, source/license/security and off-device backup gates
+remain open, and no release is qualified.
+
 ## October 5 Mint new-user password provisioning passes
 
 The [password-provisioning ending](../release/qualification/next-targets/20261005-mint-new-user-password-provisioning.json)
@@ -183,7 +212,7 @@ the dated records that follow retain their original outcomes and tested revision
 | --- | --- | --- |
 | Ubuntu/Fedora Settings, shortcuts, reboot and password lock | Ubuntu24 passes these cases and normal app/child/machine closure. Fedora44 passes native/complete setup, both SDK fixture roles, service readiness and managed staging; activation child passes with a separately diagnosed metadata ending. Fedora KDE two-window Settings Saves/conflicts and separate restoration pass at e9. | Fedora password authentication, physical shortcut/reboot cases and GNOME Settings. |
 | GNOME/KDE consent, owned selection, visible Stop and input | GNOME218's recorded composite passes observed consent, center/edge clicks, exact ASCII, save, stale-token refusal, visible Stop and independent preservation/cleanup. KDE has native session/owner evidence and the maintained owned-target adapter. | GNOME password/focus-race/lock/revocation and remaining owner/refusal cases; production integration stays disabled. KDE actual consent/text/save/Stop. New boots require fresh session admission. |
-| Mint complete and matching SUSE/Arch dependencies | Mint22.3 complete setup and SDKs pass under its declared emulated120-second profile. Its current a118 normal native replacement and full independent ending pass. Arch/Leap matching native/complete installers and SDKs pass at their recorded revisions. | Mint public60-second graphical profile and current desktop acceptance; retain matching package/dependency maintenance. |
+| Mint complete and matching SUSE/Arch dependencies | Mint22.3 complete setup and SDKs pass under its declared emulated120-second profile. Its current a118 native replacement, normal password authentication/unlock and ordinary-user complete setup pass with full old-state endings. Arch/Leap matching native/complete installers and SDKs pass at their recorded revisions. | Mint public60-second graphical profile and current desktop acceptance; retain matching package/dependency maintenance. |
 | Graphical Browser, physical audio, upgrade/rollback | Published0.2.12→0.2.13→0.2.12 passes with the separately recorded legacy save continuation. Earlier graphical Browser evidence keeps its own tested scope. | Current Mint graphical Browser/reconnect/Stop; physical microphone/speaker acceptance. Browser preference-child runtime checks do not qualify its graphical surface. |
 | Source, notices, rebuild, replacement and qualified release | Retained independent builds, authenticated kit preparation, exact72-member correspondence and all12 current Noble replacement paths pass; maintained notice/build fixes pass focused and actual-input checks. | Matching source-runtime ABIs on other release targets; concrete source/notice delivery and license review, owner22-path control-permission decision, physical/desktop gates and unwaived GitGuardian before release. |
 

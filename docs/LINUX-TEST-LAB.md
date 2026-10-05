@@ -96,6 +96,16 @@ the additional review reads retained hash/snapshot evidence only. This is passwo
 provisioning evidence. Normal graphical authentication, setup, Browser and visible
 Stop still require their separate outcomes; no release is qualified.
 
+The later [native password and normal setup checkpoint](../release/qualification/next-targets/20261005-mint-native-password-and-normal-setup.json)
+records accepted normal Cinnamon authentication, genuine password unlock and
+ordinary-user complete setup with full independent old-state endings at a118.
+Original composite/preflight failures remain recorded. A separate reader must
+correct its native IBus socket classification before headed Browser and Stop
+admission. Temporary fixture privilege and finite idle/session controls require
+normal closure after their tests; successful setup alone does not qualify those
+closures, a release or crash recovery. The owner keeps the existing 64 GB and one
+VM at a time; no additional RAM is assumed.
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private
