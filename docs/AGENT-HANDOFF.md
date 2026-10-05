@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+## October 5 publication paused for owner restart
+
+The owner explicitly requested a break. PR #39 is merged; PR #40 retains frozen
+customer source `3d1e6153f1e3aed86f56d915d60cd1d55ea49190` and remains draft.
+Seven of eight qualification workflows pass; ARM64 full native installation
+remains pending while x64 passes. The [release checkpoint](HANDY-DOWNLOADS-2026-10-05.md#october-5-publication-pause-checkpoint)
+records completed retrievals, incomplete private drafts, website branch and safe
+resume order. Local transfers are stopped. No preview-3 download or website
+change is published; preserve preview-2 assets and the working owner installation.
+
 ## October 5 merge and publication request
 
 The owner confirms the recording overlay is fixed and authorizes merge/publication

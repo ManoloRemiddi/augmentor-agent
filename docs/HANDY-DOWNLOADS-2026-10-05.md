@@ -28,3 +28,41 @@ unsigned/ad-hoc status and no automatic-update claim are retained. Windows must
 not install preview 3 over another build; follow its bundled maintenance guide.
 The owner's compatible 0.2.11 deployment remains separate and is not replaced by
 customer package tests. Preserve working conversations and DSH/speech selection.
+
+## October 5 publication pause checkpoint
+
+The owner requested a pause to restart their computer at `2026-10-05T10:19:15Z`.
+Customer source remains frozen at `3d1e6153f1e3aed86f56d915d60cd1d55ea49190` on
+`release/handy-preview-3`, with [draft PR #40](https://github.com/ManoloRemiddi/augmentor-agent/pull/40).
+PR #39 is already merged. Seven of eight required workflows pass; the full
+Windows application gate remains in progress on ARM64, while its x64 fourteen-stage
+installation/repair/recovery/removal job has passed. Hosted qualification can
+finish independently of this computer. Local transfer/staging workers are stopped.
+
+Completed retrieval receipts exist for Linux, Mac, Windows x64 customer bytes
+and Windows x64 native evidence. Linux verifies all 20 archive checksums and
+matching tracked source; Mac verifies its DMG digest and managed-setup reports.
+The ARM64 customer transfer is incomplete and must be resumed/reverified; its
+native evidence and final gate remain outstanding. Preview-3 release drafts are
+private and incomplete. Draft discovery must use the authenticated release list,
+with a fresh response/retry after creation; the tagged endpoint may return 404
+until publication. No draft is a published customer release.
+
+The website candidate is saved on its own `release/handy-preview-3` branch.
+All 15 website tests pass. It is not merged or deployed, and public website
+downloads still select preview 2. Resume by checking the exact-source results,
+finishing receipt-verified downloads and all 35 draft assets, merging PR #40,
+publishing the prepared matching cohort, anonymously hashing every public file,
+then merging/deploying and verifying the website. Publish final owning records
+without moving immutable customer tags or modifying the owner’s installed app.
+
+Qualification runs at the checkpoint:
+
+- [Matched Linux and Mac](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37289881200): passed.
+- [Windows customer packages](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37289880919): passed.
+- [Shared application and installed packages](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37289881123): passed.
+- [Windows full application](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37289932600): pending ARM64 full application.
+- [Windows installer](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37289936481): passed.
+- [Mac product](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37289941015): passed.
+- [Windows desktop](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37289944854): passed.
+- [Application SDK platforms](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37289949607): passed.
