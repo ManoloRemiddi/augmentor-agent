@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 physical-device VM backup guard
+
+The persistent-lab backup helper now resolves Linux block-device backing through
+partitions and stacked-device slaves. It refuses a same-physical-device target
+before creating files; filesystem device numbers alone incorrectly admit
+sibling partitions. All 21 lab-helper tests pass. No off-device target is
+currently verified, and no backup or restore drill was performed. See the
+[persistent lab backup procedure and boundary](LINUX-TEST-LAB.md#independent-backup)
+and [focused qualification record](../release/qualification/next-targets/20261005-lab-backup-physical-device-guard.json).
+
 ## October 5 Mint headed Browser qualification failure
 
 The [headed Browser startup checkpoint](../release/qualification/next-targets/20261005-mint-headed-browser-startup.json)
