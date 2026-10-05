@@ -106,6 +106,14 @@ normal closure after their tests; successful setup alone does not qualify those
 closures, a release or crash recovery. The owner keeps the existing 64 GB and one
 VM at a time; no additional RAM is assumed.
 
+The [later headed Browser startup attempt](../release/qualification/next-targets/20261005-mint-headed-browser-startup.json)
+has two retained failures before extension/model steps. The later attempt reaches
+the Pi readiness check but remains `connecting` through the 60-second readiness
+wait, despite native-port connect events; its cause remains undetermined. It is
+not replayed. The test driver's endpoint wait correction changes external test
+controls only. A post-failure full ending and temporary collector removal remain
+required; no Browser or Stop pass is claimed.
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private

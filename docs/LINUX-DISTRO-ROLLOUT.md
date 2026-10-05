@@ -1,5 +1,28 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint headed Browser qualification failure
+
+The [headed Browser startup checkpoint](../release/qualification/next-targets/20261005-mint-headed-browser-startup.json)
+records two real ordinary-user Cinnamon X11 attempts at installed a118. The
+original fails before extension loading because its nominal five-second DevTools
+endpoint wait expires; a complete endpoint file is observed afterwards, but the
+exact Chromium startup duration and cause remain unestablished. The test driver
+now has a measured 60-second endpoint deadline and checks its owned process, with
+seven focused source tests passing.
+
+The corrected semantic socket reader passes, preserving native IBus, all five
+normal setup settings and the temporary collector policy. Owned product processes,
+listeners and package leases are cleared; the full old-state audit passes.
+The corrected attempt also exits1 before extension/model steps after 116.8
+seconds. It reaches the normal Browser test's Pi readiness check but remains in
+`connecting` through the 60-second readiness wait, despite two native-port
+connect events. The test emits no Browser proof. Its guest journal retains
+`unknownOutcome=true`; no model interaction or visible Stop is claimed, and the
+intent is not replayed. The underlying startup/connection cause is unestablished.
+A separate full preservation ending after this attempt and removal of the
+temporary collector rule are still required. Keep one VM, existing 64 GB and the
+8 GiB host reserve. No release is qualified.
+
 ## October 5 Mint native password authentication and normal setup
 
 The [native authentication and setup checkpoint](../release/qualification/next-targets/20261005-mint-native-password-and-normal-setup.json)

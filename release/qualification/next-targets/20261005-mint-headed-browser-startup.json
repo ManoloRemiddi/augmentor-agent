@@ -1,0 +1,86 @@
+{
+  "format": "augmentor-mint-headed-browser-startup-checkpoint-v1",
+  "date": "2026-10-05",
+  "target": "linuxmint22.3-amd64-cinnamon-x11",
+  "applicationSource": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "completeArtifact": "0.2.13-linuxmint22.3-amd64-complete-preview.1-a118bf69b353",
+  "originalHeadedBrowser": {
+    "status": "FAIL_BEFORE_EXTENSION_AND_MODEL_STEPS",
+    "callerExitCode": 1,
+    "elapsedSeconds": 26.748122930526733,
+    "error": "Chromium did not publish a complete debugging endpoint.",
+    "pending": false,
+    "originalUnknownOutcomeFlag": true,
+    "originalJournalRetained": true,
+    "originalIntentReplayed": false,
+    "proofOutputs": 0,
+    "debuggingEndpointLaterObservedComplete": true,
+    "exactChromiumStartupDuration": "NOT_RECORDED",
+    "rootCause": "UNESTABLISHED"
+  },
+  "preservation": {
+    "correctedSemanticSocketReader": "PASS",
+    "nativeIBusPreserved": true,
+    "newUserProfilesAndCollectorExact": true,
+    "ownedProductProcessesAndListenersAbsent": true,
+    "ownedFixturePortsCheckedFromActualReceipt": true,
+    "packageLeaseAvailable": true,
+    "nativeSessionAndFiniteIdleHolder": "PASS",
+    "fullOldScopeAfterFailedBrowser": "PASS_ROOT_REVIEWED",
+    "oldFourHomesSixAccountDatabasesAptNativeAndHistoricalExact": true
+  },
+  "sourceCorrection": {
+    "scope": "External test driver only; installed application unchanged",
+    "originalProofSha256": "07549687c93fd50dde8159c81fba449235ab1230c7208938721ba77879489c44",
+    "newProofSha256": "e9a4dd0040fdb0b3c5a03699c22a7030c2635a4d2e1f7f6e7da1b0e950653f2c",
+    "endpointReadiness": "Nominal five-second loop replaced by measured monotonic 60-second deadline with owned-process liveness checks",
+    "endpointBudgetSeconds": 60,
+    "endpointTimingReportedSeparately": true,
+    "publicFocusedChecksPassed": 7,
+    "externalControlChecksPassed": 16,
+    "installedPayloadPatched": false,
+    "piReadinessBudgetSeconds": 60,
+    "rpcBudgetSeconds": 20,
+    "reconnectBudgetSeconds": 30,
+    "totalBrowserStartupWithin60SecondsClaimed": false
+  },
+  "correctedHeadedBrowser": {
+    "status": "FAIL_BEFORE_EXTENSION_AND_MODEL_STEPS",
+    "callerExitCode": 1,
+    "elapsedSeconds": 116.78244090080261,
+    "originalUnknownOutcomeFlag": true,
+    "originalJournalRetained": true,
+    "intentReplayed": false,
+    "extensionLoaded": false,
+    "modelPromptsReached": false,
+    "visibleStopTested": false,
+    "browserProofOutputCount": 0,
+    "observedState": {
+      "harness": "pi",
+      "phase": "connecting",
+      "running": false,
+      "modelSelected": false,
+      "portConnectEvents": 2
+    },
+    "failureBoundary": "The test did not observe ready or needs-setup within its 60-second Pi readiness wait; it exited before loading the extension.",
+    "rootCause": "UNESTABLISHED"
+  },
+  "remaining": {
+    "independentFullEndingAfterBrowserFailure": "REQUIRED",
+    "separateVisibleStop": "NOT_DISPATCHED",
+    "temporaryCollectorRemoval": "REQUIRED_AFTER_KNOWN_PROOF_ENDINGS",
+    "temporaryCollectorRemovalStatus": "REQUIRED",
+    "physicalAudio": "OPEN",
+    "sourceLicenseSecurityAndOffDeviceBackup": "OPEN"
+  },
+  "boundaries": {
+    "existing64GbRetained": true,
+    "oneVmPolicy": true,
+    "hostReserveGiB": 8,
+    "newBrowserPassClaimed": false,
+    "browserOutcomePending": false,
+    "stopPassClaimed": false,
+    "qualifiedRelease": false,
+    "privateAccountCredentialsOrTransportPublished": false
+  }
+}

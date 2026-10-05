@@ -97,19 +97,31 @@ normal_sandbox=os.environ.get('AUGMENTOR_PROOF_NORMAL_SANDBOX')=='1'
 if normal_sandbox:assert sys.platform=='linux' and os.geteuid()!=0,'Normal Linux sandbox qualification requires an ordinary user.'
 linux_flags=([] if normal_sandbox else ['--no-sandbox'])+['--disable-gpu','--ozone-platform='+ozone_platform] if sys.platform=='linux' else []
 chrome_command=[os.environ.get('AUGMENTOR_PROOF_BROWSER_BINARY','chromium'),*([] if os.environ.get('AUGMENTOR_PROOF_HEADED') else ['--headless=new']),*linux_flags,'--no-first-run','--remote-allow-origins=*','--remote-debugging-port=0','--enable-unsafe-extension-debugging','--user-data-dir='+str(temp/'profile'),'about:blank']
+def wait_debugging_endpoint(chrome, portfile, seconds=60):
+    started=time.monotonic();deadline=started+seconds
+    while True:
+        if chrome.poll() is not None:
+            raise RuntimeError('Chromium exited before its debugging endpoint became ready.')
+        if time.monotonic()>=deadline:
+            raise TimeoutError('Chromium did not publish a complete debugging endpoint.')
+        try:port_lines=portfile.read_text().splitlines()
+        except FileNotFoundError:port_lines=[]
+        # Existence alone is not readiness: Chromium first creates an empty file.
+        # A completed read must still belong to this live owned process and budget.
+        elapsed=time.monotonic()-started
+        if chrome.poll() is not None:
+            raise RuntimeError('Chromium exited before its debugging endpoint became ready.')
+        if elapsed>seconds:
+            raise TimeoutError('Chromium did not publish a complete debugging endpoint.')
+        if len(port_lines)>=2 and port_lines[0].isdigit() and port_lines[1].startswith('/devtools/browser/'):
+            return port_lines,elapsed
+        time.sleep(min(.05,max(0,deadline-time.monotonic())))
+
 log=(temp/'chrome.log').open('w');chrome=subprocess.Popen(chrome_command,env=env,stdout=log,stderr=log)
 ws=None;seq=0
 try:
     portfile=temp/'profile/DevToolsActivePort'
-    for _ in range(100):
-        try:port_lines=portfile.read_text().splitlines()
-        except FileNotFoundError:port_lines=[]
-        # Chromium creates this file before writing its contents. Existence
-        # alone is not readiness, particularly on a busy package-test runner.
-        if len(port_lines)>=2 and port_lines[0].isdigit() and port_lines[1].startswith('/devtools/browser/'):break
-        if chrome.poll() is not None:raise RuntimeError('Chromium exited before its debugging endpoint became ready.')
-        time.sleep(.05)
-    else:raise TimeoutError('Chromium did not publish a complete debugging endpoint.')
+    port_lines,debugging_endpoint_elapsed=wait_debugging_endpoint(chrome,portfile)
     port=port_lines[0]
     info=json.load(urllib.request.urlopen(f'http://127.0.0.1:{port}/json/version'));ws=websocket.create_connection(info['webSocketDebuggerUrl'],suppress_origin=True,timeout=20)
     def cdp(method,params={},session=None):
@@ -423,7 +435,7 @@ try:
         sandbox_evidence=prove_sandbox(cdp,sandbox_evaluate,chrome.pid,temp/'profile',os.environ.get('AUGMENTOR_PROOF_SANDBOX_SUDO_PROC')=='1')
     shot=cdp('Page.captureScreenshot' ,{},panel)['data'];(root/'outputs').mkdir(exist_ok=True);(root/'outputs/browser-composable.png').write_bytes(base64.b64decode(shot))
     proof={'engine':'real Pi SDK','model':'deterministic local fixture','browser':info['Browser'],'navigateSnapshotTypeClick':True,'actualPageResultVerified':True,'dshRealLocalModelBrowser':dsh_verified,'copyClipboardAndScroll':True,'reconnectWithoutReplay':True,'branchToolContext':True,'editResubmitsOnce':True,'sharedPromptsConflictAndClipboard':True,'memory':memory_verified,'appRoot':str(app_root),'extensionRoot':str(extension),'supportReportDownloadedAndPrivate':True,'promptRefreshDuringClick':bool(os.environ.get('AUGMENTOR_PROOF_PROMPT_REFRESH')),'freshBrowserSetup':bool(os.environ.get('AUGMENTOR_PROOF_FRESH')),'setupRequests':len(setup_requests),'modelRequests':len(requests),'isolatedState':str(temp)}
-    proof.update(normalLinuxSandboxRequested=normal_sandbox,linuxBrowserFlags=linux_flags,rendererSandbox=sandbox_evidence,displayBackend=display_evidence,reconnectBudgetSeconds=reconnect_budget,reconnectElapsedSeconds=reconnect_elapsed,waylandInputObservationPauseSeconds=int(wayland_input_wait))
+    proof.update(debuggingEndpointBudgetSeconds=60,debuggingEndpointElapsedSeconds=debugging_endpoint_elapsed,normalLinuxSandboxRequested=normal_sandbox,linuxBrowserFlags=linux_flags,rendererSandbox=sandbox_evidence,displayBackend=display_evidence,reconnectBudgetSeconds=reconnect_budget,reconnectElapsedSeconds=reconnect_elapsed,waylandInputObservationPauseSeconds=int(wayland_input_wait))
     (root/'outputs/browser-composable-proof.json').write_text(json.dumps(proof,indent=2));print(json.dumps(proof),flush=True)
 finally:
     if os.environ.get('AUGMENTOR_PROOF_ONBOARDING'):
