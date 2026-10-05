@@ -1,0 +1,78 @@
+{
+  "format": "augmentor-mint-native-local-apt-refusal/1",
+  "status": "KNOWN_NATIVE_TRANSACTION_FAILURE_NOT_ACCEPTANCE",
+  "target": "linuxmint22.3-amd64",
+  "candidateSourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "observedInstalledSourceCommit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+  "admission": {
+    "strictFreshAuditPass": true,
+    "strictTwoPackageSimulationPass": true,
+    "otherPackagesPlanned": 0,
+    "nativeTransactionDispatchedOnce": true,
+    "originalReportsPreserved": true
+  },
+  "nativeOutcome": {
+    "aptExitCode": 100,
+    "transportExitCode": 1,
+    "unknownAptOutcome": false,
+    "error": "Internal Error, Pathname to install is not absolute 'augmentor-runtime_0.2.13_amd64.deb'",
+    "incomingTwoPathsAbsolute": true,
+    "noReplay": true,
+    "originalAptProcessAbsentOnFollowup": true,
+    "followupDpkgVerifyPass": true,
+    "liveAccountCreated": false,
+    "graphicalAcceptance": false,
+    "stdoutSha256": "3f52f0cd94933b0db7ad7f5dc4d3cb11dfa6f0ca7c88253fdf7d3d060aae191c",
+    "stderrSha256": "6144982d1005da61a2eaff444089a7a4c108ecefaaba8cede58955b6619ae96c"
+  },
+  "preservation": {
+    "originalIndependentEndingPass": false,
+    "originalEndingRefusal": "aptLists",
+    "fourOldAccountDatabasesAndHomesExact": true,
+    "sourcesAndKeyringsExact": true,
+    "fullSnapshotDifferences": [
+      {
+        "after": 1791206826758743406,
+        "before": 1791149322438250400,
+        "path": "/aptLists/rows/auxfiles/ctimeNs"
+      },
+      {
+        "after": 1791206826757743409,
+        "before": 1791149322436250387,
+        "path": "/aptCache/rows/partial/ctimeNs"
+      }
+    ],
+    "allOtherSnapshotFieldsExact": true,
+    "noMetadataExceptionApplied": true
+  },
+  "sourceDiagnosis": {
+    "source": "APT 2.8.3 official Ubuntu source",
+    "url": "https://archive.ubuntu.com/ubuntu/pool/main/a/apt/apt_2.8.3.tar.xz",
+    "bytes": 2354680,
+    "sha256": "088522b3613b28fdbcfa61f1f7e476bf6dc6b0120a8f74409e9527580c9f9d3b",
+    "dscHashMatch": true,
+    "newSignatureVerificationClaimed": false,
+    "uncachedLocalAcquireWithNoDownloadLeavesBasename": true,
+    "simulationBypassesRealAcquireAndGetLock": true,
+    "getLockChangesOnlyTwoObservedDirectoryChangeTimes": true,
+    "freshCorrectiveCacheStageAndInstallationPending": true
+  },
+  "hostResources": {
+    "additionalRamInstalled": false,
+    "nominalRamGB": 64,
+    "oneLabVmAtATime": true,
+    "availableMemoryReserveGiB": 8,
+    "overheadGiB": 1,
+    "originalHostEndingDiskReserveRefusalPreserved": true,
+    "laterFullHostGuardPass": true,
+    "completedArchivesMovedToData": 5,
+    "verifiedBytesMoved": 5554114101,
+    "contentModeOwnerMtimeXattrsVerified": true,
+    "oldPathsPreservedAsLinks": true,
+    "originalMigrationSymlinkComparisonRefusalPreserved": true,
+    "historicalFileInodeAndChangeTimesDiffer": true,
+    "vmDisksMoved": false,
+    "independentOffDeviceBackup": false
+  },
+  "releaseQualified": false
+}

@@ -56,6 +56,15 @@ normal shutdown afterward. A new graphical cohort still needs fresh installed-so
 native-session and consent admission. Old direct-QEMU wrappers cannot be replayed
 against these libvirt machines.
 
+A later Mint adoption attempt records a known local-APT failure with its original
+strict ending refusal. A separate follow-up confirms the previous package source,
+clean native verification and no new account. Five more completed build archives
+move to DATA with verified bytes/metadata and retained path aliases, restoring the
+host reserve after its separately retained refusal. No VM disk moves. The owner
+keeps64 GB: one active lab VM, full guest allocation, 8 GiB available host reserve
+and 1 GiB overhead remain the working policy. See the
+[actual record](../release/qualification/next-targets/20261005-mint-native-local-apt-refusal.json).
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private

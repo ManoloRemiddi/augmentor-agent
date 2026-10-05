@@ -1,5 +1,27 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint local-package refusal and disk reserve
+
+The [actual native-transaction record](../release/qualification/next-targets/20261005-mint-native-local-apt-refusal.json)
+supersedes the earlier pending strict plan: the full audit and two-package simulation
+pass, but the one real APT transaction exits100 before replacement. Its local
+`--no-download` acquisition leaves an internal basename despite absolute incoming
+paths. Exact official APT2.8.3 source explains the failure and its two observed
+directory change-time effects. The original independent ending refuses; all four
+old accounts/HOMEs, source/keyrings and every other snapshot field remain exact.
+A separate follow-up verifies the previous365 packages and absent original APT
+process/new account. Preserve the failure; stage exact candidates into the canonical
+archive cache and obtain fresh audit/plan authority before a new transaction.
+No account or graphical acceptance is claimed.
+
+The owner retained64 GB. Five completed archives now move to DATA with verified
+content, mode, ownership, modification times and extended attributes; their old
+paths remain links. No VM disk moves. Historical inode/change-time identities differ.
+The original archive-root symlink comparison refusal leaves both verified copies;
+a separate corrected continuation verifies them before removing the redundant copy.
+The original host disk-reserve ending refusal remains, while a separate full host
+check now passes with restored reserve. Keep one VM and the existing memory guards.
+
 ## October 5 resumed with the existing 64 GB
 
 Latest [held-session admission](../release/qualification/next-targets/20261005-mint-held-session-admission.json):
