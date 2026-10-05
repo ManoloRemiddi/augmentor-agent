@@ -2,12 +2,12 @@
 
 # Augmentor Agent for Windows — 0.2.13 preview
 
-The published Handy preview 2 includes native x64/ARM64 dictation and its bundled
+Handy preview 3 includes native x64/ARM64 dictation and its bundled
 private browser/runtime. Preview 1 remains historical and does not include Handy.
-See [the published source, checksums and qualification](HANDY-DOWNLOADS-2026-10-03.md).
+See [the source, checksums and qualification](HANDY-DOWNLOADS-2026-10-05.md).
 Physical microphone and cross-application typing acceptance remain separate.
 
-Windows preview 2. Windows 11 **25H2 or later**, build 26200 or later.
+Windows preview 3. Windows 11 **25H2 or later**, build 26200 or later.
 Choose **x64** for Intel/AMD PCs or **ARM64** for Windows on ARM.
 Find your processor type in Settings → System → About → System type.
 Windows 10 and Windows 11 24H2 are not supported by this installer.
@@ -18,7 +18,7 @@ RTX Spark hardware has not been tested; ARM64 compatibility is not hardware cert
 This preview is **unsigned**. Windows may warn about an unknown publisher or block
 it under Smart App Control or your organisation's security policy. Only download
 from [augmentoragent.com](https://augmentoragent.com/#windows-download) or the
-[official release](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-windows-preview.2).
+[official release](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-windows-preview.3).
 If SmartScreen offers **More info → Run anyway**, proceeding is your decision after
 checking the source and checksum. If Windows policy blocks it, wait for a signed
 release. Do not turn off Defender, Smart App Control or organisational protections.
@@ -71,7 +71,7 @@ Windows runner evidence. **Physical PC acceptance starts with this public downlo
 we do not claim RTX Spark testing, every browser/provider, or complete OS parity.
 
 Automatic update notifications and one-click updates are **not enabled**. Do not
-install a different build over this one, including preview 2 over preview 1:
+install a different build over this one, including preview 3 over either preview 1 or preview 2:
 manual upgrades are not implemented. Future releases must supply a supported upgrade procedure. To repair
 this exact build, first finish active tasks, turn off System dictation in Settings,
 and close all Augmentor windows/browser work, then use Installed apps → Augmentor Agent → Modify or rerun this same installer.

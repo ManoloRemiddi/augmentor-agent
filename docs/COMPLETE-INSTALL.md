@@ -7,12 +7,12 @@ is scoped to KDE Plasma Wayland. Mac and Windows use their own
 platform installers; this Linux installer does not establish Fedora feature parity.
 
 The active project is [augmentor-agent](https://github.com/ManoloRemiddi/augmentor-agent).
-This guide describes the published **0.2.13 Handy preview 2**.
-[Exact source, checksums and qualification](HANDY-DOWNLOADS-2026-10-03.md)
-are recorded separately from historical preview-1 downloads. Use these matching assets:
-[download the archive](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.2/augmentor-0.2.13-complete-preview.2.tar.gz),
-[verify SHA256SUMS](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.2/SHA256SUMS),
-and read its [release record](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-complete-preview.2).
+This guide describes **0.2.13 Handy preview 3**.
+[Exact source, checksums and qualification](HANDY-DOWNLOADS-2026-10-05.md)
+are recorded separately from earlier previews. Use these matching assets:
+[download the archive](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.3/augmentor-0.2.13-complete-preview.3.tar.gz),
+[verify SHA256SUMS](https://github.com/ManoloRemiddi/augmentor-agent/releases/download/v0.2.13-complete-preview.3/SHA256SUMS),
+and read its [release record](https://github.com/ManoloRemiddi/augmentor-agent/releases/tag/v0.2.13-complete-preview.3).
 This release fixes the WebSocket receiver vulnerability. See the
 [browser reliability and upgrade guidance](RELEASE-0.2.13.md).
 Extract the verified archive and open a terminal in its folder:
@@ -68,8 +68,8 @@ Open Settings → **System dictation · Powered by Handy**, turn it on, choose a
 transcription model and review its terms before downloading it. Hold **Ctrl +
 Space** while speaking and release to insert text into the focused application.
 Escape or **×** cancels. Change the shortcut, microphone or activation mode in
-these settings, or turn dictation off. The recording pill follows your Augmentor
-colours and animated circle. On Wayland, approve the shortcut/input permissions
+these settings, or turn dictation off. Enabled dictation starts again automatically after login. The recording pill follows your Augmentor
+colours and animated circle, including the Linux WebKitGTK repaint repair. On Wayland, approve the shortcut/input permissions
 requested by your desktop. Physical microphone, compositor and typing acceptance
 remain specific to the target machine.
 
