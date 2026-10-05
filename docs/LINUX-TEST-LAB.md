@@ -82,6 +82,11 @@ failed transaction is preserved. New-account/login and graphical testing remain
 separate; only Mint is running. Account observation allows a finite1,800 seconds
 for its measured full snapshots, without changing guest or product deadlines.
 
+The [ordinary new-account ending](../release/qualification/next-targets/20261005-mint-ordinary-account-ending.json)
+also passes: all old rows/HOMEs and other snapshot fields stay exact, while only
+the reviewed synthetic account rows are added and its HOME is private0700.
+Password provisioning and graphical authentication require separate known outcomes.
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private

@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint ordinary account passes
+
+The [ordinary-account ending](../release/qualification/next-targets/20261005-mint-ordinary-account-ending.json)
+passes one normal group/user creation and its full independent ending on the
+verified a118 native installation. The new UID/GID1004 has only its private group,
+`/bin/sh`, a locked password and a0700 HOME with21 skeleton members. All old rows in all six
+account databases and all four old HOMEs remain exact; only the reviewed
+preview rows are added. Actual normal replacement-file metadata is retained.
+All other preservation fields, package map and native checks pass, as does the
+host ending. Separate password provisioning is running; normal graphical login,
+setup, Browser and Stop remain open. Original unused controls and failures stay
+retained; no release is qualified.
+
 ## October 5 Mint normal native installation passes
 
 The [cache-backed native observation](../release/qualification/next-targets/20261005-mint-cache-backed-native-install.json)

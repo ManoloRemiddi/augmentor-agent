@@ -1,0 +1,48 @@
+{
+  "format": "augmentor-mint-ordinary-account-ending/1",
+  "status": "NORMAL_NEW_ACCOUNT_AND_FULL_INDEPENDENT_ENDING_PASS",
+  "target": "linuxmint22.3-amd64",
+  "installedSourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "ordinarySyntheticAccount": {
+    "uid": 1004,
+    "gid": 1004,
+    "shell": "/bin/sh",
+    "homeMode": "0700",
+    "homeMembers": 21,
+    "passwordLockedAtThisEnding": true,
+    "normalGroupaddAndUseraddOnce": true,
+    "allGroups": [
+      1004
+    ]
+  },
+  "preservation": {
+    "allFourOldHomesExact": true,
+    "onlyExactPreviewRowsAdded": true,
+    "accountFileKindDeviceOwnerModeLinksExact": true,
+    "normalReplacementFileMetadataRetainedNotNormalized": true,
+    "allOtherSnapshotFieldsExact": true,
+    "beforeRawSnapshotSha256": "db85eb1a4535140850d9ecc6d8792ce993d1c69fc1f73cdd9f73088c72e075fa",
+    "afterRawSnapshotSha256": "87416fe2e95e0c67ef4503a644edf5b1f1edb42c0179ffa429caef0b01159a67",
+    "packageMapExact": true,
+    "nativeVerifiedBeforeAndAfter": true,
+    "fullHostEndingPass": true,
+    "allOldRowsInSixAccountDatabasesExact": true
+  },
+  "source": {
+    "guestAccountSha256": "e3b2c783f4b2c019c7b5b84e1b1b43f7f6287013a387bb81763982bc98afd081",
+    "hostAccountSha256": "47d611d0a52c4e6c59ed6674a06df7e092685f6652c53ed852c2d55661a297c1",
+    "outerSSHObservationSeconds": 1800,
+    "guestAndProductDeadlinesUnchanged": true
+  },
+  "actualOutcomeSha256": "bd59f0ac54fdaf6a7c3f2f1aa2cb9868862deb8034dca41ae9880d47947f8d2a",
+  "stdoutSha256": "26a5e3fa2d0f9291fb914f8f4e5acc3635dd306730257fa607983b0537f8b36a",
+  "normalAccountNotReplayed": true,
+  "noSetupOrProviderStarted": true,
+  "remaining": [
+    "Separate new-user password provisioning and normal graphical login",
+    "Normal setup in the native session, graphical Browser and visible Stop",
+    "Remaining five-point release gates"
+  ],
+  "passwordOrGraphicalAcceptance": false,
+  "releaseQualified": false
+}
