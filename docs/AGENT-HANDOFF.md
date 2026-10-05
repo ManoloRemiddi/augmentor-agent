@@ -1,12 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-## October 5 physical-device VM backup guard
+## October 5 physical-device VM backup guard and NAS route
 
 The persistent-lab backup helper now resolves Linux block-device backing through
 partitions and stacked-device slaves. It refuses a same-physical-device target
 before creating files; filesystem device numbers alone incorrectly admit
-sibling partitions. All 21 lab-helper tests pass. No off-device target is
-currently verified, and no backup or restore drill was performed. See the
+sibling partitions. All 21 lab-helper tests pass. A physically separate NAS
+destination has since been identified and its private backup folder created. A
+read-only rsync dry run was rejected by the NAS's forced-command wrapper, so no
+host write path or VM backup is verified; no VM data was copied and no restore
+drill was performed. See the
 [persistent lab backup procedure and boundary](LINUX-TEST-LAB.md#independent-backup)
 and [focused qualification record](../release/qualification/next-targets/20261005-lab-backup-physical-device-guard.json).
 
@@ -21,12 +24,19 @@ now has a measured 60-second endpoint deadline and checks its owned process, wit
 seven focused source tests passing.
 
 The corrected semantic socket reader passes, preserving native IBus, all five
-normal setup settings and the temporary collector policy. Owned product processes,
-listeners and package leases are cleared; the full old-state audit passes.
-The corrected attempt also exits1 before extension/model steps after 116.8
-seconds. It reaches the normal Browser test's Pi readiness check but remains in
-`connecting` through the 60-second readiness wait, despite two native-port
-connect events. The test emits no Browser proof. Its guest journal retains
+normal setup settings and the temporary collector policy. Before the next
+headed attempt, owned product processes, listeners and package leases are
+cleared and the full old-state audit passes.
+The corrected attempt exits1 after 116.8 seconds. Chromium loads the unpacked
+extension, the panel runtime API is available, and explicit Pi harness selection
+succeeds. The subsequent Pi readiness check remains `connecting` through its
+60-second wait despite two native-port connect events. The test emits no
+acceptance proof or model prompt. A source audit confirms Pi's cold-start helper
+can wait60 seconds inside extension requests whose native request budget is
+20 seconds; this nested budget mismatch is a candidate, not a proven failure
+cause. The package launcher also performs runtime verification before its
+native-host handshake. The exact failed RPC/timing remains unknown. Its guest
+journal retains
 `unknownOutcome=true`; no model interaction or visible Stop is claimed, and the
 intent is not replayed. The underlying startup/connection cause is unestablished.
 A separate full preservation ending after this attempt and removal of the

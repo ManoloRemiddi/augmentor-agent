@@ -5,7 +5,10 @@
   "observedStorage": {
     "labAndCandidateLocalPartitionsSharePhysicalDevice": true,
     "samePhysicalDevice": true,
+    "independentNasDestinationIdentified": true,
     "independentDestinationMounted": false,
+    "nasRsyncDryRun": "REFUSED_BY_NAS_FORCED_COMMAND",
+    "nasWriteTransportVerified": false,
     "systemDiskHasInsufficientFreeSpaceForVmBackup": true
   },
   "implementation": {
@@ -28,6 +31,8 @@
     "vmFilesModified": false,
     "backupCreated": false,
     "restoreDrillPerformed": false,
-    "requiredNext": "Connect or designate a separate physical drive or NAS with sufficient free space; then perform the guarded backup and restore drill."
+    "nasPathAndSeparatePhysicalStorageConfirmedPrivately": true,
+    "nasTransferMethod": "NAS global SSH ForceCommand rejected the rsync dry run; inspect the supported NAS transfer route before copying",
+    "requiredNext": "Validate a supported NAS write path without risking VM data; then perform a guarded offline backup and restore drill."
   }
 }

@@ -107,11 +107,12 @@ closures, a release or crash recovery. The owner keeps the existing 64 GB and on
 VM at a time; no additional RAM is assumed.
 
 The [later headed Browser startup attempt](../release/qualification/next-targets/20261005-mint-headed-browser-startup.json)
-has two retained failures before extension/model steps. The later attempt reaches
-the Pi readiness check but remains `connecting` through the 60-second readiness
-wait, despite native-port connect events; its cause remains undetermined. It is
-not replayed. The test driver's endpoint wait correction changes external test
-controls only. A post-failure full ending and temporary collector removal remain
+has two retained failures before model/prompt acceptance. The later attempt does
+load the extension and panel, accepts Pi harness selection, then remains
+`connecting` through the 60-second Pi readiness wait despite native-port connect
+events; its cause remains undetermined. It is not replayed. The test driver's
+endpoint wait correction changes external test controls only. A post-failure
+full ending and temporary collector removal remain
 required; no Browser or Stop pass is claimed.
 
 ## Storage and machines
@@ -259,11 +260,13 @@ backup in a separate copy of the specification, and import into a new private la
 directory. Do not edit the disk's backing
 header or reuse stale process/session identifiers.
 
-No independent backup destination has been verified. A candidate local
-partition shares the same physical device as the VM store, and the separate
-system disk does not currently have sufficient space for these VM backups.
-Connect or designate a separate physical drive or NAS before running the backup.
-A complete off-device restore drill remains separate from the local
+A physically separate NAS with sufficient capacity has been identified, but its
+write route is not yet verified: a read-only rsync dry run was rejected by the
+NAS's forced-command wrapper. No VM data has been copied. The helper currently
+requires a mounted local path so it can prove physical-device separation; it
+does not yet support a remote SSH destination. Keep the VMs' existing DATA
+checkpoints as the reboot recovery path until a supported NAS transfer route is
+validated. A complete off-device restore drill remains separate from the local
 disk-preservation checks.
 
 On October 5, the backup admission was tightened after observing that comparing

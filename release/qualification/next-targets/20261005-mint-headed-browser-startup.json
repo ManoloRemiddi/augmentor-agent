@@ -18,7 +18,7 @@
     "exactChromiumStartupDuration": "NOT_RECORDED",
     "rootCause": "UNESTABLISHED"
   },
-  "preservation": {
+  "preservationAfterOriginalBrowser337": {
     "correctedSemanticSocketReader": "PASS",
     "nativeIBusPreserved": true,
     "newUserProfilesAndCollectorExact": true,
@@ -45,13 +45,16 @@
     "totalBrowserStartupWithin60SecondsClaimed": false
   },
   "correctedHeadedBrowser": {
-    "status": "FAIL_BEFORE_EXTENSION_AND_MODEL_STEPS",
+    "status": "FAIL_AFTER_EXTENSION_LOAD_BEFORE_MODEL_STEPS",
     "callerExitCode": 1,
     "elapsedSeconds": 116.78244090080261,
     "originalUnknownOutcomeFlag": true,
     "originalJournalRetained": true,
     "intentReplayed": false,
-    "extensionLoaded": false,
+    "extensionLoaded": true,
+    "extensionLoadReturnedExpectedId": true,
+    "sidePanelRuntimeApiAvailable": true,
+    "harnessSelectionAccepted": true,
     "modelPromptsReached": false,
     "visibleStopTested": false,
     "browserProofOutputCount": 0,
@@ -62,7 +65,23 @@
       "modelSelected": false,
       "portConnectEvents": 2
     },
-    "failureBoundary": "The test did not observe ready or needs-setup within its 60-second Pi readiness wait; it exited before loading the extension.",
+    "failureBoundary": "After extension load and successful Pi harness selection, the test did not observe ready or needs-setup within its 60-second Pi readiness wait.",
+    "rootCause": "UNESTABLISHED"
+  },
+  "preservationAfterCorrectedBrowser347": {
+    "childProcessAbsent": true,
+    "nativeIdleInhibitReleasedNormally": true,
+    "priorManagementSessionAbsent": true,
+    "fullIndependentEnding": "REQUIRED",
+    "temporaryCollectorRuleRemoval": "REQUIRED_AFTER_FULL_ENDING"
+  },
+  "sourceAudit": {
+    "extensionLoadAndPanelPrecedePiReadinessAssertion": true,
+    "piModelsRequestCanColdStartRuntime": true,
+    "coldRuntimeStartBudgetSeconds": 60,
+    "extensionNativeRequestBudgetSeconds": 20,
+    "nestedStartupBudgetMismatch": "CONFIRMED_IN_SOURCE_POSSIBLE_RUNTIME_IMPACT_UNPROVEN",
+    "packageLauncherRunsRuntimeVerificationBeforeNativeHostHandshake": true,
     "rootCause": "UNESTABLISHED"
   },
   "remaining": {
