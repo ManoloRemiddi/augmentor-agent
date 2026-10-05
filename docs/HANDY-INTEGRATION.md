@@ -2,6 +2,113 @@
 
 # Embedded Handy dictation
 
+## October 5 animated overlay rendering
+
+The owner reports opaque black rectangles behind the animated circle and
+waveform while Ctrl+Space is held; the static Transcribing pill looks correct
+after release. This morning's package update replaced WebKitGTK 2.52.6 with
+2.54.0. Native Handy/CSS bytes were unchanged by the reboot recovery. The same
+native component now reproduces the lost static pill/border/cancel pixels on an
+isolated X11 display while recording. The new graphics engine's damage-aware
+repainting clears areas outside the animated regions; no microphone/model
+failure is observed. See [the upstream rendering changes](https://webkitgtk.org/2026/09/16/webkitgtk-2.54-highlights.html).
+
+The embedded orb now invalidates the complete Linux overlay frame using an
+imperceptible alternating body opacity (1 / 0.99999) while mounted. This preserves
+the existing palette, rounded pill, border, cancel button and four-pixel icon
+placement while the circle and waveform animate. With decoration disabled, the
+circle stays still but the repaint loop preserves the live waveform's surrounding
+UI. Unmount cancels the loop and restores the prior body opacity. Other platforms
+retain their prior scheduling. There is no extra tray/service, GPU/model switch,
+global graphics setting or system-package downgrade.
+
+The initial proposal to add the two WebKit rendering flags used by existing
+proofs did not repair the reproduced missing static elements, so it was not
+adopted. The native recording proof now checks successive frames' complete painted
+pill footprint in dark/light palettes and with animation off, in addition to
+actual capture/paste/cancel/focus/ownership/off/exit behavior. The new assertion
+fails against the unchanged prior native binary with only a 109-by-28 painted
+region. The rebuilt candidate passes all nine captured frames (three per palette/
+animation condition), both with the proof's legacy flags and with the ordinary
+renderer environment. Actual virtual-microphone speech is transcribed and pasted
+exactly once, with focus, editable shortcut, cancel, ownership, disable, no tray
+and parent exit passing. Frontend TypeScript/build and focused ESLint pass; the
+locked/offline optimized Linux native build succeeds. All 22 broker cases pass.
+No physical microphone was used. Installed adoption is recorded below; the
+owner's Wayland pixels remain a separate acceptance check.
+
+Installed compatible Linux adoption is complete through stage/activate. Native
+UI source `2ec7265` is rebuilt over the prior immutable recovery artifact
+`33b94ac55d72a41c7090303b0c5d8c0e07b7c9085e8978f54561ee56fdb1332a`.
+Selected release is `20261005-095559-8aa03c9b`, artifact SHA-256
+`d0f0386d4b37cc41dbcf53d3ecf49be33e1b583b13afe15bf57d46fc73b002a8`. Both sealed inventories verify after use; changes are confined
+to Handy runtime/build metadata and matching notices. The broker, original input
+helper bytes, 0.2.11 product, DSH/speech and saved broker preferences are retained.
+
+Only idle dictation was gracefully replaced. Its rebuilt native Handy starts
+before the first status probe and reports enabled/ready, unchanged Ctrl+Space,
+no error and no tray. It retains the owner's Wayland backend with no WebKit/GL
+environment override. Desktop and Mobile chats remain online/voice-available on
+their earlier build, with an update pending; neither was restarted. The stable
+login service is enabled/active and reads the selected release on next login.
+The prior reboot recovery is carried forward. No actual reboot or owner-session
+physical microphone/visual acceptance is claimed; these remain owner retests.
+
+Public preview-2 downloads retain their prior immutable bytes. PR #39 is a source
+candidate; this repair does not imply a merged PR or updated public downloads.
+
+## October 5 reboot startup recovery
+
+After the owner's reboot, Augmentor's dictation broker was running with saved
+`enabled: true`, but neither Handy nor its private input helper was running.
+A status request started both and reported ready on the unchanged Ctrl+Space.
+The desktop's initialize request is a single attempt with discarded errors; the
+broker previously had no enabled-component recovery loop. The exact earlier
+startup exception was not retained, so a cold-start timeout is not asserted as
+its proven cause. The installed compatible 0.2.11 backport also lacked the
+already-qualified separate 60-second first-response budget.
+
+The existing broker now restores saved enabled dictation automatically, without
+waiting for a client/status/settings read. A failed component start retries no
+more often than ten seconds after the previous attempt finishes. An exited
+component releases its input helper and leases before replacement. Disabled
+settings stay off, existing live components are retained, microphone ownership
+is preserved, and consent/binding refusals retain their existing disable policy.
+No separate tray, login service or OS-wide monitoring service is introduced.
+
+Validation: 22 broker cases, three off/settings data cases and thirteen shared
+companion lifetime cases pass. A real private broker/synthetic component proves
+startup from saved-on state and recovery after child exit, before any client
+probe. A real native Handy proof on a private Xvfb/session bus starts automatically
+in approximately 1.1 seconds and reaches enabled/setup-needed without a model,
+then turns off and remains off. No owner's display, microphone or audio setup
+was used for those fixtures. The compatible installed candidate passes all 22
+broker cases independently; its narrow patch includes the existing qualified
+startup timeout interface and leaves warm response bounds unchanged.
+
+Installed adoption is complete through the canonical stage/activate procedure:
+source implementation `e9faf1898b48990006a05505e7eb50ec343b2d0e` is narrowly
+backported over immutable artifact
+`ee648609533909b614be9345f2efb78eeb87f7fe9124a0e990e1ba383dfc9d7a`.
+Recovery-stage release (superseded by the rendering repair above) was
+`20261005-085541-c8193467`, artifact SHA-256
+`33b94ac55d72a41c7090303b0c5d8c0e07b7c9085e8978f54561ee56fdb1332a`.
+Both old/new inventories verify after use; only `services/dictation/server.py`
+differs. Matching 0.2.11 product/DSH/speech and native Handy bytes are retained.
+
+Only the idle dictation broker was gracefully replaced. Before any status probe,
+its new native Handy child started automatically; subsequent status reported
+enabled/ready, Ctrl+Space, no error and no tray. Saved broker preferences match
+their prior bytes. The canonical desktop login service is enabled/active and its
+stable launcher reads the new selection. Existing Desktop/Mobile remain online
+with voice available on their earlier running build and report an update pending;
+no conversation window was restarted. The new broker already uses the selected
+build. No actual machine reboot or physical microphone retest is claimed; the
+fresh broker/native startup plus selected login chain was verified instead.
+Source/platform checks and the owner's installed mixed 0.2.11 artifact are
+separate. Published preview-2 binaries retain their immutable earlier source;
+this new source fix does not silently replace those downloads.
+
 ## Current matched download publication — October 3
 
 [The preview-2 release ledger](HANDY-DOWNLOADS-2026-10-03.md) records the

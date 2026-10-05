@@ -41,7 +41,7 @@ def process_alive(pid):
 class Backend:
     def __init__(self, base, session="default"):
         self.base=base; self.lock=threading.RLock(); self.child=None; self.pending={}; self.sequence=0; self.generation=0; self.owner=None;self.input_daemon=None;self.portal=None
-        self.key_events=queue.Queue()
+        self.key_events=queue.Queue();self.restore_at=0
         threading.Thread(target=self.key_worker,daemon=True).start()
         self.inputdir=base/session;self.inputdir.mkdir(exist_ok=True,mode=0o700)
         self.statefile=base/'preferences.json'
@@ -96,6 +96,21 @@ class Backend:
                 if owner is not self.portal or owner.session!=session or not self.child or self.child.poll() is not None:continue
                 try:self.call('shortcut.event',{'pressed':pressed})
                 except (OSError,RuntimeError,TimeoutError):pass
+
+    def restore_enabled(self):
+        """Restore saved dictation without depending on a settings/status read."""
+        with self.lock:
+            if not self.preferences.get('enabled') or (self.child and self.child.poll() is None):return
+            if time.monotonic()<self.restore_at:return
+            try:
+                if self.child:self.stop()
+                self.start()
+            except (OSError,RuntimeError,TimeoutError) as error:
+                # A cold component or session dependency may not be ready at
+                # login. Keep the existing startup bounds and enabled intent;
+                # permission/binding refusals still use start's disable policy.
+                print('System dictation startup: '+str(error),file=sys.stderr,flush=True)
+            finally:self.restore_at=time.monotonic()+10
 
     def activate(self):
         self.start_input()
@@ -326,6 +341,7 @@ def main():
         threading.Thread(target=accept,daemon=True).start()
         try:
             while not stopped.wait(1):
+                backend.restore_enabled()
                 with backend.lock:
                     if backend.owner and not process_alive(backend.owner['pid']):
                         try:

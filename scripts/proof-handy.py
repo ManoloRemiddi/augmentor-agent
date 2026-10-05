@@ -59,6 +59,20 @@ def main():
                     return reply['result']
                 if child.poll() is not None:raise RuntimeError('Component exited: '+str(child.returncode))
             raise TimeoutError(method+' did not respond')
+        def capture_overlay(window,name):
+            # Inspect successive native frames: a partial repaint regression
+            # leaves only the orb/waveform and loses the static pill/cancel.
+            for _ in range(3):
+                pause(.12)
+                capture=app.primaryScreen().grabWindow(window)
+                image=capture.toImage()
+                painted=[(x,y) for y in range(image.height()) for x in range(image.width())
+                         if image.pixelColor(x,y).alpha()>0 and max(image.pixelColor(x,y).getRgb()[:3])>20]
+                assert painted,'Recording overlay is blank'
+                width=max(x for x,y in painted)-min(x for x,y in painted)+1
+                height=max(y for x,y in painted)-min(y for x,y in painted)+1
+                capture.save(str(OUT/name))
+                assert width>=160 and height>=36,repr({'lostStaticOverlay':True,'width':width,'height':height})
         def ready(phase):
             for _ in range(150):
                 state=call('status')
@@ -69,7 +83,7 @@ def main():
             with open(OUT/'component.log','w') as log:
                 if broker_mode:
                     os.environ.clear();os.environ.update(env)
-                    child=subprocess.Popen([sys.executable,str(ROOT/'services/dictation/server.py')],stderr=log,env=env)
+                    child=subprocess.Popen([sys.executable,'-B',str(ROOT/'services/dictation/server.py')],stderr=log,env=env)
                     for _ in range(100):
                         try:call('status');break
                         except RuntimeError:pause(.05)
@@ -89,10 +103,12 @@ def main():
                 audio=subprocess.Popen(['paplay','--device='+sink,str(workspace/'input.wav')])
                 pause(.5)
                 overlay=int(command(['xdotool','search','--onlyvisible','--name','^Recording$']).splitlines()[-1])
-                app.primaryScreen().grabWindow(overlay).save(str(OUT/'recording-dark.png'))
+                capture_overlay(overlay,'recording-dark.png')
                 light={'background':'#e8edf2','foreground':'#152b2c','accent':'#ac5335','border':'#ac5335','opacity':.9,'animated':True,'mode':'light'}
                 call('theme',light);assert call('status')['theme']==light
-                pause(.4);app.primaryScreen().grabWindow(overlay).save(str(OUT/'recording-light.png'))
+                pause(.4);capture_overlay(overlay,'recording-light.png')
+                call('theme',{**light,'animated':False});pause(.4);capture_overlay(overlay,'recording-animation-off.png')
+                call('theme',light)
                 assert int(command(['xdotool','getwindowfocus']))==target_id,'Overlay stole input focus'
                 while audio.poll() is None:pause(.05)
                 pause(.3);command(['xdotool','keyup','space','shift','ctrl']);ready('ready');pause(.8)
@@ -115,7 +131,7 @@ def main():
                 else:child.stdin.close()
                 child.wait(timeout=5);assert child.returncode==0
                 result={'schema':'augmentor-handy-proof/1','transcript':text,'virtualMicrophone':True,'physicalMicrophoneUsed':False,
-                        'defaultCtrlSpace':True,'shortcutCustomisation':True,'liveThemeChanged':True,'focusPreserved':True,'closeButtonCancelled':True,'cancelPreservedText':True,'microphoneOwnership':True,'disabled':True,'parentExit':True,'tray':False,'authenticatedBroker':broker_mode}
+                        'defaultCtrlSpace':True,'shortcutCustomisation':True,'liveThemeChanged':True,'staticOverlayPreservedAcrossFrames':True,'animationOffOverlayPreserved':True,'focusPreserved':True,'closeButtonCancelled':True,'cancelPreservedText':True,'microphoneOwnership':True,'disabled':True,'parentExit':True,'tray':False,'authenticatedBroker':broker_mode}
                 (OUT/('broker-result.json' if broker_mode else 'result.json')).write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result))
         finally:
             if child and child.poll() is None:

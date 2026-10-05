@@ -9,7 +9,7 @@
 See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualified Linux upgrade and temporary history bridge.
 
 
-- [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, themed recording pill, settings, OS adapters, licensing, build and qualification boundaries.
+- [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, reboot recovery, WebKitGTK recording repaint repair, themed pill, settings, OS adapters, licensing, build and qualification boundaries.
 - [Approved Handy integration plan](HANDY-INTEGRATION-PLAN.md).
 
 - [Application SDK foundation](APP-SDK.md): DSH integration protocol, tool grants, recoverable installation and experimental voice.

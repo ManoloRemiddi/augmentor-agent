@@ -2,6 +2,34 @@
 
 # Start here: agent handoff
 
+## October 5 animated dictation overlay
+
+[The Handy rendering record](HANDY-INTEGRATION.md#october-5-animated-overlay-rendering)
+tracks today's WebKitGTK 2.54 update and reproduced missing static pill/border/
+cancel elements during animated recording. The Linux orb now invalidates the
+whole transparent frame while mounted, preserving the approved visuals and
+model/graphics placement. The prior binary fails the new static-frame check; the rebuilt native component
+passes nine recording frames plus actual virtual-mic speech/paste/cancel, with
+and without legacy rendering flags. Compatible 0.2.11 release `20261005-095559-8aa03c9b` is
+selected, and its automatically started dictation component is enabled/ready in
+the unchanged Wayland session. Sealed inventories verify and settings remain
+unchanged. Login startup is enabled/active; existing Desktop/Mobile chats retain
+their earlier running build. Owner visual acceptance and an actual reboot remain
+separate checks. Preserve open conversations; public download bytes are unchanged.
+
+## October 5 dictation reboot recovery
+
+[The Handy startup recovery record](HANDY-INTEGRATION.md#october-5-reboot-startup-recovery)
+owns the observed saved-on broker without its native component, automatic
+restoration/retry, off-state and resource cleanup tests, and compatible installed
+adoption. Recovery release `20261005-085541-c8193467` was selected before
+the rendering repair above superseded it. Its broker automatically starts Handy and reports ready with
+unchanged Ctrl+Space/preferences. Desktop/Mobile chats were not restarted and
+retain their earlier build. The precise initial startup exception was not captured. Source and
+installed artifacts remain separate; the owner's working DSH/speech, settings
+and conversation windows must be preserved. Public preview-2 bytes are unchanged.
+
+
 ## October 4 Codex native launch merge candidate
 
 PR #28 integrates current main and browser/prompt/DSH candidates while preserving

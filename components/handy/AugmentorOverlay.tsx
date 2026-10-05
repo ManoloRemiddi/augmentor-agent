@@ -41,9 +41,18 @@ export function AugmentorOrb({ animated, colour }: { animated: boolean; colour: 
   useEffect(() => {
     const el = canvas.current, ctx = el?.getContext("2d");
     if (!el || !ctx) return;
-    let frame = 0, start: number | null = null;
+    let frame = 0, start: number | null = null, repaint = false;
+    // WebKitGTK 2.54 clears transparent frames outside the animated damage.
+    // Invalidate the whole overlay with an imperceptible opacity change so the
+    // static pill, border and close button stay present alongside live levels.
+    const linux = navigator.userAgent.includes("Linux");
+    const previousOpacity = document.body.style.opacity;
     const draw = (time: number) => {
       if (start === null) start = time;
+      if (linux) {
+        repaint = !repaint;
+        document.body.style.opacity = repaint ? "0.99999" : "1";
+      }
       const phase = animated ? (time - start) / 1000 * 2 : 0;
       const ratio = window.devicePixelRatio || 1;
       el.width = Math.round(28 * ratio); el.height = Math.round(28 * ratio);
@@ -62,10 +71,10 @@ export function AugmentorOrb({ animated, colour }: { animated: boolean; colour: 
       }
       ctx.closePath(); ctx.fillStyle = colour + "4b"; ctx.fill();
       ctx.strokeStyle = colour; ctx.lineWidth = 1.3; ctx.stroke();
-      if (animated) frame = requestAnimationFrame(draw);
+      if (animated || linux) frame = requestAnimationFrame(draw);
     };
     draw(performance.now());
-    return () => cancelAnimationFrame(frame);
+    return () => { cancelAnimationFrame(frame); if (linux) document.body.style.opacity = previousOpacity; };
   }, [animated, colour]);
   return <canvas ref={canvas} className="augmentor-orb" aria-hidden="true" style={{ width: 28, height: 28 }} />;
 }
