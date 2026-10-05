@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint corrective offline cache checkpoint
+
+The [canonical-cache observation](../release/qualification/next-targets/20261005-mint-canonical-offline-cache.json)
+passes exclusive copies of the two exact candidate DEBs, all old account/HOME,
+cache-member, source/list/keyring preservation, old native verification and the full
+host ending. Only the two allowed cache additions and archive-directory metadata
+change. The original APT exit100 and ending refusals remain. No package installation,
+live account or graphical action occurs in this step. A fresh strict audit/plan
+must match this exact cache ending before the new normal transaction. Its separately
+reviewed ending records only the source-supported APT auxfiles/partial directory
+change-time effects, with raw digests and every other field exact. Source checks
+pass36 installer-ending,6 cache-copy and33 password/login cases; those are not
+installed graphical acceptance. Keep one machine and the64 GB reserve policy.
+
 ## October 5 Mint local-package refusal and disk reserve
 
 The [actual native-transaction record](../release/qualification/next-targets/20261005-mint-native-local-apt-refusal.json)

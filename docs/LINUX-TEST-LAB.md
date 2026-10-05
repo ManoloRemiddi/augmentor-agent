@@ -65,6 +65,14 @@ keeps64 GB: one active lab VM, full guest allocation, 8 GiB available host reser
 and 1 GiB overhead remain the working policy. See the
 [actual record](../release/qualification/next-targets/20261005-mint-native-local-apt-refusal.json).
 
+Mint's separately journaled corrective cache stage now passes exact two-file copies,
+full old account/cache/source preservation, old native checks and the host ending.
+It performs no installation. Its [cache record](../release/qualification/next-targets/20261005-mint-canonical-offline-cache.json)
+is the new audit/plan baseline; preserve the original failed APT attempt and obtain
+fresh authority before another transaction. A retained ordinary management session
+keeps its existing user manager alive without changing services or audio routing;
+normal session closure and VM shutdown remain separate endings.
+
 ## Storage and machines
 
 The local lab is `/media/manolo/DATA/augmentor-test-lab`, mode 0700. Its private

@@ -1,0 +1,65 @@
+{
+  "format": "augmentor-mint-canonical-offline-cache/1",
+  "status": "CACHE_STAGE_AND_INDEPENDENT_ENDING_PASS_NO_INSTALL",
+  "target": "linuxmint22.3-amd64",
+  "installedSourceCommit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+  "candidateSourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "originalNativeFailurePreserved": true,
+  "canonicalArchiveCopies": [
+    {
+      "bytes": 5388,
+      "sha256": "714b4bf71907fd3d7a824e0e4fe6081aac1c0a1bce726ad1290e346c0d853830",
+      "uid": 0,
+      "gid": 0,
+      "mode": 420,
+      "nlink": 1,
+      "file": "augmentor-desktop_0.2.13_amd64.deb"
+    },
+    {
+      "bytes": 352953672,
+      "sha256": "f12154e0a72b02b69a8dcaa42fdd99f4ca3c38fdae90d0dfd5f0c3a0911f3061",
+      "uid": 0,
+      "gid": 0,
+      "mode": 420,
+      "nlink": 1,
+      "file": "augmentor-runtime_0.2.13_amd64.deb"
+    }
+  ],
+  "beforeRawSnapshotSha256": "2202975df7ca5394952e7434fe4efbf6d27750f65d4e00069fe6f1173d9ff7cb",
+  "afterRawSnapshotSha256": "3d9c82ca209e8988ed6158eb73e69ed5fcab7ed05ba49664c2cd3f8533dca242",
+  "fullBeforeAndAfterPreservation": {
+    "fourOldAccountsAndHomesExact": true,
+    "allOldCacheMembersExact": true,
+    "sourcesListsKeyringsExact": true,
+    "onlyTwoCandidateArchivesAdded": true,
+    "archiveDirectoryEntryAndModificationChangeTimesRecorded": true,
+    "oldNativeInventoryVerifiedBeforeAndAfter": true,
+    "nativeRegularFiles": 29328,
+    "legacyDirectoryBaselineUnchanged": true
+  },
+  "controls": {
+    "exclusiveCopies": true,
+    "durableIntentAndOutcome": true,
+    "partialOrUnknownCopyNotReplayed": true,
+    "guestFourGiBPlusRemainingCopyBudgetVerified": true,
+    "fullHostEndingPass": true,
+    "oneVMAndExisting64GBPolicy": true,
+    "noAPTOrAccountOrGraphicalOperation": true,
+    "sourceSha256": "c27afdb7f352fd7e4e5b4c6a0e8d5ba191def3ff8a423729c5a7776c3036015c",
+    "rootIndependentSourceChecks": {
+      "cacheStage": 6,
+      "installerEnding": 36,
+      "passwordLoginSource": 33
+    }
+  },
+  "outcomeSha256": "f7e51ad97943aa506d74e96425d7286dc5e89ceeb7252c1483f6230774e28a03",
+  "stdoutSha256": "53e6290db5fbbbd354b6ebcf8810ddd3fbe6b1e1787a74d2cb32f0a12ae0b6b9",
+  "remaining": [
+    "Fresh strict audit and two-package plan against this exact cache ending",
+    "One new normal native transaction with explicitly recorded normal APT directory effects",
+    "Separate ordinary account and normal login",
+    "Graphical Browser and visible Stop",
+    "Remaining five-point release gates"
+  ],
+  "releaseQualified": false
+}
