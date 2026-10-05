@@ -31,7 +31,24 @@ was used for those fixtures. The compatible installed candidate passes all 22
 broker cases independently; its narrow patch includes the existing qualified
 startup timeout interface and leaves warm response bounds unchanged.
 
-Installed adoption is recorded below after staged activation and broker restart.
+Installed adoption is complete through the canonical stage/activate procedure:
+source implementation `e9faf1898b48990006a05505e7eb50ec343b2d0e` is narrowly
+backported over immutable artifact
+`ee648609533909b614be9345f2efb78eeb87f7fe9124a0e990e1ba383dfc9d7a`.
+Selected compatible release is `20261005-085541-c8193467`, artifact SHA-256
+`33b94ac55d72a41c7090303b0c5d8c0e07b7c9085e8978f54561ee56fdb1332a`.
+Both old/new inventories verify after use; only `services/dictation/server.py`
+differs. Matching 0.2.11 product/DSH/speech and native Handy bytes are retained.
+
+Only the idle dictation broker was gracefully replaced. Before any status probe,
+its new native Handy child started automatically; subsequent status reported
+enabled/ready, Ctrl+Space, no error and no tray. Saved broker preferences match
+their prior bytes. The canonical desktop login service is enabled/active and its
+stable launcher reads the new selection. Existing Desktop/Mobile remain online
+with voice available on their earlier running build and report an update pending;
+no conversation window was restarted. The new broker already uses the selected
+build. No actual machine reboot or physical microphone retest is claimed; the
+fresh broker/native startup plus selected login chain was verified instead.
 Source/platform checks and the owner's installed mixed 0.2.11 artifact are
 separate. Published preview-2 binaries retain their immutable earlier source;
 this new source fix does not silently replace those downloads.
