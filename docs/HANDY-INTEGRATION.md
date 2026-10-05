@@ -2,6 +2,44 @@
 
 # Embedded Handy dictation
 
+## October 5 animated overlay rendering
+
+The owner reports opaque black rectangles behind the animated circle and
+waveform while Ctrl+Space is held; the static Transcribing pill looks correct
+after release. This morning's package update replaced WebKitGTK 2.52.6 with
+2.54.0. Native Handy/CSS bytes were unchanged by the reboot recovery. The same
+native component now reproduces the lost static pill/border/cancel pixels on an
+isolated X11 display while recording. The new graphics engine's damage-aware
+repainting clears areas outside the animated regions; no microphone/model
+failure is observed. See [the upstream rendering changes](https://webkitgtk.org/2026/09/16/webkitgtk-2.54-highlights.html).
+
+The embedded orb now invalidates the complete Linux overlay frame using an
+imperceptible alternating body opacity (1 / 0.99999) while mounted. This preserves
+the existing palette, rounded pill, border, cancel button and four-pixel icon
+placement while the circle and waveform animate. With decoration disabled, the
+circle stays still but the repaint loop preserves the live waveform's surrounding
+UI. Unmount cancels the loop and restores the prior body opacity. Other platforms
+retain their prior scheduling. There is no extra tray/service, GPU/model switch,
+global graphics setting or system-package downgrade.
+
+The initial proposal to add the two WebKit rendering flags used by existing
+proofs did not repair the reproduced missing static elements, so it was not
+adopted. The native recording proof now checks successive frames' complete painted
+pill footprint in dark/light palettes and with animation off, in addition to
+actual capture/paste/cancel/focus/ownership/off/exit behavior. The new assertion
+fails against the unchanged prior native binary with only a 109-by-28 painted
+region. The rebuilt candidate passes all nine captured frames (three per palette/
+animation condition), both with the proof's legacy flags and with the ordinary
+renderer environment. Actual virtual-microphone speech is transcribed and pasted
+exactly once, with focus, editable shortcut, cancel, ownership, disable, no tray
+and parent exit passing. Frontend TypeScript/build and focused ESLint pass; the
+locked/offline optimized Linux native build succeeds. All 22 broker cases pass.
+No physical microphone was used. Installed adoption is recorded below; the
+owner's Wayland pixels remain a separate acceptance check.
+
+Public preview-2 downloads retain their prior immutable bytes. PR #39 is a source
+candidate; this repair does not imply a merged PR or updated public downloads.
+
 ## October 5 reboot startup recovery
 
 After the owner's reboot, Augmentor's dictation broker was running with saved

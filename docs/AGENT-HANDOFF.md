@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+## October 5 animated dictation overlay
+
+[The Handy rendering record](HANDY-INTEGRATION.md#october-5-animated-overlay-rendering)
+tracks today's WebKitGTK 2.54 update and reproduced missing static pill/border/
+cancel elements during animated recording. The Linux orb now invalidates the
+whole transparent frame while mounted, preserving the approved visuals and
+model/graphics placement. Native frame and speech proof plus installed adoption
+are separate from owner Wayland visual acceptance. Preserve reboot recovery and
+open conversation windows; public download bytes are unchanged.
+
 ## October 5 dictation reboot recovery
 
 [The Handy startup recovery record](HANDY-INTEGRATION.md#october-5-reboot-startup-recovery)
