@@ -41,6 +41,26 @@ unchanged. All five VMs were off after that recorded normal closure. The subsequ
 Settings cohort uses a fresh KDE boot; its supported administrative fixture unlock
 does not establish password authentication acceptance.
 
+## October 5 Fedora KDE Settings
+
+The [two-window Settings observation](../release/qualification/next-targets/20261005-kde-settings-two-window.json)
+passes four actual Saves and four expected foreign/duplicate conflict refusals on
+installed e9. Native bindings/components, unrelated shortcuts, full selected29247-member
+inventory,1375 native packages and protected state pass readback/preservation.
+This uses a reviewed private helper, with70 synthetic refusal/interface checks;
+no installed product or public controller changed. Restoration closed the main
+process normally, then the secondary returned a known busy rejection after an idle
+status. That original outcome stays failed; a separately admitted known-state cleanup
+now passes, including exact restored files/directory, owned/foreign/unrelated native
+shortcuts, original disabled-but-active service and independent full ending checks.
+It sends one new secondary close after fresh idle observations; no unknown action
+is replayed. The restored normal app acknowledged its final close; its immediate
+process observation failed during exit. A separate read-only ending confirms both
+product processes/sockets absent and preserved/restored state, without another close.
+Normal machine shutdown passes. All five lab VMs are off for the owner-requested RAM
+installation pause. Native administrative unlock and a released lifetime idle inhibitor do not qualify password
+authentication or physical shortcut activation. Consent/input/Stop remain separate.
+
 <a id="current-five-point-acceptance-status--october-4"></a>
 
 ## Current five-point acceptance status — October 5
@@ -50,7 +70,7 @@ the dated records that follow retain their original outcomes and tested revision
 
 | Authorized point | Completed evidence | Remaining acceptance |
 | --- | --- | --- |
-| Ubuntu/Fedora Settings, shortcuts, reboot and password lock | Ubuntu24 passes these cases and normal app/child/machine closure. Fedora44 passes native/complete setup, both SDK fixture roles, service readiness and managed staging; activation child passes with a separately diagnosed metadata ending. | Fedora actual password authentication/restoration and desktop Settings/shortcut/reboot cases. |
+| Ubuntu/Fedora Settings, shortcuts, reboot and password lock | Ubuntu24 passes these cases and normal app/child/machine closure. Fedora44 passes native/complete setup, both SDK fixture roles, service readiness and managed staging; activation child passes with a separately diagnosed metadata ending. Fedora KDE two-window Settings Saves/conflicts and separate restoration pass at e9. | Fedora password authentication, physical shortcut/reboot cases and GNOME Settings. |
 | GNOME/KDE consent, owned selection, visible Stop and input | GNOME218's recorded composite passes observed consent, center/edge clicks, exact ASCII, save, stale-token refusal, visible Stop and independent preservation/cleanup. KDE has native session/owner evidence and the maintained owned-target adapter. | GNOME password/focus-race/lock/revocation and remaining owner/refusal cases; production integration stays disabled. KDE actual consent/text/save/Stop. New boots require fresh session admission. |
 | Mint complete and matching SUSE/Arch dependencies | Mint22.3 complete setup and SDKs pass under its declared emulated120-second profile. Arch/Leap matching native/complete installers and SDKs pass at their recorded revisions. | Mint public60-second graphical profile and current desktop acceptance; retain matching package/dependency maintenance. |
 | Graphical Browser, physical audio, upgrade/rollback | Published0.2.12→0.2.13→0.2.12 passes with the separately recorded legacy save continuation. Earlier graphical Browser evidence keeps its own tested scope. | Current Mint graphical Browser/reconnect/Stop; physical microphone/speaker acceptance. Browser preference-child runtime checks do not qualify its graphical surface. |

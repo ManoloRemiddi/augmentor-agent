@@ -1,5 +1,40 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 saved pause for RAM installation
+
+The owner requested saving and pausing before host shutdown. All five persistent
+lab VMs are verified shut off, with no pending generation transition. Fedora KDE's
+Settings exercise and separately admitted restoration pass; the restored app's
+normal close has a known ACK, an original failed immediate exit observation, and a
+separate passing read-only ending. The configured normal machine shutdown passes.
+No active lab driver remains. GitHub retains the source/results; private raw
+reports, artifacts, VM checkpoints and copied fixture helpers are on DATA.
+
+Resume only on the owner's instruction. Confirm DATA is mounted and use the
+[persistent lab guide](LINUX-TEST-LAB.md); discard all prior live PID/boot/session
+admissions. Mint's matching a118 candidate builds/inspects successfully, while the
+installed Mint generation remains unchanged at365. The prepared checkpoint/reset
+has **not run**, and no new account, package, collector policy or graphical proof
+has been installed. The immediate next target is a normal offline Mint checkpoint
+and new writable generation, fresh boot/source admission, then the reviewed normal
+adoption and graphical Browser case. Private admission/collector sources are
+preparations, not acceptance. Existing license/security/physical-audio and remaining
+Fedora/GNOME input/password gates stay open; no binary release is qualified.
+
+## October 5 Fedora KDE Settings exercise
+
+The [actual Settings observation](../release/qualification/next-targets/20261005-kde-settings-two-window.json)
+passes four Saves and four expected conflicts across two windows on installed e9,
+including native readback and independent selected/native/protected preservation.
+The private helper passes70 synthetic checks. The original restoration stops at
+a known busy refusal from the secondary after normal main exit; separately admitted
+cleanup now passes one fresh-idle secondary close, exact files/directory/native
+restoration, original disabled-active service and full selected/native/protected
+ending. Normal restored-app close is independently verified and normal machine
+shutdown passes. Preserve both original failed observation outcomes. Physical shortcut/password
+and consent/input acceptance remain separate. Native administrative unlock
+and lifetime idle inhibition leave lock policy unchanged.
+
 ## October 5 Browser connection race source fix
 
 The shared Browser startup now fences the captured native port before each

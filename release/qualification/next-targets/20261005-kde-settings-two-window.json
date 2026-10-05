@@ -1,0 +1,77 @@
+{
+  "format": "augmentor-linux-settings-observation/1",
+  "date": "2026-10-05",
+  "status": "exercise-and-separate-restoration-pass",
+  "target": "fedora44-kde-wayland-x86_64",
+  "installedSource": "e9d2e9bdd1517844bd6fbfdffe9856f07089c5df",
+  "installedArtifactSha256": "e21e7e888ab18797089ed85de953f0e670db5306aefcd2c62d5115dba6cadec1",
+  "privateHelperSha256": "812257750a8aad306713d9c8b5b73017b5f47672f017e85a7338eada8fb575d7",
+  "helperIndexSha256": "c416301120ef8d7d9bb9c9d489a16d9f75d6a318a785fe36e48d1699e9f1c03a",
+  "helperSyntheticChecks": 70,
+  "actual": {
+    "prepare": "pass",
+    "exercise": "pass",
+    "windows": 2,
+    "successfulSaves": 4,
+    "foreignConflictRefusals": 2,
+    "duplicateConflictRefusals": 2,
+    "nativeBindingAndComponentReadback": "pass",
+    "unrelatedNativeShortcutsPreserved": "pass",
+    "selectedReleaseRegularMembers": 29247,
+    "nativePackages": 1375,
+    "nativePackageVerification": "pass",
+    "exerciseEndingPreservation": "pass",
+    "originalRestore": "known-secondary-close-refusal-busy-after-status-idle",
+    "mainNormalClose": "known-ack-and-process-exit",
+    "secondaryNormalClose": "known-rejected-no-exit-action",
+    "restoration": "separately-admitted-known-state-cleanup-pass",
+    "guestReceiptBundleSha256": "1c7b928e3c6904ce9644cd3e37679bd756f94f17d8f89b19ef3e8d3b5995d262",
+    "restored": {
+      "ownedFilesAndCreatedDirectory": true,
+      "ownedAndForeignNativeShortcuts": true,
+      "unrelatedNativeShortcuts": true,
+      "originalDisabledActiveService": true,
+      "selectedOfficialRuntimeAndProtectedState": true,
+      "nativePackageMap1375": true,
+      "explicitNativeInhibitorRelease": true
+    }
+  },
+  "boundaries": {
+    "installedPayloadPatched": false,
+    "productTimeoutChanged": false,
+    "physicalShortcutActivationQualified": false,
+    "passwordAuthenticationQualified": false,
+    "fullConsentInputOrVisibleStopQualified": false,
+    "lockPolicyChanged": false,
+    "nativeAdministrativeFixtureUnlock": "observed, separate from password authentication",
+    "nativeIdleInhibition": "lifetime-owned and explicitly released"
+  },
+  "historicalAttempts": {
+    "v2": "refused absent components before product action",
+    "v3": "fixture missing-directory preparation failure; separately admitted cleanup4 pass",
+    "firstV5": "fresh native lock refusal before product phase",
+    "v5r2": "prepare/exercise pass, restoration known busy refusal; no unknown action replay"
+  },
+  "cleanup": {
+    "privateSourceSha256": "d4d9733ea2f6fd5ca4a5b64766409ce1d18c1cce6d60e36e68058bb7d1995205",
+    "sourceChecks": 10,
+    "rootIndependentSourceChecks": "pass",
+    "priorMainCloseReplayed": false,
+    "priorSecondaryReplyWasKnownRejection": true,
+    "newSecondaryCloseAfterFreshIdle": "one accepted call and exact process exit",
+    "unknownActionReplayed": false,
+    "endingErrors": []
+  },
+  "ending": {
+    "normalRestoredMainClose": "known-accepted",
+    "originalImmediateCloseObservation": "process-peer exit race, failed read preserved",
+    "separateIndependentEnding": "pass; both product processes/sockets absent and selected/native/protected/restored state verified",
+    "closeReplayed": false,
+    "allGuestJournalReceiptCount": 131,
+    "allGuestJournalReceiptSha256": "2a18f46e4dbf956e6040e78db9ed56c674085c3ed9cfe2fc4a13fa038a99dad1",
+    "normalMachineShutdown": "pass",
+    "forced": false,
+    "allFiveLabMachines": "shut off",
+    "userRequestedPauseForRamInstallation": true
+  }
+}
