@@ -1,0 +1,61 @@
+{
+  "format": "augmentor-mint-cache-backed-native-plan/1",
+  "status": "FRESH_STRICT_AUDIT_AND_TWO_PACKAGE_PLAN_PASS_NO_INSTALL",
+  "target": "linuxmint22.3-amd64",
+  "installedSourceCommit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+  "candidateSourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "canonicalCacheEndingSha256": "3d9c82ca209e8988ed6158eb73e69ed5fcab7ed05ba49664c2cd3f8533dca242",
+  "plan": {
+    "inst": [
+      "augmentor-runtime",
+      "augmentor-desktop"
+    ],
+    "conf": [
+      "augmentor-runtime",
+      "augmentor-desktop"
+    ],
+    "twoSameVersionReinstallsOnly": true
+  },
+  "nativeInventory": {
+    "allRegularFilesAndLinksVerified": true,
+    "directoryArchiveModesMatched": false,
+    "retainedExistingRootGroupDirectories": 2956,
+    "archiveModeDirectories": 42,
+    "directoryBaselineSha256": "ebdc6057aaf054ae2df83b82675dff1f1a568444f08dd7d88e129c7730e395ce",
+    "members": 32357,
+    "regularFiles": 29328
+  },
+  "preservation": {
+    "fourOldAccountsAndHomesExact": true,
+    "cacheSourcesListsKeyringsExact": true,
+    "fullRawBeforeEqualsAfter": true,
+    "timestampOrInodeExceptions": false,
+    "bothPhasesMatchExactCacheEnding": true,
+    "hostEndingPassBothPhases": true,
+    "oneActiveVMAndExisting64GBPolicy": true
+  },
+  "actualReadOnlyPhases": {
+    "audit-cache239": {
+      "stdoutSha256": "f144f8bbcd8a5d782cc250b31c6be037a405ca19b3d87b8df060e5c3c6ee2d7c",
+      "outcomeSha256": "60197cf92c3fc2ffc68d3ca5f4b8263b987d48af3cfe24cc96d8a7e23359ce15",
+      "completedTimeNs": 1791210183157061944
+    },
+    "apt-plan-cache239": {
+      "stdoutSha256": "6ac0964f25de461e09465abaac4cfd0605070a20d2237c17627d91a84a384504",
+      "outcomeSha256": "cb19894ad202a273212fe18f1995a86e408cf08f7b9f4581b4b981a8e9fd5f45",
+      "completedTimeNs": 1791210905039987274
+    }
+  },
+  "source": {
+    "readerSha256": "4a4cfba42cbba893e6f7334cc22916e5d6b86521b777d6b9963fd917d93f15c9",
+    "hostSha256": "a7f95c326e479eeb3938a0528f13af66b1f2fcfb2da9e770e9f1366cc6fced9e"
+  },
+  "originalKnownAPTFailurePreserved": true,
+  "remaining": [
+    "One new normal cache-backed package transaction and independent ending",
+    "Separate ordinary account and normal password login",
+    "Graphical Browser and visible Stop",
+    "Remaining five-point release gates"
+  ],
+  "releaseQualified": false
+}

@@ -68,8 +68,10 @@ and 1 GiB overhead remain the working policy. See the
 Mint's separately journaled corrective cache stage now passes exact two-file copies,
 full old account/cache/source preservation, old native checks and the host ending.
 It performs no installation. Its [cache record](../release/qualification/next-targets/20261005-mint-canonical-offline-cache.json)
-is the new audit/plan baseline; preserve the original failed APT attempt and obtain
-fresh authority before another transaction. A retained ordinary management session
+is the baseline for a separately passing fresh strict audit and exact two-package
+plan; see the [plan observation](../release/qualification/next-targets/20261005-mint-cache-backed-native-plan.json).
+The normal transaction needs its own outcome and independent ending. Preserve the
+original failed APT attempt. A retained ordinary management session
 keeps its existing user manager alive without changing services or audio routing;
 normal session closure and VM shutdown remain separate endings.
 

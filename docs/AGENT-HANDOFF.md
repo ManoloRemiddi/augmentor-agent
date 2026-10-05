@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Mint cache-backed plan passes
+
+The [fresh read-only observation](../release/qualification/next-targets/20261005-mint-cache-backed-native-plan.json)
+passes the full strict audit and exact two-package reinstall plan against the
+verified canonical-cache ending. Both phases preserve all four old accounts/HOMEs
+and cache/source/list/keyring state exactly, with no timestamp or inode exception,
+and pass the full host ending. No package or account change occurs in these phases.
+The separately dispatched normal transaction still needs its own known outcome
+and independent ending before account or graphical testing. The original APT
+failure remains recorded; keep one VM under the existing64 GB policy.
+
 ## October 5 Mint corrective offline cache checkpoint
 
 The [canonical-cache observation](../release/qualification/next-targets/20261005-mint-canonical-offline-cache.json)
