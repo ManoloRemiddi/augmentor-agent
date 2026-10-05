@@ -89,6 +89,35 @@ still requires its actual headed run with the published60-second startup and
 This proof remains separate from manual Load unpacked, branded Chrome,
 Snap/Flatpak native messaging, audio and desktop consent/input acceptance.
 
+### October 5 connection replacement during startup
+
+The recovered Mint diagnostic for installed source365 recorded native handshakes
+at0,1.167,2.288 and24.308 seconds, with its first native response at43.584 seconds.
+The initial automatic connection was replaced by the proof's explicit harness
+selection. That reset rejected the old handshake; its asynchronous error handler
+then called the global failure handler against the replacement connection.
+The stale failure disconnected that new port and armed an unnecessary retry.
+The same missing port checks also allowed delayed storage, catalog, initialization
+or remembered-history results to change the replacement connection's state.
+
+`extension/port.mjs` now checks the captured port before each startup operation,
+immediately after every startup await and in both error handlers. Replaced
+attempts stop without sending through the new port, publishing stale results,
+disconnecting it or scheduling its retries. Current-connection failures retain
+the existing20-second request timeout and backoff. Package maintenance leases,
+full official and recipient Python/Qt verification, and the60-second graphical
+proof budget are unchanged.
+
+`node --test tests/browser-port-generation.test.mjs` exercises the actual port
+and canonical pending-table implementations with synthetic Chrome ports and a
+finite clock. Twelve cases cover initial reset followed by successful replacement
+startup; late harness/model storage, catalog, initialization and remembered-history
+continuations; obsolete inner/outer failures and replies; and current timeout and
+initialization-error retries. These source tests do not qualify a new installed
+Mint Browser run. The recovered diagnostic remains a readiness failure, with
+zero model POSTs and no session/prompt/history mutations. It does not establish
+that this race accounts for every later cold-runtime delay.
+
 ### October 3 installed XWayland command acceptance
 
 [The current checkpoint](../release/qualification/next-targets/20261003-installed-browser-xwayland-and-clean-artifacts.json)

@@ -19,7 +19,14 @@ the first native response, and a separate full runtime validation takes 14.87 se
 in the software-emulated fixture. These are diagnostics, not graphical acceptance;
 the original additional-memory admission refusal and dispatch mistake remain explicit.
 See the [startup diagnostic](../release/qualification/next-targets/20261005-mint-browser-startup-diagnostic.json).
-No timeout or product code changed. KDE's normal hide247 passed; complete graphical/password
+The diagnostic itself changed no timeout or product code. A subsequent
+[Browser source fix](BROWSER-DISTRIBUTION.md#october-5-connection-replacement-during-startup)
+now fences obsolete connection startup operations and results; twelve new regression
+cases pass, while ten fail against the original installed source. This supersedes
+the earlier protocol-first startup proposal. The existing runtime verification and
+startup deadlines stay intact; a new installed graphical run remains required.
+See the [source checkpoint](../release/qualification/next-targets/20261005-browser-port-generation-source.json).
+KDE's normal hide247 passed; complete graphical/password
 acceptance remains open. [Hosted validation37279685573](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/37279685573)
 passes all11 jobs at1ffb509, including the maintained test infrastructure. It does
 not qualify graphical guest behavior or a release.
@@ -28,7 +35,9 @@ The [KDE transport observation](../release/qualification/next-targets/20261005-k
 passes actual read-only libvirt monitor identity/status and dedicated test-user SSH,
 following24 synthetic refusal/interface checks. It establishes the recovered transport,
 not Settings/input/password acceptance. Public proof/helper/controller bytes remain
-unchanged, and all five VMs are off after normal closure.
+unchanged. All five VMs were off after that recorded normal closure. The subsequent
+Settings cohort uses a fresh KDE boot; its supported administrative fixture unlock
+does not establish password authentication acceptance.
 
 <a id="current-five-point-acceptance-status--october-4"></a>
 

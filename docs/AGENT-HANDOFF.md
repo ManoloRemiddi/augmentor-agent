@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 5 Browser connection race source fix
+
+The shared Browser startup now fences the captured native port before each
+operation, immediately after every await and in both error handlers. An obsolete
+startup cannot disconnect its replacement, send requests through it or publish
+stale results. Twelve new regression cases pass; ten fail against the exact
+installed365 source. Root independently passes25 focused checks, and the researcher
+passes35 Node plus19 recipient-runtime Python checks. See the
+[source checkpoint](../release/qualification/next-targets/20261005-browser-port-generation-source.json)
+and [owning Browser guide](BROWSER-DISTRIBUTION.md#october-5-connection-replacement-during-startup).
+This supersedes the earlier speculative protocol-first proposal. Full runtime
+verification, maintenance leases and existing deadlines remain unchanged. No
+installed payload was patched; a matching staged artifact and actual graphical
+acceptance remain required on Mint and other applicable platforms.
+
 ## October 5 host crash and persistent test machines
 
 [Persistent Linux test machines](LINUX-TEST-LAB.md) owns recovery, local controls,

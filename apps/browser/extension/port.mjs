@@ -171,17 +171,29 @@ export function ensurePort() {
   // needed, so fetch it first, pick the model (the remembered selection when
   // it is still in the catalog, else the catalog's default — the DSH app's
   // first-configured model), and only then initialize the runtime with it.
+  // A harness reset can replace this port while any startup read is pending.
+  // Fence both sides of each await so an old attempt cannot use the new port
+  // or publish its results into the new attempt's state.
+  const fromThisPort = (operation) => {
+    if (state.port !== port) throw new Error('Native connection replaced')
+    return operation()
+  }
   ;(async () => {
-    const hello=await request('augmentor/handshake',{protocol:'augmentor/1',version:chrome.runtime.getManifest().version})
+    const hello=await fromThisPort(() => request('augmentor/handshake',{protocol:'augmentor/1',version:chrome.runtime.getManifest().version}))
+    if (state.port !== port) return
     if(hello.protocol!=='augmentor/1'||hello.version!==chrome.runtime.getManifest().version)throw Error('Update the Augmentor extension and companion together, then reconnect.')
-    const savedHarness=await new Promise(resolve=>chrome.storage.local.get(['augmentor-harness','augmentor-session-id','augmentor-model-selection'],resolve))
+    const savedHarness=await fromThisPort(() => new Promise(resolve=>chrome.storage.local.get(['augmentor-harness','augmentor-session-id','augmentor-model-selection'],resolve)))
+    if (state.port !== port) return
     state.harness=storedHarness(savedHarness)
     if(!state.harness)throw new Error('The previously selected harness is no longer supported. Choose DSH, Pi or Codex in Settings. Saved conversations and model settings are retained.')
-    const adapter=await request('harness.select',{harness:state.harness})
+    const adapter=await fromThisPort(() => request('harness.select',{harness:state.harness}))
+    if (state.port !== port) return
     if(adapter.protocol!=='augmentor/1')throw new Error('Incompatible Augmentor bridge. Update the extension and host together.')
-    const stored = await loadStoredSelection()
+    const stored = await fromThisPort(loadStoredSelection)
+    if (state.port !== port) return
     try {
-      const catalog = await request('augmentor/models')
+      const catalog = await fromThisPort(() => request('augmentor/models'))
+      if (state.port !== port) return
       const groups = Array.isArray(catalog?.groups) ? catalog.groups : []
       const inCatalog = (sel) =>
         sel !== null &&
@@ -203,11 +215,12 @@ export function ensurePort() {
       }
       state.selection = sel
       saveSelection(sel)
-      const result = await request('initialize', {
+      const result = await fromThisPort(() => request('initialize', {
         cwd: 'chrome-extension://augmentor',
         provider: sel.provider,
         model: sel.model,
-      })
+      }))
+      if (state.port !== port) return
       state.capabilities=result?.serverInfo?.capabilities??{branch:false,edit:false}
       state.homeDir = result?.serverInfo?.home ?? null
       // M3: the plugin's chat-lifecycle state rides in serverInfo.augmentor;
@@ -220,15 +233,22 @@ export function ensurePort() {
       // session we stored still exists on the server, replay its events into
       // the log so a fresh panel re-renders the chat on load; if it is gone,
       // forget it (the next prompt creates a new session).
-      const remembered = await loadStoredSessionId()
+      const remembered = await fromThisPort(loadStoredSessionId)
+      if (state.port !== port) return
       if (remembered) {
-        const exists = await sessionHistoryOk(remembered)
+        const exists = await fromThisPort(() => sessionHistoryOk(remembered))
+        if (state.port !== port) return
         if (exists === true) {
           state.sessionId = remembered
           saveSessionId(remembered)
           state.sessionReady = true
-          if(state.harness!=='dsh')state.running=(await request('session.attach',{sessionId:remembered})).running
-          const full = await request('session.history', { sessionId: remembered, maxMessages: 500 })
+          if(state.harness!=='dsh'){
+            const attached=await fromThisPort(() => request('session.attach',{sessionId:remembered}))
+            if (state.port !== port) return
+            state.running=attached.running
+          }
+          const full = await fromThisPort(() => request('session.history', { sessionId: remembered, maxMessages: 500 }))
+          if (state.port !== port) return
           for (const h of full?.events ?? []) log('event', { sessionId: remembered, event: h.event })
           broadcast(log('handshake', { event: 'session-resumed', sessionId: remembered, events: full?.events?.length ?? 0 }))
         } else if (exists === false) {
@@ -243,12 +263,13 @@ export function ensurePort() {
       state.phase = 'ready'
       broadcast(log('handshake', { serverInfo: result.serverInfo, provider: sel.provider, model: sel.model }))
     } catch (e) {
+      if (state.port !== port) return
       if(state.harness==='dsh'&&/Connect DSH from|integration is incompatible|Reconnect the matching/.test(e.message)){
         state.phase='needs-setup';state.error=e.message;broadcast();return
       }
       fail(`initialize failed: ${e.message}`)
     }
-  })().catch(e=>fail(e.message))
+  })().catch(e=>{ if (state.port === port) fail(e.message) })
 }
 
 // Drop to the error state. There is NO Connect button for the user to press —

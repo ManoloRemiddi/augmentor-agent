@@ -1,0 +1,67 @@
+{
+  "format": "augmentor-browser-port-generation-review/1",
+  "observedUTC": "2026-10-05T08:31:02.438481+00:00",
+  "candidateFiles": {
+    "apps/browser/extension/port.mjs": {
+      "sha256": "9bc968260ff7d359a5e36d2c9ecbff13200617b590a0913c9b970922d8c98ea5",
+      "bytes": 19109
+    },
+    "tests/browser-port-generation.test.mjs": {
+      "sha256": "c0f8c08a8df094e26ef09a97209b57be816aa2bd512dc54d2ea7d8a287e657f2",
+      "bytes": 10055
+    }
+  },
+  "installed365PortSha256": "819ccf1d7c783172434160164d3a5408074b9d74cd566f436df694b2786b0c7c",
+  "recoveredWireSha256": "c4d3a90cec0397908ddfe6333d02ff6cae116446701738e7a9e0dba7e6370abe",
+  "handshakeSeconds": [
+    0.0,
+    1.167,
+    2.288,
+    24.308
+  ],
+  "observedFirstResponseSeconds": 43.584,
+  "sourceMechanism": "Explicit harness reset drops pending P1 handshake and opens P2; obsolete P1 outer catch calls global fail against P2. P2 then fails too. Unguarded successes after all other startup awaits can likewise write through current state/port. Existing native listeners guard port identity but startup async continuation did not.",
+  "tests": {
+    "currentFocused": {
+      "command": "node --test tests/browser-port-generation.test.mjs",
+      "pass": 12,
+      "fail": 0
+    },
+    "sameTestsExactInstalled365Source": {
+      "pass": 2,
+      "fail": 10,
+      "expectedRegression": true
+    },
+    "currentNodeRegression": {
+      "command": "node --test tests/browser-port-generation.test.mjs tests/native-browser-maintenance.test.mjs tests/linux-python-selection.test.mjs tests/linux-recipient-runtime.test.mjs",
+      "pass": 35,
+      "fail": 0
+    },
+    "recipientPython": {
+      "command": "PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p test_linux_recipient_runtime.py -v",
+      "pass": 19,
+      "fail": 0
+    },
+    "rootIndependent": {
+      "command": "node --test tests/browser-port-generation.test.mjs tests/browser-native-host.test.mjs tests/linux-python-selection.test.mjs tests/linux-recipient-runtime.test.mjs",
+      "pass": 25,
+      "fail": 0
+    }
+  },
+  "runtimeBoundaryRedesign": false,
+  "runtimeVerificationChanged": false,
+  "budgetChanges": false,
+  "requestMs": 20000,
+  "graphicalReadinessSeconds": 60,
+  "guestModelCompilerBuildActions": false,
+  "historical12RecipientEntrypointsPreserved": true,
+  "newInstalledBrowserAcceptance": false,
+  "previousProtocolFirstProposalSupersededByConcreteRaceFix": true,
+  "scope": {
+    "baseCommit": "4a314b6415fd0192323767d853be8d9b4dd23c98",
+    "candidateIdentity": "Exact file hashes; source-only candidate before commit",
+    "installedSourceUnchanged": true,
+    "platforms": "Shared extension; new installed Linux and macOS behavior remains unqualified",
+    "releaseQualified": false
+  }
+}
