@@ -9,7 +9,11 @@ sibling partitions. All 21 lab-helper tests pass. A physically separate NAS
 destination has since been identified and its private backup folder created. A
 read-only rsync dry run was rejected by the NAS's forced-command wrapper, so no
 host write path or VM backup is verified; no VM data was copied and no restore
-drill was performed. See the
+drill was performed. The supported admin page presented an untrusted TLS
+certificate in the in-app browser. SMB remains disabled; the existing broad
+share configuration was not activated. Do not bypass the warning or activate
+generated Samba configuration. The owner was asked for a trusted NAS URL or to
+verify the certificate in their browser. See the
 [persistent lab backup procedure and boundary](LINUX-TEST-LAB.md#independent-backup)
 and [focused qualification record](../release/qualification/next-targets/20261005-lab-backup-physical-device-guard.json).
 

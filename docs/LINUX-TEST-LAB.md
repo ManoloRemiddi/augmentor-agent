@@ -262,12 +262,16 @@ header or reuse stale process/session identifiers.
 
 A physically separate NAS with sufficient capacity has been identified, but its
 write route is not yet verified: a read-only rsync dry run was rejected by the
-NAS's forced-command wrapper. No VM data has been copied. The helper currently
-requires a mounted local path so it can prove physical-device separation; it
-does not yet support a remote SSH destination. Keep the VMs' existing DATA
-checkpoints as the reboot recovery path until a supported NAS transfer route is
-validated. A complete off-device restore drill remains separate from the local
-disk-preservation checks.
+NAS's forced-command wrapper, and the supported admin page presented an
+untrusted certificate in the in-app browser. SMB remains disabled; the existing
+broad share configuration was not activated. Do not bypass the browser warning
+or activate generated Samba configuration. The owner was asked for a trusted NAS
+URL or to verify the certificate in their browser. No VM data has been copied.
+The helper currently requires a mounted local path so it can prove physical-
+device separation; it does not yet support a remote SSH destination. Keep the
+VMs' existing DATA checkpoints as the reboot recovery path until a supported
+NAS transfer route is validated. A complete off-device restore drill remains
+separate from the local disk-preservation checks.
 
 On October 5, the backup admission was tightened after observing that comparing
 filesystem device numbers accepts sibling partitions on one disk. Source tests
