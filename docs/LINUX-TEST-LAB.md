@@ -249,12 +249,15 @@ augmentor-test-vm shutdown ubuntu24-gnome
 augmentor-test-vm backup ubuntu24-gnome --destination /mounted/independent-backups
 ```
 
-Backup refuses a destination unless Linux sysfs can prove that it resides on a
-different physical block device. This follows partitions and stacked-device
-slaves, so a second partition on the same disk is not treated as independent. It
-creates a new standalone image of the current working disk, verifies its
-contents, and copies firmware, private launch assets and an import specification
-with a file-hash inventory. Keep the backup private. On another host, install QEMU/libvirt/passt,
+Backup refuses a local destination unless Linux sysfs can prove that it resides
+on a different physical block device. This follows partitions and stacked-device
+slaves, so a second partition on the same disk is not treated as independent.
+For NAS destinations, it accepts only an existing mounted CIFS share whose
+server resolves to a nonlocal host; the backup directory must remain private to
+the current user. It records the private mount identity alongside the file-hash
+inventory. It creates a new standalone image of the current working disk,
+verifies its contents, and copies firmware, private launch assets and an import
+specification. Keep the backup private. On another host, install QEMU/libvirt/passt,
 verify that inventory, adjust the import specification's paths to the mounted
 backup in a separate copy of the specification, and import into a new private lab
 directory. Do not edit the disk's backing
@@ -266,9 +269,12 @@ NAS's forced-command wrapper, and the supported admin page presented an
 untrusted certificate in the in-app browser. SMB remains disabled; the existing
 broad share configuration was not activated. Do not bypass the browser warning
 or activate generated Samba configuration. The owner was asked for a trusted NAS
-URL or to verify the certificate in their browser. No VM data has been copied.
+URL or to verify the certificate in their browser. The SMB-mount acceptance
+path is source-tested only; it has not been exercised against the NAS. No VM
+data has been copied.
 The helper currently requires a mounted local path so it can prove physical-
-device separation; it does not yet support a remote SSH destination. Keep the
+storage identity; it accepts either a verified separate local block device or
+a verified remote CIFS mount, but does not support a remote SSH destination. Keep the
 VMs' existing DATA checkpoints as the reboot recovery path until a supported
 NAS transfer route is validated. A complete off-device restore drill remains
 separate from the local disk-preservation checks.

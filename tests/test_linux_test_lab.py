@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import socket
 import subprocess
 import sys
 import tempfile
@@ -67,6 +68,51 @@ class AdmissionTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'different physical device'):
                     owner.backup('guest', destination)
             self.assertFalse(destination.exists())
+
+    def test_remote_smb_mount_requires_separate_server_identity(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); mountpoint = root / 'nas backup'; mountpoint.mkdir()
+            mountinfo = root / 'mountinfo'
+            mountinfo.write_text(f'42 1 0:99 / {str(mountpoint).replace(" ", "\\040")} rw - cifs //nas.example.test/backup rw\n')
+            addresses = [(socket.AF_INET, socket.SOCK_STREAM, 6, '', ('192.0.2.70', 0))]
+            with patch.object(lab.socket, 'getaddrinfo', return_value=addresses), \
+                 patch.object(lab, 'run', return_value=subprocess.CompletedProcess([], 0,
+                       '[{"addr_info":[{"local":"192.0.2.11"}]}]', '')):
+                remote = lab.remote_smb_mount(mountpoint, mountinfo)
+            self.assertEqual(remote['filesystem'], 'cifs')
+            self.assertEqual(remote['source'], '//nas.example.test/backup')
+            self.assertEqual(remote['serverAddresses'], ['192.0.2.70'])
+
+            with patch.object(lab.socket, 'getaddrinfo', return_value=addresses), \
+                 patch.object(lab, 'run', return_value=subprocess.CompletedProcess([], 0,
+                       '[{"addr_info":[{"local":"192.0.2.70"}]}]', '')):
+                with self.assertRaisesRegex(ValueError, 'local or its network identity'):
+                    lab.remote_smb_mount(mountpoint, mountinfo)
+
+    def test_backup_accepts_only_verified_private_remote_smb_destination(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            base = Path(temporary); owner = lab.Lab(base / 'lab'); destination = base / 'nas'
+            destination.mkdir()
+            remote = {'filesystem': 'cifs', 'mountpoint': str(destination),
+                      'source': '//nas.example.test/backup', 'serverAddresses': ['192.0.2.70']}
+            def devices(path):
+                if Path(path) == owner.root:
+                    return frozenset({'259:0'})
+                raise ValueError('Cannot prove which physical device stores this path.')
+            def fake_checkpoint(_source, output):
+                (output / 'base.qcow2').write_bytes(b'fixture disk')
+            with patch.object(owner, 'entry', return_value=(base, {'name': 'guest', 'currentGeneration': str(base)})), \
+                 patch.object(owner, 'inactive'), patch.object(owner, 'validate_domain'), \
+                 patch.object(owner, 'no_saved_memory'), patch.object(owner, 'verify_generation', return_value={}), \
+                 patch.object(lab, 'physical_devices', side_effect=devices), \
+                 patch.object(lab, 'remote_smb_mount', return_value=remote), \
+                 patch.object(owner, 'checkpoint_disk', side_effect=fake_checkpoint):
+                result = owner.backup('guest', destination)
+            self.assertEqual(result['destinationKind'], 'remote-cifs')
+            output = Path(result['backup'])
+            self.assertEqual(json.loads((output / 'storage.json').read_text())['mount'], remote)
+            self.assertEqual(json.loads((output / 'backup-files.json').read_text())['base.qcow2'], lab.sha(output / 'base.qcow2'))
+            self.assertFalse(output.stat().st_mode & 0o077)
 
     def test_unsafe_name(self):
         for name in ['../guest', '/root', 'name with spaces', 'UPPER']:

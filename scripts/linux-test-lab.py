@@ -14,6 +14,8 @@ import os
 from pathlib import Path
 import re
 import shutil
+import socket
+import stat
 import subprocess
 import time
 import uuid
@@ -153,6 +155,47 @@ def block_device_leaves(device, sysfs_root=SYS_BLOCK_DEVICES):
 def physical_devices(path):
     device = Path(path).stat().st_dev
     return block_device_leaves(device)
+
+
+def _mount_field(value):
+    return re.sub(r'\\([0-7]{3})', lambda match: chr(int(match.group(1), 8)), value)
+
+
+def remote_smb_mount(path, mountinfo='/proc/self/mountinfo'):
+    """Identify a CIFS mount whose server resolves away from this host."""
+    target = Path(path).resolve(strict=True)
+    matches = []
+    for line in Path(mountinfo).read_text().splitlines():
+        fields = line.split()
+        try:
+            separator = fields.index('-')
+            mountpoint = Path(_mount_field(fields[4]))
+            fstype, source = fields[separator + 1:separator + 3]
+        except (ValueError, IndexError):
+            raise ValueError('Cannot prove which mounted filesystem stores the backup.')
+        if fstype == 'cifs' and target == mountpoint or (fstype == 'cifs' and mountpoint in target.parents):
+            matches.append((len(mountpoint.parts), mountpoint, source))
+    if not matches:
+        return None
+    _, mountpoint, source = max(matches, key=lambda row: row[0])
+    parsed = re.fullmatch(r'//([^/]+)/([^/]+)', source)
+    if not parsed:
+        raise ValueError('The CIFS mount source is not a bounded server/share path.')
+    server = parsed.group(1).strip('[]').rstrip('.').lower()
+    if not server or server in {'localhost', socket.gethostname().lower(), socket.getfqdn().lower()}:
+        raise ValueError('A local CIFS share is not an independent backup destination.')
+    try:
+        addresses = {row[4][0].split('%', 1)[0] for row in socket.getaddrinfo(server, None, type=socket.SOCK_STREAM)}
+        local = json.loads(run(['ip', '-json', 'address', 'show']).stdout)
+        local_addresses = {entry['local'].split('%', 1)[0]
+                           for interface in local for entry in interface.get('addr_info', [])
+                           if entry.get('local')}
+    except (OSError, ValueError, KeyError, IndexError, TypeError, subprocess.SubprocessError) as error:
+        raise ValueError('Cannot verify that the CIFS server is a separate host.') from error
+    if not addresses or addresses & local_addresses:
+        raise ValueError('The CIFS server is local or its network identity cannot be verified as remote.')
+    return {'filesystem': 'cifs', 'mountpoint': str(mountpoint), 'source': source,
+            'serverAddresses': sorted(addresses)}
 
 
 def image_chain(path):
@@ -567,13 +610,28 @@ class Lab:
         if not ancestor.is_dir():
             raise ValueError('Backup destination parent must be a directory.')
         lab_devices = physical_devices(self.root)
-        if physical_devices(ancestor) & lab_devices:
-            raise ValueError('Choose storage on a different physical device for an independent backup.')
+        remote = None
+        try:
+            destination_devices = physical_devices(ancestor)
+        except ValueError:
+            remote = remote_smb_mount(ancestor)
+            if remote is None:
+                raise ValueError('Cannot prove that the backup destination is independent.')
+        else:
+            if destination_devices & lab_devices:
+                raise ValueError('Choose storage on a different physical device for an independent backup.')
         destination.mkdir(parents=True, mode=0o700, exist_ok=True)
-        if physical_devices(destination) & lab_devices:
+        if remote:
+            if remote_smb_mount(destination) != remote:
+                raise ValueError('The remote SMB mount changed during backup admission.')
+        elif physical_devices(destination) & lab_devices:
             raise ValueError('Backup destination resolves to the lab physical device.')
         output = destination / (name + '-' + time.strftime('%Y%m%dT%H%M%SZ', time.gmtime()))
         output.mkdir(mode=0o700)
+        if remote and (output.stat().st_uid != os.geteuid() or stat.S_IMODE(output.stat().st_mode) & 0o077):
+            raise ValueError('The remote backup directory is not private to the current user.')
+        write_json(output / 'storage.json', {'kind': 'remote-cifs' if remote else 'separate-physical-device',
+                                             'mount': remote})
         sync_directory(destination)
         self.checkpoint_disk(Path(spec['currentGeneration']) / 'disk.qcow2', output)
         exported = {key: spec[key] for key in ['name', 'description', 'memoryMiB', 'cpus', 'cpuModel', 'sshPort',
@@ -589,7 +647,9 @@ class Lab:
                 exported[field] = str(target)
         write_json(output / 'import-spec.json', exported)
         write_json(output / 'backup-files.json', {p.name: sha(p) for p in output.iterdir() if p.is_file()})
-        return {'name': name, 'backup': str(output), 'independentDevice': True}
+        return {'name': name, 'backup': str(output), 'independentStorage': True,
+                'independentDevice': not bool(remote),
+                'destinationKind': 'remote-cifs' if remote else 'separate-physical-device'}
 
     def status(self):
         rows = []

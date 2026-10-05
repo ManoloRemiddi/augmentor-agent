@@ -13,17 +13,23 @@
   },
   "implementation": {
     "filesystemDeviceNumberAloneAcceptedSiblingPartition": true,
-    "backupNowRequiresPhysicalBlockDeviceResolution": true,
+    "localBackupRequiresPhysicalBlockDeviceResolution": true,
     "partitionParentsAndStackedSlavesFollowed": true,
     "unprovableDeviceIdentityRefused": true,
-    "sameDeviceRefusalOccursBeforeDestinationCreation": true
+    "sameDeviceRefusalOccursBeforeDestinationCreation": true,
+    "mountedCifsRequiresSeparateRemoteServerIdentity": true,
+    "localServerAddressOverlapRefused": true,
+    "privateRemoteBackupDirectoryRequired": true,
+    "remoteMountIdentityRecheckedAfterDirectoryCreation": true
   },
   "validation": {
     "focusedTestCommand": "python3 -m unittest tests.test_linux_test_lab -v",
-    "focusedTestsPassed": 21,
+    "focusedTestsPassed": 23,
     "sameNvmePartitionResolution": "PASS",
     "stackedDeviceSlaveResolution": "PASS",
     "samePhysicalDeviceBackupRefusal": "PASS",
+    "remoteCifsIdentityAdmission": "PASS_SOURCE_TESTED",
+    "localCifsServerRefusal": "PASS_SOURCE_TESTED",
     "destinationCreatedOnRefusal": false,
     "hostStorageIdentity": "Exact volume names, capacities and block identifiers retained only in private handoff"
   },
@@ -32,7 +38,7 @@
     "backupCreated": false,
     "restoreDrillPerformed": false,
     "nasPathAndSeparatePhysicalStorageConfirmedPrivately": true,
-    "nasTransferMethod": "NAS global SSH ForceCommand rejected the rsync dry run; inspect the supported NAS transfer route before copying",
-    "requiredNext": "Validate a supported NAS write path without risking VM data; then perform a guarded offline backup and restore drill."
+    "nasTransferMethod": "NAS global SSH ForceCommand rejected the rsync dry run; SMB mount acceptance is implemented and source-tested but not exercised against this NAS; the supported admin page presented an untrusted TLS certificate",
+    "requiredNext": "Resolve trusted admin access; configure a narrowly scoped private SMB share through supported NAS controls; verify the CIFS mount; then perform guarded offline VM backups and a restore drill."
   }
 }
