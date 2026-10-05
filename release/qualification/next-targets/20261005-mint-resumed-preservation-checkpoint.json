@@ -1,0 +1,56 @@
+{
+  "format": "augmentor-mint-resumed-preservation-checkpoint/1",
+  "status": "CHECKPOINT_RESET_BOOT_AUDIT_AND_TWO_PACKAGE_STAGE_PASS",
+  "target": "linuxmint22.3-amd64",
+  "hostPlan": {
+    "installedRamGiB": 64,
+    "additionalRamInstalled": false,
+    "maximumActiveLabMachines": 1,
+    "guestRamGiB": 4,
+    "hostAvailableReserveGiB": 8,
+    "perGuestOverheadGiB": 1,
+    "cpuAcceleration": "TCG software emulation",
+    "ramHealthQualificationClaimed": false
+  },
+  "checkpoint": {
+    "offlineCreationPass": true,
+    "newWritableGenerationPass": true,
+    "previousGenerationPreserved": true,
+    "baseSha256": "b1fd9d770ba16fbc9217a17a86fdb6425cc3fe9c988089781d8dbae3568c703e",
+    "checkpointResultSha256": "5c121b5ba5a88d75fceeacb5f65b6a19320f9637baa2cd1c71a1380ba5b14cfc",
+    "resetResultSha256": "180c4224c66cab84f238f0e36d3730be6b25e2bf611a91f0e9e1ad194b968fed"
+  },
+  "installedSourceCommit": "3651e17a0c34154eb4454e80e136ee11e764aa00",
+  "candidateSourceCommit": "a118bf69b35349b952b33a42a7c5d74ebe71fb0d",
+  "audit": {
+    "pass": true,
+    "allRegularFilesAndLinksVerified": true,
+    "directoryArchiveModesMatched": false,
+    "retainedExistingRootGroupDirectories": 2956,
+    "archiveModeDirectories": 42,
+    "directoryBaselineSha256": "ebdc6057aaf054ae2df83b82675dff1f1a568444f08dd7d88e129c7730e395ce",
+    "members": 32357,
+    "regularFiles": 29328,
+    "oldAccountsAndFullHomeTrees": 4,
+    "beforeAndAfterExact": true,
+    "packageCacheSourcesListsAndKeyringsExact": true,
+    "outcomeSha256": "caa4def9826efb78555eb95e3b88ad1952dc99cb9217fa429721c9f78dcc175b",
+    "originalDirectoryModeRefusalPreserved": true,
+    "directoryBaselineOriginEstablished": false,
+    "installedDirectoryModesChanged": false,
+    "repositorySignerAuthenticationClaimed": false
+  },
+  "staging": {
+    "twoRootOwnedReadOnlyDebsOnly": true,
+    "outcomeSha256": "1ce5d4a7a6b25c1f7b29ae70fc109c13aae904a2847fc96f79fb2f067a0b0cb7"
+  },
+  "qualification": {
+    "nativeInstallPerformed": false,
+    "newAccountCreated": false,
+    "graphicalAcceptancePass": false,
+    "binaryPublished": false,
+    "releaseQualified": false,
+    "independentOffDeviceBackupCreated": false
+  },
+  "next": "Exact two-package native adoption, separate new test account and normal graphical Browser/Stop qualification. Private raw reports and inputs remain on DATA."
+}

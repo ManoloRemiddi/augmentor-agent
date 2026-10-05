@@ -15,7 +15,15 @@ account/shutdown path; its original ACPI timeout and wrong-account failure remai
 recorded. Mint reports a failed `casper-md5check.service`; its cause is not yet
 established. Leap's system was still `starting` at its read-only observation, with
 no failed units. These are boot/access/shutdown checks, not full OS or desktop
-application acceptance. All machines are left off.
+application acceptance. All machines were left off at that recovery checkpoint.
+
+The owner subsequently resumed testing with the existing64 GB and decided against
+installing additional RAM. The existing one-machine guard and reserves below stay
+in force. A new offline Mint checkpoint/writable generation, fresh boot, full
+preservation audit and staging of two matching packages now pass; see the
+[resume checkpoint](../release/qualification/next-targets/20261005-mint-resumed-preservation-checkpoint.json).
+Mint is the sole active lab VM at that observation. Native adoption and graphical
+acceptance are still pending; the previous generation and checkpoint are retained.
 
 This is test infrastructure. A recovered OS disk does not certify a new Augmentor
 release. Existing compatibility limits remain in [Linux rollout](LINUX-DISTRO-ROLLOUT.md).

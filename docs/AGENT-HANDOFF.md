@@ -1,6 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-## October 5 saved pause for RAM installation
+## October 5 resumed with the existing 64 GB
+
+The owner resumed work and decided against installing additional RAM. Keep one
+lab machine active at a time, the existing full guest allocation, 8 GiB available
+host reserve and 1 GiB overhead. Mint's normal offline checkpoint and new writable
+generation now pass; the previous generation is retained. Its fresh boot and full
+preservation audit pass, verifying29,328 regular files/links and exact before/after
+state for all four old accounts/HOMEs and package cache/sources/lists/keyrings.
+The two matching a118 native packages are staged as root-owned read-only inputs.
+See the [resume checkpoint](../release/qualification/next-targets/20261005-mint-resumed-preservation-checkpoint.json).
+At this checkpoint no native installation, new account or graphical acceptance has
+occurred. The original directory-mode refusal remains recorded; the revised private
+audit binds the measured legacy root-group directory modes without changing them
+or claiming their origin. Continue the normal two-package adoption and separate
+new-account Browser/Stop case with fresh admissions. Software emulation remains;
+this does not establish RAM health or an independent off-device backup.
+
+## October 5 saved pause for RAM installation — historical
 
 The owner requested saving and pausing before host shutdown. All five persistent
 lab VMs are verified shut off, with no pending generation transition. Fedora KDE's

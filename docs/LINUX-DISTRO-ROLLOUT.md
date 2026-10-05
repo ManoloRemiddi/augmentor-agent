@@ -41,6 +41,20 @@ unchanged. All five VMs were off after that recorded normal closure. The subsequ
 Settings cohort uses a fresh KDE boot; its supported administrative fixture unlock
 does not establish password authentication acceptance.
 
+## October 5 resumed Mint preservation checkpoint
+
+The owner resumed on the existing64 GB. Mint is the sole active test machine;
+normal offline checkpoint creation and a fresh writable generation preserve the
+previous installation. Fresh boot, full installed-file/link verification and exact
+before/after preservation of all four old accounts/HOMEs and package cache/settings
+pass. The two matching a118 packages are staged; native adoption, a new account and
+graphical Browser/Stop remain pending at this checkpoint. See the
+[actual resume record](../release/qualification/next-targets/20261005-mint-resumed-preservation-checkpoint.json).
+The original directory-mode refusal remains; a measured private baseline retains
+existing root-group directory modes without changing installed permissions or
+claiming their provenance. Keep the one-machine/reserve guards and fresh boot/session
+admissions. Software emulation and the outstanding release gates remain.
+
 ## October 5 Fedora KDE Settings
 
 The [two-window Settings observation](../release/qualification/next-targets/20261005-kde-settings-two-window.json)
@@ -57,8 +71,8 @@ It sends one new secondary close after fresh idle observations; no unknown actio
 is replayed. The restored normal app acknowledged its final close; its immediate
 process observation failed during exit. A separate read-only ending confirms both
 product processes/sockets absent and preserved/restored state, without another close.
-Normal machine shutdown passes. All five lab VMs are off for the owner-requested RAM
-installation pause. Native administrative unlock and a released lifetime idle inhibitor do not qualify password
+Normal machine shutdown passes. All five lab VMs were off for the owner-requested RAM
+installation pause; the subsequent resumed Mint checkpoint is recorded above. Native administrative unlock and a released lifetime idle inhibitor do not qualify password
 authentication or physical shortcut activation. Consent/input/Stop remain separate.
 
 <a id="current-five-point-acceptance-status--october-4"></a>
