@@ -61,7 +61,10 @@ def entries():return read()['entries']
 def get(name=None):
     name=name or current_name();value=read()
     if name in value['removed']:raise ValueError('This desktop agent was removed. Add an entry in Settings → Agents.')
-    return next((e for e in value['entries'] if e['id']==name),None)
+    entry=next((e for e in value['entries'] if e['id']==name),None)
+    if entry is None and re.fullmatch(r'agent-[a-f0-9]{20}',name):
+        raise ValueError('This desktop agent is not configured. Finish saving its entry in Settings → Agents.')
+    return entry
 
 
 @contextmanager

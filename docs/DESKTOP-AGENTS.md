@@ -34,7 +34,9 @@ removes only the entry and its owned OS shortcut. Remove a window from another
 window after closing it. The main entry remains the startup anchor and can be
 renamed or edited; other entries can be removed. Cosmetic preference files are
 retained rather than deleting unrelated personal data. IDs cannot be reused after
-removal. File writes are atomic, and concurrent saves require the displayed
+removal. Generated IDs without a committed entry fail closed, including during
+shortcut/registry transactions; they never start the normal agent by fallback.
+Unconfigured historical instance names retain their existing compatibility. File writes are atomic, and concurrent saves require the displayed
 revision. Shortcut registration occurs after revision admission, with restoration
 if its accompanying registry commit fails.
 

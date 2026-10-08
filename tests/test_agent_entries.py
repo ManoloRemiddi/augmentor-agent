@@ -27,6 +27,8 @@ class EntriesTests(unittest.TestCase):
         original=Path(self.tmp.name)/'session.secondary.json';original.write_text('original')
         self.assertEqual([e['id'] for e in store.entries()],['main','secondary']);self.assertIsNone(store.get()['stateKey']);self.create()
         self.assertEqual(original.read_text(),'original');self.assertIsNone(store.get('secondary')['stateKey'])
+        with self.assertRaisesRegex(ValueError,'not configured'):store.get(store.new_id())
+        self.assertIsNone(store.get('historical-window'))
     def test_rename_model_and_agent_changes_have_distinct_state_semantics(self):
         value=self.create();entry=store.get('research');key=entry['stateKey']
         value=store.save({**entry,'name':'New name','model':{'provider':'remote','model':'other'}},value['revision']);self.assertEqual(store.get('research')['stateKey'],key)
