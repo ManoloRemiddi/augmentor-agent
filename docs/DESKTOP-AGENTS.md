@@ -148,3 +148,50 @@ recognized only `release.json`. Managed `desktop-release.json` artifacts now
 resolve the installed namespace, preserving the existing Fn+Space bindings.
 The six KDE adapter cases pass, including managed namespace resolution and
 failed registry-commit restoration. No existing shortcut was reassigned.
+
+## Installed Linux evidence — October 8, 2026
+
+Implementation through `9c66a04e426f57939ff626aa59fa4eaca7219dcc` is staged and
+selected in compatible release `20261008-135552-66db887d`, artifact SHA-256
+`9b547979857b56952ff274ae7f006cb3551654b9040bb76b3c37f14e61291bcd`.
+Stage inventory/imports and authenticated version/catalog activation pass.
+Desktop and secondary both adopted it through acknowledged idle close/reopen and
+report online, model-ready, no restoration error and no pending update. Secondary
+was reopened through the actual new entry-opening function and the managed
+launcher. Mobile retains the previous running artifact and adopts the selection
+on reopening; its service and active page were preserved.
+
+Eight private settings/session files were compared with protected pre-adoption
+copies. Their settings, skins, model and conversation selections are preserved;
+primary placement was rewritten during normal close/reopen. Existing main and
+secondary KDE keys are unchanged. A read-only live availability check correctly
+reports the primary key as a conflict for another entry. Fn+O remains unassigned.
+No Agents registry has been written merely by upgrading; main/secondary are still
+synthesized from the original state.
+
+The regular port-3080 DSH product bridge now advertises `desktopAgents: 1`. Its
+profile row alone was backed up and redirected to the staged compatible module.
+An idle DSH restart was needed to load it. That loaded module's four presentation
+bridge files are byte-identical to the final selected release. No model-server
+settings, speech dependencies or Olares definition/launcher were changed. The
+regular catalog still has no registered Olares preset: its scoped isolation,
+registration and live read-only status demonstration remain explicitly pending.
+Completion must also verify its local-only model/telemetry rules, private shell
+environment, eight skills, nine gateway tools, filesystem confinement and guard
+hooks without dispatching any owner-only command.
+
+The implementation and evidence are published in
+[draft PR #44](https://github.com/ManoloRemiddi/augmentor-agent/pull/44).
+Hosted platform/package checks were pending at this checkpoint; this personal
+Linux adoption does not publish new downloads or certify physical Mac/Windows
+acceptance. The final native suite before the managed-namespace follow-up passes
+875 cases with 36 skips, and all six KDE cases pass after that follow-up. The
+Node suite passes 513 cases with two opt-in skips, including the real installed
+DSH fixture when its runtime is explicitly supplied.
+
+Private rollback preserves the original desktop selection and the backed-up DSH
+profile. Managed `rollback` selects the immediately preceding candidate; the
+original stable artifact remains selectable using `augmentor-update activate`.
+Backend rollback requires separately restoring its profile row while idle;
+desktop selection alone does not restore DSH configuration. Preserve newer
+conversations and registry revisions during any rollback.
