@@ -48,6 +48,28 @@ the existing DSH run. Current business evidence must still be read through app
 tools. `augmentor-link`, `augmentor-settings`, `augmentor-hide` and
 `augmentor-status` are presentation events for the host application.
 
+Panel protocol v2 (App SDK `docs/PANEL-PROTOCOL.md`): the side panel's
+`augmentor-ready` lists `capabilities` (`prompt`, `new-chat`, `focus`, `events`,
+`status-session`). From the same parent window/origin, `augmentor-prompt`
+`{requestId,text,send,fresh,context?}` places the text in the owner's composer and,
+with `send`, submits it through the normal send path; `augmentor-new-chat` opens a new
+conversation and `augmentor-focus` focuses the composer. Each command is answered with
+`augmentor-result {requestId,ok,result|code,error}`. An unsent owner draft is never
+replaced (`BUSY`), a running DSH turn is not interrupted (`BUSY`), and an open past
+conversation is not written to unless `fresh` is set. A host prompt is the owner's
+message from their authenticated application; it does not change tools, grants, preset
+or model. `augmentor-status` adds `sessionId`, and `augmentor-event` reports
+`session.changed`, `turn.started`, `turn.finished {reason}` and `tool.completed
+{tool,isError}` without arguments or results. The settings page advertises no
+capabilities. Evidence (source only, Linux, built from `9fa2317` plus this change, not
+packaged or installed on a desktop): `apps/browser/test/host-commands.test.mjs`, the
+workspace suites, `scripts/app-sdk-bundle-proof.mjs`, and the App SDK 0.2
+`npm run test:installed` proof. That proof runs a real `dsh --profile web` host with this
+integration installed by `services/dsh/setup.py`, the embedding service and native
+host, the side panel in Chromium inside an SDK host page and a deterministic fixture model.
+Not yet covered: a real model, the packaged desktop, macOS/Windows, and the jsdom
+panel suites.
+
 ## Hosting and release lifecycle
 
 `augmentor-embed.service` listens on loopback port 8872. Install it with the
