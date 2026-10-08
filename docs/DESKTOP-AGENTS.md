@@ -19,7 +19,11 @@ The version-1 registry is `~/.config/augmentor/agents.json`, respecting
 `XDG_CONFIG_HOME` or an explicit `AUGMENTOR_AGENT_ENTRIES` override. Until its first
 write, it synthesizes the existing main/secondary entries. Their original session,
 model, preferences, appearance and shortcut files stay in place. Renames and model
-changes retain the conversation binding. A changed preset or working folder gets
+changes retain the conversation binding. The state file records the last applied
+entry model in an optional `entryModel` field: a changed configured model applies
+on reopening, while a later choice made in the chat remains selected when that
+configuration has not changed. Main/secondary entries without a configured model
+keep their existing state-file shape. A changed preset or working folder gets
 a new binding and retains the old binding in the registry. DSH conversation files
 are never moved or deleted. History → All agents exposes retained conversations;
 a conversation outside the current preset/folder opens as history, with sending
@@ -120,7 +124,7 @@ Without the explicit runtime it is an opt-in skip, not runtime acceptance.
 
 The installed overlay recipe is `scripts/stage-native-agents-overlay.py`: copy an
 immutable compatible artifact to a fresh candidate, apply the feature and keep
-its product version/dependencies/approved UI. The candidate passes the seven new
+its product version/dependencies/approved UI. The candidate passes the eight new
 native cases and its Agents form has been visually inspected in the existing
 settings frame. Follow [managed deployments](DESKTOP-DEPLOYMENTS.md) for stage,
 activation and selected-versus-running evidence. This source qualification does

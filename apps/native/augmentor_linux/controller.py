@@ -93,14 +93,29 @@ class Controller(QObject):
                     if self.harness=='codex':self.pending_branch=state.get('pendingBranch')
             except (OSError, ValueError, TypeError):
                 pass
-        if self.session is None and isinstance(getattr(self.client,'initial_selection',None),dict):self.selection=dict(self.client.initial_selection)
+        self.load_entry_model(locals().get('state',{}))
+
+    def load_entry_model(self,state):
+        model=getattr(self.client,'initial_selection',None)
+        self.entry_model=dict(model) if isinstance(model,dict) else None
+        self.entry_model_tracked='entryModel' in state or self.entry_model is not None
+        if self.entry_model and (self.selection is None or state.get('entryModel')!=self.entry_model):self.selection=dict(self.entry_model)
+
+    def configure_entry_model(self,model):
+        self.client.initial_selection=dict(model) if isinstance(model,dict) else None
+        if self.running or self.read_only:return False
+        self.entry_model=self.client.initial_selection
+        self.entry_model_tracked=self.entry_model_tracked or self.entry_model is not None
+        if self.entry_model:self.choose_model(dict(self.entry_model))
+        else:self.save_session()
+        return True
 
     def save_session(self):
         if not self.state_file:
             return
         self.state_file.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
         with tempfile.NamedTemporaryFile(mode='w', dir=self.state_file.parent, delete=False) as file:
-            json.dump({'endpoint': self.client.base, 'session': self.session, 'selection':self.selection, **({'pendingBranch':self.pending_branch} if self.harness=='codex' else {})}, file)
+            json.dump({'endpoint': self.client.base, 'session': self.session, 'selection':self.selection, **({'pendingBranch':self.pending_branch} if self.harness=='codex' else {}), **({'entryModel':self.entry_model} if self.entry_model_tracked else {})}, file)
             file.flush();os.fsync(file.fileno())
             temporary = file.name
         os.replace(temporary, self.state_file)

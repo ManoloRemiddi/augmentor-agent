@@ -122,7 +122,7 @@ class AgentsSettings(QWidget):
             if entry['id']==current_name():
                 self.owner.setWindowTitle('Augmentor Agent · '+entry['name']);self.owner.brand.setText('Augmentor Agent · '+entry['name'])
                 if changed:self.owner.switch_harness('dsh',reconnect=True)
-                elif entry['model']:self.owner.controller.choose_model(entry['model']);self.owner.set_selection(entry['model'])
+                elif self.owner.controller.configure_entry_model(entry['model']) and entry['model']:self.owner.set_selection(entry['model'])
         self.owner.call_in_background(work,done)
 
     def open_entry(self):

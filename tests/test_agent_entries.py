@@ -5,12 +5,14 @@ import tempfile
 import unittest
 from unittest.mock import patch,Mock
 from contextlib import contextmanager
+from types import SimpleNamespace
 from PySide6.QtWidgets import QApplication,QWidget
 from PySide6.QtGui import QColor,QKeySequence
 from augmentor_linux import agent_entries as store
 from augmentor_linux.adapters.dsh import DshAdapter
 from augmentor_linux.adapters.dsh_wire import DshClient
 from augmentor_linux.agents_settings import AgentsSettings
+from augmentor_linux.controller import Controller
 
 class EntriesTests(unittest.TestCase):
     @classmethod
@@ -82,3 +84,19 @@ class EntriesTests(unittest.TestCase):
         # The startup installer and this action must agree on the public entrypoint.
         script=(Path(__file__).resolve().parents[1]/'scripts/install-desktop-startup.py').read_text()
         self.assertIn("binary/'augmentor-agent'",script)
+    def test_configured_model_edits_apply_on_reopen_without_overwriting_later_chat_choices(self):
+        state=Path(self.tmp.name)/'session.json';a={'provider':'local','model':'a'};b={**a,'model':'b'};c={**a,'model':'c'};d={**a,'model':'d'}
+        client=SimpleNamespace(harness='dsh',preset='synthetic',base='http://127.0.0.1:3080',initial_selection=a,state_path=lambda:state,capabilities={})
+        controllers=[]
+        try:
+            with patch('augmentor_linux.adapters.dsh.DshAdapter',return_value=client):
+                first=Controller(harness='dsh');controllers.append(first);first.session='existing-chat';first.save_session()
+                client.initial_selection=b
+                reopened=Controller(harness='dsh');controllers.append(reopened)
+                self.assertEqual(reopened.session,'existing-chat');self.assertEqual(reopened.selection,b)
+                reopened.choose_model(c)
+                again=Controller(harness='dsh');controllers.append(again);self.assertEqual(again.selection,c)
+                again.configure_entry_model(d);again.choose_model(a)
+                last=Controller(harness='dsh');controllers.append(last);self.assertEqual(last.selection,a)
+        finally:
+            for controller in controllers:controller.queue_executor.shutdown(wait=False)

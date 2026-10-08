@@ -33,7 +33,10 @@ def overlay(base,candidate):
     adapter_source=adapter_source[:source_start]+setting+adapter_source[source_end:]
     adapter.write_text(adapter_source.replace("if method=='session.create':p=", "if method=='session.create' and self.product and not self.custom:self.setting('permission')\n        if method=='session.create':p=",1))
     controller=candidate/'apps/native/augmentor_linux/controller.py'
-    replace(controller,'    def save_session(self):',"        if self.session is None and isinstance(getattr(self.client,'initial_selection',None),dict):self.selection=dict(self.client.initial_selection)\n\n    def save_session(self):")
+    shared_controller=(SOURCE/controller.relative_to(candidate)).read_text()
+    start=shared_controller.index('    def load_entry_model(');end=shared_controller.index('    def save_session(',start)
+    replace(controller,'    def save_session(self):',"        self.load_entry_model(locals().get('state',{}))\n\n"+shared_controller[start:end]+'    def save_session(self):')
+    replace(controller,"'selection':self.selection, **({'pendingBranch':self.pending_branch} if self.harness=='codex' else {})", "'selection':self.selection, **({'pendingBranch':self.pending_branch} if self.harness=='codex' else {}), **({'entryModel':self.entry_model} if self.entry_model_tracked else {})")
     text=controller.read_text().replace("getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(row.get('agentPreset'))", "getattr(self.client,'owns_session',lambda r:getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(r.get('agentPreset')))(row)")
     text=text.replace("            if provider not in ('local','openai-live')", "            if getattr(self.client,'supports_voice',True) is False:raise ContractError('Voice chat is unavailable for this independent DSH agent. Use typed chat or dictation.')\n            if provider not in ('local','openai-live')")
     controller.write_text(text)
