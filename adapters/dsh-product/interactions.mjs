@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
+import {profiles} from '../../services/workspaces/profiles.mjs'
+import {ownsNativeSession} from '../../services/dsh/desktop-entries.mjs'
 // Ephemeral native presentation leases. No answers or approval grants are replayed.
 import {randomUUID} from 'node:crypto'
 
@@ -9,7 +10,7 @@ export function registerInteractions(ctx,broker){
  for(const [event,kind] of [['approval/request','approval'],['user-questions/request','question']]){
   ctx.on(event,(request,next)=>{
    const session=request.agent?.session,header=session?.header
-   if(!session?.id||!ownsProductSession(header))return next()
+   if(!session?.id||!ownsNativeSession(header))return next()
    return broker.present(session.id,kind,request,next)
   },{prepend:true})
  }
@@ -24,7 +25,7 @@ export async function interactionOperation(ctx,broker,p){
  if(p.operation==='answer'&&(typeof p.id!=='string'||! /^[a-f0-9-]{36}$/.test(p.id)))throw Error('Invalid interaction identifier')
  const observation=await ctx.sessionQuery.observeSession(p.sessionId)
  try{
-  if(!ownsProductSession(observation.header))throw Error('This conversation belongs to another role')
+  if(!ownsNativeSession(observation.header))throw Error('This conversation belongs to another role')
   if(p.operation==='claim')broker.claim(p.sessionId,p.owner)
   else if(p.operation==='release')broker.release(p.sessionId,p.owner)
   else if(p.operation==='answer')broker.answer(p.sessionId,p.owner,p.id,p.value)

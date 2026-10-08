@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
+import {profiles} from '../../services/workspaces/profiles.mjs'
+import {ownsNativeSession} from '../../services/dsh/desktop-entries.mjs'
 // DSH rc.1 host adapter: create an exact completed-turn seed through host services.
 import {randomUUID} from 'node:crypto'
 
@@ -9,7 +10,7 @@ export async function exactFork(ctx,p){
  const observation=await ctx.sessionQuery.observeSession(p.sessionId)
  try{
   preset=observation.header.agentPreset
-  if(!ownsProductSession(observation.header))throw Error('This conversation belongs to another role')
+  if(!ownsNativeSession(observation.header))throw Error('This conversation belongs to another role')
   if(observation.cursor!==p.expectedCursor)throw Error('Source conversation changed')
   const events=observation.events
   const boundary=events.findIndex(event=>event.seq===p.atSeq&&event.type==='turn/end')

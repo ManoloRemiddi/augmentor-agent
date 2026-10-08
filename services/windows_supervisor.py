@@ -285,7 +285,7 @@ class Supervisor:
         finally: process.Close()
 
     def dispatch(self, message):
-        if message.get('action') in ('shortcut-status', 'shortcut-save'):
+        if message.get('action') in ('shortcut-status', 'shortcut-save', 'shortcut-remove'):
             if self.shell is None: raise ValueError('The Windows shortcut owner is unavailable.')
             if message['action']=='shortcut-status':return self.shell.request(message)
             # Keep the accepted queued Qt operation counted until its answer.
