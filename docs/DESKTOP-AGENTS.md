@@ -155,7 +155,7 @@ failed registry-commit restoration. No existing shortcut was reassigned.
 
 ## Installed Linux evidence — October 8, 2026
 
-Implementation through `9c66a04e426f57939ff626aa59fa4eaca7219dcc` is staged and
+Implementation through `9c66a04e426f57939ff626aa59fa4eaca7219dcc` was initially staged and
 selected in compatible release `20261008-135552-66db887d`, artifact SHA-256
 `9b547979857b56952ff274ae7f006cb3551654b9040bb76b3c37f14e61291bcd`.
 Stage inventory/imports and authenticated version/catalog activation pass.
@@ -199,3 +199,20 @@ original stable artifact remains selectable using `augmentor-update activate`.
 Backend rollback requires separately restoring its profile row while idle;
 desktop selection alone does not restore DSH configuration. Preserve newer
 conversations and registry revisions during any rollback.
+
+### Model-state follow-up — final selection
+
+The configured-model reopening correction in `98a961ae6cbad56358575e65f8f1b9668205fbc9`
+passes the full 877-case native suite (36 skips), the 513-pass Node suite (two
+opt-in skips) and all eight candidate entry cases. The test follows an existing
+conversation through a configured-model edit, reopening, a later chat-model
+choice and a second reopening; the conversation ID and later choice survive.
+
+This supersedes the initial selection above. Final selected/running Desktop and
+secondary release: `20261008-141416-242dacae`, compatible product 0.2.11, artifact
+SHA-256 `a2771ed09ba93c087f58a277cab0dcb88a3c250d44d19d840197c4e059f4b434`.
+Managed stage/activation and idle adoption pass; both windows are online and
+model-ready without restoration errors. All eight protected settings/session
+value comparisons still pass. The loaded presentation bridge remains identical
+to this final artifact. Mobile adoption and Olares-specific verification remain
+at the boundaries recorded above; no Olares preset is registered on port 3080 yet.
