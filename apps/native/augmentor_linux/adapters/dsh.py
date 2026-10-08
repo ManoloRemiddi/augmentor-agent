@@ -32,7 +32,7 @@ class DshAdapter(DshClient):
         if self.custom:return preset==self.preset
         return preset in ('augmentor-linux-product','augmentor-browser-product') if self.product else preset==self.preset
     def owns_session(self,row):
-        return self.owns_preset(row.get('agentPreset')) and (not self.custom or Path(row.get('cwd','')).resolve()==self.workspace().resolve())
+        return self.owns_preset(row.get('agentPreset')) and (not self.custom or row.get('origin')!='subagent' and Path(row.get('cwd','')).resolve()==self.workspace().resolve())
     def agent_catalog(self):return super().call('agentPresets.list').get('presets',[])
     def setting(self,namespace):
         if self.custom and namespace=='permission':return None

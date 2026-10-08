@@ -45,6 +45,7 @@ class EntriesTests(unittest.TestCase):
             adapter=DshAdapter(base='http://127.0.0.1:3080',home=self.tmp.name)
             self.assertEqual(adapter.preset,'synthetic-research');self.assertFalse(adapter.supports_voice)
             self.assertTrue(adapter.owns_session({'agentPreset':adapter.preset,'cwd':self.tmp.name}))
+            self.assertFalse(adapter.owns_session({'agentPreset':adapter.preset,'cwd':self.tmp.name,'origin':'subagent'}))
             self.assertFalse(adapter.owns_session({'agentPreset':adapter.preset,'cwd':'/elsewhere'}));self.assertFalse(adapter.owns_preset('augmentor-linux-product'))
             self.assertIn(store.get()['stateKey'],str(adapter.state_path()))
             for catalog in [[],[{'id':adapter.preset,'broken':'Missing service'}]]:

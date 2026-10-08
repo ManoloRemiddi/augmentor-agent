@@ -26,7 +26,7 @@ configuration has not changed. Main/secondary entries without a configured model
 keep their existing state-file shape. A changed preset or working folder gets
 a new binding and retains the old binding in the registry. DSH conversation files
 are never moved or deleted. History → All agents exposes retained conversations;
-a conversation outside the current preset/folder opens as history, with sending
+a subagent conversation or one outside the current preset/folder opens as history, with sending
 and branching disabled.
 
 Removal retains the DSH definition, conversation files and former binding, and
