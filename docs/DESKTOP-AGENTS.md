@@ -253,3 +253,35 @@ with 36 skips; the final state/ownership amendments pass the focused cases above
 Fresh hosted checks remain required. Olares fixture/live acceptance remain
 paused under its repository's two-failure rule; no private Olares source was
 published and no live Olares definition or model server was changed.
+
+
+## Owner catalog cleanup — October 8, 2026
+
+The owner requested removal of obsolete selectable agents. A metadata-only audit
+of the connected DSH catalog, desktop state, application workspace registry and
+session headers identified eight obsolete registrations: legacy `augmentor`
+Browser and `augmentor-linux` Desktop, legacy `sponsor-desk`, `liangshen`, and
+four dated `augmentor-evidence-pilot-*` experiment definitions. The current
+Desktop/Browser product presets and YouTube/Sponsor workspace presets were
+retained. DSH's `standard`, `ptc`, `minimal`, `cordis` and current `standard-codex`
+default were also retained. Olares's installed definition is preserved; it remains
+outside the regular server catalog pending the integration documented above.
+
+The cleanup adds only `disabled: true` to the eight declaring rows in the private
+web profile patch. Parsed comparison confirms no other configuration changed.
+Private archive copies include the previous patch, retired definitions and
+catalog/session metadata; original definition directories and every conversation
+remain at their existing paths. The application workspace's legacy-preset history
+allowlist is unchanged. To restore a retired role, re-enable its declaring row
+under idle DSH maintenance; avoid restoring an entire older patch over later work.
+Private paths, credentials, persona content and session metadata are not published.
+
+The first verification ran before the restarted DSH API was ready; automatic
+rollback restored the original profile. The corrected readiness wait verified
+exact roster membership after the idle restart: 17 entries became 9, none broken,
+and the default remained `standard-codex`. All 1,090 conversation identity/role/
+folder bindings and all eight protected settings/session value comparisons pass.
+Desktop, secondary and Mobile report online/model-ready without restoration
+errors. This is a private DSH configuration cleanup; installed release selection,
+model-server configuration and speech dependencies are unchanged. Use **Refresh**
+in an already-open Agents form to reload its cached roster.
