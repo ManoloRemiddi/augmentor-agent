@@ -120,7 +120,7 @@ Without the explicit runtime it is an opt-in skip, not runtime acceptance.
 
 The installed overlay recipe is `scripts/stage-native-agents-overlay.py`: copy an
 immutable compatible artifact to a fresh candidate, apply the feature and keep
-its product version/dependencies/approved UI. The candidate passes the six new
+its product version/dependencies/approved UI. The candidate passes the seven new
 native cases and its Agents form has been visually inspected in the existing
 settings frame. Follow [managed deployments](DESKTOP-DEPLOYMENTS.md) for stage,
 activation and selected-versus-running evidence. This source qualification does
@@ -133,3 +133,10 @@ duplicate filesystem provider, before any live Olares request. Its repository's
 for the owner's answer. No live Olares configuration, gateway safeguards or
 model-server settings have been changed. The existing dedicated launcher remains
 separate. Only a read-only status request is needed for eventual live acceptance.
+
+The first live Linux adoption exposed a public-launcher name mismatch in the new
+Open action. It is corrected to the installer-owned `augmentor-agent` entrypoint
+and covered by an installer-contract test. Primary startup also required waiting
+for the old systemd unit to finish exiting after guarded close; a successful
+`start` issued while that unit was still active had not launched a replacement.
+The old window closed cleanly and its saved conversation/model were preserved.

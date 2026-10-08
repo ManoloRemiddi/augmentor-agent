@@ -73,3 +73,12 @@ class EntriesTests(unittest.TestCase):
         with patch.object(store,'atomic',side_effect=OSError('Disk failure')):
             with self.assertRaises(OSError):store.save({**entry,'name':'Renamed'},value['revision'],change)
         self.assertEqual(actions,['apply','restore']);self.assertEqual(store.read(),value)
+    def test_linux_open_uses_the_registered_managed_launcher(self):
+        self.create()
+        launcher=Path(self.tmp.name)/'.local/bin/augmentor-agent';launcher.parent.mkdir(parents=True);launcher.touch()
+        with patch('augmentor_linux.agent_entries.Path.home',return_value=Path(self.tmp.name)),patch('sys.platform','linux'),patch('subprocess.Popen') as launch:
+            store.launch('research')
+            self.assertEqual(launch.call_args.args[0],[str(launcher),'--instance','research'])
+        # The startup installer and this action must agree on the public entrypoint.
+        script=(Path(__file__).resolve().parents[1]/'scripts/install-desktop-startup.py').read_text()
+        self.assertIn("binary/'augmentor-agent'",script)

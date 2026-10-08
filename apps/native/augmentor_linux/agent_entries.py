@@ -135,6 +135,6 @@ def launch(name):
         from .shortcut_activation import DesktopActivation
         DesktopActivation(instance=name).activate()
     else:
-        launcher=Path.home()/'.local/bin/augmentor-launch'
+        launcher=Path.home()/'.local/bin/augmentor-agent'
         if not launcher.is_file():raise ValueError('Install the managed desktop launcher before opening another window.')
         subprocess.Popen([str(launcher),'--instance',name],start_new_session=True,stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
