@@ -186,6 +186,9 @@ class Window(QWidget):
                 'No OpenCode conversation has been transferred or replayed.'))
 
     def switch_harness(self,harness,reconnect=False):
+        from .agent_entries import get
+        if harness!='dsh' and (get() or {}).get('preset'):
+            self.set_status('This entry uses an independent DSH agent. Choose Augmentor in Settings → Agents before switching harness.');return
         if self.maintenance.phase()!='ready':return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
         if harness not in ('pi','dsh','codex') or not self.controller:return
@@ -474,7 +477,7 @@ class Window(QWidget):
         self.voice_button.hands_free=self.voice_is_hands_free()
         self.voice_button.refresh_tip()
         self.voice_button.setVisible(self.preferences.values.get('resonant_voice',True))
-        self.voice_button.setEnabled(bool(self.controller and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
+        self.voice_button.setEnabled(bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_voice',True) is not False and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
         running=bool(self.controller and (self.controller.running or getattr(self.controller,'navigating',False)))
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))
@@ -864,6 +867,8 @@ class Window(QWidget):
             self.controller.rename(title)
 
     def open_access(self):
+        if self.controller and getattr(self.controller.client,'custom',False):
+            self.set_status('DSH owns this independent agent’s permissions. Edit its preset in DSH.');return
         if self.controller:AccessDialog(self).exec()
 
     def open_settings(self):

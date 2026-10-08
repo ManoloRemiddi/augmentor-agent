@@ -216,7 +216,8 @@ class ManagedShortcutManager(RemoteShortcutManager):
 
 
 def select_manager(parent=None):
-    instance=current_name() if current_name() in dict(SHORTCUT_INSTANCES) else 'main'
+    from .agent_entries import get
+    instance=current_name() if get() else 'main'
     if (ROOT/'release.json').is_file():return ManagedShortcutManager(parent,instance)
     from .macos_shortcut_service import request
     try:
@@ -243,7 +244,8 @@ def initialize(window):
     QApplication.instance().aboutToQuit.connect(manager.close)
     # Additional named windows may edit the two global shortcuts but do not
     # register another copy or claim that they own either shortcut themselves.
-    if current_name() not in dict(SHORTCUT_INSTANCES):return
+    from .agent_entries import get
+    if get() is None:return
     def restore():
         try:manager.restore()
         except Exception as error:manager.problem.emit(str(error))

@@ -79,7 +79,8 @@ class Hotkeys(QObject):
 
     def assign(self, instance, sequence, persist=lambda _text: None):
         self.require_thread()
-        if instance not in DEFAULTS: raise ValueError('Unknown shortcut window.')
+        from .instances import validate_name
+        validate_name(instance)
         parsed = binding(sequence)
         old = self.active.get(instance)
         if any(name != instance and item[1][:2] == parsed[:2] for name, item in self.active.items()):
@@ -123,11 +124,15 @@ class ShortcutOwner:
         self.directory = private_directory(Path(os.environ['XDG_CONFIG_HOME'])/'augmentor')
 
     def path(self, instance):
-        if instance not in DEFAULTS: raise ValueError('Unknown shortcut window.')
+        from .instances import validate_name
+        validate_name(instance)
         return self.directory/('shortcut.windows.'+instance+'.json')
 
     def restore(self):
-        for instance, default in DEFAULTS.items():
+        from .agent_entries import entries
+        for entry in entries():
+            instance=entry['id'];default=DEFAULTS.get(instance)
+            if default is None and not self.path(instance).exists():continue
             try:
                 try:
                     record = read_json(self.path(instance))
@@ -145,11 +150,15 @@ class ShortcutOwner:
             if not isinstance(sequence, str) or len(sequence) > 256: raise ValueError('Invalid shortcut sequence.')
             self.hotkeys.assign(instance, sequence, lambda text: atomic_json(path, {'sequence': text}))
             self.errors[instance] = None
+        elif message.get('action')=='shortcut-remove' and set(message)=={'action','instance'}:
+            path.unlink(missing_ok=True)
+            old=self.hotkeys.active.pop(instance,None)
+            if old:self.hotkeys.release(old[0])
         elif message.get('action') != 'shortcut-status' or set(message) != {'action', 'instance'}:
             raise ValueError('Unsupported shortcut operation.')
         active = self.hotkeys.active.get(instance)
         return {'instance': instance, 'active': active is not None, 'key': active[1][2] if active else None,
-                'error': self.errors[instance]}
+                'error': self.errors.get(instance)}
 
     def close(self): self.hotkeys.close()
 

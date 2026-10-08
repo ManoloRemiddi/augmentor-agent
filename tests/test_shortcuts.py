@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 from PySide6.QtGui import QKeySequence
-from augmentor_linux.shortcuts import save_shortcut,COMPONENT
+from augmentor_linux.shortcuts import save_shortcut,COMPONENT,shortcut_transaction,target
 
 class ShortcutTests(unittest.TestCase):
     def setUp(self):
@@ -61,3 +61,14 @@ class ShortcutTests(unittest.TestCase):
             self.assertEqual(call.call_args.args[0],'setShortcut')
             self.assertEqual(call.call_args.args[2],'[123]')
             self.assertTrue(int(call.call_args.args[3]) & 2,'Rollback must reactivate the previous shortcut')
+
+    def test_registry_commit_failure_restores_owned_files_and_live_keys(self):
+        with tempfile.TemporaryDirectory() as root,patch.dict(os.environ,{'XDG_DATA_HOME':root}):
+            component,action=target('research');path=Path(root)/'applications'/component
+            path.parent.mkdir();path.write_text('Original launcher\n');path.chmod(0o700)
+            def change(*_):path.write_text('Changed launcher\n');path.chmod(0o644)
+            with patch('augmentor_linux.shortcuts.current_keys',return_value=[123]),patch('augmentor_linux.shortcuts.save_shortcut',side_effect=change),patch('augmentor_linux.shortcuts.call',return_value='([123],)') as call:
+                with self.assertRaises(OSError):
+                    with shortcut_transaction('research',QKeySequence('Ctrl+Alt+J')):raise OSError('Disk full')
+                self.assertEqual(call.call_args.args[:3],('setShortcut',action,'[123]'))
+            self.assertEqual(path.read_text(),'Original launcher\n');self.assertEqual(path.stat().st_mode&0o777,0o700)

@@ -2,6 +2,9 @@
 
 # Start here: agent handoff
 
+[Named desktop agents](DESKTOP-AGENTS.md) records the new per-window DSH selection, state migration, permission boundaries, compatible Linux overlay, runtime evidence and pending Olares acceptance.
+
+
 ## October 5 dictation repair downloads — live
 
 The owner confirmed the recording overlay and authorized publication. PR #39

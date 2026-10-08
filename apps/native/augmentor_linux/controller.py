@@ -93,6 +93,7 @@ class Controller(QObject):
                     if self.harness=='codex':self.pending_branch=state.get('pendingBranch')
             except (OSError, ValueError, TypeError):
                 pass
+        if self.session is None and isinstance(getattr(self.client,'initial_selection',None),dict):self.selection=dict(self.client.initial_selection)
 
     def save_session(self):
         if not self.state_file:
@@ -170,7 +171,7 @@ class Controller(QObject):
             if self.stream:self.stream.close()
             self.stream=None;self.connected=False
             self.session=row['sessionId']
-            self.read_only=not getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(row.get('agentPreset'))
+            self.read_only=not getattr(self.client,'owns_session',lambda r:getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(r.get('agentPreset')))(row)
             if row.get('saved'):self.saved_ids.add(self.session)
             else:self.saved_ids.discard(self.session)
             if not self.read_only:self.client.call('session.create',{'sessionId':self.session,'cwd':row['cwd'],'agentPreset':row['agentPreset']})
@@ -427,7 +428,7 @@ class Controller(QObject):
                     self.problem.emit('The previous chat is unavailable. Choose a conversation from History or start a new one.')
                     sid=None
                 else:
-                    self.read_only=not getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(row.get('agentPreset'))
+                    self.read_only=not getattr(self.client,'owns_session',lambda r:getattr(self.client,'owns_preset',lambda preset:preset==self.preset)(r.get('agentPreset')))(row)
                     if not self.read_only:self.client.call('session.create',{'sessionId':sid,'cwd':row['cwd'],'agentPreset':row['agentPreset']})
             with self.events_lock:self.recover_buffer=[]
             self.subscribe(sid)

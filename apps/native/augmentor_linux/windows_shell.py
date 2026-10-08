@@ -36,6 +36,7 @@ class Shell(QObject):
         try:lease.__enter__()
         except MaintenanceBusy:return
         try:
+            if instance not in self.activations:self.activations[instance]=DesktopActivation(instance=instance)
             future=self.pool.submit(self.activations[instance].activate)
             self.pending[instance]=future
             future.add_done_callback(lambda _result:lease.__exit__(None,None,None))
@@ -43,7 +44,7 @@ class Shell(QObject):
             lease.__exit__(None,None,None);raise
 
     def request(self, message, *, timeout=10):
-        lease=self.admission.work() if message.get('action')=='shortcut-save' else None
+        lease=self.admission.work() if message.get('action') in ('shortcut-save','shortcut-remove') else None
         if lease:lease.__enter__()
         release_lock=threading.Lock()
         def release():

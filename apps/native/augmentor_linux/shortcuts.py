@@ -7,6 +7,7 @@ import re
 import subprocess
 import tempfile
 from pathlib import Path
+from contextlib import contextmanager
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence
 
@@ -117,3 +118,60 @@ def save_shortcut(sequence,instance=None):
                     write_atomic(path,text);os.chmod(path,modes[path])
         raise
     return key
+
+
+def clear_shortcut(instance):
+    instance=validate_name(instance)
+    if instance=='main':raise ValueError('The primary launcher is required. Clear its binding in platform settings instead.')
+    if sys.platform=='darwin':
+        from .macos_shortcut_service import request
+        request({'operation':'remove','instance':instance});return
+    if sys.platform=='win32':
+        from windows_supervisor import request
+        request('shortcut-remove',root=Path(__file__).resolve().parents[3],instance=instance);return
+    component,action=target(instance);previous=current_keys(instance)
+    assigned=call('setShortcut',action,'[]',SHORTCUT_FLAGS)
+    if any(int(v)>0 for v in re.findall(r'-?\d+',assigned)):
+        call('setShortcut',action,str(previous),SHORTCUT_FLAGS)
+        raise RuntimeError('KDE could not remove this shortcut.')
+    data=Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))
+    for folder in ('applications','kglobalaccel'):(data/folder/component).unlink(missing_ok=True)
+
+
+@contextmanager
+def shortcut_transaction(instance,sequence=None,remove=False):
+    """Restore the owned OS binding if its accompanying registry write fails."""
+    previous=current_keys(instance)
+    if sys.platform=='darwin':
+        from .macos_shortcuts import configuration
+        paths=[configuration(instance)]
+    elif sys.platform=='win32':
+        paths=[Path(os.environ['XDG_CONFIG_HOME'])/'augmentor'/('shortcut.windows.'+instance+'.json')]
+    else:
+        component,action=target(instance)
+        data=Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))
+        paths=[data/folder/component for folder in ('applications','kglobalaccel')]
+    backups={p:(p.read_bytes(),p.stat().st_mode&0o777) if p.exists() else None for p in paths}
+    changed=False
+    try:
+        if remove:clear_shortcut(instance);changed=True
+        elif sequence is not None and not sequence.isEmpty():save_shortcut(sequence,instance);changed=True
+        yield
+    except Exception as original:
+        if changed:
+            try:
+                if sys.platform not in ('darwin','win32'):call('setShortcut',action,str(previous),SHORTCUT_FLAGS)
+                elif previous:save_shortcut(previous[0] if previous[0]=='Fn+Space' else QKeySequence(previous[0]),instance)
+                elif sys.platform=='darwin':
+                    from .macos_shortcut_service import request
+                    request({'operation':'remove','instance':instance})
+                else:
+                    from windows_supervisor import request
+                    request('shortcut-remove',root=Path(__file__).resolve().parents[3],instance=instance)
+                for path,snapshot in backups.items():
+                    if snapshot is None:path.unlink(missing_ok=True)
+                    else:
+                        path.write_bytes(snapshot[0]);path.chmod(snapshot[1])
+            except Exception as recovery:
+                raise RuntimeError('The entry was not saved and its shortcut could not be restored. Check platform shortcuts: '+str(recovery)) from original
+        raise

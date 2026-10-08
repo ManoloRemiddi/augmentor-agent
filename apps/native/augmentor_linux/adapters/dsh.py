@@ -11,6 +11,7 @@ import urllib.request
 import urllib.error
 from .dsh_wire import DshClient,EventStream
 from ..pi_client import ContractError
+from .. import agent_entries
 
 class DshAdapter(DshClient):
     harness='dsh';preset='augmentor-linux';label='DSH'
@@ -21,12 +22,34 @@ class DshAdapter(DshClient):
         self.native_interactions=False
         saved=current();self.product=saved.get('endpoint')==self.base and saved.get('home')==str(self.home)
         if self.product:self.preset='augmentor-linux-product'
+        self.entry=agent_entries.get()
+        self.custom=bool(self.entry and self.entry.get('preset'))
+        if self.custom:self.preset=self.entry['preset']
+        self.supports_prompt_improvement=not self.custom
+        self.supports_voice=not self.custom
+        self.initial_selection=(self.entry or {}).get('model')
     def owns_preset(self, preset):
+        if self.custom:return preset==self.preset
         return preset in ('augmentor-linux-product','augmentor-browser-product') if self.product else preset==self.preset
+    def owns_session(self,row):
+        return self.owns_preset(row.get('agentPreset')) and (not self.custom or Path(row.get('cwd','')).resolve()==self.workspace().resolve())
+    def agent_catalog(self):return super().call('agentPresets.list').get('presets',[])
+    def setting(self,namespace):
+        if self.custom and namespace=='permission':return None
+        return super().setting(namespace)
+    def check_entry(self):
+        if agent_entries.binding(self.entry)!=agent_entries.binding(agent_entries.get()):
+            raise ContractError('This desktop agent changed. Reopen its window to use the new selection.')
+    def check_preset(self):
+        row=next((r for r in self.agent_catalog() if r.get('id')==self.preset),None)
+        if row is None or row.get('broken'):
+            if not self.custom:raise ContractError('The Augmentor agent preset is unavailable. Open Settings → Connect DSH, check the connection, then Save and use DSH.')
+            raise ContractError('Selected DSH agent preset is unavailable: '+self.preset+'. Refresh Agents in Settings or repair it in DSH.')
     def running_state(self, session):
         row=next((row for row in self.call('session.list')['items'] if row['sessionId']==session),None)
         return bool(row.get('running')) if row is not None else None
     def voice_ticket(self, session):
+        if self.custom:raise ContractError('The Augmentor voice bridge is unavailable for independent DSH agents. Use typed chat or dictation.')
         if not self.product:raise ContractError('Connect the Augmentor DSH integration first.')
         token=(self.home/'augmentor-product-token').read_text().strip()
         row=next((row for row in self.call('session.list')['items'] if row['sessionId']==session),{})
@@ -56,15 +79,23 @@ class DshAdapter(DshClient):
         return result
     def call(self,method,payload=None):
         p=payload or {}
+        if self.custom and method=='settings.mutate' and p.get('ns')=='permission':raise ContractError('DSH owns this independent agent’s permissions.')
         if method=='host.describe' and self.product:
             status=http(self.base,'/api/augmentor-product');token=(self.home/'augmentor-product-token').read_text().strip()
             if status.get('version')!=VERSION or status.get('homeId')!=hashlib.sha256(token.encode()).hexdigest():raise ContractError('Reconnect the matching DSH integration from Settings.')
-            self.native_interactions=status.get('nativeInteractions')==1
+            self.native_interactions=status.get('nativeInteractions')==1 and (not self.custom or status.get('desktopAgents')==1)
         if method=='host.describe':
-            presets=super().call('agentPresets.list').get('presets',[])
-            if not any(row.get('id')==self.preset and not row.get('broken') for row in presets):
-                raise ContractError('The Augmentor agent preset is unavailable. Open Settings → Connect DSH, check the connection, then Save and use DSH.')
-        if method=='session.branch':return branch(super().call,p,surface='linux',endpoint=self.base,exact_fork=product_exact_fork(self.base,self.home) if self.product else None)
+            self.check_entry();self.check_preset()
+        if method in ('session.create','session.prompt','session.selectModel','session.branch','session.updateQueue'):
+            self.check_entry()
+            if self.custom:
+                self.check_preset()
+                if method=='session.create' and (p.get('agentPreset')!=self.preset or Path(p.get('cwd','')).resolve()!=self.workspace().resolve()):
+                    raise ContractError('This conversation belongs to another DSH agent or working folder.')
+                if method!='session.create':
+                    sid=p.get('sessionId');row=next((r for r in super().call('session.list')['items'] if r['sessionId']==sid),None)
+                    if row is None or not self.owns_session(row):raise ContractError('This conversation belongs to another DSH agent or working folder.')
+        if method=='session.branch':return branch(super().call,p,surface='linux',endpoint=self.base,exact_fork=product_exact_fork(self.base,self.home) if self.product else None,allowed_presets=(self.preset,) if self.custom else None,required_cwd=str(self.workspace()) if self.custom else None)
         if method=='session.create':p={k:v for k,v in p.items() if k!='selection'}
         if method=='models.pin':
             section=self.setting('model-picker-augmented')
@@ -77,6 +108,7 @@ class DshAdapter(DshClient):
     supports_prompt_improvement=True
 
     def improve_prompt(self, text, instructions, selection):
+        if self.custom:raise ContractError('Prompt improvement is unavailable for independent DSH agents.')
         if not self.product:raise ContractError('Connect the Augmentor DSH integration before improving prompts.')
         token=(self.home/'augmentor-product-token').read_text().strip()
         # Inline editing must return an editable draft, including feedback and fragments.
@@ -100,5 +132,6 @@ class DshAdapter(DshClient):
         return result
 
     def state_path(self):
-        return Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor-linux/session.json'
-    def workspace(self):return Path(os.environ.get('AUGMENTOR_DSH_WORKSPACE',Path.home()/'Augmentor Linux'))
+        key=(self.entry or {}).get('stateKey')
+        return Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor-linux'/('session.'+key+'.json' if key else 'session.json')
+    def workspace(self):return Path((self.entry or {}).get('cwd') or os.environ.get('AUGMENTOR_DSH_WORKSPACE',Path.home()/'Augmentor Linux'))

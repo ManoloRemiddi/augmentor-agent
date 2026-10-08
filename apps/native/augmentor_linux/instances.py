@@ -38,6 +38,9 @@ def desktop_component(base):
 
 
 def window_label():
+    from .agent_entries import get
+    entry=get()
+    if entry and entry['name'] not in ('First agent','Second agent'):return 'Augmentor Agent · '+entry['name']
     return 'Augmentor Agent' if current_name() == 'main' else 'Augmentor Agent · ' + ('Second window' if current_name() == 'secondary' else current_name())
 
 

@@ -94,7 +94,7 @@ def product_exact_fork(base, home):
     return create
 
 
-def branch(call, params, *, surface, endpoint, state=None, exact_fork=None):
+def branch(call, params, *, surface, endpoint, state=None, exact_fork=None, allowed_presets=None, required_cwd=None):
     source, target, seq, mode = (params.get(k) for k in ('sessionId', 'newSessionId', 'messageSeq', 'mode'))
     if not all(isinstance(s, str) and re.fullmatch(r'[A-Za-z0-9_.-]{1,160}', s) for s in (source, target)) or type(seq) is not int or seq < 0:
         raise BranchError('Invalid branch request.')
@@ -113,7 +113,9 @@ def branch(call, params, *, surface, endpoint, state=None, exact_fork=None):
                 raise BranchError('The earlier branch outcome is unknown. Check DSH chats before starting another branch; no request was replayed.')
         else:
             row = next((r for r in call('session.list', {})['items'] if r['sessionId'] == source), None)
-            allowed = ('augmentor-linux-product','augmentor-browser-product', 'augmentor-linux' if surface == 'linux' else 'augmentor')
+            allowed = allowed_presets or ('augmentor-linux-product','augmentor-browser-product', 'augmentor-linux' if surface == 'linux' else 'augmentor')
+            if required_cwd and (row is None or Path(row.get('cwd','')).resolve()!=Path(required_cwd).resolve()):
+                raise BranchError('This chat belongs to another working folder.')
             profile_id = os.environ.get('AUGMENTOR_WORKSPACE_PROFILE')
             if profile_id:
                 profile_directory = Path(os.environ.get('AUGMENTOR_WORKSPACE_PROFILES', Path(os.environ.get('XDG_CONFIG_HOME', Path.home()/'.config'))/'augmentor/workspaces'))
