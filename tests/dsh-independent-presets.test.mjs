@@ -4,14 +4,16 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {createRequire} from 'node:module'
 import {pathToFileURL,fileURLToPath} from 'node:url'
-import {mkdtempSync,writeFileSync,mkdirSync,rmSync} from 'node:fs'
+import {mkdtempSync,writeFileSync,mkdirSync,rmSync,readFileSync} from 'node:fs'
 import {tmpdir} from 'node:os'
 import {join,resolve} from 'node:path'
 import {createServer} from 'node:http'
 import {once} from 'node:events'
 const root=process.env.DSH_INSTALL_ROOT
+const version=root?JSON.parse(readFileSync(join(root,'package.json'),'utf8')).version:null
+const skip=!root?'Set DSH_INSTALL_ROOT to run the real DSH fixture':/^0\.1\./.test(version)?'Independent isolation fixture requires DSH 0.2 preset registry and tool guard':false
 
-test('real DSH scopes independent persona, tools, sandbox and approval without changing its sibling', {skip:!root,timeout:30000},async()=>{
+test('real DSH scopes independent persona, tools, sandbox and approval without changing its sibling', {skip,timeout:30000},async()=>{
  const req=createRequire(join(root,'package.json')),load=async n=>import(pathToFileURL(req.resolve('@deepseek-ai/'+n)).href)
  const temp=mkdtempSync(join(tmpdir(),'augmentor-independent-')),repo=fileURLToPath(new URL('../',import.meta.url))
  const priorHome=process.env.DSH_HOME,priorKey=process.env.AUGMENTOR_FIXTURE_KEY

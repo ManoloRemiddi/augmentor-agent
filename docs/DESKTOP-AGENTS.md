@@ -80,6 +80,12 @@ that migration without importing private agent source:
   provider. It does not mutate the shared server environment. Use it beside that
   preset's isolated shell, never against the root shared shell.
 
+The optional scoped-isolation helpers and real independent-preset fixture are
+qualified with DSH 0.2.0-rc.2. The current download/CI pin is DSH 0.1.5-rc.1;
+that older runtime skips the explicit 0.2 fixture with a version reason. It is not
+evidence for scoped isolation. The boundary fails closed without the DSH tool
+guard; do not migrate a privileged process-isolated role on an unqualified runtime.
+
 A scoped DSH group can isolate `skills`, `sandboxPolicy`, `approval` and `shell`,
 mount fresh providers and retain its own persona, skill directory, tools and
 hooks. The tool boundary supplements DSH's sandbox; it does not replace hooks or
@@ -218,3 +224,32 @@ model-ready without restoration errors. All eight protected settings/session
 value comparisons still pass. The loaded presentation bridge remains identical
 to this final artifact. Mobile adoption and Olares-specific verification remain
 at the boundaries recorded above; no Olares preset is registered on port 3080 yet.
+
+
+### Entry boundary follow-up — current selection
+
+Implementation through `ef2d7f2` keeps child-agent conversations read-only in an
+independent window and refuses a generated desktop instance ID before its
+configuration is committed. This closes the shortcut-install/save interval
+without changing historical arbitrary-instance compatibility. The eight native
+entry cases pass against the final compatible candidate; all six KDE shortcut
+cases pass.
+
+Current selected/running Desktop and secondary release:
+`20261008-144156-6e698bc5`, compatible product 0.2.11, artifact SHA-256
+`1e2d40f63804d88acba8442eb716877d0a1bbfe6752ce243dba3640f5dc5cf29`.
+Managed stage/activation and guarded idle adoption pass. Both windows are online
+and model-ready without restoration errors. All eight protected value
+comparisons still pass, and the four loaded presentation bridge files match
+this selection. Main/secondary keys are preserved; Fn+O remains unassigned.
+Mobile keeps its original running artifact until reopening.
+
+The hosted Debian run found that the real independent-isolation fixture assumed
+DSH 0.2 modules while the public qualification lock remains 0.1.5-rc.1. The test
+now declares that version boundary explicitly. It passes on the owner's actual
+0.2.0-rc.2 runtime, and the local locked-0.1.5 Node suite passes 510 cases with
+five explained skips. The full common native suite previously passed 877 cases
+with 36 skips; the final state/ownership amendments pass the focused cases above.
+Fresh hosted checks remain required. Olares fixture/live acceptance remain
+paused under its repository's two-failure rule; no private Olares source was
+published and no live Olares definition or model server was changed.
