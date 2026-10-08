@@ -7,6 +7,7 @@
 const base=new URL('./',location.href)
 import {snapshotWorkspaceContext} from './workspace-context.mjs'
 import {restoreWorkspaceAppearance} from './workspace-settings.mjs'
+import {HOST_CAPABILITIES} from './host-commands.mjs'
 async function api(path,value){const res=await fetch(new URL(path,base),{method:value?'POST':'GET',headers:value?{'Content-Type':'application/json'}:{},body:value?JSON.stringify(value):undefined,signal:AbortSignal.timeout(8000)});const data=await res.json();if(!res.ok)throw Error(data.error||'Augmentor unavailable');return data}
 const profile=await api('config.json')
 if(profile.sdkProtocol){
@@ -15,7 +16,43 @@ if(profile.sdkProtocol){
 const eventSet=()=>{const listeners=new Set();return {addListener:f=>listeners.add(f),removeListener:f=>listeners.delete(f),emit:(...args)=>{for(const f of listeners)f(...args)}}}
 const runtimeEvents=eventSet(),storageEvents=eventSet();let handler,closed=false,workspaceContext=null
 const tell=value=>parent.postMessage(value,profile.parentOrigin)
-window.addEventListener('message',event=>{if(event.origin!==profile.parentOrigin||event.source!==parent||event.data?.type!=='augmentor-context')return;try{workspaceContext=snapshotWorkspaceContext(event.data.context)}catch{workspaceContext=null}})
+const settingsPage=location.pathname.endsWith('settings.html')
+// Panel protocol v2 (App SDK docs/PANEL-PROTOCOL.md): the side panel registers its composer
+// commands once loaded; the settings page advertises none.
+let registerCommands;const hostCommands=new Promise(resolve=>{registerCommands=resolve})
+globalThis.augmentorEmbed=Object.freeze({register:commands=>registerCommands(commands)})
+const loaded=ms=>Promise.race([hostCommands,new Promise((_,reject)=>setTimeout(()=>reject(Object.assign(Error('The panel is still loading'),{code:'BUSY'})),ms))])
+async function hostCommand(data){
+ if(typeof data.requestId!=='string'||!data.requestId||data.requestId.length>128)return
+ const reply=(ok,value)=>tell({type:'augmentor-result',requestId:data.requestId,ok,...value})
+ try{
+  if(settingsPage)throw Object.assign(Error('Settings cannot run prompts'),{code:'REFUSED'})
+  const commands=await loaded(10000)
+  if(data.type==='augmentor-new-chat')return reply(true,{result:await commands.newChat()})
+  if(typeof data.text!=='string'||!data.text.trim()||data.text.length>16000)throw Object.assign(Error('Prompt text must be 1 to 16000 characters'),{code:'INVALID_REQUEST'})
+  if(data.context!==undefined)workspaceContext=snapshotWorkspaceContext(data.context)
+  reply(true,{result:await commands.prompt({text:data.text,send:data.send===true,fresh:data.fresh===true})})
+ }catch(error){reply(false,{code:typeof error?.code==='string'?error.code:'REFUSED',error:String(error?.message||error).slice(0,500)})}
+}
+window.addEventListener('message',event=>{
+ if(event.origin!==profile.parentOrigin||event.source!==parent||!event.data||typeof event.data!=='object')return
+ const data=event.data
+ if(data.type==='augmentor-context'){try{workspaceContext=snapshotWorkspaceContext(data.context)}catch{workspaceContext=null}}
+ else if(data.type==='augmentor-focus'&&!settingsPage)void hostCommands.then(commands=>commands.focus())
+ else if((data.type==='augmentor-prompt'||data.type==='augmentor-new-chat'))void hostCommand(data)
+})
+// Turn notifications for the host page. Application data changes stay on the application's
+// own change feed; these carry no tool arguments or results.
+let followedSession=null;const toolNames=new Map()
+function forwardEvents(message){
+ if(typeof message.sessionId==='string'&&message.sessionId!==followedSession){followedSession=message.sessionId;toolNames.clear();tell({type:'augmentor-event',event:'session.changed',data:{sessionId:followedSession}})}
+ const entry=message.entry,event=entry?.event
+ if(!event||entry.sessionId!==followedSession)return
+ if(event.type==='turn/start')tell({type:'augmentor-event',event:'turn.started',data:{sessionId:followedSession}})
+ else if(event.type==='turn/end')tell({type:'augmentor-event',event:'turn.finished',data:{sessionId:followedSession,reason:typeof event.data?.reason?.kind==='string'?event.data.reason.kind:null}})
+ else if(event.type==='tool/call'&&typeof event.data?.callId==='string'){toolNames.set(event.data.callId,String(event.data.name??''));if(toolNames.size>500)toolNames.delete(toolNames.keys().next().value)}
+ else if(event.type==='tool/result'){const id=event.data?.message?.source?.callId??event.data?.message?.content?.[0]?.toolCallId;if(toolNames.has(id))tell({type:'augmentor-event',event:'tool.completed',data:{sessionId:followedSession,tool:toolNames.get(id),isError:event.data.message.content?.[0]?.isError===true}})}
+}
 function storageArea(session=false){
  const key='augmentor-embed:'+profile.id,read=async()=>{const value=session?JSON.parse(sessionStorage.getItem(key)||'{}'):await api('preferences');return session?value:{...value,'augmentor-harness':profile.harness}}
  let writes=Promise.resolve()
@@ -38,7 +75,7 @@ globalThis.chrome={runtime:{id:'augmentor-embedded',getURL:path=>new URL(path,ba
  if(message.type==='harness/select'&&message.harness!==profile.harness)return Promise.resolve({ok:false,error:'This workspace uses its registered harness.'})
  if(profile.sdkProtocol&&message.type==='voice/preferences'&&!profile.voice.enabled)return Promise.resolve({ok:true,result:{enabled:false,mode:'push-to-talk'}})
  if(profile.sdkProtocol&&message.type==='voice/start'&&!profile.voice.enabled)return Promise.resolve({ok:false,error:'Experimental voice is disabled for this workspace.'})
- if(['evt','voice/event'].includes(message.type)){runtimeEvents.emit(message);if(message.type==='evt')tell({type:'augmentor-status',online:message.phase==='ready',busy:message.running});return Promise.resolve()}
+ if(['evt','voice/event'].includes(message.type)){runtimeEvents.emit(message);if(message.type==='evt'){tell({type:'augmentor-status',online:message.phase==='ready',busy:message.running,...(typeof message.sessionId==='string'?{sessionId:message.sessionId}:{})});forwardEvents(message)}return Promise.resolve()}
  return new Promise(resolve=>{const asynchronous=handler(message,{id:chrome.runtime.id,url:'chrome-extension://'+chrome.runtime.id+'/sidepanel.html'},resolve);if(asynchronous!==true)setTimeout(()=>resolve({ok:false,error:'Operation unavailable'}),1000)})
 }},storage:{local:storageArea(),session:storageArea(true),onChanged:storageEvents},tabs:{onActivated:eventSet(),onRemoved:eventSet(),onUpdated:eventSet(),query:async()=>[],create:openTab,update:async(id,value)=>openTab(value)},windows:{onFocusChanged:eventSet(),WINDOW_ID_NONE:-1,update:async()=>({})},sidePanel:{setPanelBehavior:async()=>{},setOptions:async()=>{}}}
 window.close=()=>tell({type:'augmentor-hide'})
@@ -51,11 +88,11 @@ window.addEventListener('online',()=>void recover());window.addEventListener('fo
 // App navigation is an explicit parent contract; browser-control ownership stays
 // with the installed extension, never with a fabricated active tab.
 document.addEventListener('click',event=>{const a=event.target.closest('a');if(!a)return;const url=new URL(a.href,location.href);if(url.origin===profile.parentOrigin&&url.hash&&!url.pathname.startsWith(profile.publicPath)){event.preventDefault();tell({type:'augmentor-link',hash:url.hash})}},true)
-tell({type:'augmentor-ready',profile:profile.id})
-await import(location.pathname.endsWith('settings.html')?'./settings.mjs':'./sidepanel.js')
+tell({type:'augmentor-ready',profile:profile.id,...(settingsPage?{}:{capabilities:[...HOST_CAPABILITIES]})})
+await import(settingsPage?'./settings.mjs':'./sidepanel.js')
 
 // Experimental opt-in is workspace-specific; model and global speech settings stay owned by the product.
-if(profile.sdkProtocol&&location.pathname.endsWith('settings.html')){
+if(profile.sdkProtocol&&settingsPage){
  const section=document.createElement('fieldset'),legend=document.createElement('legend'),label=document.createElement('label'),input=document.createElement('input');
  legend.textContent='Experimental workspace voice';input.type='checkbox';input.checked=profile.voice.enabled;
  const note=document.createElement('p');note.setAttribute('role','status');section.className='card';

@@ -18,6 +18,7 @@ import { submitDraft } from './prompt-send.mjs'
 import { attachVoice } from './voice.mjs'
 import { attachPromptLibrary } from './prompt-library.mjs'
 import { attachPageMaintenance } from './maintenance-page.mjs'
+import { createHostCommands } from './host-commands.mjs'
 
 let surfaceCapabilities={branch:false,edit:false},editingMessage=null
 const answeredInteractions=new Set()
@@ -778,6 +779,9 @@ $newchat.addEventListener('click', async (e) => {
     e.stopPropagation()
     return
   }
+  await startNewChat()
+})
+async function startNewChat() {
   if (viewSessionId) {
     viewSessionId = null
     viewSessionTitle = null
@@ -788,7 +792,8 @@ $newchat.addEventListener('click', async (e) => {
   const res = await send('newchat')
   if (res?.ok) ui.clear()
   refresh()
-})
+  return res?.ok === true
+}
 
 // ── Approval mode (long-press on New Chat, 0.1.18) ──────────────────────────
 // The DSH permission preset decides what the agent may do and whether it
@@ -963,6 +968,19 @@ if (taskParam) {
   }, 500)
   setTimeout(() => clearInterval(waitForSend), 60000)
 }
+
+// Embedded workspaces only: the host page's prompt, new-chat and focus commands
+// (App SDK panel protocol v2) reuse the owner's own composer and send path.
+globalThis.augmentorEmbed?.register(createHostCommands({
+  input: document.getElementById('input'), ui,
+  submit: async () => {
+    let accepted = false
+    await submitDraft({input: document.getElementById('input'), ui, send, onAccepted: () => {accepted = true}})
+    refresh()
+    return accepted
+  },
+  newChat: startNewChat, viewing: () => !!viewSessionId, editing: () => !!editingMessage,
+}))
 
 refresh()
 const poll = setInterval(refresh, 2000)
