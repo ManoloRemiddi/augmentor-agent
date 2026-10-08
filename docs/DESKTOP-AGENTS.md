@@ -106,7 +106,7 @@ It contains the approved settings frame and specialist-workspace infrastructure
 that cannot be replaced wholesale by the current source 0.2.13 artifact.
 
 Source qualification: type/build checks pass; Node suite has 513 passes and two
-existing skips; native suite has 873 cases with 36 skips. Independently authored
+existing skips; native suite has 875 cases with 36 skips. Independently authored
 fixtures cover migration, retained bindings, stale revisions, shortcut conflicts,
 failed-commit restoration, strict preset/folder ownership and missing presets.
 The optional real-DSH test uses the installed 0.2.0-rc.2 runtime with an invented
@@ -140,3 +140,11 @@ and covered by an installer-contract test. Primary startup also required waiting
 for the old systemd unit to finish exiting after guarded close; a successful
 `start` issued while that unit was still active had not launched a replacement.
 The old window closed cleanly and its saved conversation/model were preserved.
+
+Live read-only KDE inspection also found that the compatible developer artifact
+had its real main/secondary bindings under `com.augmentor.Agent.desktop`, while
+the old settings helper looked under the development namespace because it
+recognized only `release.json`. Managed `desktop-release.json` artifacts now
+resolve the installed namespace, preserving the existing Fn+Space bindings.
+The six KDE adapter cases pass, including managed namespace resolution and
+failed registry-commit restoration. No existing shortcut was reassigned.

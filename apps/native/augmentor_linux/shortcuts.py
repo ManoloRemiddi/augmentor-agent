@@ -11,7 +11,8 @@ from contextlib import contextmanager
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QKeySequence
 
-PACKAGED=(Path(__file__).resolve().parents[3]/'release.json').is_file()
+ROOT=Path(__file__).resolve().parents[3]
+PACKAGED=any((ROOT/name).is_file() for name in ('release.json','desktop-release.json'))
 COMPONENT=desktop_component('com.augmentor.Agent.desktop' if PACKAGED else 'com.augmentor.LinuxPi.desktop')
 ACTION=f"['{COMPONENT}','_launch','Augmentor Agent','Show or hide Augmentor Agent']"
 SYSTEM_DESKTOP=Path('/usr/share/applications')/COMPONENT

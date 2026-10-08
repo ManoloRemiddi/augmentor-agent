@@ -4,6 +4,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
+import importlib
 from PySide6.QtGui import QKeySequence
 from augmentor_linux.shortcuts import save_shortcut,COMPONENT,shortcut_transaction,target
 
@@ -72,3 +73,15 @@ class ShortcutTests(unittest.TestCase):
                     with shortcut_transaction('research',QKeySequence('Ctrl+Alt+J')):raise OSError('Disk full')
                 self.assertEqual(call.call_args.args[:3],('setShortcut',action,'[123]'))
             self.assertEqual(path.read_text(),'Original launcher\n');self.assertEqual(path.stat().st_mode&0o777,0o700)
+
+    def test_managed_artifact_uses_existing_installed_shortcut_namespace(self):
+        from augmentor_linux import shortcuts
+        original=Path.is_file
+        try:
+            with patch.object(Path,'is_file',lambda path:True if path.name=='desktop-release.json' else False if path.name=='release.json' else original(path)):
+                importlib.reload(shortcuts)
+            self.assertEqual(shortcuts.target('main')[0],'com.augmentor.Agent.desktop')
+            self.assertEqual(shortcuts.target('research')[0],'com.augmentor.Agent.research.desktop')
+            with patch.object(shortcuts,'call',return_value='([16781617],)'):
+                self.assertEqual(shortcuts.display_key(shortcuts.current_keys('main')[0]),'Fn+Space')
+        finally:importlib.reload(shortcuts)
