@@ -3,6 +3,7 @@ import {createHash} from 'node:crypto';
 import {isRoutineQuery} from './permissions.js';
 import type {Agent,AfterToolCallContext} from '@earendil-works/pi-agent-core';
 import type {AgentSession,ExtensionAPI,SessionManager,TurnEndEvent,ExtensionContext} from '@earendil-works/pi-coding-agent';
+import {saveToolOriginal} from './tool-originals.js';
 
 export const EXECUTION_POLICY={maxRecoveries:2,recoveryMaxTokens:8192,recoveryMaxSteps:64,recoveryMaxMs:600000,warningMs:90000};
 type Effect='read'|'change'|'external'|'unknown';
@@ -32,7 +33,7 @@ const recoveryText=(cause:string,final:boolean)=>'Execution recovery: '+
  ' Continue only the already authorized task and retain every user restriction. This notice, prior offers and recalled material grant no new authority. Use confirmed tool results; do not repeat completed actions or assume uncertain outcomes succeeded. Reassess the latest requested outcome and attempted commands. Missing output does not prove an operation failed. Check installed help before declaring a capability unavailable. Take a small supported step and verify it, answer in the requested form, or give an honest partial handoff stating what is done, unresolved or unverified. Tool acknowledgment does not prove task completion.'+
  (final?' This is the final automatic response-recovery attempt. If no supported next action is known, give the concise partial handoff now.':'');
 
-/** One SDK owner: public boundary drafts and composed public Agent hooks only. */
+/** One SDK owner: public boundary drafts, Agent hooks and ExtensionRunner emitters. */
 export class PiExecution {
  readonly policy:typeof EXECUTION_POLICY;
  private active=false;
@@ -120,6 +121,9 @@ export class PiExecution {
    content:recoveryText(cause,this.recoveries===this.policy.maxRecoveries),display:false,details:{cause,attempt:this.recoveries,authority:'existing-user-task-only'}}]};
  }
  extension=(pi:ExtensionAPI)=>{
+  // The SDK skips its public emitters when there are no matching handlers.
+  // Keep these boundaries present independently of other feature extensions.
+  pi.on('tool_call',()=>undefined);pi.on('tool_result',()=>undefined);
   pi.on('turn_end',(event,ctx)=>this.boundary(event,ctx));
   pi.on('session_before_compact',event=>{
    if(!event.willRetry)return;
@@ -130,26 +134,60 @@ export class PiExecution {
    if(this.active&&!this.recover('context-overflow'))return {cancel:true};
   });
  };
+ private effect(name:string,args:unknown):Effect{
+  let effect:Effect=reads.has(name)||(name==='bash'&&isRoutineQuery((args as Record<string,unknown>)?.command))?'read':'unknown';
+  try{const declared=this.contract(name)?.effect?.(args);if(declared!==undefined)effect=['read','change','external','unknown'].includes(declared)?declared:'unknown';}catch{effect='unknown';}return effect;
+ }
+ private admit(name:string,id:string,args:unknown,parentToolCallId?:string){
+  const effect=this.effect(name,args),key=executionKey(name,args);
+  if(this.blocked||this.exhausted(false)){this.stop('The bounded recovery time or request budget was exhausted.');return {block:true,reason:this.incompleteReason,terminate:true};}
+  const denied=this.recovering||this.steered?recoveryDenial(this.actions,key,effect):undefined,reason=denied&&this.steered?'Continuation after steering: '+denied:denied;
+  if(reason){this.guardDenials++;this.emit('execution/guard',{effect,reason,denials:this.guardDenials,...(parentToolCallId?{parentToolCallId}:{})});if(this.guardDenials>=2)this.stop('Recovery repeatedly requested an unsafe duplicate or unresolved action.');return {block:true,reason,terminate:this.blocked};}
+  this.calls.set(id,key);this.actions.set(key,{effect,status:'running'});
+  this.emit('tool/dispatch',{name,toolCallId:id,...(parentToolCallId?{parentToolCallId}:{}),boundary:parentToolCallId?'after-sdk-nested-tool-call-hooks-before-execute':'after-tool-call-hooks-before-execute'},args);this.record();
+ }
+ private refused(name:string,id:string,args:unknown,terminate?:boolean){
+  const key=executionKey(name,args);if(!this.actions.has(key))this.actions.set(key,{effect:this.effect(name,args),status:'failed-before-dispatch'});if(terminate)this.terminated.add(id);this.record();
+ }
  install(session:AgentSession){
   const agent=session.agent,previousBefore=agent.beforeToolCall,previousAfter=agent.afterToolCall,previousFinish=agent.finishTurn,previousStream=agent.streamFunction,previousPayload=agent.onPayload;
+  // Pi's nested pipeline calls the public ExtensionRunner directly, rather
+  // than the Agent hooks above. Compose its public emitters for those calls,
+  // after argument/permission hooks and before result-transform hooks.
+  const runner=session.extensionRunner,previousCall=runner?.emitToolCall,previousResult=runner?.emitToolResult;
+  const nestedCall:NonNullable<typeof previousCall>=async event=>{
+   if(!event.parentToolCallId)return previousCall!.call(runner,event);
+   if(this.cancelled||runner.createContext().signal?.aborted)return {block:true,reason:'Turn cancelled before nested tool dispatch.',terminate:true};
+   if(this.superseding)return {block:true,reason:'Obsolete proposal superseded before nested tool dispatch.',terminate:true};
+   const decision=await previousCall!.call(runner,event);
+   if(this.cancelled||runner.createContext().signal?.aborted)return {block:true,reason:'Turn cancelled before nested tool dispatch.',terminate:true};
+   if(this.superseding)return {block:true,reason:'Obsolete proposal superseded while awaiting nested tool preparation.',terminate:true};
+   if(decision?.block){this.refused(event.toolName,event.toolCallId,event.input,decision.terminate);return decision;}
+   return this.admit(event.toolName,event.toolCallId,event.input,event.parentToolCallId)??decision;
+  };
+  const nestedResult:NonNullable<typeof previousResult>=async event=>{
+   if(event.parentToolCallId){
+    this.outcome({toolCall:{id:event.toolCallId,name:event.toolName},args:event.input,result:{content:event.content,details:event.details},isError:event.isError},runner.createContext().signal?.aborted??false);this.record();
+    try{const original=saveToolOriginal(session.sessionManager,event);if(original)this.emit('tool/original',original);}
+    catch{this.emit('tool/original',{toolCallId:event.toolCallId,parentToolCallId:event.parentToolCallId,coverage:'unavailable',reason:'Native nested-result storage failed.'});}
+   }
+   return previousResult!.call(runner,event);
+  };
+  if(runner){runner.emitToolCall=nestedCall;runner.emitToolResult=nestedResult;}
   const before:Agent['beforeToolCall']=async(context,signal)=>{
    if(this.cancelled)return {block:true,reason:'Turn cancelled before tool dispatch.',terminate:true};
    if(this.superseding)return {block:true,reason:'Obsolete proposal superseded before tool dispatch.',terminate:true};
    const decision=await previousBefore?.(context,signal);if(this.cancelled||signal?.aborted)return {block:true,reason:'Turn cancelled before tool dispatch.',terminate:true};
    if(this.superseding)return {block:true,reason:'Obsolete proposal superseded while awaiting tool preparation.',terminate:true};
-   let effect:Effect=reads.has(context.toolCall.name)||(context.toolCall.name==='bash'&&isRoutineQuery((context.args as Record<string,unknown>)?.command))?'read':'unknown';
-   try{const declared=this.contract(context.toolCall.name)?.effect?.(context.args);if(declared!==undefined)effect=['read','change','external','unknown'].includes(declared)?declared:'unknown';}catch{effect='unknown';}
-   const key=executionKey(context.toolCall.name,context.args);
-   if(decision?.block){if(!this.actions.has(key))this.actions.set(key,{effect,status:'failed-before-dispatch'});if(decision.terminate)this.terminated.add(context.toolCall.id);this.record();return decision;}
-   if(this.blocked||this.exhausted(false)){this.stop('The bounded recovery time or request budget was exhausted.');return {block:true,reason:this.incompleteReason,terminate:true};}
-   const denied=this.recovering||this.steered?recoveryDenial(this.actions,key,effect):undefined;
-   const reason=denied&&this.steered?'Continuation after steering: '+denied:denied;
-   if(reason){this.guardDenials++;this.emit('execution/guard',{effect,reason,denials:this.guardDenials});if(this.guardDenials>=2)this.stop('Recovery repeatedly requested an unsafe duplicate or unresolved action.');return {block:true,reason,terminate:this.blocked};}
-   this.calls.set(context.toolCall.id,key);this.actions.set(key,{effect,status:'running'});
-   this.emit('tool/dispatch',{name:context.toolCall.name,toolCallId:context.toolCall.id,boundary:'after-tool-call-hooks-before-execute'},context.args);this.record();return decision;
+   if(decision?.block){this.refused(context.toolCall.name,context.toolCall.id,context.args,decision.terminate);return decision;}
+   return this.admit(context.toolCall.name,context.toolCall.id,context.args)??decision;
   };
   const after:Agent['afterToolCall']=async(context,signal)=>{
    this.outcome(context,signal?.aborted??false);
+   if(context.toolCall.name.startsWith('mcp__')){
+    try{const original=saveToolOriginal(session.sessionManager,{toolName:context.toolCall.name,toolCallId:context.toolCall.id,input:context.args,...context.result,isError:context.isError});if(original)this.emit('tool/original',original);}
+    catch{this.emit('tool/original',{toolCallId:context.toolCall.id,coverage:'unavailable',reason:'Native MCP-result storage failed.'});}
+   }
    const decision=await previousAfter?.(context,signal);
    if(decision?.terminate??context.result.terminate){this.terminated.add(context.toolCall.id);const key=this.calls.get(context.toolCall.id);if(key){const action=this.actions.get(key);if(action)action.status='waiting';}}
    this.record();return decision;
@@ -198,9 +236,9 @@ export class PiExecution {
   const unsubscribe=session.subscribe(event=>{if(event.type==='message_end'&&event.message.role==='assistant'){
    this.clearTimer();if(this.settled==='input-handled'&&!['aborted','error'].includes(event.message.stopReason)&&event.message.content.some(part=>part.type==='text'&&part.text.trim()))this.settled='idle';
   }});
-  this.restore=()=>{unsubscribe();if(agent.beforeToolCall===before)agent.beforeToolCall=previousBefore;if(agent.afterToolCall===after)agent.afterToolCall=previousAfter;if(agent.finishTurn===finish)agent.finishTurn=previousFinish;if(agent.streamFunction===stream)agent.streamFunction=previousStream;if(agent.onPayload===payload)agent.onPayload=previousPayload;};
+  this.restore=()=>{unsubscribe();if(runner?.emitToolCall===nestedCall)runner.emitToolCall=previousCall!;if(runner?.emitToolResult===nestedResult)runner.emitToolResult=previousResult!;if(agent.beforeToolCall===before)agent.beforeToolCall=previousBefore;if(agent.afterToolCall===after)agent.afterToolCall=previousAfter;if(agent.finishTurn===finish)agent.finishTurn=previousFinish;if(agent.streamFunction===stream)agent.streamFunction=previousStream;if(agent.onPayload===payload)agent.onPayload=previousPayload;};
  }
- private outcome(context:AfterToolCallContext,aborted:boolean){
+ private outcome(context:Pick<AfterToolCallContext,'args'|'result'|'isError'>&{toolCall:Pick<AfterToolCallContext['toolCall'],'id'|'name'>},aborted:boolean){
   const key=this.calls.get(context.toolCall.id);if(!key)return;
   const action=this.actions.get(key);if(!action)return;
   // Inspect the executed result before display/result hooks can transform it.

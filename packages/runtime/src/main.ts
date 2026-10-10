@@ -7,6 +7,9 @@ import {HarnessServer} from './harness-server.js';
 import {atomicJson,readJson,paths} from './storage.js';
 import {MAX_FRAME,PROTOCOL,request,type Data} from '../../protocol/src/index.js';
 process.umask(0o077);
+// SDK facilities whose defaults use getAgentDir (including MCP OAuth state)
+// belong to this same managed owner profile rather than a separate Pi install.
+process.env.PI_CODING_AGENT_DIR=paths().agent;
 const clients=new Map<net.Socket,string|null>();
 const write=(socket:net.Socket,value:unknown)=>{if(socket.destroyed)return;const raw=JSON.stringify(value)+'\n';if(Buffer.byteLength(raw)>MAX_FRAME||socket.writableLength>4*MAX_FRAME){socket.destroy();return;}socket.write(raw);};
 let harness:HarnessServer|undefined;

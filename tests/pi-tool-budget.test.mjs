@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {SessionManager} from '@earendil-works/pi-coding-agent';
 import {shortenToolContent,budgetEdits,trimSavedToolContext,originalToolExcerpt,codePoints,TOOL_BUDGET} from '../dist/runtime/src/tool-budget.js';
+import {saveToolOriginal,TOOL_ORIGINAL_MAX_BYTES} from '../dist/runtime/src/tool-originals.js';
 const message=(text,toolName='fixture')=>({role:'toolResult',toolCallId:'fixture-call',toolName,content:[{type:'text',text}],isError:false,timestamp:Date.now()});
 test('Unicode tool budgets retain images, original evidence and an idempotent effective projection',()=>{
  const manager=SessionManager.inMemory();const text='😀'.repeat(5000)+'OMITTED_MIDDLE'+'尾'.repeat(5000);
@@ -42,4 +43,20 @@ test('fresh browser preservation is bounded and later requests shorten it',()=>{
  assert.deepEqual(budgetEdits(manager.buildSessionProjection().entries).entries.map(e=>e.targetId),[a,b]);
  const binary=manager.appendMessage(message('binary\0','browser_snapshot'));
  assert(budgetEdits(manager.buildSessionProjection().entries,new Set([binary])).entries.some(e=>e.targetId===binary));
+});
+test('nested originals retain post-hook arguments and pre-hook full MCP text without entering context or crossing branches',()=>{
+ const manager=SessionManager.inMemory(),anchor=manager.appendMessage(message('earlier source'));
+ const full='😀'.repeat(12000)+'UNPRINTED_MCP_ORIGINAL';
+ const event={type:'tool_result',toolName:'mcp__fixture__read',toolCallId:'outer/1',parentToolCallId:'outer',input:{query:'ACTUAL_MUTATED_INPUT'},isError:true,
+  content:[{type:'text',text:'SDK shortened display'}],details:{source:'owned fixture'},structuredContent:{content:[{type:'text',text:full}],isError:true}};
+ const saved=saveToolOriginal(manager,event);event.input.query='LATER_MUTATION';event.structuredContent.content[0].text='LATER_RESULT_HOOK';event.isError=false;
+ const native=manager.getEntry(saved.entryId);assert.equal(native.data.input.query,'ACTUAL_MUTATED_INPUT');assert.equal(native.data.result.isError,true);assert.equal(native.data.result.structuredContent.content[0].text,full);
+ assert.equal(originalToolExcerpt(manager,{entryId:saved.entryId,find:'UNPRINTED',limit:200}).text,'UNPRINTED_MCP_ORIGINAL');assert(originalToolExcerpt(manager).results.some(row=>row.entryId===saved.entryId&&row.parentToolCallId==='outer'&&row.characters===codePoints(full)));
+ assert(!JSON.stringify(manager.buildSessionProjection().messages).includes('UNPRINTED_MCP_ORIGINAL'));assert.deepEqual(trimSavedToolContext(manager),[]);
+ manager.branch(anchor);assert.throws(()=>originalToolExcerpt(manager,{entryId:saved.entryId}),/not on this conversation branch/);assert.throws(()=>originalToolExcerpt(SessionManager.inMemory(),{entryId:saved.entryId}),/not on this conversation branch/);
+});
+test('non-JSON and oversized nested originals record a small explicit coverage gap instead of corrupting native history',()=>{
+ const manager=SessionManager.inMemory(),event={type:'tool_result',toolName:'fixture',toolCallId:'outer/1',parentToolCallId:'outer',input:{},isError:false,content:[{type:'text',text:'small'}],details:{unsupported:1n}};
+ const nonJson=saveToolOriginal(manager,event);assert.equal(nonJson.coverage,'non-json');assert.equal(originalToolExcerpt(manager,{entryId:nonJson.entryId}).available,false);
+ delete event.details;event.content[0].text='x'.repeat(TOOL_ORIGINAL_MAX_BYTES+1);const large=saveToolOriginal(manager,event);assert.equal(large.coverage,'oversize');assert(JSON.stringify(manager.getEntry(large.entryId)).length<1024);assert.equal(originalToolExcerpt(manager,{entryId:large.entryId}).coverage,'oversize');
 });

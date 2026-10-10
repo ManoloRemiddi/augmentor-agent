@@ -97,9 +97,10 @@ def main():
                          'reason': 'sample applications are not part of Augmentor; separate licenses'})
         shutil.rmtree(examples)
     # The supported SDK imports codemode's JavaScript definitions, but this
-    # product does not register its execution extension. Keep its unreviewed
+    # source candidate now binds its execution extension for MCP. Keep its unreviewed
     # static native closure out of releases until the paired source/notices
-    # qualify. Runtime contracts exercise the staged tree without these assets.
+    # qualify. Ordinary chat contracts exercise the stage without these assets; codemode
+    # execution remains a separate, currently failing distribution gate.
     quickjs = target / 'node_modules/quickjs-wasi'
     if metadata['version'] == '1.1.0':
         quickjs_meta = json.loads((quickjs / 'package.json').read_text())
@@ -111,7 +112,7 @@ def main():
                 raise SystemExit('Unexpected QuickJS native asset: ' + str(asset))
             excluded.append({'name': quickjs_meta['name'], 'version': quickjs_meta['version'],
                 'path': asset.relative_to(target).as_posix(), 'sha256': hashlib.sha256(asset.read_bytes()).hexdigest(),
-                'reason': 'codemode execution is not registered; static native dependencies remain unqualified'})
+                'reason': 'codemode native execution is not release-qualified; static dependency sources/notices remain unqualified'})
             asset.unlink()
     for modules in (target / 'node_modules', sdk / 'node_modules'):
         tui = modules / '@earendil-works/pi-tui'

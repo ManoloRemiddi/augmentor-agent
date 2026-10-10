@@ -114,11 +114,11 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     }
     if (event.type === 'tool_execution_start') {
       tools.set(event.toolCallId, performance.now());
-      record('tool/start', {name: event.toolName, toolCallId: event.toolCallId,boundary:'proposed-before-validation'}, event.args);
+      record('tool/start', {name: event.toolName, toolCallId: event.toolCallId,...(event.parentToolCallId?{parentToolCallId:event.parentToolCallId}:{}),boundary:'proposed-before-validation'}, event.args);
     }
     if (event.type === 'tool_execution_end') {
       const start = tools.get(event.toolCallId); tools.delete(event.toolCallId);
-      record('tool/end', {name: event.toolName, toolCallId: event.toolCallId, isError: event.isError,
+      record('tool/end', {name: event.toolName, toolCallId: event.toolCallId,...(event.parentToolCallId?{parentToolCallId:event.parentToolCallId}:{}), isError: event.isError,
         ...(start === undefined ? {} : {durationMs: performance.now() - start})}, event.result);
     }
     if (event.type === 'entry_appended' && event.entry.type === 'context_edit') {

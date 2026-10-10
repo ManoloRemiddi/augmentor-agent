@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [managed MCP binding](../../docs/AUGMENTOR-HARNESS.md#managed-mcp-and-preserved-tool-originals) uses the public Pi 1.1.0 built-in extension factories, one existing AgentSession per conversation, explicit managed `agent/mcp.json`, exact owned read-only declarations and SDK transport/permissions. Public nested emitters join the action ledger; native tool-original custom entries retain root MCP/nested results independently of capture. Browser MCP is unavailable. Source wire qualification is separate from packaged codemode: excluded QuickJS native assets/source/notices remain a release gate.
+
 # Shared Pi runtime host
 
 Managed [original-history search](../../docs/AUGMENTOR-HARNESS.md#saved-pi-and-raw-display-original-search) provides literal, bounded selected-ancestry/all-branch Pi searches and uncompacted raw display-journal searches through `session.originalSearch`/`session.originalRead`. Private v2 derivatives contain offsets, identities, checksums and ancestry/prefix hashes, with no message bodies or search terms. Signed cursors resume partial originals after restart; source-block and optional expected entry/source hashes guard reads. Index rebuild streams the source and is reported separately from the 512 KiB search scan. These inspection methods accept no client path, start no SDK session/inference and preserve complete corrupt and incomplete-tail source bytes. Original display sequences are distinct from Pi ancestry and effective context.
