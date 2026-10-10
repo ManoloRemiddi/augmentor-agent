@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 10 indexed Trajectory metadata checkpoint
+
+Tested implementation source: `4ccbe3fe2d6eec3a1f193166ad2d0cb2206a2f61`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 19:03 UTC. The subsequent qualification commit changes documentation only.
+
+Retained Trajectory metadata now has private derived offset indexes and bounded literal search beyond the initial page. JSONL remains authoritative; payload bodies, native/display history and complete provenance are explicitly outside this slice. The actual GUI preserves selected records/DOM identity while loading earlier matches and drops delayed foreign replies. Short-window scrolling/height fixes keep the existing control positions. [The owning record](AUGMENTOR-HARNESS.md#indexed-trajectory-metadata-and-search) records limits, 100,000-record bounded paging, original-byte/corruption/retention proof, source/staged GUI evidence and the initial failures/corrections.
+
+Final Linux qualification: 646 Node cases (644 pass/two existing optional memory-engine skips), 116 Browser unit passes, and 61 staged passes with bundled Node 24.19.0. Source/staged processes exit normally. Actual Pi/IPC/HTTP, Native Qt integration, loaded Browser and 780×437/640×900 search use independently authored synthetic inputs. Build/type/shader/design/version, whitespace, public-source boundary and compiled/staged byte checks pass. No dependency/native component was added; locks, selected MIT notices and the existing 126-package catalog baseline remain unchanged. Native Python source did not change; the preceding full 864-case Python suite remains historical evidence, supplemented by current Native integration fixtures.
+
+Preceding `da9beb1` had 17 hosted successes, two downstream skips, two live Windows native jobs (114285195664/114285195633) and one terminal Debian failure (114281116507) at this observation. The Browser fixture incorrectly treated queue Send as idle; it now waits for authoritative selected Host/session idle before reasoning settings. Focused/source/staged checks pass; fresh matching-head hosted gates remain required. Both Mac jobs passed at the preceding head; the older Mac memory failure's sole cause remains unproved. No live job was blindly restarted.
+
+The complete accepted P0/P1 scope remains binding: native/display history indexing, payload search and provenance; embedded/live routing and command/resource composition; live Hindsight; integration receipts; actual voice/audio; wiki/MCP; plans/jobs/delegation; Home/mobile/multiple windows; and all platform/package/installed/update/rollback/privacy gates. Preserve DSH, private/old work, owner releases/settings, model and speech/GPU placement. Do not merge/promote, retire DSH, select an owner release or mark the full migration complete from this checkpoint. Earlier checkpoints below are historical.
+
+
 ## October 10 scoped conversation inspection checkpoint
 
 Tested implementation source: `ffcacf4bd7b829516dd797a34b033b09e1c72716`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 18:17 UTC. The subsequent qualification commit changes documentation only.

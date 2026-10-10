@@ -378,3 +378,6 @@ The former source archive and reproduction helper were removed in the
 [October 1 cleanup](CODEX-SOURCE-CLEANUP.md). Installed speech, models and device
 placement are unchanged; production companion/physical-audio qualification
 remains separate.
+
+
+The [indexed Trajectory metadata checkpoint](AUGMENTOR-HARNESS.md#indexed-trajectory-metadata-and-search), source `4ccbe3fe2d6eec3a1f193166ad2d0cb2206a2f61`, adds independently authored Augmentor offset-index/search code and synthetic public fixtures under the product license. It copies no new upstream/private code and adds no dependency or native addon. Root locks/catalog and selected DSH/Pi/Adaptive Reasoning notices retain the reviewed baseline. The stage is refreshed for qualification without installed activation; metadata-only search does not qualify native/display history indexing, payload search or complete provenance.
