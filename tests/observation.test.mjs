@@ -93,7 +93,8 @@ test('retention evicts payload copies before metadata and reports oversized or a
   const tooLarge = store.append('session', 'model/request', {}, {}, {text: 'x'.repeat(6000)});
   assert.equal(tooLarge.payload.state, 'too-large');
   const original = store.append('session', 'model/request', {}, {}, {text: 'x'.repeat(2500)});
-  for (let i = 0; i < 16; i++) store.append('session', 'tool/end', {name: 'fixture', text: 'x'.repeat(220)});
+  // Leave space for the derived offsets while forcing payload eviction first.
+  for (let i = 0; i < 12; i++) store.append('session', 'tool/end', {name: 'fixture', text: 'x'.repeat(220)});
   assert.equal(store.payload('session', original.id).available, false);
   assert(store.page('session', {limit: 500}).records.some(e => e.id === original.id));
 });

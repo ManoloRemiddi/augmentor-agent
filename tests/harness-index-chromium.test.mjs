@@ -1,0 +1,52 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Real owner/HTTP/rendered controls; independently authored saved metadata only.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdtemp,readFile,rm,writeFile,mkdir} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {setTimeout as delay} from 'node:timers/promises';
+import {harnessCdp} from './fixtures/harness-cdp.mjs';
+const source=process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('../',import.meta.url));
+async function until(fn,label){const end=Date.now()+10000;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Indexed Harness timeout: '+label);}
+test('Harness searches old retained metadata, preserves selection and drops a foreign late page',{skip:process.platform!=='linux',timeout:45000},async t=>{
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-indexed-chromium-'));let fixture,chrome,panel,link,output='',stderr='';
+ t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const done=once(child,'exit');child.kill('SIGTERM');await done;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
+ fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{env:{...env,AUGMENTOR_HARNESS_PROOF_INDEXED:'1',AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1'},stdio:['ignore','pipe','pipe']});fixture.stdout.on('data',data=>output+=data);fixture.stderr.on('data',data=>stderr+=data);
+ await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'owner ready');
+ const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token'),sid='trajectory-index-proof';
+ const rpc=async(method,params={})=>{const res=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})}),body=await res.json();if(body.error)throw Error(body.error.message);return body.result;};
+ const before=await readFile(join(link.state,'observations',sid,'events.jsonl'));
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
+ let port;await until(async()=>{try{port=(await readFile(join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0];return true;}catch{return false;}},'Chrome ready');
+ const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
+ const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{await mkdir(join(source,'outputs/harness-proof'),{recursive:true});await writeFile(join(source,'outputs/harness-proof/index-failure.png'),Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,pointer:await panel.evaluate('globalThis.__pointerTrace')});throw error;});
+ const click=async expression=>{const point=await panel.evaluate('(()=>{const e='+expression+';if(!e||e.disabled)throw Error("Control unavailable");e.scrollIntoView({block:"nearest"});const r=e.getBoundingClientRect();const x=r.x+r.width/2,y=r.y+r.height/2;globalThis.__pointerTrace={x,y,rect:r.toJSON(),ledger:document.querySelector("#ledger").getBoundingClientRect().toJSON(),hit:document.elementFromPoint(x,y)?.outerHTML.slice(0,300)};return {x,y}})()');await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});};
+ const query=text=>panel.evaluate('(()=>{const e=document.querySelector("#search");e.value='+JSON.stringify(text)+';e.dispatchEvent(new Event("input",{bubbles:true}));})()');
+ await visible('document.querySelector("#new-chat")&&!document.querySelector("#new-chat").disabled');await click('document.querySelector("[data-view=trajectory]")');await visible('document.querySelector("#coverage").textContent==="100 metadata records loaded"');
+ assert.equal(await panel.evaluate('document.querySelector("#ledger").textContent.includes("rare older café")'),false);
+ await query('rare older CAFÉ');await visible('document.querySelector("#coverage").textContent.includes("1100 metadata records searched")&&document.querySelector("#coverage").textContent.includes("snapshot search complete")');
+ assert.equal(await panel.evaluate('document.querySelectorAll("#ledger .record").length'),1);await click('document.querySelector("#ledger .record")');await visible('document.querySelector("#inspector").textContent.includes("rare older café")');
+ if(process.env.AUGMENTOR_HARNESS_INDEX_SCREENSHOT){
+  await mkdir(join(source,'outputs/harness-proof'),{recursive:true});
+  await writeFile(process.env.AUGMENTOR_HARNESS_INDEX_SCREENSHOT.replace(/\.png$/, '-short.png'),Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  await panel.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});
+  await visible('document.documentElement.scrollWidth<=640&&document.querySelector("#ledger").getBoundingClientRect().height>=80');
+  await panel.evaluate('document.querySelector("main").scrollTop=0');
+  await writeFile(process.env.AUGMENTOR_HARNESS_INDEX_SCREENSHOT,Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  await panel.call('Emulation.clearDeviceMetricsOverride');
+ }
+ await query('fixture/history');await visible('document.querySelector("#coverage").textContent.includes("100 loaded matches")&&!document.querySelector("#older").disabled');await click('document.querySelector("#ledger .record")');
+ const selected=await panel.evaluate('document.querySelector("#ledger .record.selected").dataset.recordId'),selection=await panel.evaluate('document.querySelector("#inspector").textContent');await panel.evaluate('globalThis.__selectedNode=document.querySelector("#ledger .record.selected")');
+ await click('document.querySelector("#older")');await visible('document.querySelector("#coverage").textContent.includes("200 loaded matches")');assert.equal(await panel.evaluate('document.querySelector("#inspector").textContent'),selection);assert.equal(await panel.evaluate('document.querySelector("#ledger .record.selected")===globalThis.__selectedNode'),true);assert.equal(await panel.evaluate('document.querySelector("#ledger .record.selected").dataset.recordId'),selected);
+ await rpc('session.create',{sessionId:'other-index-chat',selection:{provider:'fixture',model:'harness-fixture'},cwd:link.workspace});await rpc('session.rename',{sessionId:'other-index-chat',title:'Other inspection conversation'});
+ await panel.evaluate('globalThis.__fetch=fetch;globalThis.__held=[];globalThis.fetch=(...args)=>__fetch(...args).then(response=>{let body;try{body=JSON.parse(args[1]?.body)}catch{}if(body?.method==="observation.list"&&body.params.query==="hold-search")return new Promise(resolve=>__held.push(()=>resolve(response)));return response;})');await query('hold-search');await visible('globalThis.__held.length===1');
+ await visible('Array.from(document.querySelectorAll(".session")).some(e=>e.textContent==="Other inspection conversation")');await click('Array.from(document.querySelectorAll(".session")).find(e=>e.textContent==="Other inspection conversation")');await visible('document.querySelector("#title").textContent==="Other inspection conversation"');await panel.evaluate('globalThis.__held.splice(0).forEach(resolve=>resolve())');await delay(100);
+ assert.equal(await panel.evaluate('document.querySelector("#search").value'),'');assert.equal(await panel.evaluate('document.querySelector("#ledger").textContent.includes("Saved synthetic metadata")'),false);assert.equal((await rpc('session.models',{sessionId:sid})).current.model,'harness-fixture');assert.deepEqual(await readFile(join(link.state,'observations',sid,'events.jsonl')),before);
+ await assert.rejects(readFile(link.requestLog),'inspection performs no inference');assert.deepEqual(panel.errors,[]);assert.deepEqual(panel.failedResponses,[]);
+
+});

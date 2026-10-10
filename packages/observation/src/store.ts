@@ -1,9 +1,10 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {appendFileSync, closeSync, existsSync, openSync, readSync, readFileSync, readdirSync, renameSync, rmSync, statSync, truncateSync, writeFileSync} from 'node:fs';
+import {appendFileSync, closeSync, existsSync, openSync, readSync, readdirSync, renameSync, rmSync, statSync, writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {createHash, randomUUID} from 'node:crypto';
 import {identifier} from '../../protocol/src/index.js';
 import {atomicJson, privateDir, readJson} from '../../runtime/src/storage.js';
+import {ObservationIndex} from './journal-index.js';
 
 export const OBSERVATION_PROTOCOL = 'augmentor-observation/1';
 export const DEFAULT_RETENTION = {days: 14, maxBytes: 512 * 1024 * 1024};
@@ -20,7 +21,7 @@ export interface Observation {
   data: Record<string, unknown>;
   payload?: {state: 'retained' | 'disabled' | 'too-large' | 'invalid'; bytes?: number; sha256?: string; redactions?: string[]};
 }
-export interface PageOptions {beforeSeq?: number; afterSeq?: number; limit?: number}
+export interface PageOptions {beforeSeq?: number; afterSeq?: number; limit?: number; query?:string}
 const credential = /^(authorization|proxy-authorization|cookie|set-cookie|api[-_]?key|access[-_]?token|refresh[-_]?token|password|client[-_]?secret)$/i;
 
 // Request bodies and tool content can contain user-supplied secrets. Redact known
@@ -45,30 +46,21 @@ export class ObservationStore {
   private counters = new Map<string, number>();
   private lastPrune = 0;
   private size = 0;
+  private indexes=new Map<string,ObservationIndex>();
   constructor(readonly root: string, readonly policy: () => ObservationPolicy, readonly now = Date.now) {
     privateDir(root);
     this.prune(true);
   }
   private directory(sessionId: string) {return privateDir(join(this.root, identifier(sessionId)));}
   private journal(sessionId: string) {return join(this.directory(sessionId), 'events.jsonl');}
-  private records(sessionId: string): Observation[] {
-    const file = this.journal(sessionId);
-    if (!existsSync(file)) return [];
-    let raw = readFileSync(file);
-    // A killed writer can leave an incomplete final frame; preserve complete frames.
-    if (raw.length && raw.at(-1) !== 10) {
-      const end = raw.lastIndexOf(10) + 1;
-      truncateSync(file, end); raw = raw.subarray(0, end);
-    }
-    return raw.toString('utf8').split('\n').filter(Boolean).map(line => JSON.parse(line));
-  }
+  private index(sessionId:string){let index=this.indexes.get(sessionId);if(!index){index=new ObservationIndex(this.journal(sessionId),sessionId);if(this.indexes.size>=32)this.indexes.delete(this.indexes.keys().next().value!);this.indexes.set(sessionId,index);}return index;}
   append(sessionId: string, kind: string, data: Record<string, unknown>,
     correlations: {turnId?: string; requestId?: string} = {}, payload?: unknown): Observation {
     const directory = this.directory(sessionId);
     const counter = join(directory, 'counter.json');
     const previous = this.counters.get(sessionId) ?? Math.max(
       integer(readJson<{seq: number}>(counter, {seq: 0}).seq, 0, 0, Number.MAX_SAFE_INTEGER - 1),
-      this.records(sessionId).at(-1)?.seq ?? 0);
+      this.index(sessionId).snapshot().lastSeq ?? 0);
     if (!Number.isSafeInteger(previous) || previous < 0 || previous >= Number.MAX_SAFE_INTEGER)
       throw new Error('Observation sequence is exhausted or corrupt');
     const event: Observation = {protocol: OBSERVATION_PROTOCOL, id: randomUUID(), seq: previous + 1,
@@ -94,8 +86,8 @@ export class ObservationStore {
       }
     }
     const line = JSON.stringify(event) + '\n';
-    appendFileSync(this.journal(sessionId), line, {mode: 0o600});
-    this.size += Buffer.byteLength(line);
+    this.index(sessionId).append(event,line);
+    this.size += Buffer.byteLength(line)+40;
     this.prune(this.size > this.policy().maxBytes);
     return event;
   }
@@ -105,12 +97,10 @@ export class ObservationStore {
     if (options.beforeSeq !== undefined && options.afterSeq !== undefined) throw new Error('Choose one observation cursor');
     const before = integer(options.beforeSeq, Number.MAX_SAFE_INTEGER, 1, Number.MAX_SAFE_INTEGER);
     const after = integer(options.afterSeq, 0, 0, Number.MAX_SAFE_INTEGER);
-    const all = this.records(sessionId);
-    const eligible = all.filter(record => record.seq < before && record.seq > after);
-    const records = options.afterSeq === undefined ? eligible.slice(-limit) : eligible.slice(0, limit);
-    return {protocol: OBSERVATION_PROTOCOL, records, hasMore: eligible.length > records.length,
-      earliestSeq: all.at(0)?.seq ?? null, latestSeq: all.at(-1)?.seq ?? null,
-      capturePayloads: this.policy().capturePayloads};
+    if(options.query!==undefined&&(typeof options.query!=='string'||options.query.length>256))throw Error('Search up to 256 characters of retained metadata.');
+    const terms=(options.query??'').trim().toLowerCase().split(/\s+/).filter(Boolean);if(terms.length>16)throw Error('Search up to 16 literal metadata terms.');
+    return {protocol:OBSERVATION_PROTOCOL,...this.index(sessionId).page({before,after,forward:options.afterSeq!==undefined,limit,terms}),capturePayloads:this.policy().capturePayloads,
+      coverage:{scope:terms.length?'retained-metadata-search':'retained-metadata',payloadBodies:false,index:'byte-offset-v1',query:options.query??''}};
   }
   payload(sessionId: string, eventId: string, offset?: number, limit?: number) {
     this.prune();
@@ -132,6 +122,7 @@ export class ObservationStore {
   }
   clear(sessionId: string) {
     const directory = this.directory(sessionId);
+    this.index(sessionId).invalidate();
     for (const file of readdirSync(directory)) {
       if (file === 'events.jsonl' || file.endsWith('.payload.json')) rmSync(join(directory, file));
     }
@@ -152,24 +143,25 @@ export class ObservationStore {
       const directory = join(this.root, entry.name);
       const journal = join(directory, 'events.jsonl');
       if (existsSync(journal)) {
-        const all = this.records(entry.name);
-        const retained = all.filter(record => record.time >= oldest);
-        if (retained.length !== all.length) {
+        const index=this.index(entry.name),snapshot=index.snapshot();
+        if(snapshot.minTime!==null&&snapshot.minTime<oldest){
           // Atomic replacement prevents readers from seeing a partial retention rewrite.
-          const raw = retained.map(record => JSON.stringify(record) + '\n').join('');
           const temporary = join(directory, randomUUID() + '.retention.tmp');
-          writeFileSync(temporary, raw, {mode: 0o600}); renameSync(temporary, journal);
+          writeFileSync(temporary,'',{mode:0o600});
+          for(const {record} of index.lines())if(record.time>=oldest)appendFileSync(temporary,JSON.stringify(record)+'\n');
+          renameSync(temporary,journal);index.invalidate();index.snapshot();
         }
       }
       for (const name of readdirSync(directory)) {
         // Only our atomic-write leftovers are owned here. A second runtime is
         // excluded by the host socket before this store is constructed.
         if (/^(?:counter\.json\.|[a-f0-9-]{36}\.payload\.json\.)[a-f0-9-]{36}\.tmp$/.test(name) ||
-          /^[a-f0-9-]{36}\.retention\.tmp$/.test(name)) {rmSync(join(directory, name)); continue;}
+          /^[a-f0-9-]{36}\.retention\.tmp$/.test(name)||/^events\.jsonl\.idx(?:\.json)?\.[a-f0-9-]{36}\.tmp$/.test(name)) {rmSync(join(directory, name)); continue;}
         if (name !== 'events.jsonl' && !name.endsWith('.payload.json')) continue;
         const path = join(directory, name), info = statSync(path);
         if (name.endsWith('.payload.json') && info.mtimeMs < oldest) {rmSync(path); continue;}
-        files.push({path, time: info.mtimeMs, size: info.size, payload: name.endsWith('.payload.json')});
+        const indexBytes=name==='events.jsonl'?['.idx','.idx.json'].reduce((n,suffix)=>n+(existsSync(path+suffix)?statSync(path+suffix).size:0),0):0;
+        files.push({path, time: info.mtimeMs, size: info.size+indexBytes, payload: name.endsWith('.payload.json')});
       }
     }
     this.size = files.reduce((total, file) => total + file.size, 0);
@@ -177,7 +169,7 @@ export class ObservationStore {
     files.sort((a, b) => Number(b.payload) - Number(a.payload) || a.time - b.time);
     for (const file of files) {
       if (this.size <= maxBytes) break;
-      rmSync(file.path); this.size -= file.size;
+      rmSync(file.path);if(!file.payload)this.index(file.path.split(/[\\/]/).at(-2)!).invalidate();this.size -= file.size;
     }
   }
 }

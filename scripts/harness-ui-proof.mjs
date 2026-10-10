@@ -7,6 +7,7 @@ import {mkdtempSync,mkdirSync,writeFileSync,appendFileSync,readFileSync,existsSy
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {randomUUID} from 'node:crypto';
 const source=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('..',import.meta.url)));
 const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
@@ -55,6 +56,13 @@ model.listen(0,'127.0.0.1');await once(model,'listening');
 const selection={provider:'fixture',model:'harness-fixture'};
 writeFileSync(join(config,'agent/models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Harness deterministic fixture',reasoning:true,compat:{supportsReasoningEffort:true},input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
 writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'workspace-write',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
+// Independently authored saved metadata; no executed action or native chat is fabricated.
+if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
+ const sid='trajectory-index-proof',directory=join(state,'observations',sid),time=Date.now();mkdirSync(directory,{recursive:true,mode:0o700});mkdirSync(join(state,'sessions'),{recursive:true,mode:0o700});
+ writeFileSync(join(state,'sessions',sid+'.meta.json'),JSON.stringify({id:sid,cwd:workspace,selection,title:'Indexed synthetic metadata',saved:true,policy:'read-only',updatedAt:time,requests:[],running:false}),{mode:0o600});
+ const lines=Array.from({length:1100},(_,i)=>JSON.stringify({protocol:'augmentor-observation/1',id:randomUUID(),seq:i+1,sessionId:sid,time,kind:'fixture/history',data:{name:'Saved synthetic metadata',marker:i===4?'rare older café':'ordinary metadata '+(i+1)}})+'\n').join('');
+ writeFileSync(join(directory,'events.jsonl'),lines,{mode:0o600});writeFileSync(join(directory,'counter.json'),JSON.stringify({seq:1100}),{mode:0o600});
+}
 const lazy=process.env.AUGMENTOR_HARNESS_PROOF_LAZY==='1';
 const fixtureEnv={...process.env,HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
 const prompts=process.env.AUGMENTOR_HARNESS_PROOF_PROMPTS==='1'?spawn(process.env.AUGMENTOR_PYTHON??'python3',['-Xutf8','-B',join(source,'services/prompt-library/service.py')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','ignore','pipe']}):null;
