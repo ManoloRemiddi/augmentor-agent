@@ -68,6 +68,7 @@ export class PiPromptQueue {
  }
  accepted(id:string){if(this.item(id).status!=='dispatching')throw Error('Prompt was not dispatched.');this.patch(id,{status:'active'});}
  delivered(id:string){const item=this.item(id);if(!['dispatching','active','steering'].includes(item.status))throw Error('Prompt delivery has no active receipt.');this.patch(id,{delivered:true});}
+ handledSteer(id:string){const item=this.item(id);if(item.status!=='steering'||item.delivered)throw Error('Correction input no longer awaits preparation.');this.patch(id,{status:'completed',input:undefined});}
  finish(id:string,status:'completed'|'failed'|'cancelled'){
   const item=this.item(id);
   if(!['dispatching','active'].includes(item.status))throw Error('Prompt has no active execution receipt.');

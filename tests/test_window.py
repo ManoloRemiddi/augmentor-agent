@@ -166,6 +166,15 @@ class WindowTests(unittest.TestCase):
         self.assertTrue(window.testAttribute(Qt.WidgetAttribute.WA_TranslucentBackground))
         window.close()
 
+    def test_prepared_pi_input_keeps_submitted_text_for_display_and_editing(self):
+        window=Window();window.pending_prompt='/template original';window.submitted_draft=window.pending_prompt
+        event={'seq':1,'type':'user/message','data':{'source':{'kind':'user','rpcId':'fixture'},'submittedContent':[{'type':'text','text':'/template original'}],'content':[{'type':'text','text':'Prepared instructions'}]}}
+        window.fold_event(event)
+        self.assertEqual(window.messages,[('You','/template original')])
+        self.assertIsNone(window.pending_prompt);self.assertIsNone(window.submitted_draft)
+        self.assertEqual(window.message_events[0]['data']['content'][0]['text'],'Prepared instructions')
+        window.close()
+
     def test_compact_keeps_draft_and_on_top_request(self):
         window = Window()
         window.composer.setPlainText('A draft')

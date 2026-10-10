@@ -82,12 +82,14 @@ export class PiExecution {
  }
  cancel(){this.cancelled=true;this.clearTimer();this.record();}
  steerRequested(){if(!this.active||this.cancelled)throw Error('The active turn cannot be steered.');this.superseding=true;this.clearTimer();this.record();}
+ steerFailed(){this.superseding=false;this.stop('Correction input preparation failed; its outcome is unconfirmed.');}
+ steerHandled(){this.steerDelivered();this.settled='input-handled';}
  steerDelivered(){
   if(this.cancelled)return;
   this.superseding=false;this.steered=true;this.recovering=false;this.started=0;this.recoveries=0;this.steps=0;this.requestCap=undefined;this.requestLimit=undefined;this.guardDenials=0;
   this.blocked=false;this.incompleteReason=undefined;this.lastStop=undefined;this.handoff=false;this.record();
  }
- end(reason:'completed'|'error'|'aborted'='completed'){this.active=false;this.clearTimer();this.settled=reason==='aborted'?'cancelled':reason==='error'?'error':this.handoff?'tool-handoff':'response-produced';this.record();}
+ end(reason:'completed'|'error'|'aborted'='completed'){this.active=false;this.clearTimer();this.settled=reason==='aborted'?'cancelled':reason==='error'?'error':this.handoff?'tool-handoff':this.settled==='input-handled'?'input-handled':'response-produced';this.record();}
  private record(){this.emit('execution/state',this.describe());}
  private clearTimer(){clearTimeout(this.timer);this.timer=undefined;this.removeAbort?.();this.removeAbort=undefined;}
  private exhausted(includeSteps=true){return this.recovering&&((includeSteps&&this.steps>=this.policy.recoveryMaxSteps)||this.now()-this.started>=this.policy.recoveryMaxMs);}
@@ -192,7 +194,9 @@ export class PiExecution {
    return fields.length?bounded:transformed;
   };
   agent.beforeToolCall=before;agent.afterToolCall=after;agent.finishTurn=finish;agent.streamFunction=stream;agent.onPayload=payload;
-  const unsubscribe=session.subscribe(event=>{if(event.type==='message_end'&&event.message.role==='assistant')this.clearTimer();});
+  const unsubscribe=session.subscribe(event=>{if(event.type==='message_end'&&event.message.role==='assistant'){
+   this.clearTimer();if(this.settled==='input-handled'&&!['aborted','error'].includes(event.message.stopReason)&&event.message.content.some(part=>part.type==='text'&&part.text.trim()))this.settled='idle';
+  }});
   this.restore=()=>{unsubscribe();if(agent.beforeToolCall===before)agent.beforeToolCall=previousBefore;if(agent.afterToolCall===after)agent.afterToolCall=previousAfter;if(agent.finishTurn===finish)agent.finishTurn=previousFinish;if(agent.streamFunction===stream)agent.streamFunction=previousStream;if(agent.onPayload===payload)agent.onPayload=previousPayload;};
  }
  private outcome(context:AfterToolCallContext,aborted:boolean){

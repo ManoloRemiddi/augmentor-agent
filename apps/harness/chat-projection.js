@@ -29,7 +29,7 @@ export function projectChat(events,{running=false}={}){
    }else flush('partial');
   }else if(event.type==='user/message'){
    flush('partial');
-   items.push({kind:'user',seq:event.seq,text:(data.content||[]).filter(p=>p.type==='text').map(p=>p.text||'').join('\n')});
+   items.push({kind:'user',seq:event.seq,text:(data.submittedContent??data.content??[]).filter(p=>p.type==='text').map(p=>p.text||'').join('\n')});
   }else if(event.type==='tool/call'){
    flush('complete');const item={kind:'tool',name:data.name,toolCallId:data.toolCallId,status:'pending'};
    items.push(item);tools.set(data.toolCallId,item);

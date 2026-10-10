@@ -10,7 +10,8 @@ from augmentor_linux.window import Window
 
 app=QApplication([]);client=PiClient();client.call('host.describe');assert client.supports_queue
 steering='--steer' in sys.argv
-sid='steer-native' if steering else 'queue-native';controller=Controller(client=client,harness='pi');controller.session=sid;controller.online=True;controller.running=True
+transforms='--input' in sys.argv
+sid='steer-native-input' if transforms else 'steer-native' if steering else 'queue-native';controller=Controller(client=client,harness='pi');controller.session=sid;controller.online=True;controller.running=True
 window=Window();window.controller=controller
 controller.queue_changed.connect(window.queue_panel.replace);controller.queue_result.connect(window.queue_panel.submission_result)
 controller.queue_action_result.connect(window.queue_panel.action_result);controller.event.connect(window.on_event);controller.busy.connect(window.set_busy)
@@ -46,6 +47,9 @@ try:
         users=[row['event'] for row in client.call('session.history',{'sessionId':sid})['events'] if row['event']['type']=='user/message']
         assert [row['data']['source']['rpcId'] for row in users[1:]]==[correction,followup]
         assert users[0]['turnId']==users[1]['turnId'] and users[1]['turnId']!=users[2]['turnId']
+        if transforms:
+            assert users[1]['data']['content'][0]['text']=='Prepared native correction'
+            assert users[1]['data']['submittedContent'][0]['text']=='QUEUE_FAST correction native'
         texts=[text for who,text in window.messages if who=='You']
         assert texts.count('QUEUE_FAST correction native')==1 and texts.count('QUEUE_FAST follow-up native')==1
         print(json.dumps({'nativePiSteering':'passed','correction':correction}),flush=True)

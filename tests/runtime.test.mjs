@@ -85,7 +85,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   }else{if(content.includes('INSPECT'))chunk({reasoning_content:'Observed reasoning π'});chunk({role:'assistant',content:'Verified response π'});chunk({},'stop');}
   res.end('data: [DONE]\n\n');
  });mock.listen(0,'127.0.0.1');await once(mock,'listening');t.after(()=>{mock.closeAllConnections();mock.close();});
- const modelConfig={providers:{test:{baseUrl:`http://127.0.0.1:${mock.address().port}/v1`,api:'openai-completions',apiKey:'dummy',models:[{id:'test',name:'Test',reasoning:false,input:['text'],contextWindow:32000,maxTokens:2048},{id:'wide',name:'Wide fixture',reasoning:false,input:['text'],contextWindow:128000,maxTokens:32768}]}}};
+ const modelConfig={providers:{test:{baseUrl:`http://127.0.0.1:${mock.address().port}/v1`,api:'openai-completions',apiKey:'dummy',models:[{id:'test',name:'Test',reasoning:false,input:['text'],contextWindow:32000,maxTokens:2048},{id:'wide',name:'Wide fixture',reasoning:false,input:['text'],contextWindow:128000,maxTokens:32768},{id:'vision',name:'Vision fixture',reasoning:false,input:['text','image'],contextWindow:32000,maxTokens:2048}]}}};
  writeFileSync(join(config,'agent/models.json'),JSON.stringify(modelConfig));
  const networkLog=join(root,'network.jsonl');
  const env={...process.env,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_INTERACTION_TIMEOUT:'300',PI_OFFLINE:'1',AUGMENTOR_PI_TEST_NETWORK_LOG:networkLog,
@@ -153,6 +153,61 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
    const payloadTurn=(await client.call('session.queue',{sessionId:'steer-payload'})).activeTurnId;await client.call('session.prompt',{sessionId:'steer-payload',requestId:'payload-correction',mode:'steer',expectedTurnId:payloadTurn,content:[{type:'text',text:'Payload correction'}]});await idle('steer-payload');
    assert.equal(requests-beforePayload,1);assert(JSON.stringify(received.at(-1).messages.at(-1).content).includes('Payload correction'));
   }finally{writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]}));}
+ });
+ await t.test('identified Pi corrections use the SDK input chain, approved skill/template resources and image transforms',async()=>{
+  const source=join(root,'fixture-input-chain.mjs'),skillRoot=join(root,'fixture-input-skill'),log=join(cwd,'input-events.jsonl');mkdirSync(skillRoot);mkdirSync(join(config,'agent','prompts'),{recursive:true});
+  writeFileSync(join(skillRoot,'SKILL.md'),'---\nname: steer_fixture\ndescription: Synthetic steering skill\n---\nApproved skill body.\n');
+  writeFileSync(join(config,'agent','prompts','steer_template.md'),'Prepared template: $1 | $2 | ${3:-fallback} | ${@:2:1}\n');
+  const pixel='iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+cSu8AAAAASUVORK5CYII=';
+  writeFileSync(source,`import {appendFileSync,writeFileSync,existsSync} from 'node:fs';export default pi=>{
+   pi.registerCommand('fixture-command',{description:'Synthetic command',handler:async()=>{throw Error('A queued command must not execute');}});
+   pi.on('input',async(e,ctx)=>{appendFileSync(ctx.cwd+'/input-events.jsonl',JSON.stringify({text:e.text,source:e.source,streamingBehavior:e.streamingBehavior})+'\\n');
+    if(e.text.startsWith('INPUT_ASYNC:')){const tag=e.text.slice(12);writeFileSync(ctx.cwd+'/'+tag+'-input-started.txt','started');while(!existsSync(ctx.cwd+'/'+tag+'-input-release.txt'))await new Promise(r=>setTimeout(r,10));writeFileSync(ctx.cwd+'/'+tag+'-input-finished.txt','finished');return {action:'transform',text:'Prepared '+tag+' correction'};}
+    if(e.text==='INPUT_HANDLE'){appendFileSync(ctx.cwd+'/input-handled.txt','handled\\n');return {action:'handled'};}
+    if(e.text==='INPUT_INVALID')return {action:'transform',text:null};
+    if(e.text==='INPUT_CHAIN')return {action:'transform',text:'Prepared chain-a',images:[{type:'image',mimeType:'image/png',data:${JSON.stringify(pixel)}}]};
+    if(e.text==='INPUT_TEMPLATE')return {action:'transform',text:'/steer_template "quoted value" second'};
+    if(e.text==='INPUT_SKILL')return {action:'transform',text:'/skill:steer_fixture skill arguments'};
+   });
+   pi.on('input',e=>e.text==='Prepared chain-a'?{action:'transform',text:'Prepared chain-b'}:undefined);
+  };`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[source],skills:[skillRoot]}));
+  const countInput=text=>existsSync(log)?readFileSync(log,'utf8').trim().split('\n').map(line=>JSON.parse(line)).filter(row=>row.text===text):[];
+  try{
+   const describe=await client.call('host.describe');assert.equal(describe.steering.sdkInputTransforms,true);
+   for(const [tag,input,expected] of [['chain','INPUT_CHAIN','Prepared chain-b'],['template','INPUT_TEMPLATE','Prepared template: quoted value | second | fallback | second'],['skill','INPUT_SKILL','Approved skill body.'],['handled','INPUT_HANDLE',null]]){
+    const sid='input-'+tag;await create(sid,'read-only');if(tag==='chain')await client.call('session.selectModel',{sessionId:sid,provider:'test',model:'vision'});
+    const before=requests;await prompt(sid,'SLOW input '+tag);await until(()=>requests===before+1);const turn=(await client.call('session.queue',{sessionId:sid})).activeTurnId,id='input-correction-'+tag;
+    await client.call('session.prompt',{sessionId:sid,requestId:id,mode:'queue',content:[{type:'text',text:input}]});assert.equal(countInput(input).length,0,'Waiting input must not run handlers before promotion');
+    const result=await client.call('session.updateQueue',{sessionId:sid,itemId:id,expectedTurnId:turn,action:{kind:'steer'}});await idle(sid);assert.equal(countInput(input).length,1);assert.equal(countInput(input)[0].source,'rpc');assert.equal(countInput(input)[0].streamingBehavior,'steer');
+    const users=(await client.call('session.history',{sessionId:sid})).events.map(row=>row.event).filter(event=>event.type==='user/message'),records=(await client.call('observation.list',{sessionId:sid,limit:100})).records;
+    assert.equal((await client.call('session.queue',{sessionId:sid})).items.length,0);
+    if(expected){assert.equal(users.at(-1).data.source.rpcId,id);assert.equal(users.at(-1).turnId,turn);assert(JSON.stringify(users.at(-1).data.content).includes(expected));assert.equal(users.at(-1).data.submittedContent[0].text,input);assert.equal(requests-before,2);}
+    else{assert(result.handled);assert.equal(users.length,1);assert.equal(requests-before,1);assert.equal(records.filter(record=>record.kind==='execution/state').at(-1).data.outcome,'input-handled');assert.equal(readFileSync(join(cwd,'input-handled.txt'),'utf8'),'handled\n');}
+    if(tag==='chain'){assert(users.at(-1).data.content.some(part=>part.type==='image'&&part.data===pixel));assert(received.at(-1).messages.filter(message=>message.role==='user').at(-1).content.some(part=>part.type==='image_url'));}
+    const preparation=records.find(record=>record.kind==='execution/steer-input');assert.equal(preparation.data.handler,tag==='handled'?'handled':'transform');if(tag==='skill')assert.equal(preparation.data.skill,'steer_fixture');if(tag==='template')assert.equal(preparation.data.template,'steer_template');
+    assert((await client.call('session.prompt',{sessionId:sid,requestId:id,content:[{type:'text',text:input}]})).duplicate);assert.equal(countInput(input).length,1);
+   }
+   const parentBefore=await client.call('session.history',{sessionId:'input-chain'}),target=parentBefore.events.filter(row=>row.event.type==='user/message').at(-1).event;
+   await client.call('session.branch',{sessionId:'input-chain',newSessionId:'input-chain-edit',messageSeq:target.seq,mode:'edit'});await prompt('input-chain-edit','Edited input');await idle('input-chain-edit');assert(!JSON.stringify(received.at(-1).messages).includes('Prepared chain-b'));assert.deepEqual(await client.call('session.history',{sessionId:'input-chain'}),parentBefore);
+   await create('input-command','read-only');await prompt('input-command','SLOW input command');await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW input command')));
+   const snapshot=await client.call('session.queue',{sessionId:'input-command'});await assert.rejects(client.call('session.prompt',{sessionId:'input-command',requestId:'command-correction',mode:'steer',expectedTurnId:snapshot.activeTurnId,content:[{type:'text',text:'/fixture-command'}]}),/cannot be queued/);assert.equal((await client.call('session.queue',{sessionId:'input-command'})).revision,snapshot.revision);assert.equal(countInput('/fixture-command').length,0);await client.call('session.cancel',{sessionId:'input-command'});await idle('input-command');
+   await create('input-async','read-only');const beforeAsync=requests;await prompt('input-async','SLOW input async');await until(()=>requests===beforeAsync+1);const asyncTurn=(await client.call('session.queue',{sessionId:'input-async'})).activeTurnId;
+   const asyncPromotion=client.call('session.prompt',{sessionId:'input-async',requestId:'async-correction',mode:'steer',expectedTurnId:asyncTurn,content:[{type:'text',text:'INPUT_ASYNC:async'}]});await until(()=>existsSync(join(cwd,'async-input-started.txt')));await until(()=>closedRequests.has(beforeAsync+1),2000);assert((await client.call('session.list')).items.find(item=>item.sessionId==='input-async').running);assert.equal(requests,beforeAsync+1);
+   writeFileSync(join(cwd,'async-input-release.txt'),'release');await asyncPromotion;await idle('input-async');assert.equal(requests-beforeAsync,2);const asyncUsers=(await client.call('session.history',{sessionId:'input-async'})).events.map(row=>row.event).filter(event=>event.type==='user/message');assert(asyncUsers.every(event=>event.turnId===asyncTurn));assert.equal(asyncUsers.at(-1).data.source.rpcId,'async-correction');
+   await create('input-stop','read-only');const beforeStop=requests;await prompt('input-stop','SLOW input stop');await until(()=>requests===beforeStop+1);const stopTurn=(await client.call('session.queue',{sessionId:'input-stop'})).activeTurnId;
+   const stopPromotion=client.call('session.prompt',{sessionId:'input-stop',requestId:'stop-input-correction',mode:'steer',expectedTurnId:stopTurn,content:[{type:'text',text:'INPUT_ASYNC:stopped'}]});await until(()=>existsSync(join(cwd,'stopped-input-started.txt')));await client.call('session.cancel',{sessionId:'input-stop'});assert((await stopPromotion).interruptedPreparation);await idle('input-stop');
+   const stopped=await client.call('session.queue',{sessionId:'input-stop'});assert(stopped.paused);assert(stopped.items.find(item=>item.id==='stop-input-correction').canResolve);writeFileSync(join(cwd,'stopped-input-release.txt'),'release');await until(()=>existsSync(join(cwd,'stopped-input-finished.txt')));await delay(40);assert.equal(requests-beforeStop,1);assert.equal(countInput('INPUT_ASYNC:stopped').length,1);
+   await create('input-invalid','read-only');await prompt('input-invalid','SLOW input invalid');await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW input invalid')));const invalidTurn=(await client.call('session.queue',{sessionId:'input-invalid'})).activeTurnId;
+   await assert.rejects(client.call('session.prompt',{sessionId:'input-invalid',requestId:'invalid-input-correction',mode:'steer',expectedTurnId:invalidTurn,content:[{type:'text',text:'INPUT_INVALID'}]}));await idle('input-invalid');assert((await client.call('session.queue',{sessionId:'input-invalid'})).items[0].canResolve);assert.equal((await client.call('session.history',{sessionId:'input-invalid'})).events.at(-1).event.data.reason.kind,'error');
+   await create('input-crash','read-only');await prompt('input-crash','SLOW input crash');await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW input crash')));const crashTurn=(await client.call('session.queue',{sessionId:'input-crash'})).activeTurnId;
+   const lost=client.call('session.prompt',{sessionId:'input-crash',requestId:'crash-input-correction',mode:'steer',expectedTurnId:crashTurn,content:[{type:'text',text:'INPUT_ASYNC:crashed'}]}).catch(()=>null);await until(()=>existsSync(join(cwd,'crashed-input-started.txt')));client.close();await stop('SIGKILL');await lost;const beforeRestart=requests;await start();client=await Client.open(join(state,'runtime.sock'));
+   const recovered=await client.call('session.queue',{sessionId:'input-crash'});assert(recovered.paused);assert.equal(recovered.items.filter(item=>item.canResolve).length,2);assert.equal(requests,beforeRestart);assert.equal(countInput('INPUT_ASYNC:crashed').length,1);await assert.rejects(client.call('session.continueQueue',{sessionId:'input-crash'}),/unknown outcome/);
+  }finally{
+   const items=(await client.call('session.list').catch(()=>({items:[]}))).items;
+   for(const item of items)if(item.sessionId.startsWith('input-')&&item.running)await client.call('session.cancel',{sessionId:item.sessionId}).catch(()=>{});
+   for(const tag of ['async','stopped','crashed'])writeFileSync(join(cwd,tag+'-input-release.txt'),'release');
+   writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]}));rmSync(join(config,'agent','prompts','steer_template.md'),{force:true});
+  }
  });
  await t.test('successive steering retains distinct receipts for identical user text within one SDK turn',async()=>{
   await create('steer-successive','read-only');const before=requests,ids=[randomUUID(),randomUUID(),randomUUID()];await prompt('steer-successive','SLOW identical correction',ids[0]);await until(()=>requests===before+1);
@@ -223,6 +278,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const timer=setTimeout(()=>child.kill('SIGKILL'),25000);try{const [code]=await once(child,'exit');assert.equal(code,0,errors);assert(output.includes('"nativePiQueue": "passed"'));}finally{clearTimeout(timer);if(child.exitCode===null)child.kill('SIGKILL');}
  });
  await t.test('Pi Browser bridge forwards queue baselines and actions within its surface only',async()=>{
+  const template=join(config,'agent','prompts','browser_correction.md');writeFileSync(template,'Prepared browser correction $1');
   const bridge=spawn(process.execPath,[join(runtimeRoot,'apps/browser/pi-bridge.mjs')],{env:{...env,HOME:join(root,'browser-home'),AUGMENTOR_BROWSER_HARNESS:'pi'},stdio:['pipe','pipe','pipe']});let buffer=Buffer.alloc(0),errors='';const frames=[],pending=new Map();
   bridge.stderr.on('data',data=>errors+=data);bridge.stdout.on('data',data=>{buffer=Buffer.concat([buffer,data]);while(buffer.length>=4&&buffer.length>=buffer.readUInt32LE(0)+4){const length=buffer.readUInt32LE(0),frame=JSON.parse(buffer.subarray(4,length+4));buffer=buffer.subarray(length+4);if(frame.id&&pending.has(frame.id)){const row=pending.get(frame.id);pending.delete(frame.id);frame.error?row.reject(Error(frame.error.message)):row.resolve(frame.result);}else frames.push(frame);}});
   const call=(method,params={})=>new Promise((resolve,reject)=>{const id=randomUUID();pending.set(id,{resolve,reject});const body=Buffer.from(JSON.stringify({id,method,params})),header=Buffer.alloc(4);header.writeUInt32LE(body.length);bridge.stdin.write(Buffer.concat([header,body]));});
@@ -230,20 +286,26 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
    const initialized=await call('initialize',selection);assert.equal(initialized.serverInfo.capabilities.queue,true);assert.equal(initialized.serverInfo.capabilities.steering,true);
    const sid='queue-browser';await call('session.create',{sessionId:sid});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.sessionId===sid));
    await call('session.prompt',{sessionId:sid,requestId:'browser-active',mode:'queue',content:[{type:'text',text:'SLOW browser queue'}]});await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW browser queue')));
-   await call('session.prompt',{sessionId:sid,requestId:'browser-waiting',mode:'queue',content:[{type:'text',text:'Browser pending'}]});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.items.some(item=>item.id==='browser-waiting')));
+   await call('session.prompt',{sessionId:sid,requestId:'browser-waiting',mode:'queue',content:[{type:'text',text:'/browser_correction literal'}]});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.items.some(item=>item.id==='browser-waiting')));
    await assert.rejects(call('session.queue',{sessionId:'queue-native'}),/cannot access a Linux chat/);
    const expectedTurnId=(await call('session.queue',{sessionId:sid})).activeTurnId;
    await assert.rejects(call('session.updateQueue',{sessionId:sid,itemId:'browser-waiting',expectedTurnId:'stale',action:{kind:'steer'}}),/no longer active/);
    await call('session.updateQueue',{sessionId:sid,itemId:'browser-waiting',expectedTurnId,action:{kind:'steer'}});await until(()=>frames.some(frame=>frame.method==='session.status'&&frame.params.status==='idle'));
    assert.equal((await call('session.queue',{sessionId:sid})).items.length,0);
    const users=(await call('session.history',{sessionId:sid})).events.map(row=>row.event).filter(event=>event.type==='user/message');assert.deepEqual(users.map(event=>event.data.source.rpcId),['browser-active','browser-waiting']);assert.equal(users[0].turnId,users[1].turnId);
-  }finally{bridge.stdin.end();const timer=setTimeout(()=>bridge.kill('SIGKILL'),5000);const [code]=await once(bridge,'exit');clearTimeout(timer);assert.equal(code,0,errors);}
+   assert.equal(users[1].data.content[0].text,'Prepared browser correction literal');assert.equal(users[1].data.submittedContent[0].text,'/browser_correction literal');
+  }finally{rmSync(template,{force:true});bridge.stdin.end();const timer=setTimeout(()=>bridge.kill('SIGKILL'),5000);const [code]=await once(bridge,'exit');clearTimeout(timer);assert.equal(code,0,errors);}
  });
  await t.test('real Native Qt Steer uses the observed Pi turn and promotes one identified correction',{skip:process.platform==='win32',timeout:30000},async()=>{
-  await create('steer-native','read-only');await prompt('steer-native','SLOW native steering');await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW native steering')));
-  const child=spawn(process.env.AUGMENTOR_PYTHON??'python3',[fileURLToPath(new URL('./fixtures/native-pi-queue.py',import.meta.url)),'--steer'],{env:{...env,HOME:join(root,'qt-steer-home'),XDG_CONFIG_HOME:join(root,'qt-steer-config'),XDG_STATE_HOME:join(root,'qt-steer-state'),XDG_DATA_HOME:join(root,'qt-steer-data'),AUGMENTOR_PI_NO_AUTOSTART:'1',PYTHONPATH:join(runtimeRoot,'apps/native'),QT_QPA_PLATFORM:'offscreen'},stdio:['ignore','pipe','pipe']});
+  const inputSource=join(root,'fixture-native-input.mjs');writeFileSync(inputSource,"export default pi=>pi.on('input',e=>e.text==='QUEUE_FAST correction native'?{action:'transform',text:'Prepared native correction'}:undefined);");
+  for(const transforms of [false,true]){
+  if(transforms)writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[inputSource],skills:[]}));
+  const sid=transforms?'steer-native-input':'steer-native';
+  await create(sid,'read-only');const before=requests;await prompt(sid,'SLOW native steering');await until(()=>requests===before+1);
+  const child=spawn(process.env.AUGMENTOR_PYTHON??'python3',[fileURLToPath(new URL('./fixtures/native-pi-queue.py',import.meta.url)),'--steer',...(transforms?['--input']:[])],{env:{...env,HOME:join(root,'qt-steer-home'),XDG_CONFIG_HOME:join(root,'qt-steer-config'),XDG_STATE_HOME:join(root,'qt-steer-state'),XDG_DATA_HOME:join(root,'qt-steer-data'),AUGMENTOR_PI_NO_AUTOSTART:'1',PYTHONPATH:join(runtimeRoot,'apps/native'),QT_QPA_PLATFORM:'offscreen'},stdio:['ignore','pipe','pipe']});
   let output='',errors='';child.stdout.on('data',data=>output+=data);child.stderr.on('data',data=>errors+=data);const timer=setTimeout(()=>child.kill('SIGKILL'),25000);
-  try{const [code]=await once(child,'exit');assert.equal(code,0,errors);assert(output.includes('"nativePiSteering": "passed"'));}finally{clearTimeout(timer);if(child.exitCode===null)child.kill('SIGKILL');}
+  try{const [code]=await once(child,'exit');assert.equal(code,0,errors);assert(output.includes('"nativePiSteering": "passed"'));}finally{clearTimeout(timer);if(child.exitCode===null)child.kill('SIGKILL');writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]}));}
+  }
  });
  await t.test('inspection captures the actual post-extension provider payload, reasoning and tool evidence',async t=>{
   const beforeSettings=await client.call('observation.describe');

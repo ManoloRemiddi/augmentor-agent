@@ -11,7 +11,7 @@ export function piTranscriptEvent(event:{seq:number;type:string;data:any},live=f
   const d=event.data;
   const role=event.type==='user/message'?'user':event.type==='assistant/message'?'assistant':null;
   if(!role||role==='user'&&d.source?.kind!=='user')return [];
-  const content=(role==='user'?d.content:d.message?.content)?.filter((p:any)=>p.type==='text').map((p:any)=>p.text).join('\n');
+  const content=(role==='user'?(d.submittedContent??d.content):d.message?.content)?.filter((p:any)=>p.type==='text').map((p:any)=>p.text).join('\n');
   if(!content?.trim())return [];
   return [{id:String(event.seq),role,mode:'text',content,live,status:d.message?.stopReason==='aborted'?'interrupted':d.message?.stopReason==='error'?'error':'complete'}];
 }

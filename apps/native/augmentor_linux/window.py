@@ -761,7 +761,7 @@ class Window(QWidget):
         if kind=='user/message':
             if data.get('source',{}).get('kind')!='user':return False
             self.queue_panel.consumed(data.get('source',{}).get('rpcId'))
-            text='\n'.join(p.get('text','') for p in data.get('content',[]) if p.get('type')=='text')
+            text='\n'.join(p.get('text','') for p in data.get('submittedContent',data.get('content',[])) if p.get('type')=='text')
             if text:
                 if text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
                 self.message_events[len(self.messages)]=event

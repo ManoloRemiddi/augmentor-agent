@@ -527,7 +527,7 @@ export function createChatUI(els) {
         // Filter provenance, never the text the user may be asking about.
         if (data.source?.kind && data.source.kind !== 'user') break
         flushAssistant()
-        const text = blockText(data.content)
+        const text = blockText(data.submittedContent ?? data.content)
         confirmPrompt(text)
         const m = el('div', 'msg user')
         m.append(el('span', 'who', 'You'))

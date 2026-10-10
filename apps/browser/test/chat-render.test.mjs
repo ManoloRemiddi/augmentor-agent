@@ -9,6 +9,14 @@ import {JSDOM} from 'jsdom'
 import {marked} from 'marked'
 import {createChatUI} from '../extension/chat-render.js'
 
+test('prepared Pi input displays the original submitted text without replacing effective native content',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const event={seq:1,type:'user/message',data:{source:{kind:'user'},submittedContent:[{type:'text',text:'/template original'}],content:[{type:'text',text:'Prepared instructions'}]}}
+ ui.applyLog([{kind:'event',event}]);assert(log.textContent.includes('/template original'));assert(!log.textContent.includes('Prepared instructions'));assert.equal(event.data.content[0].text,'Prepared instructions')
+})
+
 test('workspace thinking preference applies to live reasoning, preserves manual choices and leaves history collapsed',t=>{
  const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
  globalThis.window=dom.window;globalThis.document=dom.window.document

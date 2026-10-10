@@ -39,3 +39,7 @@ test('a steering notice during generation does not duplicate the final interrupt
  assert.equal(items[1].text,'Steering accepted.');assert.equal(items[2].text,'Correction');
  const during=projectChat(events.slice(0,4),{running:true});assert.equal(during.filter(item=>item.kind==='assistant').length,1);assert.equal(during[0].text,'Partial answer');assert.equal(during[0].status,'streaming');
 });
+test('Harness chat shows historical submitted text while retaining effective native input for inspection',()=>{
+ const event={seq:1,type:'user/message',data:{submittedContent:[{type:'text',text:'/template original'}],content:[{type:'text',text:'Prepared template instructions'}]}};
+ assert.equal(projectChat([event])[0].text,'/template original');assert.equal(event.data.content[0].text,'Prepared template instructions');
+});

@@ -63,3 +63,7 @@ test('a crash leaves both the active and promoted steering receipts unknown with
  const {queue,path}=fixture(t);queue.enqueue('root','Original',false);queue.dispatch('root','turn');queue.accepted('root');queue.enqueue('correction','Correction',true);queue.promote('correction','turn');
  const reopened=new PiPromptQueue(path,'fixture');reopened.recover();assert(reopened.paused);assert(reopened.snapshot().items.every(item=>item.canResolve&&!item.canSteer));assert.throws(()=>reopened.resume(),/unknown outcome/);
 });
+test('a handled correction retains a terminal identity without claiming model delivery or replay',t=>{
+ const {queue,path}=fixture(t);queue.enqueue('root','Original',false);queue.dispatch('root','turn');queue.accepted('root');queue.enqueue('handled','Handled input',true);queue.promote('handled','turn');queue.handledSteer('handled');queue.finish('root','completed');
+ const reopened=new PiPromptQueue(path,'fixture');assert.equal(reopened.read('handled').status,'completed');assert.equal(reopened.read('handled').delivered,false);assert.equal(reopened.enqueue('handled','Handled input',true),false);assert.equal(reopened.snapshot().items.length,0);
+});
