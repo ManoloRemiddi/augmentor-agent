@@ -569,7 +569,7 @@ class Controller(QObject):
                     time.sleep(.03)
                 target=sid or self.session
                 if self.closed or self.generation is not generation or target!=self.session or not target or self.cancel_requested.is_set():raise ContractError('Prompt was not queued; the active response stopped or changed.')
-                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'expectedTurnId':turn_id} if self.harness=='codex' and mode=='steer' else {})})
+                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'expectedTurnId':turn_id} if self.harness in ('pi','codex') and mode=='steer' else {})})
                 self.queue_result.emit({'id':request_id,'accepted':result.get('accepted') is True,'command':bool(result.get('command'))})
             except Exception as exc:
                 self.queue_result.emit({'id':request_id,'accepted':False,'error':str(exc)})
@@ -583,7 +583,7 @@ class Controller(QObject):
         turn_id=getattr(self,'queue_turn_id',None)
         def work():
             try:
-                result=self.client.call('session.resolveQueue',{'sessionId':sid,'itemId':item_id,'acknowledgeUnknownOutcome':True}) if action=='acknowledge' else self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action},**({'expectedTurnId':turn_id} if self.harness=='codex' and action=='steer' else {})})
+                result=self.client.call('session.resolveQueue',{'sessionId':sid,'itemId':item_id,'acknowledgeUnknownOutcome':True}) if action=='acknowledge' else self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action},**({'expectedTurnId':turn_id} if self.harness in ('pi','codex') and action=='steer' else {})})
                 self.queue_action_result.emit({'id':item_id,'accepted':result.get('accepted') is True})
             except Exception as exc:
                 self.queue_action_result.emit({'id':item_id,'error':str(exc)})

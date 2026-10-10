@@ -10,7 +10,7 @@ history.replaceState(null,'',location.pathname);
 const state={sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0,queue:null};
 const promptQueue=createQueue({container:$('prompt-queue'),input:$('input'),allowIdle:true,send:async(method,payload)=>{
   const sid=payload.sessionId,epoch=state.epoch;
-  const result=await rpc(method==='queue/prompt'?'session.prompt':payload.action==='acknowledge'?'session.resolveQueue':'session.updateQueue',method==='queue/prompt'?{sessionId:sid,requestId:payload.requestId,mode:'queue',resumeQueue:payload.resumeQueue,content:[{type:'text',text:payload.text}]}:payload.action==='acknowledge'?{sessionId:sid,itemId:payload.itemId,acknowledgeUnknownOutcome:true}:{sessionId:sid,itemId:payload.itemId,action:{kind:payload.action}});
+  const result=await rpc(method==='queue/prompt'?'session.prompt':payload.action==='acknowledge'?'session.resolveQueue':'session.updateQueue',method==='queue/prompt'?{sessionId:sid,requestId:payload.requestId,mode:'queue',resumeQueue:payload.resumeQueue,content:[{type:'text',text:payload.text}]}:payload.action==='acknowledge'?{sessionId:sid,itemId:payload.itemId,acknowledgeUnknownOutcome:true}:{sessionId:sid,itemId:payload.itemId,expectedTurnId:payload.expectedTurnId,action:{kind:payload.action}});
   if(epoch===state.epoch){await refreshSessions();notice(result.queued?'Prompt queued.':'Request accepted.');}return result;
 }});
 function renderQueue(entry){

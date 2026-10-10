@@ -29,9 +29,10 @@ import {piToolBudget,trimSavedToolContext,TOOL_BUDGET} from './tool-budget.js';
 import {piReassessment} from './reassessment.js';
 import {PiExecution,EXECUTION_POLICY,type ExecutionContract} from './execution.js';
 import {PiPromptQueue,promptIdentity} from './queue.js';
+import {PiSteering} from './steering.js';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];execution?:PiExecution;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
+interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 export class Host {
   readonly dirs=paths();
   readonly browser=new BrowserBroker();
@@ -64,7 +65,7 @@ export class Host {
     }
   }
   private queue(m:Meta){let queue=this.queues.get(m.id);if(!queue){queue=new PiPromptQueue(join(this.dirs.sessions,m.id+'.queue.json'),m.id,()=>this.publish(m.id,{method:'session/queue',payload:{sessionId:m.id,...this.queueSnapshot(m.id)}}));this.queues.set(m.id,queue);}return queue;}
-  queueSnapshot(id:unknown){const m=this.getMeta(id);return this.queue(m).snapshot();}
+  queueSnapshot(id:unknown){const m=this.getMeta(id),r=this.loaded.get(m.id);return this.queue(m).snapshot(!!r&&m.running&&!r.cancelled&&r.phase!=='settling');}
   save(m:Meta){atomicJson(join(this.dirs.sessions,m.id+'.meta.json'),m);}
   persistSettings(){this.settings.revision++;atomicJson(join(this.dirs.config,'settings.json'),this.settings);}
   events(m:Meta):DisplayEvent[]{const file=join(this.dirs.sessions,m.id+'.events.jsonl');if(!existsSync(file))return [];let raw=readFileSync(file);if(raw.length&&raw.at(-1)!==10){const end=raw.lastIndexOf(10)+1;truncateSync(file,end);raw=raw.subarray(0,end);}const lines=raw.toString('utf8').split('\n');const result:DisplayEvent[]=[];
@@ -128,6 +129,7 @@ export class Host {
     await memory.append(history.flatMap(event=>piTranscriptEvent(event)));
     await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.id),onError:error=>this.append(m,'runtime/error',{message:error.error})});
     record.execution=execution;execution.install(created.session);
+    record.steering=new PiSteering(created.session);record.steering.install();
     record.observation=observeSession(created.session,this.observations,m.id,
       ()=>({turnId:record!.turnId,selected:{...m.selection},permissionPreset:m.policy,toolBudget:{...TOOL_BUDGET,units:'unicode-code-points'},execution:record!.execution?.describe()}),
       observation=>this.publish(m.id,{method:'observation/event',payload:{sessionId:m.id,observation}}),
@@ -137,7 +139,10 @@ export class Host {
     if(repaired.length)record.observation.record('context/budget',{changes:repaired,units:'unicode-code-points',boundary:'before-session-owner-load'});
     created.session.subscribe(e=>{
       if(e.type==='message_start'&&e.message.role==='user'){
-        const requestId=record!.activeRequestId;
+        const correction=record!.steering?.delivery(e.message);
+        const requestId=correction??(!record!.initialDelivered?record!.activeRequestId:undefined);
+        if(correction){record!.execution?.steerDelivered();record!.observation?.record('execution/steer-delivered',{clientRequestId:correction});}
+        else if(requestId)record!.initialDelivered=true;
         if(requestId)this.queue(m).delivered(requestId);
         this.append(m,'user/message',{source:{kind:'user',...(requestId?{rpcId:requestId}:{})},content:typeof e.message.content==='string'?[{type:'text',text:e.message.content}]:e.message.content});
       }
@@ -147,13 +152,30 @@ export class Host {
       }
       if(e.type==='message_end'&&e.message.role==='assistant'){
         this.append(m,'assistant/message',{message:{content:e.message.content,stopReason:e.message.stopReason}});
-        record!.failed=e.message.stopReason==='error';if(record!.failed)this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});
+        record!.failed=e.message.stopReason==='error';if(record!.failed&&!record!.steering?.waiting)this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});
       }
       if(e.type==='tool_execution_start')this.append(m,'tool/call',{name:e.toolName,toolCallId:e.toolCallId});
       if(e.type==='tool_execution_end')this.append(m,'tool/result',{name:e.toolName,toolCallId:e.toolCallId,isError:e.isError,result:{...e.result,content:e.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Desktop image sent to the selected model]'}:part)}});
     });return record;
   }
-  async cancel(id:unknown,source='user'){const m=this.getMeta(id);this.queue(m).pause();const r=this.loaded.get(m.id);if(m.running&&r){r.cancelled=true;r.execution?.cancel();}if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(!r||!m.running)return {accepted:false,paused:true};r.cancelled=true;r.session.clearQueue();r.session.abortCompaction();await r.session.abort();return {accepted:true,paused:true};}
+  async cancel(id:unknown,source='user'){
+    const m=this.getMeta(id),queue=this.queue(m);queue.pause();const r=this.loaded.get(m.id);let aborting:Promise<void>|undefined;
+    if(m.running&&r){r.cancelled=true;r.execution?.cancel();for(const requestId of r.steering?.withdraw()??[])queue.withdrawSteer(requestId);r.session.abortCompaction();aborting=r.session.abort();}
+    if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);
+    if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(aborting)await aborting;return {accepted:!!aborting,paused:true};
+  }
+  private steer(m:Meta,id:string,expectedTurnId:unknown){
+    const r=this.loaded.get(m.id),turnId=promptIdentity(expectedTurnId),queue=this.queue(m);
+    if(!m.running||!r||r.cancelled||r.phase==='settling'||r.turnId!==turnId)throw Error('The observed steering turn is no longer active.');
+    const prior=queue.read(id);if(prior.status==='steering'&&prior.steerTurnId===turnId)return {accepted:true,duplicate:true,turnId};
+    if(r.steering?.waiting)throw Error('A correction is already waiting for its safe boundary.');
+    if(!queue.promote(id,turnId))return {accepted:true,duplicate:true,turnId};
+    r.execution!.steerRequested();this.interactions.cancel(m.id);
+    r.steering!.enqueue(id,prior.input!);
+    r.observation?.record('execution/steer-requested',{clientRequestId:id,boundary:'provider-supersession; dispatched-tools-settle',input:'literal-product-text'});
+    this.append(m,'runtime/notice',{message:'Steering accepted. Obsolete generation is stopping; any dispatched tools will settle before the correction.',incomplete:false});
+    return {accepted:true,turnId};
+  }
   async branch(p:Data){
     const source=this.getMeta(p.sessionId),sid=identifier(p.newSessionId);
     if(!Number.isSafeInteger(p.messageSeq)||p.messageSeq<1||!['reply','edit'].includes(p.mode))throw new Error('Invalid branch target');
@@ -176,17 +198,18 @@ export class Host {
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
   submit(r:Loaded,input:string,id:string){const m=r.meta;if(m.running)throw new Error('This conversation is already working');
     r.turnId=randomUUID();const queue=this.queue(m);queue.dispatch(id,r.turnId);
-    m.running=true;r.cancelled=false;r.failed=false;r.activeRequestId=id;m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{requestId:id});queue.accepted(id);
+    m.running=true;r.cancelled=false;r.failed=false;r.initialDelivered=false;r.phase='preparing';r.activeRequestId=id;m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{requestId:id});queue.accepted(id);
     r.observation?.beginTurn({clientRequestId:id});
     r.execution?.begin(r.manager);
     if(!m.title){m.title=input.replace(/\s+/g,' ').slice(0,80);r.session.setSessionName(m.title);this.append(m,'session/title',{title:m.title});this.save(m);}
-    r.task=(async()=>{let failed=false;try{await r.memory.activity('foreground');if(r.cancelled)return;await r.session.prompt(input,{expandPromptTemplates:false,source:'rpc'});}catch(error){failed=true;this.append(m,'runtime/error',{message:String(error)});}finally{
+    r.task=(async()=>{let failed=false;try{await r.memory.activity('foreground');if(r.cancelled)return;r.phase='running';await r.session.prompt(input,{expandPromptTemplates:false,source:'rpc'});}catch(error){failed=true;this.append(m,'runtime/error',{message:String(error)});}finally{
+      r.phase='settling';
       await r.memory.activity('stop');
       r.execution?.end(r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed');this.interactions.cancel(m.id);if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});const reason=r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed';
       // A terminal receipt is persisted before admitting another input. A crash
       // before this boundary produces an unknown receipt, never an automatic retry.
-      queue.finish(id,reason==='aborted'?'cancelled':reason==='error'?'failed':'completed');if(reason!=='completed')queue.pause();
-      m.running=false;m.updatedAt=Date.now();this.save(m);this.append(m,'turn/end',{reason:{kind:reason},requestId:id});r.observation?.record('turn/end',{reason,execution:r.execution?.describe()});r.turnId=undefined;r.activeRequestId=undefined;
+      queue.finish(id,reason==='aborted'?'cancelled':reason==='error'?'failed':'completed');if(reason!=='completed'||queue.uncertain)queue.pause();
+      m.running=false;m.updatedAt=Date.now();this.save(m);this.append(m,'turn/end',{reason:{kind:reason},requestId:id});r.observation?.record('turn/end',{reason,execution:r.execution?.describe()});r.turnId=undefined;r.activeRequestId=undefined;r.phase=undefined;
       if(!queue.paused)this.pump(m);
     }})();return {accepted:true,turnId:r.turnId};
   }
@@ -219,7 +242,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:false,linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-only',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},steering:{input:'literal-product-text',sdkInputTransforms:false,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
       this.quiescing=true;this.setup.cancel();return {accepted:true};
@@ -253,9 +276,13 @@ export class Host {
     case 'session.selectModel':{const m=this.getMeta(p.sessionId);if(m.running)throw new Error('Stop before changing models');const model=await this.selected(p);const previous=m.selection;const loaded=this.loaded.get(m.id);if(loaded)await loaded.session.setModel(model);else{m.selection={provider:p.provider,model:p.model};try{await this.load(m);}catch(error){m.selection=previous;this.save(m);throw error;}}m.selection={provider:p.provider,model:p.model};this.save(m);return {current:m.selection};}
     case 'session.prompt':{
       const m=this.getMeta(p.sessionId),requestId=promptIdentity(p.requestId??id);
-      if(p.mode!==undefined&&p.mode!=='queue')throw Error('Responsive steering is not yet supported by this Pi candidate.');
+      if(p.mode!==undefined&&!['queue','steer'].includes(p.mode))throw Error('Choose queue or steer mode.');
       const input=text(p.content?.filter((part:Data)=>part.type==='text').map((part:Data)=>part.text).join('\n')),queue=this.queue(m);
-      if(queue.lookup(requestId,input)||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
+      const existing=queue.lookup(requestId,input);if(existing||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
+      if(p.mode==='steer'){
+        const r=this.loaded.get(m.id);if(!m.running||!r||r.cancelled||r.phase==='settling'||r.turnId!==p.expectedTurnId||queue.paused||queue.uncertain||r.steering?.waiting)throw Error('The observed steering turn is no longer available.');
+        queue.enqueue(requestId,input,true);return {...this.steer(m,requestId,p.expectedTurnId),requestId};
+      }
       if(p.mode===undefined&&m.running)throw Error('This conversation is already working; use queue mode to add a waiting prompt.');
       if(p.resumeQueue!==undefined&&typeof p.resumeQueue!=='boolean')throw Error('Choose whether to resume the queue.');
       if(queue.uncertain)throw Error('A previous prompt has an unknown outcome. Inspect its history and explicitly acknowledge the interrupted receipt before sending more.');
@@ -269,7 +296,7 @@ export class Host {
       return {accepted:true,queued:true,requestId};
     }
     case 'session.queue':return this.queueSnapshot(p.sessionId);
-    case 'session.updateQueue':{const m=this.getMeta(p.sessionId);if(p.action?.kind!=='remove')throw Error('Only removal is supported by this Pi queue candidate.');this.queue(m).remove(promptIdentity(p.itemId));return {accepted:true,...this.queueSnapshot(m.id)};}
+    case 'session.updateQueue':{const m=this.getMeta(p.sessionId),itemId=promptIdentity(p.itemId);if(p.action?.kind==='steer')return this.steer(m,itemId,p.expectedTurnId);if(p.action?.kind!=='remove')throw Error('Choose steer or remove.');this.queue(m).remove(itemId);return {accepted:true,...this.queueSnapshot(m.id)};}
     case 'session.continueQueue':{const m=this.getMeta(p.sessionId);this.queue(m).resume();this.pump(m);return {accepted:true};}
     case 'session.resolveQueue':{const m=this.getMeta(p.sessionId);if(m.running||p.acknowledgeUnknownOutcome!==true)throw Error('Inspect the saved history and explicitly acknowledge that the interrupted action outcome remains unknown.');this.queue(m).resolve(promptIdentity(p.itemId));this.append(m,'runtime/notice',{message:'The interrupted prompt receipt was acknowledged. Its action outcome may still be unknown. That prompt was not retried; waiting prompts remain paused.',incomplete:true});return {accepted:true};}
     case 'session.rename':{const m=this.getMeta(p.sessionId);m.title=text(p.title,200);this.loaded.get(m.id)?.session.setSessionName(m.title);this.save(m);this.append(m,'session/title',{title:m.title});return {title:m.title};}
@@ -279,5 +306,5 @@ export class Host {
     case 'prompts.list':case 'prompts.save':case 'prompts.delete':return promptCall(method,p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.quiescing=true;this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.execution?.dispose();r.session.dispose();}}
+  async close(){this.quiescing=true;this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}}
 }

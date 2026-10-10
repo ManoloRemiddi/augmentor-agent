@@ -1,6 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Actual Qt queue controls and Pi socket, with independently authored synthetic inputs."""
-import json,time
+import json,time,sys
 from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
 from PySide6.QtWidgets import QApplication,QPushButton
@@ -9,7 +9,8 @@ from augmentor_linux.controller import Controller
 from augmentor_linux.window import Window
 
 app=QApplication([]);client=PiClient();client.call('host.describe');assert client.supports_queue
-sid='queue-native';controller=Controller(client=client,harness='pi');controller.session=sid;controller.online=True;controller.running=True
+steering='--steer' in sys.argv
+sid='steer-native' if steering else 'queue-native';controller=Controller(client=client,harness='pi');controller.session=sid;controller.online=True;controller.running=True
 window=Window();window.controller=controller
 controller.queue_changed.connect(window.queue_panel.replace);controller.queue_result.connect(window.queue_panel.submission_result)
 controller.queue_action_result.connect(window.queue_panel.action_result);controller.event.connect(window.on_event);controller.busy.connect(window.set_busy)
@@ -37,6 +38,18 @@ def click(key,label):
 try:
     controller.subscribe(sid)
     until(lambda:getattr(controller,'queue_turn_id',None))
+    if steering:
+        correction=enter('QUEUE_FAST correction native');followup=enter('QUEUE_FAST follow-up native')
+        click(correction,'Steer')
+        until(lambda:not client.call('session.queue',{'sessionId':sid})['items'] and not controller.running)
+        until(lambda:not window.queue_panel.items and not window.queue_panel.pending)
+        users=[row['event'] for row in client.call('session.history',{'sessionId':sid})['events'] if row['event']['type']=='user/message']
+        assert [row['data']['source']['rpcId'] for row in users[1:]]==[correction,followup]
+        assert users[0]['turnId']==users[1]['turnId'] and users[1]['turnId']!=users[2]['turnId']
+        texts=[text for who,text in window.messages if who=='You']
+        assert texts.count('QUEUE_FAST correction native')==1 and texts.count('QUEUE_FAST follow-up native')==1
+        print(json.dumps({'nativePiSteering':'passed','correction':correction}),flush=True)
+        sys.exit(0)
     removed=enter('QUEUE_FAST removed native');kept=enter('QUEUE_FAST kept native')
     click(removed,'×');until(lambda:not any(row['id']==removed for row in window.queue_panel.items))
     controller.stream.close();window.queue_panel.reset();controller.subscribe(sid)

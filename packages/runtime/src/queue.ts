@@ -3,11 +3,11 @@ import {createHash,randomUUID} from 'node:crypto';
 import {existsSync,lstatSync,readFileSync,openSync,closeSync,writeFileSync,renameSync,fsyncSync,unlinkSync} from 'node:fs';
 import {dirname} from 'node:path';
 
-type Status='waiting'|'dispatching'|'active'|'completed'|'failed'|'cancelled'|'removed'|'unconfirmed';
-interface Item {id:string;input?:string;fingerprint:string;status:Status;queued:boolean;delivered:boolean;turnId?:string}
+type Status='waiting'|'dispatching'|'active'|'steering'|'completed'|'failed'|'cancelled'|'removed'|'unconfirmed';
+interface Item {id:string;input?:string;fingerprint:string;status:Status;queued:boolean;delivered:boolean;turnId?:string;steerTurnId?:string}
 interface Journal {schema:1;sessionId:string;revision:number;paused:boolean;items:Item[]}
-const statuses=new Set<Status>(['waiting','dispatching','active','completed','failed','cancelled','removed','unconfirmed']);
-const visible=(item:Item)=>item.status==='waiting'||item.status==='unconfirmed'||item.status==='failed'&&item.input!==undefined||['dispatching','active'].includes(item.status)&&item.queued&&!item.delivered;
+const statuses=new Set<Status>(['waiting','dispatching','active','steering','completed','failed','cancelled','removed','unconfirmed']);
+const visible=(item:Item)=>item.status==='waiting'||item.status==='unconfirmed'||item.status==='failed'&&item.input!==undefined||['dispatching','active','steering'].includes(item.status)&&item.queued&&!item.delivered;
 const fingerprint=(input:string)=>createHash('sha256').update(input).digest('hex');
 export function promptIdentity(value:unknown):string {if(typeof value!=='string'||!/^[a-zA-Z0-9_.:-]{1,128}$/.test(value))throw Error('Invalid prompt identity.');return value;}
 
@@ -25,8 +25,10 @@ export class PiPromptQueue {
     promptIdentity(item.id);
     if(ids.has(item.id)||!statuses.has(item.status)||typeof item.queued!=='boolean'||typeof item.delivered!=='boolean'||!/^[a-f0-9]{64}$/.test(item.fingerprint)||
      (item.turnId!==undefined&&promptIdentity(item.turnId)!==item.turnId)||
+     (item.steerTurnId!==undefined&&promptIdentity(item.steerTurnId)!==item.steerTurnId)||
+     (item.status==='steering'&&(!item.steerTurnId||item.turnId!==item.steerTurnId))||
      (item.input!==undefined&&(typeof item.input!=='string'||!item.input.trim()||item.input.length>65536||fingerprint(item.input)!==item.fingerprint))||
-     (['waiting','dispatching','active','unconfirmed'].includes(item.status)&&item.input===undefined))throw Error('Corrupt prompt queue; automatic submission is disabled.');
+     (['waiting','dispatching','active','steering','unconfirmed'].includes(item.status)&&item.input===undefined))throw Error('Corrupt prompt queue; automatic submission is disabled.');
     ids.add(item.id);
    }
    if(data.items.filter(visible).length>100||Buffer.byteLength(JSON.stringify(data.items.filter(visible)))>512*1024)throw Error('The saved prompt queue exceeds its bounds.');
@@ -37,6 +39,15 @@ export class PiPromptQueue {
  get uncertain(){return this.data.items.some(item=>item.status==='unconfirmed');}
  get next(){return this.data.items.find(item=>item.status==='waiting');}
  get active(){return this.data.items.find(item=>['dispatching','active'].includes(item.status));}
+ get pendingSteer(){return this.data.items.find(item=>item.status==='steering'&&!item.delivered);}
+ read(id:string){return structuredClone(this.item(id));}
+ promote(id:string,turnId:string){
+  const item=this.item(id);
+  if(item.steerTurnId===turnId&&item.status!=='waiting')return false;
+  if(this.paused||this.uncertain||this.active?.turnId!==turnId||item.status!=='waiting'||this.pendingSteer)throw Error('Only a waiting prompt can steer the observed active turn.');
+  this.patch(id,{status:'steering',turnId,steerTurnId:turnId,queued:true});return true;
+ }
+ withdrawSteer(id:string){if(this.item(id).status!=='steering'||this.item(id).delivered)throw Error('Steering input has already crossed its delivery boundary.');this.patch(id,{status:'waiting',turnId:undefined,steerTurnId:undefined});}
  lookup(id:string,input:string){
   const existing=this.data.items.find(item=>item.id===id);
   if(existing&&existing.fingerprint!==fingerprint(input))throw Error('Prompt identity was reused for different input.');
@@ -56,12 +67,13 @@ export class PiPromptQueue {
   this.patch(id,{status:'dispatching',turnId});
  }
  accepted(id:string){if(this.item(id).status!=='dispatching')throw Error('Prompt was not dispatched.');this.patch(id,{status:'active'});}
- delivered(id:string){const item=this.item(id);if(!['dispatching','active'].includes(item.status))throw Error('Prompt delivery has no active receipt.');this.patch(id,{delivered:true});}
+ delivered(id:string){const item=this.item(id);if(!['dispatching','active','steering'].includes(item.status))throw Error('Prompt delivery has no active receipt.');this.patch(id,{delivered:true});}
  finish(id:string,status:'completed'|'failed'|'cancelled'){
   const item=this.item(id);
   if(!['dispatching','active'].includes(item.status))throw Error('Prompt has no active execution receipt.');
   // Terminal receipts retain their fingerprint indefinitely, without retaining all historical prompt text.
-  this.patch(id,{status,input:undefined});
+  this.commit({...this.data,items:this.data.items.map(value=>value.id===id?{...value,status,input:undefined}:value.status==='steering'&&value.turnId===item.turnId?
+   (value.delivered?{...value,status,input:undefined}:{...value,status:'unconfirmed' as const}):value)});
  }
  notSent(id:string){if(this.item(id).status!=='waiting')throw Error('Only an undispatched prompt can be rejected.');this.patch(id,{status:'failed'});this.pause();}
  remove(id:string){const item=this.item(id);if(item.status==='removed')return;if(!['waiting','failed'].includes(item.status))throw Error('Active or unconfirmed prompts cannot be removed.');this.patch(id,{status:'removed',input:undefined});}
@@ -69,12 +81,12 @@ export class PiPromptQueue {
  resolve(id:string){if(this.item(id).status!=='unconfirmed')throw Error('Only an unknown prompt receipt can be acknowledged.');this.patch(id,{status:'cancelled',input:undefined});}
  recover(){
   const unsettled=this.active;
-  if(unsettled||this.next)this.commit({...this.data,paused:true,items:this.data.items.map(item=>['dispatching','active'].includes(item.status)?{...item,status:'unconfirmed' as const}:item)});
+  if(unsettled||this.next||this.data.items.some(item=>item.status==='steering'))this.commit({...this.data,paused:true,items:this.data.items.map(item=>['dispatching','active','steering'].includes(item.status)?{...item,status:'unconfirmed' as const}:item)});
  }
- snapshot(){return {revision:this.data.revision,activeTurnId:!this.paused?this.active?.turnId??null:null,paused:this.paused,items:this.data.items.filter(visible).map(item=>({
-  id:item.id,rpcId:item.id,placement:'queued',message:{content:[{type:'text',text:item.input}]},
-  stateLabel:item.status==='unconfirmed'?(item.delivered?'Interrupted — check the action outcome':'Not confirmed — check history'):item.status==='failed'?'Not sent':item.status==='waiting'&&this.paused?'Paused':item.status==='waiting'?undefined:'Sending…',
-  canSteer:false,canRemove:['waiting','failed'].includes(item.status),canResolve:item.status==='unconfirmed',
+ snapshot(steeringAvailable=false){return {revision:this.data.revision,activeTurnId:!this.paused?this.active?.turnId??null:null,paused:this.paused,items:this.data.items.filter(visible).map(item=>({
+  id:item.id,rpcId:item.id,placement:item.status==='steering'?'steering':'queued',message:{content:[{type:'text',text:item.input}]},
+  stateLabel:item.status==='unconfirmed'?(item.delivered?'Interrupted — check the action outcome':'Not confirmed — check history'):item.status==='failed'?'Not sent':item.status==='steering'?'Steering — waiting for the safe boundary':item.status==='waiting'&&this.paused?'Paused':item.status==='waiting'?undefined:'Sending…',
+  canSteer:steeringAvailable&&!this.paused&&!this.uncertain&&!this.pendingSteer&&!!this.active&&item.status==='waiting',canRemove:['waiting','failed'].includes(item.status),canResolve:item.status==='unconfirmed',
  }))};}
  private item(id:string){const item=this.data.items.find(value=>value.id===id);if(!item)throw Error('Queued prompt not found.');return item;}
  private patch(id:string,patch:Partial<Item>){this.commit({...this.data,items:this.data.items.map(item=>item.id===id?{...item,...patch}:item)});}

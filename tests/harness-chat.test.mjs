@@ -30,3 +30,12 @@ test('recovery notices and truncated output survive reopen without becoming assi
  assert.equal(items.filter(item=>item.kind==='status'&&item.text.includes('Task incomplete')).length,1);
  assert.deepEqual(projectChat(events),items);
 });
+test('a steering notice during generation does not duplicate the final interrupted SDK message',()=>{
+ const events=[chunk(1,'reasoning-delta','Thinking'),chunk(2,'text-delta','Partial'),
+  {seq:3,type:'runtime/notice',data:{message:'Steering accepted.'}},chunk(4,'text-delta',' answer'),
+  {seq:5,type:'assistant/message',data:{message:{content:[{type:'thinking',thinking:'Thinking'},{type:'text',text:'Partial answer'}],stopReason:'aborted'}}},
+  {seq:6,type:'user/message',data:{content:[{type:'text',text:'Correction'}]}}];
+ const items=projectChat(events);assert.equal(items.filter(item=>item.kind==='assistant').length,1);assert.equal(items[0].text,'Partial answer');assert.equal(items[0].status,'aborted');assert.equal(items[0].thinking,'Thinking');
+ assert.equal(items[1].text,'Steering accepted.');assert.equal(items[2].text,'Correction');
+ const during=projectChat(events.slice(0,4),{running:true});assert.equal(during.filter(item=>item.kind==='assistant').length,1);assert.equal(during[0].text,'Partial answer');assert.equal(during[0].status,'streaming');
+});

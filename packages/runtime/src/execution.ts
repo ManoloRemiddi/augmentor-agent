@@ -38,6 +38,8 @@ export class PiExecution {
  private active=false;
  private cancelled=false;
  private recovering=false;
+ private superseding=false;
+ private steered=false;
  private started=0;
  private recoveries=0;
  private steps=0;
@@ -63,11 +65,11 @@ export class PiExecution {
   for(const [key,value] of Object.entries(this.policy))if(!Number.isSafeInteger(value)||value<=0)throw Error('Invalid execution policy: '+key);
  }
  get incomplete(){return this.incompleteReason;}
- describe(){return {policy:{...this.policy},automaticRecovery:this.recovering,recoveries:this.recoveries,recoverySteps:this.steps,
+ describe(){return {policy:{...this.policy},automaticRecovery:this.recovering,steeringPending:this.superseding,steeredContinuation:this.steered,recoveries:this.recoveries,recoverySteps:this.steps,
   outcome:this.cancelled?(this.active?'cancelling':'cancelled'):this.blocked?'incomplete':this.active?'running':this.settled,incompleteReason:this.incompleteReason??null,
   historicalPending:this.historicalPending,requestLimit:this.requestLimit??null,actions:[...this.actions.values()].map(({effect,status})=>({effect,status}))};}
  begin(manager:Pick<SessionManager,'getBranch'>){
-  this.clearTimer();this.active=true;this.cancelled=false;this.recovering=false;this.started=0;this.recoveries=0;this.steps=0;this.requestCap=undefined;this.requestLimit=undefined;this.guardDenials=0;
+  this.clearTimer();this.active=true;this.cancelled=false;this.recovering=false;this.superseding=false;this.steered=false;this.started=0;this.recoveries=0;this.steps=0;this.requestCap=undefined;this.requestLimit=undefined;this.guardDenials=0;
   this.blocked=false;this.incompleteReason=undefined;this.settled='idle';this.handoff=false;this.actions.clear();this.calls.clear();this.terminated.clear();this.lastStop=undefined;
   const pending=new Set<string>();
   for(const entry of manager.getBranch()){
@@ -79,6 +81,12 @@ export class PiExecution {
   this.historicalPending=pending.size;this.record();
  }
  cancel(){this.cancelled=true;this.clearTimer();this.record();}
+ steerRequested(){if(!this.active||this.cancelled)throw Error('The active turn cannot be steered.');this.superseding=true;this.clearTimer();this.record();}
+ steerDelivered(){
+  if(this.cancelled)return;
+  this.superseding=false;this.steered=true;this.recovering=false;this.started=0;this.recoveries=0;this.steps=0;this.requestCap=undefined;this.requestLimit=undefined;this.guardDenials=0;
+  this.blocked=false;this.incompleteReason=undefined;this.lastStop=undefined;this.handoff=false;this.record();
+ }
  end(reason:'completed'|'error'|'aborted'='completed'){this.active=false;this.clearTimer();this.settled=reason==='aborted'?'cancelled':reason==='error'?'error':this.handoff?'tool-handoff':'response-produced';this.record();}
  private record(){this.emit('execution/state',this.describe());}
  private clearTimer(){clearTimeout(this.timer);this.timer=undefined;this.removeAbort?.();this.removeAbort=undefined;}
@@ -97,7 +105,7 @@ export class PiExecution {
  }
  private boundary(event:TurnEndEvent,ctx:ExtensionContext){
   this.clearTimer();if(event.message.role!=='assistant')return;this.lastStop=event.message.stopReason;
-  if(!this.active||this.cancelled||ctx.signal?.aborted||event.outcome!=='completed'||this.blocked)return;
+  if(!this.active||this.cancelled||this.superseding||ctx.signal?.aborted||event.outcome!=='completed'||this.blocked)return;
   const calls=event.message.content.filter(part=>part.type==='toolCall');
   this.handoff=!!calls.length&&calls.every(call=>this.terminated.has(call.id));
   if(this.handoff)return;
@@ -112,7 +120,7 @@ export class PiExecution {
   pi.on('turn_end',(event,ctx)=>this.boundary(event,ctx));
   pi.on('session_before_compact',event=>{
    if(!event.willRetry)return;
-   if(this.cancelled)return {cancel:true};
+   if(this.cancelled||this.superseding)return {cancel:true};
    // Length recovery belongs to the bounded boundary above. The SDK's separate
    // compact-and-retry must not bypass exhaustion or replay a truncated turn.
    if(this.lastStop==='length'||this.blocked)return {cancel:true};
@@ -123,13 +131,16 @@ export class PiExecution {
   const agent=session.agent,previousBefore=agent.beforeToolCall,previousAfter=agent.afterToolCall,previousFinish=agent.finishTurn,previousStream=agent.streamFunction,previousPayload=agent.onPayload;
   const before:Agent['beforeToolCall']=async(context,signal)=>{
    if(this.cancelled)return {block:true,reason:'Turn cancelled before tool dispatch.',terminate:true};
+   if(this.superseding)return {block:true,reason:'Obsolete proposal superseded before tool dispatch.',terminate:true};
    const decision=await previousBefore?.(context,signal);if(this.cancelled||signal?.aborted)return {block:true,reason:'Turn cancelled before tool dispatch.',terminate:true};
+   if(this.superseding)return {block:true,reason:'Obsolete proposal superseded while awaiting tool preparation.',terminate:true};
    let effect:Effect=reads.has(context.toolCall.name)||(context.toolCall.name==='bash'&&isRoutineQuery((context.args as Record<string,unknown>)?.command))?'read':'unknown';
    try{const declared=this.contract(context.toolCall.name)?.effect?.(context.args);if(declared!==undefined)effect=['read','change','external','unknown'].includes(declared)?declared:'unknown';}catch{effect='unknown';}
    const key=executionKey(context.toolCall.name,context.args);
    if(decision?.block){if(!this.actions.has(key))this.actions.set(key,{effect,status:'failed-before-dispatch'});if(decision.terminate)this.terminated.add(context.toolCall.id);this.record();return decision;}
    if(this.blocked||this.exhausted(false)){this.stop('The bounded recovery time or request budget was exhausted.');return {block:true,reason:this.incompleteReason,terminate:true};}
-   const reason=this.recovering?recoveryDenial(this.actions,key,effect):undefined;
+   const denied=this.recovering||this.steered?recoveryDenial(this.actions,key,effect):undefined;
+   const reason=denied&&this.steered?'Continuation after steering: '+denied:denied;
    if(reason){this.guardDenials++;this.emit('execution/guard',{effect,reason,denials:this.guardDenials});if(this.guardDenials>=2)this.stop('Recovery repeatedly requested an unsafe duplicate or unresolved action.');return {block:true,reason,terminate:this.blocked};}
    this.calls.set(context.toolCall.id,key);this.actions.set(key,{effect,status:'running'});
    this.emit('tool/dispatch',{name:context.toolCall.name,toolCallId:context.toolCall.id,boundary:'after-tool-call-hooks-before-execute'},context.args);this.record();return decision;
@@ -143,11 +154,12 @@ export class PiExecution {
   const finish:Agent['finishTurn']=async(turn,signal)=>{
    const decision=await previousFinish?.(turn,signal);this.clearTimer();
    if(signal?.aborted)return decision||undefined;
-   if(this.cancelled)return {action:'end'};
+   if(this.cancelled||this.superseding)return {action:'end'};
    return this.blocked?{action:'end'}:decision||undefined;
   };
   const stream:Agent['streamFunction']=async(model,context,options)=>{
    if(this.cancelled)throw Error('Turn cancelled before provider dispatch.');
+   if(this.superseding)return previousStream(model,context,options);
    if(this.blocked||this.exhausted()){this.stop('The bounded recovery time or request budget was exhausted.');throw Error(this.incompleteReason);}
    if(this.recovering)this.steps++;this.requestLimit=undefined;
    this.clearTimer();const signal=options?.signal;
@@ -161,6 +173,7 @@ export class PiExecution {
   const payload:Agent['onPayload']=async(body,model)=>{
    const transformed=await previousPayload?.(body,model),effective=transformed===undefined?body:transformed;
    if(this.cancelled)throw Error('Turn cancelled before provider payload dispatch.');
+   if(this.superseding)throw Error('Obsolete request superseded before provider payload dispatch.');
    if(!this.recovering||!effective||typeof effective!=='object'||Array.isArray(effective))return transformed;
    const cap=Math.min(this.requestCap??this.policy.recoveryMaxTokens,model.maxTokens,this.policy.recoveryMaxTokens);
    const bounded={...effective as Record<string,unknown>},fields:string[]=[];

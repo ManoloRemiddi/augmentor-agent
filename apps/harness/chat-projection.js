@@ -1,10 +1,13 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 /** Read-only display projection. Native Pi history remains authoritative. */
 export function projectChat(events,{running=false}={}){
- const items=[],tools=new Map();let pending={text:'',thinking:''};
- const flush=(status=running?'streaming':'partial')=>{
-  if(pending.text||pending.thinking)items.push({kind:'assistant',...pending,partial:true,status});
-  pending={text:'',thinking:''};
+ const items=[],tools=new Map();let pending={text:'',thinking:''},pendingItem;
+ const flush=(status=running?'streaming':'partial',keep=false)=>{
+  if(pending.text||pending.thinking){
+   const draft={kind:'assistant',...pending,partial:true,status};
+   if(pendingItem)Object.assign(pendingItem,draft);else{pendingItem=draft;items.push(pendingItem);}
+  }
+  if(!keep){pending={text:'',thinking:''};pendingItem=undefined;}
  };
  for(const event of events){
   const data=event.data||{};
@@ -19,9 +22,10 @@ export function projectChat(events,{running=false}={}){
    if(text||thinking){
     // A final SDK message already contains its deltas, including partial
     // messages on Stop/error. Do not display those bytes a second time.
-    pending={text:'',thinking:''};
     const stop=data.message?.stopReason,partial=['aborted','error','length'].includes(stop);
-    items.push({kind:'assistant',text,thinking,seq:event.seq,partial,status:partial?stop:'complete'});
+    const complete={kind:'assistant',text,thinking,seq:event.seq,partial,status:partial?stop:'complete'};
+    if(pendingItem)Object.assign(pendingItem,complete);else items.push(complete);
+    pending={text:'',thinking:''};pendingItem=undefined;
    }else flush('partial');
   }else if(event.type==='user/message'){
    flush('partial');
@@ -37,9 +41,9 @@ export function projectChat(events,{running=false}={}){
    for(const tool of tools.values())tool.status='outcome unknown';tools.clear();
    if(['aborted','interrupted','error'].includes(reason))items.push({kind:'status',text:data.message||({aborted:'Stopped.',error:'This turn ended with an error.',interrupted:'The runtime stopped; pending action outcomes may be unknown.'})[reason]});
   }else if(event.type==='runtime/notice'){
-   flush('partial');items.push({kind:'status',text:data.message||'Execution status unavailable.'});
+   flush('partial',true);items.push({kind:'status',text:data.message||'Execution status unavailable.'});
   }else if(event.type==='runtime/error'||event.type==='runtime/warning'){
-   flush('partial');items.push({kind:'warning',text:data.message||'Runtime observation unavailable.'});
+   flush('partial',true);items.push({kind:'warning',text:data.message||'Runtime observation unavailable.'});
   }
  }
  flush();return items;

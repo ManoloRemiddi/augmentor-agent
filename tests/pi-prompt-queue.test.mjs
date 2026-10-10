@@ -44,3 +44,22 @@ test('Pi queue rejects symlink or public state files on POSIX',{skip:process.pla
  const {queue,path,root}=fixture(t);queue.enqueue('one','Private',true);chmodSync(path,0o644);assert.throws(()=>new PiPromptQueue(path,'fixture'),/private/);chmodSync(path,0o600);
  const link=join(root,'linked.json');symlinkSync(path,link);assert.throws(()=>new PiPromptQueue(link,'fixture'),/private/);
 });
+test('Pi steering receipts share the original turn and finish atomically with it',t=>{
+ const {queue,path}=fixture(t);queue.enqueue('root','Original',false);queue.dispatch('root','turn');queue.accepted('root');queue.delivered('root');
+ queue.enqueue('correction','Correction',true);queue.enqueue('followup','Follow-up',true);
+ assert(queue.snapshot(true).items.every(item=>item.canSteer));assert.throws(()=>queue.promote('correction','stale'),/observed active turn/);
+ queue.promote('correction','turn');assert.equal(queue.snapshot(true).items[0].placement,'steering');assert(queue.snapshot(true).items.every(item=>!item.canSteer));
+ queue.delivered('correction');queue.finish('root','completed');const reopened=new PiPromptQueue(path,'fixture');assert.equal(reopened.read('correction').status,'completed');
+ assert.equal(reopened.enqueue('correction','Correction',true),false);assert.deepEqual(reopened.snapshot().items.map(item=>item.id),['followup']);
+});
+test('Stop returns known withdrawn steering to paused FIFO while unknown delivery remains unconfirmed',t=>{
+ for(const withdrawn of [true,false]){
+  const {queue,path}=fixture(t);queue.enqueue('root','Original',false);queue.dispatch('root','turn');queue.accepted('root');queue.enqueue('correction','Correction',true);queue.promote('correction','turn');queue.pause();
+  if(withdrawn)queue.withdrawSteer('correction');queue.finish('root','cancelled');const reopened=new PiPromptQueue(path,'fixture');
+  assert.equal(reopened.read('correction').status,withdrawn?'waiting':'unconfirmed');assert.equal(reopened.uncertain,!withdrawn);assert(reopened.paused);
+ }
+});
+test('a crash leaves both the active and promoted steering receipts unknown without replay',t=>{
+ const {queue,path}=fixture(t);queue.enqueue('root','Original',false);queue.dispatch('root','turn');queue.accepted('root');queue.enqueue('correction','Correction',true);queue.promote('correction','turn');
+ const reopened=new PiPromptQueue(path,'fixture');reopened.recover();assert(reopened.paused);assert(reopened.snapshot().items.every(item=>item.canResolve&&!item.canSteer));assert.throws(()=>reopened.resume(),/unknown outcome/);
+});

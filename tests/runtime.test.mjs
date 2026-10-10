@@ -22,7 +22,7 @@ class Client {
 
 test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},async t=>{
  const root=mkdtempSync(join(tmpdir(),'augmentor-pi-contract-'));const config=join(root,'config'),state=join(root,'state'),cwd=join(root,'work');mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(cwd);
- let requests=0;const received=[],sentStreams=[],recoveryCounts=new Map();
+ let requests=0;const received=[],sentStreams=[],recoveryCounts=new Map(),closedRequests=new Set();
  const mock=http.createServer(async(req,res)=>{let raw='';for await(const chunk of req)raw+=chunk;
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
   const body=JSON.parse(raw);
@@ -30,7 +30,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
     res.writeHead(200,{'content-type':'text/event-stream'});
     res.end('data: '+JSON.stringify({id:'distill',object:'chat.completion.chunk',model:'test',choices:[{index:0,delta:{role:'assistant',content:JSON.stringify({summary:'',items:[]})},finish_reason:'stop'}]})+'\n\ndata: [DONE]\n\n');return;
   }
-  requests++;received.push(body);const sent=[];sentStreams.push(sent);const user=[...body.messages].reverse().find(m=>m.role==='user')?.content;
+  requests++;received.push(body);const requestNumber=requests;res.once('close',()=>closedRequests.add(requestNumber));const sent=[];sentStreams.push(sent);const user=[...body.messages].reverse().find(m=>m.role==='user')?.content;
   const content=typeof user==='string'?user:JSON.stringify(user);
   if(content.includes('OUTAGE')){res.writeHead(503,{'content-type':'application/json'}).end(JSON.stringify({error:{message:'deliberate model outage'}}));return;}
   const chunk=(delta,finish=null)=>{const value={id:'mock',object:'chat.completion.chunk',created:1,model:'test',choices:[{index:0,delta,finish_reason:finish}]};sent.push(value);return res.write('data: '+JSON.stringify(value)+'\n\n');};
@@ -57,6 +57,21 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
    res.end('data: [DONE]\n\n');return;
   }
   res.writeHead(200,{'content-type':'text/event-stream'});
+  const steerCase=content.match(/STEER_CASE=(\w+)/)?.[1];
+  if(steerCase){
+   const call=(name,tag,index=0)=>chunk({role:'assistant',tool_calls:[{index,id:'steer_'+requests+'_'+index,type:'function',function:{name,arguments:JSON.stringify({tag})}}]});
+   const priorTools=body.messages.filter(message=>message.role==='tool');
+   if(steerCase.endsWith('_root')){
+    const tag=steerCase.replace('_root','');
+    if(!priorTools.length){call(tag==='unknown'?'fixture_steer_partial':tag==='duplicate'?'fixture_steer_mutation':'fixture_steer_slow',tag);if(!['unknown','duplicate'].includes(tag))call('fixture_steer_mutation',tag,1);chunk({},'tool_calls');}
+    else{const timer=setInterval(()=>chunk({content:'steering root tick '}),40);res.on('close',()=>clearInterval(timer));return;}
+   }else if(steerCase==='unknown_correct'&&body.messages.at(-1).role!=='tool'){
+    chunk({role:'assistant',tool_calls:[{index:0,id:'steer_read_'+requests,type:'function',function:{name:'read',arguments:JSON.stringify({path:join(cwd,'unknown-mutation.txt')})}}]});chunk({},'tool_calls');
+   }else if(steerCase==='unknown_correct'&&body.messages.slice(body.messages.findLastIndex(message=>message.role==='user')).filter(message=>message.role==='tool').length===1){call('fixture_steer_mutation','unknown');chunk({},'tool_calls');}
+   else if(steerCase==='duplicate_correct'&&body.messages.at(-1).role!=='tool'){call('fixture_steer_mutation','duplicate');chunk({},'tool_calls');}
+   else{chunk({role:'assistant',content:'Steered response.'});chunk({},'stop');}
+   res.end('data: [DONE]\n\n');return;
+  }
   if(content.includes('QUEUE_FAST')){setTimeout(()=>{chunk({role:'assistant',content:'Queued response.'});chunk({},'stop');res.end('data: [DONE]\n\n');},100);return;}
   if(content.includes('SEED_OVERFLOW')){chunk({role:'assistant',content:'Synthetic earlier completed context. '.repeat(4500)});chunk({},'stop');res.end('data: [DONE]\n\n');return;}
   if(content.includes('SLOW')){const timer=setInterval(()=>chunk({content:'tick '}),60);res.on('close',()=>clearInterval(timer));return;}
@@ -102,7 +117,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   await until(()=>received.some(body=>JSON.stringify(body.messages).includes('SLOW queue owner')));
   await client.call('session.prompt',{sessionId:'queue',requestId:ids[1],mode:'queue',content:[{type:'text',text:'Queued identical'}]});
   await client.call('session.prompt',{sessionId:'queue',requestId:ids[2],mode:'queue',content:[{type:'text',text:'Queued identical'}]});
-  let snapshot=await client.call('session.queue',{sessionId:'queue'});assert.deepEqual(snapshot.items.map(item=>item.id),ids.slice(1));assert(snapshot.activeTurnId);assert(snapshot.items.every(item=>!item.canSteer&&item.canRemove));
+  let snapshot=await client.call('session.queue',{sessionId:'queue'});assert.deepEqual(snapshot.items.map(item=>item.id),ids.slice(1));assert(snapshot.activeTurnId);assert(snapshot.items.every(item=>item.canSteer&&item.canRemove));
   const before=requests;const duplicate=await client.call('session.prompt',{sessionId:'queue',requestId:ids[1],content:[{type:'text',text:'Queued identical'}]});assert(duplicate.duplicate);assert.equal(requests,before);
   await assert.rejects(client.call('session.prompt',{sessionId:'queue',requestId:ids[1],content:[{type:'text',text:'Changed'}]}),/identity was reused/);
   await client.call('session.updateQueue',{sessionId:'queue',itemId:ids[1],action:{kind:'remove'}});await client.call('session.cancel',{sessionId:'queue'});await idle('queue');
@@ -110,6 +125,69 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   await client.call('session.continueQueue',{sessionId:'queue'});await idle('queue');await until(async()=>!(await client.call('session.queue',{sessionId:'queue'})).items.length);
   const history=(await client.call('session.history',{sessionId:'queue'})).events.map(row=>row.event).filter(event=>event.type==='user/message');assert.deepEqual(history.map(event=>event.data.source.rpcId),[ids[0],ids[2]]);
   assert.equal(received.filter(body=>JSON.stringify(body.messages.at(-1)).includes('Queued identical')).length,1);
+ });
+ await t.test('responsive Pi steering replaces obsolete generation in the same SDK turn before normal follow-ups',async()=>{
+  await create('steer-generation','read-only');const ids=[randomUUID(),randomUUID(),randomUUID()];
+  await client.call('session.prompt',{sessionId:'steer-generation',requestId:ids[0],content:[{type:'text',text:'SLOW steering generation'}]});await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW steering generation')));const obsolete=requests;
+  for(const [id,text] of [[ids[1],'Correction generation'],[ids[2],'Follow-up generation']])await client.call('session.prompt',{sessionId:'steer-generation',requestId:id,mode:'queue',content:[{type:'text',text}]});
+  const snapshot=await client.call('session.queue',{sessionId:'steer-generation'}),expectedTurnId=snapshot.activeTurnId;
+  await assert.rejects(client.call('session.updateQueue',{sessionId:'steer-generation',itemId:ids[1],expectedTurnId:'stale',action:{kind:'steer'}}),/no longer active/);
+  await assert.rejects(client.call('session.prompt',{sessionId:'steer-generation',requestId:'stale-new',mode:'steer',expectedTurnId:'stale',content:[{type:'text',text:'Never admitted'}]}),/no longer available/);
+  assert.equal((await client.call('session.queue',{sessionId:'steer-generation'})).revision,snapshot.revision);
+  await client.call('session.updateQueue',{sessionId:'steer-generation',itemId:ids[1],expectedTurnId,action:{kind:'steer'}});
+  await until(()=>closedRequests.has(obsolete),2000);await until(async()=>!(await client.call('session.queue',{sessionId:'steer-generation'})).items.length);await idle('steer-generation');
+  const events=(await client.call('session.history',{sessionId:'steer-generation'})).events.map(row=>row.event),users=events.filter(event=>event.type==='user/message');assert.deepEqual(users.map(event=>event.data.source.rpcId),ids);
+  assert.equal(users[0].turnId,users[1].turnId);assert.notEqual(users[1].turnId,users[2].turnId);
+  assert.deepEqual(events.filter(event=>event.type==='turn/start'||event.type==='turn/end').map(event=>event.type),['turn/start','turn/end','turn/start','turn/end']);
+  const before=requests;assert((await client.call('session.prompt',{sessionId:'steer-generation',requestId:ids[1],content:[{type:'text',text:'Correction generation'}]})).duplicate);assert.equal(requests,before);
+ });
+ await t.test('steering during SDK preparation delivers the correction before any obsolete provider request',async()=>{
+  const source=join(root,'fixture-steer-preparation.mjs');writeFileSync(source,"import {writeFileSync} from 'node:fs';export default pi=>{pi.on('before_agent_start',async(e,ctx)=>{if(e.prompt.includes('STEER_PREPARATION')){writeFileSync(ctx.cwd+'/steer-preparing.txt','started');await new Promise(r=>setTimeout(r,250));}});pi.on('before_provider_request',async(e,ctx)=>{if(JSON.stringify(e.payload).includes('STEER_PAYLOAD')){writeFileSync(ctx.cwd+'/steer-payload.txt','started');await new Promise(r=>setTimeout(r,250));}});}");writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[source],skills:[]}));
+  try{
+   await create('steer-preparation','read-only');const before=requests;await prompt('steer-preparation','STEER_PREPARATION');await until(()=>existsSync(join(cwd,'steer-preparing.txt')));
+   const expectedTurnId=(await client.call('session.queue',{sessionId:'steer-preparation'})).activeTurnId;
+   await client.call('session.prompt',{sessionId:'steer-preparation',requestId:'prepared-correction',mode:'steer',expectedTurnId,content:[{type:'text',text:'Prepared correction'}]});await idle('steer-preparation');
+   assert.equal(requests-before,1);assert(JSON.stringify(received.at(-1).messages.at(-1).content).includes('Prepared correction'));
+   const users=(await client.call('session.history',{sessionId:'steer-preparation'})).events.map(row=>row.event).filter(event=>event.type==='user/message');assert.equal(users.at(-1).data.source.rpcId,'prepared-correction');
+   await create('steer-payload','read-only');const beforePayload=requests;await prompt('steer-payload','STEER_PAYLOAD');await until(()=>existsSync(join(cwd,'steer-payload.txt')));
+   const payloadTurn=(await client.call('session.queue',{sessionId:'steer-payload'})).activeTurnId;await client.call('session.prompt',{sessionId:'steer-payload',requestId:'payload-correction',mode:'steer',expectedTurnId:payloadTurn,content:[{type:'text',text:'Payload correction'}]});await idle('steer-payload');
+   assert.equal(requests-beforePayload,1);assert(JSON.stringify(received.at(-1).messages.at(-1).content).includes('Payload correction'));
+  }finally{writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]}));}
+ });
+ await t.test('successive steering retains distinct receipts for identical user text within one SDK turn',async()=>{
+  await create('steer-successive','read-only');const before=requests,ids=[randomUUID(),randomUUID(),randomUUID()];await prompt('steer-successive','SLOW identical correction',ids[0]);await until(()=>requests===before+1);
+  const turn=(await client.call('session.queue',{sessionId:'steer-successive'})).activeTurnId;await client.call('session.prompt',{sessionId:'steer-successive',requestId:ids[1],mode:'steer',expectedTurnId:turn,content:[{type:'text',text:'SLOW identical correction'}]});await until(()=>requests===before+2);
+  await client.call('session.prompt',{sessionId:'steer-successive',requestId:ids[2],mode:'steer',expectedTurnId:turn,content:[{type:'text',text:'Final successive correction'}]});await idle('steer-successive');
+  const users=(await client.call('session.history',{sessionId:'steer-successive'})).events.map(row=>row.event).filter(event=>event.type==='user/message');assert.deepEqual(users.map(event=>event.data.source.rpcId),ids);assert(users.every(event=>event.turnId===turn));assert.equal(requests-before,3);
+ });
+ await t.test('steering settles dispatched tools, blocks obsolete proposals and preserves completed or unknown action guards',async()=>{
+  const source=join(root,'fixture-steering-tools.mjs');writeFileSync(source,`import {existsSync,writeFileSync,readFileSync} from 'node:fs';export default pi=>{
+   const parameters={type:'object',properties:{tag:{type:'string'}},required:['tag']};
+   const count=(ctx,tag)=>{const path=ctx.cwd+'/'+tag+'-mutation.txt';writeFileSync(path,String(existsSync(path)?Number(readFileSync(path,'utf8'))+1:1));};
+   pi.registerTool({name:'fixture_steer_slow',label:'Slow fixture',description:'Controlled synthetic mutating action',parameters,async execute(id,args,signal,onUpdate,ctx){writeFileSync(ctx.cwd+'/'+args.tag+'-started.txt','started');while(!existsSync(ctx.cwd+'/'+args.tag+'-release.txt')){if(signal?.aborted){writeFileSync(ctx.cwd+'/'+args.tag+'-aborted.txt','aborted');throw Error('Fixture aborted');}await new Promise(r=>setTimeout(r,10));}writeFileSync(ctx.cwd+'/'+args.tag+'-finished.txt','finished');return {content:[{type:'text',text:'Confirmed '+args.tag+' tool result'}],details:{}};}});
+   pi.registerTool({name:'fixture_steer_mutation',label:'Mutation fixture',description:'Synthetic mutating action',parameters,async execute(id,args,signal,onUpdate,ctx){count(ctx,args.tag);return {content:[{type:'text',text:'Confirmed mutation'}],details:{}};}});
+   pi.registerTool({name:'fixture_steer_partial',label:'Partial fixture',description:'Synthetic unknown mutating action',parameters,async execute(id,args,signal,onUpdate,ctx){count(ctx,args.tag);throw Error('Synthetic failure after mutation');}});
+  };`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[source],skills:[]}));
+  try{
+   await create('steer-tools','danger-full-access');await prompt('steer-tools','STEER_CASE=tool_root');await until(()=>existsSync(join(cwd,'tool-started.txt')));
+   const expectedTurnId=(await client.call('session.queue',{sessionId:'steer-tools'})).activeTurnId;await client.call('session.prompt',{sessionId:'steer-tools',requestId:'tool-correction',mode:'queue',content:[{type:'text',text:'STEER_CASE=tool_correct'}]});
+   await client.call('session.updateQueue',{sessionId:'steer-tools',itemId:'tool-correction',expectedTurnId,action:{kind:'steer'}});assert((await client.call('session.updateQueue',{sessionId:'steer-tools',itemId:'tool-correction',expectedTurnId,action:{kind:'steer'}})).duplicate);
+   await delay(80);assert(!existsSync(join(cwd,'tool-aborted.txt')));assert(!received.some(body=>JSON.stringify(body.messages.at(-1)).includes('STEER_CASE=tool_correct')));
+   writeFileSync(join(cwd,'tool-release.txt'),'release');await idle('steer-tools');assert(existsSync(join(cwd,'tool-finished.txt')));assert(!existsSync(join(cwd,'tool-mutation.txt')));
+   const correction=received.find(body=>JSON.stringify(body.messages.at(-1)).includes('STEER_CASE=tool_correct'));assert(correction.messages.some(message=>message.role==='tool'&&String(message.content).includes('Confirmed tool tool result')));
+   for(const tag of ['duplicate','unknown']){
+    const sid='steer-'+tag;await create(sid,'danger-full-access');await prompt(sid,'STEER_CASE='+tag+'_root');await until(()=>existsSync(join(cwd,tag+'-mutation.txt'))&&received.some(body=>JSON.stringify(body.messages.filter(message=>message.role==='user').at(-1)).includes('STEER_CASE='+tag+'_root')&&body.messages.some(message=>message.role==='tool')));
+    const turn=(await client.call('session.queue',{sessionId:sid})).activeTurnId;await client.call('session.prompt',{sessionId:sid,requestId:tag+'-correction',mode:'steer',expectedTurnId:turn,content:[{type:'text',text:'STEER_CASE='+tag+'_correct'}]});await idle(sid);
+    assert.equal(readFileSync(join(cwd,tag+'-mutation.txt'),'utf8'),'1');assert(received.some(body=>body.messages.some(message=>message.role==='tool'&&String(message.content).includes('Continuation after steering:'))));
+    if(tag==='unknown')assert((await client.call('session.history',{sessionId:sid})).events.some(row=>row.event.type==='tool/result'&&row.event.data.name==='read'&&!row.event.data.isError));
+   }
+   await create('steer-stop','danger-full-access');await prompt('steer-stop','STEER_CASE=stop_root');await until(()=>existsSync(join(cwd,'stop-started.txt')));const stopTurn=(await client.call('session.queue',{sessionId:'steer-stop'})).activeTurnId;
+   await client.call('session.prompt',{sessionId:'steer-stop',requestId:'stop-correction',mode:'steer',expectedTurnId:stopTurn,content:[{type:'text',text:'STEER_CASE=stop_correct'}]});await client.call('session.cancel',{sessionId:'steer-stop'});await idle('steer-stop');
+   const paused=await client.call('session.queue',{sessionId:'steer-stop'});assert(paused.paused);assert.equal(paused.items[0].id,'stop-correction');assert.equal(paused.items[0].stateLabel,'Paused');assert(existsSync(join(cwd,'stop-aborted.txt')));assert(!received.some(body=>JSON.stringify(body.messages.at(-1)).includes('STEER_CASE=stop_correct')));
+   await create('steer-crash','danger-full-access');await prompt('steer-crash','STEER_CASE=crash_root');await until(()=>existsSync(join(cwd,'crash-started.txt')));const crashTurn=(await client.call('session.queue',{sessionId:'steer-crash'})).activeTurnId;
+   await client.call('session.prompt',{sessionId:'steer-crash',requestId:'crash-correction',mode:'steer',expectedTurnId:crashTurn,content:[{type:'text',text:'STEER_CASE=crash_correct'}]});client.close();await stop('SIGKILL');const before=requests;await start();client=await Client.open(join(state,'runtime.sock'));
+   const recovered=await client.call('session.queue',{sessionId:'steer-crash'});assert(recovered.paused);assert.equal(recovered.items.filter(item=>item.canResolve).length,2);assert.equal(requests,before);await assert.rejects(client.call('session.continueQueue',{sessionId:'steer-crash'}),/unknown outcome/);assert(!existsSync(join(cwd,'crash-mutation.txt')));
+  }finally{writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]}));}
  });
  await t.test('cold reconnect preserves paused queue; explicit idle Send resumes old waiting inputs before new input',async()=>{
   await create('queue-paused','read-only');await prompt('queue-paused','SLOW paused');await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW paused')));
@@ -149,14 +227,23 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   bridge.stderr.on('data',data=>errors+=data);bridge.stdout.on('data',data=>{buffer=Buffer.concat([buffer,data]);while(buffer.length>=4&&buffer.length>=buffer.readUInt32LE(0)+4){const length=buffer.readUInt32LE(0),frame=JSON.parse(buffer.subarray(4,length+4));buffer=buffer.subarray(length+4);if(frame.id&&pending.has(frame.id)){const row=pending.get(frame.id);pending.delete(frame.id);frame.error?row.reject(Error(frame.error.message)):row.resolve(frame.result);}else frames.push(frame);}});
   const call=(method,params={})=>new Promise((resolve,reject)=>{const id=randomUUID();pending.set(id,{resolve,reject});const body=Buffer.from(JSON.stringify({id,method,params})),header=Buffer.alloc(4);header.writeUInt32LE(body.length);bridge.stdin.write(Buffer.concat([header,body]));});
   try{
-   const initialized=await call('initialize',selection);assert.equal(initialized.serverInfo.capabilities.queue,true);assert.equal(initialized.serverInfo.capabilities.steering,false);
+   const initialized=await call('initialize',selection);assert.equal(initialized.serverInfo.capabilities.queue,true);assert.equal(initialized.serverInfo.capabilities.steering,true);
    const sid='queue-browser';await call('session.create',{sessionId:sid});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.sessionId===sid));
    await call('session.prompt',{sessionId:sid,requestId:'browser-active',mode:'queue',content:[{type:'text',text:'SLOW browser queue'}]});await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW browser queue')));
    await call('session.prompt',{sessionId:sid,requestId:'browser-waiting',mode:'queue',content:[{type:'text',text:'Browser pending'}]});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.items.some(item=>item.id==='browser-waiting')));
    await assert.rejects(call('session.queue',{sessionId:'queue-native'}),/cannot access a Linux chat/);
-   await call('session.updateQueue',{sessionId:sid,itemId:'browser-waiting',action:{kind:'remove'}});assert.equal((await call('session.queue',{sessionId:sid})).items.length,0);
-   await call('session.cancel',{sessionId:sid});await until(()=>frames.some(frame=>frame.method==='session.status'&&frame.params.status==='idle'));
+   const expectedTurnId=(await call('session.queue',{sessionId:sid})).activeTurnId;
+   await assert.rejects(call('session.updateQueue',{sessionId:sid,itemId:'browser-waiting',expectedTurnId:'stale',action:{kind:'steer'}}),/no longer active/);
+   await call('session.updateQueue',{sessionId:sid,itemId:'browser-waiting',expectedTurnId,action:{kind:'steer'}});await until(()=>frames.some(frame=>frame.method==='session.status'&&frame.params.status==='idle'));
+   assert.equal((await call('session.queue',{sessionId:sid})).items.length,0);
+   const users=(await call('session.history',{sessionId:sid})).events.map(row=>row.event).filter(event=>event.type==='user/message');assert.deepEqual(users.map(event=>event.data.source.rpcId),['browser-active','browser-waiting']);assert.equal(users[0].turnId,users[1].turnId);
   }finally{bridge.stdin.end();const timer=setTimeout(()=>bridge.kill('SIGKILL'),5000);const [code]=await once(bridge,'exit');clearTimeout(timer);assert.equal(code,0,errors);}
+ });
+ await t.test('real Native Qt Steer uses the observed Pi turn and promotes one identified correction',{skip:process.platform==='win32',timeout:30000},async()=>{
+  await create('steer-native','read-only');await prompt('steer-native','SLOW native steering');await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW native steering')));
+  const child=spawn(process.env.AUGMENTOR_PYTHON??'python3',[fileURLToPath(new URL('./fixtures/native-pi-queue.py',import.meta.url)),'--steer'],{env:{...env,HOME:join(root,'qt-steer-home'),XDG_CONFIG_HOME:join(root,'qt-steer-config'),XDG_STATE_HOME:join(root,'qt-steer-state'),XDG_DATA_HOME:join(root,'qt-steer-data'),AUGMENTOR_PI_NO_AUTOSTART:'1',PYTHONPATH:join(runtimeRoot,'apps/native'),QT_QPA_PLATFORM:'offscreen'},stdio:['ignore','pipe','pipe']});
+  let output='',errors='';child.stdout.on('data',data=>output+=data);child.stderr.on('data',data=>errors+=data);const timer=setTimeout(()=>child.kill('SIGKILL'),25000);
+  try{const [code]=await once(child,'exit');assert.equal(code,0,errors);assert(output.includes('"nativePiSteering": "passed"'));}finally{clearTimeout(timer);if(child.exitCode===null)child.kill('SIGKILL');}
  });
  await t.test('inspection captures the actual post-extension provider payload, reasoning and tool evidence',async t=>{
   const beforeSettings=await client.call('observation.describe');
