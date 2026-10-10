@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {chromiumPort} from './fixtures/chromium-ready.mjs';
 // Loaded Chromium + native messaging + actual Pi; synthetic provider/page and isolated state only.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -75,7 +76,7 @@ test('loaded Pi Browser executes tools and identified steering, restores paused 
  await writeFile(launcher,'#!'+fixtureNode+'\nObject.assign(process.env,'+JSON.stringify(env)+');import('+JSON.stringify(pathToFileURL(join(repo,'apps/browser/native-host.mjs')).href)+');\n',{mode:0o700});
  await writeFile(join(profile,'NativeMessagingHosts/com.augmentor.agent.json'),JSON.stringify({name:'com.augmentor.agent',description:'Isolated Pi Browser proof',path:launcher,type:'stdio',allowed_origins:['chrome-extension://'+extensionId+'/']}));
  chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--enable-unsafe-extension-debugging','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--no-default-browser-check','--remote-debugging-port=0','--user-data-dir='+profile,'--load-extension='+extension,'--disable-extensions-except='+extension,base+'/page'],{env,stdio:'ignore'});
- let port;await until(async()=>{try{port=(await readFile(join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0];return true;}catch{return false;}},'Chromium startup');
+ let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'Chromium startup');
  const targets=()=>fetch('http://127.0.0.1:'+port+'/json').then(response=>response.json());
  let pageInfo;await until(async()=>{pageInfo=(await targets()).find(target=>target.url===base+'/page');return pageInfo;},'fixture page');const page=await cdp(pageInfo.webSocketDebuggerUrl);sockets.push(page);
  const created=await page.call('Target.createTarget',{url:'chrome-extension://'+extensionId+'/sidepanel.html'});let panelInfo;await until(async()=>{panelInfo=(await targets()).find(target=>target.id===created.targetId);return panelInfo;},'extension panel');const panel=await cdp(panelInfo.webSocketDebuggerUrl);sockets.push(panel);

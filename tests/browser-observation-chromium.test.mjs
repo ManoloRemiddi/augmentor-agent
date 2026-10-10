@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {chromiumPort} from './fixtures/chromium-ready.mjs';
 // Real DOM/layout evidence in isolated Chromium; no user profile or NAS access.
 import test from 'node:test'
 import assert from 'node:assert/strict'
@@ -15,7 +16,7 @@ test('real Chromium: delayed SPA, shadow/frame text, selectors, empty page and o
  child.once('error',error=>{spawnError=error})
  try {
   let port
-  for(let i=0;i<100;i++){try{port=(await readFile(join(dir,'DevToolsActivePort'),'utf8')).split('\n')[0];break}catch{if(spawnError)throw spawnError;await new Promise(r=>setTimeout(r,50))}}
+  for(let i=0;i<100;i++){try{port=await chromiumPort(dir);if(port)break;await new Promise(r=>setTimeout(r,50))}catch{if(spawnError)throw spawnError;await new Promise(r=>setTimeout(r,50))}}
   assert.ok(port,'Chromium started')
   const targets=await (await fetch(`http://127.0.0.1:${port}/json`)).json()
   ws=new WebSocket(targets.find(x=>x.type==='page').webSocketDebuggerUrl)

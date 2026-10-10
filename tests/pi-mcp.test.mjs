@@ -21,15 +21,22 @@ test('managed MCP reaches direct/deferred/codemode/resources through the actual 
  const root=await mkdtemp(join(tmpdir(),'augmentor-pi-mcp-')),config=join(root,'config'),agent=join(config,'agent'),state=join(root,'state'),cwd=join(root,'workspace'),home=join(root,'home'),log=join(root,'mcp.jsonl'),network=join(root,'network.jsonl'),events=[],received=[],steps=new Map();
  for(const folder of [agent,cwd,home,join(cwd,'.pi')])await mkdir(folder,{recursive:true,mode:0o700});await writeFile(log,'',{mode:0o600});
  let owner,client,ownerErrors='',ownerOutput='';const servers=[],mcpReplies=new Map(),ownedOutputFiles=new Set();
+ const httpMutations=new Map(),failures=new Map([['expired',404],['nestedexpired',404],['denied',401],['scope',403],['serverfail',500],['dropped',0],['redirected',307]]);
  const wire=http.createServer(async(req,res)=>{
   if(req.method!=='POST'){res.writeHead(req.method==='DELETE'?200:405).end();return;}
   assert.equal(req.headers.authorization,'Bearer SYNTHETIC_MCP_SECRET');let raw='';for await(const chunk of req)raw+=chunk;const frame=JSON.parse(raw);
+  const nonce=frame.params?.arguments?.nonce;
+  if(frame.method==='tools/call'&&failures.has(nonce)){
+   httpMutations.set(nonce,(httpMutations.get(nonce)??0)+1);
+   const status=failures.get(nonce);if(!status){req.socket.destroy();return;}
+   res.writeHead(status,status===307?{location:'/redirect-target'}:status===403?{'www-authenticate':'Bearer error="insufficient_scope"'}:{}).end('SYNTHETIC_PRIVATE_ERROR_BODY');return;
+  }
   if(frame.id===undefined){res.writeHead(202).end();return;}
   mcpReplies.set(frame.id,res);httpMcp.handle(frame);
  });
  const httpMcp=responder({name:'web',log,send:frame=>{const res=mcpReplies.get(frame.id);if(res){mcpReplies.delete(frame.id);res.writeHead(200,{'Content-Type':'application/json','Mcp-Session-Id':'authored-http-session'}).end(JSON.stringify(frame));}}});wire.listen(0,'127.0.0.1');await once(wire,'listening');servers.push(wire);
  const provider=http.createServer(async(req,res)=>{
-  let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw);received.push(body);const label=JSON.stringify(body.messages).match(/MCP_CASE=(\w+)/)?.[1]??'plain',step=(steps.get(label)??0)+1;steps.set(label,step);
+  let raw='';for await(const chunk of req)raw+=chunk;const body=JSON.parse(raw);received.push(body);const label=[...JSON.stringify(body.messages).matchAll(/MCP_CASE=(\w+)/g)].at(-1)?.[1]??'plain',step=(steps.get(label)??0)+1;steps.set(label,step);
   res.writeHead(200,{'Content-Type':'text/event-stream'});const chunk=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'mcp-fixture',object:'chat.completion.chunk',choices:[{index:0,delta,finish_reason:finish}]})+'\n\n'),call=(name,args)=>{chunk({role:'assistant',tool_calls:[{index:0,id:label+'_'+step,type:'function',function:{name,arguments:JSON.stringify(args)}}]});chunk({},'tool_calls');},code=script=>call('codemode',{code:script});
   if(label==='direct'&&step===1)call('mcp__direct__search_record',{query:'DIRECT_MARKER'});
   else if(label==='direct'&&step===2)call('tool_result_excerpt',{});
@@ -47,6 +54,8 @@ test('managed MCP reaches direct/deferred/codemode/resources through the actual 
   else if(label==='cancel'&&step===1)call('mcp__direct__wait_record',{});
   else if(label==='nestedcancel'&&step===1)code('await tools.mcp__script__wait_record({});text(await tools.mcp__script__write_record({nonce:"AFTER_NESTED_STOP"}));');
   else if(label==='http'&&step===1)call('mcp__web__search_record',{query:'HTTP_MARKER'});
+  else if(label==='afterfailure'&&step===1)call('mcp__web__search_record',{query:'AFTER_FAILED_MUTATION'});
+  else if(failures.has(label)&&step===1){if(label==='nestedexpired')code('text(await tools.mcp__web__write_record({nonce:"nestedexpired"}));');else call('mcp__web__write_record',{nonce:label});}
   else if(label==='browser'&&step===1)call('mcp__direct__search_record',{query:'BROWSER_MUST_NOT_RUN'});
   else{chunk({role:'assistant',content:'Authored MCP case settled: '+label});chunk({},'stop');}
   res.end('data: [DONE]\n\n');
@@ -71,6 +80,14 @@ test('managed MCP reaches direct/deferred/codemode/resources through the actual 
  let sid=await start('approved','workspace-write');await until(()=>events.some(frame=>frame.method==='approval/requested'&&frame.payload.sessionId===sid),'nested approval');let approval=events.find(frame=>frame.method==='approval/requested'&&frame.payload.sessionId===sid);assert.equal(approval.payload.toolName,'mcp__script__write_record');assert.equal((await calls()).filter(row=>row.args?.nonce==='approved').length,0);await client.call('interaction.respond',{sessionId:sid,rpcId:approval.rpcId,value:{outcome:'allowed-once'}});await settled(sid);assert.equal((await calls()).filter(row=>row.args?.nonce==='approved').length,1);
  sid=await start('stopapproval','workspace-write');await until(()=>events.some(frame=>frame.method==='approval/requested'&&frame.payload.sessionId===sid),'approval to stop');await client.call('session.cancel',{sessionId:sid});await settled(sid);assert.equal((await calls()).filter(row=>row.args?.nonce==='stopapproval').length,0);
  sid=await start('unknown','danger-full-access');await settled(sid);assert.equal((await calls()).filter(row=>row.args?.nonce==='unknown').length,1,'lost mutation acknowledgment and recovery never replay it');const diagnostics=await client.call('observation.list',{sessionId:sid,limit:500});assert(diagnostics.records.some(row=>row.kind==='execution/state'&&row.data.actions?.some(action=>action.status==='unknown')));
+ for(const label of failures.keys()){
+  sid=await start(label,'danger-full-access');await settled(sid);assert.equal(httpMutations.get(label),1,label+' cannot authorize replay of a mutation');const failure=await client.call('observation.list',{sessionId:sid,limit:500});assert(failure.records.some(row=>row.kind==='execution/state'&&row.data.actions?.some(action=>action.status==='unknown')),label+' retains an unknown action outcome');
+  assert(!JSON.stringify(received.filter(body=>JSON.stringify(body.messages).includes('MCP_CASE='+label))).includes('SYNTHETIC_PRIVATE_ERROR_BODY'));
+ }
+ sid='mcp-expired';const previousEnds=events.filter(frame=>frame.method==='session/event'&&frame.payload.sessionId===sid&&frame.payload.event.type==='turn/end').length;
+ const errorOriginals=await client.call('session.originalSearch',{sessionId:sid,query:'SYNTHETIC_PRIVATE_ERROR_BODY'});assert(errorOriginals.entries.length,'HTTP failure remains in native originals with capture disabled');const errorEntry=errorOriginals.entries[0],errorOriginal=JSON.parse((await client.call('session.originalRead',{sessionId:sid,entryId:errorEntry.entryId,entryHash:errorEntry.entryHash,limit:65536})).text);assert.equal(errorOriginal.customType,'augmentor-mcp-transport/1');assert.equal(errorOriginal.data.status,404);assert.equal(errorOriginal.data.body.text,'SYNTHETIC_PRIVATE_ERROR_BODY');assert.equal(errorOriginal.data.body.coverage,'complete');assert.equal(Buffer.from(errorOriginal.data.body.base64,'base64').toString(),'SYNTHETIC_PRIVATE_ERROR_BODY');assert(!JSON.stringify(errorOriginal).includes('SYNTHETIC_MCP_SECRET'));
+ await client.call('events.subscribe',{sessionId:sid});
+ await client.call('session.prompt',{sessionId:sid,requestId:'after-failed-mutation',content:[{type:'text',text:'MCP_CASE=afterfailure'}]});await until(()=>events.filter(frame=>frame.method==='session/event'&&frame.payload.sessionId===sid&&frame.payload.event.type==='turn/end').length>previousEnds,'new explicit turn after failure');assert((await calls()).some(row=>row.args?.query==='AFTER_FAILED_MUTATION'),'the same SDK session can reconnect for a new explicit read');assert.equal(httpMutations.get('expired'),1);
  await writeFile(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]}));sid=await start('unhooked','danger-full-access');await settled(sid);assert.equal((await calls()).filter(row=>row.args?.nonce==='unknown_unhooked').length,1,'nested outcomes do not depend on optional result/input hooks');const unhooked=await client.call('observation.list',{sessionId:sid,limit:500});assert(unhooked.records.some(row=>row.kind==='tool/original'&&row.data.coverage==='saved'));assert(unhooked.records.some(row=>row.kind==='execution/state'&&row.data.actions?.some(action=>action.status==='unknown')));await writeFile(join(config,'resources.json'),JSON.stringify({sources:[hooks],skills:[]}));
  sid=await start('cancel','danger-full-access');await until(async()=> (await calls()).some(row=>row.name==='wait_record'),'remote wait dispatched');await client.call('session.cancel',{sessionId:sid});await settled(sid);await until(async()=> (await calls()).some(row=>row.method==='cancelled'),'remote cancellation delivered');
  sid=await start('nestedcancel','danger-full-access');await until(async()=> (await calls()).some(row=>row.name==='wait_record'&&row.server==='script'),'nested remote wait dispatched');await client.call('session.cancel',{sessionId:sid});await settled(sid);await until(async()=> (await calls()).some(row=>row.method==='cancelled'&&row.server==='script'),'nested remote cancellation delivered');assert.equal((await calls()).filter(row=>row.args?.nonce==='AFTER_NESTED_STOP').length,0);

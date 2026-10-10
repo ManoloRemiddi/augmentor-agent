@@ -3,6 +3,7 @@ import {existsSync,readFileSync,statSync} from 'node:fs';
 import {join} from 'node:path';
 import {createCodemodeExtension,createMcpExtension,createToolSearchExtension,type ExtensionAPI,type ExtensionFactory,type McpServerConfig} from '@earendil-works/pi-coding-agent';
 import {privateDir} from './storage.js';
+import {createManagedMcpTransport} from './mcp-transport.js';
 
 const discovery=new Set(['codemode','tool_search','list_mcp_resources','list_mcp_resource_templates','read_mcp_resource']);
 const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
@@ -46,6 +47,10 @@ export class ManagedMcp {
   // Registrations above are validated by public ExtensionAPI. Do not admit
   // project files or Pi's default global config outside this managed profile.
   loadConfig:()=>({servers:[],errors:[...this.errors],autoEnableCodemode:this.autoEnableCodemode}),
+  createTransport:createManagedMcpTransport(original=>{
+   if(!this.api)return false;
+   this.api.appendEntry('augmentor-mcp-transport/1',original);return true;
+  }),
   logPath:this.retainLogs?join(privateDir(join(this.stateDir,'mcp-logs')),this.sessionId+'.log'):process.platform==='win32'?'NUL':'/dev/null',
  })];}
  isRead(name:string){

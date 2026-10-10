@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {chromiumPort} from './fixtures/chromium-ready.mjs';
 // Actual Harness/Chromium/HTTP/Pi/shared SQLite and Native client, synthetic private inputs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -29,7 +30,7 @@ test('Harness shared prompt editor, Native conflicts and two-step clipboard inse
     let result='',error='';child.stdout.on('data',data=>result+=data);child.stderr.on('data',data=>error+=data);const [code]=await once(child,'exit');assert.equal(code,0,error);return JSON.parse(result);
   };
   chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
-  let port;await until(async()=>{try{port=(await readFile(join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0];return true;}catch{return false;}},'Chromium startup');
+  let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'Chromium startup');
   const targets=await fetch('http://127.0.0.1:'+port+'/json').then(response=>response.json()),page=targets.find(row=>row.type==='page');assert(page);panel=await cdp(page.webSocketDebuggerUrl);await panel.call('Runtime.enable');await panel.call('Log.enable');await panel.call('Network.enable');await panel.call('Page.enable');await panel.call('Page.bringToFront');
   const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),runtimeErrors:panel.errors,requests:(await requests()).length,fixtureErrors:stderr,pointer:await panel.evaluate('globalThis.__promptPointer')});throw error;});
   const value=selector=>panel.evaluate('document.querySelector('+JSON.stringify(selector)+').value');

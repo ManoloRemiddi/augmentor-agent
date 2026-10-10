@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {chromiumPort} from './fixtures/chromium-ready.mjs';
 // Loaded Chromium extension + native messaging + pinned Codex; synthetic model and page only.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -95,7 +96,7 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   await mkdir(join(root, 'runtime'), {mode: 0o700});
   chrome = spawn(process.env.CHROMIUM_BIN ?? 'chromium', ['--headless=new', '--enable-unsafe-extension-debugging', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--load-extension=' + extension, '--disable-extensions-except=' + extension, base + '/page'], {env: {...isolatedEnv, HOME: root, XDG_CONFIG_HOME: join(root, 'config'), XDG_STATE_HOME: join(root, 'state'), XDG_DATA_HOME: join(root, 'data'), XDG_RUNTIME_DIR: join(root, 'runtime')}, stdio: 'ignore'});
   let port;
-  for (let attempt = 0; attempt < 100; attempt++) {try {port = (await readFile(join(profile, 'DevToolsActivePort'), 'utf8')).split('\n')[0]; break;} catch {await delay(50);}}
+  for (let attempt = 0; attempt < 100; attempt++) {try {port = await chromiumPort(profile); if (port) break; await delay(50);} catch {await delay(50);}}
   assert.ok(port, 'Isolated Chromium started');
   const targets = () => fetch(`http://127.0.0.1:${port}/json`).then(response => response.json());
   const pageTarget = (await targets()).find(target => target.url === base + '/page'); assert.ok(pageTarget);
