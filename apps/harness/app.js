@@ -176,8 +176,9 @@ async function inspect(record){
   container.append(detail(redacted?'Structured payload with credential redactions':'Original structured payload',payload.value,true),copyButton(payload.raw));renderImages(container,payload.value);
 }
 async function inspectContext(){
-  const id=$('requests').value,record=state.observations.get(id);if(!record)return;
   const epoch=++inspectionEpoch,sid=state.sessionId,container=$('context-content');
+  const id=$('requests').value,record=state.observations.get(id);
+  if(!record){$('context-stats').textContent='';container.replaceChildren(node('p','No request is loaded for this conversation.','empty'));return;}
   $('context-stats').textContent=record.data.provider+' · '+record.data.model+' · capacity '+Number(record.data.capacity).toLocaleString();
   container.replaceChildren(node('h2','Effective provider input'),node('p','Captured after Pi extension transformations. Authorization headers are excluded.'));
   const completion=rows().find(r=>r.kind==='model/complete'&&r.requestId===record.id),usage=completion?.data.usage;
@@ -191,7 +192,20 @@ async function inspectContext(){
   container.append(node('small',record.data.thinkingBoundary??'Thinking capture boundary unavailable for this older request.'));
   if(record.data.policies?.reasoning){const policy=record.data.policies.reasoning;container.append(node('p','Reasoning '+policy.mode+' · '+(policy.active?'tier '+policy.tier:policy.inactiveReason)+' · '+policy.reason),detail('Reasoning decision and context contribution',policy));}
   if(record.data.policies)container.append(detail('Managed policy',record.data.policies));
-  const payload=await readPayload(sid,id);if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
+  const provenance=rows().find(row=>row.kind==='context/provenance'&&row.requestId===id);
+  container.append(node('h3','Context composition'));
+  if(provenance){
+    container.append(node('p','Recorded SDK context boundaries and managed memory. Complete source attribution is not yet available.'),detail('Coverage, snapshot changes and memory contribution',provenance.data));
+  }else container.append(node('p','No composition record is loaded for this request. Older requests may predate boundary capture.','empty'));
+  let payload,lineage;
+  try{[payload,lineage]=await Promise.all([readPayload(sid,id),provenance?.payload?readPayload(sid,provenance.id):Promise.resolve(undefined)]);}
+  catch(error){if(epoch===inspectionEpoch&&sid===state.sessionId)throw error;return;}
+  if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
+  if(lineage?.available){
+    const names={input:'Input after SDK input handlers',memory:'Managed memory return',preparation:'Run prompt and options after before-agent handlers',resources:'Loaded resources · consumption not established',beforeTransform:'Messages before SDK context transforms',afterTransform:'Messages after SDK context transforms',sdkContext:'Converted SDK context before provider conversion',beforeProviderHooks:'Provider body before payload hooks',afterProviderHooks:'Provider body after payload hooks'};
+    for(const [key,value] of Object.entries(lineage.value.snapshots||{}))container.append(detail(names[key]||key,value));
+  }else if(lineage)container.append(node('p','Composition snapshots: '+lineage.reason,'empty'));
+  container.append(node('h3','Provider request'));
   if(!payload.available){container.append(node('p',payload.reason+(state.readOnly?' Future requests can be saved from the main Harness.':' Enable Save context history before future requests to retain them.'),'empty'));return;}
   const body=payload.value;
   if(record.payload.redactions?.length)container.append(node('p','Credential fields redacted: '+record.payload.redactions.join(', ')));
@@ -227,6 +241,7 @@ async function selectSession(sid,{preserveEdit=false}={}){
   const epoch=++state.epoch;inspectionEpoch++;state.selecting=true;state.selectionReady=false;state.sessionId=sid;state.queue=null;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
   sessionStorage.setItem('augmentor-harness-session',sid);
   $('interaction').hidden=true;$('inspector').replaceChildren(node('p','Select a record to inspect.','empty'));renderSessions();renderChat();
+  $('context-stats').textContent='';$('context-content').replaceChildren(node('p','No request is loaded for this conversation.','empty'));
   try{
   const subscription=await rpc('events.subscribe',{sessionId:sid,clientId:state.clientId});if(epoch!==state.epoch)return;
   state.cursor=subscription.cursor;subscription.pending.forEach(showInteraction);queueBaseline(subscription.queue);

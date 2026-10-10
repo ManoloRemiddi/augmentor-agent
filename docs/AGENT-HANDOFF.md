@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 10 recorded context composition checkpoint
+
+The same Pi 1.1 SDK owner now records opt-in immutable run/input/memory/resource frames and snapshots around aggregate context transforms, converted context and provider hooks. `context/provenance` correlates to the existing effective `model/request`; the additional bodies share an 8 MiB serialized limit and explicit partial states. Exact snapshot changes and known memory return/presence are observed; loaded resources do not prove consumption. `sourceProvenance` stays false. [The owning record](AUGMENTOR-HARNESS.md#recorded-context-composition-boundaries) preserves coverage, privacy, lifecycle, fixture failures and full remaining attribution work.
+
+Context shows these details through existing scoped reads, clears immediately on an empty conversation and drops old request/session replies. Real SDK/synthetic provider and actual Chromium/private-owner checks establish this behavior, read-only refusal and reload without inspection inference; they do not qualify live providers, physical OS use or installed adoption. Final exact-ref qualification follows the implementation commit. No dependency/native component or selected MIT notice changes; the existing 126-package baseline remains.
+
+Prior published `08c13fe4bac63b5cbb4078e4ce3cf9704f518b6f` has all **17 hosted checks successful** at this observation; fresh matching-head checks remain required. Initial local attempts retain readiness/hash-document/held-read fixture limitations, system Python missing QtTest and a spaced-interpreter synthetic shebang failure; the existing isolated interpreter and a spaces-free alias are used for final qualification. No production setting/deadline/permission change is introduced.
+
+The full accepted P0/P1 migration stays binding: complete context provenance, native history index and payload search; embedded/live routing/resources; live Hindsight; authoritative integration receipts; actual voice/audio; wiki/MCP; plans/jobs/delegation; Home/mobile/multiple windows; and all platform/package/installed/update/rollback/privacy gates. Preserve DSH, private/old work, selected releases and approved model/speech/GPU placement. Do not merge/promote/select an owner release/retire DSH or complete the full goal from this checkpoint. Earlier checkpoints below are historical.
+
 ## October 10 indexed display-history checkpoint
 
 Tested implementation source: `bce7f07dc69d1b1a1dd147e1436b1becb89110fc`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 19:29 UTC. The subsequent qualification commit changes documentation only.

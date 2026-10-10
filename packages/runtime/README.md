@@ -2,6 +2,8 @@
 
 # Shared Pi runtime host
 
+The [composition observer](../../docs/AUGMENTOR-HARNESS.md#recorded-context-composition-boundaries) records supported SDK boundaries and managed memory without changing returned context or starting another loop. Capture is opt-in; extra immutable snapshot bodies share an 8 MiB serialized budget and partial states remain visible. Loader catalogs do not establish consumption, opaque transforms have aggregate coverage and complete source provenance remains unavailable. Context clears when switching to an empty conversation and rejects delayed request/session payload replies. This is shared runtime/Harness behavior with no added OS adapter or dependency.
+
 `src/` integrates the public Pi coding-agent SDK: exact model selection, sessions,
 resource loading, policy, client protocol, shared-service clients and lifecycle.
 The independent prompt service owns prompt storage; the automatic-memory

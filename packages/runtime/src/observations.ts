@@ -2,11 +2,12 @@
 import type {AgentSession} from '@earendil-works/pi-coding-agent';
 import {ObservationStore,payloadText} from '../../observation/src/store.js';
 import type {Data} from '../../protocol/src/index.js';
+import type {ContextProvenance} from './context-provenance.js';
 
 /** Observe the supported SDK pipeline after all registered payload transforms. */
 export function observeSession(session: AgentSession, store: ObservationStore, sessionId: string,
   current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data;execution?:Data;reasoning?:Data}, notify: (event: unknown) => void,
-  warning: (message: string) => void) {
+  warning: (message: string) => void, provenance?:ContextProvenance) {
   let requestId: string | undefined;
   let started = 0, firstToken = false;
   let providerCount = 0, providerBytes = 0, providerDropped = 0, captureProvider = false;
@@ -26,10 +27,19 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
   };
   const previousPayload = session.agent.onPayload;
   const previousStream=session.agent.streamFunction;
+  const previousTransform=session.agent.transformContext;
+  const inspect=(action:()=>void)=>{try{action();}catch(error){warning('Local context inspection could not capture a boundary: '+String(error));}};
+  const transformHook:typeof previousTransform=async(messages,signal)=>{
+    inspect(()=>provenance?.beginRequest(messages));
+    const transformed=previousTransform?await previousTransform(messages,signal):messages;
+    inspect(()=>provenance?.transformed(transformed));return transformed;
+  };
+  if(provenance)session.agent.transformContext=transformHook;
   let requestedThinking:string|undefined;
-  const streamHook:typeof previousStream=async(model,context,options)=>{requestedThinking=options?.reasoning??'off';return previousStream(model,context,options);};
+  const streamHook:typeof previousStream=async(model,context,options)=>{requestedThinking=options?.reasoning??'off';inspect(()=>provenance?.streaming(context));return previousStream(model,context,options);};
   if(typeof previousStream==='function')session.agent.streamFunction=streamHook;
   const payloadHook: typeof previousPayload = async (payload, model) => {
+    inspect(()=>provenance?.beforePayload(payload));
     const transformed = await previousPayload?.(payload, model);
     const effective = transformed === undefined ? payload : transformed;
     started = performance.now(); firstToken = false; requestId = undefined;
@@ -42,6 +52,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
       boundary: 'provider-payload-after-hooks', transportAttempts: 'not-observed',
     }, effective);
     requestId = event?.id;
+    if(requestId&&provenance)inspect(()=>{const contribution=provenance.finish(effective);record('context/provenance',contribution.data,contribution.payload);});
     return transformed;
   };
   session.agent.onPayload = payloadHook;
@@ -99,6 +110,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
       event.message);
       requestOpen = false;
       requestedThinking=undefined;
+      provenance?.endRequest();
     }
     if (event.type === 'tool_execution_start') {
       tools.set(event.toolCallId, performance.now());
@@ -120,6 +132,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
   return {record, beginTurn(data: Record<string, unknown>) {
     requestId = undefined; started = 0; firstToken = false;
     requestedThinking=undefined;
+    provenance?.beginTurn();
     resetProvider(); requestOpen = false;
     return record('turn/start', data);
   }, dispose() {
@@ -128,6 +141,8 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     if (session.agent.onResponse === responseHook) session.agent.onResponse = previousResponse;
     if (session.agent.onProviderStreamEvent === providerHook) session.agent.onProviderStreamEvent = previousProvider;
     if (session.agent.streamFunction === streamHook) session.agent.streamFunction=previousStream;
+    if (session.agent.transformContext === transformHook) session.agent.transformContext=previousTransform;
+    provenance?.dispose();
     providerEvents = [];
   }};
 }

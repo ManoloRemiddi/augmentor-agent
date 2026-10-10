@@ -1,0 +1,57 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Actual private owner, rendered Context and scoped inspection; synthetic provider.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdtemp,readFile,writeFile,mkdir,rm} from 'node:fs/promises';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+import {fileURLToPath} from 'node:url';
+import {setTimeout as delay} from 'node:timers/promises';
+import {harnessCdp} from './fixtures/harness-cdp.mjs';
+import {PiConnection} from '../dist/client/src/socket.js';
+import {localConnect} from '../dist/platform/src/transport.js';
+const source=fileURLToPath(new URL('../',import.meta.url));
+async function until(fn,label){const end=Date.now()+12000;let last;while(Date.now()<end){try{if(await fn())return;}catch(error){last=error;}await delay(30);}throw Error('Harness composition timeout: '+label+(last?' ('+last.message+')':''));}
+test('rendered Context shows boundary coverage, drops stale payloads and preserves read-only authority',{skip:process.platform!=='linux',timeout:60000},async t=>{
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-context-chrome-'));let fixture,chrome,panel,owner,link,output='',stderr='';
+ t.after(async()=>{owner?.close();panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
+ fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1'},stdio:['ignore','pipe','pipe']});fixture.stdout.on('data',data=>output+=data);fixture.stderr.on('data',data=>stderr+=data);
+ await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'owner ready');
+ const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token');
+ const rpc=async(method,params={},bearer=token)=>{const response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+bearer,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})}),frame=await response.json();if(frame.error)throw Error(frame.error.message);return frame.result;};
+ const socket=localConnect(join(link.state,'runtime.sock'));await once(socket,'connect');owner=new PiConnection(socket);await owner.call('host.hello',{protocol:'augmentor-pi/1'});
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
+ let port;await until(async()=>{try{port=(await readFile(join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0];return true;}catch{return false;}},'Chrome ready');
+ const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
+ const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,fixture:stderr});throw error;});
+ const click=async expression=>{const point=await panel.evaluate('(()=>{const e='+expression+';if(!e||e.disabled)throw Error("Control unavailable");e.scrollIntoView({block:"nearest"});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;if(!r.width||!r.height||!e.contains(document.elementFromPoint(x,y)))throw Error("Control is not hit");return {x,y};})()');await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});};
+ await visible('!document.querySelector("#new-chat").disabled');await click('document.querySelector("#new-chat")');await visible('!document.querySelector("#send").disabled');const sid=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")');
+ await click('document.querySelector("#input")');await panel.call('Input.insertText',{text:'CONTEXT_BOUNDARY_FIXTURE'});await visible('document.querySelector("#input").value==="CONTEXT_BOUNDARY_FIXTURE"');await click('document.querySelector("#send")');
+ await visible('document.querySelector("#stop").disabled&&document.body.innerText.includes("The note says:")');
+ const received=(await readFile(link.requestLog,'utf8')).trim().split('\n').map(line=>JSON.parse(line));assert.equal(received.length,2);
+ const records=(await rpc('observation.list',{sessionId:sid})).records,requests=records.filter(row=>row.kind==='model/request'),lineages=records.filter(row=>row.kind==='context/provenance');assert.equal(lineages.length,2);assert.equal((await rpc('observation.describe')).capabilities.sourceProvenance,false);
+ for(let i=0;i<2;i++){
+  assert.equal(lineages[i].requestId,requests[i].id);
+  let offset=0,text='';while(true){const page=await rpc('observation.payload',{sessionId:sid,eventId:lineages[i].id,offset});assert(page.available);text+=page.text;if(!page.hasMore)break;offset=page.nextOffset;}
+  assert.deepEqual(JSON.parse(text).snapshots.afterProviderHooks,received[i]);
+ }
+ await click('document.querySelector("[data-view=context]")');await visible('document.querySelector("#context-content").innerText.includes("Context composition")&&document.querySelector("#context-content").innerText.includes("Complete source attribution is not yet available")&&document.querySelector("#context-content").innerText.includes("Provider body after payload hooks")');
+ const choose=id=>panel.evaluate('(()=>{const e=document.querySelector("#requests");e.value='+JSON.stringify(id)+';e.dispatchEvent(new Event("change",{bubbles:true}));})()');
+ await panel.evaluate('globalThis.__fetch=fetch;globalThis.__held=[];globalThis.fetch=(...args)=>__fetch(...args).then(response=>{let body;try{body=JSON.parse(args[1]?.body)}catch{}if(body?.method==="observation.payload"&&body.params.eventId==='+JSON.stringify(lineages[0].id)+')return new Promise(resolve=>__held.push(()=>resolve(response)));return response;})');
+ await choose(requests[0].id);await visible('globalThis.__held.length>=1');await choose(requests[1].id);await visible('document.querySelector("#context-content").innerText.includes("Provider body after payload hooks")');
+ const selected=await panel.evaluate('document.querySelector("#context-content").textContent');await panel.evaluate('globalThis.__held.splice(0).forEach(resolve=>resolve())');await delay(100);assert.equal(await panel.evaluate('document.querySelector("#context-content").textContent'),selected,'older request reply cannot repaint a new selection');
+ await rpc('session.create',{sessionId:'context-foreign',selection:{provider:'fixture',model:'harness-fixture'},cwd:link.workspace});await rpc('session.rename',{sessionId:'context-foreign',title:'Foreign Context conversation'});
+ await choose(requests[0].id);await visible('globalThis.__held.length>=1');await visible('Array.from(document.querySelectorAll(".session")).some(e=>e.textContent==="Foreign Context conversation")');await click('Array.from(document.querySelectorAll(".session")).find(e=>e.textContent==="Foreign Context conversation")');await visible('document.querySelector("#context-content").textContent==="No request is loaded for this conversation."');
+ await panel.evaluate('globalThis.__held.splice(0).forEach(resolve=>resolve())');await delay(100);assert.equal(await panel.evaluate('document.querySelector("#context-content").textContent'),'No request is loaded for this conversation.');
+ const inspection=await owner.call('inspection.open',{sessionId:sid}),inspectToken=new URLSearchParams(new URL(inspection.url).hash.slice(1)).get('token');
+ // A same-origin hash navigation retains the operator document. The real
+ // inspection entry point opens a fresh document; reload that URL here.
+ await panel.call('Page.navigate',{url:inspection.url});await panel.reload();await visible('document.body.innerText.includes("Read-only")');await click('document.querySelector("[data-view=context]")');await visible('document.querySelector("#context-content").innerText.includes("Context composition")&&document.querySelector("#context-content").innerText.includes("Provider body after payload hooks")');
+ assert.equal(await panel.evaluate('document.querySelector("#capture").disabled'),true);await assert.rejects(rpc('session.prompt',{sessionId:sid,requestId:'unauthorized',content:[{type:'text',text:'Must not execute'}]},inspectToken),/read-only/);await assert.rejects(rpc('observation.payload',{sessionId:'context-foreign',eventId:lineages[0].id},inspectToken),/selected conversation/);
+ await panel.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});await visible('document.documentElement.scrollWidth<=640');await panel.evaluate('Array.from(document.querySelectorAll("#context-content h3")).find(e=>e.textContent==="Context composition").scrollIntoView({block:"start"})');await mkdir(join(source,'outputs/harness-proof'),{recursive:true});await writeFile(join(source,'outputs/harness-proof/context-composition.png'),Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+ await panel.reload();await visible('document.body.innerText.includes("Read-only")');await click('document.querySelector("[data-view=context]")');await visible('document.querySelector("#context-content").innerText.includes("Provider body after payload hooks")');
+ assert.equal((await readFile(link.requestLog,'utf8')).trim().split('\n').length,2,'selection, foreign read refusal, inspection and reload perform no inference');assert.deepEqual(panel.errors,[]);assert.deepEqual(panel.failedResponses,[]);assert.equal(stderr,'');
+});
