@@ -10,8 +10,9 @@ import {fileURLToPath} from 'node:url';
 const source=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('..',import.meta.url)));
 const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
+const sharedState=join(root,'shared-state'),sharedData=join(root,'shared-data'),home=join(root,'home');
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
-mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(workspace);
+mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(workspace);mkdirSync(home);
 writeFileSync(join(workspace,'note.txt'),'Harness fixture ready.\n');
 const model=http.createServer(async(req,res)=>{
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
@@ -47,13 +48,25 @@ model.listen(0,'127.0.0.1');await once(model,'listening');
 const selection={provider:'fixture',model:'harness-fixture'};
 writeFileSync(join(config,'agent/models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Harness deterministic fixture',reasoning:true,input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
 writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'workspace-write',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
+const fixtureEnv={...process.env,HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'};
+const prompts=process.env.AUGMENTOR_HARNESS_PROOF_PROMPTS==='1'?spawn(process.env.AUGMENTOR_PYTHON??'python3',['-Xutf8','-B',join(source,'services/prompt-library/service.py')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','ignore','pipe']}):null;
+prompts?.stderr.on('data',data=>process.stderr.write(data));
+prompts?.on('error',error=>process.stderr.write('Fixture prompt service: '+error.message+'\n'));
+// Wait for our service before the runtime can try to auto-start a companion.
+if(prompts){
+  const end=Date.now()+5000;
+  while(!existsSync(join(sharedState,'prompts.sock'))){
+    if(prompts.exitCode!==null||Date.now()>end){prompts.kill('SIGTERM');model.closeAllConnections();model.close();rmSync(root,{recursive:true,force:true});throw Error('Fixture prompt service did not start');}
+    await new Promise(resolve=>setTimeout(resolve,25));
+  }
+}
 const child=spawn(process.execPath,[join(source,'dist/runtime/src/main.js')],{cwd:workspace,
-  env:{...process.env,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'},stdio:['ignore','pipe','pipe']});
+  env:fixtureEnv,stdio:['ignore','pipe','pipe']});
 child.stderr.on('data',data=>process.stderr.write(data));
 let closing=false;
 async function close(){
   if(closing)return;closing=true;
-  if(child.exitCode===null){const exit=once(child,'exit');child.kill('SIGTERM');await exit;}
+  for(const owned of [child,prompts])if(owned?.pid&&owned.exitCode===null){const exit=once(owned,'exit');owned.kill('SIGTERM');await exit;}
   model.closeAllConnections();await new Promise(resolve=>model.close(resolve));
   rmSync(root,{recursive:true,force:true});
 }
@@ -65,5 +78,5 @@ while(!existsSync(join(state,'harness.json'))){
   await new Promise(resolve=>setTimeout(resolve,25));
 }
 const link=JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-console.log(JSON.stringify({fixture:true,url:link.url,workspace,config,state,pid:child.pid,requestLog}));
+console.log(JSON.stringify({fixture:true,url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog}));
 await once(child,'exit');await close();

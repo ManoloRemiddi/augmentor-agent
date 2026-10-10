@@ -334,6 +334,7 @@ export class Host {
     case 'settings.describe':return {namespaces:[{ns:'permission',revision:this.settings.revision,value:{defaultPreset:this.settings.defaultPreset}},{ns:'prompt-library',revision:this.settings.revision,value:await promptCall('prompts.list')}]};
     case 'settings.mutate':{if(p.ns!=='permission'||p.expectedRevision!==this.settings.revision)throw new Error('Settings changed. Reopen the dialog.');const op=p.ops?.[0];if(p.ops.length!==1||op.op!=='set'||op.path?.join('.')!=='defaultPreset'||!['read-only','workspace-write','danger-full-access'].includes(op.value))throw new Error('Unsupported settings change');this.settings.defaultPreset=op.value;this.persistSettings();return {ok:true};}
     case 'prompts.list':case 'prompts.save':case 'prompts.delete':return promptCall(method,p,id);
+    case 'prompts.improvementSave':return promptCall('prompts.improvement.save',p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
   async close(){this.quiescing=true;this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}}

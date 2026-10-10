@@ -13,7 +13,7 @@ const allowed = new Set([
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.payload', 'observation.clear',
-  'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'interaction.respond',
+  'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond',
 ]);
 interface Watch {sessionId: string; seen: number}
 interface LiveFrame {seq: number; sessionId: string; frame: Data}
@@ -140,11 +140,16 @@ export class HarnessServer {
         ['/app.js', {path: join(this.assets, 'app.js'), type: 'text/javascript'}],
         ['/chat-projection.js', {path: join(this.assets, 'chat-projection.js'), type: 'text/javascript'}],
         ['/message-actions.js', {path: join(this.assets, 'message-actions.js'), type: 'text/javascript'}],
+        ['/prompt-library.js', {path: join(this.assets, 'prompt-library.js'), type: 'text/javascript'}],
         ['/queue-view.js', {path: fileURLToPath(new URL('../../harness-ui/src/queue-view.js', import.meta.url)), type: 'text/javascript'}],
         ['/harness.css', {path: join(this.assets, 'harness.css'), type: 'text/css'}],
         ['/timeline.js', {path: fileURLToPath(new URL('../../harness-ui/src/dsh-timeline.js', import.meta.url)), type: 'text/javascript'}],
         ['/trajectory-contract.js', {path: fileURLToPath(new URL('../../harness-ui/src/trajectory-contract.js', import.meta.url)), type: 'text/javascript'}],
       ]);
+      // Fixed, reviewed presentation assets; never expose arbitrary extension files.
+      for(const name of ['prompt-library.mjs','prompt-editor.mjs','clipboard.mjs','settings-form.mjs','maintenance-page.mjs','prompt-library.css']){
+        staticFiles.set('/shared-prompts/'+name,{path:fileURLToPath(new URL('../../../apps/browser/extension/'+name,import.meta.url)),type:name.endsWith('.css')?'text/css':'text/javascript'});
+      }
       const file = staticFiles.get(url.pathname);
       if (!file) {this.send(res, 404, {error: {message: 'Unknown interface asset'}}); return;}
       const bytes = readFileSync(file.path);

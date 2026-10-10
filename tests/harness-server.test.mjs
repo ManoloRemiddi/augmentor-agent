@@ -40,12 +40,20 @@ test('Harness transport requires a bearer token, local authority and matching br
   assert.equal(calls.length,0);
   assert.equal((await rpc('session.list',{}, {...bearer,Origin:link.origin})).status,200);
   assert.equal(calls.length,1);
+  assert.equal((await rpc('prompts.improvementSave',{content:'Shared settings',expectedRevision:0},bearer)).status,200);
+  assert.equal(calls.at(-1).method,'prompts.improvementSave');
   const page=await fetch(link.origin+'/');
   assert.equal(page.status,200);
   assert(page.headers.get('Content-Security-Policy').includes("frame-ancestors 'none'"));
   assert.equal(page.headers.get('Referrer-Policy'),'no-referrer');
   assert.equal(page.headers.get('Cache-Control'),'no-store');
   assert.equal((await fetch(link.origin+'/../../../package.json')).status,404);
+  for(const name of ['prompt-library.mjs','prompt-editor.mjs','clipboard.mjs','settings-form.mjs','maintenance-page.mjs','prompt-library.css']){
+    const asset=await fetch(link.origin+'/shared-prompts/'+name);assert.equal(asset.status,200);
+    assert.equal(asset.headers.get('Content-Type'),(name.endsWith('.css')?'text/css':'text/javascript')+'; charset=utf-8');
+  }
+  assert.equal((await fetch(link.origin+'/shared-prompts/sidepanel.js')).status,404);
+  assert.equal((await fetch(link.origin+'/shared-prompts/../../services/prompt-library/service.py')).status,404);
 });
 test('live pages are bounded and lost coverage is scoped to the affected conversation',async t=>{
  const host={getMeta:id=>({id}),queueSnapshot:()=>({revision:0,paused:false,activeTurnId:null,items:[]}),interactions:{frames:()=>[]}};

@@ -5,7 +5,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Augmentor Harness</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/harness.css">
+  <link rel="stylesheet" href="/shared-prompts/prompt-library.css">
   <script type="module" src="/app.js"></script>
 </head>
 <body>
@@ -19,6 +21,7 @@
     <aside id="sidebar" class="sidebar">
       <button id="new-chat" class="primary" disabled>New conversation</button>
       <label class="workspace">Working folder<input id="workspace" placeholder="Choose a folder for new conversations"></label>
+      <button id="prompt-library" type="button" disabled>Prompt library</button>
       <h2>Conversations</h2><nav id="sessions" aria-label="Conversations"></nav>
       <div class="capture-settings"><label><input type="checkbox" id="capture"> Save context history</label><p>Retain request and tool payloads locally for up to 14 days or 512 MiB. Applies to this Pi profile. Conversation history is stored separately.</p></div>
       <button id="trim-tools" disabled>Trim saved tool context</button>

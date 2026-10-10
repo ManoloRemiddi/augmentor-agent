@@ -15,7 +15,7 @@ export function matchPrompts(prompts, query) {
     Number(!a.name.startsWith(query))-Number(!b.name.startsWith(query)) || a.name.localeCompare(b.name))
 }
 
-export function attachPromptLibrary({input, send, settingsButton}) {
+export function attachPromptLibrary({input, send, settingsButton, editorOptions, context=()=>null, changed=()=>{}}) {
   const doc=input.ownerDocument, win=doc.defaultView
   const menu=doc.createElement('div');menu.id='prompt-completions';menu.hidden=true
   menu.setAttribute('role','listbox');menu.setAttribute('aria-label','Saved prompts');doc.body.append(menu)
@@ -57,20 +57,20 @@ export function attachPromptLibrary({input, send, settingsButton}) {
   }
   const choose=async index=>{
     const item=choices[index];if(inserting||!item||slashQuery(input.value,input.selectionStart)===null)return
-    inserting=true
+    inserting=true;changed()
     try {
       let end=input.selectionStart;while(/[a-zA-Z0-9_-]/.test(input.value[end]??'')&&end<input.value.length)end++
-      const before=input.value,position=input.selectionStart
+      const before=input.value,position=input.selectionStart,origin=context()
       let content=item.content
       if(content.includes('[clipboard]')) {
         try {
           const copied=await win.navigator.clipboard.readText()
           content=expandClipboard(content,copied)
-        }catch(error){errorText=error.message||'Clipboard is unavailable. Paste your text into the draft.';paint();return}
+        }catch(error){if(input.value!==before||input.selectionStart!==position||context()!==origin)return;errorText=error.message||'Clipboard is unavailable. Paste your text into the draft.';paint();return}
       }
-      if(input.value!==before||input.selectionStart!==position)return
+      if(input.value!==before||input.selectionStart!==position||context()!==origin)return
       input.setRangeText(content,0,end,'end');hide();input.dispatchEvent(new win.Event('input',{bubbles:true}));input.focus()
-    } finally {inserting=false}
+    } finally {inserting=false;changed()}
   }
   const refresh=()=>{
     if(slashQuery(input.value,input.selectionStart)===null){hide();return}
@@ -84,7 +84,7 @@ export function attachPromptLibrary({input, send, settingsButton}) {
   input.addEventListener('keydown',event=>{
     if(event.isComposing||event.shiftKey||event.ctrlKey||event.metaKey||event.altKey)return
     // Clipboard reads are asynchronous; another Enter must not submit the alias.
-    if(event.key==='Enter'&&(inserting||event.repeat||(!menu.hidden&&pending&&!loaded))){
+    if(event.key==='Enter'&&(inserting||event.repeat||(!menu.hidden&&(errorText||pending&&!loaded)))){
       event.preventDefault();event.stopImmediatePropagation();return
     }
     if(menu.hidden)return
@@ -101,10 +101,10 @@ export function attachPromptLibrary({input, send, settingsButton}) {
   settingsButton.title='Prompt library'
   settingsButton.setAttribute('aria-label','Prompt library')
   settingsButton.addEventListener('click',()=>{
-    hide();promptEditor(doc,request,value=>{library=value;loaded=true;lastRead=Date.now();paint()})
+    hide();promptEditor(doc,request,value=>{library=value;loaded=true;lastRead=Date.now();paint()},undefined,editorOptions)
   })
   }
   const timer=win.setInterval(()=>{if(!menu.hidden)refresh()},1500)
   win.addEventListener('pagehide',()=>win.clearInterval(timer),{once:true})
-  return {menu,refresh}
+  return {menu,refresh,get inserting(){return inserting}}
 }
