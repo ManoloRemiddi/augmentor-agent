@@ -777,6 +777,9 @@ class Window(QWidget):
             # notice visible, including history replay, on every native platform.
             self.messages.append(('DSH',data.get('text') or ('Command completed.' if data.get('kind')=='success' else 'Command failed.')))
             return True
+        if kind in ('runtime/notice','runtime/warning'):
+            self.messages.append(('Status',data.get('message') or 'Runtime status unavailable.'))
+            return True
         if kind=='assistant/chunk':
             chunk=data.get('chunk',{})
             if chunk.get('type')=='text-delta':self.partial+=chunk.get('text','');return True

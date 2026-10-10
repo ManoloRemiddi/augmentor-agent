@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Pi Harness recovery: build first, then `node --test tests/pi-execution.test.mjs tests/runtime.test.mjs tests/pi-observations.test.mjs tests/harness-chat.test.mjs`. The actual Pi/HTTP fixtures qualify shared recovery budgets, context overflow, truncated proposals, guarded changes, job receipts, request caps, Stop/preparation and cold replay. Unit hooks/fake clocks supplement those contracts. Native replay uses `test_reply_completion.py`; Browser replay uses its separately locked `apps/browser/test` manifest. See [qualification and limits](../docs/AUGMENTOR-HARNESS.md#bounded-recovery-and-startup-cancellation). These fixtures do not certify live-model competence or installed cutover.
+
 Codex runtime tests: build first, then run `node --test tests/codex-*.test.mjs`.
 They cover real app-server operation against a synthetic Responses provider,
 the native wire adapter, durable recovery, private IPC and profile contracts.

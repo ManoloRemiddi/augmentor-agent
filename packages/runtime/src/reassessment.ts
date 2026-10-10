@@ -51,9 +51,10 @@ export function piReassessment(notify:(data:Omit<NonNullable<ReturnType<ToolReas
  const inputs=new Map<string,string>();
  const reset=()=>{state=new ToolReassessment();inputs.clear();};
  pi.on('agent_start',reset);pi.on('agent_settled',reset);
- pi.on('tool_execution_start',event=>{
-  // Observe validated dispatch arguments after all tool_call transformations.
-  if(!event.parentToolCallId)inputs.set(event.toolCallId,digest(canonical(event.args)));
+ pi.on('tool_result',event=>{
+  // This hook receives dispatch arguments after tool_call transformations.
+  // tool_execution_start fires before preparation and only exposes proposals.
+  if(!event.parentToolCallId)inputs.set(event.toolCallId,digest(canonical(event.input)));
  });
  pi.on('turn_end',(event,ctx)=>{
   if(ctx.signal?.aborted||event.outcome!=='completed')return;

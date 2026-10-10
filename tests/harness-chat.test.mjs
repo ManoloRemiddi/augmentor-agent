@@ -19,3 +19,14 @@ test('tool status distinguishes finished results from missing outcomes after Sto
  const items=projectChat([call(1,'a'),{seq:2,type:'tool/result',data:{toolCallId:'a',isError:false}},call(3,'b'),{seq:4,type:'turn/end',data:{reason:{kind:'aborted'}}}]);
  assert.equal(items[0].status,'finished');assert.equal(items[1].status,'outcome unknown');assert.equal(items[2].text,'Stopped.');
 });
+
+test('recovery notices and truncated output survive reopen without becoming assistant answers',()=>{
+ const events=[{seq:1,type:'assistant/message',data:{message:{content:[{type:'text',text:'Partial result'}],stopReason:'length'}}},
+  {seq:2,type:'runtime/notice',data:{message:'Bounded recovery 1/2 is continuing from confirmed progress.',incomplete:false}},
+  {seq:3,type:'runtime/notice',data:{message:'Task incomplete. The bounded response-recovery budget was exhausted.',incomplete:true}},
+  {seq:4,type:'turn/end',data:{reason:{kind:'error'}}}];
+ const items=projectChat(events);assert.equal(items[0].partial,true);assert.equal(items[0].status,'length');
+ assert.equal(items.filter(item=>item.kind==='assistant').length,1);
+ assert.equal(items.filter(item=>item.kind==='status'&&item.text.includes('Task incomplete')).length,1);
+ assert.deepEqual(projectChat(events),items);
+});

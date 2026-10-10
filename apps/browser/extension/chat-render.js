@@ -487,6 +487,14 @@ export function createChatUI(els) {
         const body=el('div','md');body.innerHTML=md(text);message.append(body);$log.append(message)
         break
       }
+      case 'runtime/notice':
+      case 'runtime/warning': {
+        const message=el('div','msg status')
+        message.append(el('span','who','Status'))
+        const body=el('div','md');body.innerHTML=md(data.message??'Runtime status unavailable.')
+        message.append(body);$log.append(message)
+        break
+      }
       case 'session/title': {
         if (data.title && $title) $title.textContent = data.title
         break

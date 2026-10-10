@@ -32,9 +32,9 @@ test('the extension composes prior drafts, skips nested/aborted boundaries and r
  const handlers=new Map(),observed=[];piReassessment(data=>observed.push(data))({on:(name,handler)=>handlers.set(name,handler)});
  const result={toolName:'read',toolCallId:'fixture',content:text('same'),isError:false};
  const prior={type:'custom',customType:'another-extension',data:{kept:true}},boundary={entries:[prior],outcome:'completed',message:{role:'assistant',content:[]},toolResults:[]};
- const finish=()=>{handlers.get('tool_execution_start')({toolName:'read',toolCallId:'fixture',args:{path:'fixture'}});return handlers.get('turn_end')({...boundary,toolResults:[result]},{});};
+ const finish=()=>{handlers.get('tool_result')({toolName:'read',toolCallId:'fixture',input:{path:'fixture'}});return handlers.get('turn_end')({...boundary,toolResults:[result]},{});};
  handlers.get('agent_start')();
- for(let i=0;i<3;i++)handlers.get('tool_execution_start')({...result,args:{},parentToolCallId:'nested'});
+ for(let i=0;i<3;i++)handlers.get('tool_result')({...result,input:{},parentToolCallId:'nested'});
  assert.equal(handlers.get('turn_end')(boundary,{}),undefined);
  for(let i=0;i<2;i++)assert.equal(finish(),undefined);
  assert.equal(handlers.get('turn_end')({...boundary,toolResults:[result]},{signal:{aborted:true}}),undefined);assert.equal(observed.length,0);

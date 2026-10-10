@@ -218,3 +218,19 @@ test('v4 failed voice output never becomes an assistant reply',async t=>{
   ui.applyLog([record('event',{event:{seq:25,type:'tool/result',data:{meta:{resonantVoice:{version:1,text:'Must not appear.'}},message:{role:'tool',isError:true,content:[{type:'text',text:'failed'}]}}}})])
   assert.equal(log.querySelectorAll('.assistant .md').length,0)
 })
+
+test('Pi recovery notices remain status records across live delivery and replay',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+ globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=dom.window.requestAnimationFrame.bind(dom.window)
+ globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const rows=[{kind:'event',event:{seq:401,type:'runtime/notice',data:{message:'Bounded recovery 1/2 is continuing.'}}},
+  {kind:'event',event:{seq:402,type:'runtime/notice',data:{message:'Task incomplete. Review confirmed progress.',incomplete:true}}}]
+ ui.applyLog(rows);ui.applyLog(rows)
+ assert.equal(log.querySelectorAll('.status').length,2)
+ assert.equal(log.querySelectorAll('.assistant').length,0)
+ assert.equal(log.querySelectorAll('.status .who')[0].textContent,'Status')
+ assert.match(log.textContent,/Task incomplete/)
+ ui.clear();ui.applyLog(rows);assert.equal(log.querySelectorAll('.status').length,2)
+})

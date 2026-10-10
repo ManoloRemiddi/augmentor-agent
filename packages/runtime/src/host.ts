@@ -27,9 +27,10 @@ import {ObservationStore,OBSERVATION_PROTOCOL,DEFAULT_RETENTION} from '../../obs
 import {observeSession} from './observations.js';
 import {piToolBudget,trimSavedToolContext,TOOL_BUDGET} from './tool-budget.js';
 import {piReassessment} from './reassessment.js';
+import {PiExecution,EXECUTION_POLICY,type ExecutionContract} from './execution.js';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];observation?:ReturnType<typeof observeSession>;turnId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
+interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];execution?:PiExecution;observation?:ReturnType<typeof observeSession>;turnId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 export class Host {
   readonly dirs=paths();
   readonly browser=new BrowserBroker();
@@ -93,12 +94,16 @@ export class Host {
     const model=await this.selected(m.selection);
     const memory=new DualMemoryClient('pi:'+m.id,m.cwd,undefined,message=>console.warn('[augmentor-memory]',message));
     mkdirSync(m.cwd,{recursive:true,mode:0o700});
-    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false},compaction:{enabled:true},packages:[],defaultProjectTrust:'never'});
+    const execution:PiExecution=new PiExecution((kind,data,payload)=>record?.observation?.record(kind,data,payload),(message,incomplete)=>{record?.observation?.record('execution/notice',{message,incomplete});this.append(m,'runtime/notice',{message,incomplete});},{},undefined,(name):ExecutionContract|undefined=>{
+      const definition=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()]).find(tool=>tool.definition.name===name)?.definition;
+      return (definition as (typeof definition & {augmentorExecution?:ExecutionContract}))?.augmentorExecution;
+    });
+    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:true},packages:[],defaultProjectTrust:'never'});
     const resources=readJson<Data>(join(this.dirs.config,'resources.json'),{sources:[],skills:[]});
     if(!Array.isArray(resources.sources)||!Array.isArray(resources.skills))throw new Error('Invalid Pi resource configuration');
-    const resourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
+    const resourceLoader:DefaultResourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
       additionalExtensionPaths:m.surface==='browser'?[]:resources.sources,additionalSkillPaths:m.surface==='browser'?[]:resources.skills,additionalPromptTemplatePaths:[privateDir(join(this.dirs.agent,'prompts'))],
-      extensionFactories:[this.policy(m),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),piReassessment(data=>record?.observation?.record('execution/checkpoint',data)),homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork),...(m.surface==='browser'?[this.browser.package(m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})])],
+      extensionFactories:[this.policy(m),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),piReassessment(data=>record?.observation?.record('execution/checkpoint',data)),execution.extension,homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork),...(m.surface==='browser'?[this.browser.package(m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})])],
       appendSystemPrompt:[browserRecovery,m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
     });await resourceLoader.reload();
     const errors=resourceLoader.getExtensions().errors;if(errors.length)throw new Error('Pi extension loading failed: '+errors.map(e=>e.error).join('; '));
@@ -114,8 +119,9 @@ export class Host {
     if(m.fork){m.memoryStartSeq??=history.at(-1)?.seq??0;this.save(m);history=history.filter(e=>e.seq>m.memoryStartSeq!);}
     await memory.append(history.flatMap(event=>piTranscriptEvent(event)));
     await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.id),onError:error=>this.append(m,'runtime/error',{message:error.error})});
+    record.execution=execution;execution.install(created.session);
     record.observation=observeSession(created.session,this.observations,m.id,
-      ()=>({turnId:record!.turnId,selected:{...m.selection},permissionPreset:m.policy,toolBudget:{...TOOL_BUDGET,units:'unicode-code-points'}}),
+      ()=>({turnId:record!.turnId,selected:{...m.selection},permissionPreset:m.policy,toolBudget:{...TOOL_BUDGET,units:'unicode-code-points'},execution:record!.execution?.describe()}),
       observation=>this.publish(m.id,{method:'observation/event',payload:{sessionId:m.id,observation}}),
       message=>this.append(m,'runtime/warning',{message}));
     record.observation.record('session/load',{piVersion:'1.1.0',productVersion:RELEASE.version,
@@ -129,13 +135,13 @@ export class Host {
       }
       if(e.type==='message_end'&&e.message.role==='assistant'){
         this.append(m,'assistant/message',{message:{content:e.message.content,stopReason:e.message.stopReason}});
-        if(e.message.stopReason==='error'){record!.failed=true;this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});}
+        record!.failed=e.message.stopReason==='error';if(record!.failed)this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});
       }
       if(e.type==='tool_execution_start')this.append(m,'tool/call',{name:e.toolName,toolCallId:e.toolCallId});
       if(e.type==='tool_execution_end')this.append(m,'tool/result',{name:e.toolName,toolCallId:e.toolCallId,isError:e.isError,result:{...e.result,content:e.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Desktop image sent to the selected model]'}:part)}});
     });return record;
   }
-  async cancel(id:unknown,source='user'){const m=this.getMeta(id);const r=this.loaded.get(m.id);if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(!r||!m.running)return {accepted:false};r.cancelled=true;r.session.clearQueue();r.session.abortCompaction();await r.session.abort();return {accepted:true};}
+  async cancel(id:unknown,source='user'){const m=this.getMeta(id);const r=this.loaded.get(m.id);if(m.running&&r){r.cancelled=true;r.execution?.cancel();}if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(!r||!m.running)return {accepted:false};r.cancelled=true;r.session.clearQueue();r.session.abortCompaction();await r.session.abort();return {accepted:true};}
   async branch(p:Data){
     const source=this.getMeta(p.sessionId),sid=identifier(p.newSessionId);
     if(!Number.isSafeInteger(p.messageSeq)||p.messageSeq<1||!['reply','edit'].includes(p.mode))throw new Error('Invalid branch target');
@@ -159,10 +165,11 @@ export class Host {
   submit(r:Loaded,input:string,id:string){const m=r.meta;if(m.requests.includes(id))return {accepted:true,duplicate:true};if(m.running)throw new Error('This conversation is already working');
     m.running=true;r.cancelled=false;r.failed=false;r.turnId=randomUUID();m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{});
     r.observation?.beginTurn({clientRequestId:id});
+    r.execution?.begin(r.manager);
     if(!m.title){m.title=input.replace(/\s+/g,' ').slice(0,80);r.session.setSessionName(m.title);this.append(m,'session/title',{title:m.title});this.save(m);}
-    r.task=(async()=>{let failed=false;try{await r.memory.activity('foreground');await r.session.prompt(input,{expandPromptTemplates:false,source:'rpc'});}catch(error){failed=true;this.append(m,'runtime/error',{message:String(error)});}finally{
+    r.task=(async()=>{let failed=false;try{await r.memory.activity('foreground');if(r.cancelled)return;await r.session.prompt(input,{expandPromptTemplates:false,source:'rpc'});}catch(error){failed=true;this.append(m,'runtime/error',{message:String(error)});}finally{
       await r.memory.activity('stop');
-      this.interactions.cancel(m.id);if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});m.running=false;m.updatedAt=Date.now();this.save(m);const reason=r.cancelled?'aborted':failed||r.failed?'error':'completed';this.append(m,'turn/end',{reason:{kind:reason}});r.observation?.record('turn/end',{reason});r.turnId=undefined;
+      r.execution?.end(r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed');this.interactions.cancel(m.id);if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});m.running=false;m.updatedAt=Date.now();this.save(m);const reason=r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed';this.append(m,'turn/end',{reason:{kind:reason}});r.observation?.record('turn/end',{reason,execution:r.execution?.describe()});r.turnId=undefined;
     }})();return {accepted:true,turnId:r.turnId};
   }
   async dispatch(method:string,p:Data,id:string){
@@ -175,12 +182,12 @@ export class Host {
     const run=this.serial.then(()=>{if(this.quiescing&&method!=='host.describe')throw new Error('Runtime is closing for maintenance. No action was submitted.');return this.handle(method,p,id);});this.serial=run.catch(()=>{});return run;
   }
   async handle(method:string,p:Data,id:string):Promise<any>{switch(method){
-    case 'observation.describe':return {protocol:OBSERVATION_PROTOCOL,revision:this.settings.revision,capturePayloads:this.observations.policy().capturePayloads,retention:DEFAULT_RETENTION,boundary:'provider-payload-after-hooks',capabilities:{metadata:true,payloads:true,attachments:'inline-payloads-only',parsedProviderEvents:true,providerEventCoverage:'parsed events supplied by the provider; 8 MiB per request; partial coverage reported',sourceProvenance:false,historicalCoverage:'recorded-during-managed-operation'},telemetry:{installReporting:'disabled-by-host',analytics:'disabled-by-host',cacheWarming:'off-by-host',networkAudit:'synthetic-core-test; configured extensions and live services require separate review'}};
+    case 'observation.describe':return {protocol:OBSERVATION_PROTOCOL,revision:this.settings.revision,capturePayloads:this.observations.policy().capturePayloads,retention:DEFAULT_RETENTION,boundary:'provider-payload-after-hooks',capabilities:{metadata:true,payloads:true,attachments:'inline-payloads-only',parsedProviderEvents:true,providerEventCoverage:'parsed events supplied by the provider; 8 MiB per request; partial coverage reported',sourceProvenance:false,historicalCoverage:'recorded-during-managed-operation'},telemetry:{installReporting:'disabled-by-host',analytics:'disabled-by-host',cacheWarming:'off-by-host',providerRetries:0,sessionRetries:'disabled-by-host',networkAudit:'synthetic-core-test; configured extensions and live services require separate review'}};
     case 'observation.configure':{if(p.expectedRevision!==this.settings.revision)throw new Error('Settings changed. Refresh inspection settings.');if(typeof p.capturePayloads!=='boolean')throw new Error('Choose whether to retain private request payloads.');this.settings.observation={capturePayloads:p.capturePayloads};this.persistSettings();return this.handle('observation.describe',{},id);}
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-only',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
       this.quiescing=true;this.setup.cancel();return {accepted:true};
@@ -220,5 +227,5 @@ export class Host {
     case 'prompts.list':case 'prompts.save':case 'prompts.delete':return promptCall(method,p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.session.dispose();}}
+  async close(){this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.execution?.dispose();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.session.dispose();}}
 }

@@ -5,7 +5,7 @@ import type {Data} from '../../protocol/src/index.js';
 
 /** Observe the supported SDK pipeline after all registered payload transforms. */
 export function observeSession(session: AgentSession, store: ObservationStore, sessionId: string,
-  current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data}, notify: (event: unknown) => void,
+  current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data;execution?:Data}, notify: (event: unknown) => void,
   warning: (message: string) => void) {
   let requestId: string | undefined;
   let started = 0, firstToken = false;
@@ -33,7 +33,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     const event = record('model/request', {
       selected: current().selected, model: model.id, provider: model.provider, api: model.api,
       thinkingLevel: session.thinkingLevel, capacity: model.contextWindow,
-      policies: {permissionPreset: current().permissionPreset, toolBudget: current().toolBudget},
+      policies: {permissionPreset: current().permissionPreset, toolBudget: current().toolBudget,execution:current().execution},
       boundary: 'provider-payload-after-hooks', transportAttempts: 'not-observed',
     }, effective);
     requestId = event?.id;
@@ -96,7 +96,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     }
     if (event.type === 'tool_execution_start') {
       tools.set(event.toolCallId, performance.now());
-      record('tool/start', {name: event.toolName, toolCallId: event.toolCallId}, event.args);
+      record('tool/start', {name: event.toolName, toolCallId: event.toolCallId,boundary:'proposed-before-validation'}, event.args);
     }
     if (event.type === 'tool_execution_end') {
       const start = tools.get(event.toolCallId); tools.delete(event.toolCallId);

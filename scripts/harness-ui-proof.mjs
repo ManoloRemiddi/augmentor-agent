@@ -19,6 +19,14 @@ const model=http.createServer(async(req,res)=>{
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null,usage)=>res.write('data: '+JSON.stringify({id:'fixture',object:'chat.completion.chunk',model:'harness-fixture',choices:[{index:0,delta,finish_reason:finish}],...(usage?{usage}:{})})+'\n\n');
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
+  const original=[...body.messages].reverse().filter(message=>message.role==='user').map(message=>JSON.stringify(message.content)).find(content=>content.includes('EMPTY_FIXTURE')||content.includes('RECOVER_FIXTURE'));
+  if(original){
+    const recovering=JSON.stringify(body.messages).includes('Execution recovery:');
+    if(original.includes('EMPTY_FIXTURE')||!recovering)chunk({role:'assistant',reasoning_content:'Synthetic reasoning-only recovery fixture.'},'length');
+    else chunk({role:'assistant',content:'The recovery fixture produced this public answer. Task success remains unverified by this synthetic provider.'},'stop');
+    res.end('data: [DONE]\n\n');return;
+  }
+
   if(JSON.stringify(lastUser?.content).includes('SLOW')){
     chunk({role:'assistant',reasoning_content:'This is the isolated interruption fixture.'});
     const timer=setInterval(()=>chunk({content:'Partial fixture output. '}),300);

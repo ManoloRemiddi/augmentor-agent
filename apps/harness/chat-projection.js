@@ -20,7 +20,7 @@ export function projectChat(events,{running=false}={}){
     // A final SDK message already contains its deltas, including partial
     // messages on Stop/error. Do not display those bytes a second time.
     pending={text:'',thinking:''};
-    const stop=data.message?.stopReason,partial=['aborted','error'].includes(stop);
+    const stop=data.message?.stopReason,partial=['aborted','error','length'].includes(stop);
     items.push({kind:'assistant',text,thinking,seq:event.seq,partial,status:partial?stop:'complete'});
    }else flush('partial');
   }else if(event.type==='user/message'){
@@ -36,6 +36,8 @@ export function projectChat(events,{running=false}={}){
    const reason=data.reason?.kind||'interrupted';flush(reason);
    for(const tool of tools.values())tool.status='outcome unknown';tools.clear();
    if(['aborted','interrupted','error'].includes(reason))items.push({kind:'status',text:data.message||({aborted:'Stopped.',error:'This turn ended with an error.',interrupted:'The runtime stopped; pending action outcomes may be unknown.'})[reason]});
+  }else if(event.type==='runtime/notice'){
+   flush('partial');items.push({kind:'status',text:data.message||'Execution status unavailable.'});
   }else if(event.type==='runtime/error'||event.type==='runtime/warning'){
    flush('partial');items.push({kind:'warning',text:data.message||'Runtime observation unavailable.'});
   }

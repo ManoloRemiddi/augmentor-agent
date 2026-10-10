@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-# Bounded DSH execution recovery and response validity
+# Bounded execution recovery and response validity
 
 The September 21 one-shot diagnostic stopped after 438 seconds. Research and
 forecast retrieval succeeded, but one response consumed 32,768 output tokens
@@ -11,7 +11,7 @@ Private transcripts and task data remain outside this repository.
 ## Contract
 
 `adapters/dsh-execution/index.mjs` uses supported DSH 0.1.5-rc.1 lifecycle hooks
-for Augmentor Linux/browser presets. Pi and delegated agents are excluded. It
+for Augmentor Linux/browser presets. Its DSH adapter excludes Pi and delegated agents; the separately qualified [Pi port below](#pi-harness-port--october-10-candidate) owns managed Pi behavior. It
 creates no parallel agent loop. Normal request limits, model identity, saved
 selection, memory policy and GPU/backend configuration remain unchanged.
 
@@ -274,3 +274,21 @@ pure outcome-contract tests. Cases include lost acknowledgment, repeated sends,
 read-after-error, background job collection, handoffs after truncation, malicious
 result text, cancellation and shared recovery budgets. It establishes lifecycle
 behavior, not real-model task competence or cross-session memory quality.
+
+## Pi Harness port — October 10 candidate
+
+`packages/runtime/src/execution.ts` ports the accepted response-recovery contract to pinned Pi 1.1.0. It composes public `Agent` hooks after extension binding and uses `turn_end` boundary drafts and `session_before_compact`. The SDK remains the sole conversation loop. It does not mount a DSH execution adapter or change saved model/GPU/speech settings. This source candidate is in [draft PR #45](https://github.com/ManoloRemiddi/augmentor-agent/pull/45); [Harness qualification](AUGMENTOR-HARNESS.md#bounded-recovery-and-startup-cancellation) owns its tests and remaining migration gates.
+
+A completed boundary with `stopReason: length`, or with no non-whitespace public text and no tool call, can continue from confirmed results. The native `augmentor-execution-recovery` custom message preserves earlier drafts, has `display: false` and grants only the existing user task's authority. There are at most **two recovery attempts per accepted human turn**, shared with SDK context-overflow compaction retries. Ordinary transport/session retries are disabled. Truncated tool proposals are left to the SDK, which does not execute them. SDK length-based compact-and-retry cannot bypass this controller's budget. Provider errors outside the SDK's recognized context-overflow path are not response-recovery triggers.
+
+Recovery admits at most **64 further model requests**, caps output at the smaller of **8192**, the request's existing cap and model capacity, and admits further work for **ten minutes**. Request-local model limits also prevent simple adapters from adding a thinking allowance above that ceiling. After preceding payload hooks, conventional root `max_tokens`, `max_completion_tokens`, `max_output_tokens` and nested `generationConfig.maxOutputTokens` fields are clamped before observations record the effective body. `execution/limit` identifies which fields were present. An unknown custom adapter schema has `sdk-options-only` coverage and requires independent provider qualification. These field tests do not certify every provider's backend enforcement. The last admitted request may execute its tools; an in-flight tool may settle beyond the admission time limit. This is not a hard wall-clock kill deadline.
+
+The per-turn action ledger distinguishes proposed calls from dispatch after argument preparation, validation, extension transformations and permission checks. It samples the executed result **before** result/display hooks can conceal an error. Reads and the existing narrowly recognized literal Bash queries remain available during recovery. An unknown, running or waiting action blocks further recovery changes. A canonical action already dispatched cannot repeat during recovery unless trusted tool code proves it failed before dispatch. Bash identity excludes display descriptions/timeouts; a nonzero exit, timeout or abort does not prove no mutation occurred. Two guard denials produce a durable incomplete notice and end automatic continuation. Normal user-directed repetition keeps the existing permission policy.
+
+Approved extension code may attach `augmentorExecution` to its registered tool definition, with `effect(args)` and `outcome(args, rawResult)` callbacks. Effects are `read`, `change`, `external` or `unknown`; outcomes are `completed`, `failed`, `failed-before-dispatch`, `unknown`, `running` or `waiting`. An authoritative read receipt for the same internal job ID can settle a prior background action. Unknown/throwing contracts remain conservative. This contract does not grant tool permissions. Model text, descriptive hints and tool-output prose cannot declare an operation safe to retry. State metadata omits arguments, action hashes and job IDs; ordinary native results and opt-in payload copies retain their separate privacy contract. Current built-in Home/job integrations still need their own authoritative receipt bindings and acceptance tests.
+
+An authoritative concluding tool result ends the turn without a fabricated assistant answer. Final diagnostics distinguish `response-produced`, `tool-handoff`, `cancelled`, `error` and `incomplete`; none proves task success. A 90-second model request emits one progress notice. The timer clears at assistant completion or cancellation, so it does not call a long-running tool stalled or cancel it. Stop marks the accepted turn synchronously, clears timers and prevents late provider/tool dispatch after asynchronous preparation resumes. It retains priority during streaming, approvals, payload hooks, compaction and recovery.
+
+Raw history containing a non-truncated assistant call without a corresponding result disables automatic recovery. Truncated/error/aborted proposals that Pi never executed are excluded. Restart/reconnect only reads saved state: it never resubmits a recovery or action. This is a conservative per-turn guard, not semantic command equivalence, an exactly-once transaction protocol, cross-turn authorization or a generic task-completion verifier.
+
+`runtime/notice` is a durable UI status event. Harness, Native and Browser render it live and on replay without making it a human prompt, assistant answer, voice reply or conversational-memory item. Empty/exhausted recovery is visibly incomplete. The focused tests use actual pinned Pi with isolated synthetic HTTP/tool fixtures, plus unit hook/clock contracts and actual Qt/Browser rendering. Representative live providers, old histories and installed Linux/Mac acceptance remain required before cutover.
