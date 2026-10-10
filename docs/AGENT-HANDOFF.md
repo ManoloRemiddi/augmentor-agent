@@ -2,6 +2,8 @@
 
 ## October 10 Pi prompt improvement checkpoint
 
+Tested implementation source: `97376d2a0144f8b158215bdcbca14e335e4b2336`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 17:52 UTC. The following qualification commit changes documentation only.
+
 The active `feat/augmentor-harness` candidate adds tool-free Pi Improve/Cancel/Undo to standalone Native, Browser and Harness through one isolated SDK draft request and the existing shared instruction service. [The owning record](AUGMENTOR-HARNESS.md#pi-prompt-improvement-across-native-browser-and-harness) records authority/cancellation/receipt/privacy guards, source/staged qualification, tested ref in the follow-up and all remaining scope. No owner installation, model/GPU/speech preference or DSH retirement changes.
 
 Full qualification passes: 638 Node cases (636 pass/two opt-in memory-engine skips), 116 Browser passes, 864 Python/Qt cases (827 pass/37 skips), and 59 distinct staged cases with bundled Node 24.19.0. Actual production Qt and loaded Chromium/Native Messaging/Harness/SDK fixtures verify one selected-model rewrite, no tools/project history, Undo, actual provider cancellation, stale-draft guards and unchanged parents. New private metadata receipts prevent replay and retain no draft/output/instructions/credentials. The root 126-package/native/MIT baseline is unchanged.
