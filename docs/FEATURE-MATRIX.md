@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 10 Harness candidate: [Native Branch/Edit and ordinary input qualification](AUGMENTOR-HARNESS.md#native-branchedit-and-ordinary-sdk-inputs) uses Pi 1.1.0 with production Qt controls, exact tool history, original template submissions, saved-child restoration and handled/unknown receipts. It supersedes the earlier Native end-to-end source gap. Ordinary/FIFO input now expands approved handlers/skills/templates; Harness guards actual selection readiness. Synthetic source/staged qualification does not establish live memory cutoff, full prompt/command controls, other OS/installed acceptance or DSH retirement. The Harness delivery matrix and accepted migration specification retain the full remaining P0/P1 scope; dated tables below preserve their original baselines.
+
 The [October 10 Harness candidate](AUGMENTOR-HARNESS.md) adds a separate local Pi Chat/Trajectory/Context client, parsed-provider observations and native context-edit budgeting/original recovery. Its source/fixture qualification does not update the installed surfaces or close the full migration gates.
 
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
