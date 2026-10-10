@@ -4,7 +4,7 @@
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 
 /** Presentation only: the shared host owns admission, promotion and delivery. */
-export function createQueue({container,input,send}) {
+export function createQueue({container,input,send,allowIdle=false}) {
   let sessionId, enabled=false, online=false, running=false, activeTurnId=null, tail=Promise.resolve()
   const sessions=new Map()
   const current=()=>{
@@ -67,14 +67,14 @@ export function createQueue({container,input,send}) {
     tail=task.catch(()=>{});return task
   }
   function submit(){
-    if(!enabled||!online||!running)return Promise.resolve(false)
+    if(!enabled||!online||(!running&&!allowIdle))return Promise.resolve(false)
     const text=input.value.trim();if(!text)return Promise.resolve(false)
-    const id=globalThis.crypto.randomUUID(),target=sessionId,state=current()
+    const id=globalThis.crypto.randomUUID(),target=sessionId,state=current(),resumeQueue=!running&&state.pending.size===0
     state.pending.set(id,{text,label:'Queuing…'});input.value='';input.dispatchEvent(new input.ownerDocument.defaultView.Event('input',{bubbles:true}));render()
     const task=tail.then(async()=>{
       try{
         if(target!==sessionId||!enabled||!online)throw Error('Conversation changed before submission.')
-        const result=await send('queue/prompt',{sessionId:target,requestId:id,text})
+        const result=await send('queue/prompt',{sessionId:target,requestId:id,text,resumeQueue})
         if(!result?.accepted)throw Error(result?.error??'Submission was not confirmed.')
         const pending=state.pending.get(id);if(pending)pending.label='Queued'
       }catch(error){const pending=state.pending.get(id);if(pending){pending.label='Not confirmed — '+error.message;pending.failed=true}}

@@ -13,6 +13,7 @@ test('Harness transport requires a bearer token, local authority and matching br
   writeFileSync(join(root,'index.html'),'<title>Augmentor Harness</title>');
   const calls=[];
   const host={getMeta:id=>{if(!['a','b'].includes(id))throw Error('Conversation not found');return {id};},
+    queueSnapshot:()=>({revision:0,paused:false,activeTurnId:null,items:[]}),
     dispatch:async(method,params,id)=>{calls.push({method,params,id});return {ok:true};},
     interactions:{frames:()=>[]}};
   const server=new HarnessServer(host,root);
@@ -47,7 +48,7 @@ test('Harness transport requires a bearer token, local authority and matching br
   assert.equal((await fetch(link.origin+'/../../../package.json')).status,404);
 });
 test('live pages are bounded and lost coverage is scoped to the affected conversation',async t=>{
- const host={getMeta:id=>({id}),interactions:{frames:()=>[]}};
+ const host={getMeta:id=>({id}),queueSnapshot:()=>({revision:0,paused:false,activeTurnId:null,items:[]}),interactions:{frames:()=>[]}};
  const server=new HarnessServer(host),link=await server.start();t.after(()=>server.close());
  const headers={Authorization:'Bearer '+server.token,'Content-Type':'application/json'};
  for(const sessionId of ['a','b'])await fetch(link.origin+'/api/rpc',{method:'POST',headers,body:JSON.stringify({id:'subscribe',method:'events.subscribe',params:{sessionId,clientId:sessionId}})});
@@ -65,6 +66,7 @@ test('live pages are bounded and lost coverage is scoped to the affected convers
 test('Harness watches bind interactions and live events to their selected session', async t => {
   const calls=[];
   const host={getMeta:id=>{if(!['a','b'].includes(id))throw Error('Conversation not found');return {id};},
+    queueSnapshot:()=>({revision:7,paused:true,activeTurnId:null,items:[]}),
     dispatch:async(method,params)=>{calls.push({method,params});return {accepted:true};},
     interactions:{frames:sid=>[{method:'interaction/request',payload:{sessionId:sid}}]}};
   const server=new HarnessServer(host);
@@ -74,6 +76,7 @@ test('Harness watches bind interactions and live events to their selected sessio
   const rpc=async(method,params)=>fetch(link.origin+'/api/rpc',{method:'POST',headers,body:JSON.stringify({id:'request',method,params})});
   const subscribed=await (await rpc('events.subscribe',{sessionId:'a',clientId:'viewer'})).json();
   assert.equal(subscribed.result.pending[0].payload.sessionId,'a');
+  assert.deepEqual(subscribed.result.queue,{sessionId:'a',revision:7,paused:true,activeTurnId:null,items:[]});
   assert(server.connected('a'));assert(!server.connected('b'));
   server.publish('a',{method:'session/event',payload:{text:'selected'}});
   server.publish('b',{method:'session/event',payload:{text:'different'}});

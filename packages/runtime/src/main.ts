@@ -47,7 +47,7 @@ const server=net.createServer(socket=>{
         if(req.method==='host.hello'){if(p.protocol!==PROTOCOL)throw new Error('Incompatible Augmentor protocol');ready=true;write(socket,{id,result:{protocol:PROTOCOL}});return;}
         if(!ready)throw new Error('A protocol handshake is required');
         if(closing)throw new Error('Runtime is closing for maintenance.');
-        if(req.method==='events.subscribe'){if(p.sessionId!==null&&p.sessionId!==undefined)host.getMeta(p.sessionId);clients.set(socket,p.sessionId??null);write(socket,{id,result:{subscribed:true}});if(p.sessionId)for(const frame of host.interactions.frames(p.sessionId))write(socket,{event:frame});return;}
+        if(req.method==='events.subscribe'){if(p.sessionId!==null&&p.sessionId!==undefined)host.getMeta(p.sessionId);clients.set(socket,p.sessionId??null);write(socket,{id,result:{subscribed:true}});if(p.sessionId){write(socket,{event:{method:'session/queue',payload:{sessionId:p.sessionId,...host.queueSnapshot(p.sessionId)}}});for(const frame of host.interactions.frames(p.sessionId))write(socket,{event:frame});}return;}
         if(req.method==='browser.attach'){if(host.getMeta(p.sessionId).surface!=='browser')throw new Error('Browser tools require a browser session');host.browser.attach(p.sessionId,socket,frame=>write(socket,{event:{method:'browser/execute',payload:frame}}));write(socket,{id,result:{attached:true}});return;}
         if(req.method==='browser.respond'){host.browser.respond(socket,p.rpcId,p.result,p.error);write(socket,{id,result:{accepted:true}});return;}
         if(req.method==='host.shutdown'){await host.dispatch('host.prepareShutdown',{},req.id);write(socket,{id,result:{accepted:true}});void shutdown();return;}

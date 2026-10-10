@@ -41,6 +41,8 @@
         <div id="context-content" class="context-content"><p class="empty">Select a model request to see its effective context.</p></div>
       </section>
       <div id="interaction" class="interaction" hidden></div>
+      <div id="prompt-queue" aria-label="Queued prompts" hidden></div>
+      <button id="continue-queue" type="button" hidden>Continue queued prompts</button>
       <form id="composer"><textarea id="input" rows="2" placeholder="Message Augmentor" aria-label="Message Augmentor"></textarea><button id="send" class="primary" type="submit">Send</button></form>
       <div id="notice" role="status" aria-live="polite"></div>
     </main>

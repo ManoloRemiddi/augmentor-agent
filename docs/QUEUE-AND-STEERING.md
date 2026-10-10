@@ -8,7 +8,7 @@ Enter during a running DSH response clears the composer immediately and adds a c
 
 The `session/control` stream provides a complete queue baseline and live replacements. Each prompt carries a stable request ID, so optimistic rows are reconciled with backend items and delivered user messages. Ordered admission preserves rapid Enter submissions, including while the initial chat is being prepared. Transport failures are not automatically replayed; the row preserves the text and reports an unconfirmed outcome. Session switching and reconnect generations isolate queue updates.
 
-This native queue UI is enabled for the DSH adapter, which advertises support. Codex source support is recorded below; Pi does not advertise this queue UI. The browser panel is unchanged by the original DSH feature.
+This native queue UI is enabled for the DSH adapter, which advertises support. Codex source support is recorded below. The original DSH feature did not advertise Pi support or change the Browser panel; the October 10 Pi candidate below adds durable waiting inputs while responsive steering remains open.
 
 Reference interaction was checked in the installed Codex app's queued-message component: its Steer action applies an existing queued follow-up to the active run without interrupting the current model call. DSH implementation was checked against the installed 0.1.5-rc.1 `session.prompt`, `session.updateQueue`, and `session.control` APIs.
 
@@ -62,7 +62,7 @@ and [agent handoff](AGENT-HANDOFF.md) for remaining C0–C9 work.
 Codex Browser now uses Enter/Send during a running turn to add a compact waiting
 row above the composer. Stop stays available. Each row has Steer and Remove;
 they use the same host admission/promotion/removal contracts as native Desktop.
-DSH/Pi Browser sending behavior is unchanged. Read-only views, disconnected
+This Codex slice left DSH/Pi Browser sending behavior unchanged. Read-only views, disconnected
 panels and a changed session cannot issue queue mutations.
 
 The native bridge forwards subscription queue snapshots. The service worker
@@ -93,3 +93,10 @@ The preceding native queue source `3fd287b` passed both macOS jobs in
 Its [Debian application checks](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/36750430782)
 passed before packaging stopped at the known unreviewed Codex executable gate.
 Mac loaded-browser/device qualification and complete release remain separate.
+
+
+## Pi durable waiting queue — October 10 candidate
+
+The Augmentor Harness branch adds one persistent FIFO around the supported Pi session. Harness, Native and Browser accept Enter while working, preserve stable IDs, remove existing waiting items, reconcile delivery by `source.rpcId`, and restore complete monotonic queue baselines after reconnect. Stop, error and cold restart pause waiting work. An explicit idle Send resumes older waiting inputs before the new input; reconnect alone does not. Unknown dispatched receipts cannot be removed, steered or automatically retried. Keep interrupted acknowledges that receipt and leaves waiting work paused, with an honest persisted notice; it does not verify an external action.
+
+The host reports queue support but **no responsive steering yet**. The combined P0 gate therefore remains open. Waiting items never enter Pi's transient string queue; each is admitted through the existing SDK session only after its predecessor settles. The bounds, crash semantics, actual Qt/Browser-bridge/GUI evidence, full suite counts and remaining platform/steering gates are recorded in [Harness qualification](AUGMENTOR-HARNESS.md#durable-prompt-queue--october-10-source-candidate) and [the protocol](PROTOCOL.md). Existing DSH and Codex semantics are retained.

@@ -73,13 +73,14 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
   if (msg?.type==='queue/prompt' || msg?.type==='queue/action') {
-    if (state.harness!=='codex' || state.capabilities.queue!==true || state.phase!=='ready' || !state.sessionReady || state.panelViewSession || msg.sessionId!==state.sessionId || state.mutating) {
+    if (!['pi','codex'].includes(state.harness) || state.capabilities.queue!==true || state.phase!=='ready' || !state.sessionReady || state.panelViewSession || msg.sessionId!==state.sessionId || state.mutating) {
       sendResponse({ok:false,error:'The queue is unavailable or the conversation changed.'});return
     }
     const sessionId=state.sessionId
     state.mutating=true
     ;(async()=>{
       if(msg.type==='queue/prompt')return request('session.prompt',{sessionId,requestId:msg.requestId,mode:'queue',content:[{type:'text',text:String(msg.text??'')}]})
+      if(msg.action==='acknowledge'&&state.harness==='pi'&&!state.running)return request('session.resolveQueue',{sessionId,itemId:msg.itemId,acknowledgeUnknownOutcome:true})
       if(!['steer','remove'].includes(msg.action))throw Error('Unsupported queue action.')
       return request('session.updateQueue',{sessionId,itemId:msg.itemId,expectedTurnId:msg.expectedTurnId,action:{kind:msg.action}})
     })().then(result=>sendResponse({ok:true,...result}),error=>sendResponse({ok:false,error:error.message})).finally(()=>{state.mutating=false})
@@ -156,7 +157,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
       if(codex)intent=await prepareBranch(chrome.storage.local,intent)
       const row=await request('session.branch',intent)
       const history=await request('session.history',{sessionId:row.sessionId,maxMessages:100})
-      const queue=codex?{sessionId:row.sessionId,...await request('session.queue',{sessionId:row.sessionId})}:null
+      const queue=state.capabilities.queue===true?{sessionId:row.sessionId,...await request('session.queue',{sessionId:row.sessionId})}:null
       if(codex)await finishBranch(chrome.storage.local,intent,{[SESSION_STORAGE_KEY+'-codex']:row.sessionId,[MODEL_STORAGE_KEY+'-codex']:row.selection})
       state.sessionId=row.sessionId;state.sessionReady=true;saveSessionId(row.sessionId);state.selection=row.selection;saveSelection(row.selection)
       state.log=[];state.panelViewSession=null;state.queue=queue
@@ -324,7 +325,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
         const res = await request('session.prompt', {
           sessionId: state.sessionId,
           mode: 'queue',
-          ...(state.harness === 'codex' ? {resumeQueue: true} : {}),
+          ...(['pi','codex'].includes(state.harness) ? {resumeQueue: true,requestId:crypto.randomUUID()} : {}),
           content: [{ type: 'text', text }],
         })
         if (res?.accepted === true && !res.command) {

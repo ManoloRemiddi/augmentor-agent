@@ -57,6 +57,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
    res.end('data: [DONE]\n\n');return;
   }
   res.writeHead(200,{'content-type':'text/event-stream'});
+  if(content.includes('QUEUE_FAST')){setTimeout(()=>{chunk({role:'assistant',content:'Queued response.'});chunk({},'stop');res.end('data: [DONE]\n\n');},100);return;}
   if(content.includes('SEED_OVERFLOW')){chunk({role:'assistant',content:'Synthetic earlier completed context. '.repeat(4500)});chunk({},'stop');res.end('data: [DONE]\n\n');return;}
   if(content.includes('SLOW')){const timer=setInterval(()=>chunk({content:'tick '}),60);res.on('close',()=>clearInterval(timer));return;}
   const reassessing=body.messages.some(m=>m.role==='user'&&JSON.stringify(m.content).includes('REASSESS_TEST'));
@@ -94,6 +95,69 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
  await t.test('protocol rejects incompatible clients and keeps socket private',async()=>{await assert.rejects(Client.open(join(state,'runtime.sock'),'wrong'),/Incompatible/);assert.equal(statSync(join(state,'runtime.sock')).mode&0o777,0o600);});
  await t.test('catalog pins use the native picker contract and missing models never fall back',async()=>{await client.call('models.pin',{...selection,pinned:true});const catalog=await client.call('models.list');assert.deepEqual(catalog.pinned,['test/test']);assert.equal(catalog.groups.find(g=>g.provider==='test').models[0].location,'Local');await assert.rejects(client.call('models.validate',{...selection,model:'missing'}),/unavailable/);assert.equal(requests,0);});
  await t.test('stream, persist, history, rename, save and repeat request deduplication',async()=>{await create('basic');const id=randomUUID();await prompt('basic','hello',id);await idle('basic');assert(client.events.some(e=>e.payload?.event?.type==='assistant/chunk'));const before=requests;await prompt('basic','hello',id);assert.equal(requests,before);await client.call('session.rename',{sessionId:'basic',title:'Renamed'});await client.call('chats.saved',{sessionId:'basic',action:'save'});const row=(await client.call('session.list')).items.find(m=>m.sessionId==='basic');assert.equal(row.title,'Renamed');assert(row.saved);const history=await client.call('session.history',{sessionId:'basic'});assert(history.events.some(e=>e.event.type==='assistant/message'));});
+ await t.test('durable Pi prompts keep identity, FIFO, removal and a single SDK owner',async()=>{
+  await create('queue','read-only');assert.equal((await client.call('host.describe')).capabilities.queue,true);
+  const ids=[randomUUID(),randomUUID(),randomUUID()];
+  await client.call('session.prompt',{sessionId:'queue',requestId:ids[0],mode:'queue',content:[{type:'text',text:'SLOW queue owner'}]});
+  await until(()=>received.some(body=>JSON.stringify(body.messages).includes('SLOW queue owner')));
+  await client.call('session.prompt',{sessionId:'queue',requestId:ids[1],mode:'queue',content:[{type:'text',text:'Queued identical'}]});
+  await client.call('session.prompt',{sessionId:'queue',requestId:ids[2],mode:'queue',content:[{type:'text',text:'Queued identical'}]});
+  let snapshot=await client.call('session.queue',{sessionId:'queue'});assert.deepEqual(snapshot.items.map(item=>item.id),ids.slice(1));assert(snapshot.activeTurnId);assert(snapshot.items.every(item=>!item.canSteer&&item.canRemove));
+  const before=requests;const duplicate=await client.call('session.prompt',{sessionId:'queue',requestId:ids[1],content:[{type:'text',text:'Queued identical'}]});assert(duplicate.duplicate);assert.equal(requests,before);
+  await assert.rejects(client.call('session.prompt',{sessionId:'queue',requestId:ids[1],content:[{type:'text',text:'Changed'}]}),/identity was reused/);
+  await client.call('session.updateQueue',{sessionId:'queue',itemId:ids[1],action:{kind:'remove'}});await client.call('session.cancel',{sessionId:'queue'});await idle('queue');
+  snapshot=await client.call('session.queue',{sessionId:'queue'});assert(snapshot.paused);assert.equal(snapshot.items[0].id,ids[2]);assert(!received.some(body=>JSON.stringify(body.messages).includes('Queued identical')));
+  await client.call('session.continueQueue',{sessionId:'queue'});await idle('queue');await until(async()=>!(await client.call('session.queue',{sessionId:'queue'})).items.length);
+  const history=(await client.call('session.history',{sessionId:'queue'})).events.map(row=>row.event).filter(event=>event.type==='user/message');assert.deepEqual(history.map(event=>event.data.source.rpcId),[ids[0],ids[2]]);
+  assert.equal(received.filter(body=>JSON.stringify(body.messages.at(-1)).includes('Queued identical')).length,1);
+ });
+ await t.test('cold reconnect preserves paused queue; explicit idle Send resumes old waiting inputs before new input',async()=>{
+  await create('queue-paused','read-only');await prompt('queue-paused','SLOW paused');await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW paused')));
+  const waiting=randomUUID();await client.call('session.prompt',{sessionId:'queue-paused',requestId:waiting,mode:'queue',content:[{type:'text',text:'FIFO older'}]});await client.call('session.cancel',{sessionId:'queue-paused'});await idle('queue-paused');
+  const revision=(await client.call('session.queue',{sessionId:'queue-paused'})).revision;client.close();await stop();await start();client=await Client.open(join(state,'runtime.sock'));await client.call('events.subscribe',{sessionId:'queue-paused'});
+  await until(()=>latest('session/queue')?.payload?.sessionId==='queue-paused');const baseline=latest('session/queue').payload;assert(baseline.paused);assert(baseline.revision>revision);assert.equal(baseline.items[0].rpcId,waiting);
+  const resumed=randomUUID();await client.call('session.prompt',{sessionId:'queue-paused',requestId:resumed,resumeQueue:true,content:[{type:'text',text:'FIFO newer'}]});
+  await until(async()=>!(await client.call('session.queue',{sessionId:'queue-paused'})).items.length);await idle('queue-paused');
+  const delivered=(await client.call('session.history',{sessionId:'queue-paused'})).events.map(row=>row.event).filter(event=>event.type==='user/message').map(event=>event.data.source.rpcId);assert.deepEqual(delivered.slice(-2),[waiting,resumed]);
+ });
+ await t.test('Pi automatically drains normal waiting prompts in order without overlapping native turns',async()=>{
+  await create('queue-drain','read-only');const ids=[randomUUID(),randomUUID(),randomUUID()],before=received.length;
+  for(let n=0;n<ids.length;n++)await client.call('session.prompt',{sessionId:'queue-drain',requestId:ids[n],mode:'queue',content:[{type:'text',text:'QUEUE_FAST '+n}]});
+  await until(async()=>!(await client.call('session.queue',{sessionId:'queue-drain'})).items.length);await idle('queue-drain');
+  const events=(await client.call('session.history',{sessionId:'queue-drain'})).events.map(row=>row.event);
+  assert.deepEqual(events.filter(event=>event.type==='user/message').map(event=>event.data.source.rpcId),ids);
+  const lifecycle=events.filter(event=>event.type==='turn/start'||event.type==='turn/end').map(event=>event.type);assert.deepEqual(lifecycle,['turn/start','turn/end','turn/start','turn/end','turn/start','turn/end']);
+  assert.deepEqual(received.slice(before).map(body=>{const content=body.messages.at(-1).content;return typeof content==='string'?content:content.map(part=>part.text).join('');}),['QUEUE_FAST 0','QUEUE_FAST 1','QUEUE_FAST 2']);
+ });
+ await t.test('crashed active receipt requires explicit acknowledgment and cannot replay on reconnect',async()=>{
+  await create('queue-crash','read-only');const active=randomUUID(),waiting=randomUUID();await client.call('session.prompt',{sessionId:'queue-crash',requestId:active,content:[{type:'text',text:'SLOW crash queue'}]});await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW crash queue')));
+  await client.call('session.prompt',{sessionId:'queue-crash',requestId:waiting,mode:'queue',content:[{type:'text',text:'After crash'}]});client.close();await stop('SIGKILL');const before=requests;await start();client=await Client.open(join(state,'runtime.sock'));
+  const snapshot=await client.call('session.queue',{sessionId:'queue-crash'});assert(snapshot.paused);assert(snapshot.items.find(item=>item.id===active).canResolve);
+  await assert.rejects(client.call('session.continueQueue',{sessionId:'queue-crash'}),/unknown outcome/);await assert.rejects(client.call('session.updateQueue',{sessionId:'queue-crash',itemId:active,action:{kind:'remove'}}),/cannot be removed/);
+  const duplicate=await client.call('session.prompt',{sessionId:'queue-crash',requestId:active,content:[{type:'text',text:'SLOW crash queue'}]});assert(duplicate.duplicate);assert.equal(requests,before);
+  await assert.rejects(client.call('session.resolveQueue',{sessionId:'queue-crash',itemId:active}),/explicitly acknowledge/);await client.call('session.resolveQueue',{sessionId:'queue-crash',itemId:active,acknowledgeUnknownOutcome:true});await client.call('session.continueQueue',{sessionId:'queue-crash'});
+  await until(async()=>!(await client.call('session.queue',{sessionId:'queue-crash'})).items.length);await idle('queue-crash');assert.equal(received.filter(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW crash queue')).length,1);
+ });
+ await t.test('real Native Qt controls queue, remove, reconnect, Stop and resume through Pi',{skip:process.platform==='win32',timeout:30000},async()=>{
+  await create('queue-native','read-only');await prompt('queue-native','SLOW native queue');await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW native queue')));
+  const child=spawn(process.env.AUGMENTOR_PYTHON??'python3',[fileURLToPath(new URL('./fixtures/native-pi-queue.py',import.meta.url))],{env:{...env,HOME:join(root,'qt-home'),XDG_CONFIG_HOME:join(root,'qt-config'),XDG_STATE_HOME:join(root,'qt-state'),XDG_DATA_HOME:join(root,'qt-data'),AUGMENTOR_PI_NO_AUTOSTART:'1',PYTHONPATH:join(runtimeRoot,'apps/native'),QT_QPA_PLATFORM:'offscreen'},stdio:['ignore','pipe','pipe']});
+  let output='',errors='';child.stdout.on('data',data=>output+=data);child.stderr.on('data',data=>errors+=data);
+  const timer=setTimeout(()=>child.kill('SIGKILL'),25000);try{const [code]=await once(child,'exit');assert.equal(code,0,errors);assert(output.includes('"nativePiQueue": "passed"'));}finally{clearTimeout(timer);if(child.exitCode===null)child.kill('SIGKILL');}
+ });
+ await t.test('Pi Browser bridge forwards queue baselines and actions within its surface only',async()=>{
+  const bridge=spawn(process.execPath,[join(runtimeRoot,'apps/browser/pi-bridge.mjs')],{env:{...env,HOME:join(root,'browser-home'),AUGMENTOR_BROWSER_HARNESS:'pi'},stdio:['pipe','pipe','pipe']});let buffer=Buffer.alloc(0),errors='';const frames=[],pending=new Map();
+  bridge.stderr.on('data',data=>errors+=data);bridge.stdout.on('data',data=>{buffer=Buffer.concat([buffer,data]);while(buffer.length>=4&&buffer.length>=buffer.readUInt32LE(0)+4){const length=buffer.readUInt32LE(0),frame=JSON.parse(buffer.subarray(4,length+4));buffer=buffer.subarray(length+4);if(frame.id&&pending.has(frame.id)){const row=pending.get(frame.id);pending.delete(frame.id);frame.error?row.reject(Error(frame.error.message)):row.resolve(frame.result);}else frames.push(frame);}});
+  const call=(method,params={})=>new Promise((resolve,reject)=>{const id=randomUUID();pending.set(id,{resolve,reject});const body=Buffer.from(JSON.stringify({id,method,params})),header=Buffer.alloc(4);header.writeUInt32LE(body.length);bridge.stdin.write(Buffer.concat([header,body]));});
+  try{
+   const initialized=await call('initialize',selection);assert.equal(initialized.serverInfo.capabilities.queue,true);assert.equal(initialized.serverInfo.capabilities.steering,false);
+   const sid='queue-browser';await call('session.create',{sessionId:sid});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.sessionId===sid));
+   await call('session.prompt',{sessionId:sid,requestId:'browser-active',mode:'queue',content:[{type:'text',text:'SLOW browser queue'}]});await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW browser queue')));
+   await call('session.prompt',{sessionId:sid,requestId:'browser-waiting',mode:'queue',content:[{type:'text',text:'Browser pending'}]});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.items.some(item=>item.id==='browser-waiting')));
+   await assert.rejects(call('session.queue',{sessionId:'queue-native'}),/cannot access a Linux chat/);
+   await call('session.updateQueue',{sessionId:sid,itemId:'browser-waiting',action:{kind:'remove'}});assert.equal((await call('session.queue',{sessionId:sid})).items.length,0);
+   await call('session.cancel',{sessionId:sid});await until(()=>frames.some(frame=>frame.method==='session.status'&&frame.params.status==='idle'));
+  }finally{bridge.stdin.end();const timer=setTimeout(()=>bridge.kill('SIGKILL'),5000);const [code]=await once(bridge,'exit');clearTimeout(timer);assert.equal(code,0,errors);}
+ });
  await t.test('inspection captures the actual post-extension provider payload, reasoning and tool evidence',async t=>{
   const beforeSettings=await client.call('observation.describe');
   assert.equal(beforeSettings.capturePayloads,false);

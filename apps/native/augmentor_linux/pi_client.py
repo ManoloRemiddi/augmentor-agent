@@ -62,6 +62,8 @@ class Connection:
 class PiClient:
     def __init__(self, base=None):
         self.base = base or socket_path()
+        self.capabilities = {'branch': True, 'edit': True, 'queue': False, 'steering': False}
+        self.supports_queue = False
 
     def call(self, method, payload=None):
         connection=None
@@ -72,7 +74,12 @@ class PiClient:
                 from .runtime_start import ensure_running
                 ensure_running()
                 connection=Connection(self.base)
-            return connection.call(method,payload)
+            result=connection.call(method,payload)
+            if method == 'host.describe':
+                self.supports_queue = result.get('capabilities', {}).get('queue') is True
+                self.capabilities['queue'] = self.supports_queue
+                self.capabilities['steering'] = result.get('capabilities', {}).get('steering') is True
+            return result
         except (OSError,ValueError) as exc:
             raise ContractError('Cannot reach the Pi runtime: '+str(exc)) from exc
         finally:

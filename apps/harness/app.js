@@ -1,12 +1,24 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {deriveTrajectoryTimeline,trajectoryTimelineFocusIndexes} from './timeline.js';
 import {projectChat,appendDisplay} from './chat-projection.js';
+import {createQueue} from './queue-view.js';
 const $=id=>document.getElementById(id);
 const hash=new URLSearchParams(location.hash.slice(1));
 const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
 if(token)sessionStorage.setItem('augmentor-harness-token',token);
 history.replaceState(null,'',location.pathname);
-const state={sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0};
+const state={sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0,queue:null};
+const promptQueue=createQueue({container:$('prompt-queue'),input:$('input'),allowIdle:true,send:async(method,payload)=>{
+  const sid=payload.sessionId,epoch=state.epoch;
+  const result=await rpc(method==='queue/prompt'?'session.prompt':payload.action==='acknowledge'?'session.resolveQueue':'session.updateQueue',method==='queue/prompt'?{sessionId:sid,requestId:payload.requestId,mode:'queue',resumeQueue:payload.resumeQueue,content:[{type:'text',text:payload.text}]}:payload.action==='acknowledge'?{sessionId:sid,itemId:payload.itemId,acknowledgeUnknownOutcome:true}:{sessionId:sid,itemId:payload.itemId,action:{kind:payload.action}});
+  if(epoch===state.epoch){await refreshSessions();notice(result.queued?'Prompt queued.':'Request accepted.');}return result;
+}});
+function renderQueue(entry){
+  promptQueue.update({harness:'pi',capabilities:{queue:!!state.sessionId},sessionId:state.sessionId,phase:'ready',running:current()?.running===true,queue:state.queue,...(entry?{entry:{sessionId:state.sessionId,event:entry}}:{})});
+  $('continue-queue').hidden=!state.queue?.paused||!state.queue.items.some(item=>item.canRemove);
+  $('continue-queue').disabled=current()?.running===true||state.queue?.items.some(item=>item.canResolve);
+}
+function queueBaseline(queue){if(queue?.sessionId===state.sessionId&&(!state.queue||queue.revision>=state.queue.revision)){state.queue=queue;renderQueue();}}
 let inspectionEpoch=0,polling=false,submitting=false,timelineModel=null,timelineTurns=[],lastSessionsRefresh=0;
 function closeSidebar(){ $('sidebar').classList.remove('open');$('show-conversations').setAttribute('aria-expanded','false'); }
 $('show-conversations').onclick=()=>{const open=$('sidebar').classList.toggle('open');$('show-conversations').setAttribute('aria-expanded',String(open));};
@@ -31,7 +43,8 @@ function renderSessions(){
   }));
   const session=current();$('title').textContent=session?.title||'Your agent, in view';
   $('subtitle').textContent=session?(session.running?'Working · ':'')+session.cwd:'Open a conversation to inspect its execution and context.';
-  $('stop').disabled=!session?.running;$('send').disabled=!session||session.running||submitting;
+  $('stop').disabled=!session?.running&&!submitting;$('send').disabled=!session;
+  $('send').textContent=session?.running||submitting?'Queue':'Send';renderQueue();
   $('trim-tools').disabled=!session||session.running||submitting;
 }
 function renderChat(){
@@ -176,10 +189,10 @@ function renderInteraction(){
 }
 async function selectSession(sid){
   closeSidebar();
-  const epoch=++state.epoch;inspectionEpoch++;state.sessionId=sid;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
+  const epoch=++state.epoch;inspectionEpoch++;state.sessionId=sid;state.queue=null;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
   $('interaction').hidden=true;$('inspector').replaceChildren(node('p','Select a record to inspect.','empty'));renderSessions();renderChat();
   const subscription=await rpc('events.subscribe',{sessionId:sid,clientId:state.clientId});if(epoch!==state.epoch)return;
-  state.cursor=subscription.cursor;subscription.pending.forEach(showInteraction);
+  state.cursor=subscription.cursor;subscription.pending.forEach(showInteraction);queueBaseline(subscription.queue);
   const [page,selection]=await Promise.all([rpc('observation.list',{sessionId:sid}),rpc('session.models',{sessionId:sid}),refreshHistory(sid,epoch)]);
   if(epoch!==state.epoch)return;page.records.forEach(r=>state.observations.set(r.id,r));state.hasMore=page.hasMore;
   $('model').value=JSON.stringify(selection.current);renderObservations();if(state.view==='context')await inspectContext();
@@ -194,9 +207,11 @@ async function poll(){
     let chatChanged=false,observationChanged=false,settled=false;
     for(const item of page.frames){
       const frame=item.frame;
+      if(frame.method==='session/queue')queueBaseline(frame.payload);
       if(frame.method==='observation/event'){const r=frame.payload.observation;state.observations.set(r.id,r);observationChanged=true;}
       if(frame.method==='session/event'){
         const event=frame.payload.event;
+        if(event.type==='user/message')renderQueue(event);
         if(appendDisplay(state.history,event))chatChanged=true;
         if(event.type==='turn/end')settled=true;
       }
@@ -206,6 +221,7 @@ async function poll(){
     if(settled||page.gap){
       await refreshHistory(sid,epoch);
       if(page.gap&&epoch===state.epoch){const records=await rpc('observation.list',{sessionId:sid});if(epoch===state.epoch){records.records.forEach(r=>state.observations.set(r.id,r));state.hasMore=records.hasMore;renderObservations();}}
+      if(page.gap&&epoch===state.epoch)queueBaseline({sessionId:sid,...await rpc('session.queue',{sessionId:sid})});
       await refreshSessions();
     }
     if(Date.now()-lastSessionsRefresh>(current()?.running?2000:10000))await refreshSessions();
@@ -225,7 +241,8 @@ $('new-chat').onclick=async()=>{try{const selection=JSON.parse($('model').value|
 $('model').onchange=async()=>{const sid=state.sessionId,epoch=state.epoch;try{if(sid)await rpc('session.selectModel',{sessionId:sid,...JSON.parse($('model').value)});}catch(e){notice(e.message,true);try{const selection=await rpc('session.models',{sessionId:sid});if(epoch===state.epoch)$('model').value=JSON.stringify(selection.current);}catch{}}};
 $('stop').onclick=async()=>{try{await rpc('session.cancel',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
 $('trim-tools').onclick=async()=>{const sid=state.sessionId,epoch=state.epoch;try{const result=await rpc('session.trimTools',{sessionId:sid});if(epoch!==state.epoch)return;notice(result.changes.length+' tool results shortened. Originals remain saved.');const page=await rpc('observation.list',{sessionId:sid});if(epoch===state.epoch){page.records.forEach(r=>state.observations.set(r.id,r));renderObservations();}}catch(e){notice(e.message,true);}};
-$('composer').onsubmit=async event=>{event.preventDefault();const input=$('input').value,sid=state.sessionId,epoch=state.epoch;if(!input.trim()||!sid||submitting||current()?.running)return;submitting=true;renderSessions();try{await rpc('session.prompt',{sessionId:sid,content:[{type:'text',text:input}]});if(epoch===state.epoch&&$('input').value===input)$('input').value='';await refreshSessions();notice('Request accepted.');}catch(e){notice(e.message,true);}finally{submitting=false;renderSessions();}};
+$('composer').onsubmit=async event=>{event.preventDefault();if(!state.sessionId)return;submitting=true;renderSessions();try{await promptQueue.submit();}finally{submitting=false;renderSessions();}};
+$('continue-queue').onclick=async()=>{try{await rpc('session.continueQueue',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
 $('input').onkeydown=event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();$('composer').requestSubmit();}};
 let drag=null;
 $('timeline').onpointerdown=event=>{if(!timelineModel)return;const box=$('timeline').getBoundingClientRect();const value=timelineModel.start+Math.max(0,Math.min(1,(event.clientX-box.left-12)/(box.width-24)))*Math.max(1,timelineModel.end-timelineModel.start);drag=value;$('timeline').setPointerCapture(event.pointerId);};

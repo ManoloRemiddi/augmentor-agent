@@ -28,9 +28,10 @@ import {observeSession} from './observations.js';
 import {piToolBudget,trimSavedToolContext,TOOL_BUDGET} from './tool-budget.js';
 import {piReassessment} from './reassessment.js';
 import {PiExecution,EXECUTION_POLICY,type ExecutionContract} from './execution.js';
+import {PiPromptQueue,promptIdentity} from './queue.js';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];execution?:PiExecution;observation?:ReturnType<typeof observeSession>;turnId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
+interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];execution?:PiExecution;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 export class Host {
   readonly dirs=paths();
   readonly browser=new BrowserBroker();
@@ -42,6 +43,8 @@ export class Host {
   readonly observations:ObservationStore;
   private serial:Promise<unknown>=Promise.resolve();
   private quiescing=false;
+  private queues=new Map<string,PiPromptQueue>();
+  private pumping=new Map<string,Promise<unknown>>();
   readonly backend=process.env.AUGMENTOR_PI_DESKTOP_HELPER || fileURLToPath(new URL('../../../apps/native/augmentor_linux/desktop.py',import.meta.url));
   readonly desktopSpecialist=new DesktopSpecialist(join(this.dirs.state,'desktop-runs'),linuxDesktopExecutor(this.backend));
   constructor(readonly publish:(sid:string,frame:Data)=>void,readonly connected:(sid:string)=>boolean){
@@ -55,8 +58,13 @@ export class Host {
   }
   async init(){this.modelRuntime=await ModelRuntime.create({authPath:join(this.dirs.agent,'auth.json'),modelsPath:join(this.dirs.agent,'models.json'),modelsStorePath:join(this.dirs.agent,'models-store.json'),allowModelNetwork:false});
     if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());
-    for(const m of this.metadata.values())if(m.running){if(this.events(m).at(-1)?.type==='turn/end'){m.running=false;this.save(m);continue;}this.append(m,'turn/end',{reason:{kind:'interrupted'},message:'Runtime stopped. The previous action outcome may be unknown; the prompt was not replayed.'});m.running=false;this.save(m);}
+    for(const m of this.metadata.values()){
+      this.queue(m).recover();
+      if(m.running){if(this.events(m).at(-1)?.type==='turn/end'){m.running=false;this.save(m);continue;}this.append(m,'turn/end',{reason:{kind:'interrupted'},message:'Runtime stopped. The previous action outcome may be unknown; the prompt was not replayed.'});m.running=false;this.save(m);}
+    }
   }
+  private queue(m:Meta){let queue=this.queues.get(m.id);if(!queue){queue=new PiPromptQueue(join(this.dirs.sessions,m.id+'.queue.json'),m.id,()=>this.publish(m.id,{method:'session/queue',payload:{sessionId:m.id,...this.queueSnapshot(m.id)}}));this.queues.set(m.id,queue);}return queue;}
+  queueSnapshot(id:unknown){const m=this.getMeta(id);return this.queue(m).snapshot();}
   save(m:Meta){atomicJson(join(this.dirs.sessions,m.id+'.meta.json'),m);}
   persistSettings(){this.settings.revision++;atomicJson(join(this.dirs.config,'settings.json'),this.settings);}
   events(m:Meta):DisplayEvent[]{const file=join(this.dirs.sessions,m.id+'.events.jsonl');if(!existsSync(file))return [];let raw=readFileSync(file);if(raw.length&&raw.at(-1)!==10){const end=raw.lastIndexOf(10)+1;truncateSync(file,end);raw=raw.subarray(0,end);}const lines=raw.toString('utf8').split('\n');const result:DisplayEvent[]=[];
@@ -128,7 +136,11 @@ export class Host {
       surface:m.surface??'linux',policy:m.policy,...(m.fork?{fork:m.fork}:{})});
     if(repaired.length)record.observation.record('context/budget',{changes:repaired,units:'unicode-code-points',boundary:'before-session-owner-load'});
     created.session.subscribe(e=>{
-      if(e.type==='message_start'&&e.message.role==='user')this.append(m,'user/message',{source:{kind:'user'},content:typeof e.message.content==='string'?[{type:'text',text:e.message.content}]:e.message.content});
+      if(e.type==='message_start'&&e.message.role==='user'){
+        const requestId=record!.activeRequestId;
+        if(requestId)this.queue(m).delivered(requestId);
+        this.append(m,'user/message',{source:{kind:'user',...(requestId?{rpcId:requestId}:{})},content:typeof e.message.content==='string'?[{type:'text',text:e.message.content}]:e.message.content});
+      }
       if(e.type==='message_update'){
         const a=e.assistantMessageEvent;if(a.type==='text_delta')this.append(m,'assistant/chunk',{chunk:{type:'text-delta',text:a.delta}});
         if(a.type==='thinking_delta')this.append(m,'assistant/chunk',{chunk:{type:'reasoning-delta',text:a.delta}});
@@ -141,7 +153,7 @@ export class Host {
       if(e.type==='tool_execution_end')this.append(m,'tool/result',{name:e.toolName,toolCallId:e.toolCallId,isError:e.isError,result:{...e.result,content:e.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Desktop image sent to the selected model]'}:part)}});
     });return record;
   }
-  async cancel(id:unknown,source='user'){const m=this.getMeta(id);const r=this.loaded.get(m.id);if(m.running&&r){r.cancelled=true;r.execution?.cancel();}if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(!r||!m.running)return {accepted:false};r.cancelled=true;r.session.clearQueue();r.session.abortCompaction();await r.session.abort();return {accepted:true};}
+  async cancel(id:unknown,source='user'){const m=this.getMeta(id);this.queue(m).pause();const r=this.loaded.get(m.id);if(m.running&&r){r.cancelled=true;r.execution?.cancel();}if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(!r||!m.running)return {accepted:false,paused:true};r.cancelled=true;r.session.clearQueue();r.session.abortCompaction();await r.session.abort();return {accepted:true,paused:true};}
   async branch(p:Data){
     const source=this.getMeta(p.sessionId),sid=identifier(p.newSessionId);
     if(!Number.isSafeInteger(p.messageSeq)||p.messageSeq<1||!['reply','edit'].includes(p.mode))throw new Error('Invalid branch target');
@@ -162,15 +174,35 @@ export class Host {
     return this.branchRow(m);
   }
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
-  submit(r:Loaded,input:string,id:string){const m=r.meta;if(m.requests.includes(id))return {accepted:true,duplicate:true};if(m.running)throw new Error('This conversation is already working');
-    m.running=true;r.cancelled=false;r.failed=false;r.turnId=randomUUID();m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{});
+  submit(r:Loaded,input:string,id:string){const m=r.meta;if(m.running)throw new Error('This conversation is already working');
+    r.turnId=randomUUID();const queue=this.queue(m);queue.dispatch(id,r.turnId);
+    m.running=true;r.cancelled=false;r.failed=false;r.activeRequestId=id;m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{requestId:id});queue.accepted(id);
     r.observation?.beginTurn({clientRequestId:id});
     r.execution?.begin(r.manager);
     if(!m.title){m.title=input.replace(/\s+/g,' ').slice(0,80);r.session.setSessionName(m.title);this.append(m,'session/title',{title:m.title});this.save(m);}
     r.task=(async()=>{let failed=false;try{await r.memory.activity('foreground');if(r.cancelled)return;await r.session.prompt(input,{expandPromptTemplates:false,source:'rpc'});}catch(error){failed=true;this.append(m,'runtime/error',{message:String(error)});}finally{
       await r.memory.activity('stop');
-      r.execution?.end(r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed');this.interactions.cancel(m.id);if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});m.running=false;m.updatedAt=Date.now();this.save(m);const reason=r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed';this.append(m,'turn/end',{reason:{kind:reason}});r.observation?.record('turn/end',{reason,execution:r.execution?.describe()});r.turnId=undefined;
+      r.execution?.end(r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed');this.interactions.cancel(m.id);if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});const reason=r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed';
+      // A terminal receipt is persisted before admitting another input. A crash
+      // before this boundary produces an unknown receipt, never an automatic retry.
+      queue.finish(id,reason==='aborted'?'cancelled':reason==='error'?'failed':'completed');if(reason!=='completed')queue.pause();
+      m.running=false;m.updatedAt=Date.now();this.save(m);this.append(m,'turn/end',{reason:{kind:reason},requestId:id});r.observation?.record('turn/end',{reason,execution:r.execution?.describe()});r.turnId=undefined;r.activeRequestId=undefined;
+      if(!queue.paused)this.pump(m);
     }})();return {accepted:true,turnId:r.turnId};
+  }
+  private pump(m:Meta){
+    if(this.pumping.has(m.id))return this.pumping.get(m.id)!;
+    const run=this.serial.then(async()=>{
+      const queue=this.queue(m);
+      if(this.quiescing||m.running||queue.paused||queue.uncertain||!queue.next)return;
+      const item=queue.next;
+      let r:Loaded;
+      try{r=await this.load(m);}catch(error){queue.notSent(item.id);this.append(m,'runtime/error',{message:'Queued prompt was not sent: '+String(error)});return;}
+      if(this.quiescing||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
+      this.submit(r,item.input!,item.id);
+    });
+    this.serial=run.catch(()=>{});this.pumping.set(m.id,run);
+    void run.catch(error=>{this.queue(m).pause();console.warn('[augmentor-queue] Dispatch stopped:',String(error));}).finally(()=>this.pumping.delete(m.id));return run;
   }
   async dispatch(method:string,p:Data,id:string){
     if(this.quiescing&&method!=='host.describe')throw new Error('Runtime is closing for maintenance. No action was submitted.');
@@ -187,7 +219,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-only',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:false,linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-only',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
       this.quiescing=true;this.setup.cancel();return {accepted:true};
@@ -219,7 +251,27 @@ export class Host {
     case 'session.history':{const m=this.getMeta(p.sessionId);return historyPage(this.loaded.get(m.id)?.events??this.events(m),p.maxMessages,p.beforeSeq);}
     case 'session.models':return {current:this.getMeta(p.sessionId).selection};
     case 'session.selectModel':{const m=this.getMeta(p.sessionId);if(m.running)throw new Error('Stop before changing models');const model=await this.selected(p);const previous=m.selection;const loaded=this.loaded.get(m.id);if(loaded)await loaded.session.setModel(model);else{m.selection={provider:p.provider,model:p.model};try{await this.load(m);}catch(error){m.selection=previous;this.save(m);throw error;}}m.selection={provider:p.provider,model:p.model};this.save(m);return {current:m.selection};}
-    case 'session.prompt':{const m=this.getMeta(p.sessionId);if(m.requests.includes(id))return {accepted:true,duplicate:true};const input=text(p.content?.filter((part:Data)=>part.type==='text').map((part:Data)=>part.text).join('\n'));const r=await this.load(m);return this.submit(r,input,id);}
+    case 'session.prompt':{
+      const m=this.getMeta(p.sessionId),requestId=promptIdentity(p.requestId??id);
+      if(p.mode!==undefined&&p.mode!=='queue')throw Error('Responsive steering is not yet supported by this Pi candidate.');
+      const input=text(p.content?.filter((part:Data)=>part.type==='text').map((part:Data)=>part.text).join('\n')),queue=this.queue(m);
+      if(queue.lookup(requestId,input)||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
+      if(p.mode===undefined&&m.running)throw Error('This conversation is already working; use queue mode to add a waiting prompt.');
+      if(p.resumeQueue!==undefined&&typeof p.resumeQueue!=='boolean')throw Error('Choose whether to resume the queue.');
+      if(queue.uncertain)throw Error('A previous prompt has an unknown outcome. Inspect its history and explicitly acknowledge the interrupted receipt before sending more.');
+      queue.enqueue(requestId,input,m.running||queue.paused||!!queue.next);
+      if(p.resumeQueue===true||(p.mode===undefined&&!m.running&&p.resumeQueue!==false))queue.resume();
+      if(!m.running&&!queue.paused){
+        let r:Loaded;try{r=await this.load(m);}catch(error){queue.notSent(requestId);throw error;}
+        if(!queue.paused&&queue.next?.id===requestId)return {...this.submit(r,input,requestId),requestId};
+        if(!queue.paused)this.pump(m);
+      }
+      return {accepted:true,queued:true,requestId};
+    }
+    case 'session.queue':return this.queueSnapshot(p.sessionId);
+    case 'session.updateQueue':{const m=this.getMeta(p.sessionId);if(p.action?.kind!=='remove')throw Error('Only removal is supported by this Pi queue candidate.');this.queue(m).remove(promptIdentity(p.itemId));return {accepted:true,...this.queueSnapshot(m.id)};}
+    case 'session.continueQueue':{const m=this.getMeta(p.sessionId);this.queue(m).resume();this.pump(m);return {accepted:true};}
+    case 'session.resolveQueue':{const m=this.getMeta(p.sessionId);if(m.running||p.acknowledgeUnknownOutcome!==true)throw Error('Inspect the saved history and explicitly acknowledge that the interrupted action outcome remains unknown.');this.queue(m).resolve(promptIdentity(p.itemId));this.append(m,'runtime/notice',{message:'The interrupted prompt receipt was acknowledged. Its action outcome may still be unknown. That prompt was not retried; waiting prompts remain paused.',incomplete:true});return {accepted:true};}
     case 'session.rename':{const m=this.getMeta(p.sessionId);m.title=text(p.title,200);this.loaded.get(m.id)?.session.setSessionName(m.title);this.save(m);this.append(m,'session/title',{title:m.title});return {title:m.title};}
     case 'chats.saved':{if(p.action&&p.action!=='state'){if(!['save','unsave'].includes(p.action))throw new Error('Invalid saved-chat action');const m=this.getMeta(p.sessionId);m.saved=p.action==='save';this.save(m);}return {saved:[...this.metadata.values()].filter(m=>m.saved).map(m=>m.id)};}
     case 'settings.describe':return {namespaces:[{ns:'permission',revision:this.settings.revision,value:{defaultPreset:this.settings.defaultPreset}},{ns:'prompt-library',revision:this.settings.revision,value:await promptCall('prompts.list')}]};
@@ -227,5 +279,5 @@ export class Host {
     case 'prompts.list':case 'prompts.save':case 'prompts.delete':return promptCall(method,p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.execution?.dispose();r.session.dispose();}}
+  async close(){this.quiescing=true;this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.execution?.dispose();r.session.dispose();}}
 }

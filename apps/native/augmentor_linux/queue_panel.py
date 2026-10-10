@@ -56,11 +56,11 @@ class QueuePanel(QScrollArea):
         self.delivered.add(rpc_id)
         if len(self.delivered)>2048:self.delivered={rpc_id}
         self.pending.pop(rpc_id,None)
-        self.items=[row for row in self.items if row.get('rpcId')!=rpc_id]
+        self.items=[row for row in self.items if row.get('canResolve') or row.get('rpcId')!=rpc_id]
         self.render()
 
     def replace(self, items):
-        self.items=[row for row in items if row.get('placement') in ('queued','steering') and row.get('rpcId') not in self.delivered]
+        self.items=[row for row in items if row.get('placement') in ('queued','steering') and (row.get('canResolve') or row.get('rpcId') not in self.delivered)]
         for row in self.items:self.pending.pop(row.get('rpcId'),None)
         self.changing.intersection_update(row['id'] for row in self.items)
         self.render()
@@ -94,6 +94,10 @@ class QueuePanel(QScrollArea):
             label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
             layout.addWidget(label,1)
             if item:
+                if item.get('canResolve'):
+                    acknowledge=QPushButton('Keep interrupted');acknowledge.setToolTip('Acknowledge this interrupted receipt without retrying the prompt or confirming its action outcome')
+                    acknowledge.setEnabled(self.online and not self.running and key not in self.changing)
+                    acknowledge.clicked.connect(lambda checked=False,k=key:self.act(k,'acknowledge'));layout.addWidget(acknowledge)
                 steer=QPushButton('Steer');steer.setAccessibleName('Steer queued prompt')
                 steer.setToolTip('Use this prompt at the next step of the current response')
                 steer.setEnabled(self.online and self.running and item['placement']=='queued' and key not in self.changing and item.get('canSteer',True))

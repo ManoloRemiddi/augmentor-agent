@@ -11,6 +11,7 @@ const allowed = new Set([
   'host.describe', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.list', 'session.create', 'session.history', 'session.models', 'session.selectModel',
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
+  'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.payload', 'observation.clear',
   'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'interaction.respond',
 ]);
@@ -119,7 +120,7 @@ export class HarnessServer {
             this.host.getMeta(sessionId);
             this.watches.set(clientId, {sessionId, seen: Date.now()});
             this.send(res, 200, {id: rpc.id, result: {subscribed: true, cursor: this.sequence,
-              pending: this.host.interactions.frames(sessionId)}});
+              queue:{sessionId,...this.host.queueSnapshot(sessionId)},pending: this.host.interactions.frames(sessionId)}});
             return;
           }
           if (!allowed.has(rpc.method)) throw new Error('Method is not exposed by Augmentor Harness');
@@ -138,6 +139,7 @@ export class HarnessServer {
         ['/', {path: join(this.assets, 'index.html'), type: 'text/html'}],
         ['/app.js', {path: join(this.assets, 'app.js'), type: 'text/javascript'}],
         ['/chat-projection.js', {path: join(this.assets, 'chat-projection.js'), type: 'text/javascript'}],
+        ['/queue-view.js', {path: fileURLToPath(new URL('../../harness-ui/src/queue-view.js', import.meta.url)), type: 'text/javascript'}],
         ['/harness.css', {path: join(this.assets, 'harness.css'), type: 'text/css'}],
         ['/timeline.js', {path: fileURLToPath(new URL('../../harness-ui/src/dsh-timeline.js', import.meta.url)), type: 'text/javascript'}],
         ['/trajectory-contract.js', {path: fileURLToPath(new URL('../../harness-ui/src/trajectory-contract.js', import.meta.url)), type: 'text/javascript'}],

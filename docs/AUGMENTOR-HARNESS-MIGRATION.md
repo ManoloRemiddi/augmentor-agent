@@ -152,7 +152,7 @@ Transformations must preserve provenance without converting retrieved content in
 
 Both the local and recorded remote [Pi host](../packages/runtime/src/host.ts) suppress reasoning-delta text in the display feed, omit tool arguments at tool start, and replace image results in that feed with a text notice. Session creation sets thinking to off, and resource discovery is deliberately restricted. These are Augmentor adapter boundaries; they do not establish that Pi's underlying session file discarded the original content.
 
-The replacement must preserve available reasoning, arguments and authorized attachment references in the inspection path; expose effective thinking policy; and explicitly register approved extensions, skills and context resources. The host currently rejects concurrent submission, so SDK steer/follow-up support needs a product queue binding. Keep the display/recovery journal separate from Pi's true model context and test both after cold reopen.
+The replacement must preserve available reasoning, arguments and authorized attachment references in the inspection path; expose effective thinking policy; and explicitly register approved extensions, skills and context resources. At the analysis baseline the host rejected concurrent submission. The [October 10 candidate](AUGMENTOR-HARNESS.md) now binds durable waiting inputs around the SDK session; responsive steering and safe supersession remain required. Keep the display/recovery journal separate from Pi's true model context and test both after cold reopen.
 
 ### Inspection behavior
 

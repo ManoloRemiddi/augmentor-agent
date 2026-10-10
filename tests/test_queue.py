@@ -94,3 +94,24 @@ class QueueTests(unittest.TestCase):
         c.update_queue('queued','steer')
         self.assertEqual(calls[-1][1]['expectedTurnId'],'turn-1')
         c.close()
+
+    def test_pi_reconnect_ignores_older_queue_snapshots_and_acknowledges_without_retry(self):
+        calls=[];rows=[]
+        c=Controller(client=SimpleNamespace(call=lambda *args:calls.append(args) or {'accepted':True}),harness='pi')
+        c.session='s';c.online=True;c.task=lambda fn:fn();c.queue_changed.connect(rows.append)
+        c.frame({'method':'session/queue','payload':{'sessionId':'s','revision':8,'items':[item()]}})
+        c.frame({'method':'session/queue','payload':{'sessionId':'s','revision':7,'items':[]}})
+        self.assertEqual(len(rows),1)
+        c.update_queue('unknown','acknowledge')
+        self.assertEqual(calls[-1],('session.resolveQueue',{'sessionId':'s','itemId':'unknown','acknowledgeUnknownOutcome':True}))
+        c.running=True;c.update_queue('unknown','acknowledge');self.assertEqual(len(calls),1)
+        c.running=False;c.close()
+
+    def test_pi_unknown_action_receipt_stays_visible_after_confirmed_user_delivery(self):
+        p=QueuePanel();p.consumed('rpc')
+        p.replace([{**item(),'canResolve':True,'canSteer':False,'canRemove':False,'stateLabel':'Interrupted — check the action outcome'}])
+        self.assertEqual(len(p.items),1)
+        buttons=[b for b in p.findChildren(QPushButton) if not b.isHidden()]
+        self.assertTrue(next(b for b in buttons if b.text()=='Keep interrupted').isEnabled())
+        self.assertFalse(next(b for b in buttons if b.text()=='×').isEnabled())
+        p.replace([]);self.assertFalse(p.items);p.close()

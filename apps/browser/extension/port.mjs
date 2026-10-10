@@ -142,7 +142,7 @@ export function ensurePort() {
       return
     }
     if (msg.method === 'session.queue') {
-      if (state.harness==='codex' && msg.params?.sessionId===state.sessionId) {state.queue=msg.params;broadcast({kind:'queue',sessionId:state.sessionId})}
+      if (state.capabilities.queue===true && msg.params?.sessionId===state.sessionId && (!state.queue || state.queue.sessionId!==state.sessionId || msg.params.revision>=state.queue.revision)) {state.queue=msg.params;broadcast({kind:'queue',sessionId:state.sessionId})}
       return
     }
     if (msg.method === 'session.error') {

@@ -1,8 +1,8 @@
-import {surfaceRequest} from './shared/surface.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+import {surfaceRequest} from './shared/surface.mjs'
 import {homeConnection} from './shared/home.mjs'
 import {PiConnection} from '../../dist/client/src/socket.js'
 import {promptLibrary} from './shared/prompts.mjs'
@@ -32,6 +32,7 @@ async function client(){if(connection&&!connection.closed)return connection;if(!
   if(frame.method==='browser/execute'){send(frame.payload);return}
   if(['approval/requested','question/requested'].includes(frame.method)){interactions.set(frame.rpcId,frame.payload.sessionId);send({id:frame.rpcId,method:frame.method.replace('/','.'),params:frame.payload});return}
   if(frame.method==='interaction/resolved'){interactions.delete(frame.payload.rpcId);send({method:'interaction.resolved',params:frame.payload});return}
+  if(frame.method==='session/queue'){send({method:'session.queue',params:frame.payload});return}
   if(frame.method==='session/event'){send({method:'session.event',params:frame.payload});const type=frame.payload.event.type;if(type==='turn/start'||type==='turn/end')send({method:'session.status',params:{sessionId:frame.payload.sessionId,status:type==='turn/start'?'running':'idle'}})}
 },()=>{if(!work.closing)void cleanup(1)},harness).then(c=>{connection=c;return c}).finally(()=>opening=null);return opening}
 async function attach(sid){const c=await client();await c.call('events.subscribe',{sessionId:sid});await c.call('browser.attach',{sessionId:sid});currentSession=sid}
@@ -55,7 +56,7 @@ async function request(method,p={},id){
   if(method==='augmentor/models')return c.call('models.list')
   if(method==='initialize'){
     selection={provider:p.provider,model:p.model};await c.call('models.validate',selection)
-    const saved=await c.call('chats.saved');return {serverInfo:{home:homedir(),harness,capabilities:{branch:true,edit:true},augmentor:{chatCwd:workspace,agentPreset:preset,saved:saved.saved}}}
+    const saved=await c.call('chats.saved'),description=await c.call('host.describe');return {serverInfo:{home:homedir(),harness,capabilities:{branch:true,edit:true,queue:description.capabilities?.queue===true,steering:description.capabilities?.steering===true},augmentor:{chatCwd:workspace,agentPreset:preset,saved:saved.saved}}}
   }
   if(method==='session.attach'){await attach(p.sessionId);const rows=await c.call('session.list');return {attached:true,running:rows.items.find(r=>r.sessionId===p.sessionId)?.running===true}}
   if(method==='session.create'){const row=await c.call(method,{...p,surface:'browser',selection,cwd:workspace},id);await attach(p.sessionId);return row}
@@ -65,7 +66,7 @@ async function request(method,p={},id){
   if(method==='session.branch'){const result=await c.call(method,p,id);await attach(result.sessionId);selection=result.selection;return result}
   if(method==='session.history'){const result=await c.call(method,{...p,maxMessages:Math.min(p.maxMessages??50,100)});result.events=result.events.filter(r=>r.event.type!=='assistant/chunk');while(Buffer.byteLength(JSON.stringify(result))>850000&&result.events.length>1){result.events.shift();result.hasMore=true}return result}
   if(['augmentor/save','augmentor/unsave','augmentor/state'].includes(method)){const action=method.split('/')[1];const result=await c.call('chats.saved',{action,sessionId:p.sessionId});return {ok:true,...result}}
-  if(['session.cancel','session.rename','session.models','settings.describe','settings.mutate','models.pin'].includes(method))return c.call(method,p,id)
+  if(['session.cancel','session.rename','session.models','session.queue','session.updateQueue','session.continueQueue','session.resolveQueue','settings.describe','settings.mutate','models.pin'].includes(method))return c.call(method,p,id)
   if(method.startsWith('updates/'))throw new Error('Update this unified installation with its installer.')
   throw new Error('Unsupported harness browser operation: '+method)
 }
