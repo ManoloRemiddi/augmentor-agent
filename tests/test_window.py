@@ -192,6 +192,16 @@ class WindowTests(unittest.TestCase):
             self.assertEqual(len(window.messages),2)
         finally:window.close()
 
+    def test_handled_input_receipt_clears_only_its_own_pending_prompt_without_a_human_message(self):
+        window=Window();window.controller=SimpleNamespace(session='child',running=False,close=lambda:None);window.pending_prompt='Handled';window.submitted_draft='Handled'
+        def event(seq,origin):
+            return {'seq':seq,'type':'runtime/notice','data':{'message':'Handled by extension','disposition':'input-handled','source':{'kind':'user','sessionId':origin},'submittedContent':[{'type':'text','text':'Handled'}]}}
+        try:
+            window.fold_event(event(1,'parent'));self.assertEqual(window.pending_prompt,'Handled')
+            window.fold_event(event(2,'child'));self.assertIsNone(window.pending_prompt);self.assertIsNone(window.submitted_draft)
+            self.assertEqual(window.messages,[('Status','Handled by extension'),('Status','Handled by extension')])
+        finally:window.close()
+
     def test_compact_keeps_draft_and_on_top_request(self):
         window = Window()
         window.composer.setPlainText('A draft')

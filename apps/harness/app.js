@@ -8,22 +8,22 @@ const hash=new URLSearchParams(location.hash.slice(1));
 const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
 if(token)sessionStorage.setItem('augmentor-harness-token',token);
 history.replaceState(null,'',location.pathname);
-const state={sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0,queue:null};
+const state={sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0,queue:null,ready:false,selecting:false,selectionReady:false,creating:false};
 const promptQueue=createQueue({container:$('prompt-queue'),input:$('input'),allowIdle:true,send:async(method,payload)=>{
   const sid=payload.sessionId,epoch=state.epoch;
   const result=await rpc(method==='queue/prompt'?'session.prompt':payload.action==='acknowledge'?'session.resolveQueue':'session.updateQueue',method==='queue/prompt'?{sessionId:sid,requestId:payload.requestId,mode:'queue',resumeQueue:payload.resumeQueue,content:[{type:'text',text:payload.text}]}:payload.action==='acknowledge'?{sessionId:sid,itemId:payload.itemId,acknowledgeUnknownOutcome:true}:{sessionId:sid,itemId:payload.itemId,expectedTurnId:payload.expectedTurnId,action:{kind:payload.action}});
   if(epoch===state.epoch){await refreshSessions();notice(result.queued?'Prompt queued.':'Request accepted.');}return result;
 }});
 const messageActions=createMessageActions({
-  context:()=>({sessionId:state.sessionId,epoch:state.epoch,running:current()?.running===true,submitting,...messageTargets(state.history)}),
+  context:()=>({sessionId:state.sessionId,epoch:state.epoch,running:current()?.running===true,submitting:submitting||!state.ready||!state.selectionReady||state.selecting||state.creating,...messageTargets(state.history)}),
   input:$('input'),rpc,refresh:refreshSessions,select:selectSession,
   enqueue:(sid,text)=>sid===state.sessionId?promptQueue.submitText(text):Promise.resolve(false),
   changed:()=>{renderSessions();renderChat();},notice,
 });
 function renderQueue(entry){
-  promptQueue.update({harness:'pi',capabilities:{queue:!!state.sessionId},sessionId:state.sessionId,phase:'ready',running:current()?.running===true,queue:state.queue,...(entry?{entry:{sessionId:state.sessionId,event:entry}}:{})});
+  promptQueue.update({harness:'pi',capabilities:{queue:!!state.sessionId},sessionId:state.sessionId,phase:state.ready&&state.selectionReady&&!state.selecting&&!state.creating?'ready':'connecting',running:current()?.running===true,queue:state.queue,...(entry?{entry:{sessionId:state.sessionId,event:entry}}:{})});
   $('continue-queue').hidden=!state.queue?.paused||!state.queue.items.some(item=>item.canRemove);
-  $('continue-queue').disabled=current()?.running===true||state.queue?.items.some(item=>item.canResolve);
+  $('continue-queue').disabled=!state.ready||!state.selectionReady||state.selecting||state.creating||current()?.running===true||state.queue?.items.some(item=>item.canResolve);
 }
 function queueBaseline(queue){if(queue?.sessionId===state.sessionId&&(!state.queue||queue.revision>=state.queue.revision)){state.queue=queue;renderQueue();}}
 let inspectionEpoch=0,polling=false,submitting=false,timelineModel=null,timelineTurns=[],lastSessionsRefresh=0;
@@ -51,15 +51,15 @@ function renderSessions(){
   const session=current();$('title').textContent=session?.title||'Your agent, in view';
   $('subtitle').textContent=session?(session.running?'Working · ':'')+session.cwd:'Open a conversation to inspect its execution and context.';
   $('stop').disabled=!session?.running&&!submitting;
-  $('send').disabled=!session||messageActions.busy;
+  $('send').disabled=!session||messageActions.busy||!state.ready||!state.selectionReady||state.selecting||state.creating;
   $('send').textContent=messageActions.editing?'Send edit':session?.running||submitting?'Queue':'Send';renderQueue();
   $('edit-message').hidden=!messageActions.editing;$('cancel-edit').disabled=messageActions.busy;
-  $('new-chat').disabled=messageActions.busy;$('model').disabled=!!session?.running||submitting||messageActions.busy;
-  $('trim-tools').disabled=!session||session.running||submitting;
+  $('new-chat').disabled=messageActions.busy||!state.ready||state.selecting||state.creating;$('model').disabled=!!session?.running||submitting||messageActions.busy||!state.ready||state.selecting||state.creating||!!session&&!state.selectionReady;
+  $('trim-tools').disabled=!session||session.running||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating;
 }
 function renderChat(){
   const container=$('messages'),following=container.scrollHeight-container.scrollTop-container.clientHeight<80;
-  const rendered=[],targets=messageTargets(state.history),locked=!!current()?.running||submitting||messageActions.busy;
+  const rendered=[],targets=messageTargets(state.history),locked=!!current()?.running||submitting||messageActions.busy||!state.ready||!state.selectionReady||state.selecting||state.creating;
   for(const item of projectChat(state.history,{running:current()?.running})){
     if(item.kind==='user'||item.kind==='assistant'){
       const user=item.kind==='user',{text,thinking}=item;
@@ -207,18 +207,20 @@ function renderInteraction(){
 async function selectSession(sid,{preserveEdit=false}={}){
   if(!preserveEdit)messageActions.reset();
   closeSidebar();
-  const epoch=++state.epoch;inspectionEpoch++;state.sessionId=sid;state.queue=null;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
+  const epoch=++state.epoch;inspectionEpoch++;state.selecting=true;state.selectionReady=false;state.sessionId=sid;state.queue=null;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
   sessionStorage.setItem('augmentor-harness-session',sid);
   $('interaction').hidden=true;$('inspector').replaceChildren(node('p','Select a record to inspect.','empty'));renderSessions();renderChat();
+  try{
   const subscription=await rpc('events.subscribe',{sessionId:sid,clientId:state.clientId});if(epoch!==state.epoch)return;
   state.cursor=subscription.cursor;subscription.pending.forEach(showInteraction);queueBaseline(subscription.queue);
   const [page,selection]=await Promise.all([rpc('observation.list',{sessionId:sid}),rpc('session.models',{sessionId:sid}),refreshHistory(sid,epoch)]);
   if(epoch!==state.epoch)return;page.records.forEach(r=>state.observations.set(r.id,r));state.hasMore=page.hasMore;
-  $('model').value=JSON.stringify(selection.current);renderObservations();if(state.view==='context')await inspectContext();
+  $('model').value=JSON.stringify(selection.current);state.selectionReady=true;renderObservations();if(state.view==='context')await inspectContext();
+  }finally{if(epoch===state.epoch){state.selecting=false;renderSessions();renderChat();}}
 }
 async function refreshSessions(){const result=await rpc('session.list');state.sessions=result.items;lastSessionsRefresh=Date.now();renderSessions();renderChat();}
 async function poll(){
-  if(polling||!state.sessionId)return;polling=true;
+  if(polling||!state.sessionId||state.selecting)return;polling=true;
   const sid=state.sessionId,epoch=state.epoch;
   try{
     const response=await fetch('/api/events?sessionId='+encodeURIComponent(sid)+'&clientId='+state.clientId+'&after='+state.cursor,{headers:{Authorization:'Bearer '+token}});
@@ -256,11 +258,11 @@ $('ledger').onscroll=()=>{if(ledgerFrame===null)ledgerFrame=requestAnimationFram
 $('search').oninput=()=>{$('ledger').scrollTop=0;renderLedger();};$('requests').onchange=()=>inspectContext().catch(e=>notice(e.message,true));
 $('older').onclick=async()=>{try{const first=rows().at(0);if(!first)return;const page=await rpc('observation.list',{sessionId:state.sessionId,beforeSeq:first.seq});page.records.forEach(r=>state.observations.set(r.id,r));state.hasMore=page.hasMore;renderObservations();}catch(e){notice(e.message,true);}};
 $('capture').onchange=async()=>{try{const current=await rpc('observation.describe');await rpc('observation.configure',{expectedRevision:current.revision,capturePayloads:$('capture').checked});notice('Local capture preference saved. Existing conversation history is unaffected.');}catch(e){notice(e.message,true);try{$('capture').checked=(await rpc('observation.describe')).capturePayloads;}catch{}}};
-$('new-chat').onclick=async()=>{try{const selection=JSON.parse($('model').value||'null');if(!selection)throw Error('Choose a model first.');if(!$('workspace').value.trim())throw Error('Choose a working folder.');const sid=crypto.randomUUID();await rpc('session.create',{sessionId:sid,selection,cwd:$('workspace').value});await refreshSessions();await selectSession(sid);}catch(e){notice(e.message,true);}};
+$('new-chat').onclick=async()=>{if(!state.ready||state.selecting||state.creating||messageActions.busy)return;const epoch=state.epoch;state.creating=true;renderSessions();try{const selection=JSON.parse($('model').value||'null');if(!selection)throw Error('Choose a model first.');if(!$('workspace').value.trim())throw Error('Choose a working folder.');const sid=crypto.randomUUID();await rpc('session.create',{sessionId:sid,selection,cwd:$('workspace').value});await refreshSessions();if(epoch===state.epoch)await selectSession(sid);}catch(e){notice(e.message,true);}finally{state.creating=false;renderSessions();renderChat();}};
 $('model').onchange=async()=>{const sid=state.sessionId,epoch=state.epoch;try{if(sid)await rpc('session.selectModel',{sessionId:sid,...JSON.parse($('model').value)});}catch(e){notice(e.message,true);try{const selection=await rpc('session.models',{sessionId:sid});if(epoch===state.epoch)$('model').value=JSON.stringify(selection.current);}catch{}}};
 $('stop').onclick=async()=>{try{await rpc('session.cancel',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
 $('trim-tools').onclick=async()=>{const sid=state.sessionId,epoch=state.epoch;try{const result=await rpc('session.trimTools',{sessionId:sid});if(epoch!==state.epoch)return;notice(result.changes.length+' tool results shortened. Originals remain saved.');const page=await rpc('observation.list',{sessionId:sid});if(epoch===state.epoch){page.records.forEach(r=>state.observations.set(r.id,r));renderObservations();}}catch(e){notice(e.message,true);}};
-$('composer').onsubmit=async event=>{event.preventDefault();if(!state.sessionId||messageActions.busy)return;if(messageActions.editing){await messageActions.submit();return;}submitting=true;renderSessions();try{await promptQueue.submit();}finally{submitting=false;renderSessions();}};
+$('composer').onsubmit=async event=>{event.preventDefault();if(!state.sessionId||messageActions.busy||!state.ready||!state.selectionReady||state.selecting||state.creating)return;if(messageActions.editing){await messageActions.submit();return;}submitting=true;renderSessions();try{await promptQueue.submit();}finally{submitting=false;renderSessions();}};
 $('cancel-edit').onclick=()=>messageActions.cancel();
 $('continue-queue').onclick=async()=>{try{await rpc('session.continueQueue',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
 $('input').onkeydown=event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();$('composer').requestSubmit();}};
@@ -276,6 +278,8 @@ async function start(){
   for(const group of catalog.groups)for(const model of group.models.filter(m=>m.available)){const option=node('option',model.name+' · '+group.name);option.value=JSON.stringify({provider:model.provider,model:model.model});$('model').append(option);}
   if(catalog.default)$('model').value=JSON.stringify(catalog.default);$('capture').checked=capture.capturePayloads;
   await refreshSessions();const saved=sessionStorage.getItem('augmentor-harness-session');const initial=hash.get('session')||(state.sessions.some(row=>row.sessionId===saved)?saved:null)||state.sessions[0]?.sessionId;if(initial)await selectSession(initial);
+  state.ready=true;renderSessions();renderChat();
   setInterval(()=>void poll(),250);
 }
+renderSessions();
 start().catch(e=>notice(e.message,true));

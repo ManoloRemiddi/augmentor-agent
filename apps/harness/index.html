@@ -12,12 +12,12 @@
   <header class="topbar">
     <button id="show-conversations" class="mobile-nav" aria-controls="sidebar" aria-expanded="false">Conversations</button>
     <div class="brand"><span class="orb" aria-hidden="true"></span><div><strong>Augmentor Harness</strong><small id="runtime">Connecting to Pi</small></div></div>
-    <label class="model-control">Model <select id="model" aria-label="Selected model"><option value="">Choose a model</option></select></label>
+    <label class="model-control">Model <select id="model" aria-label="Selected model" disabled><option value="">Choose a model</option></select></label>
     <span class="local">Private local inspector</span>
   </header>
   <div class="shell">
     <aside id="sidebar" class="sidebar">
-      <button id="new-chat" class="primary">New conversation</button>
+      <button id="new-chat" class="primary" disabled>New conversation</button>
       <label class="workspace">Working folder<input id="workspace" placeholder="Choose a folder for new conversations"></label>
       <h2>Conversations</h2><nav id="sessions" aria-label="Conversations"></nav>
       <div class="capture-settings"><label><input type="checkbox" id="capture"> Save context history</label><p>Retain request and tool payloads locally for up to 14 days or 512 MiB. Applies to this Pi profile. Conversation history is stored separately.</p></div>

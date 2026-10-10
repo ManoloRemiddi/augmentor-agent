@@ -780,6 +780,9 @@ class Window(QWidget):
             self.messages.append(('DSH',data.get('text') or ('Command completed.' if data.get('kind')=='success' else 'Command failed.')))
             return True
         if kind in ('runtime/notice','runtime/warning'):
+            if data.get('disposition')=='input-handled' and data.get('source',{}).get('sessionId')==getattr(self.controller,'session',None):
+                text='\n'.join(part.get('text','') for part in data.get('submittedContent',[]) if part.get('type')=='text')
+                if text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
             self.messages.append(('Status',data.get('message') or 'Runtime status unavailable.'))
             return True
         if kind=='assistant/chunk':

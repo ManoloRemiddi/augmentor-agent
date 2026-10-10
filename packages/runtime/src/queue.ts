@@ -69,11 +69,11 @@ export class PiPromptQueue {
  accepted(id:string){if(this.item(id).status!=='dispatching')throw Error('Prompt was not dispatched.');this.patch(id,{status:'active'});}
  delivered(id:string){const item=this.item(id);if(!['dispatching','active','steering'].includes(item.status))throw Error('Prompt delivery has no active receipt.');this.patch(id,{delivered:true});}
  handledSteer(id:string){const item=this.item(id);if(item.status!=='steering'||item.delivered)throw Error('Correction input no longer awaits preparation.');this.patch(id,{status:'completed',input:undefined});}
- finish(id:string,status:'completed'|'failed'|'cancelled'){
+ finish(id:string,status:'completed'|'failed'|'cancelled'|'unconfirmed'){
   const item=this.item(id);
   if(!['dispatching','active'].includes(item.status))throw Error('Prompt has no active execution receipt.');
   // Terminal receipts retain their fingerprint indefinitely, without retaining all historical prompt text.
-  this.commit({...this.data,items:this.data.items.map(value=>value.id===id?{...value,status,input:undefined}:value.status==='steering'&&value.turnId===item.turnId?
+  this.commit({...this.data,items:this.data.items.map(value=>value.id===id?{...value,status,...(status==='unconfirmed'?{}:{input:undefined})}:value.status==='steering'&&value.turnId===item.turnId?
    (value.delivered?{...value,status,input:undefined}:{...value,status:'unconfirmed' as const}):value)});
  }
  notSent(id:string){if(this.item(id).status!=='waiting')throw Error('Only an undispatched prompt can be rejected.');this.patch(id,{status:'failed'});this.pause();}

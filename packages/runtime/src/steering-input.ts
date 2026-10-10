@@ -12,7 +12,7 @@ export interface SteeringInput {action:'queued'|'handled';text?:string;images?:I
 export function validateSteeringInput(session:AgentSession,text:string){
  if(!text.startsWith('/'))return;
  const space=text.indexOf(' '),name=space===-1?text.slice(1):text.slice(1,space);
- if(session.extensionRunner.getCommand(name))throw Error('Extension command "/'+name+'" cannot be queued as a correction.');
+ if(session.extensionRunner.getCommand(name))throw Error('Extension command "/'+name+'" cannot be queued as a prompt or correction.');
 }
 export async function prepareSteeringInput(session:AgentSession,text:string):Promise<SteeringInput>{
  const runner=session.extensionRunner;

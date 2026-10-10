@@ -48,6 +48,14 @@ test('inherited Pi input renders without confirming an optimistic child submissi
  ui.applyLog([event(2,'child')]);assert.equal(pending.confirmed,true);assert(!log.contains(pending.node));assert.equal(log.querySelectorAll('.msg.user').length,2)
 })
 
+test('handled-input status clears only the originating optimistic prompt without inventing human/model messages',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const pending=ui.pendingPrompt('Handled'),event=(seq,origin)=>({kind:'event',sessionId:'child',event:{seq,type:'runtime/notice',data:{message:'Handled by extension',disposition:'input-handled',source:{kind:'user',sessionId:origin},submittedContent:[{type:'text',text:'Handled'}]}}})
+ ui.applyLog([event(1,'parent')]);assert.equal(pending.confirmed,false);ui.applyLog([event(2,'child')]);assert.equal(pending.confirmed,true);assert.equal(log.querySelectorAll('.msg.user,.msg.assistant').length,0);assert.equal(log.querySelectorAll('.msg.status').length,2)
+})
+
 test('workspace thinking preference applies to live reasoning, preserves manual choices and leaves history collapsed',t=>{
  const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
  globalThis.window=dom.window;globalThis.document=dom.window.document

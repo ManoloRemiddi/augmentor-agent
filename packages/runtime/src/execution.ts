@@ -84,6 +84,7 @@ export class PiExecution {
  steerRequested(){if(!this.active||this.cancelled)throw Error('The active turn cannot be steered.');this.superseding=true;this.clearTimer();this.record();}
  steerFailed(){this.superseding=false;this.stop('Correction input preparation failed; its outcome is unconfirmed.');}
  steerHandled(){this.steerDelivered();this.settled='input-handled';}
+ inputHandled(){if(!this.cancelled){this.settled='input-handled';this.record();}}
  steerDelivered(){
   if(this.cancelled)return;
   this.superseding=false;this.steered=true;this.recovering=false;this.started=0;this.recoveries=0;this.steps=0;this.requestCap=undefined;this.requestLimit=undefined;this.guardDenials=0;

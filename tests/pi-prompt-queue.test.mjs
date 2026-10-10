@@ -67,3 +67,7 @@ test('a handled correction retains a terminal identity without claiming model de
  const {queue,path}=fixture(t);queue.enqueue('root','Original',false);queue.dispatch('root','turn');queue.accepted('root');queue.enqueue('handled','Handled input',true);queue.promote('handled','turn');queue.handledSteer('handled');queue.finish('root','completed');
  const reopened=new PiPromptQueue(path,'fixture');assert.equal(reopened.read('handled').status,'completed');assert.equal(reopened.read('handled').delivered,false);assert.equal(reopened.enqueue('handled','Handled input',true),false);assert.equal(reopened.snapshot().items.length,0);
 });
+test('interrupted initial preparation stays unknown even after late native delivery and survives reopen',t=>{
+ const {queue,path}=fixture(t);queue.enqueue('input','Potential extension effect',false);queue.dispatch('input','turn');queue.accepted('input');queue.pause();queue.delivered('input');queue.finish('input','unconfirmed');queue.enqueue('waiting','Next',true);
+ const reopened=new PiPromptQueue(path,'fixture');assert(reopened.snapshot().items.find(item=>item.id==='input').canResolve);assert.equal(reopened.read('input').input,'Potential extension effect');assert.throws(()=>reopened.resume(),/unknown outcome/);assert.equal(reopened.enqueue('input','Potential extension effect',false),false);reopened.resolve('input');reopened.resume();assert.equal(reopened.next.id,'waiting');assert.equal(reopened.read('input').input,undefined);
+});

@@ -491,6 +491,7 @@ export function createChatUI(els) {
       }
       case 'runtime/notice':
       case 'runtime/warning': {
+        if(data.disposition==='input-handled'&&data.source?.sessionId===entry.sessionId)confirmPrompt(blockText(data.submittedContent))
         const message=el('div','msg status')
         message.append(el('span','who','Status'))
         const body=el('div','md');body.innerHTML=md(data.message??'Runtime status unavailable.')

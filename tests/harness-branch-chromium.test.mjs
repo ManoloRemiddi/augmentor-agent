@@ -29,8 +29,12 @@ test('Harness Branch/Edit controls preserve exact tool history, original drafts 
  chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
  let port;await until(async()=>{try{port=(await readFile(join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0];return true;}catch{return false;}},'Chromium startup');
  const targets=await fetch('http://127.0.0.1:'+port+'/json').then(response=>response.json()),page=targets.find(row=>row.type==='page');assert(page);panel=await cdp(page.webSocketDebuggerUrl);await panel.call('Runtime.enable');
- const visible=expression=>until(()=>panel.evaluate(expression),expression);
- await visible('document.querySelector("#runtime")?.textContent.includes("Pi 1.1.0")');await panel.evaluate('document.querySelector("#new-chat").click()');await visible('!document.querySelector("#send").disabled');
+ const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),runtimeErrors:panel.errors,requests:(await requests()).length,fixtureErrors:stderr});throw error;});
+ await visible('document.querySelector("#runtime")?.textContent.includes("Pi 1.1.0")&&!document.querySelector("#new-chat").disabled');
+ // Hold one real subscription request: typing before selection completes stays a draft.
+ await panel.evaluate('(()=>{const original=fetch;globalThis.releaseHarnessSelection=null;globalThis.fetch=async(...args)=>{if(args[1]?.body&&JSON.parse(args[1].body).method==="events.subscribe"&&!globalThis.releaseHarnessSelection)await new Promise(resolve=>globalThis.releaseHarnessSelection=resolve);return original(...args);};document.querySelector("#new-chat").click();})()');
+ await visible('typeof globalThis.releaseHarnessSelection==="function"&&document.querySelector("#send").disabled');
+ await panel.evaluate('(()=>{const input=document.querySelector("#input");input.value="Loading draft";input.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));})()');assert.equal(await panel.evaluate('document.querySelector("#input").value'),'Loading draft');assert.equal((await requests()).length,0);await panel.evaluate('globalThis.releaseHarnessSelection()');await visible('!document.querySelector("#send").disabled');
  async function send(text){await panel.evaluate('(()=>{const input=document.querySelector("#input");input.value='+JSON.stringify(text)+';input.dispatchEvent(new KeyboardEvent("keydown",{key:"Enter",bubbles:true}));})()');}
  async function settled(sid){await until(async()=>!(await rpc('session.list')).items.find(row=>row.sessionId===sid)?.running,'native idle');await visible('document.querySelector("#stop").disabled');}
  const selected=()=>panel.evaluate('sessionStorage.getItem("augmentor-harness-session")');
