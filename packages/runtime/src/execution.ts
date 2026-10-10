@@ -42,6 +42,7 @@ export class PiExecution {
  private recoveries=0;
  private steps=0;
  private requestCap?:number;
+ private requestLimit?:{cap:number;fields:string[];coverage:string};
  private guardDenials=0;
  private blocked=false;
  private incompleteReason?:string;
@@ -64,9 +65,9 @@ export class PiExecution {
  get incomplete(){return this.incompleteReason;}
  describe(){return {policy:{...this.policy},automaticRecovery:this.recovering,recoveries:this.recoveries,recoverySteps:this.steps,
   outcome:this.cancelled?(this.active?'cancelling':'cancelled'):this.blocked?'incomplete':this.active?'running':this.settled,incompleteReason:this.incompleteReason??null,
-  historicalPending:this.historicalPending,actions:[...this.actions.values()].map(({effect,status})=>({effect,status}))};}
+  historicalPending:this.historicalPending,requestLimit:this.requestLimit??null,actions:[...this.actions.values()].map(({effect,status})=>({effect,status}))};}
  begin(manager:Pick<SessionManager,'getBranch'>){
-  this.clearTimer();this.active=true;this.cancelled=false;this.recovering=false;this.started=0;this.recoveries=0;this.steps=0;this.requestCap=undefined;this.guardDenials=0;
+  this.clearTimer();this.active=true;this.cancelled=false;this.recovering=false;this.started=0;this.recoveries=0;this.steps=0;this.requestCap=undefined;this.requestLimit=undefined;this.guardDenials=0;
   this.blocked=false;this.incompleteReason=undefined;this.settled='idle';this.handoff=false;this.actions.clear();this.calls.clear();this.terminated.clear();this.lastStop=undefined;
   const pending=new Set<string>();
   for(const entry of manager.getBranch()){
@@ -148,7 +149,7 @@ export class PiExecution {
   const stream:Agent['streamFunction']=async(model,context,options)=>{
    if(this.cancelled)throw Error('Turn cancelled before provider dispatch.');
    if(this.blocked||this.exhausted()){this.stop('The bounded recovery time or request budget was exhausted.');throw Error(this.incompleteReason);}
-   if(this.recovering)this.steps++;
+   if(this.recovering)this.steps++;this.requestLimit=undefined;
    this.clearTimer();const signal=options?.signal;
    this.timer=setTimeout(()=>{if(this.active&&!signal?.aborted)this.notice('This model step has run for '+Math.round(this.policy.warningMs/1000)+' seconds without completing. Generation remains active; task completion is unverified.',false);},this.policy.warningMs);this.timer.unref?.();
    const aborted=()=>this.clearTimer();signal?.addEventListener('abort',aborted,{once:true});this.removeAbort=()=>signal?.removeEventListener('abort',aborted);
@@ -173,7 +174,8 @@ export class PiExecution {
     const value=(config as Record<string,unknown>).maxOutputTokens;
     bounded.generationConfig={...config,maxOutputTokens:typeof value==='number'&&Number.isSafeInteger(value)&&value>0?Math.min(value,cap):cap};fields.push('generationConfig.maxOutputTokens');
    }
-   this.emit('execution/limit',{cap,fields,coverage:fields.length?'bounded-payload-fields':'sdk-options-only'});
+   this.requestLimit={cap,fields,coverage:fields.length?'bounded-payload-fields':'sdk-options-only'};
+   this.emit('execution/limit',this.requestLimit);
    return fields.length?bounded:transformed;
   };
   agent.beforeToolCall=before;agent.afterToolCall=after;agent.finishTurn=finish;agent.streamFunction=stream;agent.onPayload=payload;

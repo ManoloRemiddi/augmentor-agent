@@ -135,5 +135,6 @@ test('recovery caps follow payload transformations while normal requests and unk
  assert.equal(capped.max_tokens,2000);assert.equal(capped.max_completion_tokens,2000);assert.equal(capped.max_output_tokens,2000);
  assert.equal(capped.generationConfig.maxOutputTokens,2000);assert.equal(capped.generationConfig.temperature,0.2);assert.equal(body.max_tokens,65536);
  assert.equal(await f.agent.onPayload({customRequest:true},{maxTokens:32768}),undefined);
+ assert.equal(f.controller.describe().requestLimit.coverage,'sdk-options-only');
  assert.equal(f.events.filter(e=>e.kind==='execution/limit').at(-1).data.coverage,'sdk-options-only');f.controller.dispose();
 });

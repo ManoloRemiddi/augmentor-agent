@@ -403,6 +403,9 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const recover=await run('recovertext',2);
   assert(recover.some(e=>e.type==='assistant/message'&&JSON.stringify(e).includes('Recovery answered.')));
   assert.equal((await observations('recovertext')).filter(e=>e.kind==='execution/recovery').length,1);
+  const recoveryRecords=await observations('recovertext'),recoveryRequest=recoveryRecords.filter(e=>e.kind==='model/request').at(-1);
+  assert.equal(recoveryRequest.data.policies.execution.requestLimit.cap,2048);assert(recoveryRequest.data.policies.execution.requestLimit.fields.includes('max_completion_tokens'));
+  assert(recoveryRecords.filter(e=>e.kind.startsWith('execution/')).every(e=>e.requestId===undefined),'Turn policy events cannot inherit a previous request ID');
   assert(JSON.stringify(received.at(-1).messages).includes('Keep the protected fixture unchanged.'));
   assert((received.at(-1).max_tokens??received.at(-1).max_completion_tokens)<=2048,'Recovery must not increase a smaller model cap');
   const permanent=await run('forever',3);

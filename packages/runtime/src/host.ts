@@ -227,5 +227,5 @@ export class Host {
     case 'prompts.list':case 'prompts.save':case 'prompts.delete':return promptCall(method,p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.execution?.dispose();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.session.dispose();}}
+  async close(){this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.execution?.dispose();r.session.dispose();}}
 }

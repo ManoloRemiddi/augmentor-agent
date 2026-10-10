@@ -20,7 +20,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
   const tools = new Map<string, number>();
   const record = (kind: string, data: Record<string, unknown>, payload?: unknown) => {
     try {
-      const event = store.append(sessionId, kind, data, {turnId: current().turnId, requestId}, payload);
+      const event = store.append(sessionId, kind, data, {turnId: current().turnId, requestId:kind.startsWith('execution/')?undefined:requestId}, payload);
       notify(event); return event;
     } catch (error) {warning('Local inspection could not record an observation: ' + String(error));}
   };
