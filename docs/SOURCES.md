@@ -7,6 +7,8 @@ The [Harness qualification record](AUGMENTOR-HARNESS.md) supersedes the Septembe
 
 The production inventory records new Pi/chord component MIT texts, exact esbuild 0.28.2 / Go 1.26.5 texts and omitted wrapper texts in `licenses/catalog.json`. Photon remains the reviewed source rebuild at 0.3.4 and resolves from the SDK through its current root dependency. Unbound QuickJS native/codemode assets remain excluded pending their complete static dependency review. See the Harness record for the registry provenance boundary and required compatibility work.
 
+The [responsive steering candidate](AUGMENTOR-HARNESS.md#responsive-steering--october-10-source-candidate) uses Pi 1.1.0's public AgentSession-owned Agent: identified `steer(AgentMessage)`, `peekQueuedMessages`, AgentSession `clearQueue`, composed `streamFunction` and supported tool/finish hooks. It adds no dependency and no independent conversation loop. Actual SDK fixtures qualify generation supersession and tool settlement. This path accepts literal text and bypasses AgentSession's string input/template transforms; their approved-resource parity remains unqualified and is declared in the host capability detail.
+
 # Source baselines and migration inventory
 
 See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualified Linux upgrade and temporary history bridge.
