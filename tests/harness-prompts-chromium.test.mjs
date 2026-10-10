@@ -4,6 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
+import {harnessCdp as cdp} from './fixtures/harness-cdp.mjs';
 import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -11,22 +12,6 @@ import {fileURLToPath} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label,ms=12000){const end=Date.now()+ms;let last;while(Date.now()<end){try{if(await fn())return;}catch(error){last=error;}await delay(30);}throw Error('Harness prompts timeout: '+label+(last?' ('+last.message+')':''));}
-async function cdp(url){
-  const ws=new WebSocket(url);await once(ws,'open');let id=0;const pending=new Map(),errors=[],dialogs=[],requests=new Map(),failedResponses=[];
-  const api={acceptDialog:true,errors,dialogs,requests,failedResponses};
-  ws.addEventListener('message',event=>{
-    const frame=JSON.parse(event.data),row=pending.get(frame.id);
-    if(frame.method==='Runtime.exceptionThrown')errors.push(frame.params.exceptionDetails);
-    if(frame.method==='Log.entryAdded'&&['warning','error'].includes(frame.params.entry.level))errors.push(frame.params.entry);
-    if(frame.method==='Network.requestWillBeSent'&&frame.params.request.postData){try{requests.set(frame.params.requestId,JSON.parse(frame.params.request.postData));}catch{}}
-    if(frame.method==='Network.responseReceived'&&frame.params.response.status>=400)failedResponses.push({id:frame.params.requestId,...frame.params.response});
-    if(frame.method==='Page.javascriptDialogOpening'){dialogs.push(frame.params.message);void call('Page.handleJavaScriptDialog',{accept:api.acceptDialog}).catch(error=>errors.push(error.message));}
-    if(row){pending.delete(frame.id);clearTimeout(row.timer);frame.error?row.reject(Error(frame.error.message)):row.resolve(frame.result);}
-  });
-  const call=(method,params={})=>new Promise((resolve,reject)=>{const key=++id,timer=setTimeout(()=>{pending.delete(key);reject(Error('CDP timeout: '+method));},10000);pending.set(key,{resolve,reject,timer});ws.send(JSON.stringify({id:key,method,params}));});
-  return Object.assign(api,{call,close(){for(const row of pending.values())clearTimeout(row.timer);ws.close();},async evaluate(expression){const result=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value;}});
-}
-
 test('Harness shared prompt editor, Native conflicts and two-step clipboard insertion use one service without automatic inference',{skip:process.platform!=='linux',timeout:90000},async t=>{
   const profile=await mkdtemp(join(tmpdir(),'augmentor-harness-prompts-chrome-'));let fixture,chrome,panel,output='',stderr='',link;
   t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
@@ -87,7 +72,7 @@ test('Harness shared prompt editor, Native conflicts and two-step clipboard inse
   assert(await panel.evaluate('(()=>{const r=document.querySelector(".shared-prompt-editor").getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight;})()'));
   if(process.env.AUGMENTOR_HARNESS_PROMPTS_SCREENSHOT)await writeFile(process.env.AUGMENTOR_HARNESS_PROMPTS_SCREENSHOT,Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
   await button('Done');assert.equal(await value('#input'),'Original Harness draft');assert.equal((await requests()).length,0,'CRUD and instructions do not perform inference');
-  await panel.call('Emulation.clearDeviceMetricsOverride');await click('#new-chat');await visible('!document.querySelector("#send").disabled');await panel.call('Page.reload');await visible('!document.querySelector("#send").disabled');
+  await panel.call('Emulation.clearDeviceMetricsOverride');await visible('document.querySelector("#new-chat").getBoundingClientRect().width>0');await click('#new-chat');await visible('!document.querySelector("#send").disabled');await panel.call('Page.reload');await visible('!document.querySelector("#send").disabled');
   assert.deepEqual((await rpc('prompts.list')).prompts,[row]);
   await panel.call('Browser.grantPermissions',{origin:url.origin,permissions:['clipboardReadWrite','clipboardSanitizedWrite']});await panel.call('Page.bringToFront');
   const snapshot='Café 😀\n[clipboard]';await panel.evaluate('navigator.clipboard.writeText('+JSON.stringify(snapshot)+')');

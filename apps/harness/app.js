@@ -4,6 +4,7 @@ import {projectChat,appendDisplay,messageTargets} from './chat-projection.js';
 import {createMessageActions} from './message-actions.js';
 import {createQueue} from './queue-view.js';
 import {attachHarnessPrompts} from './prompt-library.js';
+import {attachReasoning} from './reasoning.js';
 const $=id=>document.getElementById(id);
 const hash=new URLSearchParams(location.hash.slice(1));
 const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
@@ -40,6 +41,7 @@ async function rpc(method,params={}){
 function current(){return state.sessions.find(s=>s.sessionId===state.sessionId);}
 const promptLibrary=attachHarnessPrompts({input:$('input'),button:$('prompt-library'),rpc,ready:()=>state.ready,
   context:()=>state.epoch+':'+state.sessionId+':'+(messageActions.editing?'edit':'chat'),changed:renderSessions});
+const reasoning=attachReasoning({button:$('reasoning-settings'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,ready:state.ready&&state.selectionReady&&!state.selecting&&!state.creating}),notice});
 function rows(){return [...state.observations.values()].sort((a,b)=>a.seq-b.seq);}
 function label(record){return record.kind+(record.data.name?' · '+record.data.name:record.data.model?' · '+record.data.model:'');}
 function detail(title,value,open=false){
@@ -56,6 +58,7 @@ function renderSessions(){
   $('stop').disabled=!session?.running&&!submitting;
   $('send').disabled=!session||messageActions.busy||promptLibrary.inserting||!state.ready||!state.selectionReady||state.selecting||state.creating;
   $('prompt-library').disabled=!state.ready;
+  $('reasoning-settings').disabled=!session||session.running||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating;reasoning.changed();
   $('send').textContent=messageActions.editing?'Send edit':session?.running||submitting?'Queue':'Send';renderQueue();
   $('edit-message').hidden=!messageActions.editing;$('cancel-edit').disabled=messageActions.busy;
   $('new-chat').disabled=messageActions.busy||!state.ready||state.selecting||state.creating;$('model').disabled=!!session?.running||submitting||messageActions.busy||!state.ready||state.selecting||state.creating||!!session&&!state.selectionReady;
@@ -177,7 +180,9 @@ async function inspectContext(){
     if(capacity>0){const meter=node('meter');meter.min=0;meter.max=capacity;meter.value=Math.min(input,capacity);meter.setAttribute('aria-label','SDK reported input relative to declared model capacity');container.append(meter);}
     container.append(node('small','SDK-normalized usage; zero fields may be unavailable. The model capacity is its declared configuration.'));
   }else container.append(node('p','Usage has not been reported for this request.','empty'));
-  container.append(node('p','API '+record.data.api+' · thinking '+record.data.thinkingLevel));
+  container.append(node('p','API '+record.data.api+' · SDK requested thinking '+record.data.thinkingLevel+' · saved effort '+(record.data.savedThinkingLevel??'unavailable')));
+  container.append(node('small',record.data.thinkingBoundary??'Thinking capture boundary unavailable for this older request.'));
+  if(record.data.policies?.reasoning){const policy=record.data.policies.reasoning;container.append(node('p','Reasoning '+policy.mode+' · '+(policy.active?'tier '+policy.tier:policy.inactiveReason)+' · '+policy.reason),detail('Reasoning decision and context contribution',policy));}
   if(record.data.policies)container.append(detail('Managed policy',record.data.policies));
   const payload=await readPayload(sid,id);if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
   if(!payload.available){container.append(node('p',payload.reason+' Enable Save context history before future requests to retain them.','empty'));return;}

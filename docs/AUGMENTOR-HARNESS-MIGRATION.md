@@ -8,6 +8,8 @@ Augmentor Harness will combine Pi's coding-agent session lifecycle, Augmentor's 
 
 The motivations are reduced dependence on a preview harness, preference for Pi's European roots, and control over telemetry across updates. These become release requirements rather than assumptions about an upstream brand or version number. DSH remains available until replacement workflows qualify. This extends the [accepted composable architecture](COMPOSABLE-AUGMENTOR-PROPOSAL.md); it does not create another application repository or conversational loop.
 
+October 10 implementation checkpoint: [Adaptive Reasoning and effective thinking controls](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) now qualify the selected MIT policy, public Pi hooks, saved Manual/Adaptive effort, exact profile mappings and Harness settings/Context display in synthetic source/staged fixtures. Native/Browser controls and representative live/virtual routing remain required; this does not reduce the accepted feature parity or cutover gates below.
+
 ## Decisions and boundaries
 
 | Decision | Direction |

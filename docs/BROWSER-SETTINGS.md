@@ -2,6 +2,8 @@
 
 # Browser Settings
 
+The October 10 Harness candidate adds profile-owned Adaptive Reasoning mappings and per-Pi-conversation saved effort/mode through the authenticated Host. This is distinct from the Open/Collapsed thinking display preference described below. The Harness Reasoning dialog administers both Desktop/Harness and Browser preset inclusion; Native/Browser effort controls remain a migration gate. Unmapped models retain their request effort, and no provider is selected automatically. See [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) for persistence, conflicts and qualification.
+
 SDK workspaces use the [scoped settings contract](SDK-ALIGNMENT.md#capability-and-settings-ownership).
 Their Conversation page offers the approved Open/Collapsed thinking preference,
 saved per workspace; appearance and experimental voice opt-in are also scoped.

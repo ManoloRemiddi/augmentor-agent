@@ -10,6 +10,7 @@ import type {Host} from './host.js';
 const allowed = new Set([
   'host.describe', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.list', 'session.create', 'session.history', 'session.models', 'session.selectModel',
+  'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.payload', 'observation.clear',
@@ -141,6 +142,7 @@ export class HarnessServer {
         ['/chat-projection.js', {path: join(this.assets, 'chat-projection.js'), type: 'text/javascript'}],
         ['/message-actions.js', {path: join(this.assets, 'message-actions.js'), type: 'text/javascript'}],
         ['/prompt-library.js', {path: join(this.assets, 'prompt-library.js'), type: 'text/javascript'}],
+        ['/reasoning.js', {path: join(this.assets, 'reasoning.js'), type: 'text/javascript'}],
         ['/queue-view.js', {path: fileURLToPath(new URL('../../harness-ui/src/queue-view.js', import.meta.url)), type: 'text/javascript'}],
         ['/harness.css', {path: join(this.assets, 'harness.css'), type: 'text/css'}],
         ['/timeline.js', {path: fileURLToPath(new URL('../../harness-ui/src/dsh-timeline.js', import.meta.url)), type: 'text/javascript'}],

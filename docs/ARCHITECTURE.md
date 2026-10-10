@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 10 Adaptive Reasoning candidate composes the existing AgentSession's public `prepareRequest`, `transformContext` and tool guard after session ownership and routing. The selected MIT pure policy classifies host-correlated delivered SDK input; explicit profile mappings choose supported effort for the actual routed model. An unmapped model preserves its request level. Request-only editing guidance/schema filtering is applied after the SDK's prompt projection and never mutates canonical history or global tools. Manual effort and mode are per conversation; mappings are profile settings. [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) owns the supported boundaries and remaining Native/Browser/live routing gates.
+
+
 The [shared prompt Harness checkpoint](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor) reuses the public Browser picker/editor as a client of the Pi Host and existing shared prompt service. There is no separate database or agent loop. Saved prompts, their revisions and improvement instructions keep their existing service owner; Pi draft improvement and full composition/provenance remain migration gates. This is source/staged qualification, not installed activation.
 
 

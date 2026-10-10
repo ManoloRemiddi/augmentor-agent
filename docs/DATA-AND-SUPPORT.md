@@ -2,6 +2,8 @@
 
 # Data, permissions and support
 
+The October 10 Harness reasoning candidate stores global enable/text-only/preset/model mappings in the private Pi profile settings, and saved effort/mode/revision in each conversation's metadata. Explicit effort changes also create the SDK's native thinking-level history entries. Adaptive request effort, task-tier reasons, input character/media counts and fixed MIT editing guidance are private diagnostic records under existing retention/capture rules; classification does not send an extra request or persist another copy of the submitted text. Conversation history and diagnostic retention remain separate. Context labels SDK-requested effort separately from saved effort and any exposed provider result; it does not assert the backend honored a setting. See [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls).
+
 Augmentor runs under your Linux account. Pi is bundled; DSH is optional. The Linux
 role can use OS/file tools and consented desktop input. Browser-role tool guards
 permit browser actions and optional memory recall. Approval modes govern tools;

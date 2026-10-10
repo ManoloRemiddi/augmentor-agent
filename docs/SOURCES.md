@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Selected Adaptive Reasoning policy — October 10 candidate
+
+The candidate reuses only `policy.js` from the public MIT Adaptive Reasoning 0.2.3 archive already distributed at `release/dsh/plugins/dsh-adaptive-reasoning-0.2.3.tgz`. [The selected source record](../packages/runtime/vendor/adaptive-reasoning/SOURCE.md) pins public upstream commit `64a1ef82e3d69f57a69809d530c1b9ed0bc67480` and archive SHA-256 `5c142213e4f7935cf7e8f0ba839e17d274451c689c04637001dd1d89b6da967e`. Policy and original MIT notice are copied verbatim and checked against that archive; the notice/source record are included under `dist/runtime/vendor/adaptive-reasoning`. The independently authored declarations and Pi adapter retain the product license. No DSH agent loop or service-private source is copied. The existing 126-package npm inventory and native binaries are unchanged; the selected MIT policy adds its own attribution. See [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) for behavior and evidence boundaries.
+
+
 
 ## October 10 Harness source candidate
 

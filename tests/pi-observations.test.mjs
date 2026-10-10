@@ -35,3 +35,12 @@ test('an adapter without a new request hook does not inherit the preceding reque
  const f=fixture(t);await f.agent.onPayload({},f.model);f.emit('message_end');f.emit('message_start');f.emit('message_end');
  const completed=f.store.page('fixture').records.filter(r=>r.kind==='model/complete');assert(completed[0].requestId);assert.equal(completed[1].requestId,undefined);assert.equal(completed[1].data.requestCoverage,'not-observed');assert.equal(completed[1].data.durationMs,undefined);
 });
+test('request observation records SDK effort separately from saved effort and provider completion',async t=>{
+ const root=mkdtempSync(join(tmpdir(),'augmentor-thinking-observer-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
+ const store=new ObservationStore(root,()=>({...DEFAULT_RETENTION,capturePayloads:true}));let listener;
+ const agent={streamFunction:async(model,context,options)=>{await agent.onPayload({reasoning_effort:options.reasoning},model);return 'fixture-stream';}};
+ const original=agent.streamFunction,session={agent,thinkingLevel:'off',subscribe(fn){listener=fn;return()=>{};}},model={id:'route',provider:'fixture',api:'openai-completions',contextWindow:32000};
+ const observer=observeSession(session,store,'thinking',()=>({selected:{provider:'fixture',model:'virtual'},reasoning:{active:true,tier:'high'}}),()=>{},assert.fail);
+ assert.equal(await agent.streamFunction(model,{},{reasoning:'high'}),'fixture-stream');listener({type:'message_end',message:{role:'assistant',content:[],stopReason:'stop',thinkingLevel:'high',providerThinkingLevel:'deep',model:'route',provider:'fixture'}});
+ const records=store.page('thinking').records,request=records.find(r=>r.kind==='model/request'),done=records.find(r=>r.kind==='model/complete');assert.equal(request.data.thinkingLevel,'high');assert.equal(request.data.savedThinkingLevel,'off');assert.match(request.data.thinkingBoundary,/sdk-stream-options/);assert.equal(request.data.model,'route');assert.equal(done.data.providerThinkingLevel,'deep');assert.equal(done.data.thinkingLevel,'high');observer.dispose();assert.equal(agent.streamFunction,original);
+});

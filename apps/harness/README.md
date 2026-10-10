@@ -2,6 +2,8 @@
 
 # Augmentor Harness web client
 
+Reasoning settings use the authenticated Pi Host: saved Manual/Adaptive mode and supported effort per conversation; profile enable/text-only/preset controls and exact model/tier mappings. Neutral defaults have no mappings. Revision conflicts preserve the draft; Reload explicitly discards it. Settings do no inference, and active chats prevent saves. Context displays each request's requested effort, saved level, classification, applicable route and request-only contribution. See [qualification](../../docs/AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls); Native/Browser controls and live-provider acceptance remain open.
+
 A local operator interface for the existing Pi runtime, served by `packages/runtime/src/harness-server.ts`. Build first, run an isolated configured runtime profile, then use `npm run harness` with the same environment. `npm run harness:proof` provides a disposable synthetic-provider demonstration.
 
 Chat, Trajectory and Context use the real host read models. DOM content is rendered as text; retained image blocks use approved data image types. No external fonts, scripts, analytics or CDNs are loaded. Full diagnostic payload capture is off by default and applies to future requests when enabled.

@@ -5,7 +5,7 @@ import type {Data} from '../../protocol/src/index.js';
 
 /** Observe the supported SDK pipeline after all registered payload transforms. */
 export function observeSession(session: AgentSession, store: ObservationStore, sessionId: string,
-  current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data;execution?:Data}, notify: (event: unknown) => void,
+  current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data;execution?:Data;reasoning?:Data}, notify: (event: unknown) => void,
   warning: (message: string) => void) {
   let requestId: string | undefined;
   let started = 0, firstToken = false;
@@ -25,6 +25,10 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     } catch (error) {warning('Local inspection could not record an observation: ' + String(error));}
   };
   const previousPayload = session.agent.onPayload;
+  const previousStream=session.agent.streamFunction;
+  let requestedThinking:string|undefined;
+  const streamHook:typeof previousStream=async(model,context,options)=>{requestedThinking=options?.reasoning??'off';return previousStream(model,context,options);};
+  if(typeof previousStream==='function')session.agent.streamFunction=streamHook;
   const payloadHook: typeof previousPayload = async (payload, model) => {
     const transformed = await previousPayload?.(payload, model);
     const effective = transformed === undefined ? payload : transformed;
@@ -32,8 +36,9 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     resetProvider(); requestOpen = true;
     const event = record('model/request', {
       selected: current().selected, model: model.id, provider: model.provider, api: model.api,
-      thinkingLevel: session.thinkingLevel, capacity: model.contextWindow,
-      policies: {permissionPreset: current().permissionPreset, toolBudget: current().toolBudget,execution:current().execution},
+      thinkingLevel: requestedThinking??session.thinkingLevel,savedThinkingLevel:session.thinkingLevel,
+      thinkingBoundary:requestedThinking===undefined?'session-setting-only':'sdk-stream-options; provider payload may translate or override',capacity: model.contextWindow,
+      policies: {permissionPreset: current().permissionPreset, toolBudget: current().toolBudget,execution:current().execution,reasoning:current().reasoning},
       boundary: 'provider-payload-after-hooks', transportAttempts: 'not-observed',
     }, effective);
     requestId = event?.id;
@@ -86,13 +91,14 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
         timings: started ? 'monotonic milliseconds since managed request hook' : 'not-observed'},
       {events: providerEvents});
       providerEvents = []; providerBytes = 0; providerCount = 0;
-      record('model/complete', {stopReason: event.message.stopReason, usage: event.message.usage,
+      record('model/complete', {stopReason: event.message.stopReason, usage: event.message.usage,thinkingLevel:event.message.thinkingLevel,providerThinkingLevel:event.message.providerThinkingLevel,
         usageBoundary: 'sdk-normalized; zero fields may be unavailable',
         requestCoverage: requestId ? 'observed-after-hooks' : 'not-observed',
         providerEventCoverage: observedProviderCount ? 'observed' : 'not-observed',
         ...(requestId && started > 0 ? {durationMs: performance.now() - started} : {}), model: event.message.model, provider: event.message.provider},
       event.message);
       requestOpen = false;
+      requestedThinking=undefined;
     }
     if (event.type === 'tool_execution_start') {
       tools.set(event.toolCallId, performance.now());
@@ -113,6 +119,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
   });
   return {record, beginTurn(data: Record<string, unknown>) {
     requestId = undefined; started = 0; firstToken = false;
+    requestedThinking=undefined;
     resetProvider(); requestOpen = false;
     return record('turn/start', data);
   }, dispose() {
@@ -120,6 +127,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     if (session.agent.onPayload === payloadHook) session.agent.onPayload = previousPayload;
     if (session.agent.onResponse === responseHook) session.agent.onResponse = previousResponse;
     if (session.agent.onProviderStreamEvent === providerHook) session.agent.onProviderStreamEvent = previousProvider;
+    if (session.agent.streamFunction === streamHook) session.agent.streamFunction=previousStream;
     providerEvents = [];
   }};
 }
