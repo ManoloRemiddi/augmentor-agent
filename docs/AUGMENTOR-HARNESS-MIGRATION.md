@@ -14,6 +14,8 @@ October 10 follow-up: [Native/Browser reasoning controls](AUGMENTOR-HARNESS.md#n
 
 October 10 native inspection follow-up: [indexed native entries and canonical message lineage](AUGMENTOR-HARNESS.md#indexed-native-entries-and-canonical-message-lineage) now provide scoped original-entry pages/excerpts, same-stamp source-block verification and public SDK exact/ambiguous/unmatched projection evidence. This includes reading saved originals after diagnostic clearing. Full causal provenance, payload search, representative performance and all remaining P0/P1/platform/installed cutover gates stay binding.
 
+October 10 payload search follow-up: [retained diagnostic payload search](AUGMENTOR-HARNESS.md#retained-diagnostic-payload-search) adds scoped metadata/payload/combined literal matching, restart-safe progress, hash-verified captured excerpts and explicit gaps. The UI distinguishes saved diagnostics from uncaptured context and original-history search. Complete causal provenance, full original-history search/performance and every remaining P0/P1/platform/installed cutover gate stay binding.
+
 ## Decisions and boundaries
 
 | Decision | Direction |

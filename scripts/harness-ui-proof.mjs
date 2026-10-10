@@ -7,7 +7,7 @@ import {mkdtempSync,mkdirSync,writeFileSync,appendFileSync,readFileSync,existsSy
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {randomUUID} from 'node:crypto';
+import {randomUUID,createHash} from 'node:crypto';
 const source=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('..',import.meta.url)));
 const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
@@ -60,7 +60,9 @@ writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPre
 if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
  const sid='trajectory-index-proof',directory=join(state,'observations',sid),time=Date.now();mkdirSync(directory,{recursive:true,mode:0o700});mkdirSync(join(state,'sessions'),{recursive:true,mode:0o700});
  writeFileSync(join(state,'sessions',sid+'.meta.json'),JSON.stringify({id:sid,cwd:workspace,selection,title:'Indexed synthetic metadata',saved:true,policy:'read-only',updatedAt:time,requests:[],running:false}),{mode:0o600});
- const lines=Array.from({length:1100},(_,i)=>JSON.stringify({protocol:'augmentor-observation/1',id:randomUUID(),seq:i+1,sessionId:sid,time,kind:'fixture/history',data:{name:'Saved synthetic metadata',marker:i===4?'rare older café':'ordinary metadata '+(i+1)}})+'\n').join('');
+ const lines=Array.from({length:1100},(_,i)=>{const record={protocol:'augmentor-observation/1',id:randomUUID(),seq:i+1,sessionId:sid,time,kind:'fixture/history',data:{name:'Saved synthetic metadata',marker:i===4?'rare older café':'ordinary metadata '+(i+1)}};
+  if(i===6&&process.env.AUGMENTOR_HARNESS_PROOF_PAYLOADS==='1'){const payload=JSON.stringify({authorization:'[Redacted credential field]',text:'EARLY_PAYLOAD_TERM '+ 'x'.repeat(3*1024*1024)+' DEEP_PAYLOAD_NEEDLE 日本語'});writeFileSync(join(directory,record.id+'.payload.json'),payload,{mode:0o600});record.payload={state:'retained',bytes:Buffer.byteLength(payload),sha256:createHash('sha256').update(payload).digest('hex'),redactions:['authorization']};}
+  return JSON.stringify(record)+'\n';}).join('');
  writeFileSync(join(directory,'events.jsonl'),lines,{mode:0o600});writeFileSync(join(directory,'counter.json'),JSON.stringify({seq:1100}),{mode:0o600});
 }
 const lazy=process.env.AUGMENTOR_HARNESS_PROOF_LAZY==='1';

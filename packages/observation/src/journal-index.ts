@@ -73,14 +73,14 @@ export class ObservationIndex {
    this.save({...previous,source:stamp(this.journal),index:stamp(this.file),count:previous.count+1,firstSeq:previous.firstSeq??record.seq,lastSeq:record.seq,minTime:previous.minTime===null?record.time:Math.min(previous.minTime,record.time)});
   }catch{this.cached=undefined;rmSync(this.manifest,{force:true});}
  }
- page(options:{before:number;after:number;forward:boolean;limit:number;terms:string[]}){
+ page(options:{before:number;after:number;forward:boolean;limit:number;terms:string[];inclusiveBefore?:boolean}){
   const execute=()=>{
    const s=this.snapshot(),records:Observation[]=[];let scanned=0,bytes=0,cursor:number|null=null;
    if(!s.count)return {records,hasMore:false,earliestSeq:null,latestSeq:null,nextBeforeSeq:null,nextAfterSeq:null,scanned,totalRecords:0,journalBytesRead:0};
    const idx=openSync(this.file,'r'),journal=openSync(this.journal,'r');
    try{
     const lower=(seq:number)=>{let left=0,right=s.count;while(left<right){const mid=Math.floor((left+right)/2);if(this.entry(idx,mid,s).seq<seq)left=mid+1;else right=mid;}return left;};
-    const start=lower(options.after+1),end=lower(options.before),step=options.forward?1:-1;let position=options.forward?start:end-1,responseBytes=0;
+    const start=lower(options.after+1),end=options.inclusiveBefore?(()=>{let left=0,right=s.count;while(left<right){const mid=Math.floor((left+right)/2);if(this.entry(idx,mid,s).seq<=options.before)left=mid+1;else right=mid;}return left;})():lower(options.before),step=options.forward?1:-1;let position=options.forward?start:end-1,responseBytes=0;
     while(position>=start&&position<end){
      const entry=this.entry(idx,position,s);
      if(options.terms.length&&scanned&&(scanned>=1000||bytes+entry.length>512*1024))break;

@@ -36,7 +36,7 @@
       </div>
       <section id="chat" class="panel"><div id="messages" class="messages"><p class="empty">Select a conversation or start a new one.</p></div></section>
       <section id="trajectory" class="panel inspection-panel" hidden>
-        <div class="inspection-tools"><input id="search" maxlength="256" placeholder="Search retained metadata" aria-label="Search retained trajectory metadata"><button id="older">Load earlier</button><span id="coverage"></span></div>
+        <div class="inspection-tools"><input id="search" maxlength="256" placeholder="Search retained metadata" aria-label="Search retained trajectory metadata"><select id="search-scope" aria-label="Retained search scope"><option value="metadata">Metadata</option><option value="all">Metadata + payloads</option><option value="payloads">Payloads</option></select><button id="older">Load earlier</button><span id="coverage"></span></div>
         <div class="overview"><canvas id="timeline" aria-label="Recorded execution timeline"></canvas><small>Drag to focus an interval. Right-click to clear. Missing durations remain markers.</small></div>
         <div class="inspection-split"><div id="ledger" class="ledger" role="list" aria-label="Execution records"></div><div id="inspector" class="inspector"><p class="empty">Select a record to inspect its inputs, outputs and timing.</p></div></div>
       </section>

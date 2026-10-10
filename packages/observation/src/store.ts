@@ -5,6 +5,8 @@ import {createHash, randomUUID} from 'node:crypto';
 import {identifier} from '../../protocol/src/index.js';
 import {atomicJson, privateDir, readJson} from '../../runtime/src/storage.js';
 import {ObservationIndex} from './journal-index.js';
+import {PayloadIndex,PayloadUnavailable,PAYLOAD_BLOCK} from './payload-index.js';
+import {PayloadSearch,type SearchOptions} from './payload-search.js';
 
 export const OBSERVATION_PROTOCOL = 'augmentor-observation/1';
 export const DEFAULT_RETENTION = {days: 14, maxBytes: 512 * 1024 * 1024};
@@ -47,6 +49,9 @@ export class ObservationStore {
   private lastPrune = 0;
   private size = 0;
   private indexes=new Map<string,ObservationIndex>();
+  private payloadIndexes=new Map<string,PayloadIndex>();
+  private pendingPayloadPrune=false;
+  private searcher=new PayloadSearch(this,id=>this.index(id),(sid,id)=>this.payloadIndex(sid,id));
   constructor(readonly root: string, readonly policy: () => ObservationPolicy, readonly now = Date.now) {
     privateDir(root);
     this.prune(true);
@@ -54,6 +59,9 @@ export class ObservationStore {
   private directory(sessionId: string) {return privateDir(join(this.root, identifier(sessionId)));}
   private journal(sessionId: string) {return join(this.directory(sessionId), 'events.jsonl');}
   private index(sessionId:string){let index=this.indexes.get(sessionId);if(!index){index=new ObservationIndex(this.journal(sessionId),sessionId);if(this.indexes.size>=32)this.indexes.delete(this.indexes.keys().next().value!);this.indexes.set(sessionId,index);}return index;}
+  private payloadIndex(sessionId:string,eventId:string){const file=join(this.directory(sessionId),identifier(eventId)+'.payload.json');let index=this.payloadIndexes.get(file);if(!index){index=new PayloadIndex(file,()=>{this.pendingPayloadPrune=true;});if(this.payloadIndexes.size>=32)this.payloadIndexes.delete(this.payloadIndexes.keys().next().value!);this.payloadIndexes.set(file,index);}return index;}
+  private flushPayloadIndexes(){if(this.pendingPayloadPrune){this.pendingPayloadPrune=false;this.prune(true);}}
+  search(sessionId:string,options:SearchOptions={}){this.prune();try{return this.searcher.page(identifier(sessionId),options);}finally{this.flushPayloadIndexes();}}
   append(sessionId: string, kind: string, data: Record<string, unknown>,
     correlations: {turnId?: string; requestId?: string} = {}, payload?: unknown): Observation {
     const directory = this.directory(sessionId);
@@ -102,10 +110,11 @@ export class ObservationStore {
     return {protocol:OBSERVATION_PROTOCOL,...this.index(sessionId).page({before,after,forward:options.afterSeq!==undefined,limit,terms}),capturePayloads:this.policy().capturePayloads,
       coverage:{scope:terms.length?'retained-metadata-search':'retained-metadata',payloadBodies:false,index:'byte-offset-v1',query:options.query??''}};
   }
-  payload(sessionId: string, eventId: string, offset?: number, limit?: number) {
+  payload(sessionId: string, eventId: string, offset?: number, limit?: number, sha256?:unknown) {
     this.prune();
     const file = join(this.directory(sessionId), identifier(eventId) + '.payload.json');
     if (!existsSync(file)) return {available: false, reason: 'Payload was not captured or has expired.'};
+    if(sha256!==undefined){if(typeof sha256!=='string')throw Error('Invalid captured payload hash');try{return this.payloadIndex(sessionId,eventId).withReader(sha256,reader=>{const start=integer(offset,0,0,reader.size),length=integer(limit,65536,1,65536),pieces:Buffer[]=[];let at=start,remaining=Math.min(length+3,reader.size-start);while(remaining){const block=reader.block(Math.floor(at/PAYLOAD_BLOCK)),inside=at%PAYLOAD_BLOCK,n=Math.min(remaining,block.length-inside);pieces.push(block.subarray(inside,inside+n));at+=n;remaining-=n;}const bytes=Buffer.concat(pieces);if(bytes.length&&(bytes[0]!&0xc0)===0x80)throw Error('Payload cursor splits a UTF-8 character');let end=Math.min(length,bytes.length);while(end>0&&end<bytes.length&&(bytes[end]!&0xc0)===0x80)end--;if(!end&&bytes.length){end=1;while(end<bytes.length&&(bytes[end]!&0xc0)===0x80)end++;}return {available:true,offset:start,nextOffset:start+end,length:reader.size,units:'utf8-bytes',text:bytes.subarray(0,end).toString('utf8'),hasMore:start+end<reader.size,sha256,verification:'captured snapshot source blocks'};});}catch(error){if(error instanceof PayloadUnavailable)return {available:false,reason:error.message};throw error;}finally{this.flushPayloadIndexes();}}
     const size = statSync(file).size;
     const start = integer(offset, 0, 0, size);
     const length = integer(limit, 65536, 1, 65536);
@@ -124,7 +133,7 @@ export class ObservationStore {
     const directory = this.directory(sessionId);
     this.index(sessionId).invalidate();
     for (const file of readdirSync(directory)) {
-      if (file === 'events.jsonl' || file.endsWith('.payload.json')) rmSync(join(directory, file));
+      if (file === 'events.jsonl' || file.endsWith('.payload.json')) {rmSync(join(directory,file));if(file.endsWith('.payload.json'))this.payloadIndex(sessionId,file.slice(0,-13)).invalidate();}
     }
     this.prune(true);
     return this.append(sessionId, 'observation/cleared', {scope: 'diagnostic records only'});
@@ -156,11 +165,12 @@ export class ObservationStore {
         // Only our atomic-write leftovers are owned here. A second runtime is
         // excluded by the host socket before this store is constructed.
         if (/^(?:counter\.json\.|[a-f0-9-]{36}\.payload\.json\.)[a-f0-9-]{36}\.tmp$/.test(name) ||
-          /^[a-f0-9-]{36}\.retention\.tmp$/.test(name)||/^events\.jsonl\.idx(?:\.json)?\.[a-f0-9-]{36}\.tmp$/.test(name)) {rmSync(join(directory, name)); continue;}
+          /^[a-f0-9-]{36}\.retention\.tmp$/.test(name)||/^events\.jsonl\.idx(?:\.json)?\.[a-f0-9-]{36}\.tmp$/.test(name)||/^[a-f0-9-]{36}\.payload\.json\.idx(?:\.json)?\.[a-f0-9-]{36}\.tmp$/.test(name)) {rmSync(join(directory, name)); continue;}
+        if(/^[a-f0-9-]{36}\.payload\.json\.idx(?:\.json)?$/.test(name)&&!existsSync(join(directory,name.replace(/\.idx(?:\.json)?$/,'')))){rmSync(join(directory,name),{force:true});continue;}
         if (name !== 'events.jsonl' && !name.endsWith('.payload.json')) continue;
         const path = join(directory, name), info = statSync(path);
-        if (name.endsWith('.payload.json') && info.mtimeMs < oldest) {rmSync(path); continue;}
-        const indexBytes=name==='events.jsonl'?['.idx','.idx.json'].reduce((n,suffix)=>n+(existsSync(path+suffix)?statSync(path+suffix).size:0),0):0;
+        if (name.endsWith('.payload.json') && info.mtimeMs < oldest) {rmSync(path);this.payloadIndex(entry.name,name.slice(0,-13)).invalidate(); continue;}
+        const indexBytes=['.idx','.idx.json'].reduce((n,suffix)=>n+(existsSync(path+suffix)?statSync(path+suffix).size:0),0);
         files.push({path, time: info.mtimeMs, size: info.size+indexBytes, payload: name.endsWith('.payload.json')});
       }
     }
@@ -169,7 +179,7 @@ export class ObservationStore {
     files.sort((a, b) => Number(b.payload) - Number(a.payload) || a.time - b.time);
     for (const file of files) {
       if (this.size <= maxBytes) break;
-      rmSync(file.path);if(!file.payload)this.index(file.path.split(/[\\/]/).at(-2)!).invalidate();this.size -= file.size;
+      rmSync(file.path);if(!file.payload)this.index(file.path.split(/[\\/]/).at(-2)!).invalidate();else this.payloadIndex(file.path.split(/[\\/]/).at(-2)!,file.path.split(/[\\/]/).at(-1)!.slice(0,-13)).invalidate();this.size -= file.size;
     }
   }
 }

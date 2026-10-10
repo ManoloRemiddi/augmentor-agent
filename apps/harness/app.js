@@ -13,7 +13,7 @@ const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token')
 if(token)sessionStorage.setItem('augmentor-harness-token',token);
 history.replaceState(null,'',location.pathname);
 const state={readOnly:false,boundSession:null,sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0,queue:null,ready:false,selecting:false,selectionReady:false,creating:false};
-const search={query:'',records:new Map(),epoch:0,before:null,hasMore:false,scanned:0,loading:false,error:false};let searchTimer;
+const search={query:'',scope:'metadata',cursor:null,matches:new Map(),payloadBytes:0,unavailable:0,uncaptured:0,records:new Map(),epoch:0,before:null,hasMore:false,scanned:0,loading:false,error:false};let searchTimer;
 const promptQueue=createQueue({container:$('prompt-queue'),input:$('input'),allowIdle:true,send:async(method,payload)=>{
   const sid=payload.sessionId,epoch=state.epoch;
   const result=await rpc(method==='queue/prompt'?'session.prompt':payload.action==='acknowledge'?'session.resolveQueue':'session.updateQueue',method==='queue/prompt'?{sessionId:sid,requestId:payload.requestId,mode:'queue',resumeQueue:payload.resumeQueue,content:[{type:'text',text:payload.text}]}:payload.action==='acknowledge'?{sessionId:sid,itemId:payload.itemId,acknowledgeUnknownOutcome:true}:{sessionId:sid,itemId:payload.itemId,expectedTurnId:payload.expectedTurnId,action:{kind:payload.action}});
@@ -39,7 +39,7 @@ addEventListener('keydown',event=>{if(event.key==='Escape')closeSidebar();});
 function node(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
 function notice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error);}
 async function rpc(method,params={}){
-  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead','session.models','session.queue','observation.describe','observation.list','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
+  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead','session.models','session.queue','observation.describe','observation.list','observation.search','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
   const response=await fetch('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});
   const body=await response.json();if(!response.ok||body.error)throw Error(body.error?.message||'The local connection failed');return body.result;
 }
@@ -131,7 +131,7 @@ function drawLedger(scrollTop=$('ledger').scrollTop){
   const desired=[spacer('before',start*height),...ledgerRecords.slice(start,end).map((record,index)=>{
     const row=existing.get(record.id)||node('div');row.dataset.recordId=record.id;row.setAttribute('role','listitem');row.setAttribute('aria-posinset',String(start+index+1));row.setAttribute('aria-setsize',String(ledgerRecords.length));
     const button=row.firstElementChild||node('button');button.className='record'+(record.id===state.selected?' selected':'');button.dataset.recordId=record.id;
-    button.replaceChildren(node('span',String(record.seq),'seq'),node('span',label(record),'label'),node('span',typeof record.data.durationMs==='number'?Math.round(record.data.durationMs)+' ms':'','timing'));
+    button.replaceChildren(node('span',String(record.seq),'seq'),node('span',label(record)+(search.matches.get(record.id)?.source?.includes('payload')?' · payload match':''),'label'),node('span',typeof record.data.durationMs==='number'?Math.round(record.data.durationMs)+' ms':'','timing'));
     button.onclick=()=>inspect(record).catch(e=>notice(e.message,true));if(!button.parentElement)row.append(button);return row;
   }),spacer('after',(ledgerRecords.length-end)*height)];
   // Keep visible buttons attached when scrolling makes an overscan row clickable.
@@ -144,19 +144,19 @@ function renderLedger(){
   const all=search.query?[...search.records.values()].sort((a,b)=>a.seq-b.seq):rows(),terms=$('search').value.toLowerCase().trim().split(/\s+/).filter(Boolean);
   const focus=state.focus?trajectoryTimelineFocusIndexes(timelineTurns,state.focus,'actual'):null;
   const container=$('ledger'),anchor=ledgerRecords[Math.floor(container.scrollTop/43)],offset=container.scrollTop%43;
-  ledgerRecords=all.filter(r=>(!focus||focus.has(r.seq))&&terms.every(t=>JSON.stringify(r).toLocaleLowerCase().includes(t)));
+  ledgerRecords=all.filter(r=>(!focus||focus.has(r.seq))&&(search.query&&search.scope!=='metadata'||terms.every(t=>JSON.stringify(r).toLocaleLowerCase().includes(t))));
   const index=anchor?ledgerRecords.findIndex(r=>r.id===anchor.id):-1;
-  drawLedger(index>=0?index*43+offset:container.scrollTop);$('coverage').textContent=search.query?ledgerRecords.length+' loaded matches · '+search.scanned+' metadata records searched · '+(search.loading?'searching':search.error?'search unavailable':search.hasMore?'older records remain':'snapshot search complete')+' · payload bodies excluded':all.length+' metadata records loaded';$('older').disabled=search.query?search.loading||!search.hasMore:!state.hasMore;
+  drawLedger(index>=0?index*43+offset:container.scrollTop);$('coverage').textContent=search.query?ledgerRecords.length+' loaded matches · '+search.scanned+(search.scope==='metadata'?' metadata records searched · ':' records searched · ')+(search.loading?'searching':search.error?'search unavailable':search.hasMore?'older records remain':'snapshot search complete')+(search.scope==='metadata'?' · payload bodies excluded':' · '+search.payloadBytes.toLocaleString()+' payload bytes verified · '+search.unavailable+' expired or unreadable payloads · '+search.uncaptured+' records without captured payloads'):all.length+' metadata records loaded';$('older').disabled=search.query?search.loading||!search.hasMore:!state.hasMore;
   const selected=$('requests').value,requests=rows().filter(r=>r.kind==='model/request');
   $('requests').replaceChildren(...requests.map(r=>{const option=node('option','#'+r.seq+' · '+r.data.model);option.value=r.id;return option;}));
   if(requests.some(r=>r.id===selected))$('requests').value=selected;
   else if(requests.length)$('requests').value=requests.at(-1).id;
 }
 function renderObservations(){renderTimeline();renderLedger();}
-async function readPayload(sid,eventId){
+async function readPayload(sid,eventId,sha256){
   let offset=0,text='';
   while(true){
-    const page=await rpc('observation.payload',{sessionId:sid,eventId,offset});
+    const page=await rpc('observation.payload',{sessionId:sid,eventId,offset,...(sha256?{sha256}:{})});
     if(!page.available)return {available:false,reason:page.reason};
     text+=page.text;offset=page.nextOffset;if(!page.hasMore)return {available:true,value:JSON.parse(text),raw:text};
   }
@@ -171,7 +171,9 @@ async function inspect(record){
   const epoch=++inspectionEpoch,sid=state.sessionId;state.selected=record.id;renderLedger();
   const container=$('inspector');container.replaceChildren(node('h2',label(record)),detail('Recorded metadata',record,true));
   if(!record.payload)return;
-  const payload=await readPayload(sid,record.id);if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
+  const match=search.query?search.matches.get(record.id):undefined;
+  if(match?.excerpt){container.append(node('p','Search matched a retained payload snapshot. This excerpt does not show every matched term.'),detail('Matching payload excerpt',match.excerpt,true),copyButton(match.excerpt.text));const full=node('button','Read full retained payload');full.onclick=async()=>{full.disabled=true;try{const payload=await readPayload(sid,record.id,match.payloadSha256);if(epoch!==inspectionEpoch||sid!==state.sessionId)return;if(!payload.available){container.append(node('p',payload.reason,'empty'));return;}container.append(detail('Full retained structured payload',payload.value,true),copyButton(payload.raw));renderImages(container,payload.value);}catch(error){if(epoch===inspectionEpoch&&sid===state.sessionId)notice(error.message,true);}finally{if(epoch===inspectionEpoch&&sid===state.sessionId)full.disabled=false;}};container.append(full);return;}
+  const payload=await readPayload(sid,record.id,record.payload?.sha256);if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
   if(!payload.available){container.append(node('p',payload.reason,'empty'));return;}
   const redacted=record.payload.redactions?.length>0||record.data.credentialRedactions?.length>0;
   container.append(detail(redacted?'Structured payload with credential redactions':'Original structured payload',payload.value,true),copyButton(payload.raw));renderImages(container,payload.value);
@@ -199,7 +201,7 @@ async function inspectContext(){
     container.append(node('p','Recorded SDK context boundaries and managed memory. Complete source attribution is not yet available.'),detail('Coverage, snapshot changes and memory contribution',provenance.data));
   }else container.append(node('p','No composition record is loaded for this request. Older requests may predate boundary capture.','empty'));
   let payload,lineage;
-  try{[payload,lineage]=await Promise.all([readPayload(sid,id),provenance?.payload?readPayload(sid,provenance.id):Promise.resolve(undefined)]);}
+  try{[payload,lineage]=await Promise.all([readPayload(sid,id,record.payload?.sha256),provenance?.payload?readPayload(sid,provenance.id,provenance.payload.sha256):Promise.resolve(undefined)]);}
   catch(error){if(epoch===inspectionEpoch&&sid===state.sessionId)throw error;return;}
   if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
   if(lineage?.available){
@@ -239,7 +241,7 @@ function renderInteraction(){
 async function selectSession(sid,{preserveEdit=false}={}){
   if(state.readOnly&&sid!==state.boundSession)throw Error('This inspector can read only its selected conversation.');
   if(!preserveEdit)messageActions.reset();
-  closeSidebar();clearTimeout(searchTimer);search.epoch++;search.query='';search.records.clear();search.before=null;search.scanned=0;search.hasMore=false;search.loading=false;search.error=false;$('search').value='';
+  closeSidebar();clearTimeout(searchTimer);search.epoch++;search.query='';search.cursor=null;search.matches.clear();search.payloadBytes=0;search.unavailable=0;search.uncaptured=0;search.records.clear();search.before=null;search.scanned=0;search.hasMore=false;search.loading=false;search.error=false;$('search').value='';
   const epoch=++state.epoch;inspectionEpoch++;state.selecting=true;state.selectionReady=false;state.sessionId=sid;state.queue=null;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
   sessionStorage.setItem('augmentor-harness-session',sid);
   $('interaction').hidden=true;$('inspector').replaceChildren(node('p','Select a record to inspect.','empty'));renderSessions();renderChat();
@@ -293,14 +295,14 @@ $('ledger').onscroll=()=>{if(ledgerFrame===null)ledgerFrame=requestAnimationFram
 async function searchPage(){
   const sid=state.sessionId,epoch=state.epoch,queryEpoch=search.epoch,query=search.query;if(!sid||!query)return;
   const current=()=>sid===state.sessionId&&epoch===state.epoch&&queryEpoch===search.epoch;search.loading=true;search.error=false;renderLedger();
-  try{let added=0;do{const page=await rpc('observation.list',{sessionId:sid,query,limit:Math.max(1,100-added),...(search.before!==null?{beforeSeq:search.before}:{})});if(!current())return;
-    page.records.forEach(record=>search.records.set(record.id,record));added+=page.records.length;search.before=page.nextBeforeSeq;search.hasMore=page.hasMore;search.scanned+=page.scanned;renderLedger();
+  try{let added=0;do{const page=await rpc(search.scope==='metadata'?'observation.list':'observation.search',{sessionId:sid,query,limit:Math.max(1,100-added),...(search.scope==='metadata'?(search.before!==null?{beforeSeq:search.before}:{}):{scope:search.scope,...(search.cursor?{cursor:search.cursor}:{})})});if(!current())return;
+    page.records.forEach(record=>search.records.set(record.id,record));added+=page.records.length;search.before=page.nextBeforeSeq;search.hasMore=page.hasMore;search.scanned+=page.scanned??page.coverage.completedRecords;if(search.scope!=='metadata'){search.cursor=page.nextCursor;page.matches.forEach(match=>search.matches.set(match.eventId,match));search.payloadBytes+=page.coverage.payloadBytesRead;for(const [reason,count] of Object.entries(page.coverage.unavailablePayloads)){if(['not-recorded','disabled','too-large','invalid'].includes(reason))search.uncaptured+=count;else search.unavailable+=count;}}renderLedger();
     if(!search.hasMore||added>=100)break;await new Promise(resolve=>setTimeout(resolve,0));if(!current())return;
    }while(true);
   }catch(error){if(current()){search.error=true;notice(error.message,true);}}
   finally{if(current()){search.loading=false;renderLedger();}}
 }
-$('search').oninput=()=>{clearTimeout(searchTimer);search.epoch++;search.query=$('search').value.trim();search.records.clear();search.before=null;search.scanned=0;search.hasMore=false;search.loading=!!search.query;search.error=false;$('ledger').scrollTop=0;renderLedger();if(search.query)searchTimer=setTimeout(()=>void searchPage(),300);};$('requests').onchange=()=>inspectContext().catch(e=>notice(e.message,true));
+const startSearch=()=>{clearTimeout(searchTimer);search.scope=$('search-scope').value;$('search').placeholder=search.scope==='metadata'?'Search retained metadata':'Search retained payload snapshots';search.epoch++;search.query=$('search').value.trim();search.cursor=null;search.matches.clear();search.payloadBytes=0;search.unavailable=0;search.uncaptured=0;search.records.clear();search.before=null;search.scanned=0;search.hasMore=false;search.loading=!!search.query;search.error=false;$('ledger').scrollTop=0;renderLedger();if(search.query)searchTimer=setTimeout(()=>void searchPage(),300);};$('search').oninput=startSearch;$('search-scope').onchange=startSearch;$('requests').onchange=()=>inspectContext().catch(e=>notice(e.message,true));
 $('older').onclick=async()=>{if(search.query){await searchPage();return;}const sid=state.sessionId,epoch=state.epoch;try{const first=rows().at(0);if(!first)return;const page=await rpc('observation.list',{sessionId:sid,beforeSeq:first.seq});if(sid!==state.sessionId||epoch!==state.epoch)return;page.records.forEach(r=>state.observations.set(r.id,r));state.hasMore=page.hasMore;renderObservations();}catch(e){if(sid===state.sessionId&&epoch===state.epoch)notice(e.message,true);}};
 $('capture').onchange=async()=>{try{const current=await rpc('observation.describe');await rpc('observation.configure',{expectedRevision:current.revision,capturePayloads:$('capture').checked});notice('Local capture preference saved. Existing conversation history is unaffected.');}catch(e){notice(e.message,true);try{$('capture').checked=(await rpc('observation.describe')).capturePayloads;}catch{}}};
 $('new-chat').onclick=async()=>{if(!state.ready||state.selecting||state.creating||messageActions.busy)return;const epoch=state.epoch;state.creating=true;renderSessions();try{const selection=JSON.parse($('model').value||'null');if(!selection)throw Error('Choose a model first.');if(!$('workspace').value.trim())throw Error('Choose a working folder.');const sid=crypto.randomUUID();await rpc('session.create',{sessionId:sid,selection,cwd:$('workspace').value});await refreshSessions();if(epoch===state.epoch)await selectSession(sid);}catch(e){notice(e.message,true);}finally{state.creating=false;renderSessions();renderChat();}};
