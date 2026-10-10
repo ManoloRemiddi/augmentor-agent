@@ -13,6 +13,8 @@ The selected [Pi prompt-template utility](../packages/runtime/vendor/pi/SOURCE.m
 
 # Source baselines and migration inventory
 
+The [loaded Pi Chromium checkpoint](AUGMENTOR-HARNESS.md#loaded-pi-chromium-extension) verifies the pinned Pi 1.1.0 runtime through the maintained MV3 surface and product native host, with a synthetic provider/page and isolated trusted workspace paths. It changes shared renderer queue state and Pi bridge workspace configuration only; existing SDK/native dependencies, licenses and sole-session ownership are preserved. Linux source/staged evidence does not certify a physical Mac/Windows installation or live memory/provider service.
+
 See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualified Linux upgrade and temporary history bridge.
 
 

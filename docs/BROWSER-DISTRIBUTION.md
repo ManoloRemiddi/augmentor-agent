@@ -27,6 +27,12 @@ installs the downloaded runtime package and loads the downloaded ZIP as an ordin
 user in Chromium, with a deterministic local model and no developer configuration.
 Its result must pass for the candidate being handed to testers.
 
+### October 10 Pi Harness source qualification
+
+The [loaded Pi Chromium follow-up](AUGMENTOR-HARNESS.md#loaded-pi-chromium-extension) drives the actual MV3 extension, product native host and Pi 1.1.0 against an independently authored synthetic page/provider. It verifies snapshot/type/click/screenshot, identified template-expanded steering, original Chat text, Remove, reload restoration, Stop/paused FIFO resume and exact Branch/Edit without changing the parent. Streaming now preserves the negotiated queue Send button instead of disabling it during each rendered delta. Layout and control placement are unchanged.
+
+Trusted development/companion configuration may set `AUGMENTOR_PI_BROWSER_WORKSPACE` to an explicit Pi Browser working directory. The default remains `~/Augmentor Browser Pi`. This permits isolated profiles without changing the account home; it does not grant new tools or change surface authorization. The candidate's source and staged-tree tests are Linux evidence; a staged tree is not a complete installed package. Mac/Windows Browser, other Chromium distributions, live providers and installed acceptance remain separate qualification.
+
 The preview has actual Chromium 152 evidence. Google Chrome, Brave, other operating
 systems, and Snap/Flatpak browser isolation remain uncertified until their own
 installation and native-messaging tests pass. Do not advertise those combinations
