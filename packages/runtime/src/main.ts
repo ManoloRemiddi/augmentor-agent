@@ -51,6 +51,7 @@ const server=net.createServer(socket=>{
         if(req.method==='browser.attach'){if(host.getMeta(p.sessionId).surface!=='browser')throw new Error('Browser tools require a browser session');host.browser.attach(p.sessionId,socket,frame=>write(socket,{event:{method:'browser/execute',payload:frame}}));write(socket,{id,result:{attached:true}});return;}
         if(req.method==='browser.respond'){host.browser.respond(socket,p.rpcId,p.result,p.error);write(socket,{id,result:{accepted:true}});return;}
         if(req.method==='host.shutdown'){await host.dispatch('host.prepareShutdown',{},req.id);write(socket,{id,result:{accepted:true}});void shutdown();return;}
+        if(req.method==='inspection.open'){const sid=host.getMeta(p.sessionId).id;await openHarness();write(socket,{id,result:harness!.openInspection(sid)});return;}
         if(req.method==='harness.open'){if(p.sessionId!==undefined)host.getMeta(p.sessionId);const link=await openHarness();write(socket,{id,result:{...link,url:link.url+(p.sessionId?'&session='+encodeURIComponent(p.sessionId):'')}});return;}
         const result=await host.dispatch(req.method,p,req.id);write(socket,{id,result});
       }catch(error){write(socket,{id,error:{message:error instanceof Error?error.message:String(error)}});}

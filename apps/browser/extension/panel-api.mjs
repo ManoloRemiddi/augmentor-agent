@@ -71,6 +71,19 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
     if(state.harness!=='pi'||msg.requestId!==state.promptImprovement?.requestId){sendResponse({ok:false,error:'The Pi prompt editor scope changed.'});return}
     request('prompt.cancelImprovement',{requestId:msg.requestId,scopeId:msg.requestId}).then(result=>sendResponse({ok:true,result}),error=>sendResponse({ok:false,error:error.message}));return true
   }
+  if(msg?.type==='inspection/open'){
+    const sid=msg.sourceSession;
+    const valid=()=>sid===state.sessionId&&state.harness==='pi'&&state.capabilities.inspection===true&&state.phase==='ready'&&!state.panelViewSession&&!chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol;
+    if(!valid()||state.mutating){sendResponse({ok:false,error:'Select a ready standalone Pi conversation to inspect.'});return}
+    const creating=!state.sessionReady;if(creating)state.mutating=true;
+    ;(async()=>{
+      if(creating){await request('session.create',{sessionId:sid});if(!valid())throw Error('The conversation changed. Reopen the inspector.');state.sessionReady=true}
+      const result=await request('inspection.open',{sessionId:sid});if(!valid())throw Error('The conversation changed. Reopen the inspector.');
+      const url=new URL(result.url);
+      if(result.mode!=='read-only'||result.sessionId!==sid||url.protocol!=='http:'||url.hostname!=='127.0.0.1'||!url.hash.startsWith('#token='))throw Error('The runtime returned an invalid conversation inspector link.');
+      const tab=await chrome.tabs.create({url:result.url});sendResponse({ok:true,result:{opened:true,sessionId:sid,mode:'read-only',tabId:tab.id}});
+    })().catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>{if(creating)state.mutating=false});return true
+  }
   if(msg?.type==='prompt/improve'&&state.harness==='pi'){
     const sid=state.sessionId,selection=JSON.stringify(state.selection),requestId=msg.requestId;
     const valid=()=>sid===state.sessionId&&selection===JSON.stringify(state.selection)&&state.harness==='pi'&&state.phase==='ready'&&!state.panelViewSession;

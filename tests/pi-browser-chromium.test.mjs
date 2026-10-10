@@ -61,7 +61,7 @@ test('loaded Pi Browser executes tools and identified steering, restores paused 
  await Promise.all([mkdir(join(config,'agent','prompts'),{recursive:true}),mkdir(workspace)]);
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const base='http://127.0.0.1:'+server.address().port;
  await writeFile(join(config,'agent','models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:base+'/v1',apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Isolated Pi Browser fixture',reasoning:true,compat:{supportsReasoningEffort:true},input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
- await writeFile(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'danger-full-access',defaultModel:selection,pinned:[],hidden:[]}));
+ await writeFile(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'danger-full-access',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
  await writeFile(join(config,'agent','prompts','correction.md'),'Prepared PI_BROWSER_CORRECTION $1');
  const cleanEnv=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));
  const env={...cleanEnv,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_PI_SOCKET:join(state,'runtime.sock'),AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_BROWSER_WORKSPACE:workspace,AUGMENTOR_WORKSPACE_PROFILE:'',AUGMENTOR_PI_LINUX_TOOLS:'0',PI_OFFLINE:'1',XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data')};
@@ -153,4 +153,29 @@ test('loaded Pi Browser executes tools and identified steering, restores paused 
  await panel.call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',windowsVirtualKeyCode:27});await panel.call('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',windowsVirtualKeyCode:27});await until(()=>closed.has(inputs.length),'Browser provider cancelled');
  await panelUntil('document.querySelector("#improve").textContent==="✦"','cancelled Browser draft');assert.equal(await panel.evaluate('document.querySelector("#input").value'),'IMPROVE_SLOW');
  assert.deepEqual(await client.call('session.history',{sessionId:draftSession,maxMessages:100}),draftHistory);assert.deepEqual(panel.errors,[]);
+ // Actual Models entry opens the scoped Harness; all history/Context reads leave the owner intact.
+ await assert.rejects(readFile(join(state,'harness.json')));const inspectionCount=inputs.length;
+ assert.equal((await message({type:'inspection/open',sourceSession:'foreign-conversation'})).ok,false);
+ await settingsUntil('document.querySelector("#pi-inspector")&&!document.querySelector("#pi-inspector").disabled');await clickSetting('document.querySelector("#pi-inspector")');
+ let inspectorInfo;await until(async()=>{inspectorInfo=(await targets()).find(row=>row.url.startsWith('http://127.0.0.1:')&&row.url!==base+'/page');return inspectorInfo;},'conversation inspector tab');
+ const inspector=await cdp(inspectorInfo.webSocketDebuggerUrl);sockets.push(inspector);await inspector.call('Runtime.enable');
+ await until(()=>inspector.evaluate('document.title==="Conversation inspector · Augmentor Harness"&&document.querySelector("[data-view=trajectory]").getAttribute("aria-selected")==="true"&&document.querySelectorAll("#ledger .record").length>0'),'read-only trajectory');
+ assert.equal(await inspector.evaluate('location.hash'),'', 'bearer fragment removed from visible history');
+ assert.deepEqual(await inspector.evaluate('["new-chat","composer","stop","trim-tools","prompt-library","reasoning-settings","prompt-queue","continue-queue"].map(id=>({id,visible:document.getElementById(id).getClientRects().length>0}))'),['new-chat','composer','stop','trim-tools','prompt-library','reasoning-settings','prompt-queue','continue-queue'].map(id=>({id,visible:false})));
+ assert.equal(await inspector.evaluate('document.querySelector("#model").disabled&&document.querySelector("#capture").disabled'),true);
+ const scoped=async(method,params={})=>inspector.evaluate('fetch("/api/rpc",{method:"POST",headers:{Authorization:"Bearer "+sessionStorage.getItem("augmentor-harness-token"),"Content-Type":"application/json"},body:JSON.stringify('+JSON.stringify({id:'inspection-contract',method,params})+')}).then(async response=>({status:response.status,...await response.json()}))');
+ assert.deepEqual((await scoped('session.list')).result.items.map(row=>row.sessionId),[draftSession]);
+ assert.equal((await scoped('session.prompt',{sessionId:draftSession,requestId:'inspection-forbidden',content:[{type:'text',text:'Do not run'}]})).status,400);
+ assert.equal((await scoped('session.history',{sessionId:sourceId})).status,400);
+ await inspector.evaluate('document.querySelector("[data-view=context]").click()');await until(()=>inspector.evaluate('document.querySelector("#context-content").textContent.includes("PI_BROWSER_EDITED")'),'saved effective context');
+ const userSummary=await inspector.evaluate('(()=>{const e=Array.from(document.querySelectorAll("#context-content details")).find(e=>e.querySelector("summary")?.textContent.endsWith(". user")&&e.textContent.includes("PI_BROWSER_EDITED")).querySelector("summary");e.scrollIntoView({block:"center"});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()');await inspector.call('Input.dispatchMouseEvent',{type:'mousePressed',...userSummary,button:'left',clickCount:1});await inspector.call('Input.dispatchMouseEvent',{type:'mouseReleased',...userSummary,button:'left',clickCount:1});assert.equal(await inspector.evaluate('document.querySelector("#context-content").innerText.includes("PI_BROWSER_EDITED")'),true);
+ const observed=(await scoped('observation.list',{sessionId:draftSession})).result.records.find(row=>row.kind==='model/request');assert(observed);
+ let offset=0,raw='';while(true){const response=await scoped('observation.payload',{sessionId:draftSession,eventId:observed.id,offset,limit:65536});assert.equal(response.status,200,JSON.stringify(response.error));const part=response.result;assert(part.available);raw+=part.text;offset=part.nextOffset;if(!part.hasMore)break;}
+ const captured=JSON.parse(raw);assert.deepEqual(captured,inputs.find(body=>JSON.stringify(body.messages.at(-1)?.content).includes('PI_BROWSER_EDITED')),'Context equals actual post-hook provider input');
+ await inspector.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});
+ assert.equal(await inspector.evaluate('document.querySelector("#runtime").textContent.endsWith(" · Read-only")&&document.querySelector("#runtime").getClientRects().length>0'),true,'read-only cue remains visible in narrow windows');
+ if(process.env.AUGMENTOR_PI_INSPECTION_SCREENSHOT)await writeFile(process.env.AUGMENTOR_PI_INSPECTION_SCREENSHOT,Buffer.from((await inspector.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+ await inspector.reload();await until(()=>inspector.evaluate('document.querySelector(".local")?.textContent==="Read-only conversation inspector"&&document.querySelector("#ledger .record")'),'reload retains only scoped authority');
+ assert.equal(inputs.length,inspectionCount);assert.deepEqual(await client.call('session.history',{sessionId:draftSession,maxMessages:100}),draftHistory);
+ const diagnostics=JSON.stringify(await message({type:'log'}));assert.doesNotMatch(diagnostics,/#token=|"url":"http:\/\/127\.0\.0\.1:/,'wire diagnostics must not retain bearer links');assert.deepEqual(inspector.errors,[]);
 });

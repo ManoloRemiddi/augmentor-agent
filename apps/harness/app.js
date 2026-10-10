@@ -11,19 +11,20 @@ const hash=new URLSearchParams(location.hash.slice(1));
 const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
 if(token)sessionStorage.setItem('augmentor-harness-token',token);
 history.replaceState(null,'',location.pathname);
-const state={sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0,queue:null,ready:false,selecting:false,selectionReady:false,creating:false};
+const state={readOnly:false,boundSession:null,sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0,queue:null,ready:false,selecting:false,selectionReady:false,creating:false};
 const promptQueue=createQueue({container:$('prompt-queue'),input:$('input'),allowIdle:true,send:async(method,payload)=>{
   const sid=payload.sessionId,epoch=state.epoch;
   const result=await rpc(method==='queue/prompt'?'session.prompt':payload.action==='acknowledge'?'session.resolveQueue':'session.updateQueue',method==='queue/prompt'?{sessionId:sid,requestId:payload.requestId,mode:'queue',resumeQueue:payload.resumeQueue,content:[{type:'text',text:payload.text}]}:payload.action==='acknowledge'?{sessionId:sid,itemId:payload.itemId,acknowledgeUnknownOutcome:true}:{sessionId:sid,itemId:payload.itemId,expectedTurnId:payload.expectedTurnId,action:{kind:payload.action}});
   if(epoch===state.epoch){await refreshSessions();notice(result.queued?'Prompt queued.':'Request accepted.');}return result;
 }});
 const messageActions=createMessageActions({
-  context:()=>({sessionId:state.sessionId,epoch:state.epoch,running:current()?.running===true,submitting:submitting||!state.ready||!state.selectionReady||state.selecting||state.creating,...messageTargets(state.history)}),
+  context:()=>({sessionId:state.sessionId,epoch:state.epoch,running:current()?.running===true,submitting:state.readOnly||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating,...messageTargets(state.history)}),
   input:$('input'),rpc,refresh:refreshSessions,select:selectSession,
   enqueue:(sid,text)=>sid===state.sessionId?promptQueue.submitText(text):Promise.resolve(false),
   changed:()=>{renderSessions();renderChat();},notice,
 });
 function renderQueue(entry){
+  if(state.readOnly){$('prompt-queue').hidden=true;$('continue-queue').hidden=true;return;}
   promptQueue.update({harness:'pi',capabilities:{queue:!!state.sessionId},sessionId:state.sessionId,phase:state.ready&&state.selectionReady&&!state.selecting&&!state.creating?'ready':'connecting',running:current()?.running===true,queue:state.queue,...(entry?{entry:{sessionId:state.sessionId,event:entry}}:{})});
   $('continue-queue').hidden=!state.queue?.paused||!state.queue.items.some(item=>item.canRemove);
   $('continue-queue').disabled=!state.ready||!state.selectionReady||state.selecting||state.creating||current()?.running===true||state.queue?.items.some(item=>item.canResolve);
@@ -36,14 +37,15 @@ addEventListener('keydown',event=>{if(event.key==='Escape')closeSidebar();});
 function node(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
 function notice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error);}
 async function rpc(method,params={}){
+  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.models','session.queue','observation.describe','observation.list','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
   const response=await fetch('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});
   const body=await response.json();if(!response.ok||body.error)throw Error(body.error?.message||'The local connection failed');return body.result;
 }
 function current(){return state.sessions.find(s=>s.sessionId===state.sessionId);}
-const promptLibrary=attachHarnessPrompts({input:$('input'),button:$('prompt-library'),rpc,ready:()=>state.ready,
+const promptLibrary=attachHarnessPrompts({input:$('input'),button:$('prompt-library'),rpc,ready:()=>state.ready&&!state.readOnly,
   context:()=>state.epoch+':'+state.sessionId+':'+(messageActions.editing?'edit':'chat'),changed:renderSessions});
-const reasoning=attachReasoning({button:$('reasoning-settings'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,ready:state.ready&&state.selectionReady&&!state.selecting&&!state.creating}),notice});
-const improvement=attachPiImprovement({input:$('input'),button:$('improve'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,selection:JSON.parse($('model').value||'null'),ready:state.ready&&state.selectionReady&&!state.selecting&&!state.creating&&!submitting&&!current()?.running&&!!state.sessionId}),notice,changed:renderSessions});
+const reasoning=attachReasoning({button:$('reasoning-settings'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,ready:!state.readOnly&&state.ready&&state.selectionReady&&!state.selecting&&!state.creating}),notice});
+const improvement=attachPiImprovement({input:$('input'),button:$('improve'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,selection:JSON.parse($('model').value||'null'),ready:!state.readOnly&&state.ready&&state.selectionReady&&!state.selecting&&!state.creating&&!submitting&&!current()?.running&&!!state.sessionId}),notice,changed:renderSessions});
 function rows(){return [...state.observations.values()].sort((a,b)=>a.seq-b.seq);}
 function label(record){return record.kind+(record.data.name?' · '+record.data.name:record.data.model?' · '+record.data.model:'');}
 function detail(title,value,open=false){
@@ -66,6 +68,7 @@ function renderSessions(){
   $('edit-message').hidden=!messageActions.editing;$('cancel-edit').disabled=messageActions.busy;
   $('new-chat').disabled=messageActions.busy||!state.ready||state.selecting||state.creating;$('model').disabled=!!session?.running||submitting||messageActions.busy||!state.ready||state.selecting||state.creating||!!session&&!state.selectionReady;
   $('trim-tools').disabled=!session||session.running||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating;
+  if(state.readOnly){for(const id of ['new-chat','prompt-library','reasoning-settings','composer','stop','trim-tools','clear'])if($(id))$(id).hidden=true;$('workspace').parentElement.hidden=true;$('model').disabled=true;$('capture').disabled=true;}
 }
 function renderChat(){
   const container=$('messages'),following=container.scrollHeight-container.scrollTop-container.clientHeight<80;
@@ -79,7 +82,7 @@ function renderChat(){
       if(thinking)article.append(detail('Thinking',thinking,item.status==='streaming'));
       article.append(node('div',text));
       const actions=node('div',undefined,'message-actions');if(text)actions.append(copyButton(text));
-      if(Number.isSafeInteger(item.seq)&&((user&&item.seq===targets.editSeq)||(!user&&targets.replies.has(item.seq)))){
+      if(!state.readOnly&&Number.isSafeInteger(item.seq)&&((user&&item.seq===targets.editSeq)||(!user&&targets.replies.has(item.seq)))){
         const button=node('button',user?'Edit':'Branch','message-action');button.type='button';button.dataset.messageAction=user?'edit':'branch';button.disabled=locked||!user&&!!messageActions.editing;
         button.title=user?'Edit the latest input in a new conversation':'Start a new conversation after this reply';
         button.onclick=()=>user?messageActions.edit(item.seq,text):void messageActions.reply(item.seq);actions.append(button);
@@ -188,7 +191,7 @@ async function inspectContext(){
   if(record.data.policies?.reasoning){const policy=record.data.policies.reasoning;container.append(node('p','Reasoning '+policy.mode+' · '+(policy.active?'tier '+policy.tier:policy.inactiveReason)+' · '+policy.reason),detail('Reasoning decision and context contribution',policy));}
   if(record.data.policies)container.append(detail('Managed policy',record.data.policies));
   const payload=await readPayload(sid,id);if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
-  if(!payload.available){container.append(node('p',payload.reason+' Enable Save context history before future requests to retain them.','empty'));return;}
+  if(!payload.available){container.append(node('p',payload.reason+(state.readOnly?' Future requests can be saved from the main Harness.':' Enable Save context history before future requests to retain them.'),'empty'));return;}
   const body=payload.value;
   if(record.payload.redactions?.length)container.append(node('p','Credential fields redacted: '+record.payload.redactions.join(', ')));
   if(body.system)container.append(detail('System',body.system,true));
@@ -203,7 +206,7 @@ function showInteraction(frame){
 }
 function renderInteraction(){
   const panel=$('interaction'),frame=state.interactions.values().next().value;
-  if(!frame){panel.hidden=true;return;}
+  if(state.readOnly||!frame){panel.hidden=true;return;}
   panel.replaceChildren();panel.hidden=false;
   const sid=state.sessionId,respond=async value=>{try{await rpc('interaction.respond',{sessionId:sid,clientId:state.clientId,rpcId:frame.rpcId,value});if(sid===state.sessionId){state.interactions.delete(frame.rpcId);renderInteraction();}}catch(e){notice(e.message,true);}};
   if(frame.method==='approval/requested'){
@@ -217,6 +220,7 @@ function renderInteraction(){
   }
 }
 async function selectSession(sid,{preserveEdit=false}={}){
+  if(state.readOnly&&sid!==state.boundSession)throw Error('This inspector can read only its selected conversation.');
   if(!preserveEdit)messageActions.reset();
   closeSidebar();
   const epoch=++state.epoch;inspectionEpoch++;state.selecting=true;state.selectionReady=false;state.sessionId=sid;state.queue=null;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
@@ -227,7 +231,8 @@ async function selectSession(sid,{preserveEdit=false}={}){
   state.cursor=subscription.cursor;subscription.pending.forEach(showInteraction);queueBaseline(subscription.queue);
   const [page,selection]=await Promise.all([rpc('observation.list',{sessionId:sid}),rpc('session.models',{sessionId:sid}),refreshHistory(sid,epoch)]);
   if(epoch!==state.epoch)return;page.records.forEach(r=>state.observations.set(r.id,r));state.hasMore=page.hasMore;
-  $('model').value=JSON.stringify(selection.current);state.selectionReady=true;renderObservations();if(state.view==='context')await inspectContext();
+  const selectedValue=JSON.stringify(selection.current);if(state.readOnly&&![...$('model').options].some(option=>option.value===selectedValue)){const option=node('option',selection.current.provider+'/'+selection.current.model+' · saved selection');option.value=selectedValue;$('model').append(option);}
+  $('model').value=selectedValue;state.selectionReady=true;renderObservations();if(state.view==='context')await inspectContext();
   }finally{if(epoch===state.epoch){state.selecting=false;renderSessions();renderChat();}}
 }
 async function refreshSessions(){const result=await rpc('session.list');state.sessions=result.items;lastSessionsRefresh=Date.now();renderSessions();renderChat();}
@@ -285,12 +290,15 @@ $('timeline').oncontextmenu=event=>{event.preventDefault();state.focus=null;drag
 addEventListener('resize',()=>{if(state.view==='trajectory')renderTimeline();});
 async function start(){
   if(!token){notice('Open Augmentor Harness using its private local link.',true);return;}
+  const accessResponse=await fetch('/api/access',{headers:{Authorization:'Bearer '+token}}),access=await accessResponse.json();if(!accessResponse.ok)throw Error(access.error?.message||'Open a fresh private inspector link.');state.readOnly=access.mode==='read-only';state.boundSession=access.sessionId??null;
+  if(state.readOnly){document.querySelector('.local').textContent='Read-only conversation inspector';document.title='Conversation inspector · Augmentor Harness';}
   const [host,catalog,capture]=await Promise.all([rpc('host.describe'),rpc('models.list'),rpc('observation.describe')]);
-  $('runtime').textContent='Pi '+host.piVersion+' · Augmentor '+host.version;$('workspace').value=host.workspace||'';
-  for(const group of catalog.groups)for(const model of group.models.filter(m=>m.available)){const option=node('option',model.name+' · '+group.name);option.value=JSON.stringify({provider:model.provider,model:model.model});$('model').append(option);}
+  $('runtime').textContent='Pi '+host.piVersion+' · Augmentor '+host.version+(state.readOnly?' · Read-only':'');$('workspace').value=host.workspace||'';
+  for(const group of catalog.groups)for(const model of group.models.filter(m=>m.available||state.readOnly)){const option=node('option',model.name+' · '+group.name);option.value=JSON.stringify({provider:model.provider,model:model.model});$('model').append(option);}
   if(catalog.default)$('model').value=JSON.stringify(catalog.default);$('capture').checked=capture.capturePayloads;
-  await refreshSessions();const saved=sessionStorage.getItem('augmentor-harness-session');const initial=hash.get('session')||(state.sessions.some(row=>row.sessionId===saved)?saved:null)||state.sessions[0]?.sessionId;if(initial)await selectSession(initial);
+  await refreshSessions();const saved=sessionStorage.getItem('augmentor-harness-session');const initial=state.boundSession||hash.get('session')||(state.sessions.some(row=>row.sessionId===saved)?saved:null)||state.sessions[0]?.sessionId;if(initial)await selectSession(initial);
   state.ready=true;renderSessions();renderChat();
+  if(state.readOnly||['trajectory','context'].includes(hash.get('view')))document.querySelector('[data-view='+JSON.stringify(hash.get('view')==='context'?'context':'trajectory')+']').click();
   setInterval(()=>void poll(),250);
 }
 renderSessions();

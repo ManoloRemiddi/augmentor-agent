@@ -8,6 +8,42 @@ import {request as httpRequest} from 'node:http';
 import {HarnessServer} from '../dist/runtime/src/harness-server.js';
 import {MAX_FRAME} from '../dist/protocol/src/index.js';
 
+test('conversation inspection isolates authority, expires links and cannot keep approvals alive',async t=>{
+ const calls=[],selection={provider:'fixture',model:'selected'};
+ const host={getMeta:id=>{if(!['a','b'].includes(id))throw Error('Conversation not found');return {id,cwd:'/fixture/'+id,selection};},
+  queueSnapshot:()=>({revision:0,paused:false,activeTurnId:null,items:[]}),interactions:{frames:()=>[{method:'interaction/request'}]},
+  dispatch:async(method,params)=>{calls.push({method,params});if(method==='session.list')return {items:[{sessionId:'a'},{sessionId:'b'}]};
+   if(method==='host.describe')return {protocol:'fixture',version:'1',piVersion:'1.1.0',dirs:{state:'/private/profile'},capabilities:{all:true}};
+   if(method==='models.list')return {groups:[{name:'fixture',provider:'fixture',models:[{...selection},{provider:'fixture',model:'foreign'}]}],default:{provider:'other',model:'foreign'},pinned:['private'],hidden:['private'],failures:['private']};
+   return {ok:true};}};
+ const server=new HarnessServer(host),operator=await server.start();t.after(()=>server.close());
+ const link=server.openInspection('a'),token=new URLSearchParams(new URL(link.url).hash.slice(1)).get('token');
+ assert.notEqual(token,server.token);assert.equal(link.mode,'read-only');assert.equal(link.expiresAt>Date.now(),true);assert.throws(()=>server.openInspection('missing'),/not found/);
+ const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
+ const rpc=(method,params={},auth=headers)=>fetch(link.origin+'/api/rpc',{method:'POST',headers:auth,body:JSON.stringify({id:'inspect',method,params})});
+ const access=await (await fetch(link.origin+'/api/access',{headers})).json();assert.deepEqual(access,{mode:'read-only',sessionId:'a',expiresAt:link.expiresAt});assert(!JSON.stringify(access).includes(token));
+ assert.deepEqual((await (await rpc('session.list')).json()).result.items,[{sessionId:'a'}]);
+ assert.deepEqual((await (await rpc('host.describe')).json()).result,{protocol:'fixture',version:'1',piVersion:'1.1.0',workspace:'/fixture/a',capabilities:{inspection:true}});
+ const catalog=(await (await rpc('models.list')).json()).result;assert.deepEqual(catalog.groups[0].models,[selection]);assert.deepEqual(catalog.default,selection);assert.deepEqual(catalog.pinned,[]);assert.deepEqual(catalog.failures,[]);
+ for(const method of ['session.history','session.models','session.queue','observation.list','observation.payload']){
+  assert.equal((await rpc(method,{sessionId:'a'})).status,200);const count=calls.length;
+  assert.equal((await rpc(method,{sessionId:'b'})).status,400);assert.equal((await rpc(method)).status,400);assert.equal(calls.length,count,'foreign read never reaches Host');
+ }
+ const count=calls.length;
+ for(const method of ['session.create','session.prompt','session.cancel','session.branch','session.rename','session.selectModel','session.selectReasoning','session.trimTools','session.updateQueue','session.continueQueue','session.resolveQueue','chats.saved','observation.configure','observation.clear','reasoning.configure','settings.mutate','settings.describe','prompts.list','prompts.save','prompt.improve','prompt.cancelImprovement','interaction.respond','models.configure','host.shutdown','inspection.open','harness.open'])assert.equal((await rpc(method,{sessionId:'a',clientId:'same'})).status,400,method);
+ assert.equal(calls.length,count,'mutations and unrelated profile reads never reach Host');
+ const subscribed=(await (await rpc('events.subscribe',{sessionId:'a',clientId:'same'})).json()).result;assert.deepEqual(subscribed.pending,[]);assert(!server.connected('a'),'inspection cannot act as an approval presenter');
+ server.publish('a',{method:'session/event',payload:{text:'selected'}});server.publish('b',{method:'session/event',payload:{text:'foreign'}});
+ const page=await (await fetch(link.origin+'/api/events?sessionId=a&clientId=same&after=0',{headers})).json();assert.equal(page.frames.length,1);assert.equal(page.frames[0].frame.payload.text,'selected');
+ assert.equal((await fetch(link.origin+'/api/events?sessionId=b&clientId=same&after=0',{headers})).status,400);assert.equal((await rpc('events.subscribe',{sessionId:'b',clientId:'same'})).status,400);
+ const operatorHeaders={...headers,Authorization:'Bearer '+server.token};
+ assert.equal((await rpc('events.subscribe',{sessionId:'b',clientId:'same'},operatorHeaders)).status,200);assert(server.connected('b'));assert(!server.connected('a'));
+ assert.equal((await rpc('interaction.respond',{sessionId:'b',clientId:'same'},operatorHeaders)).status,200,'operator watch is not replaced by inspection identity');
+ const second=server.openInspection('a');assert.notEqual(second.url,link.url);
+ const now=Date.now;try{Date.now=()=>link.expiresAt+1;assert.equal((await fetch(link.origin+'/api/access',{headers})).status,401);}finally{Date.now=now;}
+ assert.equal((await fetch(operator.origin+'/api/access',{headers:operatorHeaders})).status,200);
+});
+
 test('Harness transport requires a bearer token, local authority and matching browser origin', async t => {
   const root=mkdtempSync(join(tmpdir(),'augmentor-harness-http-'));
   writeFileSync(join(root,'index.html'),'<title>Augmentor Harness</title>');

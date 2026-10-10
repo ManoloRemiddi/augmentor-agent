@@ -55,7 +55,8 @@ model.listen(0,'127.0.0.1');await once(model,'listening');
 const selection={provider:'fixture',model:'harness-fixture'};
 writeFileSync(join(config,'agent/models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Harness deterministic fixture',reasoning:true,compat:{supportsReasoningEffort:true},input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
 writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'workspace-write',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
-const fixtureEnv={...process.env,HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'};
+const lazy=process.env.AUGMENTOR_HARNESS_PROOF_LAZY==='1';
+const fixtureEnv={...process.env,HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
 const prompts=process.env.AUGMENTOR_HARNESS_PROOF_PROMPTS==='1'?spawn(process.env.AUGMENTOR_PYTHON??'python3',['-Xutf8','-B',join(source,'services/prompt-library/service.py')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','ignore','pipe']}):null;
 prompts?.stderr.on('data',data=>process.stderr.write(data));
 prompts?.on('error',error=>process.stderr.write('Fixture prompt service: '+error.message+'\n'));
@@ -79,11 +80,11 @@ async function close(){
 }
 process.on('SIGINT',()=>void close());process.on('SIGTERM',()=>void close());
 const deadline=Date.now()+20000;
-while(!existsSync(join(state,'harness.json'))){
+while(!existsSync(join(state,lazy?'runtime.sock':'harness.json'))){
   if(child.exitCode!==null){await close();throw Error('Fixture runtime stopped before readiness');}
   if(Date.now()>deadline){await close();throw Error('Fixture readiness timed out');}
   await new Promise(resolve=>setTimeout(resolve,25));
 }
-const link=JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
+const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
 console.log(JSON.stringify({fixture:true,url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog}));
 await once(child,'exit');await close();

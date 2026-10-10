@@ -908,6 +908,8 @@ class Window(QWidget):
         menu.addAction('Settings',self.open_settings).setEnabled(bool(self.controller))
         menu.addAction('Colors & skins',self.open_appearance)
         menu.addAction('Prompt library',self.open_prompt_library).setEnabled(bool(self.controller))
+        if self.controller and self.controller.harness=='pi':
+            menu.addAction('Trajectory && Context',self.open_inspector).setEnabled(bool(self.controller.session and self.controller.online and self.controller.capabilities.get('inspection')))
         is_dsh=bool(self.controller and self.controller.harness=='dsh')
         menu.addAction('Agent setup' if is_dsh else 'Connect a model',self.open_setup).setEnabled(bool(self.controller))
         menu.addAction('Open DSH in browser' if is_dsh else 'Models & providers',self.open_pi).setEnabled(bool(self.controller))
@@ -922,6 +924,23 @@ class Window(QWidget):
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
         menu.addSeparator();menu.addAction('Quit Augmentor',self.quit_augmentor)
         menu.exec(self.more_button.mapToGlobal(self.more_button.rect().bottomLeft()))
+
+    def open_inspector(self):
+        controller=self.controller
+        if not controller or controller.harness!='pi' or not controller.online or not controller.session or not controller.capabilities.get('inspection'):return
+        sid=controller.session
+        def work():
+            try:return controller.client.call('inspection.open',{'sessionId':sid}),None
+            except Exception as error:return None,str(error)
+        def opened(value):
+            if self.controller is not controller or controller.session!=sid or not controller.online:return
+            result,error=value
+            if error:self.set_status(error);return
+            url=QUrl(result.get('url',''))
+            if result.get('mode')!='read-only' or result.get('sessionId')!=sid or url.scheme()!='http' or url.host()!='127.0.0.1' or not url.fragment().startswith('token='):
+                self.set_status('The runtime returned an invalid conversation inspector link.');return
+            if not QDesktopServices.openUrl(url):self.set_status('The default browser could not open the conversation inspector.')
+        self.call_in_background(work,opened)
 
     def open_updates(self):
         if self.controller:UpdatesDialog(self).exec()

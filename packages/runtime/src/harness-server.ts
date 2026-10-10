@@ -17,7 +17,9 @@ const allowed = new Set([
   'observation.describe', 'observation.configure', 'observation.list', 'observation.payload', 'observation.clear',
   'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond',
 ]);
-interface Watch {sessionId: string; seen: number}
+interface Watch {sessionId: string; seen: number; interactive:boolean}
+type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
+const inspectionReads=new Set(['host.describe','models.list','session.list','session.history','session.models','session.queue','observation.describe','observation.list','observation.payload']);
 interface LiveFrame {seq: number; sessionId: string; frame: Data}
 const LIVE_BYTES = 16 * 1024 * 1024;
 
@@ -30,6 +32,7 @@ export class HarnessServer {
   private evicted = new Map<string, number>();
   private sequence = 0;
   private base = '';
+  private inspections=new Map<string,Extract<Access,{mode:'read-only'}>>();
   private server = createServer((req, res) => void this.handle(req, res));
   constructor(readonly host: Host, readonly assets = fileURLToPath(new URL('../../../apps/harness/', import.meta.url))) {}
   async start(port = 0) {
@@ -48,7 +51,16 @@ export class HarnessServer {
     for (const [clientId, watch] of this.watches) {
       if (now - watch.seen > 15000) this.watches.delete(clientId);
     }
-    return [...this.watches.values()].some(watch => watch.sessionId === sessionId);
+    return [...this.watches.values()].some(watch => watch.sessionId === sessionId&&watch.interactive);
+  }
+  openInspection(sessionId:string){
+    this.host.getMeta(sessionId);
+    for(const [token,scope] of this.inspections)if(scope.expiresAt<=Date.now())this.inspections.delete(token);
+    if(!this.base)throw Error('The conversation inspector is not available.');
+    if(this.inspections.size>=128)throw Error('Too many active inspector links. Wait for a link to expire or restart the Pi runtime while idle.');
+    const token=randomBytes(32).toString('hex'),expiresAt=Date.now()+4*60*60*1000;
+    this.inspections.set(token,{mode:'read-only',token,sessionId,expiresAt});
+    return {url:this.base+'/#token='+token+'&session='+encodeURIComponent(sessionId)+'&view=trajectory',origin:this.base,sessionId,mode:'read-only',expiresAt};
   }
   publish(sessionId: string, frame: Data) {
     const item = {seq: ++this.sequence, sessionId, frame, bytes: Buffer.byteLength(JSON.stringify(frame)) + 256};
@@ -59,11 +71,26 @@ export class HarnessServer {
       this.evicted.set(removed.sessionId, Math.max(this.evicted.get(removed.sessionId) ?? 0, removed.seq));
     }
   }
-  private authenticated(req: IncomingMessage) {
+  private access(req: IncomingMessage):Access|null {
     const value = req.headers.authorization;
-    if (!value?.startsWith('Bearer ')) return false;
+    if (!value?.startsWith('Bearer ')) return null;
     const supplied = Buffer.from(value.slice(7)), expected = Buffer.from(this.token);
-    return supplied.length === expected.length && timingSafeEqual(supplied, expected);
+    if(supplied.length === expected.length && timingSafeEqual(supplied, expected))return {mode:'operator',token:this.token};
+    const scope=this.inspections.get(value.slice(7));
+    if(scope&&scope.expiresAt>Date.now())return scope;
+    if(scope)this.inspections.delete(scope.token);
+    return null;
+  }
+  private watchKey(access:Access,clientId:string){return access.mode==='operator'?clientId:access.token+':'+clientId;}
+  private scopedSession(access:Access,sessionId:unknown){if(access.mode==='read-only'&&sessionId!==access.sessionId)throw Error('This inspector can read only its selected conversation.');}
+  private async inspect(access:Extract<Access,{mode:'read-only'}>,method:string,params:Data,id:string){
+    if(!inspectionReads.has(method))throw Error('This conversation inspector is read-only.');
+    if(method.startsWith('session.')&&method!=='session.list'||method.startsWith('observation.')&&method!=='observation.describe')this.scopedSession(access,params.sessionId);
+    const result=await this.host.dispatch(method,params,id),meta=this.host.getMeta(access.sessionId);
+    if(method==='session.list')return {items:result.items.filter((row:Data)=>row.sessionId===access.sessionId)};
+    if(method==='host.describe')return {protocol:result.protocol,version:result.version,piVersion:result.piVersion,workspace:meta.cwd,capabilities:{inspection:true}};
+    if(method==='models.list')return {groups:result.groups.map((group:Data)=>({provider:group.provider,name:group.name,models:group.models.filter((model:Data)=>model.provider===meta.selection.provider&&model.model===meta.selection.model)})).filter((group:Data)=>group.models.length),default:meta.selection,pinned:[],hidden:[],failures:[]};
+    return result;
   }
   private send(res: ServerResponse, status: number, value: unknown) {
     const raw = JSON.stringify(value);
@@ -94,12 +121,15 @@ export class HarnessServer {
       const url = new URL(req.url ?? '/', this.base);
       if (url.origin !== this.base) {this.send(res, 403, {error: {message: 'Invalid request origin'}}); return;}
       if (url.pathname.startsWith('/api/')) {
-        if (!this.authenticated(req)) {this.send(res, 401, {error: {message: 'Open the private Harness link to connect'}}); return;}
+        const access=this.access(req);
+        if (!access) {this.send(res, 401, {error: {message: 'Open a fresh private Harness link to connect'}}); return;}
+        if(req.method==='GET'&&url.pathname==='/api/access'){this.send(res,200,{mode:access.mode,...(access.mode==='read-only'?{sessionId:access.sessionId,expiresAt:access.expiresAt}:{})});return;}
         if (req.method === 'GET' && url.pathname === '/api/events') {
           const sessionId = identifier(url.searchParams.get('sessionId'));
           const clientId = identifier(url.searchParams.get('clientId'));
+          this.scopedSession(access,sessionId);
           this.host.getMeta(sessionId);
-          const watch = this.watches.get(clientId);
+          const watch = this.watches.get(this.watchKey(access,clientId));
           if (!watch || watch.sessionId !== sessionId) throw new Error('Subscribe to this session before polling');
           watch.seen = Date.now();
           const after = Number(url.searchParams.get('after') ?? 0);
@@ -119,15 +149,17 @@ export class HarnessServer {
           const params = rpc.params ?? {};
           if (rpc.method === 'events.subscribe') {
             const sessionId = identifier(params.sessionId), clientId = identifier(params.clientId);
+            this.scopedSession(access,sessionId);
             this.host.getMeta(sessionId);
-            this.watches.set(clientId, {sessionId, seen: Date.now()});
+            this.watches.set(this.watchKey(access,clientId), {sessionId, seen: Date.now(),interactive:access.mode==='operator'});
             this.send(res, 200, {id: rpc.id, result: {subscribed: true, cursor: this.sequence,
-              queue:{sessionId,...this.host.queueSnapshot(sessionId)},pending: this.host.interactions.frames(sessionId)}});
+              queue:{sessionId,...this.host.queueSnapshot(sessionId)},pending: access.mode==='operator'?this.host.interactions.frames(sessionId):[]}});
             return;
           }
+          if(access.mode==='read-only'){const result=await this.inspect(access,rpc.method,params,rpc.id);this.send(res,200,{id:rpc.id,result});return;}
           if (!allowed.has(rpc.method)) throw new Error('Method is not exposed by Augmentor Harness');
           if (rpc.method === 'interaction.respond') {
-            const watch = this.watches.get(identifier(params.clientId));
+            const watch = this.watches.get(this.watchKey(access,identifier(params.clientId)));
             if (!watch || watch.sessionId !== params.sessionId) throw new Error('Interaction belongs to another session');
             watch.seen = Date.now();
           }
@@ -165,7 +197,7 @@ export class HarnessServer {
     }
   }
   async close() {
-    this.watches.clear(); this.frames = []; this.frameBytes = 0; this.evicted.clear();
+    this.base=''; this.inspections.clear(); this.watches.clear(); this.frames = []; this.frameBytes = 0; this.evicted.clear();
     await new Promise<void>(resolve => {this.server.close(() => resolve()); this.server.closeAllConnections();});
   }
 }
