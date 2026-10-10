@@ -16,7 +16,7 @@ import {AcceptedWork} from './shared/accepted-work.mjs'
 if(process.env.AUGMENTOR_BROWSER_HARNESS && process.env.AUGMENTOR_BROWSER_HARNESS!=='pi')throw new Error('This bridge supports Pi only.')
 const harness='pi'
 const preset='augmentor-browser-'+harness
-const workspace=join(homedir(),'Augmentor Browser Pi')
+const workspace=process.env.AUGMENTOR_PI_BROWSER_WORKSPACE??join(homedir(),'Augmentor Browser Pi')
 const send=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value));if(b.length>1024*1024)throw new Error('Browser response exceeds frame limit');const h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
 let connection,opening,selection,currentSession;const interactions=new Map()
 const work=new AcceptedWork();let closing

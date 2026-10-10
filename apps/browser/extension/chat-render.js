@@ -728,7 +728,7 @@ export function createChatUI(els) {
                 ? 'working…'
                 : 'disconnected'
     }
-    if ($send) $send.disabled = phase !== 'ready' || running || !!ui.state.submitting
+    if ($send) $send.disabled = phase !== 'ready' || (running && !ui.state.canQueue) || !!ui.state.submitting
   }
 
   function applyLog(log) {

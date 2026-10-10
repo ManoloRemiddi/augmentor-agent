@@ -9,6 +9,17 @@ import {JSDOM} from 'jsdom'
 import {marked} from 'marked'
 import {createChatUI} from '../extension/chat-render.js'
 
+test('streamed rendering preserves negotiated queue Send and still blocks unsupported or disconnected sending',t=>{
+ const dom=new JSDOM('<div id="log"></div><button id="send"></button>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),send=document.querySelector('#send'),ui=createChatUI({log,send});t.after(()=>{ui.clear();dom.window.close()})
+ let seq=0;const stream=()=>ui.applyLog([{kind:'event',event:{seq:++seq,type:'assistant/chunk',data:{chunk:{type:'text-delta',text:'Partial '}}}}])
+ ui.setState({phase:'ready',running:true,canQueue:true});stream();assert.equal(send.disabled,false)
+ ui.setState({submitting:true});stream();assert.equal(send.disabled,true)
+ ui.setState({submitting:false,canQueue:false});stream();assert.equal(send.disabled,true)
+ ui.setState({canQueue:true,phase:'error'});stream();assert.equal(send.disabled,true)
+})
+
 test('prepared Pi input displays the original submitted text without replacing effective native content',t=>{
  const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
  globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked

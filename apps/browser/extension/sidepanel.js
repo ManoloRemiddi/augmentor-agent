@@ -654,7 +654,7 @@ async function loadSessionsList() {
 // switch restarts the runtime, which would cut the live turn.
 const _setState = ui.setState
 ui.setState = (s) => {
-  _setState(s)
+  _setState({...s,canQueue:queue.enabled&&!viewSessionId})
   const running = ui.state.running
   surface.update(ui.state)
   const canQueue=queue.enabled&&!viewSessionId
