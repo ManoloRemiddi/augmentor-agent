@@ -21,6 +21,8 @@ The [Native Branch/Edit and ordinary input checkpoint](AUGMENTOR-HARNESS.md#nati
 
 See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualified Linux upgrade and temporary history bridge.
 
+The [Harness shared prompt checkpoint](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor), source `88569bb54d03c0e549101be33fcc0c67310ac86a`, reuses this public repository's Augmentor Browser picker/editor, clipboard, settings presentation and maintenance-state helpers through fixed static paths. Their original Augmentor resale-restricted headers remain intact; they are not newly copied upstream MIT components. The Harness adapter and synthetic Chromium/Native-client fixture are independently authored. No private repository source, dependency, native binary, separate store or conversational loop is added. Selected DSH/Pi MIT notices and the reviewed 126-package production inventory remain unchanged.
+
 
 ## Embedded Handy — 2 October 2026
 

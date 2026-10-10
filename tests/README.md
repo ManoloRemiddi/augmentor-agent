@@ -808,6 +808,16 @@ hosted default-concurrency checks remain an independent gate.
 
 ### Augmentor Harness candidate
 
+`harness-prompts-chromium.test.mjs` exercises the actual Harness editor/picker, HTTP/Pi owner, private shared SQLite and production Native `PromptClient`: stable CRUD/rename, simultaneous revision conflicts, preserved drafts, delete Cancel, shared instructions, reload/default/save, initial catalog/clipboard holds, two-step/repeated Enter, form refusal, actual private-browser clipboard and identical-draft cross-conversation guards. Exactly two deliberate stale writes fail; their response bodies are verified before page navigation evicts them, and other browser runtime/CSP/network warnings fail. Only explicit Send performs its two synthetic provider requests and actual read tool. This is Linux Harness plus Native-client source/staged evidence, not loaded Native/Browser prompt GUI or physical/live-provider acceptance.
+
+The fixture uses `AUGMENTOR_HARNESS_PROOF_PROMPTS=1` to own a separate prompt-service process and temporary HOME/XDG/shared/Pi state, then joins/removes them. Screenshot output is optional through `AUGMENTOR_HARNESS_PROMPTS_SCREENSHOT`. `harness-branch-chromium.test.mjs` waits for enabled Send before ordinary post-Branch submission, while its held-subscription check still verifies early Enter preserves a draft without admission. The full staged cohort uses both `AUGMENTOR_PI_TEST_ROOT` and `AUGMENTOR_WS_TEST_ROOT`, so WebSocket checks cannot silently fall back to source.
+
+```sh
+AUGMENTOR_PI_TEST_ROOT=/absolute/stage AUGMENTOR_WS_TEST_ROOT=/absolute/stage AUGMENTOR_PYTHON=/absolute/Qt/python /absolute/stage/node/bin/node --test tests/runtime.test.mjs tests/pi-owner.test.mjs tests/ws-security.test.mjs tests/pi-browser-chromium.test.mjs tests/harness-branch-chromium.test.mjs tests/harness-prompts-chromium.test.mjs
+```
+
+See [shared prompt qualification](../docs/AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor) for exact ref, final full/staged counts, initial failures and remaining full P0/P1 gates. Node's two opt-in controlled-memory-engine skips and Python's platform/dependency/environment skips are separate limitations.
+
 `observation.test.mjs` exercises opt-in private copies, credential-field redaction, retention/quota, crash tails, owned temporary cleanup, durable sequence cursors and bounded complete-character UTF-8 payload chunks. `harness-timeline.test.mjs` checks the selected MIT DSH projection's actual timing/focus semantics. `harness-server.test.mjs` checks bearer/authority/Origin/CSP boundaries, method exclusions, conversation/watch isolation and bounded live coverage loss. `pi-owner.test.mjs` starts simultaneous fresh owners and verifies that only one opens the profile; a follower cannot alter its journal.
 
 `runtime.test.mjs` compares post-extension effective payloads with the actual synthetic provider request, inspects real tools/reasoning/TTFT, verifies diagnostic clear preserves native bytes, and cold-reads captures without loading or replaying a session. Its Harness workflow resolves a real Pi write approval over HTTP through the same owner. A preload blocks and records TCP connections outside explicit loopback fixtures before runtime imports. This is a pinned-core synthetic network proof, not a live extension/provider/OS network audit.

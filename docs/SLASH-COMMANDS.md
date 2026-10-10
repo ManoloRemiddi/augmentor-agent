@@ -2,6 +2,12 @@
 
 # Saved prompts and DSH commands
 
+## October 10 Harness shared picker and editor
+
+The [Harness checkpoint](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor), source `88569bb54d03c0e549101be33fcc0c67310ac86a`, reuses the product Browser picker/editor and shared service. Enter/Tab/click inserts into the draft; a second Enter sends. Initial catalog loading, failed reads, repeated Enter and pending clipboard work cannot submit the alias. Catalog errors stay visible until refresh or explicit Escape; Send retains explicit literal submission except while Harness clipboard insertion is pending. Changed conversation/draft/cursor prevents late clipboard replacement. Editor operations do not read the clipboard or perform inference.
+
+Stable IDs/revisions preserve renamed prompts and reject stale Save/Delete without losing drafts. Shared improvement instructions are edited independently; Pi's Improve prompt action remains unavailable. Existing Native/Browser layouts are preserved. Actual Harness/Chromium/HTTP/Pi/SQLite plus Native-client evidence is source/staged qualification; loaded Native/Browser prompt GUI, other platforms, installed acceptance and full command/instruction composition remain required. Historical adoption below is unchanged.
+
 Type `/news` or `/crit` and press **Enter** to insert the highlighted saved
 prompt into the composer without sending it. Review/edit it, then press **Enter
 again** to send. Tab and clicking a completion also insert the prompt. Arrow keys

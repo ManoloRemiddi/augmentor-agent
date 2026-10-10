@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [shared prompt Harness checkpoint](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor) reuses the public Browser picker/editor as a client of the Pi Host and existing shared prompt service. There is no separate database or agent loop. Saved prompts, their revisions and improvement instructions keep their existing service owner; Pi draft improvement and full composition/provenance remain migration gates. This is source/staged qualification, not installed activation.
+
 
 The [Augmentor Harness candidate](AUGMENTOR-HARNESS.md) adds an authenticated local inspection client of the existing Pi owner. It does not add an agent loop. The [migration specification](AUGMENTOR-HARNESS-MIGRATION.md) defines the features and cutover gates still required.
 
