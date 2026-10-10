@@ -62,7 +62,7 @@ test('Harness shared prompt editor, Native conflicts and two-step clipboard inse
   const temporary=(await native('prompts.list')).prompts.find(item=>item.name==='temporary');assert(temporary);await select(temporary.id);
   panel.acceptDialog=false;await button('Delete');await until(()=>panel.dialogs.length===1,'cancel delete confirmation');assert.equal((await native('prompts.list')).prompts.length,2);
   panel.acceptDialog=true;await button('Delete');await visible('document.querySelector(".shared-prompt-editor").textContent.includes("Prompt deleted.")');assert.equal(panel.dialogs.length,2);assert.deepEqual((await native('prompts.list')).prompts,[row]);
-  await button('Improvement instructions');await visible('document.querySelector(".shared-prompt-editor").textContent.includes("Prompt improvement in Pi is not yet available")');
+  await button('Improvement instructions');await visible('document.querySelector(".shared-prompt-editor").textContent.includes("Pi makes one tool-free request")');
   await fill(instructions,'Preserve the language. Keep the requested scope.');await button('Save instructions');await visible('document.querySelector(".shared-prompt-editor").textContent.includes("Instructions saved.")');let improvement=(await native('prompts.list')).improvement;assert.equal(improvement.content,'Preserve the language. Keep the requested scope.');
   await native('prompts.improvement.save',{content:'Concurrent Native instructions',expectedRevision:improvement.revision});await fill(instructions,'Unsaved Harness instructions');await button('Save instructions');await visible('document.querySelector(".shared-prompt-editor").textContent.includes("instructions changed elsewhere")');await recordConflict('prompts.improvementSave');assert.equal(await value(instructions),'Unsaved Harness instructions');
   await button('Reload');await visible('document.querySelector('+JSON.stringify(instructions)+').value==="Concurrent Native instructions"');improvement=(await native('prompts.list')).improvement;
@@ -95,4 +95,15 @@ test('Harness shared prompt editor, Native conflicts and two-step clipboard inse
   assert.deepEqual([...expected].sort(),['prompts.improvementSave','prompts.save']);
   const conflicts=new Set(panel.failedResponses.map(response=>response.id));
   assert.deepEqual(panel.errors.filter(error=>!(error.source==='network'&&conflicts.has(error.networkRequestId))),[]);assert.equal(stderr,'');
+  await fill('#input','Harness café draft');await visible('!document.querySelector("#improve").disabled');
+  const draftSession=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")'),draftHistory=await rpc('session.history',{sessionId:draftSession,maxMessages:100});
+  await click('#improve');await visible('document.querySelector("#input").value==="Improved Harness café draft"&&document.querySelector("#improve").textContent==="↶"');
+  assert.equal((await requests()).length,3);assert.equal((await requests()).at(-1).tools?.length??0,0);assert.equal((await requests()).at(-1).messages.filter(row=>row.role==='user').length,1);assert.deepEqual(await rpc('session.history',{sessionId:draftSession,maxMessages:100}),draftHistory);
+  await panel.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});await visible('!document.querySelector("#improve").disabled&&document.documentElement.scrollWidth<=640');
+  if(process.env.AUGMENTOR_HARNESS_IMPROVE_SCREENSHOT)await writeFile(process.env.AUGMENTOR_HARNESS_IMPROVE_SCREENSHOT,Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
+  await panel.call('Emulation.clearDeviceMetricsOverride');await click('#improve');assert.equal(await value('#input'),'Harness café draft');await fill('#input','IMPROVE_SLOW');await click('#improve');await until(async()=>(await requests()).length===4,'actual slow draft request');await fill('#input','New typing must stay');await visible('document.querySelector("#improve").textContent==="✦"');
+  await visible('document.querySelector("#send").disabled===false');assert.equal(await value('#input'),'New typing must stay');assert.deepEqual(await rpc('session.history',{sessionId:draftSession,maxMessages:100}),draftHistory);
+  await visible('globalThis.fetch!==undefined');await until(()=>panel.failedResponses.length===3,'cancelled request receipt');
+  const cancelled=panel.failedResponses.at(-1);assert.equal(panel.requests.get(cancelled.id)?.method,'prompt.improve');const cancelledBody=await panel.call('Network.getResponseBody',{requestId:cancelled.id});assert.match(JSON.parse(cancelledBody.body).error.message,/interrupted/);
+  assert.deepEqual(panel.errors.filter(error=>!(error.source==='network'&&[...conflicts,cancelled.id].includes(error.networkRequestId))),[]);
 });

@@ -33,6 +33,7 @@ import {PiSteering} from './steering.js';
 import {validateSteeringInput} from './steering-input.js';
 import {getSupportedThinkingLevels} from '@earendil-works/pi-ai';
 import {PiReasoning,reasoningConfig,savedReasoning,thinkingLevel,requireThinking,type SavedReasoning} from './reasoning.js';
+import {PiPromptImprovement} from './prompt-improvement.js';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {reasoning?:SavedReasoning;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
 interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
@@ -49,6 +50,7 @@ export class Host {
   readonly setup=new SetupConnections(join(this.dirs.agent,'models.json'));
   settings:Data;
   readonly observations:ObservationStore;
+  readonly improvements=new PiPromptImprovement(join(this.dirs.state,'prompt-improvements.json'));
   private serial:Promise<unknown>=Promise.resolve();
   private quiescing=false;
   private queues=new Map<string,PiPromptQueue>();
@@ -255,11 +257,11 @@ export class Host {
     if(this.pumping.has(m.id))return this.pumping.get(m.id)!;
     const run=this.serial.then(async()=>{
       const queue=this.queue(m);
-      if(this.quiescing||m.running||queue.paused||queue.uncertain||!queue.next)return;
+      if(this.quiescing||this.improvements.busy||m.running||queue.paused||queue.uncertain||!queue.next)return;
       const item=queue.next;
       let r:Loaded;
       try{r=await this.load(m);}catch(error){queue.notSent(item.id);this.append(m,'runtime/error',{message:'Queued prompt was not sent: '+String(error)});return;}
-      if(this.quiescing||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
+      if(this.quiescing||this.improvements.busy||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
       this.submit(r,item.input!,item.id);
     });
     this.serial=run.catch(()=>{});this.pumping.set(m.id,run);
@@ -270,19 +272,32 @@ export class Host {
     if(method==='setup.test')return this.setup.test(p);
     if(method==='setup.cancel')return this.setup.cancel();
     if(method==='session.cancel')return this.cancel(p.sessionId);
+    if(method==='prompt.cancelImprovement')return this.improvements.cancel(p.requestId,p.scopeId);
+    if(method==='prompt.improvementStatus')return this.improvements.status(p.requestId);
     if(method==='interaction.respond')return this.interactions.answer(identifier(p.rpcId),p.value,identifier(p.sessionId));
     // Serialize state-changing preparations so two clients cannot create/replace an execution owner.
     const run=this.serial.then(()=>{if(this.quiescing&&method!=='host.describe')throw new Error('Runtime is closing for maintenance. No action was submitted.');return this.handle(method,p,id);});this.serial=run.catch(()=>{});
     const result=await run;return result instanceof SteeringReply?result.settled:result;
   }
   async handle(method:string,p:Data,id:string):Promise<any>{switch(method){
+    case 'prompt.improve':{
+      const model=await this.selected(p.selection);
+      const instructions=(await promptCall('prompts.list')).improvement;
+      const accepting=()=>{
+        if(this.quiescing||[...this.metadata.values()].some(m=>m.running))throw Error('Open an idle Pi conversation before improving a draft.');
+        if(p.sessionId){const m=this.getMeta(p.sessionId);if(m.selection.provider!==model.provider||m.selection.model!==model.id)throw Error('The selected conversation model changed.');}
+      };
+      accepting();
+      return new SteeringReply(this.improvements.begin(p,{cwd:this.dirs.state,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,model,instructions,accepting}));
+    }
     case 'observation.describe':return {protocol:OBSERVATION_PROTOCOL,revision:this.settings.revision,capturePayloads:this.observations.policy().capturePayloads,retention:DEFAULT_RETENTION,boundary:'provider-payload-after-hooks',capabilities:{metadata:true,payloads:true,reasoningDecisions:true,attachments:'inline-payloads-only',parsedProviderEvents:true,providerEventCoverage:'parsed events supplied by the provider; 8 MiB per request; partial coverage reported',sourceProvenance:false,historicalCoverage:'recorded-during-managed-operation'},telemetry:{installReporting:'disabled-by-host',analytics:'disabled-by-host',cacheWarming:'off-by-host',providerRetries:0,sessionRetries:'disabled-by-host',networkAudit:'synthetic-core-test; configured extensions and live services require separate review'}};
     case 'observation.configure':{if(p.expectedRevision!==this.settings.revision)throw new Error('Settings changed. Refresh inspection settings.');if(typeof p.capturePayloads!=='boolean')throw new Error('Choose whether to retain private request payloads.');this.settings.observation={capturePayloads:p.capturePayloads};this.persistSettings();return this.handle('observation.describe',{},id);}
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,reasoning:true,linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,reasoning:true,promptImprovement:true,linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
+      if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before shutting down the runtime');
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
       this.quiescing=true;this.setup.cancel();return {accepted:true};
     case 'session.branch':return this.branch(p);
@@ -315,8 +330,8 @@ export class Host {
     }
     case 'models.validate':await this.selected(p);return {valid:true};
     case 'models.pin':{await this.selected(p);const key=p.provider+'/'+p.model;this.settings.pinned=this.settings.pinned.map((m:any)=>typeof m==='string'?m:m.provider+'/'+m.model).filter((m:string)=>m!==key);if(p.pinned)this.settings.pinned.push(key);this.persistSettings();return this.catalog();}
-    case 'models.configure':{if(!p.config||typeof p.config.providers!=='object'||Array.isArray(p.config.providers))throw new Error('Invalid providers configuration');if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active chats before changing providers');const file=join(this.dirs.agent,'models.json');const old=existsSync(file)?readFileSync(file,'utf8'):null;atomicJson(file,p.config);try{await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());}catch(error){if(old===null)unlinkSync(file);else writeFileSync(file,old,{mode:0o600});await this.modelRuntime.refresh({allowNetwork:false});throw error;}return this.catalog();}
-    case 'models.reload':await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});return this.catalog();
+    case 'models.configure':{if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before changing providers');if(!p.config||typeof p.config.providers!=='object'||Array.isArray(p.config.providers))throw new Error('Invalid providers configuration');if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active chats before changing providers');const file=join(this.dirs.agent,'models.json');const old=existsSync(file)?readFileSync(file,'utf8'):null;atomicJson(file,p.config);try{await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());}catch(error){if(old===null)unlinkSync(file);else writeFileSync(file,old,{mode:0o600});await this.modelRuntime.refresh({allowNetwork:false});throw error;}return this.catalog();}
+    case 'models.reload':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before reloading models');await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});return this.catalog();
     case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
     case 'session.list':return {items:[...this.metadata.values()].sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title}))};
     case 'session.history':{const m=this.getMeta(p.sessionId);return historyPage(this.loaded.get(m.id)?.events??this.events(m),p.maxMessages,p.beforeSeq);}
@@ -332,6 +347,7 @@ export class Host {
     }
     case 'session.selectModel':{const m=this.getMeta(p.sessionId);if(m.running)throw new Error('Stop before changing models');const model=await this.selected(p);requireThinking(model,this.reasoningSettings(m).thinkingLevel);const previous=m.selection;const loaded=this.loaded.get(m.id);if(loaded)await loaded.session.setModel(model);else{m.selection={provider:p.provider,model:p.model};try{await this.load(m);}catch(error){m.selection=previous;this.save(m);throw error;}}m.selection={provider:p.provider,model:p.model};this.save(m);return {current:m.selection};}
     case 'session.prompt':{
+      if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before sending a chat prompt.');
       const m=this.getMeta(p.sessionId),requestId=promptIdentity(p.requestId??id);
       if(p.mode!==undefined&&!['queue','steer'].includes(p.mode))throw Error('Choose queue or steer mode.');
       const input=text(p.content?.filter((part:Data)=>part.type==='text').map((part:Data)=>part.text).join('\n')),queue=this.queue(m);
@@ -367,5 +383,5 @@ export class Host {
     case 'prompts.improvementSave':return promptCall('prompts.improvement.save',p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.quiescing=true;this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}}
+  async close(){this.quiescing=true;this.setup.cancel();await this.improvements.close();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}}
 }

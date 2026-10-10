@@ -16,8 +16,8 @@ export function attachSurface({send,openSettings,onError,approval,state}){
     for(const [key,value] of Object.entries({width:'16',height:'16',viewBox:'0 0 16 16',fill:'none',stroke:'currentColor','stroke-width':'1.2','aria-hidden':'true'}))svg.setAttribute(key,value)
     shape.setAttribute('d',path);svg.append(shape);$(id).replaceChildren(svg)
   }
-  let improving=false,epoch=0,undo=null,roll=null
-  const cancelImprovement=()=>{epoch++;improving=false;roll?.stop();roll=null}
+  let improving=false,epoch=0,undo=null,roll=null,requestId=null,selectionKey=null,harness='dsh'
+  const cancelImprovement=()=>{const pending=requestId;requestId=null;epoch++;improving=false;roll?.stop();roll=null;if(pending&&harness==='pi')void send('prompt/cancelImprovement',{requestId:pending}).catch(()=>{})}
   const announce=text=>{$('surface-status').textContent=text}
   const fail=error=>{announce(error.message);onError(error.message)}
   const closeMenu=()=>{menu.hidden=true;more.setAttribute('aria-expanded','false')}
@@ -55,14 +55,14 @@ export function attachSurface({send,openSettings,onError,approval,state}){
     if(appWorkspace)return
     if(improving){cancelImprovement();controls();return}
     if(undo!==null){input.value=undo;undo=null;void remember();fit();controls();return}
-    const original=input.value,id=++epoch;improving=true;roll=startLetterRoll(input);controls();announce('Improving prompt…')
+    const original=input.value,id=++epoch;requestId=crypto.randomUUID();improving=true;roll=startLetterRoll(input);controls();announce('Improving prompt…')
     const animation=roll
     try{
-      const r=await send('prompt/improve',{text:original})
+      const r=await send('prompt/improve',{text:original,requestId})
       if(id!==epoch||input.value!==original)return
       if(!r?.ok||r.result?.kind!=='rewrite'||typeof r.result.text!=='string'||!r.result.text.trim())throw Error(r?.error||'Could not improve the prompt')
       if(!await animation.settle(r.result.text)||id!==epoch||input.value!==original)return
-      input.value=r.result.text;undo=original;void remember();fit();announce('Prompt improved. Undo is available.')
+      input.value=r.result.text;undo=original;void remember();fit();announce('Prompt improved. Undo is available.'+(r.result.receipt?.usage?' Output tokens: '+r.result.receipt.usage.output+'.':''))
     }catch(error){if(id===epoch)fail(error)}finally{if(id===epoch){cancelImprovement();controls()}}
   }
   input.addEventListener('keydown',e=>{
@@ -71,10 +71,14 @@ export function attachSurface({send,openSettings,onError,approval,state}){
     else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();cancelImprovement();controls()}
   },true)
   window.addEventListener('pagehide',cancelImprovement)
+  document.addEventListener('keydown',event=>{if(improving&&event.key==='Escape'){event.preventDefault();cancelImprovement();controls();}},true)
 
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hidden){e.preventDefault();closeMenu();more.focus()}else if(e.ctrlKey&&e.key==='End'){$('log').scrollTo({top:$('log').scrollHeight,behavior:'smooth'})}else if(e.ctrlKey&&e.key==='Home'){$('log').scrollTo({top:0,behavior:'smooth'})}})
   fit();controls()
-  return {get improving(){return improving},get loadingDraft(){return loadingDraft},update(value){
+  return {cancelImprovement,get improving(){return improving},get loadingDraft(){return loadingDraft},update(value){
+    if(value.harness)harness=value.harness;
+    if(value.selection){const key=value.selection.provider+'/'+value.selection.model;if(selectionKey&&key!==selectionKey){cancelImprovement();undo=null}selectionKey=key}
+    if(value.running||value.phase&&value.phase!=='ready'){cancelImprovement();undo=null}
     if(value.sessionId){if(sessionId&&value.sessionId!==sessionId){cancelImprovement();undo=null;void chrome.storage.session.remove(draftKey)}sessionId=value.sessionId;if(!restored){restored=true;loadingDraft=true;void chrome.storage.session.get(draftKey).then(saved=>{const draft=saved[draftKey];if(draft?.sessionId===sessionId&&!input.value){input.value=draft.text;fit();controls()}}).catch(()=>{}).finally(()=>loadingDraft=false)}}
     const current={...state(),...value};const dot=$('connection-dot');dot.dataset.phase=current.phase;dot.title=current.phase==='ready'?'Connected':current.error||'Connecting…';dot.setAttribute('aria-label',dot.title);controls()}}
 }

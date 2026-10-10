@@ -53,10 +53,12 @@ async function request(method,p={},id){
     if(row&&row.agentPreset!==preset)throw new Error('This browser connection cannot access a Linux chat.')
     if(!row&&method!=='session.create')throw new Error('Browser conversation not found.')
   }
+  if(method==='prompt.improve'){const selected=await c.call('session.models',{sessionId:p.sessionId});const library=await promptLibrary({action:'list'});if(!library.ok)throw Error(library.error);return c.call(method,{...p,selection:selected.current,expectedInstructionsRevision:library.library.improvement.revision},id)}
+  if(['prompt.cancelImprovement','prompt.improvementStatus'].includes(method))return c.call(method,p,id)
   if(method==='augmentor/models')return c.call('models.list')
   if(method==='initialize'){
     selection={provider:p.provider,model:p.model};await c.call('models.validate',selection)
-    const saved=await c.call('chats.saved'),description=await c.call('host.describe');return {serverInfo:{home:homedir(),harness,capabilities:{branch:true,edit:true,queue:description.capabilities?.queue===true,steering:description.capabilities?.steering===true,reasoning:description.capabilities?.reasoning===true},augmentor:{chatCwd:workspace,agentPreset:preset,saved:saved.saved}}}
+    const saved=await c.call('chats.saved'),description=await c.call('host.describe');return {serverInfo:{home:homedir(),harness,capabilities:{branch:true,edit:true,queue:description.capabilities?.queue===true,steering:description.capabilities?.steering===true,reasoning:description.capabilities?.reasoning===true,promptImprovement:description.capabilities?.promptImprovement===true},augmentor:{chatCwd:workspace,agentPreset:preset,saved:saved.saved}}}
   }
   if(method==='session.attach'){await attach(p.sessionId);const rows=await c.call('session.list');return {attached:true,running:rows.items.find(r=>r.sessionId===p.sessionId)?.running===true}}
   if(method==='session.create'){const row=await c.call(method,{...p,surface:'browser',selection,cwd:workspace},id);await attach(p.sessionId);return row}

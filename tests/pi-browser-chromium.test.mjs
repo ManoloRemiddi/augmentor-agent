@@ -39,6 +39,10 @@ test('loaded Pi Browser executes tools and identified steering, restores paused 
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'fixture-'+number,object:'chat.completion.chunk',model:selection.model,choices:[{index:0,delta,finish_reason:finish}]})+'\n\n');
   const finish=text=>{chunk({role:'assistant',content:text},'stop');res.end('data: [DONE]\n\n');};
+  if(body.messages.some(row=>['system','developer'].includes(row.role)&&JSON.stringify(row.content).includes('Inline editor override:'))){
+   if(latest.includes('IMPROVE_SLOW')){const timer=setInterval(()=>chunk({content:' '}),50);res.once('close',()=>clearInterval(timer));return;}
+   finish(JSON.stringify({kind:'rewrite',text:'Improved Browser draft'}));return;
+  }
   if(latest.includes('PI_BROWSER_')){
    queueInputs.push(body);queueRounds++;
    if(latest.includes('PI_BROWSER_SLOW')){chunk({role:'assistant',content:'Interrupted Pi Browser fixture. '});const timer=setInterval(()=>chunk({content:'partial '}),50);res.once('close',()=>clearInterval(timer));return;}
@@ -137,4 +141,16 @@ test('loaded Pi Browser executes tools and identified steering, restores paused 
  await settings.reload();await settingsUntil('document.querySelector("#pi-reasoning-settings")&&!document.querySelector("#pi-reasoning-settings").disabled');await clickSetting('document.querySelector("#pi-reasoning-settings")');await settingsUntil('document.querySelector('+JSON.stringify('.reasoning-dialog [aria-label="Reasoning mode"]')+')?.value==="adaptive"');assert.equal(await settings.evaluate('document.querySelector('+JSON.stringify('.reasoning-dialog [aria-label="Saved thinking effort"]')+').value'),'high');
  await settings.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});await settingsUntil('document.querySelector(".reasoning-dialog").getBoundingClientRect().width<=608');await settings.evaluate('document.querySelector(".reasoning-dialog").scrollTop=0');const screenshot=await settings.call('Page.captureScreenshot',{format:'png'});await mkdir(join(repo,'outputs/harness-proof'),{recursive:true});await writeFile(join(repo,'outputs/harness-proof/browser-reasoning.png'),Buffer.from(screenshot.data,'base64'));await settingButton('Done');
  assert.deepEqual(await client.call('session.history',{sessionId:sourceId,maxMessages:100}),parent,'reasoning never changes an unselected parent');assert.deepEqual(settings.errors,[]);
+ const draftSession=(await message({type:'connect'})).sessionId,draftHistory=await client.call('session.history',{sessionId:draftSession,maxMessages:100}),beforeImprove=inputs.length;
+ assert.equal((await message({type:'connect'})).capabilities.promptImprovement,true);
+ await panel.evaluate('(()=>{const e=document.querySelector("#input");e.value="Browser draft";e.dispatchEvent(new Event("input",{bubbles:true}));})()');
+ async function improveClick(){const point=await panel.evaluate('(()=>{const e=document.querySelector("#improve");if(e.disabled)throw Error("Improve unavailable");const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()');await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});}
+ await improveClick();await panelUntil('document.querySelector("#input").value==="Improved Browser draft"&&document.querySelector("#improve").textContent==="↶"','actual Browser rewrite');
+ assert.equal(inputs.length,beforeImprove+1);assert.equal(inputs.at(-1).tools?.length??0,0);assert.equal(inputs.at(-1).messages.filter(row=>row.role==='user').length,1);assert.doesNotMatch(JSON.stringify(inputs.at(-1)),/PI_BROWSER_CHILD|browser_snapshot|data:image/);
+ assert.deepEqual(await client.call('session.history',{sessionId:draftSession,maxMessages:100}),draftHistory);
+ await improveClick();assert.equal(await panel.evaluate('document.querySelector("#input").value'),'Browser draft');
+ await panel.evaluate('(()=>{const e=document.querySelector("#input");e.value="IMPROVE_SLOW";e.dispatchEvent(new Event("input",{bubbles:true}));})()');await improveClick();await until(()=>inputs.length===beforeImprove+2,'Browser slow draft request');
+ await panel.call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',windowsVirtualKeyCode:27});await panel.call('Input.dispatchKeyEvent',{type:'keyUp',key:'Escape',windowsVirtualKeyCode:27});await until(()=>closed.has(inputs.length),'Browser provider cancelled');
+ await panelUntil('document.querySelector("#improve").textContent==="✦"','cancelled Browser draft');assert.equal(await panel.evaluate('document.querySelector("#input").value'),'IMPROVE_SLOW');
+ assert.deepEqual(await client.call('session.history',{sessionId:draftSession,maxMessages:100}),draftHistory);assert.deepEqual(panel.errors,[]);
 });

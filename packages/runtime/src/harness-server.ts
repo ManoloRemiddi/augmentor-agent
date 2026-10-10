@@ -11,6 +11,7 @@ const allowed = new Set([
   'host.describe', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.list', 'session.create', 'session.history', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
+  'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.payload', 'observation.clear',
@@ -142,6 +143,7 @@ export class HarnessServer {
         ['/chat-projection.js', {path: join(this.assets, 'chat-projection.js'), type: 'text/javascript'}],
         ['/message-actions.js', {path: join(this.assets, 'message-actions.js'), type: 'text/javascript'}],
         ['/prompt-library.js', {path: join(this.assets, 'prompt-library.js'), type: 'text/javascript'}],
+        ['/prompt-improvement.js', {path: join(this.assets, 'prompt-improvement.js'), type: 'text/javascript'}],
         ['/reasoning.js', {path: join(this.assets, 'reasoning.js'), type: 'text/javascript'}],
         ['/shared-reasoning/pi-reasoning.mjs', {path:fileURLToPath(new URL('../../../apps/browser/extension/pi-reasoning.mjs',import.meta.url)),type:'text/javascript'}],
         ['/queue-view.js', {path: fileURLToPath(new URL('../../harness-ui/src/queue-view.js', import.meta.url)), type: 'text/javascript'}],
@@ -150,7 +152,7 @@ export class HarnessServer {
         ['/trajectory-contract.js', {path: fileURLToPath(new URL('../../harness-ui/src/trajectory-contract.js', import.meta.url)), type: 'text/javascript'}],
       ]);
       // Fixed, reviewed presentation assets; never expose arbitrary extension files.
-      for(const name of ['prompt-library.mjs','prompt-editor.mjs','clipboard.mjs','settings-form.mjs','maintenance-page.mjs','prompt-library.css']){
+      for(const name of ['prompt-animation.mjs', 'prompt-library.mjs','prompt-editor.mjs','clipboard.mjs','settings-form.mjs','maintenance-page.mjs','prompt-library.css']){
         staticFiles.set('/shared-prompts/'+name,{path:fileURLToPath(new URL('../../../apps/browser/extension/'+name,import.meta.url)),type:name.endsWith('.css')?'text/css':'text/javascript'});
       }
       const file = staticFiles.get(url.pathname);

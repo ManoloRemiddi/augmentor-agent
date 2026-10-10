@@ -5,6 +5,7 @@ import {createMessageActions} from './message-actions.js';
 import {createQueue} from './queue-view.js';
 import {attachHarnessPrompts} from './prompt-library.js';
 import {attachReasoning} from './reasoning.js';
+import {attachPiImprovement} from './prompt-improvement.js';
 const $=id=>document.getElementById(id);
 const hash=new URLSearchParams(location.hash.slice(1));
 const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
@@ -42,6 +43,7 @@ function current(){return state.sessions.find(s=>s.sessionId===state.sessionId);
 const promptLibrary=attachHarnessPrompts({input:$('input'),button:$('prompt-library'),rpc,ready:()=>state.ready,
   context:()=>state.epoch+':'+state.sessionId+':'+(messageActions.editing?'edit':'chat'),changed:renderSessions});
 const reasoning=attachReasoning({button:$('reasoning-settings'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,ready:state.ready&&state.selectionReady&&!state.selecting&&!state.creating}),notice});
+const improvement=attachPiImprovement({input:$('input'),button:$('improve'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,selection:JSON.parse($('model').value||'null'),ready:state.ready&&state.selectionReady&&!state.selecting&&!state.creating&&!submitting&&!current()?.running&&!!state.sessionId}),notice,changed:renderSessions});
 function rows(){return [...state.observations.values()].sort((a,b)=>a.seq-b.seq);}
 function label(record){return record.kind+(record.data.name?' · '+record.data.name:record.data.model?' · '+record.data.model:'');}
 function detail(title,value,open=false){
@@ -49,6 +51,7 @@ function detail(title,value,open=false){
 }
 function copyButton(value){const button=node('button','Copy','copy');button.type='button';button.onclick=async()=>{try{await navigator.clipboard.writeText(value);notice('Copied.');}catch{notice('Clipboard access was refused.',true);}};return button;}
 function renderSessions(){
+  improvement.update();
   $('sessions').replaceChildren(...state.sessions.map(session=>{
     const button=node('button',session.title||'New conversation','session'+(session.sessionId===state.sessionId?' active':''));
     button.title=session.cwd;button.onclick=()=>selectSession(session.sessionId).catch(e=>notice(e.message,true));return button;
@@ -56,7 +59,7 @@ function renderSessions(){
   const session=current();$('title').textContent=session?.title||'Your agent, in view';
   $('subtitle').textContent=session?(session.running?'Working · ':'')+session.cwd:'Open a conversation to inspect its execution and context.';
   $('stop').disabled=!session?.running&&!submitting;
-  $('send').disabled=!session||messageActions.busy||promptLibrary.inserting||!state.ready||!state.selectionReady||state.selecting||state.creating;
+  $('send').disabled=improvement.busy||!session||messageActions.busy||promptLibrary.inserting||!state.ready||!state.selectionReady||state.selecting||state.creating;
   $('prompt-library').disabled=!state.ready;
   $('reasoning-settings').disabled=!session||session.running||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating;reasoning.changed();
   $('send').textContent=messageActions.editing?'Send edit':session?.running||submitting?'Queue':'Send';renderQueue();
@@ -271,7 +274,7 @@ $('new-chat').onclick=async()=>{if(!state.ready||state.selecting||state.creating
 $('model').onchange=async()=>{const sid=state.sessionId,epoch=state.epoch;try{if(sid)await rpc('session.selectModel',{sessionId:sid,...JSON.parse($('model').value)});}catch(e){notice(e.message,true);try{const selection=await rpc('session.models',{sessionId:sid});if(epoch===state.epoch)$('model').value=JSON.stringify(selection.current);}catch{}}};
 $('stop').onclick=async()=>{try{await rpc('session.cancel',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
 $('trim-tools').onclick=async()=>{const sid=state.sessionId,epoch=state.epoch;try{const result=await rpc('session.trimTools',{sessionId:sid});if(epoch!==state.epoch)return;notice(result.changes.length+' tool results shortened. Originals remain saved.');const page=await rpc('observation.list',{sessionId:sid});if(epoch===state.epoch){page.records.forEach(r=>state.observations.set(r.id,r));renderObservations();}}catch(e){notice(e.message,true);}};
-$('composer').onsubmit=async event=>{event.preventDefault();if(!state.sessionId||messageActions.busy||promptLibrary.inserting||!state.ready||!state.selectionReady||state.selecting||state.creating)return;if(messageActions.editing){await messageActions.submit();return;}submitting=true;renderSessions();try{await promptQueue.submit();}finally{submitting=false;renderSessions();}};
+$('composer').onsubmit=async event=>{event.preventDefault();if(!state.sessionId||improvement.busy||messageActions.busy||promptLibrary.inserting||!state.ready||!state.selectionReady||state.selecting||state.creating)return;if(messageActions.editing){await messageActions.submit();return;}submitting=true;renderSessions();try{await promptQueue.submit();}finally{submitting=false;renderSessions();}};
 $('cancel-edit').onclick=()=>messageActions.cancel();
 $('continue-queue').onclick=async()=>{try{await rpc('session.continueQueue',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
 $('input').onkeydown=event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();$('composer').requestSubmit();}};

@@ -392,6 +392,7 @@ modelPopSearchInput.addEventListener('keydown', (e) => {
 // re-initializes it with the new selection, the session resumes from its
 // persisted log).
 async function chooseModel(sel) {
+  surface.cancelImprovement();
   closeModelPop()
   modelLabel.textContent = sel.name
   pickerSelection = { provider: sel.provider, model: sel.model }

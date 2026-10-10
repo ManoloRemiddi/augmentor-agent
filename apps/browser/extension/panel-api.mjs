@@ -67,6 +67,22 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
   if(msg?.type==='surface/dictation'){
     request('augmentor/surface',{action:'dictation',method:msg.method,params:msg.params}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
+  if(msg?.type==='prompt/cancelImprovement'){
+    if(state.harness!=='pi'||msg.requestId!==state.promptImprovement?.requestId){sendResponse({ok:false,error:'The Pi prompt editor scope changed.'});return}
+    request('prompt.cancelImprovement',{requestId:msg.requestId,scopeId:msg.requestId}).then(result=>sendResponse({ok:true,result}),error=>sendResponse({ok:false,error:error.message}));return true
+  }
+  if(msg?.type==='prompt/improve'&&state.harness==='pi'){
+    const sid=state.sessionId,selection=JSON.stringify(state.selection),requestId=msg.requestId;
+    const valid=()=>sid===state.sessionId&&selection===JSON.stringify(state.selection)&&state.harness==='pi'&&state.phase==='ready'&&!state.panelViewSession;
+    if(!valid()||state.running||state.mutating||state.capabilities.promptImprovement!==true||chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){sendResponse({ok:false,error:'Open an idle standalone Pi conversation first.'});return}
+    state.mutating=true;state.promptImprovement={requestId,sid};
+    ;(async()=>{
+      if(!state.sessionReady){await request('session.create',{sessionId:sid});if(!valid())throw Error('The conversation changed.');state.sessionReady=true}
+      const result=await request('prompt.improve',{sessionId:sid,text:msg.text,requestId,scopeId:requestId});
+      if(!valid())throw Error('The prompt editor scope changed. Your draft is unchanged.');
+      sendResponse({ok:true,result});
+    })().catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>{state.mutating=false});return true
+  }
   if(msg?.type==='surface/appearance'||msg?.type==='prompt/improve'){
     if(msg.type==='prompt/improve'&&(!['dsh','codex'].includes(state.harness)||state.phase!=='ready'||state.running||state.panelViewSession)){sendResponse({ok:false,error:'Open an idle DSH or Codex conversation first.'});return}
     request('augmentor/surface',msg.type==='surface/appearance'?{action:'appearance',settings:msg.settings}:{action:'improve',text:msg.text,selection:state.selection})

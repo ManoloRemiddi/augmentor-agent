@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 10 Pi prompt improvement checkpoint
+
+The active `feat/augmentor-harness` candidate adds tool-free Pi Improve/Cancel/Undo to standalone Native, Browser and Harness through one isolated SDK draft request and the existing shared instruction service. [The owning record](AUGMENTOR-HARNESS.md#pi-prompt-improvement-across-native-browser-and-harness) records authority/cancellation/receipt/privacy guards, source/staged qualification, tested ref in the follow-up and all remaining scope. No owner installation, model/GPU/speech preference or DSH retirement changes.
+
+Full qualification passes: 638 Node cases (636 pass/two opt-in memory-engine skips), 116 Browser passes, 864 Python/Qt cases (827 pass/37 skips), and 59 distinct staged cases with bundled Node 24.19.0. Actual production Qt and loaded Chromium/Native Messaging/Harness/SDK fixtures verify one selected-model rewrite, no tools/project history, Undo, actual provider cancellation, stale-draft guards and unchanged parents. New private metadata receipts prevent replay and retain no draft/output/instructions/credentials. The root 126-package/native/MIT baseline is unchanged.
+
+Preceding `08db5ac` has 16 hosted successes and one terminal Mac 26 memory refresh failure (run 38071333245/job 114269384703); its sole cause is unproved. The same fixture passes locally at its unchanged deadline. Added phase/pending-call metadata should make the next failure actionable; do not call this a Mac fix. Mac 14 and Debian handles now have terminal success. Fresh matching-head hosted and physical OS/installed gates remain required.
+
+The complete accepted P0/P1 scope remains binding, including live/virtual and embedded routing, command/resource/instruction composition, provenance/indexed history/inspection, live memory, integration receipts, actual audio, wiki/MCP, plans/jobs/delegation, Home/mobile/multiple windows and full platform/installed/update/rollback/privacy acceptance. Preserve DSH and old work; do not merge/promote, select an owner release or mark the full goal complete. Earlier checkpoints below are historical.
+
 ## October 10 standalone Native/Browser reasoning checkpoint
 
 Tested implementation source: `0441e4af31540312db2310fa50967f4969230bb3`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 17:16 UTC. The following qualification commit changes documentation only.

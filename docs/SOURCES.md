@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 10 [Pi prompt improvement slice](AUGMENTOR-HARNESS.md#pi-prompt-improvement-across-native-browser-and-harness) adds the existing Native/Browser and a Harness draft control through one isolated, tool-free Pi SDK request with the explicitly selected model. Shared revisioned instructions, actual provider cancellation, Undo, unchanged parent history and durable no-replay receipts are qualified with synthetic Qt/Chromium/SDK fixtures. Full migration and live/embedded/platform/installed acceptance remain open.
+
 The October 10 Native/Browser reasoning follow-up shares the independently authored settings form at `apps/browser/extension/pi-reasoning.mjs` with Harness through a fixed local asset route; its wrapper adds no dependency or external resource. Native uses the same Pi RPC/settings owner through `reasoning_settings.py`; the scoped Browser bridge preserves role checks. Selected MIT policy/source/notice and the reviewed 126-package npm/native inventory are unchanged. [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls) distinguishes real SDK/Qt/loaded-extension evidence from live-provider, embedded and installed acceptance.
 
 

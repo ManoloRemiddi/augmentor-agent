@@ -4,7 +4,7 @@ import {attachPromptLibrary} from './shared-prompts/prompt-library.mjs';
 
 export function attachHarnessPrompts({input,button,rpc,ready,context,changed}){
   return attachPromptLibrary({input,settingsButton:button,context,changed,
-    editorOptions:{improvementLabel:'Improvement instructions',improvementDescription:'Shared instructions for Improve prompt on supported Augmentor surfaces. Prompt improvement in Pi is not yet available. These instructions are separate from saved /prompts.'},
+    editorOptions:{improvementLabel:'Improvement instructions',improvementDescription:'Shared instructions for Improve prompt. Pi makes one tool-free request with the selected model; only the editable draft is replaced. These instructions are separate from saved /prompts.'},
     send:async(type,{request})=>{
       if(type!=='prompts'||!['list','save','delete','improvement.save'].includes(request?.action))return {ok:false,error:'Unsupported prompt operation.'};
       if(!ready())return {ok:false,error:'Wait for the private Harness connection to be ready.'};
