@@ -10,8 +10,10 @@ import subprocess
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'scripts'))
 sys.path.insert(0, str(ROOT/'services'))
 from build_support import npm_command
+import quickjs_engine
 
 
 def codex_prerequisite(target, root=ROOT):
@@ -96,24 +98,11 @@ def main():
         excluded.append({'name': metadata['name'], 'version': metadata['version'], 'path': 'examples',
                          'reason': 'sample applications are not part of Augmentor; separate licenses'})
         shutil.rmtree(examples)
-    # The supported SDK imports codemode's JavaScript definitions, but this
-    # source candidate now binds its execution extension for MCP. Keep its unreviewed
-    # static native closure out of releases until the paired source/notices
-    # qualify. Ordinary chat contracts exercise the stage without these assets; codemode
-    # execution remains a separate, currently failing distribution gate.
-    quickjs = target / 'node_modules/quickjs-wasi'
+    # The same reviewed engine and complete source/notice records serve all
+    # platform packagers. Resolve from codemode, rather than guessing root layout.
+    quickjs_override = None
     if metadata['version'] == '1.1.0':
-        quickjs_meta = json.loads((quickjs / 'package.json').read_text())
-        if quickjs_meta['version'] != '3.6.2':
-            raise SystemExit('QuickJS dependency changed; review its unbound native assets.')
-        assets = [quickjs / 'quickjs.wasm', *sorted((quickjs / 'extensions').glob('*/*.so'))]
-        for asset in assets:
-            if asset.read_bytes()[:4] != b'\x00asm':
-                raise SystemExit('Unexpected QuickJS native asset: ' + str(asset))
-            excluded.append({'name': quickjs_meta['name'], 'version': quickjs_meta['version'],
-                'path': asset.relative_to(target).as_posix(), 'sha256': hashlib.sha256(asset.read_bytes()).hexdigest(),
-                'reason': 'codemode native execution is not release-qualified; static dependency sources/notices remain unqualified'})
-            asset.unlink()
+        quickjs_override = quickjs_engine.stage_engine(target, excluded)
     for modules in (target / 'node_modules', sdk / 'node_modules'):
         tui = modules / '@earendil-works/pi-tui'
         if tui.exists() and metadata['version'] == '1.1.0':
@@ -182,9 +171,12 @@ def main():
     shutil.rmtree(photon); shutil.copytree(vendor, photon)
     shutil.copytree(vendor / 'third-party', target / 'licenses/photon')
     shutil.copyfile(vendor / 'BUILD.json', target / 'licenses/photon/BUILD.json')
-    (target / 'distribution-overrides.json').write_text(json.dumps({'photon': {
+    overrides = {'photon': {
         'npmVersion': record['npmVersion'], 'source': record['source'], 'changes': record['changes'],
-        'wasmSha256': record['files']['photon_rs_bg.wasm']}}, indent=2) + '\n')
+        'wasmSha256': record['files']['photon_rs_bg.wasm']}}
+    if quickjs_override is not None:
+        overrides['quickjs'] = quickjs_override
+    (target / 'distribution-overrides.json').write_text(json.dumps(overrides, indent=2) + '\n')
     (target / 'distribution-exclusions.json').write_text(json.dumps(excluded, indent=2) + '\n')
     subprocess.run([sys.executable, str(ROOT / 'scripts/third-party-notices.py'), '--tree', str(target),
                     '--out', str(target / 'licenses/npm')], check=True)

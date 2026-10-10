@@ -12,4 +12,6 @@
 *.icns -text
 # Preserve reviewed supplier bytes and checksum-pinned notices on every OS.
 components/handy/** -text
+# Original supplier notices include whitespace covered by the artifact hashes.
+vendor/quickjs-engine/** -text -whitespace
 LICENSE -text

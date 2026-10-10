@@ -20,6 +20,8 @@ import tempfile
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'scripts'))
+import quickjs_engine
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
 
 
@@ -65,7 +67,11 @@ def native_notices(app, configuration):
     expected = {'node/bin/node': 'node', 'node_modules/@esbuild/linux-x64/bin/esbuild': 'esbuild',
                 'node_modules/@earendil-works/pi-coding-agent/node_modules/@esbuild/linux-x64/bin/esbuild': 'esbuild',
                 'node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm': 'photon',
-                'node_modules/@earendil-works/pi-coding-agent/node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm': 'photon'}
+                'node_modules/@earendil-works/pi-coding-agent/node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm': 'photon',
+                **{prefix + '/quickjs-wasi/quickjs.wasm': 'quickjs' for prefix in (
+                    'node_modules', 'node_modules/@earendil-works/pi-coding-agent/node_modules',
+                    'node_modules/@earendil-works/pi-codemode/node_modules',
+                    'node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-codemode/node_modules')}}
     components = []
     for path in sorted(app.rglob('*')):
         if not path.is_file() or path.is_symlink(): continue
@@ -83,7 +89,13 @@ def native_notices(app, configuration):
             raise ValueError('Unreviewed native executable in distribution: ' + relative)
         component = expected[relative]
         content = path.read_bytes()
-        if component == 'esbuild':
+        if component == 'quickjs':
+            item = quickjs_engine.validate_bundle(app)
+            if item['path'] != relative:
+                raise ValueError('Inactive QuickJS executable in distribution')
+            components.append(item)
+            continue
+        elif component == 'esbuild':
             versions = set(re.findall(rb'\bgo1\.\d+(?:\.\d+)?\b', content))
             if versions not in ({b'go1.26.4'}, {b'go1.26.5'}):
                 raise ValueError('esbuild Go toolchain changed; review its source/license record')
@@ -117,6 +129,8 @@ def native_notices(app, configuration):
         'join(dirname(r.resolve("@silvia-odwyer/photon-node/package.json")),"photon_rs_bg.wasm")]))',
         str(sdk)], text=True))
     required = {'node/bin/node', *(Path(path).relative_to(app).as_posix() for path in resolved)}
+    if json.loads(sdk.read_text())['version'] == '1.1.0':
+        required.add(quickjs_engine.validate_bundle(app)['path'])
     root_esbuild = 'node_modules/@esbuild/linux-x64/bin/esbuild'
     if (app / root_esbuild).exists(): required.add(root_esbuild)
     if not required.issubset(expected):

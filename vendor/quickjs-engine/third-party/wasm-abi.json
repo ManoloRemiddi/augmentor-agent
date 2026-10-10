@@ -1,0 +1,1866 @@
+{
+  "imports": [
+    {
+      "module": "env",
+      "name": "host_get_timezone_offset",
+      "kind": "function"
+    },
+    {
+      "module": "env",
+      "name": "host_interrupt",
+      "kind": "function"
+    },
+    {
+      "module": "env",
+      "name": "host_promise_rejection",
+      "kind": "function"
+    },
+    {
+      "module": "env",
+      "name": "host_module_normalize",
+      "kind": "function"
+    },
+    {
+      "module": "env",
+      "name": "host_module_load",
+      "kind": "function"
+    },
+    {
+      "module": "env",
+      "name": "host_call",
+      "kind": "function"
+    },
+    {
+      "module": "wasi_snapshot_preview1",
+      "name": "clock_time_get",
+      "kind": "function"
+    },
+    {
+      "module": "wasi_snapshot_preview1",
+      "name": "fd_close",
+      "kind": "function"
+    },
+    {
+      "module": "wasi_snapshot_preview1",
+      "name": "fd_fdstat_get",
+      "kind": "function"
+    },
+    {
+      "module": "wasi_snapshot_preview1",
+      "name": "fd_seek",
+      "kind": "function"
+    },
+    {
+      "module": "wasi_snapshot_preview1",
+      "name": "fd_write",
+      "kind": "function"
+    },
+    {
+      "module": "wasi_snapshot_preview1",
+      "name": "random_get",
+      "kind": "function"
+    }
+  ],
+  "exports": [
+    {
+      "name": "memory",
+      "kind": "memory"
+    },
+    {
+      "name": "__stack_pointer",
+      "kind": "global"
+    },
+    {
+      "name": "_initialize",
+      "kind": "function"
+    },
+    {
+      "name": "__indirect_function_table",
+      "kind": "table"
+    },
+    {
+      "name": "JS_GetVersion",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewNumber",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DupValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DupValueRT",
+      "kind": "function"
+    },
+    {
+      "name": "js_calloc_rt",
+      "kind": "function"
+    },
+    {
+      "name": "js_malloc_rt",
+      "kind": "function"
+    },
+    {
+      "name": "js_free_rt",
+      "kind": "function"
+    },
+    {
+      "name": "abort",
+      "kind": "function"
+    },
+    {
+      "name": "js_realloc_rt",
+      "kind": "function"
+    },
+    {
+      "name": "js_malloc_usable_size_rt",
+      "kind": "function"
+    },
+    {
+      "name": "js_mallocz_rt",
+      "kind": "function"
+    },
+    {
+      "name": "js_calloc",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ThrowOutOfMemory",
+      "kind": "function"
+    },
+    {
+      "name": "js_malloc",
+      "kind": "function"
+    },
+    {
+      "name": "js_mallocz",
+      "kind": "function"
+    },
+    {
+      "name": "js_free",
+      "kind": "function"
+    },
+    {
+      "name": "js_realloc",
+      "kind": "function"
+    },
+    {
+      "name": "js_malloc_usable_size",
+      "kind": "function"
+    },
+    {
+      "name": "js_strndup",
+      "kind": "function"
+    },
+    {
+      "name": "js_strdup",
+      "kind": "function"
+    },
+    {
+      "name": "strlen",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewRuntime2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_UpdateStackTop",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeRuntime",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetRuntimeOpaque",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetRuntimeOpaque",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddRuntimeFinalizer",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewRuntime",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetMemoryLimit",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetDumpFlags",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetDumpFlags",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetGCThreshold",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetGCThreshold",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetInterruptHandler",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetCanBlock",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetSharedArrayBufferFunctions",
+      "kind": "function"
+    },
+    {
+      "name": "JS_EnqueueJob",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsJobPending",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetPendingJobContext",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ExecutePendingJob",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetRuntimeInfo",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeValueRT",
+      "kind": "function"
+    },
+    {
+      "name": "JS_RunGC",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeAtomRT",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewContextRaw",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeContext",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewContext",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicBaseObjects",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicDate",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicEval",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicRegExp",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicJSON",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicProxy",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicMapSet",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicTypedArrays",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicPromise",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicWeakRef",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicAToB",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddPerformance",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetContextOpaque",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetContextOpaque",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetClassProto",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetClassProto",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetFunctionProto",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DupContext",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ComputeMemoryUsage",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DumpMemoryUsage",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetRuntime",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetMaxStackSize",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DupAtomRT",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DupAtom",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewAtomLen",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewStringLen",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewAtom",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewAtomUInt32",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewSymbol",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewPrivateSymbol",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AtomToValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AtomToString",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeAtom",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AtomToCStringLen",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewClassID",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetClassID",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsRegisteredClass",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetClassName",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewClass",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ThrowRangeError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewStringUTF16",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewAtomString",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToCStringLen2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToCStringLenUTF16",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeCString",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeCStringRT",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeCStringUTF16",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreeCStringRT_UTF16",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewObjectProtoClass",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewObjectClass",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewObjectProto",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewObjectFrom",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewObject",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetProperty",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewObjectFromStr",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewArray",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewArrayFrom",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewCFunction3",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewCFunction2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewCFunctionData2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewCFunctionData",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewCClosure",
+      "kind": "function"
+    },
+    {
+      "name": "JS_MarkValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsLiveObject",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetGlobalObject",
+      "kind": "function"
+    },
+    {
+      "name": "JS_Throw",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetException",
+      "kind": "function"
+    },
+    {
+      "name": "JS_HasException",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewInternalError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ThrowInternalError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewPlainError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ThrowPlainError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewRangeError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewReferenceError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ThrowReferenceError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewSyntaxError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ThrowSyntaxError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewTypeError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ThrowTypeError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetPrototype",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetPrototype",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetLength",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetLength",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsInstanceOf",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetProperty",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsFunction",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetOwnPropertyNames",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetOwnProperty",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreePropertyEnum",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsExtensible",
+      "kind": "function"
+    },
+    {
+      "name": "JS_PreventExtensions",
+      "kind": "function"
+    },
+    {
+      "name": "JS_HasProperty",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ValueToAtom",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetPropertyValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetPropertyUint32",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetPropertyInt64",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetPropertyStr",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetPropertyValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetPropertyUint32",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetPropertyInt64",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetPropertyStr",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DefineProperty",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DefinePropertyValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DefinePropertyValueUint32",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DefinePropertyValueStr",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DefinePropertyGetSet",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DeleteProperty",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToObject",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsAsyncFunction",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsConstructor",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetConstructorBit",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsRegExp",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsMap",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsSet",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsWeakRef",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsWeakSet",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsWeakMap",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsDataView",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsUncatchableError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetUncatchableError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ClearUncatchableError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ResetUncatchableError",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetOpaque",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetOpaque",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetOpaque2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetAnyOpaque",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetIsHTMLDDA",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToBool",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToFloat64",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToNumber",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToInt64",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToInt64Ext",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToBigInt64",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToInt32",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToIndex",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToString",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToPropertyKey",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsArray",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewBigInt64",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewBigUint64",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToBigUint64",
+      "kind": "function"
+    },
+    {
+      "name": "JS_Call",
+      "kind": "function"
+    },
+    {
+      "name": "JS_CallConstructor2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_CallConstructor",
+      "kind": "function"
+    },
+    {
+      "name": "JS_Invoke",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewCModule",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddModuleExport",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetModuleExport",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetModuleLoaderFunc",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetModuleLoaderFunc2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetModuleNormalizeFunc2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetModulePrivateValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetModulePrivateValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetModuleNamespace",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetScriptOrModuleName",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetModuleName",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetImportMeta",
+      "kind": "function"
+    },
+    {
+      "name": "JS_LoadModule",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewPromiseCapability",
+      "kind": "function"
+    },
+    {
+      "name": "JS_EvalFunction",
+      "kind": "function"
+    },
+    {
+      "name": "JS_EvalThis",
+      "kind": "function"
+    },
+    {
+      "name": "JS_EvalThis2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_Eval",
+      "kind": "function"
+    },
+    {
+      "name": "JS_Eval2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ResolveModule",
+      "kind": "function"
+    },
+    {
+      "name": "JS_WriteObject2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_WriteObject",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ReadObject2",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ReadObject",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetPropertyFunctionList",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddModuleExportList",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetModuleExportList",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetConstructor",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ToObjectString",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SealObject",
+      "kind": "function"
+    },
+    {
+      "name": "JS_FreezeObject",
+      "kind": "function"
+    },
+    {
+      "name": "js_string_codePointRange",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicRegExpCompiler",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ParseJSON",
+      "kind": "function"
+    },
+    {
+      "name": "JS_JSONStringify",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewProxy",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsProxy",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetProxyTarget",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetProxyHandler",
+      "kind": "function"
+    },
+    {
+      "name": "JS_PromiseState",
+      "kind": "function"
+    },
+    {
+      "name": "JS_PromiseResult",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsPromise",
+      "kind": "function"
+    },
+    {
+      "name": "JS_PromiseMarkAsHandled",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewSettledPromise",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetPromiseHook",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetHostPromiseRejectionTracker",
+      "kind": "function"
+    },
+    {
+      "name": "JS_PromiseThen",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewDate",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsDate",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicBigInt",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewArrayBuffer",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsArrayBuffer",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewArrayBufferCopy",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DetachArrayBuffer",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsImmutableArrayBuffer",
+      "kind": "function"
+    },
+    {
+      "name": "JS_SetImmutableArrayBuffer",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetArrayBuffer",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewTypedArray",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetTypedArrayBuffer",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetUint8Array",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewUint8Array",
+      "kind": "function"
+    },
+    {
+      "name": "JS_NewUint8ArrayCopy",
+      "kind": "function"
+    },
+    {
+      "name": "JS_GetTypedArrayType",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsEqual",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsStrictEqual",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsSameValue",
+      "kind": "function"
+    },
+    {
+      "name": "JS_IsSameValueZero",
+      "kind": "function"
+    },
+    {
+      "name": "JS_ThrowDOMException",
+      "kind": "function"
+    },
+    {
+      "name": "vsnprintf",
+      "kind": "function"
+    },
+    {
+      "name": "JS_AddIntrinsicDOMException",
+      "kind": "function"
+    },
+    {
+      "name": "JS_DetectModule",
+      "kind": "function"
+    },
+    {
+      "name": "strstr",
+      "kind": "function"
+    },
+    {
+      "name": "js_std_cmd",
+      "kind": "function"
+    },
+    {
+      "name": "calloc",
+      "kind": "function"
+    },
+    {
+      "name": "malloc",
+      "kind": "function"
+    },
+    {
+      "name": "free",
+      "kind": "function"
+    },
+    {
+      "name": "realloc",
+      "kind": "function"
+    },
+    {
+      "name": "memcmp",
+      "kind": "function"
+    },
+    {
+      "name": "snprintf",
+      "kind": "function"
+    },
+    {
+      "name": "frexp",
+      "kind": "function"
+    },
+    {
+      "name": "strrchr",
+      "kind": "function"
+    },
+    {
+      "name": "strcmp",
+      "kind": "function"
+    },
+    {
+      "name": "strchr",
+      "kind": "function"
+    },
+    {
+      "name": "strtod",
+      "kind": "function"
+    },
+    {
+      "name": "memchr",
+      "kind": "function"
+    },
+    {
+      "name": "acosh",
+      "kind": "function"
+    },
+    {
+      "name": "asinh",
+      "kind": "function"
+    },
+    {
+      "name": "atanh",
+      "kind": "function"
+    },
+    {
+      "name": "cbrt",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_quickjs_version",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_init",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_init2",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_interrupt_handler",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_promise_rejection_handler",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_module_loader",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_memory_limit",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_max_stack_size",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_run_gc",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_gc_threshold",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_gc_threshold",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_compute_memory_usage",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_destroy",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_eval",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_compile",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_eval_bytecode",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_string",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_number",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_object",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_array",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_undefined",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_null",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_true",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_false",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_symbol",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_symbol_description",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_float64",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_string",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_string_len",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_free_cstring",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_typeof",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_exception",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_undefined",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_null",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_bool",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_number",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_string",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_object",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_array",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_function",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_error",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_promise",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_symbol",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_big_int",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_proxy",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_map",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_set",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_date",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_regexp",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_weak_ref",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_weak_map",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_weak_set",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_data_view",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_class_id",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_class_name",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_proxy_target",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_proxy_handler",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_bool",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_dup_value",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_free_value",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_global",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_prop_string",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_prop_string",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_define_prop_string",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_define_prop_value",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_prop_value",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_prop_value",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_prop_uint32",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_prop_uint32",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_call_constructor",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_call",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_host_function",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_promise",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_promise_state",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_promise_result",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_promise_then",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_promise_mark_as_handled",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_job_pending",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_execute_pending_job",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_exception",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_throw",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_error",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_big_int64",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_big_int64",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_value_ptr",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_own_property_names",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_own_property_names_all",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_own_property_keys",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_own_property_descriptor",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_has_own_property",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_has_own_property_value",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_property_is_enumerable",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_property_is_enumerable_value",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_prototype_of",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_array_buffer",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_array_buffer",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_is_array_buffer",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_new_uint8_array",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_typed_array_buffer",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_runtime_ptr",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_get_context_ptr",
+      "kind": "function"
+    },
+    {
+      "name": "qjs_set_runtime_and_context",
+      "kind": "function"
+    },
+    {
+      "name": "wasm_malloc",
+      "kind": "function"
+    },
+    {
+      "name": "wasm_free",
+      "kind": "function"
+    },
+    {
+      "name": "fmin",
+      "kind": "function"
+    },
+    {
+      "name": "fmax",
+      "kind": "function"
+    },
+    {
+      "name": "fabs",
+      "kind": "function"
+    },
+    {
+      "name": "sqrt",
+      "kind": "function"
+    },
+    {
+      "name": "copysign",
+      "kind": "function"
+    },
+    {
+      "name": "ceil",
+      "kind": "function"
+    },
+    {
+      "name": "floor",
+      "kind": "function"
+    },
+    {
+      "name": "trunc",
+      "kind": "function"
+    },
+    {
+      "name": "strerror",
+      "kind": "function"
+    },
+    {
+      "name": "isalnum",
+      "kind": "function"
+    },
+    {
+      "name": "isalpha",
+      "kind": "function"
+    },
+    {
+      "name": "isdigit",
+      "kind": "function"
+    },
+    {
+      "name": "islower",
+      "kind": "function"
+    },
+    {
+      "name": "isprint",
+      "kind": "function"
+    },
+    {
+      "name": "isspace",
+      "kind": "function"
+    },
+    {
+      "name": "isupper",
+      "kind": "function"
+    },
+    {
+      "name": "isxdigit",
+      "kind": "function"
+    },
+    {
+      "name": "tolower",
+      "kind": "function"
+    },
+    {
+      "name": "toupper",
+      "kind": "function"
+    },
+    {
+      "name": "acos",
+      "kind": "function"
+    },
+    {
+      "name": "asin",
+      "kind": "function"
+    },
+    {
+      "name": "atan",
+      "kind": "function"
+    },
+    {
+      "name": "atan2",
+      "kind": "function"
+    },
+    {
+      "name": "cos",
+      "kind": "function"
+    },
+    {
+      "name": "cosh",
+      "kind": "function"
+    },
+    {
+      "name": "exp",
+      "kind": "function"
+    },
+    {
+      "name": "exp2",
+      "kind": "function"
+    },
+    {
+      "name": "fmod",
+      "kind": "function"
+    },
+    {
+      "name": "ldexp",
+      "kind": "function"
+    },
+    {
+      "name": "log",
+      "kind": "function"
+    },
+    {
+      "name": "log10",
+      "kind": "function"
+    },
+    {
+      "name": "log2",
+      "kind": "function"
+    },
+    {
+      "name": "modf",
+      "kind": "function"
+    },
+    {
+      "name": "pow",
+      "kind": "function"
+    },
+    {
+      "name": "remainder",
+      "kind": "function"
+    },
+    {
+      "name": "round",
+      "kind": "function"
+    },
+    {
+      "name": "sin",
+      "kind": "function"
+    },
+    {
+      "name": "sinh",
+      "kind": "function"
+    },
+    {
+      "name": "tan",
+      "kind": "function"
+    },
+    {
+      "name": "tanh",
+      "kind": "function"
+    },
+    {
+      "name": "sprintf",
+      "kind": "function"
+    },
+    {
+      "name": "sscanf",
+      "kind": "function"
+    },
+    {
+      "name": "atof",
+      "kind": "function"
+    },
+    {
+      "name": "atoi",
+      "kind": "function"
+    },
+    {
+      "name": "bsearch",
+      "kind": "function"
+    },
+    {
+      "name": "qsort",
+      "kind": "function"
+    },
+    {
+      "name": "strtoul",
+      "kind": "function"
+    },
+    {
+      "name": "strtol",
+      "kind": "function"
+    },
+    {
+      "name": "stpcpy",
+      "kind": "function"
+    },
+    {
+      "name": "strcat",
+      "kind": "function"
+    },
+    {
+      "name": "strcpy",
+      "kind": "function"
+    },
+    {
+      "name": "strdup",
+      "kind": "function"
+    },
+    {
+      "name": "strncat",
+      "kind": "function"
+    },
+    {
+      "name": "strncmp",
+      "kind": "function"
+    },
+    {
+      "name": "strncpy",
+      "kind": "function"
+    },
+    {
+      "name": "memcpy",
+      "kind": "function"
+    },
+    {
+      "name": "memmove",
+      "kind": "function"
+    },
+    {
+      "name": "memset",
+      "kind": "function"
+    }
+  ]
+}
