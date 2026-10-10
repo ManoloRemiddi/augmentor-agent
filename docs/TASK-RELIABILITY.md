@@ -60,7 +60,7 @@ turn resets, binary omission and excerpt protection, original evidence retention
 normal multilingual/coloured output, bounded recovery, user Stop, uncertain actions,
 permissions and cold history. Native Qt checks cover live/reopened policy visibility
 and incomplete notices. Shared backend behavior applies to Desktop and Browser;
-Pi does not use these DSH execution adapters. Its October 10 Harness candidate separately ports deterministic text budgeting, binary withholding and branch-scoped original recovery through the public Pi SDK; see [Pi context budgets](CONTEXT-BUDGET.md#pi-harness-port--october-10-candidate). Advisory reassessment/error/progress checkpoints and bounded action-aware response recovery still require a Pi port and qualification.
+Pi does not use these DSH execution adapters. Its October 10 Harness candidate separately ports deterministic text budgeting, binary withholding and branch-scoped original recovery through the public Pi SDK; see [Pi context budgets](CONTEXT-BUDGET.md#pi-harness-port--october-10-candidate). The following [Pi advisory port](AUGMENTOR-HARNESS.md#advisory-reassessment-and-home-build-correction) also qualifies repeated/error/progress checkpoints through supported SDK boundary drafts. Bounded action-aware response recovery still requires a Pi port and qualification.
 
 `node scripts/task-reliability-proof.mjs` is an opt-in local-model check. Set
 `AUGMENTOR_PROOF_MODEL_CONFIG` to a private JSON file containing `provider`, `model`,
@@ -202,3 +202,8 @@ under-counted its other inspections; the recorded total is six tool calls.
 No power-changing command was executed. The effective request still used xhigh
 reasoning; 79 seconds remains slow for this task. Model/GPU settings were preserved.
 Private full transcripts and rollback backups remain outside the repository.
+
+
+## Pi advisory port — October 10 candidate
+
+The [Harness record](AUGMENTOR-HARNESS.md#advisory-reassessment-and-home-build-correction) owns source/staged qualification of `packages/runtime/src/reassessment.ts`. It preserves the existing shared heuristics/wording without mounting a DSH loop. Pi-native boundary messages carry advisory checkpoint text; metadata observations carry reasons/counts. They use final top-level results after handlers, reset per SDK run/settlement, skip aborted/error boundaries and do not force continuation, infer action effects or grant retries. Original results and ordinary tool-loop behavior remain. The tests intentionally transform distinct raw results into repeated final evidence to qualify observation order. Action-aware recovery, empty/truncated responses and live-provider acceptance are still open migration gates.

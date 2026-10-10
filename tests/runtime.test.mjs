@@ -36,9 +36,12 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null)=>{const value={id:'mock',object:'chat.completion.chunk',created:1,model:'test',choices:[{index:0,delta,finish_reason:finish}]};sent.push(value);return res.write('data: '+JSON.stringify(value)+'\n\n');};
   if(content.includes('SLOW')){const timer=setInterval(()=>chunk({content:'tick '}),60);res.on('close',()=>clearInterval(timer));return;}
-  const tool=content.includes('BUDGET_TEST')?'fixture_large':content.includes('EXCERPT_TEST')?'tool_result_excerpt':content.includes('DELEGATE_TEST')?'desktop_delegate':content.includes('BROWSER_TEST')?'browser_snapshot':content.includes('CLOCK')||content.includes('SHELL_CHANGE')?'bash':content.includes('WRITE')?'write':content.includes('QUESTION')?'ask_user':content.includes('PACKAGE')?'fixture_probe':null;
-  if(tool&&body.messages.at(-1).role!=='tool'){
-    const args=tool==='tool_result_excerpt'?{entryId:content.match(/ENTRY=([a-f0-9]+)/)?.[1],find:'ORIGINAL_MIDDLE_SENTINEL',limit:24}:tool==='desktop_delegate'?{task:'Inspect the open window.',successCriteria:'Report the title.',constraints:'Do not change anything.'}:tool==='browser_snapshot'?{}:tool==='bash'?{command:content.includes('CLOCK')?"date '+%A, %B %d, %Y %H:%M:%S %Z'":'date > '+join(cwd,'shell-written.txt')}:tool==='write'?{path:join(cwd,content.includes('HARNESS')?'gui-written.txt':'written.txt'),content:'verified π'}:tool==='ask_user'?{question:'Choose a colour',options:['blue','green']}:{};
+  const reassessing=body.messages.some(m=>m.role==='user'&&JSON.stringify(m.content).includes('REASSESS_TEST'));
+  const progressing=body.messages.some(m=>m.role==='user'&&JSON.stringify(m.content).includes('PROGRESS_TEST'));
+  const completedTools=body.messages.filter(m=>m.role==='tool').length;
+  const tool=reassessing||progressing?(completedTools<(reassessing?3:8)?'fixture_reassess':null):content.includes('BUDGET_TEST')?'fixture_large':content.includes('EXCERPT_TEST')?'tool_result_excerpt':content.includes('DELEGATE_TEST')?'desktop_delegate':content.includes('BROWSER_TEST')?'browser_snapshot':content.includes('CLOCK')||content.includes('SHELL_CHANGE')?'bash':content.includes('WRITE')?'write':content.includes('QUESTION')?'ask_user':content.includes('PACKAGE')?'fixture_probe':null;
+  if(tool&&(reassessing||progressing||body.messages.at(-1).role!=='tool')){
+    const args=tool==='fixture_reassess'?{value:reassessing?'repeated':'different-'+completedTools}:tool==='tool_result_excerpt'?{entryId:content.match(/ENTRY=([a-f0-9]+)/)?.[1],find:'ORIGINAL_MIDDLE_SENTINEL',limit:24}:tool==='desktop_delegate'?{task:'Inspect the open window.',successCriteria:'Report the title.',constraints:'Do not change anything.'}:tool==='browser_snapshot'?{}:tool==='bash'?{command:content.includes('CLOCK')?"date '+%A, %B %d, %Y %H:%M:%S %Z'":'date > '+join(cwd,'shell-written.txt')}:tool==='write'?{path:join(cwd,content.includes('HARNESS')?'gui-written.txt':'written.txt'),content:'verified π'}:tool==='ask_user'?{question:'Choose a colour',options:['blue','green']}:{};
     chunk({role:'assistant',tool_calls:[{index:0,id:'call_'+requests,type:'function',function:{name:tool,arguments:JSON.stringify(args)}}]});chunk({},'tool_calls');
   }else{if(content.includes('INSPECT'))chunk({reasoning_content:'Observed reasoning π'});chunk({role:'assistant',content:'Verified response π'});chunk({},'stop');}
   res.end('data: [DONE]\n\n');
@@ -319,6 +322,29 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   client.close();await stop();await start();client=await Client.open(join(state,'runtime.sock'));
   assert.deepEqual((await client.call('session.trimTools',{sessionId:'budget'})).changes,[]);
   assert.equal(requests,beforeRestart);assert.equal(readFileSync(file,'utf8'),saved);
+ });
+ await t.test('Pi advisory checkpoints reach the next request without halting or extending the real loop',async t=>{
+  const extension=join(root,'fixture-reassess.mjs');
+  writeFileSync(extension,`export default pi=>{pi.registerTool({name:'fixture_reassess',label:'Reassessment fixture',description:'Return synthetic repeated or varied evidence',parameters:{type:'object',properties:{value:{type:'string'}},required:['value']},async execute(id,args){return {content:[{type:'text',text:'raw-'+id}],details:{}};}});pi.on('tool_result',e=>e.toolName==='fixture_reassess'?{content:[{type:'text',text:e.input.value==='repeated'?'command not found':e.input.value}]}:undefined);};`);
+  writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}));
+  t.after(()=>writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]})));
+  await create('reassessment','danger-full-access');const before=requests;
+  await prompt('reassessment','REASSESS_TEST');await idle('reassessment');assert.equal(requests-before,4);
+  const context=JSON.stringify(received.at(-1).messages);assert(context.includes('Repeated-tool checkpoint'));assert(context.includes('Failed-approach checkpoint'));assert(context.includes('grants no authority'));
+  const records=(await client.call('observation.list',{sessionId:'reassessment'})).records.filter(e=>e.kind==='execution/checkpoint');
+  assert.equal(records.length,1);assert.deepEqual(records[0].data.reasons,['repeated-output','failed-approach']);
+  const history=(await client.call('session.history',{sessionId:'reassessment'})).events;
+  assert.equal(history.filter(e=>e.event.type==='user/message').length,1,'An advisory must not impersonate a user prompt');
+  assert(history.some(e=>e.event.type==='assistant/message'&&JSON.stringify(e).includes('Verified response')));
+  const file=JSON.parse(readFileSync(join(state,'sessions/reassessment.meta.json'),'utf8')).file;
+  const native=readFileSync(file,'utf8').trim().split('\n').map(line=>JSON.parse(line));
+  assert.equal(native.filter(e=>e.type==='custom_message'&&e.customType==='augmentor-reassessment').length,1);
+  const originals=native.filter(e=>e.type==='message'&&e.message.role==='toolResult');assert.equal(originals.length,3);assert(originals.every(e=>e.message.content[0].text==='command not found'),'Reassessment uses final result hooks, not earlier raw execute output');
+  await create('progress-checkpoint','danger-full-access');const progressBefore=requests;
+  await prompt('progress-checkpoint','PROGRESS_TEST');await idle('progress-checkpoint');assert.equal(requests-progressBefore,9);
+  const progress=(await client.call('observation.list',{sessionId:'progress-checkpoint'})).records.filter(e=>e.kind==='execution/checkpoint');
+  assert.equal(progress.length,1);assert.deepEqual(progress[0].data.reasons,['progress']);assert.equal(progress[0].data.completedTools,8);
+  assert(JSON.stringify(received.at(-1).messages).includes('Progress checkpoint'));
  });
  await t.test('history pagination has stable non-overlapping sequences',async()=>{await create('paging');for(let i=0;i<14;i++){await prompt('paging','page '+i);await idle('paging');}const page=await client.call('session.history',{sessionId:'paging',maxMessages:3});assert(page.hasMore);const earlier=await client.call('session.history',{sessionId:'paging',maxMessages:3,beforeSeq:page.events[0].event.seq});assert(earlier.events.at(-1).event.seq<page.events[0].event.seq);assert.equal(page.events.filter(e=>e.event.type==='user/message').length,3);});
  await t.test('maintenance refuses active tasks and shuts down idle runtime without replay',async()=>{
