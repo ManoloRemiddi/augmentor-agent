@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 10 indexed display-history checkpoint
+
+Tested implementation source: `bce7f07dc69d1b1a1dd147e1436b1becb89110fc`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 19:29 UTC. The subsequent qualification commit changes documentation only.
+
+Loaded and cold Pi `session.history` now use a private derived offset/compaction index. Original sequences, frame limits, tool/partial/empty-final boundaries and suppression of finalized deltas before applying an older cursor remain compatible. Seven pure cases include 100,000-record bounded source paging and 96,002-record bounded group skipping. An actual IPC owner with 2,000 public-SDK-authored saved dialogues proves warm/restarted indexed pages, unchanged native/display bytes and no inference. [The owning record](AUGMENTOR-HARNESS.md#indexed-display-history-with-original-compaction-semantics) records the exact scope, integrity/temporary/crash-tail rules, failure history and remaining native/provenance work. SDK resume/branch/edit/memory initialization still rehydrate full required state; this is a display inspection optimization.
+
+Final source Node: 654 cases (652 pass/two existing optional memory-engine skips); Browser unit: 116 pass; refreshed unselected stage: 62 pass, bundled Node 24.19.0. All final Node/staged/type processes exit normally. Fresh Python/Qt: 864 cases (827 pass/37 existing skips), with unchanged Native Python source; final JS/helper corrections are separately covered by the final source/staged runs. Build/type/shader/design/version, whitespace, public-source boundary and compiled-stage/lock/catalog/MIT notice bytes pass. No dependency or native component is added; the existing 126-package baseline remains.
+
+Initial staged Undo and subsequent source slow-input failures are retained rather than attributed to the former sticky heading. The fixture verifies pointer hit/click delivery and waits for typed/restored input and control cues. A source regression also exposed Codex returning an invalid synthetic tool result before closing, allowing another provider request; the ephemeral check now closes without that result, preserving the exact one-request refusal. Focused 19-case and final source/staged checks pass. No deadline increase or Pi authority relaxation. No source test substitutes for physical/installed acceptance.
+
+Preceding published `667939d` has 20 hosted successes and two verified-live Windows native jobs at this observation: x64 114293845868 and ARM64 114293845778 (run 38078305698). Mac and Debian passed at that prior head. No job was blindly restarted. Fresh matching-head hosted gates remain required; older unproved Mac/GUI failure causes are not declared fixed by these successes.
+
+The complete accepted P0/P1 migration remains binding: native history indexing, payload search and complete context provenance; embedded/live routing and command/resource composition; live Hindsight; integration receipts; actual voice/audio; wiki/MCP; plans/jobs/delegation; Home/mobile/multiple windows; and full platform/package/installed/update/rollback/privacy gates. Preserve DSH, old/private work, owner installations/settings and approved model/speech/GPU placement. Do not merge/promote, select an owner release, retire DSH or complete the full goal from this checkpoint. Earlier checkpoints below are historical.
+
+
 ## October 10 indexed Trajectory metadata checkpoint
 
 Tested implementation source: `4ccbe3fe2d6eec3a1f193166ad2d0cb2206a2f61`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 19:03 UTC. The subsequent qualification commit changes documentation only.
