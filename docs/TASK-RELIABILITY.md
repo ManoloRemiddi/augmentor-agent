@@ -60,7 +60,7 @@ turn resets, binary omission and excerpt protection, original evidence retention
 normal multilingual/coloured output, bounded recovery, user Stop, uncertain actions,
 permissions and cold history. Native Qt checks cover live/reopened policy visibility
 and incomplete notices. Shared backend behavior applies to Desktop and Browser;
-Pi does not use these DSH adapters.
+Pi does not use these DSH execution adapters. Its October 10 Harness candidate separately ports deterministic text budgeting, binary withholding and branch-scoped original recovery through the public Pi SDK; see [Pi context budgets](CONTEXT-BUDGET.md#pi-harness-port--october-10-candidate). Advisory reassessment/error/progress checkpoints and bounded action-aware response recovery still require a Pi port and qualification.
 
 `node scripts/task-reliability-proof.mjs` is an opt-in local-model check. Set
 `AUGMENTOR_PROOF_MODEL_CONFIG` to a private JSON file containing `provider`, `model`,

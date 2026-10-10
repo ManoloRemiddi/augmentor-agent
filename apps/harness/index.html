@@ -21,6 +21,7 @@
       <label class="workspace">Working folder<input id="workspace" placeholder="Choose a folder for new conversations"></label>
       <h2>Conversations</h2><nav id="sessions" aria-label="Conversations"></nav>
       <div class="capture-settings"><label><input type="checkbox" id="capture"> Save context history</label><p>Retain request and tool payloads locally for up to 14 days or 512 MiB. Applies to this Pi profile. Conversation history is stored separately.</p></div>
+      <button id="trim-tools" disabled>Trim saved tool context</button>
     </aside>
     <main>
       <div class="conversation-heading"><div><h1 id="title">Your agent, in view</h1><p id="subtitle">Open a conversation to inspect its execution and context.</p></div><button id="stop" class="stop" disabled>Stop</button></div>

@@ -25,6 +25,7 @@ import {DesktopSpecialist,DESKTOP_DELEGATION_GUIDANCE} from './desktop-specialis
 import {linuxDesktopExecutor} from '../../pi-linux/src/desktop-executor.js';
 import {ObservationStore,OBSERVATION_PROTOCOL,DEFAULT_RETENTION} from '../../observation/src/store.js';
 import {observeSession} from './observations.js';
+import {piToolBudget,trimSavedToolContext,TOOL_BUDGET} from './tool-budget.js';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
 interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];observation?:ReturnType<typeof observeSession>;turnId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
@@ -78,10 +79,10 @@ export class Host {
   getMeta(id:unknown){const m=this.metadata.get(identifier(id));if(!m)throw new Error('Conversation not found');return m;}
   policy(m:Meta){return (pi:ExtensionAPI)=>{pi.on('tool_call',async e=>{
     if(e.toolName==='linux_desktop_stop')this.desktopSpecialist.cancel('pi:'+m.id);
-    if(m.surface==='browser'&&!['browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','home_devices','home_set','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
+    if(m.surface==='browser'&&!['browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','tool_result_excerpt','home_devices','home_set','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
       return {block:true,reason:'This browser chat can only use its browser tools.'};
     if(this.desktopSpecialist.busy()&&['linux_desktop_connect','linux_desktop_snapshot','linux_desktop_action'].includes(e.toolName))return {block:true,reason:'A desktop specialist owns the desktop. Wait for it or Stop it before using direct desktop tools.'};
-    if(['home_devices','home_read','home_status','home_result','home_cancel','desktop_delegate','desktop_evidence','memory_recall','memory_source','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
+    if(['home_devices','home_read','home_status','home_result','home_cancel','desktop_delegate','desktop_evidence','memory_recall','memory_source','tool_result_excerpt','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
     if(e.toolName==='bash'&&isRoutineQuery(e.input.command))return;
     if(m.policy==='read-only')return {block:true,reason:'Read-only chat: actions that can change state are disabled.'};
     if(['home_request','home_set'].includes(e.toolName))return; // Persistent NAS pairing grants the scoped Home capability.
@@ -91,16 +92,17 @@ export class Host {
     const model=await this.selected(m.selection);
     const memory=new DualMemoryClient('pi:'+m.id,m.cwd,undefined,message=>console.warn('[augmentor-memory]',message));
     mkdirSync(m.cwd,{recursive:true,mode:0o700});
-    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,retry:{enabled:false},compaction:{enabled:true},packages:[],defaultProjectTrust:'never'});
+    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false},compaction:{enabled:true},packages:[],defaultProjectTrust:'never'});
     const resources=readJson<Data>(join(this.dirs.config,'resources.json'),{sources:[],skills:[]});
     if(!Array.isArray(resources.sources)||!Array.isArray(resources.skills))throw new Error('Invalid Pi resource configuration');
     const resourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
       additionalExtensionPaths:m.surface==='browser'?[]:resources.sources,additionalSkillPaths:m.surface==='browser'?[]:resources.skills,additionalPromptTemplatePaths:[privateDir(join(this.dirs.agent,'prompts'))],
-      extensionFactories:[this.policy(m),homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork),...(m.surface==='browser'?[this.browser.package(m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})])],
+      extensionFactories:[this.policy(m),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork),...(m.surface==='browser'?[this.browser.package(m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})])],
       appendSystemPrompt:[browserRecovery,m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
     });await resourceLoader.reload();
     const errors=resourceLoader.getExtensions().errors;if(errors.length)throw new Error('Pi extension loading failed: '+errors.map(e=>e.error).join('; '));
     const manager=branchManager??(m.file&&existsSync(m.file)?SessionManager.open(m.file):SessionManager.create(m.cwd,join(this.dirs.sessions,m.id)));
+    const repaired=trimSavedToolContext(manager);
     const created=await createAgentSession({cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,model,thinkingLevel:'off',settingsManager,resourceLoader,sessionManager:manager,tools:[...(m.surface==='browser'?[]:['read','write','edit','bash','ls','find','grep']),...resourceLoader.getExtensions().extensions.flatMap(e=>[...e.tools.keys()])]});
     if(created.modelFallbackMessage){created.session.dispose();throw new Error('Pi attempted a model substitution: '+created.modelFallbackMessage);}
     if(created.session.model?.id!==m.selection.model||created.session.model?.provider!==m.selection.provider){created.session.dispose();throw new Error('Pi selected a different model.');}
@@ -112,11 +114,12 @@ export class Host {
     await memory.append(history.flatMap(event=>piTranscriptEvent(event)));
     await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.id),onError:error=>this.append(m,'runtime/error',{message:error.error})});
     record.observation=observeSession(created.session,this.observations,m.id,
-      ()=>({turnId:record!.turnId,selected:{...m.selection}}),
+      ()=>({turnId:record!.turnId,selected:{...m.selection},permissionPreset:m.policy,toolBudget:{...TOOL_BUDGET,units:'unicode-code-points'}}),
       observation=>this.publish(m.id,{method:'observation/event',payload:{sessionId:m.id,observation}}),
       message=>this.append(m,'runtime/warning',{message}));
     record.observation.record('session/load',{piVersion:'1.1.0',productVersion:RELEASE.version,
       surface:m.surface??'linux',policy:m.policy,...(m.fork?{fork:m.fork}:{})});
+    if(repaired.length)record.observation.record('context/budget',{changes:repaired,units:'unicode-code-points',boundary:'before-session-owner-load'});
     created.session.subscribe(e=>{
       if(e.type==='message_start'&&e.message.role==='user')this.append(m,'user/message',{source:{kind:'user'},content:typeof e.message.content==='string'?[{type:'text',text:e.message.content}]:e.message.content});
       if(e.type==='message_update'){
@@ -171,16 +174,26 @@ export class Host {
     const run=this.serial.then(()=>{if(this.quiescing&&method!=='host.describe')throw new Error('Runtime is closing for maintenance. No action was submitted.');return this.handle(method,p,id);});this.serial=run.catch(()=>{});return run;
   }
   async handle(method:string,p:Data,id:string):Promise<any>{switch(method){
-    case 'observation.describe':return {protocol:OBSERVATION_PROTOCOL,revision:this.settings.revision,capturePayloads:this.observations.policy().capturePayloads,retention:DEFAULT_RETENTION,boundary:'provider-payload-after-hooks',capabilities:{metadata:true,payloads:true,attachments:'inline-payloads-only',parsedProviderEvents:false,sourceProvenance:false,historicalCoverage:'recorded-during-managed-operation'},telemetry:{installReporting:'disabled-by-host',analytics:'disabled-by-host',networkAudit:'synthetic-core-test; configured extensions and live services require separate review'}};
+    case 'observation.describe':return {protocol:OBSERVATION_PROTOCOL,revision:this.settings.revision,capturePayloads:this.observations.policy().capturePayloads,retention:DEFAULT_RETENTION,boundary:'provider-payload-after-hooks',capabilities:{metadata:true,payloads:true,attachments:'inline-payloads-only',parsedProviderEvents:true,providerEventCoverage:'parsed events supplied by the provider; 8 MiB per request; partial coverage reported',sourceProvenance:false,historicalCoverage:'recorded-during-managed-operation'},telemetry:{installReporting:'disabled-by-host',analytics:'disabled-by-host',cacheWarming:'off-by-host',networkAudit:'synthetic-core-test; configured extensions and live services require separate review'}};
     case 'observation.configure':{if(p.expectedRevision!==this.settings.revision)throw new Error('Settings changed. Refresh inspection settings.');if(typeof p.capturePayloads!=='boolean')throw new Error('Choose whether to retain private request payloads.');this.settings.observation={capturePayloads:p.capturePayloads};this.persistSettings();return this.handle('observation.describe',{},id);}
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
       this.quiescing=true;this.setup.cancel();return {accepted:true};
     case 'session.branch':return this.branch(p);
+    case 'session.trimTools':{
+      const m=this.getMeta(p.sessionId);if(m.running)throw Error('Stop the current turn before repairing tool context.');
+      const loaded=this.loaded.get(m.id);
+      if(!loaded&&(!m.file||!existsSync(m.file)))return {changes:[],units:'unicode-code-points',policy:TOOL_BUDGET};
+      const manager=loaded?.manager??SessionManager.open(m.file!);
+      const changes=trimSavedToolContext(manager);
+      if(loaded){loaded.session.refreshContext();loaded.observation?.record('context/budget',{changes,units:'unicode-code-points',boundary:'manual-idle-repair'});}
+      else try{this.observations.append(m.id,'context/budget',{changes,units:'unicode-code-points',boundary:'manual-cold-repair'});}catch{console.warn('[augmentor-inspection] Idle repair completed; its diagnostic observation could not be recorded.');}
+      return {changes,units:'unicode-code-points',policy:TOOL_BUDGET};
+    }
     case 'models.list':return this.catalog();
     case 'setup.save':{
       if(!['read-only','workspace-write','danger-full-access'].includes(p.approvalMode))throw new Error('Choose an approval mode.');

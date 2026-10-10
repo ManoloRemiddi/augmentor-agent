@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [October 10 Harness candidate](AUGMENTOR-HARNESS.md) adds a separate local Pi Chat/Trajectory/Context client, parsed-provider observations and native context-edit budgeting/original recovery. Its source/fixture qualification does not update the installed surfaces or close the full migration gates.
+
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 
 The [SDK source candidate](SDK-ALIGNMENT.md) scopes Conversation/Thinking and

@@ -22,7 +22,7 @@ class Client {
 
 test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},async t=>{
  const root=mkdtempSync(join(tmpdir(),'augmentor-pi-contract-'));const config=join(root,'config'),state=join(root,'state'),cwd=join(root,'work');mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(cwd);
- let requests=0;const received=[];
+ let requests=0;const received=[],sentStreams=[];
  const mock=http.createServer(async(req,res)=>{let raw='';for await(const chunk of req)raw+=chunk;
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
   const body=JSON.parse(raw);
@@ -30,15 +30,15 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
     res.writeHead(200,{'content-type':'text/event-stream'});
     res.end('data: '+JSON.stringify({id:'distill',object:'chat.completion.chunk',model:'test',choices:[{index:0,delta:{role:'assistant',content:JSON.stringify({summary:'',items:[]})},finish_reason:'stop'}]})+'\n\ndata: [DONE]\n\n');return;
   }
-  requests++;received.push(body);const user=[...body.messages].reverse().find(m=>m.role==='user')?.content;
+  requests++;received.push(body);const sent=[];sentStreams.push(sent);const user=[...body.messages].reverse().find(m=>m.role==='user')?.content;
   const content=typeof user==='string'?user:JSON.stringify(user);
   if(content.includes('OUTAGE')){res.writeHead(503,{'content-type':'application/json'}).end(JSON.stringify({error:{message:'deliberate model outage'}}));return;}
   res.writeHead(200,{'content-type':'text/event-stream'});
-  const chunk=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'mock',object:'chat.completion.chunk',created:1,model:'test',choices:[{index:0,delta,finish_reason:finish}]})+'\n\n');
+  const chunk=(delta,finish=null)=>{const value={id:'mock',object:'chat.completion.chunk',created:1,model:'test',choices:[{index:0,delta,finish_reason:finish}]};sent.push(value);return res.write('data: '+JSON.stringify(value)+'\n\n');};
   if(content.includes('SLOW')){const timer=setInterval(()=>chunk({content:'tick '}),60);res.on('close',()=>clearInterval(timer));return;}
-  const tool=content.includes('DELEGATE_TEST')?'desktop_delegate':content.includes('BROWSER_TEST')?'browser_snapshot':content.includes('CLOCK')||content.includes('SHELL_CHANGE')?'bash':content.includes('WRITE')?'write':content.includes('QUESTION')?'ask_user':content.includes('PACKAGE')?'fixture_probe':null;
+  const tool=content.includes('BUDGET_TEST')?'fixture_large':content.includes('EXCERPT_TEST')?'tool_result_excerpt':content.includes('DELEGATE_TEST')?'desktop_delegate':content.includes('BROWSER_TEST')?'browser_snapshot':content.includes('CLOCK')||content.includes('SHELL_CHANGE')?'bash':content.includes('WRITE')?'write':content.includes('QUESTION')?'ask_user':content.includes('PACKAGE')?'fixture_probe':null;
   if(tool&&body.messages.at(-1).role!=='tool'){
-    const args=tool==='desktop_delegate'?{task:'Inspect the open window.',successCriteria:'Report the title.',constraints:'Do not change anything.'}:tool==='browser_snapshot'?{}:tool==='bash'?{command:content.includes('CLOCK')?"date '+%A, %B %d, %Y %H:%M:%S %Z'":'date > '+join(cwd,'shell-written.txt')}:tool==='write'?{path:join(cwd,content.includes('HARNESS')?'gui-written.txt':'written.txt'),content:'verified π'}:tool==='ask_user'?{question:'Choose a colour',options:['blue','green']}:{};
+    const args=tool==='tool_result_excerpt'?{entryId:content.match(/ENTRY=([a-f0-9]+)/)?.[1],find:'ORIGINAL_MIDDLE_SENTINEL',limit:24}:tool==='desktop_delegate'?{task:'Inspect the open window.',successCriteria:'Report the title.',constraints:'Do not change anything.'}:tool==='browser_snapshot'?{}:tool==='bash'?{command:content.includes('CLOCK')?"date '+%A, %B %d, %Y %H:%M:%S %Z'":'date > '+join(cwd,'shell-written.txt')}:tool==='write'?{path:join(cwd,content.includes('HARNESS')?'gui-written.txt':'written.txt'),content:'verified π'}:tool==='ask_user'?{question:'Choose a colour',options:['blue','green']}:{};
     chunk({role:'assistant',tool_calls:[{index:0,id:'call_'+requests,type:'function',function:{name:tool,arguments:JSON.stringify(args)}}]});chunk({},'tool_calls');
   }else{if(content.includes('INSPECT'))chunk({reasoning_content:'Observed reasoning π'});chunk({role:'assistant',content:'Verified response π'});chunk({},'stop');}
   res.end('data: [DONE]\n\n');
@@ -71,6 +71,8 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
  await t.test('inspection captures the actual post-extension provider payload, reasoning and tool evidence',async t=>{
   const beforeSettings=await client.call('observation.describe');
   assert.equal(beforeSettings.capturePayloads,false);
+  assert.equal(beforeSettings.telemetry.cacheWarming,'off-by-host');
+  assert.equal((await client.call('host.describe')).toolBudget.originals,'native-current-branch');
   await create('inspection-metadata','read-only');
   await prompt('inspection-metadata','INSPECT PRIVATE_PROMPT_SENTINEL');await idle('inspection-metadata');
   const metadata=await client.call('observation.list',{sessionId:'inspection-metadata'});
@@ -101,6 +103,12 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const payload=await readPayload(request.id);
   assert.deepEqual(payload,received[receivedStart]);
   assert.equal(payload.temperature,0.37);assert.equal(payload.seed,42);
+  const raw=observations.records.find(e=>e.kind==='provider/stream'&&e.requestId===request.id);
+  assert(raw);assert.equal(raw.data.coverage,'complete');
+  const parsed=(await readPayload(raw.id)).events;
+  assert.deepEqual(parsed.map(e=>e.data),sentStreams[receivedStart]);
+  assert(parsed.every(e=>e.elapsedMs>=0));
+  assert.equal((await client.call('observation.describe')).capabilities.parsedProviderEvents,true);
   const tool=observations.records.find(e=>e.kind==='tool/start'&&e.data.name==='bash');
   assert((await readPayload(tool.id)).command.includes('date'));
   const result=observations.records.find(e=>e.kind==='tool/end'&&e.data.toolCallId===tool.data.toolCallId);
@@ -288,9 +296,34 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   assert(JSON.stringify(received.at(-1).messages).includes('FIRST_CONTEXT'));assert(!JSON.stringify(received.at(-1).messages).includes('LATER_CONTEXT'));
  });
  await t.test('an explicit Pi package loads through the supported resource loader',async()=>{const pkg=join(root,'fixture-package');mkdirSync(pkg);writeFileSync(join(pkg,'package.json'),JSON.stringify({name:'fixture-package',type:'module',pi:{extensions:['./extension.js']}}));writeFileSync(join(pkg,'extension.js'),`export default pi=>pi.registerTool({name:'fixture_probe',label:'Fixture',description:'Return a fixture value',parameters:{type:'object',properties:{}},async execute(){return {content:[{type:'text',text:'PACKAGE_LOADED'}],details:{}};}});`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[pkg],skills:[]}));await create('package','danger-full-access');await prompt('package','PACKAGE');await idle('package');assert(received.some(b=>b.messages.some(m=>m.role==='tool'&&String(m.content).includes('PACKAGE_LOADED'))));});
+ await t.test('Pi bounds effective tool context, keeps originals and serves excerpts through the real tool loop',async t=>{
+  const extension=join(root,'fixture-budget.mjs'),original='HEAD π '.repeat(5000)+'ORIGINAL_MIDDLE_SENTINEL'+' TAIL 😀'.repeat(3000);
+  writeFileSync(extension,`export default pi=>{pi.on('turn_end',e=>({entries:[...e.entries,{type:'custom',customType:'fixture-boundary',data:{kept:true}}]}));pi.registerTool({name:'fixture_large',label:'Large fixture',description:'Return large synthetic evidence',parameters:{type:'object',properties:{}},async execute(){return {content:[{type:'text',text:${JSON.stringify(original)}}],details:{}};}});}`);
+  writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}));
+  t.after(()=>writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]})));
+  await create('budget','danger-full-access');const before=requests;
+  await prompt('budget','BUDGET_TEST');await idle('budget');assert.equal(requests-before,2);
+  const effective=received.at(-1).messages.find(m=>m.role==='tool').content;
+  assert(effective.includes('tool_result_excerpt'));assert(!effective.includes('ORIGINAL_MIDDLE_SENTINEL'));assert(Array.from(effective).length<=8192);
+  const file=JSON.parse(readFileSync(join(state,'sessions/budget.meta.json'),'utf8')).file;
+  const entries=readFileSync(file,'utf8').trim().split('\n').map(line=>JSON.parse(line));
+  const result=entries.find(e=>e.type==='message'&&e.message.role==='toolResult'&&e.message.toolName==='fixture_large');
+  assert.equal(result.message.content[0].text,original);
+  assert(entries.some(e=>e.type==='context_edit'&&e.targetId===result.id));
+  assert(entries.some(e=>e.type==='custom'&&e.customType==='fixture-boundary'),'Existing boundary drafts must compose with the budget extension');
+  const observations=await client.call('observation.list',{sessionId:'budget'});assert(observations.records.some(e=>e.kind==='context/budget'));assert(observations.records.some(e=>e.kind==='context/edit'&&e.data.targetId===result.id));
+  const noInference=requests;assert.deepEqual((await client.call('session.trimTools',{sessionId:'budget'})).changes,[]);assert.equal(requests,noInference);
+  await prompt('budget','EXCERPT_TEST ENTRY='+result.id);await idle('budget');
+  assert(received.at(-1).messages.filter(m=>m.role==='tool').some(m=>String(m.content).includes('ORIGINAL_MIDDLE_SENTINEL')));
+  const saved=readFileSync(file,'utf8'),beforeRestart=requests;
+  client.close();await stop();await start();client=await Client.open(join(state,'runtime.sock'));
+  assert.deepEqual((await client.call('session.trimTools',{sessionId:'budget'})).changes,[]);
+  assert.equal(requests,beforeRestart);assert.equal(readFileSync(file,'utf8'),saved);
+ });
  await t.test('history pagination has stable non-overlapping sequences',async()=>{await create('paging');for(let i=0;i<14;i++){await prompt('paging','page '+i);await idle('paging');}const page=await client.call('session.history',{sessionId:'paging',maxMessages:3});assert(page.hasMore);const earlier=await client.call('session.history',{sessionId:'paging',maxMessages:3,beforeSeq:page.events[0].event.seq});assert(earlier.events.at(-1).event.seq<page.events[0].event.seq);assert.equal(page.events.filter(e=>e.event.type==='user/message').length,3);});
  await t.test('maintenance refuses active tasks and shuts down idle runtime without replay',async()=>{
   await create('maintenance');await prompt('maintenance','SLOW');
+  await assert.rejects(client.call('session.trimTools',{sessionId:'maintenance'}),/Stop/);
   await assert.rejects(client.call('host.shutdown'),/Stop active/);
   assert((await client.call('session.list')).items.find(s=>s.sessionId==='maintenance').running);
   await client.call('session.cancel',{sessionId:'maintenance'});await idle('maintenance');

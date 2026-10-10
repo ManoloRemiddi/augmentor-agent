@@ -10,7 +10,7 @@ import type {Host} from './host.js';
 const allowed = new Set([
   'host.describe', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.list', 'session.create', 'session.history', 'session.models', 'session.selectModel',
-  'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'chats.saved',
+  'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.payload', 'observation.clear',
   'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'interaction.respond',
 ]);

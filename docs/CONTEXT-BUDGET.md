@@ -107,3 +107,14 @@ Private original-preset/session backups and rollback records remain outside the
 repository. Rollback of this adapter requires restoring the backed-up preset
 composition as well as selecting the prior desktop artifact; changing
 `desktop.json` alone does not change explicit DSH preset module paths.
+
+
+## Pi Harness port — October 10 candidate
+
+The [Augmentor Harness candidate](AUGMENTOR-HARNESS.md) implements the deterministic budget on published Pi SDK 1.1.0. `packages/runtime/src/tool-budget.ts` uses public native context-edit drafts at `turn_end`, preserves earlier extension drafts, and repairs projected results before loading a session. It shares the existing pure Augmentor binary-evidence helpers; it does not import a DSH execution engine.
+
+Limits count Unicode code points across text blocks: 8,192 threshold, 4,096 head, 1,024 tail and an original-entry recovery notice. Images and other rich blocks are preserved. Immutable originals stay in native Pi history. Fresh browser snapshots/tab inventories receive one model step within an aggregate 64,000-code-point allowance per boundary; binary text is still withheld. This is neither a total-context cap nor a display-payload budget.
+
+Pi `tool_result_excerpt` accepts `entryId` rather than DSH `seq`, an offset, limit up to 2,048 code points and optional literal case-insensitive `find`. Its manager is scoped to the current native branch: sibling/future results are excluded. Binary originals cannot be recovered as small text excerpts. The manual `session.trimTools` method and Harness button refuse active turns, work without provider calls on cold current-format histories and refresh a loaded owner using supported `refreshContext()`. Repeated repair is idempotent; original entry bytes and past actions remain.
+
+`tests/pi-tool-budget.test.mjs` checks Unicode/image preservation, literal search offsets, binary protection, branch isolation and browser allowances. `tests/runtime.test.mjs` uses an actual Pi loop to verify bounded subsequent input, original recovery, coexistence with preceding extension drafts, and idle/cold repair without inference or replay. DSH's advisory reassessment checkpoints and bounded action-aware recovery are not part of this first port. Old-format session migration, large-history performance and live workflow acceptance remain required before cutover.

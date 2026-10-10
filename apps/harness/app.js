@@ -32,6 +32,7 @@ function renderSessions(){
   const session=current();$('title').textContent=session?.title||'Your agent, in view';
   $('subtitle').textContent=session?(session.running?'Working · ':'')+session.cwd:'Open a conversation to inspect its execution and context.';
   $('stop').disabled=!session?.running;$('send').disabled=!session||session.running||submitting;
+  $('trim-tools').disabled=!session||session.running||submitting;
 }
 function renderChat(){
   const container=$('messages'),following=container.scrollHeight-container.scrollTop-container.clientHeight<80;
@@ -80,13 +81,18 @@ let ledgerRecords=[];
 function drawLedger(scrollTop=$('ledger').scrollTop){
   const container=$('ledger'),top=scrollTop,height=43,focused=document.activeElement?.dataset.recordId;
   const start=Math.min(ledgerRecords.length,Math.max(0,Math.floor(top/height)-10)),end=Math.min(ledgerRecords.length,start+Math.ceil((container.clientHeight||500)/height)+20);
-  const spacer=size=>{const el=node('div');el.setAttribute('aria-hidden','true');el.style.height=size+'px';return el;};
-  container.replaceChildren(spacer(start*height),...ledgerRecords.slice(start,end).map((record,index)=>{
-    const row=node('div');row.setAttribute('role','listitem');row.setAttribute('aria-posinset',String(start+index+1));row.setAttribute('aria-setsize',String(ledgerRecords.length));
-    const button=node('button',undefined,'record'+(record.id===state.selected?' selected':''));button.dataset.recordId=record.id;
-    button.append(node('span',String(record.seq),'seq'),node('span',label(record),'label'),node('span',typeof record.data.durationMs==='number'?Math.round(record.data.durationMs)+' ms':'','timing'));
-    button.onclick=()=>inspect(record).catch(e=>notice(e.message,true));row.append(button);return row;
-  }),spacer((ledgerRecords.length-end)*height));container.scrollTop=top;
+  const existing=new Map([...container.children].filter(row=>row.dataset.recordId).map(row=>[row.dataset.recordId,row]));
+  const spacer=(position,size)=>{const el=container.querySelector('[data-spacer="'+position+'"]')||node('div');el.dataset.spacer=position;el.setAttribute('aria-hidden','true');el.style.height=size+'px';return el;};
+  const desired=[spacer('before',start*height),...ledgerRecords.slice(start,end).map((record,index)=>{
+    const row=existing.get(record.id)||node('div');row.dataset.recordId=record.id;row.setAttribute('role','listitem');row.setAttribute('aria-posinset',String(start+index+1));row.setAttribute('aria-setsize',String(ledgerRecords.length));
+    const button=row.firstElementChild||node('button');button.className='record'+(record.id===state.selected?' selected':'');button.dataset.recordId=record.id;
+    button.replaceChildren(node('span',String(record.seq),'seq'),node('span',label(record),'label'),node('span',typeof record.data.durationMs==='number'?Math.round(record.data.durationMs)+' ms':'','timing'));
+    button.onclick=()=>inspect(record).catch(e=>notice(e.message,true));if(!button.parentElement)row.append(button);return row;
+  }),spacer('after',(ledgerRecords.length-end)*height)];
+  // Keep visible buttons attached when scrolling makes an overscan row clickable.
+  // Replacing the whole list can detach the target between pointer-down and click.
+  const retained=new Set(desired);for(const child of [...container.children])if(!retained.has(child))child.remove();
+  desired.forEach((child,index)=>{if(container.children[index]!==child)container.insertBefore(child,container.children[index]||null);});container.scrollTop=top;
   if(focused)[...container.querySelectorAll('button')].find(b=>b.dataset.recordId===focused)?.focus({preventScroll:true});
 }
 function renderLedger(){
@@ -122,7 +128,7 @@ async function inspect(record){
   if(!record.payload)return;
   const payload=await readPayload(sid,record.id);if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
   if(!payload.available){container.append(node('p',payload.reason,'empty'));return;}
-  const redacted=record.payload.redactions?.length>0;
+  const redacted=record.payload.redactions?.length>0||record.data.credentialRedactions?.length>0;
   container.append(detail(redacted?'Structured payload with credential redactions':'Original structured payload',payload.value,true),copyButton(payload.raw));renderImages(container,payload.value);
 }
 async function inspectContext(){
@@ -130,6 +136,15 @@ async function inspectContext(){
   const epoch=++inspectionEpoch,sid=state.sessionId,container=$('context-content');
   $('context-stats').textContent=record.data.provider+' · '+record.data.model+' · capacity '+Number(record.data.capacity).toLocaleString();
   container.replaceChildren(node('h2','Effective provider input'),node('p','Captured after Pi extension transformations. Authorization headers are excluded.'));
+  const completion=rows().find(r=>r.kind==='model/complete'&&r.requestId===record.id),usage=completion?.data.usage;
+  if(usage&&[usage.input,usage.output,usage.cacheRead,usage.cacheWrite].some(value=>Number(value)>0)){
+    const input=Number(usage.input||0)+Number(usage.cacheRead||0)+Number(usage.cacheWrite||0),capacity=Number(record.data.capacity);
+    container.append(node('p','SDK reported input '+input.toLocaleString()+' · output '+Number(usage.output||0).toLocaleString()+' · cache read '+Number(usage.cacheRead||0).toLocaleString()));
+    if(capacity>0){const meter=node('meter');meter.min=0;meter.max=capacity;meter.value=Math.min(input,capacity);meter.setAttribute('aria-label','SDK reported input relative to declared model capacity');container.append(meter);}
+    container.append(node('small','SDK-normalized usage; zero fields may be unavailable. The model capacity is its declared configuration.'));
+  }else container.append(node('p','Usage has not been reported for this request.','empty'));
+  container.append(node('p','API '+record.data.api+' · thinking '+record.data.thinkingLevel));
+  if(record.data.policies)container.append(detail('Managed policy',record.data.policies));
   const payload=await readPayload(sid,id);if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
   if(!payload.available){container.append(node('p',payload.reason+' Enable Save context history before future requests to retain them.','empty'));return;}
   const body=payload.value;
@@ -209,6 +224,7 @@ $('capture').onchange=async()=>{try{const current=await rpc('observation.describ
 $('new-chat').onclick=async()=>{try{const selection=JSON.parse($('model').value||'null');if(!selection)throw Error('Choose a model first.');if(!$('workspace').value.trim())throw Error('Choose a working folder.');const sid=crypto.randomUUID();await rpc('session.create',{sessionId:sid,selection,cwd:$('workspace').value});await refreshSessions();await selectSession(sid);}catch(e){notice(e.message,true);}};
 $('model').onchange=async()=>{const sid=state.sessionId,epoch=state.epoch;try{if(sid)await rpc('session.selectModel',{sessionId:sid,...JSON.parse($('model').value)});}catch(e){notice(e.message,true);try{const selection=await rpc('session.models',{sessionId:sid});if(epoch===state.epoch)$('model').value=JSON.stringify(selection.current);}catch{}}};
 $('stop').onclick=async()=>{try{await rpc('session.cancel',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
+$('trim-tools').onclick=async()=>{const sid=state.sessionId,epoch=state.epoch;try{const result=await rpc('session.trimTools',{sessionId:sid});if(epoch!==state.epoch)return;notice(result.changes.length+' tool results shortened. Originals remain saved.');const page=await rpc('observation.list',{sessionId:sid});if(epoch===state.epoch){page.records.forEach(r=>state.observations.set(r.id,r));renderObservations();}}catch(e){notice(e.message,true);}};
 $('composer').onsubmit=async event=>{event.preventDefault();const input=$('input').value,sid=state.sessionId,epoch=state.epoch;if(!input.trim()||!sid||submitting||current()?.running)return;submitting=true;renderSessions();try{await rpc('session.prompt',{sessionId:sid,content:[{type:'text',text:input}]});if(epoch===state.epoch&&$('input').value===input)$('input').value='';await refreshSessions();notice('Request accepted.');}catch(e){notice(e.message,true);}finally{submitting=false;renderSessions();}};
 $('input').onkeydown=event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();$('composer').requestSubmit();}};
 let drag=null;

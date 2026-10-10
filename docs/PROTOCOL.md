@@ -41,7 +41,7 @@ Message branching uses Pi SessionManager on a separately opened source. The chil
 
 ## Harness observation and local web client — October 10 candidate
 
-The optional `harness.open` IPC method returns an authenticated loopback URL from the **same** Pi owner. Optional `sessionId` selects an existing conversation without inference. It is an operator capability; scoped Browser/embedded bridges do not expose it. `host.describe` adds the candidate's `piVersion` and working folder. The [Harness guide](AUGMENTOR-HARNESS.md) defines its HTTP allowlist, Host/Origin/bearer checks, live-ring bounds and unqualified lifecycle/platform areas.
+The optional `harness.open` IPC method returns an authenticated loopback URL from the **same** Pi owner. Optional `sessionId` selects an existing conversation without inference. It is an operator capability; scoped Browser/embedded bridges do not expose it. `host.describe` adds the candidate's `piVersion`, working folder and managed `toolBudget` policy with code-point units and native-current-branch originals. The [Harness guide](AUGMENTOR-HARNESS.md) defines its HTTP allowlist, Host/Origin/bearer checks, live-ring bounds and unqualified lifecycle/platform areas.
 
 | Methods | Contract |
 | --- | --- |
@@ -50,7 +50,10 @@ The optional `harness.open` IPC method returns an authenticated loopback URL fro
 | `observation.list` | Existing `sessionId`, exclusive `beforeSeq` or `afterSeq`, `limit` 1–500; stable records, `hasMore`, earliest/latest sequence and capture mode |
 | `observation.payload` | `sessionId`, `eventId`, optional byte `offset` and target `limit` up to 65,536; complete UTF-8 text, `nextOffset`, `hasMore` and `units: utf8-bytes`, or explicit unavailable coverage |
 | `observation.clear` | Diagnostic records/payloads for that session only; native history and sequence reservations remain |
+| `session.trimTools` | Existing `sessionId`, idle-only deterministic projected text/binary repair; returns `changes`, `units: unicode-code-points` and `policy`; preserves original native entries, does not load a cold SDK owner or infer/replay work |
 
 Live observations use `method: observation/event` with `payload.sessionId` and `payload.observation`. These UUIDs/sequence positions belong to the diagnostic journal and cannot acknowledge or resume an action. SDK reasoning deltas now retain their exposed text in the private display projection. Full tool arguments are not additionally copied into display events; structured originals belong to native Pi history and opt-in inspection payloads.
 
 The web client subscribes with both conversation and client identity, receives a current live cursor plus pending interactions, and polls `/api/events`. A lost live range sets `gap`; it must reconcile durable read models without automatically resubmitting a prompt/tool. Responses cap at 1 MiB and the private ring caps at 4,096 frames / 16 MiB. The operator token grants access to that entire local Pi profile, not merely a web origin's scoped app session.
+
+`provider/stream` observations contain parsed provider events after preceding raw-event hooks and before SDK normalization, grouped per completed assistant message. Capture is opt-in with an 8 MiB request buffer and explicit observed/captured/dropped counts and coverage. Unsupported request hooks omit correlation/timing instead of inheriting a prior request. These are structured events, not exact HTTP bytes. `context/edit` records native committed target/edit IDs; `context/budget` records deterministic repair decisions. `model/request` includes declared capacity, API, thinking level and managed permission/tool-budget policy; `model/complete` qualifies SDK-normalized usage and coverage. Managed cache warming is explicitly off and disclosed by `observation.describe`.
