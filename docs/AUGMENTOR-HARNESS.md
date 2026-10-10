@@ -548,6 +548,8 @@ Prior published **`30ab1e0838106779785af91768bbd5614e69e761`** has **21 hosted s
 
 ## Managed MCP and preserved tool originals
 
+Tested implementation source: **`fcdbf3ae66aa522a3c09b12e1b1ba8c6b2b2e848`**; qualification recorded **10 October 2026, 22:37 UTC**. The subsequent qualification commit changes documentation only.
+
 The Native Pi owner explicitly binds the pinned Pi 1.1.0 built-in MCP, tool-search and codemode extension factories through `DefaultResourceLoader`. Each conversation retains its existing `AgentSession`; SDK transports, discovery, nested execution and usage remain owned by that session. Browser-only conversations do not load MCP configuration or grant desktop/server authority. No dependency, copied upstream/private source or selected release changes accompany this source checkpoint. **Bundled codemode is not release-qualified:** the current production stage deliberately excludes its QuickJS native engine and static dependency closure. The temporary engine probe below must not be treated as a distributable artifact.
 
 Configuration lives in the managed profile's `agent/mcp.json` (under `AUGMENTOR_PI_CONFIG`). Only this explicit file and approved extension registrations are admitted; project `.pi/mcp.json` and another Pi installation's default files are excluded. Example structure:
