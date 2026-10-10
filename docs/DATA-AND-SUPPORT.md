@@ -16,6 +16,8 @@ harness may preserve returned images in its conversation history. Clipboard copy
 writes the selected message to the system clipboard. Other applications can read
 that clipboard under the desktop's normal rules.
 
+The [October 10 Harness candidate](AUGMENTOR-HARNESS.md#sdk-input-compatibility-and-original-submissions) preserves original submissions when approved Pi input handlers, skills or templates change the model input. Its private display history keeps the original user text alongside the actual prepared SDK content; native Pi history keeps the prepared conversation. Chat/copy/edit and Pi automatic conversational memory use the original submission. Context shows the expanded provider input. A correction handled entirely by an input extension is retained as a status notice without a fabricated model message or memory item. Pending queue inputs persist privately; terminal receipts discard their queue text while normal display/native history remains. Preparation interruption is an unknown outcome and is not automatically replayed. These are ordinary history/queue records, not optional diagnostic captures. Input extensions are trusted configured code and may have their own effects or data practices; this source qualification uses isolated synthetic extensions.
+
 The [managed Mac setup](MACOS-MANAGED-SETUP.md) source feature stores its key in
 mode-0600 `runtime.json` under a private managed-DSH directory. Setup uses stdin
 and the runtime uses its owned service's environment; the key is absent from
