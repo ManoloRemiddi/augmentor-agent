@@ -6,6 +6,7 @@ import {createQueue} from './queue-view.js';
 import {attachHarnessPrompts} from './prompt-library.js';
 import {attachReasoning} from './reasoning.js';
 import {attachPiImprovement} from './prompt-improvement.js';
+import {attachNativeHistory} from './native-history.mjs';
 const $=id=>document.getElementById(id);
 const hash=new URLSearchParams(location.hash.slice(1));
 const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
@@ -38,7 +39,7 @@ addEventListener('keydown',event=>{if(event.key==='Escape')closeSidebar();});
 function node(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
 function notice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error);}
 async function rpc(method,params={}){
-  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.models','session.queue','observation.describe','observation.list','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
+  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead','session.models','session.queue','observation.describe','observation.list','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
   const response=await fetch('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});
   const body=await response.json();if(!response.ok||body.error)throw Error(body.error?.message||'The local connection failed');return body.result;
 }
@@ -178,7 +179,7 @@ async function inspect(record){
 async function inspectContext(){
   const epoch=++inspectionEpoch,sid=state.sessionId,container=$('context-content');
   const id=$('requests').value,record=state.observations.get(id);
-  if(!record){$('context-stats').textContent='';container.replaceChildren(node('p','No request is loaded for this conversation.','empty'));return;}
+  if(!record){$('context-stats').textContent='';container.replaceChildren(node('p','No request is loaded for this conversation.','empty'));if(sid)attachNativeHistory(container,{rpc,sessionId:sid,alive:()=>epoch===inspectionEpoch&&sid===state.sessionId});return;}
   $('context-stats').textContent=record.data.provider+' · '+record.data.model+' · capacity '+Number(record.data.capacity).toLocaleString();
   container.replaceChildren(node('h2','Effective provider input'),node('p','Captured after Pi extension transformations. Authorization headers are excluded.'));
   const completion=rows().find(r=>r.kind==='model/complete'&&r.requestId===record.id),usage=completion?.data.usage;
@@ -202,9 +203,10 @@ async function inspectContext(){
   catch(error){if(epoch===inspectionEpoch&&sid===state.sessionId)throw error;return;}
   if(epoch!==inspectionEpoch||sid!==state.sessionId)return;
   if(lineage?.available){
-    const names={input:'Input after SDK input handlers',memory:'Managed memory return',preparation:'Run prompt and options after before-agent handlers',resources:'Loaded resources · consumption not established',beforeTransform:'Messages before SDK context transforms',afterTransform:'Messages after SDK context transforms',sdkContext:'Converted SDK context before provider conversion',beforeProviderHooks:'Provider body before payload hooks',afterProviderHooks:'Provider body after payload hooks'};
+    const names={input:'Input after SDK input handlers',memory:'Managed memory return',preparation:'Run prompt and options after before-agent handlers',resources:'Loaded resources · consumption not established',beforeTransform:'Messages before SDK context transforms',nativeLineage:'Native entry lineage before context transforms',afterTransform:'Messages after SDK context transforms',sdkContext:'Converted SDK context before provider conversion',beforeProviderHooks:'Provider body before payload hooks',afterProviderHooks:'Provider body after payload hooks'};
     for(const [key,value] of Object.entries(lineage.value.snapshots||{}))container.append(detail(names[key]||key,value));
   }else if(lineage)container.append(node('p','Composition snapshots: '+lineage.reason,'empty'));
+  attachNativeHistory(container,{rpc,sessionId:sid,alive:()=>epoch===inspectionEpoch&&sid===state.sessionId,native:provenance?.data.native,lineage:lineage?.value?.snapshots?.nativeLineage});
   container.append(node('h3','Provider request'));
   if(!payload.available){container.append(node('p',payload.reason+(state.readOnly?' Future requests can be saved from the main Harness.':' Enable Save context history before future requests to retain them.'),'empty'));return;}
   const body=payload.value;

@@ -12,6 +12,8 @@ October 10 implementation checkpoint: [Adaptive Reasoning and effective thinking
 
 October 10 follow-up: [Native/Browser reasoning controls](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls) now qualify standalone Settings/Models entry points against the same Pi owner and shared form. No inference or automatic model selection occurs from settings. Live/virtual routing, embedded/SDK controls and the full parity/cutover requirements remain open.
 
+October 10 native inspection follow-up: [indexed native entries and canonical message lineage](AUGMENTOR-HARNESS.md#indexed-native-entries-and-canonical-message-lineage) now provide scoped original-entry pages/excerpts, same-stamp source-block verification and public SDK exact/ambiguous/unmatched projection evidence. This includes reading saved originals after diagnostic clearing. Full causal provenance, payload search, representative performance and all remaining P0/P1/platform/installed cutover gates stay binding.
+
 ## Decisions and boundaries
 
 | Decision | Direction |

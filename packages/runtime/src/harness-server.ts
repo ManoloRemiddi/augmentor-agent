@@ -9,7 +9,7 @@ import type {Host} from './host.js';
 
 const allowed = new Set([
   'host.describe', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
-  'session.list', 'session.create', 'session.history', 'session.models', 'session.selectModel',
+  'session.list', 'session.create', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
@@ -19,7 +19,7 @@ const allowed = new Set([
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
 type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
-const inspectionReads=new Set(['host.describe','models.list','session.list','session.history','session.models','session.queue','observation.describe','observation.list','observation.payload']);
+const inspectionReads=new Set(['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead','session.models','session.queue','observation.describe','observation.list','observation.payload']);
 interface LiveFrame {seq: number; sessionId: string; frame: Data}
 const LIVE_BYTES = 16 * 1024 * 1024;
 
@@ -172,6 +172,7 @@ export class HarnessServer {
       const staticFiles = new Map([
         ['/', {path: join(this.assets, 'index.html'), type: 'text/html'}],
         ['/app.js', {path: join(this.assets, 'app.js'), type: 'text/javascript'}],
+        ['/native-history.mjs', {path: join(this.assets, 'native-history.mjs'), type: 'text/javascript'}],
         ['/chat-projection.js', {path: join(this.assets, 'chat-projection.js'), type: 'text/javascript'}],
         ['/message-actions.js', {path: join(this.assets, 'message-actions.js'), type: 'text/javascript'}],
         ['/prompt-library.js', {path: join(this.assets, 'prompt-library.js'), type: 'text/javascript'}],

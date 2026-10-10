@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {createHash} from 'node:crypto';
-import type {AgentSession,ExtensionFactory} from '@earendil-works/pi-coding-agent';
+import {sessionEntryToContextMessages,type AgentSession,type ExtensionFactory} from '@earendil-works/pi-coding-agent';
 import {getSystemMessageText,type SystemMessage} from '@earendil-works/pi-ai';
 import {payloadText} from '../../observation/src/store.js';
 import type {MemoryContribution} from '../../memory/src/pi.js';
@@ -36,11 +36,27 @@ export class ContextProvenance {
     const {context,...status}=contribution;this.memoryStatus=status;
     this.save(this.run,'memory',{...status,context});
   }
-  beginRequest(messages:unknown){this.request.clear();this.requestBytes=0;this.save(this.request,'beforeTransform',messages);}
+  beginRequest(messages:unknown){this.request.clear();this.requestBytes=0;this.save(this.request,'beforeTransform',messages);this.nativeLineage();}
   transformed(messages:unknown){this.save(this.request,'afterTransform',messages);}
   streaming(context:unknown){this.save(this.request,'sdkContext',context);}
   beforePayload(payload:unknown){this.save(this.request,'beforeProviderHooks',payload);}
   endRequest(){this.request.clear();this.requestBytes=0;}
+  private nativeLineage(){
+    if(!this.capture()){this.save(this.request,'nativeLineage',undefined);return;}
+    const before=this.request.get('beforeTransform');if(before?.state!=='retained'||!Array.isArray(before.value)||!this.session)return;
+    try{
+      const manager=this.session.sessionManager,projection=manager.buildSessionProjection();
+      const matches=new Map<string,{entryId:string;entryType:string;messageIndex:number}[]>();
+      const entries=projection.entries.map(({sourceEntry,messages})=>{
+        messages.forEach((message,index)=>{const key=digest(payloadText(message).text),list=matches.get(key)??[];list.push({entryId:sourceEntry.id,entryType:sourceEntry.type,messageIndex:index});matches.set(key,list);});
+        return {entryId:sourceEntry.id,parentId:sourceEntry.parentId,type:sourceEntry.type,entryHash:digest(JSON.stringify(sourceEntry)),projectedMessageCount:messages.length,
+          comparison:payloadText(messages).text===payloadText(sessionEntryToContextMessages(sourceEntry)).text?'equal-to-entry-projection':'changed-by-canonical-context-projection'};
+      });
+      this.save(this.request,'nativeLineage',{boundary:'public SDK session projection matched to before-transform redacted JSON; no opaque handler attribution',
+        nativeSessionId:manager.getSessionId(),leafId:manager.getLeafId(),entries,
+        messages:before.value.map((message:any,index:number)=>{const candidates=matches.get(digest(JSON.stringify(message)))??[];return {snapshotIndex:index,role:message.role,state:candidates.length===1?'exact-entry-projection-match':candidates.length?'ambiguous-identical-projections':'not-matched',candidates};})});
+    }catch{this.save(this.request,'nativeLineage',()=>{});}
+  }
   private save(destination:Map<string,Frame>,key:string,value:unknown){
     const old=destination.get(key);const oldBytes=old?.state==='retained'?old.bytes??0:0;
     if(destination===this.run)this.runBytes-=oldBytes;else this.requestBytes-=oldBytes;
@@ -79,7 +95,7 @@ export class ContextProvenance {
     this.save(this.request,'afterProviderHooks',payload);
     if(!this.capture())this.dropBodies();
     const frames=new Map([...this.run,...this.request]);
-    const names=['input','memory','preparation','resources','beforeTransform','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks'];
+    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks'];
     const snapshots=Object.fromEntries(names.map(key=>[key,summary(frames.get(key)??missing())]));
     const before=frames.get('beforeTransform'),after=frames.get('afterTransform');
     const difference=messageDifference(before,after);
@@ -89,7 +105,7 @@ export class ContextProvenance {
     const data={version:PROVENANCE_VERSION,coverage:'public-boundaries-and-managed-memory; incomplete source attribution',maxCaptureBytes:PROVENANCE_LIMIT,snapshots,native,
       memory:{...(this.memoryStatus??{status:'not-observed'}),sdkSystemPresence:memoryPresence(memory,sdk,true),providerStringPresence:memoryPresence(memory,effective,false)},
       difference,providerHooks:{comparison:frames.get('beforeProviderHooks')?.state==='retained'&&effective?.state==='retained'?(frames.get('beforeProviderHooks')!.sha256===effective.sha256?'equal-redacted-json':'changed-redacted-json'):'not-observed'},
-      limitations:['Loaded resources do not establish consumption.','Opaque transforms are captured in aggregate; individual handler attribution is not established.','Native leaf is a reference, not per-message lineage.','Transport retries, headers and server-side context changes are not observed.']};
+      limitations:['Loaded resources do not establish consumption.','Opaque transforms are captured in aggregate; individual handler attribution is not established.','Native lineage matches canonical projections at the before-transform boundary; identical candidates remain ambiguous.','Transport retries, headers and server-side context changes are not observed.']};
     const bodies=Object.fromEntries([...frames].filter(([,frame])=>frame.state==='retained').map(([name,frame])=>[name,frame.value]));
     const result={data,payload:{version:PROVENANCE_VERSION,snapshots:bodies}};
     this.endRequest();

@@ -25,7 +25,7 @@ test('conversation inspection isolates authority, expires links and cannot keep 
  assert.deepEqual((await (await rpc('session.list')).json()).result.items,[{sessionId:'a'}]);
  assert.deepEqual((await (await rpc('host.describe')).json()).result,{protocol:'fixture',version:'1',piVersion:'1.1.0',workspace:'/fixture/a',capabilities:{inspection:true}});
  const catalog=(await (await rpc('models.list')).json()).result;assert.deepEqual(catalog.groups[0].models,[selection]);assert.deepEqual(catalog.default,selection);assert.deepEqual(catalog.pinned,[]);assert.deepEqual(catalog.failures,[]);
- for(const method of ['session.history','session.models','session.queue','observation.list','observation.payload']){
+ for(const method of ['session.history','session.nativeHistory','session.nativeRead','session.models','session.queue','observation.list','observation.payload']){
   assert.equal((await rpc(method,{sessionId:'a'})).status,200);const count=calls.length;
   assert.equal((await rpc(method,{sessionId:'b'})).status,400);assert.equal((await rpc(method)).status,400);assert.equal(calls.length,count,'foreign read never reaches Host');
  }

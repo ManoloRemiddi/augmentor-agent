@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
+import {createHash} from 'node:crypto';
 import {once} from 'node:events';
 import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
@@ -47,6 +48,21 @@ test('memory observation failures do not change composition and branch recall is
  assert.equal((await handlers.get('before_agent_start')({prompt:'question',systemPrompt:'Base'})).systemPrompt,'Base\n\n'+memoryText);
  const records=[];piMemoryContext(memory,false,row=>records.push(row))({on:(name,fn)=>handlers.set(name,fn)});
  assert.equal(await handlers.get('before_agent_start')({prompt:'branch',systemPrompt:'Base'}),undefined);assert.equal(recalls,1);assert.equal(records[0].status,'skipped-for-branch');assert.equal(records[0].context,'');
+});
+test('native lineage retains edited/omitted source IDs and compaction provenance through the public projection',t=>{
+ const f=setup(t),manager=SessionManager.inMemory(),user=manager.appendMessage({role:'user',content:'ORIGINAL_OMITTED_USER',timestamp:1}),tool=manager.appendMessage({role:'toolResult',toolCallId:'authored-call',toolName:'authored',content:[{type:'text',text:'ORIGINAL_LARGE_RESULT'}],isError:false,timestamp:2});
+ manager.appendContextEdit(user,null);manager.appendContextEdit(tool,{content:[{type:'text',text:'SHORT_EFFECTIVE_RESULT'}]});
+ f.provenance.attach({sessionManager:manager,sessionId:manager.getSessionId()});f.provenance.beginRequest(manager.buildSessionProjection().messages);
+ const first=f.provenance.finish({}).payload.snapshots.nativeLineage;
+ assert.equal(first.entries.find(row=>row.entryId===user).projectedMessageCount,0);assert.equal(first.entries.find(row=>row.entryId===tool).entryHash,createHash('sha256').update(JSON.stringify(manager.getEntry(tool))).digest('hex'));assert.equal(first.entries.find(row=>row.entryId===tool).comparison,'changed-by-canonical-context-projection');
+ assert(first.messages.some(row=>row.state==='exact-entry-projection-match'&&row.candidates[0].entryId===tool));assert.equal(manager.getEntry(tool).message.content[0].text,'ORIGINAL_LARGE_RESULT');
+ const compact=manager.appendCompaction('AUTHORED_COMPACTION_SUMMARY',tool,2000);f.provenance.beginRequest(manager.buildSessionProjection().messages);
+ const second=f.provenance.finish({}).payload.snapshots.nativeLineage;assert(second.messages.some(row=>row.candidates.some(source=>source.entryId===compact&&source.entryType==='compaction')));assert(!second.entries.some(row=>row.entryId===user));
+});
+test('identical native projections retain all candidates instead of inventing a unique source',t=>{
+ const f=setup(t),manager=SessionManager.inMemory(),message={role:'user',content:'IDENTICAL_AUTHORED_INPUT',timestamp:1};const a=manager.appendMessage(message),b=manager.appendMessage(message);
+ f.provenance.attach({sessionManager:manager,sessionId:manager.getSessionId()});f.provenance.beginRequest(manager.buildSessionProjection().messages);
+ const lineage=f.provenance.finish({}).payload.snapshots.nativeLineage;assert.equal(lineage.messages.length,2);for(const row of lineage.messages){assert.equal(row.state,'ambiguous-identical-projections');assert.deepEqual(row.candidates.map(source=>source.entryId),[a,b]);}
 });
 test('observer preserves original hooks and an unsupported adapter cannot reuse a prior boundary record',async t=>{
  const f=setup(t);let listener;const oldTransform=async messages=>messages.slice(1),oldStream=async()=> 'unchanged-stream';
@@ -94,6 +110,7 @@ test('real Pi SDK records template expansion, managed memory, aggregate omission
  const records=f.store.page('fixture').records,request=records.find(row=>row.kind==='model/request'),lineage=records.find(row=>row.kind==='context/provenance'),snapshots=body(f.store,lineage).snapshots;
  assert.deepEqual(body(f.store,request),received[0]);assert.deepEqual(snapshots.afterProviderHooks,received[0]);assert.equal(snapshots.beforeProviderHooks.fixtureMutation,undefined);
  assert.equal(snapshots.input.text,'/compose INPUT_TEXT');assert.equal(snapshots.preparation.prompt,'TEMPLATE_EXPANDED INPUT_TEXT');assert.equal(recalled[0].query,'TEMPLATE_EXPANDED INPUT_TEXT');
+ assert(snapshots.nativeLineage.messages.some(row=>row.role==='user'&&row.state==='exact-entry-projection-match'&&row.candidates.some(source=>manager.getEntry(source.entryId).type==='message')));
  assert.equal(snapshots.memory.context,memoryText);assert.equal(lineage.data.memory.sdkSystemPresence,'exact-text-present');assert.equal(lineage.data.memory.providerStringPresence,'exact-text-present-in-a-string-field');
  assert(snapshots.resources.skills.some(row=>row.name==='unused'));assert.equal(snapshots.resources.boundary,'loaded-resource-catalog; consumption not established');assert(!JSON.stringify(received[0]).includes('UNUSED_SKILL_BODY'));
  assert(lineage.data.difference.removedCount>0);assert.equal(lineage.requestId,request.id);assert.equal(lineage.data.native.sessionId,manager.getSessionId());assert.equal(manager.getEntry(lineage.data.native.leafId).type,'message');
