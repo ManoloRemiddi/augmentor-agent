@@ -33,6 +33,8 @@ The [loaded Pi Chromium follow-up](AUGMENTOR-HARNESS.md#loaded-pi-chromium-exten
 
 Trusted development/companion configuration may set `AUGMENTOR_PI_BROWSER_WORKSPACE` to an explicit Pi Browser working directory. The default remains `~/Augmentor Browser Pi`. This permits isolated profiles without changing the account home; it does not grant new tools or change surface authorization. The candidate's source and staged-tree tests are Linux evidence; a staged tree is not a complete installed package. Mac/Windows Browser, other Chromium distributions, live providers and installed acceptance remain separate qualification.
 
+The [Branch/Edit follow-up](AUGMENTOR-HARNESS.md#harness-branchedit-controls-and-steering-history) scopes Pi inherited delivery IDs to their originating conversation in queue and optimistic prompt reconciliation. Historical parent messages still render. Existing Branch/Edit buttons now reflect connected/idle/submitting and negotiated capability guards; queue Send remains available during supported active turns. This corrects an apparent-enabled action that previously returned without branching/editing. The loaded Codex/Pi fixtures wait for the actual action state instead of using Send as an idle signal. Layout and control placement are unchanged. Exact failed-run, source/staged checks and remaining platform acceptance are in the owning qualification record.
+
 The preview has actual Chromium 152 evidence. Google Chrome, Brave, other operating
 systems, and Snap/Flatpak browser isolation remain uncertified until their own
 installation and native-messaging tests pass. Do not advertise those combinations

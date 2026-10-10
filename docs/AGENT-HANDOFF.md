@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 10 Harness Branch/Edit checkpoint
+
+Current implementation source is `508958ad65fbe1b783ceb6600c4a06fd585b263e` on `feat/augmentor-harness`, in [draft PR #45](https://github.com/ManoloRemiddi/augmentor-agent/pull/45). [Harness Branch/Edit qualification](AUGMENTOR-HARNESS.md#harness-branchedit-controls-and-steering-history) records actual local web controls, exact native tool prefixes, steered-input display cutoff, unchanged parents, draft/epoch guards and no inference from preparation/reload. Origin-scoped inherited receipts protect child queue/pending input across Harness/Native/Browser. Existing Browser Branch/Edit buttons now reflect their actual run guard while queue Send remains available. Full source checks: 612 Node cases/610 passes/2 platform skips; 863 Python/Qt cases/826 passes/37 platform skips; 113 Browser passes; 53 staged cases. Actual source/staged Linux Chromium and the 640×900 screenshot pass with synthetic providers, not live Hindsight/provider or physical installed acceptance.
+
+Earlier published head `01535c78ae6065f8ea6e9ce84c98ad97e96743a2` finished with 14 hosted successes, one Debian failure and two downstream skips. The owning record links that job and diagnoses the queue-Send/Branch/Edit readiness race, preserves the initial failed local correction and records the final renderer/test fix. Fresh matching-head hosted gates remain required for this new source. Native end-to-end branching, live memory cutoff, old history, prompt/command controls and every remaining accepted P0/P1 service/adaptive/provenance/platform/installed gate stay open. DSH and owner installations/settings remain intact. Earlier dated checkpoints below are historical evidence; the owning delivery matrix remains the full migration scope.
 
 ## October 10 Augmentor Harness candidate
 
