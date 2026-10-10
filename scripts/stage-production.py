@@ -49,16 +49,23 @@ def main():
     subprocess.run(['node', str(ROOT / 'scripts/prepare-ws.mjs'), str(target)], check=True)
     sdk = target / 'node_modules/@earendil-works/pi-coding-agent'
     metadata = json.loads((sdk / 'package.json').read_text(encoding="utf-8"))
-    if metadata.get('optionalDependencies', {}).get('@mariozechner/clipboard') != '0.3.9':
-        raise SystemExit('Pi optional clipboard dependency changed; review the distribution exclusion.')
+    if metadata['version'] == '0.85.1':
+        if metadata.get('optionalDependencies', {}).get('@mariozechner/clipboard') != '0.3.9':
+            raise SystemExit('Pi optional clipboard dependency changed; review the distribution exclusion.')
+    elif metadata['version'] == '1.1.0':
+        if metadata.get('optionalDependencies', {}):
+            raise SystemExit('Pi optional dependencies changed; review the distribution exclusion.')
+    else:
+        raise SystemExit('Unreviewed Pi distribution version.')
     # Pi's public loader handles absence. Augmentor uses its own Qt/browser
     # clipboard bindings; do not ship unused native terminal clipboard binaries.
     excluded = [{'name': 'ws', 'version': '8.21.0',
                  'path': 'node_modules/@earendil-works/pi-coding-agent/node_modules/ws',
                  'reason': 'CVE-2026-62389; Pi resolves the locked root ws 8.21.3 instead'},
-                {'name': '@earendil-works/pi-coding-agent', 'version': '0.85.1',
-                 'path': 'dist/bundle',
-                 'reason': 'unused standalone CLI/RPC bundles embed ws 8.21.0; Augmentor uses the unbundled SDK'}]
+                ] if metadata['version'] == '0.85.1' else []
+    excluded.append({'name': metadata['name'], 'version': metadata['version'],
+                     'path': 'dist/bundle',
+                     'reason': 'unused standalone CLI/RPC bundles; Augmentor uses the locked unbundled SDK'})
     # msgpackr's optional string accelerator is not required: its public Node
     # loader catches absence and retains the JavaScript implementation. Ship
     # that portable path instead of ABI-specific prebuilt native addons.
@@ -89,8 +96,37 @@ def main():
         excluded.append({'name': metadata['name'], 'version': metadata['version'], 'path': 'examples',
                          'reason': 'sample applications are not part of Augmentor; separate licenses'})
         shutil.rmtree(examples)
+    # The supported SDK imports codemode's JavaScript definitions, but this
+    # product does not register its execution extension. Keep its unreviewed
+    # static native closure out of releases until the paired source/notices
+    # qualify. Runtime contracts exercise the staged tree without these assets.
+    quickjs = target / 'node_modules/quickjs-wasi'
+    if metadata['version'] == '1.1.0':
+        quickjs_meta = json.loads((quickjs / 'package.json').read_text())
+        if quickjs_meta['version'] != '3.6.2':
+            raise SystemExit('QuickJS dependency changed; review its unbound native assets.')
+        assets = [quickjs / 'quickjs.wasm', *sorted((quickjs / 'extensions').glob('*/*.so'))]
+        for asset in assets:
+            if asset.read_bytes()[:4] != b'\x00asm':
+                raise SystemExit('Unexpected QuickJS native asset: ' + str(asset))
+            excluded.append({'name': quickjs_meta['name'], 'version': quickjs_meta['version'],
+                'path': asset.relative_to(target).as_posix(), 'sha256': hashlib.sha256(asset.read_bytes()).hexdigest(),
+                'reason': 'codemode execution is not registered; static native dependencies remain unqualified'})
+            asset.unlink()
     for modules in (target / 'node_modules', sdk / 'node_modules'):
         tui = modules / '@earendil-works/pi-tui'
+        if tui.exists() and metadata['version'] == '1.1.0':
+            if json.loads((tui / 'package.json').read_text())['version'] != '1.1.0':
+                raise SystemExit('Pi terminal helper version changed; review its SDK fallback.')
+            native = tui / 'native'
+            if native.exists():
+                excluded.append({'name': '@earendil-works/pi-tui', 'version': '1.1.0',
+                    'path': native.relative_to(target).as_posix(),
+                    'files': {path.relative_to(native).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
+                              for path in sorted(native.rglob('*.node'))},
+                    'reason': 'unused native terminal keyboard/clipboard helpers; supported loader catches absence; Augmentor owns Qt/browser input'})
+                shutil.rmtree(native)
+            continue
         for platform in ('darwin', 'win32'):
             if platform == node_target['os']:
                 continue
@@ -136,7 +172,10 @@ def main():
     for name, expected in record['files'].items():
         if hashlib.sha256((vendor / name).read_bytes()).hexdigest() != expected:
             raise SystemExit('Photon artifact differs from its build record: ' + name)
-    photon = sdk / 'node_modules/@silvia-odwyer/photon-node'
+    photon = Path(subprocess.check_output(['node', '--input-type=module', '-e',
+        'import {createRequire} from "node:module"; import {dirname} from "node:path"; '
+        'console.log(dirname(createRequire(process.argv[1]).resolve("@silvia-odwyer/photon-node/package.json")))',
+        str(sdk / 'package.json')], text=True).strip())
     if json.loads((photon / 'package.json').read_text(encoding="utf-8"))['version'] != record['npmVersion']:
         raise SystemExit('Pi Photon version changed; review compatibility before packaging.')
     shutil.rmtree(photon); shutil.copytree(vendor, photon)

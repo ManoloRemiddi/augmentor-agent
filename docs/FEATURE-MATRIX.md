@@ -34,6 +34,9 @@ Earlier Mac setup update (26 September): source added a separate
 External DSH setup below remains available. Basic setup, chat and restart passed
 an isolated real Mac/DSH fixture; the public signed app, additional plugins and
 complete feature parity are not yet qualified.
+
+The [October 10 Harness implementation matrix](AUGMENTOR-HARNESS.md#delivery-gates) records incremental Pi coverage and remaining DSH workflow gates. First-interface availability does not mean full migration parity.
+
 # Feature ownership and compatibility · Augmentor 0.2.9 development
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.

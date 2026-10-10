@@ -11,7 +11,7 @@ copyFileSync('config/models.local.example.json',join(agentDir,'models.json'));
 const modelRuntime=await ModelRuntime.create({authPath:join(agentDir,'auth.json'),modelsPath:join(agentDir,'models.json'),modelsStorePath:join(agentDir,'models-store.json'),allowModelNetwork:false});
 const model=modelRuntime.getModel('mx-qwen','Qwen3.8-27B-UD-Q6_K_XL');assert(model);
 assert.equal(modelRuntime.getModel('mx-qwen','missing-model'),undefined);
-const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,compaction:{enabled:false},retry:{enabled:false}});
+const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,compaction:{enabled:false},retry:{enabled:false}});
 let toolCalls=0;
 const resourceLoader=new DefaultResourceLoader({cwd:root,agentDir,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,extensionFactories:[pi=>{
  pi.registerTool({name:'probe',label:'Probe',description:'Return the deterministic probe value.',parameters:Type.Object({}),async execute(){toolCalls++;return {content:[{type:'text',text:'PI_PROBE_9182'}],details:{}};}});
@@ -33,6 +33,6 @@ try{
  await running;assert(!resumed.isStreaming);
  assert(resumed.messages.some(m=>m.role==='assistant'&&m.stopReason==='aborted'));
  resumed.dispose();
- const result={date:new Date().toISOString(),pi:'0.85.1',model:model.id,root,streamedDeltas:deltas,toolCalls,persistResume:true,abort:true,missingModel:true,eventTypes:[...types]};
+ const result={date:new Date().toISOString(),pi:'1.1.0',model:model.id,root,streamedDeltas:deltas,toolCalls,persistResume:true,abort:true,missingModel:true,eventTypes:[...types]};
  mkdirSync('outputs',{recursive:true});writeFileSync('outputs/pi-spike.json',JSON.stringify(result,null,2));console.log(JSON.stringify(result));
 }finally{clearTimeout(deadline);session.dispose();}

@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+
+The [Augmentor Harness candidate](AUGMENTOR-HARNESS.md) adds an authenticated local inspection client of the existing Pi owner. It does not add an agent loop. The [migration specification](AUGMENTOR-HARNESS-MIGRATION.md) defines the features and cutover gates still required.
+
 # Current architecture
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.

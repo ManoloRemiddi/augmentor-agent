@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+
+## October 10 Harness source candidate
+
+The [Harness qualification record](AUGMENTOR-HARNESS.md) supersedes the September Pi source pin on the implementation branch: coding-agent/core/AI are exact published 1.1.0, release tag `abe508e1b89912adde45528136c3221eb69acdd7`. Root ws remains 8.21.3. Selected DSH MIT timeline source is pinned to `d743267388641bc76f17c45ce8b4c231aed1d32c`, with original notices retained. This changes candidate source only; older installed/release evidence below remains historical and does not certify the new integration.
+
+The production inventory records new Pi/chord component MIT texts, exact esbuild 0.28.2 / Go 1.26.5 texts and omitted wrapper texts in `licenses/catalog.json`. Photon remains the reviewed source rebuild at 0.3.4 and resolves from the SDK through its current root dependency. Unbound QuickJS native/codemode assets remain excluded pending their complete static dependency review. See the Harness record for the registry provenance boundary and required compatibility work.
+
 # Source baselines and migration inventory
 
 See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualified Linux upgrade and temporary history bridge.

@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+
+## October 10 Augmentor Harness candidate
+
+The owner authorized the accepted Pi migration build. Branch `feat/augmentor-harness` starts from main `79784a5687b73234b9524e7a48e91f01306f73c9` in an isolated worktree. [Harness implementation and qualification](AUGMENTOR-HARNESS.md) owns the Pi 1.1.0 candidate, local Chat/Trajectory/Context interface, MIT timeline reuse, observation/privacy/transport contract and outstanding P0/P1 gates. Installed applications, model/speech settings and old dirty work remain intact. Source and fixture evidence do not qualify removing DSH or promoting a release.
+
 # Start here: agent handoff
 
 ## October 5 dictation repair downloads — live

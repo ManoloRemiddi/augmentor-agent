@@ -9,6 +9,7 @@ import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,app
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
+import {pathToFileURL,fileURLToPath} from 'node:url';
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 async function until(fn,ms=10000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(20);}throw new Error('Condition timed out');}
 class Client {
@@ -37,16 +38,19 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   if(content.includes('SLOW')){const timer=setInterval(()=>chunk({content:'tick '}),60);res.on('close',()=>clearInterval(timer));return;}
   const tool=content.includes('DELEGATE_TEST')?'desktop_delegate':content.includes('BROWSER_TEST')?'browser_snapshot':content.includes('CLOCK')||content.includes('SHELL_CHANGE')?'bash':content.includes('WRITE')?'write':content.includes('QUESTION')?'ask_user':content.includes('PACKAGE')?'fixture_probe':null;
   if(tool&&body.messages.at(-1).role!=='tool'){
-    const args=tool==='desktop_delegate'?{task:'Inspect the open window.',successCriteria:'Report the title.',constraints:'Do not change anything.'}:tool==='browser_snapshot'?{}:tool==='bash'?{command:content.includes('CLOCK')?"date '+%A, %B %d, %Y %H:%M:%S %Z'":'date > '+join(cwd,'shell-written.txt')}:tool==='write'?{path:join(cwd,'written.txt'),content:'verified π'}:tool==='ask_user'?{question:'Choose a colour',options:['blue','green']}:{};
+    const args=tool==='desktop_delegate'?{task:'Inspect the open window.',successCriteria:'Report the title.',constraints:'Do not change anything.'}:tool==='browser_snapshot'?{}:tool==='bash'?{command:content.includes('CLOCK')?"date '+%A, %B %d, %Y %H:%M:%S %Z'":'date > '+join(cwd,'shell-written.txt')}:tool==='write'?{path:join(cwd,content.includes('HARNESS')?'gui-written.txt':'written.txt'),content:'verified π'}:tool==='ask_user'?{question:'Choose a colour',options:['blue','green']}:{};
     chunk({role:'assistant',tool_calls:[{index:0,id:'call_'+requests,type:'function',function:{name:tool,arguments:JSON.stringify(args)}}]});chunk({},'tool_calls');
-  }else{chunk({role:'assistant',content:'Verified response π'});chunk({},'stop');}
+  }else{if(content.includes('INSPECT'))chunk({reasoning_content:'Observed reasoning π'});chunk({role:'assistant',content:'Verified response π'});chunk({},'stop');}
   res.end('data: [DONE]\n\n');
  });mock.listen(0,'127.0.0.1');await once(mock,'listening');t.after(()=>{mock.closeAllConnections();mock.close();});
  const modelConfig={providers:{test:{baseUrl:`http://127.0.0.1:${mock.address().port}/v1`,api:'openai-completions',apiKey:'dummy',models:[{id:'test',name:'Test',reasoning:false,input:['text'],contextWindow:32000,maxTokens:2048}]}}};
  writeFileSync(join(config,'agent/models.json'),JSON.stringify(modelConfig));
- const env={...process.env,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_INTERACTION_TIMEOUT:'300',PI_OFFLINE:'1'};
+ const networkLog=join(root,'network.jsonl');
+ const env={...process.env,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_INTERACTION_TIMEOUT:'300',PI_OFFLINE:'1',AUGMENTOR_PI_TEST_NETWORK_LOG:networkLog,
+  NODE_OPTIONS:(process.env.NODE_OPTIONS||'')+' --import='+pathToFileURL(fileURLToPath(new URL('./fixtures/pi-network-audit.mjs',import.meta.url))).href};
  let child,client;let stderr='';
- const start=async()=>{child=spawn(process.execPath,['dist/runtime/src/main.js'],{cwd:resolve('.'),env,stdio:['ignore','pipe','pipe']});child.stderr.on('data',b=>stderr+=b);await until(async()=>{assert.equal(child.exitCode,null,stderr);if(!existsSync(join(state,'runtime.sock')))return false;try{const c=await Client.open(join(state,'runtime.sock'));c.close();return true;}catch{return false;}},20000);};
+ const runtimeRoot=resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.');
+ const start=async()=>{child=spawn(process.execPath,[join(runtimeRoot,'dist/runtime/src/main.js')],{cwd:runtimeRoot,env,stdio:['ignore','pipe','pipe']});child.stderr.on('data',b=>stderr+=b);await until(async()=>{assert.equal(child.exitCode,null,stderr);if(!existsSync(join(state,'runtime.sock')))return false;try{const c=await Client.open(join(state,'runtime.sock'));c.close();return true;}catch{return false;}},20000);};
  const stop=async(signal='SIGTERM')=>{if(child&&child.exitCode===null){child.kill(signal);await once(child,'exit');}};
  t.after(async()=>{
   client?.close();
@@ -56,6 +60,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
  });
  await start();client=await Client.open(join(state,'runtime.sock'));
  const selection={provider:'test',model:'test'};
+ let inspectionPersisted;
  const create=async(id,policy='workspace-write')=>{const settings=await client.call('settings.describe');await client.call('settings.mutate',{ns:'permission',expectedRevision:settings.namespaces[0].revision,ops:[{op:'set',path:['defaultPreset'],value:policy}]});await client.call('session.create',{sessionId:id,cwd,selection});await client.call('events.subscribe',{sessionId:id});};
  const prompt=(id,content,requestId)=>client.call('session.prompt',{sessionId:id,content:[{type:'text',text:content}]},requestId);
  const idle=async id=>until(async()=>!(await client.call('session.list')).items.find(m=>m.sessionId===id)?.running);
@@ -63,6 +68,94 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
  await t.test('protocol rejects incompatible clients and keeps socket private',async()=>{await assert.rejects(Client.open(join(state,'runtime.sock'),'wrong'),/Incompatible/);assert.equal(statSync(join(state,'runtime.sock')).mode&0o777,0o600);});
  await t.test('catalog pins use the native picker contract and missing models never fall back',async()=>{await client.call('models.pin',{...selection,pinned:true});const catalog=await client.call('models.list');assert.deepEqual(catalog.pinned,['test/test']);assert.equal(catalog.groups.find(g=>g.provider==='test').models[0].location,'Local');await assert.rejects(client.call('models.validate',{...selection,model:'missing'}),/unavailable/);assert.equal(requests,0);});
  await t.test('stream, persist, history, rename, save and repeat request deduplication',async()=>{await create('basic');const id=randomUUID();await prompt('basic','hello',id);await idle('basic');assert(client.events.some(e=>e.payload?.event?.type==='assistant/chunk'));const before=requests;await prompt('basic','hello',id);assert.equal(requests,before);await client.call('session.rename',{sessionId:'basic',title:'Renamed'});await client.call('chats.saved',{sessionId:'basic',action:'save'});const row=(await client.call('session.list')).items.find(m=>m.sessionId==='basic');assert.equal(row.title,'Renamed');assert(row.saved);const history=await client.call('session.history',{sessionId:'basic'});assert(history.events.some(e=>e.event.type==='assistant/message'));});
+ await t.test('inspection captures the actual post-extension provider payload, reasoning and tool evidence',async t=>{
+  const beforeSettings=await client.call('observation.describe');
+  assert.equal(beforeSettings.capturePayloads,false);
+  await create('inspection-metadata','read-only');
+  await prompt('inspection-metadata','INSPECT PRIVATE_PROMPT_SENTINEL');await idle('inspection-metadata');
+  const metadata=await client.call('observation.list',{sessionId:'inspection-metadata'});
+  assert(!JSON.stringify(metadata).includes('PRIVATE_PROMPT_SENTINEL'));
+  assert(metadata.records.some(e=>e.kind==='model/request'&&e.payload.state==='disabled'));
+  const description=await client.call('observation.describe');
+  await client.call('observation.configure',{expectedRevision:description.revision,capturePayloads:true});
+  t.after(async()=>{
+   const current=await client.call('observation.describe');
+   await client.call('observation.configure',{expectedRevision:current.revision,capturePayloads:false});
+   writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[],skills:[]}));
+  });
+  await assert.rejects(client.call('observation.configure',{expectedRevision:description.revision,capturePayloads:false}),/Settings changed/);
+  const transform=join(root,'inspect-transform.mjs');
+  writeFileSync(transform,"export default pi => {pi.on('before_provider_request', e => ({...e.payload, temperature:0.37})); pi.on('before_provider_request', e => ({...e.payload, seed:42}));}");
+  writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[transform],skills:[]}));
+  await create('inspection','read-only');
+  const receivedStart=received.length;
+  await prompt('inspection','CLOCK INSPECT');await idle('inspection');
+  const observations=await client.call('observation.list',{sessionId:'inspection',limit:100});
+  const request=observations.records.find(e=>e.kind==='model/request');
+  assert.equal(request.data.boundary,'provider-payload-after-hooks');
+  assert.deepEqual(request.data.selected,selection);
+  const readPayload=async eventId=>{
+   let offset=0,raw='';
+   while(true){const part=await client.call('observation.payload',{sessionId:'inspection',eventId,offset,limit:97});assert(part.available);raw+=part.text;offset=part.nextOffset;if(!part.hasMore)return JSON.parse(raw);}
+  };
+  const payload=await readPayload(request.id);
+  assert.deepEqual(payload,received[receivedStart]);
+  assert.equal(payload.temperature,0.37);assert.equal(payload.seed,42);
+  const tool=observations.records.find(e=>e.kind==='tool/start'&&e.data.name==='bash');
+  assert((await readPayload(tool.id)).command.includes('date'));
+  const result=observations.records.find(e=>e.kind==='tool/end'&&e.data.toolCallId===tool.data.toolCallId);
+  assert((await readPayload(result.id)).content.some(c=>/\d{2}:\d{2}:\d{2}/.test(c.text??'')));
+  assert(observations.records.some(e=>e.kind==='model/firstToken'&&e.data.elapsedMs>=0));
+  assert(observations.records.some(e=>e.kind==='model/response'&&e.data.status===200));
+  const history=await client.call('session.history',{sessionId:'inspection'});
+  assert(client.events.some(frame=>frame.payload?.sessionId==='inspection'&&frame.payload.event?.type==='assistant/chunk'&&frame.payload.event.data.chunk.text==='Observed reasoning π'));
+  assert(history.events.some(({event})=>event.type==='assistant/message'&&event.data.message.content.some(block=>block.type==='thinking'&&block.thinking==='Observed reasoning π')));
+  assert(history.events.some(({event})=>event.type==='tool/call'&&event.data.toolCallId===tool.data.toolCallId));
+  assert(history.events.filter(({event})=>event.type==='tool/call').every(({event})=>event.data.args===undefined),
+   'The display journal must not duplicate full private arguments outside the capture policy');
+  const original=JSON.parse(readFileSync(join(state,'sessions/inspection.meta.json'),'utf8')).file;
+  const originalBytes=readFileSync(original,'utf8');
+  const beforeClear=requests;
+  await client.call('observation.clear',{sessionId:'inspection'});
+  assert.equal(requests,beforeClear);
+  assert.equal(readFileSync(original,'utf8'),originalBytes);
+  assert.equal((await client.call('observation.payload',{sessionId:'inspection',eventId:request.id})).available,false);
+  await prompt('inspection','INSPECT PERSIST');await idle('inspection');
+  const retained=await client.call('observation.list',{sessionId:'inspection'});
+  inspectionPersisted={eventId:retained.records.filter(e=>e.kind==='model/request').at(-1).id,expected:received.at(-1)};
+ });
+ await t.test('Harness connects to the same owner and resolves approvals without an IPC UI subscription',async()=>{
+  const [link,duplicate]=await Promise.all([client.call('harness.open'),client.call('harness.open')]);
+  assert.deepEqual(link,duplicate);
+  assert.equal(statSync(join(state,'harness.json')).mode&0o777,0o600);
+  const descriptor=JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
+  assert.equal(descriptor.pid,child.pid);
+  const token=new URLSearchParams(new URL(link.url).hash.slice(1)).get('token');
+  const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
+  const rpc=async(method,params={})=>{
+   const response=await fetch(link.origin+'/api/rpc',{method:'POST',headers,body:JSON.stringify({id:randomUUID(),method,params})});
+   const body=await response.json();if(body.error)throw Error(body.error.message);return body.result;
+  };
+  const settings=await rpc('settings.describe');
+  await rpc('settings.mutate',{ns:'permission',expectedRevision:settings.namespaces[0].revision,ops:[{op:'set',path:['defaultPreset'],value:'workspace-write'}]});
+  await rpc('session.create',{sessionId:'harness-only',cwd,selection});
+  const subscribed=await rpc('events.subscribe',{sessionId:'harness-only',clientId:'viewer'});
+  await client.call('events.subscribe',{sessionId:null});
+  const before=requests;
+  await rpc('session.prompt',{sessionId:'harness-only',content:[{type:'text',text:'WRITE HARNESS'}]});
+  let cursor=subscribed.cursor,approval;
+  await until(async()=>{
+   const response=await fetch(link.origin+'/api/events?sessionId=harness-only&clientId=viewer&after='+cursor,{headers});
+   const page=await response.json();cursor=page.cursor;
+   approval=page.frames.find(e=>e.frame.method==='approval/requested')?.frame;
+   return !!approval;
+  });
+  assert(!existsSync(join(cwd,'gui-written.txt')));
+  await rpc('interaction.respond',{sessionId:'harness-only',clientId:'viewer',rpcId:approval.rpcId,value:{outcome:'allowed-once'}});
+  await idle('harness-only');
+  assert.equal(readFileSync(join(cwd,'gui-written.txt'),'utf8'),'verified π');
+  assert.equal(requests-before,2,'One shared Pi tool loop owns this Harness conversation');
+ });
  await t.test('desktop specialist is advertised by Linux Pi and refuses a text-only route before worker inference',async()=>{
   const description=await client.call('host.describe');assert.equal(description.desktopSpecialist.version,'augmentor-computer-use/1');assert.equal(description.desktopSpecialist.coreIntegration,false);
   await create('delegation-eligibility');const before=requests;await prompt('delegation-eligibility','DELEGATE_TEST');await idle('delegation-eligibility');
@@ -178,6 +271,14 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   assert(received.at(-1).messages.some(m=>m.role==='tool'&&/\d{2}:\d{2}:\d{2}/.test(String(m.content))));
  });
  await t.test('crash recovery never resends accepted prompts and Pi session resumes',async()=>{await create('crash');const requestId=randomUUID();await prompt('crash','SLOW',requestId);await delay(100);client.close();const before=requests;await stop('SIGKILL');await start();client=await Client.open(join(state,'runtime.sock'));assert.equal(requests,before);await prompt('crash','SLOW',requestId);assert.equal(requests,before);const h=await client.call('session.history',{sessionId:'crash'});assert.equal(h.events.at(-1).event.data.reason.kind,'interrupted');await client.call('events.subscribe',{sessionId:'basic'});await prompt('basic','resume hello');await idle('basic');assert(received.at(-1).messages.some(m=>m.role==='assistant'&&JSON.stringify(m.content).includes('Verified response')));});
+ await t.test('cold inspection reads the captured request without loading a session or replaying work',async()=>{
+  const before=requests;
+  const payload=await client.call('observation.payload',{sessionId:'inspection',eventId:inspectionPersisted.eventId});
+  assert(payload.available);assert(!payload.hasMore);
+  assert.deepEqual(JSON.parse(payload.text),inspectionPersisted.expected);
+  assert.equal((await client.call('observation.describe')).capturePayloads,false);
+  assert.equal(requests,before);
+ });
  await t.test('saved branches resume after restart and a cold source can branch',async()=>{
   await client.call('events.subscribe',{sessionId:'edited'});await prompt('edited','AFTER_RESTART');await idle('edited');
   const context=JSON.stringify(received.at(-1).messages);assert(context.includes('FIRST_CONTEXT'));assert(context.includes('REVISED_CONTEXT'));assert(!context.includes('LATER_CONTEXT'));
@@ -196,6 +297,11 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const before=requests;const ended=once(child,'exit');
   assert((await client.call('host.shutdown')).accepted);await ended;
   assert.equal(requests,before);assert(!existsSync(join(state,'runtime.sock')));
+ });
+ await t.test('the managed SDK attempts only explicit loopback fixture connections',()=>{
+  const connections=readFileSync(networkLog,'utf8').trim().split('\n').map(line=>JSON.parse(line));
+  assert(connections.some(item=>item.port===mock.address().port));
+  assert(connections.every(item=>item.allowed),'Unsolicited external reporting/model discovery must not connect');
  });
  client.close();await stop();
 });

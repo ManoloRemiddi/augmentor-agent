@@ -170,7 +170,7 @@ def main():
     # Stage production JS with platform-specific dependencies and notices.
     subprocess.run([sys.executable,str(ROOT/'scripts/stage-production.py'),'--out',str(resources/'app')],check=True)
     project = resources/'app'
-    for name in ('dist','apps/native','apps/browser','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json','release/macos-requirements.txt','release/dsh'):
+    for name in ('dist','apps/native','apps/browser','apps/harness','scripts','services','adapters','config','docs','licenses','LICENSE','README.md','release/product.json','release/macos.json','release/macos-requirements.txt','release/dsh'):
         copy(ROOT/name, project/name)
     subprocess.run([sys.executable,str(ROOT/'scripts/stage-handy.py'),str(project)],check=True)
     if args.source_notices:

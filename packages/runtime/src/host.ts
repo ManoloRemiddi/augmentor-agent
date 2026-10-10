@@ -23,9 +23,11 @@ import {RELEASE} from '../../contracts/src/release.js';
 import {historyPage} from '../../protocol/src/history.js';
 import {DesktopSpecialist,DESKTOP_DELEGATION_GUIDANCE} from './desktop-specialist.js';
 import {linuxDesktopExecutor} from '../../pi-linux/src/desktop-executor.js';
+import {ObservationStore,OBSERVATION_PROTOCOL,DEFAULT_RETENTION} from '../../observation/src/store.js';
+import {observeSession} from './observations.js';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];turnId?:string;cancelled:boolean;task?:Promise<void>}
+interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];observation?:ReturnType<typeof observeSession>;turnId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 export class Host {
   readonly dirs=paths();
   readonly browser=new BrowserBroker();
@@ -34,12 +36,17 @@ export class Host {
   modelRuntime!:ModelRuntime;
   readonly setup=new SetupConnections(join(this.dirs.agent,'models.json'));
   settings:Data;
+  readonly observations:ObservationStore;
   private serial:Promise<unknown>=Promise.resolve();
   private quiescing=false;
   readonly backend=process.env.AUGMENTOR_PI_DESKTOP_HELPER || fileURLToPath(new URL('../../../apps/native/augmentor_linux/desktop.py',import.meta.url));
   readonly desktopSpecialist=new DesktopSpecialist(join(this.dirs.state,'desktop-runs'),linuxDesktopExecutor(this.backend));
   constructor(readonly publish:(sid:string,frame:Data)=>void,readonly connected:(sid:string)=>boolean){
     this.settings=readJson(join(this.dirs.config,'settings.json'),{revision:0,defaultPreset:'workspace-write',pinned:[],hidden:[],defaultModel:null});
+    this.observations=new ObservationStore(join(this.dirs.state,'observations'),()=>({
+      capturePayloads:this.settings.observation?.capturePayloads===true || (this.settings.observation?.capturePayloads===undefined && process.env.AUGMENTOR_PI_CAPTURE_PAYLOADS==='1'),
+      ...DEFAULT_RETENTION,
+    }));
     this.interactions=new Interactions(publish,connected,Number(process.env.AUGMENTOR_PI_INTERACTION_TIMEOUT||120000));
     for(const file of readdirSync(this.dirs.sessions).filter(f=>f.endsWith('.meta.json'))){const m=readJson<Meta>(join(this.dirs.sessions,file),null as any);identifier(m.id);this.metadata.set(m.id,m);}
   }
@@ -84,7 +91,7 @@ export class Host {
     const model=await this.selected(m.selection);
     const memory=new DualMemoryClient('pi:'+m.id,m.cwd,undefined,message=>console.warn('[augmentor-memory]',message));
     mkdirSync(m.cwd,{recursive:true,mode:0o700});
-    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,retry:{enabled:false},compaction:{enabled:true},packages:[],defaultProjectTrust:'never'});
+    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,retry:{enabled:false},compaction:{enabled:true},packages:[],defaultProjectTrust:'never'});
     const resources=readJson<Data>(join(this.dirs.config,'resources.json'),{sources:[],skills:[]});
     if(!Array.isArray(resources.sources)||!Array.isArray(resources.skills))throw new Error('Invalid Pi resource configuration');
     const resourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
@@ -104,21 +111,27 @@ export class Host {
     if(m.fork){m.memoryStartSeq??=history.at(-1)?.seq??0;this.save(m);history=history.filter(e=>e.seq>m.memoryStartSeq!);}
     await memory.append(history.flatMap(event=>piTranscriptEvent(event)));
     await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.id),onError:error=>this.append(m,'runtime/error',{message:error.error})});
+    record.observation=observeSession(created.session,this.observations,m.id,
+      ()=>({turnId:record!.turnId,selected:{...m.selection}}),
+      observation=>this.publish(m.id,{method:'observation/event',payload:{sessionId:m.id,observation}}),
+      message=>this.append(m,'runtime/warning',{message}));
+    record.observation.record('session/load',{piVersion:'1.1.0',productVersion:RELEASE.version,
+      surface:m.surface??'linux',policy:m.policy,...(m.fork?{fork:m.fork}:{})});
     created.session.subscribe(e=>{
       if(e.type==='message_start'&&e.message.role==='user')this.append(m,'user/message',{source:{kind:'user'},content:typeof e.message.content==='string'?[{type:'text',text:e.message.content}]:e.message.content});
       if(e.type==='message_update'){
         const a=e.assistantMessageEvent;if(a.type==='text_delta')this.append(m,'assistant/chunk',{chunk:{type:'text-delta',text:a.delta}});
-        if(a.type==='thinking_delta')this.append(m,'assistant/chunk',{chunk:{type:'reasoning-delta',text:''}});
+        if(a.type==='thinking_delta')this.append(m,'assistant/chunk',{chunk:{type:'reasoning-delta',text:a.delta}});
       }
       if(e.type==='message_end'&&e.message.role==='assistant'){
         this.append(m,'assistant/message',{message:{content:e.message.content,stopReason:e.message.stopReason}});
-        if(e.message.stopReason==='error')this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});
+        if(e.message.stopReason==='error'){record!.failed=true;this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});}
       }
       if(e.type==='tool_execution_start')this.append(m,'tool/call',{name:e.toolName,toolCallId:e.toolCallId});
       if(e.type==='tool_execution_end')this.append(m,'tool/result',{name:e.toolName,toolCallId:e.toolCallId,isError:e.isError,result:{...e.result,content:e.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Desktop image sent to the selected model]'}:part)}});
     });return record;
   }
-  async cancel(id:unknown){const m=this.getMeta(id);const r=this.loaded.get(m.id);this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(!r||!m.running)return {accepted:false};r.cancelled=true;r.session.clearQueue();r.session.abortCompaction();await r.session.abort();return {accepted:true};}
+  async cancel(id:unknown,source='user'){const m=this.getMeta(id);const r=this.loaded.get(m.id);if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(!r||!m.running)return {accepted:false};r.cancelled=true;r.session.clearQueue();r.session.abortCompaction();await r.session.abort();return {accepted:true};}
   async branch(p:Data){
     const source=this.getMeta(p.sessionId),sid=identifier(p.newSessionId);
     if(!Number.isSafeInteger(p.messageSeq)||p.messageSeq<1||!['reply','edit'].includes(p.mode))throw new Error('Invalid branch target');
@@ -140,11 +153,12 @@ export class Host {
   }
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
   submit(r:Loaded,input:string,id:string){const m=r.meta;if(m.requests.includes(id))return {accepted:true,duplicate:true};if(m.running)throw new Error('This conversation is already working');
-    m.running=true;r.cancelled=false;r.turnId=randomUUID();m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{});
+    m.running=true;r.cancelled=false;r.failed=false;r.turnId=randomUUID();m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{});
+    r.observation?.beginTurn({clientRequestId:id});
     if(!m.title){m.title=input.replace(/\s+/g,' ').slice(0,80);r.session.setSessionName(m.title);this.append(m,'session/title',{title:m.title});this.save(m);}
     r.task=(async()=>{let failed=false;try{await r.memory.activity('foreground');await r.session.prompt(input,{expandPromptTemplates:false,source:'rpc'});}catch(error){failed=true;this.append(m,'runtime/error',{message:String(error)});}finally{
       await r.memory.activity('stop');
-      this.interactions.cancel(m.id);if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});m.running=false;m.updatedAt=Date.now();this.save(m);this.append(m,'turn/end',{reason:{kind:r.cancelled?'aborted':failed?'error':'completed'}});r.turnId=undefined;
+      this.interactions.cancel(m.id);if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});m.running=false;m.updatedAt=Date.now();this.save(m);const reason=r.cancelled?'aborted':failed||r.failed?'error':'completed';this.append(m,'turn/end',{reason:{kind:reason}});r.observation?.record('turn/end',{reason});r.turnId=undefined;
     }})();return {accepted:true,turnId:r.turnId};
   }
   async dispatch(method:string,p:Data,id:string){
@@ -157,7 +171,12 @@ export class Host {
     const run=this.serial.then(()=>{if(this.quiescing&&method!=='host.describe')throw new Error('Runtime is closing for maintenance. No action was submitted.');return this.handle(method,p,id);});this.serial=run.catch(()=>{});return run;
   }
   async handle(method:string,p:Data,id:string):Promise<any>{switch(method){
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'0.85.1',capabilities:{linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'observation.describe':return {protocol:OBSERVATION_PROTOCOL,revision:this.settings.revision,capturePayloads:this.observations.policy().capturePayloads,retention:DEFAULT_RETENTION,boundary:'provider-payload-after-hooks',capabilities:{metadata:true,payloads:true,attachments:'inline-payloads-only',parsedProviderEvents:false,sourceProvenance:false,historicalCoverage:'recorded-during-managed-operation'},telemetry:{installReporting:'disabled-by-host',analytics:'disabled-by-host',networkAudit:'synthetic-core-test; configured extensions and live services require separate review'}};
+    case 'observation.configure':{if(p.expectedRevision!==this.settings.revision)throw new Error('Settings changed. Refresh inspection settings.');if(typeof p.capturePayloads!=='boolean')throw new Error('Choose whether to retain private request payloads.');this.settings.observation={capturePayloads:p.capturePayloads};this.persistSettings();return this.handle('observation.describe',{},id);}
+    case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit});}
+    case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit);}
+    case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
       this.quiescing=true;this.setup.cancel();return {accepted:true};
@@ -187,5 +206,5 @@ export class Host {
     case 'prompts.list':case 'prompts.save':case 'prompts.delete':return promptCall(method,p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id);await r.task;r.memory.close();await r.memory.flush();r.session.dispose();}}
+  async close(){this.setup.cancel();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.session.dispose();}}
 }

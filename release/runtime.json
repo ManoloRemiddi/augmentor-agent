@@ -7,5 +7,5 @@
   },
   "debianImage": "docker.io/library/debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f",
   "pythonBindings": "6.8.2.1",
-  "pi": "0.85.1"
+  "pi": "1.1.0"
 }

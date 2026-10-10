@@ -801,3 +801,13 @@ and parent-scoped branch status through the packed SDK/native host. Browser
 limits. Full local source qualification uses
 `AUGMENTOR_PYTHON=/absolute/isolated/Qt/python node --test --test-concurrency=4 tests/*.test.mjs`;
 hosted default-concurrency checks remain an independent gate.
+
+### Augmentor Harness candidate
+
+`observation.test.mjs` exercises opt-in private copies, credential-field redaction, retention/quota, crash tails, owned temporary cleanup, durable sequence cursors and bounded complete-character UTF-8 payload chunks. `harness-timeline.test.mjs` checks the selected MIT DSH projection's actual timing/focus semantics. `harness-server.test.mjs` checks bearer/authority/Origin/CSP boundaries, method exclusions, conversation/watch isolation and bounded live coverage loss. `pi-owner.test.mjs` starts simultaneous fresh owners and verifies that only one opens the profile; a follower cannot alter its journal.
+
+`runtime.test.mjs` compares post-extension effective payloads with the actual synthetic provider request, inspects real tools/reasoning/TTFT, verifies diagnostic clear preserves native bytes, and cold-reads captures without loading or replaying a session. Its Harness workflow resolves a real Pi write approval over HTTP through the same owner. A preload blocks and records TCP connections outside explicit loopback fixtures before runtime imports. This is a pinned-core synthetic network proof, not a live extension/provider/OS network audit.
+
+Set `AUGMENTOR_PI_TEST_ROOT` to a source-independent staged application root to run the actual child host against its locked production dependencies. The test driver remains in this source tree. Tests include real offscreen Qt fixtures; select the complete test interpreter through `AUGMENTOR_PYTHON`. Missing test dependencies must be reported or supplied in an isolated environment, not converted into passing skips.
+
+`npm run harness:proof` provides a disposable actual-Pi browser fixture. [Harness implementation evidence](../docs/AUGMENTOR-HARNESS.md) distinguishes GUI proof, source/production contracts, installed release qualification and the full migration gates still outstanding.

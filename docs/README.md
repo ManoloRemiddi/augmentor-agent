@@ -2,6 +2,10 @@
 
 
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
+
+- [Augmentor Harness migration](AUGMENTOR-HARNESS-MIGRATION.md): DSH/Pi comparison, extension candidates, architecture, licensing and required parity.
+- [Augmentor Harness implementation](AUGMENTOR-HARNESS.md): current candidate, inspection/privacy/transport contracts, evidence and release gates.
+
 # Documentation index
 
 - [Handy repair downloads — October 5](HANDY-DOWNLOADS-2026-10-05.md): published preview 3, merged startup/rendering repair, all-platform qualification, full-byte verification and live website adoption.

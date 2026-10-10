@@ -3,3 +3,4 @@ import {copyFileSync,cpSync,mkdirSync} from 'node:fs';
 mkdirSync('dist/protocol',{recursive:true});
 copyFileSync('packages/protocol/schema.json','dist/protocol/schema.json');
 cpSync('packages/protocol/fixtures','dist/protocol/fixtures',{recursive:true});
+cpSync('packages/harness-ui/vendor','dist/harness-ui/vendor',{recursive:true});
