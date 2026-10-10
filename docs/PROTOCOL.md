@@ -21,7 +21,7 @@ Commands:
 | `session.resolveQueue` | Idle-only `itemId`, `acknowledgeUnknownOutcome: true`; acknowledge the interrupted receipt without retrying its prompt, confirming its action outcome or resuming waiting work |
 | `session.branch` | `sessionId`, caller-generated `newSessionId`, `messageSeq`, `mode: reply` or `edit`; returns a new native session row and inherited selection. Repeated identical targets with the same new ID return that branch. Reply mode includes the selected assistant message; edit mode excludes the latest user input and its subsequent context, preserving earlier messages/tools in a shared steering turn. Active sources, stale edits and unresolved tool-call messages are rejected. |
 | `session.cancel` | Cancel active generation and pending interactions; persist a paused waiting queue; does not kill unrelated applications |
-| `session.history` | `sessionId`, optional `maxMessages` and `beforeSeq`; whole user-message groups and `hasMore` |
+| `session.history` | `sessionId`, optional `maxMessages` (1–100, default 12) and exclusive `beforeSeq`; indexed display pages, original sequences, user-group limit and `hasMore`; the connection byte budget may split a group |
 | `session.rename`, `chats.saved` | Title and saved metadata; no DSH workspace association |
 | `events.subscribe` | `sessionId` or null; only that conversation's events on this connection |
 | `interaction.respond` | `rpcId`, `sessionId`, `value`; late/duplicate answers fail |
@@ -30,6 +30,8 @@ Commands:
 | `settings.describe/mutate` | New-chat tool policy, with namespace revision checking |
 
 Unsolicited data is wrapped in `event`. Display messages use `method: session/event`, `payload.sessionId`, and `payload.event` containing a durable `seq`, display `type`, `data`, and when applicable a `turnId`. Display types include user/message, assistant/chunk, assistant/message, tool/call, tool/result, session/title, runtime/error, runtime/warning, runtime/notice and turn/start/end. Display events are a private recovery projection; Pi's session files own the conversation supplied to the agent.
+
+Pi `session.history` now uses the same derived byte-offset reader for loaded and cold sessions; `host.describe.capabilities.indexedDisplayHistory` advertises it. The response shape remains `{events: [{event}], hasMore}`. Continue backward with the first returned event's original sequence. Compaction is resolved against the full saved journal before the cursor: deltas represented by a later nonempty final answer cannot reappear on an older page. Interrupted/empty-final deltas and tool boundaries remain. Valid persisted indexes avoid whole-journal reads after restart; rebuilding a derivative streams the source. A single oversized event fails with its original preserved. Reading history never loads a Pi AgentSession, invokes the provider or changes native history. SDK resume/branch/edit/memory initialization retain their separate full-state lifecycle.
 
 Questions and approvals carry a unique `rpcId`. Subscription reattachment redelivers pending interactions; a resolution emits `interaction/resolved`. Default timeout is two minutes. Stop, timeout or losing the last subscribed UI resolves a pending action without permission to execute it. No connected UI means manual actions are denied. Completed interactions cannot be answered again.
 

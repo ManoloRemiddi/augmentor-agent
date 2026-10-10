@@ -5,7 +5,7 @@ import {DualMemoryClient} from '../../memory/src/dual.js';
 import {piMemoryContext,piTranscriptEvent} from '../../memory/src/pi.js';
 import {memoryPackage} from '../../memory/src/index.js';
 import {promptCall} from '../../prompt-library/src/client.js';
-import {appendFileSync,truncateSync,mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
+import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID,createHash} from 'node:crypto';
@@ -20,7 +20,7 @@ import {isRoutineQuery} from './permissions.js';
 import {branchContext} from './branches.js';
 import {SetupConnections} from './setup.js';
 import {RELEASE} from '../../contracts/src/release.js';
-import {historyPage} from '../../protocol/src/history.js';
+import {DisplayHistory} from './display-history.js';
 import {DesktopSpecialist,DESKTOP_DELEGATION_GUIDANCE} from './desktop-specialist.js';
 import {linuxDesktopExecutor} from '../../pi-linux/src/desktop-executor.js';
 import {ObservationStore,OBSERVATION_PROTOCOL,DEFAULT_RETENTION} from '../../observation/src/store.js';
@@ -53,6 +53,7 @@ export class Host {
   readonly improvements=new PiPromptImprovement(join(this.dirs.state,'prompt-improvements.json'));
   private serial:Promise<unknown>=Promise.resolve();
   private quiescing=false;
+  private histories=new Map<string,DisplayHistory>();
   private queues=new Map<string,PiPromptQueue>();
   private pumping=new Map<string,Promise<unknown>>();
   readonly backend=process.env.AUGMENTOR_PI_DESKTOP_HELPER || fileURLToPath(new URL('../../../apps/native/augmentor_linux/desktop.py',import.meta.url));
@@ -70,19 +71,17 @@ export class Host {
     if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());
     for(const m of this.metadata.values()){
       this.queue(m).recover();
-      if(m.running){if(this.events(m).at(-1)?.type==='turn/end'){m.running=false;this.save(m);continue;}this.append(m,'turn/end',{reason:{kind:'interrupted'},message:'Runtime stopped. The previous action outcome may be unknown; the prompt was not replayed.'});m.running=false;this.save(m);}
+      if(m.running){if(this.history(m).last()?.type==='turn/end'){m.running=false;this.save(m);continue;}this.append(m,'turn/end',{reason:{kind:'interrupted'},message:'Runtime stopped. The previous action outcome may be unknown; the prompt was not replayed.'});m.running=false;this.save(m);}
     }
   }
   private queue(m:Meta){let queue=this.queues.get(m.id);if(!queue){queue=new PiPromptQueue(join(this.dirs.sessions,m.id+'.queue.json'),m.id,()=>this.publish(m.id,{method:'session/queue',payload:{sessionId:m.id,...this.queueSnapshot(m.id)}}));this.queues.set(m.id,queue);}return queue;}
   queueSnapshot(id:unknown){const m=this.getMeta(id),r=this.loaded.get(m.id);return this.queue(m).snapshot(!!r&&m.running&&!r.cancelled&&r.phase!=='settling');}
   save(m:Meta){atomicJson(join(this.dirs.sessions,m.id+'.meta.json'),m);}
   persistSettings(){this.settings.revision++;atomicJson(join(this.dirs.config,'settings.json'),this.settings);}
-  events(m:Meta):DisplayEvent[]{const file=join(this.dirs.sessions,m.id+'.events.jsonl');if(!existsSync(file))return [];let raw=readFileSync(file);if(raw.length&&raw.at(-1)!==10){const end=raw.lastIndexOf(10)+1;truncateSync(file,end);raw=raw.subarray(0,end);}const lines=raw.toString('utf8').split('\n');const result:DisplayEvent[]=[];
-    for(let i=0;i<lines.length;i++){if(!lines[i])continue;try{result.push(JSON.parse(lines[i]));}catch{throw new Error('Corrupt session display journal');}}
-    return result;
-  }
-  append(m:Meta,type:string,data:Data){const record=this.loaded.get(m.id);const events=record?.events??this.events(m);const event:DisplayEvent={seq:(events.at(-1)?.seq??0)+1,type,data,...(record?.turnId?{turnId:record.turnId}:{})};
-    appendFileSync(join(this.dirs.sessions,m.id+'.events.jsonl'),JSON.stringify(event)+'\n',{mode:0o600});if(record)events.push(event);
+  private history(m:Meta){let history=this.histories.get(m.id);if(!history){history=new DisplayHistory(join(this.dirs.sessions,m.id+'.events.jsonl'));if(this.histories.size>=32)this.histories.delete(this.histories.keys().next().value!);this.histories.set(m.id,history);}return history;}
+  events(m:Meta):DisplayEvent[]{return [...this.history(m).all()];}
+  append(m:Meta,type:string,data:Data){const record=this.loaded.get(m.id),history=this.history(m);const event:DisplayEvent={seq:history.lastSeq+1,type,data,...(record?.turnId?{turnId:record.turnId}:{})};
+    history.append(event);if(record)record.events.push(event);
     if(record){const memories=piTranscriptEvent(event,true);if(memories.length)void record.memory.append(memories);}
     this.publish(m.id,{method:'session/event',payload:{sessionId:m.id,event}});return event;
   }
@@ -295,7 +294,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before shutting down the runtime');
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
@@ -334,7 +333,7 @@ export class Host {
     case 'models.reload':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before reloading models');await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});return this.catalog();
     case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
     case 'session.list':return {items:[...this.metadata.values()].sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title}))};
-    case 'session.history':{const m=this.getMeta(p.sessionId);return historyPage(this.loaded.get(m.id)?.events??this.events(m),p.maxMessages,p.beforeSeq);}
+    case 'session.history':{const m=this.getMeta(p.sessionId);return this.history(m).page(p.maxMessages,p.beforeSeq);}
     case 'session.models':return {current:this.getMeta(p.sessionId).selection};
     case 'session.reasoning':return this.reasoningState(this.getMeta(p.sessionId));
     case 'session.selectReasoning':{

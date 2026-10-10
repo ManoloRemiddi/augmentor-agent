@@ -38,7 +38,9 @@ export async function checkAgent(connection: CodexConnection, signal: AbortSigna
       const p = request.params, args = p.arguments as Record<string, unknown> | undefined;
       if (request.method !== 'item/tool/call' || p.threadId !== threadId || p.tool !== 'augmentor_connection_probe' || invoked ||
           !args || typeof args !== 'object' || Array.isArray(args) || Object.keys(args).length !== 1 || args.nonce !== nonce) {
-        rpc!.reject(request.id, 'Only the one synthetic connection probe is permitted.'); fail('The model did not use the permitted connection-check tool.'); return;
+        // A rejection response can let Codex issue another provider request
+        // before shutdown. This ephemeral check terminates without a tool result.
+        fail('The model did not use the permitted connection-check tool.'); return;
       }
       invoked = true;
       rpc!.respond(request.id, {success: true, contentItems: [{type: 'inputText', text: receipt}]});

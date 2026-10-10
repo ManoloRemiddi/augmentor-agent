@@ -1740,3 +1740,8 @@ completed receipt before closing voice and shutting down the fixture. Exact
 request identity, one provider request, PCM delivery and completed status assertions
 remain unchanged. This corrects test ordering only; it changes no installed voice
 or runtime behavior. The failure is recorded in hosted run 37119919501.
+
+
+## October 10 invalid compatibility-probe termination
+
+The Harness regression suite exposed a race in the existing Codex synthetic compatibility check: replying with a rejection for a wrong probe nonce could allow a second provider request before shutdown. `agent-check.ts` now terminates the isolated ephemeral runtime without sending that invalid tool result. Correct probes still receive their receipt and finish normally; wrong/skipped probes, cancellation and maintenance remain refused without validation or replay. The existing `codex-agent-check.test.mjs` one-request assertion is preserved. [The Harness qualification](AUGMENTOR-HARNESS.md#indexed-display-history-with-original-compaction-semantics) records source/focused evidence and its boundary; Pi staged cases do not constitute staged/installed Codex acceptance. No owner account, provider, GPU/model settings or installed application changes.
