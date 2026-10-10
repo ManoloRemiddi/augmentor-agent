@@ -1,6 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {deriveTrajectoryTimeline,trajectoryTimelineFocusIndexes} from './timeline.js';
-import {projectChat,appendDisplay} from './chat-projection.js';
+import {projectChat,appendDisplay,messageTargets} from './chat-projection.js';
+import {createMessageActions} from './message-actions.js';
 import {createQueue} from './queue-view.js';
 const $=id=>document.getElementById(id);
 const hash=new URLSearchParams(location.hash.slice(1));
@@ -13,6 +14,12 @@ const promptQueue=createQueue({container:$('prompt-queue'),input:$('input'),allo
   const result=await rpc(method==='queue/prompt'?'session.prompt':payload.action==='acknowledge'?'session.resolveQueue':'session.updateQueue',method==='queue/prompt'?{sessionId:sid,requestId:payload.requestId,mode:'queue',resumeQueue:payload.resumeQueue,content:[{type:'text',text:payload.text}]}:payload.action==='acknowledge'?{sessionId:sid,itemId:payload.itemId,acknowledgeUnknownOutcome:true}:{sessionId:sid,itemId:payload.itemId,expectedTurnId:payload.expectedTurnId,action:{kind:payload.action}});
   if(epoch===state.epoch){await refreshSessions();notice(result.queued?'Prompt queued.':'Request accepted.');}return result;
 }});
+const messageActions=createMessageActions({
+  context:()=>({sessionId:state.sessionId,epoch:state.epoch,running:current()?.running===true,submitting,...messageTargets(state.history)}),
+  input:$('input'),rpc,refresh:refreshSessions,select:selectSession,
+  enqueue:(sid,text)=>sid===state.sessionId?promptQueue.submitText(text):Promise.resolve(false),
+  changed:()=>{renderSessions();renderChat();},notice,
+});
 function renderQueue(entry){
   promptQueue.update({harness:'pi',capabilities:{queue:!!state.sessionId},sessionId:state.sessionId,phase:'ready',running:current()?.running===true,queue:state.queue,...(entry?{entry:{sessionId:state.sessionId,event:entry}}:{})});
   $('continue-queue').hidden=!state.queue?.paused||!state.queue.items.some(item=>item.canRemove);
@@ -43,21 +50,31 @@ function renderSessions(){
   }));
   const session=current();$('title').textContent=session?.title||'Your agent, in view';
   $('subtitle').textContent=session?(session.running?'Working · ':'')+session.cwd:'Open a conversation to inspect its execution and context.';
-  $('stop').disabled=!session?.running&&!submitting;$('send').disabled=!session;
-  $('send').textContent=session?.running||submitting?'Queue':'Send';renderQueue();
+  $('stop').disabled=!session?.running&&!submitting;
+  $('send').disabled=!session||messageActions.busy;
+  $('send').textContent=messageActions.editing?'Send edit':session?.running||submitting?'Queue':'Send';renderQueue();
+  $('edit-message').hidden=!messageActions.editing;$('cancel-edit').disabled=messageActions.busy;
+  $('new-chat').disabled=messageActions.busy;$('model').disabled=!!session?.running||submitting||messageActions.busy;
   $('trim-tools').disabled=!session||session.running||submitting;
 }
 function renderChat(){
   const container=$('messages'),following=container.scrollHeight-container.scrollTop-container.clientHeight<80;
-  const rendered=[];
+  const rendered=[],targets=messageTargets(state.history),locked=!!current()?.running||submitting||messageActions.busy;
   for(const item of projectChat(state.history,{running:current()?.running})){
     if(item.kind==='user'||item.kind==='assistant'){
       const user=item.kind==='user',{text,thinking}=item;
       const article=node('article',undefined,'message'+(user?' user':''));
+      if(item.seq)article.dataset.messageSeq=item.seq;
       article.append(node('div',user?'You':item.partial?'Augmentor · '+item.status:'Augmentor','role'));
       if(thinking)article.append(detail('Thinking',thinking,item.status==='streaming'));
       article.append(node('div',text));
-      if(text)article.append(copyButton(text));rendered.push(article);
+      const actions=node('div',undefined,'message-actions');if(text)actions.append(copyButton(text));
+      if(Number.isSafeInteger(item.seq)&&((user&&item.seq===targets.editSeq)||(!user&&targets.replies.has(item.seq)))){
+        const button=node('button',user?'Edit':'Branch','message-action');button.type='button';button.dataset.messageAction=user?'edit':'branch';button.disabled=locked||!user&&!!messageActions.editing;
+        button.title=user?'Edit the latest input in a new conversation':'Start a new conversation after this reply';
+        button.onclick=()=>user?messageActions.edit(item.seq,text):void messageActions.reply(item.seq);actions.append(button);
+      }
+      if(actions.childNodes.length)article.append(actions);rendered.push(article);
     }else if(item.kind==='tool')rendered.push(node('div',item.name+' · '+item.status,'tool-chip'));
     else rendered.push(node('p',item.text,item.kind==='warning'?'error':'turn-status'));
   }
@@ -187,9 +204,11 @@ function renderInteraction(){
     const submit=node('button','Answer');submit.onclick=()=>respond({answer:{answers:[{custom:input.value}]}});panel.append(input,submit);
   }
 }
-async function selectSession(sid){
+async function selectSession(sid,{preserveEdit=false}={}){
+  if(!preserveEdit)messageActions.reset();
   closeSidebar();
   const epoch=++state.epoch;inspectionEpoch++;state.sessionId=sid;state.queue=null;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
+  sessionStorage.setItem('augmentor-harness-session',sid);
   $('interaction').hidden=true;$('inspector').replaceChildren(node('p','Select a record to inspect.','empty'));renderSessions();renderChat();
   const subscription=await rpc('events.subscribe',{sessionId:sid,clientId:state.clientId});if(epoch!==state.epoch)return;
   state.cursor=subscription.cursor;subscription.pending.forEach(showInteraction);queueBaseline(subscription.queue);
@@ -241,7 +260,8 @@ $('new-chat').onclick=async()=>{try{const selection=JSON.parse($('model').value|
 $('model').onchange=async()=>{const sid=state.sessionId,epoch=state.epoch;try{if(sid)await rpc('session.selectModel',{sessionId:sid,...JSON.parse($('model').value)});}catch(e){notice(e.message,true);try{const selection=await rpc('session.models',{sessionId:sid});if(epoch===state.epoch)$('model').value=JSON.stringify(selection.current);}catch{}}};
 $('stop').onclick=async()=>{try{await rpc('session.cancel',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
 $('trim-tools').onclick=async()=>{const sid=state.sessionId,epoch=state.epoch;try{const result=await rpc('session.trimTools',{sessionId:sid});if(epoch!==state.epoch)return;notice(result.changes.length+' tool results shortened. Originals remain saved.');const page=await rpc('observation.list',{sessionId:sid});if(epoch===state.epoch){page.records.forEach(r=>state.observations.set(r.id,r));renderObservations();}}catch(e){notice(e.message,true);}};
-$('composer').onsubmit=async event=>{event.preventDefault();if(!state.sessionId)return;submitting=true;renderSessions();try{await promptQueue.submit();}finally{submitting=false;renderSessions();}};
+$('composer').onsubmit=async event=>{event.preventDefault();if(!state.sessionId||messageActions.busy)return;if(messageActions.editing){await messageActions.submit();return;}submitting=true;renderSessions();try{await promptQueue.submit();}finally{submitting=false;renderSessions();}};
+$('cancel-edit').onclick=()=>messageActions.cancel();
 $('continue-queue').onclick=async()=>{try{await rpc('session.continueQueue',{sessionId:state.sessionId});await refreshSessions();}catch(e){notice(e.message,true);}};
 $('input').onkeydown=event=>{if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();$('composer').requestSubmit();}};
 let drag=null;
@@ -255,7 +275,7 @@ async function start(){
   $('runtime').textContent='Pi '+host.piVersion+' · Augmentor '+host.version;$('workspace').value=host.workspace||'';
   for(const group of catalog.groups)for(const model of group.models.filter(m=>m.available)){const option=node('option',model.name+' · '+group.name);option.value=JSON.stringify({provider:model.provider,model:model.model});$('model').append(option);}
   if(catalog.default)$('model').value=JSON.stringify(catalog.default);$('capture').checked=capture.capturePayloads;
-  await refreshSessions();const initial=hash.get('session')||state.sessions[0]?.sessionId;if(initial)await selectSession(initial);
+  await refreshSessions();const saved=sessionStorage.getItem('augmentor-harness-session');const initial=hash.get('session')||(state.sessions.some(row=>row.sessionId===saved)?saved:null)||state.sessions[0]?.sessionId;if(initial)await selectSession(initial);
   setInterval(()=>void poll(),250);
 }
 start().catch(e=>notice(e.message,true));

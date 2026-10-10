@@ -3,19 +3,21 @@
 import http from 'node:http';
 import {once} from 'node:events';
 import {spawn} from 'node:child_process';
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,appendFileSync,readFileSync,existsSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
-import {join} from 'node:path';
+import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
-const source=fileURLToPath(new URL('..',import.meta.url));
+const source=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('..',import.meta.url)));
 const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
+const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
 mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(workspace);
 writeFileSync(join(workspace,'note.txt'),'Harness fixture ready.\n');
 const model=http.createServer(async(req,res)=>{
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
   let raw='';for await(const chunk of req)raw+=chunk;
   const body=JSON.parse(raw),afterTool=body.messages.at(-1)?.role==='tool';
+  if(requestLog)appendFileSync(requestLog,JSON.stringify(body)+'\n',{mode:0o600});
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null,usage)=>res.write('data: '+JSON.stringify({id:'fixture',object:'chat.completion.chunk',model:'harness-fixture',choices:[{index:0,delta,finish_reason:finish}],...(usage?{usage}:{})})+'\n\n');
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
@@ -63,5 +65,5 @@ while(!existsSync(join(state,'harness.json'))){
   await new Promise(resolve=>setTimeout(resolve,25));
 }
 const link=JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-console.log(JSON.stringify({fixture:true,url:link.url,workspace,config,state,pid:child.pid}));
+console.log(JSON.stringify({fixture:true,url:link.url,workspace,config,state,pid:child.pid,requestLog}));
 await once(child,'exit');await close();

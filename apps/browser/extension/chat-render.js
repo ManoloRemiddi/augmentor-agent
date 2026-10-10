@@ -241,10 +241,12 @@ export function createChatUI(els) {
   const $send = els.send
   const $top = els.top
 
+  const canMessageAction=action=>ui.state.phase==='ready'&&!ui.state.running&&!ui.state.submitting&&!!els.actionEnabled?.(action)
   function actionButton(action,seq,text){
     const button=el('button','msgaction msg-'+action);button.type='button';button.setAttribute('aria-label',ACTIONS.labels[action]);button.dataset.tooltip=ACTIONS.labels[action]
     button.innerHTML=action==='edit'?EDIT_ICON:BRANCH_ICON
-    button.addEventListener('click',()=>{if(els.actionEnabled?.(action))els.onMessageAction?.(action,seq,text)})
+    button.disabled=!canMessageAction(action)
+    button.addEventListener('click',()=>{if(canMessageAction(action))els.onMessageAction?.(action,seq,text)})
     return button
   }
   let assistantEl = null // block container: Think(s) + one .md text container
@@ -528,7 +530,7 @@ export function createChatUI(els) {
         if (data.source?.kind && data.source.kind !== 'user') break
         flushAssistant()
         const text = blockText(data.submittedContent ?? data.content)
-        confirmPrompt(text)
+        if(!data.source?.sessionId||data.source.sessionId===entry.sessionId)confirmPrompt(text)
         const m = el('div', 'msg user')
         m.append(el('span', 'who', 'You'))
         const stack = el('div', 'userbody')
@@ -729,6 +731,7 @@ export function createChatUI(els) {
                 : 'disconnected'
     }
     if ($send) $send.disabled = phase !== 'ready' || (running && !ui.state.canQueue) || !!ui.state.submitting
+    $log.querySelectorAll('.msg-edit,.msg-branch').forEach(button=>{button.disabled=!canMessageAction(button.classList.contains('msg-edit')?'edit':'branch')})
   }
 
   function applyLog(log) {

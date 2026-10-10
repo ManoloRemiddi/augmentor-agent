@@ -55,3 +55,13 @@ export function appendDisplay(events,event){
  if(!Number.isSafeInteger(event?.seq)||event.seq<=last)return false;
  events.push(event);return true;
 }
+
+/** Actions bind persisted native message sequences, never streamed drafts. */
+export function messageTargets(events){
+ const replies=new Set(),users=events.filter(event=>event.type==='user/message'&&event.data?.source?.kind==='user');
+ for(const event of events){
+  const parts=event.data?.message?.content||[];
+  if(event.type==='assistant/message'&&Number.isSafeInteger(event.seq)&&event.seq>0&&parts.some(part=>part.type==='text'&&part.text?.trim())&&!parts.some(part=>['toolCall','tool-call'].includes(part.type)))replies.add(event.seq);
+ }
+ const seq=users.at(-1)?.seq;return {replies,editSeq:Number.isSafeInteger(seq)&&seq>0?seq:undefined};
+}

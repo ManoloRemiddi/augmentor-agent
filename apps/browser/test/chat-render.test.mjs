@@ -20,12 +20,32 @@ test('streamed rendering preserves negotiated queue Send and still blocks unsupp
  ui.setState({canQueue:true,phase:'error'});stream();assert.equal(send.disabled,true)
 })
 
+test('persisted Branch/Edit buttons reflect ready idle state and suppress guarded clicks',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ let allowed=true;const calls=[],log=document.querySelector('#log'),ui=createChatUI({log,actionEnabled:()=>allowed,onMessageAction:(...args)=>calls.push(args)});t.after(()=>{ui.clear();dom.window.close()})
+ ui.setState({phase:'ready',running:true,canQueue:true});ui.applyLog([{kind:'event',event:{seq:1,type:'user/message',data:{source:{kind:'user'},content:[{type:'text',text:'Input'}]}}},{kind:'event',event:{seq:2,type:'assistant/message',data:{message:{content:[{type:'text',text:'Reply'}]}}}}])
+ const edit=log.querySelector('.msg-edit'),branch=log.querySelector('.msg-branch');assert(edit&&branch)
+ const blocked=()=>{for(const button of [edit,branch]){assert.equal(button.disabled,true);button.click();button.dispatchEvent(new window.Event('click'))}}
+ blocked();assert.equal(calls.length,0);ui.setState({running:false});assert.equal(edit.disabled,false);assert.equal(branch.disabled,false);branch.click();assert.deepEqual(calls,[['branch',2,'Reply']])
+ ui.setState({submitting:true});blocked();ui.setState({submitting:false,phase:'error'});blocked();allowed=false;ui.setState({phase:'ready'});blocked();assert.equal(calls.length,1)
+})
+
 test('prepared Pi input displays the original submitted text without replacing effective native content',t=>{
  const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
  globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
  const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
  const event={seq:1,type:'user/message',data:{source:{kind:'user'},submittedContent:[{type:'text',text:'/template original'}],content:[{type:'text',text:'Prepared instructions'}]}}
  ui.applyLog([{kind:'event',event}]);assert(log.textContent.includes('/template original'));assert(!log.textContent.includes('Prepared instructions'));assert.equal(event.data.content[0].text,'Prepared instructions')
+})
+
+test('inherited Pi input renders without confirming an optimistic child submission with the same text',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const pending=ui.pendingPrompt('Same submission'),event=(seq,origin)=>({kind:'event',sessionId:'child',event:{seq,type:'user/message',data:{source:{kind:'user',sessionId:origin},content:[{type:'text',text:'Same submission'}]}}})
+ ui.applyLog([event(1,'parent')]);assert.equal(pending.confirmed,false);assert(log.contains(pending.node));assert.equal(log.querySelectorAll('.msg.user:not(.pending)').length,1)
+ ui.applyLog([event(2,'child')]);assert.equal(pending.confirmed,true);assert(!log.contains(pending.node));assert.equal(log.querySelectorAll('.msg.user').length,2)
 })
 
 test('workspace thinking preference applies to live reasoning, preserves manual choices and leaves history collapsed',t=>{

@@ -150,7 +150,7 @@ export class Host {
         if(requestId)this.queue(m).delivered(requestId);
         const content=typeof e.message.content==='string'?[{type:'text',text:e.message.content}]:e.message.content;
         const submitted=requestId?this.queue(m).read(requestId).input:undefined,submittedContent=submitted?[{type:'text',text:submitted}]:undefined;
-        this.append(m,'user/message',{source:{kind:'user',...(requestId?{rpcId:requestId}:{})},content,...(submittedContent&&JSON.stringify(submittedContent)!==JSON.stringify(content)?{submittedContent}:{})});
+        this.append(m,'user/message',{source:{kind:'user',sessionId:m.id,...(requestId?{rpcId:requestId}:{})},content,...(submittedContent&&JSON.stringify(submittedContent)!==JSON.stringify(content)?{submittedContent}:{})});
       }
       if(e.type==='message_update'){
         const a=e.assistantMessageEvent;if(a.type==='text_delta')this.append(m,'assistant/chunk',{chunk:{type:'text-delta',text:a.delta}});
@@ -197,7 +197,8 @@ export class Host {
     const directory=privateDir(join(this.dirs.sessions,sid));
     const context=branchContext(source.file,directory,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
     const m:Meta={memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
-    writeFileSync(join(this.dirs.sessions,sid+'.events.jsonl'),context.events.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600});
+    const inherited=context.events.map(event=>event.type==='user/message'?{...event,data:{...event.data,source:{...event.data.source,sessionId:event.data.source?.sessionId??source.id}}}:event);
+    writeFileSync(join(this.dirs.sessions,sid+'.events.jsonl'),inherited.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600});
     // Pi defers writing branches with no assistant messages until a reply.
     if(context.manager&&context.file&&!existsSync(context.file))await this.load(m,context.manager);
     this.metadata.set(sid,m);this.save(m);

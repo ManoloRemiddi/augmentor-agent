@@ -46,7 +46,7 @@ export function createQueue({container,input,send,allowIdle=false}) {
     const entries=message.log??(message.entry?[message.entry]:[])
     for(const entry of entries){
       const event=entry.event,id=event?.data?.source?.rpcId
-      if(entry.sessionId===sessionId&&event?.type==='user/message'&&event.data.source.kind==='user'&&id){state.delivered.add(id);state.pending.delete(id);state.items=state.items.filter(item=>item.canResolve===true||item.rpcId!==id)}
+      if(entry.sessionId===sessionId&&event?.type==='user/message'&&event.data.source.kind==='user'&&(!event.data.source.sessionId||event.data.source.sessionId===sessionId)&&id){state.delivered.add(id);state.pending.delete(id);state.items=state.items.filter(item=>item.canResolve===true||item.rpcId!==id)}
     }
     if(state.delivered.size>2048)state.delivered=new Set([...state.delivered].slice(-1024))
     render()
@@ -66,11 +66,11 @@ export function createQueue({container,input,send,allowIdle=false}) {
     })
     tail=task.catch(()=>{});return task
   }
-  function submit(){
+  function submitText(value,clearInput=false){
     if(!enabled||!online||(!running&&!allowIdle))return Promise.resolve(false)
-    const text=input.value.trim();if(!text)return Promise.resolve(false)
+    const text=value.trim();if(!text)return Promise.resolve(false)
     const id=globalThis.crypto.randomUUID(),target=sessionId,state=current(),resumeQueue=!running&&state.pending.size===0
-    state.pending.set(id,{text,label:'Queuing…'});input.value='';input.dispatchEvent(new input.ownerDocument.defaultView.Event('input',{bubbles:true}));render()
+    state.pending.set(id,{text,label:'Queuing…'});if(clearInput){input.value='';input.dispatchEvent(new input.ownerDocument.defaultView.Event('input',{bubbles:true}))}render()
     const task=tail.then(async()=>{
       try{
         if(target!==sessionId||!enabled||!online)throw Error('Conversation changed before submission.')
@@ -82,5 +82,5 @@ export function createQueue({container,input,send,allowIdle=false}) {
     })
     tail=task.catch(()=>{});return task
   }
-  return {update,submit,act,get enabled(){return enabled}}
+  return {update,submit:()=>submitText(input.value,true),submitText,act,get enabled(){return enabled}}
 }

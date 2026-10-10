@@ -760,10 +760,12 @@ class Window(QWidget):
                 return True
         if kind=='user/message':
             if data.get('source',{}).get('kind')!='user':return False
-            self.queue_panel.consumed(data.get('source',{}).get('rpcId'))
+            origin=data.get('source',{}).get('sessionId')
+            own_delivery=origin is None or origin==getattr(self.controller,'session',None)
+            if own_delivery:self.queue_panel.consumed(data.get('source',{}).get('rpcId'))
             text='\n'.join(p.get('text','') for p in data.get('submittedContent',data.get('content',[])) if p.get('type')=='text')
             if text:
-                if text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
+                if own_delivery and text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
                 self.message_events[len(self.messages)]=event
                 self.messages.append(('You',text))
             return bool(text)

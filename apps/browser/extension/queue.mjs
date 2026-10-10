@@ -46,7 +46,7 @@ export function createQueue({container,input,send}) {
     const entries=message.log??(message.entry?[message.entry]:[])
     for(const entry of entries){
       const event=entry.event,id=event?.data?.source?.rpcId
-      if(entry.sessionId===sessionId&&event?.type==='user/message'&&event.data.source.kind==='user'&&id){state.delivered.add(id);state.pending.delete(id);state.items=state.items.filter(item=>item.canResolve===true||item.rpcId!==id)}
+      if(entry.sessionId===sessionId&&event?.type==='user/message'&&event.data.source.kind==='user'&&(!event.data.source.sessionId||event.data.source.sessionId===sessionId)&&id){state.delivered.add(id);state.pending.delete(id);state.items=state.items.filter(item=>item.canResolve===true||item.rpcId!==id)}
     }
     if(state.delivered.size>2048)state.delivered=new Set([...state.delivered].slice(-1024))
     render()

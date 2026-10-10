@@ -175,6 +175,23 @@ class WindowTests(unittest.TestCase):
         self.assertEqual(window.message_events[0]['data']['content'][0]['text'],'Prepared instructions')
         window.close()
 
+    def test_inherited_receipt_preserves_pending_child_submission(self):
+        from unittest.mock import Mock
+        window=Window();window.controller=SimpleNamespace(session='child',running=False,close=lambda:None);window.pending_prompt='Same submission';window.submitted_draft=window.pending_prompt
+        window.queue_panel.consumed=Mock()
+        def event(seq,origin):
+            return {'seq':seq,'type':'user/message','data':{'source':{'kind':'user','sessionId':origin,'rpcId':'same-id'},'content':[{'type':'text','text':'Same submission'}]}}
+        try:
+            window.fold_event(event(1,'parent'))
+            window.queue_panel.consumed.assert_not_called()
+            self.assertEqual(window.pending_prompt,'Same submission');self.assertEqual(window.submitted_draft,'Same submission')
+            self.assertEqual(window.messages,[('You','Same submission')])
+            window.fold_event(event(2,'child'))
+            window.queue_panel.consumed.assert_called_once_with('same-id')
+            self.assertIsNone(window.pending_prompt);self.assertIsNone(window.submitted_draft)
+            self.assertEqual(len(window.messages),2)
+        finally:window.close()
+
     def test_compact_keeps_draft_and_on_top_request(self):
         window = Window()
         window.composer.setPlainText('A draft')

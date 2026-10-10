@@ -139,6 +139,7 @@ export class HarnessServer {
         ['/', {path: join(this.assets, 'index.html'), type: 'text/html'}],
         ['/app.js', {path: join(this.assets, 'app.js'), type: 'text/javascript'}],
         ['/chat-projection.js', {path: join(this.assets, 'chat-projection.js'), type: 'text/javascript'}],
+        ['/message-actions.js', {path: join(this.assets, 'message-actions.js'), type: 'text/javascript'}],
         ['/queue-view.js', {path: fileURLToPath(new URL('../../harness-ui/src/queue-view.js', import.meta.url)), type: 'text/javascript'}],
         ['/harness.css', {path: join(this.assets, 'harness.css'), type: 'text/css'}],
         ['/timeline.js', {path: fileURLToPath(new URL('../../harness-ui/src/dsh-timeline.js', import.meta.url)), type: 'text/javascript'}],

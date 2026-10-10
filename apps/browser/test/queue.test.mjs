@@ -84,3 +84,18 @@ test('Harness clears rapid initial inputs, keeps request IDs and resumes only an
  assert.equal(input.value,'');assert.deepEqual(calls.map(call=>call.text),['First','Second']);assert.deepEqual(calls.map(call=>call.resumeQueue),[true,false]);assert.notEqual(calls[0].requestId,calls[1].requestId)
  assert.equal(container.children.length,2)
 })
+
+test('Harness submits an edited text snapshot without clearing a newer composer draft',async t=>{
+ const dom=new JSDOM('<div></div><textarea></textarea>');t.after(()=>dom.window.close());const container=dom.window.document.querySelector('div'),input=dom.window.document.querySelector('textarea'),calls=[]
+ const queue=createHarnessQueue({container,input,allowIdle:true,send:async(method,payload)=>{calls.push(payload);return {accepted:true}}})
+ queue.update({harness:'pi',capabilities:{queue:true},sessionId:'child',phase:'ready',running:false});input.value='Newer draft';assert(await queue.submitText('Edited snapshot'));assert.equal(input.value,'Newer draft');assert.equal(calls[0].text,'Edited snapshot');assert.equal(calls[0].sessionId,'child');assert.equal(calls[0].resumeQueue,true)
+})
+
+for(const [label,create] of [['Browser',createQueue],['Harness',createHarnessQueue]])test(`${label} inherited receipts cannot consume a child's reused request identity`,async t=>{
+ const dom=new JSDOM('<div></div><textarea></textarea>');t.after(()=>dom.window.close());const container=dom.window.document.querySelector('div'),input=dom.window.document.querySelector('textarea')
+ const queue=create({container,input,send:async()=>({accepted:true})}),state={harness:'pi',capabilities:{queue:true},sessionId:'child',phase:'ready',running:true}
+ queue.update(state);input.value='Child submission';await queue.submit();const id=container.firstElementChild.dataset.queueId
+ const delivery=origin=>({...state,entry:{sessionId:'child',event:{type:'user/message',data:{source:{kind:'user',sessionId:origin,rpcId:id}}}}})
+ queue.update(delivery('parent'));assert.equal(container.children.length,1);assert.match(container.textContent,/Child submission/)
+ queue.update(delivery('child'));assert.equal(container.children.length,0)
+})
