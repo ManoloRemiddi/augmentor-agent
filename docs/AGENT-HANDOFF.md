@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 10 scoped conversation inspection checkpoint
+
+Tested implementation source: `ffcacf4bd7b829516dd797a34b033b09e1c72716`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 18:17 UTC. The subsequent qualification commit changes documentation only.
+
+Standalone Pi Native three-dot and Browser Models menus now open the current conversation in the existing Harness with a separate read-only link. The server binds each bearer to one conversation, expires it after four hours and refuses mutations, foreign reads, administration and approval responses before Host dispatch. Read-only watches cannot own approvals or replace an operator watch. The owner starts its loopback inspector lazily; inspection sends no provider request. Context capture remains opt-in and its missing coverage is reported honestly. [The owning record](AUGMENTOR-HARNESS.md#native-and-browser-conversation-inspection) preserves the contract, exact fixture failures/corrections, source/staged evidence and remaining transparency work.
+
+Final local qualification: 640 Node cases (638 pass/two optional memory-engine skips), 116 Browser passes, 864 Python/Qt cases (827 pass/37 existing skips), and 60 staged passes with bundled Node 24.19.0. Actual Pi/private IPC/HTTP, production Qt menu and loaded Chromium Native Messaging/Models/inspector checks verify scoped authority, expiry, unchanged parents, no inference, exact received post-hook Context, reload and a visible read-only cue at 640×900. The final source and staged processes both exit normally. One earlier staged command returned 143 after its assertions passed; its sole cause was not captured, and is recorded without substituting assertion success for normal completion. No dependency was added; 126 production package instances and their notice baseline remain.
+
+Predecessor `fe8c7b6` has 20 hosted successes, including terminal Mac 26 success (38073510871/job 114275749723). Windows x64/ARM64 native jobs 114276782076/114276781990 remain live at this observation and were not blindly restarted. The older Mac memory failure's sole cause remains unproved. Fresh matching-head hosted, physical OS and installed acceptance remain required.
+
+The complete accepted P0/P1 scope remains binding: indexed history/provenance, embedded/live routing and command/resource composition, live Hindsight, integration receipts, actual voice/audio, wiki/MCP, plans/jobs/delegation, Home/mobile/multiple windows and all platform/package/installed/update/rollback/privacy gates. Preserve DSH, private/old work, selected owner releases and model/speech/GPU settings. Do not merge/promote, retire DSH or mark the full migration complete from this inspection slice. Earlier checkpoints below are historical.
+
 ## October 10 Pi prompt improvement checkpoint
 
 Tested implementation source: `97376d2a0144f8b158215bdcbca14e335e4b2336`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 17:52 UTC. The following qualification commit changes documentation only.
