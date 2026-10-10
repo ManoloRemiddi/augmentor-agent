@@ -11,11 +11,7 @@ export interface SearchOptions {query?:unknown;scope?:unknown;cursor?:unknown;li
 type Current={seq:number;id:string;hash:string;offset:number;mask:number;metadataMask:number};
 type Cursor={version:1;sessionId:string;query:string;scope:SearchScope;ceiling:number;total:number;before:number;inclusive:boolean;current?:Current};
 const digest=(text:string)=>createHash('sha256').update(text).digest('hex');
-// Per-code-point lowercase avoids contextual case changes at chunk boundaries.
-const fold=(text:string)=>text.replace(/./gsu,character=>character.toLowerCase()).replace(/ς/g,'σ');
-const maskFor=(text:string,terms:string[])=>{const lower=fold(text);return terms.reduce((mask,term,i)=>mask|(lower.includes(term)?1<<i:0),0);};
-function decoded(bytes:Buffer){let start=0,end=bytes.length;while(start<end&&(bytes[start]!&0xc0)===0x80)start++;let last=end-1;while(last>=start&&(bytes[last]!&0xc0)===0x80)last--;if(last>=start){const b=bytes[last]!,length=b<0x80?1:b<0xe0?2:b<0xf0?3:4;if(end-last<length)end=last;}return {text:new TextDecoder('utf8',{fatal:true}).decode(bytes.subarray(start,end)),start};}
-function preview(text:string,terms:string[],base:number){const lower=fold(text),term=terms.find(term=>lower.includes(term));if(!term)return undefined;const at=lower.indexOf(term);let original=0,folded=0;for(const character of text){if(folded>=at)break;folded+=fold(character).length;original+=character.length;}const from=Math.max(0,original-80),to=Math.min(text.length,original+term.length+160);let start=from,end=to;if(start>0&&/[\uDC00-\uDFFF]/.test(text[start]!))start--;if(end<text.length&&/[\uDC00-\uDFFF]/.test(text[end]!))end++;return {offset:base+Buffer.byteLength(text.slice(0,start)),units:'utf8-bytes',text:text.slice(start,end)};}
+import {literalFold as fold,termMask as maskFor,decodedWindow as decoded,matchPreview as preview} from './literal-search.js';
 /** Stateless, authenticated progress survives owner restart. Private bodies stay
  * in their existing capture files; a cursor carries only positions/hashes/masks.
  */

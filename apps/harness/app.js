@@ -39,7 +39,7 @@ addEventListener('keydown',event=>{if(event.key==='Escape')closeSidebar();});
 function node(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
 function notice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error);}
 async function rpc(method,params={}){
-  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead','session.models','session.queue','observation.describe','observation.list','observation.search','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
+  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead','session.originalSearch','session.originalRead','session.models','session.queue','observation.describe','observation.list','observation.search','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
   const response=await fetch('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});
   const body=await response.json();if(!response.ok||body.error)throw Error(body.error?.message||'The local connection failed');return body.result;
 }

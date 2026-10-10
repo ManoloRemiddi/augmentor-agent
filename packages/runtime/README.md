@@ -2,6 +2,8 @@
 
 # Shared Pi runtime host
 
+Managed [original-history search](../../docs/AUGMENTOR-HARNESS.md#saved-pi-and-raw-display-original-search) provides literal, bounded selected-ancestry/all-branch Pi searches and uncompacted raw display-journal searches through `session.originalSearch`/`session.originalRead`. Private v2 derivatives contain offsets, identities, checksums and ancestry/prefix hashes, with no message bodies or search terms. Signed cursors resume partial originals after restart; source-block and optional expected entry/source hashes guard reads. Index rebuild streams the source and is reported separately from the 512 KiB search scan. These inspection methods accept no client path, start no SDK session/inference and preserve complete corrupt and incomplete-tail source bytes. Original display sequences are distinct from Pi ancestry and effective context.
+
 The [composition observer](../../docs/AUGMENTOR-HARNESS.md#recorded-context-composition-boundaries) records supported SDK boundaries and managed memory without changing returned context or starting another loop. Capture is opt-in; extra immutable snapshot bodies share an 8 MiB serialized budget and partial states remain visible. Loader catalogs do not establish consumption, opaque transforms have aggregate coverage and complete source provenance remains unavailable. Context clears when switching to an empty conversation and rejects delayed request/session payload replies. This is shared runtime/Harness behavior with no added OS adapter or dependency.
 
 `src/` integrates the public Pi coding-agent SDK: exact model selection, sessions,

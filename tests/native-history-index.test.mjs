@@ -25,7 +25,9 @@ test('100,000 authored native records page warm and reopened indexes with bounde
  for(let i=0;i<100000;i++){batch+=JSON.stringify({type:'custom',id:'native'+i,parentId:i?'native'+(i-1):null,timestamp:'2026-10-10T00:00:00.000Z',customType:'authored-index-proof',data:{marker:'ORIGINAL_PRIVATE_BODY_'+i}})+'\n';if(i%1000===999){fs.writeSync(fd,batch);batch='';}}
  fs.closeSync(fd);const original=fs.readFileSync(f.file),r=reader(f),first=r.page({limit:25});assert.equal(first.entries[0].entryId,'native99999');
  const tracked=[f.file,r.entries,r.lookup,r.blocks],warm=measure(tracked,()=>r.page({limit:25,cursor:first.nextCursor})),cold=measure(tracked,()=>reader(f).page({limit:25,cursor:warm.result.nextCursor}));
- for(const observed of [warm,cold]){assert(observed.bytes.get(f.file)>0);assert(observed.bytes.get(f.file)<=4*65536);assert.equal(observed.result.coverage.sourceBytesRead,observed.bytes.get(f.file));assert([...observed.bytes.entries()].filter(([path])=>path!==f.file).reduce((sum,[,n])=>sum+n,0)<16384);}
+ // v2 adds a 32-byte range hash per row; ancestry reads two rows per entry
+ // plus the bounded identifier lookup. The 100k source stays off the read path.
+ for(const observed of [warm,cold]){assert(observed.bytes.get(f.file)>0);assert(observed.bytes.get(f.file)<=4*65536);assert.equal(observed.result.coverage.sourceBytesRead,observed.bytes.get(f.file));const metadataBytes=[...observed.bytes.entries()].filter(([path])=>path!==f.file).reduce((sum,[,n])=>sum+n,0);assert(metadataBytes<20*1024,'bounded v2 metadata bytes: '+metadataBytes);}
  assert.equal(warm.result.entries[0].entryId,'native99974');assert.equal(cold.result.entries[0].entryId,'native99949');assert.equal(cold.result.nativeSessionId,f.manager.getSessionId());assert.deepEqual(fs.readFileSync(f.file),original);
  for(const path of [r.entries,r.lookup,r.blocks,r.manifest])assert(!fs.readFileSync(path).includes(Buffer.from('ORIGINAL_PRIVATE_BODY_')),'derived files contain no native content');
 });
