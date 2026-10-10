@@ -10,6 +10,8 @@ The motivations are reduced dependence on a preview harness, preference for Pi's
 
 October 10 implementation checkpoint: [Adaptive Reasoning and effective thinking controls](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) now qualify the selected MIT policy, public Pi hooks, saved Manual/Adaptive effort, exact profile mappings and Harness settings/Context display in synthetic source/staged fixtures. Native/Browser controls and representative live/virtual routing remain required; this does not reduce the accepted feature parity or cutover gates below.
 
+October 10 follow-up: [Native/Browser reasoning controls](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls) now qualify standalone Settings/Models entry points against the same Pi owner and shared form. No inference or automatic model selection occurs from settings. Live/virtual routing, embedded/SDK controls and the full parity/cutover requirements remain open.
+
 ## Decisions and boundaries
 
 | Decision | Direction |

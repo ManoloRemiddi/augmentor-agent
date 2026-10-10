@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 10 standalone Native/Browser reasoning checkpoint
+
+The active `feat/augmentor-harness` candidate now connects Native Settings and Browser Models to the same Pi saved Manual/Adaptive effort and explicit profile mappings as Harness. Browser/Harness share one local form; Native uses the private IPC owner. [The owning qualification record](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls) documents capability/context/scope/maintenance guards, neutral defaults, no settings inference, selected MIT attribution and remaining embedded/live routing gates. Existing chat layouts, owner state and speech/GPU preferences remain intact.
+
+Actual production Qt Settings mouse events/Pi socket and loaded Chromium settings/native host/bridge/SDK fixtures pass. They verify conflicts with preserved drafts, reload/reopen, role/conversation guards, unchanged parents and actual Manual `high` versus mapped Adaptive `medium` requests. Native and 640×900 Browser visuals are inspected, including the corrected Native policy contrast. Full source qualification: 637 Node cases (635 pass, two optional memory-engine skips), 116 Browser passes, and 864 Python/Qt cases (827 pass, 37 skips). Staged bundled runtime/Native/loaded Browser/ws/Harness: 58 passes. The root 126-package/native/MIT inventory is unchanged; developer Browser dependencies are excluded from the candidate. The preceding published `56c2ce4` completed all 17 registered hosted checks successfully; fresh matching-head gates remain required.
+
+The complete accepted P0/P1 scope remains binding. Live/virtual adaptive routing and embedded controls, Pi prompt improvement/composition, provenance/indexed history/inspection, live memory, authoritative integration receipts, actual audio, wiki/MCP, plans/jobs/delegation, Home/mobile/multiple windows and full platform/installed/update/rollback/privacy acceptance remain required. Keep DSH and preserved old work available; do not merge/promote or mark the migration complete from this source/staged slice. Earlier checkpoints below are historical.
+
+
 ## October 10 Adaptive Reasoning and Harness settings checkpoint
 
 Tested implementation source: `0d36c3cecad0637169156aead943eb1ba6311f08`, on `feat/augmentor-harness`; qualification recorded 10 October 2026, 16:44 UTC. The subsequent qualification commit changes documentation only.

@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 10 Native/Browser follow-up adds effort/mapping controls in existing settings locations. Browser and Harness use one DOM form; Native uses a Qt client of the same serialized Pi owner. Forms do no inference or automatic model selection. Browser operations check the selected conversation and standalone authority; global administration stays out of SDK workspaces. Context/model/working changes invalidate dialogs and late results, and open settings participate in maintenance admission. See [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls).
+
+
 The October 10 Adaptive Reasoning candidate composes the existing AgentSession's public `prepareRequest`, `transformContext` and tool guard after session ownership and routing. The selected MIT pure policy classifies host-correlated delivered SDK input; explicit profile mappings choose supported effort for the actual routed model. An unmapped model preserves its request level. Request-only editing guidance/schema filtering is applied after the SDK's prompt projection and never mutates canonical history or global tools. Manual effort and mode are per conversation; mappings are profile settings. [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) owns the supported boundaries and remaining Native/Browser/live routing gates.
 
 

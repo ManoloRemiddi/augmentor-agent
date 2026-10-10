@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 10 follow-up: standalone Native Settings and Browser Models now expose the same Pi saved effort/mode and profile mappings as Harness. Actual production Qt and loaded Chromium/native bridge/Pi fixtures qualify saves, conflicts, reload/reopen, received Manual/Adaptive effort and scope guards in [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls). This supersedes the standalone settings gap in the preceding checkpoint. Live/virtual routing, SDK/embedded controls, richer inspection and the full migration/platform/installed gates remain required.
+
+
 October 10 candidate: Adaptive Reasoning's pure MIT policy, supported Pi adapter, per-conversation Manual/Adaptive effort, exact provider/model mappings and Harness settings/Context decision display are source/staged qualified in [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls). Native and Browser settings controls, representative live providers and virtual/physical route acceptance remain required. Existing Native/Browser layouts and installed DSH support are retained. This checkpoint supersedes the earlier blanket adaptive-port gap only within this scope.
 
 

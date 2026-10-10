@@ -13,5 +13,9 @@ export async function harnessCdp(url){
     if(row){pending.delete(frame.id);clearTimeout(row.timer);frame.error?row.reject(Error(frame.error.message)):row.resolve(frame.result);}
   });
   const call=(method,params={})=>new Promise((resolve,reject)=>{const key=++id,timer=setTimeout(()=>{pending.delete(key);reject(Error('CDP timeout: '+method));},10000);pending.set(key,{resolve,reject,timer});ws.send(JSON.stringify({id:key,method,params}));});
-  return Object.assign(api,{call,close(){for(const row of pending.values())clearTimeout(row.timer);ws.close();},async evaluate(expression){const result=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value;}});
+  return Object.assign(api,{call,async reload(){
+    const key='__augmentor_test_reload_'+crypto.randomUUID().replaceAll('-','');await api.evaluate('globalThis['+JSON.stringify(key)+']=true');await call('Page.reload');
+    const end=Date.now()+10000;while(Date.now()<end){try{if(await api.evaluate('globalThis['+JSON.stringify(key)+']===undefined&&document.readyState==="complete"'))return;}catch{}await new Promise(resolve=>setTimeout(resolve,30));}
+    throw Error('CDP reload did not replace the document');
+  },close(){for(const row of pending.values())clearTimeout(row.timer);ws.close();},async evaluate(expression){const result=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true});if(result.exceptionDetails)throw Error(JSON.stringify(result.exceptionDetails));return result.result.value;}});
 }

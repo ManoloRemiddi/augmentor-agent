@@ -2,6 +2,8 @@
 
 # Augmentor Harness web client
 
+Reasoning now uses the shared standalone Browser form at `apps/browser/extension/pi-reasoning.mjs`, served through one fixed local route. Native controls use the same Host settings/RPC owner. [The follow-up qualification](../../docs/AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls) supersedes the standalone controls gap in the prior checkpoint.
+
 Reasoning settings use the authenticated Pi Host: saved Manual/Adaptive mode and supported effort per conversation; profile enable/text-only/preset controls and exact model/tier mappings. Neutral defaults have no mappings. Revision conflicts preserve the draft; Reload explicitly discards it. Settings do no inference, and active chats prevent saves. Context displays each request's requested effort, saved level, classification, applicable route and request-only contribution. See [qualification](../../docs/AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls); Native/Browser controls and live-provider acceptance remain open.
 
 A local operator interface for the existing Pi runtime, served by `packages/runtime/src/harness-server.ts`. Build first, run an isolated configured runtime profile, then use `npm run harness` with the same environment. `npm run harness:proof` provides a disposable synthetic-provider demonstration.

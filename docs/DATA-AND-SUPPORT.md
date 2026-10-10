@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Native and standalone Browser reasoning controls are clients of the existing private Pi settings and conversation metadata; no second store, prompt copy, credential export or inference is added. Browser calls carry selected-conversation identity; the bridge rejects Linux chats. Native late results are bound to the opening controller/session/model, and Browser/Harness dialogs invalidate changed context. The shared form loads through fixed local paths without remote scripts/analytics. [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls) records synthetic fixtures and remaining live/installed boundaries.
+
+
 # Data, permissions and support
 
 The October 10 Harness reasoning candidate stores global enable/text-only/preset/model mappings in the private Pi profile settings, and saved effort/mode/revision in each conversation's metadata. Explicit effort changes also create the SDK's native thinking-level history entries. Adaptive request effort, task-tier reasons, input character/media counts and fixed MIT editing guidance are private diagnostic records under existing retention/capture rules; classification does not send an extra request or persist another copy of the submitted text. Conversation history and diagnostic retention remain separate. Context labels SDK-requested effort separately from saved effort and any exposed provider result; it does not assert the backend honored a setting. See [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls).

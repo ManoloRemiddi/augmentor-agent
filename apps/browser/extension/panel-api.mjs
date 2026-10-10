@@ -201,6 +201,23 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
       sendResponse({ok:true,result})
     }).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
+  if(msg?.type==='reasoning'){
+    const methods={describe:'reasoning.describe',configure:'reasoning.configure',session:'session.reasoning',select:'session.selectReasoning',models:'augmentor/models'};
+    const method=Object.hasOwn(methods,msg.action)?methods[msg.action]:undefined,sid=msg.sourceSession;
+    if(!method){sendResponse({ok:false,error:'Unknown reasoning action.'});return}
+    const valid=()=>state.harness==='pi'&&state.capabilities.reasoning===true&&state.phase==='ready'&&!state.panelViewSession&&sid===state.sessionId&&!chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol;
+    if(!valid()){sendResponse({ok:false,error:'Select a ready standalone Pi conversation before changing reasoning.'});return}
+    const writing=['configure','select'].includes(msg.action),creating=msg.action==='session'&&!state.sessionReady;
+    if((writing||creating)&&(state.running||state.mutating)){sendResponse({ok:false,error:'Finish the current action before changing reasoning.'});return}
+    if(writing||creating)state.mutating=true;
+    ;(async()=>{
+      if(creating){await request('session.create',{sessionId:sid});if(!valid())throw Error('The conversation changed. Reopen reasoning settings.');state.sessionReady=true}
+      const params=msg.action==='configure'?{expectedRevision:msg.params?.expectedRevision,config:msg.params?.config}:msg.action==='select'?{sessionId:sid,expectedRevision:msg.params?.expectedRevision,mode:msg.params?.mode,thinkingLevel:msg.params?.thinkingLevel}:msg.action==='session'?{sessionId:sid}:{};
+      const result=await request(method,params);
+      if(!valid())throw Error('The conversation changed. Reopen reasoning settings.');
+      sendResponse({ok:true,result});
+    })().catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>{if(writing||creating)state.mutating=false});return true
+  }
   if (msg?.type === 'prompts') {
     ensurePort()
     request('augmentor/prompts', msg.request ?? {action:'list'})
@@ -211,6 +228,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
     ensurePort()
     sendResponse({
       harness: state.harness,
+      capabilities:state.capabilities,
       phase: state.phase,
       error: state.error,
       running: state.running,

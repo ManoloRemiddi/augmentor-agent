@@ -72,7 +72,7 @@ test('Harness shared prompt editor, Native conflicts and two-step clipboard inse
   assert(await panel.evaluate('(()=>{const r=document.querySelector(".shared-prompt-editor").getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=innerHeight;})()'));
   if(process.env.AUGMENTOR_HARNESS_PROMPTS_SCREENSHOT)await writeFile(process.env.AUGMENTOR_HARNESS_PROMPTS_SCREENSHOT,Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
   await button('Done');assert.equal(await value('#input'),'Original Harness draft');assert.equal((await requests()).length,0,'CRUD and instructions do not perform inference');
-  await panel.call('Emulation.clearDeviceMetricsOverride');await visible('document.querySelector("#new-chat").getBoundingClientRect().width>0');await click('#new-chat');await visible('!document.querySelector("#send").disabled');await panel.call('Page.reload');await visible('!document.querySelector("#send").disabled');
+  await panel.call('Emulation.clearDeviceMetricsOverride');await visible('document.querySelector("#new-chat").getBoundingClientRect().width>0');await click('#new-chat');await visible('!document.querySelector("#send").disabled');await panel.reload();await visible('!document.querySelector("#send").disabled');
   assert.deepEqual((await rpc('prompts.list')).prompts,[row]);
   await panel.call('Browser.grantPermissions',{origin:url.origin,permissions:['clipboardReadWrite','clipboardSanitizedWrite']});await panel.call('Page.bringToFront');
   const snapshot='Café 😀\n[clipboard]';await panel.evaluate('navigator.clipboard.writeText('+JSON.stringify(snapshot)+')');

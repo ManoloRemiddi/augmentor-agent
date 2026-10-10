@@ -143,6 +143,7 @@ export class HarnessServer {
         ['/message-actions.js', {path: join(this.assets, 'message-actions.js'), type: 'text/javascript'}],
         ['/prompt-library.js', {path: join(this.assets, 'prompt-library.js'), type: 'text/javascript'}],
         ['/reasoning.js', {path: join(this.assets, 'reasoning.js'), type: 'text/javascript'}],
+        ['/shared-reasoning/pi-reasoning.mjs', {path:fileURLToPath(new URL('../../../apps/browser/extension/pi-reasoning.mjs',import.meta.url)),type:'text/javascript'}],
         ['/queue-view.js', {path: fileURLToPath(new URL('../../harness-ui/src/queue-view.js', import.meta.url)), type: 'text/javascript'}],
         ['/harness.css', {path: join(this.assets, 'harness.css'), type: 'text/css'}],
         ['/timeline.js', {path: fileURLToPath(new URL('../../harness-ui/src/dsh-timeline.js', import.meta.url)), type: 'text/javascript'}],

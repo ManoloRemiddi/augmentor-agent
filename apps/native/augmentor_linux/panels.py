@@ -169,6 +169,11 @@ class SettingsDialog(QDialog):
         engine.setAccessibleName('Harness')
         engine.activated.connect(lambda _:window.switch_harness(engine.currentData()))
         layout.addWidget(engine)
+        if getattr(window.controller,'harness',None)=='pi':
+            from .reasoning_settings import ReasoningDialog
+            reasoning=QPushButton('Reasoning');reasoning.setAccessibleName('Pi reasoning settings')
+            reasoning.setEnabled(getattr(window.controller,'capabilities',{}).get('reasoning') is True)
+            reasoning.clicked.connect(lambda:ReasoningDialog(window).exec());layout.addWidget(reasoning)
         dsh=QPushButton('Connect Codex model' if getattr(window.controller,'harness',None)=='codex' else 'Connect DSH')
         def connect_dsh():
             self.accept()

@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Standalone Pi: Models → Reasoning opens the shared Harness/Browser form. It refreshes the selected conversation before opening, supports Manual/Adaptive mode and supported saved effort, and administers profile enable/text-only/preset/exact model-tier mappings. Neutral defaults have no mappings. Opening can create the selected blank Pi conversation without inference. Stale saves preserve drafts; Reload explicitly replaces them. Working/context changes invalidate the dialog, and open settings prevent unsafe maintenance. These installation controls are excluded from SDK workspace settings; embedded effort controls remain required. See [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls).
+
+
 # Browser Settings
 
 The October 10 Harness candidate adds profile-owned Adaptive Reasoning mappings and per-Pi-conversation saved effort/mode through the authenticated Host. This is distinct from the Open/Collapsed thinking display preference described below. The Harness Reasoning dialog administers both Desktop/Harness and Browser preset inclusion; Native/Browser effort controls remain a migration gate. Unmapped models retain their request effort, and no provider is selected automatically. See [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) for persistence, conflicts and qualification.

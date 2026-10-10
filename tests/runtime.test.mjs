@@ -327,6 +327,11 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   let output='',errors='';child.stdout.on('data',data=>output+=data);child.stderr.on('data',data=>errors+=data);
   const timer=setTimeout(()=>child.kill('SIGKILL'),25000);try{const [code]=await once(child,'exit');assert.equal(code,0,errors);assert(output.includes('"nativePiQueue": "passed"'));}finally{clearTimeout(timer);if(child.exitCode===null)child.kill('SIGKILL');}
  });
+ await t.test('production Native Qt reasoning settings save through Pi, preserve conflicts and invalidate conversation changes',{skip:process.platform==='win32',timeout:45000},async()=>{
+  mkdirSync(join(runtimeRoot,'outputs/harness-proof'),{recursive:true});const before=requests;
+  const native=spawn(process.env.AUGMENTOR_PYTHON??'python3',[fileURLToPath(new URL('./fixtures/native-pi-reasoning.py',import.meta.url))],{env:{...env,HOME:join(root,'thinking-qt-home'),XDG_CONFIG_HOME:join(root,'thinking-qt-config'),XDG_STATE_HOME:join(root,'thinking-qt-state'),AUGMENTOR_PI_NO_AUTOSTART:'1',AUGMENTOR_DESKTOP_AUTOSTART:'0',AUGMENTOR_DESKTOP_KEY:'reasoning-'+randomUUID(),AUGMENTOR_NATIVE_REASONING_SCREENSHOT:join(runtimeRoot,'outputs/harness-proof/native-reasoning.png'),PYTHONPATH:join(runtimeRoot,'apps/native'),QT_QPA_PLATFORM:'offscreen'},stdio:['ignore','pipe','pipe']});
+  let proof='',errors='';native.stdout.on('data',data=>proof+=data);native.stderr.on('data',data=>errors+=data);const [code]=await once(native,'exit');assert.equal(code,0,errors+proof);assert.match(proof,/native-pi-reasoning/);assert.equal(requests,before,'Native settings perform no inference');
+ });
  await t.test('production Native Qt Branch/Edit preserve exact Pi tool history, template submissions and saved child',{skip:process.platform==='win32',timeout:45000},async()=>{
   writeFileSync(join(cwd,'native-branch-note.txt'),'Synthetic native branch evidence.\n');mkdirSync(join(config,'agent','prompts'),{recursive:true});const template=join(config,'agent','prompts','native_branch_fixture.md');writeFileSync(template,'NATIVE_BRANCH_CHILD $1');
   const inputSource=join(root,'native-branch-input.mjs');writeFileSync(inputSource,"import {appendFileSync} from 'node:fs';export default pi=>pi.on('input',(e,ctx)=>{if(e.text==='NATIVE_INPUT_HANDLED'){appendFileSync(ctx.cwd+'/native-input-handled.txt','handled\\n');return {action:'handled'};}});");writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[inputSource],skills:[]}));
@@ -346,11 +351,13 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   bridge.stderr.on('data',data=>errors+=data);bridge.stdout.on('data',data=>{buffer=Buffer.concat([buffer,data]);while(buffer.length>=4&&buffer.length>=buffer.readUInt32LE(0)+4){const length=buffer.readUInt32LE(0),frame=JSON.parse(buffer.subarray(4,length+4));buffer=buffer.subarray(length+4);if(frame.id&&pending.has(frame.id)){const row=pending.get(frame.id);pending.delete(frame.id);frame.error?row.reject(Error(frame.error.message)):row.resolve(frame.result);}else frames.push(frame);}});
   const call=(method,params={})=>new Promise((resolve,reject)=>{const id=randomUUID();pending.set(id,{resolve,reject});const body=Buffer.from(JSON.stringify({id,method,params})),header=Buffer.alloc(4);header.writeUInt32LE(body.length);bridge.stdin.write(Buffer.concat([header,body]));});
   try{
-   const initialized=await call('initialize',selection);assert.equal(initialized.serverInfo.capabilities.queue,true);assert.equal(initialized.serverInfo.capabilities.steering,true);
+   const initialized=await call('initialize',selection);assert.equal(initialized.serverInfo.capabilities.queue,true);assert.equal(initialized.serverInfo.capabilities.steering,true);assert.equal(initialized.serverInfo.capabilities.reasoning,true);
    const sid='queue-browser';await call('session.create',{sessionId:sid});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.sessionId===sid));
    await call('session.prompt',{sessionId:sid,requestId:'browser-active',mode:'queue',content:[{type:'text',text:'SLOW browser queue'}]});await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW browser queue')));
    await call('session.prompt',{sessionId:sid,requestId:'browser-waiting',mode:'queue',content:[{type:'text',text:'/browser_correction literal'}]});await until(()=>frames.some(frame=>frame.method==='session.queue'&&frame.params.items.some(item=>item.id==='browser-waiting')));
    await assert.rejects(call('session.queue',{sessionId:'queue-native'}),/cannot access a Linux chat/);
+   await assert.rejects(call('session.reasoning',{sessionId:'reasoning'}),/cannot access a Linux chat/);
+   await assert.rejects(call('session.selectReasoning',{sessionId:'reasoning',expectedRevision:0,mode:'manual',thinkingLevel:'off'}),/cannot access a Linux chat/);
    const expectedTurnId=(await call('session.queue',{sessionId:sid})).activeTurnId;
    await assert.rejects(call('session.updateQueue',{sessionId:sid,itemId:'browser-waiting',expectedTurnId:'stale',action:{kind:'steer'}}),/no longer active/);
    await call('session.updateQueue',{sessionId:sid,itemId:'browser-waiting',expectedTurnId,action:{kind:'steer'}});await until(()=>frames.some(frame=>frame.method==='session.status'&&frame.params.status==='idle'));

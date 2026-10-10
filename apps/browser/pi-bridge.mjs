@@ -56,7 +56,7 @@ async function request(method,p={},id){
   if(method==='augmentor/models')return c.call('models.list')
   if(method==='initialize'){
     selection={provider:p.provider,model:p.model};await c.call('models.validate',selection)
-    const saved=await c.call('chats.saved'),description=await c.call('host.describe');return {serverInfo:{home:homedir(),harness,capabilities:{branch:true,edit:true,queue:description.capabilities?.queue===true,steering:description.capabilities?.steering===true},augmentor:{chatCwd:workspace,agentPreset:preset,saved:saved.saved}}}
+    const saved=await c.call('chats.saved'),description=await c.call('host.describe');return {serverInfo:{home:homedir(),harness,capabilities:{branch:true,edit:true,queue:description.capabilities?.queue===true,steering:description.capabilities?.steering===true,reasoning:description.capabilities?.reasoning===true},augmentor:{chatCwd:workspace,agentPreset:preset,saved:saved.saved}}}
   }
   if(method==='session.attach'){await attach(p.sessionId);const rows=await c.call('session.list');return {attached:true,running:rows.items.find(r=>r.sessionId===p.sessionId)?.running===true}}
   if(method==='session.create'){const row=await c.call(method,{...p,surface:'browser',selection,cwd:workspace},id);await attach(p.sessionId);return row}
@@ -66,7 +66,7 @@ async function request(method,p={},id){
   if(method==='session.branch'){const result=await c.call(method,p,id);await attach(result.sessionId);selection=result.selection;return result}
   if(method==='session.history'){const result=await c.call(method,{...p,maxMessages:Math.min(p.maxMessages??50,100)});result.events=result.events.filter(r=>r.event.type!=='assistant/chunk');while(Buffer.byteLength(JSON.stringify(result))>850000&&result.events.length>1){result.events.shift();result.hasMore=true}return result}
   if(['augmentor/save','augmentor/unsave','augmentor/state'].includes(method)){const action=method.split('/')[1];const result=await c.call('chats.saved',{action,sessionId:p.sessionId});return {ok:true,...result}}
-  if(['session.cancel','session.rename','session.models','session.queue','session.updateQueue','session.continueQueue','session.resolveQueue','settings.describe','settings.mutate','models.pin'].includes(method))return c.call(method,p,id)
+  if(['reasoning.describe','reasoning.configure','session.reasoning','session.selectReasoning','session.cancel','session.rename','session.models','session.queue','session.updateQueue','session.continueQueue','session.resolveQueue','settings.describe','settings.mutate','models.pin'].includes(method))return c.call(method,p,id)
   if(method.startsWith('updates/'))throw new Error('Update this unified installation with its installer.')
   throw new Error('Unsupported harness browser operation: '+method)
 }
