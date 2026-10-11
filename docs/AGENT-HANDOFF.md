@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 MX Linux first
+
+The owner has directed a usable local MX Linux preview and hands-on refinement before further Windows, macOS or other Linux distribution implementation. Follow [the preview guide](MX-HARNESS-PREVIEW.md). This PC is MX 25.3 KDE x86-64/Debian 13. A stable launcher and separate XDG profile/immutable update selection preserve the production installation. The first live Qwen tool request found a llama.cpp grammar repetition failure; an explicitly named-provider public payload extension omits wire string-length annotations while retaining original SDK validation. Three independent source regressions pass, including actual SDK/HTTP refusal of too-short/oversized values and one valid execution. Native self-rendering with the staged interpreter passes. Corrected installed/live qualification is in progress; no successful chat/Stop or complete migration is inferred yet.
+
+Product fc0a5b1 passes 831 source cases/825 passes/six explicit skips and ordinary stage 25 with 316 cases/312 passes/four Windows skips, all zero failures/cancellations. Its focused actual Windows x64/ARM64 runs are terminal failures in the broader Host job gate. No run was restarted or cancelled; further Windows implementation is deferred, with failures retained.
+
+
 ## October 11 parsed-provider scheduling candidate
 
 At product **`3dc4f3979ce755ddb76d138dc1657eb2dcd30500`**, the actual public-SDK scheduling regression passes on both [x64](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38126674034/job/114432363113) and [ARM64](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38126674034/job/114432363375). Eight shell-helper cases, four relay cases and the prepared-memory/private Host baseline also pass. The held-worker Stop test now receives its RPC replies on both kernels, but fails because the unchanged five-second producer-settlement bound yields `unknown` rather than the expected confirmed cancellation. The full cohort is not run. This narrows the failure; it does not qualify Stop or authorize treating unknown as cancelled.

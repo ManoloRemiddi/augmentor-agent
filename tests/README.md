@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`pi-provider-compat.test.mjs` checks explicitly named-provider llama.cpp wire adaptation and, through the public SDK/local HTTP, retains original string-length validation before actual tool execution. Too-short/oversized values fail; a valid value executes once. Property names, required fields and other constraints remain intact. See [MX preview qualification](../docs/MX-HARNESS-PREVIEW.md).
+
+
 `pi-scheduling.test.mjs` uses the actual public Pi SDK and a prebuffered independently authored stream to reproduce event-loop starvation without the scheduling hook and verify completed private checkpoints between deltas with it. Its actual local HTTP/public-provider path separately checks parsed-versus-normalized backlog without dropping output. It changes no provider or record deadline. The Windows workflow runs this common regression before the held-worker parent Stop and full command/delegation gates. [Owning evidence](../docs/PI-WINDOWS-HOST.md#october-11-buffered-stream-scheduling-candidate).
 
 [Windows Pi Host transport/private-record correction](../docs/PI-WINDOWS-HOST.md) records the failed native source baseline and actual authenticated pipe/ACL qualification scope.

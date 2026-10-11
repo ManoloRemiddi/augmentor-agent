@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[MX Linux first: installed Harness preview and feedback guide](MX-HARNESS-PREVIEW.md). Further Windows/macOS/distro implementation follows MX testing and refinement.
+
+
 [Windows Pi Host transport/private-record correction](PI-WINDOWS-HOST.md) records the failed native source baseline and actual authenticated pipe/ACL qualification scope.
 
 [Windows Pi command jobs and kernel Stop](WINDOWS-SHELL-JOBS.md) records the new owned adapter, framing/containment boundaries, real-kernel gates and current source/installed scope.
