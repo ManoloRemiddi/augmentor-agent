@@ -4,6 +4,7 @@ import {join} from 'node:path';
 import {createCodemodeExtension,createMcpExtension,createToolSearchExtension,type ExtensionAPI,type ExtensionFactory,type McpServerConfig} from '@earendil-works/pi-coding-agent';
 import {privateDir} from './storage.js';
 import {createManagedMcpTransport} from './mcp-transport.js';
+import {MCP_TRANSPORT_ORIGINAL_TYPE} from './mcp-originals.js';
 
 const discovery=new Set(['codemode','tool_search','list_mcp_resources','list_mcp_resource_templates','read_mcp_resource']);
 const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
@@ -49,7 +50,7 @@ export class ManagedMcp {
   loadConfig:()=>({servers:[],errors:[...this.errors],autoEnableCodemode:this.autoEnableCodemode}),
   createTransport:createManagedMcpTransport(original=>{
    if(!this.api)return false;
-   this.api.appendEntry('augmentor-mcp-transport/1',original);return true;
+   this.api.appendEntry(MCP_TRANSPORT_ORIGINAL_TYPE,original);return true;
   }),
   logPath:this.retainLogs?join(privateDir(join(this.stateDir,'mcp-logs')),this.sessionId+'.log'):process.platform==='win32'?'NUL':'/dev/null',
  })];}

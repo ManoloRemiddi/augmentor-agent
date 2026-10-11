@@ -97,7 +97,7 @@ code is in this repository and its deployment companion holds private home state
 | --- | --- | --- |
 | Native surface | `apps/native/augmentor_linux` | [Native map](../apps/native/README.md); controllers choose Pi or DSH |
 | Chromium surface | `apps/browser/extension`, `native-host.mjs`, `pi-bridge.mjs`, `pipe.mjs` | [Browser](../apps/browser/README.md), [distribution](BROWSER-DISTRIBUTION.md) |
-| Pi lifecycle | `packages/runtime`, `packages/pi-linux` | [Pi protocol](PROTOCOL.md), SDK 0.85.1 |
+| Pi lifecycle | `packages/runtime`, `packages/pi-linux` | [Pi protocol](PROTOCOL.md), tested Harness SDK 1.1.0; installed builds retain their recorded contracts |
 | DSH setup, sessions, exact branching | `services/dsh`, `adapters/dsh-product`, `adapters/dsh-steering` | [DSH setup](DSH-SETUP.md), [feature boundaries](FEATURE-MATRIX.md) |
 | Shared prompts and templates | `services/prompt-library`, `packages/prompt-library`, `packages/templates`, `adapters/dsh-prompt-library` | [Prompt improvement](PROMPT-IMPROVEMENT.md), [commands](SLASH-COMMANDS.md) |
 | Shared visual behavior | `packages/design`, `scripts/sync-design.py` | [Skins](SKINS.md); build generates surface bindings |

@@ -1,9 +1,14 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
 import {SessionManager} from '@earendil-works/pi-coding-agent';
-import {shortenToolContent,budgetEdits,trimSavedToolContext,originalToolExcerpt,codePoints,TOOL_BUDGET} from '../dist/runtime/src/tool-budget.js';
-import {saveToolOriginal,TOOL_ORIGINAL_MAX_BYTES} from '../dist/runtime/src/tool-originals.js';
+const implementation=pathToFileURL(resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.','dist/runtime/src/')+'/');
+const {shortenToolContent,budgetEdits,trimSavedToolContext,originalToolExcerpt,codePoints,TOOL_BUDGET}=await import(new URL('tool-budget.js',implementation));
+const {saveToolOriginal,TOOL_ORIGINAL_MAX_BYTES}=await import(new URL('tool-originals.js',implementation));
+const {MCP_TRANSPORT_ORIGINAL_TYPE,MCP_BODY_MAX_BYTES}=await import(new URL('mcp-originals.js',implementation));
 const message=(text,toolName='fixture')=>({role:'toolResult',toolCallId:'fixture-call',toolName,content:[{type:'text',text}],isError:false,timestamp:Date.now()});
 test('Unicode tool budgets retain images, original evidence and an idempotent effective projection',()=>{
  const manager=SessionManager.inMemory();const text='😀'.repeat(5000)+'OMITTED_MIDDLE'+'尾'.repeat(5000);
@@ -59,4 +64,31 @@ test('non-JSON and oversized nested originals record a small explicit coverage g
  const manager=SessionManager.inMemory(),event={type:'tool_result',toolName:'fixture',toolCallId:'outer/1',parentToolCallId:'outer',input:{},isError:false,content:[{type:'text',text:'small'}],details:{unsupported:1n}};
  const nonJson=saveToolOriginal(manager,event);assert.equal(nonJson.coverage,'non-json');assert.equal(originalToolExcerpt(manager,{entryId:nonJson.entryId}).available,false);
  delete event.details;event.content[0].text='x'.repeat(TOOL_ORIGINAL_MAX_BYTES+1);const large=saveToolOriginal(manager,event);assert.equal(large.coverage,'oversize');assert(JSON.stringify(manager.getEntry(large.entryId)).length<1024);assert.equal(originalToolExcerpt(manager,{entryId:large.entryId}).coverage,'oversize');
+});
+
+const httpOriginal=(text,coverage='complete',reason)=>{const bytes=Buffer.from(text);return {server:'fixture',requestId:17,method:'tools/call',params:{name:'write_record',arguments:{secret:'SYNTHETIC_ARGUMENT_SECRET'}},status:404,contentType:'text/plain',body:{coverage,...(reason?{reason}:{}),retainedBytes:bytes.length,prefixSha256:createHash('sha256').update(bytes).digest('hex'),text,base64:bytes.toString('base64')}};};
+test('HTTP failure originals list metadata and explicitly recover Unicode text without model projection or invented tool call IDs',()=>{
+ const manager=SessionManager.inMemory(),body='😀 İ A[1] HTTP_ORIGINAL_ONLY',id=manager.appendCustomEntry(MCP_TRANSPORT_ORIGINAL_TYPE,httpOriginal(body));
+ const listed=originalToolExcerpt(manager).results.find(row=>row.entryId===id);
+ assert.equal(listed.originalBoundary,'http-tool-failure-before-sdk-error-normalization');assert.equal(listed.transportRequestId,17);assert.equal(listed.status,404);assert.equal(listed.responseBodyComplete,true);assert.equal(listed.retainedBytes,Buffer.byteLength(body));assert(!Object.hasOwn(listed,'toolCallId'));
+ assert(!JSON.stringify(listed).includes('HTTP_ORIGINAL_ONLY'));assert(!JSON.stringify(listed).includes('SYNTHETIC_ARGUMENT_SECRET'));assert(!JSON.stringify(manager.buildSessionProjection().messages).includes('HTTP_ORIGINAL_ONLY'));
+ const found=originalToolExcerpt(manager,{entryId:id,find:'a[1]',limit:5});assert.equal(found.text,'A[1] ');assert.equal(found.offset,4);assert.equal(found.coverage,'complete');assert.equal(found.evidenceSource,'mcp-http-error-body');
+ const rest=originalToolExcerpt(manager,{entryId:id,offset:9});assert.equal(rest.text,'HTTP_ORIGINAL_ONLY');assert.equal(rest.nextOffset,null);assert.equal(rest.prefixSha256,listed.prefixSha256);
+ assert(originalToolExcerpt(manager,{entryId:id,find:'.*'}).text.includes('No saved matching'));assert.deepEqual(trimSavedToolContext(manager),[]);
+});
+test('HTTP retained prefixes expose incomplete or unavailable coverage and keep binary text withheld',()=>{
+ const manager=SessionManager.inMemory(),partial=manager.appendCustomEntry(MCP_TRANSPORT_ORIGINAL_TYPE,httpOriginal('RETAINED_PREFIX','partial','body exceeds 1 MiB'));
+ const read=originalToolExcerpt(manager,{entryId:partial});assert.equal(read.text,'RETAINED_PREFIX');assert.equal(read.nextOffset,null);assert.equal(read.coverage,'partial');assert.equal(read.responseBodyComplete,false);assert.equal(read.retentionReason,'body exceeds 1 MiB');
+ const absent=manager.appendCustomEntry(MCP_TRANSPORT_ORIGINAL_TYPE,httpOriginal('','unavailable','body read failed or exceeded its deadline')),gap=originalToolExcerpt(manager,{entryId:absent});assert.equal(gap.available,false);assert.equal(gap.coverage,'unavailable');assert.equal(gap.retainedBytes,0);assert.equal(gap.responseBodyComplete,false);assert.equal(gap.nextOffset,null);
+ const binary=manager.appendCustomEntry(MCP_TRANSPORT_ORIGINAL_TYPE,httpOriginal('x\0PRIVATE_BINARY')),withheld=originalToolExcerpt(manager,{entryId:binary,limit:1});assert.equal(withheld.withheld,true);assert(!JSON.stringify(withheld).includes('PRIVATE_BINARY'));assert.equal(withheld.coverage,'complete');assert(originalToolExcerpt(manager).results.find(row=>row.entryId===binary).binaryLike);
+});
+test('HTTP excerpt admission rejects corrupt prefixes, malformed identities and another custom entry type',()=>{
+ const mutations=[data=>data.body.prefixSha256='0'.repeat(64),data=>data.body.retainedBytes++,data=>data.body.text+='changed',data=>data.body.base64+='!',data=>data.body.retainedBytes=MCP_BODY_MAX_BYTES+1,data=>data.body.coverage='claimed',data=>{data.body.coverage='partial';},data=>data.requestId={},data=>data.method='initialize',data=>data.status=NaN,data=>data.server='',data=>data.contentType={}];
+ const manager=SessionManager.inMemory(),ids=mutations.map(mutate=>{const data=httpOriginal('SYNTHETIC_CORRUPT_BODY');mutate(data);return manager.appendCustomEntry(MCP_TRANSPORT_ORIGINAL_TYPE,data);});ids.push(manager.appendCustomEntry('foreign-evidence/1',httpOriginal('FOREIGN_ORIGINAL')));
+ assert.deepEqual(originalToolExcerpt(manager).results,[]);for(const entryId of ids)assert.throws(()=>originalToolExcerpt(manager,{entryId}),/not on this conversation branch/);
+});
+test('HTTP excerpt reads stay on the current branch and preserve the original native entry',()=>{
+ const manager=SessionManager.inMemory(),anchor=manager.appendMessage(message('branch boundary')),id=manager.appendCustomEntry(MCP_TRANSPORT_ORIGINAL_TYPE,httpOriginal('ABANDONED_HTTP_FUTURE')),before=JSON.stringify(manager.getEntry(id));
+ assert.equal(originalToolExcerpt(manager,{entryId:id}).text,'ABANDONED_HTTP_FUTURE');assert.equal(JSON.stringify(manager.getEntry(id)),before);manager.branch(anchor);
+ assert.throws(()=>originalToolExcerpt(manager,{entryId:id}),/not on this conversation branch/);assert.throws(()=>originalToolExcerpt(SessionManager.inMemory(),{entryId:id}),/not on this conversation branch/);assert(!JSON.stringify(originalToolExcerpt(manager)).includes('ABANDONED_HTTP_FUTURE'));
 });

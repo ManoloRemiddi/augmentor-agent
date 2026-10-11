@@ -5,6 +5,8 @@ import {createHash} from 'node:crypto';
 import {isJsonRpcRequest,isJsonRpcResponse,McpHttpError,StdioTransport,StreamableHttpTransport,type JsonRpcId,type McpFetch} from '@earendil-works/pi-mcp';
 import type {McpTransportFactory} from '@earendil-works/pi-coding-agent';
 import {resolveConfigValueUncached} from '../vendor/pi/config-value.js';
+import {MCP_BODY_MAX_BYTES,type McpFailureOriginal} from './mcp-originals.js';
+export type {McpFailureOriginal} from './mcp-originals.js';
 
 const home=(value:string)=>value==='~'?homedir():value.startsWith('~/')||(process.platform==='win32'&&value.startsWith('~\\'))?join(homedir(),value.slice(2)):value;
 const configured=(value:string)=>{
@@ -13,17 +15,13 @@ const configured=(value:string)=>{
  return result;
 };
 
-export interface McpFailureOriginal {
- server:string;requestId:JsonRpcId;method:'tools/call';params:unknown;status:number;contentType:string|null;
- body:{coverage:'complete'|'partial'|'unavailable';reason?:string;retainedBytes:number;prefixSha256:string;text:string;base64:string};
-}
 async function originalBody(response:Response):Promise<McpFailureOriginal['body']>{
  const reader=response.body?.getReader(),chunks:Buffer[]=[];let bytes=0,coverage:McpFailureOriginal['body']['coverage']='complete',reason:string|undefined,timer:ReturnType<typeof setTimeout>|undefined;
  const deadline=new Promise<never>((_,reject)=>{timer=setTimeout(()=>reject(Error('body deadline')),500);});
  try{
   if(reader)for(;;){
    const next=await Promise.race([reader.read(),deadline]);if(next.done)break;
-   const remaining=1024*1024-bytes,part=Buffer.from(next.value.subarray(0,remaining));chunks.push(part);bytes+=part.length;
+   const remaining=MCP_BODY_MAX_BYTES-bytes,part=Buffer.from(next.value.subarray(0,remaining));chunks.push(part);bytes+=part.length;
    if(next.value.length>remaining){coverage='partial';reason='body exceeds 1 MiB';break;}
   }
  }catch{coverage=bytes?'partial':'unavailable';reason='body read failed or exceeded its deadline';}
