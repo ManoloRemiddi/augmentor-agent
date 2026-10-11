@@ -1,5 +1,43 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Original Context slash dialog — October 11 follow-up
+
+The original Apache-2.0 `contextModal.tsx`, `modalStore.ts` and `dockMeasure.ts`
+from public dsh-context 0.68.1 / 2c8095c34da3fcef729a01437d2df65c83e08499 now
+join the reviewed selection: **89 files**, **83 verbatim** and **six marked
+adaptations**. Original CSS, dialog composition/browser structure, dock insets,
+backdrop/Close/Escape handling and focus restoration are preserved. The modal
+receives the same bounded read-only Pi request picker as the existing Context
+view and a short notice describing recorded snapshots and estimate limits.
+Supplier source/original hashes, modification notices and Apache licence remain
+preserved; no new dependency or agent owner is introduced.
+
+`/context` opens this dialog while keeping the Chat view. As in the upstream
+plugin, the leading token stays in the composer until Close, backdrop or Escape.
+An independently authored local bridge consumes only the captured unchanged
+span/revision in the same session/connection epoch. The command launcher never
+deletes selected text. Changed drafts, session/connection transitions, read-only
+state, unresolved admissions and foreground questions revoke that authority.
+Dialog Escape is handled in capture phase before the shared running-task Stop.
+Opening or closing inspection makes no Host action admission, user message,
+provider request or tool execution. Explicit request paging/body reads retain
+the existing eight-plus-one cache and all unavailable/unsupported-body behavior.
+The Context tab remains available for trend, usage, events, file activity and raw
+Pi records. Insights, Fleet, right-sidebar placement, persistent preferences,
+prompt prefix/suffix and the full P0/P1/live-provider/public release/platform
+acceptance remain open.
+
+Source build/type/hash/graph/notice checks pass. The complete source cohort
+passes **232/232 across 34 files**, zero failures/skips/cancellations, with the
+prepared QtTest interpreter, two workers and unchanged deadlines. The first
+broader run failed only the copied-GUI fixture’s preceding full-tab expectation;
+the focused restored-modal assertion and complete rerun pass. The first focused
+modal fixture also tried clicking the covered composer; its keyboard draft check
+now uses the original retained focus, without bypassing the backdrop. Ordinary
+artifact and installed MX qualification remain separate. The previous
+recorded-format release stays selected until guarded activation.
+
+
 # Original DSH GUI on Pi
 
 The owner's October 11 correction is to use the actual open-source DSH GUI before redesigning it. The standalone Harness default now bundles the original public React components and CSS. The previous custom interface is a supplementary **Full Pi record inspector** at `/inspection`, available from Settings. The native desktop and existing browser extension retain their approved interfaces.

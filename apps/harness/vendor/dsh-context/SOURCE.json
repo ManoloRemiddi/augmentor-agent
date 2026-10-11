@@ -119,6 +119,13 @@
       "adaptation": "verbatim"
     },
     {
+      "path": "src/client/components/contextModal.tsx",
+      "sourcePath": "src/client/components/contextModal.tsx",
+      "sourceSha256": "b57d4037e36b94aa199bfc0bb83b9060bfffcb453cbe3e4bef112483dfb25516",
+      "sha256": "b280a4a120f73ffc22f4d9f1d10bcdb98531534c58777a37c00dc3da8523b2b7",
+      "adaptation": "Pi read-only request picker and recorded-data notice; original dialog structure and CSS preserved"
+    },
+    {
       "path": "src/client/components/contextView.tsx",
       "sourcePath": "src/client/components/contextView.tsx",
       "sourceSha256": "74b7f1cbd92f48288b0605f833614d53a0ed3f66aa9fe7fff270b4c797f9c6aa",
@@ -287,6 +294,13 @@
       "adaptation": "verbatim"
     },
     {
+      "path": "src/client/dockMeasure.ts",
+      "sourcePath": "src/client/dockMeasure.ts",
+      "sourceSha256": "46372420c294aa65e21820577b6113e0fbff509f72c9c1ef1f073d740b3af9ff",
+      "sha256": "46372420c294aa65e21820577b6113e0fbff509f72c9c1ef1f073d740b3af9ff",
+      "adaptation": "verbatim"
+    },
+    {
       "path": "src/client/fileActivity.ts",
       "sourcePath": "src/client/fileActivity.ts",
       "sourceSha256": "2c5eb84effbb7566e59eed79fd0489377396daa77898ce5d06a0a638f28174c9",
@@ -361,6 +375,13 @@
       "sourcePath": "src/client/meta.ts",
       "sourceSha256": "3d62b647c4fe5fe4305f8f9c4a5c15b12138338bfc391c5634b04b69bd9f7012",
       "sha256": "3d62b647c4fe5fe4305f8f9c4a5c15b12138338bfc391c5634b04b69bd9f7012",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/client/modalStore.ts",
+      "sourcePath": "src/client/modalStore.ts",
+      "sourceSha256": "08e613fda11d184423e005caef8b6e748cd3c6d62d370a85191ab79bd343a921",
+      "sha256": "08e613fda11d184423e005caef8b6e748cd3c6d62d370a85191ab79bd343a921",
       "adaptation": "verbatim"
     },
     {

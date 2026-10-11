@@ -69,7 +69,7 @@ import {ComposerAttachments} from '@dsh-gui/ui-attachment/src/client/ComposerAtt
 import {MessageImages} from '@dsh-gui/ui-attachment/src/client/MessageImages.tsx';
 import {DshPiController} from './dsh-pi-controller.mjs';
 import {projectDsh} from './dsh-pi-projection.mjs';
-import {DshContextDashboard} from './dsh-context.jsx';
+import {DshContextDashboard,DshContextOverlay,createDshContextModalBinding} from './dsh-context.jsx';
 import {attachPlans} from './plans.js';
 import {attachGoals} from './goals.js';
 import {attachJobs} from './jobs.js';
@@ -83,6 +83,7 @@ history.replaceState(null,'',location.pathname);
 // the controller so a scoped inspector never retains the previous authority.
 addEventListener('hashchange',()=>{if(new URLSearchParams(location.hash.slice(1)).has('token'))location.reload();});
 const controller=new DshPiController(token);
+const contextModal=createDshContextModalBinding(controller);
 const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
 const attachmentDrafts=new DshAttachments(controller);let openFiles=null;
@@ -232,7 +233,8 @@ function CommandOverlays(){
 function App(){
   const settingsState=useSyncExternalStore(settingsShell.subscribe,settingsShell.getSnapshot);
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
-  useEffect(()=>{commandMenu.deps.actions={compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:()=>setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:()=>setView('context'),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
+  React.useLayoutEffect(()=>{contextModal.sync();});
+  useEffect(()=>{commandMenu.deps.actions={compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:()=>setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:(scope,segment,consume)=>contextModal.open(scope,segment,consume),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
   useEffect(()=>{activeDraft=state.sessionId;setDraft(drafts.get(state.sessionId)||'');},[state.sessionId]);
@@ -301,7 +303,7 @@ function App(){
       case 'conversation.message.images':return <MessageImages {...owner} loadImage={loadImage} t={t.conversation}/>;
       case 'conversation.input.right':return <ImproveDraft state={state}/>;
       case 'conversation.input.model':return <ModelSelect {...p} t={t.model} locked={owner.locked||state.readOnly||current?.running===true} available={!state.readOnly} directory={modelDirectory} load={async()=>modelDirectory.getSnapshot()} select={async selection=>{modelDirectory.update(s=>({...s,status:'selecting',pending:selection}));try{await controller.choose(selection);return modelDirectory.getSnapshot();}catch(e){modelDirectory.update(s=>({...s,status:'error',pending:null,error:e.message}));throw e;}}}/>;
-      case 'conversation.input.overlay':return <CommandOverlays/>;
+      case 'conversation.input.overlay':return <><CommandOverlays/><DshContextOverlay key={state.sessionId} state={state} controller={controller} binding={contextModal}/></>;
       default:return options.fallback??null;
     }
   };

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Original Context dialog: `harness-context-modal.test.mjs` fences exact one-time local close guards and scope/connection/interaction invalidation. The command contract verifies deferred unchanged-draft consumption and launcher preservation. `harness-context-modal-chromium.test.mjs` exercises the actual Host/SDK with authored loopback responses at 513×715: empty inspection, exact retained read arguments/history, changed keyboard draft, original Escape focus, running-task Stop separation and session switching. The existing copied-GUI slash fixture now expects the supplier modal and deferred consumption. The first broader run retained its old tab expectation and failed; that assertion is replaced with the restored original behavior, with deadlines and remaining checks preserved. Live account/provider and physical platform acceptance remain separate.
+
 `pi-provider-compat.test.mjs` checks explicitly named-provider llama.cpp wire adaptation and, through the public SDK/local HTTP, retains original string-length validation before actual tool execution. Too-short/oversized values fail; a valid value executes once. Property names, required fields and other constraints remain intact. See [MX preview qualification](../docs/MX-HARNESS-PREVIEW.md). The native reasoning fixture saves screenshots inside its temporary profile; selected release trees are never fixture output directories.
 
 

@@ -25,6 +25,14 @@ function fixture(){
 }
 const segment=(rev=1,start=0,end=5)=>({via:'menu',span:{start,end,draftRev:rev}});
 
+test('Context defers exact draft consumption until close and refuses stale or launcher deletion',async()=>{
+ const f=fixture();let close;f.deps.actions.context=(_scope,_segment,consume)=>{close=consume;};f.draft.text='/context';
+ assert.equal(await f.menu.adjudicate('/context'),'handled');assert.deepEqual(f.writes,[]);assert(close());assert.equal(f.writes.length,1);
+ f.writes.length=0;await f.menu.adjudicate('/context');f.draft.rev++;f.draft.text='/context edited';assert.equal(close(),false);assert.deepEqual(f.writes,[]);
+ f.menu.dispatch('context',f.menu.scope,{via:'launcher',span:{start:0,end:15,draftRev:f.draft.rev}});assert(close());assert.deepEqual(f.writes,[]);
+ await f.menu.adjudicate('/context edited').catch(()=>{});f.state.epoch++;assert.equal(close(),false);
+});
+
 test('command callbacks lose authority on conversation/reconnect/read-only transitions',async()=>{
   const f=fixture(),source=f.menu.engine.source;
   f.state.sessionId='two';f.state.epoch++;f.draft.sessionId='two';f.menu.sync();

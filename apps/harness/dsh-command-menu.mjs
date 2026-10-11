@@ -67,6 +67,12 @@ export class DshCommandMenu {
   }
   dispatch(name,scope,segment){
     if(!this.segmentValid(scope,segment))return false;
+    if(name==='context'){
+      const action=this.deps.actions.context;if(!action)return false;
+      // The original plugin leaves its token until the dialog closes. The
+      // captured revision/session/epoch still fence consumption at that time.
+      return action(scope,segment,()=>this.consume(scope,segment))!==false;
+    }
     if(name==='compact'){
       if(this.current().running)throw Error('Stop active work before compacting. Your draft is preserved.');
       const action=this.deps.actions.compact;if(!action)return false;

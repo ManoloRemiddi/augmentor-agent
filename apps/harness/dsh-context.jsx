@@ -1,5 +1,8 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import React,{useMemo} from 'react';
+import React,{useMemo,useSyncExternalStore} from 'react';
+import {makeContextModal} from './vendor/dsh-context/src/client/components/contextModal.tsx';
+import {modalStoreOf,setPendingConsume,takePendingConsume} from './vendor/dsh-context/src/client/modalStore.ts';
+import {DshContextModalBinding} from './dsh-context-modal-binding.mjs';
 import {makeContextView} from './vendor/dsh-context/src/client/components/contextView.tsx';
 import {makeViewKit} from './vendor/dsh-context/src/client/viewkit.ts';
 import {DICT_EN} from './vendor/dsh-context/src/client/i18nEn.ts';
@@ -8,6 +11,7 @@ import {projectDshContext} from './dsh-context-projection.mjs';
 import {bindContextSnapshot} from './dsh-context-boundary.mjs';
 import './vendor/dsh-context/src/client/styles/tailwind.css';
 import './vendor/dsh-context/src/client/styles/base.css';
+import './vendor/dsh-context/src/client/styles/modal.css';
 import './vendor/dsh-context/src/client/styles/stats.css';
 import './vendor/dsh-context/src/client/styles/stackedBar.css';
 import './vendor/dsh-context/src/client/styles/trendChart.css';
@@ -22,12 +26,24 @@ const translate=(key,params={})=>Object.entries(params).reduce((text,[k,v])=>tex
 const ctx={get:name=>name==='locale'?{getLocale:()=>({active:'en'})}:undefined};
 const settings=createContextSettings();settings.defaultPlacement=()=> 'tab';settings.fleetTab=()=> 'hide';
 const Dashboard=makeContextView(ctx,makeViewKit(translate),settings,{headOf:async()=>null});
-/** The original dashboard receives recorded Pi data through its projection seats. */
-export function DshContextDashboard({state,controller,children}){
+/** Both original presentations use the same bounded retained-data seats. */
+function useContextSeats(state,controller){
   const value=useMemo(()=>projectDshContext(state),[state.records,state.events,state.payloads,state.hasMore,state.observationHasMore]);bindContextSnapshot(value);
   const epoch=controller?.epoch,validScope=()=>controller?.epoch===epoch&&controller?.state.sessionId===state.sessionId;
   const requestPicker=controller?{choices:value.requestChoices.map(choice=>{const read=state.contextRead?.id===choice.id?state.contextRead:null;return {...choice,state:read?.state,note:read?.reason??(read?.state==='loading'?'Loading recorded provider request…':state.payloads[choice.id]?'This recorded provider format cannot be projected here; inspect its raw body.':'Choose this request to read its retained body.')};}),hasMore:state.observationHasMore===true,loading:state.contextPage?.loading===true,error:state.contextPage?.error,select:seq=>{const id=seq===null?null:value.requestChoices.find(c=>c.seq===seq)?.id;if(id!==undefined&&validScope())void controller.selectContextRequest(id).catch(()=>{});},older:()=>{if(validScope())void controller.loadContextOlder();}}:undefined;
-  const projections={contextTimeline:value.timeline,contextHeaders:value.headers,tokenUsage:value.usage,contextPressure:value.pressure,augmentorContextRequests:requestPicker};
+  const projections={contextTimeline:value.timeline,contextHeaders:value.headers,tokenUsage:value.usage,contextPressure:value.pressure,augmentorContextRequests:requestPicker,augmentorContextNotice:`Recorded SDK snapshots: ${value.coverage.available} of ${value.coverage.observed} bodies loaded. Category sizes estimate displayed text; opaque/provider transformations and next-request occupancy are unobserved. ${value.coverage.observed&&!value.coverage.latestAvailable?'Composition shows the latest retained body; the newest body is unavailable. ':''}Raw Pi records remain in the Context tab.`};
   const useProjection=key=>projections[key],useChat=select=>select({legacy:{nodes:value.conversationNodes}});
+  return {value,useProjection,useChat};
+}
+export function createDshContextModalBinding(controller){return new DshContextModalBinding({current:()=>({...controller.state,epoch:controller.epoch}),storeOf:modalStoreOf,setPending:setPendingConsume,takePending:takePendingConsume});}
+export function DshContextOverlay({state,controller,binding}){
+  const seats=useContextSeats(state,controller);
+  const Modal=useMemo(()=>makeContextModal({get:name=>name==='sessions'?binding:ctx.get(name)},makeViewKit(translate),settings),[binding]);
+  const modal=modalStoreOf(state.sessionId??''),useContextModal=selector=>selector(useSyncExternalStore(modal.subscribe,modal.getSnapshot)&&binding.valid(binding.pending?.scope));
+  return <Modal key={state.sessionId} sessionId={state.sessionId} useProjection={seats.useProjection} useChat={seats.useChat} useContextModal={useContextModal}/>;
+}
+/** The original dashboard receives recorded Pi data through its projection seats. */
+export function DshContextDashboard({state,controller,children}){
+  const {value,useProjection,useChat}=useContextSeats(state,controller);
   return <div className="augmentor-context-dashboard"><div className="augmentor-extension" role="status">Recorded provider context: {value.coverage.available} of {value.coverage.observed} request bodies available. {value.coverage.observed&&!value.coverage.latestAvailable?'The newest body is unavailable; composition shows the latest retained body. ':''}{value.coverage.historyPartial?'Message/file counts cover the loaded history. ':''}Category sizes are estimates; request contents are retained, credential-redacted snapshots. The latest eight eligible bodies load automatically. The original selector reads one older body or pages earlier metadata; unavailable bodies have no chart bar. Turn/step labels cover loaded records. {state.records?.filter(r=>r.kind==='model/request').at(-1)?.data.purpose==='manual-compaction'?'The latest request is Pi’s summary input, before its saved compaction boundary; next-request occupancy is not yet observed. ':''}SDK onPayload snapshots use their recorded API; raw records expose unsupported or larger bodies and opaque provider fields. {value.coverage.opaque?`${value.coverage.opaque} loaded bodies contain opaque reasoning/signatures or media; displayed estimates exclude those bytes. `:''} {value.coverage.compactionAttempts?`${value.coverage.compactionAttempts} recorded compaction attempts; ${value.coverage.confirmedCompactions} confirmed summaries. Failed, aborted and uncertain attempts remain in Raw Pi records. `:''}</div><Dashboard key={state.sessionId} sessionId={state.sessionId} useProjection={useProjection} useChat={useChat}/><details className="augmentor-extension"><summary>Raw Pi context and saved entries</summary>{children}</details></div>;
 }

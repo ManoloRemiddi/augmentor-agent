@@ -127,8 +127,8 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  assert.equal(await panel.evaluate(editor+'.textContent'),'Preserved draft text.','launcher navigation preserves selected draft text');
  await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Chat")');
  await replaceDraft('/con');await visible('document.querySelectorAll("[data-trigger-menu] [role=option]").length===1');await key('ArrowDown');await key('Tab');
- await visible('document.body.innerText.includes("Context Composition")||document.querySelector(".lc-root")');assert.equal(await panel.evaluate(editor+'.textContent'),'');
- await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Chat")');
+ await visible('document.querySelector(".lc-modal-card")');assert.equal(await panel.evaluate(editor+'.textContent'),'/con','original modal defers slash-span consumption until close');
+ await key('Escape');await visible('!document.querySelector(".lc-modal-card")&&'+editor+'.textContent===""');
  await replaceDraft('/permission');await click('document.querySelector("button[aria-label=\\"Send message\\"]")');
  await visible('document.querySelector("[role=dialog]")?.textContent.includes("/permission is not yet connected to Pi")');assert.equal(await panel.evaluate(editor+'.textContent'),'/permission');
  await click('document.querySelector("[role=dialog] button[aria-label=\\"Close\\"]")');
