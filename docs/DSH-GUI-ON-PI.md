@@ -813,3 +813,8 @@ The [installed refusal follow-up](PI-COMPACTION.md#installed-refusal-follow-up--
 [Attachment upload maintenance safety](UPLOAD-MAINTENANCE.md) counts the full HTTP reception and immutable storage phase, so slow and concurrent transfers veto guarded shutdown. Source checks/build and 256/256 across 40 files pass; ordinary/installed qualification is recorded separately. Original DSH GUI, supplier licences and dependencies are unchanged; durable drafts and full migration/platform gates remain open.
 
 [Installed upload maintenance safety](UPLOAD-MAINTENANCE.md#installed-mx-qualification--october-11): runtime 71c8295331e3ef6f1a3fadecdee2b3e16dde75cf, private MX 20261011-230903-26a85087, product 0.2.13, artifact a4e02988958781788a17c4e78018cbc7219c6e510e4ed41f0793584d24c3c70c, selected/running. Source and ordinary bundled Node 24.19.0 each pass 256/256 across 40 files; guarded sequential adoption, exact running roots and all 21,787 inventory entries pass. Original GUI/licences/dependencies/profile settings, eleven histories/queues and old original prefixes are preserved with classified lifecycle/title/index appends. Insights stays open for feedback. Full draft/migration/privacy/public packaging/platform gates remain open.
+
+
+## Original persistent composer drafts
+
+[Original Harness drafts](HARNESS-DRAFTS.md) restores private text, real file/image bytes and exact receipts behind the copied composer. Revision checks freeze stale writes; durable uncertain submission markers prevent replay; unsent drafts veto guarded shutdown. Source/ordinary/installed qualification is recorded separately. Supplier presentation and the single Pi owner remain preserved; broader migration and platform gates stay open.

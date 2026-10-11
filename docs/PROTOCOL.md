@@ -156,3 +156,19 @@ and immutable storage. `host.shutdown` refuses while any accepted carrier remain
 active; completion, abort and failure release only that carrier. Operator and
 conversation authority are checked before reception and after the delayed body.
 There is no new RPC or automatic retry. See [qualification](UPLOAD-MAINTENANCE.md).
+
+
+## Harness draft state
+
+Operator-only `draft.describe/text/remove/prepare/settle/acknowledge` manages
+versioned private per-conversation composer state. Text and attachments have
+separate exact revisions; preparation captures one submission identity and exact
+normalized parts. Settlement requires the same accepted Pi queue fingerprint.
+Acknowledgment preserves content and never retries. The fixed authenticated
+`/api/drafts/attachment` carrier saves original bytes and conversation receipts;
+`/api/drafts/file` verifies exact saved identity before returning original bytes.
+Inspection tokens cannot read even their own conversation’s unsent draft.
+`host.describe.activeHarnessRequests` protects operator RPC body reception through
+response, including a first incomplete text-save frame.
+`host.describe.unsentHarnessDrafts` and guarded shutdown include all non-empty
+retained Harness drafts. See [contract and qualification](HARNESS-DRAFTS.md).

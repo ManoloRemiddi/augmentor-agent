@@ -195,7 +195,7 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  assert.equal((await readFile(link.requestLog,'utf8')).trim().split('\n').length,4,'folder/conversation organization operations and reload start no model request');
  const inspection=await owner.call('inspection.open',{sessionId:sid});await panel.call('Page.navigate',{url:inspection.url});
  await visible('document.querySelector("[data-composer-input][aria-disabled=true][contenteditable=false]")');
- assert(await panel.evaluate('document.querySelector("button[aria-label=\\"Add files or run commands\\"]").disabled'),'the command launcher is disabled in scoped read-only inspection');
+ await visible('document.querySelector("button[aria-label=\\"Add files or run commands\\"]")?.disabled===true');
  await click(chooseTab('Chat'));await visible('document.body.innerText.includes("Partial fixture output.")');
  assert(!await panel.evaluate('document.querySelector("button[aria-label=\\"Branch into a new conversation\\"]")'));
  assert.equal(panel.errors.length,0,JSON.stringify(panel.errors));assert(panel.urls.every(value=>value.startsWith(url.origin)||value.startsWith('data:')),JSON.stringify(panel.urls));

@@ -65,6 +65,7 @@ import {en as trajectoryEn} from '@dsh-gui/ui-trajectory/src/client/locales.ts';
 import {en as modelEn} from '@dsh-gui/ui-model-selection/src/client/locales.ts';
 import {en as goalEn} from '@dsh-gui/ui-goal/src/client/locales.ts';
 import {DshAttachments} from './dsh-attachments.mjs';
+import {DshDrafts} from './dsh-drafts.mjs';
 import {ComposerAttachments} from '@dsh-gui/ui-attachment/src/client/ComposerAttachments.tsx';
 import {MessageImages} from '@dsh-gui/ui-attachment/src/client/MessageImages.tsx';
 import {DshPiController} from './dsh-pi-controller.mjs';
@@ -104,12 +105,13 @@ const tr=dictionary=>(key,args={})=>String(dictionary[key]??commonEn[key]??key).
 const t={conversation:tr(conversationEn),sidebar:tr(sidebarEn),workspace:tr(workspaceEn),chat:tr(chatEn),trajectory:tr(trajectoryEn),model:tr(modelEn),goal:tr(goalEn),approval:tr(approvalEn),question:tr(questionEn),common:tr(commonEn),command:tr(commandEn),menu:tr(menuEn)};
 const settingsNotice=text=>controller.update({error:text});
 const control={run:async action=>{try{return await action();}catch(error){controller.update({error:error.message});return undefined;}}};
-const drafts=new Map();let activeDraft=null;
+let activeDraft=null;
 let draftRev=0,composerProjection={detectText:'',selection:null,caret:null},commandMenu;
 const editor=createEditor({namespace:'augmentor-dsh-composer',onError:error=>controller.update({error:error.message}),theme:{}});
 registerPlainText(editor);registerHistory(editor,createEmptyHistoryState(),300);
-editor.registerUpdateListener(({editorState})=>editorState.read(()=>{composerProjection=$projectComposer(()=>0);const value=composerProjection.detectText;if(value!==draft.getSnapshot())draftRev++;draft.set(value);if(activeDraft)drafts.set(activeDraft,value);commandMenu?.track();}));
-function setDraft(value){editor.update(()=>{$getRoot().clear().append($createParagraphNode().append($createTextNode(value)));});}
+editor.registerUpdateListener(({editorState})=>editorState.read(()=>{composerProjection=$projectComposer(()=>0);const value=composerProjection.detectText;if(value!==draft.getSnapshot())draftRev++;draft.set(value);if(activeDraft)draftArchive.edit(value);commandMenu?.track();}));
+function setDraft(value){editor.update(()=>{$getRoot().clear().append($createParagraphNode().append($createTextNode(value)));},{discrete:true});}
+const draftArchive=new DshDrafts(controller,{restore:(sid,text)=>{activeDraft=sid;setDraft(text);},attachments:attachmentDrafts});
 const commandRows=[
   {name:'file',label:t.conversation('input.file'),description:'Attach files to this draft',icon:IconFolderCloseRegular},
   {name:'goal',...builtinRowFace({definitionId:'@deepseek-ai/dsh-command-goal'},t.command)},
@@ -129,11 +131,11 @@ commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,sto
 controller.subscribe(()=>commandMenu.sync());
 const useLexicon=bind(commandMenu.lexicon),useMenuLauncher=bind(commandMenu.launcher);
 const keyboard={editor,arbitrate:(key,composing)=>commandMenu.arbitrate(key,composing),space:()=>false,dismissPopup:()=>commandMenu.popup.dismiss(),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
-  const text=draft.getSnapshot(),sid=controller.state.sessionId,items=[...attachmentDrafts.draft(sid).items];if(attachmentDrafts.busy||!text.trim()&&!items.length)return;
+  const text=draft.getSnapshot(),sid=controller.state.sessionId,items=[...attachmentDrafts.draft(sid).items],epoch=controller.epoch;if(attachmentDrafts.busy||!text.trim()&&!items.length)return;
   if(await commandMenu.adjudicate(text)!==undefined)return;
   if(sid!==controller.state.sessionId||draft.getSnapshot()!==text)throw Error('The conversation or draft changed; nothing was submitted.');
   attachmentDrafts.busy=true;attachmentDrafts.changed();
-  try{const parts=await attachmentDrafts.content(sid,items);if(sid!==controller.state.sessionId)throw Error('The selected conversation changed; the draft is preserved.');await controller.send(text,mode,parts);if(sid===controller.state.sessionId&&draft.getSnapshot()===text)setDraft('');for(const item of items)attachmentDrafts.remove(item.id,sid);await controller.refresh();}
+  try{const parts=await attachmentDrafts.content(sid,items);if(sid!==controller.state.sessionId)throw Error('The selected conversation changed; the draft is preserved.');const requestId=await draftArchive.prepare(sid,text,mode,parts);if(sid!==controller.state.sessionId||epoch!==controller.epoch)throw Error('The selected conversation changed; no prompt was sent. Inspect the prepared draft before continuing.');await controller.send(text,mode,parts,requestId);await draftArchive.complete(sid,requestId);await controller.refresh();}
   finally{attachmentDrafts.busy=false;attachmentDrafts.changed();}
 }),steerQueue:()=>void control.run(async()=>{for(const item of controller.state.queue?.items||[])if(item.canSteer)await controller.rpc('session.updateQueue',{sessionId:controller.state.sessionId,itemId:item.id,expectedTurnId:controller.state.queue.activeTurnId,action:{kind:'steer'}});})};
 
@@ -222,7 +224,7 @@ function ImproveDraft({state}){
     finally{if(active.current===value){active.current=null;setJob(null);}}
   };
   const label=job?'Cancel prompt improvement':undo?.sessionId===state.sessionId&&undo.text===text?'Undo prompt improvement':'Improve prompt';
-  return <Button variant="ghost" aria-label={label} title={label} disabled={state.readOnly||!state.sessionId||!text.trim()||state.phase!=='ready'} onClick={()=>void improve()}>{job?'×':label.startsWith('Undo')?'↶':'✦'}</Button>;
+  return <Button variant="ghost" aria-label={label} title={label} disabled={state.readOnly||state.draftReady===false||!state.sessionId||!text.trim()||state.phase!=='ready'} onClick={()=>void improve()}>{job?'×':label.startsWith('Undo')?'↶':'✦'}</Button>;
 }
 
 const SessionBridge=React.createContext(null);
@@ -243,7 +245,7 @@ function App(){
   useEffect(()=>{commandMenu.deps.actions={compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:()=>setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:(scope,segment,consume)=>contextModal.open(scope,segment,consume),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
-  useEffect(()=>{activeDraft=state.sessionId;setDraft(drafts.get(state.sessionId)||'');},[state.sessionId]);
+  const draftState=useSyncExternalStore(draftArchive.subscribe,draftArchive.getSnapshot);
   useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!settingsState.open&&!commandMenu.menu.getSnapshot().open&&!commandMenu.popup.state.getSnapshot().open&&!state.interactions.length&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog,settingsState.open]);
   const current=state.sessions.find(x=>x.sessionId===state.sessionId);
   const workspaces=useMemo(()=>{
@@ -264,7 +266,7 @@ function App(){
   const unsupported=()=>Promise.reject(Error('This DSH operation is not yet connected to Pi. Use Full Pi record inspector in Settings for the retained Augmentor controls.'));
   const branch=seq=>void control.run(async()=>{const row=await controller.rpc('session.branch',{sessionId:state.sessionId,newSessionId:crypto.randomUUID(),messageSeq:seq,mode:'reply'});await controller.refresh();await controller.open(row.sessionId);});
   const renderMessageImages=props=><MessageImages {...props} loadImage={loadImage} t={t.conversation}/>;
-  const common={renderMessageImages,sessionId:state.sessionId||undefined,useSession,useSessions,useWorkspaces,useConversation,useProjection,useConversationViews:selectorFace(tabs),useSessionStatus:selectorFace(new Map()),useInput:selectorFace({draft:liveDraft,phase:'plain',attachmentIds:attached.items.map(x=>x.id),queue:state.queue?.items||[]}),useStore:selectorFace({view}),actions:{setDraft:noOp,completeViewRequest:noOp},inputActions:{pruneAttachments:ids=>{for(const id of ids)attachmentDrafts.remove(id);},persistDraft:noOp},selectWorkspace:async cwd=>startSession(cwd),useComposerBlock:selectorFace(undefined),useFactorySlot:(_,fallback)=>fallback,bindDraftPersistence:()=>noOp,openView:setView,useInspectCall:selectorFace(undefined),t:t.conversation};
+  const common={renderMessageImages,sessionId:state.sessionId||undefined,useSession,useSessions,useWorkspaces,useConversation,useProjection,useConversationViews:selectorFace(tabs),useSessionStatus:selectorFace(new Map()),useInput:selectorFace({draft:liveDraft,phase:'plain',attachmentIds:attached.items.map(x=>x.id),queue:state.queue?.items||[]}),useStore:selectorFace({view}),actions:{setDraft:value=>{const text=typeof value==='string'?value:value.text;if(text!==draft.getSnapshot())setDraft(text);},completeViewRequest:noOp},inputActions:{pruneAttachments:ids=>{for(const id of ids)attachmentDrafts.remove(id);},persistDraft:()=>{void draftArchive.persist().catch(()=>{});}},selectWorkspace:async cwd=>startSession(cwd),useComposerBlock:selectorFace(undefined),useFactorySlot:(_,fallback)=>fallback,bindDraftPersistence:writer=>draft.subscribe(()=>writer({text:draft.getSnapshot(),references:[]})),openView:setView,useInspectCall:selectorFace(undefined),t:t.conversation};
   useEffect(()=>{
     const groups=state.catalog.groups.map(g=>({id:g.provider,name:g.name,models:g.models.map(m=>({id:m.model,name:m.name||m.model,...(m.provider===state.selection?.provider&&m.model===state.selection?.model&&state.reasoning?{reasoning:{efforts:state.reasoning.availableLevels.map(id=>({id,label:id})),defaultEffort:state.reasoning.thinkingLevel}}:{})}))}));
     modelDirectory.set({current:state.selection?{...state.selection,reasoningEffort:state.reasoning?.thinkingLevel}:null,routable:true,groups,failures:state.catalog.failures||[],status:'ready',pending:null,error:null});
@@ -305,10 +307,10 @@ function App(){
         return <p role="status">{owner.node.data.text}</p>;
       case 'conversation.chat.reasoning.body':return <MarkdownText text={owner.text} streaming={owner.running}/>;
       case 'conversation.input.dock':return <><QueueStatus state={state}/><QueueDock {...p} useSession={selectorFace({...composed.session,subagent:state.readOnly?{address:{mode:'read-only'}}:null})} updateQueue={(itemId,action)=>controller.updateQueue(itemId,action)} notify={(_,text)=>controller.update({error:text})} loadImage={loadImage}/>{!state.readOnly&&<GoalBar goal={state.goal?.goal} activation={state.goal?.activation} t={t.goal} onPause={()=>goalAction('pause')} onResume={()=>goalAction('resume')} onClear={()=>goalAction('clear')} onEdit={objective=>goalAction('edit',{objective,maxGoalRounds:state.goal?.goal?.maxGoalRounds})}/>}</>;
-      case 'conversation.composer.bar':return <InputBar {...p} placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!!state.unconfirmed||state.compactionPending||state.compaction?.blocked||attachmentDrafts.busy||owner.disabled} keyboard={keyboard} addFiles={attachmentDrafts.add} removeAttachment={attachmentDrafts.remove} retryFileUpload={attachmentDrafts.retry} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace(attached.uploads)} useNotices={selectorFace(undefined)} useLexicon={useLexicon} useMenuLauncher={useMenuLauncher} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={ids=>attached.items.filter(x=>ids.includes(x.id))} toggleCommandMenu={span=>commandMenu.toggle(span)}/>;
+      case 'conversation.composer.bar':return <InputBar {...p} placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!draftState.ready||!!state.unconfirmed||state.compactionPending||state.compaction?.blocked||attachmentDrafts.busy||owner.disabled} keyboard={keyboard} addFiles={attachmentDrafts.add} removeAttachment={attachmentDrafts.remove} retryFileUpload={attachmentDrafts.retry} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace(attached.uploads)} useNotices={selectorFace(undefined)} useLexicon={useLexicon} useMenuLauncher={useMenuLauncher} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={ids=>attached.items.filter(x=>ids.includes(x.id))} toggleCommandMenu={span=>commandMenu.toggle(span)}/>;
       case 'conversation.input.attachments':return <ComposerAttachments {...owner} t={t.conversation}/>;
       case 'conversation.message.images':return <MessageImages {...owner} loadImage={loadImage} t={t.conversation}/>;
-      case 'conversation.input.right':return <ImproveDraft state={state}/>;
+      case 'conversation.input.right':return <ImproveDraft state={{...state,draftReady:draftState.ready}}/>;
       case 'conversation.input.model':return <ModelSelect {...p} t={t.model} locked={owner.locked||state.readOnly||current?.running===true} available={!state.readOnly} directory={modelDirectory} load={async()=>modelDirectory.getSnapshot()} select={async selection=>{modelDirectory.update(s=>({...s,status:'selecting',pending:selection}));try{await controller.choose(selection);return modelDirectory.getSnapshot();}catch(e){modelDirectory.update(s=>({...s,status:'error',pending:null,error:e.message}));throw e;}}}/>;
       case 'conversation.input.overlay':return <><CommandOverlays/><DshContextOverlay key={state.sessionId} state={state} controller={controller} binding={contextModal}/></>;
       default:return options.fallback??null;

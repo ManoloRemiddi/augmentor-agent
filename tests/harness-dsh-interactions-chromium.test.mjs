@@ -26,6 +26,7 @@ test('original DSH approval/question components answer the selected Host interac
  const waits=[];
  const host={getMeta:()=>({id:'fixture',cwd:profile,selection}),queueSnapshot:()=>queue,interactions,dispatch:async(method,p)=>{
   if(method==='settings.describe'&&p.ns==='dsh-context')return {namespaces:[{ns:'dsh-context',revision:0,value:contextPreferences({}),writableFields:Object.keys(CONTEXT_PREFERENCE_OPTIONS)}]};
+  if(method==='draft.describe')return {version:1,revision:0,textRevision:0,attachmentsRevision:0,text:'',attachments:[],submission:null};
   if(method==='host.describe')return {workspace:profile};
   if(method==='models.list')return {groups:[{provider:'fixture',name:'Fixture',models:[{...selection,name:'Chosen'}]}],default:selection,failures:[]};
   if(method==='session.list')return {items:[{sessionId:'fixture',cwd:profile,title:'Synthetic interaction',running:false}]};
@@ -42,7 +43,7 @@ test('original DSH approval/question components answer the selected Host interac
   if(method==='interaction.wait'){waits.push(p);return interactions.wait(p.rpcId,p.sessionId,p.clientId,p.action);}
   throw Error('Unexpected fixture RPC: '+method);
  }};
- server=new HarnessServer(host);const link=await server.start();
+ server=new HarnessServer({...host,receiveHarnessRequest:async fn=>fn()});const link=await server.start();
  chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{stdio:'ignore'});
  let port;await until(async()=>{port=await chromiumPort(profile).catch(()=>null);return !!port;},'Chrome ready');
  const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(x=>x.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);await panel.call('Runtime.enable');await panel.call('Log.enable');

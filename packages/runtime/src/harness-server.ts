@@ -9,6 +9,7 @@ import {FILE_LIMIT} from './attachments.js';
 import type {Host} from './host.js';
 
 const allowed = new Set([
+  'draft.describe','draft.text','draft.remove','draft.prepare','draft.settle','draft.acknowledge',
   'host.describe', 'session.organize', 'workspace.list', 'workspace.adopt', 'workspace.rename', 'workspace.remove', 'workspace.move', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
@@ -125,6 +126,19 @@ export class HarnessServer {
         const access=this.access(req);
         if (!access) {this.send(res, 401, {error: {message: 'Open a fresh private Harness link to connect'}}); return;}
         if(req.method==='GET'&&url.pathname==='/api/access'){this.send(res,200,{mode:access.mode,...(access.mode==='read-only'?{sessionId:access.sessionId,expiresAt:access.expiresAt}:{})});return;}
+        if(req.method==='POST'&&url.pathname==='/api/drafts/attachment'){
+          if(access.mode!=='operator')throw Error('This conversation inspector cannot read or edit unsent drafts.');
+          const sid=identifier(url.searchParams.get('sessionId')),rawRevision=url.searchParams.get('expectedAttachmentsRevision');if(!rawRevision||! /^(0|[1-9][0-9]{0,15})$/.test(rawRevision)||url.searchParams.get('lastModified')===null)throw Error('Supply an exact draft attachment revision and file timestamp.');const expected=Number(rawRevision);
+          if(Number(req.headers['content-length']??0)>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');
+          const input={id:identifier(url.searchParams.get('id')),name:url.searchParams.get('name'),kind:url.searchParams.get('kind'),mediaType:url.searchParams.get('mediaType')??'',lastModified:Number(url.searchParams.get('lastModified'))};
+          const result=await this.host.receiveDraftAttachment(sid,async()=>{let bytes=0;const chunks:Buffer[]=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');chunks.push(Buffer.from(chunk));}return Buffer.concat(chunks);},expected,input);
+          this.send(res,200,result);return;
+        }
+        if(req.method==='GET'&&url.pathname==='/api/drafts/file'){
+          if(access.mode!=='operator')throw Error('This conversation inspector cannot read or edit unsent drafts.');
+          const stored=this.host.draftAttachmentBytes(identifier(url.searchParams.get('sessionId')),identifier(url.searchParams.get('id')),url.searchParams.get('sha256'));
+          res.writeHead(200,{'Content-Type':'application/octet-stream','Content-Length':stored.data.byteLength});res.end(stored.data);return;
+        }
         if(req.method==='POST'&&url.pathname==='/api/attachments/upload'){
           if(access.mode!=='operator')throw Error('This conversation inspector is read-only.');
           const sid=identifier(url.searchParams.get('sessionId'));this.host.getMeta(sid);
@@ -161,6 +175,7 @@ export class HarnessServer {
           return;
         }
         if (req.method === 'POST' && url.pathname === '/api/rpc') {
+          const operation=async()=>{
           const rpc: unknown = await this.body(req); request(rpc);
           const params = rpc.params ?? {};
           if (rpc.method === 'events.subscribe') {
@@ -181,6 +196,9 @@ export class HarnessServer {
           }
           const result = await this.host.dispatch(rpc.method, params, rpc.id);
           this.send(res, 200, {id: rpc.id, result}); return;
+          };
+          if(access.mode==='operator')await this.host.receiveHarnessRequest(operation);else await operation();
+          return;
         }
         this.send(res, 404, {error: {message: 'Unknown Harness API'}}); return;
       }

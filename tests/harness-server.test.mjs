@@ -16,7 +16,7 @@ test('conversation inspection isolates authority, expires links and cannot keep 
    if(method==='host.describe')return {protocol:'fixture',version:'1',piVersion:'1.1.0',dirs:{state:'/private/profile'},capabilities:{all:true}};
    if(method==='models.list')return {groups:[{name:'fixture',provider:'fixture',models:[{...selection},{provider:'fixture',model:'foreign'}]}],default:{provider:'other',model:'foreign'},pinned:['private'],hidden:['private'],failures:['private']};
    return {ok:true};}};
- const server=new HarnessServer(host),operator=await server.start();t.after(()=>server.close());
+ const server=new HarnessServer({...host,receiveHarnessRequest:async fn=>fn()}),operator=await server.start();t.after(()=>server.close());
  const link=server.openInspection('a'),token=new URLSearchParams(new URL(link.url).hash.slice(1)).get('token');
  assert.notEqual(token,server.token);assert.equal(link.mode,'read-only');assert.equal(link.expiresAt>Date.now(),true);assert.throws(()=>server.openInspection('missing'),/not found/);
  const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
@@ -53,7 +53,7 @@ test('Harness transport requires a bearer token, local authority and matching br
     queueSnapshot:()=>({revision:0,paused:false,activeTurnId:null,items:[]}),
     dispatch:async(method,params,id)=>{calls.push({method,params,id});return {ok:true};},
     interactions:{frames:()=>[]}};
-  const server=new HarnessServer(host,root);
+  const server=new HarnessServer({...host,receiveHarnessRequest:async fn=>fn()},root);
   const link=await server.start();
   t.after(async()=>{await server.close();rmSync(root,{recursive:true,force:true});});
   const rpc=(method,params={},headers={})=>fetch(link.origin+'/api/rpc',{method:'POST',
@@ -94,7 +94,7 @@ test('Harness transport requires a bearer token, local authority and matching br
 });
 test('live pages are bounded and lost coverage is scoped to the affected conversation',async t=>{
  const host={getMeta:id=>({id}),queueSnapshot:()=>({revision:0,paused:false,activeTurnId:null,items:[]}),interactions:{frames:()=>[]}};
- const server=new HarnessServer(host),link=await server.start();t.after(()=>server.close());
+ const server=new HarnessServer({...host,receiveHarnessRequest:async fn=>fn()}),link=await server.start();t.after(()=>server.close());
  const headers={Authorization:'Bearer '+server.token,'Content-Type':'application/json'};
  for(const sessionId of ['a','b'])await fetch(link.origin+'/api/rpc',{method:'POST',headers,body:JSON.stringify({id:'subscribe',method:'events.subscribe',params:{sessionId,clientId:sessionId}})});
  server.publish('b',{method:'small'});
@@ -114,7 +114,7 @@ test('Harness watches bind interactions and live events to their selected sessio
     queueSnapshot:()=>({revision:7,paused:true,activeTurnId:null,items:[]}),
     dispatch:async(method,params)=>{calls.push({method,params});return {accepted:true};},
     interactions:{frames:sid=>[{method:'interaction/request',payload:{sessionId:sid}}]}};
-  const server=new HarnessServer(host);
+  const server=new HarnessServer({...host,receiveHarnessRequest:async fn=>fn()});
   const link=await server.start();
   t.after(()=>server.close());
   const headers={Authorization:'Bearer '+server.token,'Content-Type':'application/json'};

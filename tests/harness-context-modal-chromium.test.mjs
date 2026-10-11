@@ -51,7 +51,9 @@ test('original Context modal preserves chat, exact arguments, close guards and r
  await click(modal+'.querySelector("button[aria-label=\\"Close\\"]")');await visible('!'+modal+'&&'+composer+'.textContent===""');assert.deepEqual(await rpc('session.history',{sessionId:sid}),before);assert.equal(await readFile(link.requestLog,'utf8'),wire);
  // A changed draft cannot be erased by the original dialog close path.
  await open();assert(await panel.evaluate('document.activeElement==='+composer));await panel.call('Input.insertText',{text:' changed'});const changed=await draft();await key('Escape');await visible('!'+modal);assert.equal(await draft(),changed);
- await panel.reload();await visible(composer+'&&'+composer+'.textContent===""');
+ await until(async()=> (await rpc("draft.describe",{sessionId:sid})).text===changed,"changed Context draft saved");await panel.reload();await visible(composer+"&&"+composer+".textContent==="+JSON.stringify(changed));
+ // Clear the restored draft through the original composer before the next fixture.
+ await click(composer);await panel.call("Input.dispatchKeyEvent",{type:"keyDown",key:"a",code:"KeyA",windowsVirtualKeyCode:65,modifiers:2});await panel.call("Input.dispatchKeyEvent",{type:"keyUp",key:"a",code:"KeyA",windowsVirtualKeyCode:65,modifiers:2});await panel.call("Input.dispatchKeyEvent",{type:"keyDown",key:"Backspace",code:"Backspace",windowsVirtualKeyCode:8});await panel.call("Input.dispatchKeyEvent",{type:"keyUp",key:"Backspace",code:"Backspace",windowsVirtualKeyCode:8});await visible(composer+'.textContent===""');
  // Capture-phase dialog Escape must not bubble into the running owner's Stop.
  await click(composer);await panel.call('Input.insertText',{text:'SLOW fixture'});await click('document.querySelector("button[aria-label=\\"Send message\\"]")');await visible('document.querySelector("button[aria-label=\\"Stop generating\\"]")&&'+composer+'.textContent===""');
  await open();await key('Escape');await visible('!'+modal);assert.equal((await rpc('session.list')).items.find(x=>x.sessionId===sid).running,true,'Escape closes only the inspection dialog');

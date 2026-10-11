@@ -174,13 +174,13 @@ export class DshPiController {
     if(epoch===this.epoch)this.update({compaction:result,compactionPending:false});
     void this.refresh().catch(()=>{});return result;
   }
-  clearUnconfirmed(){this.pending.delete(this.state.sessionId);this.update({unconfirmed:null});}
-  async send(text,mode='queue',attachments=[]){
+  clearUnconfirmed(){const sid=this.state.sessionId,epoch=this.epoch;const finish=()=>{this.pending.delete(sid);if(sid===this.state.sessionId&&epoch===this.epoch)this.update({unconfirmed:null});};if(this.draftAcknowledge)return Promise.resolve(this.draftAcknowledge()).then(finish).catch(error=>{if(sid===this.state.sessionId&&epoch===this.epoch&&!this.state.readOnly)this.update({error:error.message});});finish();}
+  async send(text,mode='queue',attachments=[],requestId=crypto.randomUUID()){
     const {sessionId,queue}=this.state;if(!sessionId)throw Error('Choose a workspace first.');
     if(this.state.readOnly||this.state.phase!=='ready')throw Error('The conversation is not ready for submission.');
     if(this.state.workspaces?.archivedSessionIds?.includes(sessionId))throw Error('Restore the conversation before sending.');
     if(this.pending.has(sessionId))throw Error('The previous submission is unconfirmed. Inspect the history; it was not retried.');
-    const requestId=crypto.randomUUID(),receipt={requestId,text,attachments};this.pending.set(sessionId,receipt);
+    const receipt={requestId,text,attachments};this.pending.set(sessionId,receipt);
     try{const result=await this.rpc('session.prompt',{sessionId,requestId,content:[...(text?[{type:'text',text}]:[]),...attachments],mode,resumeQueue:true,...(mode==='steer'?{expectedTurnId:queue?.activeTurnId}:{})});this.pending.delete(sessionId);return result;}
     catch(error){if(sessionId===this.state.sessionId)this.update({unconfirmed:receipt});throw Error(error.message+' Submission is unconfirmed. Nothing was resent.');}
   }
