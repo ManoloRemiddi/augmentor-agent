@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 jobs follow-up: [background jobs and delegation](PI-JOBS.md) add exact-parent durable receipts, real bounded SDK children and commands, root/nested tool grants, scoped approvals/Stop, unknown restart recovery and saved one-time usage attribution. This advances the combined P1 requirement; desktop-specialist consolidation, live services and every accepted P0/P1/platform/installed gate remain required.
+
+
 The [DSH goal fold source record](../packages/runtime/vendor/dsh-goal/SOURCE.md) pins public `d743267388641bc76f17c45ce8b4c231aed1d32c` and retains the original DeepSeek MIT notice. Only imports and attribution change; a body SHA-256 regression checks the selected implementation. The public SDK/Host/native [goal adapter](PI-GOALS.md) is separately authored, adds no npm/native dependency and transplants no DSH service or loop.
 
 The [Pi planning candidate](PI-PLANNING.md#source-selection-and-qualification) is independently authored using the public Pi 1.1.0 extension append, read-only branch and tool APIs. Official MIT todo/plan-mode examples were inspected; their source, terminal widgets, text-marker completion and tool activation policy are not copied. No supplier/private source, SDK patch/private import, dependency, native component or selected MIT notice changes.

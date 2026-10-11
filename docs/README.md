@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+- [Pi background jobs and delegation](PI-JOBS.md): exact-parent execution, grants, Stop, durable outcomes and one-time attribution.
+
 [Persistent Pi goals and continuation](PI-GOALS.md) — strict native replay, explicit human arming, same-owner rounds, limits, Stop, restart/fork disarming and standalone Harness controls.
 
 - [Pi plans and todos](PI-PLANNING.md): branch-owned revisioned state, public SDK tools, read-only Harness view, persistence boundaries and remaining goals/jobs/delegation.

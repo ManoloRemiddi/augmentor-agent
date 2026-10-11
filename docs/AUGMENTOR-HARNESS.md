@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 jobs follow-up: [background jobs and delegation](PI-JOBS.md) add exact-parent durable receipts, real bounded SDK children and commands, root/nested tool grants, scoped approvals/Stop, unknown restart recovery and saved one-time usage attribution. This advances the combined P1 requirement; desktop-specialist consolidation, live services and every accepted P0/P1/platform/installed gate remain required.
+
+
 [The Goal tab and persistent continuation](PI-GOALS.md) expose strict branch state, phase, process-local activation, admitted round limits and operator controls. Continuation stays in the existing Pi owner/queue; scoped cold inspection loads no owner. General jobs/delegation and full migration gates remain open.
 
 The [October 11 planning candidate](PI-PLANNING.md) adds public-SDK plan tools and a read-only Plan view on the existing Pi owner. The full delivery gates below remain required, including general goals, background jobs and delegation.

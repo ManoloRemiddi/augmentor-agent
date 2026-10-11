@@ -41,9 +41,11 @@ import {PiReasoning,reasoningConfig,savedReasoning,thinkingLevel,requireThinking
 import {PiPromptImprovement} from './prompt-improvement.js';
 import {piPlans,currentPlan,planProjection,PLAN_TYPE,PLAN_GUIDANCE} from './plans.js';
 import {PiGoals,goalProjection,GOAL_GUIDANCE,GOAL_ROUND_TYPE} from './goals.js';
+import {PiJobs,jobSpec,jobsExtension,shellJob,boundChild,JOB_GUIDANCE,type JobRecord,type JobSpec,type JobControl,type JobOutcome} from './jobs.js';
+import type {Usage} from '@earendil-works/pi-ai';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
-interface Meta {reasoning?:SavedReasoning;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];goals:PiGoals;mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean})=>Promise<void>;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
+interface Meta {delegation?:{parentId:string;jobId:string;allowedTools:string[];resources:Data};reasoning?:SavedReasoning;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
+interface Loaded {resources:Data;memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];goals:PiGoals;mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean})=>Promise<void>;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 /** Admission is serialized; extension preparation must not hold the host's
  * state lock while waiting for a UI answer, another RPC or an input handler.
  */
@@ -59,6 +61,8 @@ export class Host {
   readonly observations:ObservationStore;
   readonly improvements=new PiPromptImprovement(join(this.dirs.state,'prompt-improvements.json'));
   readonly mcpManagement:McpManagement;
+  readonly jobs:PiJobs;
+  private jobReceipts=new Map<string,Promise<void>>();
   private serial:Promise<unknown>=Promise.resolve();
   private quiescing=false;
   private mcpReloading=false;
@@ -82,6 +86,10 @@ export class Host {
       this.loaded.get(row.sessionId)?.observation?.record('integration/mcp-management',{...row});
       const m=this.metadata.get(row.sessionId);if(m&&!['running','cancel-requested'].includes(row.state))this.append(m,'runtime/notice',{message:'MCP '+row.action+' for '+row.server+': '+row.state+'. '+(row.result==='unknown'?'Its effects may be unknown; the command was not replayed.':'This is the SDK command report; connection and credential health need separate verification.'),mcpManagement:{...row}});
       if(!['running','cancel-requested'].includes(row.state))this.wakeGoals();
+    });
+    this.jobs=new PiJobs(join(this.dirs.state,'jobs'),row=>{
+      this.publish(row.owner,{method:'job/updated',payload:{sessionId:row.owner,jobId:row.id,state:row.state,childId:row.childId}});
+      if(['completed','failed','cancelled','unknown'].includes(row.state))void this.flushJobReceipts(row.owner).catch(()=>{}).finally(()=>this.wakeGoals());
     });
   }
   async init(){this.modelRuntime=await ModelRuntime.create({authPath:join(this.dirs.agent,'auth.json'),modelsPath:join(this.dirs.agent,'models.json'),modelsStorePath:join(this.dirs.agent,'models-store.json'),allowModelNetwork:false});
@@ -124,17 +132,18 @@ export class Host {
     // an admitted Host turn may deliver input into this conversation's loop.
     pi.on('input',()=>this.mcpReloading||!m.running?{action:'handled'}:undefined);
     pi.on('tool_call',async e=>{
+    if(m.delegation&&!m.delegation.allowedTools.includes(e.toolName))return {block:true,reason:'This tool is outside the delegated job’s explicit grants.'};
     if((this.mcpReloading||!m.running)&&e.toolName!=='linux_desktop_stop')return {block:true,reason:'No admitted Host turn is available for this tool call.'};
     if(e.toolName==='linux_desktop_stop')this.desktopSpecialist.cancel('pi:'+m.id);
-    if(m.surface==='browser'&&!['get_goal','create_goal','update_goal','plan_read','plan_update','browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','tool_result_excerpt','home_devices','home_set','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
+    if(m.surface==='browser'&&!['job_start','job_list','job_read','job_wait','job_cancel','get_goal','create_goal','update_goal','plan_read','plan_update','browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','tool_result_excerpt','home_devices','home_set','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
       return {block:true,reason:'This browser chat can only use its browser tools.'};
     if(this.desktopSpecialist.busy()&&['linux_desktop_connect','linux_desktop_snapshot','linux_desktop_action'].includes(e.toolName))return {block:true,reason:'A desktop specialist owns the desktop. Wait for it or Stop it before using direct desktop tools.'};
     if(m.surface!=='browser'&&this.loaded.get(m.id)?.mcp?.isRead(e.toolName))return;
-    if(['get_goal','plan_read','home_devices','home_read','home_status','home_result','home_cancel','desktop_delegate','desktop_evidence','memory_recall','memory_source','tool_result_excerpt','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
+    if(['job_list','job_read','job_wait','job_cancel','job_start','get_goal','plan_read','home_devices','home_read','home_status','home_result','home_cancel','desktop_delegate','desktop_evidence','memory_recall','memory_source','tool_result_excerpt','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
     if(e.toolName==='bash'&&isRoutineQuery(e.input.command))return;
     if(m.policy==='read-only')return {block:true,reason:'Read-only chat: actions that can change state are disabled.'};
     if(['home_request','home_set'].includes(e.toolName))return; // Persistent NAS pairing grants the scoped Home capability.
-    if(m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,e.toolName,e.input))return {block:true,reason:'Action not approved, cancelled or no user interface connected.'};
+    if(m.policy!=='danger-full-access'&&!await this.interactions.approve(m.delegation?.parentId??m.id,e.toolName,e.input,m.id))return {block:true,reason:'Action not approved, cancelled or no user interface connected.'};
   });};}
   async load(m:Meta,branchManager?:SessionManager){let record=this.loaded.get(m.id);if(record){record.mcp?.assertReady();return record;}
     if(this.mcpReloading)throw Error('Finish MCP session reload before loading another conversation.');
@@ -155,15 +164,15 @@ export class Host {
       const definition=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()]).find(tool=>tool.definition.name===name)?.definition;
       return (definition as (typeof definition & {augmentorExecution?:ExecutionContract}))?.augmentorExecution??(mcp?.isRead(name)?{effect:()=> 'read'}:undefined);
     },(toolCallId,toolName)=>mcp?.takeResultIdentity(toolCallId,toolName));
-    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:true},packages:[],defaultProjectTrust:'never'});
-    const resources=readJson<Data>(join(this.dirs.config,'resources.json'),{sources:[],skills:[]});
+    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:!m.delegation},packages:[],defaultProjectTrust:'never'});
+    const resources=m.delegation?.resources??readJson<Data>(join(this.dirs.config,'resources.json'),{sources:[],skills:[]});
     const goals=new PiGoals({getBranch:()=>manager.getBranch(),appendCustomEntry:(type,data)=>manager.appendCustomEntry(type,data),getSessionId:()=>manager.getSessionId()},()=>{this.publish(m.id,{method:'goal/updated',payload:{sessionId:m.id}});record?.observation?.record('goal/update',{activation:goals.armed?'armed':'disarmed'});});
     const provenance=new ContextProvenance(()=>this.observations.policy().capturePayloads);
     if(!Array.isArray(resources.sources)||!Array.isArray(resources.skills))throw new Error('Invalid Pi resource configuration');
     const resourceLoader:DefaultResourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
       additionalExtensionPaths:m.surface==='browser'?[]:resources.sources,additionalSkillPaths:m.surface==='browser'?[]:resources.skills,additionalPromptTemplatePaths:[privateDir(join(this.dirs.agent,'prompts'))],
-      extensionFactories:[this.policy(m),goals.extension,piPlans(revision=>{this.publish(m.id,{method:'plan/updated',payload:{sessionId:m.id,revision}});record?.observation?.record('planning/update',{revision});}),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),piReassessment(data=>record?.observation?.record('execution/checkpoint',data)),execution.extension,homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork,contribution=>provenance.memory(contribution)),...(mcp?mcp.factories():[]),...(m.surface==='browser'?[this.browser.package(m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})]),{name:'augmentor-context-observer',factory:provenance.extension}],
-      appendSystemPrompt:[browserRecovery,PLAN_GUIDANCE,GOAL_GUIDANCE,m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
+      extensionFactories:[this.policy(m),...(m.delegation?[]:[jobsExtension(m.id,this.jobs,(spec,signal)=>this.startJob(m,spec,signal))]),goals.extension,piPlans(revision=>{this.publish(m.id,{method:'plan/updated',payload:{sessionId:m.id,revision}});record?.observation?.record('planning/update',{revision});}),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),piReassessment(data=>record?.observation?.record('execution/checkpoint',data)),execution.extension,homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork,contribution=>provenance.memory(contribution)),...(mcp?mcp.factories():[]),...(m.surface==='browser'?[this.browser.package(m.delegation?.parentId??m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})]),{name:'augmentor-context-observer',factory:provenance.extension}],
+      appendSystemPrompt:[browserRecovery,PLAN_GUIDANCE,GOAL_GUIDANCE,...(m.delegation?['You are a bounded delegated worker. Follow the supplied task and all constraints. Do not start jobs, persistent goals or other workers. Your tools are explicitly granted by the parent conversation. Report failures and unknown outcomes; verify changes.']:[JOB_GUIDANCE]),m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
     });await resourceLoader.reload();
     const errors=resourceLoader.getExtensions().errors;if(errors.length)throw new Error('Pi extension loading failed: '+errors.map(e=>e.error).join('; '));
     const manager=branchManager??(m.file&&existsSync(m.file)?SessionManager.open(m.file):SessionManager.create(m.cwd,join(this.dirs.sessions,m.id)));
@@ -173,12 +182,13 @@ export class Host {
     if(created.modelFallbackMessage){created.session.dispose();throw new Error('Pi attempted a model substitution: '+created.modelFallbackMessage);}
     if(created.session.model?.id!==m.selection.model||created.session.model?.provider!==m.selection.provider){created.session.dispose();throw new Error('Pi selected a different model.');}
     if(m.surface!=='browser')created.session.agent.toolExecution='sequential';
+    if(m.delegation){const callable=created.session.getCallableToolNames();if(m.delegation.allowedTools.some(name=>!callable.includes(name))){created.session.dispose();throw Error('A delegated tool grant is unavailable in the child resource registry.');}created.session.setActiveToolsByName(m.delegation.allowedTools);}
     if(m.title)created.session.setSessionName(m.title);m.reasoning=reasoning;m.file=created.session.sessionFile;this.save(m);
-    record={memory,meta:m,session:created.session,manager,events:this.events(m),goals,mcp,cancelled:false};this.loaded.set(m.id,record);
+    record={resources:structuredClone(resources),memory,meta:m,session:created.session,manager,events:this.events(m),goals,mcp,cancelled:false};this.loaded.set(m.id,record);
     let history=record.events;
     if(m.fork){m.memoryStartSeq??=history.at(-1)?.seq??0;this.save(m);history=history.filter(e=>e.seq>m.memoryStartSeq!);}
     await memory.append(history.flatMap(event=>piTranscriptEvent(event)));
-    await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.id),onError:error=>{if(record?.reloading)record.reloadError=true;this.append(m,'runtime/error',{message:record?.reloading?'A Pi resource reported a reload problem. Inspect the configuration receipt before continuing.':error.error});}});
+    await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.delegation?.parentId??m.id,m.id),onError:error=>{if(record?.reloading)record.reloadError=true;this.append(m,'runtime/error',{message:record?.reloading?'A Pi resource reported a reload problem. Inspect the configuration receipt before continuing.':error.error});}});
     record.execution=execution;
     record.steering=new PiSteering(created.session);
     record.reasoning=new PiReasoning(created.session,m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',data=>record!.observation?.record('execution/reasoning',data));
@@ -238,16 +248,88 @@ export class Host {
       }
       if(e.type==='tool_execution_start')this.append(m,'tool/call',{name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId}:{})});
       if(e.type==='tool_execution_end')this.append(m,'tool/result',{name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId}:{}),isError:e.isError,result:{...e.result,content:e.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Tool image omitted from this display projection; inspect native evidence]'}:part)}});
-    });return record;
+    });void this.flushJobReceipts(m.id).catch(()=>{});return record;
+  }
+  private savedJobEntry(m:Meta,id:string){
+    if(!m.file||!existsSync(m.file))return false;
+    try{const result=new NativeHistory(m.file,join(this.dirs.state,'job-native-index',m.id)).read(id,{limit:8192});return result.available&&!result.hasMore&&JSON.parse(result.text).id===id;}catch{return false;}
+  }
+  private async flushJobReceipts(owner:string):Promise<void>{
+    const r=this.loaded.get(owner);if(!r||r.meta.running||r.meta.delegation)return;
+    const pending=this.jobReceipts.get(owner);if(pending)return pending;
+    const run=Promise.resolve().then(async()=>{
+      for(const row of this.jobs.pendingAccounting(owner)){
+        if(r.meta.running)return;
+        const note='augmentor-job:'+row.id;
+        if(row.usage&&!row.usageAccounted){
+          const entry=r.manager.getBranch().find(entry=>entry.type==='usage'&&entry.kind==='delegation'&&entry.note===note)??r.manager.appendUsage('delegation',row.usage.provider,row.usage.model,row.usage.value,note);
+          if(this.savedJobEntry(r.meta,entry.id))this.jobs.accounted(owner,row.id,{usageAccounted:true});
+        }
+        if(!row.notified){
+          const exists=r.manager.getBranch().some(entry=>entry.type==='custom_message'&&entry.customType==='augmentor/job-settled-v1'&&(entry.details as Data)?.jobId===row.id);
+          if(!exists)await r.session.sendCustomMessage({customType:'augmentor/job-settled-v1',content:'Background job '+row.id+' reported '+row.state+'. '+(row.reason??'Inspect job_read and verify the result.')+' This receipt does not start another turn.',display:true,details:{jobId:row.id,owner,state:row.state}},{triggerTurn:false});
+          const entry=r.manager.getBranch().find(entry=>entry.type==='custom_message'&&entry.customType==='augmentor/job-settled-v1'&&(entry.details as Data)?.jobId===row.id);
+          if(!entry)throw Error('Job notification was accepted but is not visible in native history yet.');
+          if(!this.savedJobEntry(r.meta,entry.id))continue;
+          this.jobs.accounted(owner,row.id,{notified:true});
+          this.append(r.meta,'runtime/notice',{message:'Background '+row.spec.kind+' job '+row.id+' reported '+row.state+'. Inspect Jobs before another attempt.',jobId:row.id});
+        }
+      }
+    }).finally(()=>this.jobReceipts.delete(owner));this.jobReceipts.set(owner,run);return run;
+  }
+  private async startJob(m:Meta,input:unknown,signal?:AbortSignal){
+    if(m.delegation)throw Error('Delegated jobs cannot create other workers.');
+    if(this.quiescing||this.mcpReloading||this.improvements.busy||this.mcpManagement.busy)throw Error('Finish runtime maintenance before starting a background job.');
+    const spec=jobSpec(input),parent=this.loaded.get(m.id);if(!parent)throw Error('Load the parent conversation before starting a job.');
+    const readTool=(name:string)=>['read','ls','find','grep','plan_read','get_goal','tool_result_excerpt','memory_recall','memory_source','browser_tabs_list','browser_snapshot','browser_screenshot'].includes(name)||parent.mcp?.isRead(name)||parent.session.getToolDefinition(name)?.annotations?.readOnlyHint===true;
+    let changes=false;
+    if(spec.kind==='shell'){
+      if(m.surface==='browser')throw Error('Background shell commands are unavailable in browser-only conversations.');
+      changes=!isRoutineQuery(spec.task);
+    }else{
+      const callable=parent.session.getCallableToolNames();
+      if(spec.allowedTools.some(name=>!callable.includes(name)||name.startsWith('job_')||['desktop_delegate','create_goal','update_goal'].includes(name)))throw Error('A delegated tool is unavailable or would grant recursive execution.');
+      changes=spec.allowedTools.some(name=>!readTool(name));
+    }
+    if(changes&&m.policy==='read-only')throw Error('Read-only chat cannot grant changing tools or a changing background command.');
+    if(changes&&m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,'background_'+spec.kind,{task:spec.task,allowedTools:spec.allowedTools,limits:spec.limits}))throw Error('Background job was not approved.');
+    signal?.throwIfAborted();
+    const result=this.jobs.start(m.id,spec,(row,control)=>spec.kind==='shell'?shellJob(m.cwd,row,control):this.delegateJob(structuredClone(m),row,control));
+    if(!result.duplicate){parent.manager.appendCustomEntry('augmentor/job-start-v1',{jobId:result.job.id,kind:spec.kind,requestId:spec.requestId,allowedTools:spec.allowedTools,limits:spec.limits,selection:{...m.selection},permissionPreset:m.policy});parent.observation?.record('job/start',{jobId:result.job.id,kind:spec.kind,allowedTools:spec.allowedTools,limits:spec.limits});}
+    return result;
+  }
+  private async delegateJob(parent:Meta,row:JobRecord,control:JobControl):Promise<JobOutcome>{
+    control.signal.throwIfAborted();
+    const m:Meta={id:'job-'+row.id,delegation:{parentId:parent.id,jobId:row.id,allowedTools:[...row.spec.allowedTools],resources:structuredClone(this.loaded.get(parent.id)!.resources)},reasoning:{...this.reasoningSettings(parent)},surface:parent.surface,cwd:parent.cwd,selection:{...parent.selection},title:'Delegated job '+row.id,saved:false,policy:parent.policy,updatedAt:Date.now(),requests:[],running:false};
+    this.metadata.set(m.id,m);this.save(m);control.update({childId:m.id});
+    let child:Loaded|undefined,unsubscribe:(()=>void)|undefined;
+    const abort=()=>{if(child)void this.cancel(m.id,'parent-job-stop').catch(()=>{});};control.signal.addEventListener('abort',abort,{once:true});
+    try{
+      child=await this.load(m);control.signal.throwIfAborted();
+      unsubscribe=boundChild(child.session,row,control);
+      const requestId='job-input:'+row.id,input='Delegated task from the parent conversation. Preserve all supplied constraints. Report the result and any uncertainty.\n\n'+row.spec.task;
+      this.queue(m).enqueue(requestId,input,true);this.submit(child,input,requestId);await child.task;
+      const value:Usage={input:0,output:0,cacheRead:0,cacheWrite:0,totalTokens:0,cost:{input:0,output:0,cacheRead:0,cacheWrite:0,total:0}};
+      // Public native entries include assistant, nested-tool and compaction usage.
+      for(const entry of child.manager.getEntries()){
+        const usage=entry.type==='usage'?entry.usage:entry.type==='compaction'||entry.type==='branch_summary'?entry.usage:entry.type==='message'&&(entry.message.role==='assistant'||entry.message.role==='toolResult')?entry.message.usage:undefined;
+        if(usage){for(const key of ['input','output','cacheRead','cacheWrite','totalTokens'] as const)value[key]+=usage[key]??0;for(const key of ['input','output','cacheRead','cacheWrite','total'] as const)value.cost[key]+=usage.cost?.[key]??0;}
+      }
+      return {state:control.signal.aborted?'cancelled':child.failed||child.execution?.incomplete||this.queue(m).read(requestId).status!=='completed'||!child.initialDelivered?'failed':'completed',reason:control.signal.aborted?'Child stopped; its dispatched actions may have effects.':'Child turn settled. Verify the reported result and retained originals.',usage:{provider:m.selection.provider,model:m.selection.model,value}};
+    }finally{
+      control.signal.removeEventListener('abort',abort);unsubscribe?.();
+      if(child){child.goals.disarm();child.observation?.record('job/child-close',{jobId:row.id,parentId:parent.id});child.observation?.dispose();child.reasoning?.dispose();child.steering?.dispose();child.execution?.dispose();child.memory.close();await child.memory.flush();await child.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});child.session.dispose();this.loaded.delete(m.id);}
+      void this.flushJobReceipts(parent.id).catch(()=>{});this.wakeGoals();
+    }
   }
   async cancel(id:unknown,source='user'){
     const m=this.getMeta(id),queue=this.queue(m);queue.pause();const r=this.loaded.get(m.id);let aborting:Promise<void>|undefined;
     const reserved=queue.next;if(reserved?.goalSource)queue.remove(reserved.id);
-    const cancellingMcp=this.mcpManagement.cancelSession(m.id);
+    const cancellingMcp=this.mcpManagement.cancelSession(m.id),jobsWereRunning=this.jobs.busyOwner(m.id);const cancellingJobs=this.jobs.cancelOwner(m.id);
     if(r){try{source==='user'?r.goals.stop():r.goals.disarm();}catch{r.goals.disarm();this.append(m,'runtime/warning',{message:'Goal state could not be paused. Continuation is disarmed; inspect the preserved native original.'});}}
     if(m.running&&r){if(r.preparingInput)r.interruptedInput=true;r.cancelled=true;r.execution?.cancel();for(const requestId of r.steering?.withdraw()??[])queue.withdrawSteer(requestId);r.session.abortCompaction();aborting=r.session.abort();}
     if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);
-    if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(aborting)await aborting;return {accepted:!!aborting||cancellingMcp,paused:true};
+    if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(aborting)await aborting;await cancellingJobs;return {accepted:!!aborting||cancellingMcp||jobsWereRunning,paused:true};
   }
   private async steer(m:Meta,id:string,expectedTurnId:unknown){
     const r=this.loaded.get(m.id),turnId=promptIdentity(expectedTurnId),queue=this.queue(m);
@@ -321,7 +403,7 @@ export class Host {
       if(unknownInput)this.append(m,'runtime/notice',{message:'Input preparation stopped before model delivery. Its extension effects may be unknown; this prompt will not be replayed.',incomplete:true});
       if(r.goals.armed&&(reason!=='completed'||goalSource&&handled)){try{r.goals.fail(handled?'goal-input-handled':reason==='aborted'?'turn-interrupted':'turn-failed',handled?'A goal input was handled without model admission. Explicit human review is required.':'Work stopped or failed. Inspect its outcome before explicitly resuming the goal.');}catch{r.goals.disarm();}}
       m.running=false;m.updatedAt=Date.now();this.save(m);this.append(m,'turn/end',{reason:{kind:reason},requestId:id});r.observation?.record('turn/end',{reason,execution:r.execution?.describe()});r.turnId=undefined;r.activeRequestId=undefined;r.phase=undefined;
-      if(!queue.paused)this.pump(m);
+      void this.flushJobReceipts(m.id).catch(()=>{});if(!m.delegation&&!queue.paused)this.pump(m);
     }})();return {accepted:true,turnId:r.turnId};
   }
   private wakeGoals(){for(const r of this.loaded.values())if(r.goals.armed&&!r.meta.running)void this.pump(r.meta);}
@@ -331,7 +413,7 @@ export class Host {
       const queue=this.queue(m);
       if(this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain)return;
       let item=queue.next;
-      if(!item){const owner=this.loaded.get(m.id);if(!owner?.goals.armed)return;try{const source=owner.goals.reserve();if(!source)return;const requestId='goal:'+randomUUID();queue.enqueue(requestId,owner.goals.prompt(source),true,source);item=queue.next;}catch{try{owner.goals.fail('goal-queue-failed','Goal input could not be queued. Inspect the queue before explicitly resuming.');}catch{owner.goals.disarm();}return;}}
+      if(!item){if(this.jobs.busyOwner(m.id))return;const owner=this.loaded.get(m.id);if(!owner?.goals.armed)return;try{const source=owner.goals.reserve();if(!source)return;const requestId='goal:'+randomUUID();queue.enqueue(requestId,owner.goals.prompt(source),true,source);item=queue.next;}catch{try{owner.goals.fail('goal-queue-failed','Goal input could not be queued. Inspect the queue before explicitly resuming.');}catch{owner.goals.disarm();}return;}}
       if(!item)return;
       let r:Loaded;
       try{r=await this.load(m);}catch(error){queue.notSent(item.id);this.append(m,'runtime/error',{message:'Queued prompt was not sent: '+String(error)});return;}
@@ -346,6 +428,8 @@ export class Host {
     if(method==='setup.test')return this.setup.test(p);
     if(method==='setup.cancel')return this.setup.cancel();
     if(method==='session.cancel')return this.cancel(p.sessionId);
+    if(method==='session.cancelJob')return this.jobs.cancel(this.getMeta(p.sessionId).id,identifier(p.jobId));
+    if(method==='session.waitJob')return this.jobs.wait(this.getMeta(p.sessionId).id,identifier(p.jobId),p.timeoutMs);
     if(method==='prompt.cancelImprovement')return this.improvements.cancel(p.requestId,p.scopeId);
     if(method==='prompt.improvementStatus')return this.improvements.status(p.requestId);
     if(method==='interaction.respond')return this.interactions.answer(identifier(p.rpcId),p.value,identifier(p.sessionId));
@@ -355,7 +439,14 @@ export class Host {
   }
   async handle(method:string,p:Data,id:string):Promise<any>{
     if(this.mcpReloading&&(['prompt.improve','setup.save','models.configure','models.reload','session.create','session.branch','session.updateGoal','session.trimTools','session.selectModel','session.selectReasoning','reasoning.configure','session.prompt','session.continueQueue'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Finish MCP session reload before changing or starting a conversation.');
+    if(method.startsWith('session.')&&p.sessionId&&this.metadata.get(p.sessionId)?.delegation&&!['session.history','session.nativeHistory','session.nativeRead','session.originalSearch','session.originalRead','session.plan','session.goal','session.queue','session.cancel'].includes(method))throw Error('Delegated conversations are controlled by their parent job.');
+    if(this.jobs.busy&&['models.configure','models.reload','setup.save','reasoning.configure','session.mcpConfigure','session.mcpAction'].includes(method))throw Error('Stop and settle background jobs before changing their shared configuration.');
     switch(method){
+    case 'session.jobs':{const m=this.getMeta(p.sessionId);return {available:!this.jobs.problem,reason:this.jobs.problem,items:this.jobs.list(m.id),scope:'exact-parent-conversation; reported producer outcomes; reads do not add usage'};}
+    case 'session.job':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));return {job,output:this.jobs.output(m.id,job.id,p.from)};}
+    case 'session.jobHistory':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));if(!job.childId)return {available:false,reason:'This job has no delegated conversation.'};return {available:true,childId:job.childId,...this.history(this.getMeta(job.childId)).page(p.maxMessages,p.beforeSeq)};}
+    case 'session.startJob':{const m=this.getMeta(p.sessionId);await this.load(m);return this.startJob(m,p.spec);}
+    case 'session.removeJob':{const m=this.getMeta(p.sessionId);return this.jobs.remove(m.id,identifier(p.jobId));}
     case 'prompt.improve':{
       const model=await this.selected(p.selection);
       const instructions=(await promptCall('prompts.list')).improvement;
@@ -372,8 +463,9 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
+      if(this.jobs.busy)throw Error('Stop and settle background jobs before shutting down the runtime');
       if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before shutting down the runtime');
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
       this.quiescing=true;this.setup.cancel();return {accepted:true};
@@ -410,7 +502,7 @@ export class Host {
     case 'models.configure':{if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before changing providers');if(!p.config||typeof p.config.providers!=='object'||Array.isArray(p.config.providers))throw new Error('Invalid providers configuration');if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active chats before changing providers');const file=join(this.dirs.agent,'models.json');const old=existsSync(file)?readFileSync(file,'utf8'):null;atomicJson(file,p.config);try{await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());}catch(error){if(old===null)unlinkSync(file);else writeFileSync(file,old,{mode:0o600});await this.modelRuntime.refresh({allowNetwork:false});throw error;}return this.catalog();}
     case 'models.reload':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before reloading models');await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});return this.catalog();
     case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
-    case 'session.list':return {items:[...this.metadata.values()].sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title}))};
+    case 'session.list':return {items:[...this.metadata.values()].filter(m=>!m.delegation).sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title,jobsRunning:this.jobs.busyOwner(m.id)}))};
     case 'session.history':{const m=this.getMeta(p.sessionId);return this.history(m).page(p.maxMessages,p.beforeSeq);}
     case 'session.mcpInfo':return this.mcpInfo(this.getMeta(p.sessionId));
     case 'session.mcpActionStatus':{const m=this.getMeta(p.sessionId),receipt=this.mcpManagement.lookup(m.id,identifier(p.requestId));return p.includeCatalog===true?{...receipt,catalog:this.mcpInfo(m)}:receipt;}
@@ -552,7 +644,7 @@ export class Host {
         let r:Loaded;try{r=await this.load(m);}catch(error){queue.notSent(requestId);throw error;}
         if(this.mcpReloading||m.surface!=='browser'&&this.mcpManagement.busy){queue.notSent(requestId);throw Error('Finish MCP management or session reload before dispatching another prompt.');}
         if(!queue.paused&&queue.next?.id===requestId)return {...this.submit(r,input,requestId),requestId};
-        if(!queue.paused)this.pump(m);
+        void this.flushJobReceipts(m.id).catch(()=>{});if(!m.delegation&&!queue.paused)this.pump(m);
       }
       return {accepted:true,queued:true,requestId};
     }
@@ -568,5 +660,5 @@ export class Host {
     case 'prompts.improvementSave':return promptCall('prompts.improvement.save',p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.quiescing=true;this.setup.cancel();await this.improvements.close();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}await this.mcpManagement.settled();}
+  async close(){this.quiescing=true;this.setup.cancel();await this.jobs.close();await this.improvements.close();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}await this.mcpManagement.settled();}
 }

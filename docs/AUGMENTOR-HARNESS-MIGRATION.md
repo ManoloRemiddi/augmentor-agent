@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 jobs follow-up: [background jobs and delegation](PI-JOBS.md) add exact-parent durable receipts, real bounded SDK children and commands, root/nested tool grants, scoped approvals/Stop, unknown restart recovery and saved one-time usage attribution. This advances the combined P1 requirement; desktop-specialist consolidation, live services and every accepted P0/P1/platform/installed gate remain required.
+
+
 October 11 goal follow-up: [persistent goals and same-owner continuation](PI-GOALS.md) add strict native replay, explicit human arming, admitted round limits, Stop and restart/fork disarming. General jobs/delegation with child authority, durable outcomes and one-time usage totals, plus all accepted P0/P1 gates, remain required.
 
 October 11 planning follow-up: [plans and todos](PI-PLANNING.md) provide revisioned reported state on native ancestry and read-only inspection. This does not close the combined P1 goal/job/delegation requirement; parent/child authority, limits, Stop, durable job outcomes and usage accounting remain required.

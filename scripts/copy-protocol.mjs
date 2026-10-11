@@ -10,3 +10,5 @@ copyFileSync('packages/runtime/vendor/pi/SOURCE.md','dist/runtime/vendor/pi/SOUR
 cpSync('packages/runtime/vendor/adaptive-reasoning','dist/runtime/vendor/adaptive-reasoning',{recursive:true});
 copyFileSync('packages/runtime/vendor/dsh-goal/LICENSE','dist/runtime/vendor/dsh-goal/LICENSE');
 copyFileSync('packages/runtime/vendor/dsh-goal/SOURCE.md','dist/runtime/vendor/dsh-goal/SOURCE.md');
+copyFileSync('packages/runtime/vendor/dsh-jobs/LICENSE','dist/runtime/vendor/dsh-jobs/LICENSE');
+copyFileSync('packages/runtime/vendor/dsh-jobs/SOURCE.md','dist/runtime/vendor/dsh-jobs/SOURCE.md');

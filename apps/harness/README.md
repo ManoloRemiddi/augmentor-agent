@@ -17,3 +17,5 @@ Prompt library reuses the Browser picker/editor and shared service. Stable renam
 The responsive conversation drawer, bounded ledger rows and accessible real buttons retain their behavior at narrow widths. Durable queue/identified steering, latest-input Edit/persisted-reply Branch and shared prompt editing have real SDK/service and isolated Linux Chromium qualification with synthetic inputs. Branch performs no inference; Send edit creates an exact native child and submits through the queue. Selected conversation identity survives tab reload; composer/editor drafts remain in memory. Pi prompt improvement, full command/resource composition, voice, richer source provenance and all remaining service/platform/installed migration gates remain open. Existing Native and Browser surfaces keep their approved layouts.
 
 Read [the implementation and test record](../../docs/AUGMENTOR-HARNESS.md) before claiming workflow or installed parity.
+
+The Jobs view starts bounded SDK children or permitted background commands, inspects exact-parent output/history and stops owned work. Its scoped inspector only reads. See [the lifecycle and accounting contract](../../docs/PI-JOBS.md).

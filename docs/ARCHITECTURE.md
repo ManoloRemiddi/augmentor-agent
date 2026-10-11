@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 jobs follow-up: [background jobs and delegation](PI-JOBS.md) add exact-parent durable receipts, real bounded SDK children and commands, root/nested tool grants, scoped approvals/Stop, unknown restart recovery and saved one-time usage attribution. This advances the combined P1 requirement; desktop-specialist consolidation, live services and every accepted P0/P1/platform/installed gate remain required.
+
+
 [Persistent Pi goals](PI-GOALS.md) retain branch-owned completion state through a selected public MIT DSH fold. Explicit human continuation uses the existing public Pi owner and durable Host queue. Restart/fork/reload disarm it; Stop pauses active state. Plans, jobs and verified outcomes remain separate.
 
 The [Pi planning candidate](PI-PLANNING.md) stores revisioned plans and explicit todo states in native branch custom entries through the public SDK. Its Plan view reads the existing owner or verified cold originals. Reported progress grants no task-completion evidence, execution authority or autonomous goal/job loop.

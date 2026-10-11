@@ -9,7 +9,7 @@ import type {Host} from './host.js';
 
 const allowed = new Set([
   'host.describe', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
-  'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
+  'session.jobs', 'session.job', 'session.jobHistory', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
@@ -19,7 +19,7 @@ const allowed = new Set([
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
 type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
-const inspectionReads=new Set(['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','observation.describe','observation.list', 'observation.search','observation.payload']);
+const inspectionReads=new Set(['session.jobs','session.job','session.jobHistory','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','observation.describe','observation.list', 'observation.search','observation.payload']);
 interface LiveFrame {seq: number; sessionId: string; frame: Data}
 const LIVE_BYTES = 16 * 1024 * 1024;
 
@@ -173,6 +173,7 @@ export class HarnessServer {
         ['/', {path: join(this.assets, 'index.html'), type: 'text/html'}],
         ['/app.js', {path: join(this.assets, 'app.js'), type: 'text/javascript'}],
         ['/plans.js', {path: join(this.assets, 'plans.js'), type: 'text/javascript'}],
+        ['/jobs.js', {path: join(this.assets, 'jobs.js'), type: 'text/javascript'}],
         ['/goals.js', {path: join(this.assets, 'goals.js'), type: 'text/javascript'}],
         ['/native-history.mjs', {path: join(this.assets, 'native-history.mjs'), type: 'text/javascript'}],
         ['/original-search.mjs', {path: join(this.assets, 'original-search.mjs'), type: 'text/javascript'}],

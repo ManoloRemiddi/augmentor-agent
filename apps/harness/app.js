@@ -10,6 +10,7 @@ import {attachPiImprovement} from './prompt-improvement.js';
 import {attachNativeHistory} from './native-history.mjs';
 import {attachPlans} from './plans.js';
 import {attachGoals} from './goals.js';
+import {attachJobs} from './jobs.js';
 const $=id=>document.getElementById(id);
 const hash=new URLSearchParams(location.hash.slice(1));
 const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
@@ -42,12 +43,13 @@ addEventListener('keydown',event=>{if(event.key==='Escape')closeSidebar();});
 function node(tag,text,cls){const el=document.createElement(tag);if(text!==undefined)el.textContent=text;if(cls)el.className=cls;return el;}
 function notice(message,error=false){$('notice').textContent=message;$('notice').classList.toggle('error',error);}
 async function rpc(method,params={}){
-  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead','session.goal','session.plan','session.originalSearch','session.originalRead','session.mcpInfo','session.models','session.queue','observation.describe','observation.list','observation.search','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
+  if(state.readOnly&&!['host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead','session.jobs','session.job','session.jobHistory','session.goal','session.plan','session.originalSearch','session.originalRead','session.mcpInfo','session.models','session.queue','observation.describe','observation.list','observation.search','observation.payload','events.subscribe'].includes(method))throw Error('This conversation inspector is read-only.');
   const response=await fetch('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});
   const body=await response.json();if(!response.ok||body.error)throw Error(body.error?.message||'The local connection failed');return body.result;
 }
 function current(){return state.sessions.find(s=>s.sessionId===state.sessionId);}
 const plans=attachPlans({container:$('plan-content'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch})});
+const jobs=attachJobs({container:$('jobs-content'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,readOnly:state.readOnly})});
 const goals=attachGoals({container:$('goal-content'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,readOnly:state.readOnly})});
 const promptLibrary=attachHarnessPrompts({input:$('input'),button:$('prompt-library'),rpc,ready:()=>state.ready&&!state.readOnly,
   context:()=>state.epoch+':'+state.sessionId+':'+(messageActions.editing?'edit':'chat'),changed:renderSessions});
@@ -68,7 +70,7 @@ function renderSessions(){
   }));
   const session=current();$('title').textContent=session?.title||'Your agent, in view';
   $('subtitle').textContent=session?(session.running?'Working · ':'')+session.cwd:'Open a conversation to inspect its execution and context.';
-  $('stop').disabled=!session?.running&&!submitting&&!mcp.busy;
+  $('stop').disabled=!session?.running&&!session?.jobsRunning&&!submitting&&!mcp.busy;
   $('send').disabled=mcp.blocked||improvement.busy||!session||messageActions.busy||promptLibrary.inserting||!state.ready||!state.selectionReady||state.selecting||state.creating;
   $('prompt-library').disabled=!state.ready;
   $('reasoning-settings').disabled=!session||session.running||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating;reasoning.changed();
@@ -251,7 +253,7 @@ async function selectSession(sid,{preserveEdit=false}={}){
   closeSidebar();clearTimeout(searchTimer);search.epoch++;search.query='';search.cursor=null;search.matches.clear();search.payloadBytes=0;search.unavailable=0;search.uncaptured=0;search.records.clear();search.before=null;search.scanned=0;search.hasMore=false;search.loading=false;search.error=false;$('search').value='';
   const epoch=++state.epoch;inspectionEpoch++;state.selecting=true;state.selectionReady=false;state.sessionId=sid;state.queue=null;state.observations.clear();state.interactions.clear();state.selected=null;state.focus=null;state.history=[];ledgerRecords=[];$('ledger').scrollTop=0;
   sessionStorage.setItem('augmentor-harness-session',sid);
-  plans.reset();goals.reset();$('interaction').hidden=true;$('inspector').replaceChildren(node('p','Select a record to inspect.','empty'));renderSessions();renderChat();
+  plans.reset();goals.reset();jobs.reset();$('interaction').hidden=true;$('inspector').replaceChildren(node('p','Select a record to inspect.','empty'));renderSessions();renderChat();
   $('context-stats').textContent='';$('context-content').replaceChildren(node('p','No request is loaded for this conversation.','empty'));
   try{
   const subscription=await rpc('events.subscribe',{sessionId:sid,clientId:state.clientId});if(epoch!==state.epoch)return;
@@ -259,7 +261,7 @@ async function selectSession(sid,{preserveEdit=false}={}){
   const [page,selection]=await Promise.all([rpc('observation.list',{sessionId:sid}),rpc('session.models',{sessionId:sid}),refreshHistory(sid,epoch)]);
   if(epoch!==state.epoch)return;page.records.forEach(r=>state.observations.set(r.id,r));state.hasMore=page.hasMore;
   const selectedValue=JSON.stringify(selection.current);if(state.readOnly&&![...$('model').options].some(option=>option.value===selectedValue)){const option=node('option',selection.current.provider+'/'+selection.current.model+' · saved selection');option.value=selectedValue;$('model').append(option);}
-  $('model').value=selectedValue;state.selectionReady=true;renderObservations();if(state.view==='context')await inspectContext();if(state.view==='plan')await plans.refresh();if(state.view==='goal')await goals.refresh();
+  $('model').value=selectedValue;state.selectionReady=true;renderObservations();if(state.view==='context')await inspectContext();if(state.view==='plan')await plans.refresh();if(state.view==='goal')await goals.refresh();if(state.view==='jobs')await jobs.refresh();
   }finally{if(epoch===state.epoch){state.selecting=false;renderSessions();renderChat();}}
 }
 async function refreshSessions(){const result=await rpc('session.list');state.sessions=result.items;lastSessionsRefresh=Date.now();renderSessions();renderChat();}
@@ -269,12 +271,13 @@ async function poll(){
   try{
     const response=await fetch('/api/events?sessionId='+encodeURIComponent(sid)+'&clientId='+state.clientId+'&after='+state.cursor,{headers:{Authorization:'Bearer '+token}});
     const page=await response.json();if(page.error)throw Error(page.error.message);if(epoch!==state.epoch)return;state.cursor=page.cursor;
-    let chatChanged=false,observationChanged=false,settled=false,planChanged=false,goalChanged=false;
+    let chatChanged=false,observationChanged=false,settled=false,planChanged=false,goalChanged=false,jobChanged=false;
     for(const item of page.frames){
       const frame=item.frame;
       if(frame.method==='session/queue')queueBaseline(frame.payload);
       if(frame.method==='plan/updated')planChanged=true;
       if(frame.method==='goal/updated')goalChanged=true;
+      if(frame.method==='job/updated'){jobChanged=true;const session=current();if(session)session.jobsRunning=['starting','running','stopping'].includes(frame.payload?.state)||state.sessions.some(row=>row.sessionId===state.sessionId&&row.jobsRunning);}
       if(frame.method==='observation/event'){const r=frame.payload.observation;state.observations.set(r.id,r);observationChanged=true;}
       if(frame.method==='session/event'){
         const event=frame.payload.event;
@@ -287,6 +290,8 @@ async function poll(){
     if(observationChanged)renderObservations();if(chatChanged)renderChat();
     if(state.view==='plan'&&(planChanged||settled||page.gap))await plans.refresh();
     if(state.view==='goal'&&(goalChanged||settled||page.gap))await goals.refresh();
+    if(jobChanged)await refreshSessions();
+    if(state.view==='jobs'&&(jobChanged||settled||page.gap))await jobs.refresh();
     if(settled||page.gap){
       await refreshHistory(sid,epoch);
       if(page.gap&&epoch===state.epoch){const records=await rpc('observation.list',{sessionId:sid});if(epoch===state.epoch){records.records.forEach(r=>state.observations.set(r.id,r));state.hasMore=records.hasMore;renderObservations();}}
@@ -298,9 +303,10 @@ async function poll(){
 }
 document.querySelectorAll('[data-view]').forEach(button=>button.onclick=()=>{
   state.view=button.dataset.view;document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-selected',String(b===button)));
-  for(const name of ['chat','trajectory','context','plan','goal'])$(name).hidden=name!==state.view;
+  for(const name of ['chat','trajectory','context','plan','goal','jobs'])$(name).hidden=name!==state.view;
   if(state.view==='plan')void plans.refresh();
   if(state.view==='goal')void goals.refresh();
+  if(state.view==='jobs')void jobs.refresh();
   if(state.view==='trajectory')renderObservations();if(state.view==='context')inspectContext().catch(e=>notice(e.message,true));
 });
 let ledgerFrame=null;
