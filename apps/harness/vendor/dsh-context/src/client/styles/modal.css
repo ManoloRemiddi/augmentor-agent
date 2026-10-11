@@ -1,0 +1,17 @@
+/* Fixed positioning escapes the composer anchor; the card's percentage width resolves against the backdrop, so a docked mask clamps it inside the main column. */
+.lc-modal-backdrop { position: fixed; inset: 0; z-index: 200; background: var(--dsw-alias-bg-mask-1, rgba(0, 0, 0, 0.45)); display: flex; align-items: center; justify-content: center; }
+.lc-modal-card { width: min(720px, calc(100% - 48px)); max-height: min(82vh, 760px); overflow-y: auto; box-sizing: border-box; background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l2); border-radius: 12px; box-shadow: var(--dsw-shadow-lv3, 0 12px 32px rgba(0, 0, 0, 0.4)); padding: 16px 18px 18px; color: var(--dsw-alias-label-primary); font-size: 13px; }
+.lc-modal-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 12px; }
+.lc-modal-title { font-weight: 600; font-size: 14px; }
+.lc-modal-close { margin-left: auto; border: 0; background: transparent; color: var(--dsw-alias-label-secondary); font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 6px; cursor: pointer; font-family: inherit; transition: color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+
+/* ---- the baseline-gate dialog (upgradeGate.tsx) ---- */
+.lc-gate-card { width: min(440px, calc(100vw - 48px)); }
+.lc-gate-body { color: var(--dsw-alias-label-secondary); line-height: 1.7; }
+.lc-gate-versions { display: flex; gap: 24px; margin-top: 14px; }
+.lc-gate-version { display: flex; flex-direction: column; gap: 2px; }
+.lc-gate-version-label { font-size: 11px; color: var(--dsw-alias-label-secondary); }
+.lc-gate-version-value { font-weight: 600; font-family: var(--dsw-font-family-mono, monospace); color: var(--dsw-alias-label-primary); }
+.lc-gate-or-newer { margin-left: 6px; font-family: inherit; font-weight: 400; font-size: 11px; color: var(--dsw-alias-label-secondary); }
+.lc-gate-actions { display: flex; justify-content: flex-end; margin-top: 16px; }
+.lc-gate-ok { border: 0; border-radius: 6px; padding: 6px 16px; font-size: 12px; font-family: inherit; cursor: pointer; background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); transition: filter var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }

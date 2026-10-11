@@ -36,13 +36,15 @@ export class DshPiController {
     if(epoch!==this.epoch)return;
     const reasoning=this.state.readOnly?null:await this.rpc('session.reasoning',{sessionId});if(epoch!==this.epoch)return;
     sessionStorage.setItem('augmentor-harness-session',sessionId);
-    this.update({events:history.events.map(x=>x.event),hasMore:history.hasMore===true,records:observations.records,selection:model.current,queue,goal,reasoning,interactions:sub.pending,phase:'ready'});
+    this.update({events:history.events.map(x=>x.event),hasMore:history.hasMore===true,observationHasMore:observations.hasMore===true,records:observations.records,selection:model.current,queue,goal,reasoning,interactions:sub.pending,phase:'ready'});
     void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
   }
   hydrating=false;
   async hydrate(){
     if(this.hydrating)return;this.hydrating=true;const epoch=this.epoch,sessionId=this.state.sessionId;
-    try{const requests=this.state.records.filter(r=>r.kind==='model/request'&&r.payload?.state==='retained'&&r.payload.bytes<=1024*1024&&!this.state.payloads[r.id]).slice(-8);
+    try{const window=this.state.records.filter(r=>r.kind==='model/request'&&r.payload?.state==='retained'&&r.payload.bytes<=1024*1024).slice(-8),ids=new Set(window.map(r=>r.id));
+      const retained=Object.fromEntries(Object.entries(this.state.payloads).filter(([id])=>ids.has(id)));if(Object.keys(retained).length!==Object.keys(this.state.payloads).length)this.update({payloads:retained});
+      const requests=window.filter(r=>!this.state.payloads[r.id]);
       for(const record of requests){const result=await readDshPayload((m,p)=>this.rpc(m,p),sessionId,record);if(epoch!==this.epoch)return;if(result.available)this.update({payloads:{...this.state.payloads,[record.id]:result.value}});}
     }finally{this.hydrating=false;}
   }

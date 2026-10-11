@@ -1,0 +1,146 @@
+/** Glyphs: inject/model-switch reuse the harness's shared icon set (`@deepseek-ai/dsh-client-ui-primitives`, a platform seed word);
+ * compaction/prune keep the ✂ marker — no shared glyph exists for it. */
+
+import { useEffect, useLayoutEffect, useRef, type ReactElement } from 'react'
+import type { ContextEventRecord } from '../../shared/types'
+import { IconBranch, IconPlus } from '../primitives'
+import type { Translate } from '../i18n'
+import type { DetailState } from '../timelineSource'
+import type { ViewKit } from '../viewkit'
+import { makeDetailNote } from './detailNote'
+
+const EVENT_ICONS: Record<string, string> = { compaction: '✂', prune: '✂', mode: '⇄' }
+
+export interface EventListProps {
+  events: ContextEventRecord[]
+  /** The timeline source's detail state (split generation): with no events to
+   * list, `loading`/`failed` replace the empty claim with the pending note /
+   * retry button — an un-fetched list is not an empty one. */
+  state?: DetailState
+  onRetry?: () => void
+  /** Reveal an injection's own context item in the Context Browser: its label becomes a link (hover underline).
+   * Absent — every row keeps a plain label. */
+  onInjectFocus?: (ev: ContextEventRecord) => void
+}
+
+export function makeEventText(t: Translate): {
+  eventLabel: (ev: ContextEventRecord) => string
+  eventAt: (ev: ContextEventRecord) => string | null
+} {
+  function eventLabel(ev: ContextEventRecord): string {
+    if (ev.kind === 'compaction') return t('ev.compaction', { n: ev.count || 0 })
+    if (ev.kind === 'prune') return t('ev.prune')
+    if (ev.kind === 'model') return t('ev.model', { a: ev.from || '?', b: ev.to || '?' })
+    if (ev.kind === 'mode') return t('ev.mode.' + (ev.name || '?'))
+    // The kind union narrows to 'inject' here; a future kind breaks the
+    // compile (ev.sub ev.form ev.name are inject-only), forcing a label.
+    if (ev.sub === 'skill') return t('ev.skill', { name: ev.name || '?' })
+    const base = t('form.' + (ev.form || 'context'))
+    let label = ev.name ? base + ' · ' + ev.name : base
+    if (ev.detail) label += ' · ' + ev.detail
+    return label
+  }
+
+  /** Where this event sits in the timeline: boundary events (compaction/prune) label the GAP they sit in — same-turn 'T2 S3→4',
+   * cross-turn 'T50 S8 → T51 S1'; other kinds keep their single point; no turn/step (in flight) → null. */
+  function eventAt(ev: ContextEventRecord): string | null {
+    if (ev.kind === 'compaction' || ev.kind === 'prune') {
+      if (typeof ev.turn === 'number' && typeof ev.step === 'number') {
+        if (typeof ev.fromTurn === 'number' && typeof ev.fromStep === 'number') {
+          if (ev.fromTurn === ev.turn) return t('events.range', { t: ev.turn, a: ev.fromStep, b: ev.step })
+          return t('events.rangeTo', { a: ev.fromTurn, as: ev.fromStep, b: ev.turn, bs: ev.step })
+        }
+        return t('events.at', { t: ev.turn, s: ev.step })
+      }
+      return null
+    }
+    if (typeof ev.turn === 'number' && typeof ev.step === 'number') {
+      return t('events.at', { t: ev.turn, s: ev.step })
+    }
+    return null
+  }
+
+  return { eventLabel, eventAt }
+}
+
+/** Set the native `title` on every label whose text overflows its box (the styled tips cover cards, but a plain
+ * ellipsis row still needs the native fallback); reads (scrollWidth/clientWidth) and writes (title) stay separate
+ * from layout-affecting work, and callers gate WHEN this runs so it never becomes a per-render forced layout. */
+function syncTitles(root: HTMLElement): void {
+  for (const el of root.querySelectorAll<HTMLElement>('.lc-event-label')) {
+    el.title = el.scrollWidth > el.clientWidth ? el.textContent || '' : ''
+  }
+}
+
+export function makeEventList(kit: ViewKit): (props: EventListProps) => ReactElement {
+  const { t, fmt, fmtTime, eventLabel, eventAt } = kit
+  const DetailNote = makeDetailNote(kit)
+  // The lane both row shapes share; its 92px basis reservation covers icon + gap + the widest kind chip in both locales.
+  const labelClass = 'lc-event-label flex-1 @max-[380px]/lc-card:basis-[calc(100%-92px)]'
+  return function EventList(props: EventListProps): ReactElement {
+    // Hooks stay unconditional (Rules of Hooks): events going empty ->
+    // non-empty in one mounted instance must not grow the hook count — an
+    // early return above these hooks is a React #310 class bug (issue #12).
+    const rootRef = useRef<HTMLDivElement | null>(null)
+    // Truncation titles ride a resize-only listener plus an events-driven resync: the effect MUST NOT run
+    // on every render — a plain re-render (hover/select elsewhere in the view) would re-read scrollWidth /
+    // clientWidth for every label, one forced synchronous layout per row, and rebind the listener.
+    useLayoutEffect(() => {
+      const root = rootRef.current
+      if (!root) return
+      syncTitles(root)
+    }, [props.events])
+    useEffect(() => {
+      const onResize = (): void => {
+        const root = rootRef.current
+        if (root !== null) syncTitles(root)
+      }
+      window.addEventListener('resize', onResize)
+      return () => { window.removeEventListener('resize', onResize) }
+    }, [])
+    if (props.events.length === 0) {
+      if (props.state === 'loading') return <DetailNote state="loading" className="lc-empty lc-lane" />
+      if (props.state === 'failed' && props.onRetry !== undefined) {
+        return <DetailNote state="failed" onRetry={props.onRetry} className="lc-empty lc-lane" />
+      }
+      return <div className="lc-empty lc-lane">{t('events.empty')}</div>
+    }
+    const sorted = props.events.slice().reverse()
+    return (
+      <div className="lc-events" ref={rootRef}>
+        {sorted.map((ev) => {
+          const label = eventLabel(ev)
+          const at = eventAt(ev)
+          const glyph = ev.kind === 'inject' ? <IconPlus />
+            : ev.kind === 'model' ? <IconBranch />
+              : EVENT_ICONS[ev.kind] || '•'
+          // Key on the durable seq alone: the list renders newest-first, so a fresh event lands at index 0
+          // and an index-bearing key would shift EVERY existing row's key — a full-list remount on every push.
+          // Narrow cards (phone panes): the row wraps, folding the meta tail onto line 2 instead of crushing
+          // the label into a scrollbar.
+          // An injection's label doubles as the link into the Context Browser (the row's own context item);
+          // every other kind keeps a plain label.
+          const reveal = ev.kind === 'inject' ? props.onInjectFocus : undefined
+          return (
+            <div key={ev.seq} className="lc-event @max-[380px]/lc-card:flex-wrap">
+              <span className={'lc-event-icon lc-event-' + ev.kind}>{glyph}</span>
+              <span className={'lc-kind lc-kind-' + ev.kind}>{t('kind.' + ev.kind)}</span>
+              {reveal !== undefined ? (
+                <button type="button" className={labelClass + ' lc-event-jump'} onClick={() => { reveal(ev) }}>{label}</button>
+              ) : (
+                <span className={labelClass}>{label}</span>
+              )}
+              {at !== null ? <span className="lc-event-at">{at}</span> : null}
+              {ev.tokens ? (
+                <span className={'lc-event-tokens' + (ev.kind === 'inject' ? ' lc-up' : ' lc-down')}>
+                  {(ev.kind === 'inject' ? '+' : '−') + fmt(ev.tokens)}
+                </span>
+              ) : null}
+              <span className="lc-event-time">{fmtTime(ev.time)}</span>
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+}

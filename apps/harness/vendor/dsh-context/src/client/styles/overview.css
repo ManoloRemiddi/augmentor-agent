@@ -1,0 +1,200 @@
+/* The page is the `lc-ov` query container; inline-size containment makes it the containing block for fixed descendants, so hoverTip.tsx portals its bubble to <body>. */
+.lc-ov-page { display: flex; flex-direction: column; width: 100%; height: 100%; min-width: 0; min-height: 0; overflow: hidden; box-sizing: border-box; background: var(--dsw-alias-bg-base); color: var(--dsw-alias-label-primary); font-size: 13px; container: lc-ov / inline-size; }
+.lc-ov-pagescroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; scrollbar-gutter: stable; }
+/* No width cap: the shipped first-level pages frame at 960px, this page adapts to the pane. */
+.lc-ov-pagecontent { padding: 0 clamp(24px, 4vw, 48px) 48px; }
+.lc-ov-pagehead { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 28px; margin-bottom: 24px; }
+/* macOS hiddenInset titlebar clearance, so first-level pages align with the frame. */
+[data-platform='darwin'] .lc-ov-pagehead { padding-top: calc(28px + var(--dsh-frame-top-clearance, 0px)); }
+.lc-ov-pagetitle { flex: 0 1 auto; min-width: 0; margin: 0; font-size: 20px; line-height: 28px; font-weight: 500; }
+.lc-ov-settings { flex: none; display: inline-flex; align-items: center; gap: 6px; box-sizing: border-box; border: 1px solid var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-layer-2); border-radius: 999px; padding: 3px 12px; font: inherit; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-secondary); white-space: nowrap; cursor: pointer; transition: border-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+/* One wrapper around the picker and range group, so the head keeps a single auto-margin push. */
+.lc-ov-headctl { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lc-ov-settings:hover { border-color: var(--dsw-alias-label-secondary); color: var(--dsw-alias-label-primary); }
+.lc-ov-balance { flex: none; display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 2px 10px; border-radius: 999px; background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l2); font-size: 12px; line-height: 18px; text-decoration: none; color: inherit; }
+.lc-ov-balance:hover .lc-ov-balance-value { text-decoration: underline; }
+.lc-ov-balance-label { color: var(--dsw-alias-label-secondary); white-space: nowrap; }
+.lc-ov-balance-value { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+
+.lc-hovertip { position: fixed; z-index: 300; max-width: min(320px, 50vw); white-space: pre-line; }
+
+/* The pair folds to one column at 932px of container, below which a half-width chart's seven day groups crush. */
+.lc-ov-first { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.lc-ov-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.lc-ov-kpi { align-items: center; padding: 8px; }
+.lc-ov-kpi .lc-stat-value { font-size: 20px; }
+@container lc-ov (max-width: 932px) {
+  .lc-ov-first { grid-template-columns: minmax(0, 1fr); }
+}
+@container lc-ov (max-width: 640px) {
+  .lc-ov-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Both bars scale on their own window maximum: a $2 week must not flatten under a 169M-token week. */
+.lc-ov-usage { flex: 1 1 auto; display: flex; flex-direction: column; margin-bottom: 0; min-width: 0; box-sizing: border-box; }
+/* Grid columns: tick rail | chart | tick rail, with the day strip as row 2 of the chart column, so labels center under their own columns. */
+.lc-ov-usage-plot { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; grid-template-rows: minmax(56px, 1fr) auto; gap: 6px; }
+.lc-ov-usage-rail-l { grid-area: 1 / 1; }
+.lc-ov-usage-grid { grid-area: 1 / 2; position: relative; min-width: 0; display: flex; }
+.lc-ov-usage-rail-r { grid-area: 1 / 3; }
+/* Fixed width keeps both rails symmetric across differing tick widths ("169.2M" vs "$0.0075"). */
+.lc-ov-usage-rail { position: relative; width: 42px; font-size: 9px; line-height: 1.2; color: var(--dsw-alias-label-secondary); font-variant-numeric: tabular-nums; }
+.lc-ov-usage-rail-l .lc-ov-usage-tick { right: 0; }
+.lc-ov-usage-rail-r .lc-ov-usage-tick { left: 0; }
+.lc-ov-usage-tick { position: absolute; transform: translateY(-50%); white-space: nowrap; }
+/* The grid spans the bar region only, so gridlines never cross the labels; the row template's 56px floor keeps percentage-height bars alive when the pair folds. */
+.lc-ov-usage-line { position: absolute; left: 0; right: 0; height: 1px; background: color-mix(in srgb, var(--dsw-alias-border-l2) 70%, transparent); }
+.lc-ov-usage-line-0 { background: var(--dsw-alias-border-l2); }
+.lc-ov-usage-cols { position: relative; flex: 1 1 auto; min-width: 0; display: flex; align-items: stretch; gap: 6px; }
+.lc-ov-usage-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+.lc-ov-usage-bars { flex: 1 1 auto; width: 100%; display: flex; align-items: flex-end; justify-content: center; gap: 3px; }
+.lc-ov-usage-bar { flex: none; width: 10px; border-radius: 3px 3px 0 0; }
+.lc-ov-usage-tokens { background: color-mix(in srgb, var(--color-blue-500) 72%, transparent); }
+.lc-ov-usage-cost { background: color-mix(in srgb, var(--color-green-500) 72%, transparent); }
+.lc-ov-usage-days { grid-area: 2 / 2; display: flex; gap: 6px; }
+.lc-ov-usage-day { flex: 1 1 0; min-width: 0; text-align: center; font-size: 9px; line-height: 1.2; color: var(--dsw-alias-label-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* Under ~400px a full seven-label strip crushes; `visibility` keeps every slot in the columns' geometry. */
+@container lc-ov (max-width: 400px) {
+  .lc-ov-usage-day:nth-child(even) { visibility: hidden; }
+}
+.lc-ov-usage-key { flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 5px; padding-top: 5px; }
+.lc-ov-usage-swatch { flex: none; width: 10px; height: 8px; border-radius: 2px; }
+.lc-ov-usage-key-label { font-size: 9px; color: var(--dsw-alias-label-secondary); }
+
+.lc-ov-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.lc-ov-stats > .lc-card { margin-bottom: 0; min-width: 0; box-sizing: border-box; }
+@container lc-ov (max-width: 700px) {
+  .lc-ov-stats { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* `align-items: start` keeps the heat card at its natural height instead of stretching to the paged grid. */
+.lc-ov-body { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 7fr); gap: 10px; align-items: start; }
+.lc-ov-left { min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.lc-ov-right { min-width: 0; }
+@container lc-ov (max-width: 932px) {
+  .lc-ov-body { display: block; }
+  .lc-ov-left { margin-bottom: 12px; }
+}
+.lc-ov-left > .lc-card { margin-bottom: 0; min-width: 0; box-sizing: border-box; }
+.lc-ov-heat-card { display: flex; flex-direction: column; }
+
+/* Fixed 20px cells centered in the card, so the card's height follows its 7 cell rows instead of the cells stretching to the card's width. */
+.lc-heat-wrap { display: flex; flex-direction: column; flex: 1; }
+.lc-heat { display: flex; gap: 8px; flex: 1; align-items: center; justify-content: center; }
+/* The columns and the weekday gutter reserve the same 18px line for the month labels, so the centered cell rows stay aligned. */
+.lc-heat-wds, .lc-heat-col { padding-top: 18px; }
+.lc-heat-wds { display: flex; flex-direction: column; gap: 3px; }
+/* The gutter self-sizes to its widest weekday label, which the zh locale makes the widest. */
+.lc-heat-wd { flex: none; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: var(--dsw-alias-label-secondary); text-align: center; white-space: nowrap; }
+.lc-heat-cols { display: flex; gap: 3px; }
+/* Absolute so a label's width stays off the 20px column and cannot skew the grid. */
+.lc-heat-col { position: relative; display: flex; flex-direction: column; gap: 3px; }
+.lc-heat-mon { position: absolute; top: 0; left: 0; font-size: 9px; line-height: 18px; color: var(--dsw-alias-label-secondary); white-space: nowrap; }
+.lc-heat-cell { width: 20px; height: 20px; box-sizing: border-box; border: 0; border-radius: 20%; padding: 0; background: var(--dsw-alias-bg-layer-2); cursor: default; }
+button.lc-heat-cell { cursor: pointer; }
+button.lc-heat-cell:hover { box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--color-blue-500) 70%, transparent); }
+.lc-heat-future { background: transparent; }
+/* A day with no billed activity keeps a visible gray floor (layer-2 is the card's own white in the light theme). */
+.lc-heat-0 { background: color-mix(in srgb, var(--dsw-alias-label-secondary) 16%, transparent); }
+.lc-heat-1 { background: color-mix(in srgb, var(--color-blue-500) 28%, transparent); }
+.lc-heat-2 { background: color-mix(in srgb, var(--color-blue-500) 50%, transparent); }
+.lc-heat-3 { background: color-mix(in srgb, var(--color-blue-500) 72%, transparent); }
+.lc-heat-4 { background: color-mix(in srgb, var(--color-blue-500) 92%, transparent); }
+/* The pinned day: the grid filter's source. */
+.lc-heat-on { box-shadow: 0 0 0 1.5px var(--color-blue-500); }
+/* Swatches half the grid's cell size: at cell size the key reads as a second row of cells. */
+.lc-heat-legend { display: flex; align-items: center; justify-content: flex-end; gap: 2px; padding-top: 6px; }
+.lc-heat-legend .lc-heat-cell { width: 10px; height: 10px; }
+.lc-heat-key { font-size: 9px; color: var(--dsw-alias-label-secondary); margin: 0 2px; }
+
+/* Each bar is a share of the heaviest row's tally, so no ordering can push it past the card edge. */
+.lc-ov-skills { display: flex; flex-direction: column; gap: 2px; }
+/* Pulled into the title's bottom margin so totals and title read as one head. */
+.lc-ov-skills-sub { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: -4px 0 8px; }
+.lc-ov-skills-sub-n { margin-left: 0; }
+.lc-ov-skills-search { flex: 0 1 170px; margin-left: auto; }
+.lc-ov-skill { position: relative; display: flex; align-items: baseline; gap: 7px; min-width: 0; width: 100%; border: 0; border-radius: 6px; padding: 2px 6px 4px; background: transparent; font: inherit; font-size: 12px; line-height: 1.7; color: inherit; text-align: left; cursor: pointer; transition: background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-ov-skill:hover { background: var(--dsw-alias-bg-layer-2); }
+/* The pinned row and its detail read as one unit: the fill and the single ring live on the wrapper. */
+.lc-ov-skill-unit { background: var(--dsw-alias-bg-layer-2); border-radius: 8px; box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--color-blue-500) 45%, transparent); }
+.lc-ov-skill-unit .lc-ov-skill-detail { margin-top: 0; padding: 4px 6px 8px; background: transparent; }
+.lc-ov-skill-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; align-self: center; }
+.lc-ov-skill-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 11px; color: var(--dsw-alias-label-primary); }
+.lc-ov-skill-count { flex: none; font-variant-numeric: tabular-nums; color: var(--dsw-alias-label-primary); }
+.lc-ov-skill-last { flex: none; min-width: 56px; text-align: right; font-size: 11px; color: var(--dsw-alias-label-secondary); white-space: nowrap; }
+/* Absolute off the row's bottom padding, so the hairline never moves the text baseline; the JS width subtracts the row's 6px insets. */
+.lc-ov-skill-bar { position: absolute; left: 6px; bottom: 1px; height: 2px; border-radius: 1px; opacity: 0.45; pointer-events: none; }
+.lc-ov-skill-more { padding-top: 4px; font-size: 11px; color: var(--dsw-alias-label-secondary); }
+.lc-skilltip { position: fixed; z-index: 300; max-width: min(300px, 60vw); padding: 10px 12px; border-radius: 10px; white-space: normal; line-height: 1.5; }
+.lc-skilld-head { display: flex; align-items: center; gap: 7px; }
+.lc-skilld-name { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 12px; font-weight: 600; color: var(--dsw-alias-label-primary); }
+.lc-skilld-chip { flex: none; font-size: 10px; line-height: 1.5; color: var(--dsw-alias-label-secondary); border: 1px solid var(--dsw-alias-border-l2); border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+.lc-skilld-desc { margin: 6px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dsw-alias-label-secondary); overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.lc-skilld-path { margin-top: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 11px; color: var(--dsw-alias-label-tertiary); }
+/* The bubble is portaled to <body>, outside the lc-ov container, so it wraps with flex instead of a container query. */
+.lc-skilld-foot { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--dsw-alias-border-l2); font-size: 11px; color: var(--dsw-alias-label-secondary); }
+.lc-skilld-foot > span:first-child { white-space: nowrap; }
+.lc-skilld-hint { margin-left: auto; flex: none; color: var(--color-blue-500); white-space: nowrap; }
+/* Sits under its pinned row, or detached at the card's bottom when that row is out of scope. */
+.lc-ov-skill-detail { margin: 4px 0 2px; padding: 8px 10px 9px; background: var(--dsw-alias-bg-layer-2); border-radius: 8px; }
+.lc-ov-skill-detail > :first-child { margin-top: 0; }
+/* Label column against value column; the path value is the copy button. */
+.lc-skilld-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; margin-top: 7px; font-size: 11px; line-height: 1.6; }
+.lc-skilld-k { color: var(--dsw-alias-label-tertiary); white-space: nowrap; }
+.lc-skilld-v { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-secondary); }
+.lc-skilld-pathv { display: flex; align-items: center; gap: 5px; border: 0; padding: 0; background: transparent; font: inherit; cursor: copy; text-align: left; }
+.lc-skilld-pathv-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); }
+.lc-skilld-pathv svg { flex: none; color: var(--dsw-alias-label-tertiary); transition: color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-skilld-pathv:hover .lc-skilld-pathv-text, .lc-skilld-pathv:hover svg { color: var(--dsw-alias-label-primary); }
+
+.lc-ov-list-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.lc-ov-list-title { font-weight: 600; white-space: nowrap; }
+.lc-ov-list-count { color: var(--dsw-alias-label-secondary); font-size: 11px; font-variant-numeric: tabular-nums; background: var(--dsw-alias-bg-layer-2); border-radius: 8px; padding: 1px 7px; }
+.lc-ov-day-chip { border: 1px solid color-mix(in srgb, var(--color-blue-500) 45%, transparent); color: var(--color-blue-500); background: color-mix(in srgb, var(--color-blue-500) 10%, transparent); border-radius: 999px; font-size: 11px; line-height: 1.4; padding: 1px 10px; cursor: pointer; font-family: inherit; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.lc-ov-search { flex: 1 1 150px; min-width: 110px; border: 1px solid var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-layer-2); border-radius: 6px; padding: 4px 10px; font: inherit; font-size: 12px; color: var(--dsw-alias-label-primary); outline: none; transition: border-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-ov-search:focus { border-color: var(--dsw-alias-label-secondary); }
+.lc-ov-search::placeholder { color: var(--dsw-alias-label-secondary); }
+
+.lc-ov-groups { display: flex; gap: 6px; flex-wrap: wrap; margin: -2px 0 10px; }
+.lc-ov-chip { display: inline-flex; align-items: baseline; gap: 5px; border: 1px solid var(--dsw-alias-border-l2); background: transparent; color: var(--dsw-alias-label-secondary); border-radius: 999px; font: inherit; font-size: 11px; line-height: 1.5; padding: 2px 10px; cursor: pointer; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), border-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-ov-chip:hover { color: var(--dsw-alias-label-primary); border-color: var(--dsw-alias-label-secondary); }
+.lc-ov-chip-on, .lc-ov-chip-on:hover { background: var(--dsw-alias-button-primary-fill); border-color: transparent; color: var(--dsw-alias-label-primary-foreground); }
+.lc-ov-chip-n { font-variant-numeric: tabular-nums; opacity: 0.65; font-size: 10px; }
+.lc-ov-chip-on .lc-ov-chip-n { opacity: 0.85; }
+
+/* auto-fill folds the 3-column grid down as the pane narrows. */
+.lc-ov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+/* The grid sizes every row to its tallest card. */
+.lc-ov-session { display: flex; flex-direction: column; gap: 6px; text-align: left; background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l2); border-radius: 10px; padding: 10px 12px; cursor: pointer; font: inherit; color: inherit; transition: border-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-ov-session:hover { border-color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-2); }
+.lc-ov-session-current { border-color: color-mix(in srgb, var(--color-blue-500) 65%, transparent); }
+.lc-ov-session-head { display: flex; align-items: flex-start; gap: 6px; min-width: 0; }
+.lc-ov-running { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--color-green-500); }
+/* The 2-line clamp keeps one long title from ballooning its row; the full text stays on the tooltip. */
+.lc-ov-session-title { flex: 1 1 auto; min-width: 0; font-weight: 600; overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; }
+.lc-ov-current { flex: none; font-size: 10px; line-height: 1.5; color: var(--color-blue-500); border: 1px solid color-mix(in srgb, var(--color-blue-500) 45%, transparent); border-radius: 4px; padding: 0 4px; }
+.lc-ov-session-times { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1px; }
+.lc-ov-session-time { color: var(--dsw-alias-label-secondary); font-size: 11px; white-space: nowrap; }
+.lc-ov-session-created { color: var(--dsw-alias-label-secondary); font-size: 10px; line-height: 1.4; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lc-ov-session-crumb { display: flex; align-items: center; gap: 5px; min-width: 0; font-size: 11px; color: var(--dsw-alias-label-secondary); white-space: nowrap; overflow: hidden; }
+.lc-ov-crumb-group { flex: none; max-width: 55%; overflow: hidden; text-overflow: ellipsis; }
+.lc-ov-crumb-sep { flex: none; opacity: 0.55; }
+/* Mixes the label gray instead of layer-2: layer-2 is the card's own white in the light theme, which would leave the pill invisible. */
+.lc-ov-crumb-project { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 10px; line-height: 1.6; color: var(--dsw-alias-label-primary); background: color-mix(in srgb, var(--dsw-alias-label-secondary) 16%, transparent); border-radius: 999px; padding: 0 8px; }
+.lc-ov-session-body { display: flex; gap: 14px; align-items: center; min-width: 0; }
+.lc-ov-mini-stats { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+/* Label and value pull to opposite card edges, mirroring the header's right-aligned times. */
+.lc-ov-mini-stat { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-size: 11px; }
+.lc-ov-mini-label { flex: none; color: var(--dsw-alias-label-secondary); white-space: nowrap; }
+.lc-ov-mini-value { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lc-ov-session-empty { color: var(--dsw-alias-label-secondary); font-size: 11px; line-height: 1.5; padding: 6px 0; }
+/* `margin-top: auto` pins the caption to the bottom edge when a taller sibling stretches the row. */
+.lc-ov-session-preview { display: flex; align-items: baseline; gap: 6px; margin-top: auto; padding-top: 6px; border-top: 1px solid color-mix(in srgb, var(--dsw-alias-border-l2) 60%, transparent); min-width: 0; }
+.lc-ov-session-preview-label { flex: none; color: var(--dsw-alias-label-secondary); font-size: 10px; }
+.lc-ov-session-preview-text { flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--dsw-alias-label-primary); font-size: 11px; line-height: 1.5; }
+
+.lc-ov-pager { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
+.lc-ov-pager-btn { flex: none; width: 26px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--dsw-alias-border-l2); background: transparent; color: var(--dsw-alias-label-primary); border-radius: 6px; font: inherit; line-height: 1; cursor: pointer; transition: border-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-ov-pager-btn:hover:enabled { border-color: var(--dsw-alias-label-secondary); }
+.lc-ov-pager-btn:disabled { opacity: 0.4; cursor: default; }
+.lc-ov-pager-n { color: var(--dsw-alias-label-secondary); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }

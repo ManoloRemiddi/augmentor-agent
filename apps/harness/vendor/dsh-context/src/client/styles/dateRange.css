@@ -1,0 +1,58 @@
+.lc-dp { position: relative; flex: none; }
+.lc-dp-trigger { display: inline-flex; align-items: center; gap: 6px; box-sizing: border-box; border: 1px solid var(--dsw-alias-border-l2); background: var(--dsw-alias-bg-layer-2); border-radius: 999px; padding: 3px 12px; font: inherit; font-size: 12px; line-height: 18px; color: var(--dsw-alias-label-secondary); white-space: nowrap; cursor: pointer; transition: border-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-dp-trigger:hover { border-color: var(--dsw-alias-label-secondary); color: var(--dsw-alias-label-primary); }
+/** A live range takes the chip's own voice: the brand-bordered pill the page
+ * uses for the balance capsule, so the head reads "this scope is custom" without adding another control. */
+.lc-dp-trigger-on { border-color: color-mix(in srgb, var(--dsw-alias-brand-primary) 45%, transparent); color: var(--dsw-alias-brand-primary); }
+/* The two ends, always on show: the start reads left of the end, so the scope
+   is legible straight off the head without opening the panel. Neither half
+   shrinks — the chip is nowrap, so a date never ellipsizes into nonsense. */
+.lc-dp-half { flex: none; text-align: center; font-variant-numeric: tabular-nums; }
+.lc-dp-half-empty { color: var(--dsw-alias-label-tertiary); font-variant-numeric: normal; }
+.lc-dp-sep { flex: none; color: var(--dsw-alias-label-tertiary); }
+
+/* ---- the panel: `.lc-tip`'s face, this sheet's fixed seat ---- */
+/* Portaled to <body> with a fixed seat: the page is the `lc-ov` query container, so an in-tree popover would be captured by its containing block and clipped by the page's one scroller. */
+.lc-dp-panel { position: fixed; z-index: 300; left: 0; top: 0; width: max-content; max-width: calc(100vw - 16px); padding: 8px; pointer-events: auto; opacity: 1; }
+
+/* The month's own nav — the panel's only chrome above the grid. */
+.lc-dp-nav { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+.lc-dp-month { flex: 1 1 auto; text-align: center; font-size: 12px; line-height: 20px; font-weight: 500; white-space: nowrap; }
+.lc-dp-navbtn { flex: none; width: 22px; height: 22px; border: 0; border-radius: 5px; background: transparent; color: var(--dsw-alias-label-secondary); font: inherit; font-size: 14px; line-height: 1; cursor: pointer; }
+.lc-dp-navbtn:hover { background: var(--dsw-alias-interactive-bg-hover); color: var(--dsw-alias-label-primary); }
+.lc-dp-navbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+.lc-dp-navbtn:disabled:hover { background: transparent; color: var(--dsw-alias-label-secondary); }
+
+/** ---- the month grid ---- Fixed 28px cells: a calendar that sized to its content would change width
+ * month to month (a five-week February against a six-week one), and the panel
+ * would jump under the cursor. The grid also sets the panel's own width, so
+ * the month header and the foot hint lay out against a stable measure. */
+.lc-dp-wds, .lc-dp-week { display: flex; }
+.lc-dp-wd { flex: 0 0 28px; text-align: center; font-size: 10px; line-height: 18px; color: var(--dsw-alias-label-tertiary); }
+.lc-dp-grid { display: flex; flex-direction: column; outline: none; }
+.lc-dp-grid:focus-visible { outline: 1px solid var(--dsw-alias-brand-primary); border-radius: 6px; }
+.lc-dp-cell { flex: 0 0 28px; height: 26px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; border-radius: 5px; font-size: 11px; line-height: 1; color: var(--dsw-alias-label-primary); font-variant-numeric: tabular-nums; user-select: none; cursor: pointer; }
+.lc-dp-cell:hover { background: var(--dsw-alias-interactive-bg-hover); }
+/* The picked band: a continuous run between the two ends, squared off at the
+   run's ends so consecutive days read as one interval. */
+.lc-dp-in { background: color-mix(in srgb, var(--dsw-alias-brand-primary) 16%, transparent); border-radius: 0; }
+.lc-dp-in:hover { background: color-mix(in srgb, var(--dsw-alias-brand-primary) 24%, transparent); }
+/* The ends themselves ride the page's primary fill, like the range group's own
+   lit chip — the band rules come first so this wins on both counts. */
+.lc-dp-edge { background: var(--dsw-alias-button-primary-fill); color: var(--dsw-alias-label-primary-foreground); border-radius: 5px; font-weight: 500; }
+.lc-dp-edge:hover { background: var(--dsw-alias-button-primary-fill); }
+/* The keyboard cursor: a ring that never shifts the cell's layout. */
+.lc-dp-cursor { box-shadow: inset 0 0 0 1px var(--dsw-alias-label-secondary); }
+.lc-dp-today { font-weight: 600; }
+/* A day with no session can be had: the future stays selectable-looking but
+   inert, so a wasted pick never lands as an empty scope. */
+.lc-dp-future { color: var(--dsw-alias-label-tertiary); opacity: 0.4; cursor: not-allowed; }
+.lc-dp-future:hover { background: transparent; }
+.lc-dp-blank { cursor: default; }
+.lc-dp-blank:hover { background: transparent; }
+
+/* ---- the foot: which end comes next, and the way back to the presets ---- */
+.lc-dp-foot { display: flex; align-items: center; gap: 8px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--dsw-alias-border-l2); }
+.lc-dp-hint { flex: 1 1 auto; min-width: 0; font-size: 11px; line-height: 18px; color: var(--dsw-alias-label-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-dp-clear { flex: none; border: 0; background: transparent; color: var(--dsw-alias-label-secondary); font: inherit; font-size: 11px; line-height: 18px; cursor: pointer; }
+.lc-dp-clear:hover { color: var(--dsw-alias-label-primary); text-decoration: underline; }

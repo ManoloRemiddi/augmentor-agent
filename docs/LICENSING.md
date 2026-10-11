@@ -2,6 +2,10 @@
 
 # Licensing and distribution decision
 
+## October 11 dsh-context supplier
+
+The owner-requested dashboard is **Apache-2.0**, not MIT. Original Copyright 2025 bowenliang123, full licence, original/adapted file hashes and prominent notices on three modified files are preserved. The inspected upstream commit includes no separate NOTICE. Build-only pinned Tailwind generates CSS with its own MIT text in the browser notice bundle. Neither supplier is relabelled under Augmentor’s resale restriction. [The source manifest](../apps/harness/vendor/dsh-context/SOURCE.md) and [qualification guide](DSH-GUI-ON-PI.md#original-context-dashboard--october-11-follow-up) record precise scope; existing Sharp/LGPL linked-source/rebuild and public-binary gates remain open.
+
 ## Augmentor source license — 23 September 2026
 
 Augmentor-authored Desktop and Browser code uses **[MIT with Augmentor Resale

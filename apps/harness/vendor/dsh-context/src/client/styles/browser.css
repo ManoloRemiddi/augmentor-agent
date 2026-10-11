@@ -1,0 +1,54 @@
+/* The DNA group's margin is zeroed so the delta-baseline `.lc-gran` keeps the row's single auto-margin push. */
+.lc-br-dna-ctl { margin-left: 0; flex: none; }
+/* The divider scales with its band (`min(0.5px, 12.5%)` of its own width): long sessions pin hundreds of bands at ≤1px, where a fixed divider would cover the whole band. A gradient layer, because a fixed inset box-shadow cannot scale. */
+.lc-br-bar-dna .lc-stacked-seg { background-image: linear-gradient(to right, transparent calc(100% - min(0.5px, 12.5%)), var(--dsw-alias-bg-layer-1) 0); }
+.lc-br-pick { font: inherit; font-size: 12px; color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l2); border-radius: 6px; padding: 3px 6px; max-width: 240px; }
+.lc-br-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 8px; color: var(--dsw-alias-label-secondary); }
+.lc-br-meta b { color: var(--dsw-alias-label-primary); }
+.lc-br-meta .lc-est { margin-left: auto; }
+.lc-br-note { margin-top: 8px; color: var(--dsw-alias-label-secondary); font-size: 12px; }
+.lc-br-retry { border: 0; background: transparent; padding: 0; color: var(--dsw-alias-brand-primary); font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; transition: filter var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-br-cats { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.lc-br-cat { border: 1px solid var(--dsw-alias-border-l2); border-radius: 8px; background: var(--dsw-alias-bg-layer-2); overflow: hidden; }
+.lc-br-cat-empty { opacity: 0.55; }
+/* The row stays ONE line: the item counts change as the hovered step moves, and a wrapped row resized the browser
+   card (and the page below it) mid-scrub. The figures keep their width; the name yields and ellipsizes instead. */
+.lc-br-cat-row { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent; color: var(--dsw-alias-label-primary); font: inherit; padding: 7px 10px; cursor: pointer; text-align: left; transition: background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+/* Current-composition hover echo: the shared hover link lights the category row as a physical hover would. */
+.lc-br-cat-on { background: var(--dsw-alias-interactive-bg-hover); }
+.lc-br-cat-on i { box-shadow: 0 0 0 1px var(--dsw-alias-brand-primary); }
+.lc-br-cat-open { background: var(--dsw-alias-interactive-bg-hover); }
+.lc-br-cat-row i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; flex: none; transition: box-shadow var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-br-cat-label { font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-br-cat-count { color: var(--dsw-alias-label-secondary); font-size: 12px; white-space: nowrap; }
+.lc-br-count-grp { flex: 1; min-width: 0; display: inline-flex; align-items: center; gap: 4px; }
+/* A bordered box instead of a ▸ glyph: it rotates about its true center and stays crisp at any zoom. */
+.lc-br-chev { flex: none; width: 12px; height: 14px; display: flex; align-items: center; justify-content: center; color: var(--dsw-alias-label-tertiary); }
+.lc-br-chev::before { content: ''; width: 5px; height: 5px; border-right: 1px solid currentColor; border-bottom: 1px solid currentColor; transform: rotate(-45deg); transition: transform var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-br-chev-on::before { transform: rotate(45deg); }
+.lc-br-tokens { flex: none; color: var(--dsw-alias-label-secondary); font-size: 12px; }
+.lc-br-delta, .lc-br-tdelta { flex: none; font-size: 11px; font-weight: 600; padding: 0 5px; border-radius: 4px; white-space: nowrap; }
+.lc-br-delta-up, .lc-br-tdelta-up { color: var(--dsw-alias-state-success-primary); background: color-mix(in srgb, var(--dsw-alias-state-success-primary) 15%, transparent); }
+.lc-br-delta-down, .lc-br-tdelta-down { color: var(--dsw-alias-state-error-primary); background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 15%, transparent); }
+.lc-br-tokens-grp { flex: none; min-width: 0; display: inline-flex; align-items: center; gap: 4px; }
+.lc-br-pct { flex: none; width: 36px; text-align: right; color: var(--dsw-alias-label-secondary); font-size: 12px; }
+.lc-br-body { border-top: 1px solid var(--dsw-alias-border-l1); padding: 4px 6px; display: flex; flex-direction: column; gap: 2px; }
+.lc-br-elem { border-radius: 6px; }
+.lc-br-elem-on { background: var(--dsw-alias-interactive-bg-active); }
+.lc-br-elem-row { display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent; color: var(--dsw-alias-label-primary); font: inherit; font-size: 12px; padding: 5px 6px; cursor: pointer; text-align: left; border-radius: 6px; transition: background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+/* The chat's run-state dot, so the failure scans without expanding the row. */
+.lc-br-err-dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--dsw-alias-state-error-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--dsw-alias-state-error-primary) 10%, transparent); }
+.lc-br-tag { min-width: 0; font-size: 11px; color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l2); border-radius: 4px; padding: 0 6px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* One capsule per distinct call name, repeats folded into a ×N multiplier. */
+.lc-br-tags { min-width: 0; display: inline-flex; align-items: center; gap: 4px; }
+/* Same face and size as the tool name it tags. */
+.lc-br-tool-plugin { font-size: 12px; border-radius: 6px; color: var(--dsw-alias-brand-primary); background: color-mix(in srgb, var(--dsw-alias-brand-primary) 14%, transparent); border-color: transparent; }
+.lc-br-preview { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* The introducing-step stamp merges with the clock into one nowrap span. */
+.lc-br-time { flex: none; color: var(--dsw-alias-label-secondary); font-size: 11px; white-space: nowrap; }
+/* A PENDING stamp (a live-tail item no request carries yet) is an estimate; its tooltip names the not-yet-sent step. */
+.lc-br-time-pending { text-decoration: underline dotted; text-underline-offset: 2px; }
+/* Call-hit tally on a tool-definition row. */
+.lc-br-hits { flex: none; color: var(--dsw-alias-label-secondary); font-size: 11px; }
+.lc-br-content { padding: 2px 6px 8px 26px; display: flex; flex-direction: column; gap: 6px; }
+.lc-br-dim { color: var(--dsw-alias-label-secondary); }

@@ -24,6 +24,8 @@ The initial selection uses the existing local Qwen 27B 262k route on the RTX 509
 
 ## What to try
 
+- **Context**: the original dsh-context dashboard now has Pi bindings. Inspect composition, trend, request-specific system/tools/messages, and expand **Raw Pi context and saved entries** for provenance. Check the explicit availability/estimate notes. See [current qualification](DSH-GUI-ON-PI.md#original-context-dashboard--october-11-follow-up); installation identity is recorded with each immutable adoption.
+
 - Original workspace Rename/Delete dialogs, folder selection and ordering. Removing a registration preserves its directory and conversations.
 - Chat, file reading and ordinary tasks in your chosen folder; check that answers and Stop behave as expected.
 - **Trajectory**: inspect request, tool and turn order, timing and saved tool originals.

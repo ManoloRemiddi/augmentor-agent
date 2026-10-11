@@ -60,6 +60,7 @@ import {ComposerAttachments} from '@dsh-gui/ui-attachment/src/client/ComposerAtt
 import {MessageImages} from '@dsh-gui/ui-attachment/src/client/MessageImages.tsx';
 import {DshPiController} from './dsh-pi-controller.mjs';
 import {projectDsh} from './dsh-pi-projection.mjs';
+import {DshContextDashboard} from './dsh-context.jsx';
 import {attachPlans} from './plans.js';
 import {attachGoals} from './goals.js';
 import {attachJobs} from './jobs.js';
@@ -248,7 +249,7 @@ function App(){
         const id=options.only||view;
         if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={unsupported} openSkill={unsupported} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={loadImage} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={unsupported} fileMentions={()=>undefined}/>;
         if(id==='trajectory')return <TrajectoryView {...p} t={t.trajectory} useTrajectory={selectorFace(composed.trajectory)} useDuration={useDuration} setActualDuration={value=>duration.set(value)} jsonStringWrapping={{getDefault:()=>wrapping.getSnapshot(),setDefault:value=>wrapping.set(value)}} loadOlder={()=>controller.older()} loadImage={loadImage} viewRequest={null}/>;
-        if(id==='context')return <ContextView key={state.sessionId} state={state}/>;
+        if(id==='context')return <DshContextDashboard key={state.sessionId} state={state}><ContextView state={state}/></DshContextDashboard>;
         return <ExtensionView key={id+state.sessionId} kind={id} state={state}/>;
       }
       case 'conversation.chat.flow':return <ChatFlow {...p} t={t.chat} useChat={useChat} useChatNode={(key,selector=x=>x)=>selector(composed.chat.nodes.get(key))} useChatNodeBottom={()=>false} useChatNodeProcess={()=>undefined} useChatGroup={()=>undefined} usePresentation={selectorFace(presentation)} useStore={selectorFace({})} useGroupAction={useGroupAction} useGroupHeaderAction={useGroupAction}/>;

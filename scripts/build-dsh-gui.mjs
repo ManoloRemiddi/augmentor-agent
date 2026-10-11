@@ -8,6 +8,13 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ui=join(root,'apps/harness'),vendor=join(ui,'vendor/dsh');
 const provenance=JSON.parse(readFileSync(join(vendor,'SOURCE.json'),'utf8'));
 for(const entry of provenance.files){if(createHash('sha256').update(readFileSync(join(vendor,entry.path))).digest('hex')!==entry.sha256)throw Error('DSH source differs from reviewed public selection: '+entry.path);}
+const contextVendor=join(ui,'vendor/dsh-context'),contextSource=JSON.parse(readFileSync(join(contextVendor,'SOURCE.json'),'utf8'));
+for(const entry of contextSource.files){if(createHash('sha256').update(readFileSync(join(contextVendor,entry.path))).digest('hex')!==entry.sha256)throw Error('dsh-context source differs from reviewed selection: '+entry.path);}
+const requireUi=createRequire(join(ui,'package.json'));
+const {compile}=requireUi('@tailwindcss/node'),{Scanner}=requireUi('@tailwindcss/oxide');
+const tailwindPath=join(contextVendor,'src/client/styles/tailwind.css');
+const compiler=await compile(readFileSync(tailwindPath,'utf8'),{base:dirname(tailwindPath),onDependency:()=>{}});
+const contextUtilities=compiler.build(new Scanner({sources:compiler.sources}).scan());
 const {build}=createRequire(join(ui,'package.json'))('esbuild');
 const packages=new Map();
 for(const family of readdirSync(join(vendor,'packages'))){
@@ -21,8 +28,12 @@ const result=await build({
   entryNames:'dsh-gui',bundle:true,format:'esm',platform:'browser',target:'chrome120',
   jsx:'automatic',minify:false,metafile:true,legalComments:'eof',
   nodePaths:[join(ui,'node_modules')],loader:{'.woff2':'file','.woff':'file','.ttf':'file','.png':'file','.svg':'dataurl'},
-  define:{'process.env.NODE_ENV':'"production"','process.env.DSH_CLIENT_TITLE':'"Augmentor Harness"','process.env.DSH_CLIENT_VERSION':'"0.2.13"','process.env.DSH_CLIENT_COMMIT_HASH':'undefined','process.env.DSH_CLIENT_GIT_DIRTY':'"false"'},
+  define:{'__DSH_CTX_VERSION__':'"0.68.1"','process.env.NODE_ENV':'"production"','process.env.DSH_CLIENT_TITLE':'"Augmentor Harness"','process.env.DSH_CLIENT_VERSION':'"0.2.13"','process.env.DSH_CLIENT_COMMIT_HASH':'undefined','process.env.DSH_CLIENT_GIT_DIRTY':'"false"'},
   plugins:[{name:'pinned-public-dsh',setup(b){
+    b.onResolve({filter:/^(\.\.\/historyPage|\.\/historyPage|\.\.\/modelPrices)$/},args=>args.importer.startsWith(contextVendor)?{path:join(ui,'dsh-context-boundary.mjs')}:undefined);
+    b.onResolve({filter:/\?raw$/},args=>({path:resolve(dirname(args.importer),args.path.slice(0,-4)),namespace:'raw'}));
+    b.onLoad({filter:/.*/,namespace:'raw'},args=>({contents:readFileSync(args.path,'utf8'),loader:'text'}));
+    b.onLoad({filter:/vendor\/dsh-context\/src\/client\/styles\/tailwind\.css$/},()=>({contents:contextUtilities,loader:'css'}));
     b.onResolve({filter:/^@dsh-gui\//},args=>({path:join(vendor,'packages/client',args.path.slice(9))}));
     b.onResolve({filter:/^@deepseek-ai\//},args=>{
       const parts=args.path.split('/'),name=parts.slice(0,2).join('/'),sub=parts.slice(2).join('/');
@@ -36,7 +47,7 @@ const result=await build({
     });
   }}],
 });
-const forbidden=Object.keys(result.metafile.inputs).filter(path=>/vendor\/dsh\/.*(?:client-runtime|product-analytics|ui-settings-account|ui-settings-session-log|packages\/host)|node_modules\/(?:@deepseek-ai\/cordis|posthog|@sentry)/.test(path));
+const forbidden=Object.keys(result.metafile.inputs).filter(path=>/vendor\/dsh\/.*(?:client-runtime|product-analytics|ui-settings-account|ui-settings-session-log|packages\/host)|vendor\/dsh-context\/(?:src\/host|src\/client\/(?:modelPrices|historyPage|latestVersion|settingsJump))|node_modules\/(?:@deepseek-ai\/cordis|@opencode-ai\/models|posthog|@sentry)/.test(path));
 if(forbidden.length)throw Error('Supplier runtime/analytics entered the browser graph: '+forbidden.join(', '));
 const npmRoots=new Map();
 for(const name of Object.keys(result.metafile.inputs)){
@@ -47,8 +58,11 @@ for(const name of Object.keys(result.metafile.inputs)){
   const manifest=JSON.parse(readFileSync(join(directory,'package.json'),'utf8'));
   npmRoots.set(directory,manifest);
 }
-const licenses=[readFileSync(join(vendor,'LICENSE'),'utf8')];
+const licenses=[readFileSync(join(vendor,'LICENSE'),'utf8'),'\n--- dsh-context 0.68.1 · Copyright 2025 bowenliang123 · Apache-2.0 ---\n'+readFileSync(join(contextVendor,'LICENSE'),'utf8')];
 const npmRecords=[];
+const tailwindRoot=dirname(requireUi.resolve('tailwindcss/package.json')),tailwindManifest=JSON.parse(readFileSync(join(tailwindRoot,'package.json'),'utf8'));
+licenses.push('\n--- tailwindcss '+tailwindManifest.version+' (MIT; generated dashboard CSS) ---\n'+readFileSync(join(tailwindRoot,'LICENSE'),'utf8'));
+npmRecords.push({name:'tailwindcss',version:tailwindManifest.version,license:tailwindManifest.license,notices:['LICENSE'],scope:'generated dashboard CSS; compiler is build-only'});
 for(const [directory,manifest] of [...npmRoots].sort((a,b)=>a[1].name.localeCompare(b[1].name))){
   const notices=readdirSync(directory).filter(name=>/^(license|notice|copying|copyright)([.\-_]|$)/i.test(name));
   if(!notices.length)throw Error('Missing browser supplier notice: '+manifest.name);
@@ -61,7 +75,7 @@ for(const family of ['cosmokit','schemastery']){
 mkdirSync(join(root,'dist/harness-web'),{recursive:true});
 copyFileSync(join(vendor,'assets/favicon.svg'),join(root,'dist/harness-web/favicon.svg'));
 writeFileSync(join(root,'dist/harness-web/THIRD-PARTY-NOTICES.txt'),licenses.join('\n')+'\n');
-writeFileSync(join(root,'dist/harness-web/SOURCE.json'),JSON.stringify({dsh:provenance,npm:npmRecords},null,2)+'\n');
+writeFileSync(join(root,'dist/harness-web/SOURCE.json'),JSON.stringify({dsh:provenance,dshContext:contextSource,npm:npmRecords},null,2)+'\n');
 writeFileSync(join(root,'dist/harness-web/build-inputs.json'),JSON.stringify(result.metafile,null,2)+'\n');
 console.log('Built the pinned public DSH GUI.');
 

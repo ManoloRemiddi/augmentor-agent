@@ -133,6 +133,12 @@
       "url": "https://raw.githubusercontent.com/TooTallNate/proxy-agents/4813885d3f4e2ff837878ceffdba656a71dc31f0/packages/proxy-agent/LICENSE",
       "sha256": "8d8c55319c7729d57be811c747452636688d54f19701ee0752b6b15ad3771d9a",
       "note": "The 1.1.0 negotiate wrapper declares MIT and Nathan Rajlich as author but omits LICENSE. Preserve the same monorepo author's complete MIT text from packages/proxy-agent at this inspected source ref."
+    },
+    "dsh-context-0.68.1": {
+      "file": "upstream/dsh-context-0.68.1.txt",
+      "url": "https://raw.githubusercontent.com/bowenliang123/dsh-context/2c8095c34da3fcef729a01437d2df65c83e08499/LICENSE",
+      "sha256": "919857728c4e1d0f76be03af00437d9910c943f883d04c8c58a6a0cb1c3225b0",
+      "note": "Original Apache-2.0; selected Context dashboard copied with original attribution and prominent adaptation notices. It is not MIT or relicensed under Augmentor terms."
     }
   },
   "overrides": {
