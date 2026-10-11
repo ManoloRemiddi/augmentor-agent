@@ -253,8 +253,9 @@ export class Host {
         this.append(m,'user/message',{source:{...(goalSource??{kind:'user'}),sessionId:m.id,...(requestId?{rpcId:requestId}:{})},content,...(submittedContent&&JSON.stringify(submittedContent)!==JSON.stringify(content)?{submittedContent}:{})});
       }
       if(e.type==='message_update'){
-        const a=e.assistantMessageEvent;if(a.type==='text_delta')this.append(m,'assistant/chunk',{chunk:{type:'text-delta',text:a.delta}});
-        if(a.type==='thinking_delta')this.append(m,'assistant/chunk',{chunk:{type:'reasoning-delta',text:a.delta}});
+        const a=e.assistantMessageEvent,requestId=record!.observation?.currentRequestId();
+        if(a.type==='text_delta')this.append(m,'assistant/chunk',{requestId,chunk:{type:'text-delta',text:a.delta}});
+        if(a.type==='thinking_delta')this.append(m,'assistant/chunk',{requestId,chunk:{type:'reasoning-delta',text:a.delta}});
       }
       if(e.type==='message_end'&&e.message.role==='assistant'){
         this.append(m,'assistant/message',{requestId:record!.observation?.currentRequestId(),message:{content:e.message.content,stopReason:e.message.stopReason,timestamp:e.message.timestamp,usage:e.message.usage}});

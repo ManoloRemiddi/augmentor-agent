@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {projectChat} from './chat-projection.js';
+import {trajectoryStream} from './dsh-trajectory-stream.mjs';
 const blocks=content=>(content||[]).flatMap(p=>p.type==='text'?[{kind:'text',text:p.text||''}]:['thinking','reasoning'].includes(p.type)?[{kind:'reasoning',text:p.thinking??p.text??''}]:['toolCall','tool-call'].includes(p.type)?[{kind:'tool-call',callId:p.id??p.callId,name:p.name,argsRaw:JSON.stringify(p.arguments??p.args??{}),subCalls:[]}]:[]);
 const usage=u=>u?{inputTokens:u.input,outputTokens:u.output,cacheReadTokens:u.cacheRead,cacheWriteTokens:u.cacheWrite}:undefined;
 /** Pure projection into DSH presentation contracts. Missing timestamps remain absent. */
@@ -19,6 +20,8 @@ export function projectDsh(state){
     }
     if(n){eventNodes.push(n);locations.set(e.seq,{kind:'session'});}
   }
+  const live=trajectoryStream(state,eventNodes,turnIds);
+  for(const node of eventNodes)locations.set(node.seq,{kind:'session'});
   // The existing streaming projection removes overlaps with durable final messages.
   const visible=projectChat(state.events,{running});let ordinal=0,currentTurn=0;
   for(const item of visible){
@@ -38,19 +41,21 @@ export function projectDsh(state){
   const latestComplete=state.records.filter(r=>r.kind==='model/complete').at(-1),latestRequest=state.records.filter(r=>r.kind==='model/request').at(-1),u=latestComplete?.data.usage;
   const pressureRequest=state.records.find(r=>r.id===latestComplete?.requestId);
   const pressure=u&&((u.input||0)+(u.cacheRead||0)+(u.cacheWrite||0))>0&&pressureRequest?.data.capacity?{pressureTokens:(u.input||0)+(u.cacheRead||0)+(u.cacheWrite||0),contextWindow:pressureRequest.data.capacity}:undefined;
-  const steps=new Map(),callSchemas=new Map();
+  const callSchemas=new Map();
   for(const record of state.records.filter(r=>r.kind==='tool/start')){const body=state.payloads?.[record.requestId];if(!body)continue;const tool=(body.tools||[]).map(x=>x.function||x).find(x=>x.name===record.data.name);if(tool)callSchemas.set(record.data.toolCallId,tool);}
   const requests=state.records.filter(r=>r.kind==='model/request').flatMap(r=>{
     // Observation and display sequences are independent. Join only an explicit request id.
     const result=state.events.find(e=>e.type==='assistant/message'&&e.data.requestId===r.id);
     const end=state.records.find(x=>x.kind==='model/complete'&&x.requestId===r.id);
-    if(!result)return []; // Historical unlinked requests remain available in Context without invented attribution.
-    const turn=turnIds.get(r.turnId)||1,step=(steps.get(turn)||0)+1;steps.set(turn,step);
+    const pending=live.liveRequest?.id===r.id?live.liveRequest:null;
+    if(!result&&!pending)return []; // Unlinked requests stay in Context without invented attribution.
+    const node=result?eventNodes.find(node=>node.seq===result.seq):null;
+    const turn=node?.turn??pending.turn,step=node?.step??pending.step;
     const body=state.payloads?.[r.id],config={provider:r.data.provider,model:r.data.model,reasoningEffort:r.data.thinkingLevel};
     const prompt=body?{config,system:body.system??(body.messages||[]).filter(m=>['system','developer'].includes(m.role)).map(m=>typeof m.content==='string'?m.content:JSON.stringify(m.content)).join('\n'),tools:(body.tools||[]).map(x=>x.function||x)}:undefined;
-    const previous=state.events.filter(e=>e.seq<result.seq).at(-1);
-    return [{purpose:'assistant',startSeq:previous?.seq??result.seq,resultSeq:result.seq,turn,step,startedAt:r.time,completedAt:end?.time??null,status:end?['aborted','error'].includes(end.data.stopReason)?'error':'complete':'running',requestConfig:{provider:r.data.provider,model:r.data.model,reasoningEffort:r.data.thinkingLevel},providerMetadata:{provider:r.data.provider,model:r.data.model},usage:end?.data.usage,...(prompt?{prompt}:{})}];
+    const previous=state.events.filter(e=>e.seq<(result?.seq??pending.firstSeq)&&e.type!=='assistant/chunk').at(-1);
+    return [{purpose:'assistant',startSeq:previous?.seq??result?.seq??pending.firstSeq,...(result?{resultSeq:result.seq}:{}),turn,step,startedAt:r.time,completedAt:end?.time??null,status:end?['aborted','error'].includes(end.data.stopReason)?'error':'complete':'running',requestConfig:{provider:r.data.provider,model:r.data.model,reasoningEffort:r.data.thinkingLevel},providerMetadata:{provider:r.data.provider,model:r.data.model},usage:end?.data.usage,...(prompt?{prompt}:{})}];
   });
   const inbox={'next-turn':(state.queue?.items||[]).filter(x=>x.canRemove).map(x=>({id:x.id,source:{kind:'user',rpcId:x.id},content:x.message?.content||[]})),'next-step':[]};
-  return {chat,trajectory:{eventNodes,eventLocations:locations,requests,callSchemas,partial:null,runningCalls:[]},session:{running,blank:!visible.length,openState:state.phase==='loading'?'loading':'open',openError:null,hasMore:state.hasMore,loadingOlder:false,pendingSubmissions:[],subagent:null,removed:false,promptError:null},conversation:{activeTargets:new Set(visible.length?['chat','trajectory']:[]),views:{get:()=>undefined,grouped:()=>undefined}},projection:{contextPressure:pressure,inbox,goal:state.goal?.goal}};
+  return {chat,trajectory:{eventNodes,eventLocations:locations,requests,callSchemas,partial:live.partial,runningCalls:live.runningCalls},session:{running,blank:!visible.length,openState:state.phase==='loading'?'loading':'open',openError:null,hasMore:state.hasMore,loadingOlder:false,pendingSubmissions:[],subagent:null,removed:false,promptError:null},conversation:{activeTargets:new Set(visible.length?['chat','trajectory']:[]),views:{get:()=>undefined,grouped:()=>undefined}},projection:{contextPressure:pressure,inbox,goal:state.goal?.goal}};
 }

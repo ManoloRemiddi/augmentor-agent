@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+
+## October 11 original live Trajectory candidate
+
+The [original live Trajectory binding](DSH-GUI-ON-PI.md#original-live-trajectory--october-11-follow-up) now supplies growing text/reasoning, exact request linkage and unresolved root SDK tool starts to the copied DSH view without changing supplier source/CSS or adding dependencies. Source qualification passes **135/135 across seventeen files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Old unidentified chunks never inherit request timing, final output replaces deltas, and missing-final Stop stays visibly interrupted. Tool start precedes validation/approval; no external effect is inferred. Tool-argument/nested streaming and full Harness gates remain open. The ordinary bundled-Node artifact also passes 135/135, with all 472 compiled files matching source and production dependencies/licences unchanged. Installed acceptance will be recorded separately; the preceding selected Context dashboard remains preserved below. Further platforms stay deferred for MX feedback.
+
 # MX Linux Harness preview
 
 ## Current original Context dashboard — October 11

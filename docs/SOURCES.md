@@ -432,3 +432,6 @@ The [retained diagnostic payload search checkpoint](AUGMENTOR-HARNESS.md#retaine
 ## October 11 attachment selection
 
 Public DSH d743267 contributes thirteen unchanged GUI attachment files (358 GUI total) and twelve pure MIT storage/codec modules (local import adaptation only). Pi remains locked at 1.1.0; image admission uses its public session/steering APIs. Sharp 0.35.5 is newly pinned and production-staged on MX x64; Linux libvips wrapper 1.3.4/native bytes are recorded in release/attachment-native-linux-x64.json. Original Apache/LGPL notices remain separate from MIT supplier source. See [original attachments](DSH-GUI-ON-PI.md#original-attachments--october-11-follow-up) for exact qualified scope, retained failures and unfinished release gates.
+
+
+The October 11 [original live Trajectory binding](DSH-GUI-ON-PI.md#original-live-trajectory--october-11-follow-up) adds independently authored Pi display linkage/projection only. The pinned 358 DSH GUI files and 86 dsh-context supplier files, original licenses, CSS, production dependencies and notice closure are unchanged. Live SDK/browser qualification uses a synthetic provider; actual installed MX evidence is recorded separately.
