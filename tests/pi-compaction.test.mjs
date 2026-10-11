@@ -70,3 +70,8 @@ test('Compact transport never retries, preserves authoritative refusals and scop
  let writes=0;const controller=new DshPiController('fixture',async()=>{writes++;throw Error('connection lost');});controller.update({phase:'ready',sessionId:'one',selection:{provider:'fixture',model:'model'},sessions:[]});await assert.rejects(controller.compact({sessionId:'one',epoch:0}),/unconfirmed/);assert.equal(writes,1);assert.equal(controller.state.unconfirmed.kind,'compaction');await assert.rejects(controller.compact({sessionId:'one',epoch:0}),/not ready/);assert.equal(writes,1);
  const refused=new DshPiController('fixture',async()=>({ok:false,json:async()=>({error:{message:'Model changed'}})}));refused.update({phase:'ready',sessionId:'one',selection:{provider:'fixture',model:'model'},sessions:[]});await assert.rejects(refused.compact({sessionId:'one',epoch:0}),/Model changed/);assert.equal(refused.pending.size,0);assert.equal(refused.state.unconfirmed,undefined);
 });
+
+test('a received failed compaction receipt exposes a visible refusal without dispatching inference',async()=>{
+ const frame={method:'session/compaction',payload:{busy:false,blocked:false,lastReceipt:{state:'failed',requestId:'empty'}}};
+ const controller=new DshPiController('fixture',async()=>({ok:true,json:async()=>({cursor:1,frames:[{frame}]})}));controller.refresh=async()=>{};controller.hydrate=async()=>{};controller.update({phase:'ready',sessionId:'empty'});await controller.poll();assert.match(controller.state.error,/did not save a compaction summary/);assert.equal(controller.state.compaction.lastReceipt.requestId,'empty');
+});

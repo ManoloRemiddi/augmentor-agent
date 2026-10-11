@@ -79,7 +79,7 @@ export class DshPiController {
         if(frame.method==='session/event'){appendDisplay(events,frame.payload.event);changed=true;}
         if(frame.method==='observation/event'){const r=frame.payload.observation;records.set(r.id,r);changed=true;}
         if(frame.method==='session/queue'){queue=frame.payload;changed=true;}
-        if(frame.method==='session/compaction'){this.update({compaction:frame.payload});changed=true;}
+        if(frame.method==='session/compaction'){const info=frame.payload,row=info.lastReceipt;this.update({compaction:info,...(row?.state==='failed'?{error:'Pi did not save a compaction summary. This conversation may be too small or already compacted, or its summary request failed. Inspect Context for the recorded attempt.'}:{})});changed=true;}
         if(['approval/requested','question/requested'].includes(frame.method)){interactions.set(frame.rpcId,frame);changed=true;}
         if(['interaction/resolved'].includes(frame.method)){interactions.delete(frame.rpcId);changed=true;}
       }

@@ -17,6 +17,7 @@ test('original DSH approval/question components answer the selected Host interac
  const profile=await mkdtemp(join(tmpdir(),'augmentor-dsh-controls-'));let chrome,panel,server;
  t.after(async()=>{panel?.close();if(chrome?.exitCode===null){const end=once(chrome,'exit');chrome.kill('SIGTERM');await end;}await server?.close();await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  const selection={provider:'fixture',model:'chosen'},queue={revision:0,paused:false,activeTurnId:null,items:[]},answers=[];
+ let compaction={available:true,busy:false,blocked:false,lastReceipt:null};
  let pending={method:'approval/requested',rpcId:'approve',payload:{toolName:'fixture_write',reason:'Synthetic approval; no tool is executed.'}};
  const host={getMeta:()=>({id:'fixture',cwd:profile,selection}),queueSnapshot:()=>queue,interactions:{frames:()=>pending?[pending]:[]},dispatch:async(method,p)=>{
   if(method==='host.describe')return {workspace:profile};
@@ -27,7 +28,8 @@ test('original DSH approval/question components answer the selected Host interac
   if(method==='observation.list')return {records:[]};
   if(method==='session.models')return {current:selection};
   if(method==='session.reasoning')return {availableLevels:['off'],thinkingLevel:'off'};
-  if(method==='session.compaction')return {available:true,busy:false,blocked:false,lastReceipt:null};
+  if(method==='session.compaction')return compaction;
+  if(method==='session.acknowledgeCompaction'){answers.push(p);compaction={...compaction,blocked:false,lastReceipt:{...compaction.lastReceipt,acknowledged:true}};return compaction;}
   if(method==='session.goal')return {goal:null};
   if(method==='session.queue')return queue;
   if(method==='interaction.respond'){answers.push(p);const id=pending.rpcId;pending=null;server.publish('fixture',{method:'interaction/resolved',rpcId:id,payload:{sessionId:'fixture'}});return {accepted:true};}
@@ -44,5 +46,8 @@ test('original DSH approval/question components answer the selected Host interac
  pending={method:'question/requested',rpcId:'question',payload:{questions:[{id:'answer',header:'Choose',question:'Which fixture option?',options:[{label:'First'},{label:'Second'}]}]}};server.publish('fixture',pending);
  await visible('document.body?.innerText.includes("Which fixture option?")');await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent.includes("First"))');
  await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent==="Submit")');
- await until(()=>answers.length===2,'question answered');assert.equal(answers[1].rpcId,'question');assert.deepEqual(answers[1].value.answer.answers[0].selected,['First']);assert.equal(answers[1].sessionId,'fixture');assert.deepEqual(panel.errors,[]);
+ await until(()=>answers.length===2,'question answered');assert.equal(answers[1].rpcId,'question');assert.deepEqual(answers[1].value.answer.answers[0].selected,['First']);assert.equal(answers[1].sessionId,'fixture');
+ compaction={available:true,busy:false,blocked:true,lastReceipt:{state:'unknown',requestId:'uncertain-summary',acknowledged:false}};server.publish('fixture',{method:'session/compaction',payload:compaction});
+ await visible('document.body.innerText.includes("Compaction outcome unknown; inspect native history")');assert(await panel.evaluate('!!Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Context")'),'empty unknown context still exposes original inspection tabs');
+ await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent==="Acknowledge unknown; do not retry")');await until(()=>answers.length===3,'unknown acknowledgement');assert.equal(answers[2].requestId,'uncertain-summary');assert.equal(answers[2].acknowledgeUnknownOutcome,true);assert.equal(compaction.lastReceipt.state,'unknown');assert(compaction.lastReceipt.acknowledged);assert.deepEqual(panel.errors,[]);
 });

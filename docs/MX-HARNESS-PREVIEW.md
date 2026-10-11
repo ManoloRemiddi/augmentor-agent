@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 Compact refusal correction candidate
+
+[Manual Pi compaction](PI-COMPACTION.md#installed-refusal-follow-up--october-11) records the initial installed original ninth row and its empty-session refusal gap. The corrected binding uses the existing original dialog for failed receipts and exposes the original tabs/disclosure while an empty session's compaction is pending, busy or uncertain. Fresh source and ordinary bundled Node 24.19.0 cohorts each pass **196/196 across 25 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Actual SDK success/cancellation/crash and actual Chromium Compact/empty refusal pass; component-only unknown acknowledgement is explicitly distinguished. All 475 compiled files match; dependencies/licences/native hashes/Node and supplier bytes remain unchanged. Corrected installed acceptance follows separately; initial 4d73af7/20261011-174439-ae5dc4bc remains preserved. Complete command/Harness/public packaging/migration gates stay open and further platforms are deferred.
+
+
 ## October 11 original Compact candidate
 
 [Manual Pi compaction](PI-COMPACTION.md) adds the original ninth command row and actual SDK summary/Stop/unknown receipt binding. Source **195/195 across 25 files** passes with prepared QtTest/two workers/unchanged deadlines. No supplier/dependency/licence bytes change. Ordinary bundled Node 24.19.0 also passes 195/195; installed qualification follows separately; the earlier selected/running command menu below remains preserved. Full Harness/migration gates stay open and further platforms are deferred.
