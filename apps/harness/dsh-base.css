@@ -1,0 +1,16 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+@import './vendor/dsh/packages/client/ui-theme/src/styles/base.css';
+@import './vendor/dsh/packages/client/ui-theme/src/styles/design-platform.css';
+@import './vendor/dsh/packages/client/ui-theme/src/styles/focus.css';
+@import './vendor/dsh/packages/client/ui-theme/src/styles/scrollbar.css';
+@import './vendor/dsh/packages/client/ui-theme/src/styles/corner-shape.css';
+@import './vendor/dsh/packages/client/ui-theme/src/styles/shiki.css';
+@import './vendor/dsh/packages/client/ui-theme/src/styles/gradient-shadow-text.css';
+html,body,#root {height:100%;margin:0;}
+body {font-family:var(--dsw-font-family);font-size:var(--dsw-font-size,14px);background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-text-primary);}
+
+.augmentor-extension {padding:24px;display:flex;flex-direction:column;gap:16px;max-width:100%;overflow:auto;}
+.augmentor-extension label {display:flex;flex-direction:column;gap:8px;}
+.augmentor-extension textarea {min-height:120px;}
+.augmentor-extension input,.augmentor-extension textarea,.augmentor-extension select,.reasoning-dialog {font:inherit;color:inherit;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-standard);border-radius:8px;padding:8px;}
+.reasoning-dialog {max-width:760px;max-height:85vh;overflow:auto;}

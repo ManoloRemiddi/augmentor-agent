@@ -8,7 +8,7 @@ import {MAX_FRAME, identifier, request, type Data} from '../../protocol/src/inde
 import type {Host} from './host.js';
 
 const allowed = new Set([
-  'host.describe', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
+  'host.describe', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
@@ -112,7 +112,7 @@ export class HarnessServer {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
-    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'");
+    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; img-src 'self' data: blob:; base-uri 'none'; frame-ancestors 'none'");
     try {
       if (!this.base || req.headers.host !== new URL(this.base).host ||
         (req.headers.origin !== undefined && req.headers.origin !== this.base)) {
@@ -171,6 +171,7 @@ export class HarnessServer {
       if (req.method !== 'GET') {this.send(res, 405, {error: {message: 'Use GET for interface assets'}}); return;}
       const staticFiles = new Map([
         ['/', {path: join(this.assets, 'index.html'), type: 'text/html'}],
+        ['/inspection', {path: join(this.assets, 'inspection.html'), type:'text/html'}],
         ['/app.js', {path: join(this.assets, 'app.js'), type: 'text/javascript'}],
         ['/plans.js', {path: join(this.assets, 'plans.js'), type: 'text/javascript'}],
         ['/jobs.js', {path: join(this.assets, 'jobs.js'), type: 'text/javascript'}],
@@ -192,6 +193,12 @@ export class HarnessServer {
       // Fixed, reviewed presentation assets; never expose arbitrary extension files.
       for(const name of ['prompt-animation.mjs', 'prompt-library.mjs','prompt-editor.mjs','clipboard.mjs','settings-form.mjs','maintenance-page.mjs','prompt-library.css']){
         staticFiles.set('/shared-prompts/'+name,{path:fileURLToPath(new URL('../../../apps/browser/extension/'+name,import.meta.url)),type:name.endsWith('.css')?'text/css':'text/javascript'});
+      }
+      const web=fileURLToPath(new URL('../../harness-web/',import.meta.url));
+      if(/^\/[A-Za-z0-9_@.-]+$/.test(url.pathname)){
+        try{const names=JSON.parse(readFileSync(join(web,'assets.json'),'utf8')) as string[];const name=url.pathname.slice(1);
+          if(names.includes(name)){const ext=name.split('.').at(-1);staticFiles.set(url.pathname,{path:join(web,name),type:({js:'text/javascript',css:'text/css',png:'image/png',svg:'image/svg+xml',txt:'text/plain',json:'application/json',woff2:'font/woff2',woff:'font/woff',ttf:'font/ttf'} as Record<string,string>)[ext!]??'application/octet-stream'});}
+        }catch{/* A missing GUI build leaves the reviewed source assets available. */}
       }
       const file = staticFiles.get(url.pathname);
       if (!file) {this.send(res, 404, {error: {message: 'Unknown interface asset'}}); return;}

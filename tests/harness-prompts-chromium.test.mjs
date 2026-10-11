@@ -22,7 +22,7 @@ test('Harness shared prompt editor, Native conflicts and two-step clipboard inse
   fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_PROMPTS:'1'},stdio:['ignore','pipe','pipe']});
   fixture.stdout.on('data',data=>output+=data);fixture.stderr.on('data',data=>stderr+=data);
   await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'fixture readiness',20000);
-  const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token');
+  const url=new URL(link.url.replace('/#','/inspection#')),token=new URLSearchParams(url.hash.slice(1)).get('token');
   const rpc=async(method,params={})=>{const response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})}),frame=await response.json();if(frame.error)throw Error(frame.error.message);return frame.result;};
   const requests=async()=>{try{return (await readFile(link.requestLog,'utf8')).trim().split('\n').filter(Boolean).map(line=>JSON.parse(line));}catch{return [];}};
   const native=async(method,params={})=>{
@@ -30,7 +30,7 @@ test('Harness shared prompt editor, Native conflicts and two-step clipboard inse
     const child=spawn(env.AUGMENTOR_PYTHON??'python3',['-Xutf8','-B','-c','import json,sys; from augmentor_linux.prompt_client import PromptClient; print(json.dumps(PromptClient().call(sys.argv[1],json.loads(sys.argv[2]))))',method,JSON.stringify(params)],{env:{...env,PYTHONPATH:join(root,'apps/native'),AUGMENTOR_SHARED_STATE:link.sharedState,AUGMENTOR_SHARED_DATA:link.sharedData},stdio:['ignore','pipe','pipe']});
     let result='',error='';child.stdout.on('data',data=>result+=data);child.stderr.on('data',data=>error+=data);const [code]=await once(child,'exit');assert.equal(code,0,error);return JSON.parse(result);
   };
-  chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
+  chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url.replace('/#','/inspection#')],{env,stdio:'ignore'});
   let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'Chromium startup');
   const targets=await fetch('http://127.0.0.1:'+port+'/json').then(response=>response.json()),page=targets.find(row=>row.type==='page');assert(page);panel=await cdp(page.webSocketDebuggerUrl);await panel.call('Runtime.enable');await panel.call('Log.enable');await panel.call('Network.enable');await panel.call('Page.enable');await panel.call('Page.bringToFront');
   const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),runtimeErrors:panel.errors,requests:(await requests()).length,fixtureErrors:stderr,pointer:await panel.evaluate('globalThis.__promptPointer')});throw error;});

@@ -2,6 +2,8 @@
 
 [MX Linux first: installed Harness preview and feedback guide](MX-HARNESS-PREVIEW.md). Further Windows/macOS/distro implementation follows MX testing and refinement.
 
+[Original public DSH GUI on Pi](DSH-GUI-ON-PI.md): copied interface, licensing, Pi bindings, MX qualification and remaining compatibility gaps.
+
 
 [Windows Pi Host transport/private-record correction](PI-WINDOWS-HOST.md) records the failed native source baseline and actual authenticated pipe/ACL qualification scope.
 

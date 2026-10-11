@@ -80,6 +80,18 @@ export class PiPromptQueue {
  }
  notSent(id:string){if(this.item(id).status!=='waiting')throw Error('Only an undispatched prompt can be rejected.');this.patch(id,{status:'failed'});this.pause();}
  remove(id:string){const item=this.item(id);if(item.status==='removed')return;if(!['waiting','failed'].includes(item.status))throw Error('Active or unconfirmed prompts cannot be removed.');this.patch(id,{status:'removed',input:undefined});}
+ /** Replace one undispatched human input atomically, preserving the old admission identity. */
+ replaceWaiting(id:string,newId:string,input:string,expectedRevision:unknown){
+  promptIdentity(newId);if(typeof input!=='string'||!input.trim()||input.length>65536)throw Error('Invalid queued prompt.');
+  const item=this.item(id),duplicate=this.lookup(newId,input);
+  if(duplicate){if(item.status==='removed')return false;throw Error('Replacement identity is already in use.');}
+  if(expectedRevision!==this.data.revision)throw Error('The prompt queue changed. Review its current contents.');
+  if(item.status!=='waiting'||item.delivered||item.goalSource)throw Error('Only an undispatched human prompt can be edited.');
+  const replacement:Item={id:newId,input,fingerprint:fingerprint(input),status:'waiting',queued:item.queued,delivered:false};
+  const items=this.data.items.flatMap(value=>value.id===id?[{...value,status:'removed' as const,input:undefined},replacement]:[value]);
+  const pending=items.filter(visible);if(pending.length>100||Buffer.byteLength(JSON.stringify(pending))>512*1024)throw Error('The prompt queue is full.');
+  this.commit({...this.data,items});return true;
+ }
  /** Explicit owner acknowledgment, never a retry. The unknown native/tool outcome remains in history. */
  resolve(id:string){if(this.item(id).status!=='unconfirmed')throw Error('Only an unknown prompt receipt can be acknowledged.');this.patch(id,{status:'cancelled',input:undefined});}
  recover(){

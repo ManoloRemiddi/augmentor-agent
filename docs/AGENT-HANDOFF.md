@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 original public DSH GUI
+
+The owner rejected the custom standalone GUI and explicitly requested copying the original MIT DSH interface before improving it. [Original DSH GUI on Pi](DSH-GUI-ON-PI.md) records the selected public d743267 source, 340 hashed files, original visual components/CSS, Pi prop/data bindings, 95 bundled npm notices and outstanding compatibility gaps. The default Harness is now that copied GUI; the former interface remains at /inspection for advanced controls. No DSH owner, Cordis or account/analytics runtime is bundled. Native/browser-extension approved interfaces and production selections remain unchanged.
+
+Source browser/Host checks pass within the documented scope after correcting missing QtTest preparation; ordinary unselected bundled Node 24.19.0 assembly passes 77 cases, zero failures/skips/cancellations. Its 422 compiled files match source, and all 19,088 production dependencies, 709 existing license files and Node remain unchanged. Installed MX selection/running evidence follows this implementation through the normal updater. Preserve DSH and prior immutable artifacts; do not claim complete backend parity or full Harness completion. Further platform implementation stays deferred for MX feedback.
+
 ## October 11 MX Linux first
 
 The owner has directed a usable local MX Linux preview and hands-on refinement before further Windows, macOS or other Linux distribution implementation. Follow [the preview guide](MX-HARNESS-PREVIEW.md). This PC is MX 25.3 KDE x86-64/Debian 13. A stable launcher and separate XDG profile/immutable update selection preserve the production installation. Native workspace and Linux dictation state are explicitly isolated as well. No production data/Hindsight configuration is imported, and existing Qwen/Breeze/GPU/context/concurrency/precision/ASR/VAD settings are not changed.

@@ -1,0 +1,248 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import React,{useEffect,useMemo,useRef,useState,useSyncExternalStore} from 'react';
+import {createRoot} from 'react-dom/client';
+import {createEditor,$getRoot,$createParagraphNode,$createTextNode,$getSelection,$isRangeSelection} from 'lexical';
+import {registerPlainText} from '@lexical/plain-text';
+import {registerHistory,createEmptyHistoryState} from '@lexical/history';
+import {AppFrame} from '@dsh-gui/ui-layout/src/client/AppFrame.tsx';
+import {SidebarRoot} from '@dsh-gui/ui-sidebar/src/client/SidebarRoot.tsx';
+import {ConversationRoot} from '@dsh-gui/ui-conversation/src/client/skeleton/ConversationRoot.tsx';
+import {ConversationContent} from '@dsh-gui/ui-conversation/src/client/skeleton/ConversationContent.tsx';
+import {ConversationHeader} from '@dsh-gui/ui-conversation/src/client/skeleton/ConversationHeader.tsx';
+import {ConversationSessionHeader,ConversationSession} from '@dsh-gui/ui-conversation/src/client/skeleton/ConversationSession.tsx';
+import {InputBar} from '@dsh-gui/ui-conversation/src/client/skeleton/InputBar.tsx';
+import {ModelSelect} from '@dsh-gui/ui-model-selection/src/client/ModelSelect.tsx';
+import {ChatView} from '@dsh-gui/ui-chat/src/client/chat/ChatView.tsx';
+import {ChatFlow} from '@dsh-gui/ui-chat/src/client/chat/ChatFlow.tsx';
+import {UserMessageNodeView,TurnErrorNodeView} from '@dsh-gui/ui-chat/src/client/chat/MessageItem.tsx';
+import {AssistantNodeView} from '@dsh-gui/ui-chat/src/client/chat/AssistantNodeView.tsx';
+import {ApprovalPanel} from '@dsh-gui/ui-approval/src/client/ApprovalPanel.tsx';
+import {QuestionComposer} from '@dsh-gui/ui-user-questions/src/client/QuestionComposer.tsx';
+import {createQuestionDraftStore} from '@dsh-gui/ui-user-questions/src/client/draft-store.ts';
+import {en as approvalEn} from '@dsh-gui/ui-approval/src/client/locales.ts';
+import {en as questionEn} from '@dsh-gui/ui-user-questions/src/client/locales.ts';
+import {readDshPayload} from './dsh-payload.mjs';
+import {attachNativeHistory} from './native-history.mjs';
+import {MessageIconActions} from '@dsh-gui/ui-chat/src/client/chat/MessageIconActions.tsx';
+import {messageTargets} from './chat-projection.js';
+import {attachReasoning} from '../browser/extension/pi-reasoning.mjs';
+import {attachMcpManagement} from './mcp-management.js';
+import {TrajectoryView} from '@dsh-gui/ui-trajectory/src/client/TrajectoryView.tsx';
+import {WorkspaceBrowser} from '@dsh-gui/ui-workspace/src/client/rows/WorkspaceBrowser.tsx';
+import {QueueDock} from '@dsh-gui/ui-conversation/src/client/queue/QueueDock.tsx';
+import {GoalBar} from '@dsh-gui/ui-goal/src/client/GoalBar.tsx';
+import {DirectoryBrowser} from '@dsh-gui/ui-directory-picker-browse/src/client/DirectoryBrowser.tsx';
+import {WorkspacePicker} from '@dsh-gui/ui-workspace/src/client/WorkspacePicker.tsx';
+import {createLayoutStore} from '@dsh-gui/ui-layout/src/client/stores.ts';
+import {createWorkspaceViewStore} from '@dsh-gui/ui-workspace/src/client/stores.ts';
+import {createWorkspaceShortcutControls} from '@dsh-gui/ui-workspace/src/client/shortcuts.ts';
+import {createTrajectoryDurationStore} from '@dsh-gui/ui-trajectory/src/client/duration-store.ts';
+import {createTrajectoryStringWrappingStore} from '@dsh-gui/ui-trajectory/src/client/string-wrapping-store.ts';
+import {createSnapshotStore} from '@deepseek-ai/dsh-client-store';
+import {Button,Modal,Menu,MenuItemButton,Input,IconSettingsOutlineRegular,IconEditOutlineRegular,IconCopyOutlineRegular,IconGoalOutlineRegular,IconFolderCloseRegular,JsonBlock,MarkdownText,DisclosureRow,StateDot} from '@deepseek-ai/dsh-client-ui-primitives';
+import {en as commonEn} from '@dsh-gui/locale/src/locales/en.ts';
+import {en as conversationEn} from '@dsh-gui/ui-conversation/src/client/locales.ts';
+import {en as sidebarEn} from '@dsh-gui/ui-sidebar/src/client/locales.ts';
+import {en as workspaceEn} from '@dsh-gui/ui-workspace/src/client/locales.ts';
+import {en as chatEn} from '@dsh-gui/ui-chat/src/client/locale.ts';
+import {en as trajectoryEn} from '@dsh-gui/ui-trajectory/src/client/locales.ts';
+import {en as modelEn} from '@dsh-gui/ui-model-selection/src/client/locales.ts';
+import {en as goalEn} from '@dsh-gui/ui-goal/src/client/locales.ts';
+import {DshPiController} from './dsh-pi-controller.mjs';
+import {projectDsh} from './dsh-pi-projection.mjs';
+import {attachPlans} from './plans.js';
+import {attachGoals} from './goals.js';
+import {attachJobs} from './jobs.js';
+import './dsh-base.css';
+
+const hash=new URLSearchParams(location.hash.slice(1));
+const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
+if(token)sessionStorage.setItem('augmentor-harness-token',token);
+history.replaceState(null,'',location.pathname);
+// A fresh private link can arrive as same-document navigation. Reinitialize
+// the controller so a scoped inspector never retains the previous authority.
+addEventListener('hashchange',()=>{if(new URLSearchParams(location.hash.slice(1)).has('token'))location.reload();});
+const controller=new DshPiController(token);
+const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
+const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
+const questionDraft=createQuestionDraftStore().create(),useQuestionDraft=bindQuestionDraft;
+function bindQuestionDraft(selector=x=>x){return selector(useSyncExternalStore(questionDraft.subscribe,questionDraft.getSnapshot));}
+const draft=createSnapshotStore(''),modelDirectory=createSnapshotStore({current:null,routable:null,groups:[],failures:[],status:'idle',pending:null,error:null});
+const noOp=()=>{},selectorFace=value=>(selector=x=>x)=>selector(value);
+const bind=source=>(selector=x=>x)=>selector(useSyncExternalStore(source.subscribe,source.getSnapshot));
+const useLayout=bind(layout),useWorkspaceView=bind(workspaceView),useWorkspaceShortcuts=bind(shortcuts.state),useDuration=bind(duration),useDraft=bind(draft);
+const tr=dictionary=>(key,args={})=>String(dictionary[key]??commonEn[key]??key).replace(/\{(\w+)\}/g,(_,name)=>String(args[name]??''));
+const t={conversation:tr(conversationEn),sidebar:tr(sidebarEn),workspace:tr(workspaceEn),chat:tr(chatEn),trajectory:tr(trajectoryEn),model:tr(modelEn),goal:tr(goalEn),approval:tr(approvalEn),question:tr(questionEn),common:tr(commonEn)};
+const control={run:async action=>{try{return await action();}catch(error){controller.update({error:error.message});return undefined;}}};
+const drafts=new Map();let activeDraft=null;
+const editor=createEditor({namespace:'augmentor-dsh-composer',onError:error=>controller.update({error:error.message}),theme:{}});
+registerPlainText(editor);registerHistory(editor,createEmptyHistoryState(),300);
+editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const value=$getRoot().getTextContent();draft.set(value);if(activeDraft)drafts.set(activeDraft,value);}));
+function setDraft(value){editor.update(()=>{$getRoot().clear().append($createParagraphNode().append($createTextNode(value)));});}
+const keyboard={editor,arbitrate:()=> 'pass',space:()=>false,dismissPopup:()=>controller.update({commands:false}),bindFilePicker:()=>noOp,caretSpan:()=>({start:0,end:0}),paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
+  const text=draft.getSnapshot();if(!text.trim())return;
+  setDraft('');await controller.send(text,mode);await controller.refresh();
+}),steerQueue:()=>void control.run(async()=>{for(const item of controller.state.queue?.items||[])if(item.canSteer)await controller.rpc('session.updateQueue',{sessionId:controller.state.sessionId,itemId:item.id,expectedTurnId:controller.state.queue.activeTurnId,action:{kind:'steer'}});})};
+
+function useDisclosure(){const [expanded,set]=useState(false);return {expanded,toggle:()=>set(x=>!x)};}
+function useGroupAction(){return useRef(null);}
+const presentation={mode:'detailed',foldCompletedTurns:false,collapseTiming:'immediate',settledReasoningPreview:true};
+const position={read:()=>null,save:noOp};
+function OwnedMessage(props){return <AssistantNodeView {...props} useDisclosure={useDisclosure} useTurnData={()=>undefined} useGroupAction={useGroupAction} usePresentation={selectorFace(presentation)} t={t.chat}/>;}
+function PiTool({node,onInspect}){const [expanded,set]=useState(false),data=node.data;return <DisclosureRow open={expanded} expandable onToggle={()=>set(x=>!x)} title={data.name} icon={<StateDot state={data.status==='pending'?'ongoing':data.status==='error'?'error':data.status==='finished'?'done':'warning'}/>} headerAccessory={<Button variant="ghost" onClick={onInspect}>Inspect</Button>} children={expanded?<><JsonBlock payload={data.call?.arguments??{}} label="Arguments"/><JsonBlock payload={data.result??{status:data.status}} label="Result"/></>:undefined}/>;}
+const directoryT=tr({'browser.title':'Select Workspace Directory','browser.home':'Home','browser.newFolder':'New folder','browser.folderName':'Folder name','browser.createIn':'New folder in "{name}"','browser.untitledFolder':'Untitled folder','browser.create':'Create','browser.cancel':'Cancel','browser.open':'Open','browser.editPath':'Edit path','browser.loading':'Loading…','browser.truncated':'Too many folders to list; only the beginning is shown.','browser.showHidden':'Show hidden files'});
+function DirectoryFlow(owner){return <DirectoryBrowser {...owner} t={directoryT} listDirectory={path=>controller.rpc('workspace.listDirectory',{path})} createDirectory={async(path,name)=>(await controller.rpc('workspace.createDirectory',{path,name})).path} onOpen={owner.onPicked} onClose={owner.onCancel}/>;}
+
+/** Existing Augmentor feature extensions occupy DSH's view slots. */
+function ExtensionView({kind,state}){
+  const ref=useRef(null),refresh=useRef(noOp),session=useRef(state);session.current=state;
+  useEffect(()=>{
+    const current=()=>({sessionId:session.current.sessionId,epoch:controller.epoch,readOnly:session.current.readOnly});
+    const attach={plan:attachPlans,goal:attachGoals,jobs:attachJobs}[kind];
+    const view=attach({container:ref.current,rpc:(method,params)=>controller.rpc(method,params),current});
+    refresh.current=()=>view.refresh();
+    void view.refresh();
+    return()=>{refresh.current=noOp;view.reset();};
+  },[kind,state.sessionId]);
+  return <div className="augmentor-extension"><Button onClick={()=>void refresh.current()}>Refresh {kind}</Button><div ref={ref}/></div>;
+}
+function ContextView({state}){
+  const requests=state.records.filter(r=>r.kind==='model/request').reverse();const [selected,set]=useState(null),[payload,setPayload]=useState(null),[lineage,setLineage]=useState(null),[error,setError]=useState(null);
+  const request=requests.find(r=>r.id===selected)||requests[0];
+  useEffect(()=>{let live=true;setPayload(null);setLineage(null);setError(null);const provenance=state.records.find(r=>r.kind==='context/provenance'&&r.requestId===request?.id);if(provenance)readDshPayload((m,p)=>controller.rpc(m,p),state.sessionId,provenance).then(value=>{if(live)setLineage({...value,metadata:provenance.data});},e=>{if(live)setError(e.message);});if(request)readDshPayload((method,params)=>controller.rpc(method,params),state.sessionId,request).then(value=>{if(live){if(value.available)setPayload(value.value);else setError(value.reason);}},e=>{if(live)setError(e.message);});return()=>{live=false;};},[request?.id,state.sessionId]);
+  return <div className="augmentor-extension"><h2>Context</h2><label>Recorded request <select value={request?.id||''} onChange={e=>set(e.target.value)}>{requests.map(r=><option key={r.id} value={r.id}>{r.data.provider}/{r.data.model} · #{r.seq}</option>)}</select></label>{!request?<p>No provider request has been recorded for this conversation.</p>:<><JsonBlock payload={request.data} label="Request settings"/><JsonBlock payload={request.payload||{available:false}} label="Retained payload identity"/>{error&&<p role="status">{error}</p>}{payload&&<><JsonBlock label="Effective provider request" payload={payload}/><JsonBlock label="Tool declarations" payload={payload.tools||[]}/>{lineage&&<><JsonBlock label="Composition coverage" payload={lineage.metadata}/>{lineage.available?Object.entries(lineage.value.snapshots||{}).map(([name,value])=><JsonBlock key={name} label={name} payload={value}/>):<p role="status">{lineage.reason}</p>}</>}</>}</>}<NativeRecords state={state}/></div>;
+}
+function NativeRecords({state}){const ref=useRef(null);useEffect(()=>{let live=true;attachNativeHistory(ref.current,{rpc:(m,p)=>controller.rpc(m,p),sessionId:state.sessionId,alive:()=>live});return()=>{live=false;ref.current?.replaceChildren();};},[state.sessionId]);return <div ref={ref}/>;}
+function PromptLibrary({close}){
+  const [items,set]=useState([]),[selected,pick]=useState(null),[title,setTitle]=useState(''),[body,setBody]=useState('');
+  const refresh=async()=>{const value=await controller.rpc('prompts.list');set(value.items||value.prompts||[]);};
+  useEffect(()=>{void control.run(refresh);},[]);
+  return <Modal open onClose={close} title="Prompt library" closeLabel="Close" footer={<><Button variant="outline" onClick={()=>{pick(null);setTitle('');setBody('');}}>New prompt</Button><Button variant="primary" onClick={()=>{setDraft(body);close();}}>Use prompt</Button></>}><div className="augmentor-extension"><select aria-label="Saved prompts" value={selected?.id||''} onChange={e=>{const row=items.find(x=>x.id===e.target.value);pick(row);setTitle(row?.name||'');setBody(row?.content||'');}}><option value="">Choose a saved prompt</option>{items.map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select><label>Name<Input value={title} onChange={e=>setTitle(e.target.value)}/></label><label>Prompt<textarea value={body} onChange={e=>setBody(e.target.value)}/></label><Button onClick={()=>void control.run(async()=>{await controller.rpc('prompts.save',{id:selected?.id,expectedRevision:selected?.revision,name:title,content:body});await refresh();})}>Save</Button></div></Modal>;
+}
+
+
+function InteractionTakeover({frame,state}){
+  const pending=useMemo(()=>{
+    const snapshot=()=>({state:'open',waitState:'waiting',countdown:undefined,channel:'waterfall',closed:false});
+    const keys=()=>controller.state.interactions.map(x=>x.rpcId);
+    return {key:frame.rpcId,kind:'question',sessionId:state.sessionId,toolName:frame.payload.toolName,reason:frame.payload.reason,answerable:true,
+      questions:(frame.payload.questions||[]).map((q,i)=>({...q,id:q.id||String(i)})),review:undefined,dismissal:'cancel',snapshot,liveKeys:keys,
+      takeTime:noOp,engage:noOp,holdFocus:noOp,releaseFocus:noOp,
+      dismiss:()=>controller.answer(frame,{cancelled:true}),answer:value=>controller.answer(frame,frame.method==='approval/requested'?{outcome:value==='rejected'?'denied':value}:{answer:value})};
+  },[frame,state.sessionId]);
+  return frame.method==='approval/requested'?<ApprovalPanel matched={pending} t={t.approval} resolveReason={x=>String(x)} renderSlot={()=>null}/>:<QuestionComposer matched={pending} t={t.question} useStore={useQuestionDraft} actions={questionDraft.actions} useQuestionCard={(_,selector=x=>x)=>selector(pending.snapshot())} renderSlot={()=>null}/>;
+}
+function QueueStatus({state}){
+  const queue=state.queue;if(!queue)return null;
+  const uncertain=(queue.items||[]).filter(x=>x.canResolve);
+  return <>{state.unconfirmed&&<DisclosureRow open expandable={false} title="Submission unconfirmed; inspect history before continuing"><JsonBlock label="Unconfirmed prompt" payload={state.unconfirmed}/><Button onClick={()=>controller.clearUnconfirmed()}>Acknowledge; do not retry</Button></DisclosureRow>}{queue.paused&&<Button disabled={state.readOnly||!!uncertain.length} onClick={()=>void control.run(()=>controller.rpc('session.continueQueue',{sessionId:state.sessionId}))}>Resume waiting messages</Button>}{uncertain.map(item=><DisclosureRow key={item.id} open expandable={false} title={item.stateLabel||'Interrupted action: outcome unknown'}><JsonBlock label="Prompt" payload={item.message}/><Button disabled={state.readOnly} onClick={()=>void control.run(()=>controller.rpc('session.resolveQueue',{sessionId:state.sessionId,itemId:item.id,acknowledgeUnknownOutcome:true}))}>Keep interrupted; do not retry</Button></DisclosureRow>)}</>;
+}
+
+function ImproveDraft({state}){
+  const [job,setJob]=useState(null),[undo,setUndo]=useState(null),text=useDraft(x=>x),active=useRef(null);
+  const cancel=()=>{const value=active.current;active.current=null;setJob(null);if(value)void controller.rpc('prompt.cancelImprovement',{requestId:value.id,scopeId:value.id}).catch(()=>{});};
+  useEffect(()=>{if(active.current&&(active.current.sessionId!==state.sessionId||active.current.original!==text))cancel();},[state.sessionId,text]);
+  useEffect(()=>()=>{const value=active.current;if(value)void controller.rpc('prompt.cancelImprovement',{requestId:value.id,scopeId:value.id}).catch(()=>{});},[]);
+  const improve=async()=>{
+    if(job){cancel();return;}
+    if(undo&&undo.sessionId===state.sessionId&&undo.text===text){setDraft(undo.original);setUndo(null);return;}
+    const value={id:crypto.randomUUID(),sessionId:state.sessionId,original:text};active.current=value;setJob(value);
+    try{const instructions=(await controller.rpc('prompts.list')).improvement;
+      if(active.current!==value)return;
+      const result=await controller.rpc('prompt.improve',{sessionId:value.sessionId,selection:state.selection,text:value.original,requestId:value.id,scopeId:value.id,expectedInstructionsRevision:instructions.revision});
+      if(active.current!==value||controller.state.sessionId!==value.sessionId||draft.getSnapshot()!==value.original)return;
+      if(result.kind!=='rewrite'||!result.text?.trim())throw Error('Invalid prompt improvement; the original draft is preserved.');
+      active.current=null;setJob(null);setUndo({...value,text:result.text});setDraft(result.text);
+    }catch(error){if(active.current===value)controller.update({error:error.message});}
+    finally{if(active.current===value){active.current=null;setJob(null);}}
+  };
+  const label=job?'Cancel prompt improvement':undo?.sessionId===state.sessionId&&undo.text===text?'Undo prompt improvement':'Improve prompt';
+  return <Button variant="ghost" aria-label={label} title={label} disabled={state.readOnly||!state.sessionId||!text.trim()||state.phase!=='ready'} onClick={()=>void improve()}>{job?'×':label.startsWith('Undo')?'↶':'✦'}</Button>;
+}
+
+function ManagedSettings({state}){
+  const reasoningRef=useRef(null),mcpRef=useRef(null),latest=useRef(state);latest.current=state;
+  useEffect(()=>{
+    const current=()=>({sessionId:latest.current.sessionId,epoch:controller.epoch,ready:!latest.current.readOnly&&latest.current.phase==='ready'&&!latest.current.sessions.find(x=>x.sessionId===latest.current.sessionId)?.running});
+    const rpc=(method,params)=>controller.rpc(method,params),notice=text=>controller.update({error:text});
+    const reasoning=attachReasoning({button:reasoningRef.current,rpc,current,notice});
+    const mcp=attachMcpManagement({button:mcpRef.current,rpc,current,notice});
+    return ()=>{reasoning.close();mcp.changed();};
+  },[]);
+  return <><Button ref={reasoningRef} disabled={state.readOnly||!state.sessionId}>Reasoning settings</Button><Button ref={mcpRef} disabled={state.readOnly||!state.sessionId}>MCP servers</Button></>;
+}
+
+const SessionBridge=React.createContext(null);
+function BoundSession(){return <ConversationSession {...React.useContext(SessionBridge)}/>;}
+function App(){
+  const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null),[commands,setCommands]=useState(false);
+  const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
+  const liveDraft=useDraft(x=>x);
+  useEffect(()=>{activeDraft=state.sessionId;setDraft(drafts.get(state.sessionId)||'');},[state.sessionId]);
+  useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!commands&&!state.interactions.length&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog,commands]);
+  const current=state.sessions.find(x=>x.sessionId===state.sessionId);
+  const workspaces=useMemo(()=>{
+    const paths=[...new Set([state.workspace,...state.sessions.map(x=>x.cwd)].filter(Boolean))];
+    return {phase:'ready',state:'ready',items:paths.map(cwd=>({workspaceId:cwd,cwd,title:cwd.split('/').filter(Boolean).at(-1)||cwd,sessionIds:state.sessions.filter(x=>x.cwd===cwd).map(x=>x.sessionId)})),pinnedSessionIds:[],archivedSessionIds:[]};
+  },[state.sessions,state.workspace]);
+  const list=useMemo(()=>({projectionsBySession:{},ids:state.sessions.map(x=>x.sessionId),byId:Object.fromEntries(state.sessions.map(x=>[x.sessionId,{...x,id:x.sessionId,displayTitle:x.title||'New conversation',origin:'main',retainedBy:{mainView:x.sessionId===state.sessionId?1:0}}]))}),[state.sessions,state.sessionId]);
+  const tabs=[{id:'chat',label:'Chat'},{id:'trajectory',label:'Trajectory'},{id:'context',label:'Context'},{id:'plan',label:'Plan'},{id:'goal',label:'Goal'},{id:'jobs',label:'Jobs'}];
+  const useSession=selectorFace({...composed.session,blank:composed.session.blank&&view==='chat'}),useSessions=selectorFace(list),useWorkspaces=selectorFace(workspaces),useConversation=selectorFace(composed.conversation),useChat=selectorFace(composed.chat),useProjection=(name,selector=x=>x)=>selector(composed.projection[name]);
+  const open=sid=>void control.run(()=>controller.open(sid)),startSession=cwd=>void control.run(()=>controller.create(cwd||current?.cwd||state.workspace));
+  const createWorkspace=async({path})=>{await controller.create(path);return {workspaceId:path,cwd:path,title:path.split('/').at(-1),sessionIds:[controller.state.sessionId]};};
+  const unsupported=()=>Promise.reject(Error('This DSH operation is not yet connected to Pi. Use Full Pi record inspector in Settings for the retained Augmentor controls.'));
+  const branch=seq=>void control.run(async()=>{const row=await controller.rpc('session.branch',{sessionId:state.sessionId,newSessionId:crypto.randomUUID(),messageSeq:seq,mode:'reply'});await controller.refresh();await controller.open(row.sessionId);});
+  const common={sessionId:state.sessionId||undefined,useSession,useSessions,useWorkspaces,useConversation,useProjection,useConversationViews:selectorFace(tabs),useSessionStatus:selectorFace(new Map()),useInput:selectorFace({draft:liveDraft,phase:'plain',attachmentIds:[],queue:state.queue?.items||[]}),useStore:selectorFace({view}),actions:{setDraft:noOp,completeViewRequest:noOp},inputActions:{pruneAttachments:noOp,persistDraft:noOp},selectWorkspace:async cwd=>startSession(cwd),useComposerBlock:selectorFace(undefined),useFactorySlot:(_,fallback)=>fallback,bindDraftPersistence:()=>noOp,openView:setView,useInspectCall:selectorFace(undefined),t:t.conversation};
+  useEffect(()=>{
+    const groups=state.catalog.groups.map(g=>({id:g.provider,name:g.name,models:g.models.map(m=>({id:m.model,name:m.name||m.model,...(m.provider===state.selection?.provider&&m.model===state.selection?.model&&state.reasoning?{reasoning:{efforts:state.reasoning.availableLevels.map(id=>({id,label:id})),defaultEffort:state.reasoning.thinkingLevel}}:{})}))}));
+    modelDirectory.set({current:state.selection?{...state.selection,reasoningEffort:state.reasoning?.thinkingLevel}:null,routable:true,groups,failures:state.catalog.failures||[],status:'ready',pending:null,error:null});
+  },[state.catalog,state.selection,state.reasoning]);
+  const goalAction=async(operation,extra={})=>{
+    try{const goal=controller.state.goal?.goal;await controller.rpc('session.updateGoal',{sessionId:state.sessionId,change:{operation,expectedRef:goal?{id:goal.id,revision:goal.revision}:null,...extra,...(operation==='resume'?{continueAutomatically:true}:{})}});const next=await controller.rpc('session.goal',{sessionId:state.sessionId});controller.update({goal:next});return {ok:true,value:next};}catch(e){return {ok:false,error:{message:e.message,code:'goal-update'}};}
+  };
+  const render=(name,owner={},options={})=>{
+    const p={...common,...owner,renderSlot:render,renderSlotChain:(name,owner,opts)=>name==='conversation.composer'&&!state.readOnly&&state.interactions.length?<InteractionTakeover frame={state.interactions[0]} state={state}/>:opts.fallback,renderFactorySlot:(name,owner,opts)=><ConversationContent {...common} {...owner} renderSlot={render} renderSlotChain={(name,owner,o)=>name==='conversation.composer'&&!state.readOnly&&state.interactions.length?<InteractionTakeover frame={state.interactions[0]} state={state}/>:o.fallback} useFactorySlot={(key,fallback)=>key==='views'?BoundSession:opts.slots?.[key]||fallback}/>};
+    switch(name){
+      case 'sidebar':return <SidebarRoot {...p} t={t.sidebar} usePanels={selectorFace([])} useShortcuts={selectorFace([])} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} startSession={()=>startSession()} toggleSidebar={layout.actions.toggleSidebar} selectPanel={layout.actions.selectPanel}/>;
+      case 'sidebar.brand.name':return <span>Augmentor Harness</span>;
+      case 'sidebar.workspaces':return <WorkspaceBrowser {...p} t={t.workspace} useStore={useWorkspaceView} actions={workspaceView.actions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} useHostInfo={selectorFace({home:''})} useWorkspaceShortcuts={useWorkspaceShortcuts} useShortcuts={selectorFace([])} useDirectoryFlow={selectorFace(!state.readOnly)} open={open} startSession={startSession} searchResultLimit={100} searchSessions={async query=>({items:state.sessions.filter(x=>x.title.toLowerCase().includes(query.toLowerCase())).map(x=>({sessionId:x.sessionId,title:x.title,cwd:x.cwd}))})} requestSearch={shortcuts.search} requestAddWorkspace={shortcuts.add} closeAddWorkspace={shortcuts.closeAdd} setDirectoryBusy={shortcuts.directoryBusy} dismissForkError={shortcuts.dismissForkError} requestSessionRename={(sid,title)=>{setDialog({kind:'rename',sid,title});}} notifyArchivedNotOpenable={noOp} renameWorkspace={unsupported} deleteWorkspace={unsupported} insertWorkspaceBefore={unsupported} unarchiveSession={unsupported} createWorkspace={createWorkspace}/>;
+      case 'sidebar.workspaces.directoryFlow':return DirectoryFlow(owner);
+      case 'sidebar.settings':return <Button variant="ghost" aria-label="Settings" onClick={()=>setDialog({kind:'settings'})}><IconSettingsOutlineRegular/> {owner.wide?'Settings':null}</Button>;
+      case 'sidebar.workspaces.session.menu.item':return <MenuItemButton label="Rename" onClick={()=>setDialog({kind:'rename',sid:owner.sessionId,title:owner.displayTitle})}/>;
+      case 'main':return <ConversationRoot {...p}/>;
+      case 'conversation.header':return <ConversationHeader {...p}/>;
+      case 'conversation.session.header':return <ConversationSessionHeader {...p} open={open} selectView={setView}/>;
+      case 'conversation.session.header.actions':return <Button variant="ghost" disabled={state.readOnly} aria-label="Rename conversation" onClick={()=>setDialog({kind:'rename',sid:state.sessionId,title:current?.title||''})}><IconEditOutlineRegular/></Button>;
+      case 'conversation.hero.workspace':return <WorkspacePicker {...p} t={t.workspace} useDirectoryFlow={selectorFace(!state.readOnly)} createWorkspace={createWorkspace}/>;
+      case 'conversation.workspace.directoryFlow':return DirectoryFlow(owner);
+      case 'conversation.session':return <ConversationSession {...p}/>;
+      case 'conversation.view':{
+        const id=options.only||view;
+        if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={unsupported} openSkill={unsupported} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={unsupported} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={unsupported} fileMentions={()=>undefined}/>;
+        if(id==='trajectory')return <TrajectoryView {...p} t={t.trajectory} useTrajectory={selectorFace(composed.trajectory)} useDuration={useDuration} setActualDuration={value=>duration.set(value)} jsonStringWrapping={{getDefault:()=>wrapping.getSnapshot(),setDefault:value=>wrapping.set(value)}} loadOlder={()=>controller.older()} loadImage={unsupported} viewRequest={null}/>;
+        if(id==='context')return <ContextView key={state.sessionId} state={state}/>;
+        return <ExtensionView key={id+state.sessionId} kind={id} state={state}/>;
+      }
+      case 'conversation.chat.flow':return <ChatFlow {...p} t={t.chat} useChat={useChat} useChatNode={(key,selector=x=>x)=>selector(composed.chat.nodes.get(key))} useChatNodeBottom={()=>false} useChatNodeProcess={()=>undefined} useChatGroup={()=>undefined} usePresentation={selectorFace(presentation)} useStore={selectorFace({})} useGroupAction={useGroupAction} useGroupHeaderAction={useGroupAction}/>;
+      case 'conversation.chat.node':
+        if(owner.node.kind==='user')return <UserMessageNodeView {...p} t={t.chat}/>;
+        if(owner.node.kind==='assistant-step')return <><OwnedMessage {...p}/>{Number.isSafeInteger(owner.node.data.finalNode?.seq)&&messageTargets(state.events).replies.has(owner.node.data.finalNode.seq)&&<MessageIconActions text={owner.node.data.blocks.filter(x=>x.kind==='text').map(x=>x.text).join('')} clock="end" t={t.chat} onBranch={state.readOnly?undefined:()=>branch(owner.node.data.finalNode.seq)} branchUnavailable={current?.running===true}/>}</>;
+        if(owner.node.kind==='pi-tool')return <PiTool node={owner.node} onInspect={()=>setView('trajectory')}/>;
+        return <p role="status">{owner.node.data.text}</p>;
+      case 'conversation.chat.reasoning.body':return <MarkdownText text={owner.text} streaming={owner.running}/>;
+      case 'conversation.input.dock':return <><QueueStatus state={state}/><QueueDock {...p} useSession={selectorFace({...composed.session,subagent:state.readOnly?{address:{mode:'read-only'}}:null})} updateQueue={(itemId,action)=>controller.updateQueue(itemId,action)} notify={(_,text)=>controller.update({error:text})} loadImage={unsupported}/>{!state.readOnly&&<GoalBar goal={state.goal?.goal} activation={state.goal?.activation} t={t.goal} onPause={()=>goalAction('pause')} onResume={()=>goalAction('resume')} onClear={()=>goalAction('clear')} onEdit={objective=>goalAction('edit',{objective,maxGoalRounds:state.goal?.goal?.maxGoalRounds})}/>}</>;
+      case 'conversation.composer.bar':return <InputBar {...p} disabled={state.readOnly||state.phase!=='ready'||!!state.unconfirmed||owner.disabled} keyboard={keyboard} addFiles={()=>controller.update({error:'File uploads are not connected in this Pi preview. Put the file in the selected workspace and refer to its path.'})} removeAttachment={noOp} retryFileUpload={noOp} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace({})} useNotices={selectorFace(undefined)} useLexicon={selectorFace(new Map())} useMenuLauncher={selectorFace(commands?'command':null)} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={()=>[]} toggleCommandMenu={()=>setCommands(x=>!x)}/>;
+      case 'conversation.input.right':return <ImproveDraft state={state}/>;
+      case 'conversation.input.model':return <ModelSelect {...p} t={t.model} locked={owner.locked||state.readOnly||current?.running===true} available={!state.readOnly} directory={modelDirectory} load={async()=>modelDirectory.getSnapshot()} select={async selection=>{modelDirectory.update(s=>({...s,status:'selecting',pending:selection}));try{await controller.choose(selection);return modelDirectory.getSnapshot();}catch(e){modelDirectory.update(s=>({...s,status:'error',pending:null,error:e.message}));throw e;}}}/>;
+      case 'conversation.input.overlay':return commands?<Menu open anchor={<span/>} onClose={()=>setCommands(false)} items={[{id:'goal',label:'Goal'},{id:'prompts',label:'Prompt library'},{id:'jobs',label:'Jobs'},{id:'context',label:'Context'},{id:'inspect',label:'Full Pi record inspector'}]} onSelect={id=>{setCommands(false);if(id==='prompts')setDialog({kind:'prompts'});else if(id==='inspect')window.open('/inspection#'+new URLSearchParams({token:controller.token,session:state.sessionId||''}),'_blank','noopener,noreferrer');else setView(id);}}/>:null;
+      default:return options.fallback??null;
+    }
+  };
+  return <SessionBridge.Provider value={{...common,renderSlot:render}}><AppFrame t={t.common} useStore={useLayout} actions={layout.actions} useSessions={useSessions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} renderSlot={render}/>{state.phase==='connecting'&&<Modal open title="Augmentor Harness" closeLabel="Close" onClose={noOp} description="Connecting to Pi…"/>}{state.error&&<Modal open title="Augmentor Harness" closeLabel="Close" onClose={()=>controller.update({error:null})} description={state.error}/>}{dialog?.kind==='rename'&&<RenameDialog {...dialog} close={()=>setDialog(null)}/>} {dialog?.kind==='settings'&&<SettingsDialog close={()=>setDialog(null)} state={state} open={setDialog}/>} {dialog?.kind==='prompts'&&<PromptLibrary close={()=>setDialog(null)}/>}</SessionBridge.Provider>;
+}
+function RenameDialog({sid,title,close}){const [value,set]=useState(title);return <Modal open title="Rename conversation" onClose={close} closeLabel="Close" footer={<Button variant="primary" onClick={()=>void control.run(async()=>{await controller.rpc('session.rename',{sessionId:sid,title:value});await controller.refresh();close();})}>Save</Button>}><Input autoFocus aria-label="Conversation title" value={value} onChange={e=>set(e.target.value)}/></Modal>;}
+function SettingsDialog({close,state,open}){const [capture,setCapture]=useState(null);useEffect(()=>{void controller.rpc('observation.describe').then(setCapture);},[]);return <Modal open title="Settings" onClose={close} closeLabel="Close"><div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>open({kind:'prompts'})}>Prompt library</Button><ManagedSettings state={state}/><Button onClick={()=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:state.sessionId||''}),'_blank','noopener,noreferrer')}>Full Pi record inspector</Button><Button disabled={state.readOnly||capture===null} onClick={()=>void control.run(async()=>{const before=await controller.rpc('observation.describe');setCapture(await controller.rpc('observation.configure',{expectedRevision:before.revision,capturePayloads:!before.capturePayloads}));})}>Request payload capture: {capture===null?'loading':capture.capturePayloads?'on':'off'}</Button><Button onClick={()=>{document.body.toggleAttribute('data-ds-dark-theme');localStorage.setItem('augmentor.dsh.dark',document.body.hasAttribute('data-ds-dark-theme')?'1':'0');}}>Light / dark</Button><p>Pi 1.1.0 · DSH GUI d743267 · Augmentor Harness</p></div></Modal>;}
+if(localStorage.getItem('augmentor.dsh.dark')==='1')document.body.setAttribute('data-ds-dark-theme','');
+createRoot(document.getElementById('root')).render(<App/>);
+void controller.start(hash.get('session')).catch(error=>controller.update({phase:'error',error:error.message}));
+setInterval(()=>void controller.poll().catch(error=>controller.update({error:error.message})),350);

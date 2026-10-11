@@ -1,0 +1,64 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {chromiumPort} from './fixtures/chromium-ready.mjs';
+// Actual private owner, rendered Context and scoped inspection; synthetic provider.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdtemp,readFile,writeFile,mkdir,rm} from 'node:fs/promises';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+import {fileURLToPath} from 'node:url';
+import {setTimeout as delay} from 'node:timers/promises';
+import {harnessCdp} from './fixtures/harness-cdp.mjs';
+import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
+import {PiConnection} from '../dist/client/src/socket.js';
+import {localConnect} from '../dist/platform/src/transport.js';
+const source=fileURLToPath(new URL('../',import.meta.url));
+async function until(fn,label){const end=Date.now()+12000;let last;while(Date.now()<end){try{if(await fn())return;}catch(error){last=error;}await delay(30);}throw Error('Harness composition timeout: '+label+(last?' ('+last.message+')':''));}
+test('copied DSH GUI drives the real Pi owner, opens record details, inspects context and stops without replay',{skip:process.platform!=='linux',timeout:60000},async t=>{
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-context-chrome-'));let fixture,chrome,panel,owner,link,output='',stderr='';
+ t.after(async()=>{owner?.close();panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
+ fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_PROMPTS:'1'},stdio:['ignore','pipe','pipe']});fixture.stdout.on('data',data=>output+=data);fixture.stderr.on('data',data=>stderr+=data);
+ await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'owner ready');
+ const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token');
+ const rpc=async(method,params={},bearer=token)=>{const response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+bearer,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})}),frame=await response.json();if(frame.error)throw Error(frame.error.message);return frame.result;};
+ const socket=localConnect(join(link.state,'runtime.sock'));await once(socket,'connect');owner=new PiConnection(socket);await owner.call('host.hello',{protocol:'augmentor-pi/1'});
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
+ let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'Chrome ready');
+ const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);await panel.call('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await panel.reload();for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
+ const visible=expression=>until(()=>panel.evaluate('Boolean('+expression+')'),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,fixture:stderr});throw error;});
+ const click=expression=>harnessPointerClick(panel,expression,until);
+ await visible('document.querySelector("button[aria-label=\\"New session\\"]")');
+ await click('document.querySelector("button[aria-label=\\"New session\\"]")');
+ await visible('document.querySelector("[contenteditable=true]")&&!document.querySelector("[contenteditable=true]").hasAttribute("aria-disabled")');
+ const sid=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")');assert(sid);
+ // Extension views remain reachable before the first turn; opening them starts no work.
+ await click('document.querySelector("button[aria-label=\\"Add files or run commands\\"]")');
+ await click('Array.from(document.querySelectorAll("[role=menuitem]")).find(x=>x.textContent==="Goal")');
+ await visible('document.body.innerText.includes("Refresh goal")&&document.querySelector("[role=tab]")');
+ await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Chat")');
+ assert.equal((await rpc('session.history',{sessionId:sid})).events.filter(x=>x.event.type==='user/message').length,0);
+ await click('document.querySelector("[contenteditable=true]")');await panel.call('Input.insertText',{text:'Read the fixture note.'});
+ await visible('!document.querySelector("button[aria-label=\\"Send message\\"]").disabled');await click('document.querySelector("button[aria-label=\\"Send message\\"]")');
+ await visible('document.body.innerText.includes("The note says:")&&!document.querySelector("button[aria-label=\\"Stop generating\\"]")');
+ const history=await rpc('session.history',{sessionId:sid});assert.equal(history.events.filter(x=>x.event.type==='user/message').length,1);
+ const assistant=history.events.filter(x=>x.event.type==='assistant/message').map(x=>x.event);assert.equal(assistant.length,2);assert(assistant.every(x=>x.data.requestId&&typeof x.data.message.timestamp==='number'));
+ const chooseTab=name=>'Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==='+JSON.stringify(name)+')';
+ await click(chooseTab('Trajectory'));await visible('document.querySelector("[data-record-index]")');
+ await click('Array.from(document.querySelectorAll("[data-record-index]")).find(x=>x.textContent.includes("TOOL")&&x.textContent.includes("read"))');
+ await visible('document.querySelector("#trajectory-detail-panel")?.innerText.includes("Harness fixture ready.")');
+ await click(chooseTab('Context'));await visible('document.body.innerText.includes("Effective provider request")&&document.body.innerText.includes("afterProviderHooks")');
+ await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent==="Read saved Pi entries")');await visible('document.body.innerText.includes("saved entries on the selected ancestry")');
+ await click(chooseTab('Chat'));await click('document.querySelector("[contenteditable=true]")');await panel.call('Input.insertText',{text:'SLOW interruption fixture'});await click('document.querySelector("button[aria-label=\\"Send message\\"]")');
+ await visible('document.body.innerText.includes("Partial fixture output.")');await click('document.querySelector("button[aria-label=\\"Stop generating\\"]")');
+ await visible('document.body.innerText.includes("Stopped.")||document.body.innerText.includes("ABORTED")');
+ const count=(await rpc('session.history',{sessionId:sid})).events.filter(x=>x.event.type==='user/message').length;await panel.reload();
+ await visible('document.body.innerText.includes("Partial fixture output.")');assert.equal((await rpc('session.history',{sessionId:sid})).events.filter(x=>x.event.type==='user/message').length,count,'reopen never resends');
+ const inspection=await owner.call('inspection.open',{sessionId:sid});await panel.call('Page.navigate',{url:inspection.url});
+ await visible('document.querySelector("[data-composer-input][aria-disabled=true][contenteditable=false]")');
+ await click(chooseTab('Chat'));await visible('document.body.innerText.includes("Partial fixture output.")');
+ assert(!await panel.evaluate('document.querySelector("button[aria-label=\\"Branch into a new conversation\\"]")'));
+ assert.equal(panel.errors.length,0,JSON.stringify(panel.errors));assert(panel.urls.every(value=>value.startsWith(url.origin)||value.startsWith('data:')),JSON.stringify(panel.urls));
+});

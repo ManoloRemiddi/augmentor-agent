@@ -1,10 +1,11 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {once} from "node:events";
 export async function harnessCdp(url){
-  const ws=new WebSocket(url);await once(ws,'open');let id=0;const pending=new Map(),errors=[],dialogs=[],requests=new Map(),failedResponses=[];
-  const api={acceptDialog:true,errors,dialogs,requests,failedResponses};
+  const ws=new WebSocket(url);await once(ws,'open');let id=0;const pending=new Map(),errors=[],dialogs=[],requests=new Map(),failedResponses=[],urls=[];
+  const api={acceptDialog:true,errors,dialogs,requests,failedResponses,urls};
   ws.addEventListener('message',event=>{
     const frame=JSON.parse(event.data),row=pending.get(frame.id);
+    if(frame.method==='Network.requestWillBeSent')urls.push(frame.params.request.url);
     if(frame.method==='Runtime.exceptionThrown')errors.push(frame.params.exceptionDetails);
     if(frame.method==='Log.entryAdded'&&['warning','error'].includes(frame.params.entry.level))errors.push(frame.params.entry);
     if(frame.method==='Network.requestWillBeSent'&&frame.params.request.postData){try{requests.set(frame.params.requestId,JSON.parse(frame.params.request.postData));}catch{}}

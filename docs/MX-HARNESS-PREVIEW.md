@@ -14,7 +14,7 @@ augmentor-harness-preview
 
 It opens the local Harness in the default browser. **Augmentor Desktop – Pi Preview**, or `augmentor-harness-preview --native`, opens the existing native interface with Pi in the same preview profile. The native preview uses its own working folder and dictation state. The existing Augmentor and DSH installation remains available. The two preview presentations share one Pi Host; each conversation has one SDK session owner.
 
-Choose **Conversations**, enter a working folder and create a new conversation. The initial demonstration uses a separate preview workspace and an independently authored note. Choose your own project folder when ready; tools operate with your user account's filesystem access, so this profile separation is not an execution sandbox.
+The default interface is now the [original public DSH GUI on Pi](DSH-GUI-ON-PI.md). Use **New Session** and the workspace picker, or **Workspaces → Add workspace**, to choose a working folder. The initial demonstration uses a separate preview workspace and an independently authored note. Choose your own project folder when ready; tools operate with your user account's filesystem access, so this profile separation is not an execution sandbox.
 
 The initial selection uses the existing local Qwen 27B 262k route on the RTX 5090. The preview copies that provider's connection/model metadata into its own private configuration. It does not restart the model service or change GPU placement, context, concurrency, precision, ASR or VAD. No production conversations, prompts or Hindsight bank are imported. This preview therefore starts without your existing personal/project memory configuration.
 
@@ -22,7 +22,7 @@ The initial selection uses the existing local Qwen 27B 262k route on the RTX 509
 
 - Chat, file reading and ordinary tasks in your chosen folder; check that answers and Stop behave as expected.
 - **Trajectory**: inspect request, tool and turn order, timing and saved tool originals.
-- **Context**: inspect the structured provider request, system instructions, messages, tool declarations and reported usage. **Save context history** in Conversations retains future diagnostic payloads locally for up to 14 days or 512 MiB; it does not reconstruct old requests. It is enabled for the demonstration profile so the first successful request can be inspected.
+- **Context**: inspect the structured provider request, system instructions, messages, tool declarations and reported usage. **Settings → Request payload capture** retains future diagnostic payloads locally for up to 14 days or 512 MiB; it does not reconstruct old requests. It is enabled for the demonstration profile so the first successful request can be inspected.
 - Prompt library, draft improvement and exact Branch/Edit behavior.
 - Plan, Goal and Jobs views. Autonomous continuation and delegated work require their explicit controls/grants; merely opening a tab starts no work.
 
