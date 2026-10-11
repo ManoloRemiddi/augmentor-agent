@@ -1,5 +1,59 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Installed original Context dialog — October 11
+
+Runtime **3a112af4633d6259c1866650044a423459d45997** is selected **and running** in
+private MX release **20261011-212056-aeaf1a5c**, product **0.2.13**,
+artifact **e933bb08a2128614d8136dc35ced23a5f482609f955eb6487f2a6910bb0c19d7**. Source and fresh ordinary
+bundled Node **24.19.0** each pass **232/232 across 34 files**, zero
+failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines.
+All **475 compiled files**, **19,160 dependency files**, **131 npm instances**,
+**723 licence files**, **96 browser notice records** and **six native paths/hashes**
+are verified. Exactly four supplier documentation/notice records change:
+`dsh-context/SOURCE.json`, `dsh-context/SOURCE.md`, `dsh-gui/SOURCE.json` and
+`dsh-gui/THIRD-PARTY-NOTICES.txt`; licence bodies/dependencies/native binaries,
+original DSH GUI and all original supplier CSS remain preserved.
+
+A separate tested ordinary assembly is staged and activated through
+`augmentor-update`; stable preview launch starts Host **2953393** with the
+selected bundled Node and Native **2953702** from the selected root. Normal
+idle Native maintenance close and one guarded Host shutdown precede activation.
+The previous immutable release is retained. The complete **21,767-entry**
+installed inventory passes after GUI reads. Native is online/model-ready/idle;
+active turns, uploads and compactions are zero.
+
+Actual installed browser inspection at **513×715** opens `/context` over the
+retained authored **DSH GUI on Pi · MX Linux check** conversation. The original
+composition/browser dialog shows the retained local-Qwen snapshots, Step 2,
+exact `preview-note.txt` call path and saved verification word **infinity**.
+Escape closes the dialog, restores composer focus and consumes the unchanged
+slash token. Chat stays selected; the empty composer is ready for feedback.
+The screenshot `outputs/dsh-context-modal-installed-mx.jpg` is a local visual
+record, not a published binary or private transcript. This reopens existing
+local-Qwen evidence; it makes **no new owner inference or tool action**. The
+running-task Escape and changed-draft cases use the real SDK with independently
+authored loopback provider responses, separately from installed idle inspection
+and live-provider/physical-platform acceptance.
+
+All eleven displayed histories and queue-item identities remain preserved,
+with zero new conversations/admissions/provider requests/tools. Across the
+**241** saved native/diagnostic files, **231** remain byte-identical, **four**
+retain their exact old prefixes and append only **two `session_info`, two
+`session/close` and two `session/load`** records; **six** corresponding
+counter/index files update. Native title appends must match saved metadata;
+other original bodies and the complete file set remain unchanged. This does
+not claim all complete journal files remain byte-identical. Production selection
+and the existing model router remain preserved. No model, speech, GPU placement,
+context/concurrency/precision or CPU ASR/VAD setting changes.
+
+This shared browser change adds no protocol endpoint or OS adapter. Full Context
+Insights/Fleet/sidebar/preferences, remaining provider-native formats and P0/P1,
+live-provider/privacy/public Sharp-source/rebuild/package/platform gates stay
+open. DSH stays available; Windows/macOS/other Linux implementation remains
+deferred for MX feedback. Subsequent qualification documentation changes no
+selected runtime bytes.
+
+
 ## Original Context slash dialog — October 11 follow-up
 
 The original Apache-2.0 `contextModal.tsx`, `modalStore.ts` and `dockMeasure.ts`
