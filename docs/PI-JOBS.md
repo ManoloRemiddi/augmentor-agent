@@ -11,13 +11,14 @@ platform/installed acceptance remain required before DSH retirement.
 
 ## Streaming scheduling
 
-All Pi conversation and specialist sessions use awaited public `message_update`
-and `message_end` extension hooks to yield to Node's event loop. Buffered provider
+All Pi conversation and specialist sessions use awaited public `provider_stream_event`,
+`message_update` and `message_end` extension hooks to yield to Node's event loop. Buffered provider
 output therefore permits RPC/Stop processing between events even when durable
 Windows record writes take longer than the provider's output cadence. Each event's
 listeners and checkpoints finish before the next event; output is not batched.
 This permits scheduling, but does not make a blocking record operation interruptible
-or put unbounded trusted extension code under a deadline. See the scoped actual SDK
+or put unbounded trusted extension code under a deadline. Providers that omit the
+public parsed-event hook retain message-level fairness only. See the scoped actual SDK
 regression and [Windows candidate evidence](PI-WINDOWS-HOST.md#october-11-buffered-stream-scheduling-candidate).
 
 ## Authority and admission

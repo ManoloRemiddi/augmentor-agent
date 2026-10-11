@@ -43,7 +43,12 @@ test('actual child request and tool limits terminate production without extra pr
 });
 test('parent Stop cancels idle-parent delegated work and real owned shell process without replay',{timeout:60000},async t=>{
  const f=await fixture(t),started=await start(f,f.sid,spec({kind:'worker-hold'},[]));await until(async()=>(await read(f,f.sid,started.job.id)).output.next>0,'child streaming');
- assert.equal((await f.call('session.list')).items[0].running,false);assert.equal((await f.call('session.cancel',{sessionId:f.sid})).accepted,true);assert.equal((await done(f,f.sid,started.job.id)).state,'cancelled');
+ assert.equal((await f.call('session.list')).items[0].running,false);assert.equal((await f.call('session.cancel',{sessionId:f.sid})).accepted,true);const stopped=await done(f,f.sid,started.job.id);
+ if(stopped.state==='unknown'){
+  const entries=(await f.native(stopped.childId)).bytes.toString().trim().split('\n').map(JSON.parse),messages=entries.filter(entry=>entry.type==='message');
+  t.diagnostic('Unconfirmed child settlement: '+JSON.stringify({reason:stopped.reason,requests:stopped.requests,tools:stopped.tools,outputBytes:stopped.output.next,nativeMessages:messages.length,lastRole:messages.at(-1)?.message.role,lastStopReason:messages.at(-1)?.message.stopReason}));
+ }
+ assert.equal(stopped.state,'cancelled');
  const path=join(f.workspace,'should-not-exist'),script=join(f.workspace,'slow-owned-command.cjs');await writeFile(script,'console.log("owned-command-started");setTimeout(()=>require("node:fs").writeFileSync('+JSON.stringify(path)+',"Unexpected late write"),15000);');const command='"'+process.execPath+'" "'+script+'"';
  const shell=await start(f,f.sid,{requestId:'shell-stop',kind:'shell',task:command,allowedTools:[],limits:{timeoutMs:30000}});await until(async()=>(await read(f,f.sid,shell.job.id)).output.chunks.some(c=>c.text.includes('owned-command-started')),'actual shell output');await f.call('session.cancel',{sessionId:f.sid});assert.equal((await done(f,f.sid,shell.job.id)).state,'cancelled');await assert.rejects(stat(path),{code:'ENOENT'});
  const count=f.requests.length;await f.stop();await f.start();assert.equal((await read(f,f.sid,started.job.id)).job.state,'cancelled');assert.equal((await read(f,f.sid,shell.job.id)).job.state,'cancelled');assert.equal(f.requests.length,count);assert.equal(f.errors(),'');

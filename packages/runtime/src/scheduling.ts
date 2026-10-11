@@ -7,6 +7,7 @@ import type {ExtensionAPI} from '@earendil-works/pi-coding-agent';
  */
 export function piScheduling(pi:ExtensionAPI){
  const yieldToHost=async()=>{await setImmediate();};
+ pi.on('provider_stream_event',yieldToHost);
  pi.on('message_update',yieldToHost);
  pi.on('message_end',yieldToHost);
 }
