@@ -47,7 +47,7 @@ const result=await build({
     });
   }}],
 });
-const forbidden=Object.keys(result.metafile.inputs).filter(path=>/vendor\/dsh\/.*(?:client-runtime|product-analytics|ui-settings-account|ui-settings-session-log|packages\/host)|vendor\/dsh-context\/(?:src\/host|src\/client\/(?:modelPrices|historyPage|latestVersion|settingsJump))|node_modules\/(?:@deepseek-ai\/cordis|@opencode-ai\/models|posthog|@sentry)/.test(path));
+const forbidden=Object.keys(result.metafile.inputs).filter(path=>/vendor\/dsh\/.*(?:client-runtime|product-analytics|ui-settings-account|ui-settings-session-log|packages\/host)|vendor\/dsh-context\/(?:src\/host|src\/client\/(?:modelPrices|historyPage|latestVersion|settingsJump|balance|skills))|node_modules\/(?:@deepseek-ai\/cordis|@opencode-ai\/models|posthog|@sentry)/.test(path));
 if(forbidden.length)throw Error('Supplier runtime/analytics entered the browser graph: '+forbidden.join(', '));
 const npmRoots=new Map();
 for(const name of Object.keys(result.metafile.inputs)){
@@ -58,7 +58,7 @@ for(const name of Object.keys(result.metafile.inputs)){
   const manifest=JSON.parse(readFileSync(join(directory,'package.json'),'utf8'));
   npmRoots.set(directory,manifest);
 }
-const licenses=[readFileSync(join(vendor,'LICENSE'),'utf8'),'\n--- dsh-context 0.68.1 · Copyright 2025 bowenliang123 · Apache-2.0 ---\n'+readFileSync(join(contextVendor,'LICENSE'),'utf8')+'\nModified by Augmentor: Pi read-only data/history bindings; automatic registry/price lookups and unbound DSH settings removed; unattested DSH threshold removed; unobserved skill/fleet figures marked unavailable; original request selector binds explicit metadata paging/body reads with unavailable-data notes; original slash modal binds the same read-only picker and recorded-data notice. Original/adapted source hashes and modification notices are recorded in SOURCE.json.\n'];
+const licenses=[readFileSync(join(vendor,'LICENSE'),'utf8'),'\n--- dsh-context 0.68.1 · Copyright 2025 bowenliang123 · Apache-2.0 ---\n'+readFileSync(join(contextVendor,'LICENSE'),'utf8')+'\nModified by Augmentor: Pi read-only data/history bindings; automatic registry/price lookups and unbound DSH settings removed; unattested DSH threshold removed; unobserved skill/fleet figures marked unavailable; original request selector binds explicit metadata paging/body reads with unavailable-data notes; original slash modal binds the same read-only picker and recorded-data notice; original Insights uses bounded Pi metadata/newest-body reads and reported SDK usage buckets, with unavailable skills/prices/detailed timing explicit and DSH backfill disabled; tooltip identity is captured outside state updaters to prevent focus/measurement loops. Original/adapted source hashes and modification notices are recorded in SOURCE.json.\n'];
 const npmRecords=[];
 const tailwindRoot=dirname(requireUi.resolve('tailwindcss/package.json')),tailwindManifest=JSON.parse(readFileSync(join(tailwindRoot,'package.json'),'utf8'));
 licenses.push('\n--- tailwindcss '+tailwindManifest.version+' (MIT; generated dashboard CSS) ---\n'+readFileSync(join(tailwindRoot,'LICENSE'),'utf8'));

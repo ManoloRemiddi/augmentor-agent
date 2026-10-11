@@ -4,7 +4,7 @@
   "version": "0.68.1",
   "license": "Apache-2.0",
   "copyright": "Copyright 2025 bowenliang123",
-  "scope": "Selected original Context dashboard presentation; Pi supplies the data/transport. No DSH plugin Host or second agent owner.",
+  "scope": "Selected original Context dashboard, slash modal and Context Insights presentation; Pi supplies bounded retained data/transport. No DSH plugin Host or second agent owner.",
   "files": [
     {
       "path": "LICENSE",
@@ -140,6 +140,13 @@
       "adaptation": "Prominently marked Pi qualification: external registry/settings hooks, DSH-only threshold or unobserved skill/fleet figures removed/marked unavailable; original visual structure preserved."
     },
     {
+      "path": "src/client/components/dateRange.tsx",
+      "sourcePath": "src/client/components/dateRange.tsx",
+      "sourceSha256": "2c194cde6babff437bb06035d7a64cf5f3ff749087e4f947b39efcc4c823a6f7",
+      "sha256": "2c194cde6babff437bb06035d7a64cf5f3ff749087e4f947b39efcc4c823a6f7",
+      "adaptation": "verbatim"
+    },
+    {
       "path": "src/client/components/detailNote.tsx",
       "sourcePath": "src/client/components/detailNote.tsx",
       "sourceSha256": "f853ead6a2f15c71446b8423a588e084fef0e8f5bcf54a308ff537e722b98b21",
@@ -189,6 +196,20 @@
       "adaptation": "verbatim"
     },
     {
+      "path": "src/client/components/heatmap.tsx",
+      "sourcePath": "src/client/components/heatmap.tsx",
+      "sourceSha256": "b2492ac5ba0f70c781f3a0bfe03e1d9a7b385b5cb2eabdaa1552e356023ae99f",
+      "sha256": "b2492ac5ba0f70c781f3a0bfe03e1d9a7b385b5cb2eabdaa1552e356023ae99f",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/client/components/hoverTip.tsx",
+      "sourcePath": "src/client/components/hoverTip.tsx",
+      "sourceSha256": "2d02b9c67244030ca72502a6139f137362022bd175ae46c0fb3b38c0542e9656",
+      "sha256": "9ba3b0bbf1e99e26b60c618989a98e113306d52587ffffdd41f791380a91bb7c",
+      "adaptation": "modified: stable tooltip identity outside React state updaters prevents heatmap focus/measurement loops; original UI and CSS preserved"
+    },
+    {
       "path": "src/client/components/images.tsx",
       "sourcePath": "src/client/components/images.tsx",
       "sourceSha256": "96c35dcc2dd7d6239ff4762b0867c1a9a9a01d2f7e715ec953827e8951257ec8",
@@ -200,6 +221,34 @@
       "sourcePath": "src/client/components/nodes.tsx",
       "sourceSha256": "cabd56d92a3d5224bfb730dd635b2702d7dcfb33fb80fd0096346c705ffee4b1",
       "sha256": "cabd56d92a3d5224bfb730dd635b2702d7dcfb33fb80fd0096346c705ffee4b1",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/client/components/overviewCard.tsx",
+      "sourcePath": "src/client/components/overviewCard.tsx",
+      "sourceSha256": "7825fd23a9a534be1aedb19604d0bcd516e0f74e82cf52ae395f2e342cd0dc37",
+      "sha256": "906c9a7dbf6ef99a347633263b0a3a28ab9d37e9242946f45e5c480861f027ad",
+      "adaptation": "Pi read-only Insights seats and explicit unavailable data; original structure/CSS preserved"
+    },
+    {
+      "path": "src/client/components/overviewPanel.tsx",
+      "sourcePath": "src/client/components/overviewPanel.tsx",
+      "sourceSha256": "8edbd5e38c1d5d6b6b8760b488dc1e55ebf084a4028156a089f6a1dda9558794",
+      "sha256": "967c481fed0d8040c12fd6a67d489a8979d86fa1a8c6c861eebfd1d7393604dd",
+      "adaptation": "Pi read-only Insights seats and explicit unavailable data; original structure/CSS preserved"
+    },
+    {
+      "path": "src/client/components/overviewTokens.tsx",
+      "sourcePath": "src/client/components/overviewTokens.tsx",
+      "sourceSha256": "8f0b36eae3ab82c7f19d63d6279568be87010cb70f24b3e97d6738a97b6f1ff5",
+      "sha256": "fea0eadb0c84d33cd9daff99b510032c81440cda0e1ffb7ad5d9703e624bb2ae",
+      "adaptation": "Pi read-only Insights seats and explicit unavailable data; original structure/CSS preserved"
+    },
+    {
+      "path": "src/client/components/overviewUsage.tsx",
+      "sourcePath": "src/client/components/overviewUsage.tsx",
+      "sourceSha256": "1b449ec75386e88853dd411dfddbcf54f18ba1c6914e1169d99e4d93721d8838",
+      "sha256": "1b449ec75386e88853dd411dfddbcf54f18ba1c6914e1169d99e4d93721d8838",
       "adaptation": "verbatim"
     },
     {
@@ -399,6 +448,13 @@
       "adaptation": "verbatim"
     },
     {
+      "path": "src/client/overview.ts",
+      "sourcePath": "src/client/overview.ts",
+      "sourceSha256": "c9d5858e3c879e9cc1b8c27b5897890dce3964520f8b0e7cdb6708d86ba0cee6",
+      "sha256": "beed0f190e7da142f9756e3fdb6d7d2b5897894e6f122bd95c2cf97a63fc8a10",
+      "adaptation": "Pi read-only Insights seats and explicit unavailable data; original structure/CSS preserved"
+    },
+    {
       "path": "src/client/primitives.ts",
       "sourcePath": "src/client/primitives.ts",
       "sourceSha256": "92e6ed60714c155b91cbfe700a00093da8a22e300201301cc1d142aa84237aa8",
@@ -592,6 +648,13 @@
       "sourcePath": "src/client/viewkit.ts",
       "sourceSha256": "aed7b7d7cccb23f911ff21ef51973ecd3476d9ab8774cc84b2f9106667f6c219",
       "sha256": "aed7b7d7cccb23f911ff21ef51973ecd3476d9ab8774cc84b2f9106667f6c219",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/shared/days.ts",
+      "sourcePath": "src/shared/days.ts",
+      "sourceSha256": "43072291616978df6ef76bbdd4025e14d1ab085b4945924baf8333fb041550e3",
+      "sha256": "43072291616978df6ef76bbdd4025e14d1ab085b4945924baf8333fb041550e3",
       "adaptation": "verbatim"
     },
     {

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Context Insights](DSH-GUI-ON-PI.md#original-context-insights--october-11-follow-up) restores the supplier first-level overview with bounded retained Pi metadata/newest-body reads, reported SDK token buckets, original filters/heatmap/navigation and explicit unavailable data. Source/ordinary/installed qualification follows separately; full migration/plugin/platform gates stay open.
+
 October 11 specialist follow-up: [desktop jobs](PI-JOBS.md#desktop-specialist-jobs) now use the shared durable registry, distinct native SDK histories, pre-dispatch intent, scoped approvals/Stop, unknown recovery and one-time usage. Harness exposes child originals and optional provider payloads through parent-owned read-only inspection. Synthetic source/staged qualification does not establish live perception, physical consent or installed platform acceptance. Every remaining accepted P0/P1 gate and DSH retention remains binding.
 
 
