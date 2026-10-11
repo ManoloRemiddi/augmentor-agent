@@ -1,6 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 
+## October 11 current installed original live Trajectory
+
+Final tested implementation **39b92629ba51bccdeb81018960ef3ee4bd11427e** is selected **and running** in private MX release **20261011-161859-071bde6e**, product 0.2.13, artifact **7c20d7ae1470bcde24f7c9d1ac57f724c2ee21f1dfd05e6551c4515425b56368**. Normal guarded immutable staging/activation and stable Host/Native launch succeed; both running roots match selection and Native is online/model-ready/idle. Full **21,671-entry** inventory passes after original GUI/detail/Context reads. Corrected source and ordinary bundled Node 24.19.0 cohorts each pass **135/135 across seventeen files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. All ten histories and queue item identities are preserved by the correction update. Compared with the original nine-history baseline, there is exactly one new Qwen demonstration with one human admission/one provider request/one final reply, no tools and the same explicit model as the earlier attachment demonstration. The correction's saved-response reopening causes no inference or replay. Production selection SHA-256 remains cb426b4a2daa960f66533f28fb2b164385c243c1ba53fc18e61ca33fb4256be7; model router and model/speech/GPU/context/concurrency/precision settings remain unchanged.
+
+[Installed detail](DSH-GUI-ON-PI.md#installed-live-trajectory-qualification--october-11) records growing original output, restored completed timing, preserved Context and retained failures. The Context tab is selected for feedback. This qualification-only documentation changes no runtime or selected bytes. Full Harness gates remain open and further platforms remain deferred. Preceding candidates below are historical checkpoints.
+
+
 ## October 11 original live Trajectory candidate
 
 The first immutable installed candidate (9e33a0b / 20261011-160742-76cca811) shows local Qwen text growing in the original Trajectory, preserving nine histories and adding one one-request demonstration. Its completed detail reveals missing final timing. The corrected projection retains exact observed generation boundaries and again passes source 135/135; the corrected ordinary bundled-Node cohort also passes 135/135, with final installed acceptance following separately. The SDK timestamp is not used as a completion clock. [Retained failures and scope](DSH-GUI-ON-PI.md#original-live-trajectory--october-11-follow-up) explain live-only chunks and the private proof preparation.
