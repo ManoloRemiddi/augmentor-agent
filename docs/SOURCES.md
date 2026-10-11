@@ -435,3 +435,6 @@ Public DSH d743267 contributes thirteen unchanged GUI attachment files (358 GUI 
 
 
 The October 11 [original live Trajectory binding](DSH-GUI-ON-PI.md#original-live-trajectory--october-11-follow-up) adds independently authored Pi display linkage/projection only. The pinned 358 DSH GUI files and 86 dsh-context supplier files, original licenses, CSS, production dependencies and notice closure are unchanged. Live SDK/browser qualification uses a synthetic provider; actual installed MX evidence is recorded separately.
+
+
+The October 11 [original command menu](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up) adds 28 verbatim public MIT menu/controller/grouping/popup/coordinate/grammar files from the same DSH d743267 pin, bringing the GUI selection to 386. The preceding supplier records, visual source/CSS and production dependencies remain unchanged. Pi action/scope/revision bindings are independently authored; no supplier owner or telemetry runtime is selected. Complete command and platform parity remain open.

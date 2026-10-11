@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 original command menu candidate
+
+The [original DSH command menu](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up) replaces the simplified popup with copied MIT menu/controller/grouping/model-popup source. Eight existing Pi actions, slash filtering, keyboard selection, scoped model choice and draft/attachment/Escape guards are connected. The 28 new files bring the supplier selection to 386; all preceding hashes, visual CSS, licences and dependencies remain unchanged. Source qualification passes **139/139 across eighteen files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Retained fixture failures and explicit missing commands are in the guide. Ordinary/installed acceptance remains pending for this candidate; the installed 39b9262 release below is preserved. Full Harness gates remain open and further platforms stay deferred.
+
+
 
 ## October 11 current installed original live Trajectory
 

@@ -12,6 +12,16 @@ import {ConversationContent} from '@dsh-gui/ui-conversation/src/client/skeleton/
 import {ConversationHeader} from '@dsh-gui/ui-conversation/src/client/skeleton/ConversationHeader.tsx';
 import {ConversationSessionHeader,ConversationSession} from '@dsh-gui/ui-conversation/src/client/skeleton/ConversationSession.tsx';
 import {InputBar} from '@dsh-gui/ui-conversation/src/client/skeleton/InputBar.tsx';
+import {MenuView} from '@dsh-gui/ui-input-trigger/src/client/MenuView.tsx';
+import {InputTriggerController} from '@dsh-gui/ui-input-trigger/src/client/controller.ts';
+import {PopupSelectView} from '@dsh-gui/ui-commands/src/client/PopupSelectView.tsx';
+import {PopupSelectController} from '@dsh-gui/ui-commands/src/client/popup.ts';
+import {builtinRowFace,sectionRows} from '@dsh-gui/ui-commands/src/client/presentation.ts';
+import {en as commandEn} from '@dsh-gui/ui-commands/src/client/locales.ts';
+import {en as menuEn} from '@dsh-gui/ui-input-trigger/src/client/locales.ts';
+import {$projectComposer} from '@dsh-gui/ui-conversation/src/client/input/editor/projection.ts';
+import {$replaceDetectSpanWithText} from '@dsh-gui/ui-conversation/src/client/input/editor/span-map.ts';
+import {DshCommandMenu} from './dsh-command-menu.mjs';
 import {ModelSelect} from '@dsh-gui/ui-model-selection/src/client/ModelSelect.tsx';
 import {ChatView} from '@dsh-gui/ui-chat/src/client/chat/ChatView.tsx';
 import {ChatFlow} from '@dsh-gui/ui-chat/src/client/chat/ChatFlow.tsx';
@@ -46,7 +56,7 @@ import {createWorkspaceShortcutControls} from '@dsh-gui/ui-workspace/src/client/
 import {createTrajectoryDurationStore} from '@dsh-gui/ui-trajectory/src/client/duration-store.ts';
 import {createTrajectoryStringWrappingStore} from '@dsh-gui/ui-trajectory/src/client/string-wrapping-store.ts';
 import {createSnapshotStore} from '@deepseek-ai/dsh-client-store';
-import {Button,Modal,Menu,MenuItemButton,Input,IconSettingsOutlineRegular,IconEditOutlineRegular,IconCopyOutlineRegular,IconGoalOutlineRegular,IconFolderCloseRegular,JsonBlock,MarkdownText,DisclosureRow,StateDot} from '@deepseek-ai/dsh-client-ui-primitives';
+import {Button,Modal,Input,IconSettingsOutlineRegular,IconEditOutlineRegular,IconCopyOutlineRegular,IconGoalOutlineRegular,IconFolderCloseRegular,JsonBlock,MarkdownText,DisclosureRow,StateDot} from '@deepseek-ai/dsh-client-ui-primitives';
 import {en as commonEn} from '@dsh-gui/locale/src/locales/en.ts';
 import {en as conversationEn} from '@dsh-gui/ui-conversation/src/client/locales.ts';
 import {en as sidebarEn} from '@dsh-gui/ui-sidebar/src/client/locales.ts';
@@ -87,15 +97,35 @@ const useLayout=bind(layout),useWorkspaceView=bind(workspaceView),useWorkspaceSh
 const useRowNotice=bind(rowNotice),useArchiveRequest=bind(archiveRequest);
 const notifyRow=(kind,extra={})=>rowNotice.set({kind,...extra,seq:++noticeSeq});
 const tr=dictionary=>(key,args={})=>String(dictionary[key]??commonEn[key]??key).replace(/\{(\w+)\}/g,(_,name)=>String(args[name]??''));
-const t={conversation:tr(conversationEn),sidebar:tr(sidebarEn),workspace:tr(workspaceEn),chat:tr(chatEn),trajectory:tr(trajectoryEn),model:tr(modelEn),goal:tr(goalEn),approval:tr(approvalEn),question:tr(questionEn),common:tr(commonEn)};
+const t={conversation:tr(conversationEn),sidebar:tr(sidebarEn),workspace:tr(workspaceEn),chat:tr(chatEn),trajectory:tr(trajectoryEn),model:tr(modelEn),goal:tr(goalEn),approval:tr(approvalEn),question:tr(questionEn),common:tr(commonEn),command:tr(commandEn),menu:tr(menuEn)};
 const control={run:async action=>{try{return await action();}catch(error){controller.update({error:error.message});return undefined;}}};
 const drafts=new Map();let activeDraft=null;
+let draftRev=0,composerProjection={detectText:'',selection:null,caret:null},commandMenu;
 const editor=createEditor({namespace:'augmentor-dsh-composer',onError:error=>controller.update({error:error.message}),theme:{}});
 registerPlainText(editor);registerHistory(editor,createEmptyHistoryState(),300);
-editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const value=$getRoot().getTextContent();draft.set(value);if(activeDraft)drafts.set(activeDraft,value);}));
+editor.registerUpdateListener(({editorState})=>editorState.read(()=>{composerProjection=$projectComposer(()=>0);const value=composerProjection.detectText;if(value!==draft.getSnapshot())draftRev++;draft.set(value);if(activeDraft)drafts.set(activeDraft,value);commandMenu?.track();}));
 function setDraft(value){editor.update(()=>{$getRoot().clear().append($createParagraphNode().append($createTextNode(value)));});}
-const keyboard={editor,arbitrate:()=> 'pass',space:()=>false,dismissPopup:()=>controller.update({commands:false}),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>({start:0,end:0}),paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
+const commandRows=[
+  {name:'file',label:t.conversation('input.file'),description:'Attach files to this draft',icon:IconFolderCloseRegular},
+  {name:'goal',...builtinRowFace({definitionId:'@deepseek-ai/dsh-command-goal'},t.command)},
+  {name:'plan',...builtinRowFace({definitionId:'@deepseek-ai/dsh-plan-mode'},t.command),description:'View this conversation’s plan and todos'},
+  {name:'model',label:'Model',description:'Select a model for this conversation'},
+  {name:'prompts',label:'Prompt library',description:'Use or edit a saved prompt'},
+  {name:'jobs',label:'Jobs',description:'Inspect and manage this conversation’s jobs'},
+  {name:'context',label:'Context',description:'Inspect the recorded context dashboard'},
+  {name:'inspect',label:'Full Pi record inspector',description:'Open the advanced conversation inspector'},
+];
+commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,store:createSnapshotStore,sectionRows:rows=>sectionRows(rows,t.command),rows:()=>commandRows,actions:{},
+  current:()=>({...controller.state,epoch:controller.epoch,running:controller.state.sessions.find(x=>x.sessionId===controller.state.sessionId)?.running===true}),
+  draft:()=>({text:draft.getSnapshot(),rev:draftRev,sessionId:activeDraft,caret:composerProjection.caret}),catalog:()=>controller.state.catalog,choose:selection=>controller.choose(selection),notice:text=>controller.update({error:text}),focus:()=>editor.focus(),
+  replace:(span,text,rev,scope)=>{let applied=false;editor.update(()=>{if(draftRev===rev&&activeDraft===scope.sessionId&&controller.epoch===scope.epoch)applied=$replaceDetectSpanWithText(span,text);},{discrete:true});return applied;},
+});
+controller.subscribe(()=>commandMenu.sync());
+const useLexicon=bind(commandMenu.lexicon),useMenuLauncher=bind(commandMenu.launcher);
+const keyboard={editor,arbitrate:(key,composing)=>commandMenu.arbitrate(key,composing),space:()=>false,dismissPopup:()=>commandMenu.popup.dismiss(),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
   const text=draft.getSnapshot(),sid=controller.state.sessionId,items=[...attachmentDrafts.draft(sid).items];if(attachmentDrafts.busy||!text.trim()&&!items.length)return;
+  if(await commandMenu.adjudicate(text)!==undefined)return;
+  if(sid!==controller.state.sessionId||draft.getSnapshot()!==text)throw Error('The conversation or draft changed; nothing was submitted.');
   attachmentDrafts.busy=true;attachmentDrafts.changed();
   try{const parts=await attachmentDrafts.content(sid,items);if(sid!==controller.state.sessionId)throw Error('The selected conversation changed; the draft is preserved.');await controller.send(text,mode,parts);if(sid===controller.state.sessionId&&draft.getSnapshot()===text)setDraft('');for(const item of items)attachmentDrafts.remove(item.id,sid);await controller.refresh();}
   finally{attachmentDrafts.busy=false;attachmentDrafts.changed();}
@@ -195,12 +225,21 @@ function ManagedSettings({state}){
 
 const SessionBridge=React.createContext(null);
 function BoundSession(){return <ConversationSession {...React.useContext(SessionBridge)}/>;}
+function CommandOverlays(){
+  const composing=useRef(false),ended=useRef(0);
+  // Keep IME candidate acceptance out of the generic copied option picker.
+  return <div style={{display:'contents'}} onCompositionStart={()=>{composing.current=true;}} onCompositionEnd={()=>{composing.current=false;ended.current=performance.now();}} onKeyDownCapture={event=>{if(composing.current||event.nativeEvent.isComposing||event.nativeEvent.keyCode===229||performance.now()-ended.current<10)event.stopPropagation();}}>
+    <MenuView menu={commandMenu.menu} headers={commandMenu.headers} onPick={(source,index,action)=>commandMenu.engine?.pick(source,index,action)} onHover={(source,index)=>commandMenu.engine?.hover(source,index)} onCrumb={(source,index)=>commandMenu.engine?.pickCrumb(source,index)} onDismiss={()=>commandMenu.dismiss()} t={t.menu}/>
+    <PopupSelectView popup={commandMenu.popup} t={t.command}/>
+  </div>;
+}
 function App(){
-  const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null),[commands,setCommands]=useState(false);
+  const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
+  useEffect(()=>{commandMenu.deps.actions={file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:()=>setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:()=>setView('context'),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
   useEffect(()=>{activeDraft=state.sessionId;setDraft(drafts.get(state.sessionId)||'');},[state.sessionId]);
-  useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!commands&&!state.interactions.length&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog,commands]);
+  useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!commandMenu.menu.getSnapshot().open&&!commandMenu.popup.state.getSnapshot().open&&!state.interactions.length&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog]);
   const current=state.sessions.find(x=>x.sessionId===state.sessionId);
   const workspaces=useMemo(()=>{
     if(state.workspaces)return {...state.workspaces,phase:'ready',state:'ready'};
@@ -260,12 +299,12 @@ function App(){
         return <p role="status">{owner.node.data.text}</p>;
       case 'conversation.chat.reasoning.body':return <MarkdownText text={owner.text} streaming={owner.running}/>;
       case 'conversation.input.dock':return <><QueueStatus state={state}/><QueueDock {...p} useSession={selectorFace({...composed.session,subagent:state.readOnly?{address:{mode:'read-only'}}:null})} updateQueue={(itemId,action)=>controller.updateQueue(itemId,action)} notify={(_,text)=>controller.update({error:text})} loadImage={loadImage}/>{!state.readOnly&&<GoalBar goal={state.goal?.goal} activation={state.goal?.activation} t={t.goal} onPause={()=>goalAction('pause')} onResume={()=>goalAction('resume')} onClear={()=>goalAction('clear')} onEdit={objective=>goalAction('edit',{objective,maxGoalRounds:state.goal?.goal?.maxGoalRounds})}/>}</>;
-      case 'conversation.composer.bar':return <InputBar {...p} placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!!state.unconfirmed||attachmentDrafts.busy||owner.disabled} keyboard={keyboard} addFiles={attachmentDrafts.add} removeAttachment={attachmentDrafts.remove} retryFileUpload={attachmentDrafts.retry} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace(attached.uploads)} useNotices={selectorFace(undefined)} useLexicon={selectorFace(new Map())} useMenuLauncher={selectorFace(commands?'command':null)} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={ids=>attached.items.filter(x=>ids.includes(x.id))} toggleCommandMenu={()=>setCommands(x=>!x)}/>;
+      case 'conversation.composer.bar':return <InputBar {...p} placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!!state.unconfirmed||attachmentDrafts.busy||owner.disabled} keyboard={keyboard} addFiles={attachmentDrafts.add} removeAttachment={attachmentDrafts.remove} retryFileUpload={attachmentDrafts.retry} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace(attached.uploads)} useNotices={selectorFace(undefined)} useLexicon={useLexicon} useMenuLauncher={useMenuLauncher} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={ids=>attached.items.filter(x=>ids.includes(x.id))} toggleCommandMenu={span=>commandMenu.toggle(span)}/>;
       case 'conversation.input.attachments':return <ComposerAttachments {...owner} t={t.conversation}/>;
       case 'conversation.message.images':return <MessageImages {...owner} loadImage={loadImage} t={t.conversation}/>;
       case 'conversation.input.right':return <ImproveDraft state={state}/>;
       case 'conversation.input.model':return <ModelSelect {...p} t={t.model} locked={owner.locked||state.readOnly||current?.running===true} available={!state.readOnly} directory={modelDirectory} load={async()=>modelDirectory.getSnapshot()} select={async selection=>{modelDirectory.update(s=>({...s,status:'selecting',pending:selection}));try{await controller.choose(selection);return modelDirectory.getSnapshot();}catch(e){modelDirectory.update(s=>({...s,status:'error',pending:null,error:e.message}));throw e;}}}/>;
-      case 'conversation.input.overlay':return commands?<Menu open anchor={<span/>} onClose={()=>setCommands(false)} items={[{id:'files',label:t.conversation('input.file')},{id:'goal',label:'Goal'},{id:'prompts',label:'Prompt library'},{id:'jobs',label:'Jobs'},{id:'context',label:'Context'},{id:'inspect',label:'Full Pi record inspector'}]} onSelect={id=>{setCommands(false);if(id==='files')openFiles?.open();else if(id==='prompts')setDialog({kind:'prompts'});else if(id==='inspect')window.open('/inspection#'+new URLSearchParams({token:controller.token,session:state.sessionId||''}),'_blank','noopener,noreferrer');else setView(id);}}/>:null;
+      case 'conversation.input.overlay':return <CommandOverlays/>;
       default:return options.fallback??null;
     }
   };

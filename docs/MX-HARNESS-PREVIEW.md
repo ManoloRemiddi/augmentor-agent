@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 original command menu candidate
+
+The [original DSH command menu](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up) replaces the simplified popup with copied MIT menu/controller/grouping/model-popup source. Eight existing Pi actions, slash filtering, keyboard selection, scoped model choice and draft/attachment/Escape guards are connected. The 28 new files bring the supplier selection to 386; all preceding hashes, visual CSS, licences and dependencies remain unchanged. Source qualification passes **139/139 across eighteen files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Retained fixture failures and explicit missing commands are in the guide. Ordinary/installed acceptance remains pending for this candidate; the installed 39b9262 release below is preserved. Full Harness gates remain open and further platforms stay deferred.
+
+
 
 ## October 11 current installed original live Trajectory
 
@@ -42,6 +47,7 @@ The initial selection uses the existing local Qwen 27B 262k route on the RTX 509
 
 ## What to try
 
+- The **original command menu** candidate restores Add/Commands grouping, slash filtering and the original model-option popup. Its installation qualification is recorded above; `/context` opens the dashboard and `/model` opens the picker when installed. See [exact coverage](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up).
 - **Context**: the original dsh-context dashboard now has Pi bindings. Inspect composition, trend, request-specific system/tools/messages, and expand **Raw Pi context and saved entries** for provenance. Check the explicit availability/estimate notes. See [current qualification](DSH-GUI-ON-PI.md#original-context-dashboard--october-11-follow-up); installation identity is recorded with each immutable adoption.
 
 - Original workspace Rename/Delete dialogs, folder selection and ordering. Removing a registration preserves its directory and conversations.
