@@ -8,3 +8,5 @@ copyFileSync('packages/harness-ui/src/queue-view.js','dist/harness-ui/src/queue-
 copyFileSync('packages/runtime/vendor/pi/LICENSE','dist/runtime/vendor/pi/LICENSE');
 copyFileSync('packages/runtime/vendor/pi/SOURCE.md','dist/runtime/vendor/pi/SOURCE.md');
 cpSync('packages/runtime/vendor/adaptive-reasoning','dist/runtime/vendor/adaptive-reasoning',{recursive:true});
+copyFileSync('packages/runtime/vendor/dsh-goal/LICENSE','dist/runtime/vendor/dsh-goal/LICENSE');
+copyFileSync('packages/runtime/vendor/dsh-goal/SOURCE.md','dist/runtime/vendor/dsh-goal/SOURCE.md');

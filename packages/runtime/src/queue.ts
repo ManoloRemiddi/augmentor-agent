@@ -2,9 +2,10 @@
 import {createHash,randomUUID} from 'node:crypto';
 import {existsSync,lstatSync,readFileSync,openSync,closeSync,writeFileSync,renameSync,fsyncSync,unlinkSync} from 'node:fs';
 import {dirname} from 'node:path';
+import {validateGoalSource,type GoalMessageSource} from './goals.js';
 
 type Status='waiting'|'dispatching'|'active'|'steering'|'completed'|'failed'|'cancelled'|'removed'|'unconfirmed';
-interface Item {id:string;input?:string;fingerprint:string;status:Status;queued:boolean;delivered:boolean;turnId?:string;steerTurnId?:string}
+interface Item {id:string;input?:string;fingerprint:string;status:Status;queued:boolean;delivered:boolean;turnId?:string;steerTurnId?:string;goalSource?:GoalMessageSource}
 interface Journal {schema:1;sessionId:string;revision:number;paused:boolean;items:Item[]}
 const statuses=new Set<Status>(['waiting','dispatching','active','steering','completed','failed','cancelled','removed','unconfirmed']);
 const visible=(item:Item)=>item.status==='waiting'||item.status==='unconfirmed'||item.status==='failed'&&item.input!==undefined||['dispatching','active','steering'].includes(item.status)&&item.queued&&!item.delivered;
@@ -23,6 +24,7 @@ export class PiPromptQueue {
    const ids=new Set<string>();
    for(const item of data.items){
     promptIdentity(item.id);
+    if(item.goalSource!==undefined)validateGoalSource(item.goalSource);
     if(ids.has(item.id)||!statuses.has(item.status)||typeof item.queued!=='boolean'||typeof item.delivered!=='boolean'||!/^[a-f0-9]{64}$/.test(item.fingerprint)||
      (item.turnId!==undefined&&promptIdentity(item.turnId)!==item.turnId)||
      (item.steerTurnId!==undefined&&promptIdentity(item.steerTurnId)!==item.steerTurnId)||
@@ -53,9 +55,9 @@ export class PiPromptQueue {
   if(existing&&existing.fingerprint!==fingerprint(input))throw Error('Prompt identity was reused for different input.');
   return existing?structuredClone(existing):undefined;
  }
- enqueue(id:string,input:string,queued:boolean){
+ enqueue(id:string,input:string,queued:boolean,goalSource?:GoalMessageSource){
   promptIdentity(id);if(typeof input!=='string'||!input.trim()||input.length>65536)throw Error('Invalid queued prompt.');const duplicate=this.lookup(id,input);if(duplicate)return false;
-  const item:Item={id,input,fingerprint:fingerprint(input),status:'waiting',queued,delivered:false};
+  const item:Item={id,input,fingerprint:fingerprint(input),status:'waiting',queued,delivered:false,...(goalSource?{goalSource:validateGoalSource(goalSource)}:{})};
   const pending=[...this.data.items.filter(visible),item];
   if(pending.length>100||Buffer.byteLength(JSON.stringify(pending))>512*1024)throw Error('The prompt queue is full. Remove waiting or unsent prompts before adding more.');
   this.commit({...this.data,items:[...this.data.items,item]});return true;
@@ -82,7 +84,7 @@ export class PiPromptQueue {
  resolve(id:string){if(this.item(id).status!=='unconfirmed')throw Error('Only an unknown prompt receipt can be acknowledged.');this.patch(id,{status:'cancelled',input:undefined});}
  recover(){
   const unsettled=this.active;
-  if(unsettled||this.next||this.data.items.some(item=>item.status==='steering'))this.commit({...this.data,paused:true,items:this.data.items.map(item=>['dispatching','active','steering'].includes(item.status)?{...item,status:'unconfirmed' as const}:item)});
+  if(unsettled||this.next||this.data.items.some(item=>item.status==='steering'))this.commit({...this.data,paused:true,items:this.data.items.map(item=>['dispatching','active','steering'].includes(item.status)?{...item,status:'unconfirmed' as const}:item.status==='waiting'&&item.goalSource?{...item,status:'removed' as const,input:undefined}:item)});
  }
  snapshot(steeringAvailable=false){return {revision:this.data.revision,activeTurnId:!this.paused?this.active?.turnId??null:null,paused:this.paused,items:this.data.items.filter(visible).map(item=>({
   id:item.id,rpcId:item.id,placement:item.status==='steering'?'steering':'queued',message:{content:[{type:'text',text:item.input}]},

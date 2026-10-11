@@ -1,6 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {SessionManager} from '@earendil-works/pi-coding-agent';
 import {type DisplayEvent} from '../../protocol/src/index.js';
+import {GOAL_ROUND_TYPE,goalUserHash,goalProjection} from './goals.js';
 
 const messageText=(content:any):string=>typeof content==='string'?content:(content??[]).filter((p:any)=>p.type==='text').map((p:any)=>p.text).join('\n');
 
@@ -18,7 +19,15 @@ export function branchContext(file:string, directory:string, events:DisplayEvent
   const content=mode==='edit'?target.data.content:target.data.message?.content;
   if(!entry||entry.type!=='message'||messageText((entry.message as any).content)!==messageText(content))throw new Error('Cannot locate this message in Pi history. Reload the conversation.');
   if(mode==='reply'&&entry.message.role==='assistant'&&entry.message.content.some(p=>p.type==='toolCall'))throw new Error('Choose the reply after the tools have finished.');
-  const leaf=mode==='edit'?entry.parentId:entry.id;
+  let leaf=mode==='edit'?entry.parentId:entry.id;
+  if(mode==='edit'&&target.data.source?.kind==='goal'){
+    const ancestors=manager.getBranch(entry.id);goalProjection(ancestors);
+    const admission=ancestors.findLast(e=>e.type==='custom'&&e.customType===GOAL_ROUND_TYPE&&(e.data as any)?.requestId===target.data.source.rpcId&&(e.data as any)?.userHash===goalUserHash(entry.message));
+    if(!admission)throw Error('Cannot locate this goal input admission in Pi history.');
+    // Editing excludes the removed input's admission too; retaining it would
+    // falsely attribute the replacement user message to the old goal round.
+    leaf=admission.parentId;
+  }
   const branchFile=leaf?manager.createBranchedSession(leaf):undefined;
   let cutoff=seq;
   if(mode==='edit'){

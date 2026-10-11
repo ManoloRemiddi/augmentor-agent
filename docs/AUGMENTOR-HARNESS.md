@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[The Goal tab and persistent continuation](PI-GOALS.md) expose strict branch state, phase, process-local activation, admitted round limits and operator controls. Continuation stays in the existing Pi owner/queue; scoped cold inspection loads no owner. General jobs/delegation and full migration gates remain open.
+
 The [October 11 planning candidate](PI-PLANNING.md) adds public-SDK plan tools and a read-only Plan view on the existing Pi owner. The full delivery gates below remain required, including general goals, background jobs and delegation.
 
 

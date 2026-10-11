@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Persistent Pi goals](PI-GOALS.md) retain branch-owned completion state through a selected public MIT DSH fold. Explicit human continuation uses the existing public Pi owner and durable Host queue. Restart/fork/reload disarm it; Stop pauses active state. Plans, jobs and verified outcomes remain separate.
+
 The [Pi planning candidate](PI-PLANNING.md) stores revisioned plans and explicit todo states in native branch custom entries through the public SDK. Its Plan view reads the existing owner or verified cold originals. Reported progress grants no task-completion evidence, execution authority or autonomous goal/job loop.
 
 

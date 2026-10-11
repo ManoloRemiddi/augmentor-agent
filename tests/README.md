@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Pi goals: `node --test tests/goals-history.test.mjs tests/pi-goals.test.mjs tests/harness-goals-chromium.test.mjs` checks strict selected MIT replay, actual SDK continuation/queue/Stop/fork/restart/failure/no-replay and real Chromium controls/scoped reads. Synthetic source/staged checks remain distinct from physical/installed and live-provider acceptance. See [the owning goal contract](../docs/PI-GOALS.md).
+
 Pi planning: `pi-plans.test.mjs`, `plans-history.test.mjs` and `harness-plans-chromium.test.mjs` use actual SDK/private-owner/provider/native-original/Chromium paths. They qualify revision refusal, exact branch inheritance, clearing, Stop, cold reopening without inference/replay, policy and safe/stale/scoped UI reads. Read-only startup readiness is established by completed selection, not its early label; `harness-context-chromium.test.mjs` now waits for that condition before changing the initial view. Fake semantics and live/installed acceptance are not inferred.
 
 

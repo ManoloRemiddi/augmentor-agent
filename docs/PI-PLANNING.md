@@ -1,12 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Persistent goals and continuation](PI-GOALS.md) now own the separate goal lifecycle and explicit arming contract. Planning state remains reported progress; general background jobs/delegation remain accepted work.
+
 # Branch-owned plans and todos
 
 The Pi Harness candidate adds **plan_read**, **plan_update**, private
 **session.plan**, and a read-only **Plan** inspection view. One existing Pi
 AgentSession still owns each conversation. There is no scheduler, automatic
 continuation, child agent, extra loop or separate authoritative planning store.
-General goals, background jobs and delegation remain accepted migration work.
+Persistent goals now have their separate [lifecycle and continuation contract](PI-GOALS.md). General background jobs and delegation remain accepted migration work.
 
 The plan is reported progress. **completed** means the agent marked a step
 complete; it does not verify external effects or completion of the user's task.

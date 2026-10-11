@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi goals](PI-GOALS.md) now provide persistent revisioned state and explicitly armed same-owner continuation with round limits, Stop and restart/fork disarming. This extends the plans/todos slice; general jobs/delegation, child authority and one-time usage accounting remain open.
+
 October 11 planning candidate: [branch-owned plans and todos](PI-PLANNING.md) add model tools and a read-only Harness view. Native/Browser can use their existing inspection entry point without a layout change. Revisioned native state, branch isolation and cold inspection are separate from full persistent goals, jobs and delegation; every accepted migration and platform/installed gate remains required.
 
 

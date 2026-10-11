@@ -188,6 +188,45 @@ export class NativeHistory {
       }finally{verify.close();}
     });
   }
+  /** Complete bounded ancestry for strict event folds. No latest-record fallback. */
+  replayCustom(leafId?:string|null,admissionType?:string){
+    if(this.displaySessionId)throw Error('Use native session ancestry for custom replay.');
+    return this.withIndex((fd,lookup,s)=>{
+      let position=leafId===null?-1:leafId===undefined?s.count-1:this.position(leafId,lookup,s),scanned=0,customBytes=0,associatedUserBytes=0;
+      const verify=this.verifier(s),entries:{id:string;type:string;customType?:string;data?:unknown;message?:{role:string;content?:unknown;timestamp?:number}}[]=[];
+      const inspectionCoverage=()=>({scanned,customBytes,associatedUserBytes,maxEntries:4096,maxCustomBytes:4*1024*1024,maxAssociatedUserBytes:4*1024*1024,maxRecordBytes:256*1024,sourceBytesRead:verify.bytes(),indexBuildBytesRead:this.indexBuildBytesRead,incompleteTailBytes:s.tailBytes,scope:'complete selected saved native ancestry; custom originals, associated user originals and other message identity metadata'});
+      const original=(row:Row)=>{const pieces:Buffer[]=[];let at=row.offset,remaining=row.length;
+        while(remaining){const block=verify.get(Math.floor(at/CHUNK)),start=at%CHUNK,n=Math.min(remaining,block.length-start);pieces.push(block.subarray(start,start+n));at+=n;remaining-=n;}
+        const parsed=parseSessionEntries(new TextDecoder('utf-8',{fatal:true}).decode(Buffer.concat(pieces)));
+        if(parsed.length!==1||hash(JSON.stringify(parsed[0])).toString('hex')!==row.entryHash.toString('hex'))throw Error('Saved replay entry changed; originals are preserved.');return parsed[0]!;
+      };
+      try{
+        if(s.source.size)verify.get(0);
+        while(position>=0&&scanned<4096){
+          const row=this.row(fd,position,s);position=row.parent;scanned++;
+          verify.get(Math.floor(row.offset/CHUNK));verify.get(Math.floor((row.offset+row.length-1)/CHUNK));
+          if(types[row.type]==='custom'){
+            if(row.length>256*1024||customBytes+row.length>4*1024*1024)return {available:false as const,reason:'Goal replay reached its custom-entry byte limit; originals are preserved.',coverage:inspectionCoverage()};
+            customBytes+=row.length;const entry=original(row);if(entry.type!=='custom')throw Error('Saved custom replay type changed.');
+            if(admissionType&&entry.customType===admissionType){
+              const next=entries.findLastIndex(candidate=>candidate.type==='message');
+              if(next>=0&&entries[next]!.message?.role==='user'){
+                const userRow=this.row(fd,this.position(entries[next]!.id,lookup,s),s);
+                if(userRow.length>256*1024||associatedUserBytes+userRow.length>4*1024*1024)return {available:false as const,reason:'Goal replay reached its admitted-user byte limit; originals are preserved.',coverage:inspectionCoverage()};
+                associatedUserBytes+=userRow.length;const user=original(userRow);if(user.type!=='message'||user.message.role!=='user')throw Error('Saved admitted user identity changed.');entries[next]=user;
+              }
+            }
+            entries.push(entry);
+          }else entries.push({id:row.id,type:types[row.type]!,...(types[row.type]==='message'?{message:{role:roles[row.role]!}}:{})});
+        }
+        if(!same(s.source,stamp(this.source)))throw Error('Native session changed during replay inspection.');
+        const coverage=inspectionCoverage();
+        if(position>=0)return {available:false as const,reason:'Goal replay reached its ancestry limit; originals are preserved.',coverage};
+        if(s.tailBytes)return {available:false as const,reason:'Goal replay found an incomplete saved native tail; inspect its preserved original.',coverage};
+        return {available:true as const,entries:entries.reverse(),nativeSessionId:s.header.id,coverage};
+      }finally{verify.close();}
+    });
+  }
   read(entryId:string,options:{offset?:unknown;limit?:unknown;pathHash?:unknown;entryHash?:unknown;nativeSessionId?:unknown}={}){
     return this.withIndex((fd,lookup,s)=>{
       if(options.nativeSessionId!==undefined&&options.nativeSessionId!==s.header.id)throw Error('Saved native session identity changed.');

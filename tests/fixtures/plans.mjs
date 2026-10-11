@@ -11,7 +11,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {PiConnection} from '../../dist/client/src/socket.js';
 import {localConnect} from '../../dist/platform/src/transport.js';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
-export async function planFixture(t,{policy='danger-full-access'}={}){
+export async function planFixture(t,{policy='danger-full-access',goalMode}={}){
  const root=await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
  for(const path of [join(config,'agent'),workspace])await mkdir(path,{recursive:true,mode:0o700});
  const requests=[],children=[],connections=[];let child,owner,errors='';
@@ -20,9 +20,25 @@ export async function planFixture(t,{policy='danger-full-access'}={}){
   let raw='';for await(const bytes of req)raw+=bytes;const body=JSON.parse(raw);requests.push(body);
   const user=body.messages.findLast(message=>message.role==='user'),text=typeof user?.content==='string'?user.content:user?.content?.map(p=>p.text??'').join('');
   let op;try{op=JSON.parse(text);}catch{op={kind:'read'};}
+  if(goalMode?.failGoal&&text?.startsWith('Continue the explicitly started goal')){res.writeHead(500,{'content-type':'application/json'}).end(JSON.stringify({error:{message:'Independent synthetic provider failure'}}));return;}
   res.writeHead(200,{'content-type':'text/event-stream'});
   const send=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'plan-fixture',object:'chat.completion.chunk',model:'plan-fixture',choices:[{index:0,delta,finish_reason:finish}]})+'\n\n');
   const last=body.messages.at(-1),proposal=body.messages.findLast(m=>m.role==='assistant'&&m.tool_calls?.length),toolName=proposal?.tool_calls?.at(-1)?.function?.name;
+  if(goalMode){
+   const tool=(name,args)=>send({role:'assistant',tool_calls:[{index:0,id:'goal-'+requests.length,type:'function',function:{name,arguments:JSON.stringify(args)}}]},'tool_calls');
+   if(last?.role!=='tool')tool('get_goal',{});
+   else if(toolName==='get_goal'){
+    const view=JSON.parse(last.content),g=view.goal,expectedRef=g?{id:g.id,revision:g.revision}:null;
+    if(op.kind==='goal-create')tool('create_goal',{expectedRef,...op.change});
+    else if(op.kind==='goal-update')tool('update_goal',{expectedRef,...op.change});
+    else if(text?.startsWith('Continue the explicitly started goal')&&goalMode.hold){
+     send({role:'assistant',content:'Synthetic goal round holding after admission. '});const timer=setInterval(()=>send({content:' '}),100);res.once('close',()=>clearInterval(timer));return;
+    }else if(text?.startsWith('Continue the explicitly started goal')&&goalMode.completeAfter&&g?.roundsStarted>=goalMode.completeAfter)tool('update_goal',{operation:'complete',expectedRef});
+    else send({role:'assistant',content:'Synthetic goal progress report.'},'stop');
+   }else send({role:'assistant',content:'Synthetic goal tool result observed.'},'stop');
+   res.end('data: [DONE]\n\n');return;
+  }
+
   if(last?.role!=='tool')send({role:'assistant',tool_calls:[{index:0,id:'plan-read-call',type:'function',function:{name:'plan_read',arguments:'{}'}}]},'tool_calls');
   else if(toolName==='plan_read'&&op.kind==='update'){
    const result=JSON.parse(last.content),args={expectedRevision:op.expectedRevision??result.revision,title:op.title,steps:op.steps};
@@ -44,6 +60,7 @@ export async function planFixture(t,{policy='danger-full-access'}={}){
   const socket=localConnect(join(state,'runtime.sock'));await once(socket,'connect');owner=new PiConnection(socket);connections.push(owner);await owner.call('host.hello',{protocol:'augmentor-pi/1'});
  }
  async function stop(){owner?.close();if(child?.exitCode===null&&child.signalCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}}
+ async function crash(){owner?.close();if(child?.exitCode===null&&child.signalCode===null){const ended=once(child,'exit');child.kill('SIGKILL');await ended;}}
  t.after(async()=>{for(const connection of connections)connection.close();for(const process of children)if(process.exitCode===null&&process.signalCode===null){const ended=once(process,'exit');process.kill('SIGTERM');await ended;}model.closeAllConnections();await new Promise(done=>model.close(done));await rm(root,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  await start();
  const call=(method,params={})=>owner.call(method,params);
@@ -51,5 +68,5 @@ export async function planFixture(t,{policy='danger-full-access'}={}){
  async function prompt(sid,op,{wait=true}={}){const result=await call('session.prompt',{sessionId:sid,requestId:crypto.randomUUID(),content:[{type:'text',text:JSON.stringify(op)}]});if(wait)await settled(sid);return result;}
  async function native(sid){const meta=JSON.parse(await readFile(join(state,'sessions',sid+'.meta.json'),'utf8'));return {file:meta.file,bytes:await readFile(meta.file)};}
  const link=()=>readFile(join(state,'harness.json'),'utf8').then(JSON.parse);
- return {root,env,workspace,state,config,selection,requests,call,prompt,settled,native,link,stop,start,errors:()=>errors};
+ return {root,env,workspace,state,config,selection,requests,call,prompt,settled,native,link,stop,crash,start,errors:()=>errors};
 }
