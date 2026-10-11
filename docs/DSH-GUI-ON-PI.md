@@ -54,6 +54,40 @@ follow separately. Only the byte-verified redundant ordinary Context copy is
 retired against retained immutable release 20261011-154116-43c10051 to provide
 staging capacity; source, immutable releases, licences and proof logs remain.
 
+### Installed Context argument qualification — October 11
+
+Tested runtime **1bc456008b06eb8642b5139bfefeed5537a37f81** is selected **and running** in private MX release **20261011-195826-1738f137**, product **0.2.13**, artifact **9e5496e5709ab20d2096d3a062cca4ad88db4b78c25538ec050c180e84c77ac3**. Source and fresh ordinary bundled Node **24.19.0** each pass **210/210 across 30 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Normal staging, idle Native maintenance close, one guarded Host shutdown, immutable activation and stable Host/Native launch succeed. Both running roots match selection, Host uses its selected Node, Native is online/model-ready/idle and all **21,761 inventory entries** pass after GUI reads.
+
+The actual installed **513×715** original dashboard reopens the independently
+authored preview-note demonstration recorded earlier through local Qwen. Before
+adoption the original result card has no arguments; afterward its original
+Tool Results category automatically expands the single result and displays
+**path: preview-note.txt** beside the unchanged result/verification word. The
+original row breadcrumb and In detail also recover that argument through the
+same projection. A screenshot is retained outside the immutable release and
+this Context card remains selected for feedback. This is an installed fresh-
+Host read of a retained live-provider record, with no new live inference or
+tool execution. Synthetic cold-process execution evidence remains separately
+identified above.
+
+All **eleven histories and queue item identities** are preserved: zero new
+histories, admissions, provider requests or executed tools during adoption and
+inspection. Production selection/model-router and the model/speech/GPU/context/
+concurrency/precision settings remain preserved. All **475 compiled files**,
+**19,160 dependency files/131 npm instances**, **723 licence files/96 browser
+supplier records**, six native executable paths/hashes and bundled Node are
+verified; no supplier/CSS/licence/dependency bytes change. The successful
+ordinary copy is retired only after core/contract/two changed-source byte
+comparison with the retained immutable release. Source commits, test failures,
+qualification logs and proof records remain. Documentation following the tested
+runtime commit changes no installed bytes.
+
+The latest-eight automatic body limit, earlier-body paging, alternate provider
+shapes, complete original plugin functionality, action-success/status semantics,
+and all full P0/P1 migration/privacy/public packaging/platform gates remain open.
+DSH remains available for unmet workflows; further platforms stay deferred for
+MX feedback.
+
 ## Original Settings shell — October 11 follow-up
 
 The sidebar Settings trigger and dialog now use the public MIT `SettingsRoot`,

@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Context tool-result argument fidelity](DSH-GUI-ON-PI.md#context-tool-result-arguments--october-11-follow-up) binds exact recorded provider calls to the original dashboard without guessing from SDK history. Source, ordinary and installed evidence remain distinct; the fresh-Host no-replay fixture is synthetic-provider evidence. Supplier/CSS/licences and the single Pi owner are preserved; complete context/migration/platform/public packaging gates remain open.
+[Context argument qualification](DSH-GUI-ON-PI.md#installed-context-argument-qualification--october-11) restores exact provider-call arguments in the original dashboard. Source/ordinary 210/210 and private MX selection 1bc4560 / 20261011-195826-1738f137 are qualified separately from full migration/platform acceptance; all eleven histories are preserved. Synthetic fresh-Host execution and installed retained Qwen-record reads start no replay. Supplier/CSS/licences/dependencies and the single Pi owner are unchanged; all remaining context/migration/public packaging gates stay open.
 
 [Original DSH Settings shell](DSH-GUI-ON-PI.md#original-settings-shell--october-11-follow-up) restores section navigation, Appearance and access to existing Pi controls.
 
