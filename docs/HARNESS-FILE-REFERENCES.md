@@ -96,8 +96,56 @@ provider text must be read from its actual string/text-block representation rath
 than comparing JSON-escaped quotes or assuming a string-only carrier. No guard,
 original layout or deadline is weakened.
 
-Ordinary/installed qualification follows separately. Session references,
+Session references,
 file-chip click previews/right-sidebar resources, native rich-editor parity,
 complete command/skill discovery, the remaining Harness migration/privacy/public
 packaging gates and other platforms stay open. Existing DSH workflows remain
 available; this increment does not complete the Augmentor Harness goal.
+
+## Installed MX qualification — October 12
+
+Runtime **debe8040c7a02ea958c9d5aabbf07cacff757a89** is selected **and running**
+in private MX release **20261012-002708-3571d021**, product 0.2.13, artifact
+**1b08c0220f3e5760e905f60430bca530645878aaaeb7412d7e1c149813da853a**.
+Later qualification edits change documentation only.
+
+Source and fresh ordinary bundled Node **24.19.0** each pass **272/272 across
+45 files**, zero failures/skips/cancellations, prepared QtTest, two workers and
+unchanged deadlines. All **502 compiled files** match the ordinary assembly.
+The preceding installed draft release's **19,160 dependency files / 131 npm
+instances**, six native executables, bundled Node and **96 browser notices** match
+byte-for-byte. The **726 licence files** add three file-reference records and
+update only GUI source provenance among preceding records; all original licence
+bodies remain unchanged. Four public runtime and three GUI supplier selections
+are verified against the pinned source and marked as described above.
+
+Normal immutable guarded stage/activation finishes before stable Host launch.
+The selected runtime entry and bundled Node are verified before stable Native
+launch. Both running roots match selection; Native is online/model-ready/idle,
+and all **21,821 installed inventory entries** pass after GUI verification.
+No selected release is patched.
+
+Actual installed acceptance types an unsent fixture into the original composer,
+selects the original `@file` completion row for an existing authored demo file,
+and reloads. The atomic chip, exact clipboard text, reference fields and revisions
+restore unchanged. The dirty draft vetoes guarded shutdown before and after
+reload. Original Ctrl+A/Backspace clears only that fixture, leaving an empty
+legacy-compatible record and zero dirty drafts, lookups, operator requests,
+uploads, turns and compactions. Of the prior private draft/attachment files,
+only that owned draft metadata changes; no object or receipt is added and all
+old attachment bytes remain preserved. Context Insights finishes its retained
+reads and stays open at the normal 513×715 viewport for owner feedback. No owner
+model request, content read tool or prompt admission is made during acceptance.
+
+All **eleven histories and queue identities** remain preserved, with zero new
+conversations, admissions, provider requests or tool actions. Of **243 preceding
+saved files**, **233** are byte-identical; four original journals retain their
+exact prior prefixes with only two saved-title/session_info, two session/close
+and two session/load appends, plus six corresponding counter/index derivatives.
+Private profile settings and production selection/model router remain unchanged,
+as do model/speech/GPU/context/concurrency/precision and CPU ASR/VAD placement.
+
+This qualifies path completion and reference draft continuity in the private MX
+preview, separately from the synthetic SDK execution evidence above. Session
+references, click previews/right-sidebar resources, native rich-editor parity,
+complete migration, public packaging/privacy and other platforms remain open.

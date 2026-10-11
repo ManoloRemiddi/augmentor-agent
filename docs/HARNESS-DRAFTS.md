@@ -147,3 +147,5 @@ synthetic cold-Host/new-origin and lost-reply cases above remain distinct from
 installed acceptance, which adds no owner inference. Rich references, retention
 collection, broader migration, public packaging/privacy and other platforms
 remain open; this increment does not complete the Augmentor Harness goal.
+
+[Original file references](HARNESS-FILE-REFERENCES.md#installed-mx-qualification--october-12) extends the clipboard draft with validated optional chip spans. Legacy plain records remain unchanged, while reference edits share the text CAS and restore original nodes. This supersedes the preceding plain-composer limitation for local file/folder references; session references and native rich-editor parity remain open.
