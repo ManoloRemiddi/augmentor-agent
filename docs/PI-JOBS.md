@@ -132,3 +132,5 @@ services and the full accepted P0/P1 migration/installed gates remain open.
 
 Exact revisions, test counts and failures are recorded in the
 [agent handoff](AGENT-HANDOFF.md). DSH and owner-selected releases remain available.
+
+Tested implementation `26a6c07a28f618a6446f64c40cd9ddbca16cb825`: 809 source cases/807 passes/two existing optional skips; ordinary unselected stage 19, Node 24.19.0, 187 passes across 45 files. See the handoff for retained failures and hosted gates.
