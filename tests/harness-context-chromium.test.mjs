@@ -11,6 +11,7 @@ import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
 import {harnessCdp} from './fixtures/harness-cdp.mjs';
+import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
 import {PiConnection} from '../dist/client/src/socket.js';
 import {localConnect} from '../dist/platform/src/transport.js';
 const source=fileURLToPath(new URL('../',import.meta.url));
@@ -28,7 +29,7 @@ test('rendered Context shows boundary coverage, drops stale payloads and preserv
  let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'Chrome ready');
  const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
  const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,fixture:stderr});throw error;});
- const click=async expression=>{const point=await panel.evaluate('(async()=>{let e='+expression+';if(!e||e.disabled)throw Error("Control unavailable");e.scrollIntoView({block:"center",inline:"nearest"});await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));e='+expression+';if(!e||!e.isConnected||e.disabled)throw Error("Control changed while scrolling");const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;if(!r.width||!r.height||!e.contains(document.elementFromPoint(x,y)))throw Error("Control is not hit");return {x,y};})()');await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});};
+ const click=expression=>harnessPointerClick(panel,expression,until);
  await visible('!document.querySelector("#new-chat").disabled');await click('document.querySelector("#new-chat")');await visible('!document.querySelector("#send").disabled');const sid=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")');
  await click('document.querySelector("#input")');await panel.call('Input.insertText',{text:'CONTEXT_BOUNDARY_FIXTURE'});await visible('document.querySelector("#input").value==="CONTEXT_BOUNDARY_FIXTURE"');await click('document.querySelector("#send")');
  await visible('document.querySelector("#stop").disabled&&document.body.innerText.includes("The note says:")');

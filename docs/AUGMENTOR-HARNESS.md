@@ -2,6 +2,8 @@
 
 # Augmentor Harness — implementation and qualification
 
+The [MCP authorization-drain follow-up](MCP-TRANSPORT.md#authorization-errors-and-parallel-receipts) preserves delayed tool receipts before delivering typed SDK sign-in errors, sanitizes generic refresh failures and qualifies cancellation/timeout/close controls. Actual public-SDK parallel fixtures are separate from Native's unchanged sequential owner. Post-timeout auth reporting, metadata/GET closure, live OAuth and full migration acceptance remain open.
+
 The owner authorized building the accepted [Pi migration](AUGMENTOR-HARNESS-MIGRATION.md) on 10 October 2026. The implementation branch is `feat/augmentor-harness`, based on canonical main `79784a5687b73234b9524e7a48e91f01306f73c9`. The older dirty checkout and historical private repositories remain intact. This is an incremental source candidate. Existing installed applications, selected releases, model settings, speech services and conversations have not been migrated.
 
 ## Available in this candidate

@@ -6,9 +6,14 @@ import http from 'node:http';
 import {once} from 'node:events';
 import {resolve,join} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {McpClient} from '@earendil-works/pi-mcp';
+import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-const {managedMcpTransport,createManagedMcpTransport}=await import(pathToFileURL(join(resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.'),'dist/runtime/src/mcp-transport.js')));
+const root=resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.'),mcpRoot=join(root,'node_modules/@earendil-works/pi-mcp');
+// Use the selected artifact's declared public ESM exports, including class identity.
+const exports=JSON.parse(await readFile(join(mcpRoot,'package.json'),'utf8')).exports;
+const {McpClient,McpAbortError,McpTimeoutError,McpConnectionClosedError}=await import(pathToFileURL(join(mcpRoot,exports['.'].import)));
+const {McpOAuthAuthorizationRequiredError}=await import(pathToFileURL(join(mcpRoot,exports['./oauth'].import)));
+const {managedMcpTransport,createManagedMcpTransport}=await import(pathToFileURL(join(root,'dist/runtime/src/mcp-transport.js')));
 
 async function fixture(t,handle,save){
  const calls=[],clients=[],timers=new Set();
@@ -77,4 +82,37 @@ test('private originals retain bounded exact error bytes with explicit truncatio
  const f=await fixture(t,({res})=>res.writeHead(404,{'content-type':'application/octet-stream'}).end(body),original=>{originals.push(original);return true;});
  const client=await f.connect({token:async()=> 'SYNTHETIC_HEADER_SECRET'});await assert.rejects(client.callTool('write_record',{nonce:'authored'}),error=>error.status===404&&!error.message.includes('AUTHORED_PRIVATE_ERROR'));
  assert.equal(originals.length,1);const original=originals[0];assert.equal(original.body.coverage,'partial');assert.equal(original.body.retainedBytes,1024*1024);assert.deepEqual(Buffer.from(original.body.base64,'base64'),body.subarray(0,1024*1024));assert.equal(original.body.prefixSha256,createHash('sha256').update(body.subarray(0,1024*1024)).digest('hex'));assert.equal(JSON.stringify(original).includes('SYNTHETIC_HEADER_SECRET'),false);
+});
+
+test('refresh exceptions expose an unknown HTTP outcome without leaking the provider error',async t=>{
+ let refreshes=0;const originals=[],f=await fixture(t,({res})=>res.writeHead(401).end('AUTHORED_BODY'),original=>{originals.push(original);return true;});
+ const client=await f.connect({token:async()=>undefined,onUnauthorized:async()=>{refreshes++;throw Error('SYNTHETIC_REFRESH_SECRET');}});
+ await assert.rejects(client.callTool('write_record',{}),error=>error.status===401&&error.message.includes('outcome unknown')&&error.message.includes('Authorization handling failed')&&!JSON.stringify({message:error.message,body:error.body}).includes('SYNTHETIC_REFRESH_SECRET'));
+ assert.equal(refreshes,1);assert.equal(tools(f.calls).length,1);assert.equal(originals[0].body.text,'AUTHORED_BODY');
+});
+
+for(const mode of ['sibling-cancel','failed-cancel','sibling-timeout','auth-timeout','both-cancel','client-close'])test('typed OAuth failure drains siblings and controls across '+mode,{timeout:5000},async t=>{
+ let releaseFailure,bodySaved,mutations=0;const ready=new Promise(done=>releaseFailure=done),saved=new Promise(done=>bodySaved=done),originals=[];
+ const f=await fixture(t,async({frame,res,later})=>{
+  if(frame.params.name==='needs_auth'){mutations++;await ready;res.writeHead(401).end('AUTHORED_PRIVATE_BODY');return;}
+  res.writeHead(200,{'content-type':'text/event-stream'});res.write('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:'authored',progress:1}})+'\n\n');releaseFailure();
+  if(mode==='failed-cancel'||mode==='auth-timeout')later(()=>res.end('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',id:frame.id,result:{content:[{type:'text',text:'AUTHORED_SURVIVING_RECEIPT'}]}})+'\n\n'),120);
+ },original=>{originals.push(original);bodySaved();return true;});
+ const client=await f.connect({token:async()=>undefined,onUnauthorized:async()=>{throw new McpOAuthAuthorizationRequiredError();}}),firstAbort=new AbortController(),secondAbort=new AbortController();
+ let closed;const closeEvent=new Promise(done=>closed=done);client.onClose(closed);
+ const result=Promise.allSettled([client.callTool('needs_auth',{}, {signal:firstAbort.signal,timeoutMs:mode==='auth-timeout'?60:1000}),client.callTool('pending_read',{}, {signal:secondAbort.signal,timeoutMs:mode==='sibling-timeout'?60:1000})]);
+ await saved;
+ if(mode==='client-close')await client.close();
+ if(mode==='sibling-cancel'||mode==='both-cancel')secondAbort.abort('Authored sibling cancellation');
+ if(mode==='failed-cancel'||mode==='both-cancel')firstAbort.abort('Authored failed-call cancellation');
+ const [first,second]=await result;
+ if(mode==='client-close'){assert(first.reason instanceof McpConnectionClosedError);assert(second.reason instanceof McpConnectionClosedError);}
+ else if(mode==='failed-cancel'||mode==='auth-timeout'){assert(first.reason instanceof (mode==='auth-timeout'?McpTimeoutError:McpAbortError));assert.equal(second.status,'fulfilled');assert.equal(second.value.content[0].text,'AUTHORED_SURVIVING_RECEIPT');}
+ else{assert(first.reason instanceof (mode==='both-cancel'?McpAbortError:McpOAuthAuthorizationRequiredError));assert(second.reason instanceof (mode==='sibling-timeout'?McpTimeoutError:McpAbortError));}
+ await closeEvent;assert.equal(client.connectionState,'closed');assert.equal(mutations,1);assert.equal(tools(f.calls).length,2);assert.equal(originals.length,1);assert.equal(originals[0].body.coverage,'complete');
+ if(mode!=='client-close'){
+  const cancelled=f.calls.filter(row=>row.frame.method==='notifications/cancelled').map(row=>row.frame.params.requestId);
+  if(mode!=='failed-cancel'&&mode!=='auth-timeout')assert(cancelled.includes(tools(f.calls).find(row=>row.frame.params.name==='pending_read').frame.id),'sibling cancellation reaches the wire before reset');
+  if(mode==='failed-cancel'||mode==='auth-timeout'||mode==='both-cancel')assert(cancelled.includes(tools(f.calls).find(row=>row.frame.params.name==='needs_auth').frame.id),'failed-call cancellation reaches the wire before reset');
+ }
 });

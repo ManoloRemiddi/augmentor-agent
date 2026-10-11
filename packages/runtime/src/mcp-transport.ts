@@ -3,6 +3,7 @@ import {homedir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {createHash} from 'node:crypto';
 import {isJsonRpcRequest,isJsonRpcResponse,McpHttpError,StdioTransport,StreamableHttpTransport,type JsonRpcId,type McpFetch} from '@earendil-works/pi-mcp';
+import {McpOAuthAuthorizationRequiredError} from '@earendil-works/pi-mcp/oauth';
 import type {McpTransportFactory} from '@earendil-works/pi-coding-agent';
 import {resolveConfigValueUncached} from '../vendor/pi/config-value.js';
 import {MCP_BODY_MAX_BYTES,type McpFailureOriginal} from './mcp-originals.js';
@@ -38,11 +39,19 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
  if(!('url' in config))return new StdioTransport({command:home(config.command),args:config.args?.map(home),cwd:resolve(cwd,home(config.cwd??'.')),
   env:Object.fromEntries(Object.entries(config.env??{}).map(([name,value])=>[name,configured(value)])),stderr:'pipe'});
  let transport:StreamableHttpTransport;
- const pending=new Set<JsonRpcId>();let reset=false,closing=false;
+ const pending=new Set<JsonRpcId>(),authFailures=new Set<JsonRpcId>(),drains=new Set<()=>void>();let reset=false,closing=false,closed=false,cancellations=0;
+ const active=()=>!closed&&(cancellations>0||[...pending].some(id=>!authFailures.has(id)));
  const release=()=>{
-  if(!reset||pending.size||closing)return;
-  closing=true;setImmediate(()=>{closing=false;if(reset&&!pending.size)void transport.close().catch(()=>{});});
+  if(!active()){for(const done of drains)done();drains.clear();}
+  if(closed||!reset||pending.size||cancellations||closing)return;
+  closing=true;setImmediate(()=>{closing=false;if(!closed&&reset&&!pending.size&&!cancellations){closed=true;void transport.close().catch(()=>{});}});
  };
+ const drainAuth=async(id:JsonRpcId)=>{
+  authFailures.add(id);
+  try{if(active())await new Promise<void>(done=>drains.add(done));}
+  finally{authFailures.delete(id);}
+ };
+ const end=()=>{closed=true;pending.clear();release();};
  const guardedFetch:McpFetch=async(input,init)=>{
   let tool=false,frame:any;
   if(init?.method==='POST'&&typeof init.body==='string'){
@@ -58,8 +67,16 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
     // Preserve SDK credential refresh/challenge handling, but never let the
     // transport resend this dispatched call after refreshing those credentials.
     const authorization=new Headers(init?.headers).get('authorization');
-    await authProvider.onUnauthorized({response,serverUrl:new URL(config.url),fetch:guardedFetch,
-     token:authorization?.match(/^Bearer (.*)$/i)?.[1]});
+    try{await authProvider.onUnauthorized({response,serverUrl:new URL(config.url),fetch:guardedFetch,
+     token:authorization?.match(/^Bearer (.*)$/i)?.[1]});}
+    catch(error){
+     if(error instanceof McpOAuthAuthorizationRequiredError){
+      // The SDK closes its client on this typed error. Deliver it after sibling
+      // calls settle, so that sign-in handling cannot discard their receipts.
+      await drainAuth(frame.id);throw new McpOAuthAuthorizationRequiredError();
+     }
+     throw new McpHttpError(response.status,'MCP tool response HTTP '+response.status+'; outcome unknown. Authorization handling failed and this call was not retried.'+(!saved?' Original HTTP evidence could not be saved.':''));
+    }
    }
    throw new McpHttpError(response.status,'MCP tool response HTTP '+response.status+'; outcome unknown. This call was not retried. Inspect the outcome before another action.'+(!saved?' Original HTTP evidence could not be saved.':''));
   }finally{
@@ -71,17 +88,20 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
  // Keep concurrent receipts, including asynchronous SSE replies, alive until
  // their SDK requests settle. SDK cancellation removes a timed-out request.
  transport.onMessage(message=>{if(isJsonRpcResponse(message)){pending.delete(message.id);release();}});
+ transport.onClose(end);
  return {
-  start:()=>transport.start(),close:()=>transport.close(),setProtocolVersion:version=>transport.setProtocolVersion(version),
+  start:()=>transport.start(),close:()=>{end();return transport.close();},setProtocolVersion:version=>transport.setProtocolVersion(version),
   onMessage:listener=>transport.onMessage(listener),onError:listener=>transport.onError(listener),onClose:listener=>transport.onClose(listener),
   async send(message){
    const tool=isJsonRpcRequest(message)&&message.method==='tools/call';
+   const cancellation='method' in message&&message.method==='notifications/cancelled';
    if(tool)pending.add(message.id);
-   if('method' in message&&message.method==='notifications/cancelled'){
+   if(cancellation){
+    cancellations++;
     const params=message.params,id=params&&typeof params==='object'&&'requestId' in params?params.requestId:undefined;
-    if(typeof id==='string'||typeof id==='number')pending.delete(id);
+    if(typeof id==='string'||typeof id==='number'){pending.delete(id);release();}
    }
-   try{await transport.send(message);}catch(error){if(tool)pending.delete(message.id);throw error;}finally{release();}
+   try{await transport.send(message);}catch(error){if(tool)pending.delete(message.id);throw error;}finally{if(cancellation)cancellations--;release();}
   },
  };
 };
