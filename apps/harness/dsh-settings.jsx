@@ -12,6 +12,7 @@ import {Button} from '@deepseek-ai/dsh-client-ui-primitives';
 import {createSnapshotStore} from '@deepseek-ai/dsh-client-store';
 import {attachReasoning} from '../browser/extension/pi-reasoning.mjs';
 import {attachMcpManagement} from './mcp-management.js';
+import {DshContextSettingsCard} from './dsh-context-settings.jsx';
 
 export const settingsShell=createSettingsShellStore().create();
 const face=value=>(select=x=>x)=>select(value);
@@ -69,7 +70,7 @@ function InspectionSettings({state,controller}){
 }
 
 /** Pure supplier shell; section contents call the existing Pi owner. */
-export function OriginalSettings({wide,state,controller,onPrompts,onContext,notice}){
+export function OriginalSettings({wide,state,controller,preferences,onPrompts,onContext,notice}){
   const renderSlot=(name,owner={},options={})=>{
     if(name==='settings.trigger')return <TriggerContent {...owner} t={t}/>;
     if(name==='settings.header')return <HeaderContent t={t}/>;
@@ -77,7 +78,7 @@ export function OriginalSettings({wide,state,controller,onPrompts,onContext,noti
     if(name==='settings.section'){
       if(options.only==='general')return <GeneralSection renderSlot={renderSlot}/>;
       if(options.only==='models')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></div>}/>;
-      if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><p>dsh-context 0.68.1 · Apache-2.0</p><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
+      if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
     }
     if(name==='settings.general.item')return <><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/><div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div><CurrentVersionRow t={t}/></>;
     return options.fallback??null;

@@ -4,7 +4,7 @@
   "version": "0.68.1",
   "license": "Apache-2.0",
   "copyright": "Copyright 2025 bowenliang123",
-  "scope": "Selected original Context dashboard, slash modal and Context Insights presentation; Pi supplies bounded retained data/transport. No DSH plugin Host or second agent owner.",
+  "scope": "Selected original Context dashboard, slash modal, Context Insights and settings card; Pi supplies bounded retained data and private display preferences. No DSH plugin Host or second agent owner.",
   "files": [
     {
       "path": "LICENSE",
@@ -271,6 +271,15 @@
       "sourceSha256": "02800f5c5a6e6bd27644466dfcf31150cca1e43204205c0c4c9ab4ca7fb440ff",
       "sha256": "02800f5c5a6e6bd27644466dfcf31150cca1e43204205c0c4c9ab4ca7fb440ff",
       "adaptation": "verbatim"
+    },
+    {
+      "path": "src/client/components/settingsCard.tsx",
+      "sourcePath": "src/client/components/settingsCard.tsx",
+      "sourceSha256": "605120ff915f3bcd3c736d0ba39c2aa5f2c770a2d9c3be273241f5c3c0cfea61",
+      "sourceGitBlob": "b9527ef13b3438381075f5e857e0ef0d466fc30f",
+      "sha256": "0e093a7b532502f4137d9b8c05d5e43081e3559e818fc3a5009996773effb98f",
+      "adaptation": "modified",
+      "changes": "Preserve original settings card markup; allow the Pi binding to disable unsupported placement, Fleet and prompt-wrapping fields."
     },
     {
       "path": "src/client/components/sliceList.tsx",

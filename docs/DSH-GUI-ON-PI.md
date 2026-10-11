@@ -797,3 +797,8 @@ The [installed refusal follow-up](PI-COMPACTION.md#installed-refusal-follow-up--
 ## Installed original question-controls qualification — October 11
 
 [Current qualification](PI-QUESTIONS.md#installed-mx-qualification--october-11) records source/ordinary **203/203 across 27 files**, exact selected/running **65b0a49 / 20261011-184609-8cac1bd0**, preserved eleven histories/queues and full 21,742-entry inventory. Actual SDK/browser cases and the visually inspected original question panel remain synthetic-provider evidence; installed live-provider questions are unqualified. The retained original Context dashboard is reopened without inference for feedback. Supplier/CSS/dependency/licence/native/Node bytes are unchanged. Complete original question/plan-review/command and full Harness/migration/platform/public-package gates remain open; further platforms stay deferred.
+
+
+## Original Context preferences — October 11 follow-up
+
+[Original Context preferences](CONTEXT-PREFERENCES.md) connects the supplier settings card to seven private, revisioned Pi display defaults. Unsupported Fleet/sidebar/prompt-wrapping controls remain visibly disabled; stale/unknown writes require explicit refresh and are never replayed. Source/ordinary/installed qualification follows in the guide; complete Harness and platform gates remain open.

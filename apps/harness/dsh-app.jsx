@@ -71,6 +71,8 @@ import {DshPiController} from './dsh-pi-controller.mjs';
 import {projectDsh} from './dsh-pi-projection.mjs';
 import {DshContextDashboard,DshContextOverlay,createDshContextModalBinding} from './dsh-context.jsx';
 import {DshContextInsights} from './dsh-insights.jsx';
+import {DshContextPreferences} from './dsh-context-preferences.mjs';
+import {contextSettings} from './dsh-context-settings.jsx';
 import {InsightPanelIcon} from './vendor/dsh-context/src/client/icon.tsx';
 import {attachPlans} from './plans.js';
 import {attachGoals} from './goals.js';
@@ -85,6 +87,7 @@ history.replaceState(null,'',location.pathname);
 // the controller so a scoped inspector never retains the previous authority.
 addEventListener('hashchange',()=>{if(new URLSearchParams(location.hash.slice(1)).has('token'))location.reload();});
 const controller=new DshPiController(token);
+const contextPreferences=new DshContextPreferences(controller);contextSettings.attach(contextPreferences);
 const contextModal=createDshContextModalBinding(controller);
 const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
@@ -233,9 +236,10 @@ function CommandOverlays(){
   </div>;
 }
 function App(){
+  const contextPrefs=useSyncExternalStore(contextPreferences.subscribe,contextPreferences.getSnapshot);
   const settingsState=useSyncExternalStore(settingsShell.subscribe,settingsShell.getSnapshot);
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
-  React.useLayoutEffect(()=>{contextModal.sync();if(state.phase!=='ready'||state.readOnly)layout.actions.selectPanel(null);});
+  React.useLayoutEffect(()=>{contextModal.sync();if(state.phase!=='ready'||state.readOnly||contextPrefs.value.insightsEntry==='hide')layout.actions.selectPanel(null);});
   useEffect(()=>{commandMenu.deps.actions={compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:()=>setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:(scope,segment,consume)=>contextModal.open(scope,segment,consume),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
@@ -271,11 +275,11 @@ function App(){
   const render=(name,owner={},options={})=>{
     const p={...common,...owner,renderSlot:render,renderSlotChain:(name,owner,opts)=>name==='conversation.composer'&&!state.readOnly&&state.interactions.length?<InteractionTakeover frame={state.interactions[0]} state={state}/>:opts.fallback,renderFactorySlot:(name,owner,opts)=><ConversationContent {...common} {...owner} renderSlot={render} renderSlotChain={(name,owner,o)=>name==='conversation.composer'&&!state.readOnly&&state.interactions.length?<InteractionTakeover frame={state.interactions[0]} state={state}/>:o.fallback} useFactorySlot={(key,fallback)=>key==='views'?BoundSession:opts.slots?.[key]||fallback}/>};
     switch(name){
-      case 'sidebar':return <SidebarRoot {...p} t={t.sidebar} usePanels={selectorFace(state.readOnly?[]:[{id:'dsh-context',label:'Context Insights'}])} useShortcuts={selectorFace([])} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} startSession={()=>startSession()} toggleSidebar={layout.actions.toggleSidebar} selectPanel={layout.actions.selectPanel}/>;
+      case 'sidebar':return <SidebarRoot {...p} t={t.sidebar} usePanels={selectorFace(state.readOnly||contextPrefs.value.insightsEntry==='hide'?[]:[{id:'dsh-context',label:'Context Insights'}])} useShortcuts={selectorFace([])} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} startSession={()=>startSession()} toggleSidebar={layout.actions.toggleSidebar} selectPanel={layout.actions.selectPanel}/>;
       case 'sidebar.brand.name':return <span className={sidebarCss.fallbackBrandName}>Augmentor Harness</span>;
       case 'sidebar.workspaces':return <WorkspaceBrowser {...p} t={t.workspace} useStore={useWorkspaceView} actions={workspaceView.actions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} useHostInfo={selectorFace({home:''})} useWorkspaceShortcuts={useWorkspaceShortcuts} useShortcuts={selectorFace([])} useDirectoryFlow={selectorFace(!state.readOnly)} open={open} startSession={startSession} searchResultLimit={100} searchSessions={async query=>({items:state.sessions.filter(x=>x.title.toLowerCase().includes(query.toLowerCase())).map(x=>({sessionId:x.sessionId,title:x.title,cwd:x.cwd}))})} requestSearch={shortcuts.search} requestAddWorkspace={shortcuts.add} closeAddWorkspace={shortcuts.closeAdd} setDirectoryBusy={shortcuts.directoryBusy} dismissForkError={shortcuts.dismissForkError} requestSessionRename={(sid,title)=>{setDialog({kind:'rename',sid,title});}} notifyArchivedNotOpenable={()=>notifyRow('archivedNotOpenable')} renameWorkspace={(workspaceId,title)=>controller.workspaceAction('rename',{workspaceId,title})} deleteWorkspace={workspaceId=>controller.workspaceAction('remove',{workspaceId})} insertWorkspaceBefore={(workspaceId,beforeWorkspaceId)=>controller.workspaceAction('move',{workspaceId,beforeWorkspaceId})} unarchiveSession={restoreSession} createWorkspace={createWorkspace}/>;
       case 'sidebar.workspaces.directoryFlow':return DirectoryFlow(owner);
-      case 'sidebar.settings':return <OriginalSettings wide={owner.wide} state={state} controller={controller} notice={settingsNotice} onPrompts={()=>setDialog({kind:'prompts'})} onContext={()=>setView('context')}/>;
+      case 'sidebar.settings':return <OriginalSettings wide={owner.wide} state={state} controller={controller} preferences={contextPreferences} notice={settingsNotice} onPrompts={()=>setDialog({kind:'prompts'})} onContext={()=>setView('context')}/>;
       case 'sidebar.workspaces.session.menu.item':{if(state.readOnly)return null;const props={...p,...sessionActions,useMenuOpenState:()=>options.hookContext||[false,noOp]};return <><PinSessionMenuItem {...props}/><RenameSessionMenuItem {...props}/><ForkSessionMenuItem {...props}/><ArchiveSessionMenuItem {...props}/></>;}
       case 'sidebar.workspaces.session.row.action':return state.readOnly?null:<><ArchiveSessionRowButton {...p} {...sessionActions}/><PinSessionRowButton {...p} {...sessionActions}/></>;
       case 'sidebar.panellist':return options.only==='dsh-context'?<InsightPanelIcon size={owner.size}/>:null;

@@ -11,6 +11,6 @@ body {font-family:var(--dsw-font-family);font-size:var(--dsw-font-size,14px);bac
 
 .augmentor-extension {padding:24px;display:flex;flex-direction:column;gap:16px;max-width:100%;overflow:auto;}
 .augmentor-extension label {display:flex;flex-direction:column;gap:8px;}
-.augmentor-extension textarea {min-height:120px;}
-.augmentor-extension input,.augmentor-extension textarea,.augmentor-extension select,.reasoning-dialog {font:inherit;color:inherit;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-standard);border-radius:8px;padding:8px;}
+.augmentor-extension textarea:not(.lc-settings-textarea) {min-height:120px;}
+.augmentor-extension input,.augmentor-extension textarea:not(.lc-settings-textarea),.augmentor-extension select,.reasoning-dialog {font:inherit;color:inherit;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-standard);border-radius:8px;padding:8px;}
 .reasoning-dialog {max-width:760px;max-height:85vh;overflow:auto;}

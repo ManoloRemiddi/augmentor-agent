@@ -10,6 +10,7 @@ import {tmpdir} from 'node:os';
 import {setTimeout as delay} from 'node:timers/promises';
 import {HarnessServer} from '../dist/runtime/src/harness-server.js';
 import {Interactions} from '../dist/runtime/src/interactions.js';
+import {contextPreferences,CONTEXT_PREFERENCE_OPTIONS} from '../dist/runtime/src/context-preferences.js';
 import {chromiumPort} from './fixtures/chromium-ready.mjs';
 import {harnessCdp} from './fixtures/harness-cdp.mjs';
 import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
@@ -24,6 +25,7 @@ test('original DSH approval/question components answer the selected Host interac
  const approval=interactions.ask('fixture','approval/requested',{toolName:'fixture_write',reason:'Synthetic approval; no tool is executed.'});
  const waits=[];
  const host={getMeta:()=>({id:'fixture',cwd:profile,selection}),queueSnapshot:()=>queue,interactions,dispatch:async(method,p)=>{
+  if(method==='settings.describe'&&p.ns==='dsh-context')return {namespaces:[{ns:'dsh-context',revision:0,value:contextPreferences({}),writableFields:Object.keys(CONTEXT_PREFERENCE_OPTIONS)}]};
   if(method==='host.describe')return {workspace:profile};
   if(method==='models.list')return {groups:[{provider:'fixture',name:'Fixture',models:[{...selection,name:'Chosen'}]}],default:selection,failures:[]};
   if(method==='session.list')return {items:[{sessionId:'fixture',cwd:profile,title:'Synthetic interaction',running:false}]};

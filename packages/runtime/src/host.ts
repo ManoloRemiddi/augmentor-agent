@@ -9,6 +9,7 @@ import {listWorkspaceDirectory,createWorkspaceDirectory} from './workspace-picke
 import {WorkspaceRegistry,workspacePath} from './workspace-registry.js';
 import {PiAttachments,submittedParts,IMAGE_LIMITS,FILE_LIMIT} from './attachments.js';
 import {SessionOrganization} from './session-organization.js';
+import {contextPreferences,contextPreferenceChange,CONTEXT_PREFERENCE_OPTIONS} from './context-preferences.js';
 import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -123,6 +124,7 @@ export class Host {
   queueSnapshot(id:unknown){const m=this.getMeta(id),r=this.loaded.get(m.id);return this.queue(m).snapshot(!!r&&m.running&&!r.cancelled&&r.phase!=='settling');}
   save(m:Meta){atomicJson(join(this.dirs.sessions,m.id+'.meta.json'),m);}
   persistSettings(){this.settings.revision++;atomicJson(join(this.dirs.config,'settings.json'),this.settings);}
+  contextPreferenceSnapshot(){return {ns:'dsh-context',revision:this.settings.revision,value:contextPreferences(this.settings.contextPreferences),writableFields:Object.keys(CONTEXT_PREFERENCE_OPTIONS)};}
   private history(m:Meta){let history=this.histories.get(m.id);if(!history){history=new DisplayHistory(join(this.dirs.sessions,m.id+'.events.jsonl'));if(this.histories.size>=32)this.histories.delete(this.histories.keys().next().value!);this.histories.set(m.id,history);}return history;}
   events(m:Meta):DisplayEvent[]{return [...this.history(m).all()];}
   append(m:Meta,type:string,data:Data){const record=this.loaded.get(m.id),history=this.history(m);const event:DisplayEvent={seq:history.lastSeq+1,type,data,...(record?.turnId?{turnId:record.turnId}:{})};
@@ -779,8 +781,11 @@ export class Host {
     case 'session.resolveQueue':{const m=this.getMeta(p.sessionId);if(m.running||p.acknowledgeUnknownOutcome!==true)throw Error('Inspect the saved history and explicitly acknowledge that the interrupted action outcome remains unknown.');this.queue(m).resolve(promptIdentity(p.itemId));this.append(m,'runtime/notice',{message:'The interrupted prompt receipt was acknowledged. Its action outcome may still be unknown. That prompt was not retried; waiting prompts remain paused.',incomplete:true});return {accepted:true};}
     case 'session.rename':{const m=this.getMeta(p.sessionId);m.title=text(p.title,200);this.loaded.get(m.id)?.session.setSessionName(m.title);this.save(m);this.append(m,'session/title',{title:m.title});return {title:m.title};}
     case 'chats.saved':{if(p.action&&p.action!=='state'){if(!['save','unsave'].includes(p.action))throw new Error('Invalid saved-chat action');const m=this.getMeta(p.sessionId);m.saved=p.action==='save';this.save(m);}return {saved:[...this.metadata.values()].filter(m=>m.saved).map(m=>m.id)};}
-    case 'settings.describe':return {namespaces:[{ns:'permission',revision:this.settings.revision,value:{defaultPreset:this.settings.defaultPreset}},{ns:'prompt-library',revision:this.settings.revision,value:await promptCall('prompts.list')}]};
-    case 'settings.mutate':{if(p.ns!=='permission'||p.expectedRevision!==this.settings.revision)throw new Error('Settings changed. Reopen the dialog.');const op=p.ops?.[0];if(p.ops.length!==1||op.op!=='set'||op.path?.join('.')!=='defaultPreset'||!['read-only','workspace-write','danger-full-access'].includes(op.value))throw new Error('Unsupported settings change');this.settings.defaultPreset=op.value;this.persistSettings();return {ok:true};}
+    case 'settings.describe':if(p.ns==='dsh-context')return {namespaces:[this.contextPreferenceSnapshot()]};return {namespaces:[{ns:'permission',revision:this.settings.revision,value:{defaultPreset:this.settings.defaultPreset}},{ns:'prompt-library',revision:this.settings.revision,value:await promptCall('prompts.list')},this.contextPreferenceSnapshot()]};
+    case 'settings.mutate':{
+      if(p.expectedRevision!==this.settings.revision)throw new Error('Settings changed. Reopen the dialog.');
+      if(p.ns==='dsh-context'){const change=contextPreferenceChange(p.ops);const next={...this.settings,revision:this.settings.revision+1,contextPreferences:{...contextPreferences(this.settings.contextPreferences),[change.field]:change.value}};atomicJson(join(this.dirs.config,'settings.json'),next);this.settings=next;return this.contextPreferenceSnapshot();}
+      if(p.ns!=='permission')throw Error('Unsupported settings namespace.');const op=p.ops?.[0];if(!Array.isArray(p.ops)||p.ops.length!==1||op.op!=='set'||op.path?.join('.')!=='defaultPreset'||!['read-only','workspace-write','danger-full-access'].includes(op.value))throw new Error('Unsupported settings change');this.settings.defaultPreset=op.value;this.persistSettings();return {ok:true};}
     case 'prompts.list':case 'prompts.save':case 'prompts.delete':return promptCall(method,p,id);
     case 'prompts.improvementSave':return promptCall('prompts.improvement.save',p,id);
     default:throw new Error('Unsupported method: '+method);

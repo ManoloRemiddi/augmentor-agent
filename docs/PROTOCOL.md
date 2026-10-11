@@ -49,7 +49,7 @@ Commands:
 | `interaction.wait` | Exact pending question `rpcId`, `sessionId`, operator `clientId`, and `action`: `take-time`, `engage`, `hold-focus`, `release-focus`; approvals/read-only access refuse pause |
 | `prompts.list/save/delete` | Shared service snapshot, stable IDs and text; updates/deletes require the current numeric per-prompt `expectedRevision` |
 | `prompts.improvementSave` | Shared improvement instructions, up to 8,000 characters, with current improvement `expectedRevision`; maps to service `prompts.improvement.save` |
-| `settings.describe/mutate` | New-chat tool policy, with namespace revision checking |
+| `settings.describe/mutate` | New-chat tool policy and private Context display defaults, with namespace revision checking; optional `describe {ns:"dsh-context"}` reads only that namespace. See [Context preferences](CONTEXT-PREFERENCES.md). |
 
 Unsolicited data is wrapped in `event`. Display messages use `method: session/event`, `payload.sessionId`, and `payload.event` containing a durable `seq`, display `type`, `data`, and when applicable a `turnId`. Display types include user/message, assistant/chunk, assistant/message, tool/call, tool/result, session/title, runtime/error, runtime/warning, runtime/notice and turn/start/end. Display events are a private recovery projection; Pi's session files own the conversation supplied to the agent.
 
