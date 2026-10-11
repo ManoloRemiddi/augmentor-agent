@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Installed original question controls](PI-QUESTIONS.md#installed-mx-qualification--october-11) now qualify countdown/Take time/engagement/focus with source and ordinary 203/203, preserved eleven histories and exact MX selection 65b0a49 / 20261011-184609-8cac1bd0. Live-provider questions and every complete Harness/migration gate remain open.
+
 [Original question controls](PI-QUESTIONS.md) connect countdown, Take time, editing/focus leases and scoped cancellation through the existing public Pi owner. Source/ordinary/installed scopes remain separate; original GUI and complete Harness/migration gates remain open.
 
 [Installed original Compact](PI-COMPACTION.md#final-installed-qualification--october-11) now qualifies the original command/recorded SDK operation and honest dashboard markers on MX (64d0d4b, 20261011-180640-ae7c817e). Source and ordinary each pass 197/197; installed controls/provider-free refusal and preserved histories are verified. Successful live Qwen summary, complete command and all full delivery gates remain open.
