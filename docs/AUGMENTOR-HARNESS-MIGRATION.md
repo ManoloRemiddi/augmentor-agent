@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 MCP evidence follow-up: [retained HTTP bodies](MCP-TRANSPORT.md#agent-recovery-of-retained-http-bodies) now enter the existing branch-scoped agent excerpt tool only through explicit reads after metadata listing, with validated prefixes and complete/partial/unavailable coverage. Transport IDs remain distinct from canonical agent-call IDs. [Qualification](AGENT-HANDOFF.md#october-11-retained-http-excerpt-checkpoint) retains source/staged boundaries; parallel auth/cancellation/timeout, live OAuth/services and all remaining P0/P1/platform/installed cutover gates stay binding.
+
 # Augmentor Harness migration to Pi
 
 Status on 10 October 2026: the owner accepted the direction of moving Augmentor's primary conversational engine from DeepSeek Harness to Pi, retaining useful DSH features through supported Pi extensions and selected source reuse. The owner subsequently authorized implementation. This remains the full migration specification; [the implementation record](AUGMENTOR-HARNESS.md) tracks the isolated source candidate and outstanding gates. Installed applications and existing conversations have not been migrated.
