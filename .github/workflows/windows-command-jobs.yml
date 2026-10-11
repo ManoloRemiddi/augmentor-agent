@@ -66,6 +66,8 @@ jobs:
           $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
           & outputs/runtime/node/node.exe tests/fixtures/windows-record-latency.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/record-latency.log
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/runtime/node/node.exe --test --test-reporter=tap tests/pi-scheduling.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/scheduling.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/runtime/node/node.exe --test --test-reporter=tap --test-name-pattern='read-only Windows parent' tests/pi-windows-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/host-baseline.log
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Qualify streaming job progress and parent Stop

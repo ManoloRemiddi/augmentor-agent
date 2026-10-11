@@ -5,6 +5,7 @@ import {createAgentSession, DefaultResourceLoader, SessionManager, SettingsManag
 import type {Context, Model, Api,Usage} from '@earendil-works/pi-ai';
 import type {ThinkingLevel} from '@earendil-works/pi-agent-core';
 import {privateDir} from './storage.js';
+import {piScheduling} from './scheduling.js';
 import {join} from 'node:path';
 import {chmodSync,existsSync} from 'node:fs';
 import {desktopTools as definitions} from '../../computer-use/src/tools.js';
@@ -166,6 +167,7 @@ export class DesktopSpecialist {
       const settingsManager = SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:false},packages:[],defaultProjectTrust:'never'});
       const resourceLoader = new DefaultResourceLoader({cwd: options.cwd, agentDir: options.agentDir, settingsManager,
         noExtensions: true, noSkills: true, noPromptTemplates: true, noContextFiles: true, noThemes: true,
+        extensionFactories:[piScheduling],
         appendSystemPrompt: [], systemPrompt: instructions + '\nPlatform knowledge:\n' + this.executor.domainInstructions});
       await resourceLoader.reload();
       abort.signal.throwIfAborted();
