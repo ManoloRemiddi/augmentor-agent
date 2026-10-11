@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 Windows Pi Host correction candidate
+
+The focused source Windows workflow found a genuine platform gap at `26528e9b2e1155b50e8610d66989761944b1b393`: Pi main bound a POSIX filesystem endpoint, and Node private records had no kernel ACL implementation. The x64 cohort had 26 cases/10 passes/16 failures/no skips; helper kernel tests still passed. The [owning correction guide](PI-WINDOWS-HOST.md) records the authenticated named-pipe relay, per-client bounded data framing and EOF shutdown, and reuse of existing ACL/reparse/single-link/durable-record operations. No SDK internals, supplier-private source, second agent loop, TCP port or UI change is introduced. Fixtures exercise the actual private record adapter rather than skipping Windows privacy evidence.
+
+Type/build and helper syntax checks pass. New broad/ordinary stage and real source Windows Host/SDK qualification remain pending. All preceding local and helper counts below belong to the preceding implementation; they do not qualify this correction. Full accepted migration, assembled/physical/installed/platform/privacy gates remain binding. Preserve DSH, selected releases, canonical dirty main and explicit model/speech/GPU placement; the Harness goal remains active.
+
+
 ## October 11 owned Windows Pi command jobs qualification
 
 Implementation **`cbcd5b397a7656a4d43bfc8a0e4e627bfb325afd`** replaces direct-process-only Windows shell Stop with the existing owned kernel Job. The [command adapter](WINDOWS-SHELL-JOBS.md) waits for a contained workload readiness marker before releasing approved CMD text. Ordinary detached descendants retain ownership after leader exit. Parent/job Stop, private lease EOF and supervisor crash terminate only that range. Encoded command output cannot forge control receipts; fragmented UTF-8 and independently bounded frames preserve output. Missing/malformed evidence or uncertain drain stays unknown without replay. Failed bootstrap has no direct shell fallback. The raw lease reader also avoids a daemon-held standard-stream lock during natural Python exit. No dependency/native binary, supplier-private source, new agent loop or approved UI/layout change is introduced.

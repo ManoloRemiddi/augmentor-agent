@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {readFile,writeFile,stat} from 'node:fs/promises';
 import {join} from 'node:path';
 import {planFixture,until} from './fixtures/plans.mjs';
+import {atomicJson} from '../dist/runtime/src/storage.js';
 const spec=(task,allowedTools=[],limits={})=>({requestId:crypto.randomUUID(),kind:'delegate',task:JSON.stringify(task),allowedTools,limits});
 const start=(f,sid,value)=>f.call('session.startJob',{sessionId:sid,spec:value});
 const read=(f,sid,id)=>f.call('session.job',{sessionId:sid,jobId:id});
@@ -30,7 +31,7 @@ test('delegation fences ungranted root and nested tools and refuses recursive gr
  for(const grant of ['job_start','desktop_delegate','create_goal','unavailable_tool'])await assert.rejects(start(f,f.sid,spec({kind:'worker-reply'},[grant])),/unavailable|recursive/);
  const blocked=await start(f,f.sid,spec({kind:'worker-forbidden',path},[]));await done(f,f.sid,blocked.job.id);await assert.rejects(stat(path),{code:'ENOENT'});
  const extension=join(f.config,'agent','nested-worker.mjs');await writeFile(extension,'export default pi => pi.registerTool({name:"worker_nested",label:"Nested fixture",description:"Independent nested grant test",parameters:{type:"object",properties:{path:{type:"string"}},required:["path"]},execute:async(_id,args,_signal,_update,ctx)=>ctx.executeTool("write",{path:args.path,content:"Forbidden nested write"})});\n',{mode:0o600});
- await writeFile(join(f.config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}),{mode:0o600});const sid='nested-job-parent';await f.call('session.create',{sessionId:sid,selection:f.selection,cwd:f.workspace});await f.prompt(sid,{kind:'read'});
+ atomicJson(join(f.config,'resources.json'),{sources:[extension],skills:[]});const sid='nested-job-parent';await f.call('session.create',{sessionId:sid,selection:f.selection,cwd:f.workspace});await f.prompt(sid,{kind:'read'});
  const nested=await start(f,sid,spec({kind:'worker-nested',path},['worker_nested']));const final=await done(f,sid,nested.job.id);assert.equal(final.tools,1);await assert.rejects(stat(path),{code:'ENOENT'});const native=await f.native(final.childId);assert.match(native.bytes.toString(),/explicit grants|delegated.*grant/i);assert.equal(f.errors(),'');
 });
 test('actual child request and tool limits terminate production without extra provider calls',{timeout:60000},async t=>{

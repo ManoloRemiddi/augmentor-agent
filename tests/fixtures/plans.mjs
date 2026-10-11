@@ -11,11 +11,12 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {PiConnection} from '../../dist/client/src/socket.js';
 import {localConnect} from '../../dist/platform/src/transport.js';
 import {pythonExecutable} from '../../dist/platform/src/index.js';
+import {privateDir,atomicJson} from '../../dist/runtime/src/storage.js';
 import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
 export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode}={}){
- const root=await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
- const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])await mkdir(path,{recursive:true,mode:0o700});
+ const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
+ const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])privateDir(path);
  const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
  const requests=[],children=[],connections=[],frames=[];let child,owner,errors='';
  const model=http.createServer(async(req,res)=>{
@@ -83,8 +84,8 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
   res.end('data: [DONE]\n\n');
  });model.listen(0,'127.0.0.1');await once(model,'listening');
  const selection={provider:'fixture',model:'plan-fixture'};
- await writeFile(join(config,'agent','models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-plan-key',models:[{id:selection.model,name:'Synthetic planning provider',reasoning:false,input:desktopMode&&!desktopMode.textOnly?['text','image']:['text'],contextWindow:131072,maxTokens:2048}]}}}),{mode:0o600});
- await writeFile(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:policy,pinned:[],hidden:[],defaultModel:selection,observation:{capturePayloads:true}}),{mode:0o600});
+ atomicJson(join(config,'agent','models.json'),{providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-plan-key',models:[{id:selection.model,name:'Synthetic planning provider',reasoning:false,input:desktopMode&&!desktopMode.textOnly?['text','image']:['text'],contextWindow:131072,maxTokens:2048}]}}});
+ atomicJson(join(config,'settings.json'),{revision:0,defaultPreset:policy,pinned:[],hidden:[],defaultModel:selection,observation:{capturePayloads:true}});
  const env=Object.fromEntries(Object.entries(process.env).filter(([k])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(k)));
  Object.assign(env,{HOME:root,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),XDG_RUNTIME_DIR:runtime,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_LINUX_TOOLS:desktopMode?'1':'0',AUGMENTOR_DESKTOP_NO_AUTOSTART:'1',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'});
  // Keep only the explicitly resolved component interpreter in this private

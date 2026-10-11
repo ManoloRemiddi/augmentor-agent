@@ -5,12 +5,14 @@ import {mkdtemp,rm,stat,writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {PiJobs,JOB_LIMITS} from '../dist/runtime/src/jobs.js';
+import {privateDir} from '../dist/runtime/src/storage.js';
+import {windowsRecord} from '../dist/platform/src/private-records.js';
 const spec=()=>({requestId:crypto.randomUUID(),kind:'delegate',task:'Independent synthetic job',allowedTools:[],limits:{timeoutMs:30000}});
-async function fixture(t){const root=await mkdtemp(join(tmpdir(),'augmentor-jobs-ledger-'));t.after(()=>rm(root,{recursive:true,force:true}));return root;}
+async function fixture(t){const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-jobs-ledger-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-jobs-ledger-'));t.after(()=>rm(root,{recursive:true,force:true}));return root;}
 test('durable output ring preserves UTF-8 and absolute eviction offsets across restart, with exact owner reads',async t=>{
  const root=await fixture(t),jobs=new PiJobs(root);const started=jobs.start('owner-a',spec(),async(_row,control)=>{control.append('日本語 café 😀'.repeat(12000),'stdout');control.append('tail','stderr');return {state:'completed'};});
  await jobs.wait('owner-a',started.job.id,10000);const before=jobs.output('owner-a',started.job.id);assert(before.lossy);assert(before.next>JOB_LIMITS.liveBytes);assert(Buffer.byteLength(before.chunks.map(c=>c.text).join(''))<=JOB_LIMITS.settledBytes);assert(!before.chunks.some(c=>c.text.includes('�')));
- const cold=new PiJobs(root);assert.deepEqual(cold.output('owner-a',started.job.id),before);assert.throws(()=>cold.output('owner-b',started.job.id),/not found/);await assert.rejects(cold.cancel('owner-b',started.job.id),/not found/);assert.equal((await stat(join(root,started.job.id+'.json'))).mode&0o777,0o600);
+ const cold=new PiJobs(root);assert.deepEqual(cold.output('owner-a',started.job.id),before);assert.throws(()=>cold.output('owner-b',started.job.id),/not found/);await assert.rejects(cold.cancel('owner-b',started.job.id),/not found/);const path=join(root,started.job.id+'.json');if(process.platform==='win32')assert.equal(windowsRecord('verify',path),'');else assert.equal((await stat(path)).mode&0o777,0o600);
 });
 test('saved running receipt recovers unknown without invoking a producer; stable request IDs refuse changed parameters',async t=>{
  const root=await fixture(t),jobs=new PiJobs(root);let finish;const value=spec(),result=jobs.start('owner',value,async()=>{await new Promise(resolve=>finish=resolve);return {state:'completed'};});await new Promise(resolve=>setTimeout(resolve,10));

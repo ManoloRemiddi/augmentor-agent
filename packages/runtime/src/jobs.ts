@@ -11,7 +11,7 @@ import {desktopTools} from '../../computer-use/src/tools.js';
 import {DEFAULT_DESKTOP_LIMITS,type DesktopResult} from '../../computer-use/src/contracts.js';
 import type {Usage} from '@earendil-works/pi-ai';
 import type {ExecutionContract} from './execution.js';
-import {atomicJson,privateDir} from './storage.js';
+import {atomicJson,privateDir,readJson} from './storage.js';
 import {windowsShellJob} from './windows-shell-job.js';
 import {OutputRing} from '../vendor/dsh-jobs/ring.js';
 import type {JobChannel,JobOutputRead} from '../vendor/dsh-jobs/contracts.js';
@@ -52,7 +52,7 @@ export class PiJobs {
  private rows=new Map<string,JobRecord>();private rings=new Map<string,OutputRing>();private active=new Map<string,Active>();
  constructor(private directory:string,private changed:(row:JobRecord)=>void=()=>{}){
   try{privateDir(directory);const files=readdirSync(directory).filter(file=>file.endsWith('.json'));if(files.length>JOB_LIMITS.records)throw Error('Saved job registry exceeds its limit; inspect it before starting the runtime.');
-  for(const file of files){const path=join(directory,file);if(statSync(path).size>1024*1024)throw Error('Saved job receipt exceeds its limit.');const row=validateRecord(JSON.parse(readFileSync(path,'utf8')));if(file!==row.id+'.json')throw Error('Saved job identity mismatch.');const ring=new OutputRing();ring.restore(row.output);this.rows.set(row.id,row);this.rings.set(row.id,ring);if(!terminal(row.state)){row.state='unknown';row.reason='Runtime stopped before settlement. Effects may be unknown; this job was not replayed.';ring.trim(JOB_LIMITS.settledBytes);this.save(row);}}
+  for(const file of files){const path=join(directory,file);if(statSync(path).size>1024*1024)throw Error('Saved job receipt exceeds its limit.');const row=validateRecord(readJson<JobRecord>(path,null as unknown as JobRecord));if(file!==row.id+'.json')throw Error('Saved job identity mismatch.');const ring=new OutputRing();ring.restore(row.output);this.rows.set(row.id,row);this.rings.set(row.id,ring);if(!terminal(row.state)){row.state='unknown';row.reason='Runtime stopped before settlement. Effects may be unknown; this job was not replayed.';ring.trim(JOB_LIMITS.settledBytes);this.save(row);}}
   }catch{this.problem='Saved job evidence is invalid or inaccessible. Background admission is disabled; inspect the preserved private originals. Ordinary chat remains available.';}
  }
  get busy(){return this.active.size>0;}

@@ -6,12 +6,14 @@ import {Host} from './host.js';
 import {HarnessServer} from './harness-server.js';
 import {atomicJson,readJson,paths} from './storage.js';
 import {MAX_FRAME,PROTOCOL,request,type Data} from '../../protocol/src/index.js';
+import {localServer} from '../../platform/src/server.js';
+import type {LocalConnection} from '../../platform/src/transport.js';
 process.umask(0o077);
 // SDK facilities whose defaults use getAgentDir (including MCP OAuth state)
 // belong to this same managed owner profile rather than a separate Pi install.
 process.env.PI_CODING_AGENT_DIR=paths().agent;
-const clients=new Map<net.Socket,string|null>();
-const write=(socket:net.Socket,value:unknown)=>{if(socket.destroyed)return;const raw=JSON.stringify(value)+'\n';if(Buffer.byteLength(raw)>MAX_FRAME||socket.writableLength>4*MAX_FRAME){socket.destroy();return;}socket.write(raw);};
+const clients=new Map<LocalConnection,string|null>();
+const write=(socket:LocalConnection,value:unknown)=>{if(socket.destroyed)return;const raw=JSON.stringify(value)+'\n';if(Buffer.byteLength(raw)>MAX_FRAME||socket.writableLength>4*MAX_FRAME){socket.destroy();return;}socket.write(raw);};
 let harness:HarnessServer|undefined;
 let openingHarness:Promise<{url:string;origin:string}>|undefined;
 let host:Host;
@@ -33,12 +35,12 @@ async function openHarness(){
   return openingHarness;
 }
 const path=paths().socket;
-if(existsSync(path)){
+if(process.platform!=='win32'&&existsSync(path)){
   if(!lstatSync(path).isSocket()||lstatSync(path).uid!==process.getuid?.())throw new Error('Runtime socket path is not an owned socket');
   const live=await new Promise<boolean>((resolve,reject)=>{const probe=net.createConnection(path);probe.on('connect',()=>{probe.destroy();resolve(true);});probe.on('error',(error:NodeJS.ErrnoException)=>{if(error.code==='ECONNREFUSED'||error.code==='ENOENT')resolve(false);else reject(error);});});
   if(live){console.error('Augmentor Pi runtime is already running');process.exit(0);}unlinkSync(path);
 }
-const server=net.createServer(socket=>{
+const server=localServer(socket=>{
   clients.set(socket,null);let buffer=Buffer.alloc(0);let ready=false;
   socket.on('error',()=>{});
   socket.on('close',()=>{if(host)host.browser.detach(socket);const sid=clients.get(socket);clients.delete(socket);if(host&&sid&&!connected(sid))host.interactions.cancel(sid);});
@@ -61,14 +63,15 @@ const server=net.createServer(socket=>{
     })();}
   });
 });
-await new Promise<void>((resolve,reject)=>{server.once('error',reject);server.listen(path,()=>{chmodSync(path,0o600);resolve();});});
+server.on('error',()=>{process.exitCode=1;void shutdown();});
+await new Promise<void>((resolve,reject)=>{server.once('error',reject);server.listen(path,()=>{if(process.platform!=='win32')chmodSync(path,0o600);resolve();});});
 // Bind the owned socket before opening session journals. Concurrent fresh
 // launches therefore cannot both recover/prune the same profile.
 try{
   host=new Host((sid,frame)=>{harness?.publish(sid,frame);for(const [socket,session] of clients)if(session===sid)write(socket,{event:frame});},connected);
   await host.init();readyOwner!();
-}catch(error){failedOwner!(error);for(const socket of clients.keys())socket.destroy();server.close();if(existsSync(path))unlinkSync(path);throw error;}
+}catch(error){failedOwner!(error);for(const socket of clients.keys())socket.destroy();server.close();if(process.platform!=='win32'&&existsSync(path))unlinkSync(path);throw error;}
 if(process.env.AUGMENTOR_HARNESS==='1')await openHarness();
 console.log(JSON.stringify({ready:true,socket:path,protocol:PROTOCOL}));
-async function shutdown(){if(closing)return;closing=true;server.close();await harness?.close();await host.close();for(const client of clients.keys())client.destroy();if(existsSync(path))unlinkSync(path);const descriptor=join(host.dirs.state,'harness.json');if(readJson<Data>(descriptor,{}).pid===process.pid)unlinkSync(descriptor);}
+async function shutdown(){if(closing)return;closing=true;server.close();await harness?.close();await host?.close();for(const client of clients.keys())client.destroy();if(process.platform!=='win32'&&existsSync(path))unlinkSync(path);if(host){const descriptor=join(host.dirs.state,'harness.json');if(readJson<Data>(descriptor,{}).pid===process.pid)unlinkSync(descriptor);}}
 process.on('SIGTERM',()=>void shutdown());process.on('SIGINT',()=>void shutdown());
