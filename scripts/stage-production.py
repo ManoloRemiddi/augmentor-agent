@@ -16,6 +16,25 @@ from build_support import npm_command
 import quickjs_engine
 
 
+def stage_workspace_manifests(target, root=ROOT):
+    """Let npm install locked workspace dependencies without copying source."""
+    workspaces = json.loads((root / 'package.json').read_text()).get('workspaces', [])
+    if not isinstance(workspaces, list):
+        raise ValueError('Production workspaces must be explicit relative paths.')
+    for workspace in workspaces:
+        if not isinstance(workspace, str) or not workspace or any(c in workspace for c in '*?[]'):
+            raise ValueError('Production workspaces must be explicit relative paths.')
+        relative = Path(workspace)
+        if relative.is_absolute() or '..' in relative.parts or not relative.parts:
+            raise ValueError('Production workspace escapes the source tree.')
+        source = (root / relative / 'package.json').resolve()
+        if not source.is_relative_to(root.resolve()):
+            raise ValueError('Production workspace escapes the source tree.')
+        destination = target / relative / 'package.json'
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, destination)
+
+
 def codex_prerequisite(target, root=ROOT):
     """Keep the reviewed production tree separate from supplier CLI payloads."""
     record = json.loads((root / 'release/codex/runtime-prerequisite.json').read_text())
@@ -46,6 +65,7 @@ def main():
         'JSON.stringify({os:process.platform,cpu:process.arch})'],text=True))
     for name in ('package.json', 'package-lock.json'):
         shutil.copy2(ROOT / name, target / name)
+    stage_workspace_manifests(target)
     subprocess.run([*npm_command(), 'ci', '--ignore-scripts', '--omit=dev', '--no-audit', '--no-fund'], cwd=target, check=True)
     codex_prerequisite(target)
     subprocess.run(['node', str(ROOT / 'scripts/prepare-ws.mjs'), str(target)], check=True)

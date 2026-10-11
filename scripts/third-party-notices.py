@@ -36,6 +36,7 @@ def package_dirs(modules):
 
 def inventory(tree, catalog_root):
     lock = json.loads((tree / 'package-lock.json').read_text(encoding="utf-8"))['packages']
+    workspaces = json.loads((tree / 'package.json').read_text()).get('workspaces', [])
     catalog = json.loads((catalog_root / 'catalog.json').read_text(encoding="utf-8"))
     for name, source in catalog['sources'].items():
         if digest((catalog_root / source['file']).read_bytes()) != source['sha256']:
@@ -44,8 +45,19 @@ def inventory(tree, catalog_root):
     for package in package_dirs(tree / 'node_modules'):
         relative = package.relative_to(tree).as_posix()
         meta = json.loads((package / 'package.json').read_text(encoding="utf-8"))
-        key = meta['name'] + '@' + meta['version']
         locked = lock.get(relative)
+        if locked and locked.get('link'):
+            resolved = locked.get('resolved')
+            # Authored product workspaces are not third-party packages. Their
+            # actual installed dependencies remain in the recursive inventory.
+            if (resolved not in workspaces or not meta.get('private') or
+                    not isinstance(resolved, str) or
+                    not (tree / resolved).resolve().is_relative_to(tree.resolve()) or
+                    package.resolve() != (tree / resolved).resolve() or
+                    lock.get(resolved, {}).get('name') != meta['name']):
+                errors.append(f'{relative}: unverified workspace link')
+            continue
+        key = meta['name'] + '@' + meta['version']
         if locked is None:
             errors.append(f'{relative}: package is not in the lock'); continue
         if locked.get('dev'):

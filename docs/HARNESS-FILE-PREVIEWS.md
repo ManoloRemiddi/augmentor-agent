@@ -110,5 +110,16 @@ browser records retain their preceding versions/notices. The copied supplier
 manifest contains a duplicate identical office-to-pdf key; the build warning is
 retained with the original manifest. No Office renderer/service is registered.
 
+The first fresh production staging run exposed that npm workspace manifests were
+not copied before `npm ci`; its inventory consequently omitted Zod. That partial
+assembly was not selected or launched. Production staging now copies only the
+explicit workspace manifests before install, validating source containment. The
+notice collector excludes only declared, locked, private authored workspace
+links and still audits their actual suppliers. Two Python packaging cases pass
+for exact-manifest/no-implicit-source staging, escape rejection and verified
+workspace exclusion with supplier coverage. A separate fresh artifact qualifies
+the corrected install; the preceding successful Node cohort remains runtime/UI
+evidence, not evidence for the failed assembly.
+
 The broader [migration gates](AUGMENTOR-HARNESS-MIGRATION.md) remain open.
 DSH stays available while these replacements are tested.
