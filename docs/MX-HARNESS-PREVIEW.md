@@ -51,7 +51,13 @@ augmentor-harness-preview --status
 
 This verifies and prints selected release/version/source/hash without starting a Host or model. Selected and running identities are distinct. The private runtime log is `<preview state>/augmentor-pi/runtime.log`. Never share `harness.json`, a real bearer link, API credentials or unreviewed conversation payloads.
 
-## Original DSH GUI qualification
+## Current original-workspace follow-up
+
+Selected **and running** preview **20261011-132906-51b57282**, product 0.2.13, tested implementation **f89371bdb7c8589653a8a2350a640a91edf87188**, artifact **dd76ae454642839792e05a481a3f600718b8c420eaa949f8e4635faee94eb2cd**. Source and ordinary bundled-Node cohorts each pass **84 cases across eight files**, zero failures/skips/cancellations. Original workspace name/removal/order bindings, directory stability, no duplicate conversation creation and actual Host restart are qualified within [the current GUI evidence](DSH-GUI-ON-PI.md#current-installed-workspace-follow-up--october-11).
+
+The original installed Rename dialog saves **MX Linux preview** across reopening; the original path editor retains its directory while Host state refreshes. Host and native online/model-ready window match the selected root, and full artifact inventory passes after both start and workspace metadata changes. The saved clean demonstration keeps one user admission/two assistant steps with no new request or resend. Production selection/router/model/speech settings are unchanged. Subsequent qualification-only documentation changes no selected bytes. Further platform work and full Harness completion remain open.
+
+## Previous original DSH GUI qualification
 
 The default now uses the actual public DSH interface with Pi bindings. Tested implementation **fe5edae3c44c1905692afc3f63fe3688f7fb249e** passes the final ordinary bundled-Node **77-case** cohort, zero failures/skips/cancellations. Source and actual-browser checks, public-source hashes and 95 bundled npm notice records are verified. This increment's evidence and remaining compatibility gaps are in [Original DSH GUI on Pi](DSH-GUI-ON-PI.md).
 

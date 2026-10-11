@@ -73,7 +73,15 @@ Build/type checks and source-hash/dependency-graph/notice audits pass. The ordin
 
 Prior broad 834-case results in the MX guide belong to the preceding implementation and are not presented as a rerun of this GUI increment.
 
-## Installed MX preview — October 11
+## Current installed workspace follow-up — October 11
+
+Tested implementation **f89371bdb7c8589653a8a2350a640a91edf87188** is selected and running in private MX release **20261011-132906-51b57282**, product **0.2.13**, artifact SHA-256 **dd76ae454642839792e05a481a3f600718b8c420eaa949f8e4635faee94eb2cd**. Normal immutable staging/preflight and idle native maintenance close followed by guarded Host shutdown/activation succeed. Host command and native online/model-ready window match the selected root. Full inventory passes after both presentations start and the workspace metadata changes. All **425 build-output files** match source; **19,088 production dependency files**, **709 existing license files** and bundled Node remain unchanged. The current 84-case source/ordinary results above and an additional selected-folder identity assertion in the browser fixture pass.
+
+Actual installed checks use the original Rename dialog to persist **MX Linux preview**, reopen it with the saved name, and navigate the original path editor to the isolated preview directory without losing the selection during Host refreshes. Original controls/layout are inspected at normal narrow sizing and the **1440×1000** desktop breakpoint; the temporary viewport is reset. Cancelling the directory picker creates no conversation or request. The saved clean demonstration still has exactly **one user admission/two assistant steps**, with no new inference or replay. Registry metadata is private mode 0600 outside the immutable release. Actual physical drag/delete and new inference on this follow-up are not claimed; their synthetic/preceding live evidence remains separately identified.
+
+Production selection hash **cb426b4a2daa960f66533f28fb2b164385c243c1ba53fc18e61ca33fb4256be7** and the running local model-router process remain unchanged; model/speech settings are untouched. The stable launcher and original GUI/native preview remain available for feedback. This qualification-only documentation changes no installed bytes. Full Harness migration, remaining GUI gaps and further platform acceptance remain open.
+
+## Previous installed MX preview — October 11
 
 Tested implementation: **fe5edae3c44c1905692afc3f63fe3688f7fb249e**. Final ordinary bundled-stage run after the original-brand-style adjustment again passes **77/77 cases**, zero skips/failures/cancellations. The selected and running private preview is **20261011-125858-2e384fa5**, product **0.2.13**, artifact SHA-256 **d1943d2f1cbae906f06d3277d22f90dc560bfb04105843a4ebec75b811d32899**. Both the observed Node entry and the native online/model-ready window match its selected immutable root. Full inventory verification passes after startup and a fresh local-model request. The qualification documentation commit following this implementation changes no runtime or installed artifact.
 
