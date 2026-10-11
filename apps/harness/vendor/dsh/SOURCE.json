@@ -1784,6 +1784,96 @@
       "upstreamSha256": "d8f4e591767ca97b2fd4fdffa5eae1fc4063ce65f3e675d851cf491fc007dfcd"
     },
     {
+      "path": "packages/client/ui-settings-general/package.json",
+      "sha256": "c46b04d8379444757a9d1a5ae62f645cb57fcc5194999324ef034eeb0c170017",
+      "upstreamPath": "packages/client/ui-settings-general/package.json",
+      "upstreamSha256": "c46b04d8379444757a9d1a5ae62f645cb57fcc5194999324ef034eeb0c170017"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/CurrentVersionRow.module.css",
+      "sha256": "025690154ff19102ad24dd8c821a12d77210e01e28072c8af1a10cae8a9e8ec0",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/CurrentVersionRow.module.css",
+      "upstreamSha256": "025690154ff19102ad24dd8c821a12d77210e01e28072c8af1a10cae8a9e8ec0"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/CurrentVersionRow.tsx",
+      "sha256": "1b363fa12a68958c44871f83f06ad4b321c7a56d5ca33cb2e5ccbbfe2a0afc58",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/CurrentVersionRow.tsx",
+      "upstreamSha256": "1b363fa12a68958c44871f83f06ad4b321c7a56d5ca33cb2e5ccbbfe2a0afc58"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/DesktopUpdateIndicator.module.css",
+      "sha256": "3d3afea694008e2f9587efed31c419e963297026dd53aef475641dc8d2f5fcfa",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/DesktopUpdateIndicator.module.css",
+      "upstreamSha256": "3d3afea694008e2f9587efed31c419e963297026dd53aef475641dc8d2f5fcfa"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/DesktopUpdateIndicator.tsx",
+      "sha256": "c551d302c80252bf7f9a258409427a3d3587da7dc92abb1ef75646ef2623fbe2",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/DesktopUpdateIndicator.tsx",
+      "upstreamSha256": "c551d302c80252bf7f9a258409427a3d3587da7dc92abb1ef75646ef2623fbe2"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/GeneralSection.module.css",
+      "sha256": "3d39210b1ea0f422827b3ba5b58fc906e21e8465b3ebbe6f3ed9c8a434dc1156",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/GeneralSection.module.css",
+      "upstreamSha256": "3d39210b1ea0f422827b3ba5b58fc906e21e8465b3ebbe6f3ed9c8a434dc1156"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/GeneralSection.tsx",
+      "sha256": "043d6022dead282f19b163b4694dd0cb0c29ace8ee208062c99d5e8c84c9b829",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/GeneralSection.tsx",
+      "upstreamSha256": "043d6022dead282f19b163b4694dd0cb0c29ace8ee208062c99d5e8c84c9b829"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/SettingsRoot.module.css",
+      "sha256": "886528a854b668db25c60cbc46ad982687142fcb02fda1f533dcbf491dc73513",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/SettingsRoot.module.css",
+      "upstreamSha256": "886528a854b668db25c60cbc46ad982687142fcb02fda1f533dcbf491dc73513"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/SettingsRoot.tsx",
+      "sha256": "01966a7299b66d16b2f80106c72dd1f37c541bbfe2d3a0397ca9edd96c21f466",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/SettingsRoot.tsx",
+      "upstreamSha256": "01966a7299b66d16b2f80106c72dd1f37c541bbfe2d3a0397ca9edd96c21f466"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/chrome.module.css",
+      "sha256": "b358ca8429afe83e3a025a770f10884c9eb270b1de3ed52c9754e8b2061baeea",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/chrome.module.css",
+      "upstreamSha256": "b358ca8429afe83e3a025a770f10884c9eb270b1de3ed52c9754e8b2061baeea"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/chrome.tsx",
+      "sha256": "5d2d9262ce0e4b4659f95e31813778fe5f64ba6381fdd17e2a21d0c4837a5b52",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/chrome.tsx",
+      "upstreamSha256": "5d2d9262ce0e4b4659f95e31813778fe5f64ba6381fdd17e2a21d0c4837a5b52"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/locales.ts",
+      "sha256": "95eab48b2b5bef5567e0d10d013a1465a13c38a658372d8d458971f3d7a08a35",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/locales.ts",
+      "upstreamSha256": "95eab48b2b5bef5567e0d10d013a1465a13c38a658372d8d458971f3d7a08a35"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/shell-contract.ts",
+      "sha256": "dc8d6f6decbbb285d30b3791d5889857062479faf2294286af909dd3662dcf25",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/shell-contract.ts",
+      "upstreamSha256": "dc8d6f6decbbb285d30b3791d5889857062479faf2294286af909dd3662dcf25"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/shell-store.ts",
+      "sha256": "ff394549d6e3cd15473a42a3e85be45fe100c501f865d31126234f8ea932894d",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/shell-store.ts",
+      "upstreamSha256": "ff394549d6e3cd15473a42a3e85be45fe100c501f865d31126234f8ea932894d"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/types.ts",
+      "sha256": "a55f2c8088f226afeecde38e75aa348271b01cce00dc1bd7aa1afded625a745f",
+      "upstreamPath": "packages/client/ui-settings-general/src/types.ts",
+      "upstreamSha256": "a55f2c8088f226afeecde38e75aa348271b01cce00dc1bd7aa1afded625a745f"
+    },
+    {
       "path": "packages/client/ui-sidebar/package.json",
       "sha256": "39bb5c7eb7c0acdec961a3ec2fef11ea116f6699093737cfbba60373745996f1",
       "upstreamPath": "packages/client/ui-sidebar/package.json",
@@ -1818,6 +1908,24 @@
       "sha256": "074d8127fc444891de5e2c1f887f5c58d2b90b85830077bc276754d9f3908149",
       "upstreamPath": "packages/client/ui-theme/package.json",
       "upstreamSha256": "074d8127fc444891de5e2c1f887f5c58d2b90b85830077bc276754d9f3908149"
+    },
+    {
+      "path": "packages/client/ui-theme/src/client/AppearanceRow.module.css",
+      "sha256": "2e1f8f44ee41256aaf6af103d38edb7220a3e0a82099be8e9d3e0b75a5e4f6c4",
+      "upstreamPath": "packages/client/ui-theme/src/client/AppearanceRow.module.css",
+      "upstreamSha256": "2e1f8f44ee41256aaf6af103d38edb7220a3e0a82099be8e9d3e0b75a5e4f6c4"
+    },
+    {
+      "path": "packages/client/ui-theme/src/client/AppearanceRow.tsx",
+      "sha256": "88778d6678654a337ade450289ada6e51aa5bcd19f4e8f5e9b135f7f4da3585e",
+      "upstreamPath": "packages/client/ui-theme/src/client/AppearanceRow.tsx",
+      "upstreamSha256": "88778d6678654a337ade450289ada6e51aa5bcd19f4e8f5e9b135f7f4da3585e"
+    },
+    {
+      "path": "packages/client/ui-theme/src/client/locales.ts",
+      "sha256": "7abc0a0d2cc8411335e64eff385231480ba5f8176903ddcf365151dd5dcb959c",
+      "upstreamPath": "packages/client/ui-theme/src/client/locales.ts",
+      "upstreamSha256": "7abc0a0d2cc8411335e64eff385231480ba5f8176903ddcf365151dd5dcb959c"
     },
     {
       "path": "packages/client/ui-theme/src/styles/base.css",

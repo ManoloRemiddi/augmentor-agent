@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Settings candidate](DSH-GUI-ON-PI.md#original-settings-shell--october-11-follow-up) uses the copied MIT shell/Appearance and scoped Pi handlers. Source, ordinary and installed qualification are recorded separately; all remaining Harness/migration/public packaging/platform gates remain open, with further platforms deferred for MX feedback.
+
 ## October 11 current installed original question controls
 
 Tested runtime **65b0a498e93d8453062f63eaf9e0806101f39fed** is selected **and running** in private MX release **20261011-184609-8cac1bd0**, product 0.2.13, artifact **8c9c01c8e3d53a384c63bbc2211ab0f545bb1568fbdacbc06cbcaaf780a16615**. Source and fresh ordinary bundled Node 24.19.0 each pass **203/203 across 27 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Guarded ordinary adoption/stable Host and Native launch succeed; roots match selection and Native is online/model-ready/idle. The full **21,742-entry** inventory passes before and after GUI reads. All eleven baseline histories and queue identities are preserved, with zero new histories/admissions/provider requests during adoption/inspection. Production selection/model router/model/speech/GPU/context/concurrency/precision settings remain preserved. The original Context dashboard is reopened on the retained Qwen demonstration for feedback.

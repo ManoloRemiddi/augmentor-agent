@@ -4,6 +4,63 @@
 
 The owner's October 11 correction is to use the actual open-source DSH GUI before redesigning it. The standalone Harness default now bundles the original public React components and CSS. The previous custom interface is a supplementary **Full Pi record inspector** at `/inspection`, available from Settings. The native desktop and existing browser extension retain their approved interfaces.
 
+## Original Settings shell — October 11 follow-up
+
+The sidebar Settings trigger and dialog now use the public MIT `SettingsRoot`,
+original navigation rail, keyboard/focus layer, General section, Appearance cubes
+and current-version row from the same DSH 0.2.1-alpha.2/d743267 baseline. Eighteen
+verbatim files bring the selection to **404**; all preceding source records,
+licences and visual CSS remain unchanged. Supplier shell state is one UI store,
+not a new agent owner. Existing Pi controls occupy its section slots:
+
+- **General**: original Light/Dark/System selector, shared Prompt library, Full Pi
+  record inspector and explicit request-payload retention choice.
+- **Models**: current explicit model and existing revisioned Reasoning settings.
+  The conversation's original model chooser still owns model selection.
+- **Plugins**: existing MCP management and a direct Open Context action identifying
+  dsh-context 0.68.1/Apache-2.0.
+
+Appearance is a browser-local preference. A missing new theme key preserves the
+previous `augmentor.dsh.dark` choice; opening Settings writes no preference. Only
+an explicit selection persists the new choice. System follows the OS colour
+scheme; reopening/reloading restores the selected preference. Native/Desktop and
+Browser-extension layout and their appearance preferences are unchanged.
+
+The native Pi reasoning/MCP dialogs own keyboard input above the supplier shell.
+Escape closes only the foreground dialog; the original shell's Escape restores
+its trigger focus. Section unmount, conversation/epoch/readiness change and
+read-only scope dispose or invalidate managed handlers. Reasoning/MCP remain
+unavailable while the selected conversation runs. Scoped inspection disables
+profile/conversation mutations while retaining local appearance and Context
+viewing. Capture changes read the current revision, check the captured scope
+before dispatch and never retry a failed/unknown write; an explicit refresh is
+required after a failure. No settings action requests inference.
+
+The shell's optional Electron update seat stays empty without a bridge. DSH
+account login, original model-provider administration, agent presets, plugin
+installation/configuration, onboarding and archived-session Settings sections
+are not connected. Existing original workspace archive controls remain available.
+This increment restores settings navigation; it does not establish complete DSH
+settings/GUI parity, native platform acceptance or full migration completion.
+
+### Settings qualification
+
+The real Host/Chromium fixture at **513×715** checks original trigger/nav/focus,
+Light/Dark/System and reload/system changes, capture CAS through the Host, Prompt
+library transition, foreground reasoning/MCP Escape, Open Context, scoped
+read-only guards and zero user admissions/provider requests. Separate existing
+reasoning and MCP browser fixtures pass. The initial fixture targeted a nonexistent
+prompt-overlay marker and later read asynchronous controls before they appeared;
+those preparation failures are retained and corrected to visible controls.
+A genuine foreground Escape regression is reproduced and corrected in the Pi
+handlers, without modifying the supplier. A later assertion attempted to return
+an entire DOM element over CDP; it now reads a Boolean. Deadlines are unchanged.
+The final source cohort passes **206/206 across 30 files**, zero failures/skips/
+cancellations, prepared QtTest/two workers/unchanged deadlines. Build/type checks
+and all 404 source-hash/browser-graph/96 npm-notice checks pass. Fresh ordinary
+bundled-Node and installed acceptance follow separately; no installed version is
+changed by source qualification.
+
 ## Original attachments — October 11 follow-up
 
 Original File picker binding, attachment rail/cards, drop overlay, retry/remove controls and image lightbox/history rendering now use thirteen verbatim public ui-attachment files and unchanged supplier CSS. The GUI selection is **358 files**; preceding 345 bytes/hashes remain unchanged. The Pi Host additionally reuses twelve public MIT pure attachment storage/codec modules, with import-path/NodeNext suffix changes only and retained provenance/license. No Cordis attachment service or second agent owner is introduced.

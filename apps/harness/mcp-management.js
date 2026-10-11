@@ -48,7 +48,9 @@ export function attachMcpManagement({button,rpc,current,notice,changed=()=>{}}){
   finally{if(own===ticket&&live()){reading=false;controls();void reload();}}
  }
  function open(){
-  if(!current().ready||!current().sessionId)return;close();scope={...current()};panel=node('dialog');panel.className='reasoning-dialog mcp-dialog';panel.setAttribute('aria-label','MCP servers');
+  if(!current().ready||!current().sessionId)return;close();scope={...current()};panel=node('dialog');panel.className='reasoning-dialog mcp-dialog';panel.setAttribute('aria-label','MCP servers');panel.setAttribute('aria-modal','true');
+  // Keep native dialog keys out of the settings shell behind it.
+  panel.addEventListener('keydown',event=>event.stopPropagation());
   panel.append(node('h2','MCP servers'),node('p','Actions use this conversation’s Pi session. No prompt is sent. Sign-out deletes stored credentials. Reconnect does not replay a tool.'));
   panel.server=node('select');panel.server.setAttribute('aria-label','MCP server');panel.servers=[];panel.server.onchange=()=>{panel.exposureDirty=false;panel.exposure.value=panel.servers.find(row=>row.name===panel.server.value)?.exposure??'codemode';controls();};panel.append(panel.server);
   const row=node('div');row.className='reasoning-actions';panel.actions=[];
@@ -68,5 +70,5 @@ export function attachMcpManagement({button,rpc,current,notice,changed=()=>{}}){
   panel.addEventListener('cancel',event=>{event.preventDefault();close();});document.body.append(panel);panel.showModal();void reload();
  }
  button.onclick=open;
- return {get busy(){return active(receipt);},get blocked(){return blocked;},changed(){if(scope&&!live())close();},open};
+ return {get busy(){return active(receipt);},get blocked(){return blocked;},changed(){if(scope&&!live())close();},open,close};
 }

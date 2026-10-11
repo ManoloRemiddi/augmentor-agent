@@ -36,8 +36,7 @@ import {readDshPayload} from './dsh-payload.mjs';
 import {attachNativeHistory} from './native-history.mjs';
 import {MessageIconActions} from '@dsh-gui/ui-chat/src/client/chat/MessageIconActions.tsx';
 import {messageTargets} from './chat-projection.js';
-import {attachReasoning} from '../browser/extension/pi-reasoning.mjs';
-import {attachMcpManagement} from './mcp-management.js';
+import {OriginalSettings,settingsShell} from './dsh-settings.jsx';
 import {TrajectoryView} from '@dsh-gui/ui-trajectory/src/client/TrajectoryView.tsx';
 import {WorkspaceBrowser} from '@dsh-gui/ui-workspace/src/client/rows/WorkspaceBrowser.tsx';
 import {PinSessionMenuItem,PinSessionRowButton} from '@dsh-gui/ui-workspace/src/client/session-actions/PinSession.tsx';
@@ -56,7 +55,7 @@ import {createWorkspaceShortcutControls} from '@dsh-gui/ui-workspace/src/client/
 import {createTrajectoryDurationStore} from '@dsh-gui/ui-trajectory/src/client/duration-store.ts';
 import {createTrajectoryStringWrappingStore} from '@dsh-gui/ui-trajectory/src/client/string-wrapping-store.ts';
 import {createSnapshotStore} from '@deepseek-ai/dsh-client-store';
-import {Button,Modal,Input,IconSettingsOutlineRegular,IconEditOutlineRegular,IconCopyOutlineRegular,IconGoalOutlineRegular,IconFolderCloseRegular,JsonBlock,MarkdownText,DisclosureRow,StateDot} from '@deepseek-ai/dsh-client-ui-primitives';
+import {Button,Modal,Input,IconEditOutlineRegular,IconCopyOutlineRegular,IconGoalOutlineRegular,IconFolderCloseRegular,JsonBlock,MarkdownText,DisclosureRow,StateDot} from '@deepseek-ai/dsh-client-ui-primitives';
 import {en as commonEn} from '@dsh-gui/locale/src/locales/en.ts';
 import {en as conversationEn} from '@dsh-gui/ui-conversation/src/client/locales.ts';
 import {en as sidebarEn} from '@dsh-gui/ui-sidebar/src/client/locales.ts';
@@ -97,6 +96,7 @@ const useRowNotice=bind(rowNotice),useArchiveRequest=bind(archiveRequest);
 const notifyRow=(kind,extra={})=>rowNotice.set({kind,...extra,seq:++noticeSeq});
 const tr=dictionary=>(key,args={})=>String(dictionary[key]??commonEn[key]??key).replace(/\{(\w+)\}/g,(_,name)=>String(args[name]??''));
 const t={conversation:tr(conversationEn),sidebar:tr(sidebarEn),workspace:tr(workspaceEn),chat:tr(chatEn),trajectory:tr(trajectoryEn),model:tr(modelEn),goal:tr(goalEn),approval:tr(approvalEn),question:tr(questionEn),common:tr(commonEn),command:tr(commandEn),menu:tr(menuEn)};
+const settingsNotice=text=>controller.update({error:text});
 const control={run:async action=>{try{return await action();}catch(error){controller.update({error:error.message});return undefined;}}};
 const drafts=new Map();let activeDraft=null;
 let draftRev=0,composerProjection={detectText:'',selection:null,caret:null},commandMenu;
@@ -219,18 +219,6 @@ function ImproveDraft({state}){
   return <Button variant="ghost" aria-label={label} title={label} disabled={state.readOnly||!state.sessionId||!text.trim()||state.phase!=='ready'} onClick={()=>void improve()}>{job?'×':label.startsWith('Undo')?'↶':'✦'}</Button>;
 }
 
-function ManagedSettings({state}){
-  const reasoningRef=useRef(null),mcpRef=useRef(null),latest=useRef(state);latest.current=state;
-  useEffect(()=>{
-    const current=()=>({sessionId:latest.current.sessionId,epoch:controller.epoch,ready:!latest.current.readOnly&&latest.current.phase==='ready'&&!latest.current.sessions.find(x=>x.sessionId===latest.current.sessionId)?.running});
-    const rpc=(method,params)=>controller.rpc(method,params),notice=text=>controller.update({error:text});
-    const reasoning=attachReasoning({button:reasoningRef.current,rpc,current,notice});
-    const mcp=attachMcpManagement({button:mcpRef.current,rpc,current,notice});
-    return ()=>{reasoning.close();mcp.changed();};
-  },[]);
-  return <><Button ref={reasoningRef} disabled={state.readOnly||!state.sessionId}>Reasoning settings</Button><Button ref={mcpRef} disabled={state.readOnly||!state.sessionId}>MCP servers</Button></>;
-}
-
 const SessionBridge=React.createContext(null);
 function BoundSession(){return <ConversationSession {...React.useContext(SessionBridge)}/>;}
 function CommandOverlays(){
@@ -242,12 +230,13 @@ function CommandOverlays(){
   </div>;
 }
 function App(){
+  const settingsState=useSyncExternalStore(settingsShell.subscribe,settingsShell.getSnapshot);
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
   useEffect(()=>{commandMenu.deps.actions={compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:()=>setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:()=>setView('context'),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
   useEffect(()=>{activeDraft=state.sessionId;setDraft(drafts.get(state.sessionId)||'');},[state.sessionId]);
-  useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!commandMenu.menu.getSnapshot().open&&!commandMenu.popup.state.getSnapshot().open&&!state.interactions.length&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog]);
+  useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!settingsState.open&&!commandMenu.menu.getSnapshot().open&&!commandMenu.popup.state.getSnapshot().open&&!state.interactions.length&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog,settingsState.open]);
   const current=state.sessions.find(x=>x.sessionId===state.sessionId);
   const workspaces=useMemo(()=>{
     if(state.workspaces)return {...state.workspaces,phase:'ready',state:'ready'};
@@ -282,7 +271,7 @@ function App(){
       case 'sidebar.brand.name':return <span className={sidebarCss.fallbackBrandName}>Augmentor Harness</span>;
       case 'sidebar.workspaces':return <WorkspaceBrowser {...p} t={t.workspace} useStore={useWorkspaceView} actions={workspaceView.actions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} useHostInfo={selectorFace({home:''})} useWorkspaceShortcuts={useWorkspaceShortcuts} useShortcuts={selectorFace([])} useDirectoryFlow={selectorFace(!state.readOnly)} open={open} startSession={startSession} searchResultLimit={100} searchSessions={async query=>({items:state.sessions.filter(x=>x.title.toLowerCase().includes(query.toLowerCase())).map(x=>({sessionId:x.sessionId,title:x.title,cwd:x.cwd}))})} requestSearch={shortcuts.search} requestAddWorkspace={shortcuts.add} closeAddWorkspace={shortcuts.closeAdd} setDirectoryBusy={shortcuts.directoryBusy} dismissForkError={shortcuts.dismissForkError} requestSessionRename={(sid,title)=>{setDialog({kind:'rename',sid,title});}} notifyArchivedNotOpenable={()=>notifyRow('archivedNotOpenable')} renameWorkspace={(workspaceId,title)=>controller.workspaceAction('rename',{workspaceId,title})} deleteWorkspace={workspaceId=>controller.workspaceAction('remove',{workspaceId})} insertWorkspaceBefore={(workspaceId,beforeWorkspaceId)=>controller.workspaceAction('move',{workspaceId,beforeWorkspaceId})} unarchiveSession={restoreSession} createWorkspace={createWorkspace}/>;
       case 'sidebar.workspaces.directoryFlow':return DirectoryFlow(owner);
-      case 'sidebar.settings':return <Button variant="ghost" aria-label="Settings" onClick={()=>setDialog({kind:'settings'})}><IconSettingsOutlineRegular/> {owner.wide?'Settings':null}</Button>;
+      case 'sidebar.settings':return <OriginalSettings wide={owner.wide} state={state} controller={controller} notice={settingsNotice} onPrompts={()=>setDialog({kind:'prompts'})} onContext={()=>setView('context')}/>;
       case 'sidebar.workspaces.session.menu.item':{if(state.readOnly)return null;const props={...p,...sessionActions,useMenuOpenState:()=>options.hookContext||[false,noOp]};return <><PinSessionMenuItem {...props}/><RenameSessionMenuItem {...props}/><ForkSessionMenuItem {...props}/><ArchiveSessionMenuItem {...props}/></>;}
       case 'sidebar.workspaces.session.row.action':return state.readOnly?null:<><ArchiveSessionRowButton {...p} {...sessionActions}/><PinSessionRowButton {...p} {...sessionActions}/></>;
       case 'main':return <ConversationRoot {...p}/>;
@@ -316,11 +305,9 @@ function App(){
       default:return options.fallback??null;
     }
   };
-  return <SessionBridge.Provider value={{...common,renderSlot:render}}><AppFrame t={t.common} useStore={useLayout} actions={layout.actions} useSessions={useSessions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} renderSlot={render}/>{state.phase==='connecting'&&<Modal open title="Augmentor Harness" closeLabel="Close" onClose={noOp} description="Connecting to Pi…"/>}{state.error&&<Modal open title="Augmentor Harness" closeLabel="Close" onClose={()=>controller.update({error:null})} description={state.error}/>}<SessionRenameDialog t={t.workspace} useRenameRequest={selectorFace(dialog?.kind==='rename'?{sessionId:dialog.sid,currentTitle:dialog.title}:null)} settleSessionRename={()=>setDialog(null)} renameSession={async(sessionId,title)=>{await controller.rpc('session.rename',{sessionId,title});await controller.refresh();}}/><SessionArchiveConfirmDialog t={t.workspace} useArchiveRequest={useArchiveRequest} settleSessionArchive={()=>archiveRequest.set(null)} stopAndArchiveSession={stopAndArchiveSession}/><RowActionToast t={t.workspace} useToast={useRowNotice} useStore={useWorkspaceView} dismissToast={()=>rowNotice.set(null)} undoArchive={sid=>void control.run(()=>restoreSession(sid))} showArchived={()=>workspaceView.actions.setArchivedFilter('show')} openForkSource={open}/> {dialog?.kind==='settings'&&<SettingsDialog close={()=>setDialog(null)} state={state} open={setDialog}/>} {dialog?.kind==='prompts'&&<PromptLibrary close={()=>setDialog(null)}/>}</SessionBridge.Provider>;
+  return <SessionBridge.Provider value={{...common,renderSlot:render}}><AppFrame t={t.common} useStore={useLayout} actions={layout.actions} useSessions={useSessions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} renderSlot={render}/>{state.phase==='connecting'&&<Modal open title="Augmentor Harness" closeLabel="Close" onClose={noOp} description="Connecting to Pi…"/>}{state.error&&<Modal open title="Augmentor Harness" closeLabel="Close" onClose={()=>controller.update({error:null})} description={state.error}/>}<SessionRenameDialog t={t.workspace} useRenameRequest={selectorFace(dialog?.kind==='rename'?{sessionId:dialog.sid,currentTitle:dialog.title}:null)} settleSessionRename={()=>setDialog(null)} renameSession={async(sessionId,title)=>{await controller.rpc('session.rename',{sessionId,title});await controller.refresh();}}/><SessionArchiveConfirmDialog t={t.workspace} useArchiveRequest={useArchiveRequest} settleSessionArchive={()=>archiveRequest.set(null)} stopAndArchiveSession={stopAndArchiveSession}/><RowActionToast t={t.workspace} useToast={useRowNotice} useStore={useWorkspaceView} dismissToast={()=>rowNotice.set(null)} undoArchive={sid=>void control.run(()=>restoreSession(sid))} showArchived={()=>workspaceView.actions.setArchivedFilter('show')} openForkSource={open}/> {dialog?.kind==='prompts'&&<PromptLibrary close={()=>setDialog(null)}/>}</SessionBridge.Provider>;
 }
 
-function SettingsDialog({close,state,open}){const [capture,setCapture]=useState(null);useEffect(()=>{void controller.rpc('observation.describe').then(setCapture);},[]);return <Modal open title="Settings" onClose={close} closeLabel="Close"><div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>open({kind:'prompts'})}>Prompt library</Button><ManagedSettings state={state}/><Button onClick={()=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:state.sessionId||''}),'_blank','noopener,noreferrer')}>Full Pi record inspector</Button><Button disabled={state.readOnly||capture===null} onClick={()=>void control.run(async()=>{const before=await controller.rpc('observation.describe');setCapture(await controller.rpc('observation.configure',{expectedRevision:before.revision,capturePayloads:!before.capturePayloads}));})}>Request payload capture: {capture===null?'loading':capture.capturePayloads?'on':'off'}</Button><Button onClick={()=>{document.body.toggleAttribute('data-ds-dark-theme');localStorage.setItem('augmentor.dsh.dark',document.body.hasAttribute('data-ds-dark-theme')?'1':'0');}}>Light / dark</Button><p>Pi 1.1.0 · DSH GUI d743267 · Augmentor Harness</p></div></Modal>;}
-if(localStorage.getItem('augmentor.dsh.dark')==='1')document.body.setAttribute('data-ds-dark-theme','');
 createRoot(document.getElementById('root')).render(<App/>);
 void controller.start(hash.get('session')).catch(error=>controller.update({phase:'error',error:error.message}));
 setInterval(()=>void controller.poll().catch(error=>controller.update({error:error.message})),350);

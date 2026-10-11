@@ -13,7 +13,9 @@ export function attachReasoning({button,rpc,current,notice,document=globalThis.d
   if(ticket!==epoch)return;const context=current();
   openedContext=context;
   if(!context.ready||!context.sessionId){notice('Select a ready conversation before changing reasoning.',true);return;}
-  dialog=el('dialog');dialog.className='reasoning-dialog';dialog.setAttribute('aria-label','Reasoning settings');
+  dialog=el('dialog');dialog.className='reasoning-dialog';dialog.setAttribute('aria-label','Reasoning settings');dialog.setAttribute('aria-modal','true');
+  // A native modal owns keyboard traversal and Escape above a React modal.
+  dialog.addEventListener('keydown',event=>event.stopPropagation());
   const content=el('div'),status=el('p','Loading reasoning settings…');status.setAttribute('role','status');
   dialog.append(el('h2','Reasoning'),content,status,action('Done',close));document.body.append(dialog);dialog.showModal();dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
   const valid=()=>ticket===epoch&&current().ready&&current().sessionId===context.sessionId&&current().epoch===context.epoch;
