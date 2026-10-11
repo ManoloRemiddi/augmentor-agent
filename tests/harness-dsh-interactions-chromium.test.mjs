@@ -27,6 +27,7 @@ test('original DSH approval/question components answer the selected Host interac
   if(method==='observation.list')return {records:[]};
   if(method==='session.models')return {current:selection};
   if(method==='session.reasoning')return {availableLevels:['off'],thinkingLevel:'off'};
+  if(method==='session.compaction')return {available:true,busy:false,blocked:false,lastReceipt:null};
   if(method==='session.goal')return {goal:null};
   if(method==='session.queue')return queue;
   if(method==='interaction.respond'){answers.push(p);const id=pending.rpcId;pending=null;server.publish('fixture',{method:'interaction/resolved',rpcId:id,payload:{sessionId:'fixture'}});return {accepted:true};}

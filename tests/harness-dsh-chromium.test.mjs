@@ -61,7 +61,7 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  assert.equal(await panel.evaluate('getSelection().toString()'),'Preserved draft text.');
  await click('document.querySelector("button[aria-label=\\"Add files or run commands\\"]")');
  await visible('document.querySelector("[data-trigger-menu] [role=listbox][aria-label=\\"Trigger suggestions\\"]")');
- assert.deepEqual(await panel.evaluate('Array.from(document.querySelectorAll("[data-trigger-menu] [role=option]")).map(x=>x.querySelector("[class*=itemName]")?.textContent)'),['File','Goal','Plan','Model','Prompt library','Jobs','Context','Full Pi record inspector']);
+ assert.deepEqual(await panel.evaluate('Array.from(document.querySelectorAll("[data-trigger-menu] [role=option]")).map(x=>x.querySelector("[class*=itemName]")?.textContent)'),['File','Goal','Plan','Compact','Model','Prompt library','Jobs','Context','Full Pi record inspector']);
  assert(await panel.evaluate('document.querySelector("[data-trigger-menu]").innerText.includes("Add")&&document.querySelector("[data-trigger-menu]").innerText.includes("Commands")'));
  assert(await panel.evaluate('document.activeElement==='+editor),'the original slash menu keeps composer focus');
  await click('Array.from(document.querySelectorAll("[data-trigger-menu] [role=option]")).find(x=>x.textContent.includes("Set or view the goal"))');
@@ -71,8 +71,8 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  await replaceDraft('/con');await visible('document.querySelectorAll("[data-trigger-menu] [role=option]").length===1');await key('ArrowDown');await key('Tab');
  await visible('document.body.innerText.includes("Context Composition")||document.querySelector(".lc-root")');assert.equal(await panel.evaluate(editor+'.textContent'),'');
  await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Chat")');
- await replaceDraft('/compact');await click('document.querySelector("button[aria-label=\\"Send message\\"]")');
- await visible('document.querySelector("[role=dialog]")?.textContent.includes("/compact is not yet connected to Pi")');assert.equal(await panel.evaluate(editor+'.textContent'),'/compact');
+ await replaceDraft('/permission');await click('document.querySelector("button[aria-label=\\"Send message\\"]")');
+ await visible('document.querySelector("[role=dialog]")?.textContent.includes("/permission is not yet connected to Pi")');assert.equal(await panel.evaluate(editor+'.textContent'),'/permission');
  await click('document.querySelector("[role=dialog] button[aria-label=\\"Close\\"]")');
  await replaceDraft('/model');await visible('document.querySelectorAll("[data-trigger-menu] [role=option]").length===1');await key('Tab');
  await visible('document.querySelector("input[aria-label=\\"Filter options\\"]")&&document.querySelector("[role=listbox][aria-label=\\"/model matches\\"]")');
@@ -141,4 +141,23 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  await click(chooseTab('Chat'));await visible('document.body.innerText.includes("Partial fixture output.")');
  assert(!await panel.evaluate('document.querySelector("button[aria-label=\\"Branch into a new conversation\\"]")'));
  assert.equal(panel.errors.length,0,JSON.stringify(panel.errors));assert(panel.urls.every(value=>value.startsWith(url.origin)||value.startsWith('data:')),JSON.stringify(panel.urls));
+});
+
+test('original DSH Compact row saves a real Pi summary and reports its native boundary in the copied context dashboard',{timeout:90000},async t=>{
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-compact-chrome-'));let fixture,chrome,panel,link,output='',stderr='';
+ t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
+ fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_COMPACTION:'1'},stdio:['ignore','pipe','pipe']});fixture.stdout.on('data',data=>output+=data);fixture.stderr.on('data',data=>stderr+=data);
+ await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'compact owner ready');
+ const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token'),rpc=async(method,params={})=>{const response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params:{sessionId:'compact-fixture',...params}})}),frame=await response.json();if(frame.error)throw Error(frame.error.message);return frame.result;};
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
+ let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'compact Chrome ready');const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);await panel.call('Emulation.setDeviceMetricsOverride',{width:513,height:715,deviceScaleFactor:1,mobile:false});await panel.reload();for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
+ const visible=expression=>until(()=>panel.evaluate('Boolean('+expression+')'),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,fixture:stderr});throw error;}),click=expression=>harnessPointerClick(panel,expression,until);
+ await visible('document.querySelector("[contenteditable=true]")&&!document.querySelector("[contenteditable=true]").hasAttribute("aria-disabled")');
+ await click('document.querySelector("button[aria-label=\\"Add files or run commands\\"]")');await visible('document.querySelectorAll("[data-trigger-menu] [role=option]").length===9');
+ await click('Array.from(document.querySelectorAll("[data-trigger-menu] [role=option]")).find(x=>x.textContent.includes("Compact"))');
+ let info;await until(async()=>{info=await rpc('session.compaction');return info.lastReceipt?.state==='completed';},'original Compact saves native entry');assert(info.lastReceipt.estimatedTokensAfter<info.lastReceipt.tokensBefore);assert.equal((await rpc('session.history')).events.filter(x=>x.event.type==='user/message').length,0);
+ await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Context")');await visible('document.querySelector(".lc-root")&&document.body.innerText.includes("Context Stats")');
+ assert.equal((await rpc('observation.list',{limit:500})).records.filter(r=>r.kind==='compaction/end'&&r.data.returnedSummary).length,1);await visible('document.querySelector(".lc-root").innerText.includes("Compact")');
+ const requests=(await readFile(link.requestLog,'utf8')).trim().split('\n').map(JSON.parse);assert(requests.length>=1);assert(requests.every(body=>body.messages.some(m=>JSON.stringify(m.content).includes('context summarization assistant'))));const before=requests.length;await panel.reload();await visible('document.querySelector("[contenteditable=true]")');await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Context")');await visible('document.querySelector(".lc-root")');assert.equal((await readFile(link.requestLog,'utf8')).trim().split('\n').length,before,'reload never repeats the summary');assert.equal(panel.errors.length,0,JSON.stringify(panel.errors));assert(panel.urls.every(value=>value.startsWith(url.origin)||value.startsWith('data:')),JSON.stringify(panel.urls));
 });

@@ -14,13 +14,13 @@ const allowed = new Set([
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
-  'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue',
+  'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue', 'session.compact', 'session.compaction', 'session.acknowledgeCompaction',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.search', 'observation.payload', 'observation.clear',
   'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond',
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
 type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
-const inspectionReads=new Set(['session.jobs','session.job','session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','observation.describe','observation.list', 'observation.search','observation.payload']);
+const inspectionReads=new Set(['session.jobs','session.job','session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','session.compaction','observation.describe','observation.list', 'observation.search','observation.payload']);
 interface LiveFrame {seq: number; sessionId: string; frame: Data}
 const LIVE_BYTES = 16 * 1024 * 1024;
 

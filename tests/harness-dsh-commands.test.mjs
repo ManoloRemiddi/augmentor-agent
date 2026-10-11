@@ -48,7 +48,7 @@ test('draft revision and inline slash picks prevent unintended UI actions; launc
 test('owned commands are adjudicated before inference; arguments and unbound DSH commands preserve the draft',async()=>{
   const f=fixture();assert.equal(await f.menu.adjudicate('/goal'),'handled');assert.deepEqual(f.actions,['goal']);assert.equal(f.writes.length,1);
   f.writes.length=0;f.actions.length=0;
-  for(const command of ['compact','permission','export','feedback'])await assert.rejects(f.menu.adjudicate('/'+command),/not yet connected to Pi/);
+  for(const command of ['permission','export','feedback'])await assert.rejects(f.menu.adjudicate('/'+command),/not yet connected to Pi/);
   await assert.rejects(f.menu.adjudicate('/goal draft arguments'),/by itself/);
   assert.equal(await f.menu.adjudicate('/unrelated-saved-template'),undefined);
   assert.deepEqual(f.actions,[]);assert.deepEqual(f.writes,[]);assert.deepEqual(f.choices,[]);
@@ -64,4 +64,16 @@ test('model popup captures provider identity and refuses stale draft/model/runni
   f.state.running=true;await assert.rejects(spec.onSelect(options[1],context),/changed/);f.state.running=false;
   await spec.onSelect(options[1],context);assert.deepEqual(f.choices,[{provider:'fixture',model:'second'}]);
   f.state.epoch++;await assert.rejects(spec.onSelect(options[1],context),/changed/);assert.equal(f.choices.length,1);assert.deepEqual(f.writes,[]);
+});
+
+// Async command admission must not erase a rejected or subsequently edited draft.
+test('Compact consumes only a confirmed, unchanged command span and refuses active work',async()=>{
+ const f=fixture();f.draft.text='/compact';f.deps.rows=()=>[{name:'compact'}];let settle;
+ f.deps.actions.compact=()=>new Promise(resolve=>settle=resolve);
+ assert.equal(await f.menu.adjudicate('/compact'),'handled');await Promise.resolve();assert.deepEqual(f.writes,[]);
+ f.draft.rev++;settle({accepted:true});await new Promise(resolve=>setImmediate(resolve));assert.deepEqual(f.writes,[]);
+ f.draft.rev--;f.deps.actions.compact=async()=>{throw Error('Authoritative refusal');};
+ await f.menu.adjudicate('/compact');await new Promise(resolve=>setImmediate(resolve));assert.deepEqual(f.writes,[]);assert.deepEqual(f.notices,['Authoritative refusal']);
+ f.deps.actions.compact=async()=>({accepted:true});await f.menu.adjudicate('/compact');await new Promise(resolve=>setImmediate(resolve));assert.equal(f.writes.length,1);
+ f.state.running=true;await assert.rejects(f.menu.adjudicate('/compact'),/Stop active/);await assert.rejects(f.menu.adjudicate('/compact arguments'),/by itself/);
 });

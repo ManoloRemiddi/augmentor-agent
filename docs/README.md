@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Manual Pi compaction](PI-COMPACTION.md) — original DSH command, private operation receipts, summary observations, cancellation and unknown/no replay.
+
 [MX Linux first: installed Harness preview and feedback guide](MX-HARNESS-PREVIEW.md). Further Windows/macOS/distro implementation follows MX testing and refinement.
 
 [Original public DSH GUI on Pi](DSH-GUI-ON-PI.md): copied interface, licensing, Pi bindings, MX qualification and remaining compatibility gaps.

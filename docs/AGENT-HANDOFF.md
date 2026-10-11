@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 original Compact candidate
+
+[Manual Pi compaction](PI-COMPACTION.md) binds the original ninth command row to supported `AgentSession.compact()` with durable operation identities, scoped cancellation, native-boundary verification and unknown/no replay. Summary requests are separately observed; the existing copied Context dashboard labels the summary-input boundary and SDK estimates. Source qualification passes **195/195 across 25 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. No supplier files/CSS/licences or dependencies change. Ordinary bundled Node 24.19.0 also passes 195/195; installed acceptance follows separately; the preceding installed original command menu is preserved below. Full Harness/platform/migration gates remain open and further platforms stay deferred.
+
+
 ## October 11 current installed original command menu
 
 Tested implementation **d6010d040f4533ced34f1da8453a1c15c42bcdbf** is selected **and running** in private MX release **20261011-170722-5dfb555f**, product 0.2.13, artifact **32f6005e9b8506c77bed6f92eb7591e7af2e4e7a87eca5809f729e5b73e10c36**. Normal guarded immutable update/stable Host and Native launch succeed; both running roots match selection and Native is online/model-ready/idle. Full **21,737-entry** inventory passes after GUI reads. Source and final ordinary bundled Node 24.19.0 cohorts each pass **139/139 across eighteen files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. All ten histories and queue item identities are preserved, with zero new admissions/provider requests. Actual installed original eight-row menu, `/con` filtering/Tab-to-Context and model-popup current Qwen highlight/Escape pass; the current model is not changed. Context remains selected for owner feedback. Production selection/model router/model and speech settings remain preserved.

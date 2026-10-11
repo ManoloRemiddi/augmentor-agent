@@ -8,6 +8,7 @@ import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID,createHash} from 'node:crypto';
+import {SessionManager} from '@earendil-works/pi-coding-agent';
 const source=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('..',import.meta.url)));
 const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
@@ -23,6 +24,9 @@ const model=http.createServer(async(req,res)=>{
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null,usage)=>res.write('data: '+JSON.stringify({id:'fixture',object:'chat.completion.chunk',model:'harness-fixture',choices:[{index:0,delta,finish_reason:finish}],...(usage?{usage}:{})})+'\n\n');
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
+  if(body.messages.some(message=>['system','developer'].includes(message.role)&&JSON.stringify(message.content).includes('context summarization assistant'))){
+    chunk({role:'assistant',content:'# Goal\nPreserve the authored summary fixture.\n# Progress\nSynthetic history only.\n# Next steps\nContinue explicitly.'},'stop',{prompt_tokens:6000,completion_tokens:40,total_tokens:6040});res.end('data: [DONE]\n\n');return;
+  }
   if(body.messages.some(message=>['system','developer'].includes(message.role)&&JSON.stringify(message.content).includes('Inline editor override:'))){
     const draft=typeof lastUser?.content==='string'?lastUser.content:lastUser?.content?.map(part=>part.text??'').join('');
     if(draft?.includes('IMPROVE_SLOW')){const timer=setInterval(()=>chunk({content:' '}),50);res.once('close',()=>clearInterval(timer));return;}
@@ -56,6 +60,14 @@ model.listen(0,'127.0.0.1');await once(model,'listening');
 const selection={provider:'fixture',model:'harness-fixture'};
 writeFileSync(join(config,'agent/models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Harness deterministic fixture',reasoning:true,compat:{supportsReasoningEffort:true},input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
 writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'workspace-write',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
+// Large independently authored native context exercises default Pi compaction;
+// these saved messages do not represent executed actions or private history.
+if(process.env.AUGMENTOR_HARNESS_PROOF_COMPACTION==='1'){
+ const sid='compact-fixture',manager=SessionManager.create(workspace,join(state,'sessions',sid));manager.appendModelChange(selection.provider,selection.model);manager.appendThinkingLevelChange('off');
+ const assistant=text=>({role:'assistant',content:[{type:'text',text}],api:'openai-completions',provider:selection.provider,model:selection.model,stopReason:'stop',timestamp:1,usage:{input:0,output:0,cacheRead:0,cacheWrite:0,totalTokens:0,cost:{input:0,output:0,cacheRead:0,cacheWrite:0,total:0}}});
+ manager.appendMessage({role:'user',content:'Old authored context '+ 'x'.repeat(12000),timestamp:1});manager.appendMessage(assistant('Old authored answer '+ 'y'.repeat(12000)));manager.appendMessage({role:'user',content:'Kept authored context '+ 'z'.repeat(80000),timestamp:2});manager.appendMessage(assistant('Keep this authored answer.'));
+ writeFileSync(join(state,'sessions',sid+'.meta.json'),JSON.stringify({id:sid,cwd:workspace,file:manager.getSessionFile(),selection,title:'Synthetic Compact fixture',saved:false,policy:'read-only',updatedAt:1,requests:[],running:false}),{mode:0o600});
+}
 // Independently authored saved metadata; no executed action or native chat is fabricated.
 if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
  const sid='trajectory-index-proof',directory=join(state,'observations',sid),time=Date.now();mkdirSync(directory,{recursive:true,mode:0o700});mkdirSync(join(state,'sessions'),{recursive:true,mode:0o700});

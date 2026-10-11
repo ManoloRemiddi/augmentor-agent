@@ -200,6 +200,9 @@ export class PiExecution {
    return this.blocked?{action:'end'}:decision||undefined;
   };
   const stream:Agent['streamFunction']=async(model,context,options)=>{
+   // Summary requests have their own SDK lifecycle, not the preceding turn's
+   // cancellation/recovery budget. Preserve the SDK's summarization options.
+   if(session.isCompacting)return previousStream(model,context,options);
    if(this.cancelled)throw Error('Turn cancelled before provider dispatch.');
    if(this.superseding)return previousStream(model,context,options);
    if(this.blocked||this.exhausted()){this.stop('The bounded recovery time or request budget was exhausted.');throw Error(this.incompleteReason);}

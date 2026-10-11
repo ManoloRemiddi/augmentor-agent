@@ -12,7 +12,7 @@ export class DshPiController {
   update(patch){this.state={...this.state,...patch};for(const fn of this.listeners)fn();}
   async rpc(method,params={}){
     const response=await this.fetcher('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});
-    const body=await response.json();if(!response.ok||body.error)throw Error(body.error?.message||'The local connection failed.');return body.result;
+    const body=await response.json();if(!response.ok||body.error){const error=Error(body.error?.message||'The local connection failed.');error.authoritative=!!body.error;throw error;}return body.result;
   }
   async start(requestedSession){
     const access=await this.fetcher('/api/access',{headers:{Authorization:'Bearer '+this.token}}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error?.message||'Open a fresh Harness link.');return v;});
@@ -27,16 +27,16 @@ export class DshPiController {
   async open(sessionId){
     if(!this.state.readOnly&&this.state.workspaces?.archivedSessionIds?.includes(sessionId))throw Error('Restore the conversation before opening it.');
     const epoch=++this.epoch;
-    this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,phase:'loading',events:[],records:[],payloads:{},queue:null,interactions:[],selection:null,reasoning:null,goal:null,hasMore:false,error:null});
+    this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,compaction:null,compactionPending:false,phase:'loading',events:[],records:[],payloads:{},queue:null,interactions:[],selection:null,reasoning:null,goal:null,hasMore:false,error:null});
     const sub=await this.rpc('events.subscribe',{sessionId,clientId:this.clientId});if(epoch!==this.epoch)return;
     this.cursor=sub.cursor;
-    const [history,observations,model,queue,goal]=await Promise.all([
-      this.rpc('session.history',{sessionId,maxMessages:100}),this.rpc('observation.list',{sessionId}),this.rpc('session.models',{sessionId}),this.rpc('session.queue',{sessionId}),this.rpc('session.goal',{sessionId}),
+    const [history,observations,model,queue,goal,compaction]=await Promise.all([
+      this.rpc('session.history',{sessionId,maxMessages:100}),this.rpc('observation.list',{sessionId}),this.rpc('session.models',{sessionId}),this.rpc('session.queue',{sessionId}),this.rpc('session.goal',{sessionId}),this.rpc('session.compaction',{sessionId}),
     ]);
     if(epoch!==this.epoch)return;
     const reasoning=this.state.readOnly?null:await this.rpc('session.reasoning',{sessionId});if(epoch!==this.epoch)return;
     sessionStorage.setItem('augmentor-harness-session',sessionId);
-    this.update({events:history.events.map(x=>x.event),hasMore:history.hasMore===true,observationHasMore:observations.hasMore===true,records:observations.records,selection:model.current,queue,goal,reasoning,interactions:sub.pending,phase:'ready'});
+    this.update({events:history.events.map(x=>x.event),hasMore:history.hasMore===true,observationHasMore:observations.hasMore===true,records:observations.records,selection:model.current,queue,goal,reasoning,compaction,interactions:sub.pending,phase:'ready'});
     void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
   }
   hydrating=false;
@@ -48,7 +48,7 @@ export class DshPiController {
       for(const record of requests){const result=await readDshPayload((m,p)=>this.rpc(m,p),sessionId,record);if(epoch!==this.epoch)return;if(result.available)this.update({payloads:{...this.state.payloads,[record.id]:result.value}});}
     }finally{this.hydrating=false;}
   }
-  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},queue:null,goal:null,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
+  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},queue:null,goal:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
   async refresh(){const [list,workspaces]=await Promise.all([this.rpc('session.list'),this.state.readOnly?null:this.rpc('workspace.list')]);this.update({sessions:list.items,workspaces});if(!this.state.readOnly&&workspaces?.archivedSessionIds?.includes(this.state.sessionId))this.clearSelection();}
   async organize(action,sessionId,stop=false){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
@@ -79,6 +79,7 @@ export class DshPiController {
         if(frame.method==='session/event'){appendDisplay(events,frame.payload.event);changed=true;}
         if(frame.method==='observation/event'){const r=frame.payload.observation;records.set(r.id,r);changed=true;}
         if(frame.method==='session/queue'){queue=frame.payload;changed=true;}
+        if(frame.method==='session/compaction'){this.update({compaction:frame.payload});changed=true;}
         if(['approval/requested','question/requested'].includes(frame.method)){interactions.set(frame.rpcId,frame);changed=true;}
         if(['interaction/resolved'].includes(frame.method)){interactions.delete(frame.rpcId);changed=true;}
       }
@@ -95,6 +96,16 @@ export class DshPiController {
     const sessionId=crypto.randomUUID();await this.rpc('session.create',{sessionId,selection,cwd});await this.refresh();await this.open(sessionId);
   }
   pending=new Map();
+  async compact(scope){
+    const {sessionId,selection}=this.state,epoch=this.epoch;
+    if(scope.sessionId!==sessionId||scope.epoch!==epoch||this.state.readOnly||this.state.phase!=='ready'||this.state.sessions.find(x=>x.sessionId===sessionId)?.running||this.state.compaction?.blocked||this.pending.has(sessionId))throw Error('The conversation is not ready to compact. Your draft is preserved.');
+    const requestId=crypto.randomUUID(),receipt={kind:'compaction',requestId,provider:selection.provider,model:selection.model};this.pending.set(sessionId,receipt);this.update({compactionPending:true});
+    let result;
+    try{result=await this.rpc('session.compact',{sessionId,...receipt});this.pending.delete(sessionId);}
+    catch(error){if(error.authoritative)this.pending.delete(sessionId);if(epoch===this.epoch)this.update({compactionPending:false,...(!error.authoritative?{unconfirmed:receipt}:{})});throw Error(error.message+(!error.authoritative?' Compaction submission is unconfirmed; nothing was resent.':''));}
+    if(epoch===this.epoch)this.update({compaction:result,compactionPending:false});
+    void this.refresh().catch(()=>{});return result;
+  }
   clearUnconfirmed(){this.pending.delete(this.state.sessionId);this.update({unconfirmed:null});}
   async send(text,mode='queue',attachments=[]){
     const {sessionId,queue}=this.state;if(!sessionId)throw Error('Choose a workspace first.');

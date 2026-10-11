@@ -6,7 +6,7 @@ import type {ContextProvenance} from './context-provenance.js';
 
 /** Observe the supported SDK pipeline after all registered payload transforms. */
 export function observeSession(session: AgentSession, store: ObservationStore, sessionId: string,
-  current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data;execution?:Data;reasoning?:Data}, notify: (event: unknown) => void,
+  current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data;execution?:Data;reasoning?:Data;compactionId?:string}, notify: (event: unknown) => void,
   warning: (message: string) => void, provenance?:ContextProvenance) {
   let requestId: string | undefined;
   let started = 0, firstToken = false;
@@ -36,7 +36,35 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
   };
   if(provenance)session.agent.transformContext=transformHook;
   let requestedThinking:string|undefined;
-  const streamHook:typeof previousStream=async(model,context,options)=>{requestedThinking=options?.reasoning??'off';inspect(()=>provenance?.streaming(context));return previousStream(model,context,options);};
+  const streamHook:typeof previousStream=async(model,context,options)=>{
+    const operationId=current().compactionId;
+    if(operationId&&session.isCompacting){
+      // Default Pi summaries use stream options directly and bypass Agent's
+      // onPayload/message hooks. Observe the public request options/result;
+      // never consume, replace or retry the SDK's stream.
+      let id:string|undefined,clock=0,count=0,bytes=0,dropped=0;
+      const capture=store.policy().capturePayloads,events:unknown[]=[],redactions=new Set<string>();
+      const summaryRecord=(kind:string,data:Data,payload?:unknown)=>{
+        let event;inspect(()=>{event=store.append(sessionId,kind,{...data,purpose:'manual-compaction',operationId},{requestId:id},payload);notify(event);});return event as ReturnType<ObservationStore['append']>|undefined;
+      };
+      const stream=await previousStream(model,context,{...options,
+        onPayload:async(body,selected)=>{const transformed=await options?.onPayload?.(body,selected),effective=transformed===undefined?body:transformed;clock=performance.now();id=undefined;
+          id=summaryRecord('model/request',{selected:current().selected,model:model.id,provider:model.provider,api:model.api,capacity:model.contextWindow,thinkingLevel:options?.reasoning??'off',boundary:'provider-payload-after-summary-hooks',transportAttempts:'not-observed'},effective)?.id;return transformed;},
+        onResponse:async(response,selected)=>{await options?.onResponse?.(response,selected);summaryRecord('model/response',{status:response.status});},
+        onProviderStreamEvent:async(data,selected)=>{await options?.onProviderStreamEvent?.(data,selected);count++;
+          if(!capture||!store.policy().capturePayloads){dropped++;return;}
+          try{const snapshot=payloadText(data),size=Buffer.byteLength(snapshot.text)+128;if(bytes+size>8*1024*1024){dropped++;return;}bytes+=size;snapshot.redactions.forEach(key=>redactions.add(key));events.push({index:count,...(clock?{elapsedMs:performance.now()-clock}:{}),data:JSON.parse(snapshot.text)});}catch{dropped++;}
+        },
+      });
+      // result() is a public, repeatable promise. Pi still owns and consumes it.
+      void stream.result().then(message=>{
+        if(count)summaryRecord('provider/stream',{boundary:'parsed-summary-provider-events-after-hooks',observedEvents:count,capturedEvents:events.length,droppedEvents:dropped,coverage:!capture?'disabled-at-request-start':dropped?'partial':'complete',credentialRedactions:[...redactions],maxCaptureBytes:8*1024*1024},{events});
+        summaryRecord('model/complete',{stopReason:message.stopReason,usage:message.usage,usageBoundary:'sdk-normalized; zero fields may be unavailable',requestCoverage:id?'observed-after-summary-hooks':'not-observed',...(clock?{durationMs:performance.now()-clock}:{}),model:message.model,provider:message.provider},message);
+      }).catch(()=>summaryRecord('model/complete',{stopReason:'error',requestCoverage:id?'observed-after-summary-hooks':'not-observed'}));
+      return stream;
+    }
+    requestedThinking=options?.reasoning??'off';inspect(()=>provenance?.streaming(context));return previousStream(model,context,options);
+  };
   if(typeof previousStream==='function')session.agent.streamFunction=streamHook;
   const payloadHook: typeof previousPayload = async (payload, model) => {
     inspect(()=>provenance?.beforePayload(payload));
@@ -124,8 +152,13 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     if (event.type === 'entry_appended' && event.entry.type === 'context_edit') {
       record('context/edit', {entryId: event.entry.id, targetId: event.entry.targetId}, event.entry);
     }
-    if (event.type === 'compaction_start' || event.type === 'compaction_end' ||
-      event.type === 'auto_retry_start' || event.type === 'auto_retry_end') {
+    if(event.type==='compaction_start'||event.type==='compaction_end'){
+      inspect(()=>{const data:Data={reason:event.reason,...(current().compactionId?{operationId:current().compactionId}:{})};
+        if(event.type==='compaction_end')Object.assign(data,{aborted:event.aborted,willRetry:event.willRetry,returnedSummary:!!event.result,...(event.result?{tokensBefore:event.result.tokensBefore,estimatedTokensAfter:event.result.estimatedTokensAfter}:{})});
+        notify(store.append(sessionId,event.type.replaceAll('_','/'),data,event.reason==='manual'?{}:{turnId:current().turnId},event));
+      });
+    }
+    if (event.type === 'auto_retry_start' || event.type === 'auto_retry_end') {
       record(event.type.replaceAll('_', '/'), {}, event);
     }
   });

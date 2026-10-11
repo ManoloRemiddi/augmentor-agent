@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 
-const unavailable=new Set(['compact','permission','export','feedback']);
+const unavailable=new Set(['permission','export','feedback']);
 const sameModel=(a,b)=>a?.provider===b?.provider&&a?.model===b?.model;
 
 /** Pi bindings for the copied DSH trigger and popup controllers; no agent owner. */
@@ -67,6 +67,13 @@ export class DshCommandMenu {
   }
   dispatch(name,scope,segment){
     if(!this.segmentValid(scope,segment))return false;
+    if(name==='compact'){
+      if(this.current().running)throw Error('Stop active work before compacting. Your draft is preserved.');
+      const action=this.deps.actions.compact;if(!action)return false;
+      // Only a confirmed admission may consume the owned slash span. Late
+      // replies cannot erase a changed draft or another conversation's text.
+      void Promise.resolve().then(()=>{if(!this.segmentValid(scope,segment))return;return action(scope);}).then(result=>{if(result?.accepted)this.consume(scope,segment);}).catch(error=>this.deps.notice(error.message));return true;
+    }
     if(name!=='model'){
       const action=this.deps.actions[name];if(!action)return false;
       action(scope);this.consume(scope,segment);return true;

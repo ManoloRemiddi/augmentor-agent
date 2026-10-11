@@ -58,6 +58,7 @@ export class PiSteering {
  install(){
   const agent=this.session.agent,previous=agent.streamFunction,previousFinish=agent.finishTurn;
   const stream:Agent['streamFunction']=async(model,context,options)=>{
+   if(this.session.isCompacting)return previous(model,context,options);
    const request=new AbortController();this.request=request;
    if(this.pending)request.abort(new Error('Superseded before provider dispatch.'));
    const signal=options?.signal?AbortSignal.any([options.signal,request.signal]):request.signal;
