@@ -18,4 +18,4 @@ The responsive conversation drawer, bounded ledger rows and accessible real butt
 
 Read [the implementation and test record](../../docs/AUGMENTOR-HARNESS.md) before claiming workflow or installed parity.
 
-The Jobs view starts bounded SDK children or permitted background commands, inspects exact-parent output/history and stops owned work. Its scoped inspector only reads. See [the lifecycle and accounting contract](../../docs/PI-JOBS.md).
+The Jobs view starts bounded SDK children, desktop specialists or permitted background commands, inspects exact-parent output/history/originals and optional child provider payloads and stops owned work. Its scoped inspector only reads. See [the lifecycle and accounting contract](../../docs/PI-JOBS.md).

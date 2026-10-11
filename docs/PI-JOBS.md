@@ -6,14 +6,16 @@ The shared Host owns a private durable job registry. A delegated worker has one
 distinct Pi AgentSession and its own native history, queue and observations.
 The parent continues through its existing owner. Background commands own separate
 processes; they never create another agent loop. This source feature extends the
-accepted P1 migration requirement. Live services, specialist consolidation and
+accepted P1 migration requirement. Live services, concurrent integration and
 platform/installed acceptance remain required before DSH retirement.
 
 ## Authority and admission
 
 Model tools are `job_start`, `job_list`, `job_read`, `job_wait`, `job_cancel`.
 Operator RPCs are `session.startJob`, `session.jobs`, `session.job`,
-`session.jobHistory`, `session.waitJob`, `session.cancelJob`, `session.removeJob`.
+`session.jobHistory`, `session.jobNativeHistory`, `session.jobNativeRead`,
+`session.jobObservations`, `session.jobPayload`, `session.waitJob`,
+`session.cancelJob`, `session.removeJob`.
 All read, wait, cancellation and child-history operations require the exact
 parent conversation. A guessed job ID or a fork does not grant access. The
 standalone Harness Jobs tab offers bounded start, evidence and Stop controls;
@@ -50,9 +52,57 @@ Host. Direct JavaScript effects inside a trusted extension are not confined by
 model-tool grants. Concurrent workers share the selected workspace and may
 conflict; this feature does not add filesystem isolation or transaction rollback.
 
+## Desktop specialist jobs
+
+`kind:desktop` uses the existing [bounded specialist](DESKTOP-SPECIALIST.md).
+Its task is strict JSON with `task`, `successCriteria` and `constraints`; tool
+names are fixed, and `allowedTools:[]` selects that set. Shell, file, memory,
+parent resources and recursive delegation stay outside this child. The selected
+image model and effective parent thinking level are snapshotted without fallback.
+Defaults are 180 seconds, 24 provider requests, 40 tool dispatches and 24576 total
+reported output tokens. Each request still has the specialist's 1024-token cap,
+existing conservative context guard and two recent outgoing images.
+
+The awaited `desktop_delegate` coordinator tool now starts this same durable
+job and returns its structured result with job/child/run IDs. Only one such tool
+is accepted per parent turn. Operator `session.startJob` and model `job_start`
+can start a background specialist; one desktop job is admitted globally. This
+is the existing public SDK specialist loop with one distinct native child owner,
+not another loop for the parent. Child SDK history, screenshots, tool pairs and
+provider observations survive disposal. Native files are tightened to 0600 after
+public message events and settlement, inside private 0700 directories.
+
+The OS executor and desktop evidence retain `pi:<parentId>` ownership so existing
+consent, independent desktop Stop and `desktop_evidence` continue to work.
+Restricted admission and each input approval route to the parent UI with a child
+identity; individual Stop cancels that child's pending approval. Fresh screenshot
+tokens remain single-use. Both saved action intent and the job checkpoint precede
+input dispatch. Screenshots and detailed worker metadata stay outside ordinary
+parent context; explicit evidence reads remain authorized operations.
+
+Ordinary parent settlement preserves the child’s pending approvals and desktop
+connection; direct desktop tools are fenced while its job owns admission. The
+existing direct desktop Stop cancels the durable job as well.
+
+Parent Stop, job Stop or child-session Stop cancel the actual worker and release
+the consented executor. A failed release confirmation remains `unknown`, even
+when cancellation or a time limit was requested. Crashes retain native originals,
+known partial usage and attempted-input evidence without reconnecting or replaying.
+The job's disposition is authoritative; a retained partial desktop result is a
+checkpoint, not proof of eventual settlement. Completed still means a fresh
+post-action screenshot and the worker's observed claim, not external verification.
+
+The standalone Harness Jobs form exposes the strict desktop brief and bounds.
+Parent-owned native history pages and hash-bound excerpts, plus child provider
+observations and captured payload excerpts, also work through its scoped read-only
+inspector. Reads perform no inference, producer dispatch or usage attribution.
+Payload capture follows the existing optional observation/retention policy;
+native screenshot history and desktop evidence are separate private stores.
+Approved Native/Browser layout and model/speech/GPU settings are unchanged.
+
 ## Bounds, Stop and restart
 
-Defaults are sixty seconds, sixteen provider requests, 64 tool dispatches and
+General defaults are sixty seconds, sixteen provider requests, 64 tool dispatches and
 8192 reported output tokens. Supported maxima are five minutes, 64 requests,
 256 tools and 131072 output tokens. Provider requests are counted and saved at
 the public stream seam before dispatch. Root/nested tool dispatches are counted
@@ -119,18 +169,21 @@ inherited model for attribution; it is not a provider-by-provider billing report
 Actual private SDK/provider fixtures cover permitted writes, denied root/nested
 tools, request/tool/output limits, parent and individual Stop, scoped approvals,
 real command processes, stable IDs, crash recovery and one-time native usage.
+Actual Host/SDK/desktop-client fixtures cover awaited and operator desktop jobs,
+pre-dispatch receipts, preserved screenshots and tool pairs, consent/input/Stop
+failures, limits, scoped approvals, crash recovery and one-time usage. Their
+independent peer is synthetic; it does not request physical OS consent.
 Actual Chromium covers Jobs start/output/Stop, literal HTML rendering, narrow
 viewport and scoped cold read-only inspection. Registry tests cover UTF-8
 eviction/restart, owner fences, quotas and independent waits.
 
 These are synthetic service and Linux source/staged checks, not live provider,
-physical desktop/audio or installed Mac/Windows qualification. The existing
-desktop specialist remains a separately bounded awaited workflow; its durable
-job lifecycle/usage consolidation remains required. Actual concurrent Browser,
+physical desktop/audio or installed Mac/Windows qualification. The desktop specialist now shares durable job lifecycle and usage accounting.
+Actual concurrent Browser,
 MCP and desktop jobs, all platform cancellation adapters, representative live
 services and the full accepted P0/P1 migration/installed gates remain open.
 
 Exact revisions, test counts and failures are recorded in the
 [agent handoff](AGENT-HANDOFF.md). DSH and owner-selected releases remain available.
 
-Tested implementation `26a6c07a28f618a6446f64c40cd9ddbca16cb825`: 809 source cases/807 passes/two existing optional skips; ordinary unselected stage 19, Node 24.19.0, 187 passes across 45 files. See the handoff for retained failures and hosted gates.
+Historical general-jobs implementation `26a6c07a28f618a6446f64c40cd9ddbca16cb825`: 809 source cases/807 passes/two existing optional skips; ordinary unselected stage 19, Node 24.19.0, 187 passes across 45 files. See the handoff for retained failures and hosted gates.

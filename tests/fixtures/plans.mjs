@@ -10,10 +10,12 @@ import {join,resolve} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 import {PiConnection} from '../../dist/client/src/socket.js';
 import {localConnect} from '../../dist/platform/src/transport.js';
+import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
-export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode}={}){
+export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode}={}){
  const root=await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
- for(const path of [join(config,'agent'),workspace])await mkdir(path,{recursive:true,mode:0o700});
+ const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])await mkdir(path,{recursive:true,mode:0o700});
+ const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
  const requests=[],children=[],connections=[],frames=[];let child,owner,errors='';
  const model=http.createServer(async(req,res)=>{
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
@@ -24,6 +26,25 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
   res.writeHead(200,{'content-type':'text/event-stream'});
   const send=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'plan-fixture',object:'chat.completion.chunk',model:'plan-fixture',choices:[{index:0,delta,finish_reason:finish}]})+'\n\n');
   const last=body.messages.at(-1),proposal=body.messages.findLast(m=>m.role==='assistant'&&m.tool_calls?.length),toolName=proposal?.tool_calls?.at(-1)?.function?.name;
+  if(desktopMode){
+   const tool=(name,args={})=>send({role:'assistant',tool_calls:[{index:0,id:'desktop-call-'+requests.length,type:'function',function:{name,arguments:JSON.stringify(args)}}]},'tool_calls');
+   const worker=body.tools?.some(tool=>tool.function.name==='desktop_finish');
+   if(worker){
+    for(const message of body.messages.filter(message=>message.role==='user')){const value=typeof message.content==='string'?message.content:message.content?.map(part=>part.text??'').join('');try{const brief=JSON.parse(value);if(typeof brief.task==='string'&&typeof brief.successCriteria==='string'){op=brief;break;}}catch{}}
+    if(desktopMode.holdBeforeConnect||desktopMode.holdAfterAction&&toolName==='desktop_action'){
+     send({role:'assistant',content:'Synthetic desktop provider holding. '});const timer=setInterval(()=>send({content:' '}),100);res.once('close',()=>clearInterval(timer));return;
+    }
+    if(!toolName)tool('desktop_connect');
+    else if(toolName==='desktop_connect'||toolName==='desktop_action')tool('desktop_snapshot');
+    else if(toolName==='desktop_snapshot'&&!body.messages.some(m=>m.role==='assistant'&&m.tool_calls?.some(c=>c.function.name==='desktop_action'))){
+     const result=body.messages.findLast(message=>message.role==='tool'),metadata=typeof result.content==='string'?result.content:result.content.find(p=>p.type==='text')?.text;tool('desktop_action',{token:JSON.parse(metadata).token,kind:'click',x:0,y:0});
+    }else tool('desktop_finish',{status:'completed',summary:op.task,verification:op.successCriteria});
+   }else if(op.kind==='desktop-direct'&&last?.role!=='tool')tool(op.tool,{});
+   else if(op.kind==='desktop-parent'&&last?.role!=='tool')tool('desktop_delegate',op.brief);
+   else if(op.kind==='desktop-parent'&&desktopMode.doubleDelegate&&toolName==='desktop_delegate'&&!body.messages.some(m=>m.role==='tool'&&String(m.content).includes('Only one desktop delegation')))tool('desktop_delegate',op.brief);
+   else send({role:'assistant',content:op.reply??'Synthetic parent result; inspect evidence.'},'stop');
+   res.write('data: '+JSON.stringify({id:'desktop-usage',object:'chat.completion.chunk',choices:[],usage:{prompt_tokens:10,completion_tokens:5,total_tokens:15}})+'\n\n');res.end('data: [DONE]\n\n');return;
+  }
   if(jobMode){
    if(text?.startsWith('Delegated task from the parent conversation.')){try{op=JSON.parse(text.split('\n\n').slice(1).join('\n\n'));}catch{op={kind:'worker-reply'};}}
    const tool=(name,args)=>send({role:'assistant',tool_calls:[{index:0,id:'job-call-'+requests.length,type:'function',function:{name,arguments:JSON.stringify(args)}}]},'tool_calls');
@@ -61,10 +82,15 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
   res.end('data: [DONE]\n\n');
  });model.listen(0,'127.0.0.1');await once(model,'listening');
  const selection={provider:'fixture',model:'plan-fixture'};
- await writeFile(join(config,'agent','models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-plan-key',models:[{id:selection.model,name:'Synthetic planning provider',reasoning:false,input:['text'],contextWindow:131072,maxTokens:2048}]}}}),{mode:0o600});
+ await writeFile(join(config,'agent','models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-plan-key',models:[{id:selection.model,name:'Synthetic planning provider',reasoning:false,input:desktopMode&&!desktopMode.textOnly?['text','image']:['text'],contextWindow:131072,maxTokens:2048}]}}}),{mode:0o600});
  await writeFile(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:policy,pinned:[],hidden:[],defaultModel:selection,observation:{capturePayloads:true}}),{mode:0o600});
  const env=Object.fromEntries(Object.entries(process.env).filter(([k])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(k)));
- Object.assign(env,{HOME:root,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'});
+ Object.assign(env,{HOME:root,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),XDG_RUNTIME_DIR:runtime,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_LINUX_TOOLS:desktopMode?'1':'0',AUGMENTOR_DESKTOP_NO_AUTOSTART:'1',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'});
+ if(desktopMode&&process.platform==='darwin'){
+  // Satisfy the existing installed-helper presence gate in this synthetic profile.
+  // Actual control goes to the private wire peer; this stub cannot capture/input.
+  env.AUGMENTOR_MACOS_HELPER=join(root,'synthetic-macos-helper');await writeFile(env.AUGMENTOR_MACOS_HELPER,'#!/bin/sh\nexit 3\n',{mode:0o700});
+ }
  const source=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.');
  async function start(){
   errors='';child=spawn(process.execPath,[join(source,'dist/runtime/src/main.js')],{env,cwd:workspace,stdio:['ignore','pipe','pipe']});children.push(child);let ready=false;
@@ -74,12 +100,12 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
  }
  async function stop(){owner?.close();if(child?.exitCode===null&&child.signalCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}}
  async function crash(){owner?.close();if(child?.exitCode===null&&child.signalCode===null){const ended=once(child,'exit');child.kill('SIGKILL');await ended;}}
- t.after(async()=>{for(const connection of connections)connection.close();for(const process of children)if(process.exitCode===null&&process.signalCode===null){const ended=once(process,'exit');process.kill('SIGTERM');await ended;}model.closeAllConnections();await new Promise(done=>model.close(done));await rm(root,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ t.after(async()=>{for(const connection of connections)connection.close();for(const process of children)if(process.exitCode===null&&process.signalCode===null){const ended=once(process,'exit');process.kill('SIGTERM');await ended;}model.closeAllConnections();await new Promise(done=>model.close(done));await desktop?.close();await rm(root,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  await start();
  const call=(method,params={})=>owner.call(method,params);
  const settled=sid=>until(async()=>!(await call('session.list')).items.find(m=>m.sessionId===sid)?.running,'settled '+sid);
  async function prompt(sid,op,{wait=true}={}){const result=await call('session.prompt',{sessionId:sid,requestId:crypto.randomUUID(),content:[{type:'text',text:JSON.stringify(op)}]});if(wait)await settled(sid);return result;}
  async function native(sid){const meta=JSON.parse(await readFile(join(state,'sessions',sid+'.meta.json'),'utf8'));return {file:meta.file,bytes:await readFile(meta.file)};}
  const link=()=>readFile(join(state,'harness.json'),'utf8').then(JSON.parse);
- return {root,env,workspace,state,config,selection,requests,frames,call,prompt,settled,native,link,stop,crash,start,errors:()=>errors};
+ return {root,env,workspace,state,config,selection,requests,frames,desktop,call,prompt,settled,native,link,stop,crash,start,errors:()=>errors};
 }

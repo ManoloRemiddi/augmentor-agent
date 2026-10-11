@@ -4,12 +4,16 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import {once} from 'node:events';
 import {mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync, rmSync} from 'node:fs';
-import {join} from 'node:path';
+import {join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
-import {createAgentSession, ModelRuntime, DefaultResourceLoader, SettingsManager, SessionManager} from '@earendil-works/pi-coding-agent';
-import {DesktopSpecialist, boundedDesktopContext} from '../dist/runtime/src/desktop-specialist.js';
-import {DesktopEvidence} from '../dist/computer-use/src/evidence.js';
-import {DEFAULT_DESKTOP_LIMITS} from '../dist/computer-use/src/contracts.js';
+import {pathToFileURL} from 'node:url';
+const productRoot=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.'),sdkRoot=join(productRoot,'node_modules/@earendil-works/pi-coding-agent');
+// Resolve the package's published ESM root, including the selected staged SDK.
+const sdkImport=JSON.parse(readFileSync(join(sdkRoot,'package.json'),'utf8')).exports['.'].import;
+const {createAgentSession,ModelRuntime,DefaultResourceLoader,SettingsManager,SessionManager}=await import(pathToFileURL(resolve(sdkRoot,sdkImport)).href);
+const {DesktopSpecialist,boundedDesktopContext}=await import(pathToFileURL(join(productRoot,'dist/runtime/src/desktop-specialist.js')).href);
+const {DesktopEvidence}=await import(pathToFileURL(join(productRoot,'dist/computer-use/src/evidence.js')).href);
+const {DEFAULT_DESKTOP_LIMITS}=await import(pathToFileURL(join(productRoot,'dist/computer-use/src/contracts.js')).href);
 
 const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aJCkAAAAASUVORK5CYII=';
 const brief = {task: 'Click the test button once.', successCriteria: 'The desktop displays DONE.', constraints: 'Do not open other applications.'};
@@ -76,6 +80,8 @@ test('isolated Pi worker verifies a task, persists evidence and preserves select
   const record = DesktopEvidence.read(f.evidenceRoot, 'pi:test', result.runId);
   assert.equal(record.events.filter(event => event.image).length, 2);
   assert.equal(statSync(join(f.evidenceRoot, result.runId, 'record.json')).mode & 0o777, 0o600);
+  const nativeRoot=join(f.evidenceRoot,result.runId,'native'),nativeFiles=readdirSync(nativeRoot).filter(name=>name.endsWith('.jsonl'));assert.equal(nativeFiles.length,1);
+  const nativeFile=join(nativeRoot,nativeFiles[0]);assert.equal(statSync(nativeFile).mode&0o777,0o600);assert(readFileSync(nativeFile,'utf8').includes(png),'Standalone SDK originals also survive disposal');
   assert.throws(() => DesktopEvidence.read(f.evidenceRoot, 'pi:other', result.runId), /another conversation/);
   assert.throws(() => DesktopEvidence.read(f.evidenceRoot, 'pi:test', '../../etc/passwd'), /Invalid/);
 });

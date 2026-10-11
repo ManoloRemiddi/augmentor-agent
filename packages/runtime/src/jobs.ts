@@ -6,6 +6,9 @@ import {spawn} from 'node:child_process';
 import {StringDecoder} from 'node:string_decoder';
 import {Type} from 'typebox';
 import type {ExtensionAPI,AgentSession,ToolDefinition} from '@earendil-works/pi-coding-agent';
+import {desktopBrief} from './desktop-specialist.js';
+import {desktopTools} from '../../computer-use/src/tools.js';
+import {DEFAULT_DESKTOP_LIMITS,type DesktopResult} from '../../computer-use/src/contracts.js';
 import type {Usage} from '@earendil-works/pi-ai';
 import type {ExecutionContract} from './execution.js';
 import {atomicJson,privateDir} from './storage.js';
@@ -14,21 +17,23 @@ import type {JobChannel,JobOutputRead} from '../vendor/dsh-jobs/contracts.js';
 
 export const JOB_LIMITS={perOwner:4,global:16,records:256,liveBytes:64*1024,settledBytes:16*1024,cancelMs:5000};
 export type JobBounds={timeoutMs:number;maxRequests:number;maxTools:number;maxOutputTokens:number};
-export type JobSpec={requestId:string;kind:'delegate'|'shell';task:string;allowedTools:string[];limits:JobBounds};
+export type JobSpec={requestId:string;kind:'delegate'|'shell'|'desktop';task:string;allowedTools:string[];limits:JobBounds};
 export type JobState='starting'|'running'|'stopping'|'completed'|'failed'|'cancelled'|'unknown';
-export type JobRecord={version:1;id:string;owner:string;fingerprint:string;spec:JobSpec;state:JobState;createdAt:number;updatedAt:number;childId?:string;reason?:string;exitCode?:number;requests:number;tools:number;outputTokens:number;usage?:{provider:string;model:string;value:Usage};usageAccounted?:boolean;notified?:boolean;output:JobOutputRead};
-export type JobControl={signal:AbortSignal;append:(text:string,channel?:JobChannel)=>void;update:(patch:Partial<Pick<JobRecord,'childId'|'requests'|'tools'|'outputTokens'|'usage'>>)=>void};
-export type JobOutcome=Pick<JobRecord,'state'|'reason'|'exitCode'|'usage'>;
+export type JobRecord={version:1;id:string;owner:string;fingerprint:string;spec:JobSpec;state:JobState;createdAt:number;updatedAt:number;childId?:string;desktop?:DesktopResult;reason?:string;exitCode?:number;requests:number;tools:number;outputTokens:number;usage?:{provider:string;model:string;value:Usage};usageAccounted?:boolean;notified?:boolean;output:JobOutputRead};
+export type JobControl={signal:AbortSignal;append:(text:string,channel?:JobChannel)=>void;update:(patch:Partial<Pick<JobRecord,'childId'|'requests'|'tools'|'outputTokens'|'usage'|'desktop'>>)=>void};
+export type JobOutcome=Pick<JobRecord,'state'|'reason'|'exitCode'|'usage'|'desktop'>;
 type Active={abort:AbortController;done:Promise<void>;timer:ReturnType<typeof setTimeout>};
 const terminal=(state:JobState)=>!['starting','running','stopping'].includes(state);
 const bounded=(v:unknown,min:number,max:number)=>Number.isSafeInteger(v)&&Number(v)>=min&&Number(v)<=max;
 const name=(v:unknown,max=128):v is string=>typeof v==='string'&&v.length>0&&v.length<=max&&/^[A-Za-z0-9][A-Za-z0-9_.:/-]*$/.test(v);
 export function jobSpec(input:any):JobSpec{
- if(!input||!name(input.requestId)||!['delegate','shell'].includes(input.kind)||typeof input.task!=='string'||!input.task.trim()||Buffer.byteLength(input.task)>16*1024||!Array.isArray(input.allowedTools)||input.allowedTools.length>64||new Set(input.allowedTools).size!==input.allowedTools.length||input.allowedTools.some((tool:unknown)=>!name(tool,256)))throw Error('Jobs need a stable request ID, kind, bounded task and explicit unique tool grants.');
- const limits={timeoutMs:60000,maxRequests:16,maxTools:64,maxOutputTokens:8192,...input.limits};
+ if(!input||!name(input.requestId)||!['delegate','shell','desktop'].includes(input.kind)||typeof input.task!=='string'||!input.task.trim()||Buffer.byteLength(input.task)>16*1024||!Array.isArray(input.allowedTools)||input.allowedTools.length>64||new Set(input.allowedTools).size!==input.allowedTools.length||input.allowedTools.some((tool:unknown)=>!name(tool,256)))throw Error('Jobs need a stable request ID, kind, bounded task and explicit unique tool grants.');
+ const limits={...(input.kind==='desktop'?{timeoutMs:DEFAULT_DESKTOP_LIMITS.timeoutMs,maxRequests:DEFAULT_DESKTOP_LIMITS.requests,maxTools:DEFAULT_DESKTOP_LIMITS.tools,maxOutputTokens:DEFAULT_DESKTOP_LIMITS.requests*DEFAULT_DESKTOP_LIMITS.outputTokens}:{timeoutMs:60000,maxRequests:16,maxTools:64,maxOutputTokens:8192}),...input.limits};
  if(!bounded(limits.timeoutMs,100,300000)||!bounded(limits.maxRequests,1,64)||!bounded(limits.maxTools,0,256)||!bounded(limits.maxOutputTokens,1,131072)||Object.keys(limits).some(key=>!['timeoutMs','maxRequests','maxTools','maxOutputTokens'].includes(key)))throw Error('Job limits are invalid.');
  if(input.kind==='shell'&&input.allowedTools.length)throw Error('Shell jobs use the command permission; they do not accept agent tool grants.');
- return {requestId:input.requestId,kind:input.kind,task:input.task,allowedTools:[...input.allowedTools],limits};
+ let allowedTools=[...input.allowedTools],task=input.task;
+ if(input.kind==='desktop'){let brief;try{brief=desktopBrief(JSON.parse(task));}catch{throw Error('Desktop jobs require a task, success criteria and constraints.');}task=JSON.stringify(brief);const fixed=[...desktopTools.map(tool=>tool.name),'desktop_observe','desktop_finish'];if(allowedTools.length&&JSON.stringify(allowedTools)!==JSON.stringify(fixed))throw Error('Desktop jobs use their fixed consented specialist tools.');allowedTools=fixed;}
+ return {requestId:input.requestId,kind:input.kind,task,allowedTools,limits};
 }
 function validateRecord(row:JobRecord){
  if(!row||row.version!==1||!name(row.id)||!name(row.owner)||!['starting','running','stopping','completed','failed','cancelled','unknown'].includes(row.state)||!/^[a-f0-9]{64}$/.test(row.fingerprint)||!bounded(row.createdAt,0,Number.MAX_SAFE_INTEGER)||!bounded(row.updatedAt,0,Number.MAX_SAFE_INTEGER))throw Error('Invalid saved job receipt.');
@@ -50,12 +55,14 @@ export class PiJobs {
   }catch{this.problem='Saved job evidence is invalid or inaccessible. Background admission is disabled; inspect the preserved private originals. Ordinary chat remains available.';}
  }
  get busy(){return this.active.size>0;}
+ busyKind(kind:JobSpec['kind'],owner?:string){return [...this.active.keys()].some(id=>{const row=this.rows.get(id);return row?.spec.kind===kind&&(owner===undefined||row.owner===owner);});}
  busyOwner(owner:string){return [...this.active.keys()].some(id=>this.rows.get(id)?.owner===owner);}
  private save(row:JobRecord){row.updatedAt=Date.now();const ring=this.rings.get(row.id)!,snapshot=ring.readFrom(0),chunks:JobOutputRead['chunks']=[];
   for(const chunk of snapshot.chunks){const previous=chunks.at(-1);if(previous&&previous.channel===chunk.channel&&!chunk.gapBefore&&previous.at+Buffer.byteLength(previous.text)===chunk.at)previous.text+=chunk.text;else chunks.push({...chunk});}
   ring.restore({chunks:chunks.slice(-128),next:snapshot.next,lossy:snapshot.lossy||chunks.length>128});row.output=ring.readFrom(0);atomicJson(join(this.directory,row.id+'.json'),row);try{this.changed(structuredClone(row));}catch{/* Notification cannot reverse persistence. */}}
  private owned(owner:string,id:string){const row=this.rows.get(id);if(!row||row.owner!==owner)throw Error('Job not found in this conversation.');return row;}
  lookup(owner:string,id:string){return structuredClone(this.owned(owner,id));}
+ existing(owner:string,input:unknown){const spec=jobSpec(input),row=[...this.rows.values()].find(row=>row.owner===owner&&row.spec.requestId===spec.requestId);if(!row)return;const fingerprint=createHash('sha256').update(JSON.stringify(spec)).digest('hex');if(row.fingerprint!==fingerprint)throw Error('The job request ID was already used with different parameters.');return {accepted:true,duplicate:true,job:this.lookup(owner,row.id)};}
  list(owner:string){return [...this.rows.values()].filter(row=>row.owner===owner).sort((a,b)=>b.createdAt-a.createdAt).map(row=>{const {spec,output,usage,...rest}=row;return {...rest,kind:spec.kind,allowedTools:spec.allowedTools,limits:spec.limits,retainedFrom:output.chunks[0]?.at??output.next,outputBytes:output.next,usageRecorded:!!usage};});}
  output(owner:string,id:string,from=0){this.owned(owner,id);if(!bounded(from,0,Number.MAX_SAFE_INTEGER))throw Error('Choose an absolute output byte offset.');return this.rings.get(id)!.readFrom(from);}
  pendingAccounting(owner:string){return [...this.rows.values()].filter(row=>row.owner===owner&&terminal(row.state)&&(!row.notified||row.usage&&!row.usageAccounted)).map(row=>structuredClone(row));}
@@ -79,7 +86,7 @@ export class PiJobs {
    row.state='running';this.save(row);return producer(structuredClone(row),{signal:abort.signal,append,update});
   }).then(outcome=>{
    if(terminal(row.state))return;
-   row.state=timeout?'failed':abort.signal.aborted?'cancelled':outcome.state;row.reason=timeout?'Execution time limit reached. Side effects are not rolled back.':outcome.reason;row.exitCode=outcome.exitCode;row.usage=outcome.usage??row.usage;
+   row.state=outcome.state==='unknown'?'unknown':timeout?'failed':abort.signal.aborted?'cancelled':outcome.state;row.reason=timeout?'Execution time limit reached. Side effects are not rolled back.':outcome.reason;row.desktop=outcome.desktop??row.desktop;row.exitCode=outcome.exitCode;row.usage=outcome.usage??row.usage;
    if(!terminal(row.state))row.state='unknown';this.rings.get(row.id)!.trim(JOB_LIMITS.settledBytes);this.save(row);
   }).catch(()=>{if(row.state==='unknown')return;if(terminal(row.state)){this.persistenceGap(row);return;}row.state=abort.signal.aborted?'cancelled':'failed';row.reason='The producer could not confirm completion. Inspect retained evidence before another attempt; side effects may remain.';this.rings.get(row.id)!.trim(JOB_LIMITS.settledBytes);try{this.save(row);}catch{this.persistenceGap(row);}}).finally(()=>{clearTimeout(timer);this.active.delete(row.id);try{this.changed(structuredClone(row));}catch{}});
   this.active.set(row.id,{abort,done,timer});return {accepted:true,duplicate:false,job:this.lookup(owner,row.id)};
@@ -118,10 +125,10 @@ export async function shellJob(cwd:string,row:JobRecord,control:JobControl):Prom
 }
 
 const reply=(value:unknown)=>({content:[{type:'text' as const,text:JSON.stringify(value)}],details:value});
-export const JOB_GUIDANCE='Use job_start to delegate a bounded separate task or start a background shell command. Supply a unique stable requestId, explicit minimum tool grants and limits. Children inherit the selected model and permission preset but do not inherit conversation history or permission to delegate again. Read job outputs and verify results. Stop cancels this conversation’s jobs; restart records unsettled work as unknown without replay. Completed means the producer returned, not independent proof of task success. Never retry an unknown outcome automatically. Read/wait results never add usage again.';
+export const JOB_GUIDANCE='Use job_start to delegate a bounded separate task, start a background shell command, or start a desktop specialist. Supply a unique stable requestId, explicit minimum tool grants and limits. Desktop task is a JSON object with task, successCriteria and constraints; use allowedTools:[] for its fixed consented specialist tools. Children inherit the selected model and permission preset but do not inherit conversation history or permission to delegate again. Desktop screenshots stay in child originals. Read job outputs and verify results. Stop cancels this conversation’s jobs; restart records unsettled work as unknown without replay. Completed means the producer returned, not independent proof of task success. Never retry an unknown outcome automatically. Read/wait results never add usage again.';
 export function jobsExtension(owner:string,jobs:PiJobs,start:(spec:JobSpec,signal?:AbortSignal)=>Promise<unknown>){return (pi:ExtensionAPI)=>{
  const register=(tool:ToolDefinition)=>{const definition:ToolDefinition&{augmentorExecution:ExecutionContract}={...tool,augmentorExecution:{effect:()=>['job_list','job_read','job_wait'].includes(tool.name)?'read':'change',outcome:(_args,result)=>{if(tool.name==='job_list')return {status:'completed'};const row=(result.details as {job?:JobRecord})?.job;return row&&name(row.id)&&['starting','running','stopping','completed','failed','cancelled','unknown'].includes(row.state)?{status:['starting','running','stopping'].includes(row.state)?'running':row.state==='completed'?'completed':row.state==='unknown'?'unknown':'failed',jobId:row.id}:{status:'unknown'};}}};pi.registerTool(definition);};
- register({name:'job_start',label:'Start background job',description:JOB_GUIDANCE,parameters:Type.Object({requestId:Type.String({minLength:1,maxLength:128}),kind:Type.Union([Type.Literal('delegate'),Type.Literal('shell')]),task:Type.String({minLength:1,maxLength:16384}),allowedTools:Type.Array(Type.String({minLength:1,maxLength:256}),{maxItems:64}),limits:Type.Optional(Type.Object({timeoutMs:Type.Optional(Type.Integer({minimum:100,maximum:300000})),maxRequests:Type.Optional(Type.Integer({minimum:1,maximum:64})),maxTools:Type.Optional(Type.Integer({minimum:0,maximum:256})),maxOutputTokens:Type.Optional(Type.Integer({minimum:1,maximum:131072}))},{additionalProperties:false}))},{additionalProperties:false}),execute:async(_id,args,signal)=>reply(await start(jobSpec(args),signal))});
+ register({name:'job_start',label:'Start background job',description:JOB_GUIDANCE,parameters:Type.Object({requestId:Type.String({minLength:1,maxLength:128}),kind:Type.Union([Type.Literal('delegate'),Type.Literal('shell'),Type.Literal('desktop')]),task:Type.String({minLength:1,maxLength:16384}),allowedTools:Type.Array(Type.String({minLength:1,maxLength:256}),{maxItems:64}),limits:Type.Optional(Type.Object({timeoutMs:Type.Optional(Type.Integer({minimum:100,maximum:300000})),maxRequests:Type.Optional(Type.Integer({minimum:1,maximum:64})),maxTools:Type.Optional(Type.Integer({minimum:0,maximum:256})),maxOutputTokens:Type.Optional(Type.Integer({minimum:1,maximum:131072}))},{additionalProperties:false}))},{additionalProperties:false}),execute:async(_id,args,signal)=>reply(await start(jobSpec(args),signal))});
  for(const operation of ['list','read','wait','cancel'] as const)register({name:'job_'+operation,label:operation+' background jobs',description:operation==='list'?'List jobs owned by this conversation.':'Inspect or control a job owned by this conversation. Reading or waiting does not re-add its usage.',parameters:operation==='list'?Type.Object({},{additionalProperties:false}):Type.Object({jobId:Type.String({minLength:1,maxLength:128}),from:Type.Optional(Type.Integer({minimum:0})),timeoutMs:Type.Optional(Type.Integer({minimum:0,maximum:30000}))},{additionalProperties:false}),execute:async(_id,args:any,signal)=>reply(operation==='list'?{items:jobs.list(owner)}:operation==='read'?{job:jobs.lookup(owner,args.jobId),output:jobs.output(owner,args.jobId,args.from)}:operation==='wait'?await jobs.wait(owner,args.jobId,args.timeoutMs,signal):await jobs.cancel(owner,args.jobId))});
 };}
 

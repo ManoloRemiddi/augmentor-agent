@@ -1,9 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-October 11 jobs follow-up: [background jobs and delegation](PI-JOBS.md) add exact-parent durable receipts, real bounded SDK children and commands, root/nested tool grants, scoped approvals/Stop, unknown restart recovery and saved one-time usage attribution. This advances the combined P1 requirement; desktop-specialist consolidation, live services and every accepted P0/P1/platform/installed gate remain required.
+October 11 specialist follow-up: [desktop jobs](PI-JOBS.md#desktop-specialist-jobs) now use the shared durable registry, distinct native SDK histories, pre-dispatch intent, scoped approvals/Stop, unknown recovery and one-time usage. Harness exposes child originals and optional provider payloads through parent-owned read-only inspection. Synthetic source/staged qualification does not establish live perception, physical consent or installed platform acceptance. Every remaining accepted P0/P1 gate and DSH retention remains binding.
 
 
-[Pi goals](PI-GOALS.md) now provide persistent revisioned state and explicitly armed same-owner continuation with round limits, Stop and restart/fork disarming. This extends the plans/todos slice; general jobs/delegation, child authority and one-time usage accounting remain open.
+October 11 jobs follow-up: [background jobs and delegation](PI-JOBS.md) add exact-parent durable receipts, real bounded SDK children and commands, root/nested tool grants, scoped approvals/Stop, unknown restart recovery and saved one-time usage attribution. This advances the combined P1 requirement; actual concurrent integration, live services and every accepted P0/P1/platform/installed gate remain required.
+
+
+[Pi goals](PI-GOALS.md) now provide persistent revisioned state and explicitly armed same-owner continuation with round limits, Stop and restart/fork disarming. This extends the plans/todos slice; general jobs and desktop delegation now have source/staged authority and usage implementation. Their live/concurrent and platform/installed qualification remains required.
 
 October 11 planning candidate: [branch-owned plans and todos](PI-PLANNING.md) add model tools and a read-only Harness view. Native/Browser can use their existing inspection entry point without a layout change. Revisioned native state, branch isolation and cold inspection are separate from full persistent goals, jobs and delegation; every accepted migration and platform/installed gate remains required.
 

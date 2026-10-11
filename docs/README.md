@@ -96,7 +96,7 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 - [Independent second window](SECOND-WINDOW.md)
 - [Desktop window resizing (Linux and macOS)](WINDOW-RESIZING.md)
 - [Linux desktop control preview](DESKTOP-CONTROL.md)
-- [Bounded desktop specialist](DESKTOP-SPECIALIST.md)
+- [Bounded desktop specialist and durable jobs](DESKTOP-SPECIALIST.md)
 - [Browser Settings](BROWSER-SETTINGS.md)
 - [Browser recovery review — 19 September 2026](BROWSER-RECOVERY-REVIEW.md)
 - [Desktop offline recovery](DESKTOP-OFFLINE-RECOVERY.md)

@@ -1,18 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 # Bounded desktop specialist
 
-Development implementation, 2026-09-09. This slice runs in Augmentor's Pi runtime
+Current source integration, 2026-10-11; the September 9 qualification below is historical. This slice runs in Augmentor's Pi runtime
 without Resonant CORE. It follows the user's decision to develop useful
 standalone capabilities while CORE's design continues. No CORE code, service,
 credential store or scheduler is required or modified.
 
 ## What runs now
 
-The Linux coordinator has two new tools: `desktop_delegate` and
+Native Pi conversations expose two tools: `desktop_delegate` and
 `desktop_evidence`. For a multi-step desktop task, it supplies a small brief with
 `task`, `successCriteria` and `constraints`. The runtime creates an independent,
-in-memory Pi SDK session with the **currently selected model**. Parent and worker
-use that model sequentially; no second model is downloaded or loaded.
+durable Pi SDK child session with the **currently selected model** and effective
+parent thinking level. The awaited coordinator tool uses that model sequentially.
+An explicitly started background job can overlap ordinary parent inference; no
+provider concurrency or model/GPU configuration is changed.
 
 The worker can connect, capture, click/type/send keys, inspect accessibility,
 stop, and finish. It cannot use shell/file tools, recall memory, load the parent's
@@ -31,7 +33,7 @@ ownership across chats and harnesses.
 flowchart TD
     A[Augmentor coordinator · existing Pi session] -->|bounded brief| B[Desktop specialist · separate Pi session]
     B --> C[Portable desktop tool vocabulary]
-    C --> D[Linux adapter · KDE Wayland executor]
+    C --> D[Native adapter · Linux or macOS]
     D -->|screenshots and observations| B
     B --> E[Private local evidence files]
     B -->|short result and run ID| A
@@ -65,12 +67,14 @@ Only old image payloads are replaced in outgoing requests. Tool call/result
 pairs, observation metadata, constraints and errors remain. If that bounded
 history no longer fits, the worker stops instead of silently dropping task
 requirements. Automatic compaction and retries are disabled. The worker's
-temporary in-memory session is disposed at completion; its images are not
-inserted into the parent's session or display journal. This is context
+SDK owner is disposed at completion; native screenshots and tool pairs remain
+under its private child history. Images are not automatically inserted into the
+parent's session or display journal. This is context
 separation, not a separate operating-system process or a security sandbox.
 
-Limits are host-owned defaults in `packages/computer-use/src/contracts.ts`;
-models cannot raise them. Future qualification should tune image reserves and
+Limits have host defaults in `packages/computer-use/src/contracts.ts`. The
+shared jobs API accepts explicit request/tool/time/total-output bounds within its
+host maxima; context, image and per-request limits remain specialist-owned. Future qualification should tune image reserves and
 context budgets for each actual provider. Total token savings and task success
 relative to direct execution have not yet been measured.
 
@@ -119,6 +123,42 @@ exports. A local selected endpoint keeps this module's inference local; a remote
 selected endpoint receives worker screenshots just as it receives other model
 inputs. This module does not enforce network routing.
 
+## Shared durable jobs lifecycle — October 11
+
+The [Pi jobs contract](PI-JOBS.md#desktop-specialist-jobs) now owns admission,
+parent/child IDs, bounds, cancellation, durable outcomes and one-time normalized
+usage attribution for the specialist. `desktop_delegate` remains an awaited,
+once-per-turn tool; `job_start kind:desktop` and `session.startJob` use the same
+producer in the background. The standalone Jobs form accepts task, observed
+success criteria and constraints, then offers child-native and provider-payload
+inspection without changing Native/Browser control placement.
+
+The specialist keeps its fixed six tools and isolated context. Its native owner
+is `job-<jobId>`; OS/evidence ownership remains the parent so existing consent and
+independent Stop work. Both evidence intent and the durable job checkpoint are
+saved before input. An unconfirmed release stays unknown after Stop; restart
+never reconnects or repeats an input. The job outcome must be read alongside its
+partial desktop checkpoint. Child SDK files are private and survive disposal;
+standalone direct specialist runs also save their native history inside the run.
+
+Normalized child usage is attributed once through the parent's public native
+usage entry, confirmed against saved originals. Explicit reads/waits have no
+result-usage field, so they do not add usage again. Interrupted provider usage
+may remain unavailable. Native screenshot history, optional provider captures
+and desktop evidence have separate retention; the existing 256 MiB evidence
+admission counts direct evidence files, not the new nested standalone native
+history. Removing an inactive run removes that nested history too. General job
+history lives separately and is retained when its job receipt is removed.
+
+`pi-desktop-jobs.test.mjs` invokes the actual Host, public SDK and desktop Python
+client against an independently authored private wire peer. It covers awaited
+and operator runs, saved screenshots/tool pairs, exact-parent inspection, limits,
+consent refusal, disconnected input, failed release, Stop during inference/input
+approval, crash recovery and usage. Actual Chromium verifies the form, literal
+HTML rendering, 640-pixel viewport, Stop and scoped cold reads. These qualify
+source/staged contracts, not live model perception, physical consent or installed
+Linux/Mac/Windows acceptance. Exact counts/ref and failures belong to the handoff.
+
 ## Future Resonant integration boundary
 
 `packages/computer-use` owns Augmentor's versioned brief/result, limits, evidence
@@ -128,7 +168,10 @@ tool registration and context handling. `packages/pi-linux/src/desktop-executor.
 binds the native executor and its Linux knowledge. Changing platforms should
 replace the executor implementation and domain instructions; native permission,
 focus, input and capture behavior still needs qualification on each platform.
-macOS and Windows adapters are **not implemented**.
+The common executor now selects Linux KDE/portal or macOS native capture and
+accessibility support. This lifecycle checkpoint is qualified on Linux with a
+synthetic desktop peer; physical Mac consent/input and installed parity remain
+separate gates. Windows desktop control remains unavailable.
 
 `augmentor-computer-use/1` is a private Augmentor component contract, **not a
 claimed Resonant API**. Once CORE's actual contracts are ready, a reviewed
@@ -169,7 +212,7 @@ saved file. Unsupported non-ASCII text, multiple monitors or other desktops
 remain outside the current executor's scope. Browser conversations, DSH and
 OpenCode do not expose this new specialist; their existing tools are unchanged.
 
-`tests/desktop-specialist.test.mjs` uses actual Pi 0.85.1 sessions and an HTTP SSE
+`tests/desktop-specialist.test.mjs` currently uses pinned public Pi 1.1.0 sessions and an HTTP SSE
 model fixture with a simulated executor. It covers parent/worker context
 isolation, image routing, selected-model preservation, scoped evidence,
 pre-dispatch intent, permissions, unknown outcomes, post-action observation,
@@ -182,6 +225,6 @@ worker input sizes, total inference, time and blockers. Do this before adding
 more models or parallel workers. Stronger perception, deterministic routines,
 exact token accounting and model capability qualification remain later work.
 
-Validation on Node 24.19.0: `npm run build` passed and `npm test` passed all
+Historical September 9 validation on Node 24.19.0: `npm run build` passed and `npm test` passed all
 73 tests, including 14 specialist tests and the host eligibility integration
 check. No live desktop, local-model quality or CORE test was run for this slice.

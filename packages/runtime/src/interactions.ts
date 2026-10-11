@@ -18,6 +18,7 @@ export class Interactions {
   }
   answer(id:string,value:any,sessionId:string){const item=this.pending.get(id);if(!item||item.sessionId!==sessionId)throw new Error('This interaction has already resolved');item.finish(value);return {accepted:true};}
   cancel(sessionId:string){for(const item of [...this.pending.values()])if(item.sessionId===sessionId||item.ownerId===sessionId)item.finish(undefined);}
+  settleOwner(ownerId:string){for(const item of [...this.pending.values()])if(item.ownerId===ownerId)item.finish(undefined);}
   frames(sessionId:string){return [...this.pending.values()].filter(p=>p.sessionId===sessionId).map(p=>p.frame);}
   async approve(sid:string,toolName:string,input:unknown,ownerId=sid){const result=await this.ask(sid,'approval/requested',{toolName,reason:JSON.stringify(input).slice(0,16000),...(ownerId!==sid?{delegatedSessionId:ownerId}:{})},undefined,ownerId);return result?.outcome==='allowed-once';}
   ui(sid:string,ownerId=sid):ExtensionUIContext {

@@ -25,7 +25,8 @@ import {NativeHistory} from './native-history.js';
 import {ManagedMcp} from './mcp.js';
 import {McpManagement,type McpManagementAction} from './mcp-management.js';
 import {readMcpProfile,prepareMcpProfile,saveMcpProfile,mcpDigest} from './mcp-profile.js';
-import {DesktopSpecialist,DESKTOP_DELEGATION_GUIDANCE} from './desktop-specialist.js';
+import {DesktopSpecialist,desktopBrief,DESKTOP_DELEGATION_GUIDANCE} from './desktop-specialist.js';
+import {COMPUTER_USE_VERSION,type DesktopBrief,type DesktopResult} from '../../computer-use/src/contracts.js';
 import {linuxDesktopExecutor} from '../../pi-linux/src/desktop-executor.js';
 import {ObservationStore,OBSERVATION_PROTOCOL,DEFAULT_RETENTION} from '../../observation/src/store.js';
 import {observeSession} from './observations.js';
@@ -134,10 +135,10 @@ export class Host {
     pi.on('tool_call',async e=>{
     if(m.delegation&&!m.delegation.allowedTools.includes(e.toolName))return {block:true,reason:'This tool is outside the delegated job’s explicit grants.'};
     if((this.mcpReloading||!m.running)&&e.toolName!=='linux_desktop_stop')return {block:true,reason:'No admitted Host turn is available for this tool call.'};
-    if(e.toolName==='linux_desktop_stop')this.desktopSpecialist.cancel('pi:'+m.id);
+    if(e.toolName==='linux_desktop_stop'){await Promise.all(this.jobs.list(m.id).filter(row=>row.kind==='desktop'&&['starting','running','stopping'].includes(row.state)).map(row=>this.jobs.cancel(m.id,row.id)));this.desktopSpecialist.cancel('pi:'+m.id);}
     if(m.surface==='browser'&&!['job_start','job_list','job_read','job_wait','job_cancel','get_goal','create_goal','update_goal','plan_read','plan_update','browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','tool_result_excerpt','home_devices','home_set','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
       return {block:true,reason:'This browser chat can only use its browser tools.'};
-    if(this.desktopSpecialist.busy()&&['linux_desktop_connect','linux_desktop_snapshot','linux_desktop_action'].includes(e.toolName))return {block:true,reason:'A desktop specialist owns the desktop. Wait for it or Stop it before using direct desktop tools.'};
+    if((this.desktopSpecialist.busy()||this.jobs.busyKind('desktop'))&&['linux_desktop_connect','linux_desktop_snapshot','linux_desktop_action'].includes(e.toolName))return {block:true,reason:'A desktop specialist owns the desktop. Wait for it or Stop it before using direct desktop tools.'};
     if(m.surface!=='browser'&&this.loaded.get(m.id)?.mcp?.isRead(e.toolName))return;
     if(['job_list','job_read','job_wait','job_cancel','job_start','get_goal','plan_read','home_devices','home_read','home_status','home_result','home_cancel','desktop_delegate','desktop_evidence','memory_recall','memory_source','tool_result_excerpt','read','ls','find','grep','linux_system_profile','linux_desktop_observe','linux_desktop_connect','linux_desktop_snapshot','linux_desktop_stop','ask_user','browser_tabs_list','browser_screenshot','browser_snapshot'].includes(e.toolName))return;
     if(e.toolName==='bash'&&isRoutineQuery(e.input.command))return;
@@ -161,6 +162,7 @@ export class Host {
     },()=>({hostTurnId:record?.turnId,hostRequestId:record?.activeRequestId,modelRequestObservationId:record?.observation?.currentRequestId()}));
     mkdirSync(m.cwd,{recursive:true,mode:0o700});
     const execution:PiExecution=new PiExecution((kind,data,payload)=>record?.observation?.record(kind,data,payload),(message,incomplete)=>{record?.observation?.record('execution/notice',{message,incomplete});this.append(m,'runtime/notice',{message,incomplete});},{},undefined,(name):ExecutionContract|undefined=>{
+      if(name==='desktop_delegate'||name==='desktop_evidence')return {effect:()=>name==='desktop_evidence'?'read':'change',outcome:(_args,result)=>{try{const part=result.content.find(part=>part.type==='text');const data=part?.type==='text'?JSON.parse(part.text):undefined,id=(data?.jobId??data?.result?.jobId);if(typeof id!=='string')return {status:'unknown'};const row=this.jobs.lookup(m.id,id);return {status:['starting','running','stopping'].includes(row.state)?'running':row.state==='completed'?'completed':row.state==='unknown'?'unknown':'failed',jobId:id};}catch{return {status:'unknown'};}}};
       const definition=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()]).find(tool=>tool.definition.name===name)?.definition;
       return (definition as (typeof definition & {augmentorExecution?:ExecutionContract}))?.augmentorExecution??(mcp?.isRead(name)?{effect:()=> 'read'}:undefined);
     },(toolCallId,toolName)=>mcp?.takeResultIdentity(toolCallId,toolName));
@@ -171,7 +173,7 @@ export class Host {
     if(!Array.isArray(resources.sources)||!Array.isArray(resources.skills))throw new Error('Invalid Pi resource configuration');
     const resourceLoader:DefaultResourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
       additionalExtensionPaths:m.surface==='browser'?[]:resources.sources,additionalSkillPaths:m.surface==='browser'?[]:resources.skills,additionalPromptTemplatePaths:[privateDir(join(this.dirs.agent,'prompts'))],
-      extensionFactories:[this.policy(m),...(m.delegation?[]:[jobsExtension(m.id,this.jobs,(spec,signal)=>this.startJob(m,spec,signal))]),goals.extension,piPlans(revision=>{this.publish(m.id,{method:'plan/updated',payload:{sessionId:m.id,revision}});record?.observation?.record('planning/update',{revision});}),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),piReassessment(data=>record?.observation?.record('execution/checkpoint',data)),execution.extension,homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork,contribution=>provenance.memory(contribution)),...(mcp?mcp.factories():[]),...(m.surface==='browser'?[this.browser.package(m.delegation?.parentId??m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)})]),{name:'augmentor-context-observer',factory:provenance.extension}],
+      extensionFactories:[this.policy(m),...(m.delegation?[]:[jobsExtension(m.id,this.jobs,(spec,signal)=>this.startJob(m,spec,signal))]),goals.extension,piPlans(revision=>{this.publish(m.id,{method:'plan/updated',payload:{sessionId:m.id,revision}});record?.observation?.record('planning/update',{revision});}),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),piReassessment(data=>record?.observation?.record('execution/checkpoint',data)),execution.extension,homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),piMemoryContext(memory,!m.fork,contribution=>provenance.memory(contribution)),...(mcp?mcp.factories():[]),...(m.surface==='browser'?[this.browser.package(m.delegation?.parentId??m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)},(brief,toolCallId,signal)=>this.awaitDesktopJob(m,brief,toolCallId,signal))]),{name:'augmentor-context-observer',factory:provenance.extension}],
       appendSystemPrompt:[browserRecovery,PLAN_GUIDANCE,GOAL_GUIDANCE,...(m.delegation?['You are a bounded delegated worker. Follow the supplied task and all constraints. Do not start jobs, persistent goals or other workers. Your tools are explicitly granted by the parent conversation. Report failures and unknown outcomes; verify changes.']:[JOB_GUIDANCE]),m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
     });await resourceLoader.reload();
     const errors=resourceLoader.getExtensions().errors;if(errors.length)throw new Error('Pi extension loading failed: '+errors.map(e=>e.error).join('; '));
@@ -281,11 +283,17 @@ export class Host {
     if(m.delegation)throw Error('Delegated jobs cannot create other workers.');
     if(this.quiescing||this.mcpReloading||this.improvements.busy||this.mcpManagement.busy)throw Error('Finish runtime maintenance before starting a background job.');
     const spec=jobSpec(input),parent=this.loaded.get(m.id);if(!parent)throw Error('Load the parent conversation before starting a job.');
+    const existing=this.jobs.existing(m.id,spec);if(existing)return existing;
     const readTool=(name:string)=>['read','ls','find','grep','plan_read','get_goal','tool_result_excerpt','memory_recall','memory_source','browser_tabs_list','browser_snapshot','browser_screenshot'].includes(name)||parent.mcp?.isRead(name)||parent.session.getToolDefinition(name)?.annotations?.readOnlyHint===true;
     let changes=false;
     if(spec.kind==='shell'){
       if(m.surface==='browser')throw Error('Background shell commands are unavailable in browser-only conversations.');
       changes=!isRoutineQuery(spec.task);
+    }else if(spec.kind==='desktop'){
+      if(m.surface==='browser'||!desktopCapabilities().available)throw Error('Desktop specialist jobs are unavailable on this surface or platform.');
+      if(!parent.session.model?.input.includes('image'))throw Error('Desktop delegation requires the selected model to support image input. No model was substituted.');
+      if(this.jobs.busyKind('desktop')||this.desktopSpecialist.busy())throw Error('A desktop specialist is already active. Stop or settle it before another run.');
+      changes=true;
     }else{
       const callable=parent.session.getCallableToolNames();
       if(spec.allowedTools.some(name=>!callable.includes(name)||name.startsWith('job_')||['desktop_delegate','create_goal','update_goal'].includes(name)))throw Error('A delegated tool is unavailable or would grant recursive execution.');
@@ -294,9 +302,38 @@ export class Host {
     if(changes&&m.policy==='read-only')throw Error('Read-only chat cannot grant changing tools or a changing background command.');
     if(changes&&m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,'background_'+spec.kind,{task:spec.task,allowedTools:spec.allowedTools,limits:spec.limits}))throw Error('Background job was not approved.');
     signal?.throwIfAborted();
-    const result=this.jobs.start(m.id,spec,(row,control)=>spec.kind==='shell'?shellJob(m.cwd,row,control):this.delegateJob(structuredClone(m),row,control));
+    const result=this.jobs.start(m.id,spec,(row,control)=>spec.kind==='shell'?shellJob(m.cwd,row,control):spec.kind==='desktop'?this.desktopJob(structuredClone(m),row,control):this.delegateJob(structuredClone(m),row,control));
     if(!result.duplicate){parent.manager.appendCustomEntry('augmentor/job-start-v1',{jobId:result.job.id,kind:spec.kind,requestId:spec.requestId,allowedTools:spec.allowedTools,limits:spec.limits,selection:{...m.selection},permissionPreset:m.policy});parent.observation?.record('job/start',{jobId:result.job.id,kind:spec.kind,allowedTools:spec.allowedTools,limits:spec.limits});}
     return result;
+  }
+  private async awaitDesktopJob(m:Meta,brief:DesktopBrief,toolCallId:string,signal?:AbortSignal):Promise<DesktopResult>{
+    const requestId='desktop:'+createHash('sha256').update((this.loaded.get(m.id)?.turnId??'idle')+'\0'+toolCallId).digest('hex');
+    const started=await this.startJob(m,{requestId,kind:'desktop',task:JSON.stringify(desktopBrief(brief)),allowedTools:[]},signal);
+    while(true){try{const read=await this.jobs.wait(m.id,started.job.id,30000,signal);if(!read.timedOut||['completed','failed','cancelled','unknown'].includes(read.job.state))break;}catch(error){if(!signal?.aborted)throw error;await this.jobs.cancel(m.id,started.job.id);break;}}
+    const job=this.jobs.lookup(m.id,started.job.id);
+    return {...(job.desktop??{version:COMPUTER_USE_VERSION,runId:'',status:job.state==='cancelled'?'cancelled':job.state==='failed'?'failed':'unknown',summary:job.reason??'Desktop job has no confirmed structured outcome.',verification:'Inspect its saved receipt and child originals before another attempt.',verificationSource:'runtime',observedAfterLastAction:false,actionAttempted:false,model:{provider:m.selection.provider,id:m.selection.model},counts:{requests:job.requests,tools:job.tools,images:0}}),...(job.state==='unknown'?{status:'unknown' as const,summary:job.reason??'Desktop settlement is unknown.'}:{}),jobId:job.id,childId:job.childId};
+  }
+  private async desktopJob(parent:Meta,row:JobRecord,control:JobControl):Promise<JobOutcome>{
+    control.signal.throwIfAborted();const model=await this.selected(parent.selection);control.signal.throwIfAborted();
+    const m:Meta={id:'job-'+row.id,delegation:{parentId:parent.id,jobId:row.id,allowedTools:[...row.spec.allowedTools],resources:{sources:[],skills:[]}},reasoning:{...this.reasoningSettings(parent)},surface:'linux',cwd:parent.cwd,selection:{...parent.selection},title:'Desktop specialist '+row.id,saved:false,policy:parent.policy,updatedAt:Date.now(),requests:[],running:false};
+    const manager=SessionManager.create(m.cwd,privateDir(join(this.dirs.sessions,m.id)));m.file=manager.getSessionFile();this.metadata.set(m.id,m);this.save(m);control.update({childId:m.id});
+    const effective=thinkingLevel(this.loaded.get(parent.id)?.reasoning?.snapshot()?.thinkingLevel??m.reasoning!.thinkingLevel);requireThinking(model,effective);
+    const result=await this.desktopSpecialist.run({owner:'pi:'+parent.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,model,policy:parent.policy,approve:(name,args)=>this.interactions.approve(parent.id,name,args,m.id),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(parent,'desktop/progress',{...info,jobId:row.id,childId:m.id}),tracking:{jobId:row.id,childId:m.id,manager,thinkingLevel:effective,limits:{requests:row.spec.limits.maxRequests,tools:row.spec.limits.maxTools,timeoutMs:row.spec.limits.timeoutMs},maxTotalOutputTokens:row.spec.limits.maxOutputTokens,
+      checkpoint:(result,outputTokens,usage)=>control.update({requests:result.counts.requests,tools:result.counts.tools,outputTokens,desktop:{...structuredClone(result),jobId:row.id,childId:m.id},usage:{provider:model.provider,model:model.id,value:structuredClone(usage)}}),
+      onSession:(session,result)=>{
+        m.running=true;this.save(m);this.append(m,'turn/start',{requestId:'desktop:'+row.id,jobId:row.id,parentId:parent.id});
+        const observation=observeSession(session,this.observations,m.id,()=>({turnId:row.id,selected:m.selection,permissionPreset:m.policy,execution:{specialist:true,limits:row.spec.limits}}),event=>this.publish(parent.id,{method:'job/observation',payload:{sessionId:parent.id,childId:m.id,jobId:row.id,observation:event}}),message=>this.append(m,'runtime/warning',{message}));observation.beginTurn({jobId:row.id,parentId:parent.id});
+        const unsub=session.subscribe(event=>{
+          if(event.type==='message_start'&&event.message.role==='user')this.append(m,'user/message',{source:{kind:'delegation',sessionId:m.id,parentId:parent.id,jobId:row.id},content:event.message.content});
+          if(event.type==='message_update'&&event.assistantMessageEvent.type==='text_delta')this.append(m,'assistant/chunk',{chunk:{type:'text-delta',text:event.assistantMessageEvent.delta}});
+          if(event.type==='message_end'&&event.message.role==='assistant')this.append(m,'assistant/message',{message:{content:event.message.content,stopReason:event.message.stopReason}});
+          if(event.type==='tool_execution_start')this.append(m,'tool/call',{name:event.toolName,toolCallId:event.toolCallId});
+          if(event.type==='tool_execution_end')this.append(m,'tool/result',{name:event.toolName,toolCallId:event.toolCallId,isError:event.isError,result:{...event.result,content:event.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Specialist image preserved in native history and desktop evidence]'}:part)}});
+        });
+        return ()=>{unsub();observation.record('turn/end',{status:result.status,jobId:row.id});observation.dispose();m.running=false;this.save(m);this.append(m,'turn/end',{reason:{kind:result.status},jobId:row.id});};
+      }}},desktopBrief(JSON.parse(row.spec.task)),control.signal);
+    const desktop={...result,jobId:row.id,childId:m.id};control.append(result.summary+'\n'+result.verification,'notice');
+    return {state:result.status==='completed'?'completed':result.status==='unknown'?'unknown':result.status==='cancelled'?'cancelled':'failed',reason:result.summary,desktop,usage:{provider:model.provider,model:model.id,value:collectNativeUsage(manager)}};
   }
   private async delegateJob(parent:Meta,row:JobRecord,control:JobControl):Promise<JobOutcome>{
     control.signal.throwIfAborted();
@@ -309,12 +346,7 @@ export class Host {
       unsubscribe=boundChild(child.session,row,control);
       const requestId='job-input:'+row.id,input='Delegated task from the parent conversation. Preserve all supplied constraints. Report the result and any uncertainty.\n\n'+row.spec.task;
       this.queue(m).enqueue(requestId,input,true);this.submit(child,input,requestId);await child.task;
-      const value:Usage={input:0,output:0,cacheRead:0,cacheWrite:0,totalTokens:0,cost:{input:0,output:0,cacheRead:0,cacheWrite:0,total:0}};
-      // Public native entries include assistant, nested-tool and compaction usage.
-      for(const entry of child.manager.getEntries()){
-        const usage=entry.type==='usage'?entry.usage:entry.type==='compaction'||entry.type==='branch_summary'?entry.usage:entry.type==='message'&&(entry.message.role==='assistant'||entry.message.role==='toolResult')?entry.message.usage:undefined;
-        if(usage){for(const key of ['input','output','cacheRead','cacheWrite','totalTokens'] as const)value[key]+=usage[key]??0;for(const key of ['input','output','cacheRead','cacheWrite','total'] as const)value.cost[key]+=usage.cost?.[key]??0;}
-      }
+      const value=collectNativeUsage(child.manager);
       return {state:control.signal.aborted?'cancelled':child.failed||child.execution?.incomplete||this.queue(m).read(requestId).status!=='completed'||!child.initialDelivered?'failed':'completed',reason:control.signal.aborted?'Child stopped; its dispatched actions may have effects.':'Child turn settled. Verify the reported result and retained originals.',usage:{provider:m.selection.provider,model:m.selection.model,value}};
     }finally{
       control.signal.removeEventListener('abort',abort);unsubscribe?.();
@@ -323,6 +355,7 @@ export class Host {
     }
   }
   async cancel(id:unknown,source='user'){
+    const target=this.getMeta(id);if(target.delegation&&source==='user')return this.jobs.cancel(target.delegation.parentId,target.delegation.jobId);
     const m=this.getMeta(id),queue=this.queue(m);queue.pause();const r=this.loaded.get(m.id);let aborting:Promise<void>|undefined;
     const reserved=queue.next;if(reserved?.goalSource)queue.remove(reserved.id);
     const cancellingMcp=this.mcpManagement.cancelSession(m.id),jobsWereRunning=this.jobs.busyOwner(m.id);const cancellingJobs=this.jobs.cancelOwner(m.id);
@@ -395,7 +428,7 @@ export class Host {
       r.phase='settling';
       try{r.goals.settle();}catch{r.goals.disarm();r.failed=true;this.append(m,'runtime/warning',{message:'Goal admission or pending pause could not be confirmed at settlement. Inspect its preserved original before resuming.'});}
       await r.memory.activity('stop');
-      r.execution?.end(r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed');this.interactions.cancel(m.id);if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});const reason=r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed';
+      r.execution?.end(r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed');this.interactions.settleOwner(m.id);if(m.surface!=='browser'&&!this.jobs.busyKind('desktop',m.id))await desktopControl('stop','pi:'+m.id).catch(()=>{});const reason=r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed';
       // A terminal receipt is persisted before admitting another input. A crash
       // before this boundary produces an unknown receipt, never an automatic retry.
       const unknownInput=r.interruptedInput||attempted&&!r.initialDelivered&&!handled&&(r.cancelled||failed);r.preparingInput=false;
@@ -445,6 +478,11 @@ export class Host {
     case 'session.jobs':{const m=this.getMeta(p.sessionId);return {available:!this.jobs.problem,reason:this.jobs.problem,items:this.jobs.list(m.id),scope:'exact-parent-conversation; reported producer outcomes; reads do not add usage'};}
     case 'session.job':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));return {job,output:this.jobs.output(m.id,job.id,p.from)};}
     case 'session.jobHistory':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));if(!job.childId)return {available:false,reason:'This job has no delegated conversation.'};return {available:true,childId:job.childId,...this.history(this.getMeta(job.childId)).page(p.maxMessages,p.beforeSeq)};}
+    case 'session.jobNativeHistory':case 'session.jobNativeRead':case 'session.jobObservations':case 'session.jobPayload':{
+      const parent=this.getMeta(p.sessionId),job=this.jobs.lookup(parent.id,identifier(p.jobId));if(!job.childId)return {available:false,reason:'This job has no child native history.'};
+      const childMethod=({ 'session.jobNativeHistory':'session.nativeHistory','session.jobNativeRead':'session.nativeRead','session.jobObservations':'observation.list','session.jobPayload':'observation.payload'} as Record<string,string>)[method]!;
+      return this.handle(childMethod,{...p,sessionId:job.childId},id);
+    }
     case 'session.startJob':{const m=this.getMeta(p.sessionId);await this.load(m);return this.startJob(m,p.spec);}
     case 'session.removeJob':{const m=this.getMeta(p.sessionId);return this.jobs.remove(m.id,identifier(p.jobId));}
     case 'prompt.improve':{
@@ -661,4 +699,14 @@ export class Host {
     default:throw new Error('Unsupported method: '+method);
   }}
   async close(){this.quiescing=true;this.setup.cancel();await this.jobs.close();await this.improvements.close();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}await this.mcpManagement.settled();}
+}
+
+/** Normalized public native usage, including nested tools, with one owner. */
+function collectNativeUsage(manager:SessionManager):Usage{
+ const value:Usage={input:0,output:0,cacheRead:0,cacheWrite:0,totalTokens:0,cost:{input:0,output:0,cacheRead:0,cacheWrite:0,total:0}};
+ for(const entry of manager.getEntries()){
+  const usage=entry.type==='usage'?entry.usage:entry.type==='compaction'||entry.type==='branch_summary'?entry.usage:entry.type==='message'&&(entry.message.role==='assistant'||entry.message.role==='toolResult')?entry.message.usage:undefined;
+  if(usage){for(const key of ['input','output','cacheRead','cacheWrite','totalTokens'] as const)value[key]+=usage[key]??0;for(const key of ['input','output','cacheRead','cacheWrite','total'] as const)value.cost[key]+=usage.cost?.[key]??0;}
+ }
+ return value;
 }

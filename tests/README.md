@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Desktop jobs: `pi-desktop-jobs.test.mjs` exercises actual Host/public SDK/desktop-client IPC with an independently authored private desktop peer. `desktop-specialist.test.mjs` retains isolated-tool regressions and durable native originals; `harness-jobs-chromium.test.mjs` covers the real desktop form, scoped child originals/payloads, Stop and cold read-only evidence. Physical OS consent/perception, live providers and installed platform acceptance remain separate.
+
 Jobs qualification: `jobs-registry.test.mjs`, `pi-jobs.test.mjs` and `harness-jobs-chromium.test.mjs` use independent private registry/provider/Host/Chromium fixtures. They cover actual writes/processes, nested grants, scoped approvals, bounds, Stop/restart and saved one-time usage; full live/platform/installed gates remain separate.
 
 Pi goals: `node --test tests/goals-history.test.mjs tests/pi-goals.test.mjs tests/harness-goals-chromium.test.mjs` checks strict selected MIT replay, actual SDK continuation/queue/Stop/fork/restart/failure/no-replay and real Chromium controls/scoped reads. Synthetic source/staged checks remain distinct from physical/installed and live-provider acceptance. See [the owning goal contract](../docs/PI-GOALS.md).
