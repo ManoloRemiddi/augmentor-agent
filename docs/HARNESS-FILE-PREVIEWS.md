@@ -123,3 +123,36 @@ evidence, not evidence for the failed assembly.
 
 The broader [migration gates](AUGMENTOR-HARNESS-MIGRATION.md) remain open.
 DSH stays available while these replacements are tested.
+
+## First installed MX candidate — October 12
+
+Runtime f61c845d19cf9a0821cf48662e25d2c56ff71acf was selected/running in private
+release 20261012-014650-931f2f01, product 0.2.13, artifact
+9cc3ee9806b55dda196c72fca3db813f79a768fcbb7769df541998b46d91a581.
+Source and ordinary cohorts passed 277/277; two packaging cases passed in both
+trees. The assembly had 511 compiled files, 19,878 production dependency files,
+132 npm instances, 730 licence files, six preserved native executables and 98
+browser notices. Its only new production dependency was the 718-file Zod 4.4.3
+selection; every preceding dependency byte/path and Node/native executable
+matched the installed file-reference release. A post-assembly supplier audit
+agreed exactly, including verified authored workspace exclusion.
+
+Guarded stage/close/shutdown/activation and sequential stable Host/Native launch
+passed. Both running roots and bundled Node matched selection; all 22,630
+inventory entries passed after GUI reads. Eleven histories and queue identities
+were preserved; 243 saved original files retained exact prefixes, with 233
+byte-identical files, four append-only journals (two title/session_info, two close
+and two load records) and six corresponding index/counter derivatives. Production,
+model router and profile/model/speech settings remained preserved. The original
+file completion/chip opened actual installed preview-note.txt in the narrow
+fullscreen sidebar. Its draft vetoed shutdown and cleared through original keys;
+only owned draft metadata changed, with no new object, receipt, admission,
+provider request or tool action.
+
+Visual verification exposed `codeBlock.title` instead of the original shared
+English label. This candidate remains immutable. The authored locale binder now
+falls back to the already selected original common dictionary; supplier files,
+CSS, dependencies and licence bodies are unchanged. The strengthened original
+Chromium case requires “Code block” and rejects the untranslated key. Corrected
+source/ordinary/installed evidence follows separately; this first candidate is
+historical and not final GUI acceptance.

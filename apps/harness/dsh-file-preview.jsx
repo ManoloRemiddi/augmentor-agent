@@ -25,7 +25,8 @@ import {en as codeEn} from '@dsh-gui/ui-sidebar-documentpreview/src/client/code/
 import {en as markdownEn} from '@dsh-gui/ui-sidebar-documentpreview/src/client/markdown/locales.ts';
 import {en as imageEn} from '@dsh-gui/ui-sidebar-documentpreview/src/client/image/locales.ts';
 import {parseGfm} from '@dsh-gui/ui-primitives/src/markdown/parse.ts';
-const tr=map=>(key,args={})=>String(map[key]??key).replace(/\{(\w+)\}/g,(_,k)=>String(args[k]??''));
+import {en as commonEn} from '@dsh-gui/locale/src/locales/en.ts';
+const tr=map=>(key,args={})=>String(map[key]??commonEn[key]??key).replace(/\{(\w+)\}/g,(_,k)=>String(args[k]??''));
 const bind=store=>(selector=x=>x)=>selector(useSyncExternalStore(store.subscribe,store.getSnapshot));
 const staticHook=value=>(selector=x=>x)=>selector(value);
 const errorResult=error=>({ok:false,error:{code:error.code??'gateway/internal',message:error.message,details:error.details??{}}});
