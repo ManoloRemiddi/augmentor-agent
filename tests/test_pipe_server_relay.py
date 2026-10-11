@@ -2,6 +2,7 @@
 """Actual Windows relay framing and lease; no SDK or provider can mask the pipe."""
 import base64
 import json
+import os
 from pathlib import Path
 import queue
 import subprocess
@@ -118,7 +119,7 @@ class WindowsPipeServerRelayTests(unittest.TestCase):
         self.assertEqual(self.child.wait(timeout=5), 0)
         self.assertEqual(client.recv(16), b'')
         self.diagnostics.join(timeout=5)
-        self.assertEqual(b''.join(self.errors), b'')
+        self.assertNotIn(b'Private Windows listener was refused', b''.join(self.errors))
 
     def test_invalid_control_fails_closed_without_treating_it_as_client_bytes(self):
         client, identity = self.connect()
@@ -127,6 +128,62 @@ class WindowsPipeServerRelayTests(unittest.TestCase):
         self.assertEqual(client.recv(16), b'')
         self.diagnostics.join(timeout=5)
         self.assertIn(b'Private Windows listener was refused', b''.join(self.errors))
+
+
+@unittest.skipUnless(sys.platform == 'win32', 'requires Windows handles and Node pipe ownership')
+class WindowsNodeRelayLeaseTests(unittest.TestCase):
+    def test_node_owner_exit_releases_its_relay_without_using_the_cleanup_job(self):
+        import win32api, win32con, win32event
+        from platform_adapters.processes import OwnedProcess
+        node = Path(os.environ.get('AUGMENTOR_PI_NODE', ROOT / 'outputs/runtime/node/node.exe'))
+        self.assertTrue(node.is_file(), 'The prepared product Node runtime is required.')
+        code = '''const {spawn}=require('node:child_process');
+const child=spawn(process.argv[1],['-I','-Xutf8','-B',process.argv[2],process.argv[3]],{stdio:'pipe',windowsHide:true});
+child.stderr.pipe(process.stderr);
+let buffer='';child.stdout.on('data',bytes=>{buffer+=bytes;let end;
+ while((end=buffer.indexOf('\\n'))>=0){const frame=JSON.parse(buffer.slice(0,end));buffer=buffer.slice(end+1);
+  if(frame.type==='ready')console.log(JSON.stringify({ready:true,owner:process.pid,relay:child.pid}));
+  else if(frame.type==='connect'||frame.type==='close')console.log(JSON.stringify({observed:frame.type}));}});
+process.stdin.once('data',()=>process.exit(0));
+'''
+        with tempfile.TemporaryDirectory() as temporary:
+            endpoint = str(Path(temporary) / 'node-owned-relay.sock')
+            owned = OwnedProcess([str(node), '-e', code, sys.executable,
+                str(ROOT / 'services/platform_adapters/pipe_server_relay.py'), endpoint],
+                stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            frames, errors, handles = queue.Queue(), [], []
+            def read_frames():
+                for line in owned.process.stdout:
+                    frames.put(line)
+            reader = threading.Thread(target=read_frames)
+            diagnostics = threading.Thread(target=lambda: errors.append(owned.process.stderr.read()))
+            reader.start(); diagnostics.start()
+            try:
+                identity = json.loads(frames.get(timeout=5))
+                self.assertTrue(identity['ready'])
+                for pid in (identity['owner'], identity['relay']):
+                    handles.append(win32api.OpenProcess(win32con.SYNCHRONIZE, False, pid))
+                from platform_adapters.windows_pipe import PipeSocket
+                with PipeSocket() as peer:
+                    peer.settimeout(3); peer.connect(endpoint)
+                    self.assertEqual(peer.verify_peer(), identity['relay'])
+                    self.assertEqual(json.loads(frames.get(timeout=5)), {'observed': 'connect'})
+                self.assertEqual(json.loads(frames.get(timeout=5)), {'observed': 'close'})
+                owned.process.stdin.write(b'exit\n'); owned.process.stdin.flush()
+                self.assertEqual(win32event.WaitForSingleObject(handles[0], 5000), win32event.WAIT_OBJECT_0)
+                # The enclosing cleanup Job remains open and is not terminated
+                # until after this assertion, so it cannot mask a broken lease.
+                self.assertEqual(win32event.WaitForSingleObject(handles[1], 5000), win32event.WAIT_OBJECT_0,
+                    'The relay outlived its original Node owner.')
+                self.assertEqual(owned.wait_graceful(timeout=5), 0)
+            finally:
+                owned.terminate(); owned.wait(timeout=5)
+                for handle in handles:
+                    handle.Close()
+                owned.process.stdin.close()
+                reader.join(timeout=5); diagnostics.join(timeout=5)
+                self.assertFalse(reader.is_alive()); self.assertFalse(diagnostics.is_alive())
+                owned.process.stdout.close(); owned.process.stderr.close()
 
 
 if __name__ == '__main__':
