@@ -13,7 +13,13 @@ export function projectDsh(state){
     const d=e.data||{},t=turnIds.get(e.turnId)||turn||1,time=d.message?.timestamp??times.get(e.turnId)??null;
     let n;
     if(e.type==='user/message'){turn=t;step=0;n={kind:'user',seq:e.seq,time,turn,content:d.submittedContent??d.content??[],source:d.source};}
-    if(e.type==='assistant/message'){step++;n={kind:'assistant',seq:e.seq,time,turn:t,step,blocks:blocks(d.message?.content),usage:usage(d.message?.usage),...(['aborted','error','length'].includes(d.message?.stopReason)?{interrupted:true}:{})};}
+    if(e.type==='assistant/message'){
+      step++;const request=d.requestId?state.records.find(r=>r.kind==='model/request'&&r.id===d.requestId):undefined;
+      const end=request?state.records.find(r=>r.kind==='model/complete'&&r.requestId===request.id):undefined,first=request?state.records.find(r=>r.kind==='model/firstToken'&&r.requestId===request.id):undefined;
+      // SDK message timestamps can mark creation rather than completion.
+      // Use the matching observed generation boundary, never an older request.
+      n={kind:'assistant',seq:e.seq,time:end?.time??null,turn:t,step,blocks:blocks(d.message?.content),usage:usage(d.message?.usage),...(request?{timing:{stepStartTime:request.time??null,firstTokenTime:first?.time??null,completedTime:end?.time??null}}:{}),...(['aborted','error','length'].includes(d.message?.stopReason)?{interrupted:true}:{})};
+    }
     if(e.type==='tool/result'){
       const start=state.records.find(r=>r.kind==='tool/start'&&r.data.toolCallId===d.toolCallId),end=state.records.find(r=>r.kind==='tool/end'&&r.data.toolCallId===d.toolCallId);
       n={kind:'tool-result',seq:e.seq,time:end?.time??null,callTime:start?.time??null,turn:t,step,callId:d.toolCallId,name:d.name,content:d.result?.content||[],isError:d.isError,subCalls:[]};
