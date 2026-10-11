@@ -1,3 +1,6 @@
+// Augmentor modification, October 2026: keep the original selector/CSS, adding
+// read-only metadata choices, explicit earlier paging and unavailable-body notes.
+// Original Copyright 2025 bowenliang123 and Apache-2.0 licence remain in force.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react'
 import { UNKNOWN_TOOL_SOURCE, type Category, type ContextHeaders, type ContextTimeline, type HeaderTool, type RequestRecord, type SurfaceNode } from '../../shared/types'
 import { assemble } from '../assemble'
@@ -49,8 +52,17 @@ export interface ContextBrowserProps {
   loadImage?: ImageLoader
   detailState?: DetailState
   onDetailRetry?: () => void
+  requestPicker?: ContextRequestPicker
 }
 
+export interface ContextRequestPicker {
+  choices: readonly { seq: number; time: number; turn: number; step: number; available: boolean; note: string; state?: string }[]
+  select: (seq: number | null) => void
+  older: () => void
+  hasMore: boolean
+  loading: boolean
+  error?: string | null
+}
 
 export interface CatFocus {
   cat: string
@@ -191,6 +203,9 @@ export function makeContextBrowser(
 
     const requests = data.requests
     const stepsOf = useMemo(() => turnStepsOf(requests), [requests])
+    const picker = props.requestPicker
+    const choices = picker?.choices ?? requests
+    const choiceSteps = (turn: number | undefined) => picker ? choices.filter(r => r.turn === turn).length : stepsOf(turn)
     const stampOf = useMemo(() => stepStampOf(requests), [requests])
     // The live tail — items no logged request carries yet — rides the NEXT request, following the harness's step loop
     // (`core/agent-loop`'s agent.ts): a newest user message opens a new turn, a text-only final reply ends the turn,
@@ -223,8 +238,9 @@ export function makeContextBrowser(
       : null
     const req = hoverReq ?? (sel === 'live' ? null : requests.find(r => r.seq === sel) ?? null)
     // The live surface pairs its next-request estimate with the freshest actual the log holds (highest seq — wire order is not trusted).
-    const actual = req ?? requests.reduce<RequestRecord | null>((a, r) => (a === null || r.seq > a.seq ? r : a), null)
-    const seq = req !== null ? req.seq : null
+    const missingChoice = req === null && sel !== 'live' ? picker?.choices.find(r => r.seq === sel) : undefined
+    const actual = missingChoice ? null : req ?? requests.reduce<RequestRecord | null>((a, r) => (a === null || r.seq > a.seq ? r : a), null)
+    const seq = req !== null ? req.seq : missingChoice?.seq ?? null
     // The browser joins the shared composition hover ONLY while it shows the LIVE step — a pinned/previewed step has a
     // different composition, so its hover must not light the overview (and vice versa).
     const linked = req === null && props.onHoverKey !== undefined
@@ -254,9 +270,11 @@ export function makeContextBrowser(
     // composition holds nothing for it, so the bar never reads all-dimmed.
     const pinKey = openCat !== null && (breakdown[openCat as Category | 'system' | 'tools'] || 0) > 0 ? openCat : null
     const pick = (v: string) => {
+      if (v === 'older') { picker?.older(); return }
       setSel(v === 'live' ? 'live' : Number(v))
       setCat(null)
       setOpenElem(null)
+      picker?.select(v === 'live' ? null : Number(v))
     }
 
     // δ baseline: 'step' diffs the immediately preceding record, 'turn' the previous turn's last step — live: the last
@@ -650,21 +668,29 @@ export function makeContextBrowser(
           </span>
           <select
             className="lc-br-pick"
+            aria-label="Context request"
             value={seq === null ? 'live' : String(seq)}
             onChange={(e) => { pick(e.target.value) }}
           >
             <option value="live">{t('browser.live')}</option>
-            {requests.slice().reverse().map(r => (
+            {choices.slice().reverse().map(r => (
               <option key={r.seq} value={String(r.seq)}>
-                {t('detail.step', { t: r.turn ?? 0, s: r.step ?? 0, n: stepsOf(r.turn) })}
+                {t('detail.step', { t: r.turn ?? 0, s: r.step ?? 0, n: choiceSteps(r.turn) })}
               </option>
             ))}
+            {picker?.hasMore ? <option value="older" disabled={picker.loading}>{picker.loading ? 'Loading earlier request metadata…' : 'Load earlier request metadata…'}</option> : null}
           </select>
         </div>
 
+        {picker?.error ? <div className="lc-br-note" role="status">{picker.error}</div> : null}
+        {missingChoice ? <>
+          <div className="lc-br-meta"><b>{t('detail.step', { t: missingChoice.turn, s: missingChoice.step, n: choiceSteps(missingChoice.turn) })}</b><span>{fmtTime(missingChoice.time)}</span></div>
+          <div className="lc-br-note" role="status">{missingChoice.note}</div>
+          {missingChoice.state === 'failed' ? <DetailNote state="failed" onRetry={() => picker?.select(missingChoice.seq)} className="lc-br-note" /> : null}
+        </> : <>
         <div className="lc-br-meta">
           <b>{req !== null
-            ? t('detail.step', { t: req.turn ?? 0, s: req.step ?? 0, n: stepsOf(req.turn) })
+            ? t('detail.step', { t: req.turn ?? 0, s: req.step ?? 0, n: choiceSteps(req.turn) })
             : t('browser.liveNow')}</b>
           {req !== null ? <span>{fmtTime(req.time)}</span> : null}
           <span className="lc-est">{t('detail.estTotal', { n: fmt(total) })}</span>
@@ -752,6 +778,7 @@ export function makeContextBrowser(
             )
           })}
         </div>
+        </>}
       </div>
     )
   }

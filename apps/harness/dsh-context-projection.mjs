@@ -4,6 +4,14 @@ const empty=()=>({system:0,tools:0,user:0,inject:0,skill:0,assistant:0,tool:0,to
 const estimate=text=>text?Math.ceil(text.length/4)+4:0;
 const textOf=content=>typeof content==='string'?content:Array.isArray(content)?content.map(p=>p?.text??p?.thinking??(p?.type==='tool_result'?textOf(p.content):'')).join('\n'):'';
 const imagesOf=content=>Array.isArray(content)?content.filter(p=>['image','image_url','input_image'].includes(p?.type)).length:0;
+// Sparse supplier ordinals keep request selection stable when an older body
+// arrives. A <=1 MiB body cannot fill this message range. Observation identities
+// remain separate; numbers outside the exact ordinal range stay unsupported.
+export const CONTEXT_REQUEST_STRIDE=2**20;
+export function contextRequestSequence(record){
+  const seq=record.seq*CONTEXT_REQUEST_STRIDE+CONTEXT_REQUEST_STRIDE-1;
+  return Number.isSafeInteger(record.seq)&&record.seq>0&&seq<2**52?seq:null;
+}
 function blocksOf(message){
   const content=message.content,blocks=typeof content==='string'?[{kind:'text',text:content}]:Array.isArray(content)?content.flatMap(p=>{
     if(['text','input_text','output_text'].includes(p?.type))return [{kind:'text',text:p.text??''}];
@@ -44,18 +52,19 @@ function resultCalls(messages){
  */
 export function projectDshContext(state){
   const requests=(state.records??[]).filter(r=>r.kind==='model/request'),ends=new Map((state.records??[]).filter(r=>r.kind==='model/complete'&&r.requestId).map(r=>[r.requestId,r]));
-  const headers=[],headerContent=new Map(),nodes=[],archive=[],conversationNodes=[],requestRecords=[],requestIds=new Map(),turns=new Map(),steps=new Map();
+  const headers=[],headerContent=new Map(),nodes=[],archive=[],conversationNodes=[],requestRecords=[],requestChoices=[],requestIds=new Map(),turns=new Map(),steps=new Map();
   const usage={uncachedInputTokens:0,outputTokens:0,cacheReadTokens:0,cacheWriteTokens:0},cost={};let ordinal=0,previous=[],previousKeys=[],current=empty(),latest=null,latestEnd=null;
   for(const request of requests){
     if(!turns.has(request.turnId??request.id))turns.set(request.turnId??request.id,turns.size+1);
     const turn=turns.get(request.turnId??request.id),step=(steps.get(turn)??0)+1;steps.set(turn,step);
+    const requestSeq=contextRequestSequence(request),choice=requestSeq===null?null:{seq:requestSeq,id:request.id,time:request.time,turn,step,available:false};if(choice)requestChoices.push(choice);
     const end=ends.get(request.id),u=end?.data?.usage;
     if(u){usage.uncachedInputTokens+=number(u.input);usage.outputTokens+=number(u.output);usage.cacheReadTokens+=number(u.cacheRead);usage.cacheWriteTokens+=number(u.cacheWrite);
       const provider=request.data.provider,model=request.data.model;const bucket=((cost[provider]??={})[model]??={peak:{uncached:0,output:0,cacheRead:0,cacheWrite:0}}).peak;bucket.uncached+=number(u.input);bucket.output+=number(u.output);bucket.cacheRead+=number(u.cacheRead);bucket.cacheWrite+=number(u.cacheWrite);}
-    const frame=frameOf(state.payloads?.[request.id]);if(!frame)continue;
+    const frame=frameOf(state.payloads?.[request.id]);if(!frame||requestSeq===null||frame.messages.length>=CONTEXT_REQUEST_STRIDE-2)continue;
     const keys=frame.messages.map(m=>JSON.stringify(m));let prefix=0;
     while(prefix<previousKeys.length&&prefix<keys.length&&previousKeys[prefix]===keys[prefix])prefix++;
-    const headerSeq=++ordinal;for(const node of previous.slice(prefix))archive.push({...node,gone:headerSeq});
+    const headerSeq=requestSeq-CONTEXT_REQUEST_STRIDE+2;for(const node of previous.slice(prefix))archive.push({...node,gone:headerSeq});
     headers.push({seq:headerSeq,time:request.time,systemTokens:estimate(frame.system),tools:frame.tools.map(tool=>({name:tool.name,tokens:estimate(JSON.stringify(tool))}))});headerContent.set(headerSeq,frame);
     current=empty();current.system=estimate(frame.system);current.tools=headers.at(-1).tools.reduce((total,t)=>total+t.tokens,0);previous=previous.slice(0,prefix);previousKeys=keys;
     for(const node of previous)current[node.cat]+=node.tokens;
@@ -66,12 +75,12 @@ export function projectDshContext(state){
       const blocks=blocksOf(message),text=blocks.filter(b=>b.kind!=='tool-call').map(b=>b.text??'').join('\n');
       const callText=blocks.filter(b=>b.kind==='tool-call').map(b=>b.name+' '+b.argsRaw).join('\n');
       const call=calls[index],toolName=message.name??call?.name;
-      const node={seq:++ordinal,time:request.time,cat,tokens:estimate(textOf(message.content)+'\n'+callText+(message.reasoning_content??'')),text,imgs:imagesOf(message.content),form:cat==='tool'?'tool-result':cat,tool:cat==='tool'?toolName:undefined,calls:blocks.filter(b=>b.kind==='tool-call').map(b=>b.name),...(message.tool_call_id?{callId:message.tool_call_id}:{})};
+      const node={seq:headerSeq+index+1,time:request.time,cat,tokens:estimate(textOf(message.content)+'\n'+callText+(message.reasoning_content??'')),text,imgs:imagesOf(message.content),form:cat==='tool'?'tool-result':cat,tool:cat==='tool'?toolName:undefined,calls:blocks.filter(b=>b.kind==='tool-call').map(b=>b.name),...(message.tool_call_id?{callId:message.tool_call_id}:{})};
       const conv={seq:node.seq,kind:cat==='tool'?'tool-result':cat,...(cat==='assistant'?{blocks}:{content:blocks}),...(cat==='tool'&&toolName?{call:{name:toolName,argsRaw:typeof call?.arguments==='string'?call.arguments:'[Call arguments unavailable in this recorded request]'}}:{})};
       previous.push(node);conversationNodes.push(conv);current[cat]+=node.tokens;
     }
     current.total=Object.entries(current).filter(([k])=>k!=='total').reduce((sum,[,v])=>sum+v,0);
-    const seq=++ordinal,prompt=u?number(u.input)+number(u.cacheRead)+number(u.cacheWrite):undefined;
+    const seq=requestSeq,prompt=u?number(u.input)+number(u.cacheRead)+number(u.cacheWrite):undefined;ordinal=Math.max(ordinal,seq);choice.available=true;
     requestRecords.push({...current,seq,time:request.time,turn,step,...(prompt>0?{prompt}:{}),...(u?{cacheRead:number(u.cacheRead),output:number(u.output)}:{}),...(Number.isFinite(end?.data.durationMs)?{activeMs:end.data.durationMs}:{})});
     requestIds.set(seq,request.id);latest=request;latestEnd=end;
   }
@@ -93,6 +102,6 @@ export function projectDshContext(state){
   const timeline={ok:true,model:latest?.data.model,provider:latest?.data.provider,...(capacity?{contextWindow:capacity}:{}),current,nodes,archive,droppedNodes:0,requests:requestRecords,events,fileOps,cost,
     counts:{turns:turns.size,steps:requests.length,injects:0,compactions:events.filter(e=>e.kind==='compaction'&&e.committed).length,prunes:events.filter(e=>e.kind==='prune').length},
     humanInputs:completed.filter(e=>e.type==='user/message').length,answers:completed.filter(e=>e.type==='assistant/message'&&e.data.message?.content?.some(p=>p.type==='text'&&p.text?.trim())).length,toolCalls:completed.filter(e=>e.type==='tool/result').length,images:nodes.reduce((sum,n)=>sum+(n.imgs??0),0)};
-  return {timeline,headers:{headers},headerContent,conversationNodes,requestIds,usage,pressure:latestAvailable&&prompt>0?{pressureTokens:prompt,...(capacity?{contextWindow:capacity}:{})}:null,
+  return {timeline,headers:{headers},headerContent,conversationNodes,requestIds,requestChoices,usage,pressure:latestAvailable&&prompt>0?{pressureTokens:prompt,...(capacity?{contextWindow:capacity}:{})}:null,
     coverage:{observed:requests.length,available:requestRecords.length,latestAvailable,compactionAttempts:compactionAttempts.length,confirmedCompactions:events.length,historyPartial:state.hasMore===true||state.observationHasMore===true,unsupported:requests.filter(r=>state.payloads?.[r.id]&&!frameOf(state.payloads[r.id])).length}};
 }

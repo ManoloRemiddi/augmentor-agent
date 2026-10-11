@@ -64,3 +64,47 @@ test('missing or conflicting call identities never invent arguments from names o
  const value=projectDshContext({records:[request('one',1),request('two',2)],events:[],payloads:{one:{messages:[{role:'assistant',content:'',tool_calls:[{id:'only-before',function:{name:'read',arguments:'{"path":"before.txt"}'}}]}]},two:{messages:[{role:'tool',name:'read',tool_call_id:'only-before',content:'Orphan'},{role:'assistant',tool_calls:[{id:'mismatch',function:{name:'write',arguments:'{"path":"wrong.txt"}'}}]},{role:'tool',name:'read',tool_call_id:'mismatch',content:'Conflicting name'},{role:'assistant',tool_calls:[{id:'missing',function:{name:'read'}}]},{role:'tool',name:'read',tool_call_id:'missing',content:'Missing arguments'}]}}});
  assert(value.conversationNodes.filter(n=>n.kind==='tool-result').every(n=>n.call.name==='read'&&n.call.argsRaw==='[Call arguments unavailable in this recorded request]'));
 });
+
+test('unloaded request choices stay out of charts and retain selection identity when older bodies arrive',()=>{
+ const records=Array.from({length:12},(_,i)=>request(String(i),i+10)),payloads=Object.fromEntries(records.slice(-8).map(r=>[r.id,{messages:[{role:'user',content:r.id}]}]));
+ const before=projectDshContext({records,events:[],payloads});assert.equal(before.requestChoices.length,12);assert.equal(before.timeline.requests.length,8);assert.equal(before.requestChoices[0].available,false);
+ const identities=value=>Object.fromEntries(value.timeline.requests.map(r=>[value.requestIds.get(r.seq),r.seq]));
+ const after=projectDshContext({records:[request('earlier-metadata',1),...records],events:[],payloads:{...payloads,0:{messages:[{role:'user',content:'Read explicitly'}]}}});assert.equal(after.timeline.requests.length,9);
+ for(const [id,seq] of Object.entries(identities(before)))assert.equal(identities(after)[id],seq);assert.equal(after.requestChoices.find(r=>r.id==='0').seq,before.requestChoices[0].seq);
+});
+
+test('explicit older reads pin only one extra body, survive polling and evict prior selections without backfill',async()=>{
+ const {DshPiController}=await import('../apps/harness/dsh-pi-controller.mjs'),reads=[];
+ const controller=new DshPiController('fixture',async(_url,options)=>{const call=JSON.parse(options.body);assert.equal(call.method,'observation.payload');reads.push(call.params.eventId);return {ok:true,json:async()=>({result:{available:true,text:JSON.stringify({messages:[{role:'user',content:call.params.eventId}]}),hasMore:false}})};});
+ const records=Array.from({length:12},(_,i)=>({...request(String(i),i+1),payload:{state:'retained',bytes:100,sha256:'immutable-'+i}}));controller.update({sessionId:'s',phase:'ready',readOnly:true,records});await controller.hydrate();assert.equal(reads.length,8);
+ await controller.selectContextRequest('0');assert.equal(reads.length,9);assert.equal(Object.keys(controller.state.payloads).length,9);await controller.hydrate();assert.equal(reads.length,9);assert(controller.state.payloads['0']);
+ await controller.selectContextRequest('1');assert.equal(reads.length,10);assert(!controller.state.payloads['0']);assert(controller.state.payloads['1']);await controller.selectContextRequest(null);assert.equal(Object.keys(controller.state.payloads).length,8);assert(!controller.state.payloads['1']);
+ assert.equal(controller.state.readOnly,true);assert.equal(controller.state.contextRead,null);
+});
+
+test('late selected-body replies cannot replace a newer selection or another conversation',async()=>{
+ const {DshPiController}=await import('../apps/harness/dsh-pi-controller.mjs'),pending=new Map();
+ const controller=new DshPiController('fixture',async(_url,options)=>{const call=JSON.parse(options.body);return await new Promise(resolve=>pending.set(call.params.sessionId+':'+call.params.eventId,()=>resolve({ok:true,json:async()=>({result:{available:true,text:'{"messages":[]}',hasMore:false}})})));});
+ const records=Array.from({length:12},(_,i)=>({...request(String(i),i+1),payload:{state:'retained',bytes:15}}));controller.update({sessionId:'one',phase:'ready',records});const first=controller.selectContextRequest('0'),second=controller.selectContextRequest('1');pending.get('one:1')();await second;pending.get('one:0')();await first;assert.equal(controller.state.contextRequestId,'1');assert.equal(controller.state.contextRead.id,'1');assert(!controller.state.payloads['0']);
+ const old=controller.hydrate();controller.epoch++;controller.update({sessionId:'two',records:[{...request('new',1),payload:{state:'retained',bytes:15}}],payloads:{},contextRequestId:null,contextRead:null});const fresh=controller.hydrate();pending.get('two:new')();await fresh;pending.get('one:4')();await old;assert.deepEqual(Object.keys(controller.state.payloads),['new']);
+});
+
+test('a new request arriving during hydration is reconciled within the same bounded window',async()=>{
+ const {DshPiController}=await import('../apps/harness/dsh-pi-controller.mjs');let release;const reads=[];
+ const controller=new DshPiController('fixture',async(_url,options)=>{const id=JSON.parse(options.body).params.eventId;reads.push(id);if(id==='4')await new Promise(resolve=>release=resolve);return {ok:true,json:async()=>({result:{available:true,text:'{"messages":[]}',hasMore:false}})};});
+ const records=Array.from({length:12},(_,i)=>({...request(String(i),i+1),payload:{state:'retained',bytes:15}}));controller.update({sessionId:'s',records});const first=controller.hydrate();controller.update({records:[...records,{...request('12',13),payload:{state:'retained',bytes:15}}]});const again=controller.hydrate();release();await Promise.all([first,again]);assert.deepEqual(Object.keys(controller.state.payloads),['5','6','7','8','9','10','11','12']);assert.equal(reads.length,9);
+});
+
+test('earlier metadata pages use advancing cursors, coalesce reads and reject stale or failed pages without body reads',async()=>{
+ const {DshPiController}=await import('../apps/harness/dsh-pi-controller.mjs');let release,calls=0;
+ const controller=new DshPiController('fixture',async(_url,options)=>{const call=JSON.parse(options.body);assert.equal(call.method,'observation.list');assert.equal(call.params.beforeSeq,100);assert.equal(call.params.limit,100);calls++;await new Promise(resolve=>release=resolve);return {ok:true,json:async()=>({result:{records:[request('older',99)],hasMore:false}})};});
+ controller.update({sessionId:'s',phase:'ready',records:[request('latest',100)],observationHasMore:true});const a=controller.loadContextOlder(),b=controller.loadContextOlder();assert.equal(calls,1);release();await Promise.all([a,b]);assert.deepEqual(controller.state.records.map(r=>r.id),['older','latest']);assert.equal(controller.state.observationHasMore,false);assert.deepEqual(controller.state.payloads,{});
+ controller.update({records:[request('latest',100)],observationHasMore:true});const stale=controller.loadContextOlder();controller.epoch++;controller.update({sessionId:'other',records:[],contextPage:null});release();await stale;assert.deepEqual(controller.state.records,[]);assert.equal(controller.state.contextPage,null);
+ controller.update({sessionId:'s',records:[request('latest',100)],observationHasMore:true});controller.rpc=async()=>({records:[request('latest',100)],hasMore:true});await controller.loadContextOlder();assert.match(controller.state.contextPage.error,/did not advance/);assert.equal(controller.state.records.length,1);assert.equal(controller.state.observationHasMore,true);
+});
+
+test('unretained, oversized and byte-limit failures remain unavailable rather than being read or projected as empty',async()=>{
+ const {DshPiController}=await import('../apps/harness/dsh-pi-controller.mjs');let calls=0;
+ const controller=new DshPiController('fixture',async()=>{calls++;return {ok:true,json:async()=>({result:{available:true,text:JSON.stringify({messages:[],text:'日'.repeat(400000)}),hasMore:false}})};});
+ controller.update({sessionId:'s',phase:'ready',records:[{...request('off',1),payload:{state:'disabled'}},{...request('large',2),payload:{state:'retained',bytes:1024*1024+1}},{...request('bound',3),payload:{state:'retained',bytes:15}}]});await controller.selectContextRequest('off');assert.equal(controller.state.contextRead.state,'unavailable');await controller.selectContextRequest('large');assert.match(controller.state.contextRead.reason,/1 MiB/);assert.equal(calls,0);await controller.selectContextRequest('bound');assert.equal(controller.state.contextRead.state,'failed');assert.match(controller.state.contextRead.reason,/1 MiB/);assert.deepEqual(controller.state.payloads,{});assert.equal(projectDshContext(controller.state).timeline.requests.length,0);
+});

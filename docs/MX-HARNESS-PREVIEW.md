@@ -1,6 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-## October 11 current installed Context argument fidelity
+## October 11 earlier Context requests source candidate
+
+[Earlier Context requests](DSH-GUI-ON-PI.md#earlier-context-requests--october-11-follow-up) bind the original dropdown to explicit 100-record metadata paging and one selected older body, alongside the eight-body automatic cache. Unavailable data has no fake chart bar or borrowed newest context. The 86-file Apache selection now has five marked adaptations, preserved originals/licence/CSS; DSH MIT sources and dependencies are unchanged. Source passes 217/217 across 30 files, including fifteen Context units and actual synthetic saved-data Chromium navigation; ordinary/installed qualification follows separately. The existing MX release remains selected until guarded adoption. Complete migration/privacy/public packaging/platform gates remain open.
+
+## October 11 previous installed Context argument fidelity
 
 Tested runtime **1bc456008b06eb8642b5139bfefeed5537a37f81** is selected **and running** in private MX release **20261011-195826-1738f137**, product 0.2.13, artifact **9e5496e5709ab20d2096d3a062cca4ad88db4b78c25538ec050c180e84c77ac3**. Source and fresh ordinary bundled Node 24.19.0 each pass **210/210 across 30 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Normal guarded immutable update/stable Host and Native launch and all **21,761 inventory entries** pass. Running roots/Node match selection; Native is online/model-ready/idle. All eleven histories and queue identities are preserved, with zero new conversations/admissions/provider requests/tools. Production/model router/model and speech settings remain preserved.
 

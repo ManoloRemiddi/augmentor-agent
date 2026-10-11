@@ -78,7 +78,21 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_COMPACTION==='1'){
  manager.appendMessage({role:'user',content:'Old authored context '+ 'x'.repeat(12000),timestamp:1});manager.appendMessage(assistant('Old authored answer '+ 'y'.repeat(12000)));manager.appendMessage({role:'user',content:'Kept authored context '+ 'z'.repeat(80000),timestamp:2});manager.appendMessage(assistant('Keep this authored answer.'));
  writeFileSync(join(state,'sessions',sid+'.meta.json'),JSON.stringify({id:sid,cwd:workspace,file:manager.getSessionFile(),selection,title:'Synthetic Compact fixture',saved:false,policy:'read-only',updatedAt:1,requests:[],running:false}),{mode:0o600});
 }
-// Independently authored saved metadata; no executed action or native chat is fabricated.
+// Independently authored saved fixture state; no executed actions are fabricated.
+if(process.env.AUGMENTOR_HARNESS_PROOF_CONTEXT_HISTORY==='1'){
+ const sid='context-history-proof',directory=join(state,'observations',sid),time=Date.now();mkdirSync(directory,{recursive:true,mode:0o700});mkdirSync(join(state,'sessions'),{recursive:true,mode:0o700});
+ const manager=SessionManager.create(workspace,join(state,'sessions',sid));manager.appendModelChange(selection.provider,selection.model);
+ writeFileSync(join(state,'sessions',sid+'.meta.json'),JSON.stringify({id:sid,cwd:workspace,file:manager.getSessionFile(),selection,title:'Synthetic recorded Context history',saved:true,policy:'read-only',updatedAt:time,requests:[],running:false}),{mode:0o600});
+ const records=[];
+ for(let i=0;i<12;i++){
+  const id='context-request-'+i,seq=i*12+1,payload=i===2?{contents:[{role:'user',parts:[{text:'Unsupported authored format'}]}]}:{messages:[{role:'system',content:'AUTHORED_HEADER_'+i},{role:'user',content:'AUTHORED_INPUT_'+i},{role:'assistant',content:'',tool_calls:[{id:'authored-call-'+i,function:{name:'read',arguments:JSON.stringify({path:'authored-note-'+i+'.txt'})}}]},{role:'tool',tool_call_id:'authored-call-'+i,content:'AUTHORED_RESULT_'+i}],tools:[{type:'function',function:{name:'read',parameters:{type:'object'}}}],...(i===3?{padding:'x'.repeat(1024*1024)}:{})},raw=JSON.stringify(payload);
+  if(i!==1)writeFileSync(join(directory,id+'.payload.json'),raw,{mode:0o600});
+  records.push({protocol:'augmentor-observation/1',id,seq,sessionId:sid,time:time+i,kind:'model/request',turnId:'authored-turn',data:{provider:selection.provider,model:selection.model,capacity:32000},payload:i===1?{state:'disabled'}:{state:'retained',bytes:Buffer.byteLength(raw),sha256:createHash('sha256').update(raw).digest('hex'),redactions:[]}});
+  records.push({protocol:'augmentor-observation/1',id:id+'-complete',seq:seq+1,sessionId:sid,time:time+i+1,kind:'model/complete',requestId:id,data:{usage:{input:100+i,output:5,cacheRead:0,cacheWrite:0},durationMs:50}});
+  for(let j=2;j<12;j++)records.push({protocol:'augmentor-observation/1',id:id+'-metadata-'+j,seq:seq+j,sessionId:sid,time,kind:'fixture/history',data:{name:'Independently authored saved metadata'}});
+ }
+ writeFileSync(join(directory,'events.jsonl'),records.map(r=>JSON.stringify(r)+'\n').join(''),{mode:0o600});writeFileSync(join(directory,'counter.json'),JSON.stringify({seq:records.length}),{mode:0o600});
+}
 if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
  const sid='trajectory-index-proof',directory=join(state,'observations',sid),time=Date.now();mkdirSync(directory,{recursive:true,mode:0o700});mkdirSync(join(state,'sessions'),{recursive:true,mode:0o700});
  writeFileSync(join(state,'sessions',sid+'.meta.json'),JSON.stringify({id:sid,cwd:workspace,selection,title:'Indexed synthetic metadata',saved:true,policy:'read-only',updatedAt:time,requests:[],running:false}),{mode:0o600});

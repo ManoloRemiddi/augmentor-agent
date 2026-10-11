@@ -4,7 +4,75 @@
 
 The owner's October 11 correction is to use the actual open-source DSH GUI before redesigning it. The standalone Harness default now bundles the original public React components and CSS. The previous custom interface is a supplementary **Full Pi record inspector** at `/inspection`, available from Settings. The native desktop and existing browser extension retain their approved interfaces.
 
-## Context tool-result arguments — October 11 follow-up
+## Earlier Context requests — October 11 follow-up
+
+The original Context Browser dropdown now includes loaded request metadata even
+when its body is not loaded. Its existing placement and supplier CSS remain.
+**Load earlier request metadata…** reads one preceding 100-record observation
+page; it does not backfill every provider body. Selecting a retained older
+request explicitly reads that body's immutable identity, including every page,
+with an actual UTF-8 limit of **1 MiB**. The cache holds the newest **eight**
+eligible bodies and at most **one** selected older body. Another selection or
+Latest recorded request releases that extra body. Polling coalesces requests
+arriving during an existing read and preserves the same cache bound.
+
+Metadata-only, unretained, oversized and unsupported requests have no invented
+zero-sized chart bar. A selected unavailable body shows its own time/label and
+an explicit note rather than another request's contents, categories or usage.
+Sparse supplier ordinals preserve request identity when earlier metadata or a
+body arrives; turn/step numbering describes the loaded metadata. Failed reads
+show the original retry note, and failed/nonadvancing metadata pages preserve
+existing records. Conversation epochs and exact selected IDs reject late reads;
+read-only scoped inspectors can use these read paths. No new RPC, owner, model
+request, tool execution or history mutation is added. Raw inspection remains
+available for larger or unsupported provider bodies.
+
+Two additional Apache-2.0 presentation modules are prominently marked modified:
+`browser.tsx` binds its existing selector and unavailable notes, and
+`contextView.tsx` forwards that optional projection seat. The pinned 86-file
+selection now contains **81 verbatim files and five marked adaptations**; every
+original source hash, Apache licence and copyright is preserved. DSH's 404 MIT
+GUI source files and all supplier CSS are unchanged. The expanded source
+manifest and compiled notice describe the binding; no dependency is added.
+This shared presentation contract is exercised on Linux; further Windows,
+macOS and distribution implementation remains deferred for owner MX feedback.
+
+Six controller/projection regressions check stable request identity, bounded
+reads/cache, late replies and conversation switches, new observations during
+hydration, metadata paging/single-flight/failure and dishonest UTF-8 size
+metadata. All **15 Context unit cases** pass. The actual private Host/Chromium
+fixture at **513×715** opens independently authored saved observation data via
+the original Trajectory navigation, then uses the original Context tab and
+native dropdown. It pages 144 synthetic records/12 requests, selects an older
+retained body, reads its exact authored tool path/result, and distinguishes
+unretained/unsupported/oversized cases. No provider log is created and saved
+history is unchanged. This qualifies synthetic saved-data navigation, not live
+older-request generation. Existing actual SDK/tool/cold-Host and retained local
+Qwen checks remain separately identified in the preceding argument evidence.
+
+Retained preparation failures initially opened empty Chat display history, so
+the original app correctly hid its tabs despite visible saved Host metadata.
+Adding authored native messages did not create a display journal. The final
+fixture removes those unused messages and opens the existing Trajectory view;
+assertions, deadlines and product empty-Chat behavior are unchanged. The
+supplier build/type/hash/browser-graph/notice audits pass. Full source,
+ordinary artifact and installed qualification are recorded separately below.
+Only a byte-verified redundant ordinary attachment assembly is retired against
+retained immutable release 20261011-145640-7322f8c1 to make staging capacity;
+source, immutable releases, licences and proof logs remain.
+
+### Earlier-request qualification status
+
+Source passes **217/217 across 30 files**, zero failures/skips/cancellations,
+prepared QtTest/two workers/unchanged deadlines. The prior tested runtime 1bc4560 /
+private MX release 20261011-195826-1738f137 remains selected and running until a
+fresh ordinary candidate passes and normal guarded immutable adoption succeeds.
+This increment advances P0 request inspection; complete plugin functionality,
+alternate provider shapes, action-success/status semantics, all remaining
+P0/P1 migration/privacy/public packaging/platform gates and DSH retention remain
+binding. No full migration or public release acceptance is claimed.
+
+## Previous Context tool-result arguments — October 11 follow-up
 
 The original Context Browser result card now receives the call arguments from
 its **recorded provider request**, instead of an empty string. The Pi adapter

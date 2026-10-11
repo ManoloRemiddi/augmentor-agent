@@ -1,3 +1,6 @@
+// Augmentor modification, October 2026: pass the page-local read-only request
+// picker seat to the original browser. Supplier structure and CSS are unchanged.
+// Original Copyright 2025 bowenliang123 and Apache-2.0 licence remain in force.
 import { createElement as h, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react'
 import type { Category, ContextEventRecord, RequestRecord, SurfaceNode } from '../../shared/types'
 import { CATS } from '../categories'
@@ -18,6 +21,7 @@ import type { AgentHeads } from '../agentHeads'
 import { agentSelfOf } from '../agentTree'
 import { makeContextBrowser } from './browser'
 import type { CatFocus } from './browser'
+import type { ContextRequestPicker } from './browser'
 import { makeAgentGraph } from './agentGraph'
 import { Donut } from './donut'
 import { makeCurrentComposition } from './currentComposition'
@@ -527,6 +531,7 @@ export function makeContextView(
     )
     const browserCard = (
       <ContextBrowser
+        requestPicker={props.useProjection?.('augmentorContextRequests') as ContextRequestPicker | undefined}
         data={data}
         headers={headers}
         convNodes={convNodes}

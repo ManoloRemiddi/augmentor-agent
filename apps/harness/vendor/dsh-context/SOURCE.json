@@ -87,8 +87,8 @@
       "path": "src/client/components/browser.tsx",
       "sourcePath": "src/client/components/browser.tsx",
       "sourceSha256": "93eeca2aae016854e50c87fe76deac597b2aed5a6a14b197f44bc961c5eb1062",
-      "sha256": "93eeca2aae016854e50c87fe76deac597b2aed5a6a14b197f44bc961c5eb1062",
-      "adaptation": "verbatim"
+      "sha256": "9d904f0b99523417fc6c1c5999469d60451ad90815e79fcc8e10c46ea28dcd20",
+      "adaptation": "Original selector/CSS retained; add read-only metadata choices, explicit earlier paging and unavailable-body notes without fabricated chart bars."
     },
     {
       "path": "src/client/components/browserNodes.tsx",
@@ -122,8 +122,8 @@
       "path": "src/client/components/contextView.tsx",
       "sourcePath": "src/client/components/contextView.tsx",
       "sourceSha256": "74b7f1cbd92f48288b0605f833614d53a0ed3f66aa9fe7fff270b4c797f9c6aa",
-      "sha256": "74b7f1cbd92f48288b0605f833614d53a0ed3f66aa9fe7fff270b4c797f9c6aa",
-      "adaptation": "verbatim"
+      "sha256": "29636fa217ea416a4d59f976e78296fd1fada106d77f02e21845671c62079aad",
+      "adaptation": "Forward the page-local read-only request picker projection to the original browser; supplier structure/CSS retained."
     },
     {
       "path": "src/client/components/currentComposition.tsx",

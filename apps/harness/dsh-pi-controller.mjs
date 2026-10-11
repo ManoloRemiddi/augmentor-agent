@@ -5,7 +5,7 @@ import {appendDisplay} from './chat-projection.js';
 /** Browser transport to the existing Pi Host; never owns an agent or retries a mutation. */
 export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
-  state={phase:'connecting',sessionId:null,readOnly:false,sessions:[],events:[],records:[],payloads:{},queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,goal:null,workspace:'',error:null,hasMore:false};
+  state={phase:'connecting',sessionId:null,readOnly:false,sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
@@ -27,7 +27,7 @@ export class DshPiController {
   async open(sessionId){
     if(!this.state.readOnly&&this.state.workspaces?.archivedSessionIds?.includes(sessionId))throw Error('Restore the conversation before opening it.');
     const epoch=++this.epoch;
-    this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,compaction:null,compactionPending:false,phase:'loading',events:[],records:[],payloads:{},queue:null,interactions:[],selection:null,reasoning:null,goal:null,hasMore:false,error:null});
+    this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,compaction:null,compactionPending:false,phase:'loading',events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],selection:null,reasoning:null,goal:null,hasMore:false,error:null});
     const sub=await this.rpc('events.subscribe',{sessionId,clientId:this.clientId});if(epoch!==this.epoch)return;
     this.cursor=sub.cursor;
     const [history,observations,model,queue,goal,compaction]=await Promise.all([
@@ -39,16 +39,57 @@ export class DshPiController {
     this.update({events:history.events.map(x=>x.event),hasMore:history.hasMore===true,observationHasMore:observations.hasMore===true,records:observations.records,selection:model.current,queue,goal,reasoning,compaction,interactions:sub.pending,phase:'ready'});
     void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
   }
-  hydrating=false;
-  async hydrate(){
-    if(this.hydrating)return;this.hydrating=true;const epoch=this.epoch,sessionId=this.state.sessionId;
-    try{const window=this.state.records.filter(r=>r.kind==='model/request'&&r.payload?.state==='retained'&&r.payload.bytes<=1024*1024).slice(-8),ids=new Set(window.map(r=>r.id));
-      const retained=Object.fromEntries(Object.entries(this.state.payloads).filter(([id])=>ids.has(id)));if(Object.keys(retained).length!==Object.keys(this.state.payloads).length)this.update({payloads:retained});
-      const requests=window.filter(r=>!this.state.payloads[r.id]);
-      for(const record of requests){const result=await readDshPayload((m,p)=>this.rpc(m,p),sessionId,record);if(epoch!==this.epoch)return;if(result.available)this.update({payloads:{...this.state.payloads,[record.id]:result.value}});}
-    }finally{this.hydrating=false;}
+  hydrating=null;contextPayloadReads=new Map();contextPaging=null;
+  eligibleContext(record){return record?.kind==='model/request'&&record.payload?.state==='retained'&&Number.isSafeInteger(record.payload.bytes)&&record.payload.bytes>=0&&record.payload.bytes<=1024*1024;}
+  contextBodies(){
+    const records=this.state.records.filter(r=>this.eligibleContext(r)),latest=records.slice(-8),selected=records.find(r=>r.id===this.state.contextRequestId);
+    return [...latest,...(selected&&!latest.includes(selected)?[selected]:[])];
   }
-  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},queue:null,goal:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
+  trimContextBodies(){
+    const ids=new Set(this.contextBodies().map(r=>r.id)),payloads=Object.fromEntries(Object.entries(this.state.payloads).filter(([id])=>ids.has(id)));
+    if(Object.keys(payloads).length!==Object.keys(this.state.payloads).length)this.update({payloads});
+  }
+  readContextBody(record,epoch=this.epoch,sessionId=this.state.sessionId){
+    const key=epoch+':'+record.id;if(this.contextPayloadReads.has(key))return this.contextPayloadReads.get(key);
+    const promise=readDshPayload((m,p)=>this.rpc(m,p),sessionId,record,{maxBytes:1024*1024}).then(result=>{
+      if(epoch===this.epoch&&sessionId===this.state.sessionId&&result.available&&this.contextBodies().some(r=>r.id===record.id))this.update({payloads:{...this.state.payloads,[record.id]:result.value}});
+      return result;
+    }).finally(()=>{if(this.contextPayloadReads.get(key)===promise)this.contextPayloadReads.delete(key);});
+    this.contextPayloadReads.set(key,promise);return promise;
+  }
+  async hydrate(){
+    const epoch=this.epoch,sessionId=this.state.sessionId;this.trimContextBodies();if(this.hydrating?.epoch===epoch){this.hydrating.dirty=true;return this.hydrating.promise;}
+    const job={epoch,dirty:false};this.hydrating=job;
+    job.promise=(async()=>{do{job.dirty=false;this.trimContextBodies();for(const record of this.contextBodies()){
+      if(epoch!==this.epoch)return;if(!this.state.payloads[record.id]&&this.contextBodies().some(r=>r.id===record.id))await this.readContextBody(record,epoch,sessionId);
+    }}while(job.dirty&&epoch===this.epoch);})();
+    try{await job.promise;}finally{if(this.hydrating===job)this.hydrating=null;}
+  }
+  async selectContextRequest(requestId){
+    const epoch=this.epoch,sessionId=this.state.sessionId;if(!sessionId||this.state.phase!=='ready')return;
+    const record=requestId===null?null:this.state.records.find(r=>r.id===requestId&&r.kind==='model/request');if(requestId!==null&&!record)throw Error('This recorded request is no longer loaded.');
+    this.update({contextRequestId:requestId,contextRead:record?{id:requestId,state:'loading'}:null});this.trimContextBodies();if(!record)return;
+    let read;
+    try{
+      if(!this.eligibleContext(record))read={id:requestId,state:'unavailable',reason:record.payload?.state==='retained'?'This recorded body exceeds the dashboard’s 1 MiB limit; use the raw inspector.':'This request body was not retained or is no longer available.'};
+      else if(this.state.payloads[requestId])read={id:requestId,state:'ready'};
+      else{const result=await this.readContextBody(record,epoch,sessionId);read={id:requestId,state:result.available?'ready':'unavailable',...(!result.available?{reason:'Recorded body unavailable: '+result.reason}:{})};}
+    }catch(error){read={id:requestId,state:'failed',reason:error.message};}
+    if(epoch===this.epoch&&sessionId===this.state.sessionId&&requestId===this.state.contextRequestId)this.update({contextRead:read});
+  }
+  async loadContextOlder(){
+    const epoch=this.epoch,sessionId=this.state.sessionId;if(!sessionId||this.state.phase!=='ready'||!this.state.observationHasMore)return;
+    if(this.contextPaging?.epoch===epoch)return this.contextPaging.promise;
+    const beforeSeq=this.state.records[0]?.seq,job={epoch};this.contextPaging=job;this.update({contextPage:{loading:true,error:null}});
+    job.promise=(async()=>{try{
+      if(!Number.isSafeInteger(beforeSeq))throw Error('The earlier observation cursor is unavailable.');
+      const page=await this.rpc('observation.list',{sessionId,beforeSeq,limit:100});if(epoch!==this.epoch||sessionId!==this.state.sessionId)return;
+      if(page.hasMore&&(!page.records.length||page.records[0].seq>=beforeSeq))throw Error('The earlier observation cursor did not advance.');
+      const records=new Map([...page.records,...this.state.records].map(r=>[r.id,r]));this.update({records:[...records.values()].sort((a,b)=>a.seq-b.seq),observationHasMore:page.hasMore===true,contextPage:{loading:false,error:null}});
+    }catch(error){if(epoch===this.epoch)this.update({contextPage:{loading:false,error:error.message}});}})();
+    try{await job.promise;}finally{if(this.contextPaging===job)this.contextPaging=null;}
+  }
+  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,goal:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
   async refresh(){const [list,workspaces]=await Promise.all([this.rpc('session.list'),this.state.readOnly?null:this.rpc('workspace.list')]);this.update({sessions:list.items,workspaces});if(!this.state.readOnly&&workspaces?.archivedSessionIds?.includes(this.state.sessionId))this.clearSelection();}
   async organize(action,sessionId,stop=false){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
