@@ -6,6 +6,8 @@ from pathlib import Path
 import sys
 import time
 
+if len(sys.argv) not in (3, 4) or len(sys.argv) == 4 and sys.argv[3] != '--prepare':
+    raise SystemExit('Unsupported private fixture operation.')
 ROOT = Path(sys.argv[1]).resolve(strict=True)
 PRIVATE = Path(sys.argv[2])
 if sys.platform != 'win32' or not PRIVATE.name.startswith('augmentor-plan-'):
@@ -25,6 +27,32 @@ if Path(os.environ['XDG_RUNTIME_DIR']).resolve(strict=True) != runtime.resolve(s
     raise SystemExit('The cleanup profile differs from the fixture.')
 if Path(os.environ['AUGMENTOR_SHARED_STATE']).resolve() != shared.resolve():
     raise SystemExit('The cleanup shared profile differs from the fixture.')
+if len(sys.argv) == 4 and sys.argv[3] == '--prepare':
+    from windows_supervisor import ensure_companion
+    from platform_adapters.transport import LocalSocket
+    private_directory(shared)
+    ensure_companion('memory', root=ROOT)
+    deadline = time.monotonic() + 10
+    while True:
+        try:
+            with LocalSocket() as peer:
+                peer.settimeout(5); peer.connect(str(shared / 'dual-memory.sock'))
+                peer.sendall(json.dumps({'protocol': 'augmentor-prompts/1', 'id': 'private-fixture-ready',
+                    'method': 'memory.dual.describe', 'params': {}}).encode() + b'\n')
+                with peer.makefile('rb') as stream:
+                    raw = stream.readline(65537)
+            if len(raw) > 65536 or not raw.endswith(b'\n'):
+                raise ValueError('The private memory readiness reply is incomplete.')
+            response = json.loads(raw)
+            if response.get('id') != 'private-fixture-ready' or response.get('error') or not isinstance(response.get('result'), dict):
+                raise ValueError('The private memory companion refused readiness.')
+            break
+        except FileNotFoundError:
+            if time.monotonic() >= deadline:
+                raise
+            time.sleep(.02)  # Read-only discovery only; the start is never resent.
+    print(json.dumps({'privateMemoryPrepared': True}))
+    raise SystemExit(0)
 # Validate physical identity above while retaining the exact endpoint spelling:
 # resolving a Windows 8.3 TEMP path would change the logical pipe-name hash.
 owner = discover_owner(ROOT, runtime)

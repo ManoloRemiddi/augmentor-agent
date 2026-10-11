@@ -115,6 +115,10 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
  // Report only the operation name, never synthetic request payloads or profiles.
  // This identifies a stalled Windows boundary even if a later file cannot exit.
  const call=async(method,params={})=>{try{return await owner.call(method,params);}catch(error){error.message=method+': '+error.message;throw error;}};
+ if(process.platform==='win32'){
+  const {stdout}=await promisify(execFile)(pythonExecutable(),['-I','-Xutf8','-B',resolve('tests/fixtures/windows-plan-cleanup.py'),source,root,'--prepare'],{env,windowsHide:true,timeout:35000,maxBuffer:65536});
+  t.diagnostic('Private companion preparation: '+stdout.trim());
+ }
  await start();
  const settled=sid=>until(async()=>!(await call('session.list')).items.find(m=>m.sessionId===sid)?.running,'settled '+sid);
  async function prompt(sid,op,{wait=true}={}){const result=await call('session.prompt',{sessionId:sid,requestId:crypto.randomUUID(),content:[{type:'text',text:JSON.stringify(op)}]});if(wait)await settled(sid);return result;}
