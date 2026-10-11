@@ -10,6 +10,7 @@ import {resolveConfigValueUncached} from '../vendor/pi/config-value.js';
 import {MCP_BODY_MAX_BYTES,type McpFailureOriginal} from './mcp-originals.js';
 import type {McpAuthorizationObservation} from './mcp-authorization.js';
 import {McpConnectionObserver,type McpConnectionObservation} from './mcp-connection.js';
+import type {McpAgentCall} from './mcp-call-context.js';
 export type {McpFailureOriginal} from './mcp-originals.js';
 
 const home=(value:string)=>value==='~'?homedir():value.startsWith('~/')||(process.platform==='win32'&&value.startsWith('~\\'))?join(homedir(),value.slice(2)):value;
@@ -37,9 +38,9 @@ async function originalBody(response:Response):Promise<McpFailureOriginal['body'
 /** Public SDK transport factory. The SDK still owns clients, sessions, OAuth,
  * discovery and tools. A dispatched tool failure cannot authorize another POST.
  */
-export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boolean,authorizationObserved?:(event:McpAuthorizationObservation)=>boolean,connectionObserved?:(event:McpConnectionObservation)=>void):McpTransportFactory=>(entry,cwd,authProvider)=>{
+export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boolean,authorizationObserved?:(event:McpAuthorizationObservation)=>boolean,connectionObserved?:(event:McpConnectionObservation)=>void,currentToolCall?:(server:string)=>McpAgentCall|undefined):McpTransportFactory=>(entry,cwd,authProvider)=>{
  const config=entry.config;
- const connection=new McpConnectionObserver(entry.name,'url' in config?'http':'stdio',connectionObserved);
+ const connection=new McpConnectionObserver(entry.name,'url' in config?'http':'stdio',connectionObserved,()=>currentToolCall?.(entry.name));
  if(!('url' in config)){
   try{return connection.wrap(new StdioTransport({command:home(config.command),args:config.args?.map(home),cwd:resolve(cwd,home(config.cwd??'.')),
    env:Object.fromEntries(Object.entries(config.env??{}).map(([name,value])=>[name,configured(value)])),stderr:'pipe'}));}
@@ -118,7 +119,8 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
   if(!tool||response.ok)return response;
   failedAdmission=true;
   const body=await originalBody(response);let saved=false;
-  try{saved=save?.({server:entry.name,requestId:frame.id,method:'tools/call',params:frame.params,status:response.status,contentType:response.headers.get('content-type'),body})===true;}catch{}
+  const agentCall=connection.callFor(frame.id);
+  try{saved=save?.({server:entry.name,requestId:frame.id,method:'tools/call',params:frame.params,status:response.status,contentType:response.headers.get('content-type'),body,...(agentCall?{agentCall}:{})})===true;}catch{}
   try{
    const challenge=response.headers.get('www-authenticate')??'';
    if(protectedAuth?.onUnauthorized&&(response.status===401||(response.status===403&&/(?:^|[\s,])error="?insufficient_scope"?/i.test(challenge)))){

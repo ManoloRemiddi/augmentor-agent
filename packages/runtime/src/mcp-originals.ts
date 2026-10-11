@@ -1,11 +1,13 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {createHash} from 'node:crypto';
 import type {JsonRpcId} from '@earendil-works/pi-mcp';
+import {savedMcpAgentCall,type McpAgentCall} from './mcp-call-context.js';
 
 export const MCP_TRANSPORT_ORIGINAL_TYPE='augmentor-mcp-transport/1';
 export const MCP_BODY_MAX_BYTES=1024*1024;
 export interface McpFailureOriginal {
  server:string;requestId:JsonRpcId;method:'tools/call';params:unknown;status:number;contentType:string|null;
+ agentCall?:McpAgentCall;
  body:{coverage:'complete'|'partial'|'unavailable';reason?:string;retainedBytes:number;prefixSha256:string;text:string;base64:string};
 }
 
@@ -26,5 +28,6 @@ export function savedMcpFailureOriginal(data:unknown):McpFailureOriginal|undefin
   (body.coverage==='unavailable'&&body.retainedBytes!==0))return;
  const bytes=Buffer.from(body.base64,'base64');
  if(bytes.length!==body.retainedBytes||bytes.toString('base64')!==body.base64||bytes.toString('utf8')!==body.text||createHash('sha256').update(bytes).digest('hex')!==body.prefixSha256)return;
- return record;
+ const agentCall=record.agentCall===undefined?undefined:savedMcpAgentCall(record.agentCall);if(record.agentCall!==undefined&&(!agentCall||!agentCall.toolName.startsWith('mcp__'+record.server.replaceAll('-','_')+'__')))return;
+ return {...record,...(agentCall?{agentCall}:{})};
 }

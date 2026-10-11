@@ -11,6 +11,26 @@ from augmentor_linux.window import Window
 from augmentor_linux.panels import SettingsDialog
 from augmentor_linux.mcp_settings import McpDialog
 app=QApplication([]);client=PiClient();sid='native-manager';errors=[];phase='startup'
+original_call=PiClient.call;stale_catalog_released=False;coherent_snapshot_used=False
+def traced_call(self,method,params=None):
+    global stale_catalog_released,coherent_snapshot_used
+    result=original_call(self,method,params)
+    release=os.environ.get('AUGMENTOR_MCP_FIXTURE_RELEASE_RELOAD')
+    if release and method=='session.mcpInfo' and result.get('configuration',{}).get('pendingSessionOptions') and not stale_catalog_released:
+        # Keep this genuine earlier catalog response while the public reload
+        # settles. The next status call must carry a coherent fresh catalog.
+        Path(release).write_text('release');request=result['management']['lastReceipt']['requestId'];end=time.monotonic()+12
+        while time.monotonic()<end:
+            current=original_call(self,'session.mcpActionStatus',{'sessionId':sid,'requestId':request})
+            if current['state']=='completed':break
+            time.sleep(.01)
+        assert current['state']=='completed','Authored held reload did not settle'
+        stale_catalog_released=True
+    if stale_catalog_released and method=='session.mcpActionStatus' and params.get('includeCatalog') is True:
+        assert result['catalog']['configuration']['pendingSessionOptions'] is False
+        coherent_snapshot_used=True
+    return result
+PiClient.call=traced_call
 pointer=Path(os.environ['AUGMENTOR_PI_STATE'])/'session.json';pointer.write_text(json.dumps({'endpoint':client.base,'session':sid,'selection':{'provider':'fixture','model':'manager-model'}}));pointer.chmod(0o600)
 def until(check,label):
     global phase
@@ -47,7 +67,7 @@ try:
                 click(dialog.enable_button,'Disable server');until(lambda:dialog.receipt and dialog.receipt['action']=='configure' and dialog.receipt['result']=='registration-events-settled' and dialog.enable_button.text()=='Enable server' and not dialog.reading,'disable settlement')
                 click(dialog.enable_button,'Enable server');until(lambda:dialog.enable_button.text()=='Disable server' and not dialog.blocked and not dialog.reading,'enable settlement')
                 dialog.exposure.setCurrentText('hidden');click(dialog.exposure_button,'Apply exposure');until(lambda:any(row['name']=='web' and row['exposure']=='hidden' for row in dialog.servers) and not dialog.blocked and not dialog.reading,'exposure settlement')
-                click(dialog.edit_button,'Edit profile');until(lambda:dialog.editor.isVisible() and bool(dialog.profile.toPlainText()) and not dialog.reading,'profile editor');profile=json.loads(dialog.profile.toPlainText());profile['authoredUnrelated']='retained';profile['autoEnableCodemode']=False;profile['mcpServers']['header']['headers']['Authorization']='Bearer AUTHORED_CONFIG_PRIVATE_SECRET';dialog.profile.setPlainText(json.dumps(profile));previous=dialog.receipt['requestId'];click(dialog.save_button,'Save profile');until(lambda:dialog.receipt and dialog.receipt['requestId']!=previous and dialog.receipt['result']=='session-options-applied' and not dialog.reading,'profile settlement');assert not dialog.receipt['pendingSessionOptions'];assert 'MCP session options have not settled yet' not in dialog.evidence.text();dialog.close_editor();assert dialog.profile.toPlainText()==''
+                click(dialog.edit_button,'Edit profile');until(lambda:dialog.editor.isVisible() and bool(dialog.profile.toPlainText()) and not dialog.reading,'profile editor');profile=json.loads(dialog.profile.toPlainText());profile['authoredUnrelated']='retained';profile['autoEnableCodemode']=False;profile['mcpServers']['header']['headers']['Authorization']='Bearer AUTHORED_CONFIG_PRIVATE_SECRET';dialog.profile.setPlainText(json.dumps(profile));previous=dialog.receipt['requestId'];click(dialog.save_button,'Save profile');until(lambda:dialog.receipt and dialog.receipt['requestId']!=previous and dialog.receipt['result']=='session-options-applied' and not dialog.reading,'profile settlement');assert not dialog.receipt['pendingSessionOptions'];assert 'MCP session options have not settled yet' not in dialog.evidence.text(),'Stale pre-reload catalog is still displayed after completed receipt';assert stale_catalog_released and coherent_snapshot_used,'The actual held reload must use the coherent status/catalog snapshot';dialog.close_editor();assert dialog.profile.toPlainText()==''
                 click(dialog.actions['reconnect'],'Reconnect');until(lambda:dialog.receipt and dialog.receipt['action']=='reconnect' and dialog.receipt['state']=='completed' and not dialog.reading,'reconnect settlement')
                 click(dialog.actions['logout'],'Sign out');until(lambda:dialog.receipt and dialog.receipt['action']=='logout' and dialog.receipt['state']=='completed' and not dialog.reading,'sign-out settlement')
                 click(dialog.actions['login'],'Sign in again');until(lambda:bool(dialog.authorization_url) and not dialog.reading,'cancellable login');click(dialog.cancel_button,'Cancel');until(lambda:dialog.receipt and dialog.receipt['state']=='cancelled','cancellation settlement')

@@ -129,7 +129,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
       record(event.type.replaceAll('_', '/'), {}, event);
     }
   });
-  return {record, beginTurn(data: Record<string, unknown>) {
+  return {record,currentRequestId:()=>requestId, beginTurn(data: Record<string, unknown>) {
     requestId = undefined; started = 0; firstToken = false;
     requestedThinking=undefined;
     provenance?.beginTurn();

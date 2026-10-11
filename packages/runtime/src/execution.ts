@@ -4,6 +4,7 @@ import {isRoutineQuery} from './permissions.js';
 import type {Agent,AfterToolCallContext} from '@earendil-works/pi-agent-core';
 import type {AgentSession,ExtensionAPI,SessionManager,TurnEndEvent,ExtensionContext} from '@earendil-works/pi-coding-agent';
 import {saveToolOriginal} from './tool-originals.js';
+import type {McpAgentCall} from './mcp-call-context.js';
 
 export const EXECUTION_POLICY={maxRecoveries:2,recoveryMaxTokens:8192,recoveryMaxSteps:64,recoveryMaxMs:600000,warningMs:90000};
 type Effect='read'|'change'|'external'|'unknown';
@@ -61,7 +62,7 @@ export class PiExecution {
  private restore?:()=>void;
  constructor(private emit:(kind:string,data:Record<string,unknown>,payload?:unknown)=>void,
   private notice:(message:string,incomplete:boolean)=>void,
-  policy:Partial<typeof EXECUTION_POLICY>={},private now=()=>performance.now(),private contract:(name:string)=>ExecutionContract|undefined=()=>undefined){
+  policy:Partial<typeof EXECUTION_POLICY>={},private now=()=>performance.now(),private contract:(name:string)=>ExecutionContract|undefined=()=>undefined,private mcpResultIdentity?:(toolCallId:string,toolName:string)=>McpAgentCall|undefined){
   this.policy={...EXECUTION_POLICY,...policy};
   for(const [key,value] of Object.entries(this.policy))if(!Number.isSafeInteger(value)||value<=0)throw Error('Invalid execution policy: '+key);
  }
@@ -168,7 +169,7 @@ export class PiExecution {
   const nestedResult:NonNullable<typeof previousResult>=async event=>{
    if(event.parentToolCallId){
     this.outcome({toolCall:{id:event.toolCallId,name:event.toolName},args:event.input,result:{content:event.content,details:event.details},isError:event.isError},runner.createContext().signal?.aborted??false);this.record();
-    try{const original=saveToolOriginal(session.sessionManager,event);if(original)this.emit('tool/original',original);}
+    try{const original=saveToolOriginal(session.sessionManager,{...event,agentCall:this.mcpResultIdentity?.(event.toolCallId,event.toolName)});if(original)this.emit('tool/original',original);}
     catch{this.emit('tool/original',{toolCallId:event.toolCallId,parentToolCallId:event.parentToolCallId,coverage:'unavailable',reason:'Native nested-result storage failed.'});}
    }
    return previousResult!.call(runner,event);
@@ -185,7 +186,7 @@ export class PiExecution {
   const after:Agent['afterToolCall']=async(context,signal)=>{
    this.outcome(context,signal?.aborted??false);
    if(context.toolCall.name.startsWith('mcp__')){
-    try{const original=saveToolOriginal(session.sessionManager,{toolName:context.toolCall.name,toolCallId:context.toolCall.id,input:context.args,...context.result,isError:context.isError});if(original)this.emit('tool/original',original);}
+    try{const original=saveToolOriginal(session.sessionManager,{toolName:context.toolCall.name,toolCallId:context.toolCall.id,input:context.args,...context.result,isError:context.isError,agentCall:this.mcpResultIdentity?.(context.toolCall.id,context.toolCall.name)});if(original)this.emit('tool/original',original);}
     catch{this.emit('tool/original',{toolCallId:context.toolCall.id,coverage:'unavailable',reason:'Native MCP-result storage failed.'});}
    }
    const decision=await previousAfter?.(context,signal);

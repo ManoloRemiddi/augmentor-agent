@@ -14,10 +14,11 @@ export function attachMcpManagement({button,rpc,current,notice,changed=()=>{}}){
  async function reload(){
   if(reading||!live()){if(!live())close();return;}clearTimeout(timer);reading=true;controls();const own=++ticket;
   try{
-   const info=await call('session.mcpInfo');if(own!==ticket||!live())return;
+   let info=await call('session.mcpInfo');if(own!==ticket||!live())return;
+   receipt=info.management?.lastReceipt??null;
+   if(receipt){const {catalog,...status}=await call('session.mcpActionStatus',{requestId:receipt.requestId,includeCatalog:true});receipt=status;info=catalog??info;}if(own!==ticket||!live())return;
    const previous=panel.server.value;panel.servers=info.servers??[];panel.server.replaceChildren(...panel.servers.map(row=>{const option=node('option',row.name+' · '+row.transport+' · '+row.exposure+' · '+row.toolCount+' tools');option.value=row.name;return option;}));if(panel.servers.some(row=>row.name===previous))panel.server.value=previous;
-   available=info.available===true&&info.management?.available===true;configAvailable=available&&!!info.configuration;blocked=info.management?.busy===true;receipt=info.management?.lastReceipt??null;
-   if(receipt)receipt=await call('session.mcpActionStatus',{requestId:receipt.requestId});if(own!==ticket||!live())return;
+   available=info.available===true&&info.management?.available===true;configAvailable=available&&!!info.configuration;blocked=info.management?.busy===true;
    panel.status.textContent=!info.available?info.reason:!info.management?.available?'Management receipts are unavailable.':receipt?receipt.action+' · '+receipt.server+' · '+receipt.state+' · '+receipt.result+(receipt.cancelRequested?' · cancellation requested; credentials were not rolled back':''):panel.servers.length?'Select a server and an explicit action.':'No MCP servers are registered in this Pi profile.';
    panel.link.hidden=!receipt?.authorizationUrl;panel.link.href=receipt?.authorizationUrl??'';
    panel.redirect.hidden=!receipt?.waitingForRedirect;if(!receipt?.waitingForRedirect)panel.redirectInput.value='';

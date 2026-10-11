@@ -69,13 +69,14 @@ export function trimSavedToolContext(manager:SessionManager){
  return result.changes;
 }
 
-type ExcerptOriginal={id:string;toolName:string;toolCallId?:string;parentToolCallId?:string;originalBoundary?:string;coverage:string;content:ToolResultMessage['content'];http?:McpFailureOriginal};
+type ExcerptOriginal={id:string;toolName:string;toolCallId?:string;parentToolCallId?:string;agentCall?:McpFailureOriginal['agentCall'];originalBoundary?:string;coverage:string;content:ToolResultMessage['content'];http?:McpFailureOriginal};
 const originalMetadata=(entry:ExcerptOriginal)=>entry.http?{
  originalBoundary:entry.originalBoundary,evidenceSource:'mcp-http-error-body',server:entry.http.server,method:entry.http.method,
  transportRequestId:entry.http.requestId,status:entry.http.status,contentType:entry.http.contentType,coverage:entry.http.body.coverage,
+ ...(entry.http.agentCall?{agentCall:{...entry.http.agentCall}}:{}),
  responseBodyComplete:entry.http.body.coverage==='complete',retainedBytes:entry.http.body.retainedBytes,prefixSha256:entry.http.body.prefixSha256,
  ...(entry.http.body.reason?{retentionReason:entry.http.body.reason}:{}),
-}:entry.originalBoundary?{originalBoundary:entry.originalBoundary,coverage:entry.coverage}:{};
+}:entry.originalBoundary?{originalBoundary:entry.originalBoundary,coverage:entry.coverage,...(entry.agentCall?{agentCall:{...entry.agentCall}}:{})}:{};
 
 export function originalToolExcerpt(manager:Pick<SessionManager,'getBranch'>,args:{entryId?:string;offset?:number;limit?:number;find?:string}={}){
  let {offset=0,limit=2048}=args;
@@ -85,7 +86,7 @@ export function originalToolExcerpt(manager:Pick<SessionManager,'getBranch'>,arg
   const http=entry.type==='custom'&&entry.customType===MCP_TRANSPORT_ORIGINAL_TYPE?savedMcpFailureOriginal(entry.data):undefined;
   if(http)return [{id:entry.id,toolName:'MCP tools/call',originalBoundary:'http-tool-failure-before-sdk-error-normalization',coverage:http.body.coverage,content:[{type:'text',text:http.body.text}],http}];
   const nested=entry.type==='custom'&&entry.customType===TOOL_ORIGINAL_TYPE?savedToolOriginal(entry.data):undefined;
-  return nested?[{id:entry.id,toolName:nested.toolName,toolCallId:nested.toolCallId,content:originalContent(nested.toolName,nested.result?.content??[],nested.result?.structuredContent),parentToolCallId:nested.parentToolCallId,originalBoundary:nested.boundary,coverage:nested.coverage}]:[];
+  return nested?[{id:entry.id,toolName:nested.toolName,toolCallId:nested.toolCallId,content:originalContent(nested.toolName,nested.result?.content??[],nested.result?.structuredContent),parentToolCallId:nested.parentToolCallId,agentCall:nested.agentCall,originalBoundary:nested.boundary,coverage:nested.coverage}]:[];
  });
  if(args.entryId===undefined)return {results:originals.filter(entry=>entry.originalBoundary||codePoints(contentText(entry.content))>4096||binaryLike(contentText(entry.content))).slice(-20).map(entry=>{
   const text=contentText(entry.content);

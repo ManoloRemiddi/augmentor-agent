@@ -8,6 +8,7 @@ import {MCP_AUTHORIZATION_TYPE,savedMcpAuthorization,type McpAuthorizationObserv
 import type {McpManagementAction} from './mcp-management.js';
 import {readMcpProfile,type McpProfile} from './mcp-profile.js';
 import {MCP_CONNECTION_TYPE,savedMcpConnection,connectionSummary,type McpConnectionSummary,type McpConnectionObservation} from './mcp-connection.js';
+import {McpCallContext} from './mcp-call-context.js';
 
 const discovery=new Set(['codemode','tool_search','list_mcp_resources','list_mcp_resource_templates','read_mcp_resource']);
 const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
@@ -34,8 +35,10 @@ export class ManagedMcp {
  private registrationWait?:{snapshot:string;finish:()=>void};
  private connections=new Map<string,{summary:McpConnectionSummary;unsaved:number}>();
  private connectionTrackingDropped=0;
+ private calls:McpCallContext;
  readonly source:string;
- constructor(agentDir:string,private stateDir:string,private sessionId:string,private authorizationChanged?:(event:McpAuthorizationObservation,retained:boolean)=>void,private openAuthorization?:(url:string)=>void,private connectionChanged?:(event:McpConnectionObservation,retained:boolean)=>void){
+ constructor(agentDir:string,private stateDir:string,private sessionId:string,private authorizationChanged?:(event:McpAuthorizationObservation,retained:boolean)=>void,private openAuthorization?:(url:string)=>void,private connectionChanged?:(event:McpConnectionObservation,retained:boolean)=>void,owner?:()=>{hostTurnId?:string;hostRequestId?:string;modelRequestObservationId?:string}){
+  this.calls=new McpCallContext(sessionId,owner);
   this.source=join(agentDir,'mcp.json');
   try{
    const initial=readMcpProfile(this.source);this.revision=initial.revision;
@@ -51,6 +54,7 @@ export class ManagedMcp {
   }catch{this.errors=['Managed MCP configuration is invalid or exceeds its limits; no configured server was admitted.'];}
  }
  private register:ExtensionFactory=pi=>{
+  this.calls.observe(pi);
   this.api=pi;const namespaces=new Set<string>();
   pi.on('session_start',(_event,ctx)=>{this.manager=ctx.sessionManager;});
   for(const [name,config] of Object.entries(this.entries)){
@@ -81,13 +85,14 @@ export class ManagedMcp {
     const same=previous?.summary.instanceId===event.instanceId;this.connections.set(event.server,{summary:connectionSummary(same?previous.summary:undefined,event),unsaved:(same?previous.unsaved:0)+(retained?0:1)});
    }
    this.connectionChanged?.(event,retained);
-  }),
+  },server=>this.calls.current(server)),
   logPath:this.retainLogs?join(privateDir(join(this.stateDir,'mcp-logs')),this.sessionId+'.log'):process.platform==='win32'?'NUL':'/dev/null',
   // The operator surface presents this ephemeral URL. The SDK must not launch
   // an unrelated default browser or place the URL in retained notifications.
   openUrl:url=>{if(!this.openAuthorization)throw Error('Open MCP management to sign in.');this.openAuthorization(url);},
  });
   return builtin(new Proxy(pi,{get:(target,key)=>{
+   if(key==='registerTool')return (definition:Parameters<ExtensionAPI['registerTool']>[0])=>target.registerTool(this.calls.wrap(definition));
    if(key==='setActiveTools')return (names:string[])=>{if(names.includes('codemode')&&!target.getActiveTools().includes('codemode'))this.autoCodemodeActivated=true;target.setActiveTools(names);};
    if(key==='registerCommand')return (name:string,options:Omit<RegisteredCommand,'name'|'sourceInfo'>)=>{if(name==='mcp')this.command=options.handler;target.registerCommand(name,options);};
    if(key==='on')return (event:string,handler:(event:any,ctx:ExtensionContext)=>unknown)=>{
@@ -113,6 +118,7 @@ export class ManagedMcp {
   if([...profile.servers.keys()].some(name=>other.some(row=>row.name.replaceAll('-','_')===name.replaceAll('-','_'))))throw Error('A configured MCP name conflicts with a server owned by another extension. No profile was saved.');
  }
  assertReady(){if(this.pending)throw Error('MCP configuration has not settled for this conversation. Inspect its configuration receipt before sending a prompt.');}
+ takeResultIdentity(toolCallId:string,toolName:string){return this.calls.takeResult(toolCallId,toolName);}
  markPending(){this.pending=true;}
  needsSessionReload(profile:McpProfile){return this.reloadPending||profile.autoEnableCodemode!==this.autoEnableCodemode||profile.retainLogs!==this.retainLogs;}
  prepareSessionReload(profile:McpProfile){
@@ -168,7 +174,7 @@ export class ManagedMcp {
   for(const entry of this.manager?.getBranch()??[])if(entry.type==='custom'&&entry.customType===MCP_CONNECTION_TYPE){const row=savedMcpConnection(entry.data);if(!row||!visible.has(row.server))continue;const previous=history.get(row.server);if(row.event==='created'||!previous||previous.instanceId===row.instanceId)history.set(row.server,connectionSummary(previous?.instanceId===row.instanceId?previous:undefined,row));}
   return {available:!!catalog,source:'managed-profile-mcp.json',projectConfiguration:false,modelsInCodemode:false,retainServerLogs:this.retainLogs,configurationErrors:this.errors.length,
    configuration:{loadedRevision:this.revision,registrationPending:this.pending,pendingSessionOptions:this.reloadPending||(this.requestedOptions?this.requestedOptions.autoEnableCodemode!==this.autoEnableCodemode||this.requestedOptions.retainLogs!==this.retainLogs:false),optionApplication:'changed log retention and automatic codemode options use an idle public session reload; connection health is separate'},
-   activeDiscoveryTools:[...discovery].filter(name=>active.has(name)),
+   activeDiscoveryTools:[...discovery].filter(name=>active.has(name)),callCorrelation:this.calls.describe(),
    coverage:'registered MCP tool catalog and public transport observations; no health probe or private SDK connection state',connectionTrackingDropped:this.connectionTrackingDropped,serverCount:servers.length,omittedServers:Math.max(0,servers.length-64),servers:servers.slice(0,64).map(entry=>{
     const namespace='mcp__'+entry.name.replaceAll('-','_'),registered=tools.filter(tool=>tool.namespace?.name===namespace),shown=registered.filter(tool=>tool.name.length<=256).slice(0,remaining);remaining-=shown.length;
     const lastObserved=authorization.get(entry.name)??null,gap=this.authorizationGaps.get(entry.name);

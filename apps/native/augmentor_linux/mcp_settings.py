@@ -79,7 +79,9 @@ class McpDialog(QDialog):
         def read():
             try:
                 info=client.call('session.mcpInfo',{'sessionId':sid});receipt=info.get('management',{}).get('lastReceipt')
-                if receipt:receipt=client.call('session.mcpActionStatus',{'sessionId':sid,'requestId':receipt['requestId']})
+                if receipt:
+                    receipt=client.call('session.mcpActionStatus',{'sessionId':sid,'requestId':receipt['requestId'],'includeCatalog':True})
+                    info=receipt.pop('catalog',info)
                 return info,receipt,None
             except Exception:return None,None,'MCP management could not be read. Reload to inspect its receipt.'
         def loaded(result):

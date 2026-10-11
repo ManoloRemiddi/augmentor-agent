@@ -146,12 +146,12 @@ export class Host {
       record?.observation?.record('integration/mcp-connection',{...event,retained});
       this.publish(m.id,{method:'mcp/connection',payload:{sessionId:m.id,observation:{...event},retained}});
       if(!retained)this.append(m,'runtime/warning',{message:'An MCP connection observation could not be saved. Its historical evidence has a gap.'});
-    });
+    },()=>({hostTurnId:record?.turnId,hostRequestId:record?.activeRequestId,modelRequestObservationId:record?.observation?.currentRequestId()}));
     mkdirSync(m.cwd,{recursive:true,mode:0o700});
     const execution:PiExecution=new PiExecution((kind,data,payload)=>record?.observation?.record(kind,data,payload),(message,incomplete)=>{record?.observation?.record('execution/notice',{message,incomplete});this.append(m,'runtime/notice',{message,incomplete});},{},undefined,(name):ExecutionContract|undefined=>{
       const definition=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()]).find(tool=>tool.definition.name===name)?.definition;
       return (definition as (typeof definition & {augmentorExecution?:ExecutionContract}))?.augmentorExecution??(mcp?.isRead(name)?{effect:()=> 'read'}:undefined);
-    });
+    },(toolCallId,toolName)=>mcp?.takeResultIdentity(toolCallId,toolName));
     const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:true},packages:[],defaultProjectTrust:'never'});
     const resources=readJson<Data>(join(this.dirs.config,'resources.json'),{sources:[],skills:[]});
     const provenance=new ContextProvenance(()=>this.observations.policy().capturePayloads);
@@ -278,6 +278,7 @@ export class Host {
     return this.branchRow(m);
   }
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
+  private mcpInfo(m:Meta){if(m.surface==='browser')return {available:false,reason:'MCP is unavailable in browser-only conversations.'};return {...(this.loaded.get(m.id)?.mcp?.describe()??{available:false,reason:'MCP bindings are not loaded for this saved conversation.'}),management:this.mcpManagement.describe(m.id)};}
   submit(r:Loaded,input:string,id:string){r.mcp?.assertReady();const m=r.meta;if(m.running)throw new Error('This conversation is already working');
     if(this.mcpReloading)throw Error('Finish MCP session reload before sending a chat prompt.');
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
@@ -398,8 +399,8 @@ export class Host {
     case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
     case 'session.list':return {items:[...this.metadata.values()].sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title}))};
     case 'session.history':{const m=this.getMeta(p.sessionId);return this.history(m).page(p.maxMessages,p.beforeSeq);}
-    case 'session.mcpInfo':{const m=this.getMeta(p.sessionId);if(m.surface==='browser')return {available:false,reason:'MCP is unavailable in browser-only conversations.'};return {...(this.loaded.get(m.id)?.mcp?.describe()??{available:false,reason:'MCP bindings are not loaded for this saved conversation.'}),management:this.mcpManagement.describe(m.id)};}
-    case 'session.mcpActionStatus':{const m=this.getMeta(p.sessionId);return this.mcpManagement.lookup(m.id,identifier(p.requestId));}
+    case 'session.mcpInfo':return this.mcpInfo(this.getMeta(p.sessionId));
+    case 'session.mcpActionStatus':{const m=this.getMeta(p.sessionId),receipt=this.mcpManagement.lookup(m.id,identifier(p.requestId));return p.includeCatalog===true?{...receipt,catalog:this.mcpInfo(m)}:receipt;}
     case 'session.mcpCancelAction':{const m=this.getMeta(p.sessionId);return this.mcpManagement.cancel(m.id,identifier(p.requestId));}
     case 'session.mcpSubmitRedirect':{const m=this.getMeta(p.sessionId);return this.mcpManagement.submitRedirect(m.id,identifier(p.requestId),p.url);}
     case 'session.mcpProfile':{
