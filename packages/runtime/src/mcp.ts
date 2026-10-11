@@ -26,6 +26,7 @@ export class ManagedMcp {
  private autoEnableCodemode=true;
  private retainLogs=false;
  private owned=new Set<string>();
+ private foreignNamespaces?:Set<string>;
  private revision='missing';
  private pending=false;
  private requestedOptions?:{autoEnableCodemode:boolean;retainLogs:boolean};
@@ -113,9 +114,17 @@ export class ManagedMcp {
  }
  private snapshot(servers:ReturnType<ExtensionAPI['getMcpServers']>){return JSON.stringify(servers.map(row=>[row.name,row.config,row.extensionPath]));}
  preflight(profile:McpProfile){
-  if(!this.api)throw Error('Load the Native conversation before changing MCP configuration.');
-  const other=this.api.getMcpServers().filter(row=>!this.owned.has(row.name));
-  if([...profile.servers.keys()].some(name=>other.some(row=>row.name.replaceAll('-','_')===name.replaceAll('-','_'))))throw Error('A configured MCP name conflicts with a server owned by another extension. No profile was saved.');
+  let servers:ReturnType<ExtensionAPI['getMcpServers']>|undefined;
+  try{servers=this.api?.getMcpServers();}catch{}
+  if(servers){
+   const other=servers.filter(row=>!this.owned.has(row.name));
+   if(other.length>256){this.foreignNamespaces=undefined;throw Error('Too many extension-owned MCP namespaces to validate this configuration. No profile was saved.');}
+   this.foreignNamespaces=new Set(other.map(row=>row.name.replaceAll('-','_')));
+  }else if(!this.reloadPending||!this.foreignNamespaces)throw Error('Load a usable Native conversation before changing MCP configuration.');
+  // A public loader rejection can leave the old API invalidated before a new
+  // runner exists. Retain only observed names for an explicit pending reload;
+  // this snapshot is validation evidence, never a live catalog or tool grant.
+  if([...profile.servers.keys()].some(name=>this.foreignNamespaces!.has(name.replaceAll('-','_'))))throw Error('A configured MCP name conflicts with a server owned by another extension. No profile was saved.');
  }
  assertReady(){if(this.pending)throw Error('MCP configuration has not settled for this conversation. Inspect its configuration receipt before sending a prompt.');}
  takeResultIdentity(toolCallId:string,toolName:string){return this.calls.takeResult(toolCallId,toolName);}
@@ -128,7 +137,10 @@ export class ManagedMcp {
   this.autoEnableCodemode=profile.autoEnableCodemode;this.retainLogs=profile.retainLogs;this.requestedOptions=undefined;this.errors=[];this.owned.clear();
   return {removeAutoCodemode};
  }
- finishSessionReload(revision:string){this.reloadPending=false;this.pending=false;this.revision=revision;}
+ finishSessionReload(revision:string){
+  if(this.errors.length||Object.keys(this.entries).some(name=>!this.owned.has(name)))throw Error('Managed MCP registrations did not settle. Repair their namespace conflicts before applying configuration again.');
+  this.reloadPending=false;this.pending=false;this.revision=revision;
+ }
  async apply(profile:McpProfile,revision:string){
   this.preflight(profile);const api=this.api!;
   const change=(mutate:()=>void)=>new Promise<void>((resolve,reject)=>{

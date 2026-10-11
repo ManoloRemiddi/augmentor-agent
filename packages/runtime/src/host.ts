@@ -496,6 +496,7 @@ export class Host {
       const input=text(p.content?.filter((part:Data)=>part.type==='text').map((part:Data)=>part.text).join('\n')),queue=this.queue(m);
       const existing=queue.lookup(requestId,input);if(existing||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
       if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
+      this.loaded.get(m.id)?.mcp?.assertReady();
       if(p.mode==='steer'){
         const r=this.loaded.get(m.id);if(!m.running||!r||r.cancelled||r.phase==='settling'||r.turnId!==p.expectedTurnId||queue.paused||queue.uncertain||r.steering?.waiting)throw Error('The observed steering turn is no longer available.');
         r.steering!.validate(input);queue.enqueue(requestId,input,true);return new SteeringReply(this.steer(m,requestId,p.expectedTurnId).then(result=>({...result,requestId})));
@@ -519,7 +520,7 @@ export class Host {
     }
     case 'session.queue':return this.queueSnapshot(p.sessionId);
     case 'session.updateQueue':{const m=this.getMeta(p.sessionId),itemId=promptIdentity(p.itemId);if(p.action?.kind==='steer')return new SteeringReply(this.steer(m,itemId,p.expectedTurnId));if(p.action?.kind!=='remove')throw Error('Choose steer or remove.');this.queue(m).remove(itemId);return {accepted:true,...this.queueSnapshot(m.id)};}
-    case 'session.continueQueue':{const m=this.getMeta(p.sessionId);if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before continuing Native prompts.');this.queue(m).resume();this.pump(m);return {accepted:true};}
+    case 'session.continueQueue':{const m=this.getMeta(p.sessionId);if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before continuing Native prompts.');this.loaded.get(m.id)?.mcp?.assertReady();this.queue(m).resume();this.pump(m);return {accepted:true};}
     case 'session.resolveQueue':{const m=this.getMeta(p.sessionId);if(m.running||p.acknowledgeUnknownOutcome!==true)throw Error('Inspect the saved history and explicitly acknowledge that the interrupted action outcome remains unknown.');this.queue(m).resolve(promptIdentity(p.itemId));this.append(m,'runtime/notice',{message:'The interrupted prompt receipt was acknowledged. Its action outcome may still be unknown. That prompt was not retried; waiting prompts remain paused.',incomplete:true});return {accepted:true};}
     case 'session.rename':{const m=this.getMeta(p.sessionId);m.title=text(p.title,200);this.loaded.get(m.id)?.session.setSessionName(m.title);this.save(m);this.append(m,'session/title',{title:m.title});return {title:m.title};}
     case 'chats.saved':{if(p.action&&p.action!=='state'){if(!['save','unsave'].includes(p.action))throw new Error('Invalid saved-chat action');const m=this.getMeta(p.sessionId);m.saved=p.action==='save';this.save(m);}return {saved:[...this.metadata.values()].filter(m=>m.saved).map(m=>m.id)};}

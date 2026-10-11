@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pending MCP reload recovery](MCP-TRANSPORT.md#pending-mcp-reload-recovery) qualifies a public loader rejection before a replacement runner exists. Bounded observed external names permit explicit same-owner repair without claiming a live catalog. Partial configuration refuses direct/queued admission and resume before queue mutation; refreshed registration errors stay partial rather than producing applied receipts. Live services, other catastrophic boundaries and every accepted migration/platform/installed gate remain binding.
+
 Latest qualified implementation **`eb6ecc85b63074233cf8a789f26d2a892a76fec4`**: 772 source Node cases/770 passes/two optional skips; 150 stable ordinary bundled-stage passes; 872 Native Python cases/835 passes/37 skips; all zero failures. [The October 11 handoff](AGENT-HANDOFF.md#october-11-exact-mcp-call-linkage-and-coherent-catalog-checkpoint) records exact managed MCP identities, the reproduced/fixed catalog race, unchanged dependencies/notices, cleanup, prior failures and the complete remaining requirements. This source/staged checkpoint does not qualify installed or representative live acceptance.
 
 # Augmentor Harness — implementation and qualification
