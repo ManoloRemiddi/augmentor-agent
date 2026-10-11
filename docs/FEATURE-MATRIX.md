@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 planning candidate: [branch-owned plans and todos](PI-PLANNING.md) add model tools and a read-only Harness view. Native/Browser can use their existing inspection entry point without a layout change. Revisioned native state, branch isolation and cold inspection are separate from full persistent goals, jobs and delegation; every accepted migration and platform/installed gate remains required.
+
+
 October 10 follow-up: standalone Native Settings and Browser Models now expose the same Pi saved effort/mode and profile mappings as Harness. Actual production Qt and loaded Chromium/native bridge/Pi fixtures qualify saves, conflicts, reload/reopen, received Manual/Adaptive effort and scope guards in [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls). This supersedes the standalone settings gap in the preceding checkpoint. Live/virtual routing, SDK/embedded controls, richer inspection and the full migration/platform/installed gates remain required.
 
 

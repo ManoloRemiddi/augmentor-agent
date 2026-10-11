@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [Pi planning candidate](PI-PLANNING.md) stores revisioned plans and explicit todo states in native branch custom entries through the public SDK. Its Plan view reads the existing owner or verified cold originals. Reported progress grants no task-completion evidence, execution authority or autonomous goal/job loop.
+
+
 The October 10 Native/Browser follow-up adds effort/mapping controls in existing settings locations. Browser and Harness use one DOM form; Native uses a Qt client of the same serialized Pi owner. Forms do no inference or automatic model selection. Browser operations check the selected conversation and standalone authority; global administration stays out of SDK workspaces. Context/model/working changes invalidate dialogs and late results, and open settings participate in maintenance admission. See [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls).
 
 

@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [October 11 planning candidate](PI-PLANNING.md) adds public-SDK plan tools and a read-only Plan view on the existing Pi owner. The full delivery gates below remain required, including general goals, background jobs and delegation.
+
+
 Latest qualified implementation **`3e278de5f7fad42fed95715aed667d166a146f60`**: 775 source cases/773 passes/two optional skips, 153 stable bundled-stage passes, plus all three current recovery cases in source and stage after the portable test-preload correction; zero failures. [The recovery handoff](AGENT-HANDOFF.md#october-11-pending-mcp-reload-recovery-checkpoint) records unchanged Python baseline scope, verified defects, exact cleanup and every remaining migration/platform/live/installed gate.
 
 [Pending MCP reload recovery](MCP-TRANSPORT.md#pending-mcp-reload-recovery) qualifies a public loader rejection before a replacement runner exists. Bounded observed external names permit explicit same-owner repair without claiming a live catalog. Partial configuration refuses direct/queued admission and resume before queue mutation; refreshed registration errors stay partial rather than producing applied receipts. Live services, other catastrophic boundaries and every accepted migration/platform/installed gate remain binding.

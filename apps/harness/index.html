@@ -34,6 +34,7 @@
         <button role="tab" aria-selected="true" data-view="chat">Chat</button>
         <button role="tab" aria-selected="false" data-view="trajectory">Trajectory</button>
         <button role="tab" aria-selected="false" data-view="context">Context</button>
+        <button role="tab" aria-selected="false" data-view="plan">Plan</button>
       </div>
       <section id="chat" class="panel"><div id="messages" class="messages"><p class="empty">Select a conversation or start a new one.</p></div></section>
       <section id="trajectory" class="panel inspection-panel" hidden>
@@ -46,6 +47,7 @@
         <div id="context-content" class="context-content"><p class="empty">Select a model request to see its effective context.</p></div>
       </section>
       <div id="interaction" class="interaction" hidden></div>
+      <section id="plan" class="panel inspection-panel" hidden><div id="plan-content" class="plan-content"><p class="empty">Select a conversation to inspect its plan.</p></div></section>
       <div id="prompt-queue" aria-label="Queued prompts" hidden></div>
       <button id="continue-queue" type="button" hidden>Continue queued prompts</button>
       <div id="edit-message" class="edit-message" hidden><span>Editing latest message · Send creates a new conversation</span><button id="cancel-edit" type="button">Cancel</button></div>

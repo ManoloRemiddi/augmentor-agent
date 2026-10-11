@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 planning follow-up: [plans and todos](PI-PLANNING.md) provide revisioned reported state on native ancestry and read-only inspection. This does not close the combined P1 goal/job/delegation requirement; parent/child authority, limits, Stop, durable job outcomes and usage accounting remain required.
+
+
 October 11 loader-recovery follow-up: [explicit same-owner repair](MCP-TRANSPORT.md#pending-mcp-reload-recovery) qualifies public loader rejection before a replacement runner exists, bounded namespace validation, refusal before queue mutation and truthful late-registration receipts. This extends action/recovery evidence; live services, other SDK/resource failures and every accepted P0/P1/platform/installed gate remain open.
 
 October 11 call-linkage follow-up: [managed public execute/transport identities](MCP-TRANSPORT.md#exact-managed-tool-call-linkage) connect actual MCP requests and native originals to SDK/root/nested calls and recorded Host/model observations, including reused IDs, branch inheritance and cold reads. This extends transparency evidence; full global provenance, opaque handlers, live services and all accepted P0/P1/platform/installed gates remain open.

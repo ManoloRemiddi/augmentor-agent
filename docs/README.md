@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+- [Pi plans and todos](PI-PLANNING.md): branch-owned revisioned state, public SDK tools, read-only Harness view, persistence boundaries and remaining goals/jobs/delegation.
+
+
 The October 10 [Pi prompt improvement slice](AUGMENTOR-HARNESS.md#pi-prompt-improvement-across-native-browser-and-harness) adds the existing Native/Browser and a Harness draft control through one isolated, tool-free Pi SDK request with the explicitly selected model. Shared revisioned instructions, actual provider cancellation, Undo, unchanged parent history and durable no-replay receipts are qualified with synthetic Qt/Chromium/SDK fixtures. Full migration and live/embedded/platform/installed acceptance remain open.
 
 

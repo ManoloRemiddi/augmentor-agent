@@ -162,6 +162,32 @@ export class NativeHistory {
       return {available:true,nativeSessionId:s.header.id,leafId:leaf<0?null:this.row(fd,leaf,s).id,entries,nextCursor,hasMore:position>=0,coverage:{scope:'indexed original selected ancestry; not effective provider input',index:'augmentor-native-index/2',verification:'header and returned entry boundary blocks; excerpts verify every returned block',sourceBytesRead,incompleteTailBytes:s.tailBytes,maxRecordBytes:MAX_RECORD}};
     });
   }
+  /** Bounded cold projection of one custom state on the selected ancestry.
+   * Never opens/migrates the SDK owner or rewrites the native source. */
+  latestCustom(customType:string,leafId?:string|null){
+    if(this.displaySessionId||typeof customType!=='string'||!/^[A-Za-z0-9/_-]{1,128}$/.test(customType))throw Error('Choose a supported native custom type.');
+    return this.withIndex((fd,lookup,s)=>{
+      let position=leafId===null?-1:leafId===undefined?s.count-1:this.position(leafId,lookup,s),scanned=0,customBytes=0;
+      const verify=this.verifier(s);let result:{available:true;entry:Extract<SessionEntry,{type:'custom'}>|null}|{available:false;reason:string}|undefined;
+      try{
+        if(s.source.size)verify.get(0);
+        while(position>=0&&scanned<4096){
+          const row=this.row(fd,position,s);position=row.parent;scanned++;
+          if(types[row.type]!=='custom')continue;
+          if(row.length>256*1024||customBytes+row.length>4*1024*1024){result={available:false,reason:'Saved plan inspection reached its custom-entry byte limit; originals are preserved.'};break;}
+          const pieces:Buffer[]=[];let at=row.offset,remaining=row.length;customBytes+=row.length;
+          while(remaining){const block=verify.get(Math.floor(at/CHUNK)),start=at%CHUNK,n=Math.min(remaining,block.length-start);pieces.push(block.subarray(start,start+n));at+=n;remaining-=n;}
+          const entries=parseSessionEntries(new TextDecoder('utf-8',{fatal:true}).decode(Buffer.concat(pieces)));
+          if(entries.length!==1||entries[0]!.type!=='custom'||hash(JSON.stringify(entries[0])).toString('hex')!==row.entryHash.toString('hex'))throw Error('Saved custom entry changed; originals are preserved.');
+          const entry=entries[0]!;
+          if(entry.type==='custom'&&entry.customType===customType){result={available:true,entry};break;}
+        }
+        if(!same(s.source,stamp(this.source)))throw Error('Native session changed while reading its custom state; retry inspection.');
+        result??=position>=0?{available:false,reason:'Saved plan inspection reached its 4096-entry ancestry limit; originals are preserved.'}:{available:true,entry:null};
+        return {...result,nativeSessionId:s.header.id,coverage:{scanned,customBytes,maxEntries:4096,maxCustomBytes:4*1024*1024,maxRecordBytes:256*1024,scope:'selected saved native ancestry'}};
+      }finally{verify.close();}
+    });
+  }
   read(entryId:string,options:{offset?:unknown;limit?:unknown;pathHash?:unknown;entryHash?:unknown;nativeSessionId?:unknown}={}){
     return this.withIndex((fd,lookup,s)=>{
       if(options.nativeSessionId!==undefined&&options.nativeSessionId!==s.header.id)throw Error('Saved native session identity changed.');
