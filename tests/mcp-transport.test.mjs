@@ -15,7 +15,7 @@ const {McpClient,McpAbortError,McpTimeoutError,McpConnectionClosedError}=await i
 const {McpOAuthAuthorizationRequiredError}=await import(pathToFileURL(join(mcpRoot,exports['./oauth'].import)));
 const {managedMcpTransport,createManagedMcpTransport}=await import(pathToFileURL(join(root,'dist/runtime/src/mcp-transport.js')));
 
-async function fixture(t,handle,save){
+async function fixture(t,handle,save,options={}){
  const calls=[],clients=[],timers=new Set();
  const server=http.createServer(async(req,res)=>{
   if(req.method!=='POST'){res.writeHead(req.method==='DELETE'?200:405).end();return;}
@@ -23,11 +23,11 @@ async function fixture(t,handle,save){
   const answer=result=>res.writeHead(200,{'content-type':'application/json','mcp-session-id':'authored-session'}).end(JSON.stringify({jsonrpc:'2.0',id:frame.id,result}));
   const later=(fn,ms)=>{const timer=setTimeout(()=>{timers.delete(timer);fn();},ms);timers.add(timer);};
   if(frame.method==='initialize'){answer({protocolVersion:frame.params.protocolVersion,capabilities:{tools:{}},serverInfo:{name:'Authored HTTP',version:'1'}});return;}
-  if(frame.id===undefined){res.writeHead(202).end();return;}
+  if(frame.id===undefined){if(options.control)await options.control({frame,res});else res.writeHead(202).end();return;}
   await handle({frame,req,res,answer,later});
  });server.listen(0,'127.0.0.1');await once(server,'listening');
  t.after(async()=>{for(const client of clients)await client.close();for(const timer of timers)clearTimeout(timer);server.closeAllConnections();await new Promise(done=>server.close(done));});
- const connect=async auth=>{const client=new McpClient({name:'Authored transport caller',version:'1',requestTimeoutMs:1500});clients.push(client);await client.connect((save?createManagedMcpTransport(save):managedMcpTransport)({name:'web',config:{url:'http://127.0.0.1:'+server.address().port+'/mcp'}},process.cwd(),auth));return client;};
+ const connect=async auth=>{const client=new McpClient({name:'Authored transport caller',version:'1',requestTimeoutMs:1500});clients.push(client);await client.connect(createManagedMcpTransport(save,options.authorizationObserved)({name:'web',config:{url:'http://127.0.0.1:'+server.address().port+'/mcp'}},process.cwd(),auth));return client;};
  return {calls,connect};
 }
 const tools=calls=>calls.filter(row=>row.frame.method==='tools/call');
@@ -85,19 +85,20 @@ test('private originals retain bounded exact error bytes with explicit truncatio
 });
 
 test('refresh exceptions expose an unknown HTTP outcome without leaking the provider error',async t=>{
- let refreshes=0;const originals=[],f=await fixture(t,({res})=>res.writeHead(401).end('AUTHORED_BODY'),original=>{originals.push(original);return true;});
- const client=await f.connect({token:async()=>undefined,onUnauthorized:async()=>{refreshes++;throw Error('SYNTHETIC_REFRESH_SECRET');}});
+ let refreshes=0;const originals=[],authorization=[],f=await fixture(t,({res})=>res.writeHead(401).end('AUTHORED_BODY'),original=>{originals.push(original);return true;},{authorizationObserved:event=>{authorization.push(event);return true;},control:({frame,res})=>frame.grant_type?res.writeHead(401).end('AUTHORED_PRIVATE_REFRESH_BODY'):res.writeHead(202).end()});
+ const client=await f.connect({token:async()=>undefined,onUnauthorized:async context=>{refreshes++;const response=await context.fetch(context.serverUrl,{method:'POST',body:JSON.stringify({grant_type:'authored-refresh'})});assert.equal(response.status,401);await response.body?.cancel();throw Error('SYNTHETIC_REFRESH_SECRET');}});
  await assert.rejects(client.callTool('write_record',{}),error=>error.status===401&&error.message.includes('outcome unknown')&&error.message.includes('Authorization handling failed')&&!JSON.stringify({message:error.message,body:error.body}).includes('SYNTHETIC_REFRESH_SECRET'));
  assert.equal(refreshes,1);assert.equal(tools(f.calls).length,1);assert.equal(originals[0].body.text,'AUTHORED_BODY');
+ assert.deepEqual(authorization.map(row=>row.state),['challenge-observed','refresh-failed'],'a non-RPC refresh response at the same URL is not MCP response evidence');assert(!JSON.stringify(authorization).includes('AUTHORED_PRIVATE_REFRESH_BODY'));
 });
 
 for(const mode of ['sibling-cancel','failed-cancel','sibling-timeout','auth-timeout','both-cancel','client-close'])test('typed OAuth failure drains siblings and controls across '+mode,{timeout:5000},async t=>{
- let releaseFailure,bodySaved,mutations=0;const ready=new Promise(done=>releaseFailure=done),saved=new Promise(done=>bodySaved=done),originals=[];
+ let releaseFailure,bodySaved,mutations=0;const ready=new Promise(done=>releaseFailure=done),saved=new Promise(done=>bodySaved=done),originals=[],authorization=[];
  const f=await fixture(t,async({frame,res,later})=>{
   if(frame.params.name==='needs_auth'){mutations++;await ready;res.writeHead(401).end('AUTHORED_PRIVATE_BODY');return;}
   res.writeHead(200,{'content-type':'text/event-stream'});res.write('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:'authored',progress:1}})+'\n\n');releaseFailure();
   if(mode==='failed-cancel'||mode==='auth-timeout')later(()=>res.end('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',id:frame.id,result:{content:[{type:'text',text:'AUTHORED_SURVIVING_RECEIPT'}]}})+'\n\n'),120);
- },original=>{originals.push(original);bodySaved();return true;});
+ },original=>{originals.push(original);bodySaved();return true;},{authorizationObserved:event=>{authorization.push(event);return true;}});
  const client=await f.connect({token:async()=>undefined,onUnauthorized:async()=>{throw new McpOAuthAuthorizationRequiredError();}}),firstAbort=new AbortController(),secondAbort=new AbortController();
  let closed;const closeEvent=new Promise(done=>closed=done);client.onClose(closed);
  const result=Promise.allSettled([client.callTool('needs_auth',{}, {signal:firstAbort.signal,timeoutMs:mode==='auth-timeout'?60:1000}),client.callTool('pending_read',{}, {signal:secondAbort.signal,timeoutMs:mode==='sibling-timeout'?60:1000})]);
@@ -110,9 +111,34 @@ for(const mode of ['sibling-cancel','failed-cancel','sibling-timeout','auth-time
  else if(mode==='failed-cancel'||mode==='auth-timeout'){assert(first.reason instanceof (mode==='auth-timeout'?McpTimeoutError:McpAbortError));assert.equal(second.status,'fulfilled');assert.equal(second.value.content[0].text,'AUTHORED_SURVIVING_RECEIPT');}
  else{assert(first.reason instanceof (mode==='both-cancel'?McpAbortError:McpOAuthAuthorizationRequiredError));assert(second.reason instanceof (mode==='sibling-timeout'?McpTimeoutError:McpAbortError));}
  await closeEvent;assert.equal(client.connectionState,'closed');assert.equal(mutations,1);assert.equal(tools(f.calls).length,2);assert.equal(originals.length,1);assert.equal(originals[0].body.coverage,'complete');
+ assert.equal(authorization.at(-1).state,'sign-in-required','the observation survives the original caller timeout/cancellation');assert(!JSON.stringify(authorization).includes('AUTHORED_PRIVATE_BODY'));
  if(mode!=='client-close'){
   const cancelled=f.calls.filter(row=>row.frame.method==='notifications/cancelled').map(row=>row.frame.params.requestId);
   if(mode!=='failed-cancel'&&mode!=='auth-timeout')assert(cancelled.includes(tools(f.calls).find(row=>row.frame.params.name==='pending_read').frame.id),'sibling cancellation reaches the wire before reset');
   if(mode==='failed-cancel'||mode==='auth-timeout'||mode==='both-cancel')assert(cancelled.includes(tools(f.calls).find(row=>row.frame.params.name==='needs_auth').frame.id),'failed-call cancellation reaches the wire before reset');
  }
+});
+
+test('new MCP tools are refused before dispatch during an auth drain while admitted receipts survive',{timeout:5000},async t=>{
+ let releaseRead,required;const ready=new Promise(done=>releaseRead=done),reported=new Promise(done=>required=done),authorization=[];
+ const f=await fixture(t,async({frame,res,later})=>{
+  if(frame.params.name==='write_record'){await ready;res.writeHead(401).end('AUTHORED_PRIVATE_BODY');return;}
+  res.writeHead(200,{'content-type':'text/event-stream'});res.write('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:'authored',progress:1}})+'\n\n');releaseRead();
+  later(()=>res.end('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',id:frame.id,result:{content:[{type:'text',text:'AUTHORED_ADMITTED_RECEIPT'}]}})+'\n\n'),120);
+ },()=>true,{authorizationObserved:event=>{authorization.push(event);if(event.state==='sign-in-required')required();return true;}});
+ const client=await f.connect({token:async()=>undefined,onUnauthorized:async()=>{throw new McpOAuthAuthorizationRequiredError();}});
+ const settled=Promise.allSettled([client.callTool('write_record',{}),client.callTool('read_record',{})]);await reported;
+ await assert.rejects(client.callTool('late_write',{}),error=>error.message.includes('not dispatched'));
+ const [failed,read]=await settled;assert(failed.reason instanceof McpOAuthAuthorizationRequiredError);assert.equal(read.value.content[0].text,'AUTHORED_ADMITTED_RECEIPT');assert.equal(tools(f.calls).length,2);assert.equal(authorization.at(-1).state,'sign-in-required');
+});
+
+test('an unauthorized cancellation does not wait on its own POST or discard a sibling receipt',{timeout:5000},async t=>{
+ let held,release;const ready=new Promise(done=>release=done),authorization=[];
+ const f=await fixture(t,({frame,res,later})=>{
+  res.writeHead(200,{'content-type':'text/event-stream'});res.write('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:'authored',progress:1}})+'\n\n');
+  if(frame.params.name==='cancel_read'){held=res;release();}else later(()=>res.end('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',id:frame.id,result:{content:[{type:'text',text:'AUTHORED_CONTROL_SIBLING'}]}})+'\n\n'),120);
+ },undefined,{authorizationObserved:event=>{authorization.push(event);return true;},control:({frame,res})=>frame.method==='notifications/cancelled'?res.writeHead(403,{'www-authenticate':'Bearer error="insufficient_scope"'}).end('AUTHORED_PRIVATE_CONTROL'):res.writeHead(202).end()});
+ const client=await f.connect({token:async()=>undefined,onUnauthorized:async()=>{throw new McpOAuthAuthorizationRequiredError();}}),abort=new AbortController();let close;const closed=new Promise(done=>close=done);client.onClose(close);
+ const settled=Promise.allSettled([client.callTool('cancel_read',{}, {signal:abort.signal}),client.callTool('surviving_read',{})]);await ready;abort.abort();const [cancelled,read]=await settled;assert(cancelled.reason instanceof McpAbortError);assert.equal(read.value.content[0].text,'AUTHORED_CONTROL_SIBLING');await closed;
+ assert(held);assert.equal(f.calls.filter(row=>row.frame.method==='notifications/cancelled').length,1);assert.equal(authorization.at(-1).state,'sign-in-required');assert.equal(authorization.at(-1).boundary,'http-control-response');assert(!JSON.stringify(authorization).includes('AUTHORED_PRIVATE_CONTROL'));
 });

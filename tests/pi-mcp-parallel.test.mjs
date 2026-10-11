@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import {once} from 'node:events';
-import {mkdtemp,mkdir,writeFile,rm} from 'node:fs/promises';
+import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
@@ -13,6 +13,7 @@ const {ManagedMcp}=await import(pathToFileURL(join(resolve(process.env.AUGMENTOR
 
 for(const failureCount of [1,2])test('SDK '+failureCount+' OAuth sign-in error(s) preserve a sibling SSE receipt in an explicitly parallel managed MCP session',{timeout:15000},async t=>{
  const root=await mkdtemp(join(tmpdir(),'augmentor-mcp-sdk-parallel-')),agentDir=join(root,'agent'),cwd=join(root,'workspace');for(const path of [agentDir,cwd])await mkdir(path,{mode:0o700});
+ const priorAgentDir=process.env.PI_CODING_AGENT_DIR;process.env.PI_CODING_AGENT_DIR=agentDir;t.after(()=>{if(priorAgentDir===undefined)delete process.env.PI_CODING_AGENT_DIR;else process.env.PI_CODING_AGENT_DIR=priorAgentDir;});
  let session,mutations=0,reads=0,releaseFailure;const ready=new Promise(done=>releaseFailure=done),timers=new Set(),requests=[];
  const wire=http.createServer(async(req,res)=>{
   if(req.method!=='POST'){res.writeHead(req.method==='DELETE'?200:405).end();return;}
@@ -42,5 +43,6 @@ for(const failureCount of [1,2])test('SDK '+failureCount+' OAuth sign-in error(s
  session.agent.toolExecution='parallel';await session.bindExtensions({mode:'rpc'});await session.prompt('Authored MCP parallel qualification');
  assert.equal(mutations,failureCount);assert.equal(reads,1);assert.equal(requests.length,2);const output=JSON.stringify(requests[1].messages.filter(message=>message.role==='tool'));
  assert(output.includes('AUTHORED_PARALLEL_RECEIPT'),'SDK sign-in handling must retain the concurrent SSE receipt');assert.match(output,/requires sign-in/i);assert(!JSON.stringify(requests).includes('SYNTHETIC_PRIVATE_AUTH_BODY'));
+ assert.deepEqual(JSON.parse(await readFile(join(agentDir,'mcp-auth.json'),'utf8')),{},'synthetic credentials stay in the explicitly private SDK agent directory');
  const originals=session.sessionManager.getBranch().filter(entry=>entry.type==='custom'&&entry.customType==='augmentor-mcp-transport/1');assert.equal(originals.length,failureCount);assert.equal(new Set(originals.map(entry=>entry.data.requestId)).size,failureCount);for(const original of originals){assert.equal(original.data.status,403);assert.equal(original.data.body.text,'SYNTHETIC_PRIVATE_AUTH_BODY');}
 });

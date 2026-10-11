@@ -2,7 +2,9 @@
 
 # Augmentor Harness — implementation and qualification
 
-The [MCP authorization-drain follow-up](MCP-TRANSPORT.md#authorization-errors-and-parallel-receipts) preserves delayed tool receipts before delivering typed SDK sign-in errors, sanitizes generic refresh failures and qualifies cancellation/timeout/close controls. Actual public-SDK parallel fixtures are separate from Native's unchanged sequential owner. Post-timeout auth reporting, metadata/GET closure, live OAuth and full migration acceptance remain open.
+The [recorded MCP authorization follow-up](MCP-TRANSPORT.md#recorded-authorization-requirements) retains sign-in requirements after caller timeout/cancellation through private native metadata and loaded inspection. Public request-ID tracking now protects tool and resource receipts across authorization boundaries, refuses new tools before dispatch during drain and preserves cancellation. Failed saves are explicit gaps. Cold SDK restoration is qualified with synthetic providers; actual OAuth management controls, live credentials/services and full migration acceptance remain open.
+
+The historical [initial MCP authorization-drain checkpoint](AGENT-HANDOFF.md#october-11-mcp-authorization-and-context-pointer-checkpoint) preserves delayed tool receipts before delivering typed SDK sign-in errors, sanitizes generic refresh failures and qualifies cancellation/timeout/close controls. Its post-timeout reporting and metadata/GET/admission gaps are extended by the current recorded-authorization follow-up above. Actual public-SDK parallel fixtures remain separate from Native's unchanged sequential owner; live OAuth and full migration acceptance remain open.
 
 The owner authorized building the accepted [Pi migration](AUGMENTOR-HARNESS-MIGRATION.md) on 10 October 2026. The implementation branch is `feat/augmentor-harness`, based on canonical main `79784a5687b73234b9524e7a48e91f01306f73c9`. The older dirty checkout and historical private repositories remain intact. This is an incremental source candidate. Existing installed applications, selected releases, model settings, speech services and conversations have not been migrated.
 

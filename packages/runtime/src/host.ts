@@ -122,7 +122,11 @@ export class Host {
   async load(m:Meta,branchManager?:SessionManager){let record=this.loaded.get(m.id);if(record)return record;
     const model=await this.selected(m.selection);
     const memory=new DualMemoryClient('pi:'+m.id,m.cwd,undefined,message=>console.warn('[augmentor-memory]',message));
-    const mcp=m.surface==='browser'?undefined:new ManagedMcp(this.dirs.agent,this.dirs.state,m.id);
+    const mcp=m.surface==='browser'?undefined:new ManagedMcp(this.dirs.agent,this.dirs.state,m.id,(event,retained)=>{
+      record?.observation?.record('integration/mcp-authorization',{...event,retained});
+      if(!retained)this.append(m,'runtime/warning',{message:'An MCP authorization observation could not be saved. Its historical evidence has a gap.'});
+      if(event.state==='sign-in-required'||event.state==='refresh-failed')this.append(m,'runtime/notice',{message:event.state==='sign-in-required'?'An MCP server requires sign-in. Inspect its recorded authorization status before another action.':'An MCP authorization refresh failed. Inspect its recorded status before another action.'});
+    });
     mkdirSync(m.cwd,{recursive:true,mode:0o700});
     const execution:PiExecution=new PiExecution((kind,data,payload)=>record?.observation?.record(kind,data,payload),(message,incomplete)=>{record?.observation?.record('execution/notice',{message,incomplete});this.append(m,'runtime/notice',{message,incomplete});},{},undefined,(name):ExecutionContract|undefined=>{
       const definition=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()]).find(tool=>tool.definition.name===name)?.definition;

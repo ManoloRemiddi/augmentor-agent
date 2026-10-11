@@ -1,10 +1,11 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {existsSync,readFileSync,statSync} from 'node:fs';
 import {join} from 'node:path';
-import {createCodemodeExtension,createMcpExtension,createToolSearchExtension,type ExtensionAPI,type ExtensionFactory,type McpServerConfig} from '@earendil-works/pi-coding-agent';
+import {createCodemodeExtension,createMcpExtension,createToolSearchExtension,type ExtensionAPI,type ExtensionContext,type ExtensionFactory,type McpServerConfig} from '@earendil-works/pi-coding-agent';
 import {privateDir} from './storage.js';
 import {createManagedMcpTransport} from './mcp-transport.js';
 import {MCP_TRANSPORT_ORIGINAL_TYPE} from './mcp-originals.js';
+import {MCP_AUTHORIZATION_TYPE,savedMcpAuthorization,type McpAuthorizationObservation} from './mcp-authorization.js';
 
 const discovery=new Set(['codemode','tool_search','list_mcp_resources','list_mcp_resource_templates','read_mcp_resource']);
 const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
@@ -13,13 +14,15 @@ const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof va
  */
 export class ManagedMcp {
  private api?:ExtensionAPI;
+ private manager?:ExtensionContext['sessionManager'];
+ private authorizationGaps=new Map<string,McpAuthorizationObservation>();
  private errors:string[]=[];
  private readTools=new Set<string>();
  private entries:Record<string,unknown>={};
  private autoEnableCodemode=true;
  private retainLogs=false;
  readonly source:string;
- constructor(agentDir:string,private stateDir:string,private sessionId:string){
+ constructor(agentDir:string,private stateDir:string,private sessionId:string,private authorizationChanged?:(event:McpAuthorizationObservation,retained:boolean)=>void){
   this.source=join(agentDir,'mcp.json');
   try{
    if(!existsSync(this.source))return;
@@ -36,6 +39,7 @@ export class ManagedMcp {
  }
  private register:ExtensionFactory=pi=>{
   this.api=pi;const namespaces=new Set<string>();
+  pi.on('session_start',(_event,ctx)=>{this.manager=ctx.sessionManager;});
   for(const [name,config] of Object.entries(this.entries)){
    const namespace=name.replaceAll('-','_');
    try{
@@ -51,6 +55,10 @@ export class ManagedMcp {
   createTransport:createManagedMcpTransport(original=>{
    if(!this.api)return false;
    this.api.appendEntry(MCP_TRANSPORT_ORIGINAL_TYPE,original);return true;
+  },event=>{
+   if(!this.api)return false;
+   let retained=false;try{this.api.appendEntry(MCP_AUTHORIZATION_TYPE,event);retained=true;this.authorizationGaps.delete(event.server);}catch{this.authorizationGaps.set(event.server,event);}
+   this.authorizationChanged?.(event,retained);return retained;
   }),
   logPath:this.retainLogs?join(privateDir(join(this.stateDir,'mcp-logs')),this.sessionId+'.log'):process.platform==='win32'?'NUL':'/dev/null',
  })];}
@@ -60,10 +68,13 @@ export class ManagedMcp {
  }
  describe(){
   const tools=this.api?.getAllTools()??[],active=new Set(this.api?.getActiveTools()??[]),servers=this.api?.getMcpServers()??[];let remaining=256;
+  const authorization=new Map<string,McpAuthorizationObservation>();
+  for(const entry of this.manager?.getBranch()??[])if(entry.type==='custom'&&entry.customType===MCP_AUTHORIZATION_TYPE){const row=savedMcpAuthorization(entry.data);if(row)authorization.set(row.server,row);}
   return {available:!!this.api,source:'managed-profile-mcp.json',projectConfiguration:false,modelsInCodemode:false,retainServerLogs:this.retainLogs,configurationErrors:this.errors.length,
    coverage:'registered MCP tool catalog; not a connection health probe',serverCount:servers.length,omittedServers:Math.max(0,servers.length-64),servers:servers.slice(0,64).map(entry=>{
     const namespace='mcp__'+entry.name.replaceAll('-','_'),registered=tools.filter(tool=>tool.namespace?.name===namespace),shown=registered.filter(tool=>tool.name.length<=256).slice(0,remaining);remaining-=shown.length;
-    return {name:entry.name,enabled:entry.config.enabled!==false,transport:'url' in entry.config?'http':'stdio',exposure:entry.config.exposure??'codemode',toolCount:registered.length,omittedToolNames:registered.length-shown.length,toolNames:shown.map(tool=>tool.name),declaredToolNames:shown.filter(tool=>active.has(tool.name)).map(tool=>tool.name),readOnlyToolNames:shown.filter(tool=>this.readTools.has(tool.name)).map(tool=>tool.name)};
+    const lastObserved=authorization.get(entry.name)??null,gap=this.authorizationGaps.get(entry.name);
+    return {name:entry.name,enabled:entry.config.enabled!==false,transport:'url' in entry.config?'http':'stdio',exposure:entry.config.exposure??'codemode',toolCount:registered.length,omittedToolNames:registered.length-shown.length,toolNames:shown.map(tool=>tool.name),declaredToolNames:shown.filter(tool=>active.has(tool.name)).map(tool=>tool.name),readOnlyToolNames:shown.filter(tool=>this.readTools.has(tool.name)).map(tool=>tool.name),authorization:{coverage:'last recorded HTTP authorization observation on the selected Pi branch; not current credential health',lastObserved,unsaved:gap??null,retention:gap?'native-append-failed':lastObserved?'sdk-native-entry-policy':'not-observed'}};
    })};
  }
 }
