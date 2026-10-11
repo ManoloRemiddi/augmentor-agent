@@ -187,3 +187,5 @@ Exact revisions, test counts and failures are recorded in the
 [agent handoff](AGENT-HANDOFF.md). DSH and owner-selected releases remain available.
 
 Historical general-jobs implementation `26a6c07a28f618a6446f64c40cd9ddbca16cb825`: 809 source cases/807 passes/two existing optional skips; ordinary unselected stage 19, Node 24.19.0, 187 passes across 45 files. See the handoff for retained failures and hosted gates.
+
+October 11 specialist implementation `f3a3d4ac476f71c86ea0f2c9ffe3fcfb218cbb91`: final source **820 cases/818 passes/two existing optional skips**; ordinary unselected stage 20, Node 24.19.0, **212 passes across 47 files with four test workers**, no failures/skips and unchanged timeouts. The [current handoff](AGENT-HANDOFF.md#october-11-pi-desktop-specialist-jobs-checkpoint) records scope, retained fixture/timeout failures and all remaining migration/platform/installed gates.

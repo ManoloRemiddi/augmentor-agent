@@ -228,3 +228,5 @@ exact token accounting and model capability qualification remain later work.
 Historical September 9 validation on Node 24.19.0: `npm run build` passed and `npm test` passed all
 73 tests, including 14 specialist tests and the host eligibility integration
 check. No live desktop, local-model quality or CORE test was run for this slice.
+
+October 11 specialist implementation `f3a3d4ac476f71c86ea0f2c9ffe3fcfb218cbb91`: final source **820 cases/818 passes/two existing optional skips**; ordinary unselected stage 20, Node 24.19.0, **212 passes across 47 files with four test workers**, no failures/skips and unchanged timeouts. The [current handoff](AGENT-HANDOFF.md#october-11-pi-desktop-specialist-jobs-checkpoint) records scope, retained fixture/timeout failures and all remaining migration/platform/installed gates.
