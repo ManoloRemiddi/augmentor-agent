@@ -2,7 +2,8 @@
 // Independent local provider, real private Host/SDK; no owner profile/service source.
 import assert from 'node:assert/strict';
 import http from 'node:http';
-import {spawn} from 'node:child_process';
+import {spawn,execFile} from 'node:child_process';
+import {promisify} from 'node:util';
 import {once} from 'node:events';
 import {mkdtemp,mkdir,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -105,7 +106,12 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
  }
  async function stop(){owner?.close();if(child?.exitCode===null&&child.signalCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}}
  async function crash(){owner?.close();if(child?.exitCode===null&&child.signalCode===null){const ended=once(child,'exit');child.kill('SIGKILL');await ended;}}
- t.after(async()=>{for(const connection of connections)connection.close();for(const process of children)if(process.exitCode===null&&process.signalCode===null){const ended=once(process,'exit');process.kill('SIGTERM');await ended;}model.closeAllConnections();await new Promise(done=>model.close(done));await desktop?.close();await rm(root,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ t.after(async()=>{for(const connection of connections)connection.close();for(const process of children)if(process.exitCode===null&&process.signalCode===null){const ended=once(process,'exit');process.kill('SIGTERM');await ended;}model.closeAllConnections();await new Promise(done=>model.close(done));await desktop?.close();
+  if(process.platform==='win32'){
+   const {stdout}=await promisify(execFile)(pythonExecutable(),['-I','-Xutf8','-B',resolve('tests/fixtures/windows-plan-cleanup.py'),source,root],{env,windowsHide:true,timeout:55000,maxBuffer:65536});
+   t.diagnostic('Private companion cleanup: '+stdout.trim());
+  }
+  await rm(root,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  // Report only the operation name, never synthetic request payloads or profiles.
  // This identifies a stalled Windows boundary even if a later file cannot exit.
  const call=async(method,params={})=>{try{return await owner.call(method,params);}catch(error){error.message=method+': '+error.message;throw error;}};
