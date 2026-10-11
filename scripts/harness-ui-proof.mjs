@@ -9,11 +9,14 @@ import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID,createHash} from 'node:crypto';
 import {SessionManager} from '@earendil-works/pi-coding-agent';
+import {serveContextProvider} from './fixtures/context-provider-http.mjs';
 const source=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('..',import.meta.url)));
 const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
 const sharedState=join(root,'shared-state'),sharedData=join(root,'shared-data'),home=join(root,'home');
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
+const providerApi=process.env.AUGMENTOR_HARNESS_PROOF_PROVIDER_API??'openai-completions';
+if(!['openai-completions','anthropic-messages','openai-responses','google-generative-ai'].includes(providerApi))throw Error('Unsupported authored provider fixture.');
 mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(workspace);mkdirSync(home);
 writeFileSync(join(workspace,'note.txt'),'Harness fixture ready.\n');
 if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'){
@@ -22,6 +25,7 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'){
  writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}));
 }
 const model=http.createServer(async(req,res)=>{
+  if(providerApi!=='openai-completions'){await serveContextProvider(providerApi,req,res,{path:join(workspace,'note.txt'),requestLog});return;}
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
   let raw='';for await(const chunk of req)raw+=chunk;
   const body=JSON.parse(raw),afterTool=body.messages.at(-1)?.role==='tool';
@@ -68,7 +72,9 @@ const model=http.createServer(async(req,res)=>{
 });
 model.listen(0,'127.0.0.1');await once(model,'listening');
 const selection={provider:'fixture',model:'harness-fixture'};
-writeFileSync(join(config,'agent/models.json'),JSON.stringify({providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Harness deterministic fixture',reasoning:true,compat:{supportsReasoningEffort:true},input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
+// Anthropic's client appends /v1/messages; the other fixture clients use /v1
+// as their base. This is test endpoint configuration, never owner model setup.
+writeFileSync(join(config,'agent/models.json'),JSON.stringify({providers:{fixture:{api:providerApi,baseUrl:'http://127.0.0.1:'+model.address().port+(providerApi==='anthropic-messages'?'':'/v1'),apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Harness deterministic fixture',reasoning:providerApi==='openai-completions',...(providerApi==='openai-completions'?{compat:{supportsReasoningEffort:true}}:{}),input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
 writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'workspace-write',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
 // Large independently authored native context exercises default Pi compaction;
 // these saved messages do not represent executed actions or private history.

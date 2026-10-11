@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {contextFrame} from './dsh-context-frame.mjs';
 const number=x=>typeof x==='number'&&Number.isFinite(x)&&x>=0?x:0;
 const empty=()=>({system:0,tools:0,user:0,inject:0,skill:0,assistant:0,tool:0,total:0});
 const estimate=text=>text?Math.ceil(text.length/4)+4:0;
@@ -24,12 +25,6 @@ function blocksOf(message){
   if(typeof message.reasoning_content==='string')blocks.push({kind:'reasoning',text:message.reasoning_content});
   for(const call of message.tool_calls??[])blocks.push({kind:'tool-call',name:call.function?.name??'unknown',argsRaw:call.function?.arguments??''});
   return blocks;
-}
-function frameOf(payload){
-  if(!payload||!Array.isArray(payload.messages))return null;
-  const system=[textOf(payload.system),...payload.messages.filter(m=>['system','developer'].includes(m?.role)).map(m=>textOf(m.content))].filter(Boolean).join('\n\n');
-  const tools=(payload.tools??[]).map(t=>t.function??t).filter(t=>typeof t?.name==='string').map(t=>({name:t.name,description:t.description,schema:t.parameters??t.input_schema}));
-  return {system,tools,messages:payload.messages.filter(m=>['user','assistant','tool'].includes(m?.role))};
 }
 // Link only a preceding, unambiguous provider call in this exact snapshot.
 // Consume each id once; a later settled reuse may have different arguments.
@@ -61,7 +56,7 @@ export function projectDshContext(state){
     const end=ends.get(request.id),u=end?.data?.usage;
     if(u){usage.uncachedInputTokens+=number(u.input);usage.outputTokens+=number(u.output);usage.cacheReadTokens+=number(u.cacheRead);usage.cacheWriteTokens+=number(u.cacheWrite);
       const provider=request.data.provider,model=request.data.model;const bucket=((cost[provider]??={})[model]??={peak:{uncached:0,output:0,cacheRead:0,cacheWrite:0}}).peak;bucket.uncached+=number(u.input);bucket.output+=number(u.output);bucket.cacheRead+=number(u.cacheRead);bucket.cacheWrite+=number(u.cacheWrite);}
-    const frame=frameOf(state.payloads?.[request.id]);if(!frame||requestSeq===null||frame.messages.length>=CONTEXT_REQUEST_STRIDE-2)continue;
+    const frame=contextFrame(state.payloads?.[request.id],request.data.api);if(!frame||requestSeq===null||frame.messages.length>=CONTEXT_REQUEST_STRIDE-2)continue;
     const keys=frame.messages.map(m=>JSON.stringify(m));let prefix=0;
     while(prefix<previousKeys.length&&prefix<keys.length&&previousKeys[prefix]===keys[prefix])prefix++;
     const headerSeq=requestSeq-CONTEXT_REQUEST_STRIDE+2;for(const node of previous.slice(prefix))archive.push({...node,gone:headerSeq});
@@ -75,14 +70,14 @@ export function projectDshContext(state){
       const blocks=blocksOf(message),text=blocks.filter(b=>b.kind!=='tool-call').map(b=>b.text??'').join('\n');
       const callText=blocks.filter(b=>b.kind==='tool-call').map(b=>b.name+' '+b.argsRaw).join('\n');
       const call=calls[index],toolName=message.name??call?.name;
-      const node={seq:headerSeq+index+1,time:request.time,cat,tokens:estimate(textOf(message.content)+'\n'+callText+(message.reasoning_content??'')),text,imgs:imagesOf(message.content),form:cat==='tool'?'tool-result':cat,tool:cat==='tool'?toolName:undefined,calls:blocks.filter(b=>b.kind==='tool-call').map(b=>b.name),...(message.tool_call_id?{callId:message.tool_call_id}:{})};
-      const conv={seq:node.seq,kind:cat==='tool'?'tool-result':cat,...(cat==='assistant'?{blocks}:{content:blocks}),...(cat==='tool'&&toolName?{call:{name:toolName,argsRaw:typeof call?.arguments==='string'?call.arguments:'[Call arguments unavailable in this recorded request]'}}:{})};
+      const node={seq:headerSeq+index+1,time:request.time,cat,tokens:estimate(textOf(message.content)+'\n'+callText+(message.reasoning_content??'')),text,imgs:imagesOf(message.content),form:cat==='tool'?'tool-result':cat,tool:cat==='tool'?toolName:undefined,calls:blocks.filter(b=>b.kind==='tool-call').map(b=>b.name),...(message.tool_call_id?{callId:message.tool_call_id}:{}),...(typeof message.isError==='boolean'?{err:message.isError}:{})};
+      const conv={seq:node.seq,kind:cat==='tool'?'tool-result':cat,...(cat==='assistant'?{blocks}:{content:blocks}),...(cat==='tool'&&toolName?{call:{name:toolName,argsRaw:typeof call?.arguments==='string'?call.arguments:'[Call arguments unavailable in this recorded request]'}}:{}),...(typeof message.isError==='boolean'?{isError:message.isError}:{})};
       previous.push(node);conversationNodes.push(conv);current[cat]+=node.tokens;
     }
     current.total=Object.entries(current).filter(([k])=>k!=='total').reduce((sum,[,v])=>sum+v,0);
     const seq=requestSeq,prompt=u?number(u.input)+number(u.cacheRead)+number(u.cacheWrite):undefined;ordinal=Math.max(ordinal,seq);choice.available=true;
     requestRecords.push({...current,seq,time:request.time,turn,step,...(prompt>0?{prompt}:{}),...(u?{cacheRead:number(u.cacheRead),output:number(u.output)}:{}),...(Number.isFinite(end?.data.durationMs)?{activeMs:end.data.durationMs}:{})});
-    requestIds.set(seq,request.id);latest=request;latestEnd=end;
+    requestIds.set(seq,request.id);choice.gaps=frame.gaps;latest=request;latestEnd=end;
   }
   nodes.push(...previous);
   const latestAvailable=latest?.id===requests.at(-1)?.id;
@@ -103,5 +98,5 @@ export function projectDshContext(state){
     counts:{turns:turns.size,steps:requests.length,injects:0,compactions:events.filter(e=>e.kind==='compaction'&&e.committed).length,prunes:events.filter(e=>e.kind==='prune').length},
     humanInputs:completed.filter(e=>e.type==='user/message').length,answers:completed.filter(e=>e.type==='assistant/message'&&e.data.message?.content?.some(p=>p.type==='text'&&p.text?.trim())).length,toolCalls:completed.filter(e=>e.type==='tool/result').length,images:nodes.reduce((sum,n)=>sum+(n.imgs??0),0)};
   return {timeline,headers:{headers},headerContent,conversationNodes,requestIds,requestChoices,usage,pressure:latestAvailable&&prompt>0?{pressureTokens:prompt,...(capacity?{contextWindow:capacity}:{})}:null,
-    coverage:{observed:requests.length,available:requestRecords.length,latestAvailable,compactionAttempts:compactionAttempts.length,confirmedCompactions:events.length,historyPartial:state.hasMore===true||state.observationHasMore===true,unsupported:requests.filter(r=>state.payloads?.[r.id]&&!frameOf(state.payloads[r.id])).length}};
+    coverage:{observed:requests.length,available:requestRecords.length,latestAvailable,compactionAttempts:compactionAttempts.length,confirmedCompactions:events.length,historyPartial:state.hasMore===true||state.observationHasMore===true,unsupported:requests.filter(r=>state.payloads?.[r.id]&&!contextFrame(state.payloads[r.id],r.data.api)).length,opaque:requestChoices.filter(r=>r.gaps?.length).length}};
 }

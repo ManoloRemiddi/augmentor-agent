@@ -4,6 +4,74 @@
 
 The owner's October 11 correction is to use the actual open-source DSH GUI before redesigning it. The standalone Harness default now bundles the original public React components and CSS. The previous custom interface is a supplementary **Full Pi record inspector** at `/inspection`, available from Settings. The native desktop and existing browser extension retain their approved interfaces.
 
+## Recorded provider formats — October 11 follow-up
+
+The independently authored Pi projection now reads the recorded API before
+interpreting an SDK **onPayload** snapshot. OpenAI messages and legacy records
+without an API preserve the existing binding. Anthropic Messages, OpenAI
+Responses (including Azure/Codex aliases), and Google Generative AI/Vertex
+snapshots map into the same original dashboard without supplier/CSS changes.
+This is presentation of a saved SDK boundary, not proof of later transport or
+provider transformations, complete context provenance or action success.
+
+Anthropic mixed content stays ordered: separate tool uses/results, intervening
+user text, visible thinking and multiple calls retain distinct original rows.
+Responses instructions/developer messages, reasoning summaries, function/custom
+calls, string input and result items keep their request-local identity. Retained
+argument strings keep their exact formatting; object-valued Anthropic/Google
+arguments display deterministic JSON from the recorded object, with original
+serialized payloads still available in raw inspection. Google config-level
+instructions/declarations, visible thoughts, explicit call IDs, structured
+results and nested media map to the existing seats. An id-less Google result
+retains its recorded name and shows unavailable arguments; names never infer
+call identity. Recorded Anthropic is_error/Google error keys supply the
+supplier error flag, separately from evidence of external effects.
+
+Opaque reasoning/signatures and media produce explicit placeholders/coverage
+notes, preserving source identity for conservative snapshot-prefix comparison.
+Their bytes do not enter rendered nodes/cards, and their token sizes are not
+measured. Displayed-text estimates include placeholders, exclude provider
+control fields and do not predict next-request occupancy. Unknown APIs, native
+tool-search/addition items, unsupported content/declarations and malformed
+frames remain unavailable with no fabricated chart bar. Bedrock, Mistral,
+Pi Messages and other provider/native formats remain separate gaps. The
+latest-eight plus one selected body and explicit metadata paging bounds remain.
+
+Seven independently authored projection regressions cover mixed ordering,
+parallel/reused/ambiguous/orphan IDs, exact/malformed argument strings, API
+aliases, structured failure output, images/audio, opaque signature identity and
+unsupported shapes. Together with the existing Context units, **22/22 pass**.
+Actual Pi 1.1.0 Host/provider-adapter/Chromium fixtures at **513×715** execute
+one real fixture read through each of Anthropic, Responses and Gemini using
+independently authored loopback responses. The original Context card shows the
+result and available arguments, then reloads without changing saved history or
+either provider request. Gemini's actual id-less wire conversion confirms the
+unavailable-arguments guard. This is actual SDK/synthetic-provider evidence;
+Azure/Codex/Vertex aliases are pure-contract coverage, not live account/provider
+qualification. No owner provider settings, routes or inference are changed.
+
+The first Anthropic fixture endpoint returns 404 because its test base URL
+includes /v1 while the SDK also appends /v1/messages. The corrected authored
+configuration supplies that client's base origin; assertions/deadlines and
+product provider setup stay unchanged. Failed fixture candidates are not
+installed. The supplier build/type/hash/graph/notice audits pass. Full source,
+ordinary and installed evidence follows separately. To make staging capacity,
+only the redundant ordinary command assembly is retired after dist/dependency/
+Node/licence/root-contract comparison with retained immutable release
+20261011-170722-5dfb555f. Immutable releases/source/logs remain preserved.
+
+### Recorded-format qualification status
+
+Source passes **227/227 across 32 files**, zero failures/skips/cancellations,
+prepared QtTest/two workers/unchanged deadlines. Tested dd478b5 /
+20261011-203308-c2b28497 remains selected/running until a fresh ordinary candidate
+passes and normal guarded immutable adoption succeeds. This shared presentation
+change adds no RPC, owner, dependency, native binary or OS adapter. Actual Linux
+fixtures do not establish physical Mac/Windows or live provider acceptance;
+further platform implementation remains deferred for MX feedback. All remaining
+P0/P1 migration, plugin, privacy, public packaging and platform gates remain open.
+DSH remains available for unmet workflows.
+
 ## Earlier Context requests — October 11 follow-up
 
 The original Context Browser dropdown now includes loaded request metadata even
