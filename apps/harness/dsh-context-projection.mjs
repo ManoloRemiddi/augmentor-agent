@@ -23,6 +23,22 @@ function frameOf(payload){
   const tools=(payload.tools??[]).map(t=>t.function??t).filter(t=>typeof t?.name==='string').map(t=>({name:t.name,description:t.description,schema:t.parameters??t.input_schema}));
   return {system,tools,messages:payload.messages.filter(m=>['user','assistant','tool'].includes(m?.role))};
 }
+// Link only a preceding, unambiguous provider call in this exact snapshot.
+// Consume each id once; a later settled reuse may have different arguments.
+// SDK arguments and calls from other snapshots are not effective wire input.
+function resultCalls(messages){
+  const pending=new Map();
+  return messages.map(message=>{
+    if(message.role==='assistant')for(const call of message.tool_calls??[]){
+      if(typeof call?.id!=='string'||!call.id)continue;
+      pending.set(call.id,pending.has(call.id)?null:call.function);
+    }
+    if(message.role!=='tool')return undefined;
+    const call=pending.get(message.tool_call_id);pending.delete(message.tool_call_id);
+    if(typeof call?.name!=='string'||(message.name!==undefined&&message.name!==call.name))return undefined;
+    return call;
+  });
+}
 /** Read-only presentation of retained provider snapshots, never a prediction of the next request.
  * Internal node ordinals only join the supplier browser; observation identities stay in requestIds.
  */
@@ -43,14 +59,15 @@ export function projectDshContext(state){
     headers.push({seq:headerSeq,time:request.time,systemTokens:estimate(frame.system),tools:frame.tools.map(tool=>({name:tool.name,tokens:estimate(JSON.stringify(tool))}))});headerContent.set(headerSeq,frame);
     current=empty();current.system=estimate(frame.system);current.tools=headers.at(-1).tools.reduce((total,t)=>total+t.tokens,0);previous=previous.slice(0,prefix);previousKeys=keys;
     for(const node of previous)current[node.cat]+=node.tokens;
-    const names=new Map(frame.messages.flatMap(m=>(m.tool_calls??[]).map(c=>[c.id,c.function?.name])));
-    for(const message of frame.messages.slice(prefix)){
+    const calls=resultCalls(frame.messages);
+    for(const [index,message] of frame.messages.entries()){
+      if(index<prefix)continue;
       const cat=message.role==='tool'||(message.role==='user'&&Array.isArray(message.content)&&message.content.every(p=>p.type==='tool_result'))?'tool':message.role;
       const blocks=blocksOf(message),text=blocks.filter(b=>b.kind!=='tool-call').map(b=>b.text??'').join('\n');
       const callText=blocks.filter(b=>b.kind==='tool-call').map(b=>b.name+' '+b.argsRaw).join('\n');
-      const toolName=message.name??names.get(message.tool_call_id);
+      const call=calls[index],toolName=message.name??call?.name;
       const node={seq:++ordinal,time:request.time,cat,tokens:estimate(textOf(message.content)+'\n'+callText+(message.reasoning_content??'')),text,imgs:imagesOf(message.content),form:cat==='tool'?'tool-result':cat,tool:cat==='tool'?toolName:undefined,calls:blocks.filter(b=>b.kind==='tool-call').map(b=>b.name),...(message.tool_call_id?{callId:message.tool_call_id}:{})};
-      const conv={seq:node.seq,kind:cat==='tool'?'tool-result':cat,...(cat==='assistant'?{blocks}:{content:blocks}),...(cat==='tool'&&toolName?{call:{name:toolName,argsRaw:''}}:{})};
+      const conv={seq:node.seq,kind:cat==='tool'?'tool-result':cat,...(cat==='assistant'?{blocks}:{content:blocks}),...(cat==='tool'&&toolName?{call:{name:toolName,argsRaw:typeof call?.arguments==='string'?call.arguments:'[Call arguments unavailable in this recorded request]'}}:{})};
       previous.push(node);conversationNodes.push(conv);current[cat]+=node.tokens;
     }
     current.total=Object.entries(current).filter(([k])=>k!=='total').reduce((sum,[,v])=>sum+v,0);

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Context tool-result argument fidelity](DSH-GUI-ON-PI.md#context-tool-result-arguments--october-11-follow-up) binds exact recorded provider calls to the original dashboard without guessing from SDK history. Source, ordinary and installed evidence remain distinct; the fresh-Host no-replay fixture is synthetic-provider evidence. Supplier/CSS/licences and the single Pi owner are preserved; complete context/migration/platform/public packaging gates remain open.
+
 [Original Settings qualification](DSH-GUI-ON-PI.md#final-installed-settings-qualification--october-11) records the copied MIT shell, scoped Pi handlers and corrected empty-MCP focus. Source, ordinary and installed evidence remain distinct; full Harness/migration/public packaging/platform gates stay open, with further platforms deferred for MX feedback.
 
 [Installed original question controls](PI-QUESTIONS.md#installed-mx-qualification--october-11) now qualify countdown/Take time/engagement/focus with source and ordinary 203/203, preserved eleven histories and exact MX selection 65b0a49 / 20261011-184609-8cac1bd0. Live-provider questions and every complete Harness/migration gate remain open.

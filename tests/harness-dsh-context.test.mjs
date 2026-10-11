@@ -46,3 +46,21 @@ test('only confirmed saved summaries enter the supplier Compact markers; failed 
  const records=[{kind:'compaction/end',seq:1,data:{operationId:'fail',returnedSummary:false}},{kind:'compaction/receipt',seq:2,data:{requestId:'fail',state:'failed'}},{kind:'compaction/end',seq:3,data:{operationId:'abort',aborted:true}},{kind:'compaction/end',seq:4,data:{operationId:'saved',returnedSummary:true}},{kind:'compaction/receipt',seq:5,data:{requestId:'saved',state:'completed',entryId:'native-summary',tokensBefore:26000,estimatedTokensAfter:20000}}];
  const value=projectDshContext({records,events:[],payloads:{}});assert.equal(value.timeline.counts.compactions,1);assert.equal(value.timeline.events.length,1);assert.match(value.timeline.events[0].detail,/native-summary/);assert.equal(value.coverage.compactionAttempts,3);assert.equal(value.coverage.confirmedCompactions,1);
 });
+
+test('tool-result cards retain exact preceding provider call arguments in each recorded request',()=>{
+ const call=(path)=>({role:'assistant',content:'',tool_calls:[{id:'reused',type:'function',function:{name:'read',arguments:path}}]}),result={role:'tool',tool_call_id:'reused',content:'Recorded text'};
+ const value=projectDshContext({records:[request('before',1),request('after',2)],events:[{type:'assistant/message',data:{message:{content:[{type:'toolCall',id:'reused',name:'read',arguments:{path:'sdk-value-must-not-replace-provider-value'}}]}}}],payloads:{before:{messages:[call(' { "path": "first.txt" } '),result]},after:{messages:[call('{"path":"changed.txt"}'),result]}}});
+ assert.deepEqual(value.conversationNodes.filter(n=>n.kind==='tool-result').map(n=>n.call),[{name:'read',argsRaw:' { "path": "first.txt" } '},{name:'read',argsRaw:'{"path":"changed.txt"}'}]);
+});
+
+test('tool-result linkage is chronological, consumes calls once and accepts later reuse of a settled id',()=>{
+ const call=(id,args)=>({role:'assistant',content:'',tool_calls:[{id,function:{name:'read',arguments:args}}]}),result=id=>({role:'tool',name:'read',tool_call_id:id,content:'Result'});
+ const messages=[result('future'),call('future','{"path":"future.txt"}'),result('future'),result('future'),call('future','malformed retained arguments'),result('future'),call('duplicate','{"path":"one.txt"}'),call('duplicate','{"path":"two.txt"}'),result('duplicate'),call('empty','{}'),result('empty')];
+ const cards=projectDshContext({records:[request('one',1)],events:[],payloads:{one:{messages}}}).conversationNodes.filter(n=>n.kind==='tool-result').map(n=>n.call.argsRaw);
+ assert.deepEqual(cards,['[Call arguments unavailable in this recorded request]','{"path":"future.txt"}','[Call arguments unavailable in this recorded request]','malformed retained arguments','[Call arguments unavailable in this recorded request]','{}']);
+});
+
+test('missing or conflicting call identities never invent arguments from names or another snapshot',()=>{
+ const value=projectDshContext({records:[request('one',1),request('two',2)],events:[],payloads:{one:{messages:[{role:'assistant',content:'',tool_calls:[{id:'only-before',function:{name:'read',arguments:'{"path":"before.txt"}'}}]}]},two:{messages:[{role:'tool',name:'read',tool_call_id:'only-before',content:'Orphan'},{role:'assistant',tool_calls:[{id:'mismatch',function:{name:'write',arguments:'{"path":"wrong.txt"}'}}]},{role:'tool',name:'read',tool_call_id:'mismatch',content:'Conflicting name'},{role:'assistant',tool_calls:[{id:'missing',function:{name:'read'}}]},{role:'tool',name:'read',tool_call_id:'missing',content:'Missing arguments'}]}}});
+ assert(value.conversationNodes.filter(n=>n.kind==='tool-result').every(n=>n.call.name==='read'&&n.call.argsRaw==='[Call arguments unavailable in this recorded request]'));
+});

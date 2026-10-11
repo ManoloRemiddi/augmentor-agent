@@ -4,6 +4,56 @@
 
 The owner's October 11 correction is to use the actual open-source DSH GUI before redesigning it. The standalone Harness default now bundles the original public React components and CSS. The previous custom interface is a supplementary **Full Pi record inspector** at `/inspection`, available from Settings. The native desktop and existing browser extension retain their approved interfaces.
 
+## Context tool-result arguments — October 11 follow-up
+
+The original Context Browser result card now receives the call arguments from
+its **recorded provider request**, instead of an empty string. The Pi adapter
+matches only a preceding, unambiguous OpenAI-compatible call ID in that same
+snapshot. Each pending ID is consumed once; later reuse after a result retains
+the later call's own arguments. A future call, unresolved duplicate ID,
+conflicting explicit name, absent arguments or another request's call never
+supplies invented arguments. Available argument strings retain their exact
+recorded formatting, including malformed text. Known-name results without a
+valid join explicitly show **Call arguments unavailable in this recorded
+request**. SDK arguments do not replace transformed effective provider input.
+
+The supplier's React components, CSS, controls, source hashes and Apache-2.0
+notices are unchanged. This is a read-only projection correction, shared by all
+Harness deployments. It adds no agent loop, RPC, dependency or model setting.
+The original result status styling still uses supplier result/error-marker
+semantics; the card is recorded context, not independent proof of action success.
+The existing explicitly linked Trajectory and raw originals remain available.
+Alternate provider shapes, older-body paging, unavailable identity/name cases
+and all full context/migration/platform gates remain separate requirements.
+
+Three meaningful projection regressions reproduce the missing arguments before
+the correction, then check exact provider input, request-local identity,
+chronology, duplicate IDs, settled reuse, malformed/missing arguments and name
+conflicts. The real Pi SDK/local synthetic-provider/Chromium fixture at
+**513×715** executes one read, then closes its document and gracefully restarts
+the Host in a fresh process over the same private fixture state. The original
+Tool Results category displays the same path/result after reopening; saved
+history and both recorded provider requests remain byte-identical, with no tool
+or inference replay. This is synthetic-provider cold-process evidence, not
+live-provider cold-restart qualification or full migration acceptance.
+
+Retained fixture preparation failures clicked the supplier's already
+auto-expanded single-result row, closing it; the assertion now respects that
+original behavior. A further run left the old tab polling its deliberately
+stopped Host and correctly recorded a connection refusal. The cold-reopen case
+now closes the old document before stopping the idle owner, while keeping the
+zero-unexpected-browser-errors assertion. Deadlines are unchanged and failed
+fixture candidates are not installed. Source/ordinary/installed qualification
+is recorded separately; the preceding Settings release remains historical.
+
+Source build/type checks and the pinned supplier-hash/browser-graph/notice audits
+pass. The relevant existing cohort plus the four added cases passes **210/210
+across 30 files**, zero failures/skips/cancellations, prepared QtTest/two workers
+and unchanged deadlines. Fresh ordinary bundled-Node and installed acceptance
+follow separately. Only the byte-verified redundant ordinary Context copy is
+retired against retained immutable release 20261011-154116-43c10051 to provide
+staging capacity; source, immutable releases, licences and proof logs remain.
+
 ## Original Settings shell — October 11 follow-up
 
 The sidebar Settings trigger and dialog now use the public MIT `SettingsRoot`,

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Context tool-result argument fidelity](DSH-GUI-ON-PI.md#context-tool-result-arguments--october-11-follow-up) binds exact recorded provider calls to the original dashboard without guessing from SDK history. Source, ordinary and installed evidence remain distinct; the fresh-Host no-replay fixture is synthetic-provider evidence. Supplier/CSS/licences and the single Pi owner are preserved; complete context/migration/platform/public packaging gates remain open.
+
 [Original DSH Settings](DSH-GUI-ON-PI.md#final-installed-settings-qualification--october-11) is a copied MIT presentation shell over existing scoped Pi handlers. It adds no execution owner. MX source/ordinary/installed evidence is qualified separately; original dashboard data gaps and all remaining migration/platform gates are retained.
 
 October 11 Windows command follow-up: [owned Pi shell jobs](WINDOWS-SHELL-JOBS.md) replace direct-process-only Stop with a contained kernel Job, readiness before command release, private parent lease and truthful no-replay settlement. Eight real helper cases pass on both x64 and ARM64; actual Windows Host/assembled/physical acceptance remains open. Unix keeps the existing process-group adapter. Shared Native/Browser layout, installed selections and the full migration gates are preserved.

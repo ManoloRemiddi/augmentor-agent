@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Context tool-result argument fidelity](DSH-GUI-ON-PI.md#context-tool-result-arguments--october-11-follow-up) binds exact recorded provider calls to the original dashboard without guessing from SDK history. Source, ordinary and installed evidence remain distinct; the fresh-Host no-replay fixture is synthetic-provider evidence. Supplier/CSS/licences and the single Pi owner are preserved; complete context/migration/platform/public packaging gates remain open.
+
 [Original DSH Settings shell](DSH-GUI-ON-PI.md#original-settings-shell--october-11-follow-up) restores section navigation, Appearance and access to existing Pi controls.
 
 [Original question controls](PI-QUESTIONS.md) bind the copied DSH countdown, Take time, editing and focus to canonical scoped Pi state. SDK/browser fixtures distinguish foreground pause, hard approval deadlines and no replay.

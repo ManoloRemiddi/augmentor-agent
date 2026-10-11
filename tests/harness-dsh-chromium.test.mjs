@@ -16,6 +16,39 @@ import {PiConnection} from '../dist/client/src/socket.js';
 import {localConnect} from '../dist/platform/src/transport.js';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label){const end=Date.now()+12000;let last;while(Date.now()<end){try{if(await fn())return;}catch(error){last=error;}await delay(30);}throw Error('Harness composition timeout: '+label+(last?' ('+last.message+')':''));}
+test('original Context tool-result arguments survive a fresh Host process without inference or tool replay',{skip:process.platform!=='linux',timeout:60000},async t=>{
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-context-reopen-'));let fixture,chrome,panel,link,output='',stderr='';
+ t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
+ fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_REOPEN:'1'},stdio:['ignore','pipe','pipe','ipc']});fixture.stdout.on('data',data=>output+=data);fixture.stderr.on('data',data=>stderr+=data);
+ const ready=async reopened=>until(()=>{assert.equal(fixture.exitCode,null,stderr);const lines=output.trim().split('\n').filter(line=>line.startsWith('{"fixture"')).map(line=>JSON.parse(line));link=lines.find(row=>!!row.reopened===reopened);return !!link;},'fixture ready');
+ await ready(false);
+ const rpc=async(method,params={})=>{const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token');const response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})}),frame=await response.json();if(frame.error)throw Error(frame.error.message);return frame.result;};
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
+ let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'Chrome ready');
+ const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);await panel.call('Emulation.setDeviceMetricsOverride',{width:513,height:715,deviceScaleFactor:1,mobile:false});await panel.reload();for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
+ const visible=expression=>until(()=>panel.evaluate('Boolean('+expression+')'),expression).catch(async error=>{error.message+=' '+JSON.stringify({context:await panel.evaluate('document.querySelector(".lc-br-body")?.innerText'),errors:panel.errors,fixture:stderr});throw error;}),click=expression=>harnessPointerClick(panel,expression,until);
+ await visible('document.querySelector("button[aria-label=\\"New session\\"]")');await click('document.querySelector("button[aria-label=\\"New session\\"]")');await visible('document.querySelector("[contenteditable=true]")&&!document.querySelector("[contenteditable=true]").hasAttribute("aria-disabled")');
+ await click('document.querySelector("[contenteditable=true]")');await panel.call('Input.insertText',{text:'Read the authored fixture note once.'});await click('document.querySelector("button[aria-label=\\"Send message\\"]")');await visible('document.body.innerText.includes("The note says:")&&!document.querySelector("button[aria-label=\\"Stop generating\\"]")');
+ const sessions=await rpc('session.list'),sid=sessions.items[0].sessionId,before=await rpc('session.history',{sessionId:sid}),wire=await readFile(link.requestLog,'utf8'),hostPid=link.pid;
+ assert.equal(before.events.filter(row=>row.event.type==='tool/result').length,1);assert.equal(wire.trim().split('\n').length,2);
+ const showCall=async()=>{
+  await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Context")');await visible('document.querySelector(".lc-root")&&document.querySelectorAll("[data-seq]").length===2');
+  // The supplier auto-expands a category with one result; another click closes it.
+  await click('Array.from(document.querySelectorAll(".lc-br-cat-row")).find(x=>x.textContent.includes("Tool Results"))');await visible('document.querySelector(".lc-br-elem-on")');
+  await visible('document.querySelector(".lc-ts-arg-val")?.textContent==='+JSON.stringify(join(link.workspace,'note.txt')));
+  assert(await panel.evaluate('document.querySelector(".lc-br-elem-on").textContent.includes("Harness fixture ready.")'),'original result and exact provider call path share the copied card');
+ };
+ await showCall();
+ // Close the old document's polling before stopping its owner; this models a
+ // closed application reopening, rather than a deliberately disconnected tab.
+ await panel.call('Page.navigate',{url:'about:blank'});await visible('document.URL==="about:blank"');
+ fixture.send({type:'reopen'});await ready(true);assert.notEqual(link.pid,hostPid,'cold reopen constructs a new owner process');
+ await panel.call('Page.navigate',{url:link.url+'&session='+encodeURIComponent(sid)});await visible('document.querySelector("[role=tab]")');await showCall();
+ assert.equal(await readFile(link.requestLog,'utf8'),wire,'opening retained context starts no provider request');assert.deepEqual(await rpc('session.history',{sessionId:sid}),before,'reopening runs no tool and appends no history');
+ assert.equal(panel.errors.length,0,JSON.stringify(panel.errors));
+ const origins=output.trim().split('\n').filter(line=>line.startsWith('{"fixture"')).map(line=>new URL(JSON.parse(line).url).origin);assert(panel.urls.every(url=>origins.some(origin=>url.startsWith(origin))||url.startsWith('data:')),'browser remains local');
+});
 test('copied DSH GUI drives the real Pi owner, opens record details, inspects context and stops without replay',{skip:process.platform!=='linux',timeout:60000},async t=>{
  const profile=await mkdtemp(join(tmpdir(),'augmentor-context-chrome-'));let fixture,chrome,panel,owner,link,output='',stderr='';
  t.after(async()=>{owner?.close();panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});

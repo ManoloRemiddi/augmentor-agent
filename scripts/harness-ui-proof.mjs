@@ -100,10 +100,11 @@ if(prompts){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
 }
-const child=spawn(process.execPath,[join(source,'dist/runtime/src/main.js')],{cwd:workspace,
-  env:fixtureEnv,stdio:['ignore','pipe','pipe']});
-child.stderr.on('data',data=>process.stderr.write(data));
-let closing=false;
+const startRuntime=()=>{
+  const runtime=spawn(process.execPath,[join(source,'dist/runtime/src/main.js')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','pipe','pipe']});
+  runtime.stderr.on('data',data=>process.stderr.write(data));return runtime;
+};
+let child=startRuntime(),closing=false,reopenRequested=false,reopened=false;
 async function close(){
   if(closing)return;closing=true;
   for(const owned of [child,prompts])if(owned?.pid&&owned.exitCode===null){const exit=once(owned,'exit');owned.kill('SIGTERM');await exit;}
@@ -111,12 +112,23 @@ async function close(){
   rmSync(root,{recursive:true,force:true});
 }
 process.on('SIGINT',()=>void close());process.on('SIGTERM',()=>void close());
-const deadline=Date.now()+20000;
-while(!existsSync(join(state,lazy?'runtime.sock':'harness.json'))){
-  if(child.exitCode!==null){await close();throw Error('Fixture runtime stopped before readiness');}
-  if(Date.now()>deadline){await close();throw Error('Fixture readiness timed out');}
-  await new Promise(resolve=>setTimeout(resolve,25));
+// Explicit test-only cold reopen: keep independently authored state and the
+// synthetic provider, stop the idle Host, then construct a fresh Host process.
+process.on('message',message=>{
+  if(process.env.AUGMENTOR_HARNESS_PROOF_REOPEN==='1'&&message?.type==='reopen'&&!closing&&!reopenRequested&&child.exitCode===null){reopenRequested=true;child.kill('SIGTERM');}
+});
+process.channel?.unref();
+while(!closing){
+  const deadline=Date.now()+20000;
+  while(!existsSync(join(state,lazy?'runtime.sock':'harness.json'))){
+    if(child.exitCode!==null){await close();throw Error('Fixture runtime stopped before readiness');}
+    if(Date.now()>deadline){await close();throw Error('Fixture readiness timed out');}
+    await new Promise(resolve=>setTimeout(resolve,25));
+  }
+  const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog}));
+  await once(child,'exit');
+  if(!reopenRequested||closing){await close();break;}
+  reopenRequested=false;reopened=true;
+  rmSync(join(state,'harness.json'),{force:true});child=startRuntime();
 }
-const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-console.log(JSON.stringify({fixture:true,url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog}));
-await once(child,'exit');await close();
