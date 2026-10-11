@@ -95,7 +95,55 @@ passes 11/11. Final source type/build and supplier hash/graph/notice checks pass
 the final 43-file cohort passes **266/266**, zero failures, skips or cancellations,
 with the prepared QtTest interpreter, two workers and unchanged deadlines.
 
-Ordinary/installed totals and tested revisions follow when complete.
 This shared Host/web change adds no OS adapter. Windows, macOS, other Linux distro
 acceptance and the full Harness/voice/services/migration/privacy/public packaging
 gates remain open; the existing DSH installation stays available.
+
+## Installed MX qualification — October 11
+
+Tested runtime **6f6bf39071839d1e023a648247bb9ff89892b5ce** is selected
+**and running** in private MX release **20261011-235335-2d8c7e8f**, product
+0.2.13, artifact
+**5cfd01bb69668bc52a2a5801cd1b9c7540f1fb1c6c28c9604007c38d0809f8d2**.
+Subsequent qualification edits change documentation only.
+
+Source and fresh ordinary bundled Node **24.19.0** each pass **266/266 across
+43 files**, zero failures/skips/cancellations, prepared QtTest, two workers and
+unchanged deadlines. All **481 compiled files** match the ordinary assembly.
+The preceding release's **19,160 dependency files**, **131 npm instances**, six
+native executables, bundled Node, **723 licence files** and **96 browser notice
+records** match byte-for-byte. Public supplier selections, original CSS and
+licence bodies remain unchanged; the authored bindings provide persistence.
+
+Normal guarded staging/activation finishes before the stable Host launch; its
+exact selected entry point and bundled Node are verified before stable Native
+launch. Both running roots match selection, Native is online/model-ready/idle,
+and all **21,792 installed inventory entries** pass after GUI acceptance.
+No selected release is patched.
+
+Actual installed acceptance uses the copied composer and File menu/picker on an
+existing authored demo conversation. Unsent text and one authored 73-byte TXT
+file restore after page reload with the exact saved revisions, original bytes,
+attachment identity and single Pi receipt; restoration performs no new upload.
+Guarded shutdown refuses the dirty draft both before and after reload. Original
+keys and Remove file clear only that fixture; the Host then reports zero dirty
+drafts, uploads, operator requests, turns and compactions. The five classified
+private draft/object/receipt/alias records remain retained under the documented
+retention policy, with exactly one owned receipt added and all preceding private
+attachment files preserved. Original Context and Insights retained reads pass;
+Insights remains open at the normal 513×715 viewport for owner feedback.
+
+All **eleven histories and queue identities** remain preserved, with zero new
+conversations, prompt admissions, provider requests or tool actions. Of **243
+preceding saved files**, **233** are byte-identical; four original journals retain
+their exact previous prefixes with only two saved-title/session_info, two
+session/close and two session/load appends, plus six corresponding counter/index
+derivatives. Private profile settings are unchanged. Production selection and
+the running model router remain preserved, as do model/speech/GPU/context/
+concurrency/precision and CPU ASR/VAD placement.
+
+This qualifies original plain-composer drafts in the private MX preview. The
+synthetic cold-Host/new-origin and lost-reply cases above remain distinct from
+installed acceptance, which adds no owner inference. Rich references, retention
+collection, broader migration, public packaging/privacy and other platforms
+remain open; this increment does not complete the Augmentor Harness goal.
