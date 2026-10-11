@@ -2,6 +2,10 @@
 
 # MX Linux Harness preview
 
+## Current original Context dashboard — October 11
+
+Final tested implementation **4cab447705789369cfa97ee2063586ba14a480d6** is selected and running in private MX release **20261011-154116-43c10051**, product 0.2.13, artifact **ce80d1d00ebb79df121f5097eff70fc366e0f076375de80a7a64e2e23bb6f772**. Normal guarded immutable update uses the artifact’s own Node 24.19.0; Host entry and native module root match the selection, native is online/model-ready, and the complete **21,670-entry** inventory passes after UI/history reads. Source and ordinary bundled cohorts each pass **132/132 across seventeen files**, zero failures/skips/cancellations, prepared QtTest/two workers. All eight baseline histories and queue item identities are preserved, with no provider request after the baseline. One new empty history reached during a batched selection/collapse check is retained with zero user admissions/requests; current total is nine. Production selection/model-router and model/speech settings remain unchanged. This is the copied Context dashboard qualification, with the upstream overview/Fleet/sidebar/modal/preferences and complete Harness/platform/release gates still open. [Dashboard coverage](DSH-GUI-ON-PI.md#original-context-dashboard--october-11-follow-up) and [installed detail](DSH-GUI-ON-PI.md#installed-context-dashboard-qualification--october-11) are the current reference. Use **Context** in a conversation with recorded requests. The preceding attachment/session artifacts below are preserved historical checkpoints.
+
 The owner has chosen MX Linux first: test the experience on this PC, collect feedback and refine it before implementing further Windows, macOS or other Linux distribution work. The first machine is **MX Linux 25.3 KDE x86-64, based on Debian 13**. This is a separate local development preview, not a production migration or a public binary release.
 
 ## October 11 original attachments — current selection
