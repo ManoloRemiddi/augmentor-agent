@@ -29,7 +29,7 @@ function frameOf(payload){
 export function projectDshContext(state){
   const requests=(state.records??[]).filter(r=>r.kind==='model/request'),ends=new Map((state.records??[]).filter(r=>r.kind==='model/complete'&&r.requestId).map(r=>[r.requestId,r]));
   const headers=[],headerContent=new Map(),nodes=[],archive=[],conversationNodes=[],requestRecords=[],requestIds=new Map(),turns=new Map(),steps=new Map();
-  const usage={uncachedInputTokens:0,outputTokens:0,cacheReadTokens:0,cacheWriteTokens:0},cost={};let ordinal=0,previous=[],current=empty(),latest=null,latestEnd=null;
+  const usage={uncachedInputTokens:0,outputTokens:0,cacheReadTokens:0,cacheWriteTokens:0},cost={};let ordinal=0,previous=[],previousKeys=[],current=empty(),latest=null,latestEnd=null;
   for(const request of requests){
     if(!turns.has(request.turnId??request.id))turns.set(request.turnId??request.id,turns.size+1);
     const turn=turns.get(request.turnId??request.id),step=(steps.get(turn)??0)+1;steps.set(turn,step);
@@ -37,11 +37,14 @@ export function projectDshContext(state){
     if(u){usage.uncachedInputTokens+=number(u.input);usage.outputTokens+=number(u.output);usage.cacheReadTokens+=number(u.cacheRead);usage.cacheWriteTokens+=number(u.cacheWrite);
       const provider=request.data.provider,model=request.data.model;const bucket=((cost[provider]??={})[model]??={peak:{uncached:0,output:0,cacheRead:0,cacheWrite:0}}).peak;bucket.uncached+=number(u.input);bucket.output+=number(u.output);bucket.cacheRead+=number(u.cacheRead);bucket.cacheWrite+=number(u.cacheWrite);}
     const frame=frameOf(state.payloads?.[request.id]);if(!frame)continue;
-    const headerSeq=++ordinal;for(const node of previous)archive.push({...node,gone:headerSeq});
+    const keys=frame.messages.map(m=>JSON.stringify(m));let prefix=0;
+    while(prefix<previousKeys.length&&prefix<keys.length&&previousKeys[prefix]===keys[prefix])prefix++;
+    const headerSeq=++ordinal;for(const node of previous.slice(prefix))archive.push({...node,gone:headerSeq});
     headers.push({seq:headerSeq,time:request.time,systemTokens:estimate(frame.system),tools:frame.tools.map(tool=>({name:tool.name,tokens:estimate(JSON.stringify(tool))}))});headerContent.set(headerSeq,frame);
-    current=empty();current.system=estimate(frame.system);current.tools=headers.at(-1).tools.reduce((total,t)=>total+t.tokens,0);previous=[];
+    current=empty();current.system=estimate(frame.system);current.tools=headers.at(-1).tools.reduce((total,t)=>total+t.tokens,0);previous=previous.slice(0,prefix);previousKeys=keys;
+    for(const node of previous)current[node.cat]+=node.tokens;
     const names=new Map(frame.messages.flatMap(m=>(m.tool_calls??[]).map(c=>[c.id,c.function?.name])));
-    for(const message of frame.messages){
+    for(const message of frame.messages.slice(prefix)){
       const cat=message.role==='tool'||(message.role==='user'&&Array.isArray(message.content)&&message.content.every(p=>p.type==='tool_result'))?'tool':message.role;
       const blocks=blocksOf(message),text=blocks.filter(b=>b.kind!=='tool-call').map(b=>b.text??'').join('\n');
       const callText=blocks.filter(b=>b.kind==='tool-call').map(b=>b.name+' '+b.argsRaw).join('\n');

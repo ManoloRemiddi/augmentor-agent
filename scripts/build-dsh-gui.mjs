@@ -58,7 +58,7 @@ for(const name of Object.keys(result.metafile.inputs)){
   const manifest=JSON.parse(readFileSync(join(directory,'package.json'),'utf8'));
   npmRoots.set(directory,manifest);
 }
-const licenses=[readFileSync(join(vendor,'LICENSE'),'utf8'),'\n--- dsh-context 0.68.1 · Copyright 2025 bowenliang123 · Apache-2.0 ---\n'+readFileSync(join(contextVendor,'LICENSE'),'utf8')];
+const licenses=[readFileSync(join(vendor,'LICENSE'),'utf8'),'\n--- dsh-context 0.68.1 · Copyright 2025 bowenliang123 · Apache-2.0 ---\n'+readFileSync(join(contextVendor,'LICENSE'),'utf8')+'\nModified by Augmentor: Pi read-only data/history bindings; automatic registry/price lookups and unbound DSH settings removed; unattested DSH threshold removed; unobserved skill/fleet figures marked unavailable. Original/adapted source hashes and modification notices are recorded in SOURCE.json.\n'];
 const npmRecords=[];
 const tailwindRoot=dirname(requireUi.resolve('tailwindcss/package.json')),tailwindManifest=JSON.parse(readFileSync(join(tailwindRoot,'package.json'),'utf8'));
 licenses.push('\n--- tailwindcss '+tailwindManifest.version+' (MIT; generated dashboard CSS) ---\n'+readFileSync(join(tailwindRoot,'LICENSE'),'utf8'));
