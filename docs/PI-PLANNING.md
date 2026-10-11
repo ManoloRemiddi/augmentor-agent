@@ -113,3 +113,9 @@ adapter or Python product change. These fixtures are separate from live model,
 physical OS, installed/update and packaging acceptance. Full P0/P1 requirements
 in the [migration specification](AUGMENTOR-HARNESS-MIGRATION.md) remain binding.
 Preserve DSH and selected installations until those workflows qualify.
+
+## October 11 qualification
+
+Implementation **`325029c435d87f082da6ee01bf376b9908ff8f03`**: full source Node **780 cases/778 passes/two existing optional skips**, zero failures. Ordinary unselected Node **24.19.0** stage 17 has **158 passes** across 38 files, zero failures/skips; a subsequent test-only Browser branch readiness change separately passes against that same stage. All **314 compiled files**, **19,088 production dependency files**, **709 license files** and reviewed native/dependency contract checks match their recorded source/preceding stage. Inventory remains **126 npm instances/four native components**. No installed artifact is selected.
+
+[The handoff](AGENT-HANDOFF.md#october-11-pi-plans-and-todos-checkpoint) preserves fixture preparation failures, the wrong temporary interpreter alias, the corrected broad Browser failure and its unproved exact schedule, controlled startup evidence, hosted status, authenticated test-process cleanup and the full remaining scope. Python source is unchanged; the preceding full Python evidence remains a retained baseline, supplemented by actual current Qt/Browser cases in Node qualification.
