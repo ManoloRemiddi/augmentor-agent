@@ -17,6 +17,11 @@
 !adapters/dsh-home/**
 !adapters/dsh-execution/
 !adapters/dsh-execution/**
+!adapters/dsh-context-budget/
+!adapters/dsh-context-budget/evidence.mjs
+!adapters/dsh-context-budget/evidence.d.mts
+!adapters/dsh-compat/
+!adapters/dsh-compat/messages.mjs
 !apps/
 !apps/home/
 !apps/home/*.mjs

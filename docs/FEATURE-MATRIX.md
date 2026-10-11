@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 10 follow-up: standalone Native Settings and Browser Models now expose the same Pi saved effort/mode and profile mappings as Harness. Actual production Qt and loaded Chromium/native bridge/Pi fixtures qualify saves, conflicts, reload/reopen, received Manual/Adaptive effort and scope guards in [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls). This supersedes the standalone settings gap in the preceding checkpoint. Live/virtual routing, SDK/embedded controls, richer inspection and the full migration/platform/installed gates remain required.
+
+
+October 10 candidate: Adaptive Reasoning's pure MIT policy, supported Pi adapter, per-conversation Manual/Adaptive effort, exact provider/model mappings and Harness settings/Context decision display are source/staged qualified in [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls). Native and Browser settings controls, representative live providers and virtual/physical route acceptance remain required. Existing Native/Browser layouts and installed DSH support are retained. This checkpoint supersedes the earlier blanket adaptive-port gap only within this scope.
+
+
+October 10 shared prompt checkpoint: [Harness picker/editor qualification](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor), source `88569bb54d03c0e549101be33fcc0c67310ac86a`, covers actual Chromium/shared-SQLite plus Native-client stable CRUD, revision conflicts, shared instructions, two-step Enter and guarded clipboard insertion. It supersedes the earlier Harness library/editor source gap. Pi prompt improvement, full command/resource/instruction composition, loaded Native/Browser prompt GUI and installed/platform acceptance remain required. The full P0/P1 matrix remains binding; DSH is retained.
+
+October 10 Harness candidate: [Native Branch/Edit and ordinary input qualification](AUGMENTOR-HARNESS.md#native-branchedit-and-ordinary-sdk-inputs) uses Pi 1.1.0 with production Qt controls, exact tool history, original template submissions, saved-child restoration and handled/unknown receipts. It supersedes the earlier Native end-to-end source gap. Ordinary/FIFO input now expands approved handlers/skills/templates; Harness guards actual selection readiness. Synthetic source/staged qualification does not establish live memory cutoff, full prompt/command controls, other OS/installed acceptance or DSH retirement. The Harness delivery matrix and accepted migration specification retain the full remaining P0/P1 scope; dated tables below preserve their original baselines.
+
+The [October 10 Harness candidate](AUGMENTOR-HARNESS.md) adds a separate local Pi Chat/Trajectory/Context client, parsed-provider observations and native context-edit budgeting/original recovery. Its source/fixture qualification does not update the installed surfaces or close the full migration gates.
+
 Windows public preview scope: [installation and explicit parity limits](WINDOWS-PREVIEW.md). Physical acceptance is pending; shared source does not imply complete Windows feature qualification.
 
 The [SDK source candidate](SDK-ALIGNMENT.md) scopes Conversation/Thinking and
@@ -34,6 +46,9 @@ Earlier Mac setup update (26 September): source added a separate
 External DSH setup below remains available. Basic setup, chat and restart passed
 an isolated real Mac/DSH fixture; the public signed app, additional plugins and
 complete feature parity are not yet qualified.
+
+The [October 10 Harness implementation matrix](AUGMENTOR-HARNESS.md#delivery-gates) records incremental Pi coverage and remaining DSH workflow gates. First-interface availability does not mean full migration parity.
+
 # Feature ownership and compatibility · Augmentor 0.2.9 development
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.

@@ -6,6 +6,8 @@ COPY package.json package-lock.json tsconfig.json ./
 COPY scripts/prepare-ws.mjs scripts/prepare-ws.mjs
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY packages packages
+COPY adapters/dsh-context-budget/evidence.mjs adapters/dsh-context-budget/evidence.d.mts adapters/dsh-context-budget/
+COPY adapters/dsh-compat/messages.mjs adapters/dsh-compat/
 RUN ./node_modules/.bin/tsc -p tsconfig.json
 
 FROM ${NODE_IMAGE}
@@ -17,6 +19,8 @@ COPY apps/home/*.mjs ./
 COPY apps/home/web ./web
 COPY adapters/dsh-home /app/adapters/dsh-home
 COPY adapters/dsh-execution /app/adapters/dsh-execution
+COPY adapters/dsh-context-budget/evidence.mjs /app/adapters/dsh-context-budget/evidence.mjs
+COPY adapters/dsh-compat/messages.mjs /app/adapters/dsh-compat/messages.mjs
 COPY services /app/services
 COPY release/product.json /app/release/product.json
 COPY --from=build /app/dist /app/dist

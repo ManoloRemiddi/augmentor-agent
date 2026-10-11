@@ -1,7 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 10 [Pi prompt improvement slice](AUGMENTOR-HARNESS.md#pi-prompt-improvement-across-native-browser-and-harness) adds the existing Native/Browser and a Harness draft control through one isolated, tool-free Pi SDK request with the explicitly selected model. Shared revisioned instructions, actual provider cancellation, Undo, unchanged parent history and durable no-replay receipts are qualified with synthetic Qt/Chromium/SDK fixtures. Full migration and live/embedded/platform/installed acceptance remain open.
+
 
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
+
+- [Augmentor Harness migration](AUGMENTOR-HARNESS-MIGRATION.md): DSH/Pi comparison, extension candidates, architecture, licensing and required parity.
+- [Augmentor Harness implementation](AUGMENTOR-HARNESS.md): current candidate, inspection/privacy/transport contracts, evidence and release gates.
+- [Pi codemode engine](QUICKJS-ENGINE.md): pinned QuickJS source rebuild, static notices, common platform staging and execution qualification.
+- [Managed MCP dispatch and management](MCP-TRANSPORT.md): failed acknowledgment guards, concurrent receipts, Native/Harness sign-in and revisioned configuration controls, observed connection lifecycle, token-provider failures, existing-session log/discovery reload and pending recovery, exact managed call identities, coherent operator snapshots and public SDK evidence.
+
 # Documentation index
 
 - [Handy repair downloads — October 5](HANDY-DOWNLOADS-2026-10-05.md): published preview 3, merged startup/rendering repair, all-platform qualification, full-byte verification and live website adoption.

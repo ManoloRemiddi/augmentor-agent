@@ -147,3 +147,28 @@ test('Enter does not submit a slash alias before its catalog finishes loading',a
   await new Promise(r=>setTimeout(r,0));enter()
   assert.equal(input.value,'Expanded news');assert.deepEqual(sent,[])
 })
+
+test('a failed catalog retains the alias on Enter; explicit Escape can dismiss the error',async t=>{
+  const dom=new JSDOM('<textarea></textarea>',{pretendToBeVisual:true});t.after(()=>dom.window.close())
+  const win=dom.window,input=win.document.querySelector('textarea'),sent=[]
+  attachPromptLibrary({input,send:async()=>({ok:false,error:'Shared service offline'})})
+  input.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.defaultPrevented)sent.push(input.value)})
+  input.focus();input.value='/news';input.setSelectionRange(5,5);input.dispatchEvent(new win.Event('input'))
+  await new Promise(r=>setTimeout(r,10))
+  const key=key=>input.dispatchEvent(new win.KeyboardEvent('keydown',{key,bubbles:true,cancelable:true}))
+  key('Enter');assert.equal(input.value,'/news');assert.deepEqual(sent,[])
+  assert.match(win.document.querySelector('#prompt-completions').textContent,/offline/)
+  key('Escape');key('Enter');assert.deepEqual(sent,['/news'])
+})
+
+test('late clipboard expansion cannot replace an identical draft in another conversation',async t=>{
+  const dom=new JSDOM('<textarea></textarea>',{pretendToBeVisual:true});t.after(()=>dom.window.close())
+  const win=dom.window,input=win.document.querySelector('textarea');let resolve,origin='parent';const changes=[]
+  Object.defineProperty(win.navigator,'clipboard',{value:{readText:()=>new Promise(r=>resolve=r)}})
+  const view=attachPromptLibrary({input,context:()=>origin,changed:()=>changes.push(view.inserting),send:async()=>({ok:true,library:{prompts:[{id:'news',name:'news',content:'Read: [clipboard]'}]}})})
+  input.focus();input.value='/news';input.setSelectionRange(5,5);input.dispatchEvent(new win.Event('input'))
+  await new Promise(r=>setTimeout(r,10))
+  win.document.querySelector('#prompt-completions button').click();assert.equal(view.inserting,true)
+  origin='child';resolve('Parent clipboard');await new Promise(r=>setTimeout(r,0))
+  assert.equal(input.value,'/news');assert.equal(view.inserting,false);assert.deepEqual(changes,[true,false])
+})

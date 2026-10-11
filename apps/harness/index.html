@@ -1,0 +1,57 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Augmentor Harness</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/harness.css">
+  <link rel="stylesheet" href="/shared-prompts/prompt-library.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <button id="show-conversations" class="mobile-nav" aria-controls="sidebar" aria-expanded="false">Conversations</button>
+    <div class="brand"><span class="orb" aria-hidden="true"></span><div><strong>Augmentor Harness</strong><small id="runtime">Connecting to Pi</small></div></div>
+    <label class="model-control">Model <select id="model" aria-label="Selected model" disabled><option value="">Choose a model</option></select></label>
+    <span class="local">Private local inspector</span>
+  </header>
+  <div class="shell">
+    <aside id="sidebar" class="sidebar">
+      <button id="new-chat" class="primary" disabled>New conversation</button>
+      <label class="workspace">Working folder<input id="workspace" placeholder="Choose a folder for new conversations"></label>
+      <button id="prompt-library" type="button" disabled>Prompt library</button>
+      <button id="reasoning-settings" type="button" disabled>Reasoning</button>
+      <button id="mcp-settings" type="button" disabled>MCP servers</button>
+      <h2>Conversations</h2><nav id="sessions" aria-label="Conversations"></nav>
+      <div class="capture-settings"><label><input type="checkbox" id="capture"> Save context history</label><p>Retain request and tool payloads locally for up to 14 days or 512 MiB. Applies to this Pi profile. Conversation history is stored separately.</p></div>
+      <button id="trim-tools" disabled>Trim saved tool context</button>
+    </aside>
+    <main>
+      <div class="conversation-heading"><div><h1 id="title">Your agent, in view</h1><p id="subtitle">Open a conversation to inspect its execution and context.</p></div><button id="stop" class="stop" disabled>Stop</button></div>
+      <div class="tabs" role="tablist" aria-label="Conversation views">
+        <button role="tab" aria-selected="true" data-view="chat">Chat</button>
+        <button role="tab" aria-selected="false" data-view="trajectory">Trajectory</button>
+        <button role="tab" aria-selected="false" data-view="context">Context</button>
+      </div>
+      <section id="chat" class="panel"><div id="messages" class="messages"><p class="empty">Select a conversation or start a new one.</p></div></section>
+      <section id="trajectory" class="panel inspection-panel" hidden>
+        <div class="inspection-tools"><input id="search" maxlength="256" placeholder="Search retained metadata" aria-label="Search retained trajectory metadata"><select id="search-scope" aria-label="Retained search scope"><option value="metadata">Metadata</option><option value="all">Metadata + payloads</option><option value="payloads">Payloads</option></select><button id="older">Load earlier</button><span id="coverage"></span></div>
+        <div class="overview"><canvas id="timeline" aria-label="Recorded execution timeline"></canvas><small>Drag to focus an interval. Right-click to clear. Missing durations remain markers.</small></div>
+        <div class="inspection-split"><div id="ledger" class="ledger" role="list" aria-label="Execution records"></div><div id="inspector" class="inspector"><p class="empty">Select a record to inspect its inputs, outputs and timing.</p></div></div>
+      </section>
+      <section id="context" class="panel context-panel" hidden>
+        <div class="inspection-tools"><label>Request <select id="requests" aria-label="Request to inspect"></select></label><span id="context-stats"></span></div>
+        <div id="context-content" class="context-content"><p class="empty">Select a model request to see its effective context.</p></div>
+      </section>
+      <div id="interaction" class="interaction" hidden></div>
+      <div id="prompt-queue" aria-label="Queued prompts" hidden></div>
+      <button id="continue-queue" type="button" hidden>Continue queued prompts</button>
+      <div id="edit-message" class="edit-message" hidden><span>Editing latest message · Send creates a new conversation</span><button id="cancel-edit" type="button">Cancel</button></div>
+      <form id="composer"><textarea id="input" rows="2" placeholder="Message Augmentor" aria-label="Message Augmentor"></textarea><button id="improve" type="button" disabled aria-label="Improve prompt">✦</button><button id="send" class="primary" type="submit">Send</button></form>
+      <div id="notice" role="status" aria-live="polite"></div>
+    </main>
+  </div>
+</body>
+</html>

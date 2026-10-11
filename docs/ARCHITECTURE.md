@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 10 Native/Browser follow-up adds effort/mapping controls in existing settings locations. Browser and Harness use one DOM form; Native uses a Qt client of the same serialized Pi owner. Forms do no inference or automatic model selection. Browser operations check the selected conversation and standalone authority; global administration stays out of SDK workspaces. Context/model/working changes invalidate dialogs and late results, and open settings participate in maintenance admission. See [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls).
+
+
+The October 10 Adaptive Reasoning candidate composes the existing AgentSession's public `prepareRequest`, `transformContext` and tool guard after session ownership and routing. The selected MIT pure policy classifies host-correlated delivered SDK input; explicit profile mappings choose supported effort for the actual routed model. An unmapped model preserves its request level. Request-only editing guidance/schema filtering is applied after the SDK's prompt projection and never mutates canonical history or global tools. Manual effort and mode are per conversation; mappings are profile settings. [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) owns the supported boundaries and remaining Native/Browser/live routing gates.
+
+
+The [shared prompt Harness checkpoint](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor) reuses the public Browser picker/editor as a client of the Pi Host and existing shared prompt service. There is no separate database or agent loop. Saved prompts, their revisions and improvement instructions keep their existing service owner; Pi draft improvement and full composition/provenance remain migration gates. This is source/staged qualification, not installed activation.
+
+
+The [Augmentor Harness candidate](AUGMENTOR-HARNESS.md) adds an authenticated local inspection client of the existing Pi owner. It does not add an agent loop. The [migration specification](AUGMENTOR-HARNESS-MIGRATION.md) defines the features and cutover gates still required.
+
 # Current architecture
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for product-owned embedding, scoped tools and memory.
@@ -86,7 +97,7 @@ code is in this repository and its deployment companion holds private home state
 | --- | --- | --- |
 | Native surface | `apps/native/augmentor_linux` | [Native map](../apps/native/README.md); controllers choose Pi or DSH |
 | Chromium surface | `apps/browser/extension`, `native-host.mjs`, `pi-bridge.mjs`, `pipe.mjs` | [Browser](../apps/browser/README.md), [distribution](BROWSER-DISTRIBUTION.md) |
-| Pi lifecycle | `packages/runtime`, `packages/pi-linux` | [Pi protocol](PROTOCOL.md), SDK 0.85.1 |
+| Pi lifecycle | `packages/runtime`, `packages/pi-linux` | [Pi protocol](PROTOCOL.md), tested Harness SDK 1.1.0; installed builds retain their recorded contracts |
 | DSH setup, sessions, exact branching | `services/dsh`, `adapters/dsh-product`, `adapters/dsh-steering` | [DSH setup](DSH-SETUP.md), [feature boundaries](FEATURE-MATRIX.md) |
 | Shared prompts and templates | `services/prompt-library`, `packages/prompt-library`, `packages/templates`, `adapters/dsh-prompt-library` | [Prompt improvement](PROMPT-IMPROVEMENT.md), [commands](SLASH-COMMANDS.md) |
 | Shared visual behavior | `packages/design`, `scripts/sync-design.py` | [Skins](SKINS.md); build generates surface bindings |

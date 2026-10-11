@@ -9,6 +9,53 @@ import {JSDOM} from 'jsdom'
 import {marked} from 'marked'
 import {createChatUI} from '../extension/chat-render.js'
 
+test('streamed rendering preserves negotiated queue Send and still blocks unsupported or disconnected sending',t=>{
+ const dom=new JSDOM('<div id="log"></div><button id="send"></button>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),send=document.querySelector('#send'),ui=createChatUI({log,send});t.after(()=>{ui.clear();dom.window.close()})
+ let seq=0;const stream=()=>ui.applyLog([{kind:'event',event:{seq:++seq,type:'assistant/chunk',data:{chunk:{type:'text-delta',text:'Partial '}}}}])
+ ui.setState({phase:'ready',running:true,canQueue:true});stream();assert.equal(send.disabled,false)
+ ui.setState({submitting:true});stream();assert.equal(send.disabled,true)
+ ui.setState({submitting:false,canQueue:false});stream();assert.equal(send.disabled,true)
+ ui.setState({canQueue:true,phase:'error'});stream();assert.equal(send.disabled,true)
+})
+
+test('persisted Branch/Edit buttons reflect ready idle state and suppress guarded clicks',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ let allowed=true;const calls=[],log=document.querySelector('#log'),ui=createChatUI({log,actionEnabled:()=>allowed,onMessageAction:(...args)=>calls.push(args)});t.after(()=>{ui.clear();dom.window.close()})
+ ui.setState({phase:'ready',running:true,canQueue:true});ui.applyLog([{kind:'event',event:{seq:1,type:'user/message',data:{source:{kind:'user'},content:[{type:'text',text:'Input'}]}}},{kind:'event',event:{seq:2,type:'assistant/message',data:{message:{content:[{type:'text',text:'Reply'}]}}}}])
+ const edit=log.querySelector('.msg-edit'),branch=log.querySelector('.msg-branch');assert(edit&&branch)
+ const blocked=()=>{for(const button of [edit,branch]){assert.equal(button.disabled,true);button.click();button.dispatchEvent(new window.Event('click'))}}
+ blocked();assert.equal(calls.length,0);ui.setState({running:false});assert.equal(edit.disabled,false);assert.equal(branch.disabled,false);branch.click();assert.deepEqual(calls,[['branch',2,'Reply']])
+ ui.setState({submitting:true});blocked();ui.setState({submitting:false,phase:'error'});blocked();allowed=false;ui.setState({phase:'ready'});blocked();assert.equal(calls.length,1)
+})
+
+test('prepared Pi input displays the original submitted text without replacing effective native content',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const event={seq:1,type:'user/message',data:{source:{kind:'user'},submittedContent:[{type:'text',text:'/template original'}],content:[{type:'text',text:'Prepared instructions'}]}}
+ ui.applyLog([{kind:'event',event}]);assert(log.textContent.includes('/template original'));assert(!log.textContent.includes('Prepared instructions'));assert.equal(event.data.content[0].text,'Prepared instructions')
+})
+
+test('inherited Pi input renders without confirming an optimistic child submission with the same text',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const pending=ui.pendingPrompt('Same submission'),event=(seq,origin)=>({kind:'event',sessionId:'child',event:{seq,type:'user/message',data:{source:{kind:'user',sessionId:origin},content:[{type:'text',text:'Same submission'}]}}})
+ ui.applyLog([event(1,'parent')]);assert.equal(pending.confirmed,false);assert(log.contains(pending.node));assert.equal(log.querySelectorAll('.msg.user:not(.pending)').length,1)
+ ui.applyLog([event(2,'child')]);assert.equal(pending.confirmed,true);assert(!log.contains(pending.node));assert.equal(log.querySelectorAll('.msg.user').length,2)
+})
+
+test('handled-input status clears only the originating optimistic prompt without inventing human/model messages',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window);globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const pending=ui.pendingPrompt('Handled'),event=(seq,origin)=>({kind:'event',sessionId:'child',event:{seq,type:'runtime/notice',data:{message:'Handled by extension',disposition:'input-handled',source:{kind:'user',sessionId:origin},submittedContent:[{type:'text',text:'Handled'}]}}})
+ ui.applyLog([event(1,'parent')]);assert.equal(pending.confirmed,false);ui.applyLog([event(2,'child')]);assert.equal(pending.confirmed,true);assert.equal(log.querySelectorAll('.msg.user,.msg.assistant').length,0);assert.equal(log.querySelectorAll('.msg.status').length,2)
+})
+
 test('workspace thinking preference applies to live reasoning, preserves manual choices and leaves history collapsed',t=>{
  const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
  globalThis.window=dom.window;globalThis.document=dom.window.document
@@ -217,4 +264,20 @@ test('v4 failed voice output never becomes an assistant reply',async t=>{
   t.after(()=>{ui.clear();dom.window.close();state.log=[]})
   ui.applyLog([record('event',{event:{seq:25,type:'tool/result',data:{meta:{resonantVoice:{version:1,text:'Must not appear.'}},message:{role:'tool',isError:true,content:[{type:'text',text:'failed'}]}}}})])
   assert.equal(log.querySelectorAll('.assistant .md').length,0)
+})
+
+test('Pi recovery notices remain status records across live delivery and replay',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+ globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=dom.window.requestAnimationFrame.bind(dom.window)
+ globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const rows=[{kind:'event',event:{seq:401,type:'runtime/notice',data:{message:'Bounded recovery 1/2 is continuing.'}}},
+  {kind:'event',event:{seq:402,type:'runtime/notice',data:{message:'Task incomplete. Review confirmed progress.',incomplete:true}}}]
+ ui.applyLog(rows);ui.applyLog(rows)
+ assert.equal(log.querySelectorAll('.status').length,2)
+ assert.equal(log.querySelectorAll('.assistant').length,0)
+ assert.equal(log.querySelectorAll('.status .who')[0].textContent,'Status')
+ assert.match(log.textContent,/Task incomplete/)
+ ui.clear();ui.applyLog(rows);assert.equal(log.querySelectorAll('.status').length,2)
 })

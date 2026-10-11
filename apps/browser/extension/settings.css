@@ -87,3 +87,5 @@ input[type=range]::-webkit-slider-thumb { appearance:none; width:20px; height:20
 
 .formatting-colours label { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:7px 0; }
 .formatting-colours input[type="color"] { width:64px; height:32px; padding:2px; border:1px solid var(--border2); border-radius:5px; background:var(--layer1); }
+
+.reasoning-dialog{color:var(--text);background:var(--panel, #181d28);border:1px solid var(--line, #364053);border-radius:12px;width:min(680px,calc(100vw - 32px));max-height:calc(100dvh - 40px);overflow:auto;padding:20px}.reasoning-dialog::backdrop{background:#0008}.reasoning-dialog fieldset{border:1px solid var(--line, #364053);border-radius:8px;margin:12px 0;padding:12px;min-width:0}.reasoning-dialog label{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0;overflow-wrap:anywhere}.reasoning-dialog select{max-width:65%;min-width:0}.reasoning-dialog legend{overflow-wrap:anywhere}.reasoning-dialog button{margin:6px 8px 0 0}.reasoning-dialog [role=status]{overflow-wrap:anywhere}

@@ -1,0 +1,51 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {chromiumPort} from './fixtures/chromium-ready.mjs';
+// Actual rendered controls and provider requests; isolated synthetic model only.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdtemp,readFile,writeFile,mkdir,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {setTimeout as delay} from 'node:timers/promises';
+import {harnessCdp} from './fixtures/harness-cdp.mjs';
+const source=fileURLToPath(new URL('../',import.meta.url));
+async function until(fn,label){const end=Date.now()+12000;let last;while(Date.now()<end){try{if(await fn())return;}catch(error){last=error;}await delay(30);}throw Error('Harness reasoning timeout: '+label+(last?' ('+last.message+')':''));}
+test('Harness reasoning controls persist effort, explicit adaptive routes and inspect actual request decisions',{skip:process.platform!=='linux',timeout:90000},async t=>{
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-thinking-chrome-'));let fixture,chrome,panel,output='',stderr='',link;
+ t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
+ fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1'},stdio:['ignore','pipe','pipe']});fixture.stdout.on('data',data=>output+=data);fixture.stderr.on('data',data=>stderr+=data);
+ await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'fixture ready');
+ const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token');
+ const rpc=async(method,params={})=>{const response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})}),frame=await response.json();if(frame.error)throw Error(frame.error.message);return frame.result;};
+ const requests=async()=>{try{return (await readFile(link.requestLog,'utf8')).trim().split('\n').filter(Boolean).map(line=>JSON.parse(line));}catch{return [];}};
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});
+ let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'Chrome ready');
+ const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
+ const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,fixture:stderr});throw error;});
+ const click=async expression=>{const point=await panel.evaluate('(()=>{const e='+expression+';if(!e||e.disabled)throw Error("Control unavailable");e.scrollIntoView({block:"nearest"});const r=e.getBoundingClientRect();if(!r.width||!r.height)throw Error("Control hidden");return {x:r.x+r.width/2,y:r.y+r.height/2};})()');await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});};
+ const button=label=>click('Array.from(document.querySelectorAll(".reasoning-dialog button")).find(e=>e.textContent==='+JSON.stringify(label)+')');
+ const set=(label,value)=>panel.evaluate('(()=>{const e=document.querySelector('+JSON.stringify('.reasoning-dialog [aria-label='+JSON.stringify(label)+']')+');e.value='+JSON.stringify(value)+';e.dispatchEvent(new Event("change",{bubbles:true}));})()');
+ await visible('!document.querySelector("#new-chat").disabled');await click('document.querySelector("#new-chat")');await visible('!document.querySelector("#reasoning-settings").disabled');const sid=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")');
+ await click('document.querySelector("#reasoning-settings")');await visible('document.querySelector(".reasoning-dialog")?.innerText.includes("unmapped-model")');await set('Reasoning mode','manual');await set('Saved thinking effort','high');await button('Save conversation');await visible('document.querySelector(".reasoning-dialog [role=status]").textContent==="Conversation reasoning saved."');assert.equal((await rpc('session.reasoning',{sessionId:sid})).thinkingLevel,'high');assert.equal((await requests()).length,0);
+ await button('Add mapping');await set('Greeting / simple text','low');
+ const external=await rpc('reasoning.describe');await rpc('reasoning.configure',{expectedRevision:external.revision,config:external.config});
+ await button('Save adaptive policy');await visible('document.querySelector(".reasoning-dialog [role=status]").textContent.includes("Settings changed")');
+ assert.equal(await panel.evaluate('document.querySelector('+JSON.stringify('.reasoning-dialog [aria-label="Greeting / simple text"]')+').value'),'low','conflict preserves the unsaved draft');
+ await button('Reload saved settings');await visible('document.querySelector(".reasoning-dialog [role=status]")?.textContent.includes("Changes apply")&&!document.querySelector('+JSON.stringify('.reasoning-dialog [aria-label="Greeting / simple text"]')+')');
+ await button('Add mapping');await set('Greeting / simple text','low');await button('Save adaptive policy');await visible('document.querySelector(".reasoning-dialog [role=status]").textContent==="Adaptive policy saved."');
+ await set('Reasoning mode','adaptive');await button('Save conversation');await visible('document.querySelector(".reasoning-dialog [role=status]").textContent==="Conversation reasoning saved."');assert.equal((await rpc('session.reasoning',{sessionId:sid})).adaptiveStatus,'configured');
+ await panel.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});await visible('document.querySelector(".reasoning-dialog").getBoundingClientRect().width<=608&&document.documentElement.scrollWidth<=640');
+ await panel.evaluate('document.querySelector(".reasoning-dialog").scrollTop=0');const image=await panel.call('Page.captureScreenshot',{format:'png'});await mkdir(join(source,'outputs/harness-proof'),{recursive:true});await writeFile(join(source,'outputs/harness-proof/reasoning.png'),Buffer.from(image.data,'base64'));
+ await button('Done');await panel.call('Emulation.clearDeviceMetricsOverride');
+ await click('document.querySelector("#input")');await panel.call('Input.insertText',{text:'Hello Augmentor!'});await click('document.querySelector("#send")');await visible('document.querySelector("#stop").disabled&&document.body.innerText.includes("The note says:")');const received=await requests();assert.equal(received.length,2);assert.equal(received[0].reasoning_effort,'low');assert.equal(received[1].reasoning_effort,'medium');
+ await click('document.querySelector("[data-view=context]")');await visible('document.querySelector("#requests").options.length===2');await panel.evaluate('(()=>{const e=document.querySelector("#requests");e.value=e.options[1].value;e.dispatchEvent(new Event("change",{bubbles:true}));})()');await visible('document.querySelector("#context-content").innerText.includes("SDK requested thinking medium")&&document.querySelector("#context-content").innerText.includes("saved effort high")');
+ const observed=(await rpc('observation.list',{sessionId:sid})).records.filter(row=>row.kind==='model/request');assert.equal(observed[0].data.policies.reasoning.tier,'off');assert.equal(observed[1].data.policies.reasoning.reason,'agent-continuation');
+ await panel.reload();await visible('!document.querySelector("#reasoning-settings").disabled');await click('document.querySelector("#reasoning-settings")');await visible('document.querySelector('+JSON.stringify('.reasoning-dialog [aria-label="Saved thinking effort"]')+')?.value==="high"');assert.equal(await panel.evaluate('document.querySelector('+JSON.stringify('.reasoning-dialog [aria-label="Greeting / simple text"]')+').value'),'low');assert.equal((await requests()).length,2,'reload performs no inference');
+ await until(()=>panel.failedResponses.length===1,'one expected revision conflict');
+ const conflict=panel.failedResponses[0];assert.equal(conflict.status,400);assert.equal(conflict.url,url.origin+'/api/rpc');assert.equal(panel.requests.get(conflict.id).method,'reasoning.configure');
+ assert.deepEqual(panel.errors.filter(error=>!(error.source==='network'&&error.networkRequestId===conflict.id)),[]);assert.equal(stderr,'');
+});

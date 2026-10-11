@@ -27,7 +27,7 @@ Finish using desktop_finish with concise observed evidence or the precise blocke
 
 // Strip image payloads only; keep every tool call/result pair, constraint and error.
 // This conservative byte-based estimate is a guard, not an exact provider tokenizer.
-export function boundedDesktopContext(context: Context, limits: DesktopLimits, contextWindow: number): Context {
+export function boundedDesktopContext<T extends Context>(context: T, limits: DesktopLimits, contextWindow: number): T {
   let retained = 0;
   const messages = [...context.messages].reverse().map(message => {
     if (!Array.isArray(message.content)) return message;
@@ -154,13 +154,17 @@ export class DesktopSpecialist {
       if (created.modelFallbackMessage || session.model?.id !== options.model.id || session.model?.provider !== options.model.provider)
         throw Error('Desktop worker refused model substitution.');
       session.agent.toolExecution = 'sequential';
-      const originalStop = session.agent.shouldStopAfterTurn;
-      session.agent.shouldStopAfterTurn = async (context, signal) => stopped || finished || !!await originalStop?.(context, signal);
+      const originalFinish = session.agent.finishTurn;
+      session.agent.finishTurn = async (turn, signal) => {
+        const decision = await originalFinish?.(turn, signal);
+        if (stopped || finished) return {action: 'end'};
+        return decision || undefined;
+      };
       const stream = session.agent.streamFunction;
       session.agent.streamFunction = (model, context, streamOptions) => {
         abort.signal.throwIfAborted();
         if (result.counts.requests >= this.limits.requests) {stop('budget_exceeded', 'Desktop model request budget exceeded.'); throw Error(result.summary);}
-        let bounded: Context;
+        let bounded: typeof context;
         try {bounded = boundedDesktopContext(context, this.limits, model.contextWindow);} catch (error) {stop('budget_exceeded', String(error)); throw error;}
         result.counts.requests++;
         return stream(model, bounded, {...streamOptions, maxTokens: Math.min(this.limits.outputTokens, model.maxTokens)});

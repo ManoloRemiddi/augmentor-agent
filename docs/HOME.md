@@ -424,3 +424,10 @@ Codex receipt lookup/cancellation requires its conversation's recorded ownership
 under the current pairing. Unknown outcomes still block new dispatches. Stopping
 Codex's wait does not guarantee that an admitted NAS task stopped; inspect the
 saved result, and use explicit cancellation where supported.
+
+
+## Harness helper build closure — October 10
+
+The `feat/augmentor-harness` follow-up on base `0b17d1f7d3971072b6cd0c342262e640452b0671` repairs the hosted Home Docker build's missing shared evidence dependency. Root TypeScript compiles the Pi host as well as Home clients; its new context/reassessment modules import the pure Augmentor helper and typed declaration. The curated Docker context now includes exactly `adapters/dsh-context-budget/evidence.mjs`, its `.d.mts` declaration and `adapters/dsh-compat/messages.mjs`. Runtime copies include the two JavaScript helpers. No DSH context service is mounted, and Home continues using its existing owned runtime.
+
+All **30 Home Node tests pass** after installing its independent locked manifest with `npm ci --prefix apps/home --ignore-scripts`. The first local invocation had no Home dependencies and failed module resolution; dependencies were supplied without changing the manifest. The corrected final source image builds using the workflow's pinned Node 24.19.0 base. Local image ID: `sha256:5d8b530587780d9bf1f1ead0bb8719a571258c549a079779c375c3e7ee3ed43d`. An isolated `docker run --rm --tmpfs /tmp` with temporary shared data/state successfully calls the packaged `prompts.list` service and returns a valid empty library. It performs no household/device action and changes no installed Home service or private deployment companion. This is container/package proof; fresh matching-head hosted validation and broader NAS/device acceptance remain distinct gates. See [Harness evidence](AUGMENTOR-HARNESS.md#advisory-reassessment-and-home-build-correction) and [draft PR #45](https://github.com/ManoloRemiddi/augmentor-agent/pull/45).

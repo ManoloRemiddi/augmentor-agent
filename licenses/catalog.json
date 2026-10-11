@@ -107,6 +107,32 @@
       "file": "upstream/codex-0.159.2-notice.txt",
       "url": "https://raw.githubusercontent.com/openai/codex/ff6aec96948b70d94983af2641a6b67c94faeff5/NOTICE",
       "sha256": "9d71575ecfd9a843fc1677b0efb08053c6ba9fd686a0de1a6f5382fd3c220915"
+    },
+    "pi-1.1.0": {
+      "file": "upstream/pi-1.1.0.txt",
+      "url": "https://raw.githubusercontent.com/earendil-works/pi/abe508e1b89912adde45528136c3221eb69acdd7/LICENSE",
+      "sha256": "0457f5bcec3b3b211605dfb5d1a49042fd638f3686a410fe099c24a25af13c48"
+    },
+    "esbuild-0.28.2": {
+      "file": "upstream/esbuild-0.28.2.txt",
+      "url": "https://raw.githubusercontent.com/evanw/esbuild/609683d892977362a0f99026cb74b96263d728a9/LICENSE.md",
+      "sha256": "b40ec5baec7bb34fa5b1c09521fa3cd52d5fad7adafed74932a2010d3612a681"
+    },
+    "esbuild-0.28.2-xxhash": {
+      "file": "upstream/esbuild-0.28.2-xxhash.txt",
+      "url": "https://raw.githubusercontent.com/evanw/esbuild/609683d892977362a0f99026cb74b96263d728a9/internal/xxhash/LICENSE.txt",
+      "sha256": "f566a9f97bacdaf00d9f21dd991e81dc11201c4e016c86b470799429a1c9a79c"
+    },
+    "go-1.26.5": {
+      "file": "upstream/go-1.26.5.txt",
+      "url": "https://raw.githubusercontent.com/golang/go/go1.26.5/LICENSE",
+      "sha256": "911f8f5782931320f5b8d1160a76365b83aea6447ee6c04fa6d5591467db9dad"
+    },
+    "proxy-agent-negotiate-1.1.0": {
+      "file": "upstream/proxy-agent-negotiate-1.1.0.txt",
+      "url": "https://raw.githubusercontent.com/TooTallNate/proxy-agents/4813885d3f4e2ff837878ceffdba656a71dc31f0/packages/proxy-agent/LICENSE",
+      "sha256": "8d8c55319c7729d57be811c747452636688d54f19701ee0752b6b15ad3771d9a",
+      "note": "The 1.1.0 negotiate wrapper declares MIT and Nathan Rajlich as author but omits LICENSE. Preserve the same monorepo author's complete MIT text from packages/proxy-agent at this inspected source ref."
     }
   },
   "overrides": {
@@ -176,7 +202,45 @@
     "@openai/codex@0.159.2-darwin-x64": "codex-0.159.2",
     "@openai/codex@0.159.2-darwin-arm64": "codex-0.159.2",
     "@openai/codex@0.159.2-win32-x64": "codex-0.159.2",
-    "@openai/codex@0.159.2-win32-arm64": "codex-0.159.2"
+    "@openai/codex@0.159.2-win32-arm64": "codex-0.159.2",
+    "@earendil-works/chord@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-agent-core@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-ai@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-codemode@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-coding-agent@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-mcp@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-telemetry@1.1.0": "pi-1.1.0",
+    "@earendil-works/pi-tui@1.1.0": "pi-1.1.0",
+    "@esbuild/aix-ppc64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/android-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/android-arm@0.28.2": "esbuild-0.28.2",
+    "@esbuild/android-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/darwin-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/darwin-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/freebsd-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/freebsd-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-arm@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-ia32@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-loong64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-mips64el@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-ppc64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-riscv64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-s390x@0.28.2": "esbuild-0.28.2",
+    "@esbuild/linux-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/netbsd-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/netbsd-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/openbsd-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/openbsd-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/openharmony-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/sunos-x64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/win32-arm64@0.28.2": "esbuild-0.28.2",
+    "@esbuild/win32-ia32@0.28.2": "esbuild-0.28.2",
+    "@esbuild/win32-x64@0.28.2": "esbuild-0.28.2",
+    "@aws-sdk/credential-provider-http@3.972.75": "aws-sdk",
+    "@aws-sdk/credential-provider-login@3.972.80": "aws-sdk",
+    "@aws-sdk/nested-clients@3.997.47": "aws-sdk",
+    "proxy-agent-negotiate@1.1.0": "proxy-agent-negotiate-1.1.0"
   },
   "choices": {
     "json-schema@0.4.0": {

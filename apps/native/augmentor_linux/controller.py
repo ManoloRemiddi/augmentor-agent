@@ -51,6 +51,7 @@ class Controller(QObject):
         self.harness=getattr(self.client,'harness',harness)
         self.preset=getattr(self.client,'preset','augmentor-linux-pi')
         self.capabilities=getattr(self.client,'capabilities',{'branch':True,'edit':True})
+        self.queue_revisions={}
         self.session = None
         self.stream = None
         self.running = False
@@ -533,7 +534,7 @@ class Controller(QObject):
                 if not self.connected or not self.stream or self.stream.session!=self.session:self.subscribe(self.session)
                 if cancelled.is_set():
                     return
-                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', **({'resumeQueue':True} if self.harness=='codex' else {}), 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
+                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', **({'resumeQueue':True} if self.harness in ('pi','codex') else {}), 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
                 accepted = True
@@ -568,7 +569,7 @@ class Controller(QObject):
                     time.sleep(.03)
                 target=sid or self.session
                 if self.closed or self.generation is not generation or target!=self.session or not target or self.cancel_requested.is_set():raise ContractError('Prompt was not queued; the active response stopped or changed.')
-                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'expectedTurnId':turn_id} if self.harness=='codex' and mode=='steer' else {})})
+                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'expectedTurnId':turn_id} if self.harness in ('pi','codex') and mode=='steer' else {})})
                 self.queue_result.emit({'id':request_id,'accepted':result.get('accepted') is True,'command':bool(result.get('command'))})
             except Exception as exc:
                 self.queue_result.emit({'id':request_id,'accepted':False,'error':str(exc)})
@@ -577,11 +578,12 @@ class Controller(QObject):
     @admitted
     def update_queue(self, item_id, action):
         sid=self.session
-        if not sid or self.read_only or not self.online or action not in ('steer','remove'):return
+        if not sid or self.read_only or not self.online or action not in ('steer','remove','acknowledge'):return
+        if action=='acknowledge' and (self.harness!='pi' or self.running):return
         turn_id=getattr(self,'queue_turn_id',None)
         def work():
             try:
-                result=self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action},**({'expectedTurnId':turn_id} if self.harness=='codex' and action=='steer' else {})})
+                result=self.client.call('session.resolveQueue',{'sessionId':sid,'itemId':item_id,'acknowledgeUnknownOutcome':True}) if action=='acknowledge' else self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action},**({'expectedTurnId':turn_id} if self.harness in ('pi','codex') and action=='steer' else {})})
                 self.queue_action_result.emit({'id':item_id,'accepted':result.get('accepted') is True})
             except Exception as exc:
                 self.queue_action_result.emit({'id':item_id,'error':str(exc)})
@@ -631,6 +633,10 @@ class Controller(QObject):
                         self.task(lambda:self.reconcile_turn(sid,generation))
             elif method == 'session/queue':
                 if payload.get('sessionId')==self.session:
+                    revision=payload.get('revision')
+                    if type(revision) is int:
+                        if revision < self.queue_revisions.get(self.session,-1):return
+                        self.queue_revisions[self.session]=revision
                     self.queue_turn_id=payload.get('activeTurnId')
                     self.queue_changed.emit(payload.get('items',[]))
             elif method == 'session/event':

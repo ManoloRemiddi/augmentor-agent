@@ -21,5 +21,8 @@ harness. See [current architecture](../../docs/ARCHITECTURE.md) and
 Run native tests from the repository root with its Python/Qt environment:
 `npm run test:native`. Actual pointer/clipboard, first-run, package and platform
 acceptance are separate checks described in [tests](../../tests/README.md).
+
+The [October 10 Pi Harness checkpoint](../../docs/AUGMENTOR-HARNESS.md#native-branchedit-and-ordinary-sdk-inputs) additionally drives the production Window/Controller/socket with QTest clicks on actual Branch/Edit anchors and Enter/Cancel/Stop. Original template text, exact prior tool context, unchanged parents, saved-child reopening and extension-handled status pass against a synthetic provider. This is source/staged offscreen Qt evidence; live memory cutoff, physical display/audio and installed/platform acceptance remain open.
+
 Hiding a window must not cancel its task; Stop must remain explicit. Do not
 restart an active installed window to verify a source-only documentation change.

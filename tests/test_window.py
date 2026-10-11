@@ -166,6 +166,42 @@ class WindowTests(unittest.TestCase):
         self.assertTrue(window.testAttribute(Qt.WidgetAttribute.WA_TranslucentBackground))
         window.close()
 
+    def test_prepared_pi_input_keeps_submitted_text_for_display_and_editing(self):
+        window=Window();window.pending_prompt='/template original';window.submitted_draft=window.pending_prompt
+        event={'seq':1,'type':'user/message','data':{'source':{'kind':'user','rpcId':'fixture'},'submittedContent':[{'type':'text','text':'/template original'}],'content':[{'type':'text','text':'Prepared instructions'}]}}
+        window.fold_event(event)
+        self.assertEqual(window.messages,[('You','/template original')])
+        self.assertIsNone(window.pending_prompt);self.assertIsNone(window.submitted_draft)
+        self.assertEqual(window.message_events[0]['data']['content'][0]['text'],'Prepared instructions')
+        window.close()
+
+    def test_inherited_receipt_preserves_pending_child_submission(self):
+        from unittest.mock import Mock
+        window=Window();window.controller=SimpleNamespace(session='child',running=False,close=lambda:None);window.pending_prompt='Same submission';window.submitted_draft=window.pending_prompt
+        window.queue_panel.consumed=Mock()
+        def event(seq,origin):
+            return {'seq':seq,'type':'user/message','data':{'source':{'kind':'user','sessionId':origin,'rpcId':'same-id'},'content':[{'type':'text','text':'Same submission'}]}}
+        try:
+            window.fold_event(event(1,'parent'))
+            window.queue_panel.consumed.assert_not_called()
+            self.assertEqual(window.pending_prompt,'Same submission');self.assertEqual(window.submitted_draft,'Same submission')
+            self.assertEqual(window.messages,[('You','Same submission')])
+            window.fold_event(event(2,'child'))
+            window.queue_panel.consumed.assert_called_once_with('same-id')
+            self.assertIsNone(window.pending_prompt);self.assertIsNone(window.submitted_draft)
+            self.assertEqual(len(window.messages),2)
+        finally:window.close()
+
+    def test_handled_input_receipt_clears_only_its_own_pending_prompt_without_a_human_message(self):
+        window=Window();window.controller=SimpleNamespace(session='child',running=False,close=lambda:None);window.pending_prompt='Handled';window.submitted_draft='Handled'
+        def event(seq,origin):
+            return {'seq':seq,'type':'runtime/notice','data':{'message':'Handled by extension','disposition':'input-handled','source':{'kind':'user','sessionId':origin},'submittedContent':[{'type':'text','text':'Handled'}]}}
+        try:
+            window.fold_event(event(1,'parent'));self.assertEqual(window.pending_prompt,'Handled')
+            window.fold_event(event(2,'child'));self.assertIsNone(window.pending_prompt);self.assertIsNone(window.submitted_draft)
+            self.assertEqual(window.messages,[('Status','Handled by extension'),('Status','Handled by extension')])
+        finally:window.close()
+
     def test_compact_keeps_draft_and_on_top_request(self):
         window = Window()
         window.composer.setPlainText('A draft')

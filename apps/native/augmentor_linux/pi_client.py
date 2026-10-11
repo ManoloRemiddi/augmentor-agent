@@ -43,6 +43,7 @@ class Connection:
         return json.loads(raw)
 
     def call(self, method, params=None):
+        self.socket.settimeout(65 if method=='prompt.improve' else 20)
         identity = uuid.uuid4().hex
         raw = (json.dumps({'id':identity,'method':method,'params':params or {}})+'\n').encode()
         if len(raw)>MAX_FRAME: raise ContractError('Request exceeded size limit')
@@ -62,6 +63,8 @@ class Connection:
 class PiClient:
     def __init__(self, base=None):
         self.base = base or socket_path()
+        self.capabilities = {'branch': True, 'edit': True, 'queue': False, 'steering': False, 'reasoning': False,'promptImprovement': False,'inspection':False,'mcpManagement':False,'mcpConfiguration':False}
+        self.supports_queue = False
 
     def call(self, method, payload=None):
         connection=None
@@ -72,7 +75,17 @@ class PiClient:
                 from .runtime_start import ensure_running
                 ensure_running()
                 connection=Connection(self.base)
-            return connection.call(method,payload)
+            result=connection.call(method,payload)
+            if method == 'host.describe':
+                self.supports_queue = result.get('capabilities', {}).get('queue') is True
+                self.capabilities['queue'] = self.supports_queue
+                self.capabilities['steering'] = result.get('capabilities', {}).get('steering') is True
+                self.capabilities['reasoning'] = result.get('capabilities', {}).get('reasoning') is True
+                self.capabilities['promptImprovement'] = result.get('capabilities', {}).get('promptImprovement') is True
+                self.capabilities['inspection'] = result.get('capabilities', {}).get('inspection') is True
+                self.capabilities['mcpManagement'] = result.get('capabilities', {}).get('mcpManagement') is True
+                self.capabilities['mcpConfiguration'] = result.get('capabilities', {}).get('mcpConfiguration') is True
+            return result
         except (OSError,ValueError) as exc:
             raise ContractError('Cannot reach the Pi runtime: '+str(exc)) from exc
         finally:
@@ -82,6 +95,10 @@ class PiClient:
         return self.call('interaction.respond',{'rpcId':rpc_id,'sessionId':value['sessionId'],'value':value})
 
     def validate_model(self, selection):return self.call('models.validate',selection)
+    def improve_prompt(self,text,instructions,selection,*,request_id,expected_revision,session_id=None):
+        return self.call('prompt.improve',{'text':text,'selection':selection,'requestId':request_id,'scopeId':request_id,
+            'expectedInstructionsRevision':expected_revision,**({'sessionId':session_id} if session_id else {})})
+    def cancel_improvement(self,request_id):return self.call('prompt.cancelImprovement',{'requestId':request_id,'scopeId':request_id})
     def model_catalog(self):return self.call('models.list')
     def session_rows(self):return self.call('session.list')['items']
     def saved_chats(self,action='state',session=None):return self.call('chats.saved',{'action':action,'sessionId':session})['saved']

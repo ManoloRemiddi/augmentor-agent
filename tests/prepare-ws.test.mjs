@@ -55,3 +55,11 @@ for (const [name, versions] of [
     assert.ok(existsSync(path.join(root, sdk, 'dist/bundle/cli.js')));
   });
 }
+
+test('1.1.0 without a shrinkwrapped ws resolves the qualified root dependency', t => {
+  const {root, sdk, run} = fixture(t, '8.21.3', '1.1.0');
+  rmSync(path.join(root, sdk, 'node_modules/ws'), {recursive: true});
+  assert.equal(run().status, 0);
+  assert.ok(existsSync(path.join(root, sdk, 'dist/index.js')));
+  assert.equal(existsSync(path.join(root, sdk, 'dist/bundle')), false);
+});

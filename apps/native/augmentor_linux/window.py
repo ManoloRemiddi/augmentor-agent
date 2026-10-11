@@ -135,6 +135,8 @@ class Window(QWidget):
         self.composer=Composer()
         self.composer.improve_requested.connect(self.improve_prompt)
         self.composer.improvement_changed.connect(self.update_controls)
+        self.prompt_improvement_owners={}
+        self.composer.improvement_cancelled.connect(self.cancel_prompt_improvement)
         self.edit_bar=QFrame();edit_layout=QHBoxLayout(self.edit_bar);scaled(edit_layout).setContentsMargins(2,0,2,0)
         edit_label=QLabel('Editing latest message');edit_layout.addWidget(edit_label,1)
         self.cancel_edit_button=QPushButton('Cancel');self.cancel_edit_button.clicked.connect(self.cancel_edit);edit_layout.addWidget(self.cancel_edit_button)
@@ -292,6 +294,7 @@ class Window(QWidget):
         self.call_in_background(lambda:self.controller.client.call('models.pin',{**model,'pinned':pinned}),self.set_models)
 
     def model_selected(self,selection,persist=True):
+        if self.composer.improving and selection!=getattr(self,'prompt_improvement_context',(None,None,None))[2]:self.composer.cancel_improvement()
         if not selection:return
         if persist and self.controller:self.controller.choose_model(selection)
         self.sync_orb();self.update_controls()
@@ -471,6 +474,7 @@ class Window(QWidget):
         if self.read_only:self.set_status('History view')
 
     def update_controls(self):
+        if self.composer.improving and (not self.controller or self.controller.running or not self.controller.online or self.read_only):self.composer.cancel_improvement()
         self.voice_button.hands_free=self.voice_is_hands_free()
         self.voice_button.refresh_tip()
         self.voice_button.setVisible(self.preferences.values.get('resonant_voice',True))
@@ -479,7 +483,7 @@ class Window(QWidget):
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))
         if self.composer.improving or getattr(self.controller,'repairing',False):self.send_button.setEnabled(False)
-        self.composer.improvement_available=bool(self.controller and hasattr(getattr(self.controller,'client',None),'improve_prompt') and self.model_picker.currentData() and not self.read_only and getattr(self.controller,'online',False))
+        self.composer.improvement_available=bool(self.controller and hasattr(getattr(self.controller,'client',None),'improve_prompt') and (self.controller.harness!='pi' or self.controller.client.capabilities.get('promptImprovement') is True) and self.model_picker.currentData() and not self.read_only and getattr(self.controller,'online',False))
         self.composer.refresh_improve_button()
         self.model_picker.setEnabled(not running and not self.read_only)
         self.new_button.setEnabled(bool(self.controller) and not running)
@@ -509,6 +513,16 @@ class Window(QWidget):
         original=self.composer.toPlainText()
         if not original.strip() or not hasattr(adapter,'improve_prompt'):return
         identity=self.composer.begin_improvement()
+        controller=self.controller;session=controller.session;connected=controller.connected
+        self.prompt_improvement_context=(controller,session,selection)
+        if controller.harness=='pi':self.prompt_improvement_owners[identity]=adapter
+        def finished(value):
+            if self.composer.improvement_id!=identity:return
+            if self.controller is controller and controller.session==session and self.model_picker.currentData()==selection and controller.online and not self.read_only and not controller.running:
+                self.composer.improvement_result.emit(identity,*value)
+                if controller.harness=='pi' and value[0] and value[0].get('receipt'):
+                    receipt=value[0]['receipt'];self.set_status('Prompt improved with '+receipt['provider']+'/'+receipt['model']+'. Output tokens: '+str(receipt.get('usage',{}).get('output','unavailable'))+'.')
+            else:self.composer.cancel_improvement()
         def work():
             result=None;error=''
             try:
@@ -516,11 +530,21 @@ class Window(QWidget):
                 settings=PromptClient().call('prompts.list').get('improvement')
                 if not settings:raise ValueError('Restart the prompt service to load Improve prompt settings.')
                 template=settings['content']
-                result=adapter.improve_prompt(original,template,selection)
+                if controller.harness=='pi':
+                    result=adapter.improve_prompt(original,template,selection,request_id=identity,expected_revision=settings['revision'],session_id=session if connected else None)
+                else:result=adapter.improve_prompt(original,template,selection)
             except Exception as exc:error=str(exc)
-            try:self.composer.improvement_result.emit(identity,result,error)
+            try:self.completed.emit(finished,(result,error))
             except RuntimeError:pass
         self.controller.task(work)
+
+    def cancel_prompt_improvement(self,identity):
+        adapter=self.prompt_improvement_owners.pop(identity,None)
+        if adapter:
+            def cancel():
+                try:adapter.cancel_improvement(identity)
+                except Exception:pass
+            threading.Thread(target=cancel,daemon=True).start()
 
     def send(self):
         if self.composer.improving:return
@@ -760,10 +784,12 @@ class Window(QWidget):
                 return True
         if kind=='user/message':
             if data.get('source',{}).get('kind')!='user':return False
-            self.queue_panel.consumed(data.get('source',{}).get('rpcId'))
-            text='\n'.join(p.get('text','') for p in data.get('content',[]) if p.get('type')=='text')
+            origin=data.get('source',{}).get('sessionId')
+            own_delivery=origin is None or origin==getattr(self.controller,'session',None)
+            if own_delivery:self.queue_panel.consumed(data.get('source',{}).get('rpcId'))
+            text='\n'.join(p.get('text','') for p in data.get('submittedContent',data.get('content',[])) if p.get('type')=='text')
             if text:
-                if text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
+                if own_delivery and text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
                 self.message_events[len(self.messages)]=event
                 self.messages.append(('You',text))
             return bool(text)
@@ -776,6 +802,12 @@ class Window(QWidget):
             # Effective policy may differ from the saved picker value. Keep its
             # notice visible, including history replay, on every native platform.
             self.messages.append(('DSH',data.get('text') or ('Command completed.' if data.get('kind')=='success' else 'Command failed.')))
+            return True
+        if kind in ('runtime/notice','runtime/warning'):
+            if data.get('disposition')=='input-handled' and data.get('source',{}).get('sessionId')==getattr(self.controller,'session',None):
+                text='\n'.join(part.get('text','') for part in data.get('submittedContent',[]) if part.get('type')=='text')
+                if text==self.pending_prompt:self.pending_prompt=None;self.submitted_draft=None
+            self.messages.append(('Status',data.get('message') or 'Runtime status unavailable.'))
             return True
         if kind=='assistant/chunk':
             chunk=data.get('chunk',{})
@@ -876,6 +908,8 @@ class Window(QWidget):
         menu.addAction('Settings',self.open_settings).setEnabled(bool(self.controller))
         menu.addAction('Colors & skins',self.open_appearance)
         menu.addAction('Prompt library',self.open_prompt_library).setEnabled(bool(self.controller))
+        if self.controller and self.controller.harness=='pi':
+            menu.addAction('Trajectory && Context',self.open_inspector).setEnabled(bool(self.controller.session and self.controller.online and self.controller.capabilities.get('inspection')))
         is_dsh=bool(self.controller and self.controller.harness=='dsh')
         menu.addAction('Agent setup' if is_dsh else 'Connect a model',self.open_setup).setEnabled(bool(self.controller))
         menu.addAction('Open DSH in browser' if is_dsh else 'Models & providers',self.open_pi).setEnabled(bool(self.controller))
@@ -890,6 +924,23 @@ class Window(QWidget):
         menu.addAction('About & licenses',lambda:LicensesDialog(self).exec())
         menu.addSeparator();menu.addAction('Quit Augmentor',self.quit_augmentor)
         menu.exec(self.more_button.mapToGlobal(self.more_button.rect().bottomLeft()))
+
+    def open_inspector(self):
+        controller=self.controller
+        if not controller or controller.harness!='pi' or not controller.online or not controller.session or not controller.capabilities.get('inspection'):return
+        sid=controller.session
+        def work():
+            try:return controller.client.call('inspection.open',{'sessionId':sid}),None
+            except Exception as error:return None,str(error)
+        def opened(value):
+            if self.controller is not controller or controller.session!=sid or not controller.online:return
+            result,error=value
+            if error:self.set_status(error);return
+            url=QUrl(result.get('url',''))
+            if result.get('mode')!='read-only' or result.get('sessionId')!=sid or url.scheme()!='http' or url.host()!='127.0.0.1' or not url.fragment().startswith('token='):
+                self.set_status('The runtime returned an invalid conversation inspector link.');return
+            if not QDesktopServices.openUrl(url):self.set_status('The default browser could not open the conversation inspector.')
+        self.call_in_background(work,opened)
 
     def open_updates(self):
         if self.controller:UpdatesDialog(self).exec()

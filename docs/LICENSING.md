@@ -119,6 +119,21 @@ image-processing algorithms. New dependency expressions or missing notices stop
 the rebuild. Ordinary release builds verify the recorded artifacts and do not
 silently re-resolve Rust dependencies.
 
+The required Pi codemode engine has a separate [QuickJS source-build and notice
+record](QUICKJS-ENGINE.md). A retained QuickJS-WASI 3.6.2 rebuild replaces the
+published npm WASM with an explicitly different hash. Full pinned engine/NG/libc
+sources, the LLVM builtins subtree, original static-library notices and normalized
+link evidence accompany it. SDK libraries are pinned release inputs, not
+independently rebuilt here. The package's MIT text alone does not cover that
+static dependency inventory.
+
+All platform packagers verify the paired engine/source/notice hashes and exclude
+five separately unqualified optional WASM extensions. Debian's strict native
+inventory requires the active engine and still rejects unknown executables.
+Third-party notices and source headers retain their original licenses. Packaged
+fixture execution does not replace physical platform, installed/update or
+complete distribution acceptance.
+
 ## Authorship and repository
 
 Preserve copyright attribution and the complete combined license on Augmentor-authored

@@ -21,7 +21,12 @@ export function branchContext(file:string, directory:string, events:DisplayEvent
   const leaf=mode==='edit'?entry.parentId:entry.id;
   const branchFile=leaf?manager.createBranchedSession(leaf):undefined;
   let cutoff=seq;
-  if(mode==='edit')cutoff=events.findLast(e=>e.seq<seq&&e.type==='turn/start')?.seq??seq;
+  if(mode==='edit'){
+    const start=events.findLast(e=>e.seq<seq&&e.type==='turn/start')?.seq??seq;
+    // A steered correction shares the host turn with earlier native messages.
+    // Its parent includes those messages; only an initial input cuts at start.
+    cutoff=events.some(e=>e.type==='user/message'&&e.seq>start&&e.seq<seq)?seq:start;
+  }
   const inherited=events.filter(e=>mode==='edit'?e.seq<cutoff:e.seq<=cutoff);
   return {manager:leaf?manager:undefined,file:branchFile,events:inherited};
 }

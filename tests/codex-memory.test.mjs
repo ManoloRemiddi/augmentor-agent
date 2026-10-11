@@ -56,10 +56,10 @@ test('actual memory companion deduplicates Codex backfill, respects capture paus
  const root=mkdtempSync(join(process.platform==='darwin'?'/tmp':tmpdir(),'codex-memory-'));
  const state=join(root,'state'),data=join(root,'data');mkdirSync(state);mkdirSync(data);
  const env={...process.env,HOME:root,AUGMENTOR_SHARED_STATE:state,AUGMENTOR_SHARED_DATA:data,AUGMENTOR_WORKSPACE_PROFILE:'',XDG_RUNTIME_DIR:join(root,'run'),XDG_CONFIG_HOME:join(root,'config'),XDG_STATE_HOME:state,XDG_DATA_HOME:data};
- const child=spawn(process.env.AUGMENTOR_PYTHON??'python3',['services/memory/service.py'],{env,stdio:'ignore'});const exited=once(child,'exit');const clients=[];
+ let startupError='';const child=spawn(process.env.AUGMENTOR_PYTHON??'python3',['services/memory/service.py'],{env,stdio:['ignore','ignore','pipe']});child.stderr.on('data',data=>startupError=(startupError+data).slice(-4096));const exited=once(child,'exit');const clients=[];
  t.after(async()=>{for(const c of clients)await c.close();if(child.exitCode===null){child.kill();await exited;}rmSync(root,{recursive:true,force:true});});
- for(let n=0;n<100&&!existsSync(join(state,'dual-memory.sock'));n++)await new Promise(r=>setTimeout(r,20));
- assert.ok(existsSync(join(state,'dual-memory.sock')),'Isolated companion started');
+ for(let n=0;n<100&&child.exitCode===null&&!existsSync(join(state,'dual-memory.sock'));n++)await new Promise(r=>setTimeout(r,20));
+ assert.ok(existsSync(join(state,'dual-memory.sock')),'Isolated companion started '+JSON.stringify({exitCode:child.exitCode,signal:child.signalCode,stderr:startupError}));
  const call=(method,params={})=>new Promise((resolve,reject)=>{
   const socket=net.createConnection(join(state,'dual-memory.sock'));let raw='';const id=randomUUID();socket.setTimeout(3000,()=>socket.destroy(Error('Fixture socket timeout')));
   socket.on('error',reject);socket.on('connect',()=>socket.write(JSON.stringify({protocol:'augmentor-prompts/1',id,method,params})+'\n'));

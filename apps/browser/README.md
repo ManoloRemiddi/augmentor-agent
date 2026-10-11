@@ -12,6 +12,13 @@ approvals, saved conversations and speech engine.
 [Feature matrix](../../docs/FEATURE-MATRIX.md) records actual harness support;
 [distribution](../../docs/BROWSER-DISTRIBUTION.md) is the current install guide.
 
+The [October 10 Harness candidate](../../docs/AUGMENTOR-HARNESS.md#loaded-pi-chromium-extension)
+qualifies loaded Linux Chromium with Pi 1.1.0 for actual browser tools, identified
+steering, queue/reload/Stop/resume and exact Branch/Edit using a synthetic provider.
+The distribution guide records trusted `AUGMENTOR_PI_BROWSER_WORKSPACE` isolation;
+its default remains `~/Augmentor Browser Pi`. Other OS/browser installations and
+live provider/memory acceptance retain their separate gates.
+
 | Component | Responsibility |
 | --- | --- |
 | `extension/` | Side panel, settings, service worker, page executor, overlays and thin voice controls |

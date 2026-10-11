@@ -5,7 +5,7 @@
 
 import {presentSettingsForm} from './settings-form.mjs'
 import {registerMaintenanceState, isPageMaintenancePaused} from './maintenance-page.mjs'
-export function promptEditor(doc,request,onSaved,container){
+export function promptEditor(doc,request,onSaved,container,options={}){
   const dialog=doc.createElement('dialog');dialog.className='shared-prompt-editor';
   const make=(tag,text)=>{const e=doc.createElement(tag);if(text)e.textContent=text;return e}
   const title=make('h3','Prompt library'),list=make('select'),name=make('input'),body=make('textarea'),note=make('p'),actions=make('div')
@@ -15,7 +15,7 @@ export function promptEditor(doc,request,onSaved,container){
   let current=null,improvementBusy=false
   const instructions=make('textarea');instructions.rows=12;instructions.maxLength=8000;instructions.setAttribute('aria-label','Prompt improvement instructions')
   const improvementNote=make('p');improvementNote.setAttribute('role','status')
-  improvement.append(make('p','Instructions for ✦ Improve prompt in the input box. Edit these independently of your saved /prompts.'),instructions,improvementNote)
+  improvement.append(make('p',options.improvementDescription??'Instructions for ✦ Improve prompt in the input box. Edit these independently of your saved /prompts.'),instructions,improvementNote)
   const improvementActions=make('div');improvement.append(improvementActions)
   const control=(label,fn)=>{const b=make('button',label);b.type='button';b.onclick=fn;improvementActions.append(b);return b}
   const applyImprovement=value=>{if(!value){improvementNote.textContent='Restart the prompt service to load these settings.';return}current=value;instructions.value=value.content}
@@ -28,7 +28,7 @@ export function promptEditor(doc,request,onSaved,container){
   })
   control('Reload',async()=>{try{applyImprovement((await request({action:'list'})).improvement);improvementNote.textContent='Latest instructions loaded.'}catch(e){improvementNote.textContent=e.message}})
   control('Use default',()=>{if(current){instructions.value=current.defaultContent;improvementNote.textContent='Default loaded. Save to apply it.'}})
-  for(const [label,target] of [['Saved prompts',saved],['Improve prompt',improvement]]){const b=make('button',label);b.type='button';b.setAttribute('aria-pressed',String(target===saved));b.onclick=()=>{saved.hidden=target!==saved;improvement.hidden=target!==improvement;for(const item of sections.children)item.setAttribute('aria-pressed',String(item===b))};sections.append(b)}
+  for(const [label,target] of [['Saved prompts',saved],[options.improvementLabel??'Improve prompt',improvement]]){const b=make('button',label);b.type='button';b.setAttribute('aria-pressed',String(target===saved));b.onclick=()=>{saved.hidden=target!==saved;improvement.hidden=target!==improvement;for(const item of sections.children)item.setAttribute('aria-pressed',String(item===b))};sections.append(b)}
   let rows=[],selected=null,busy=false
   const error=e=>{note.textContent=e.message}
   const load=async()=>{const value=await request({action:'list'});rows=value.prompts;if(!current)applyImprovement(value.improvement);list.replaceChildren();for(const row of rows){const option=make('option','/'+row.name);option.value=row.id;list.append(option)}list.value=selected?.id??'';return value}

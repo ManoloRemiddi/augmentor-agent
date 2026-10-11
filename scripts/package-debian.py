@@ -20,6 +20,8 @@ import tempfile
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'scripts'))
+import quickjs_engine
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
 
 
@@ -64,7 +66,12 @@ def node_runtime(app, configuration, cache):
 def native_notices(app, configuration):
     expected = {'node/bin/node': 'node', 'node_modules/@esbuild/linux-x64/bin/esbuild': 'esbuild',
                 'node_modules/@earendil-works/pi-coding-agent/node_modules/@esbuild/linux-x64/bin/esbuild': 'esbuild',
-                'node_modules/@earendil-works/pi-coding-agent/node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm': 'photon'}
+                'node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm': 'photon',
+                'node_modules/@earendil-works/pi-coding-agent/node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm': 'photon',
+                **{prefix + '/quickjs-wasi/quickjs.wasm': 'quickjs' for prefix in (
+                    'node_modules', 'node_modules/@earendil-works/pi-coding-agent/node_modules',
+                    'node_modules/@earendil-works/pi-codemode/node_modules',
+                    'node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-codemode/node_modules')}}
     components = []
     for path in sorted(app.rglob('*')):
         if not path.is_file() or path.is_symlink(): continue
@@ -82,13 +89,21 @@ def native_notices(app, configuration):
             raise ValueError('Unreviewed native executable in distribution: ' + relative)
         component = expected[relative]
         content = path.read_bytes()
-        if component == 'esbuild':
+        if component == 'quickjs':
+            item = quickjs_engine.validate_bundle(app)
+            if item['path'] != relative:
+                raise ValueError('Inactive QuickJS executable in distribution')
+            components.append(item)
+            continue
+        elif component == 'esbuild':
             versions = set(re.findall(rb'\bgo1\.\d+(?:\.\d+)?\b', content))
-            if versions != {b'go1.26.4'}:
+            if versions not in ({b'go1.26.4'}, {b'go1.26.5'}):
                 raise ValueError('esbuild Go toolchain changed; review its source/license record')
             version = subprocess.check_output([str(path), '--version'], text=True).strip()
-            if version != '0.28.1': raise ValueError('Unexpected esbuild version')
-            notices = ['upstream/esbuild.txt', 'upstream/go.txt', 'upstream/esbuild-xxhash.txt']
+            if (version, versions) not in [('0.28.1', {b'go1.26.4'}), ('0.28.2', {b'go1.26.5'})]:
+                raise ValueError('Unexpected esbuild version/toolchain pair')
+            notices = (['upstream/esbuild-0.28.2.txt', 'upstream/go-1.26.5.txt', 'upstream/esbuild-0.28.2-xxhash.txt']
+                       if version == '0.28.2' else ['upstream/esbuild.txt', 'upstream/go.txt', 'upstream/esbuild-xxhash.txt'])
         elif component == 'photon':
             record = json.loads((app / 'licenses/photon/BUILD.json').read_text())
             if hashlib.sha256(content).hexdigest() != record['files']['photon_rs_bg.wasm']:
@@ -101,7 +116,26 @@ def native_notices(app, configuration):
             notices = ['node.txt']
         components.append({'component': component, 'version': version, 'path': relative,
                            'sha256': hashlib.sha256(content).hexdigest(), 'notices': notices})
-    if {item['path'] for item in components if item['component']!='Handy'} != set(expected):
+    # Pi 1.1.0 deduplicates these dependencies; older locks keep some nested.
+    # Require exactly the active SDK resolution paths, rather than requiring
+    # two copies or accepting a missing transitive executable.
+    sdk = app / 'node_modules/@earendil-works/pi-coding-agent/package.json'
+    if json.loads(sdk.read_text())['version'] not in ('0.85.1', '1.1.0'):
+        raise ValueError('Unreviewed Pi native dependency layout')
+    resolved = json.loads(subprocess.check_output(['node', '--input-type=module', '-e',
+        'import {createRequire} from "node:module"; import {dirname,join} from "node:path"; '
+        'const r=createRequire(process.argv[1]); console.log(JSON.stringify(['
+        'join(dirname(r.resolve("@esbuild/linux-x64/package.json")),"bin/esbuild"),'
+        'join(dirname(r.resolve("@silvia-odwyer/photon-node/package.json")),"photon_rs_bg.wasm")]))',
+        str(sdk)], text=True))
+    required = {'node/bin/node', *(Path(path).relative_to(app).as_posix() for path in resolved)}
+    if json.loads(sdk.read_text())['version'] == '1.1.0':
+        required.add(quickjs_engine.validate_bundle(app)['path'])
+    root_esbuild = 'node_modules/@esbuild/linux-x64/bin/esbuild'
+    if (app / root_esbuild).exists(): required.add(root_esbuild)
+    if not required.issubset(expected):
+        raise ValueError('Unreviewed Pi native dependency resolution')
+    if {item['path'] for item in components if item['component']!='Handy'} != required:
         raise ValueError('Expected packaged native executables are missing')
     write(app / 'licenses/native-components.json', json.dumps(components, indent=2) + '\n')
 
@@ -142,7 +176,7 @@ def build(output):
         workspace = Path(temporary); runtime = workspace / 'runtime'; desktop = workspace / 'desktop'
         app = runtime / 'usr/lib/augmentor'
         subprocess.run([sys.executable, str(ROOT / 'scripts/stage-production.py'), '--out', str(app)], check=True)
-        for name in ('dist', 'apps/native', 'apps/browser', 'scripts', 'services', 'adapters', 'config', 'docs', 'licenses', 'LICENSE', 'README.md', 'release/runtime.json', 'release/product.json'):
+        for name in ('dist', 'apps/native', 'apps/browser', 'apps/harness', 'scripts', 'services', 'adapters', 'config', 'docs', 'licenses', 'LICENSE', 'README.md', 'release/runtime.json', 'release/product.json'):
             copy(ROOT / name, app / name)
         for name in ('desktop-capabilities.json', 'desktop-capabilities.LICENSE'):
             copy(ROOT / 'release/dsh' / name, app / 'release/dsh' / name)
