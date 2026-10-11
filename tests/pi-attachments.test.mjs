@@ -43,7 +43,7 @@ test('browser upload and prompt failures retain exact attachment identity and ne
 });
 test('binary upload/image carrier enforces bearer, browser origin and exact inspection scope',async t=>{
  const {store}=await fixture(t),data=await pixel();let writes=0;
- const host={getMeta:id=>{if(!['a','b'].includes(id))throw Error('Unknown conversation');return {id};},uploadFile:async(sid,bytes,name,mediaType)=>{writes++;return mediaType?store.uploadImage(sid,bytes,name,mediaType):store.upload(sid,bytes,name);},attachmentImage:(sid,ref)=>store.image(sid,ref)};
+ const host={getMeta:id=>{if(!['a','b'].includes(id))throw Error('Unknown conversation');return {id};},receiveAttachmentUpload:async(sid,read,name,mediaType)=>{const bytes=await read();writes++;return mediaType?store.uploadImage(sid,bytes,name,mediaType):store.upload(sid,bytes,name);},attachmentImage:(sid,ref)=>store.image(sid,ref)};
  const server=new HarnessServer(host),link=await server.start();t.after(()=>server.close());const url=link.origin+'/api/attachments/upload?sessionId=a&name=red.png&mediaType=image/png',options={method:'POST',body:data,headers:{Authorization:'Bearer '+server.token}};
  assert.equal((await fetch(url,{...options,headers:{}})).status,401);assert.equal((await fetch(url,{...options,headers:{...options.headers,Origin:'https://foreign.invalid'}})).status,403);assert.equal(writes,0);
  const upload=await (await fetch(url,options)).json(),own=server.openInspection('a'),foreign=server.openInspection('b'),token=x=>new URLSearchParams(new URL(x.url).hash.slice(1)).get('token');

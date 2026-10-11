@@ -147,3 +147,12 @@ Opening settings may create an unstarted blank conversation through the existing
 Retained diagnostic search uses private hash-only payload derivatives and a persistent cursor key, with no stored query/body copy. Cursor state binds the selected session/query/scope and original sequence ceiling; new arrivals require a new search. Metadata and payload terms may combine in `all`. Unicode uses per-code-point lowercase/final-sigma normalization, not accent normalization or regexes. Search verifies ≤512 KiB payload source blocks per call; first/stale/damaged index creation separately streams one body up to 32 MiB against its recorded SHA and rechecks retention. `metadataVisits`, `completedRecords`, `examinedPayloads`, missing/capture reason counts and separate metadata/payload/build bytes describe partial work. Missing coverage is not a negative body match. `matches` identify the source and optional bounded payload excerpt/hash; native/display originals and external attachments are excluded. Read-only scope rejects foreign search before dispatch. Optional `observation.payload.sha256` verifies returned bytes against that captured snapshot and reports unavailable changed captures; legacy unguarded callers keep their previous contract. See [search qualification](AUGMENTOR-HARNESS.md#retained-diagnostic-payload-search).
 
 Native custom `augmentor-tool-original/1` entries preserve root MCP/nested SDK results before result hooks, independently of diagnostic capture. Boundaries/coverage are explicit, original snapshots are limited to 63 MiB and are not model-context contributions. The branch-scoped excerpt tool can recover full structured MCP text; original search/read preserves saved images/JSON. See [the MCP contract and package gate](AUGMENTOR-HARNESS.md#managed-mcp-and-preserved-tool-originals).
+
+
+## Attachment reception during maintenance
+
+The existing `host.describe.activeUploads` includes authenticated body reception
+and immutable storage. `host.shutdown` refuses while any accepted carrier remains
+active; completion, abort and failure release only that carrier. Operator and
+conversation authority are checked before reception and after the delayed body.
+There is no new RPC or automatic retry. See [qualification](UPLOAD-MAINTENANCE.md).

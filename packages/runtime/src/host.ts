@@ -67,7 +67,13 @@ export class Host {
   readonly organization=new SessionOrganization(join(this.dirs.state,'session-organization.json'));
   readonly attachments=new PiAttachments(this.dirs.state,(sid,part)=>this.events(this.getMeta(sid)).some(event=>event.type==='user/message'&&event.data.source?.sessionId!==sid&&(event.data.submittedContent??event.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))));
   private uploads=0;
-  async uploadFile(sid:string,data:Uint8Array,name:string,mediaType?:any){const m=this.getMeta(sid);if(this.quiescing||m.delegation||this.organization.archived(sid))throw Error('This conversation cannot accept uploads.');this.uploads++;try{return await (mediaType?this.attachments.uploadImage(sid,data,name,mediaType):this.attachments.upload(sid,data,name));}finally{this.uploads--;}}
+  async receiveAttachmentUpload(sid:string,read:()=>Promise<Uint8Array>,name:string,mediaType?:any){
+    const check=()=>{const m=this.getMeta(sid);if(this.quiescing||m.delegation||this.organization.archived(sid))throw Error('This conversation cannot accept uploads.');};
+    check();this.uploads++;
+    try{const data=await read();check();return await (mediaType?this.attachments.uploadImage(sid,data,name,mediaType):this.attachments.upload(sid,data,name));}
+    finally{this.uploads--;}
+  }
+  async uploadFile(sid:string,data:Uint8Array,name:string,mediaType?:any){return this.receiveAttachmentUpload(sid,async()=>data,name,mediaType);}
   async attachmentImage(sid:string,ref:any){this.getMeta(sid);return this.attachments.image(sid,ref);}
   readonly interactions:Interactions;
   modelRuntime!:ModelRuntime;

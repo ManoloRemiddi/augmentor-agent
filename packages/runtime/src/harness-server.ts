@@ -129,8 +129,10 @@ export class HarnessServer {
           if(access.mode!=='operator')throw Error('This conversation inspector is read-only.');
           const sid=identifier(url.searchParams.get('sessionId'));this.host.getMeta(sid);
           const announced=Number(req.headers['content-length']??0);if(announced>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');
-          let bytes=0;const chunks:Buffer[]=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');chunks.push(Buffer.from(chunk));}
-          const result=await this.host.uploadFile(sid,Buffer.concat(chunks),url.searchParams.get('name')??'attachment',url.searchParams.get('mediaType')??undefined);
+          const result=await this.host.receiveAttachmentUpload(sid,async()=>{
+            let bytes=0;const chunks:Buffer[]=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');chunks.push(Buffer.from(chunk));}
+            return Buffer.concat(chunks);
+          },url.searchParams.get('name')??'attachment',url.searchParams.get('mediaType')??undefined);
           this.send(res,200,result);return;
         }
         if(req.method==='GET'&&url.pathname==='/api/attachments/image'){

@@ -806,3 +806,8 @@ The [installed refusal follow-up](PI-COMPACTION.md#installed-refusal-follow-up--
 ## Installed original Context preferences — October 11
 
 [Installed original Context preferences](CONTEXT-PREFERENCES.md#installed-mx-qualification--october-11): runtime 52a0368f1f3272c8c202879ffca894eca22bbe06, private MX 20261011-224436-af6876b9, product 0.2.13, artifact d15089e3b6545205c7c55a7ec98b4d69adb035ba089e0d0e7ce7ab4a47ab7175, selected/running. Source and ordinary Node 24.19.0 each pass 251/251 across 38 files. Guarded adoption, matching Host/Native roots and the full 21,786-entry inventory pass. The original card persists seven display defaults; installed Turn/reload/chart acceptance restores Step. Eleven histories/queues and old original prefixes are preserved with classified title/lifecycle/index changes and exactly two display-only settings writes. Dependencies/native/supplier licence bodies/CSS/model/speech settings remain preserved; full Harness/migration/live/privacy/public packaging/platform gates stay open.
+
+
+## October 11 attachment maintenance follow-up
+
+[Attachment upload maintenance safety](UPLOAD-MAINTENANCE.md) counts the full HTTP reception and immutable storage phase, so slow and concurrent transfers veto guarded shutdown. Source checks/build and 256/256 across 40 files pass; ordinary/installed qualification is recorded separately. Original DSH GUI, supplier licences and dependencies are unchanged; durable drafts and full migration/platform gates remain open.
