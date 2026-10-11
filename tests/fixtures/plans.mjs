@@ -101,13 +101,15 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
   errors='';child=spawn(process.execPath,[join(source,'dist/runtime/src/main.js')],{env,cwd:workspace,stdio:['ignore','pipe','pipe']});children.push(child);let ready=false;
   child.stdout.on('data',data=>{for(const line of String(data).split('\n'))try{if(JSON.parse(line).ready)ready=true;}catch{}});child.stderr.on('data',data=>errors+=data);
   await until(()=>{assert.equal(child.exitCode,null,errors);return ready;},'owner startup');
-  const socket=localConnect(join(state,'runtime.sock'));await once(socket,'connect');owner=new PiConnection(socket,frame=>frames.push(frame));connections.push(owner);await owner.call('host.hello',{protocol:'augmentor-pi/1'});
+  const socket=localConnect(join(state,'runtime.sock'));await once(socket,'connect');owner=new PiConnection(socket,frame=>frames.push(frame));connections.push(owner);await call('host.hello',{protocol:'augmentor-pi/1'});
  }
  async function stop(){owner?.close();if(child?.exitCode===null&&child.signalCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}}
  async function crash(){owner?.close();if(child?.exitCode===null&&child.signalCode===null){const ended=once(child,'exit');child.kill('SIGKILL');await ended;}}
  t.after(async()=>{for(const connection of connections)connection.close();for(const process of children)if(process.exitCode===null&&process.signalCode===null){const ended=once(process,'exit');process.kill('SIGTERM');await ended;}model.closeAllConnections();await new Promise(done=>model.close(done));await desktop?.close();await rm(root,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ // Report only the operation name, never synthetic request payloads or profiles.
+ // This identifies a stalled Windows boundary even if a later file cannot exit.
+ const call=async(method,params={})=>{try{return await owner.call(method,params);}catch(error){error.message=method+': '+error.message;throw error;}};
  await start();
- const call=(method,params={})=>owner.call(method,params);
  const settled=sid=>until(async()=>!(await call('session.list')).items.find(m=>m.sessionId===sid)?.running,'settled '+sid);
  async function prompt(sid,op,{wait=true}={}){const result=await call('session.prompt',{sessionId:sid,requestId:crypto.randomUUID(),content:[{type:'text',text:JSON.stringify(op)}]});if(wait)await settled(sid);return result;}
  async function native(sid){const meta=JSON.parse(await readFile(join(state,'sessions',sid+'.meta.json'),'utf8'));return {file:meta.file,bytes:await readFile(meta.file)};}

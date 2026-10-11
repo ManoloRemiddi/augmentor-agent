@@ -49,7 +49,7 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-      - name: Exercise real kernel containment and Host SDK command jobs
+      - name: Exercise real kernel containment
         env:
           AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
         run: |
@@ -57,7 +57,19 @@ jobs:
           $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
           & outputs/runtime/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_shell_job.py -v 2>&1 | Tee-Object -FilePath outputs/evidence/kernel.log
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          & outputs/runtime/node/node.exe --test --test-concurrency=4 tests/windows-shell-frames.test.mjs tests/pi-windows-jobs.test.mjs tests/jobs-registry.test.mjs tests/pi-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/host-jobs.log
+      - name: Qualify the private Host before command admission
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
+          & outputs/runtime/node/node.exe --test --test-reporter=tap --test-name-pattern='read-only Windows parent' tests/pi-windows-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/host-baseline.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Exercise Host SDK command jobs and durable delegation
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
+          & outputs/runtime/node/node.exe --test --test-reporter=tap --test-concurrency=4 tests/windows-shell-frames.test.mjs tests/pi-windows-jobs.test.mjs tests/jobs-registry.test.mjs tests/pi-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/host-jobs.log
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
