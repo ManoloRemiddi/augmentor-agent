@@ -17,3 +17,6 @@ copyFileSync('packages/runtime/vendor/dsh-jobs/LICENSE','dist/runtime/vendor/dsh
 copyFileSync('packages/runtime/vendor/dsh-jobs/SOURCE.md','dist/runtime/vendor/dsh-jobs/SOURCE.md');
 
 for(const name of ['LICENSE','SOURCE.json'])copyFileSync('packages/runtime/vendor/dsh-attachment/'+name,'dist/runtime/vendor/dsh-attachment/'+name);
+const referenceSelection=JSON.parse(readFileSync('packages/runtime/vendor/dsh-file-reference/SOURCE.json','utf8'));
+for(const row of referenceSelection.files)if(createHash('sha256').update(readFileSync('packages/runtime/vendor/dsh-file-reference/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH file-reference source changed: '+row.path);
+for(const name of ['LICENSE','SOURCE.json','SOURCE.md'])copyFileSync('packages/runtime/vendor/dsh-file-reference/'+name,'dist/runtime/vendor/dsh-file-reference/'+name);

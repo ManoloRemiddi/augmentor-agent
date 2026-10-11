@@ -14,7 +14,7 @@ export class DshCommandMenu {
     this.popup={state:deps.store(this.closedPopup),...Object.fromEntries(['retry','setSearch','move','highlight','select','acknowledge','cancelConfirmation','confirm','dismiss'].map(name=>[name,(...args)=>this.select?.[name](...args)]))};
   }
   current(){return this.deps.current();}
-  enabled(s){return s.phase==='ready'&&!s.readOnly&&!s.unconfirmed&&!s.interactions?.length&&s.sessionId&&this.deps.draft().sessionId===s.sessionId;}
+  enabled(s){return s.phase==='ready'&&!s.readOnly&&!s.unconfirmed&&!s.interactions?.length&&this.deps.ready?.()!==false&&s.sessionId&&this.deps.draft().sessionId===s.sessionId;}
   valid(scope){const now=this.current();return this.enabled(now)&&scope?.sessionId===now.sessionId&&scope.epoch===now.epoch;}
   mirror(source,target){target.set(source.getSnapshot());this.offs.push(source.subscribe(()=>target.set(source.getSnapshot())));}
   sync(){
@@ -44,12 +44,17 @@ export class DshCommandMenu {
       if(line!=='/'+name)throw Error('Use /'+name+' by itself to open this command. Your draft is preserved.');
       this.dispatch(name,scope,{via:'enter',token:line,rev:this.deps.draft().rev});return 'handled';
     }};
-    this.engine=new this.deps.InputTriggerController({sessionId:scope.sessionId,actx:{bail:()=>false},roster:{sources:trigger=>trigger==='/'?[source]:[],all:()=>[source]}});
+    const reference=this.deps.referenceSource?.(scope),sources=[source,...(reference?[reference]:[])];
+    this.engine=new this.deps.InputTriggerController({sessionId:scope.sessionId,actx:{bail:(_,event,p)=>{
+      if(event==='slash/input-insert-text')return this.consume(scope,{via:'menu',span:p.span},p.text);
+      if(event==='slash/input-insert-reference'&&this.segmentValid(scope,{via:'menu',span:p.span}))return this.deps.insertReference?.(p.span,p.reference,this.deps.draft().rev,scope)===true;
+      return false;
+    }},roster:{sources:trigger=>sources.filter(s=>s.trigger===trigger),all:()=>sources}});
     this.select=new this.deps.PopupSelectController({consume:segment=>this.consume(scope,segment),focusComposer:()=>{if(this.valid(scope))this.deps.focus();}});
     for(const key of ['menu','headers','launcher','lexicon'])this.mirror(this.engine[key],this[key]);
     this.mirror(this.select.state,this.popup.state);
   }
-  track(){this.sync();if(!this.engine||this.popup.state.getSnapshot().open)return;const value=this.deps.draft();if(value.rev!==this.launchSegment?.draftRev)this.launchSegment=null;this.engine.track(value.text,value.caret??-1,{tier:'plain'},value.rev);}
+  track(){this.sync();if(!this.engine||this.popup.state.getSnapshot().open)return;const value=this.deps.draft();if(value.rev!==this.launchSegment?.draftRev)this.launchSegment=null;this.engine.track(value.detectText??value.text,value.caret??-1,{tier:'plain'},value.rev);}
   toggle(span){this.sync();if(!this.engine)return;this.select.dismiss();this.launchSegment={...span,draftRev:this.deps.draft().rev};this.engine.toggleSource('command',{trigger:'/',query:'',quoted:false,position:'leading',span:this.launchSegment});}
   arbitrate(key,composing){this.sync();return this.engine?.arbitrate(key,composing)??'pass';}
   dismiss(){this.engine?.dismiss();}
@@ -57,7 +62,7 @@ export class DshCommandMenu {
   segmentValid(scope,segment){
     if(!this.valid(scope))return false;
     const draft=this.deps.draft();
-    return segment.via==='enter'?draft.rev===segment.rev&&draft.text.trim()===segment.token:draft.rev===segment.span.draftRev&&segment.span.start>=0&&segment.span.end>=segment.span.start&&segment.span.end<=draft.text.length;
+    return segment.via==='enter'?draft.rev===segment.rev&&draft.text.trim()===segment.token:draft.rev===segment.span.draftRev&&segment.span.start>=0&&segment.span.end>=segment.span.start&&segment.span.end<=(draft.detectText??draft.text).length;
   }
   consume(scope,segment,replacement=''){
     if(!this.segmentValid(scope,segment))return false;

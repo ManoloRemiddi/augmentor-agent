@@ -20,7 +20,11 @@ import {builtinRowFace,sectionRows} from '@dsh-gui/ui-commands/src/client/presen
 import {en as commandEn} from '@dsh-gui/ui-commands/src/client/locales.ts';
 import {en as menuEn} from '@dsh-gui/ui-input-trigger/src/client/locales.ts';
 import {$projectComposer} from '@dsh-gui/ui-conversation/src/client/input/editor/projection.ts';
-import {$replaceDetectSpanWithText} from '@dsh-gui/ui-conversation/src/client/input/editor/span-map.ts';
+import {$replaceDetectSpanWithNodes,$replaceDetectSpanWithText} from '@dsh-gui/ui-conversation/src/client/input/editor/span-map.ts';
+import {fileReferenceSource} from './dsh-file-references.mjs';
+import {fileCandidate,crumbsFor,parseCandidate} from '@dsh-gui/ui-reference/src/client/index.ts';
+import {en as referenceEn} from '@dsh-gui/ui-reference/src/client/locales.ts';
+import {ReferenceChipNode,$createReferenceChipNode} from '@dsh-gui/ui-conversation/src/client/input/editor/chip-node.tsx';
 import {DshCommandMenu} from './dsh-command-menu.mjs';
 import {ModelSelect} from '@dsh-gui/ui-model-selection/src/client/ModelSelect.tsx';
 import {ChatView} from '@dsh-gui/ui-chat/src/client/chat/ChatView.tsx';
@@ -106,12 +110,13 @@ const t={conversation:tr(conversationEn),sidebar:tr(sidebarEn),workspace:tr(work
 const settingsNotice=text=>controller.update({error:text});
 const control={run:async action=>{try{return await action();}catch(error){controller.update({error:error.message});return undefined;}}};
 let activeDraft=null;
-let draftRev=0,composerProjection={detectText:'',selection:null,caret:null},commandMenu;
-const editor=createEditor({namespace:'augmentor-dsh-composer',onError:error=>controller.update({error:error.message}),theme:{}});
+let draftRev=0,composerProjection={detectText:'',clipboardText:'',occurrences:[],selection:null,caret:null},commandMenu;const occurrenceIds=new Map();let nextOccurrenceId=0;
+const references=()=>composerProjection.occurrences.map(({occurrenceId,...ref})=>ref);
+const editor=createEditor({namespace:'augmentor-dsh-composer',nodes:[ReferenceChipNode],onError:error=>controller.update({error:error.message}),theme:{}});
 registerPlainText(editor);registerHistory(editor,createEmptyHistoryState(),300);
-editor.registerUpdateListener(({editorState})=>editorState.read(()=>{composerProjection=$projectComposer(()=>0);const value=composerProjection.detectText;if(value!==draft.getSnapshot())draftRev++;draft.set(value);if(activeDraft)draftArchive.edit(value);commandMenu?.track();}));
-function setDraft(value){editor.update(()=>{$getRoot().clear().append($createParagraphNode().append($createTextNode(value)));},{discrete:true});}
-const draftArchive=new DshDrafts(controller,{restore:(sid,text)=>{activeDraft=sid;setDraft(text);},attachments:attachmentDrafts});
+editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const previous=composerProjection;composerProjection=$projectComposer(key=>{if(!occurrenceIds.has(key))occurrenceIds.set(key,++nextOccurrenceId);return occurrenceIds.get(key);});const value=composerProjection.clipboardText;if(value!==draft.getSnapshot()||previous.detectText!==composerProjection.detectText||JSON.stringify(previous.occurrences)!==JSON.stringify(composerProjection.occurrences))draftRev++;draft.set(value);if(activeDraft)draftArchive.edit(value,references());commandMenu?.track();}));
+function setDraft(value){const text=typeof value==='string'?value:value.text,refs=typeof value==='string'?[]:value.references??[];editor.update(()=>{const paragraph=$createParagraphNode();let offset=0;for(const ref of refs){if(ref.offset>offset)paragraph.append($createTextNode(text.slice(offset,ref.offset)));const chip=$createReferenceChipNode(ref);if(ref.invalid)chip.setInvalid(true);paragraph.append(chip);offset=ref.offset+ref.length;}if(offset<text.length)paragraph.append($createTextNode(text.slice(offset)));$getRoot().clear().append(paragraph);},{discrete:true});}
+const draftArchive=new DshDrafts(controller,{restore:(sid,text,references)=>{activeDraft=sid;setDraft({text,references});},attachments:attachmentDrafts});
 const commandRows=[
   {name:'file',label:t.conversation('input.file'),description:'Attach files to this draft',icon:IconFolderCloseRegular},
   {name:'goal',...builtinRowFace({definitionId:'@deepseek-ai/dsh-command-goal'},t.command)},
@@ -125,12 +130,14 @@ const commandRows=[
 ];
 commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,store:createSnapshotStore,sectionRows:rows=>sectionRows(rows,t.command),rows:()=>commandRows,actions:{},
   current:()=>({...controller.state,epoch:controller.epoch,running:controller.state.sessions.find(x=>x.sessionId===controller.state.sessionId)?.running===true}),
-  draft:()=>({text:draft.getSnapshot(),rev:draftRev,sessionId:activeDraft,caret:composerProjection.caret}),catalog:()=>controller.state.catalog,choose:selection=>controller.choose(selection),notice:text=>controller.update({error:text}),focus:()=>editor.focus(),
+  ready:()=>draftArchive.getSnapshot().ready,referenceSource:scope=>fileReferenceSource({controller,valid:s=>commandMenu.valid(s),fileCandidate,crumbsFor,parseCandidate,t:tr(referenceEn)},scope),
+  draft:()=>({text:draft.getSnapshot(),detectText:composerProjection.detectText,rev:draftRev,sessionId:activeDraft,caret:composerProjection.caret}),catalog:()=>controller.state.catalog,choose:selection=>controller.choose(selection),notice:text=>controller.update({error:text}),focus:()=>editor.focus(),
+  insertReference:(span,ref,rev,scope)=>{let applied=false;editor.update(()=>{if(draftRev===rev&&activeDraft===scope.sessionId&&controller.epoch===scope.epoch){const tail=composerProjection.detectText.slice(span.end);applied=$replaceDetectSpanWithNodes(span,[$createReferenceChipNode(ref),...(tail.startsWith(' ')?[]:[$createTextNode(' ')])]);}},{discrete:true});return applied;},
   replace:(span,text,rev,scope)=>{let applied=false;editor.update(()=>{if(draftRev===rev&&activeDraft===scope.sessionId&&controller.epoch===scope.epoch)applied=$replaceDetectSpanWithText(span,text);},{discrete:true});return applied;},
 });
-controller.subscribe(()=>commandMenu.sync());
+controller.subscribe(()=>commandMenu.sync());draftArchive.subscribe(()=>commandMenu.sync());
 const useLexicon=bind(commandMenu.lexicon),useMenuLauncher=bind(commandMenu.launcher);
-const keyboard={editor,arbitrate:(key,composing)=>commandMenu.arbitrate(key,composing),space:()=>false,dismissPopup:()=>commandMenu.popup.dismiss(),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
+const keyboard={editor,arbitrate:(key,composing)=>commandMenu.arbitrate(key,composing),space:()=>commandMenu.engine?.onSpace()??false,dismissPopup:()=>commandMenu.popup.dismiss(),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
   const text=draft.getSnapshot(),sid=controller.state.sessionId,items=[...attachmentDrafts.draft(sid).items],epoch=controller.epoch;if(attachmentDrafts.busy||!text.trim()&&!items.length)return;
   if(await commandMenu.adjudicate(text)!==undefined)return;
   if(sid!==controller.state.sessionId||draft.getSnapshot()!==text)throw Error('The conversation or draft changed; nothing was submitted.');
@@ -266,7 +273,7 @@ function App(){
   const unsupported=()=>Promise.reject(Error('This DSH operation is not yet connected to Pi. Use Full Pi record inspector in Settings for the retained Augmentor controls.'));
   const branch=seq=>void control.run(async()=>{const row=await controller.rpc('session.branch',{sessionId:state.sessionId,newSessionId:crypto.randomUUID(),messageSeq:seq,mode:'reply'});await controller.refresh();await controller.open(row.sessionId);});
   const renderMessageImages=props=><MessageImages {...props} loadImage={loadImage} t={t.conversation}/>;
-  const common={renderMessageImages,sessionId:state.sessionId||undefined,useSession,useSessions,useWorkspaces,useConversation,useProjection,useConversationViews:selectorFace(tabs),useSessionStatus:selectorFace(new Map()),useInput:selectorFace({draft:liveDraft,phase:'plain',attachmentIds:attached.items.map(x=>x.id),queue:state.queue?.items||[]}),useStore:selectorFace({view}),actions:{setDraft:value=>{const text=typeof value==='string'?value:value.text;if(text!==draft.getSnapshot())setDraft(text);},completeViewRequest:noOp},inputActions:{pruneAttachments:ids=>{for(const id of ids)attachmentDrafts.remove(id);},persistDraft:()=>{void draftArchive.persist().catch(()=>{});}},selectWorkspace:async cwd=>startSession(cwd),useComposerBlock:selectorFace(undefined),useFactorySlot:(_,fallback)=>fallback,bindDraftPersistence:writer=>draft.subscribe(()=>writer({text:draft.getSnapshot(),references:[]})),openView:setView,useInspectCall:selectorFace(undefined),t:t.conversation};
+  const common={renderMessageImages,sessionId:state.sessionId||undefined,useSession,useSessions,useWorkspaces,useConversation,useProjection,useConversationViews:selectorFace(tabs),useSessionStatus:selectorFace(new Map()),useInput:selectorFace({draft:liveDraft,phase:'plain',attachmentIds:attached.items.map(x=>x.id),queue:state.queue?.items||[]}),useStore:selectorFace({view}),actions:{setDraft:value=>{const text=typeof value==='string'?value:value.text;if(text!==draft.getSnapshot()||JSON.stringify(value.references??[])!==JSON.stringify(references()))setDraft(value);},completeViewRequest:noOp},inputActions:{pruneAttachments:ids=>{for(const id of ids)attachmentDrafts.remove(id);},persistDraft:()=>{void draftArchive.persist().catch(()=>{});}},selectWorkspace:async cwd=>startSession(cwd),useComposerBlock:selectorFace(undefined),useFactorySlot:(_,fallback)=>fallback,bindDraftPersistence:writer=>draft.subscribe(()=>writer({text:draft.getSnapshot(),references:references()})),openView:setView,useInspectCall:selectorFace(undefined),t:t.conversation};
   useEffect(()=>{
     const groups=state.catalog.groups.map(g=>({id:g.provider,name:g.name,models:g.models.map(m=>({id:m.model,name:m.name||m.model,...(m.provider===state.selection?.provider&&m.model===state.selection?.model&&state.reasoning?{reasoning:{efforts:state.reasoning.availableLevels.map(id=>({id,label:id})),defaultEffort:state.reasoning.thinkingLevel}}:{})}))}));
     modelDirectory.set({current:state.selection?{...state.selection,reasoningEffort:state.reasoning?.thinkingLevel}:null,routable:true,groups,failures:state.catalog.failures||[],status:'ready',pending:null,error:null});

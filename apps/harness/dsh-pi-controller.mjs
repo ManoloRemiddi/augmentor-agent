@@ -10,8 +10,8 @@ export class DshPiController {
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
   update(patch){this.state={...this.state,...patch};for(const fn of this.listeners)fn();}
-  async rpc(method,params={}){
-    const response=await this.fetcher('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});
+  async rpc(method,params={},signal){
+    const response=await this.fetcher('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params}),...(signal?{signal}:{})});
     const body=await response.json();if(!response.ok||body.error){const error=Error(body.error?.message||'The local connection failed.');error.authoritative=!!body.error;throw error;}return body.result;
   }
   async start(requestedSession){

@@ -1784,6 +1784,25 @@
       "upstreamSha256": "d8f4e591767ca97b2fd4fdffa5eae1fc4063ce65f3e675d851cf491fc007dfcd"
     },
     {
+      "path": "packages/client/ui-reference/package.json",
+      "sha256": "83cc15829fc94923095dda64ae127cb9e1fdac59c7f21108393be97eaf99da17",
+      "upstreamPath": "packages/client/ui-reference/package.json",
+      "upstreamSha256": "83cc15829fc94923095dda64ae127cb9e1fdac59c7f21108393be97eaf99da17"
+    },
+    {
+      "path": "packages/client/ui-reference/src/client/index.ts",
+      "sha256": "321f5fc0f47b60d89e70ef15b7678c8aa082c2b2629b009faaacb6f6456ac1b2",
+      "upstreamPath": "packages/client/ui-reference/src/client/index.ts",
+      "upstreamSha256": "91ddb2efac14c5d1d04c434fdad8301ce5ef8132688702dfa8e9b70d99542775",
+      "adaptation": "Export original pure file-row/breadcrumb/value helpers; original UI logic unchanged; supplier apply is not mounted."
+    },
+    {
+      "path": "packages/client/ui-reference/src/client/locales.ts",
+      "sha256": "5c719649a7f1f58bc2e0c4bd9132c3b98710ad4e3ea6fb7556087e3c594d783a",
+      "upstreamPath": "packages/client/ui-reference/src/client/locales.ts",
+      "upstreamSha256": "5c719649a7f1f58bc2e0c4bd9132c3b98710ad4e3ea6fb7556087e3c594d783a"
+    },
+    {
       "path": "packages/client/ui-settings-general/package.json",
       "sha256": "c46b04d8379444757a9d1a5ae62f645cb57fcc5194999324ef034eeb0c170017",
       "upstreamPath": "packages/client/ui-settings-general/package.json",

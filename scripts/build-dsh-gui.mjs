@@ -8,6 +8,8 @@ const root=resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ui=join(root,'apps/harness'),vendor=join(ui,'vendor/dsh');
 const provenance=JSON.parse(readFileSync(join(vendor,'SOURCE.json'),'utf8'));
 for(const entry of provenance.files){if(createHash('sha256').update(readFileSync(join(vendor,entry.path))).digest('hex')!==entry.sha256)throw Error('DSH source differs from reviewed public selection: '+entry.path);}
+const fileReferenceVendor=join(root,'packages/runtime/vendor/dsh-file-reference'),fileReferenceSource=JSON.parse(readFileSync(join(fileReferenceVendor,'SOURCE.json'),'utf8'));
+for(const entry of fileReferenceSource.files){if(createHash('sha256').update(readFileSync(join(fileReferenceVendor,entry.path))).digest('hex')!==entry.sha256)throw Error('DSH file-reference source differs from reviewed public selection: '+entry.path);}
 const contextVendor=join(ui,'vendor/dsh-context'),contextSource=JSON.parse(readFileSync(join(contextVendor,'SOURCE.json'),'utf8'));
 for(const entry of contextSource.files){if(createHash('sha256').update(readFileSync(join(contextVendor,entry.path))).digest('hex')!==entry.sha256)throw Error('dsh-context source differs from reviewed selection: '+entry.path);}
 const requireUi=createRequire(join(ui,'package.json'));

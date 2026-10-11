@@ -9,6 +9,7 @@ import {FILE_LIMIT} from './attachments.js';
 import type {Host} from './host.js';
 
 const allowed = new Set([
+  'session.fileReferences',
   'draft.describe','draft.text','draft.remove','draft.prepare','draft.settle','draft.acknowledge',
   'host.describe', 'session.organize', 'workspace.list', 'workspace.adopt', 'workspace.rename', 'workspace.remove', 'workspace.move', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
@@ -194,7 +195,9 @@ export class HarnessServer {
             if (!watch || watch.sessionId !== params.sessionId) throw new Error('Interaction belongs to another session');
             watch.seen = Date.now();
           }
-          const result = await this.host.dispatch(rpc.method, params, rpc.id);
+          let result;
+          if(rpc.method==='session.fileReferences'){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{result=await this.host.listFileReferences(params.sessionId,params.query,abort.signal);}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
+          else result = await this.host.dispatch(rpc.method, params, rpc.id);
           this.send(res, 200, {id: rpc.id, result}); return;
           };
           if(access.mode==='operator')await this.host.receiveHarnessRequest(operation);else await operation();

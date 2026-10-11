@@ -172,3 +172,9 @@ Inspection tokens cannot read even their own conversation’s unsent draft.
 response, including a first incomplete text-save frame.
 `host.describe.unsentHarnessDrafts` and guarded shutdown include all non-empty
 retained Harness drafts. See [contract and qualification](HARNESS-DRAFTS.md).
+
+## Original Harness path references
+
+`session.fileReferences` accepts `{sessionId, query}` and returns bounded `{path, kind}` candidates for an operator-owned Desktop cwd. It does not read file content or load a new SDK owner. HTTP caller cancellation reaches the lookup; inspectors, browser-only, delegated and archived conversations are refused. `activeFileReferences` vetoes guarded shutdown.
+
+`draft.text` also accepts optional ordered `references` in clipboard-text coordinates; their metadata shares the text CAS. Legacy plain records stay unchanged. References serialize to ordinary mention text; the effective filesystem tool still owns content reads. [Full contract and qualification](HARNESS-FILE-REFERENCES.md).
