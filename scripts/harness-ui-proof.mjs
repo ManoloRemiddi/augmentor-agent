@@ -16,6 +16,11 @@ const sharedState=join(root,'shared-state'),sharedData=join(root,'shared-data'),
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
 mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(workspace);mkdirSync(home);
 writeFileSync(join(workspace,'note.txt'),'Harness fixture ready.\n');
+if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'){
+ const extension=join(root,'question-ui.mjs');
+ writeFileSync(extension,`export default pi=>pi.registerTool({name:'ask_user',label:'Fixture question',description:'Ask an independently authored test question; no external action.',parameters:{type:'object',properties:{}},async execute(_id,_args,signal,_update,ctx){const answer=await ctx.ui.select('Keep the authored fixture going?',['Keep going','Stop here'],{timeout:3000,signal});return {content:[{type:'text',text:answer===undefined?'No fixture answer.':'Fixture choice: '+answer}],details:{}};}});`);
+ writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}));
+}
 const model=http.createServer(async(req,res)=>{
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
   let raw='';for await(const chunk of req)raw+=chunk;
@@ -24,6 +29,11 @@ const model=http.createServer(async(req,res)=>{
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null,usage)=>res.write('data: '+JSON.stringify({id:'fixture',object:'chat.completion.chunk',model:'harness-fixture',choices:[{index:0,delta,finish_reason:finish}],...(usage?{usage}:{})})+'\n\n');
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
+  if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'&&JSON.stringify(lastUser?.content).includes('QUESTION_FIXTURE')){
+    if(!afterTool)chunk({role:'assistant',tool_calls:[{index:0,id:'authored_question',type:'function',function:{name:'ask_user',arguments:'{}'}}]},'tool_calls');
+    else chunk({role:'assistant',content:'Original question answer received: '+JSON.stringify(body.messages.at(-1).content)},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});
+    res.end('data: [DONE]\n\n');return;
+  }
   if(body.messages.some(message=>['system','developer'].includes(message.role)&&JSON.stringify(message.content).includes('context summarization assistant'))){
     chunk({role:'assistant',content:'# Goal\nPreserve the authored summary fixture.\n# Progress\nSynthetic history only.\n# Next steps\nContinue explicitly.'},'stop',{prompt_tokens:6000,completion_tokens:40,total_tokens:6040});res.end('data: [DONE]\n\n');return;
   }

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original question controls](PI-QUESTIONS.md) bind the copied DSH countdown, Take time, editing and focus to canonical scoped Pi state. SDK/browser fixtures distinguish foreground pause, hard approval deadlines and no replay.
+
 [Manual Pi compaction](PI-COMPACTION.md) — original DSH command, private operation receipts, summary observations, cancellation and unknown/no replay.
 
 [MX Linux first: installed Harness preview and feedback guide](MX-HARNESS-PREVIEW.md). Further Windows/macOS/distro implementation follows MX testing and refinement.

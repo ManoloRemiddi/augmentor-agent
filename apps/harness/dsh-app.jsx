@@ -87,9 +87,8 @@ const controller=new DshPiController(token);
 const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
 const attachmentDrafts=new DshAttachments(controller);let openFiles=null;
-const questionDraft=createQuestionDraftStore().create(),useQuestionDraft=bindQuestionDraft;
+const questionDrafts=new Map();
 const rowNotice=createSnapshotStore(null),archiveRequest=createSnapshotStore(null);let noticeSeq=0;
-function bindQuestionDraft(selector=x=>x){return selector(useSyncExternalStore(questionDraft.subscribe,questionDraft.getSnapshot));}
 const draft=createSnapshotStore(''),modelDirectory=createSnapshotStore({current:null,routable:null,groups:[],failures:[],status:'idle',pending:null,error:null});
 const noOp=()=>{},selectorFace=value=>(selector=x=>x)=>selector(value);
 const bind=source=>(selector=x=>x)=>selector(useSyncExternalStore(source.subscribe,source.getSnapshot));
@@ -174,15 +173,22 @@ function PromptLibrary({close}){
 
 
 function InteractionTakeover({frame,state}){
+  const [,tick]=useState(0);
+  useEffect(()=>{if(frame.method!=='question/requested'||frame.payload.wait?.deadline===undefined)return;const timer=setInterval(()=>tick(x=>x+1),1000);return()=>clearInterval(timer);},[frame.rpcId,frame.payload.wait?.deadline]);
+  const draft=useMemo(()=>{if(!questionDrafts.has(state.sessionId))questionDrafts.set(state.sessionId,createQuestionDraftStore().create());return questionDrafts.get(state.sessionId);},[state.sessionId]);
+  function useQuestionDraft(selector=x=>x){return selector(useSyncExternalStore(draft.subscribe,draft.getSnapshot));}
   const pending=useMemo(()=>{
-    const snapshot=()=>({state:'open',waitState:'waiting',countdown:undefined,channel:'waterfall',closed:false});
+    const epoch=controller.epoch,sessionId=state.sessionId;
+    const snapshot=()=>{const current=controller.state.sessionId===sessionId&&controller.epoch===epoch?controller.state.interactions.find(x=>x.rpcId===frame.rpcId):null,wait=current?.payload.wait;
+      return {state:'open',waitState:wait?.state||'waiting',countdown:wait?{remainingMs:wait.deadline===undefined?wait.remainingMs:Math.max(0,wait.deadline-Date.now()),running:wait.deadline!==undefined}:undefined,channel:current?'waterfall':'none',closed:!current};};
     const keys=()=>controller.state.interactions.map(x=>x.rpcId);
+    const wait=action=>{void controller.questionWait(frame,action).catch(error=>{if(epoch===controller.epoch&&controller.state.interactions.some(x=>x.rpcId===frame.rpcId))controller.update({error:error.message});});};
     return {key:frame.rpcId,kind:'question',sessionId:state.sessionId,toolName:frame.payload.toolName,reason:frame.payload.reason,answerable:true,
       questions:(frame.payload.questions||[]).map((q,i)=>({...q,id:q.id||String(i)})),review:undefined,dismissal:'cancel',snapshot,liveKeys:keys,
-      takeTime:noOp,engage:noOp,holdFocus:noOp,releaseFocus:noOp,
+      takeTime:()=>wait('take-time'),engage:()=>wait('engage'),holdFocus:()=>wait('hold-focus'),releaseFocus:()=>wait('release-focus'),
       dismiss:()=>controller.answer(frame,{cancelled:true}),answer:value=>controller.answer(frame,frame.method==='approval/requested'?{outcome:value==='rejected'?'denied':value}:{answer:value})};
-  },[frame,state.sessionId]);
-  return frame.method==='approval/requested'?<ApprovalPanel matched={pending} t={t.approval} resolveReason={x=>String(x)} renderSlot={()=>null}/>:<QuestionComposer matched={pending} t={t.question} useStore={useQuestionDraft} actions={questionDraft.actions} useQuestionCard={(_,selector=x=>x)=>selector(pending.snapshot())} renderSlot={()=>null}/>;
+  },[frame.rpcId,frame.method,state.sessionId,controller.epoch]);
+  return frame.method==='approval/requested'?<ApprovalPanel matched={pending} t={t.approval} resolveReason={x=>String(x)} renderSlot={()=>null}/>:<QuestionComposer matched={pending} t={t.question} useStore={useQuestionDraft} actions={draft.actions} useQuestionCard={(_,selector=x=>x)=>selector(pending.snapshot())} renderSlot={()=>null}/>;
 }
 function QueueStatus({state}){
   const queue=state.queue;if(!queue)return null;

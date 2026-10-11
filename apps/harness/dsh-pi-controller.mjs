@@ -81,13 +81,19 @@ export class DshPiController {
         if(frame.method==='session/queue'){queue=frame.payload;changed=true;}
         if(frame.method==='session/compaction'){const info=frame.payload,row=info.lastReceipt;this.update({compaction:info,...(row?.state==='failed'?{error:'Pi did not save a compaction summary. This conversation may be too small or already compacted, or its summary request failed. Inspect Context for the recorded attempt.'}:{})});changed=true;}
         if(['approval/requested','question/requested'].includes(frame.method)){interactions.set(frame.rpcId,frame);changed=true;}
-        if(['interaction/resolved'].includes(frame.method)){interactions.delete(frame.rpcId);changed=true;}
+        if(frame.method==='interaction/updated'){const old=interactions.get(frame.rpcId);if(old?.method==='question/requested'&&(old.payload.wait?.revision??-1)<=frame.payload.wait?.revision){interactions.set(frame.rpcId,{...old,payload:{...old.payload,wait:frame.payload.wait}});changed=true;}}
+        if(['interaction/resolved'].includes(frame.method)){interactions.delete(frame.rpcId);this.heldQuestions.delete(frame.rpcId);changed=true;}
       }
       if(changed)this.update({events,records:[...records.values()].sort((a,b)=>a.seq-b.seq),queue,interactions:[...interactions.values()]});
       if(changed)void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
       if(page.gap){await this.open(sessionId);return;}
       if(page.frames.length||!this.lastRefresh||Date.now()-this.lastRefresh>3000){this.lastRefresh=Date.now();await this.refresh();}
       if(page.frames.some(({frame})=>frame.method==='goal/updated')){const goal=await this.rpc('session.goal',{sessionId});if(epoch===this.epoch)this.update({goal});}
+      for(const [key,held] of this.heldQuestions){
+        const frame=this.state.interactions.find(x=>x.rpcId===key);
+        if(held.epoch!==this.epoch||held.sessionId!==this.state.sessionId||frame?.payload.wait?.state!=='focused'){this.heldQuestions.delete(key);continue;}
+        if(Date.now()-held.lastRenew>=4000)await this.questionWait(frame,'hold-focus');
+      }
     }finally{this.polling=false;}
   }
   async create(cwd=this.state.workspace){
@@ -96,6 +102,27 @@ export class DshPiController {
     const sessionId=crypto.randomUUID();await this.rpc('session.create',{sessionId,selection,cwd});await this.refresh();await this.open(sessionId);
   }
   pending=new Map();
+  heldQuestions=new Map();
+  interactionScope(frame){
+    const sessionId=this.state.sessionId,epoch=this.epoch;
+    if(this.state.readOnly||this.state.phase!=='ready'||!sessionId||frame.payload?.sessionId&&frame.payload.sessionId!==sessionId||!this.state.interactions.some(x=>x.rpcId===frame.rpcId&&x.method===frame.method))throw Error('This interaction is no longer selected. Nothing was sent.');
+    return {sessionId,epoch};
+  }
+  updateQuestionWait(rpcId,wait,epoch=this.epoch){
+    if(epoch!==this.epoch||!wait)return;
+    this.update({interactions:this.state.interactions.map(frame=>frame.rpcId===rpcId&&frame.method==='question/requested'&&(frame.payload.wait?.revision??-1)<=wait.revision?{...frame,payload:{...frame.payload,wait}}:frame)});
+  }
+  async questionWait(frame,action){
+    const scope=this.interactionScope(frame);
+    if(frame.method!=='question/requested')throw Error('Only questions have wait controls.');
+    if(action==='hold-focus')this.heldQuestions.set(frame.rpcId,{frame,...scope,lastRenew:Date.now()});
+    else this.heldQuestions.delete(frame.rpcId);
+    try{
+      const result=await this.rpc('interaction.wait',{sessionId:scope.sessionId,clientId:this.clientId,rpcId:frame.rpcId,action});
+      this.updateQuestionWait(frame.rpcId,result.wait,scope.epoch);
+      return result;
+    }catch(error){this.heldQuestions.delete(frame.rpcId);throw error;}
+  }
   async compact(scope){
     const {sessionId,selection}=this.state,epoch=this.epoch;
     if(scope.sessionId!==sessionId||scope.epoch!==epoch||this.state.readOnly||this.state.phase!=='ready'||this.state.sessions.find(x=>x.sessionId===sessionId)?.running||this.state.compaction?.blocked||this.pending.has(sessionId))throw Error('The conversation is not ready to compact. Your draft is preserved.');
@@ -128,7 +155,7 @@ export class DshPiController {
     if(sessionId===this.state.sessionId)this.update({queue:value});return value;
   }
   async answer(frame,value){
-    const sessionId=this.state.sessionId,epoch=this.epoch;
+    const {sessionId,epoch}=this.interactionScope(frame);this.heldQuestions.delete(frame.rpcId);
     await this.rpc('interaction.respond',{sessionId,clientId:this.clientId,rpcId:frame.rpcId,value});
     if(epoch===this.epoch)this.update({interactions:this.state.interactions.filter(x=>x.rpcId!==frame.rpcId)});
   }

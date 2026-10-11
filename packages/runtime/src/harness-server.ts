@@ -16,7 +16,7 @@ const allowed = new Set([
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue', 'session.compact', 'session.compaction', 'session.acknowledgeCompaction',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.search', 'observation.payload', 'observation.clear',
-  'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond',
+  'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
 type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
@@ -172,7 +172,7 @@ export class HarnessServer {
           }
           if(access.mode==='read-only'){const result=await this.inspect(access,rpc.method,params,rpc.id);this.send(res,200,{id:rpc.id,result});return;}
           if (!allowed.has(rpc.method)) throw new Error('Method is not exposed by Augmentor Harness');
-          if (rpc.method === 'interaction.respond') {
+          if (rpc.method === 'interaction.respond' || rpc.method === 'interaction.wait') {
             const watch = this.watches.get(this.watchKey(access,identifier(params.clientId)));
             if (!watch || watch.sessionId !== params.sessionId) throw new Error('Interaction belongs to another session');
             watch.seen = Date.now();

@@ -509,6 +509,7 @@ export class Host {
     if(method==='prompt.cancelImprovement')return this.improvements.cancel(p.requestId,p.scopeId);
     if(method==='prompt.improvementStatus')return this.improvements.status(p.requestId);
     if(method==='interaction.respond')return this.interactions.answer(identifier(p.rpcId),p.value,identifier(p.sessionId));
+    if(method==='interaction.wait')return this.interactions.wait(identifier(p.rpcId),identifier(p.sessionId),identifier(p.clientId),p.action);
     // Serialize state-changing preparations so two clients cannot create/replace an execution owner.
     const run=this.serial.then(()=>{if(this.quiescing&&method!=='host.describe')throw new Error('Runtime is closing for maintenance. No action was submitted.');return this.handle(method,p,id);});this.serial=run.catch(()=>{});
     const result=await run;return result instanceof SteeringReply?result.settled.finally(()=>this.wakeGoals()):result;
