@@ -61,6 +61,34 @@ and all 404 source-hash/browser-graph/96 npm-notice checks pass. Fresh ordinary
 bundled-Node and installed acceptance follow separately; no installed version is
 changed by source qualification.
 
+### Installed Settings follow-up — first candidate
+
+Runtime a275c43a7c02854d99e1e96ffa8e9649b808ee61 is first selected/running as
+20261011-192032-e30df476, artifact
+2df06722dd037a649cd6f4fea0214a7b17d30982a88380acba9d6ba0c4e193d1.
+Source and ordinary pass 206/206; 21,761 inventory entries pass and all eleven
+histories/queue identities are preserved. Installed General/Models/Plugins and
+reasoning Escape work at the normal 513×715 size. Actual empty MCP reveals a
+further focus failure: initial catalog loading disables the focused selector,
+focus falls to body and Escape reaches the supplier shell. The preceding test
+sent Escape before catalog settlement, so it did not qualify this case. The
+strengthened fixture waits for the empty-catalog message and reproduces the same
+failure. The Pi handler's control refresh now restores focus to Done when focus
+leaves the open native modal. Supplier source/CSS and dependencies stay unchanged.
+Final corrected source again passes **206/206 across 30 files**, zero failures/
+skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Corrected
+ordinary/installed acceptance is recorded separately;
+the first installed candidate is retained and never patched.
+
+To make room for separately staged immutable candidates, only independently
+verified redundant ordinary command/settings/Trajectory builds are retired after
+core byte comparison with retained installed copies. Source commits, licences,
+installed releases, fixture logs and proof records remain. The agent-created
+public DSH download cache is also retired after copied provenance/licence checks;
+all 404 selected supplier files remain in Git. No user conversation/configuration,
+private repository or unrelated work is removed. This is core equivalence, not a
+claim that excluded source/CI files match an installed artifact.
+
 ## Original attachments — October 11 follow-up
 
 Original File picker binding, attachment rail/cards, drop overlay, retry/remove controls and image lightbox/history rendering now use thirteen verbatim public ui-attachment files and unchanged supplier CSS. The GUI selection is **358 files**; preceding 345 bytes/hashes remain unchanged. The Pi Host additionally reuses twelve public MIT pure attachment storage/codec modules, with import-path/NodeNext suffix changes only and retained provenance/license. No Cordis attachment service or second agent owner is introduced.

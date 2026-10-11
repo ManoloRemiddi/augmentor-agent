@@ -10,7 +10,11 @@ export function attachMcpManagement({button,rpc,current,notice,changed=()=>{}}){
   if(previous&&active(row))void rpc('session.mcpCancelAction',{sessionId:previous.sessionId,requestId:row.requestId}).catch(error=>notice(error.message,true));
  }
  function controls(){if(!panel)return;const selected=panel.server.value,server=panel.servers.find(row=>row.name===selected);for(const el of panel.actions)el.disabled=reading||blocked||!available||!server?.managementActions?.includes(el.dataset.action);panel.cancel.disabled=reading||!active(receipt)||receipt.state==='cancel-requested';panel.server.disabled=reading||blocked;panel.reload.disabled=reading;
-  panel.enable.textContent=server?.enabled?'Disable server':'Enable server';panel.enable.disabled=panel.exposure.disabled=panel.applyExposure.disabled=reading||blocked||!configAvailable||!server;panel.edit.disabled=panel.save.disabled=reading||blocked||!configAvailable;}
+  panel.enable.textContent=server?.enabled?'Disable server':'Enable server';panel.enable.disabled=panel.exposure.disabled=panel.applyExposure.disabled=reading||blocked||!configAvailable||!server;panel.edit.disabled=panel.save.disabled=reading||blocked||!configAvailable;
+  // Disabling the focused selector during loading can move focus to body.
+  // Keep keys on the foreground native modal even when its catalog is empty.
+  if(panel.open&&!panel.contains(document.activeElement))panel.done?.focus();
+ }
  async function reload(){
   if(reading||!live()){if(!live())close();return;}clearTimeout(timer);reading=true;controls();const own=++ticket;
   try{
@@ -66,7 +70,7 @@ export function attachMcpManagement({button,rpc,current,notice,changed=()=>{}}){
   panel.redirectInput=node('input');panel.redirectInput.type='password';panel.redirectInput.autocomplete='off';panel.redirectInput.spellcheck=false;panel.redirectInput.maxLength=8192;panel.redirectInput.setAttribute('aria-label','MCP redirected URL');const submit=node('button','Submit redirected URL');submit.type='submit';panel.redirect.append(panel.redirectInput,submit);panel.append(panel.redirect);
   panel.redirect.onsubmit=async event=>{event.preventDefault();if(!live()||!receipt?.waitingForRedirect)return;const url=panel.redirectInput.value;panel.redirectInput.value='';try{await call('session.mcpSubmitRedirect',{requestId:receipt.requestId,url});void reload();}catch(error){if(live())panel.status.textContent=error.message;}};
   panel.cancel=node('button','Cancel management');panel.cancel.type='button';panel.cancel.onclick=async()=>{if(!live()||!active(receipt))return;try{await call('session.mcpCancelAction',{requestId:receipt.requestId});void reload();}catch(error){if(live())panel.status.textContent=error.message;}};
-  panel.reload=node('button','Reload');panel.reload.type='button';panel.reload.onclick=()=>void reload();const done=node('button','Done');done.type='button';done.onclick=close;panel.append(panel.cancel,panel.reload,done);
+  panel.reload=node('button','Reload');panel.reload.type='button';panel.reload.onclick=()=>void reload();const done=node('button','Done');done.type='button';done.onclick=close;panel.done=done;panel.append(panel.cancel,panel.reload,done);
   panel.addEventListener('cancel',event=>{event.preventDefault();close();});document.body.append(panel);panel.showModal();void reload();
  }
  button.onclick=open;

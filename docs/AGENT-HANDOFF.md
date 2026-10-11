@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 empty-MCP Settings correction source
+
+[Installed follow-up](DSH-GUI-ON-PI.md#installed-settings-follow-up--first-candidate) reproduces Escape escaping the empty MCP dialog after initial control loading drops focus to body. The existing Pi handler restores Done focus; the strengthened real Host/Chromium fixture waits for settled empty-catalog state. Final source again passes **206/206 across 30 files**, zero failures/skips/cancellations, with unchanged workers/deadlines/prepared QtTest. Supplier/CSS/locked dependencies remain unchanged. Corrected ordinary/installed acceptance follows; a275c43/20261011-192032-e30df476 is retained, never patched. Full Harness/settings/migration/public packaging/platform gates remain open and further platforms remain deferred.
+
 ## October 11 original Settings source qualification
 
 The [copied Settings shell](DSH-GUI-ON-PI.md#original-settings-shell--october-11-follow-up) and scoped Pi handlers pass **206/206 across 30 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Build/type/source-hash/graph/notice checks pass. Source selection is 404 MIT DSH files; the 86-file Apache dashboard remains unchanged. The foreground Escape regression is reproduced and corrected without changing supplier files or CSS. Ordinary/installed acceptance follows separately; 65b0a49 / 20261011-184609-8cac1bd0 remains selected until guarded adoption. Complete settings/GUI/migration/public packaging/platform gates remain open and further platforms are deferred for MX feedback.
