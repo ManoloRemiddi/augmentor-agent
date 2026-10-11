@@ -61,16 +61,50 @@ Only a byte-verified redundant ordinary attachment assembly is retired against
 retained immutable release 20261011-145640-7322f8c1 to make staging capacity;
 source, immutable releases, licences and proof logs remain.
 
-### Earlier-request qualification status
+### Installed earlier-request qualification — October 11
 
-Source passes **217/217 across 30 files**, zero failures/skips/cancellations,
-prepared QtTest/two workers/unchanged deadlines. The prior tested runtime 1bc4560 /
-private MX release 20261011-195826-1738f137 remains selected and running until a
-fresh ordinary candidate passes and normal guarded immutable adoption succeeds.
-This increment advances P0 request inspection; complete plugin functionality,
-alternate provider shapes, action-success/status semantics, all remaining
-P0/P1 migration/privacy/public packaging/platform gates and DSH retention remain
-binding. No full migration or public release acceptance is claimed.
+Tested runtime **dd478b51c7bf4f145051185b4cc3f00d11f1d258** is selected **and
+running** in private MX release **20261011-203308-c2b28497**, product **0.2.13**,
+artifact **e25b512f420703de41951e7fcb60d1c4700f84f49b6c8379aaee7d1a78cbafa1**.
+Source and fresh ordinary bundled Node **24.19.0** each pass **217/217 across
+30 files**, zero failures/skips/cancellations, prepared QtTest/two workers and
+unchanged deadlines. Normal staging, idle Native maintenance close, one guarded
+Host shutdown, immutable activation and stable Host/Native launch succeed.
+Both running roots and the Host executable match selection; Native is online,
+model-ready and idle. All **21,761 inventory entries** pass after GUI reads.
+
+At the actual installed **513×715** viewport, the original Context dropdown
+selects Step 1 of the retained independently authored local-Qwen demonstration:
+its earlier input has zero assistant/tool-result items. Step 2 has its own
+later assistant/read result, exact **path: preview-note.txt** and the retained
+verification word. A screenshot outside the immutable release includes the
+original selector and result card; this view remains open for owner feedback.
+This is installed fresh-Host inspection of earlier retained live-provider
+records. Requests beyond the eight-body cache and 100-record metadata page are
+qualified by the separately identified authored saved-data fixture, not by a
+new live-provider run. All **eleven histories and queue item identities** are
+unchanged: zero new histories, admissions, provider requests or executed tools.
+Production selection/model router and model/speech/GPU/context/concurrency/
+precision settings remain preserved.
+
+All **475 compiled files**, **19,160 dependency files/131 npm instances**,
+**723 licence files/96 browser supplier records**, six native executable paths/
+hashes and bundled Node are verified. Only four licence/source-record paths
+change: dashboard SOURCE.json/SOURCE.md and expanded GUI SOURCE.json/compiled
+THIRD-PARTY-NOTICES.txt. Supplier licence texts, original hashes, DSH MIT files,
+CSS and locked dependencies are preserved. The redundant ordinary assembly is
+retired only after core/root-contract/eleven included changed-source files match
+the retained immutable release. The installer's test-source exclusion initially
+stops an overbroad retirement comparison; the corrected proof explicitly scopes
+included files and makes no whole-artifact equality claim. Test source, failed
+preparation logs, successful qualification logs and immutable releases remain.
+Subsequent qualification documentation changes no installed bytes.
+
+This advances P0 request inspection. Complete plugin functionality, alternate
+provider shapes, action-success/status semantics and all remaining P0/P1
+migration/privacy/public packaging/platform gates stay open. DSH remains
+available for unmet workflows; further platform implementation stays deferred
+for MX feedback. No full migration or public release acceptance is claimed.
 
 ## Previous Context tool-result arguments — October 11 follow-up
 
