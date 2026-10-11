@@ -12,6 +12,7 @@ import {DEFAULT_DESKTOP_LIMITS,type DesktopResult} from '../../computer-use/src/
 import type {Usage} from '@earendil-works/pi-ai';
 import type {ExecutionContract} from './execution.js';
 import {atomicJson,privateDir} from './storage.js';
+import {windowsShellJob} from './windows-shell-job.js';
 import {OutputRing} from '../vendor/dsh-jobs/ring.js';
 import type {JobChannel,JobOutputRead} from '../vendor/dsh-jobs/contracts.js';
 
@@ -113,10 +114,11 @@ export class PiJobs {
  * A process close is evidence of its own outcome, not rollback of descendants.
  */
 export async function shellJob(cwd:string,row:JobRecord,control:JobControl):Promise<JobOutcome>{
- control.signal.throwIfAborted();const child=spawn(process.platform==='win32'?'cmd.exe':'/bin/sh',process.platform==='win32'?['/d','/s','/c',row.spec.task]:['-c',row.spec.task],{cwd,env:process.env,detached:process.platform!=='win32',stdio:['ignore','pipe','pipe']});
+ control.signal.throwIfAborted();if(process.platform==='win32')return windowsShellJob(cwd,row,control);
+ const child=spawn('/bin/sh',['-c',row.spec.task],{cwd,env:process.env,detached:true,stdio:['ignore','pipe','pipe']});
  return new Promise(resolve=>{
   let killTimer:ReturnType<typeof setTimeout>|undefined;const decoders={stdout:new StringDecoder('utf8'),stderr:new StringDecoder('utf8')};
-  const kill=(signal:NodeJS.Signals)=>{try{if(process.platform==='win32')child.kill(signal);else if(child.pid)process.kill(-child.pid,signal);}catch{/* Close/error event confirms disposition. */}};
+  const kill=(signal:NodeJS.Signals)=>{try{if(child.pid)process.kill(-child.pid,signal);}catch{/* Close/error event confirms disposition. */}};
   const abort=()=>{kill('SIGTERM');killTimer=setTimeout(()=>kill('SIGKILL'),500);};control.signal.addEventListener('abort',abort,{once:true});if(control.signal.aborted)abort();
   for(const channel of ['stdout','stderr'] as const){child[channel].on('data',data=>{try{control.append(decoders[channel].write(data),channel);}catch{abort();}});}
   child.once('error',()=>resolve({state:'failed',reason:'The background command could not be started.'}));

@@ -80,6 +80,8 @@ jobs:
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_processes.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_shell_job.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_supervisor.py -v
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_voice.py -v
@@ -98,6 +100,14 @@ jobs:
           npm run check
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run build
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Qualify actual Pi command jobs and detached descendants
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/payload/python/python.exe"
+          & outputs/payload/node/node.exe --test --test-concurrency=4 tests/windows-shell-frames.test.mjs tests/pi-windows-jobs.test.mjs tests/jobs-registry.test.mjs tests/pi-jobs.test.mjs
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise Python and Node shared prompt clients and durable restart
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
@@ -136,6 +146,17 @@ jobs:
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}
         run: |
           & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_windows_recovery_observer.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Qualify the assembled Pi command producer and kernel Stop
+        if: ${{ !cancelled() && steps.application.outcome == 'success' }}
+        env:
+          AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
+        run: |
+          $env:AUGMENTOR_PI_TEST_ROOT = "$PWD/outputs/payload"
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/payload/python/python.exe"
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_shell_job.py -v
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/node/node.exe --test --test-concurrency=4 tests/windows-shell-frames.test.mjs tests/pi-windows-jobs.test.mjs tests/pi-jobs.test.mjs
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Exercise the actual bundled dictation broker and private state
         if: ${{ !cancelled() && steps.application.outcome == 'success' }}

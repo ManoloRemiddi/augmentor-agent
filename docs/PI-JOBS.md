@@ -116,9 +116,7 @@ bounded execution uses the same product guard and inherited reasoning policy.
 Parent Stop cancels its jobs even when its chat turn is idle. Individual Stop
 aborts the actual child SDK owner and scoped interactions. Shell Stop signals
 the exact owned Unix process group, then escalates after 500 ms. No saved PID is
-adopted or killed after restart. Windows currently signals the direct process;
-descendant-tree cancellation is an explicit unqualified adapter gap. Process
-closure does not undo earlier side effects or prove escaped descendants stopped.
+adopted or killed after restart. Windows uses the owned [command supervisor](WINDOWS-SHELL-JOBS.md), which contains ordinary descendants in a kernel Job before releasing command text. Stop, parent-pipe EOF and supervisor exit terminate that owned range. A leader exit alone does not settle a live descendant. Missing receipts remain unknown. Actual Windows source/bundled qualification is still pending for this new adapter; Linux skips do not prove it. Process closure does not undo earlier side effects or prove effects outside the owned range stopped.
 
 Cancellation waits at most five seconds for producer settlement. Failure to
 confirm it records `unknown` and retains the live producer's capacity until it
