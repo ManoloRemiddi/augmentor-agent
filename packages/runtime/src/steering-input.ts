@@ -14,11 +14,11 @@ export function validateSteeringInput(session:AgentSession,text:string){
  const space=text.indexOf(' '),name=space===-1?text.slice(1):text.slice(1,space);
  if(session.extensionRunner.getCommand(name))throw Error('Extension command "/'+name+'" cannot be queued as a prompt or correction.');
 }
-export async function prepareSteeringInput(session:AgentSession,text:string):Promise<SteeringInput>{
+export async function prepareSteeringInput(session:AgentSession,text:string,inputImages?:ImageContent[]):Promise<SteeringInput>{
  const runner=session.extensionRunner;
- const processed=runner.hasHandlers('input')?await runner.emitInput(text,undefined,'rpc','steer'):{action:'continue' as const};
+ const processed=runner.hasHandlers('input')?await runner.emitInput(text,inputImages,'rpc','steer'):{action:'continue' as const};
  if(processed.action==='handled')return {action:'handled',handler:'handled'};
- let expanded=processed.action==='transform'?processed.text:text;const images=processed.action==='transform'?processed.images:undefined;
+ let expanded=processed.action==='transform'?processed.text:text;const images=processed.action==='transform'?(processed.images??inputImages):inputImages;
  let skillName:string|undefined;
  if(expanded.startsWith('/skill:')){
   const space=expanded.indexOf(' '),name=space===-1?expanded.slice(7):expanded.slice(7,space),args=space===-1?'':expanded.slice(space+1).trim();

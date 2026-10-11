@@ -90,6 +90,84 @@
       "upstreamSha256": "983009bc6bd08adc823d1c032f412a222818613e7cdce69eba323e7503170e2e"
     },
     {
+      "path": "packages/client/ui-attachment/src/AttachmentRail.module.css",
+      "sha256": "328127d897bc3c1b4a414919f5a8de0a75a333006d948178a38ddc8d53d4888a",
+      "upstreamPath": "packages/client/ui-attachment/src/AttachmentRail.module.css",
+      "upstreamSha256": "328127d897bc3c1b4a414919f5a8de0a75a333006d948178a38ddc8d53d4888a"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/AttachmentRail.tsx",
+      "sha256": "45b33aa0203c38fe79fbb75f25c728705a4181e281b06bf048578c766f249905",
+      "upstreamPath": "packages/client/ui-attachment/src/AttachmentRail.tsx",
+      "upstreamSha256": "45b33aa0203c38fe79fbb75f25c728705a4181e281b06bf048578c766f249905"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/DropOverlay.module.css",
+      "sha256": "cce5c2b38f9db422895d498ea652fad36276b6117a8e02d7b5dbe4960e000189",
+      "upstreamPath": "packages/client/ui-attachment/src/DropOverlay.module.css",
+      "upstreamSha256": "cce5c2b38f9db422895d498ea652fad36276b6117a8e02d7b5dbe4960e000189"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/DropOverlay.tsx",
+      "sha256": "4911dcbd56263e5076564210519574c78dd2d58ce2122f8194c61909fb7b2e51",
+      "upstreamPath": "packages/client/ui-attachment/src/DropOverlay.tsx",
+      "upstreamSha256": "4911dcbd56263e5076564210519574c78dd2d58ce2122f8194c61909fb7b2e51"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/FileCard.module.css",
+      "sha256": "8dbd8226fd3ce3452f9a8e82d5a4d4e0039afff5e434a62840a8eca8cf8fbc75",
+      "upstreamPath": "packages/client/ui-attachment/src/FileCard.module.css",
+      "upstreamSha256": "8dbd8226fd3ce3452f9a8e82d5a4d4e0039afff5e434a62840a8eca8cf8fbc75"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/FileCard.tsx",
+      "sha256": "0b855e0c7833073ce599609bead66d772e05185ab3ea8b7ca2571885803625c1",
+      "upstreamPath": "packages/client/ui-attachment/src/FileCard.tsx",
+      "upstreamSha256": "0b855e0c7833073ce599609bead66d772e05185ab3ea8b7ca2571885803625c1"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/MessageImage.module.css",
+      "sha256": "21278a1b8b8303d8e7817e59b416cb9a11317fdd5ac0f7490bd0e67bbdc99e67",
+      "upstreamPath": "packages/client/ui-attachment/src/MessageImage.module.css",
+      "upstreamSha256": "21278a1b8b8303d8e7817e59b416cb9a11317fdd5ac0f7490bd0e67bbdc99e67"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/MessageImage.tsx",
+      "sha256": "3822c8e5d82e6ea06dfe590883380440372ba3e2781a197faee321ebe08aadfe",
+      "upstreamPath": "packages/client/ui-attachment/src/MessageImage.tsx",
+      "upstreamSha256": "3822c8e5d82e6ea06dfe590883380440372ba3e2781a197faee321ebe08aadfe"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/client/ComposerAttachments.module.css",
+      "sha256": "c2191478d35bd2c6a16355c60ac2801f4533bfcfcbb83309d9a03d7faeeee71e",
+      "upstreamPath": "packages/client/ui-attachment/src/client/ComposerAttachments.module.css",
+      "upstreamSha256": "c2191478d35bd2c6a16355c60ac2801f4533bfcfcbb83309d9a03d7faeeee71e"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/client/ComposerAttachments.tsx",
+      "sha256": "5522c084b8c044d6dd64a790851e53f254c6b11b288ae887acf5b5daa67b2c03",
+      "upstreamPath": "packages/client/ui-attachment/src/client/ComposerAttachments.tsx",
+      "upstreamSha256": "5522c084b8c044d6dd64a790851e53f254c6b11b288ae887acf5b5daa67b2c03"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/client/MessageImages.tsx",
+      "sha256": "2df27febdfcd0bd6335912a2eceec3fcaf57095f273cf7d0852939893cc95930",
+      "upstreamPath": "packages/client/ui-attachment/src/client/MessageImages.tsx",
+      "upstreamSha256": "2df27febdfcd0bd6335912a2eceec3fcaf57095f273cf7d0852939893cc95930"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/client/drop-events.ts",
+      "sha256": "312be7b48f465e8d4999ac0ca3a6f4b9eff88254b723dd7e2e51d63ded5e1bf0",
+      "upstreamPath": "packages/client/ui-attachment/src/client/drop-events.ts",
+      "upstreamSha256": "312be7b48f465e8d4999ac0ca3a6f4b9eff88254b723dd7e2e51d63ded5e1bf0"
+    },
+    {
+      "path": "packages/client/ui-attachment/src/client/labels.ts",
+      "sha256": "74c7f2a9617eae53672582b9e0ea4cbc64b09ebfa75d543edbf4eb1002f34884",
+      "upstreamPath": "packages/client/ui-attachment/src/client/labels.ts",
+      "upstreamSha256": "74c7f2a9617eae53672582b9e0ea4cbc64b09ebfa75d543edbf4eb1002f34884"
+    },
+    {
       "path": "packages/client/ui-chat/package.json",
       "sha256": "0d73e5c8bc6e69fc8e4ff8e70e233f4192b67f35b744ca4ca0e699f9946652eb",
       "upstreamPath": "packages/client/ui-chat/package.json",

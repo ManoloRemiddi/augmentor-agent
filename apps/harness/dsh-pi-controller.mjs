@@ -18,7 +18,7 @@ export class DshPiController {
     const access=await this.fetcher('/api/access',{headers:{Authorization:'Bearer '+this.token}}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error?.message||'Open a fresh Harness link.');return v;});
     const [host,catalog,list]=await Promise.all([this.rpc('host.describe'),this.rpc('models.list'),this.rpc('session.list')]);
     const workspaces=access.mode==='read-only'?null:await this.rpc('workspace.list');
-    this.update({readOnly:access.mode==='read-only',catalog,workspace:host.workspace,workspaces,sessions:list.items,phase:'ready'});
+    this.update({readOnly:access.mode==='read-only',catalog,workspace:host.workspace,workspaces,sessions:list.items,phase:'ready',attachmentLimits:host.attachmentLimits});
     const selected=access.sessionId||requestedSession||sessionStorage.getItem('augmentor-harness-session');
     const available=list.items.filter(x=>access.mode==='read-only'||!workspaces?.archivedSessionIds?.includes(x.sessionId));
     const row=available.find(x=>x.sessionId===selected)||available[0];
@@ -94,13 +94,13 @@ export class DshPiController {
   }
   pending=new Map();
   clearUnconfirmed(){this.pending.delete(this.state.sessionId);this.update({unconfirmed:null});}
-  async send(text,mode='queue'){
+  async send(text,mode='queue',attachments=[]){
     const {sessionId,queue}=this.state;if(!sessionId)throw Error('Choose a workspace first.');
     if(this.state.readOnly||this.state.phase!=='ready')throw Error('The conversation is not ready for submission.');
     if(this.state.workspaces?.archivedSessionIds?.includes(sessionId))throw Error('Restore the conversation before sending.');
     if(this.pending.has(sessionId))throw Error('The previous submission is unconfirmed. Inspect the history; it was not retried.');
-    const requestId=crypto.randomUUID(),receipt={requestId,text};this.pending.set(sessionId,receipt);
-    try{const result=await this.rpc('session.prompt',{sessionId,requestId,content:[{type:'text',text}],mode,resumeQueue:true,...(mode==='steer'?{expectedTurnId:queue?.activeTurnId}:{})});this.pending.delete(sessionId);return result;}
+    const requestId=crypto.randomUUID(),receipt={requestId,text,attachments};this.pending.set(sessionId,receipt);
+    try{const result=await this.rpc('session.prompt',{sessionId,requestId,content:[...(text?[{type:'text',text}]:[]),...attachments],mode,resumeQueue:true,...(mode==='steer'?{expectedTurnId:queue?.activeTurnId}:{})});this.pending.delete(sessionId);return result;}
     catch(error){if(sessionId===this.state.sessionId)this.update({unconfirmed:receipt});throw Error(error.message+' Submission is unconfirmed. Nothing was resent.');}
   }
   edits=new Map();

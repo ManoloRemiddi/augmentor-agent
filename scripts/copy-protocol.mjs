@@ -1,5 +1,8 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {copyFileSync,cpSync,mkdirSync} from 'node:fs';
+import {copyFileSync,cpSync,mkdirSync,readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+const attachmentSelection=JSON.parse(readFileSync('packages/runtime/vendor/dsh-attachment/SOURCE.json','utf8'));
+for(const row of attachmentSelection.files)if(createHash('sha256').update(readFileSync('packages/runtime/vendor/dsh-attachment/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH attachment source changed: '+row.path);
 mkdirSync('dist/protocol',{recursive:true});
 copyFileSync('packages/protocol/schema.json','dist/protocol/schema.json');
 cpSync('packages/protocol/fixtures','dist/protocol/fixtures',{recursive:true});
@@ -12,3 +15,5 @@ copyFileSync('packages/runtime/vendor/dsh-goal/LICENSE','dist/runtime/vendor/dsh
 copyFileSync('packages/runtime/vendor/dsh-goal/SOURCE.md','dist/runtime/vendor/dsh-goal/SOURCE.md');
 copyFileSync('packages/runtime/vendor/dsh-jobs/LICENSE','dist/runtime/vendor/dsh-jobs/LICENSE');
 copyFileSync('packages/runtime/vendor/dsh-jobs/SOURCE.md','dist/runtime/vendor/dsh-jobs/SOURCE.md');
+
+for(const name of ['LICENSE','SOURCE.json'])copyFileSync('packages/runtime/vendor/dsh-attachment/'+name,'dist/runtime/vendor/dsh-attachment/'+name);

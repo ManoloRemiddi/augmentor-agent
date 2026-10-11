@@ -5,6 +5,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {MAX_FRAME, identifier, request, type Data} from '../../protocol/src/index.js';
+import {FILE_LIMIT} from './attachments.js';
 import type {Host} from './host.js';
 
 const allowed = new Set([
@@ -124,6 +125,19 @@ export class HarnessServer {
         const access=this.access(req);
         if (!access) {this.send(res, 401, {error: {message: 'Open a fresh private Harness link to connect'}}); return;}
         if(req.method==='GET'&&url.pathname==='/api/access'){this.send(res,200,{mode:access.mode,...(access.mode==='read-only'?{sessionId:access.sessionId,expiresAt:access.expiresAt}:{})});return;}
+        if(req.method==='POST'&&url.pathname==='/api/attachments/upload'){
+          if(access.mode!=='operator')throw Error('This conversation inspector is read-only.');
+          const sid=identifier(url.searchParams.get('sessionId'));this.host.getMeta(sid);
+          const announced=Number(req.headers['content-length']??0);if(announced>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');
+          let bytes=0;const chunks:Buffer[]=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');chunks.push(Buffer.from(chunk));}
+          const result=await this.host.uploadFile(sid,Buffer.concat(chunks),url.searchParams.get('name')??'attachment',url.searchParams.get('mediaType')??undefined);
+          this.send(res,200,result);return;
+        }
+        if(req.method==='GET'&&url.pathname==='/api/attachments/image'){
+          const sid=identifier(url.searchParams.get('sessionId'));this.scopedSession(access,sid);
+          const ref=JSON.parse(url.searchParams.get('ref')??'null'),stored=await this.host.attachmentImage(sid,ref);
+          res.writeHead(200,{'Content-Type':stored.ref.mediaType,'Content-Length':stored.data.byteLength});res.end(stored.data);return;
+        }
         if (req.method === 'GET' && url.pathname === '/api/events') {
           const sessionId = identifier(url.searchParams.get('sessionId'));
           const clientId = identifier(url.searchParams.get('clientId'));

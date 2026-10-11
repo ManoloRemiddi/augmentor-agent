@@ -7,6 +7,7 @@ import {memoryPackage} from '../../memory/src/index.js';
 import {promptCall} from '../../prompt-library/src/client.js';
 import {listWorkspaceDirectory,createWorkspaceDirectory} from './workspace-picker.js';
 import {WorkspaceRegistry,workspacePath} from './workspace-registry.js';
+import {PiAttachments,submittedParts,IMAGE_LIMITS,FILE_LIMIT} from './attachments.js';
 import {SessionOrganization} from './session-organization.js';
 import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
 import {join,resolve} from 'node:path';
@@ -62,6 +63,10 @@ export class Host {
   readonly metadata=new Map<string,Meta>();readonly loaded=new Map<string,Loaded>();
   readonly workspaces=new WorkspaceRegistry(join(this.dirs.state,'workspaces.json'),()=>[resolve(process.env.AUGMENTOR_PI_WORKSPACE||process.cwd()),...[...this.metadata.values()].map(m=>resolve(m.cwd))]);
   readonly organization=new SessionOrganization(join(this.dirs.state,'session-organization.json'));
+  readonly attachments=new PiAttachments(this.dirs.state,(sid,part)=>this.events(this.getMeta(sid)).some(event=>event.type==='user/message'&&event.data.source?.sessionId!==sid&&(event.data.submittedContent??event.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))));
+  private uploads=0;
+  async uploadFile(sid:string,data:Uint8Array,name:string,mediaType?:any){const m=this.getMeta(sid);if(this.quiescing||m.delegation||this.organization.archived(sid))throw Error('This conversation cannot accept uploads.');this.uploads++;try{return await (mediaType?this.attachments.uploadImage(sid,data,name,mediaType):this.attachments.upload(sid,data,name));}finally{this.uploads--;}}
+  async attachmentImage(sid:string,ref:any){this.getMeta(sid);return this.attachments.image(sid,ref);}
   readonly interactions:Interactions;
   modelRuntime!:ModelRuntime;
   readonly setup=new SetupConnections(join(this.dirs.agent,'models.json'));
@@ -242,7 +247,7 @@ export class Host {
         else if(requestId)record!.initialDelivered=true;
         if(requestId){this.queue(m).delivered(requestId);record!.reasoning?.admit(e.message);}
         const content=typeof e.message.content==='string'?[{type:'text',text:e.message.content}]:e.message.content;
-        const submitted=requestId?this.queue(m).read(requestId).input:undefined,submittedContent=submitted?[{type:'text',text:submitted}]:undefined;
+        const admitted=requestId?this.queue(m).read(requestId):undefined,submittedContent=admitted?submittedParts(admitted.input??'',admitted.attachments):undefined;
         const goalSource=requestId&&!correction?this.queue(m).read(requestId).goalSource:undefined;
         if(goalSource){try{record!.goals.admit(goalSource,requestId!,e.message);}catch{record!.goals.disarm();record!.failed=true;record!.execution?.cancel();this.append(m,'runtime/error',{message:'Goal admission could not be saved or replayed. Inspect its original; no automatic continuation will be replayed.'});void record!.session.abort().catch(()=>{});}}
         this.append(m,'user/message',{source:{...(goalSource??{kind:'user'}),sessionId:m.id,...(requestId?{rpcId:requestId}:{})},content,...(submittedContent&&JSON.stringify(submittedContent)!==JSON.stringify(content)?{submittedContent}:{})});
@@ -377,12 +382,14 @@ export class Host {
     const prior=queue.read(id);if(prior.steerTurnId===turnId&&prior.status!=='waiting')return {accepted:true,duplicate:true,turnId};
     if(r.steering?.waiting)throw Error('A correction is already waiting for its safe boundary.');
     r.steering!.validate(prior.input!);
+    const attachmentInput=await this.attachments.resolve(m.id,prior.input!,prior.attachments);
+    if(!m.running||r.cancelled||this.loaded.get(m.id)?.phase==='settling'||r.turnId!==turnId)throw Error('The observed steering turn is no longer active.');
     if(!queue.promote(id,turnId))return {accepted:true,duplicate:true,turnId};
     r.execution!.steerRequested();this.interactions.cancel(m.id);
-    const pending=r.steering!.enqueue(id,prior.input!,result=>{
-      if(result.action==='handled'){queue.handledSteer(id);r.execution!.steerHandled();this.append(m,'runtime/notice',{message:'The correction was handled by an input extension. No copy of that input was sent to the model.',submittedContent:[{type:'text',text:prior.input}],source:{kind:'user',rpcId:id},incomplete:false});}
+    const pending=r.steering!.enqueue(id,attachmentInput.text,result=>{
+      if(result.action==='handled'){queue.handledSteer(id);r.execution!.steerHandled();this.append(m,'runtime/notice',{message:'The correction was handled by an input extension. No copy of that input was sent to the model.',submittedContent:submittedParts(prior.input??'',prior.attachments),source:{kind:'user',rpcId:id},incomplete:false});}
       r.observation?.record('execution/steer-input',{clientRequestId:id,action:result.action,handler:result.handler,skill:result.skill,template:result.template});
-    },error=>{r.failed=true;r.execution!.steerFailed();this.append(m,'runtime/error',{message:'Correction input preparation failed: '+String(error)});});
+    },error=>{r.failed=true;r.execution!.steerFailed();this.append(m,'runtime/error',{message:'Correction input preparation failed: '+String(error)});},attachmentInput.images);
     r.observation?.record('execution/steer-requested',{clientRequestId:id,boundary:'provider-supersession; dispatched-tools-settle',input:'sdk-public-input-and-approved-resources'});
     this.append(m,'runtime/notice',{message:'Steering accepted. Obsolete generation is stopping; any dispatched tools will settle before the correction.',incomplete:false});
     const result=await pending;return {accepted:true,turnId,...(result.action==='handled'?{handled:true}:result.action==='cancelled'?{interruptedPreparation:true}:{})};
@@ -438,17 +445,17 @@ export class Host {
     r.observation?.beginTurn({clientRequestId:id});
     r.execution?.begin(r.manager);
     r.reasoning?.begin(reasoningPolicy,savedThinking,this.settings.revision);
-    if(!m.title){m.title=input.replace(/\s+/g,' ').slice(0,80);r.session.setSessionName(m.title);this.append(m,'session/title',{title:m.title});this.save(m);}
+    if(!m.title){m.title=(input||queue.read(id).attachments?.map(p=>p.attachment.name||'Attachment').join(', ')||'Attachment').replace(/\s+/g,' ').slice(0,80);r.session.setSessionName(m.title);this.append(m,'session/title',{title:m.title});this.save(m);}
     r.task=(async()=>{let failed=false,attempted=false,handled=false;try{
       await r.memory.activity('foreground');if(r.cancelled)return;
-      validateSteeringInput(r.session,input);r.phase='running';attempted=true;r.preparingInput=true;
-      await r.session.prompt(input,{expandPromptTemplates:!goalSource,source:'rpc',preflightResult:disposition=>{
+      const attachmentInput=await this.attachments.resolve(m.id,input,queue.read(id).attachments);if(r.cancelled)return;validateSteeringInput(r.session,input);r.phase='running';attempted=true;r.preparingInput=true;
+      await r.session.prompt(attachmentInput.text,{images:attachmentInput.images,expandPromptTemplates:!goalSource,source:'rpc',preflightResult:disposition=>{
         r.preparingInput=false;
         if(r.cancelled)return;
         r.observation?.record('execution/input',{clientRequestId:id,disposition,expansion:'sdk-approved-skills-and-templates'});
         if(disposition==='handled'){
           handled=true;r.execution?.inputHandled();
-          this.append(m,'runtime/notice',{message:'The input was handled by an input extension. No copy of that input was sent to the model.',disposition:'input-handled',submittedContent:[{type:'text',text:input}],source:{kind:'user',sessionId:m.id,rpcId:id},incomplete:false});
+          this.append(m,'runtime/notice',{message:'The input was handled by an input extension. No copy of that input was sent to the model.',disposition:'input-handled',submittedContent:submittedParts(input,queue.read(id).attachments),source:{kind:'user',sessionId:m.id,rpcId:id},incomplete:false});
         }
       }});
     }catch(error){failed=true;this.append(m,'runtime/error',{message:String(error)});}finally{
@@ -530,8 +537,9 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),capabilities:{jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
+      if(this.uploads)throw Error('Finish file uploads before shutting down the runtime.');
       if(this.jobs.busy)throw Error('Stop and settle background jobs before shutting down the runtime');
       if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before shutting down the runtime');
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
@@ -698,13 +706,14 @@ export class Host {
       if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before sending a chat prompt.');
       const m=this.getMeta(p.sessionId),requestId=promptIdentity(p.requestId??id);
       if(p.mode!==undefined&&!['queue','steer'].includes(p.mode))throw Error('Choose queue or steer mode.');
-      const input=text(p.content?.filter((part:Data)=>part.type==='text').map((part:Data)=>part.text).join('\n')),queue=this.queue(m);
-      const existing=queue.lookup(requestId,input);if(existing||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
+      const hasImages=Array.isArray(p.content)&&p.content.some((part:Data)=>part.type==='image');if(hasImages&&!(await this.selected(m.selection)).input.includes('image'))throw Error('The selected model does not support image input.');
+      const {input,attachments}=await this.attachments.admit(m.id,p.content),queue=this.queue(m);
+      const existing=queue.lookup(requestId,input,attachments);if(existing||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
       if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
       this.loaded.get(m.id)?.mcp?.assertReady();
       if(p.mode==='steer'){
         const r=this.loaded.get(m.id);if(!m.running||!r||r.cancelled||r.phase==='settling'||r.turnId!==p.expectedTurnId||queue.paused||queue.uncertain||r.steering?.waiting)throw Error('The observed steering turn is no longer available.');
-        r.steering!.validate(input);queue.enqueue(requestId,input,true);return new SteeringReply(this.steer(m,requestId,p.expectedTurnId).then(result=>({...result,requestId})));
+        r.steering!.validate(input);queue.enqueue(requestId,input,true,undefined,attachments);return new SteeringReply(this.steer(m,requestId,p.expectedTurnId).then(result=>({...result,requestId})));
       }
       if(p.mode===undefined&&m.running)throw Error('This conversation is already working; use queue mode to add a waiting prompt.');
       if(p.resumeQueue!==undefined&&typeof p.resumeQueue!=='boolean')throw Error('Choose whether to resume the queue.');
@@ -713,7 +722,7 @@ export class Host {
       // commands cannot bypass the persistent queue's admission/receipt rules.
       if(input.startsWith('/'))validateSteeringInput((await this.load(m)).session,input);
       if(this.mcpReloading||m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish MCP management or session reload before admitting another prompt.');
-      queue.enqueue(requestId,input,m.running||queue.paused||!!queue.next);
+      queue.enqueue(requestId,input,m.running||queue.paused||!!queue.next,undefined,attachments);
       if(p.resumeQueue===true||(p.mode===undefined&&!m.running&&p.resumeQueue!==false))queue.resume();
       if(!m.running&&!queue.paused){
         let r:Loaded;try{r=await this.load(m);}catch(error){queue.notSent(requestId);throw error;}

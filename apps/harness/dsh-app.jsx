@@ -55,6 +55,9 @@ import {en as chatEn} from '@dsh-gui/ui-chat/src/client/locale.ts';
 import {en as trajectoryEn} from '@dsh-gui/ui-trajectory/src/client/locales.ts';
 import {en as modelEn} from '@dsh-gui/ui-model-selection/src/client/locales.ts';
 import {en as goalEn} from '@dsh-gui/ui-goal/src/client/locales.ts';
+import {DshAttachments} from './dsh-attachments.mjs';
+import {ComposerAttachments} from '@dsh-gui/ui-attachment/src/client/ComposerAttachments.tsx';
+import {MessageImages} from '@dsh-gui/ui-attachment/src/client/MessageImages.tsx';
 import {DshPiController} from './dsh-pi-controller.mjs';
 import {projectDsh} from './dsh-pi-projection.mjs';
 import {attachPlans} from './plans.js';
@@ -72,6 +75,7 @@ addEventListener('hashchange',()=>{if(new URLSearchParams(location.hash.slice(1)
 const controller=new DshPiController(token);
 const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
+const attachmentDrafts=new DshAttachments(controller);let openFiles=null;
 const questionDraft=createQuestionDraftStore().create(),useQuestionDraft=bindQuestionDraft;
 const rowNotice=createSnapshotStore(null),archiveRequest=createSnapshotStore(null);let noticeSeq=0;
 function bindQuestionDraft(selector=x=>x){return selector(useSyncExternalStore(questionDraft.subscribe,questionDraft.getSnapshot));}
@@ -89,9 +93,11 @@ const editor=createEditor({namespace:'augmentor-dsh-composer',onError:error=>con
 registerPlainText(editor);registerHistory(editor,createEmptyHistoryState(),300);
 editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const value=$getRoot().getTextContent();draft.set(value);if(activeDraft)drafts.set(activeDraft,value);}));
 function setDraft(value){editor.update(()=>{$getRoot().clear().append($createParagraphNode().append($createTextNode(value)));});}
-const keyboard={editor,arbitrate:()=> 'pass',space:()=>false,dismissPopup:()=>controller.update({commands:false}),bindFilePicker:()=>noOp,caretSpan:()=>({start:0,end:0}),paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
-  const text=draft.getSnapshot();if(!text.trim())return;
-  setDraft('');await controller.send(text,mode);await controller.refresh();
+const keyboard={editor,arbitrate:()=> 'pass',space:()=>false,dismissPopup:()=>controller.update({commands:false}),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>({start:0,end:0}),paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
+  const text=draft.getSnapshot(),sid=controller.state.sessionId,items=[...attachmentDrafts.draft(sid).items];if(attachmentDrafts.busy||!text.trim()&&!items.length)return;
+  attachmentDrafts.busy=true;attachmentDrafts.changed();
+  try{const parts=await attachmentDrafts.content(sid,items);if(sid!==controller.state.sessionId)throw Error('The selected conversation changed; the draft is preserved.');await controller.send(text,mode,parts);if(sid===controller.state.sessionId&&draft.getSnapshot()===text)setDraft('');for(const item of items)attachmentDrafts.remove(item.id,sid);await controller.refresh();}
+  finally{attachmentDrafts.busy=false;attachmentDrafts.changed();}
 }),steerQueue:()=>void control.run(async()=>{for(const item of controller.state.queue?.items||[])if(item.canSteer)await controller.rpc('session.updateQueue',{sessionId:controller.state.sessionId,itemId:item.id,expectedTurnId:controller.state.queue.activeTurnId,action:{kind:'steer'}});})};
 
 function useDisclosure(){const [expanded,set]=useState(false);return {expanded,toggle:()=>set(x=>!x)};}
@@ -191,7 +197,7 @@ function BoundSession(){return <ConversationSession {...React.useContext(Session
 function App(){
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null),[commands,setCommands]=useState(false);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
-  const liveDraft=useDraft(x=>x);
+  const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
   useEffect(()=>{activeDraft=state.sessionId;setDraft(drafts.get(state.sessionId)||'');},[state.sessionId]);
   useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!commands&&!state.interactions.length&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog,commands]);
   const current=state.sessions.find(x=>x.sessionId===state.sessionId);
@@ -202,7 +208,7 @@ function App(){
   },[state.sessions,state.workspace,state.workspaces]);
   const list=useMemo(()=>({projectionsBySession:{},ids:state.sessions.map(x=>x.sessionId),byId:Object.fromEntries(state.sessions.map(x=>[x.sessionId,{...x,id:x.sessionId,displayTitle:x.title||'New conversation',origin:'main',retainedBy:{mainView:x.sessionId===state.sessionId?1:0}}]))}),[state.sessions,state.sessionId]);
   const tabs=[{id:'chat',label:'Chat'},{id:'trajectory',label:'Trajectory'},{id:'context',label:'Context'},{id:'plan',label:'Plan'},{id:'goal',label:'Goal'},{id:'jobs',label:'Jobs'}];
-  const useSession=selectorFace({...composed.session,blank:composed.session.blank&&view==='chat'}),useSessions=selectorFace(list),useWorkspaces=selectorFace(workspaces),useConversation=selectorFace(composed.conversation),useChat=selectorFace(composed.chat),useProjection=(name,selector=x=>x)=>selector(composed.projection[name]);
+  const useSession=selectorFace({...composed.session,blank:composed.session.blank&&view==='chat'}),useSessions=selectorFace(list),useWorkspaces=selectorFace(workspaces),useConversation=selectorFace(composed.conversation),useChat=selectorFace(composed.chat),useProjection=(name,selector=x=>x)=>selector(name==='imageLimits'?state.attachmentLimits:composed.projection[name]);
   const open=sid=>void control.run(()=>controller.open(sid)),startSession=cwd=>void control.run(()=>controller.create(cwd||current?.cwd||state.workspace));
   const restoreSession=sid=>controller.organize('restore',sid);
   const pinSession=(sid,action)=>void controller.organize(action,sid).then(result=>{if(action==='pin'){const snapshot=result.workspaces;workspaceView.actions.pinSessionOrder(sid,pinOrderAccounts(snapshot.items,sid),pinOrderSource(snapshot.items,list,snapshot));}}).catch(()=>notifyRow(action==='pin'?'pinFailed':'unpinFailed'));
@@ -212,7 +218,8 @@ function App(){
   const createWorkspace=async({path})=>controller.adoptWorkspace(path);
   const unsupported=()=>Promise.reject(Error('This DSH operation is not yet connected to Pi. Use Full Pi record inspector in Settings for the retained Augmentor controls.'));
   const branch=seq=>void control.run(async()=>{const row=await controller.rpc('session.branch',{sessionId:state.sessionId,newSessionId:crypto.randomUUID(),messageSeq:seq,mode:'reply'});await controller.refresh();await controller.open(row.sessionId);});
-  const common={sessionId:state.sessionId||undefined,useSession,useSessions,useWorkspaces,useConversation,useProjection,useConversationViews:selectorFace(tabs),useSessionStatus:selectorFace(new Map()),useInput:selectorFace({draft:liveDraft,phase:'plain',attachmentIds:[],queue:state.queue?.items||[]}),useStore:selectorFace({view}),actions:{setDraft:noOp,completeViewRequest:noOp},inputActions:{pruneAttachments:noOp,persistDraft:noOp},selectWorkspace:async cwd=>startSession(cwd),useComposerBlock:selectorFace(undefined),useFactorySlot:(_,fallback)=>fallback,bindDraftPersistence:()=>noOp,openView:setView,useInspectCall:selectorFace(undefined),t:t.conversation};
+  const renderMessageImages=props=><MessageImages {...props} loadImage={loadImage} t={t.conversation}/>;
+  const common={renderMessageImages,sessionId:state.sessionId||undefined,useSession,useSessions,useWorkspaces,useConversation,useProjection,useConversationViews:selectorFace(tabs),useSessionStatus:selectorFace(new Map()),useInput:selectorFace({draft:liveDraft,phase:'plain',attachmentIds:attached.items.map(x=>x.id),queue:state.queue?.items||[]}),useStore:selectorFace({view}),actions:{setDraft:noOp,completeViewRequest:noOp},inputActions:{pruneAttachments:ids=>{for(const id of ids)attachmentDrafts.remove(id);},persistDraft:noOp},selectWorkspace:async cwd=>startSession(cwd),useComposerBlock:selectorFace(undefined),useFactorySlot:(_,fallback)=>fallback,bindDraftPersistence:()=>noOp,openView:setView,useInspectCall:selectorFace(undefined),t:t.conversation};
   useEffect(()=>{
     const groups=state.catalog.groups.map(g=>({id:g.provider,name:g.name,models:g.models.map(m=>({id:m.model,name:m.name||m.model,...(m.provider===state.selection?.provider&&m.model===state.selection?.model&&state.reasoning?{reasoning:{efforts:state.reasoning.availableLevels.map(id=>({id,label:id})),defaultEffort:state.reasoning.thinkingLevel}}:{})}))}));
     modelDirectory.set({current:state.selection?{...state.selection,reasoningEffort:state.reasoning?.thinkingLevel}:null,routable:true,groups,failures:state.catalog.failures||[],status:'ready',pending:null,error:null});
@@ -239,8 +246,8 @@ function App(){
       case 'conversation.session':return <ConversationSession {...p}/>;
       case 'conversation.view':{
         const id=options.only||view;
-        if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={unsupported} openSkill={unsupported} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={unsupported} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={unsupported} fileMentions={()=>undefined}/>;
-        if(id==='trajectory')return <TrajectoryView {...p} t={t.trajectory} useTrajectory={selectorFace(composed.trajectory)} useDuration={useDuration} setActualDuration={value=>duration.set(value)} jsonStringWrapping={{getDefault:()=>wrapping.getSnapshot(),setDefault:value=>wrapping.set(value)}} loadOlder={()=>controller.older()} loadImage={unsupported} viewRequest={null}/>;
+        if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={unsupported} openSkill={unsupported} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={loadImage} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={unsupported} fileMentions={()=>undefined}/>;
+        if(id==='trajectory')return <TrajectoryView {...p} t={t.trajectory} useTrajectory={selectorFace(composed.trajectory)} useDuration={useDuration} setActualDuration={value=>duration.set(value)} jsonStringWrapping={{getDefault:()=>wrapping.getSnapshot(),setDefault:value=>wrapping.set(value)}} loadOlder={()=>controller.older()} loadImage={loadImage} viewRequest={null}/>;
         if(id==='context')return <ContextView key={state.sessionId} state={state}/>;
         return <ExtensionView key={id+state.sessionId} kind={id} state={state}/>;
       }
@@ -251,11 +258,13 @@ function App(){
         if(owner.node.kind==='pi-tool')return <PiTool node={owner.node} onInspect={()=>setView('trajectory')}/>;
         return <p role="status">{owner.node.data.text}</p>;
       case 'conversation.chat.reasoning.body':return <MarkdownText text={owner.text} streaming={owner.running}/>;
-      case 'conversation.input.dock':return <><QueueStatus state={state}/><QueueDock {...p} useSession={selectorFace({...composed.session,subagent:state.readOnly?{address:{mode:'read-only'}}:null})} updateQueue={(itemId,action)=>controller.updateQueue(itemId,action)} notify={(_,text)=>controller.update({error:text})} loadImage={unsupported}/>{!state.readOnly&&<GoalBar goal={state.goal?.goal} activation={state.goal?.activation} t={t.goal} onPause={()=>goalAction('pause')} onResume={()=>goalAction('resume')} onClear={()=>goalAction('clear')} onEdit={objective=>goalAction('edit',{objective,maxGoalRounds:state.goal?.goal?.maxGoalRounds})}/>}</>;
-      case 'conversation.composer.bar':return <InputBar {...p} placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!!state.unconfirmed||owner.disabled} keyboard={keyboard} addFiles={()=>controller.update({error:'File uploads are not connected in this Pi preview. Put the file in the selected workspace and refer to its path.'})} removeAttachment={noOp} retryFileUpload={noOp} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace({})} useNotices={selectorFace(undefined)} useLexicon={selectorFace(new Map())} useMenuLauncher={selectorFace(commands?'command':null)} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={()=>[]} toggleCommandMenu={()=>setCommands(x=>!x)}/>;
+      case 'conversation.input.dock':return <><QueueStatus state={state}/><QueueDock {...p} useSession={selectorFace({...composed.session,subagent:state.readOnly?{address:{mode:'read-only'}}:null})} updateQueue={(itemId,action)=>controller.updateQueue(itemId,action)} notify={(_,text)=>controller.update({error:text})} loadImage={loadImage}/>{!state.readOnly&&<GoalBar goal={state.goal?.goal} activation={state.goal?.activation} t={t.goal} onPause={()=>goalAction('pause')} onResume={()=>goalAction('resume')} onClear={()=>goalAction('clear')} onEdit={objective=>goalAction('edit',{objective,maxGoalRounds:state.goal?.goal?.maxGoalRounds})}/>}</>;
+      case 'conversation.composer.bar':return <InputBar {...p} placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!!state.unconfirmed||attachmentDrafts.busy||owner.disabled} keyboard={keyboard} addFiles={attachmentDrafts.add} removeAttachment={attachmentDrafts.remove} retryFileUpload={attachmentDrafts.retry} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace(attached.uploads)} useNotices={selectorFace(undefined)} useLexicon={selectorFace(new Map())} useMenuLauncher={selectorFace(commands?'command':null)} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={ids=>attached.items.filter(x=>ids.includes(x.id))} toggleCommandMenu={()=>setCommands(x=>!x)}/>;
+      case 'conversation.input.attachments':return <ComposerAttachments {...owner} t={t.conversation}/>;
+      case 'conversation.message.images':return <MessageImages {...owner} loadImage={loadImage} t={t.conversation}/>;
       case 'conversation.input.right':return <ImproveDraft state={state}/>;
       case 'conversation.input.model':return <ModelSelect {...p} t={t.model} locked={owner.locked||state.readOnly||current?.running===true} available={!state.readOnly} directory={modelDirectory} load={async()=>modelDirectory.getSnapshot()} select={async selection=>{modelDirectory.update(s=>({...s,status:'selecting',pending:selection}));try{await controller.choose(selection);return modelDirectory.getSnapshot();}catch(e){modelDirectory.update(s=>({...s,status:'error',pending:null,error:e.message}));throw e;}}}/>;
-      case 'conversation.input.overlay':return commands?<Menu open anchor={<span/>} onClose={()=>setCommands(false)} items={[{id:'goal',label:'Goal'},{id:'prompts',label:'Prompt library'},{id:'jobs',label:'Jobs'},{id:'context',label:'Context'},{id:'inspect',label:'Full Pi record inspector'}]} onSelect={id=>{setCommands(false);if(id==='prompts')setDialog({kind:'prompts'});else if(id==='inspect')window.open('/inspection#'+new URLSearchParams({token:controller.token,session:state.sessionId||''}),'_blank','noopener,noreferrer');else setView(id);}}/>:null;
+      case 'conversation.input.overlay':return commands?<Menu open anchor={<span/>} onClose={()=>setCommands(false)} items={[{id:'files',label:t.conversation('input.file')},{id:'goal',label:'Goal'},{id:'prompts',label:'Prompt library'},{id:'jobs',label:'Jobs'},{id:'context',label:'Context'},{id:'inspect',label:'Full Pi record inspector'}]} onSelect={id=>{setCommands(false);if(id==='files')openFiles?.open();else if(id==='prompts')setDialog({kind:'prompts'});else if(id==='inspect')window.open('/inspection#'+new URLSearchParams({token:controller.token,session:state.sessionId||''}),'_blank','noopener,noreferrer');else setView(id);}}/>:null;
       default:return options.fallback??null;
     }
   };

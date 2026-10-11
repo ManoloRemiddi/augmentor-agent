@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import type {ImageContent} from '@earendil-works/pi-ai';
 import type {Agent,AgentMessage} from '@earendil-works/pi-agent-core';
 import type {AgentSession} from '@earendil-works/pi-coding-agent';
 import {prepareSteeringInput,validateSteeringInput,type SteeringInput} from './steering-input.js';
@@ -18,7 +19,7 @@ export class PiSteering {
  constructor(private session:AgentSession){}
  get waiting(){return this.pending;}
  validate(input:string){validateSteeringInput(this.session,input);}
- enqueue(id:string,input:string,prepared:(result:SteeringInput)=>void=()=>{},failed:(error:unknown)=>void=()=>{}){
+ enqueue(id:string,input:string,prepared:(result:SteeringInput)=>void=()=>{},failed:(error:unknown)=>void=()=>{},images?:ImageContent[]){
   if(this.pending)throw Error('A steering correction is already waiting for its safe boundary.');
   this.validate(input);let release!:()=>void,cancel!:()=>void;
   const preparation:Preparation={id,ready:new Promise<void>(resolve=>release=resolve),release:()=>release(),cancelled:new Promise<null>(resolve=>cancel=()=>resolve(null)),cancel:()=>cancel(),stopped:false};
@@ -26,11 +27,11 @@ export class PiSteering {
   // This signal belongs only to the provider request. The SDK run/tool signal
   // stays live, so tools already dispatched can settle with their real result.
   this.request?.abort(new Error('Superseded by an identified user correction.'));
-  return this.prepare(preparation,input,prepared,failed);
+  return this.prepare(preparation,input,prepared,failed,images);
  }
- private async prepare(preparation:Preparation,input:string,prepared:(result:SteeringInput)=>void,failed:(error:unknown)=>void):Promise<PreparationResult>{
+ private async prepare(preparation:Preparation,input:string,prepared:(result:SteeringInput)=>void,failed:(error:unknown)=>void,images?:ImageContent[]):Promise<PreparationResult>{
   try{
-   const result=await Promise.race([prepareSteeringInput(this.session,input),preparation.cancelled]);
+   const result=await Promise.race([prepareSteeringInput(this.session,input,images),preparation.cancelled]);
    if(!result||preparation.stopped)return {action:'cancelled'};
    if(result.action==='handled')this.pending=undefined;
    else{

@@ -164,3 +164,7 @@ including the shader compiler, are removed before signing. See [current packagin
 and qualification](MACOS-RECOVERY-2026-09-26.md). DSH adds reviewed BSD-2-Clause
 and Python-2.0 dependencies and a version-bound LGPL libvips exception to the
 npm notice collector. Native source/notices are reviewed separately.
+
+## October 11 private MX attachment candidate
+
+The copied DSH attachment GUI and pure storage/codec modules retain the original MIT notice and provenance. Sharp 0.35.5/native Linux wrapper retains Apache-2.0; the libvips Linux x64 1.3.4 package declares LGPL-3.0-or-later. The existing reviewed LGPL notice is now bound to this exact npm wrapper version in the catalog. Production notice collection inventories 131 instances. `release/attachment-native-linux-x64.json` records exact native objects and upstream reported linked versions; this package-level record does not establish full linked source/notices/rebuild coverage. Those remain public-binary release gates. The private MX preview and published source do not relabel the dependency closure MIT. See [attachment qualification](DSH-GUI-ON-PI.md#original-attachments--october-11-follow-up).

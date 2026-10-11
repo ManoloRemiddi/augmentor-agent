@@ -240,7 +240,8 @@
     "@aws-sdk/credential-provider-http@3.972.75": "aws-sdk",
     "@aws-sdk/credential-provider-login@3.972.80": "aws-sdk",
     "@aws-sdk/nested-clients@3.997.47": "aws-sdk",
-    "proxy-agent-negotiate@1.1.0": "proxy-agent-negotiate-1.1.0"
+    "proxy-agent-negotiate@1.1.0": "proxy-agent-negotiate-1.1.0",
+    "@img/sharp-libvips-linux-x64@1.3.4": "lgpl-3.0"
   },
   "choices": {
     "json-schema@0.4.0": {
@@ -255,7 +256,8 @@
     "@img/sharp-libvips-darwin-arm64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-darwin-x64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-linux-x64@1.3.3": "LGPL-3.0-or-later",
-    "@img/sharp-libvips-linux-arm64@1.3.3": "LGPL-3.0-or-later"
+    "@img/sharp-libvips-linux-arm64@1.3.3": "LGPL-3.0-or-later",
+    "@img/sharp-libvips-linux-x64@1.3.4": "LGPL-3.0-or-later"
   },
   "additionalNotices": {
     "@openai/codex@0.159.2": [

@@ -1,0 +1,81 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {randomUUID} from 'node:crypto';
+import {join} from 'node:path';
+import {readFileSync,lstatSync,openSync,closeSync,fsyncSync} from 'node:fs';
+import type {ImageContent} from '@earendil-works/pi-ai';
+import {privateDir,atomicJson} from './storage.js';
+import {saveFileVerbatim,storedFilePath,readFileStreamVerbatim} from '../vendor/dsh-attachment/file-store.js';
+import {saveImageFile,readImageFile} from '../vendor/dsh-attachment/store.js';
+import type {FileAttachmentRef,ImageAttachmentRef,ImageMediaType} from '../vendor/dsh-attachment/types.js';
+
+export type PromptAttachment={type:'file';attachment:FileAttachmentRef}|{type:'image';attachment:ImageAttachmentRef & {originalAttachmentId?:string}};
+export const IMAGE_LIMITS={maxImageBytes:10*1024*1024,maxImagesPerMessage:8,maxMessageImageBytes:20*1024*1024,maxImagePixels:40_000_000,maxImageDimension:32768,mediaTypes:['image/png','image/jpeg','image/webp','image/gif'] as ImageMediaType[]};
+export const FILE_LIMIT=20*1024*1024;
+interface Receipt {receiptId:string;part:PromptAttachment;original?:FileAttachmentRef}
+/** Validates queue references without granting access to the underlying objects. */
+export function promptAttachments(value:unknown):PromptAttachment[]{
+ if(value===undefined)return [];
+ if(!Array.isArray(value)||value.length>16)throw Error('Choose at most sixteen attachments.');
+ return value.map(part=>{
+  const a=part?.attachment;
+  if(!['image','file'].includes(part?.type)||!a||!/^sha256:[a-f0-9]{64}$/.test(a.attachmentId)||!Number.isSafeInteger(a.bytes)||a.bytes<0||a.bytes>FILE_LIMIT||a.name!==undefined&&(typeof a.name!=='string'||a.name.length>255||/[\\/\x00-\x1f]/.test(a.name)))throw Error('Invalid attachment reference.');
+  if(part.type==='image'&&a.originalAttachmentId!==undefined&&!/^sha256:[a-f0-9]{64}$/.test(a.originalAttachmentId))throw Error('Invalid original image identity.');
+  if(part.type==='image'&&(!IMAGE_LIMITS.mediaTypes.includes(a.mediaType)||![a.width,a.height].every(n=>Number.isSafeInteger(n)&&n>0&&n<=32768)))throw Error('Invalid image reference.');
+  return structuredClone(part);
+ });
+}
+export function submittedParts(input:string,attachments:PromptAttachment[]=[]){return [...(input?[{type:'text',text:input}]:[]),...attachments];}
+
+/** Private immutable supplier objects plus exact-conversation upload authority.
+ * Receipts survive Host restart; reading history never loads an AgentSession.
+ */
+export class PiAttachments {
+ readonly root:string;
+ constructor(state:string,private inherited:(sid:string,part:PromptAttachment)=>boolean=()=>false){this.root=privateDir(join(state,'attachments','v1'));}
+ private path(sid:string){return join(this.root,sid+'.json');}
+ private receipts(sid:string):Receipt[]{
+  try{const stat=lstatSync(this.path(sid));if(!stat.isFile()||stat.isSymbolicLink()||process.getuid&&stat.uid!==process.getuid()||process.platform!=='win32'&&stat.mode&0o077)throw Error('Attachment receipts require a private owned file.');const raw=readFileSync(this.path(sid),'utf8');if(raw.length>4*1024*1024)throw Error('Attachment receipts exceed their bounds.');const rows=JSON.parse(raw);if(!Array.isArray(rows)||rows.length>10000)throw Error('Invalid attachment receipts.');for(const row of rows){if(typeof row.receiptId!=='string')throw Error('Invalid attachment receipt.');promptAttachments([row.part]);}return rows;}
+  catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return [];throw error;}
+ }
+ private commit(sid:string,part:PromptAttachment,original?:FileAttachmentRef){const rows=this.receipts(sid);if(rows.length>=10000)throw Error('This conversation has too many attachment receipts.');const receipt={receiptId:randomUUID(),part,...(original?{original}:{})};atomicJson(this.path(sid),[...rows,receipt]);if(process.platform!=='win32'){for(const path of [this.path(sid),this.root]){const fd=openSync(path,'r');try{fsyncSync(fd);}finally{closeSync(fd);}}}return receipt;}
+ async uploadImage(sid:string,data:Uint8Array,name:string,mediaType:ImageMediaType){
+  if(!IMAGE_LIMITS.mediaTypes.includes(mediaType))throw Error('Unsupported image type.');
+  const normalized=await saveImageFile(this.root,{data,name,mediaType},IMAGE_LIMITS,{maxPixels:4_000_000,maxDimension:4096,maxBytes:5*1024*1024});
+  const original=await saveFileVerbatim(this.root,{data,name}),attachment={...normalized,originalAttachmentId:original.attachmentId};const receipt=this.commit(sid,{type:'image',attachment},original);return {receiptId:receipt.receiptId,attachment};
+ }
+ async upload(sid:string,data:Uint8Array,name:string){if(data.byteLength>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');const file=await saveFileVerbatim(this.root,{data,name});const receipt=this.commit(sid,{type:'file',attachment:file});return {receiptId:receipt.receiptId,file};}
+ private authorize(sid:string,part:PromptAttachment){
+  promptAttachments([part]);
+  if(!this.receipts(sid).some(row=>JSON.stringify(row.part)===JSON.stringify(part))&&!this.inherited(sid,part))throw Error('Attachment does not belong to this conversation.');
+ }
+ async admit(sid:string,content:unknown):Promise<{input:string;attachments:PromptAttachment[]}>{
+  if(!Array.isArray(content)||content.length>32)throw Error('Invalid prompt content.');
+  let bytes=0,count=0;const attachments:PromptAttachment[]=[],texts:string[]=[];
+  for(const p of content){
+   if(p?.type==='text'&&typeof p.text==='string'){texts.push(p.text);continue;}
+   if(p?.type==='file'||p?.type==='image'&&p.attachment){
+    const receipt=this.receipts(sid).find(row=>row.receiptId===p.receiptId&&row.part.type===p.type);
+    if(!receipt||JSON.stringify(receipt.part.attachment)!==JSON.stringify(p.attachment))throw Error('Upload receipt is missing or belongs to another conversation.');
+    if(receipt.part.type==='image'){bytes+=receipt.original?.bytes??receipt.part.attachment.bytes;if(++count>IMAGE_LIMITS.maxImagesPerMessage||bytes>IMAGE_LIMITS.maxMessageImageBytes)throw Error('Images exceed the message limit.');}attachments.push(receipt.part);continue;
+   }
+   if(p?.type==='image'&&typeof p.data==='string'){
+    if(!IMAGE_LIMITS.mediaTypes.includes(p.mediaType)||p.data.length>Math.ceil(IMAGE_LIMITS.maxImageBytes/3)*4||!p.data.length||p.data.length%4||!/^[A-Za-z0-9+/]*={0,2}$/.test(p.data))throw Error('Invalid or oversized image upload.');
+    const data=Buffer.from(p.data,'base64');if(data.toString('base64')!==p.data)throw Error('Invalid image encoding.');bytes+=data.length;
+    if(++count>IMAGE_LIMITS.maxImagesPerMessage||bytes>IMAGE_LIMITS.maxMessageImageBytes)throw Error('Images exceed the message limit.');
+    const normalized=await saveImageFile(this.root,{data,mediaType:p.mediaType,name:p.name},IMAGE_LIMITS,{maxPixels:4_000_000,maxDimension:4096,maxBytes:5*1024*1024});
+    const original=await saveFileVerbatim(this.root,{data,name:p.name}),attachment={...normalized,originalAttachmentId:original.attachmentId};const part:PromptAttachment={type:'image',attachment};this.commit(sid,part,original);attachments.push(part);continue;
+   }
+   throw Error('Unsupported prompt content; no input was submitted.');
+  }
+  const input=texts.join('\n');if(input.length>65536||!input.trim()&&!attachments.length)throw Error('Invalid prompt text.');return {input,attachments:promptAttachments(attachments)};
+ }
+ async resolve(sid:string,input:string,attachments:PromptAttachment[]=[]){
+  const images:ImageContent[]=[],files:string[]=[];
+  for(const part of attachments){this.authorize(sid,part);
+   if(part.type==='image'){const stored=await readImageFile(this.root,part.attachment);images.push({type:'image',mimeType:part.attachment.mediaType,data:Buffer.from(stored.data).toString('base64')});}
+   else{for await(const _ of readFileStreamVerbatim(this.root,part.attachment)){}files.push(JSON.stringify({name:part.attachment.name,path:storedFilePath(this.root,part.attachment),bytes:part.attachment.bytes}));}
+  }
+  return {text:input+(files.length?'\n\nAttached files (read their exact contents using the file tools):\n'+files.join('\n'):''),images};
+ }
+ async image(sid:string,attachment:ImageAttachmentRef){this.authorize(sid,{type:'image',attachment});return readImageFile(this.root,attachment);}
+}

@@ -45,7 +45,7 @@ const model=http.createServer(async(req,res)=>{
   }
   if(!afterTool){
     chunk({role:'assistant',reasoning_content:'I will inspect the isolated fixture note.'});
-    chunk({tool_calls:[{index:0,id:'fixture_read',type:'function',function:{name:'read',arguments:JSON.stringify({path:join(workspace,'note.txt')})}}]},'tool_calls');
+    chunk({tool_calls:[{index:0,id:'fixture_read',type:'function',function:{name:'read',arguments:JSON.stringify({path:process.env.AUGMENTOR_HARNESS_PROOF_ATTACHMENTS==='1'?(()=>{const text=typeof lastUser.content==='string'?lastUser.content:lastUser.content.map(p=>p.text??'').join('');const row=text.split('\n').find(line=>line.startsWith('{"name":'));return row?JSON.parse(row).path:join(workspace,'note.txt');})():join(workspace,'note.txt')})}}]},'tool_calls');
   }else{
     chunk({role:'assistant',reasoning_content:'The read tool returned the fixture note.'});
     chunk({content:'The note says: Harness fixture ready. The real Pi session executed one read tool; this provider is a deterministic test fixture.'},'stop',{prompt_tokens:640,completion_tokens:45,total_tokens:685});
