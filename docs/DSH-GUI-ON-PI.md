@@ -802,3 +802,7 @@ The [installed refusal follow-up](PI-COMPACTION.md#installed-refusal-follow-up--
 ## Original Context preferences — October 11 follow-up
 
 [Original Context preferences](CONTEXT-PREFERENCES.md) connects the supplier settings card to seven private, revisioned Pi display defaults. Unsupported Fleet/sidebar/prompt-wrapping controls remain visibly disabled; stale/unknown writes require explicit refresh and are never replayed. Source/ordinary/installed qualification follows in the guide; complete Harness and platform gates remain open.
+
+## Installed original Context preferences — October 11
+
+[Installed original Context preferences](CONTEXT-PREFERENCES.md#installed-mx-qualification--october-11): runtime 52a0368f1f3272c8c202879ffca894eca22bbe06, private MX 20261011-224436-af6876b9, product 0.2.13, artifact d15089e3b6545205c7c55a7ec98b4d69adb035ba089e0d0e7ce7ab4a47ab7175, selected/running. Source and ordinary Node 24.19.0 each pass 251/251 across 38 files. Guarded adoption, matching Host/Native roots and the full 21,786-entry inventory pass. The original card persists seven display defaults; installed Turn/reload/chart acceptance restores Step. Eleven histories/queues and old original prefixes are preserved with classified title/lifecycle/index changes and exactly two display-only settings writes. Dependencies/native/supplier licence bodies/CSS/model/speech settings remain preserved; full Harness/migration/live/privacy/public packaging/platform gates stay open.
