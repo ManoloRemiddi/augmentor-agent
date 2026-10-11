@@ -59,3 +59,8 @@ test('Insights enforces the corpus and per-session budgets with two concurrent w
 test('Insights does not retain context messages in corpus projections',()=>{
  const value=insightProjection([request(1,{payload:retained}),end(2,'r1')],payload);assert(value.currentAvailable);assert(!JSON.stringify(value).includes('Public fixture instructions.'));assert.deepEqual(value.timeline.archive,[]);
 });
+
+test('Insights empty sessions have no available body or invented zero context ring',async()=>{
+ const projected=insightProjection([],null);assert.equal(projected.currentAvailable,false);
+ const {reader,calls}=fixture({entries:[]});assert.equal(await reader.load(),true);assert.equal(reader.state.coverage.bodies,0);assert.equal(reader.state.coverage.bodyUnavailable,1);assert.equal(reader.state.details.get('a').currentAvailable,false);assert.equal(calls.filter(c=>c.method==='observation.payload').length,0);
+});

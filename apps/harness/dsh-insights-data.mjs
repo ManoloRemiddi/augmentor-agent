@@ -45,7 +45,7 @@ export function insightProjection(records,payload){
  const value=projectDshContext({records:safeLatest?[safeLatest,...summary.accepted.filter(r=>r.requestId===safeLatest.id)]:[],events:[],payloads:safeLatest&&payload?{[safeLatest.id]:payload}:{}});
  // Corpus cards retain figures, never all provider texts or historical nodes.
  const timeline={...value.timeline,nodes:[],archive:[],requests:[],events:[],fileOps:[],cost:summary.cost,counts:{...value.timeline.counts,turns:summary.turns,steps:summary.requests}};
- return {summary:{...summary,accepted:undefined},timeline,activity:{days:summary.days},currentAvailable:value.coverage.latestAvailable};
+ return {summary:{...summary,accepted:undefined},timeline,activity:{days:summary.days},currentAvailable:Boolean(safeLatest&&payload&&value.coverage.latestAvailable)};
 }
 /** The original donut shows actual SDK-normalized buckets, not an inferred all-history composition. */
 export function reportedInsightTokens(rows){
