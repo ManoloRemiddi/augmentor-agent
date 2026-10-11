@@ -104,6 +104,10 @@ Actual SDK/private-owner fixtures reproduce three baselines: pre-runner loader r
 
 Fault injection overrides only public **DefaultResourceLoader.reload** in an isolated test child using that tree's declared SDK export. Product code does not patch supplier methods. These independently authored synthetic provider/resource/account cases do not qualify live services, opaque resource side effects, failure at every SDK boundary or installed/platform acceptance. [The migration specification](AUGMENTOR-HARNESS-MIGRATION.md#required-feature-parity) remains binding.
 
+### Pending-reload qualification
+
+Implementation **`3e278de5f7fad42fed95715aed667d166a146f60`**: full product-code source **775 cases/773 passes/two existing optional skips**, stable ordinary Node 24.19.0 stage **153 passes/no skips**, all zero failures. The later portable preload file-URL fixture passes all three recovery cases in both current source and bundled stage; product bytes are unchanged. Native Python source is unchanged from the preceding 872-case/835-pass/37-skip qualification; current actual Qt cases qualify the changed Node RPC behavior. All 311 compiled files match stage, and the preceding stage's 19,088 dependency files, 709 license files, locks, distribution/native records and binary hashes remain unchanged. Strict inventory retains 126 npm instances/four native components. [The exact handoff](AGENT-HANDOFF.md#october-11-pending-mcp-reload-recovery-checkpoint) owns verified baselines, fixture corrections, process cleanup and complete remaining scope.
+
 ## Existing-session MCP options
 
 Saving changed server-log retention or automatic codemode activation now refreshes each loaded Native conversation through the public Pi 1.1.0 **AgentSession.reload({beforeSessionStart})** API. The same AgentSession, native manager/history, selected model, permission policy and paused Host queue remain owned by the existing conversation. The SDK refreshes approved extensions/resources and their lifecycle hooks; the existing profile editor explains that consequence. Validation starts no session/transport/command. No second agent loop or supplier-private import/patch is introduced.
