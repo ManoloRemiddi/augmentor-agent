@@ -12,6 +12,8 @@ Copied components include AppFrame, SidebarRoot, conversation layout and compose
 
 The original DeepSeek MIT copyright/license, selected CosmoKit/Schemastery licenses and all bundled npm notices are retained. The browser bundle includes **95 npm package notice records**. These packages have their own licenses, including compatible non-MIT licenses; they are not all relabeled MIT. Separately authored glue retains Augmentor's own source license. The build verifies every selected source hash and rejects DSH client-runtime, Cordis owner, account/analytics modules, PostHog and Sentry from the compiled dependency graph.
 
+The longer Augmentor name uses DSH's existing fallback-brand text class so it fits the fixed-height identity row. Composer labels omit the unconnected file-mention/slash hints. No original supplier styles are changed. All eight DSH contract/browser cases pass again after this binding-only adjustment.
+
 UI build dependencies are exact locked workspace development dependencies. The pre-existing **126 production npm instances** retain their versions and integrities; production dependency files and their 709 existing license files remain unchanged in the ordinary assembly. The selected public Pi SDK remains **1.1.0**.
 
 ## Execution and data ownership
