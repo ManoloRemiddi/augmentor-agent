@@ -4,6 +4,10 @@
 
 The owner has chosen MX Linux first: test the experience on this PC, collect feedback and refine it before implementing further Windows, macOS or other Linux distribution work. The first machine is **MX Linux 25.3 KDE x86-64, based on Debian 13**. This is a separate local development preview, not a production migration or a public binary release.
 
+## October 11 original attachments — current selection
+
+The [original attachment controls](DSH-GUI-ON-PI.md#original-attachments--october-11-follow-up) now use the copied DSH picker/cards/rail/image viewers on Pi. Source and ordinary bundled-Node cohorts each pass **127/127 across sixteen files**, zero failures/skips/cancellations. Selected **and running** release **20261011-145640-7322f8c1**, implementation **9b74f88f8cdb98394012ecec6cef52397f3c2f5c**, product 0.2.13, artifact **d08ce2b892fe9e12adbe22059c5c0ff2b2dfe0e614564f6eb8493f05989293ad** is adopted through normal guarded immutable maintenance. Host/native module roots match; native is online/model-ready. Full inventory passes after startup/upload/request and metadata changes. Original local File/ready cards/image viewers work, Qwen reads the synthetic note and returns harbor, and the original Trajectory preserves exact attachment details and actual read evidence. The model's red-rectangle description invents a black border; that accuracy limitation is retained in the guide. Reload makes no request. Seven histories remain, with all five preceding histories unchanged and one new empty/one completed demonstration. The current chat is **DSH attachments · MX Linux check**. Production selection/model-router and model/speech configuration remain unchanged; prior releases remain preserved. This is the private MX preview, with full release/platform/live-service gates still open.
+
 ## Open the preview
 
 Use **Augmentor Harness Preview** in the application menu, or run:
