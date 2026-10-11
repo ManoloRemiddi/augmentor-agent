@@ -18,6 +18,13 @@ test('explicit command receipts retain only metadata, refuse duplicate replay an
  const cold=new McpManagement(file);assert.equal(cold.lookup('conversation','action').state,'interrupted');assert.equal(cold.lookup('conversation','action').result,'unknown');assert(cold.duplicate(input).duplicate);assert.equal(calls,1);
  release();await manager.settled();const row=manager.lookup('conversation','action');assert.equal(row.state,'completed');assert.equal(row.result,'sdk-reported-success');assert.equal(row.authorizationUrl,null);assert(!manager.busy);
 });
+
+test('session option receipts persist actual reload counts and reject impossible saved application claims without replay',async t=>{
+ const file=await fixture(t),manager=new McpManagement(file),admission={...input,action:'configure',parametersSha256:'a'.repeat(64)};let effects=0;
+ manager.configure(admission,async(_signal,checkpoint)=>{effects++;checkpoint({saveAttempted:true,savedRevision:'b'.repeat(64),expectedSessions:2,appliedSessions:2,reloadedSessions:2,pendingSessionOptions:false});});await manager.settled();const row=manager.lookup(input.sessionId,input.requestId);assert.equal(row.result,'session-options-applied');assert.equal(row.reloadedSessions,2);assert.equal(row.pendingSessionOptions,false);const cold=new McpManagement(file);assert(cold.duplicate(admission).duplicate);assert.equal(cold.lookup(input.sessionId,input.requestId).reloadedSessions,2);assert.equal(effects,1);
+ const retained=JSON.parse(await readFile(file,'utf8'));retained.receipts[0].reloadedSessions=3;await writeFile(file,JSON.stringify(retained));const invalid=new McpManagement(file);assert.equal(invalid.describe().available,false);assert.throws(()=>invalid.configure({...admission,requestId:'must-not-dispatch'},async()=>effects++),/receipts are unavailable/);assert.equal(effects,1);
+});
+
 test('cancellation waits for the actual handler and does not claim credential rollback',async t=>{
  const file=await fixture(t);let release;const waiting=new Promise(resolve=>release=resolve),manager=new McpManagement(file);
  manager.begin(input,async(_args,ctx)=>{await waiting;await ctx.ui.input('private SDK title','private prefill');ctx.ui.notify('Sign-in cancelled.','info');},context);

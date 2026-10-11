@@ -28,6 +28,9 @@ export class ManagedMcp {
  private revision='missing';
  private pending=false;
  private requestedOptions?:{autoEnableCodemode:boolean;retainLogs:boolean};
+ private reloadPending=false;
+ private autoCodemodeActivated=false;
+ private inheritedAutoCodemode=false;
  private registrationWait?:{snapshot:string;finish:()=>void};
  private connections=new Map<string,{summary:McpConnectionSummary;unsaved:number}>();
  private connectionTrackingDropped=0;
@@ -58,7 +61,8 @@ export class ManagedMcp {
    }catch{this.errors.push('A managed MCP server could not be registered; check its name and configuration.');}
   }
  };
- factories():ExtensionFactory[]{const builtin=createMcpExtension({
+ factories():ExtensionFactory[]{
+  const managed:ExtensionFactory=pi=>{this.autoCodemodeActivated=this.inheritedAutoCodemode;this.inheritedAutoCodemode=false;const builtin=createMcpExtension({
   // Registrations above are validated by public ExtensionAPI. Do not admit
   // project files or Pi's default global config outside this managed profile.
   loadConfig:()=>({servers:[],errors:[...this.errors],autoEnableCodemode:this.autoEnableCodemode}),
@@ -83,7 +87,8 @@ export class ManagedMcp {
   // an unrelated default browser or place the URL in retained notifications.
   openUrl:url=>{if(!this.openAuthorization)throw Error('Open MCP management to sign in.');this.openAuthorization(url);},
  });
-  const managed:ExtensionFactory=pi=>builtin(new Proxy(pi,{get:(target,key)=>{
+  return builtin(new Proxy(pi,{get:(target,key)=>{
+   if(key==='setActiveTools')return (names:string[])=>{if(names.includes('codemode')&&!target.getActiveTools().includes('codemode'))this.autoCodemodeActivated=true;target.setActiveTools(names);};
    if(key==='registerCommand')return (name:string,options:Omit<RegisteredCommand,'name'|'sourceInfo'>)=>{if(name==='mcp')this.command=options.handler;target.registerCommand(name,options);};
    if(key==='on')return (event:string,handler:(event:any,ctx:ExtensionContext)=>unknown)=>{
     const guarded=async(value:any,ctx:ExtensionContext)=>{
@@ -94,7 +99,7 @@ export class ManagedMcp {
     target.on(event as 'mcp_servers_change',(event==='mcp_servers_change'||event==='session_start'?guarded:handler) as any);
    };
    return Reflect.get(target,key);
-  }}));
+  }}));};
   // SDK event dispatch awaits handlers in factory order. This observer runs
   // after the built-in handler's close/connect work for the matching snapshot;
   // registration return alone is not settlement or connection health.
@@ -109,6 +114,15 @@ export class ManagedMcp {
  }
  assertReady(){if(this.pending)throw Error('MCP configuration has not settled for this conversation. Inspect its configuration receipt before sending a prompt.');}
  markPending(){this.pending=true;}
+ needsSessionReload(profile:McpProfile){return this.reloadPending||profile.autoEnableCodemode!==this.autoEnableCodemode||profile.retainLogs!==this.retainLogs;}
+ prepareSessionReload(profile:McpProfile){
+  const removeAutoCodemode=this.autoCodemodeActivated&&!profile.autoEnableCodemode;
+  this.inheritedAutoCodemode=this.autoCodemodeActivated&&profile.autoEnableCodemode;
+  this.reloadPending=true;this.entries=profile.document.mcpServers as Record<string,unknown>;this.readTools=new Set(profile.readTools);
+  this.autoEnableCodemode=profile.autoEnableCodemode;this.retainLogs=profile.retainLogs;this.requestedOptions=undefined;this.errors=[];this.owned.clear();
+  return {removeAutoCodemode};
+ }
+ finishSessionReload(revision:string){this.reloadPending=false;this.pending=false;this.revision=revision;}
  async apply(profile:McpProfile,revision:string){
   this.preflight(profile);const api=this.api!;
   const change=(mutate:()=>void)=>new Promise<void>((resolve,reject)=>{
@@ -142,13 +156,19 @@ export class ManagedMcp {
   return this.readTools.has(name)&&this.api?.getAllTools().some(tool=>tool.name===name)===true;
  }
  describe(){
-  const tools=this.api?.getAllTools()??[],active=new Set(this.api?.getActiveTools()??[]),servers=this.api?.getMcpServers()??[];let remaining=256;
+  // Public reload invalidates the old API before constructing the new runner.
+  // Inspection during that interval must not claim a live catalog or throw
+  // through a captured stale context.
+  let catalog:undefined|{tools:ReturnType<ExtensionAPI['getAllTools']>;active:string[];servers:ReturnType<ExtensionAPI['getMcpServers']>};
+  try{if(this.api)catalog={tools:this.api.getAllTools(),active:this.api.getActiveTools(),servers:this.api.getMcpServers()};}catch{}
+  const tools=catalog?.tools??[],active=new Set(catalog?.active??[]),servers=catalog?.servers??[];let remaining=256;
   const authorization=new Map<string,McpAuthorizationObservation>();
   const history=new Map<string,McpConnectionSummary>(),visible=new Set(servers.slice(0,64).map(row=>row.name));
   for(const entry of this.manager?.getBranch()??[])if(entry.type==='custom'&&entry.customType===MCP_AUTHORIZATION_TYPE){const row=savedMcpAuthorization(entry.data);if(row)authorization.set(row.server,row);}
   for(const entry of this.manager?.getBranch()??[])if(entry.type==='custom'&&entry.customType===MCP_CONNECTION_TYPE){const row=savedMcpConnection(entry.data);if(!row||!visible.has(row.server))continue;const previous=history.get(row.server);if(row.event==='created'||!previous||previous.instanceId===row.instanceId)history.set(row.server,connectionSummary(previous?.instanceId===row.instanceId?previous:undefined,row));}
-  return {available:!!this.api,source:'managed-profile-mcp.json',projectConfiguration:false,modelsInCodemode:false,retainServerLogs:this.retainLogs,configurationErrors:this.errors.length,
-   configuration:{loadedRevision:this.revision,registrationPending:this.pending,pendingSessionOptions:this.requestedOptions?this.requestedOptions.autoEnableCodemode!==this.autoEnableCodemode||this.requestedOptions.retainLogs!==this.retainLogs:false,optionApplication:'log retention and automatic codemode activation use the values at session load; changed values apply to new sessions'},
+  return {available:!!catalog,source:'managed-profile-mcp.json',projectConfiguration:false,modelsInCodemode:false,retainServerLogs:this.retainLogs,configurationErrors:this.errors.length,
+   configuration:{loadedRevision:this.revision,registrationPending:this.pending,pendingSessionOptions:this.reloadPending||(this.requestedOptions?this.requestedOptions.autoEnableCodemode!==this.autoEnableCodemode||this.requestedOptions.retainLogs!==this.retainLogs:false),optionApplication:'changed log retention and automatic codemode options use an idle public session reload; connection health is separate'},
+   activeDiscoveryTools:[...discovery].filter(name=>active.has(name)),
    coverage:'registered MCP tool catalog and public transport observations; no health probe or private SDK connection state',connectionTrackingDropped:this.connectionTrackingDropped,serverCount:servers.length,omittedServers:Math.max(0,servers.length-64),servers:servers.slice(0,64).map(entry=>{
     const namespace='mcp__'+entry.name.replaceAll('-','_'),registered=tools.filter(tool=>tool.namespace?.name===namespace),shown=registered.filter(tool=>tool.name.length<=256).slice(0,remaining);remaining-=shown.length;
     const lastObserved=authorization.get(entry.name)??null,gap=this.authorizationGaps.get(entry.name);

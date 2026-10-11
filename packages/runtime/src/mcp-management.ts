@@ -6,14 +6,14 @@ import {atomicJson} from './storage.js';
 
 export type McpManagementAction='login'|'logout'|'reconnect'|'configure';
 type State='running'|'cancel-requested'|'completed'|'failed'|'cancelled'|'interrupted';
-type Result='pending'|'sdk-reported-success'|'sdk-reported-error'|'sdk-reported-warning'|'sdk-command-settled'|'registration-events-settled'|'configuration-not-saved'|'profile-saved-partial'|'unknown';
+type Result='pending'|'sdk-reported-success'|'sdk-reported-error'|'sdk-reported-warning'|'sdk-command-settled'|'registration-events-settled'|'session-options-applied'|'configuration-not-saved'|'profile-saved-partial'|'unknown';
 export interface McpManagementReceipt {
  requestId:string;sessionId:string;server:string;action:McpManagementAction;state:State;result:Result;
  startedAt:string;settledAt?:string;cancelRequested:boolean;
- parametersSha256?:string;saveAttempted?:boolean;savedRevision?:string;appliedSessions?:number;expectedSessions?:number;pendingSessionOptions?:boolean;
+ parametersSha256?:string;saveAttempted?:boolean;savedRevision?:string;appliedSessions?:number;expectedSessions?:number;reloadedSessions?:number;pendingSessionOptions?:boolean;
 }
 type Admission={sessionId:string;requestId:string;server:string;action:McpManagementAction;parametersSha256?:string};
-const actions=new Set(['login','logout','reconnect','configure']),states=new Set(['running','cancel-requested','completed','failed','cancelled','interrupted']),results=new Set(['pending','sdk-reported-success','sdk-reported-error','sdk-reported-warning','sdk-command-settled','registration-events-settled','configuration-not-saved','profile-saved-partial','unknown']);
+const actions=new Set(['login','logout','reconnect','configure']),states=new Set(['running','cancel-requested','completed','failed','cancelled','interrupted']),results=new Set(['pending','sdk-reported-success','sdk-reported-error','sdk-reported-warning','sdk-command-settled','registration-events-settled','session-options-applied','configuration-not-saved','profile-saved-partial','unknown']);
 const hash=(value:unknown)=>typeof value==='string'&&/^[a-f0-9]{64}$/.test(value);
 const terminal=(row:McpManagementReceipt)=>!['running','cancel-requested'].includes(row.state);
 const iso=(value:unknown)=>typeof value==='string'&&value.length===24&&!Number.isNaN(Date.parse(value))&&new Date(value).toISOString()===value;
@@ -22,13 +22,15 @@ function saved(value:unknown):McpManagementReceipt {
  const row=value as McpManagementReceipt;
  if(!row||typeof row!=='object'||!actions.has(row.action)||!states.has(row.state)||!results.has(row.result)||!iso(row.startedAt)||(row.settledAt!==undefined&&!iso(row.settledAt))||typeof row.cancelRequested!=='boolean')throw Error('Invalid MCP management receipt');
  if(terminal(row)?!row.settledAt||row.result==='pending':row.settledAt!==undefined||row.result!=='pending')throw Error('Invalid MCP management settlement');
- if(row.state==='interrupted'&&row.result!=='unknown'||row.state==='completed'&&!['sdk-reported-success','sdk-command-settled','registration-events-settled'].includes(row.result)||row.state==='cancelled'&&!['sdk-command-settled','configuration-not-saved'].includes(row.result))throw Error('Invalid MCP management outcome');
+ if(row.state==='interrupted'&&row.result!=='unknown'||row.state==='completed'&&!['sdk-reported-success','sdk-command-settled','registration-events-settled','session-options-applied'].includes(row.result)||row.state==='cancelled'&&!['sdk-command-settled','configuration-not-saved'].includes(row.result))throw Error('Invalid MCP management outcome');
  const extra:Partial<McpManagementReceipt>={};
  if(row.action==='configure'){
   if(!hash(row.parametersSha256))throw Error('Invalid configuration identity');extra.parametersSha256=row.parametersSha256;
   if(row.savedRevision!==undefined){if(!hash(row.savedRevision))throw Error('Invalid revision');extra.savedRevision=row.savedRevision;}
-  for(const key of ['appliedSessions','expectedSessions'] as const)if(row[key]!==undefined){if(!Number.isSafeInteger(row[key])||row[key]!<0)throw Error('Invalid session count');extra[key]=row[key];}
+  for(const key of ['appliedSessions','expectedSessions','reloadedSessions'] as const)if(row[key]!==undefined){if(!Number.isSafeInteger(row[key])||row[key]!<0)throw Error('Invalid session count');extra[key]=row[key];}
   for(const key of ['saveAttempted','pendingSessionOptions'] as const)if(row[key]!==undefined){if(typeof row[key]!=='boolean')throw Error('Invalid option report');extra[key]=row[key];}
+  if(row.reloadedSessions!==undefined&&(row.appliedSessions===undefined||row.reloadedSessions>row.appliedSessions||row.expectedSessions!==undefined&&row.appliedSessions>row.expectedSessions))throw Error('Invalid reload count');
+  if(row.result==='session-options-applied'&&(!row.savedRevision||!row.reloadedSessions||row.appliedSessions!==row.expectedSessions||row.pendingSessionOptions!==false))throw Error('Invalid option application');
  }
  return {requestId:identifier(row.requestId),sessionId:identifier(row.sessionId),server:serverName(row.server),action:row.action,state:row.state,result:row.result,startedAt:row.startedAt,...(row.settledAt?{settledAt:row.settledAt}:{}),cancelRequested:row.cancelRequested,...extra};
 }
@@ -109,13 +111,13 @@ export class McpManagement {
   });
   return {accepted:true,duplicate:false,...this.lookup(row.sessionId,row.requestId)};
  }
- configure(input:Admission,effect:(signal:AbortSignal,checkpoint:(details:Pick<McpManagementReceipt,'saveAttempted'|'savedRevision'|'appliedSessions'|'expectedSessions'|'pendingSessionOptions'>)=>void)=>Promise<void>){
+ configure(input:Admission,effect:(signal:AbortSignal,checkpoint:(details:Pick<McpManagementReceipt,'saveAttempted'|'savedRevision'|'appliedSessions'|'expectedSessions'|'reloadedSessions'|'pendingSessionOptions'>)=>void)=>Promise<void>){
   const duplicate=this.duplicate(input);if(duplicate)return duplicate;
   const current=this.admit(input),row=current.row;
   current.task=Promise.resolve().then(async()=>{
    if(current.abort.signal.aborted){row.state='cancelled';row.result='configuration-not-saved';return;}
    await effect(current.abort.signal,details=>{Object.assign(row,details);this.persist();this.notify(row);});
-   row.state='completed';row.result='registration-events-settled';
+   row.state='completed';row.result=row.reloadedSessions?'session-options-applied':'registration-events-settled';
   }).catch(()=>{row.state=current.abort.signal.aborted&&!row.saveAttempted?'cancelled':'failed';row.result=row.savedRevision?'profile-saved-partial':row.saveAttempted?'unknown':'configuration-not-saved';}).finally(()=>{
    row.settledAt=new Date().toISOString();this.retain(row);if(this.current===current)this.current=undefined;
   });

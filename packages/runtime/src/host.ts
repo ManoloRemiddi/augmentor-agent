@@ -41,7 +41,7 @@ import {PiReasoning,reasoningConfig,savedReasoning,thinkingLevel,requireThinking
 import {PiPromptImprovement} from './prompt-improvement.js';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {reasoning?:SavedReasoning;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];mcp?:ManagedMcp;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
+interface Loaded {memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean})=>Promise<void>;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 /** Admission is serialized; extension preparation must not hold the host's
  * state lock while waiting for a UI answer, another RPC or an input handler.
  */
@@ -59,6 +59,7 @@ export class Host {
   readonly mcpManagement:McpManagement;
   private serial:Promise<unknown>=Promise.resolve();
   private quiescing=false;
+  private mcpReloading=false;
   private histories=new Map<string,DisplayHistory>();
   private nativeHistories=new Map<string,NativeHistory>();
   private displayOriginals=new Map<string,NativeHistory>();
@@ -115,7 +116,12 @@ export class Host {
     const route=config.routes.find(r=>r.provider===model.provider&&r.model===model.id);
     return {...saved,availableLevels:getSupportedThinkingLevels(model),policy:{...config,revision:this.settings.revision},route:route??null,lastDecision:loaded.reasoning?.snapshot()??null,adaptiveStatus:saved.mode==='manual'?'manual-override':!config.enabled?'policy-disabled':!config.presets.includes(preset)?'preset-excluded':!route?'unmapped-model':'configured'};
   }
-  policy(m:Meta){return (pi:ExtensionAPI)=>{pi.on('tool_call',async e=>{
+  policy(m:Meta){return (pi:ExtensionAPI)=>{
+    // Resource startup/reload may call the SDK's sendUserMessage API. Only
+    // an admitted Host turn may deliver input into this conversation's loop.
+    pi.on('input',()=>this.mcpReloading||!m.running?{action:'handled'}:undefined);
+    pi.on('tool_call',async e=>{
+    if((this.mcpReloading||!m.running)&&e.toolName!=='linux_desktop_stop')return {block:true,reason:'No admitted Host turn is available for this tool call.'};
     if(e.toolName==='linux_desktop_stop')this.desktopSpecialist.cancel('pi:'+m.id);
     if(m.surface==='browser'&&!['browser_tabs_list','browser_screenshot','browser_snapshot','browser_navigate','browser_click','browser_type','memory_recall','memory_source','tool_result_excerpt','home_devices','home_set','home_read','home_status','home_request','home_result','home_cancel'].includes(e.toolName))
       return {block:true,reason:'This browser chat can only use its browser tools.'};
@@ -128,6 +134,7 @@ export class Host {
     if(m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,e.toolName,e.input))return {block:true,reason:'Action not approved, cancelled or no user interface connected.'};
   });};}
   async load(m:Meta,branchManager?:SessionManager){let record=this.loaded.get(m.id);if(record){record.mcp?.assertReady();return record;}
+    if(this.mcpReloading)throw Error('Finish MCP session reload before loading another conversation.');
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish MCP management before loading another Native conversation.');
     const model=await this.selected(m.selection);
     const memory=new DualMemoryClient('pi:'+m.id,m.cwd,undefined,message=>console.warn('[augmentor-memory]',message));
@@ -167,19 +174,43 @@ export class Host {
     let history=record.events;
     if(m.fork){m.memoryStartSeq??=history.at(-1)?.seq??0;this.save(m);history=history.filter(e=>e.seq>m.memoryStartSeq!);}
     await memory.append(history.flatMap(event=>piTranscriptEvent(event)));
-    await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.id),onError:error=>this.append(m,'runtime/error',{message:error.error})});
-    record.execution=execution;execution.install(created.session);
-    record.steering=new PiSteering(created.session);record.steering.install();
-    record.reasoning=new PiReasoning(created.session,m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',data=>record!.observation?.record('execution/reasoning',data));record.reasoning.install();
+    await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.id),onError:error=>{if(record?.reloading)record.reloadError=true;this.append(m,'runtime/error',{message:record?.reloading?'A Pi resource reported a reload problem. Inspect the configuration receipt before continuing.':error.error});}});
+    record.execution=execution;
+    record.steering=new PiSteering(created.session);
+    record.reasoning=new PiReasoning(created.session,m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',data=>record!.observation?.record('execution/reasoning',data));
+    const installBindings=()=>{
+    execution.install(created.session);record!.steering!.install();record!.reasoning!.install();
     provenance.attach(created.session);
     record.observation=observeSession(created.session,this.observations,m.id,
       ()=>({turnId:record!.turnId,selected:{...m.selection},permissionPreset:m.policy,toolBudget:{...TOOL_BUDGET,units:'unicode-code-points'},execution:record!.execution?.describe(),reasoning:record!.reasoning?.snapshot()}),
       observation=>this.publish(m.id,{method:'observation/event',payload:{sessionId:m.id,observation}}),
       message=>this.append(m,'runtime/warning',{message}),provenance);
-    record.observation.record('session/load',{piVersion:'1.1.0',productVersion:RELEASE.version,
+    return record!.observation;
+    };
+    const installed=installBindings();
+    record.reload=async options=>{
+      record!.reloading=true;record!.reloadError=false;
+      try{
+      // Unwind in reverse composition order; the public reload replaces the
+      // runner captured by execution's nested-tool hooks, but keeps this owner.
+      record!.observation?.dispose();record!.observation=undefined;
+      record!.reasoning?.dispose();record!.steering?.dispose();execution.dispose();
+      await created.session.reload({beforeSessionStart:()=>{
+        if(options.removeAutoCodemode)created.session.setActiveToolsByName(created.session.getActiveToolNames().filter(name=>name!=='codemode'));
+        installBindings();
+      }});
+      if(record!.reloadError||resourceLoader.getExtensions().errors.length)throw Error('An approved Pi resource failed to reload. Repair it before applying the configuration again.');
+      const reloadedModel=created.session.model;
+      if(!reloadedModel||reloadedModel.provider!==m.selection.provider||reloadedModel.id!==m.selection.model)throw Error('A reloaded resource changed the selected model. Choose the intended model explicitly before continuing.');
+      requireThinking(reloadedModel,this.reasoningSettings(m).thinkingLevel);
+      created.session.agent.toolExecution='sequential';
+      const recordReload=()=>record!.observation?.record('session/reload',{reason:'mcp-session-options',piVersion:'1.1.0'});recordReload();
+      }finally{record!.reloading=false;}
+    };
+    installed.record('session/load',{piVersion:'1.1.0',productVersion:RELEASE.version,
       surface:m.surface??'linux',policy:m.policy,...(m.fork?{fork:m.fork}:{})});
-    if(mcp){const info=mcp.describe();if(info.servers.length||info.configurationErrors)record.observation.record('integration/mcp',info);if(info.configurationErrors)this.append(m,'runtime/warning',{message:'Managed MCP configuration contains errors. Some servers are unavailable; ordinary chat remains available.'});}
-    if(repaired.length)record.observation.record('context/budget',{changes:repaired,units:'unicode-code-points',boundary:'before-session-owner-load'});
+    if(mcp){const info=mcp.describe();if(info.servers.length||info.configurationErrors)installed.record('integration/mcp',info);if(info.configurationErrors)this.append(m,'runtime/warning',{message:'Managed MCP configuration contains errors. Some servers are unavailable; ordinary chat remains available.'});}
+    if(repaired.length)installed.record('context/budget',{changes:repaired,units:'unicode-code-points',boundary:'before-session-owner-load'});
     created.session.subscribe(e=>{
       if(e.type==='message_start'&&e.message.role==='user'){
         const correction=record!.steering?.delivery(e.message);
@@ -248,6 +279,7 @@ export class Host {
   }
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
   submit(r:Loaded,input:string,id:string){r.mcp?.assertReady();const m=r.meta;if(m.running)throw new Error('This conversation is already working');
+    if(this.mcpReloading)throw Error('Finish MCP session reload before sending a chat prompt.');
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
     const reasoningPolicy=reasoningConfig(this.settings.reasoning),savedThinking=this.reasoningSettings(m);
     r.turnId=randomUUID();const queue=this.queue(m);queue.dispatch(id,r.turnId);
@@ -285,11 +317,11 @@ export class Host {
     if(this.pumping.has(m.id))return this.pumping.get(m.id)!;
     const run=this.serial.then(async()=>{
       const queue=this.queue(m);
-      if(this.quiescing||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain||!queue.next)return;
+      if(this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain||!queue.next)return;
       const item=queue.next;
       let r:Loaded;
       try{r=await this.load(m);}catch(error){queue.notSent(item.id);this.append(m,'runtime/error',{message:'Queued prompt was not sent: '+String(error)});return;}
-      if(this.quiescing||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
+      if(this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
       this.submit(r,item.input!,item.id);
     });
     this.serial=run.catch(()=>{});this.pumping.set(m.id,run);
@@ -307,7 +339,9 @@ export class Host {
     const run=this.serial.then(()=>{if(this.quiescing&&method!=='host.describe')throw new Error('Runtime is closing for maintenance. No action was submitted.');return this.handle(method,p,id);});this.serial=run.catch(()=>{});
     const result=await run;return result instanceof SteeringReply?result.settled:result;
   }
-  async handle(method:string,p:Data,id:string):Promise<any>{switch(method){
+  async handle(method:string,p:Data,id:string):Promise<any>{
+    if(this.mcpReloading&&(['prompt.improve','setup.save','models.configure','models.reload','session.create','session.branch','session.trimTools','session.selectModel','session.selectReasoning','reasoning.configure','session.prompt','session.continueQueue'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Finish MCP session reload before changing or starting a conversation.');
+    switch(method){
     case 'prompt.improve':{
       const model=await this.selected(p.selection);
       const instructions=(await promptCall('prompts.list')).improvement;
@@ -398,15 +432,27 @@ export class Host {
       }
       const targets=[...this.loaded.values()].filter(row=>row.mcp);
       return this.mcpManagement.configure(input,async(signal,checkpoint)=>{
+       try{
         const profile=await prepareMcpProfile(proposed,m.cwd,this.dirs.agent);
         for(const row of targets)row.mcp!.preflight(profile);
+        if(targets.some(row=>row.mcp!.needsSessionReload(profile))){
+          // Public reload resets shared provider registrations. Exclude work
+          // in every surface before save, and admit none until it settles.
+          this.mcpReloading=true;
+          if(this.improvements.busy||[...this.metadata.values()].some(row=>row.running||!this.queue(row).paused&&!!this.queue(row).next))throw Error('Finish all turns and pause waiting prompts before changing MCP session options.');
+        }
         if(signal.aborted)throw Error('Cancelled before profile save.');
         const revision=saveMcpProfile(file,p.expectedRevision,profile,()=>{checkpoint({saveAttempted:true});for(const row of targets)row.mcp!.markPending();});
         checkpoint({savedRevision:revision,expectedSessions:targets.length,appliedSessions:0});
-        let applied=0,pendingOptions=false;
+        let applied=0,reloaded=0,pendingOptions=false;
         // Once saved, finish applying instead of letting Cancel leave avoidable
         // stale owners. A crash/SDK rejection remains partial/unknown, no replay.
-        for(const row of targets){await row.mcp!.apply(profile,revision);applied++;pendingOptions ||= row.mcp!.describe().configuration.pendingSessionOptions;checkpoint({appliedSessions:applied,pendingSessionOptions:pendingOptions});}
+        for(const row of targets){
+          if(row.mcp!.needsSessionReload(profile)){const options=row.mcp!.prepareSessionReload(profile);await row.reload!(options);row.mcp!.finishSessionReload(revision);reloaded++;}
+          else await row.mcp!.apply(profile,revision);
+          applied++;pendingOptions ||= row.mcp!.describe().configuration.pendingSessionOptions;checkpoint({appliedSessions:applied,reloadedSessions:reloaded,pendingSessionOptions:pendingOptions});
+        }
+       }finally{this.mcpReloading=false;}
       });
     }
     case 'session.mcpAction':{
@@ -459,10 +505,12 @@ export class Host {
       // Templates/skills use Session.prompt's SDK expansion, while registered
       // commands cannot bypass the persistent queue's admission/receipt rules.
       if(input.startsWith('/'))validateSteeringInput((await this.load(m)).session,input);
+      if(this.mcpReloading||m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish MCP management or session reload before admitting another prompt.');
       queue.enqueue(requestId,input,m.running||queue.paused||!!queue.next);
       if(p.resumeQueue===true||(p.mode===undefined&&!m.running&&p.resumeQueue!==false))queue.resume();
       if(!m.running&&!queue.paused){
         let r:Loaded;try{r=await this.load(m);}catch(error){queue.notSent(requestId);throw error;}
+        if(this.mcpReloading||m.surface!=='browser'&&this.mcpManagement.busy){queue.notSent(requestId);throw Error('Finish MCP management or session reload before dispatching another prompt.');}
         if(!queue.paused&&queue.next?.id===requestId)return {...this.submit(r,input,requestId),requestId};
         if(!queue.paused)this.pump(m);
       }

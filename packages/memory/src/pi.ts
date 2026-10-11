@@ -7,7 +7,7 @@ export function piMemoryContext(memory:DualMemoryClient,recall=true,observe?:(co
     // An inspection failure must not change memory composition or agent execution.
     try{observe?.({sourceSession:memory.session,mode:'text',status:recall?(context?'returned-context':'empty-result'):'skipped-for-branch',boundary:'managed-memory-recall-before-system-append',context});}catch{}
     return context?{systemPrompt:event.systemPrompt+'\n\n'+context}:undefined;});
-  pi.on('session_shutdown',()=>{memory.close();});
+  pi.on('session_shutdown',async event=>{if(event.reason==='reload'){await memory.activity('stop');await memory.flush();}else memory.close();});
   pi.on('turn_start',async()=>{await memory.activity('foreground');});
   pi.on('tool_call',async event=>{await memory.activity(['bash','read','write','edit','ls','find','grep'].includes(event.toolName)||event.toolName.startsWith('browser_')?'tools':'foreground');});
 };}

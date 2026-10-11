@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {harnessCdp as cdp} from './fixtures/harness-cdp.mjs';
+import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
 import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -35,8 +36,8 @@ test('Harness shared prompt editor, Native conflicts and two-step clipboard inse
   const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),runtimeErrors:panel.errors,requests:(await requests()).length,fixtureErrors:stderr,pointer:await panel.evaluate('globalThis.__promptPointer')});throw error;});
   const value=selector=>panel.evaluate('document.querySelector('+JSON.stringify(selector)+').value');
   const clickExpression=async expression=>{
-    const point=await panel.evaluate('(()=>{const e='+expression+';if(!e||e.disabled)throw Error("Control unavailable");e.scrollIntoView({block:"nearest"});const r=e.getBoundingClientRect();if(!r.width||!r.height)throw Error("Control hidden");const x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);globalThis.__promptPointer={id:e.id,label:e.textContent,rect:r.toJSON(),hit:hit?.id,viewport:{width:innerWidth,height:innerHeight},events:[]};if(!hit||!e.contains(hit))throw Error("Control obscured: "+JSON.stringify(globalThis.__promptPointer));return {x,y};})()');
-    await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});
+    await panel.evaluate('globalThis.__promptPointer={expression:'+JSON.stringify(expression)+',events:[]}');
+    await harnessPointerClick(panel,expression,until);
   };
   const click=selector=>clickExpression('document.querySelector('+JSON.stringify(selector)+')');
   const button=label=>clickExpression('Array.from(document.querySelectorAll(".shared-prompt-editor button")).find(b=>b.textContent==='+JSON.stringify(label)+'&&!b.hidden&&b.getBoundingClientRect().width)');

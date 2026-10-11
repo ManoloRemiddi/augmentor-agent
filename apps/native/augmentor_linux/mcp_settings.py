@@ -24,7 +24,7 @@ class McpDialog(QDialog):
         self.exposure_button=QPushButton('Apply exposure');self.exposure_button.clicked.connect(lambda:self.configure({'operation':'set-exposure','server':self.server.currentData(),'exposure':self.exposure.currentText()}));config_row.addWidget(self.exposure_button)
         self.edit_button=QPushButton('Edit profile JSON');self.edit_button.clicked.connect(self.edit_profile);body.addWidget(self.edit_button)
         self.editor=QWidget();editor_body=QVBoxLayout(self.editor);body.addWidget(self.editor);self.editor.hide();self.profile_revision=None
-        editor_note=QLabel('This private profile may contain credentials. Saving can start or stop configured servers in loaded Native conversations. Log retention and automatic codemode changes apply to new sessions.');editor_note.setWordWrap(True);editor_body.addWidget(editor_note)
+        editor_note=QLabel('This private profile may contain credentials. Saving can start or stop configured servers. Log retention and automatic codemode changes refresh approved extensions in idle conversations.');editor_note.setWordWrap(True);editor_body.addWidget(editor_note)
         self.profile=QPlainTextEdit();self.profile.setAccessibleName('MCP profile JSON');self.profile.setMinimumHeight(px(self,160));editor_body.addWidget(self.profile)
         self.save_button=QPushButton('Save profile');self.save_button.clicked.connect(lambda:self.configure({'operation':'save-profile','expectedRevision':self.profile_revision,'text':self.profile.toPlainText()}));editor_body.addWidget(self.save_button)
         close_editor=QPushButton('Close editor');close_editor.clicked.connect(self.close_editor);editor_body.addWidget(close_editor)
@@ -100,7 +100,7 @@ class McpDialog(QDialog):
             evidence='Last recorded HTTP authorization: '+observation['state']+'. This is historical evidence.' if observation else 'Connection and credential health are not probed by this catalog.'
             configuration=info.get('configuration',{})
             if configuration.get('registrationPending'):evidence+=' Configuration is pending for this conversation.'
-            if configuration.get('pendingSessionOptions'):evidence+=' Changed log retention or automatic codemode settings apply to new sessions.'
+            if configuration.get('pendingSessionOptions'):evidence+=' MCP session options have not settled yet.'
             connection=row.get('connection',{});current=connection.get('current')
             if current:evidence+=' Observed connection: '+current['state']+(' · protocol negotiation observed' if current.get('protocolNegotiated') else ' · protocol negotiation not observed')+(' · last problem: '+current['lastProblem']['event'] if current.get('lastProblem') else '')+'.'
             if connection.get('unsavedObservations'):evidence+=' '+str(connection['unsavedObservations'])+' connection observations could not be saved.'

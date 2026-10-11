@@ -10,9 +10,11 @@ from augmentor_linux.pi_client import PiClient
 from augmentor_linux.window import Window
 from augmentor_linux.panels import SettingsDialog
 from augmentor_linux.mcp_settings import McpDialog
-app=QApplication([]);client=PiClient();sid='native-manager';errors=[]
+app=QApplication([]);client=PiClient();sid='native-manager';errors=[];phase='startup'
 pointer=Path(os.environ['AUGMENTOR_PI_STATE'])/'session.json';pointer.write_text(json.dumps({'endpoint':client.base,'session':sid,'selection':{'provider':'fixture','model':'manager-model'}}));pointer.chmod(0o600)
 def until(check,label):
+    global phase
+    phase=label
     end=time.monotonic()+12
     while time.monotonic()<end:
         app.processEvents()
@@ -45,13 +47,13 @@ try:
                 click(dialog.enable_button,'Disable server');until(lambda:dialog.receipt and dialog.receipt['action']=='configure' and dialog.receipt['result']=='registration-events-settled' and dialog.enable_button.text()=='Enable server' and not dialog.reading,'disable settlement')
                 click(dialog.enable_button,'Enable server');until(lambda:dialog.enable_button.text()=='Disable server' and not dialog.blocked and not dialog.reading,'enable settlement')
                 dialog.exposure.setCurrentText('hidden');click(dialog.exposure_button,'Apply exposure');until(lambda:any(row['name']=='web' and row['exposure']=='hidden' for row in dialog.servers) and not dialog.blocked and not dialog.reading,'exposure settlement')
-                click(dialog.edit_button,'Edit profile');until(lambda:dialog.editor.isVisible() and bool(dialog.profile.toPlainText()) and not dialog.reading,'profile editor');profile=json.loads(dialog.profile.toPlainText());profile['authoredUnrelated']='retained';profile['autoEnableCodemode']=False;profile['mcpServers']['header']['headers']['Authorization']='Bearer AUTHORED_CONFIG_PRIVATE_SECRET';dialog.profile.setPlainText(json.dumps(profile));previous=dialog.receipt['requestId'];click(dialog.save_button,'Save profile');until(lambda:dialog.receipt and dialog.receipt['requestId']!=previous and dialog.receipt['result']=='registration-events-settled' and not dialog.reading,'profile settlement');assert 'apply to new sessions' in dialog.evidence.text();dialog.close_editor();assert dialog.profile.toPlainText()==''
+                click(dialog.edit_button,'Edit profile');until(lambda:dialog.editor.isVisible() and bool(dialog.profile.toPlainText()) and not dialog.reading,'profile editor');profile=json.loads(dialog.profile.toPlainText());profile['authoredUnrelated']='retained';profile['autoEnableCodemode']=False;profile['mcpServers']['header']['headers']['Authorization']='Bearer AUTHORED_CONFIG_PRIVATE_SECRET';dialog.profile.setPlainText(json.dumps(profile));previous=dialog.receipt['requestId'];click(dialog.save_button,'Save profile');until(lambda:dialog.receipt and dialog.receipt['requestId']!=previous and dialog.receipt['result']=='session-options-applied' and not dialog.reading,'profile settlement');assert not dialog.receipt['pendingSessionOptions'];assert 'MCP session options have not settled yet' not in dialog.evidence.text();dialog.close_editor();assert dialog.profile.toPlainText()==''
                 click(dialog.actions['reconnect'],'Reconnect');until(lambda:dialog.receipt and dialog.receipt['action']=='reconnect' and dialog.receipt['state']=='completed' and not dialog.reading,'reconnect settlement')
                 click(dialog.actions['logout'],'Sign out');until(lambda:dialog.receipt and dialog.receipt['action']=='logout' and dialog.receipt['state']=='completed' and not dialog.reading,'sign-out settlement')
                 click(dialog.actions['login'],'Sign in again');until(lambda:bool(dialog.authorization_url) and not dialog.reading,'cancellable login');click(dialog.cancel_button,'Cancel');until(lambda:dialog.receipt and dialog.receipt['state']=='cancelled','cancellation settlement')
                 assert not dialog.authorization_url
                 window.controller.navigating=True;dialog.poll();assert dialog.closed;window.controller.navigating=False
-            except Exception as error:errors.append(str(error))
+            except Exception as error:errors.append({'phase':phase,'type':type(error).__name__,'reason':str(error),'receipt':{key:dialog.receipt.get(key) for key in ['requestId','state','result','pendingSessionOptions']} if dialog and dialog.receipt else None,'serverCount':dialog.server.count() if dialog else None,'authorizationPresent':bool(dialog.authorization_url) if dialog else None})
             finally:
                 if dialog is not None:dialog.accept()
         QTimer.singleShot(0,exercise);QTest.mouseClick(entry,Qt.MouseButton.LeftButton);settings.reject()
