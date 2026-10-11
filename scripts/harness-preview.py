@@ -26,7 +26,7 @@ def configuration():
     config=Path(os.environ.get('XDG_CONFIG_HOME',home/'.config'))/'augmentor-harness-preview'
     state=Path(os.environ.get('XDG_STATE_HOME',home/'.local/state'))/'augmentor-harness-preview'
     runtime=Path(os.environ.get('XDG_RUNTIME_DIR',f'/run/user/{os.getuid()}'))/'augmentor-harness-preview'
-    for directory in (data,config,state,runtime):private_directory(directory)
+    for directory in (data,config,state,runtime,data/'workspace',data/'dictation'):private_directory(directory)
     descriptor=data/'augmentor/desktop.json'
     info=descriptor.lstat()
     if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_mode&0o077 or info.st_nlink!=1:
@@ -60,6 +60,8 @@ def configuration():
          'AUGMENTOR_HARNESS':'1','PYTHONDONTWRITEBYTECODE':'1'})
     env['PYTHONPATH']=str(root/'apps/native')
     env['AUGMENTOR_PI_LLAMA_CPP_PROVIDERS']='mx-qwen'
+    env['AUGMENTOR_PI_WORKSPACE']=str(data/'workspace')
+    env['AUGMENTOR_DICTATION_STATE']=str(data/'dictation')
     return selected,env
 
 
