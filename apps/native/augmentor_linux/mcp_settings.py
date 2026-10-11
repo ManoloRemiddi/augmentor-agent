@@ -3,7 +3,7 @@
 from uuid import uuid4
 from PySide6.QtCore import QTimer,QUrl
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QDialog,QVBoxLayout,QHBoxLayout,QLabel,QComboBox,QPushButton,QLineEdit,QWidget
+from PySide6.QtWidgets import QDialog,QVBoxLayout,QHBoxLayout,QLabel,QComboBox,QPushButton,QLineEdit,QWidget,QPlainTextEdit
 from .ui_scale import px
 
 def active(row):return bool(row) and row.get('state') in ('running','cancel-requested')
@@ -14,10 +14,20 @@ class McpDialog(QDialog):
         self.closed=False;self.reading=False;self.ticket=0;self.servers=[];self.receipt=None;self.authorization_url=None;self.blocked=False;self.available=False
         self.setWindowTitle('MCP servers');self.resize(px(self,550),px(self,430));body=QVBoxLayout(self)
         intro=QLabel('Actions use this conversation’s Pi session. No prompt is sent. Sign-out deletes stored credentials. Reconnect does not replay a tool.');intro.setWordWrap(True);body.addWidget(intro)
-        self.server=QComboBox();self.server.setAccessibleName('MCP server');self.server.currentIndexChanged.connect(self.controls);body.addWidget(self.server)
+        self.server=QComboBox();self.server.setAccessibleName('MCP server');self.server.currentIndexChanged.connect(self.selected_server);body.addWidget(self.server)
         row=QHBoxLayout();body.addLayout(row);self.actions={}
         for kind,label in [('login','Sign in'),('logout','Sign out'),('reconnect','Reconnect')]:
             button=QPushButton(label);button.clicked.connect(lambda _,kind=kind:self.action(kind));row.addWidget(button);self.actions[kind]=button
+        config_row=QHBoxLayout();body.addLayout(config_row)
+        self.enable_button=QPushButton('Enable server');self.enable_button.clicked.connect(self.enable_server);config_row.addWidget(self.enable_button)
+        self.exposure=QComboBox();self.exposure.setAccessibleName('MCP tool exposure');self.exposure.addItems(['codemode','deferred','direct','hidden']);config_row.addWidget(self.exposure)
+        self.exposure_button=QPushButton('Apply exposure');self.exposure_button.clicked.connect(lambda:self.configure({'operation':'set-exposure','server':self.server.currentData(),'exposure':self.exposure.currentText()}));config_row.addWidget(self.exposure_button)
+        self.edit_button=QPushButton('Edit profile JSON');self.edit_button.clicked.connect(self.edit_profile);body.addWidget(self.edit_button)
+        self.editor=QWidget();editor_body=QVBoxLayout(self.editor);body.addWidget(self.editor);self.editor.hide();self.profile_revision=None
+        editor_note=QLabel('This private profile may contain credentials. Saving can start or stop configured servers in loaded Native conversations. Log retention and automatic codemode changes apply to new sessions.');editor_note.setWordWrap(True);editor_body.addWidget(editor_note)
+        self.profile=QPlainTextEdit();self.profile.setAccessibleName('MCP profile JSON');self.profile.setMinimumHeight(px(self,160));editor_body.addWidget(self.profile)
+        self.save_button=QPushButton('Save profile');self.save_button.clicked.connect(lambda:self.configure({'operation':'save-profile','expectedRevision':self.profile_revision,'text':self.profile.toPlainText()}));editor_body.addWidget(self.save_button)
+        close_editor=QPushButton('Close editor');close_editor.clicked.connect(self.close_editor);editor_body.addWidget(close_editor)
         self.note=QLabel('Loading MCP registrations…');self.note.setWordWrap(True);self.note.setAccessibleName('MCP management status');body.addWidget(self.note)
         self.evidence=QLabel('');self.evidence.setWordWrap(True);body.addWidget(self.evidence)
         self.open_sign_in=QPushButton('Open sign-in page');self.open_sign_in.clicked.connect(self.open_url);self.open_sign_in.hide();body.addWidget(self.open_sign_in)
@@ -37,7 +47,7 @@ class McpDialog(QDialog):
                 and not any(getattr(c,key,False) for key in ('closed','running','navigating','preparing')))
 
     def finish(self,_):
-        self.closed=True;self.ticket+=1;self.timer.stop();self.authorization_url=None
+        self.closed=True;self.ticket+=1;self.timer.stop();self.authorization_url=None;self.close_editor()
         if active(self.receipt):self.cancel_receipt(self.receipt['requestId'])
 
     def cancel_receipt(self,request_id):
@@ -53,6 +63,15 @@ class McpDialog(QDialog):
         for kind,button in self.actions.items():button.setEnabled(not self.reading and not self.blocked and self.available and kind in server.get('managementActions',[]))
         self.server.setEnabled(not self.reading and not self.blocked);self.reload_button.setEnabled(not self.reading)
         self.cancel_button.setEnabled(not self.reading and active(self.receipt) and self.receipt.get('state')!='cancel-requested')
+        self.enable_button.setText('Disable server' if server.get('enabled') else 'Enable server')
+        configurable=self.controller.capabilities.get('mcpConfiguration') is True
+        for button in [self.enable_button,self.exposure,self.exposure_button]:button.setEnabled(not self.reading and not self.blocked and self.available and configurable and bool(server))
+        for button in [self.edit_button,self.save_button]:button.setEnabled(not self.reading and not self.blocked and self.available and configurable)
+
+    def selected_server(self,*_):
+        if not hasattr(self,'exposure'):return
+        server=next((row for row in self.servers if row['name']==self.server.currentData()),{})
+        self.exposure.setCurrentText(server.get('exposure','codemode'));self.controls()
 
     def reload(self):
         if self.reading or not self.live():return
@@ -72,12 +91,17 @@ class McpDialog(QDialog):
             index=self.server.findData(selected)
             if index>=0:self.server.setCurrentIndex(index)
             self.server.blockSignals(False);self.receipt=receipt;self.available=info.get('available') is True and info.get('management',{}).get('available') is True;self.blocked=info.get('management',{}).get('busy') is True
+            if self.server.currentData()!=selected:self.selected_server()
             self.authorization_url=receipt.get('authorizationUrl') if receipt else None;self.open_sign_in.setVisible(bool(self.authorization_url))
             waiting=bool(receipt and receipt.get('waitingForRedirect'));self.redirect.setVisible(waiting)
             if not waiting:self.redirect_input.clear()
             self.note.setText((receipt['action']+' · '+receipt['server']+' · '+receipt['state']+' · '+receipt['result']+(' · cancellation requested; credentials were not rolled back' if receipt.get('cancelRequested') else '')) if receipt else info.get('reason') or ('Select a server and an explicit action.' if self.servers else 'No MCP servers are registered in this Pi profile.'))
             row=next((row for row in self.servers if row['name']==self.server.currentData()),{});observation=row.get('authorization',{}).get('lastObserved')
-            self.evidence.setText('Last recorded HTTP authorization: '+observation['state']+'. This is historical evidence.' if observation else 'Connection and credential health are not probed by this catalog.');self.controls()
+            evidence='Last recorded HTTP authorization: '+observation['state']+'. This is historical evidence.' if observation else 'Connection and credential health are not probed by this catalog.'
+            configuration=info.get('configuration',{})
+            if configuration.get('registrationPending'):evidence+=' Configuration is pending for this conversation.'
+            if configuration.get('pendingSessionOptions'):evidence+=' Changed log retention or automatic codemode settings apply to new sessions.'
+            self.evidence.setText(evidence);self.controls()
         self.owner.call_in_background(read,loaded)
 
     def action(self,kind):
@@ -98,6 +122,45 @@ class McpDialog(QDialog):
 
     def cancel(self):
         if self.live() and active(self.receipt):self.cancel_receipt(self.receipt['requestId'])
+
+    def close_editor(self):
+        self.profile.clear();self.profile_revision=None;self.editor.hide()
+
+    def edit_profile(self):
+        if not self.live() or self.reading or self.blocked or not self.available:return
+        self.reading=True;self.ticket+=1;ticket=self.ticket;self.controls();client=self.controller.client;sid=self.session_id
+        def read():
+            try:return client.call('session.mcpProfile',{'sessionId':sid}),None
+            except Exception:return None,'The private MCP profile could not be read.'
+        def loaded(result):
+            if ticket!=self.ticket or not self.live():return
+            self.reading=False;profile,error=result
+            if error:self.note.setText(error)
+            else:self.profile.setPlainText(profile['text']);self.profile_revision=profile['revision'];self.editor.show()
+            self.controls()
+        self.owner.call_in_background(read,loaded)
+
+    def enable_server(self):
+        server=next((row for row in self.servers if row['name']==self.server.currentData()),None)
+        if server:self.configure({'operation':'set-enabled','server':server['name'],'enabled':not server['enabled']})
+
+    def configure(self,params):
+        if not self.live() or self.reading or self.blocked or not self.available:return
+        client=self.controller.client;sid=self.session_id;request_id=str(uuid4());self.reading=True;self.ticket+=1;ticket=self.ticket;self.controls()
+        def submit():
+            try:
+                if 'expectedRevision' not in params:params['expectedRevision']=client.call('session.mcpProfile',{'sessionId':sid,'metadataOnly':True})['revision']
+                return client.call('session.mcpConfigure',{'sessionId':sid,'requestId':request_id,**params}),None
+            except Exception:return None,'Configuration was not acknowledged. Reload the profile and inspect the receipt before another save. Your draft is kept.'
+        def accepted(result):
+            receipt,error=result
+            if ticket!=self.ticket or not self.live():
+                if receipt and active(receipt):self.cancel_receipt(request_id)
+                return
+            self.reading=False
+            if error:self.note.setText(error);self.controls();return
+            self.receipt=receipt;self.blocked=active(receipt);self.controls();self.reload()
+        self.owner.call_in_background(submit,accepted)
 
     def open_url(self):
         if self.live() and self.authorization_url:QDesktopServices.openUrl(QUrl(self.authorization_url))

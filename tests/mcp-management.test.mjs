@@ -33,3 +33,12 @@ test('invalid saved receipts and authorization URLs fail closed before further m
  const file=await fixture(t);await writeFile(file,JSON.stringify({version:'augmentor-mcp-management/1',receipts:[{...input,state:'running',result:'pending',startedAt:new Date().toISOString(),cancelRequested:false},{action:'private-invalid'}]}));const bad=new McpManagement(file);assert.equal(bad.describe().available,false);assert.equal(bad.describe('conversation').lastReceipt,null,'a partially admitted invalid store cannot advertise a live action');assert.throws(()=>bad.begin(input,async()=>{},context),/unavailable/);
  await rm(file);const manager=new McpManagement(file);let release;manager.begin(input,async()=>new Promise(resolve=>release=resolve),context);await Promise.resolve();assert.throws(()=>manager.authorizationUrl('conversation','http://untrusted.invalid/authorize'),/Unsupported/);assert.throws(()=>manager.authorizationUrl('conversation','https://user:password@example.invalid/'),/Unsupported/);release();await manager.settled();
 });
+
+test('configuration admission distinguishes cancellation before save, partial save and unknown write outcomes without retaining profile values',async t=>{
+ const file=await fixture(t),manager=new McpManagement(file),config={...input,action:'configure',parametersSha256:'a'.repeat(64)};
+ let effects=0;manager.configure(config,async()=>effects++);manager.cancel(input.sessionId,input.requestId);await manager.settled();assert.equal(effects,0);assert.equal(manager.lookup(input.sessionId,input.requestId).result,'configuration-not-saved');assert(manager.configure(config,async()=>effects++).duplicate);assert.throws(()=>manager.configure({...config,parametersSha256:'b'.repeat(64)},async()=>{}),/different parameters/);
+ for(const [requestId,savedRevision,result] of [['attempted',undefined,'unknown'],['partial','c'.repeat(64),'profile-saved-partial']]){
+  manager.configure({...config,requestId},async(_signal,checkpoint)=>{checkpoint({saveAttempted:true,...(savedRevision?{savedRevision,expectedSessions:2,appliedSessions:1}:{})});throw Error('AUTHORED_PRIVATE_CONFIG_ERROR');});await manager.settled();const row=manager.lookup(input.sessionId,requestId);assert.equal(row.result,result);assert.equal(row.state,'failed');assert.equal(new McpManagement(file).lookup(input.sessionId,requestId).result,result);
+ }
+ assert(!(await readFile(file,'utf8')).includes('AUTHORED_PRIVATE_CONFIG_ERROR'));
+});

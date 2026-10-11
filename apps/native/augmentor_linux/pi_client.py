@@ -63,7 +63,7 @@ class Connection:
 class PiClient:
     def __init__(self, base=None):
         self.base = base or socket_path()
-        self.capabilities = {'branch': True, 'edit': True, 'queue': False, 'steering': False, 'reasoning': False,'promptImprovement': False,'inspection':False,'mcpManagement':False}
+        self.capabilities = {'branch': True, 'edit': True, 'queue': False, 'steering': False, 'reasoning': False,'promptImprovement': False,'inspection':False,'mcpManagement':False,'mcpConfiguration':False}
         self.supports_queue = False
 
     def call(self, method, payload=None):
@@ -84,6 +84,7 @@ class PiClient:
                 self.capabilities['promptImprovement'] = result.get('capabilities', {}).get('promptImprovement') is True
                 self.capabilities['inspection'] = result.get('capabilities', {}).get('inspection') is True
                 self.capabilities['mcpManagement'] = result.get('capabilities', {}).get('mcpManagement') is True
+                self.capabilities['mcpConfiguration'] = result.get('capabilities', {}).get('mcpConfiguration') is True
             return result
         except (OSError,ValueError) as exc:
             raise ContractError('Cannot reach the Pi runtime: '+str(exc)) from exc

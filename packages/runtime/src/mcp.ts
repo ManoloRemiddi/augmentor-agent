@@ -1,5 +1,4 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {existsSync,readFileSync,statSync} from 'node:fs';
 import {join} from 'node:path';
 import {createCodemodeExtension,createMcpExtension,createToolSearchExtension,type ExtensionAPI,type ExtensionContext,type ExtensionFactory,type McpServerConfig,type RegisteredCommand} from '@earendil-works/pi-coding-agent';
 import {privateDir} from './storage.js';
@@ -7,6 +6,7 @@ import {createManagedMcpTransport} from './mcp-transport.js';
 import {MCP_TRANSPORT_ORIGINAL_TYPE} from './mcp-originals.js';
 import {MCP_AUTHORIZATION_TYPE,savedMcpAuthorization,type McpAuthorizationObservation} from './mcp-authorization.js';
 import type {McpManagementAction} from './mcp-management.js';
+import {readMcpProfile,type McpProfile} from './mcp-profile.js';
 
 const discovery=new Set(['codemode','tool_search','list_mcp_resources','list_mcp_resource_templates','read_mcp_resource']);
 const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
@@ -23,13 +23,18 @@ export class ManagedMcp {
  private entries:Record<string,unknown>={};
  private autoEnableCodemode=true;
  private retainLogs=false;
+ private owned=new Set<string>();
+ private revision='missing';
+ private pending=false;
+ private requestedOptions?:{autoEnableCodemode:boolean;retainLogs:boolean};
+ private registrationWait?:{snapshot:string;finish:()=>void};
  readonly source:string;
  constructor(agentDir:string,private stateDir:string,private sessionId:string,private authorizationChanged?:(event:McpAuthorizationObservation,retained:boolean)=>void,private openAuthorization?:(url:string)=>void){
   this.source=join(agentDir,'mcp.json');
   try{
-   if(!existsSync(this.source))return;
-   if(statSync(this.source).size>1024*1024)throw Error('size');
-   const config:unknown=JSON.parse(readFileSync(this.source,'utf8'));
+   const initial=readMcpProfile(this.source);this.revision=initial.revision;
+   if(initial.revision==='missing')return;
+   const config:unknown=JSON.parse(initial.text);
    if(!object(config)||!object(config.mcpServers)||Object.keys(config.mcpServers).length>64)throw Error('shape');
    if(config.autoEnableCodemode!==undefined&&typeof config.autoEnableCodemode!=='boolean')throw Error('discovery');
    const augmentor=config.augmentor??{};if(!object(augmentor))throw Error('policy');
@@ -46,7 +51,7 @@ export class ManagedMcp {
    const namespace=name.replaceAll('-','_');
    try{
     if(name.length>128||namespaces.has(namespace))throw Error('identity');
-    pi.registerMcpServer(name,config as McpServerConfig);namespaces.add(namespace);
+    pi.registerMcpServer(name,config as McpServerConfig);namespaces.add(namespace);this.owned.add(name);
    }catch{this.errors.push('A managed MCP server could not be registered; check its name and configuration.');}
   }
  };
@@ -69,11 +74,47 @@ export class ManagedMcp {
  });
   const managed:ExtensionFactory=pi=>builtin(new Proxy(pi,{get:(target,key)=>{
    if(key==='registerCommand')return (name:string,options:Omit<RegisteredCommand,'name'|'sourceInfo'>)=>{if(name==='mcp')this.command=options.handler;target.registerCommand(name,options);};
+   if(key==='on')return (event:string,handler:(event:any,ctx:ExtensionContext)=>unknown)=>{
+    const guarded=async(value:any,ctx:ExtensionContext)=>{
+     const ui=new Proxy(ctx.ui,{get:(ui,key)=>key==='notify'?(_message:string,type?:string)=>ui.notify('MCP connection setup reported a problem. Inspect its registration and recorded authorization status; current connection health is unverified.',type==='error'?'error':'warning'):Reflect.get(ui,key)});
+     try{return await handler(value,new Proxy(ctx,{get:(context,key)=>key==='ui'?ui:Reflect.get(context,key)}));}
+     catch{throw Error('MCP connection setup failed; inspect its registration and recorded authorization status.');}
+    };
+    target.on(event as 'mcp_servers_change',(event==='mcp_servers_change'||event==='session_start'?guarded:handler) as any);
+   };
    return Reflect.get(target,key);
   }}));
-  return [createCodemodeExtension({models:false}),createToolSearchExtension(),this.register,managed];
+  // SDK event dispatch awaits handlers in factory order. This observer runs
+  // after the built-in handler's close/connect work for the matching snapshot;
+  // registration return alone is not settlement or connection health.
+  const observer:ExtensionFactory=pi=>{pi.on('mcp_servers_change',event=>{const wait=this.registrationWait;if(wait&&this.snapshot(event.servers)===wait.snapshot){this.registrationWait=undefined;wait.finish();}});};
+  return [createCodemodeExtension({models:false}),createToolSearchExtension(),this.register,managed,observer];
+ }
+ private snapshot(servers:ReturnType<ExtensionAPI['getMcpServers']>){return JSON.stringify(servers.map(row=>[row.name,row.config,row.extensionPath]));}
+ preflight(profile:McpProfile){
+  if(!this.api)throw Error('Load the Native conversation before changing MCP configuration.');
+  const other=this.api.getMcpServers().filter(row=>!this.owned.has(row.name));
+  if([...profile.servers.keys()].some(name=>other.some(row=>row.name.replaceAll('-','_')===name.replaceAll('-','_'))))throw Error('A configured MCP name conflicts with a server owned by another extension. No profile was saved.');
+ }
+ assertReady(){if(this.pending)throw Error('MCP configuration has not settled for this conversation. Inspect its configuration receipt before sending a prompt.');}
+ markPending(){this.pending=true;}
+ async apply(profile:McpProfile,revision:string){
+  this.preflight(profile);const api=this.api!;
+  const change=(mutate:()=>void)=>new Promise<void>((resolve,reject)=>{
+   // Install before the synchronous registration emits its asynchronous event.
+   const wait={snapshot:'',finish:resolve};this.registrationWait=wait;
+   try{mutate();wait.snapshot=this.snapshot(api.getMcpServers());}catch{if(this.registrationWait===wait)this.registrationWait=undefined;reject(Error('An MCP registration could not be changed. The saved profile may be ahead of this conversation.'));}
+  });
+  for(const name of [...this.owned])if(!profile.servers.has(name)){await change(()=>api.unregisterMcpServer(name));this.owned.delete(name);}
+  for(const [name,config] of profile.servers){
+   const current=api.getMcpServers().find(row=>row.name===name);
+   if(!current||JSON.stringify(current.config)!==JSON.stringify(config)){await change(()=>api.registerMcpServer(name,config));this.owned.add(name);}
+  }
+  this.readTools=new Set(profile.readTools);this.entries=profile.document.mcpServers as Record<string,unknown>;this.errors=[];this.revision=revision;this.pending=false;
+  this.requestedOptions={autoEnableCodemode:profile.autoEnableCodemode,retainLogs:profile.retainLogs};
  }
  managementCommand(action:McpManagementAction,name:string){
+  this.assertReady();
   if(!this.command||!this.api)throw Error('MCP management is unavailable for this conversation.');
   const server=this.api.getMcpServers().find(row=>row.name===name);
   if(!server||server.config.enabled===false)throw Error('Choose an enabled registered MCP server.');
@@ -94,6 +135,7 @@ export class ManagedMcp {
   const authorization=new Map<string,McpAuthorizationObservation>();
   for(const entry of this.manager?.getBranch()??[])if(entry.type==='custom'&&entry.customType===MCP_AUTHORIZATION_TYPE){const row=savedMcpAuthorization(entry.data);if(row)authorization.set(row.server,row);}
   return {available:!!this.api,source:'managed-profile-mcp.json',projectConfiguration:false,modelsInCodemode:false,retainServerLogs:this.retainLogs,configurationErrors:this.errors.length,
+   configuration:{loadedRevision:this.revision,registrationPending:this.pending,pendingSessionOptions:this.requestedOptions?this.requestedOptions.autoEnableCodemode!==this.autoEnableCodemode||this.requestedOptions.retainLogs!==this.retainLogs:false,optionApplication:'log retention and automatic codemode activation use the values at session load; changed values apply to new sessions'},
    coverage:'registered MCP tool catalog; not a connection health probe',serverCount:servers.length,omittedServers:Math.max(0,servers.length-64),servers:servers.slice(0,64).map(entry=>{
     const namespace='mcp__'+entry.name.replaceAll('-','_'),registered=tools.filter(tool=>tool.namespace?.name===namespace),shown=registered.filter(tool=>tool.name.length<=256).slice(0,remaining);remaining-=shown.length;
     const lastObserved=authorization.get(entry.name)??null,gap=this.authorizationGaps.get(entry.name);

@@ -24,6 +24,7 @@ import {DisplayHistory} from './display-history.js';
 import {NativeHistory} from './native-history.js';
 import {ManagedMcp} from './mcp.js';
 import {McpManagement,type McpManagementAction} from './mcp-management.js';
+import {readMcpProfile,prepareMcpProfile,saveMcpProfile,mcpDigest} from './mcp-profile.js';
 import {DesktopSpecialist,DESKTOP_DELEGATION_GUIDANCE} from './desktop-specialist.js';
 import {linuxDesktopExecutor} from '../../pi-linux/src/desktop-executor.js';
 import {ObservationStore,OBSERVATION_PROTOCOL,DEFAULT_RETENTION} from '../../observation/src/store.js';
@@ -126,7 +127,7 @@ export class Host {
     if(['home_request','home_set'].includes(e.toolName))return; // Persistent NAS pairing grants the scoped Home capability.
     if(m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,e.toolName,e.input))return {block:true,reason:'Action not approved, cancelled or no user interface connected.'};
   });};}
-  async load(m:Meta,branchManager?:SessionManager){let record=this.loaded.get(m.id);if(record)return record;
+  async load(m:Meta,branchManager?:SessionManager){let record=this.loaded.get(m.id);if(record){record.mcp?.assertReady();return record;}
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish MCP management before loading another Native conversation.');
     const model=await this.selected(m.selection);
     const memory=new DualMemoryClient('pi:'+m.id,m.cwd,undefined,message=>console.warn('[augmentor-memory]',message));
@@ -242,7 +243,7 @@ export class Host {
     return this.branchRow(m);
   }
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
-  submit(r:Loaded,input:string,id:string){const m=r.meta;if(m.running)throw new Error('This conversation is already working');
+  submit(r:Loaded,input:string,id:string){r.mcp?.assertReady();const m=r.meta;if(m.running)throw new Error('This conversation is already working');
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
     const reasoningPolicy=reasoningConfig(this.settings.reasoning),savedThinking=this.reasoningSettings(m);
     r.turnId=randomUUID();const queue=this.queue(m);queue.dispatch(id,r.turnId);
@@ -319,7 +320,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before shutting down the runtime');
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
@@ -363,6 +364,47 @@ export class Host {
     case 'session.mcpActionStatus':{const m=this.getMeta(p.sessionId);return this.mcpManagement.lookup(m.id,identifier(p.requestId));}
     case 'session.mcpCancelAction':{const m=this.getMeta(p.sessionId);return this.mcpManagement.cancel(m.id,identifier(p.requestId));}
     case 'session.mcpSubmitRedirect':{const m=this.getMeta(p.sessionId);return this.mcpManagement.submitRedirect(m.id,identifier(p.requestId),p.url);}
+    case 'session.mcpProfile':{
+      const m=this.getMeta(p.sessionId);if(m.surface==='browser')throw Error('MCP configuration is unavailable in browser-only conversations.');
+      const profile=readMcpProfile(join(this.dirs.agent,'mcp.json'));return {...(p.metadataOnly===true?{revision:profile.revision}:profile),scope:'private operator profile; may contain credentials; never retain in diagnostics or send to the model'};
+    }
+    case 'session.mcpConfigure':{
+      const m=this.getMeta(p.sessionId),requestId=identifier(p.requestId),operation=p.operation;
+      if(m.surface==='browser')throw Error('MCP configuration is unavailable in browser-only conversations.');
+      if(!['save-profile','set-enabled','set-exposure'].includes(operation))throw Error('Choose a supported MCP configuration operation.');
+      const server=operation==='save-profile'?'profile':identifier(p.server);
+      if(typeof p.expectedRevision!=='string'||!(p.expectedRevision==='missing'||/^[a-f0-9]{64}$/.test(p.expectedRevision)))throw Error('Read the MCP profile revision before changing it.');
+      if(operation==='save-profile'&&(typeof p.text!=='string'||Buffer.byteLength(p.text)>1024*1024))throw Error('The MCP JSON profile exceeds its limits.');
+      if(operation==='set-enabled'&&typeof p.enabled!=='boolean')throw Error('Choose whether the MCP server is enabled.');
+      if(operation==='set-exposure'&&!['codemode','deferred','direct','hidden'].includes(p.exposure))throw Error('Choose codemode, deferred, direct or hidden tool exposure.');
+      const parametersSha256=mcpDigest(JSON.stringify([operation,p.expectedRevision,server,operation==='save-profile'?p.text:operation==='set-enabled'?p.enabled:p.exposure]));
+      const input={sessionId:m.id,requestId,server,action:'configure' as const,parametersSha256},duplicate=this.mcpManagement.duplicate(input);if(duplicate)return duplicate;
+      if(!this.connected(m.id))throw Error('Connect an operator surface before changing MCP configuration.');
+      if(this.improvements.busy||[...this.metadata.values()].some(row=>row.surface!=='browser'&&(row.running||!this.queue(row).paused&&!!this.queue(row).next)))throw Error('Finish active Native turns and pause their waiting prompts before configuring MCP.');
+      if(!this.loaded.get(m.id)?.mcp)throw Error('Load this Native conversation before changing MCP configuration.');
+      const file=join(this.dirs.agent,'mcp.json'),before=readMcpProfile(file);
+      if(before.revision!==p.expectedRevision)throw Error('The MCP profile changed since it was read. Reload it before saving.');
+      let proposed=p.text;
+      if(operation!=='save-profile'){
+        let config;try{config=JSON.parse(before.text);}catch{throw Error('Repair the MCP JSON profile before changing a server.');}
+        if(!config?.mcpServers||typeof config.mcpServers!=='object'||!Object.hasOwn(config.mcpServers,server))throw Error('Choose a server in the managed MCP profile.');
+        const entry=config.mcpServers[server];if(!entry||typeof entry!=='object'||Array.isArray(entry))throw Error('Choose a server in the managed MCP profile.');
+        if(operation==='set-enabled')entry.enabled=p.enabled;else entry.exposure=p.exposure;
+        proposed=JSON.stringify(config,null,2)+'\n';
+      }
+      const targets=[...this.loaded.values()].filter(row=>row.mcp);
+      return this.mcpManagement.configure(input,async(signal,checkpoint)=>{
+        const profile=await prepareMcpProfile(proposed,m.cwd,this.dirs.agent);
+        for(const row of targets)row.mcp!.preflight(profile);
+        if(signal.aborted)throw Error('Cancelled before profile save.');
+        const revision=saveMcpProfile(file,p.expectedRevision,profile,()=>{checkpoint({saveAttempted:true});for(const row of targets)row.mcp!.markPending();});
+        checkpoint({savedRevision:revision,expectedSessions:targets.length,appliedSessions:0});
+        let applied=0,pendingOptions=false;
+        // Once saved, finish applying instead of letting Cancel leave avoidable
+        // stale owners. A crash/SDK rejection remains partial/unknown, no replay.
+        for(const row of targets){await row.mcp!.apply(profile,revision);applied++;pendingOptions ||= row.mcp!.describe().configuration.pendingSessionOptions;checkpoint({appliedSessions:applied,pendingSessionOptions:pendingOptions});}
+      });
+    }
     case 'session.mcpAction':{
       const m=this.getMeta(p.sessionId),requestId=identifier(p.requestId),server=identifier(p.server);
       if(m.surface==='browser')throw Error('MCP management is unavailable in browser-only conversations.');
