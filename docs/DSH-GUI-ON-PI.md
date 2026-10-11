@@ -31,9 +31,9 @@ Opaque reasoning/signatures and media produce explicit placeholders/coverage
 notes, preserving source identity for conservative snapshot-prefix comparison.
 Their bytes do not enter rendered nodes/cards, and their token sizes are not
 measured. Displayed-text estimates include placeholders, exclude provider
-control fields and do not predict next-request occupancy. Unknown APIs, native
+control fields and do not predict next-request occupancy. Unknown APIs remain unavailable. The new adapters refuse native
 tool-search/addition items, unsupported content/declarations and malformed
-frames remain unavailable with no fabricated chart bar. Bedrock, Mistral,
+frames with no fabricated chart bar. Bedrock, Mistral,
 Pi Messages and other provider/native formats remain separate gaps. The
 latest-eight plus one selected body and explicit metadata paging bounds remain.
 
@@ -60,17 +60,62 @@ only the redundant ordinary command assembly is retired after dist/dependency/
 Node/licence/root-contract comparison with retained immutable release
 20261011-170722-5dfb555f. Immutable releases/source/logs remain preserved.
 
-### Recorded-format qualification status
+### Installed recorded-format qualification — October 11
 
-Source passes **227/227 across 32 files**, zero failures/skips/cancellations,
-prepared QtTest/two workers/unchanged deadlines. Tested dd478b5 /
-20261011-203308-c2b28497 remains selected/running until a fresh ordinary candidate
-passes and normal guarded immutable adoption succeeds. This shared presentation
-change adds no RPC, owner, dependency, native binary or OS adapter. Actual Linux
-fixtures do not establish physical Mac/Windows or live provider acceptance;
-further platform implementation remains deferred for MX feedback. All remaining
-P0/P1 migration, plugin, privacy, public packaging and platform gates remain open.
-DSH remains available for unmet workflows.
+Tested runtime **f5ff7be4d346213ef0b8dc463072261196b8c440** is selected **and
+running** in private MX release **20261011-205518-9903c1a4**, product **0.2.13**,
+artifact **c6727cc06f6119aa6dc633df97b1371e191559616c33d3a3a1604b483ecd2803**.
+Source and fresh ordinary bundled Node **24.19.0** each pass **227/227 across
+32 files**, zero failures/skips/cancellations, prepared QtTest/two workers and
+unchanged deadlines. Normal staging, idle Native maintenance close, one guarded
+Host shutdown, immutable activation and stable Host/Native launch succeed.
+Both running roots and the Host executable match selection; Native is online,
+model-ready and idle. All **21,763 inventory entries** pass after GUI reads.
+
+Actual installed **513×715** inspection reopens the earlier independently
+authored local-Qwen demonstration. The original selector distinguishes Step 1
+input/no tool result from Step 2's exact **path: preview-note.txt** and retained
+result/verification word. This original card remains open, with a screenshot
+outside the immutable release. No new live inference or tool execution is
+performed. New API formats use actual pinned SDK/synthetic-provider source and
+ordinary qualification, separately from this retained live-record inspection.
+No Anthropic, OpenAI, Gemini, Azure, Codex or Vertex account sign-in/live-provider
+or cold-process execution acceptance is inferred from those fixtures.
+
+All **eleven displayed histories and queue item identities** are unchanged,
+with zero new histories, admissions, provider requests or tools. A stronger
+pre-adoption baseline hashes **241 saved history/diagnostic files**, including
+complete native/display journals and captured bodies. A first strict equality
+check correctly detects normal lifecycle/title bookkeeping, not rewritten
+original content. After Native restart and the GUI opening another saved
+session, **231 files remain byte-identical**; **four source journals preserve
+the exact prior byte prefix** and append only **two saved-title session_info,
+two session/close and two session/load records**. Each title matches its saved
+metadata. The remaining **six corresponding counter/index files** update with
+those diagnostic appends. No existing file is removed or new file added.
+Explicit before-UI/after-UI suffix/type checks retain that distinction; they
+never waive original-prefix, payload, history, queue or no-action checks. This
+is complete old-original preservation with accounted append-only bookkeeping,
+not a claim that every complete file remains unchanged. Production selection/
+model router and model/speech/GPU/context/concurrency/precision settings remain
+preserved.
+
+All **475 compiled files**, **19,160 dependency files/131 npm instances**,
+**723 licence files/96 browser supplier records**, six native executable paths/
+hashes and bundled Node are verified. Supplier files/CSS/original hashes and
+all licence records are unchanged. The new frame adapter and authored test HTTP
+helper account for the two new included files. The redundant ordinary candidate
+is retired only after core/root-contract/five included changed-source files
+match the retained immutable release; source/tests/failure and qualification
+logs remain. Subsequent qualification documentation changes no installed bytes.
+
+This shared presentation change adds no RPC, owner, dependency, native binary
+or OS adapter. Actual Linux fixtures do not establish physical Mac/Windows or
+live-provider acceptance; further platform implementation remains deferred for
+MX feedback. Bedrock/Mistral/Pi Messages/native provider items, full plugin
+functionality, complete context provenance/action-success semantics, all other
+P0/P1 migration/privacy/public packaging/platform gates remain open. DSH remains
+available for unmet workflows; no complete migration or public release is claimed.
 
 ## Earlier Context requests — October 11 follow-up
 
