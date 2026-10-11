@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The original click-preview follow-up is now described in [file previews](HARNESS-FILE-PREVIEWS.md). The reference qualification below remains evidence for its preceding installed runtime.
+
 # Original Harness file references
 
 The copied DSH `@` menu now discovers paths in the selected Desktop conversation's

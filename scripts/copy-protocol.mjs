@@ -20,3 +20,6 @@ for(const name of ['LICENSE','SOURCE.json'])copyFileSync('packages/runtime/vendo
 const referenceSelection=JSON.parse(readFileSync('packages/runtime/vendor/dsh-file-reference/SOURCE.json','utf8'));
 for(const row of referenceSelection.files)if(createHash('sha256').update(readFileSync('packages/runtime/vendor/dsh-file-reference/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH file-reference source changed: '+row.path);
 for(const name of ['LICENSE','SOURCE.json','SOURCE.md'])copyFileSync('packages/runtime/vendor/dsh-file-reference/'+name,'dist/runtime/vendor/dsh-file-reference/'+name);
+const previewSelection=JSON.parse(readFileSync('packages/runtime/vendor/dsh-preview/SOURCE.json','utf8'));
+for(const row of previewSelection.files)if(createHash('sha256').update(readFileSync('packages/runtime/vendor/dsh-preview/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH file-preview source changed: '+row.path);
+for(const name of ['LICENSE','SOURCE.json','SOURCE.md'])copyFileSync('packages/runtime/vendor/dsh-preview/'+name,'dist/runtime/vendor/dsh-preview/'+name);

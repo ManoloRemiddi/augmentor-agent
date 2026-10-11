@@ -1,7 +1,8 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {DshFilePreviews,DshPreviewSidebar,DshPreviewExpand} from './dsh-file-preview.jsx';
 import React,{useEffect,useMemo,useRef,useState,useSyncExternalStore} from 'react';
 import {createRoot} from 'react-dom/client';
-import {createEditor,$getRoot,$createParagraphNode,$createTextNode,$getSelection,$isRangeSelection} from 'lexical';
+import {createEditor,$getRoot,$createParagraphNode,$createTextNode,$getSelection,$isRangeSelection,$getNearestNodeFromDOMNode} from 'lexical';
 import {registerPlainText} from '@lexical/plain-text';
 import {registerHistory,createEmptyHistoryState} from '@lexical/history';
 import {AppFrame} from '@dsh-gui/ui-layout/src/client/AppFrame.tsx';
@@ -24,7 +25,7 @@ import {$replaceDetectSpanWithNodes,$replaceDetectSpanWithText} from '@dsh-gui/u
 import {fileReferenceSource} from './dsh-file-references.mjs';
 import {fileCandidate,crumbsFor,parseCandidate} from '@dsh-gui/ui-reference/src/client/index.ts';
 import {en as referenceEn} from '@dsh-gui/ui-reference/src/client/locales.ts';
-import {ReferenceChipNode,$createReferenceChipNode} from '@dsh-gui/ui-conversation/src/client/input/editor/chip-node.tsx';
+import {ReferenceChipNode,$createReferenceChipNode,$isReferenceChipNode} from '@dsh-gui/ui-conversation/src/client/input/editor/chip-node.tsx';
 import {DshCommandMenu} from './dsh-command-menu.mjs';
 import {ModelSelect} from '@dsh-gui/ui-model-selection/src/client/ModelSelect.tsx';
 import {ChatView} from '@dsh-gui/ui-chat/src/client/chat/ChatView.tsx';
@@ -95,6 +96,7 @@ const controller=new DshPiController(token);
 const contextPreferences=new DshContextPreferences(controller);contextSettings.attach(contextPreferences);
 const contextModal=createDshContextModalBinding(controller);
 const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
+const filePreviews=new DshFilePreviews(controller,layout);
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
 const attachmentDrafts=new DshAttachments(controller);let openFiles=null;
 const questionDrafts=new Map();
@@ -114,6 +116,8 @@ let draftRev=0,composerProjection={detectText:'',clipboardText:'',occurrences:[]
 const references=()=>composerProjection.occurrences.map(({occurrenceId,...ref})=>ref);
 const editor=createEditor({namespace:'augmentor-dsh-composer',nodes:[ReferenceChipNode],onError:error=>controller.update({error:error.message}),theme:{}});
 registerPlainText(editor);registerHistory(editor,createEmptyHistoryState(),300);
+const openChip=event=>{if(!(event.target instanceof Node))return;let opened=false;editor.read(()=>{const node=$getNearestNodeFromDOMNode(event.target);if($isReferenceChipNode(node)&&!node.isInvalid()&&node.getSource()==='reference'&&node.getAppearance()==='file'){const ref=node.getReference(),path=ref.startsWith('@\"')?ref.slice(2,-1):ref.slice(1);opened=filePreviews.open(path);}});if(opened){event.preventDefault();commandMenu?.dismiss();}};
+editor.registerRootListener((root,previous)=>{previous?.removeEventListener('click',openChip);root?.addEventListener('click',openChip);});
 editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const previous=composerProjection;composerProjection=$projectComposer(key=>{if(!occurrenceIds.has(key))occurrenceIds.set(key,++nextOccurrenceId);return occurrenceIds.get(key);});const value=composerProjection.clipboardText;if(value!==draft.getSnapshot()||previous.detectText!==composerProjection.detectText||JSON.stringify(previous.occurrences)!==JSON.stringify(composerProjection.occurrences))draftRev++;draft.set(value);if(activeDraft)draftArchive.edit(value,references());commandMenu?.track();}));
 function setDraft(value){const text=typeof value==='string'?value:value.text,refs=typeof value==='string'?[]:value.references??[];editor.update(()=>{const paragraph=$createParagraphNode();let offset=0;for(const ref of refs){if(ref.offset>offset)paragraph.append($createTextNode(text.slice(offset,ref.offset)));const chip=$createReferenceChipNode(ref);if(ref.invalid)chip.setInvalid(true);paragraph.append(chip);offset=ref.offset+ref.length;}if(offset<text.length)paragraph.append($createTextNode(text.slice(offset)));$getRoot().clear().append(paragraph);},{discrete:true});}
 const draftArchive=new DshDrafts(controller,{restore:(sid,text,references)=>{activeDraft=sid;setDraft({text,references});},attachments:attachmentDrafts});
@@ -293,6 +297,8 @@ function App(){
       case 'sidebar.workspaces.session.row.action':return state.readOnly?null:<><ArchiveSessionRowButton {...p} {...sessionActions}/><PinSessionRowButton {...p} {...sessionActions}/></>;
       case 'sidebar.panellist':return options.only==='dsh-context'?<InsightPanelIcon size={owner.size}/>:null;
       case 'main':return options.entryKey==='dsh-context'&&!state.readOnly?<DshContextInsights controller={controller} onOpen={sid=>{layout.actions.selectPanel(null);open(sid);}} onSettings={()=>settingsShell.actions.openSection('plugins')}/>:<ConversationRoot {...p}/>;
+      case 'rightbar':return <DshPreviewSidebar previews={filePreviews} state={state} {...owner}/>;
+      case 'conversation.session.header.corner':return <DshPreviewExpand previews={filePreviews} state={state}/>;
       case 'conversation.header':return <ConversationHeader {...p}/>;
       case 'conversation.session.header':return <ConversationSessionHeader {...p} open={open} selectView={setView}/>;
       case 'conversation.session.header.actions':return <Button variant="ghost" disabled={state.readOnly} aria-label="Rename conversation" onClick={()=>setDialog({kind:'rename',sid:state.sessionId,title:current?.title||''})}><IconEditOutlineRegular/></Button>;
@@ -301,7 +307,7 @@ function App(){
       case 'conversation.session':return <ConversationSession {...p}/>;
       case 'conversation.view':{
         const id=options.only||view;
-        if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={unsupported} openSkill={unsupported} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={loadImage} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={unsupported} fileMentions={()=>undefined}/>;
+        if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={async(path,options)=>{if(!filePreviews.open(path,{params:options?.line===undefined?undefined:{line:options.line}}))throw Error('File preview is unavailable in this conversation.');}} openSkill={unsupported} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={loadImage} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={unsupported} fileMentions={()=>undefined}/>;
         if(id==='trajectory')return <TrajectoryView {...p} t={t.trajectory} useTrajectory={selectorFace(composed.trajectory)} useDuration={useDuration} setActualDuration={value=>duration.set(value)} jsonStringWrapping={{getDefault:()=>wrapping.getSnapshot(),setDefault:value=>wrapping.set(value)}} loadOlder={()=>controller.older()} loadImage={loadImage} viewRequest={null}/>;
         if(id==='context')return <DshContextDashboard key={state.sessionId} state={state} controller={controller}><ContextView state={state}/></DshContextDashboard>;
         return <ExtensionView key={id+state.sessionId} kind={id} state={state}/>;

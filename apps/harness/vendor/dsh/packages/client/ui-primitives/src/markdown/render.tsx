@@ -1,3 +1,4 @@
+// Augmentor adaptation: preview vocabularies may suppress remote images; existing renderer defaults and presentation retained.
 /**
  * Direct mdast→React markdown renderer. Replaces the react-markdown /
  * remark-rehype pipeline with one switch over parsed nodes so streaming can
@@ -102,7 +103,7 @@ function vocabularyImageUrl(url: string): string | undefined {
  */
 function imageSource(url: string, pathImages: MarkdownPathImages | undefined): string | undefined {
   const remote = remoteImageUrl(sanitizeUrl(normalizeUri(url)))
-  if (remote !== undefined) return remote
+  if (remote !== undefined) return pathImages?.allowRemote === false ? undefined : remote
   const rewritten = pathImages?.resolve(url)
   return rewritten === undefined ? undefined : vocabularyImageUrl(rewritten)
 }
@@ -154,6 +155,7 @@ export function collectReferenceTargets(
  * absolute; the renderer re-checks their protocol before emitting them.
  */
 export interface MarkdownPathImages {
+  readonly allowRemote?: boolean
   /**
    * Resolve one authored image destination.
    * @param value - The destination exactly as the markdown author wrote it.

@@ -61,6 +61,9 @@ const model=http.createServer(async(req,res)=>{
     const timer=setInterval(()=>chunk({content:'Partial fixture output. '}),300);
     res.on('close',()=>clearInterval(timer));return;
   }
+  if(process.env.AUGMENTOR_HARNESS_PROOF_FILE_PREVIEWS==='1'){
+    chunk({role:'assistant',content:'Authored fixture preview link: [Open exact line](pages.txt#L350).'},'stop',{prompt_tokens:10,completion_tokens:10,total_tokens:20});res.end('data: [DONE]\n\n');return;
+  }
   if(!afterTool){
     chunk({role:'assistant',reasoning_content:'I will inspect the isolated fixture note.'});
     chunk({tool_calls:[{index:0,id:'fixture_read',type:'function',function:{name:'read',arguments:JSON.stringify({path:process.env.AUGMENTOR_HARNESS_PROOF_REFERENCES==='1'?join(workspace,'docs','a note.txt'):process.env.AUGMENTOR_HARNESS_PROOF_ATTACHMENTS==='1'?(()=>{const text=typeof lastUser.content==='string'?lastUser.content:lastUser.content.map(p=>p.text??'').join('');const row=text.split('\n').find(line=>line.startsWith('{"name":'));return row?JSON.parse(row).path:join(workspace,'note.txt');})():join(workspace,'note.txt')})}}]},'tool_calls');

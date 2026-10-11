@@ -6,10 +6,11 @@ import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {MAX_FRAME, identifier, request, type Data} from '../../protocol/src/index.js';
 import {FILE_LIMIT} from './attachments.js';
+import {PreviewReadError} from './file-preview.js';
 import type {Host} from './host.js';
 
 const allowed = new Set([
-  'session.fileReferences',
+  'session.fileReferences','workspaceFiles.stat','workspaceFiles.read','workspaceFiles.readBytes',
   'draft.describe','draft.text','draft.remove','draft.prepare','draft.settle','draft.acknowledge',
   'host.describe', 'session.organize', 'workspace.list', 'workspace.adopt', 'workspace.rename', 'workspace.remove', 'workspace.move', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
@@ -175,6 +176,11 @@ export class HarnessServer {
             gap: after < (this.evicted.get(sessionId) ?? 0)});
           return;
         }
+        if(req.method==='GET'&&url.pathname==='/api/preview/bytes'){
+          if(access.mode!=='operator')throw Error('File previews require operator authority.');
+          const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);
+          try{await this.host.receiveHarnessRequest(async()=>{const sid=identifier(url.searchParams.get('sessionId')),p={path:url.searchParams.get('path'),...(url.searchParams.has('baseFile')?{baseFile:url.searchParams.get('baseFile')}:{}),...(url.searchParams.has('expectedVersion')?{expectedVersion:url.searchParams.get('expectedVersion')}:{})};const value=await this.host.previewFile(sid,'bytes',p,abort.signal);const {data,...meta}=value;res.writeHead(200,{'Content-Type':'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','X-Augmentor-Preview':Buffer.from(JSON.stringify(meta)).toString('base64')});res.end(data);});}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}return;
+        }
         if (req.method === 'POST' && url.pathname === '/api/rpc') {
           const operation=async()=>{
           const rpc: unknown = await this.body(req); request(rpc);
@@ -196,7 +202,8 @@ export class HarnessServer {
             watch.seen = Date.now();
           }
           let result;
-          if(rpc.method==='session.fileReferences'){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{result=await this.host.listFileReferences(params.sessionId,params.query,abort.signal);}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
+          if(['workspaceFiles.stat','workspaceFiles.read','workspaceFiles.readBytes'].includes(rpc.method)){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{const paramsRead=rpc.method==='workspaceFiles.readBytes'&&params.range===undefined?{...params,range:{offset:0,length:256*1024}}:params;try{result={ok:true,value:await this.host.previewFile(params.sessionId,rpc.method==='workspaceFiles.stat'?'stat':rpc.method==='workspaceFiles.read'?'read':'bytes',paramsRead,abort.signal)};}catch(error){const e=error as any;result={ok:false,error:{code:e.code??'gateway/internal',message:e.message,details:e.details??{}}};}}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
+          else if(rpc.method==='session.fileReferences'){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{result=await this.host.listFileReferences(params.sessionId,params.query,abort.signal);}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
           else result = await this.host.dispatch(rpc.method, params, rpc.id);
           this.send(res, 200, {id: rpc.id, result}); return;
           };
@@ -243,7 +250,9 @@ export class HarnessServer {
       res.writeHead(200, {'Content-Type': file.type + '; charset=utf-8'}); res.end(bytes);
     } catch (error) {
       if (res.headersSent) {res.destroy(); return;}
-      this.send(res, 400, {error: {message: error instanceof Error ? error.message : 'Harness request failed'}});
+      this.send(res, 400, {error: error instanceof PreviewReadError
+        ? {code:error.code,message:error.message,details:error.details}
+        : {message: error instanceof Error ? error.message : 'Harness request failed'}});
     }
   }
   async close() {
