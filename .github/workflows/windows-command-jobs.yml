@@ -57,6 +57,8 @@ jobs:
           $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
           & outputs/runtime/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_shell_job.py -v 2>&1 | Tee-Object -FilePath outputs/evidence/kernel.log
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/runtime/python/python.exe -Xutf8 -B -m unittest discover -s tests -p test_pipe_server_relay.py -v 2>&1 | Tee-Object -FilePath outputs/evidence/pipe-relay.log
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Qualify the private Host before command admission
         env:
           AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
