@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Installed original Context Insights](DSH-GUI-ON-PI.md#installed-original-context-insights--october-11): runtime db98a93393a97f39d143295dba5db196798aef57, private MX 20261011-221239-d4a9b70d, product 0.2.13, artifact b99b5f256aee307bf4be29f74445d40ba18ce0e794657717bc6d431a79770cd0, selected/running. Source and ordinary Node 24.19.0 each pass 242/242 across 36 files; sequential guarded adoption and 21,779 installed inventory entries pass. Original Insights filters/charts/heatmap/cards use bounded retained Pi reads and reported SDK buckets; empty contexts stay unavailable. Eleven histories/queues and old original prefixes are preserved with classified title/lifecycle/index changes and no new inference/tools. Supplier licences/CSS/dependencies/native/model/speech settings remain preserved; full plugin/migration/live/privacy/public packaging/platform gates stay open.
+
 [Original Context Insights](DSH-GUI-ON-PI.md#original-context-insights--october-11-follow-up) restores the supplier first-level overview with bounded retained Pi metadata/newest-body reads, reported SDK token buckets, original filters/heatmap/navigation and explicit unavailable data. Source/ordinary/installed qualification follows separately; full migration/plugin/platform gates stay open.
 
 ## October 11 current installed original Context dialog
