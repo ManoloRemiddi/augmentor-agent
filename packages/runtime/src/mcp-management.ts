@@ -55,6 +55,8 @@ export class McpManagement {
   }catch{this.storageError=true;}
  }
  get busy(){return !!this.current;}
+ busySession(sessionId:string){return this.current?.row.sessionId===sessionId;}
+ waitSession(sessionId:string){return this.current?.row.sessionId===sessionId?this.current.task:Promise.resolve();}
  private persist(){atomicJson(this.file,{version:'augmentor-mcp-management/1',receipts:[...this.rows.values()]});}
  private notify(row:McpManagementReceipt){try{this.changed({...row});}catch{this.notificationGap=true;}}
  private retain(row:McpManagementReceipt){try{this.persist();}catch{this.storageError=true;}this.notify(row);}

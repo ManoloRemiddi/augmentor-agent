@@ -26,7 +26,7 @@ test('job admission bounds actual producers and cancelled waits do not cancel th
 });
 test('unconfirmed cancellation remains unknown and capacity stays owned until late producer settlement',{timeout:10000},async t=>{
  const root=await fixture(t),jobs=new PiJobs(root);let finish;const result=jobs.start('owner',spec(),async()=>{await new Promise(resolve=>finish=resolve);return {state:'completed'};});await new Promise(resolve=>setTimeout(resolve,10));
- const stopped=await jobs.cancel('owner',result.job.id);assert.equal(stopped.job.state,'unknown');assert.equal(jobs.busy,true);finish();await jobs.wait('owner',result.job.id,1000);assert.equal(jobs.busy,false);assert.equal(jobs.lookup('owner',result.job.id).state,'unknown');
+ const stopped=await jobs.cancel('owner',result.job.id);assert.equal(stopped.job.state,'unknown');assert.equal(jobs.busy,true);assert.deepEqual(jobs.activeOwnerIds('owner'),[result.job.id]);assert.deepEqual(jobs.activeOwnerIds('foreign'),[]);finish();await jobs.wait('owner',result.job.id,1000);assert.equal(jobs.busy,false);assert.deepEqual(jobs.activeOwnerIds('owner'),[]);assert.equal(jobs.lookup('owner',result.job.id).state,'unknown');
 });
 test('corrupt originals disable job admission without replacing evidence, and settlement persistence loss is contained',async t=>{
  const root=await fixture(t),path=join(root,'invalid.json');await writeFile(path,'Original invalid synthetic receipt');const cold=new PiJobs(root);assert.match(cold.problem,/invalid|inaccessible/);assert.throws(()=>cold.start('owner',spec(),async()=>({state:'completed'})),/disabled/);assert.equal((await stat(path)).size,34);

@@ -8,7 +8,7 @@ import {MAX_FRAME, identifier, request, type Data} from '../../protocol/src/inde
 import type {Host} from './host.js';
 
 const allowed = new Set([
-  'host.describe', 'workspace.list', 'workspace.adopt', 'workspace.rename', 'workspace.remove', 'workspace.move', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
+  'host.describe', 'session.organize', 'workspace.list', 'workspace.adopt', 'workspace.rename', 'workspace.remove', 'workspace.move', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
   'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',

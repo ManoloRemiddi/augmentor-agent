@@ -51,7 +51,11 @@ augmentor-harness-preview --status
 
 This verifies and prints selected release/version/source/hash without starting a Host or model. Selected and running identities are distinct. The private runtime log is `<preview state>/augmentor-pi/runtime.log`. Never share `harness.json`, a real bearer link, API credentials or unreviewed conversation payloads.
 
-## Current original-workspace follow-up
+## Original session-control qualification
+
+The original DSH sidebar menus, hover controls, session rename dialog, Archive Undo/restore/filter and Stop-and-archive confirmation are connected to Pi. Source and ordinary unselected bundled-Node cohorts each pass **121 cases across fourteen files**, zero failures/skips/cancellations. [The session-control record](DSH-GUI-ON-PI.md#original-session-controls--october-11-follow-up) preserves failed runs and exact qualification scopes. Supplier selection is now 345 public hashed files; five original action/notice files are added, with original CSS and all previous supplier bytes unchanged. All 428 build-output files match; 19,088 production dependency files, 709 existing license files and Node remain unchanged. Installed adoption is recorded separately; the full Harness and additional platforms remain open.
+
+## Previous original-workspace follow-up
 
 Selected **and running** preview **20261011-132906-51b57282**, product 0.2.13, tested implementation **f89371bdb7c8589653a8a2350a640a91edf87188**, artifact **dd76ae454642839792e05a481a3f600718b8c420eaa949f8e4635faee94eb2cd**. Source and ordinary bundled-Node cohorts each pass **84 cases across eight files**, zero failures/skips/cancellations. Original workspace name/removal/order bindings, directory stability, no duplicate conversation creation and actual Host restart are qualified within [the current GUI evidence](DSH-GUI-ON-PI.md#current-installed-workspace-follow-up--october-11).
 

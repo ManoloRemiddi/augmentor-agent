@@ -6,7 +6,7 @@ The owner's October 11 correction is to use the actual open-source DSH GUI befor
 
 ## Selected public source
 
-The selected baseline is public DeepSeek Harness **0.2.1-alpha.2**, commit [d743267388641bc76f17c45ce8b4c231aed1d32c](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c). [The selection record](../apps/harness/vendor/dsh/SOURCE.md) and machine-readable SOURCE.json identify **340 files**, their original public paths and SHA-256 hashes. This is public upstream source, not a historical private checkout or its Git history.
+The selected baseline is public DeepSeek Harness **0.2.1-alpha.2**, commit [d743267388641bc76f17c45ce8b4c231aed1d32c](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c). [The selection record](../apps/harness/vendor/dsh/SOURCE.md) and machine-readable SOURCE.json identify **345 files**, their original public paths and SHA-256 hashes. This is public upstream source, not a historical private checkout or its Git history.
 
 Copied components include AppFrame, SidebarRoot, conversation layout and composer, model chooser, chat renderers, the complete Trajectory table/timeline/detail presentation, workspace picker and directory browser, queue dock, goal bar, approval panel, question composer, shared controls, typography and themes. Their visual source and CSS remain upstream. InputBar has one nonvisual image-predicate import substitution; that predicate is selected verbatim from its public upstream service. The directory browser dictionary in the adapter derives from the same public English locale. The favicon is the original public asset. Augmentor branding and existing extension views occupy the original component slots.
 
@@ -28,7 +28,7 @@ The directory browser enumerates actual folders and directory symlinks, with bou
 
 | Original DSH presentation | Pi binding |
 | --- | --- |
-| Sidebar and workspaces | Persistent workspace adoption/name/order/removal, conversation list/grouping/search, new conversation, title rename and actual directory picker |
+| Sidebar and workspaces | Persistent workspace adoption/name/order/removal, conversation list/grouping/search, new conversation, original title rename, Pin/Unpin, Fork, Archive/Undo/restore, archived filters and actual directory picker |
 | Chat and composer | Retained/streaming Pi text, reasoning and tool output; identified Send, queue/steer and Stop |
 | Model chooser | Exact configured provider/model and supported reasoning effort; no silent substitution |
 | Trajectory | User/assistant/tool rows, timing, table/timeline and original tool detail pane with arguments, result and schema |
@@ -42,6 +42,22 @@ The existing Augmentor Context, Plan, Goal and Jobs extensions occupy DSH's view
 Trajectory joins new assistant records to provider requests by **explicit retained request identity**. Independent sequence counters are never joined by ordinal. Old records without this identity still display their chat/tool evidence and are inspectable through Context; no old provider association is invented. Request inspection reads all retained payload pages using their recorded whole-body identity. Only actual captured system/developer messages and tool declarations appear; enabling capture affects future requests and cannot reconstruct old bodies.
 
 Unknown submission responses are retained as unconfirmed and never automatically resent. Queue edits preserve the original admission fingerprint and append a replacement identity atomically at the same position; edits cannot rewrite already-dispatching, delivered or goal-owned work. Reopen preserves partial output after Stop.
+
+## Original session controls — October 11 follow-up
+
+The sidebar now uses the public original **Pin/Unpin, Rename, Fork and Archive** menu entries, **Pin/Archive** hover buttons, session rename dialog, **Stop and archive** confirmation and row notices. Their five newly selected source files are verbatim from the same public pinned baseline. The existing original pin-order helpers and archived view filters are reused; supplier visual source/CSS and all earlier 340 selected files remain unchanged.
+
+`session.organize` stores pin/archive membership in private mode-0600 `session-organization.json`, separate from saved-chat state, workspace registrations and conversation originals. Mutations require the current organization revision. Archive removes pin membership, pauses continuation and clears the operator's selection. Undo/Unarchive restore membership without restarting work or deleting logs, files or stopped output. Startup skips archived operator selections; a scoped read-only link can still inspect that conversation's retained history. Archived conversations cannot start prompts, jobs, goals, improvement or queued continuation until restored.
+
+Plain Archive returns the original confirmation when the selected conversation has a running turn, an owned job, prompt improvement or MCP management. Cancelling the dialog changes nothing. Confirmed Stop uses existing Host cancellation, waits for the owned producers and then rechecks activity and the revision before archiving. It holds no admission-chain lock while producers settle. An unknown job receipt still counts as active while its producer owns capacity. Unavailable receipts reject archive before cancellation; incomplete settlement leaves the conversation unarchived and reports that work needs inspection. No failure, stale revision or lost reply is automatically retried.
+
+The original Fork menu branches at the last retained, completed assistant reply through the existing public SDK branch API, retains the source and opens one child. It excludes interrupted replies and makes no model request. Sidebar metadata retains the source reference. The per-reply original branch control remains connected as before.
+
+The browser fixture exercises the original menus/hover controls, rename dialog, fork, pin marker, archive Undo/filter/restore, cancellation and confirmation of a streaming turn, plus reload and read-only isolation. Separate actual public-SDK Host fixtures cover restart persistence, revision conflicts and confirmed scoped cancellation of turns, delegated jobs, prompt improvement and MCP login. Provider, OAuth and worker inputs are synthetic and local; these checks do not certify live external accounts or physical platform parity.
+
+The final source and ordinary unselected bundled-Node cohorts each pass **121 cases across fourteen files**, zero failures/skips/cancellations, with two workers and the isolated QtTest interpreter. The scope is `harness-dsh`, `harness-dsh-chromium`, `harness-dsh-interactions-chromium`, `harness-server`, `runtime`, `pi-observations`, `pi-prompt-queue`, `pi-workspaces`, `pi-session-organization`, `pi-prompt-improvement`, `mcp-management`, `pi-mcp-management`, `jobs-registry` and `pi-jobs` (`tests/<name>.test.mjs`). Ordinary qualification uses its bundled Node **24.19.0** and `AUGMENTOR_PI_TEST_ROOT` set to that unselected assembly. All **428 build-output files** match source; **19,088 production dependency files**, **709 existing license files** and Node remain unchanged. Public source hashes, forbidden-runtime graph and **95 npm notice records** pass; each original public hash also matches the pinned upstream archive.
+
+Retained failures: the first focused run reports **71 cases/64 passes/seven failures**. Fork source metadata was missing from sidebar rows and is now included. The new Stop assertion incorrectly expected `cancelled` instead of the existing Pi turn-end `aborted`; its interrupted stream is correctly retained. Failed fixture cleanup left an unrelated held turn, causing cascading settings/inspection/restart failures. Cleanup now runs in `finally`, with no product cancellation/status or deadline change. The corrected focused cohort passes **71/71**. The first expanded source run reports **121 cases/120 passes/one failure** because creating a foreign MCP fixture moved the operator subscription away from the target; the fixture explicitly subscribes the intended operator before management. The four MCP cases then pass, followed by the final complete source/ordinary cohorts above. These results do not qualify live external accounts, voice or additional platforms.
 
 ## Persistent original workspace controls — October 11 follow-up
 
@@ -57,7 +73,7 @@ Final focused source and ordinary unselected bundled-Node cohorts each pass **84
 
 ## Remaining compatibility gaps
 
-This is an original-GUI integration preview, not complete DSH backend parity. File-upload receipts, @-mention chips/autocomplete and the full slash-command catalog are not connected; use files already in the chosen workspace by path. Workspace archive/pin behavior and the complete original global settings/provider configuration are not connected. Unsupported operations report their missing binding.
+This is an original-GUI integration preview, not complete DSH backend parity. File-upload receipts, @-mention chips/autocomplete and the full slash-command catalog are not connected; use files already in the chosen workspace by path. The complete original global settings/provider configuration is not connected. Unsupported operations report their missing binding.
 
 Final assistant branching uses the original DSH branch control; current-message Edit remains in the advanced inspector. The original question/approval components answer Host requests, but DSH's indefinite/take-time timing protocol is not implemented: the existing Host's finite timeout still applies. Transient request streaming is not fully projected into Trajectory, although final retained request/tool details are connected. Account/telemetry and backend-only DSH plugins are intentionally excluded.
 
@@ -73,7 +89,7 @@ Build/type checks and source-hash/dependency-graph/notice audits pass. The ordin
 
 Prior broad 834-case results in the MX guide belong to the preceding implementation and are not presented as a rerun of this GUI increment.
 
-## Current installed workspace follow-up — October 11
+## Previous installed workspace follow-up — October 11
 
 Tested implementation **f89371bdb7c8589653a8a2350a640a91edf87188** is selected and running in private MX release **20261011-132906-51b57282**, product **0.2.13**, artifact SHA-256 **dd76ae454642839792e05a481a3f600718b8c420eaa949f8e4635faee94eb2cd**. Normal immutable staging/preflight and idle native maintenance close followed by guarded Host shutdown/activation succeed. Host command and native online/model-ready window match the selected root. Full inventory passes after both presentations start and the workspace metadata changes. All **425 build-output files** match source; **19,088 production dependency files**, **709 existing license files** and bundled Node remain unchanged. The current 84-case source/ordinary results above and an additional selected-folder identity assertion in the browser fixture pass.
 

@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-October 11 interface correction: [the original public DSH GUI](DSH-GUI-ON-PI.md) now replaces the custom standalone default. The actual copied React components/CSS bind to the same Pi Host; the previous interface remains at /inspection for advanced retained controls. No DSH owner/analytics runtime is transplanted. The source record, exact bindings, qualification scope and remaining gaps are documented in that guide; the complete migration goal remains active.
+October 11 interface correction: [the original public DSH GUI](DSH-GUI-ON-PI.md) now replaces the custom standalone default. The actual copied React components/CSS bind to the same Pi Host; the previous interface remains at /inspection for advanced retained controls. No DSH owner/analytics runtime is transplanted. Original workspace and session menus/dialogs (Pin, Rename, Fork, Archive, Undo, restore and explicit Stop-and-archive) are bound to private revisioned Pi metadata and existing scoped cancellation. The source record, exact bindings, qualification scope and remaining gaps are documented in that guide; the complete migration goal remains active.
 
 Current owner priority: [MX Linux first, with a separate installed preview](MX-HARNESS-PREVIEW.md). Further Windows, macOS and other-distro implementation is deferred until feedback and refinement. The complete migration remains the longer-term scope.
 

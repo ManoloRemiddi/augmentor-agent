@@ -6,6 +6,12 @@
   "license": "MIT",
   "files": [
     {
+      "path": "assets/favicon.svg",
+      "sha256": "9e983b4f649c25c6ca0623a50be1a6e705fd8f49f756638b980fa13b40575ab6",
+      "upstreamPath": "apps/web/public/favicon.svg",
+      "upstreamSha256": "9e983b4f649c25c6ca0623a50be1a6e705fd8f49f756638b980fa13b40575ab6"
+    },
+    {
       "path": "packages/api/workspace-controller/package.json",
       "sha256": "89ab3219d2e2281e8143f6456cd59a53d59ee34e94d0bd90206dbb6c4b2cf7d3",
       "upstreamPath": "packages/api/workspace-controller/package.json",
@@ -1880,6 +1886,36 @@
       "upstreamSha256": "32ab2c110ea7679fccec00fd8523fbfa184185f375c56f339f1df35942be4731"
     },
     {
+      "path": "packages/client/ui-workspace/src/client/session-actions/ArchiveSession.tsx",
+      "sha256": "d9c3c3819e119448b5bc8e26feefeb61896a1838e74b5d44bba4b68c538c8e1c",
+      "upstreamPath": "packages/client/ui-workspace/src/client/session-actions/ArchiveSession.tsx",
+      "upstreamSha256": "d9c3c3819e119448b5bc8e26feefeb61896a1838e74b5d44bba4b68c538c8e1c"
+    },
+    {
+      "path": "packages/client/ui-workspace/src/client/session-actions/ForkSession.tsx",
+      "sha256": "4945d0ce8244d41376c691b93b12b6681ec84d4e888d4a4389467d8a0156ba7c",
+      "upstreamPath": "packages/client/ui-workspace/src/client/session-actions/ForkSession.tsx",
+      "upstreamSha256": "4945d0ce8244d41376c691b93b12b6681ec84d4e888d4a4389467d8a0156ba7c"
+    },
+    {
+      "path": "packages/client/ui-workspace/src/client/session-actions/PinSession.tsx",
+      "sha256": "33d005e2b8f843c39dfe5267e6de34cc640f44fdaf7ddc8b534ad8bd1b622fcc",
+      "upstreamPath": "packages/client/ui-workspace/src/client/session-actions/PinSession.tsx",
+      "upstreamSha256": "33d005e2b8f843c39dfe5267e6de34cc640f44fdaf7ddc8b534ad8bd1b622fcc"
+    },
+    {
+      "path": "packages/client/ui-workspace/src/client/session-actions/RenameSession.tsx",
+      "sha256": "6d2cbc25552034e3ccd80b4aff0010513359fdc6794f69cbaf36b98332b3c992",
+      "upstreamPath": "packages/client/ui-workspace/src/client/session-actions/RenameSession.tsx",
+      "upstreamSha256": "6d2cbc25552034e3ccd80b4aff0010513359fdc6794f69cbaf36b98332b3c992"
+    },
+    {
+      "path": "packages/client/ui-workspace/src/client/session-actions/RowActionToast.tsx",
+      "sha256": "158d1a5a3f24f209f02e15a76b4bc4948a16e9c46c98e594fd5f716b7acd76c3",
+      "upstreamPath": "packages/client/ui-workspace/src/client/session-actions/RowActionToast.tsx",
+      "upstreamSha256": "158d1a5a3f24f209f02e15a76b4bc4948a16e9c46c98e594fd5f716b7acd76c3"
+    },
+    {
       "path": "packages/client/ui-workspace/src/client/shortcuts.ts",
       "sha256": "088acbd87d2b40ab2d2e6f0608db9d2d828908df25b6ce5a4be7a30b7a68c880",
       "upstreamPath": "packages/client/ui-workspace/src/client/shortcuts.ts",
@@ -2040,12 +2076,6 @@
       "sha256": "a6647b515659cf439b701fa9f9574c9c310ce3872d26a13a81e9fa4d02ba10ad",
       "upstreamPath": "vendor/schemastery/src/index.ts",
       "upstreamSha256": "a6647b515659cf439b701fa9f9574c9c310ce3872d26a13a81e9fa4d02ba10ad"
-    },
-    {
-      "path": "assets/favicon.svg",
-      "sha256": "9e983b4f649c25c6ca0623a50be1a6e705fd8f49f756638b980fa13b40575ab6",
-      "upstreamPath": "apps/web/public/favicon.svg",
-      "upstreamSha256": "9e983b4f649c25c6ca0623a50be1a6e705fd8f49f756638b980fa13b40575ab6"
     }
   ]
 }

@@ -20,10 +20,12 @@ export class DshPiController {
     const workspaces=access.mode==='read-only'?null:await this.rpc('workspace.list');
     this.update({readOnly:access.mode==='read-only',catalog,workspace:host.workspace,workspaces,sessions:list.items,phase:'ready'});
     const selected=access.sessionId||requestedSession||sessionStorage.getItem('augmentor-harness-session');
-    const row=list.items.find(x=>x.sessionId===selected)||list.items[0];
+    const available=list.items.filter(x=>access.mode==='read-only'||!workspaces?.archivedSessionIds?.includes(x.sessionId));
+    const row=available.find(x=>x.sessionId===selected)||available[0];
     if(row)await this.open(row.sessionId);
   }
   async open(sessionId){
+    if(!this.state.readOnly&&this.state.workspaces?.archivedSessionIds?.includes(sessionId))throw Error('Restore the conversation before opening it.');
     const epoch=++this.epoch;
     this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,phase:'loading',events:[],records:[],payloads:{},queue:null,interactions:[],selection:null,reasoning:null,goal:null,hasMore:false,error:null});
     const sub=await this.rpc('events.subscribe',{sessionId,clientId:this.clientId});if(epoch!==this.epoch)return;
@@ -44,7 +46,19 @@ export class DshPiController {
       for(const record of requests){const result=await readDshPayload((m,p)=>this.rpc(m,p),sessionId,record);if(epoch!==this.epoch)return;if(result.available)this.update({payloads:{...this.state.payloads,[record.id]:result.value}});}
     }finally{this.hydrating=false;}
   }
-  async refresh(){const [list,workspaces]=await Promise.all([this.rpc('session.list'),this.state.readOnly?null:this.rpc('workspace.list')]);this.update({sessions:list.items,workspaces});}
+  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},queue:null,goal:null,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
+  async refresh(){const [list,workspaces]=await Promise.all([this.rpc('session.list'),this.state.readOnly?null:this.rpc('workspace.list')]);this.update({sessions:list.items,workspaces});if(!this.state.readOnly&&workspaces?.archivedSessionIds?.includes(this.state.sessionId))this.clearSelection();}
+  async organize(action,sessionId,stop=false){
+    if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
+    try{const result=await this.rpc('session.organize',{sessionId,action,stop,expectedRevision:this.state.workspaces?.organizationRevision});this.update({workspaces:result.workspaces});if(result.workspaces.archivedSessionIds.includes(this.state.sessionId))this.clearSelection();return result;}
+    catch(error){await this.refresh().catch(()=>{});throw error;}
+  }
+  async forkLast(sessionId){
+    if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
+    const history=await this.rpc('session.history',{sessionId,maxMessages:100}),last=[...history.events].reverse().find(x=>x.event.type==='assistant/message'&&x.event.data?.message?.stopReason==='stop');
+    if(!last)throw Error('This conversation has no completed assistant turn to fork.');
+    const row=await this.rpc('session.branch',{sessionId,newSessionId:crypto.randomUUID(),messageSeq:last.event.seq,mode:'reply'});await this.refresh();await this.open(row.sessionId);return row;
+  }
   async workspaceAction(action,params={}){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
     try{const workspaces=await this.rpc('workspace.'+action,{...params,expectedRevision:this.state.workspaces?.revision});this.update({workspaces});return workspaces;}
@@ -83,6 +97,7 @@ export class DshPiController {
   async send(text,mode='queue'){
     const {sessionId,queue}=this.state;if(!sessionId)throw Error('Choose a workspace first.');
     if(this.state.readOnly||this.state.phase!=='ready')throw Error('The conversation is not ready for submission.');
+    if(this.state.workspaces?.archivedSessionIds?.includes(sessionId))throw Error('Restore the conversation before sending.');
     if(this.pending.has(sessionId))throw Error('The previous submission is unconfirmed. Inspect the history; it was not retried.');
     const requestId=crypto.randomUUID(),receipt={requestId,text};this.pending.set(sessionId,receipt);
     try{const result=await this.rpc('session.prompt',{sessionId,requestId,content:[{type:'text',text}],mode,resumeQueue:true,...(mode==='steer'?{expectedTurnId:queue?.activeTurnId}:{})});this.pending.delete(sessionId);return result;}

@@ -19,6 +19,8 @@ export class PiPromptImprovement {
     if(this.receipts.length)this.persist();
   }
   get busy(){return this.active.size>0;}
+  busySession(sessionId:string){return this.receipts.some(row=>row.sessionId===sessionId&&this.active.has(row.requestId));}
+  cancelSession(sessionId:string){const pending=[];for(const row of this.receipts){const active=this.active.get(row.requestId);if(row.sessionId===sessionId&&active){active.abort.abort();pending.push(active.pending);}}return Promise.allSettled(pending);}
   private persist(){atomicJson(this.file,this.receipts);}
   status(requestId:unknown){const id=identifier(requestId);const receipt=this.receipts.find(r=>r.requestId===id);return {receipt:receipt??null,replayed:false,payloadsRetained:false};}
   cancel(requestId:unknown,scopeId:unknown){

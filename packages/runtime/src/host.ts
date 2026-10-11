@@ -7,6 +7,7 @@ import {memoryPackage} from '../../memory/src/index.js';
 import {promptCall} from '../../prompt-library/src/client.js';
 import {listWorkspaceDirectory,createWorkspaceDirectory} from './workspace-picker.js';
 import {WorkspaceRegistry,workspacePath} from './workspace-registry.js';
+import {SessionOrganization} from './session-organization.js';
 import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -60,6 +61,7 @@ export class Host {
   readonly browser=new BrowserBroker();
   readonly metadata=new Map<string,Meta>();readonly loaded=new Map<string,Loaded>();
   readonly workspaces=new WorkspaceRegistry(join(this.dirs.state,'workspaces.json'),()=>[resolve(process.env.AUGMENTOR_PI_WORKSPACE||process.cwd()),...[...this.metadata.values()].map(m=>resolve(m.cwd))]);
+  readonly organization=new SessionOrganization(join(this.dirs.state,'session-organization.json'));
   readonly interactions:Interactions;
   modelRuntime!:ModelRuntime;
   readonly setup=new SetupConnections(join(this.dirs.agent,'models.json'));
@@ -406,9 +408,28 @@ export class Host {
     return this.branchRow(m);
   }
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
-  workspaceSnapshot(){const data=this.workspaces.snapshot();return {revision:data.revision,items:data.items.map(row=>({...row,sessionIds:[...this.metadata.values()].filter(m=>resolve(m.cwd)===row.cwd).map(m=>m.id)})),pinnedSessionIds:[],archivedSessionIds:[]};}
+  workspaceSnapshot(){const data=this.workspaces.snapshot(),organization=this.organization.snapshot();return {revision:data.revision,items:data.items.map(row=>({...row,sessionIds:[...this.metadata.values()].filter(m=>resolve(m.cwd)===row.cwd).map(m=>m.id)})),organizationRevision:organization.revision,pinnedSessionIds:organization.pinnedSessionIds,archivedSessionIds:organization.archivedSessionIds};}
+  private organizationTarget(p:Data){const m=this.getMeta(p.sessionId);if(m.delegation)throw Error('Delegated conversations are controlled by their parent job.');if(!['pin','unpin','archive','restore'].includes(p.action)||p.stop!==undefined&&typeof p.stop!=='boolean'||p.stop===true&&p.action!=='archive')throw Error('Choose a supported conversation organization action.');this.organization.check(p.expectedRevision);if(p.action==='archive'&&(this.jobs.problem||!this.mcpManagement.describe(m.id).available))throw Error('Work receipts are unavailable. Inspect them before archiving.');return m;}
+  private archiveActivity(m:Meta){const activity:Data[]=[];if(m.running)activity.push({kind:'turn',items:[{id:m.id}]});const jobs=this.jobs.activeOwnerIds(m.id);if(jobs.length)activity.push({kind:'job',items:jobs.map(id=>({id}))});if(this.improvements.busySession(m.id))activity.push({kind:'prompt-improvement',items:[{id:m.id}]});if(this.mcpManagement.busySession(m.id))activity.push({kind:'mcp-management',items:[{id:m.id}]});return activity;}
+  private organizeSession(p:Data){
+    const m=this.organizationTarget(p);
+    if(p.action==='archive'&&!this.organization.archived(m.id)){const activity=this.archiveActivity(m);if(activity.length)return {workspaces:this.workspaceSnapshot(),confirmation:{sessionId:m.id,displayTitle:m.title||'New conversation',activity}};}
+    this.organization.mutate(p.action,m.id,p.expectedRevision);
+    if(p.action==='archive'){this.queue(m).pause();this.loaded.get(m.id)?.goals.stop();}
+    return {workspaces:this.workspaceSnapshot()};
+  }
+  private async stopAndArchive(p:Data){
+    // Review on the admission chain; never hold it while existing producers settle.
+    const review=this.serial.then(()=>{if(this.quiescing)throw Error('Runtime is closing for maintenance.');return this.organizationTarget(p);});this.serial=review.catch(()=>{});const m=await review;
+    if(!this.organization.archived(m.id)){
+      const improvement=this.improvements.cancelSession(m.id);await this.cancel(m.id);
+      const pending=[improvement,this.loaded.get(m.id)?.task,this.mcpManagement.waitSession(m.id)].filter(Boolean);let timer:ReturnType<typeof setTimeout>|undefined;
+      try{await Promise.race([Promise.allSettled(pending),new Promise(resolve=>{timer=setTimeout(resolve,5000);})]);}finally{if(timer)clearTimeout(timer);}
+    }
+    const finish=this.serial.then(()=>{if(this.quiescing)throw Error('Runtime is closing for maintenance.');return this.organizeSession(p);});this.serial=finish.catch(()=>{});return finish;
+  }
   private mcpInfo(m:Meta){if(m.surface==='browser')return {available:false,reason:'MCP is unavailable in browser-only conversations.'};return {...(this.loaded.get(m.id)?.mcp?.describe()??{available:false,reason:'MCP bindings are not loaded for this saved conversation.'}),management:this.mcpManagement.describe(m.id)};}
-  submit(r:Loaded,input:string,id:string){r.mcp?.assertReady();const m=r.meta;if(m.running)throw new Error('This conversation is already working');
+  submit(r:Loaded,input:string,id:string){r.mcp?.assertReady();const m=r.meta;if(this.organization.archived(m.id))throw Error('Restore the conversation before starting work.');if(m.running)throw new Error('This conversation is already working');
     if(this.mcpReloading)throw Error('Finish MCP session reload before sending a chat prompt.');
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
     const reasoningPolicy=reasoningConfig(this.settings.reasoning),savedThinking=this.reasoningSettings(m);
@@ -450,13 +471,13 @@ export class Host {
     if(this.pumping.has(m.id))return this.pumping.get(m.id)!;
     const run=this.serial.then(async()=>{
       const queue=this.queue(m);
-      if(this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain)return;
+      if(this.organization.archived(m.id)||this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain)return;
       let item=queue.next;
       if(!item){if(this.jobs.busyOwner(m.id))return;const owner=this.loaded.get(m.id);if(!owner?.goals.armed)return;try{const source=owner.goals.reserve();if(!source)return;const requestId='goal:'+randomUUID();queue.enqueue(requestId,owner.goals.prompt(source),true,source);item=queue.next;}catch{try{owner.goals.fail('goal-queue-failed','Goal input could not be queued. Inspect the queue before explicitly resuming.');}catch{owner.goals.disarm();}return;}}
       if(!item)return;
       let r:Loaded;
       try{r=await this.load(m);}catch(error){queue.notSent(item.id);this.append(m,'runtime/error',{message:'Queued prompt was not sent: '+String(error)});return;}
-      if(this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
+      if(this.organization.archived(m.id)||this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
       this.submit(r,item.input!,item.id);
     });
     this.serial=run.catch(()=>{});this.pumping.set(m.id,run);
@@ -467,6 +488,7 @@ export class Host {
     if(method==='setup.test')return this.setup.test(p);
     if(method==='setup.cancel')return this.setup.cancel();
     if(method==='session.cancel')return this.cancel(p.sessionId);
+    if(method==='session.organize'&&p.action==='archive'&&p.stop===true)return this.stopAndArchive(p);
     if(method==='session.cancelJob')return this.jobs.cancel(this.getMeta(p.sessionId).id,identifier(p.jobId));
     if(method==='session.waitJob')return this.jobs.wait(this.getMeta(p.sessionId).id,identifier(p.jobId),p.timeoutMs);
     if(method==='prompt.cancelImprovement')return this.improvements.cancel(p.requestId,p.scopeId);
@@ -477,6 +499,7 @@ export class Host {
     const result=await run;return result instanceof SteeringReply?result.settled.finally(()=>this.wakeGoals()):result;
   }
   async handle(method:string,p:Data,id:string):Promise<any>{
+    if(p.sessionId&&this.organization.archived(p.sessionId)&&['session.prompt','session.continueQueue','session.startJob','session.updateGoal','prompt.improve'].includes(method))throw Error('Restore the conversation before starting work.');
     if(this.mcpReloading&&(['prompt.improve','setup.save','models.configure','models.reload','session.create','session.branch','session.updateGoal','session.trimTools','session.selectModel','session.selectReasoning','reasoning.configure','session.prompt','session.continueQueue'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Finish MCP session reload before changing or starting a conversation.');
     if(method.startsWith('session.')&&p.sessionId&&this.metadata.get(p.sessionId)?.delegation&&!['session.history','session.nativeHistory','session.nativeRead','session.originalSearch','session.originalRead','session.plan','session.goal','session.queue','session.cancel'].includes(method))throw Error('Delegated conversations are controlled by their parent job.');
     if(this.jobs.busy&&['models.configure','models.reload','setup.save','reasoning.configure','session.mcpConfigure','session.mcpAction'].includes(method))throw Error('Stop and settle background jobs before changing their shared configuration.');
@@ -525,6 +548,7 @@ export class Host {
       return {changes,units:'unicode-code-points',policy:TOOL_BUDGET};
     }
     case 'workspace.list':return this.workspaceSnapshot();
+    case 'session.organize':return this.organizeSession(p);
     case 'workspace.adopt':await this.workspaces.adopt(p.path,p.expectedRevision);return {...this.workspaceSnapshot(),adoptedWorkspaceId:workspacePath(p.path)};
     case 'workspace.rename':this.workspaces.rename(p.workspaceId,p.title,p.expectedRevision);return this.workspaceSnapshot();
     case 'workspace.remove':this.workspaces.remove(p.workspaceId,p.expectedRevision);return this.workspaceSnapshot();
@@ -553,7 +577,7 @@ export class Host {
     case 'models.configure':{if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before changing providers');if(!p.config||typeof p.config.providers!=='object'||Array.isArray(p.config.providers))throw new Error('Invalid providers configuration');if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active chats before changing providers');const file=join(this.dirs.agent,'models.json');const old=existsSync(file)?readFileSync(file,'utf8'):null;atomicJson(file,p.config);try{await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());}catch(error){if(old===null)unlinkSync(file);else writeFileSync(file,old,{mode:0o600});await this.modelRuntime.refresh({allowNetwork:false});throw error;}return this.catalog();}
     case 'models.reload':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before reloading models');await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});return this.catalog();
     case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
-    case 'session.list':return {items:[...this.metadata.values()].filter(m=>!m.delegation).sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title,jobsRunning:this.jobs.busyOwner(m.id)}))};
+    case 'session.list':return {items:[...this.metadata.values()].filter(m=>!m.delegation).sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title,jobsRunning:this.jobs.busyOwner(m.id),...(m.fork?{fork:m.fork}:{})}))};
     case 'session.history':{const m=this.getMeta(p.sessionId);return this.history(m).page(p.maxMessages,p.beforeSeq);}
     case 'session.mcpInfo':return this.mcpInfo(this.getMeta(p.sessionId));
     case 'session.mcpActionStatus':{const m=this.getMeta(p.sessionId),receipt=this.mcpManagement.lookup(m.id,identifier(p.requestId));return p.includeCatalog===true?{...receipt,catalog:this.mcpInfo(m)}:receipt;}

@@ -28,8 +28,9 @@ test('session option receipts persist actual reload counts and reject impossible
 test('cancellation waits for the actual handler and does not claim credential rollback',async t=>{
  const file=await fixture(t);let release;const waiting=new Promise(resolve=>release=resolve),manager=new McpManagement(file);
  manager.begin(input,async(_args,ctx)=>{await waiting;await ctx.ui.input('private SDK title','private prefill');ctx.ui.notify('Sign-in cancelled.','info');},context);
+ assert(manager.busySession('conversation'));assert(!manager.busySession('foreign'));await manager.waitSession('foreign');let settled=false;const own=manager.waitSession('conversation').then(()=>{settled=true;});await Promise.resolve();assert(!settled,'the scoped wait observes the actual running handler');
  const cancelled=manager.cancel('conversation','action');assert.equal(cancelled.state,'cancel-requested');assert(manager.busy);assert.throws(()=>manager.begin({...input,requestId:'other'},async()=>{},context),/active/);
- release();await manager.settled();assert.equal(manager.lookup('conversation','action').state,'cancelled');assert.equal(manager.lookup('conversation','action').cancelRequested,true);assert(!manager.busy);
+ release();await manager.settled();await own;assert(settled);assert.equal(manager.lookup('conversation','action').state,'cancelled');assert.equal(manager.lookup('conversation','action').cancelRequested,true);assert(!manager.busySession('conversation'));assert(!manager.busy);
 });
 test('SDK errors, notification failures and receipt save gaps remain explicit without leaking raw messages',async t=>{
  const file=await fixture(t),manager=new McpManagement(file,()=>{throw Error('AUTHORED_PRIVATE_NOTIFIER_ERROR');});let release;const waiting=new Promise(resolve=>release=resolve);

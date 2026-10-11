@@ -53,6 +53,19 @@ test('parent Stop cancels idle-parent delegated work and real owned shell proces
  const shell=await start(f,f.sid,{requestId:'shell-stop',kind:'shell',task:command,allowedTools:[],limits:{timeoutMs:30000}});await until(async()=>(await read(f,f.sid,shell.job.id)).output.chunks.some(c=>c.text.includes('owned-command-started')),'actual shell output');await f.call('session.cancel',{sessionId:f.sid});assert.equal((await done(f,f.sid,shell.job.id)).state,'cancelled');await assert.rejects(stat(path),{code:'ENOENT'});
  const count=f.requests.length;await f.stop();await f.start();assert.equal((await read(f,f.sid,started.job.id)).job.state,'cancelled');assert.equal((await read(f,f.sid,shell.job.id)).job.state,'cancelled');assert.equal(f.requests.length,count);assert.equal(f.errors(),'');
 });
+test('original archive confirmation sees idle-parent delegated work and confirmed Stop preserves only its owned receipts',{timeout:60000},async t=>{
+ const f=await fixture(t),foreign='archive-foreign-job';await f.call('session.create',{sessionId:foreign,selection:f.selection,cwd:f.workspace});
+ const target=await start(f,f.sid,spec({kind:'worker-hold'},[])),other=await start(f,foreign,spec({kind:'worker-hold'},[]));
+ try{
+  await until(async()=>(await read(f,f.sid,target.job.id)).output.next>0&&(await read(f,foreign,other.job.id)).output.next>0,'both owned workers streaming');
+  const history=await f.call('session.history',{sessionId:f.sid}),count=f.requests.length,organization=(await f.call('workspace.list')).organizationRevision;
+  assert.equal((await f.call('session.list')).items.find(x=>x.sessionId===f.sid).running,false);
+  const review=await f.call('session.organize',{sessionId:f.sid,action:'archive',expectedRevision:organization});assert.deepEqual(review.confirmation.activity.find(x=>x.kind==='job').items,[{id:target.job.id}]);assert.equal((await read(f,f.sid,target.job.id)).job.state,'running');
+  const archived=await f.call('session.organize',{sessionId:f.sid,action:'archive',stop:true,expectedRevision:organization});assert(!archived.confirmation);assert(archived.workspaces.archivedSessionIds.includes(f.sid));assert.equal((await read(f,f.sid,target.job.id)).job.state,'cancelled');assert.equal((await read(f,foreign,other.job.id)).job.state,'running');assert.equal(f.requests.length,count);
+  const retained=await f.call('session.history',{sessionId:f.sid});assert.equal(retained.events.filter(x=>x.event.type==='user/message').length,history.events.filter(x=>x.event.type==='user/message').length);assert((await f.call('session.jobHistory',{sessionId:f.sid,jobId:target.job.id})).events.some(x=>x.event.type==='assistant/message'));
+  await assert.rejects(start(f,f.sid,spec({kind:'worker-reply'},[])),/Restore/);assert.equal(f.requests.length,count);assert.equal(f.errors(),'');
+ }finally{await f.call('session.cancel',{sessionId:f.sid});await f.call('session.cancel',{sessionId:foreign});await done(f,foreign,other.job.id);}
+});
 test('crash recovery retains child originals and unknown outcome without starting any producer',{timeout:60000},async t=>{
  const f=await fixture(t),value=spec({kind:'worker-hold'},[]),result=await start(f,f.sid,value);await until(async()=>(await read(f,f.sid,result.job.id)).output.next>0,'live child before crash');const before=await read(f,f.sid,result.job.id),native=await f.native(before.job.childId),count=f.requests.length;
  await f.crash();await f.start();const cold=await read(f,f.sid,result.job.id);assert.equal(cold.job.state,'unknown');assert.match(cold.job.reason,/not replayed/);assert.equal(f.requests.length,count);assert.deepEqual((await f.native(before.job.childId)).bytes,native.bytes);

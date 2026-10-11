@@ -58,6 +58,7 @@ export class PiJobs {
  get busy(){return this.active.size>0;}
  busyKind(kind:JobSpec['kind'],owner?:string){return [...this.active.keys()].some(id=>{const row=this.rows.get(id);return row?.spec.kind===kind&&(owner===undefined||row.owner===owner);});}
  busyOwner(owner:string){return [...this.active.keys()].some(id=>this.rows.get(id)?.owner===owner);}
+ activeOwnerIds(owner:string){return [...this.active.keys()].filter(id=>this.rows.get(id)?.owner===owner);}
  private save(row:JobRecord){row.updatedAt=Date.now();const ring=this.rings.get(row.id)!,snapshot=ring.readFrom(0),chunks:JobOutputRead['chunks']=[];
   for(const chunk of snapshot.chunks){const previous=chunks.at(-1);if(previous&&previous.channel===chunk.channel&&!chunk.gapBefore&&previous.at+Buffer.byteLength(previous.text)===chunk.at)previous.text+=chunk.text;else chunks.push({...chunk});}
   ring.restore({chunks:chunks.slice(-128),next:snapshot.next,lossy:snapshot.lossy||chunks.length>128});row.output=ring.readFrom(0);atomicJson(join(this.directory,row.id+'.json'),row);try{this.changed(structuredClone(row));}catch{/* Notification cannot reverse persistence. */}}
