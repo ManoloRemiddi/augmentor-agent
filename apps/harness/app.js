@@ -5,6 +5,7 @@ import {createMessageActions} from './message-actions.js';
 import {createQueue} from './queue-view.js';
 import {attachHarnessPrompts} from './prompt-library.js';
 import {attachReasoning} from './reasoning.js';
+import {attachMcpManagement} from './mcp-management.js';
 import {attachPiImprovement} from './prompt-improvement.js';
 import {attachNativeHistory} from './native-history.mjs';
 const $=id=>document.getElementById(id);
@@ -47,6 +48,7 @@ function current(){return state.sessions.find(s=>s.sessionId===state.sessionId);
 const promptLibrary=attachHarnessPrompts({input:$('input'),button:$('prompt-library'),rpc,ready:()=>state.ready&&!state.readOnly,
   context:()=>state.epoch+':'+state.sessionId+':'+(messageActions.editing?'edit':'chat'),changed:renderSessions});
 const reasoning=attachReasoning({button:$('reasoning-settings'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,ready:!state.readOnly&&state.ready&&state.selectionReady&&!state.selecting&&!state.creating}),notice});
+const mcp=attachMcpManagement({button:$('mcp-settings'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,ready:!state.readOnly&&state.ready&&state.selectionReady&&!state.selecting&&!state.creating&&!current()?.running}),notice,changed:renderSessions});
 const improvement=attachPiImprovement({input:$('input'),button:$('improve'),rpc,current:()=>({sessionId:state.sessionId,epoch:state.epoch,selection:JSON.parse($('model').value||'null'),ready:!state.readOnly&&state.ready&&state.selectionReady&&!state.selecting&&!state.creating&&!submitting&&!current()?.running&&!!state.sessionId}),notice,changed:renderSessions});
 function rows(){return [...state.observations.values()].sort((a,b)=>a.seq-b.seq);}
 function label(record){return record.kind+(record.data.name?' · '+record.data.name:record.data.model?' · '+record.data.model:'');}
@@ -62,15 +64,16 @@ function renderSessions(){
   }));
   const session=current();$('title').textContent=session?.title||'Your agent, in view';
   $('subtitle').textContent=session?(session.running?'Working · ':'')+session.cwd:'Open a conversation to inspect its execution and context.';
-  $('stop').disabled=!session?.running&&!submitting;
-  $('send').disabled=improvement.busy||!session||messageActions.busy||promptLibrary.inserting||!state.ready||!state.selectionReady||state.selecting||state.creating;
+  $('stop').disabled=!session?.running&&!submitting&&!mcp.busy;
+  $('send').disabled=mcp.blocked||improvement.busy||!session||messageActions.busy||promptLibrary.inserting||!state.ready||!state.selectionReady||state.selecting||state.creating;
   $('prompt-library').disabled=!state.ready;
   $('reasoning-settings').disabled=!session||session.running||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating;reasoning.changed();
+  $('mcp-settings').disabled=!session||session.running||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating;mcp.changed();
   $('send').textContent=messageActions.editing?'Send edit':session?.running||submitting?'Queue':'Send';renderQueue();
   $('edit-message').hidden=!messageActions.editing;$('cancel-edit').disabled=messageActions.busy;
   $('new-chat').disabled=messageActions.busy||!state.ready||state.selecting||state.creating;$('model').disabled=!!session?.running||submitting||messageActions.busy||!state.ready||state.selecting||state.creating||!!session&&!state.selectionReady;
   $('trim-tools').disabled=!session||session.running||submitting||!state.ready||!state.selectionReady||state.selecting||state.creating;
-  if(state.readOnly){for(const id of ['new-chat','prompt-library','reasoning-settings','composer','stop','trim-tools','clear'])if($(id))$(id).hidden=true;$('workspace').parentElement.hidden=true;$('model').disabled=true;$('capture').disabled=true;}
+  if(state.readOnly){for(const id of ['new-chat','prompt-library','reasoning-settings','mcp-settings','composer','stop','trim-tools','clear'])if($(id))$(id).hidden=true;$('workspace').parentElement.hidden=true;$('model').disabled=true;$('capture').disabled=true;}
 }
 function renderChat(){
   const container=$('messages'),following=container.scrollHeight-container.scrollTop-container.clientHeight<80;

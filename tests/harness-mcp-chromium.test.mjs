@@ -1,0 +1,25 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {once} from 'node:events';
+import {mkdtemp,readFile,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {managementOwner,until} from './fixtures/mcp-management-owner.mjs';
+import {harnessCdp} from './fixtures/harness-cdp.mjs';
+import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
+test('rendered Harness manages OAuth through operator controls and withholds them from a read-only inspector',{skip:process.platform!=='linux',timeout:90000},async t=>{
+ const owner=await managementOwner(t),sid=await owner.create(),profile=await mkdtemp(join(tmpdir(),'augmentor-mcp-chrome-'));let chrome,panel;
+ t.after(async()=>{panel?.close();if(chrome?.exitCode===null&&chrome.signalCode===null){const ended=once(chrome,'exit');chrome.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,owner.link.url+'&session='+sid],{env:owner.env,stdio:'ignore'});
+ let port;await until(async()=>{try{port=(await readFile(join(profile,'DevToolsActivePort'),'utf8')).split('\n')[0];return !!port;}catch{return false;}},'Chromium ready');const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);for(const name of ['Runtime','Log','Network','Page'])await panel.call(name+'.enable');
+ const visible=expression=>until(()=>panel.evaluate(expression).catch(()=>false),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,ownerError:owner.errors});throw error;});
+ const click=expression=>harnessPointerClick(panel,expression,until),button=label=>'Array.from(document.querySelectorAll(".mcp-dialog button")).find(e=>e.textContent==='+JSON.stringify(label)+')';
+ await visible('!document.querySelector("#mcp-settings").disabled');await click('document.querySelector("#mcp-settings")');await visible('document.querySelector(".mcp-dialog select")?.options.length===3');await click(button('Sign in'));await visible('document.querySelector(".mcp-dialog a")?.hidden===false');assert.equal(owner.requests.length,0);assert.equal(owner.wire.stats.tools,0);
+ const receipt=(await owner.client.call('session.mcpInfo',{sessionId:sid})).management.lastReceipt,row=await owner.client.call('session.mcpActionStatus',{sessionId:sid,requestId:receipt.requestId});const response=await fetch(row.authorizationUrl,{redirect:'manual'}),redirect=response.headers.get('location');
+ await panel.evaluate('(()=>{const el=document.querySelector('+JSON.stringify('.mcp-dialog [aria-label="MCP redirected URL"]')+');el.value='+JSON.stringify(redirect)+';el.dispatchEvent(new Event("input",{bubbles:true}));})()');await click(button('Submit redirected URL'));await visible('document.querySelector(".mcp-dialog [role=status]").textContent.includes("sdk-reported-success")');assert.equal(await panel.evaluate('document.querySelector('+JSON.stringify('.mcp-dialog [aria-label="MCP redirected URL"]')+').value'),'');assert.equal(owner.wire.stats.pkceVerified,1);assert.equal(owner.requests.length,0);
+ owner.wire.rejectToken();await click(button('Reconnect'));await visible('document.querySelector(".mcp-dialog [role=status]").textContent.includes("reconnect")&&document.querySelector(".mcp-dialog [role=status]").textContent.includes("sdk-reported-success")');assert.equal(owner.wire.stats.refreshGrants,1);await click(button('Sign out'));await visible('document.querySelector(".mcp-dialog [role=status]").textContent.includes("logout")&&document.querySelector(".mcp-dialog [role=status]").textContent.includes("sdk-reported-success")');assert.equal(owner.wire.stats.tools,0);assert.equal(owner.requests.length,0);
+ await click(button('Sign in'));await visible('document.querySelector(".mcp-dialog a")?.hidden===false');await click(button('Cancel management'));await visible('document.querySelector(".mcp-dialog [role=status]").textContent.includes("cancelled")');await click(button('Done'));await visible('!document.querySelector(".mcp-dialog")');
+ const inspect=await owner.client.call('inspection.open',{sessionId:sid});await panel.call('Page.navigate',{url:inspect.url});await panel.reload();await visible('document.querySelector("#mcp-settings")?.hidden===true');assert.equal(owner.requests.length,0);assert.equal(owner.wire.stats.tools,0);assert.deepEqual(panel.errors,[]);assert.deepEqual(owner.wire.errors,[]);
+});

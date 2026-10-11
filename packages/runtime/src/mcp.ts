@@ -1,11 +1,12 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {existsSync,readFileSync,statSync} from 'node:fs';
 import {join} from 'node:path';
-import {createCodemodeExtension,createMcpExtension,createToolSearchExtension,type ExtensionAPI,type ExtensionContext,type ExtensionFactory,type McpServerConfig} from '@earendil-works/pi-coding-agent';
+import {createCodemodeExtension,createMcpExtension,createToolSearchExtension,type ExtensionAPI,type ExtensionContext,type ExtensionFactory,type McpServerConfig,type RegisteredCommand} from '@earendil-works/pi-coding-agent';
 import {privateDir} from './storage.js';
 import {createManagedMcpTransport} from './mcp-transport.js';
 import {MCP_TRANSPORT_ORIGINAL_TYPE} from './mcp-originals.js';
 import {MCP_AUTHORIZATION_TYPE,savedMcpAuthorization,type McpAuthorizationObservation} from './mcp-authorization.js';
+import type {McpManagementAction} from './mcp-management.js';
 
 const discovery=new Set(['codemode','tool_search','list_mcp_resources','list_mcp_resource_templates','read_mcp_resource']);
 const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
@@ -14,6 +15,7 @@ const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof va
  */
 export class ManagedMcp {
  private api?:ExtensionAPI;
+ private command?:RegisteredCommand['handler'];
  private manager?:ExtensionContext['sessionManager'];
  private authorizationGaps=new Map<string,McpAuthorizationObservation>();
  private errors:string[]=[];
@@ -22,7 +24,7 @@ export class ManagedMcp {
  private autoEnableCodemode=true;
  private retainLogs=false;
  readonly source:string;
- constructor(agentDir:string,private stateDir:string,private sessionId:string,private authorizationChanged?:(event:McpAuthorizationObservation,retained:boolean)=>void){
+ constructor(agentDir:string,private stateDir:string,private sessionId:string,private authorizationChanged?:(event:McpAuthorizationObservation,retained:boolean)=>void,private openAuthorization?:(url:string)=>void){
   this.source=join(agentDir,'mcp.json');
   try{
    if(!existsSync(this.source))return;
@@ -48,7 +50,7 @@ export class ManagedMcp {
    }catch{this.errors.push('A managed MCP server could not be registered; check its name and configuration.');}
   }
  };
- factories():ExtensionFactory[]{return [createCodemodeExtension({models:false}),createToolSearchExtension(),this.register,createMcpExtension({
+ factories():ExtensionFactory[]{const builtin=createMcpExtension({
   // Registrations above are validated by public ExtensionAPI. Do not admit
   // project files or Pi's default global config outside this managed profile.
   loadConfig:()=>({servers:[],errors:[...this.errors],autoEnableCodemode:this.autoEnableCodemode}),
@@ -61,7 +63,28 @@ export class ManagedMcp {
    this.authorizationChanged?.(event,retained);return retained;
   }),
   logPath:this.retainLogs?join(privateDir(join(this.stateDir,'mcp-logs')),this.sessionId+'.log'):process.platform==='win32'?'NUL':'/dev/null',
- })];}
+  // The operator surface presents this ephemeral URL. The SDK must not launch
+  // an unrelated default browser or place the URL in retained notifications.
+  openUrl:url=>{if(!this.openAuthorization)throw Error('Open MCP management to sign in.');this.openAuthorization(url);},
+ });
+  const managed:ExtensionFactory=pi=>builtin(new Proxy(pi,{get:(target,key)=>{
+   if(key==='registerCommand')return (name:string,options:Omit<RegisteredCommand,'name'|'sourceInfo'>)=>{if(name==='mcp')this.command=options.handler;target.registerCommand(name,options);};
+   return Reflect.get(target,key);
+  }}));
+  return [createCodemodeExtension({models:false}),createToolSearchExtension(),this.register,managed];
+ }
+ managementCommand(action:McpManagementAction,name:string){
+  if(!this.command||!this.api)throw Error('MCP management is unavailable for this conversation.');
+  const server=this.api.getMcpServers().find(row=>row.name===name);
+  if(!server||server.config.enabled===false)throw Error('Choose an enabled registered MCP server.');
+  if(action!=='reconnect'&&!this.managementActions(server.config).includes(action))throw Error('This MCP server does not support OAuth management.');
+  return this.command;
+ }
+ private managementActions(config:McpServerConfig):McpManagementAction[]{
+  if(config.enabled===false)return [];
+  const oauth='url' in config&&!Object.keys(config.headers??{}).some(name=>name.toLowerCase()==='authorization');
+  return oauth?['login','logout','reconnect']:['reconnect'];
+ }
  isRead(name:string){
   if(discovery.has(name))return true;
   return this.readTools.has(name)&&this.api?.getAllTools().some(tool=>tool.name===name)===true;
@@ -74,7 +97,7 @@ export class ManagedMcp {
    coverage:'registered MCP tool catalog; not a connection health probe',serverCount:servers.length,omittedServers:Math.max(0,servers.length-64),servers:servers.slice(0,64).map(entry=>{
     const namespace='mcp__'+entry.name.replaceAll('-','_'),registered=tools.filter(tool=>tool.namespace?.name===namespace),shown=registered.filter(tool=>tool.name.length<=256).slice(0,remaining);remaining-=shown.length;
     const lastObserved=authorization.get(entry.name)??null,gap=this.authorizationGaps.get(entry.name);
-    return {name:entry.name,enabled:entry.config.enabled!==false,transport:'url' in entry.config?'http':'stdio',exposure:entry.config.exposure??'codemode',toolCount:registered.length,omittedToolNames:registered.length-shown.length,toolNames:shown.map(tool=>tool.name),declaredToolNames:shown.filter(tool=>active.has(tool.name)).map(tool=>tool.name),readOnlyToolNames:shown.filter(tool=>this.readTools.has(tool.name)).map(tool=>tool.name),authorization:{coverage:'last recorded HTTP authorization observation on the selected Pi branch; not current credential health',lastObserved,unsaved:gap??null,retention:gap?'native-append-failed':lastObserved?'sdk-native-entry-policy':'not-observed'}};
+    return {name:entry.name,enabled:entry.config.enabled!==false,transport:'url' in entry.config?'http':'stdio',exposure:entry.config.exposure??'codemode',managementActions:this.managementActions(entry.config),toolCount:registered.length,omittedToolNames:registered.length-shown.length,toolNames:shown.map(tool=>tool.name),declaredToolNames:shown.filter(tool=>active.has(tool.name)).map(tool=>tool.name),readOnlyToolNames:shown.filter(tool=>this.readTools.has(tool.name)).map(tool=>tool.name),authorization:{coverage:'last recorded HTTP authorization observation on the selected Pi branch; not current credential health',lastObserved,unsaved:gap??null,retention:gap?'native-append-failed':lastObserved?'sdk-native-entry-policy':'not-observed'}};
    })};
  }
 }

@@ -174,6 +174,10 @@ class SettingsDialog(QDialog):
             reasoning=QPushButton('Reasoning');reasoning.setAccessibleName('Pi reasoning settings')
             reasoning.setEnabled(getattr(window.controller,'capabilities',{}).get('reasoning') is True)
             reasoning.clicked.connect(lambda:ReasoningDialog(window).exec());layout.addWidget(reasoning)
+            from .mcp_settings import McpDialog
+            mcp=QPushButton('MCP servers');mcp.setAccessibleName('Pi MCP server management')
+            mcp.setEnabled(getattr(window.controller,'capabilities',{}).get('mcpManagement') is True)
+            mcp.clicked.connect(lambda:McpDialog(window).exec());layout.addWidget(mcp)
         dsh=QPushButton('Connect Codex model' if getattr(window.controller,'harness',None)=='codex' else 'Connect DSH')
         def connect_dsh():
             self.accept()

@@ -9,7 +9,7 @@ import type {Host} from './host.js';
 
 const allowed = new Set([
   'host.describe', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
-  'session.list', 'session.create', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.models', 'session.selectModel',
+  'session.list', 'session.create', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
@@ -179,6 +179,7 @@ export class HarnessServer {
         ['/prompt-library.js', {path: join(this.assets, 'prompt-library.js'), type: 'text/javascript'}],
         ['/prompt-improvement.js', {path: join(this.assets, 'prompt-improvement.js'), type: 'text/javascript'}],
         ['/reasoning.js', {path: join(this.assets, 'reasoning.js'), type: 'text/javascript'}],
+        ['/mcp-management.js', {path: join(this.assets, 'mcp-management.js'), type: 'text/javascript'}],
         ['/shared-reasoning/pi-reasoning.mjs', {path:fileURLToPath(new URL('../../../apps/browser/extension/pi-reasoning.mjs',import.meta.url)),type:'text/javascript'}],
         ['/queue-view.js', {path: fileURLToPath(new URL('../../harness-ui/src/queue-view.js', import.meta.url)), type: 'text/javascript'}],
         ['/harness.css', {path: join(this.assets, 'harness.css'), type: 'text/css'}],

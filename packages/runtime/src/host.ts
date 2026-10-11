@@ -23,6 +23,7 @@ import {RELEASE} from '../../contracts/src/release.js';
 import {DisplayHistory} from './display-history.js';
 import {NativeHistory} from './native-history.js';
 import {ManagedMcp} from './mcp.js';
+import {McpManagement,type McpManagementAction} from './mcp-management.js';
 import {DesktopSpecialist,DESKTOP_DELEGATION_GUIDANCE} from './desktop-specialist.js';
 import {linuxDesktopExecutor} from '../../pi-linux/src/desktop-executor.js';
 import {ObservationStore,OBSERVATION_PROTOCOL,DEFAULT_RETENTION} from '../../observation/src/store.js';
@@ -54,6 +55,7 @@ export class Host {
   settings:Data;
   readonly observations:ObservationStore;
   readonly improvements=new PiPromptImprovement(join(this.dirs.state,'prompt-improvements.json'));
+  readonly mcpManagement:McpManagement;
   private serial:Promise<unknown>=Promise.resolve();
   private quiescing=false;
   private histories=new Map<string,DisplayHistory>();
@@ -71,6 +73,11 @@ export class Host {
     }));
     this.interactions=new Interactions(publish,connected,Number(process.env.AUGMENTOR_PI_INTERACTION_TIMEOUT||120000));
     for(const file of readdirSync(this.dirs.sessions).filter(f=>f.endsWith('.meta.json'))){const m=readJson<Meta>(join(this.dirs.sessions,file),null as any);identifier(m.id);this.metadata.set(m.id,m);}
+    this.mcpManagement=new McpManagement(join(this.dirs.state,'mcp-management.json'),row=>{
+      this.publish(row.sessionId,{method:'mcp/management',payload:{sessionId:row.sessionId,receipt:row}});
+      this.loaded.get(row.sessionId)?.observation?.record('integration/mcp-management',{...row});
+      const m=this.metadata.get(row.sessionId);if(m&&!['running','cancel-requested'].includes(row.state))this.append(m,'runtime/notice',{message:'MCP '+row.action+' for '+row.server+': '+row.state+'. '+(row.result==='unknown'?'Its effects may be unknown; the command was not replayed.':'This is the SDK command report; connection and credential health need separate verification.'),mcpManagement:{...row}});
+    });
   }
   async init(){this.modelRuntime=await ModelRuntime.create({authPath:join(this.dirs.agent,'auth.json'),modelsPath:join(this.dirs.agent,'models.json'),modelsStorePath:join(this.dirs.agent,'models-store.json'),allowModelNetwork:false});
     if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());
@@ -120,13 +127,14 @@ export class Host {
     if(m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,e.toolName,e.input))return {block:true,reason:'Action not approved, cancelled or no user interface connected.'};
   });};}
   async load(m:Meta,branchManager?:SessionManager){let record=this.loaded.get(m.id);if(record)return record;
+    if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish MCP management before loading another Native conversation.');
     const model=await this.selected(m.selection);
     const memory=new DualMemoryClient('pi:'+m.id,m.cwd,undefined,message=>console.warn('[augmentor-memory]',message));
     const mcp=m.surface==='browser'?undefined:new ManagedMcp(this.dirs.agent,this.dirs.state,m.id,(event,retained)=>{
       record?.observation?.record('integration/mcp-authorization',{...event,retained});
       if(!retained)this.append(m,'runtime/warning',{message:'An MCP authorization observation could not be saved. Its historical evidence has a gap.'});
       if(event.state==='sign-in-required'||event.state==='refresh-failed')this.append(m,'runtime/notice',{message:event.state==='sign-in-required'?'An MCP server requires sign-in. Inspect its recorded authorization status before another action.':'An MCP authorization refresh failed. Inspect its recorded status before another action.'});
-    });
+    },url=>this.mcpManagement.authorizationUrl(m.id,url));
     mkdirSync(m.cwd,{recursive:true,mode:0o700});
     const execution:PiExecution=new PiExecution((kind,data,payload)=>record?.observation?.record(kind,data,payload),(message,incomplete)=>{record?.observation?.record('execution/notice',{message,incomplete});this.append(m,'runtime/notice',{message,incomplete});},{},undefined,(name):ExecutionContract|undefined=>{
       const definition=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()]).find(tool=>tool.definition.name===name)?.definition;
@@ -192,9 +200,10 @@ export class Host {
   }
   async cancel(id:unknown,source='user'){
     const m=this.getMeta(id),queue=this.queue(m);queue.pause();const r=this.loaded.get(m.id);let aborting:Promise<void>|undefined;
+    const cancellingMcp=this.mcpManagement.cancelSession(m.id);
     if(m.running&&r){if(r.preparingInput)r.interruptedInput=true;r.cancelled=true;r.execution?.cancel();for(const requestId of r.steering?.withdraw()??[])queue.withdrawSteer(requestId);r.session.abortCompaction();aborting=r.session.abort();}
     if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);
-    if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(aborting)await aborting;return {accepted:!!aborting,paused:true};
+    if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(aborting)await aborting;return {accepted:!!aborting||cancellingMcp,paused:true};
   }
   private async steer(m:Meta,id:string,expectedTurnId:unknown){
     const r=this.loaded.get(m.id),turnId=promptIdentity(expectedTurnId),queue=this.queue(m);
@@ -234,6 +243,7 @@ export class Host {
   }
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
   submit(r:Loaded,input:string,id:string){const m=r.meta;if(m.running)throw new Error('This conversation is already working');
+    if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
     const reasoningPolicy=reasoningConfig(this.settings.reasoning),savedThinking=this.reasoningSettings(m);
     r.turnId=randomUUID();const queue=this.queue(m);queue.dispatch(id,r.turnId);
     m.running=true;r.cancelled=false;r.failed=false;r.initialDelivered=false;r.preparingInput=false;r.interruptedInput=false;r.phase='preparing';r.activeRequestId=id;m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{requestId:id});queue.accepted(id);
@@ -270,11 +280,11 @@ export class Host {
     if(this.pumping.has(m.id))return this.pumping.get(m.id)!;
     const run=this.serial.then(async()=>{
       const queue=this.queue(m);
-      if(this.quiescing||this.improvements.busy||m.running||queue.paused||queue.uncertain||!queue.next)return;
+      if(this.quiescing||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain||!queue.next)return;
       const item=queue.next;
       let r:Loaded;
       try{r=await this.load(m);}catch(error){queue.notSent(item.id);this.append(m,'runtime/error',{message:'Queued prompt was not sent: '+String(error)});return;}
-      if(this.quiescing||this.improvements.busy||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
+      if(this.quiescing||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
       this.submit(r,item.input!,item.id);
     });
     this.serial=run.catch(()=>{});this.pumping.set(m.id,run);
@@ -309,7 +319,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; catalog-only',toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.cwd(),capabilities:{queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before shutting down the runtime');
       if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active Pi tasks before shutting down the runtime');
@@ -349,7 +359,20 @@ export class Host {
     case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
     case 'session.list':return {items:[...this.metadata.values()].sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running,blank:!m.title}))};
     case 'session.history':{const m=this.getMeta(p.sessionId);return this.history(m).page(p.maxMessages,p.beforeSeq);}
-    case 'session.mcpInfo':{const m=this.getMeta(p.sessionId);if(m.surface==='browser')return {available:false,reason:'MCP is unavailable in browser-only conversations.'};return this.loaded.get(m.id)?.mcp?.describe()??{available:false,reason:'MCP bindings are not loaded for this saved conversation.'};}
+    case 'session.mcpInfo':{const m=this.getMeta(p.sessionId);if(m.surface==='browser')return {available:false,reason:'MCP is unavailable in browser-only conversations.'};return {...(this.loaded.get(m.id)?.mcp?.describe()??{available:false,reason:'MCP bindings are not loaded for this saved conversation.'}),management:this.mcpManagement.describe(m.id)};}
+    case 'session.mcpActionStatus':{const m=this.getMeta(p.sessionId);return this.mcpManagement.lookup(m.id,identifier(p.requestId));}
+    case 'session.mcpCancelAction':{const m=this.getMeta(p.sessionId);return this.mcpManagement.cancel(m.id,identifier(p.requestId));}
+    case 'session.mcpSubmitRedirect':{const m=this.getMeta(p.sessionId);return this.mcpManagement.submitRedirect(m.id,identifier(p.requestId),p.url);}
+    case 'session.mcpAction':{
+      const m=this.getMeta(p.sessionId),requestId=identifier(p.requestId),server=identifier(p.server);
+      if(m.surface==='browser')throw Error('MCP management is unavailable in browser-only conversations.');
+      if(!['login','logout','reconnect'].includes(p.action))throw Error('Choose sign in, sign out or reconnect.');
+      const input={sessionId:m.id,requestId,server,action:p.action as McpManagementAction},duplicate=this.mcpManagement.duplicate(input);if(duplicate)return duplicate;
+      if(!this.connected(m.id))throw Error('Connect an operator surface before starting MCP management.');
+      if(this.improvements.busy||[...this.metadata.values()].some(row=>row.surface!=='browser'&&(row.running||!this.queue(row).paused&&!!this.queue(row).next)))throw Error('Finish active Native turns and pause their waiting prompts before managing MCP.');
+      const r=this.loaded.get(m.id);if(!r?.mcp)throw Error('Load this Native conversation before managing MCP.');
+      return this.mcpManagement.begin(input,r.mcp.managementCommand(input.action,server),r.session.extensionRunner.createCommandContext());
+    }
     case 'session.originalSearch':case 'session.originalRead':{
       const m=this.getMeta(p.sessionId),source=p.source??'pi';if(!['pi','display'].includes(source))throw Error('Choose Pi entries or display originals.');
       const file=source==='pi'?m.file:join(this.dirs.sessions,m.id+'.events.jsonl');if(!file)return {available:false,reason:'This conversation has no saved native session.'};
@@ -379,6 +402,7 @@ export class Host {
       if(p.mode!==undefined&&!['queue','steer'].includes(p.mode))throw Error('Choose queue or steer mode.');
       const input=text(p.content?.filter((part:Data)=>part.type==='text').map((part:Data)=>part.text).join('\n')),queue=this.queue(m);
       const existing=queue.lookup(requestId,input);if(existing||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
+      if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
       if(p.mode==='steer'){
         const r=this.loaded.get(m.id);if(!m.running||!r||r.cancelled||r.phase==='settling'||r.turnId!==p.expectedTurnId||queue.paused||queue.uncertain||r.steering?.waiting)throw Error('The observed steering turn is no longer available.');
         r.steering!.validate(input);queue.enqueue(requestId,input,true);return new SteeringReply(this.steer(m,requestId,p.expectedTurnId).then(result=>({...result,requestId})));
@@ -400,7 +424,7 @@ export class Host {
     }
     case 'session.queue':return this.queueSnapshot(p.sessionId);
     case 'session.updateQueue':{const m=this.getMeta(p.sessionId),itemId=promptIdentity(p.itemId);if(p.action?.kind==='steer')return new SteeringReply(this.steer(m,itemId,p.expectedTurnId));if(p.action?.kind!=='remove')throw Error('Choose steer or remove.');this.queue(m).remove(itemId);return {accepted:true,...this.queueSnapshot(m.id)};}
-    case 'session.continueQueue':{const m=this.getMeta(p.sessionId);this.queue(m).resume();this.pump(m);return {accepted:true};}
+    case 'session.continueQueue':{const m=this.getMeta(p.sessionId);if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before continuing Native prompts.');this.queue(m).resume();this.pump(m);return {accepted:true};}
     case 'session.resolveQueue':{const m=this.getMeta(p.sessionId);if(m.running||p.acknowledgeUnknownOutcome!==true)throw Error('Inspect the saved history and explicitly acknowledge that the interrupted action outcome remains unknown.');this.queue(m).resolve(promptIdentity(p.itemId));this.append(m,'runtime/notice',{message:'The interrupted prompt receipt was acknowledged. Its action outcome may still be unknown. That prompt was not retried; waiting prompts remain paused.',incomplete:true});return {accepted:true};}
     case 'session.rename':{const m=this.getMeta(p.sessionId);m.title=text(p.title,200);this.loaded.get(m.id)?.session.setSessionName(m.title);this.save(m);this.append(m,'session/title',{title:m.title});return {title:m.title};}
     case 'chats.saved':{if(p.action&&p.action!=='state'){if(!['save','unsave'].includes(p.action))throw new Error('Invalid saved-chat action');const m=this.getMeta(p.sessionId);m.saved=p.action==='save';this.save(m);}return {saved:[...this.metadata.values()].filter(m=>m.saved).map(m=>m.id)};}
@@ -410,5 +434,5 @@ export class Host {
     case 'prompts.improvementSave':return promptCall('prompts.improvement.save',p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.quiescing=true;this.setup.cancel();await this.improvements.close();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}}
+  async close(){this.quiescing=true;this.setup.cancel();await this.improvements.close();for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}await this.mcpManagement.settled();}
 }

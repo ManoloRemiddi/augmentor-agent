@@ -82,7 +82,14 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
    boundaries.set(response,info);challenged.add(response);observe(info,'challenge-observed');
    // The SDK can close the whole client after a metadata or GET auth error.
    // Keep every already-admitted request alive before handing it that boundary.
-   if(!tool&&info.boundary!=='http-control-response'){await drainAuth(requestId);reset=true;release();}
+   if(!tool&&info.boundary!=='http-control-response'){
+    await drainAuth(requestId);
+    // A public auth callback may rotate credentials and let this metadata/GET
+    // request finish. Closing here races that refresh and loses initialization.
+    // Failed callbacks request reset above; dispatched tools keep their separate
+    // no-resend path below even when their callback succeeds.
+    if(!protectedAuth?.onUnauthorized){reset=true;release();}
+   }
   }
   if(!tool||response.ok)return response;
   failedAdmission=true;

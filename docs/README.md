@@ -8,7 +8,7 @@ The October 10 [Pi prompt improvement slice](AUGMENTOR-HARNESS.md#pi-prompt-impr
 - [Augmentor Harness migration](AUGMENTOR-HARNESS-MIGRATION.md): DSH/Pi comparison, extension candidates, architecture, licensing and required parity.
 - [Augmentor Harness implementation](AUGMENTOR-HARNESS.md): current candidate, inspection/privacy/transport contracts, evidence and release gates.
 - [Pi codemode engine](QUICKJS-ENGINE.md): pinned QuickJS source rebuild, static notices, common platform staging and execution qualification.
-- [Managed MCP dispatch](MCP-TRANSPORT.md): failed acknowledgment/redirect guards, concurrent receipts, public SDK transport ownership and evidence.
+- [Managed MCP dispatch and management](MCP-TRANSPORT.md): failed acknowledgment guards, concurrent receipts, explicit Native/Harness sign-in controls, public SDK ownership and evidence.
 
 # Documentation index
 
