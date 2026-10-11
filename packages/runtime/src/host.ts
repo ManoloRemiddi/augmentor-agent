@@ -135,7 +135,11 @@ export class Host {
       record?.observation?.record('integration/mcp-authorization',{...event,retained});
       if(!retained)this.append(m,'runtime/warning',{message:'An MCP authorization observation could not be saved. Its historical evidence has a gap.'});
       if(event.state==='sign-in-required'||event.state==='refresh-failed')this.append(m,'runtime/notice',{message:event.state==='sign-in-required'?'An MCP server requires sign-in. Inspect its recorded authorization status before another action.':'An MCP authorization refresh failed. Inspect its recorded status before another action.'});
-    },url=>this.mcpManagement.authorizationUrl(m.id,url));
+    },url=>this.mcpManagement.authorizationUrl(m.id,url),(event,retained)=>{
+      record?.observation?.record('integration/mcp-connection',{...event,retained});
+      this.publish(m.id,{method:'mcp/connection',payload:{sessionId:m.id,observation:{...event},retained}});
+      if(!retained)this.append(m,'runtime/warning',{message:'An MCP connection observation could not be saved. Its historical evidence has a gap.'});
+    });
     mkdirSync(m.cwd,{recursive:true,mode:0o700});
     const execution:PiExecution=new PiExecution((kind,data,payload)=>record?.observation?.record(kind,data,payload),(message,incomplete)=>{record?.observation?.record('execution/notice',{message,incomplete});this.append(m,'runtime/notice',{message,incomplete});},{},undefined,(name):ExecutionContract|undefined=>{
       const definition=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()]).find(tool=>tool.definition.name===name)?.definition;

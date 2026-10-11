@@ -2,12 +2,14 @@
 import {homedir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {createHash} from 'node:crypto';
+import {AsyncLocalStorage} from 'node:async_hooks';
 import {isJsonRpcRequest,isJsonRpcResponse,McpHttpError,StdioTransport,StreamableHttpTransport,type AuthProvider,type JsonRpcId,type McpFetch} from '@earendil-works/pi-mcp';
 import {McpOAuthAuthorizationRequiredError} from '@earendil-works/pi-mcp/oauth';
 import type {McpTransportFactory} from '@earendil-works/pi-coding-agent';
 import {resolveConfigValueUncached} from '../vendor/pi/config-value.js';
 import {MCP_BODY_MAX_BYTES,type McpFailureOriginal} from './mcp-originals.js';
 import type {McpAuthorizationObservation} from './mcp-authorization.js';
+import {McpConnectionObserver,type McpConnectionObservation} from './mcp-connection.js';
 export type {McpFailureOriginal} from './mcp-originals.js';
 
 const home=(value:string)=>value==='~'?homedir():value.startsWith('~/')||(process.platform==='win32'&&value.startsWith('~\\'))?join(homedir(),value.slice(2)):value;
@@ -35,15 +37,20 @@ async function originalBody(response:Response):Promise<McpFailureOriginal['body'
 /** Public SDK transport factory. The SDK still owns clients, sessions, OAuth,
  * discovery and tools. A dispatched tool failure cannot authorize another POST.
  */
-export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boolean,authorizationObserved?:(event:McpAuthorizationObservation)=>boolean):McpTransportFactory=>(entry,cwd,authProvider)=>{
+export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boolean,authorizationObserved?:(event:McpAuthorizationObservation)=>boolean,connectionObserved?:(event:McpConnectionObservation)=>void):McpTransportFactory=>(entry,cwd,authProvider)=>{
  const config=entry.config;
- if(!('url' in config))return new StdioTransport({command:home(config.command),args:config.args?.map(home),cwd:resolve(cwd,home(config.cwd??'.')),
-  env:Object.fromEntries(Object.entries(config.env??{}).map(([name,value])=>[name,configured(value)])),stderr:'pipe'});
+ const connection=new McpConnectionObserver(entry.name,'url' in config?'http':'stdio',connectionObserved);
+ if(!('url' in config)){
+  try{return connection.wrap(new StdioTransport({command:home(config.command),args:config.args?.map(home),cwd:resolve(cwd,home(config.cwd??'.')),
+   env:Object.fromEntries(Object.entries(config.env??{}).map(([name,value])=>[name,configured(value)])),stderr:'pipe'}));}
+  catch(error){connection.record('start-failed');throw error;}
+ }
  let transport:StreamableHttpTransport;
  const pending=new Set<JsonRpcId>(),authFailures=new Set<JsonRpcId>(),drains=new Set<()=>void>(),challenged=new Set<Response>();let reset=false,closing=false,closed=false,cancellations=0,failedAdmission=false;
  type AuthBoundary=Omit<McpAuthorizationObservation,'state'|'observedAt'>;
+ const requestContext=new AsyncLocalStorage<{requestId?:JsonRpcId;method?:string;dispatches:number;cancellation:boolean}>();
  const boundaries=new WeakMap<Response,AuthBoundary>();
- const observe=(info:AuthBoundary,state:McpAuthorizationObservation['state'])=>{try{authorizationObserved?.({...info,state,observedAt:new Date().toISOString()});}catch{}};
+ const observe=(info:AuthBoundary,state:McpAuthorizationObservation['state'])=>{connection.record(state==='challenge-observed'?'authorization-challenge':state==='challenge-handled'?'authorization-handled':state==='sign-in-required'?'sign-in-required':'refresh-failed',{requestId:info.requestId});try{authorizationObserved?.({...info,state,observedAt:new Date().toISOString()});}catch{}};
  const active=()=>!closed&&(cancellations>0||[...pending].some(id=>!authFailures.has(id)));
  const release=()=>{
   if(!active()){for(const done of drains)done();drains.clear();}
@@ -57,7 +64,23 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
  };
  const end=()=>{closed=true;pending.clear();challenged.clear();release();};
  const protectedAuth:AuthProvider|undefined=authProvider?{
-  token:()=>authProvider.token(),
+  token:async()=>{
+   try{return await authProvider.token();}
+   catch(error){
+    const context=requestContext.getStore(),details={requestId:context?.requestId,method:context?.method,requestAlreadyDispatched:context?.requestId===undefined?undefined:!!context.dispatches};connection.record('token-provider-failed',details);
+    if(error instanceof McpOAuthAuthorizationRequiredError){
+     connection.record('sign-in-required',details);reset=true;failedAdmission=true;
+     // A token callback has no request argument. Public send's asynchronous
+     // context identifies its own request without treating it as a sibling or
+     // waiting on its cancellation POST. Drain real siblings before SDK close.
+     if(!closed&&!context?.cancellation)await drainAuth(context?.requestId);
+     throw new McpOAuthAuthorizationRequiredError();
+    }
+    // Ordinary callback errors do not close the SDK connection. Preserve that
+    // behavior while withholding arbitrary credential-bearing error text.
+    throw Error('MCP credential provider failed before an HTTP attempt. This attempt was not retried; inspect the observed outcome before another action.');
+   }
+  },
   ...(authProvider.onUnauthorized?{onUnauthorized:async(context)=>{
    const info=boundaries.get(context.response);
    try{await authProvider.onUnauthorized!(context);if(info)observe(info,'challenge-handled');challenged.delete(context.response);}
@@ -74,6 +97,7 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
   if(init?.method==='POST'&&typeof init.body==='string'){
    try{frame=JSON.parse(init.body);tool=frame?.method==='tools/call';}catch{}
   }
+  const context=requestContext.getStore();if(context&&context.requestId!==undefined&&frame?.jsonrpc==='2.0'&&frame.id===context.requestId)context.dispatches++;
   const response=await fetch(input,tool?{...init,redirect:'manual'}:init);
   const needsAuth=response.status===401||(response.status===403&&/(?:^|[\s,])error="?insufficient_scope"?/i.test(response.headers.get('www-authenticate')??''));
   if(needsAuth&&new URL(input).href===new URL(config.url).href&&(init?.method==='GET'||(init?.method==='POST'&&frame?.jsonrpc==='2.0'))){
@@ -112,12 +136,13 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
    reset=true;release();
   }
  };
- transport=new StreamableHttpTransport({url:config.url,headers:config.headers?Object.fromEntries(Object.entries(config.headers).map(([name,value])=>[name,configured(value)])):undefined,authProvider:protectedAuth,fetch:guardedFetch});
+ try{transport=new StreamableHttpTransport({url:config.url,headers:config.headers?Object.fromEntries(Object.entries(config.headers).map(([name,value])=>[name,configured(value)])):undefined,authProvider:protectedAuth,fetch:guardedFetch});}
+ catch(error){connection.record('start-failed');throw error;}
  // Keep concurrent receipts, including asynchronous SSE replies, alive until
  // their SDK requests settle. SDK cancellation removes a timed-out request.
  transport.onMessage(message=>{if(isJsonRpcResponse(message)){pending.delete(message.id);release();}});
  transport.onClose(end);
- return {
+ return connection.wrap({
   start:()=>transport.start(),close:()=>{end();return transport.close();},setProtocolVersion:version=>transport.setProtocolVersion(version),
   onMessage:listener=>transport.onMessage(listener),onError:listener=>transport.onError(listener),onClose:listener=>transport.onClose(listener),
   async send(message){
@@ -130,8 +155,8 @@ export const createManagedMcpTransport=(save?:(original:McpFailureOriginal)=>boo
     const params=message.params,id=params&&typeof params==='object'&&'requestId' in params?params.requestId:undefined;
     if(typeof id==='string'||typeof id==='number'){pending.delete(id);release();}
    }
-   try{await transport.send(message);}catch(error){if(request)pending.delete(message.id);throw error;}finally{if(cancellation)cancellations--;release();}
+   try{await requestContext.run({...(request?{requestId:message.id}:{}),...('method' in message?{method:message.method}:{}),dispatches:0,cancellation},()=>transport.send(message));}catch(error){if(request)pending.delete(message.id);throw error;}finally{if(cancellation)cancellations--;release();}
   },
- };
+ });
 };
 export const managedMcpTransport=createManagedMcpTransport();

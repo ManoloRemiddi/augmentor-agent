@@ -7,6 +7,7 @@ import {MCP_TRANSPORT_ORIGINAL_TYPE} from './mcp-originals.js';
 import {MCP_AUTHORIZATION_TYPE,savedMcpAuthorization,type McpAuthorizationObservation} from './mcp-authorization.js';
 import type {McpManagementAction} from './mcp-management.js';
 import {readMcpProfile,type McpProfile} from './mcp-profile.js';
+import {MCP_CONNECTION_TYPE,savedMcpConnection,connectionSummary,type McpConnectionSummary,type McpConnectionObservation} from './mcp-connection.js';
 
 const discovery=new Set(['codemode','tool_search','list_mcp_resources','list_mcp_resource_templates','read_mcp_resource']);
 const object=(value:unknown):value is Record<string,unknown>=>!!value&&typeof value==='object'&&!Array.isArray(value);
@@ -28,8 +29,10 @@ export class ManagedMcp {
  private pending=false;
  private requestedOptions?:{autoEnableCodemode:boolean;retainLogs:boolean};
  private registrationWait?:{snapshot:string;finish:()=>void};
+ private connections=new Map<string,{summary:McpConnectionSummary;unsaved:number}>();
+ private connectionTrackingDropped=0;
  readonly source:string;
- constructor(agentDir:string,private stateDir:string,private sessionId:string,private authorizationChanged?:(event:McpAuthorizationObservation,retained:boolean)=>void,private openAuthorization?:(url:string)=>void){
+ constructor(agentDir:string,private stateDir:string,private sessionId:string,private authorizationChanged?:(event:McpAuthorizationObservation,retained:boolean)=>void,private openAuthorization?:(url:string)=>void,private connectionChanged?:(event:McpConnectionObservation,retained:boolean)=>void){
   this.source=join(agentDir,'mcp.json');
   try{
    const initial=readMcpProfile(this.source);this.revision=initial.revision;
@@ -66,6 +69,14 @@ export class ManagedMcp {
    if(!this.api)return false;
    let retained=false;try{this.api.appendEntry(MCP_AUTHORIZATION_TYPE,event);retained=true;this.authorizationGaps.delete(event.server);}catch{this.authorizationGaps.set(event.server,event);}
    this.authorizationChanged?.(event,retained);return retained;
+  },event=>{
+   let retained=false;try{this.api?.appendEntry(MCP_CONNECTION_TYPE,event);retained=!!this.api;}catch{}
+   const previous=this.connections.get(event.server);
+   if(event.event==='created'||!previous||previous.summary.instanceId===event.instanceId){
+    if(!previous&&this.connections.size>=256){this.connections.delete(this.connections.keys().next().value!);this.connectionTrackingDropped++;}
+    const same=previous?.summary.instanceId===event.instanceId;this.connections.set(event.server,{summary:connectionSummary(same?previous.summary:undefined,event),unsaved:(same?previous.unsaved:0)+(retained?0:1)});
+   }
+   this.connectionChanged?.(event,retained);
   }),
   logPath:this.retainLogs?join(privateDir(join(this.stateDir,'mcp-logs')),this.sessionId+'.log'):process.platform==='win32'?'NUL':'/dev/null',
   // The operator surface presents this ephemeral URL. The SDK must not launch
@@ -133,13 +144,16 @@ export class ManagedMcp {
  describe(){
   const tools=this.api?.getAllTools()??[],active=new Set(this.api?.getActiveTools()??[]),servers=this.api?.getMcpServers()??[];let remaining=256;
   const authorization=new Map<string,McpAuthorizationObservation>();
+  const history=new Map<string,McpConnectionSummary>(),visible=new Set(servers.slice(0,64).map(row=>row.name));
   for(const entry of this.manager?.getBranch()??[])if(entry.type==='custom'&&entry.customType===MCP_AUTHORIZATION_TYPE){const row=savedMcpAuthorization(entry.data);if(row)authorization.set(row.server,row);}
+  for(const entry of this.manager?.getBranch()??[])if(entry.type==='custom'&&entry.customType===MCP_CONNECTION_TYPE){const row=savedMcpConnection(entry.data);if(!row||!visible.has(row.server))continue;const previous=history.get(row.server);if(row.event==='created'||!previous||previous.instanceId===row.instanceId)history.set(row.server,connectionSummary(previous?.instanceId===row.instanceId?previous:undefined,row));}
   return {available:!!this.api,source:'managed-profile-mcp.json',projectConfiguration:false,modelsInCodemode:false,retainServerLogs:this.retainLogs,configurationErrors:this.errors.length,
    configuration:{loadedRevision:this.revision,registrationPending:this.pending,pendingSessionOptions:this.requestedOptions?this.requestedOptions.autoEnableCodemode!==this.autoEnableCodemode||this.requestedOptions.retainLogs!==this.retainLogs:false,optionApplication:'log retention and automatic codemode activation use the values at session load; changed values apply to new sessions'},
-   coverage:'registered MCP tool catalog; not a connection health probe',serverCount:servers.length,omittedServers:Math.max(0,servers.length-64),servers:servers.slice(0,64).map(entry=>{
+   coverage:'registered MCP tool catalog and public transport observations; no health probe or private SDK connection state',connectionTrackingDropped:this.connectionTrackingDropped,serverCount:servers.length,omittedServers:Math.max(0,servers.length-64),servers:servers.slice(0,64).map(entry=>{
     const namespace='mcp__'+entry.name.replaceAll('-','_'),registered=tools.filter(tool=>tool.namespace?.name===namespace),shown=registered.filter(tool=>tool.name.length<=256).slice(0,remaining);remaining-=shown.length;
     const lastObserved=authorization.get(entry.name)??null,gap=this.authorizationGaps.get(entry.name);
-    return {name:entry.name,enabled:entry.config.enabled!==false,transport:'url' in entry.config?'http':'stdio',exposure:entry.config.exposure??'codemode',managementActions:this.managementActions(entry.config),toolCount:registered.length,omittedToolNames:registered.length-shown.length,toolNames:shown.map(tool=>tool.name),declaredToolNames:shown.filter(tool=>active.has(tool.name)).map(tool=>tool.name),readOnlyToolNames:shown.filter(tool=>this.readTools.has(tool.name)).map(tool=>tool.name),authorization:{coverage:'last recorded HTTP authorization observation on the selected Pi branch; not current credential health',lastObserved,unsaved:gap??null,retention:gap?'native-append-failed':lastObserved?'sdk-native-entry-policy':'not-observed'}};
+    const connection=this.connections.get(entry.name);
+    return {name:entry.name,enabled:entry.config.enabled!==false,transport:'url' in entry.config?'http':'stdio',exposure:entry.config.exposure??'codemode',managementActions:this.managementActions(entry.config),toolCount:registered.length,omittedToolNames:registered.length-shown.length,toolNames:shown.map(tool=>tool.name),declaredToolNames:shown.filter(tool=>active.has(tool.name)).map(tool=>tool.name),readOnlyToolNames:shown.filter(tool=>this.readTools.has(tool.name)).map(tool=>tool.name),connection:{coverage:'observed public transport lifecycle; no active service or credential probe',current:connection?.summary??null,unsavedObservations:connection?.unsaved??0,lastSaved:history.get(entry.name)??null,retention:connection?.unsaved?'native-append-gap':'sdk-native-entry-policy'},authorization:{coverage:'last recorded HTTP authorization observation on the selected Pi branch; not current credential health',lastObserved,unsaved:gap??null,retention:gap?'native-append-failed':lastObserved?'sdk-native-entry-policy':'not-observed'}};
    })};
  }
 }

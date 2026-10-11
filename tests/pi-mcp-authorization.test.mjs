@@ -8,8 +8,10 @@ import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
-import {createAgentSession,DefaultResourceLoader,ModelRuntime,SessionManager,SettingsManager} from '@earendil-works/pi-coding-agent';
-const {ManagedMcp}=await import(pathToFileURL(join(resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.'),'dist/runtime/src/mcp.js')));
+const artifact=resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.'),sdk=join(artifact,'node_modules/@earendil-works/pi-coding-agent'),metadata=JSON.parse(await readFile(join(sdk,'package.json'),'utf8')),entry=metadata.exports['.'];
+const {createAgentSession,DefaultResourceLoader,ModelRuntime,SessionManager,SettingsManager}=await import(pathToFileURL(join(sdk,typeof entry==='string'?entry:entry.import)));
+const {ManagedMcp}=await import(pathToFileURL(join(artifact,'dist/runtime/src/mcp.js')));
+const {MCP_CONNECTION_TYPE,savedMcpConnection}=await import(pathToFileURL(join(artifact,'dist/runtime/src/mcp-connection.js')));
 for(const mode of ['metadata','healthy-resource','get','timeout','timeout-save-failure'])test('actual SDK retains MCP '+mode+' authorization evidence and active receipts',{timeout:15000},async t=>{
  const root=await mkdtemp(join(tmpdir(),'augmentor-mcp-auth-boundary-')),agentDir=join(root,'agent'),cwd=join(root,'workspace'),sessions=join(root,'sessions'),timeoutCase=mode.startsWith('timeout'),notices=[];for(const path of [agentDir,cwd,sessions])await mkdir(path,{mode:0o700});
  const priorAgentDir=process.env.PI_CODING_AGENT_DIR;process.env.PI_CODING_AGENT_DIR=agentDir;t.after(()=>{if(priorAgentDir===undefined)delete process.env.PI_CODING_AGENT_DIR;else process.env.PI_CODING_AGENT_DIR=priorAgentDir;});
@@ -63,5 +65,10 @@ for(const mode of ['metadata','healthy-resource','get','timeout','timeout-save-f
  const info=managed.describe().servers.find(row=>row.name==='web').authorization,observed=mode==='timeout-save-failure'?info.unsaved:info.lastObserved;assert.equal(observed?.state,'sign-in-required');assert.equal(observed?.boundary,mode==='metadata'?'http-request-response':mode==='get'?'http-get-response':'http-tool-response');assert.equal(observed.status,403);
  assert.equal(notices.at(-1).retained,mode!=='timeout-save-failure');assert(!JSON.stringify(requests).includes('AUTHORED_PRIVATE_SAVE_ERROR'));if(mode==='timeout-save-failure'){assert.equal(info.lastObserved,null);assert.equal(info.retention,'native-append-failed');}
  const file=session.sessionManager.getSessionFile(),original=await readFile(file);assert.equal(session.sessionManager.getBranch().filter(row=>row.type==='custom'&&row.customType==='augmentor-mcp-authorization/1').length,mode==='timeout-save-failure'?0:2);session.dispose();session=undefined;
- reopened=true;const restored=await open(SessionManager.open(file)),restoredInfo=restored.describe().servers.find(row=>row.name==='web').authorization;assert.deepEqual(restoredInfo.lastObserved,mode==='timeout-save-failure'?null:observed);assert.equal(restoredInfo.unsaved,null,'cold restoration cannot invent missing native evidence');assert.equal(requests.length,2,'cold restoration cannot infer or replay');assert.deepEqual(await readFile(file),original,'restoring auth inspection preserves native originals');
+ reopened=true;const manager=SessionManager.open(file);assert.deepEqual(await readFile(file),original,'cold native restoration alone does not change originals');
+ const restored=await open(manager),restoredInfo=restored.describe().servers.find(row=>row.name==='web').authorization;assert.deepEqual(restoredInfo.lastObserved,mode==='timeout-save-failure'?null:observed);assert.equal(restoredInfo.unsaved,null,'cold restoration cannot invent missing native evidence');assert.equal(requests.length,2,'restoring the SDK binding cannot infer or replay');assert.equal(reads,mode==='healthy-resource'?0:1);assert.equal(mutations,mode==='healthy-resource'||timeoutCase?1:0);
+ const after=await readFile(file);assert.deepEqual(after.subarray(0,original.length),original,'SDK reconnection preserves every original byte');
+ const appended=after.subarray(original.length).toString('utf8').trim().split('\n').filter(Boolean).map(line=>JSON.parse(line));assert(appended.length>0,'SDK rebinding records its actual new connection');
+ for(const row of appended){assert.equal(row.type,'custom');assert.equal(row.customType,MCP_CONNECTION_TYPE);assert.deepEqual(row.data,savedMcpConnection(row.data),'only validated connection metadata is appended');}
+ assert(appended.some(row=>row.data.event==='created'),'rebinding creates a new observed generation');assert.equal(manager.getBranch().filter(row=>row.type==='custom'&&row.customType==='augmentor-mcp-authorization/1').length,mode==='timeout-save-failure'?0:2,'auth originals are not regenerated');
 });

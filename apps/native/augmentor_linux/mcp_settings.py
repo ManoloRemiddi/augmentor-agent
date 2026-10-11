@@ -101,6 +101,9 @@ class McpDialog(QDialog):
             configuration=info.get('configuration',{})
             if configuration.get('registrationPending'):evidence+=' Configuration is pending for this conversation.'
             if configuration.get('pendingSessionOptions'):evidence+=' Changed log retention or automatic codemode settings apply to new sessions.'
+            connection=row.get('connection',{});current=connection.get('current')
+            if current:evidence+=' Observed connection: '+current['state']+(' · protocol negotiation observed' if current.get('protocolNegotiated') else ' · protocol negotiation not observed')+(' · last problem: '+current['lastProblem']['event'] if current.get('lastProblem') else '')+'.'
+            if connection.get('unsavedObservations'):evidence+=' '+str(connection['unsavedObservations'])+' connection observations could not be saved.'
             self.evidence.setText(evidence);self.controls()
         self.owner.call_in_background(read,loaded)
 

@@ -41,6 +41,7 @@ try:
                     assert response.code==302;redirect=response.headers['Location']
                 dialog.redirect_input.setText(redirect);click(dialog.redirect_submit,'Submit redirect')
                 until(lambda:dialog.receipt and dialog.receipt['state']=='completed' and not dialog.reading,'login settlement');assert dialog.receipt['result']=='sdk-reported-success';assert dialog.redirect_input.text()=='';assert not dialog.open_sign_in.isVisible()
+                assert 'Observed connection:' in dialog.evidence.text();assert 'protocol negotiation observed' in dialog.evidence.text()
                 click(dialog.enable_button,'Disable server');until(lambda:dialog.receipt and dialog.receipt['action']=='configure' and dialog.receipt['result']=='registration-events-settled' and dialog.enable_button.text()=='Enable server' and not dialog.reading,'disable settlement')
                 click(dialog.enable_button,'Enable server');until(lambda:dialog.enable_button.text()=='Disable server' and not dialog.blocked and not dialog.reading,'enable settlement')
                 dialog.exposure.setCurrentText('hidden');click(dialog.exposure_button,'Apply exposure');until(lambda:any(row['name']=='web' and row['exposure']=='hidden' for row in dialog.servers) and not dialog.blocked and not dialog.reading,'exposure settlement')

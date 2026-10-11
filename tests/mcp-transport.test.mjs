@@ -11,14 +11,14 @@ import {createHash} from 'node:crypto';
 const root=resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.'),mcpRoot=join(root,'node_modules/@earendil-works/pi-mcp');
 // Use the selected artifact's declared public ESM exports, including class identity.
 const exports=JSON.parse(await readFile(join(mcpRoot,'package.json'),'utf8')).exports;
-const {McpClient,McpAbortError,McpTimeoutError,McpConnectionClosedError}=await import(pathToFileURL(join(mcpRoot,exports['.'].import)));
+const {McpClient,StreamableHttpTransport,McpAbortError,McpTimeoutError,McpConnectionClosedError}=await import(pathToFileURL(join(mcpRoot,exports['.'].import)));
 const {McpOAuthAuthorizationRequiredError}=await import(pathToFileURL(join(mcpRoot,exports['./oauth'].import)));
 const {managedMcpTransport,createManagedMcpTransport}=await import(pathToFileURL(join(root,'dist/runtime/src/mcp-transport.js')));
 
 async function fixture(t,handle,save,options={}){
  const calls=[],clients=[],timers=new Set();
  const server=http.createServer(async(req,res)=>{
-  if(req.method!=='POST'){res.writeHead(req.method==='DELETE'?200:405).end();return;}
+  if(req.method==='GET'&&options.get){await options.get({req,res});return;}if(req.method!=='POST'){res.writeHead(req.method==='DELETE'?200:405).end();return;}
   let raw='';for await(const chunk of req)raw+=chunk;const frame=JSON.parse(raw);calls.push({frame,path:req.url,authorization:req.headers.authorization});
   const answer=result=>res.writeHead(200,{'content-type':'application/json','mcp-session-id':'authored-session'}).end(JSON.stringify({jsonrpc:'2.0',id:frame.id,result}));
   const later=(fn,ms)=>{const timer=setTimeout(()=>{timers.delete(timer);fn();},ms);timers.add(timer);};
@@ -27,7 +27,7 @@ async function fixture(t,handle,save,options={}){
   await handle({frame,req,res,answer,later});
  });server.listen(0,'127.0.0.1');await once(server,'listening');
  t.after(async()=>{for(const client of clients)await client.close();for(const timer of timers)clearTimeout(timer);server.closeAllConnections();await new Promise(done=>server.close(done));});
- const connect=async auth=>{const client=new McpClient({name:'Authored transport caller',version:'1',requestTimeoutMs:1500});clients.push(client);await client.connect(createManagedMcpTransport(save,options.authorizationObserved)({name:'web',config:{url:'http://127.0.0.1:'+server.address().port+'/mcp'}},process.cwd(),auth));return client;};
+ const connect=async auth=>{const client=new McpClient({name:'Authored transport caller',version:'1',requestTimeoutMs:1500});clients.push(client);const url='http://127.0.0.1:'+server.address().port+'/mcp';await client.connect(options.baseline?new StreamableHttpTransport({url,authProvider:auth}):createManagedMcpTransport(save,options.authorizationObserved,options.connectionObserved)({name:'web',config:{url}},process.cwd(),auth));return client;};
  return {calls,connect};
 }
 const tools=calls=>calls.filter(row=>row.frame.method==='tools/call');
@@ -141,4 +141,33 @@ test('an unauthorized cancellation does not wait on its own POST or discard a si
  const client=await f.connect({token:async()=>undefined,onUnauthorized:async()=>{throw new McpOAuthAuthorizationRequiredError();}}),abort=new AbortController();let close;const closed=new Promise(done=>close=done);client.onClose(close);
  const settled=Promise.allSettled([client.callTool('cancel_read',{}, {signal:abort.signal}),client.callTool('surviving_read',{})]);await ready;abort.abort();const [cancelled,read]=await settled;assert(cancelled.reason instanceof McpAbortError);assert.equal(read.value.content[0].text,'AUTHORED_CONTROL_SIBLING');await closed;
  assert(held);assert.equal(f.calls.filter(row=>row.frame.method==='notifications/cancelled').length,1);assert.equal(authorization.at(-1).state,'sign-in-required');assert.equal(authorization.at(-1).boundary,'http-control-response');assert(!JSON.stringify(authorization).includes('AUTHORED_PRIVATE_CONTROL'));
+});
+
+for(const mode of ['receipt','sibling-cancel','sibling-timeout','failed-cancel','failed-timeout','close'])test('pre-attempt typed token failure settles real siblings and controls across '+mode,{timeout:5000},async t=>{
+ let ready,saved,fault=false;const admitted=new Promise(resolve=>ready=resolve),observed=new Promise(resolve=>saved=resolve),observations=[];
+ const f=await fixture(t,({frame,res,later})=>{res.writeHead(200,{'content-type':'text/event-stream'});res.write('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:'authored',progress:1}})+'\n\n');ready();if(['receipt','failed-cancel','failed-timeout'].includes(mode))later(()=>res.end('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',id:frame.id,result:{content:[{type:'text',text:'AUTHORED_TOKEN_CONTROL_RECEIPT'}]}})+'\n\n'),120);},undefined,{connectionObserved:row=>{observations.push(row);if(row.event==='token-provider-failed')saved();}});
+ const client=await f.connect({token:async()=>{if(fault)throw new McpOAuthAuthorizationRequiredError();return undefined;}}),siblingAbort=new AbortController(),failedAbort=new AbortController();let ended;const closed=new Promise(resolve=>ended=resolve);client.onClose(ended);
+ const sibling=client.callTool('pending_read',{}, {signal:siblingAbort.signal,timeoutMs:mode==='sibling-timeout'?60:1000});sibling.catch(()=>{});await admitted;fault=true;
+ const failed=client.callTool('not-dispatched',{}, {signal:failedAbort.signal,timeoutMs:mode==='failed-timeout'?60:1000});failed.catch(()=>{});await observed;
+ await assert.rejects(client.callTool('during-drain',{}),/not dispatched/);
+ if(mode==='sibling-cancel')siblingAbort.abort();if(mode==='failed-cancel')failedAbort.abort();if(mode==='close')await client.close();
+ const [bad,read]=await Promise.allSettled([failed,sibling]);
+ if(mode==='close'){assert(bad.reason instanceof McpConnectionClosedError);assert(read.reason instanceof McpConnectionClosedError);}
+ else{
+  assert(bad.reason instanceof (mode==='failed-cancel'?McpAbortError:mode==='failed-timeout'?McpTimeoutError:McpOAuthAuthorizationRequiredError));
+  if(mode==='sibling-cancel'||mode==='sibling-timeout')assert(read.reason instanceof (mode==='sibling-cancel'?McpAbortError:McpTimeoutError));else assert.equal(read.value.content[0].text,'AUTHORED_TOKEN_CONTROL_RECEIPT');
+ }
+ await closed;assert.equal(tools(f.calls).length,1,'only the admitted sibling reaches the wire');assert(observations.some(row=>row.event==='token-provider-failed'&&row.method==='tools/call'&&row.requestAlreadyDispatched===false));assert(!JSON.stringify(observations).includes('AUTHORED_TOKEN_CONTROL_RECEIPT'));
+});
+
+for(const kind of ['generic','sign-in'])for(const guarded of [false,true])test('background GET '+kind+' token failure '+(guarded?'preserves the pending receipt and sanitizes the reported error':'baseline retains its pending receipt'),{timeout:5000},async t=>{
+ let stream,admitted,release,fault=false,tokenFailure,initialGet;const ready=new Promise(resolve=>admitted=resolve),getReady=new Promise(resolve=>initialGet=resolve),failedToken=new Promise(resolve=>tokenFailure=resolve),observations=[];
+ const f=await fixture(t,({frame,res})=>{res.writeHead(200,{'content-type':'text/event-stream'});res.write('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:'authored',progress:1}})+'\n\n');release=()=>res.end('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',id:frame.id,result:{content:[{type:'text',text:'AUTHORED_GET_TOKEN_RECEIPT'}]}})+'\n\n');admitted();},undefined,{baseline:!guarded,get:({res})=>{stream=res;res.writeHead(200,{'content-type':'text/event-stream'});res.write(': authored keepalive\n\n');initialGet();},connectionObserved:row=>{observations.push(row);if(row.event==='token-provider-failed')tokenFailure();}});
+ const client=await f.connect({token:async()=>{if(fault){if(!guarded)tokenFailure();throw kind==='sign-in'?new McpOAuthAuthorizationRequiredError():Error('SYNTHETIC_PRIVATE_GET_TOKEN_ERROR');}return undefined;}});let errorReported,ended;const reported=new Promise(resolve=>errorReported=resolve),closed=new Promise(resolve=>ended=resolve);client.onError(errorReported);client.onClose(ended);
+ await getReady;const read=client.callTool('pending_read',{}, {timeoutMs:3000});read.catch(()=>{});await ready;fault=true;stream.end();await failedToken;
+ if(guarded){const observation=observations.find(row=>row.event==='token-provider-failed');assert.equal(observation.requestId,undefined,'background GET must not inherit a fictitious POST request');assert.equal(observation.requestAlreadyDispatched,undefined,'no POST dispatch claim exists for the independent GET stream');}
+ release();assert.equal((await read).content[0].text,'AUTHORED_GET_TOKEN_RECEIPT');const error=await reported;
+ if(kind==='sign-in'){assert(error instanceof McpOAuthAuthorizationRequiredError);if(guarded)await closed;else assert.equal(client.connectionState,'connected','the public client reports GET errors without dropping its connection');}
+ else{assert.equal(error.message.includes('SYNTHETIC_PRIVATE_GET_TOKEN_ERROR'),!guarded);assert.equal(client.connectionState,'connected','ordinary callback errors do not reset the connection');}
+ assert.equal(tools(f.calls).length,1);assert(!JSON.stringify(observations).includes('AUTHORED_GET_TOKEN_RECEIPT'));
 });
