@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 private MX [original Compact qualification](PI-COMPACTION.md#final-installed-qualification--october-11): 64d0d4b15cd0cde2c04dfec197b702b7e2a169f1 is selected/running as 20261011-180640-ae7c817e, product 0.2.13, artifact 99cb8a756ba55024840b73a1e54451daa95bb6d34aaa3c354d9f14640b2c3306. Normal guarded immutable update/stable launch and complete inventory pass; production is preserved. A disk-capacity staging refusal is resolved by retiring only verified redundant current-turn ordinary copies, preserving immutable candidates/source/logs and retrying the unchanged candidate. No selected artifact or guard is patched. Complete public packaging/migration/platform gates remain open.
+
 # Consistent installed desktop releases
 
 ## October 3: bounded companion lifetimes

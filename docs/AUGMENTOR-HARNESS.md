@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Installed original Compact](PI-COMPACTION.md#final-installed-qualification--october-11) now qualifies the original command/recorded SDK operation and honest dashboard markers on MX (64d0d4b, 20261011-180640-ae7c817e). Source and ordinary each pass 197/197; installed controls/provider-free refusal and preserved histories are verified. Successful live Qwen summary, complete command and all full delivery gates remain open.
+
 October 11 Compact follow-up: [manual Pi compaction](PI-COMPACTION.md) binds the original DSH row/bare command to the sole public SDK owner, with private no-replay receipts, scoped Stop/unknown acknowledgement and recorded summary requests. Source 195/195 passes; ordinary/installed qualification follows separately. All full Harness/migration gates remain open.
 
 
