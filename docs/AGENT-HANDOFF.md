@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 confirmed Compact marker candidate
+
+[Confirmed dashboard markers](PI-COMPACTION.md#confirmed-dashboard-markers--october-11) exclude failed/aborted/unconfirmed attempts from the original supplier seat that asserts completion. Attempt versus confirmed counts stay in the existing coverage notice; every attempt remains in raw records. The original marker translation states that removed-message count is unavailable. Fresh source and ordinary bundled Node 24.19.0 each pass **197/197 across 25 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Supplier files/CSS/licences and all dependencies/native/Node hashes are unchanged; all 475 compiled files match. Final installed qualification follows separately; e7079e4/20261011-175646-9263edad and preceding candidates are retained. Full command/Harness/public packaging/migration gates remain open and further platforms stay deferred.
+
+
 ## October 11 Compact refusal correction candidate
 
 [Manual Pi compaction](PI-COMPACTION.md#installed-refusal-follow-up--october-11) records the initial installed original ninth row and its empty-session refusal gap. The corrected binding uses the existing original dialog for failed receipts and exposes the original tabs/disclosure while an empty session's compaction is pending, busy or uncertain. Fresh source and ordinary bundled Node 24.19.0 cohorts each pass **196/196 across 25 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Actual SDK success/cancellation/crash and actual Chromium Compact/empty refusal pass; component-only unknown acknowledgement is explicitly distinguished. All 475 compiled files match; dependencies/licences/native hashes/Node and supplier bytes remain unchanged. Corrected installed acceptance follows separately; initial 4d73af7/20261011-174439-ae5dc4bc remains preserved. Complete command/Harness/public packaging/migration gates stay open and further platforms are deferred.

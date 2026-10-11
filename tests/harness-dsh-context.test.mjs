@@ -32,7 +32,7 @@ test('repeated polling keeps the eight newest eligible bodies and never silently
  controller.update({sessionId:'s',records:Array.from({length:12},(_,i)=>({...request(String(i),i+1),payload:{state:'retained',bytes:15}}))});
  await controller.hydrate();await controller.hydrate();assert.equal(reads,8);assert.deepEqual(Object.keys(controller.state.payloads),['4','5','6','7','8','9','10','11']);
  controller.update({records:[...controller.state.records,{...request('12',13),payload:{state:'retained',bytes:15}}]});await controller.hydrate();assert.equal(reads,9);assert.deepEqual(Object.keys(controller.state.payloads),['5','6','7','8','9','10','11','12']);
- const value=projectDshContext({records:[request('first',1),{kind:'context/edit',seq:2,time:20,data:{}},{kind:'compaction/end',seq:3,time:30,data:{}}],events:[],payloads:{}});assert.equal(value.timeline.counts.prunes,0);assert.equal(value.timeline.events.length,1);
+ const value=projectDshContext({records:[request('first',1),{kind:'context/edit',seq:2,time:20,data:{}},{kind:'compaction/end',seq:3,time:30,data:{}}],events:[],payloads:{}});assert.equal(value.timeline.counts.prunes,0);assert.equal(value.timeline.events.length,0);assert.equal(value.coverage.compactionAttempts,1);
 });
 
 
@@ -40,4 +40,9 @@ test('changed or reordered provider messages reconstruct their own order without
  const value=projectDshContext({records:[request('before',1),request('after',2)],events:[],payloads:{before:{messages:[{role:'user',content:'A'},{role:'assistant',content:'B'}]},after:{messages:[{role:'assistant',content:'B'},{role:'user',content:'Changed A'}]}}});
  const at=seq=>[...value.timeline.nodes,...value.timeline.archive].filter(n=>n.seq<seq&&(n.gone===undefined||n.gone>seq)).sort((a,b)=>a.seq-b.seq);
  assert.deepEqual(at(value.timeline.requests[0].seq).map(n=>n.text),['A','B']);assert.deepEqual(at(value.timeline.requests[1].seq).map(n=>n.text),['B','Changed A']);assert.notEqual(at(value.timeline.requests[0].seq)[0].seq,at(value.timeline.requests[1].seq)[0].seq);
+});
+
+test('only confirmed saved summaries enter the supplier Compact markers; failed and aborted attempts stay in coverage',()=>{
+ const records=[{kind:'compaction/end',seq:1,data:{operationId:'fail',returnedSummary:false}},{kind:'compaction/receipt',seq:2,data:{requestId:'fail',state:'failed'}},{kind:'compaction/end',seq:3,data:{operationId:'abort',aborted:true}},{kind:'compaction/end',seq:4,data:{operationId:'saved',returnedSummary:true}},{kind:'compaction/receipt',seq:5,data:{requestId:'saved',state:'completed',entryId:'native-summary',tokensBefore:26000,estimatedTokensAfter:20000}}];
+ const value=projectDshContext({records,events:[],payloads:{}});assert.equal(value.timeline.counts.compactions,1);assert.equal(value.timeline.events.length,1);assert.match(value.timeline.events[0].detail,/native-summary/);assert.equal(value.coverage.compactionAttempts,3);assert.equal(value.coverage.confirmedCompactions,1);
 });

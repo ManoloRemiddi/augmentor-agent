@@ -64,7 +64,10 @@ export function projectDshContext(state){
   const capacity=latestAvailable?number(latest?.data.capacity):0;
   const nextSeq=r=>requestRecords.find(x=>requests.find(q=>q.id===requestIds.get(x.seq))?.seq>r.seq)?.seq;
   const receipts=new Map((state.records??[]).filter(r=>r.kind==='compaction/receipt').map(r=>[r.data.requestId,r.data]));
-  const events=(state.records??[]).filter(r=>r.kind==='compaction/end').map(r=>{const receipt=receipts.get(r.data.operationId),saved=receipt?.state==='completed';return {seq:nextSeq(r)!==undefined?nextSeq(r)-0.5:++ordinal,time:r.time,kind:'compaction',committed:saved||r.data.returnedSummary===true,detail:saved?`Manual Pi summary saved as native entry ${receipt.entryId}. SDK context estimate before: ${receipt.tokensBefore??'unavailable'}; after: ${receipt.estimatedTokensAfter??'unavailable'}. Original history is preserved.`:r.data.aborted?'Pi compaction aborted. No successful summary is reported.':r.data.returnedSummary?'Pi returned a compaction summary. SDK token estimates and the native boundary remain in Raw Pi records.':'Recorded Pi compaction-end event; successful effect and removed-token count are unconfirmed. Inspect Raw Pi records.'};});
+  const compactionAttempts=(state.records??[]).filter(r=>r.kind==='compaction/end');
+  // The supplier marker asserts a saved compaction. Attempts remain in raw
+  // records/coverage; feeding them here would falsely label them completed.
+  const events=compactionAttempts.filter(r=>receipts.get(r.data.operationId)?.state==='completed'||r.data.returnedSummary===true).map(r=>{const receipt=receipts.get(r.data.operationId);return {seq:nextSeq(r)!==undefined?nextSeq(r)-0.5:++ordinal,time:r.time,kind:'compaction',committed:true,detail:`Pi summary saved${receipt?.entryId?` as native entry ${receipt.entryId}`:''}. SDK context estimate before: ${receipt?.tokensBefore??r.data.tokensBefore??'unavailable'}; after: ${receipt?.estimatedTokensAfter??r.data.estimatedTokensAfter??'unavailable'}. Original history is preserved.`};});
   const completed=state.events??[],toolCalls=new Map();
   for(const event of completed)for(const block of event.data?.message?.content??[])if(block.type==='toolCall')toolCalls.set(block.id,block);
   const fileOps=[];
@@ -74,5 +77,5 @@ export function projectDshContext(state){
     counts:{turns:turns.size,steps:requests.length,injects:0,compactions:events.filter(e=>e.kind==='compaction'&&e.committed).length,prunes:events.filter(e=>e.kind==='prune').length},
     humanInputs:completed.filter(e=>e.type==='user/message').length,answers:completed.filter(e=>e.type==='assistant/message'&&e.data.message?.content?.some(p=>p.type==='text'&&p.text?.trim())).length,toolCalls:completed.filter(e=>e.type==='tool/result').length,images:nodes.reduce((sum,n)=>sum+(n.imgs??0),0)};
   return {timeline,headers:{headers},headerContent,conversationNodes,requestIds,usage,pressure:latestAvailable&&prompt>0?{pressureTokens:prompt,...(capacity?{contextWindow:capacity}:{})}:null,
-    coverage:{observed:requests.length,available:requestRecords.length,latestAvailable,historyPartial:state.hasMore===true||state.observationHasMore===true,unsupported:requests.filter(r=>state.payloads?.[r.id]&&!frameOf(state.payloads[r.id])).length}};
+    coverage:{observed:requests.length,available:requestRecords.length,latestAvailable,compactionAttempts:compactionAttempts.length,confirmedCompactions:events.length,historyPartial:state.hasMore===true||state.observationHasMore===true,unsupported:requests.filter(r=>state.payloads?.[r.id]&&!frameOf(state.payloads[r.id])).length}};
 }
