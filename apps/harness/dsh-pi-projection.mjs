@@ -25,7 +25,7 @@ export function projectDsh(state){
     const key=item.seq?'event:'+item.seq:'tail:'+ordinal,anchorSeq=item.seq??state.events.at(-1)?.seq??0;
     let n;
     if(item.kind==='user'){
-      currentTurn++;const event=state.events.find(e=>e.seq===item.seq),data={content:event?.data.submittedContent??event?.data.content??[{type:'text',text:item.text}],time:times.get(event?.turnId)??null};
+      currentTurn++;const event=state.events.find(e=>e.seq===item.seq),data={content:event?.data.submittedContent??event?.data.content??[{type:'text',text:item.text}],time:times.get(event?.turnId)};
       n={kind:'user',data};navigation.push({turn:currentTurn,anchorKey:key,prompt:item.text.slice(0,100),response:''});
     }
     if(item.kind==='assistant')n={kind:'assistant-step',data:{blocks:[...(item.thinking?[{kind:'reasoning',text:item.thinking}]:[]),...(item.text?[{kind:'text',text:item.text}]:[])],step:ordinal,status:item.status==='streaming'?'running':item.partial?'interrupted':'complete',...(item.seq?{finalNode:{seq:item.seq}}:{})}};
