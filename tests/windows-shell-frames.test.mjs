@@ -1,7 +1,9 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {WindowsShellFrames} from '../dist/runtime/src/windows-shell-job.js';
+import {resolve,join} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const {WindowsShellFrames}=await import(pathToFileURL(join(resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.'),'dist/runtime/src/windows-shell-job.js')));
 const frame=value=>Buffer.from(JSON.stringify({version:'augmentor-shell-job/1',...value})+'\n');
 const ready=()=>frame({type:'ready',range:'windows-job',boundary:'assigned-before-workload'});
 const output=(bytes,channel='stdout')=>frame({type:'output',channel,data:Buffer.from(bytes).toString('base64')});

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+October 11 Windows command follow-up: [owned Pi shell jobs](WINDOWS-SHELL-JOBS.md) replace direct-process-only Stop with a contained kernel Job, readiness before command release, private parent lease and truthful no-replay settlement. Eight real helper cases pass on both x64 and ARM64; actual Windows Host/assembled/physical acceptance remains open. Unix keeps the existing process-group adapter. Shared Native/Browser layout, installed selections and the full migration gates are preserved.
+
 October 11 specialist follow-up: [desktop jobs](PI-JOBS.md#desktop-specialist-jobs) now use the shared durable registry, distinct native SDK histories, pre-dispatch intent, scoped approvals/Stop, unknown recovery and one-time usage. Harness exposes child originals and optional provider payloads through parent-owned read-only inspection. Synthetic source/staged qualification does not establish live perception, physical consent or installed platform acceptance. Every remaining accepted P0/P1 gate and DSH retention remains binding.
 
 
