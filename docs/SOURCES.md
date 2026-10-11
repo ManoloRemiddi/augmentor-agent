@@ -2,7 +2,7 @@
 
 The [original Settings selection](DSH-GUI-ON-PI.md#original-settings-shell--october-11-follow-up) adds 18 verbatim MIT files at d743267, bringing the current DSH selection to **404**. The 86-file Apache-2.0 dashboard, all preceding supplier hashes/CSS, npm locks/dependencies and 96 browser notice records are unchanged.
 
-[Original Settings candidate](DSH-GUI-ON-PI.md#original-settings-shell--october-11-follow-up) uses the copied MIT shell/Appearance and scoped Pi handlers. Source, ordinary and installed qualification are recorded separately; all remaining Harness/migration/public packaging/platform gates remain open, with further platforms deferred for MX feedback.
+[Original Settings qualification](DSH-GUI-ON-PI.md#final-installed-settings-qualification--october-11) records the copied MIT shell, scoped Pi handlers and corrected empty-MCP focus. Source, ordinary and installed evidence remain distinct; full Harness/migration/public packaging/platform gates stay open, with further platforms deferred for MX feedback.
 
 [Original question controls](PI-QUESTIONS.md) use the existing copied MIT QuestionComposer and Pi 1.1.0 public ExtensionUIContext. Authored Host/controller bindings and synthetic fixtures add no supplier files, dependencies, native binaries or licence changes. Shared behavior remains platform-neutral; physical further-platform qualification is deferred for MX feedback.
 

@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Original Settings candidate](DSH-GUI-ON-PI.md#original-settings-shell--october-11-follow-up) uses the copied MIT shell/Appearance and scoped Pi handlers. Source, ordinary and installed qualification are recorded separately; all remaining Harness/migration/public packaging/platform gates remain open, with further platforms deferred for MX feedback.
+[Original Settings qualification](DSH-GUI-ON-PI.md#final-installed-settings-qualification--october-11) records the copied MIT shell, scoped Pi handlers and corrected empty-MCP focus. Source, ordinary and installed evidence remain distinct; full Harness/migration/public packaging/platform gates stay open, with further platforms deferred for MX feedback.
 
 [Installed original question controls](PI-QUESTIONS.md#installed-mx-qualification--october-11) now qualify countdown/Take time/engagement/focus with source and ordinary 203/203, preserved eleven histories and exact MX selection 65b0a49 / 20261011-184609-8cac1bd0. Live-provider questions and every complete Harness/migration gate remain open.
 

@@ -1,6 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Original Settings candidate](DSH-GUI-ON-PI.md#original-settings-shell--october-11-follow-up) uses the copied MIT shell/Appearance and scoped Pi handlers. Source, ordinary and installed qualification are recorded separately; all remaining Harness/migration/public packaging/platform gates remain open, with further platforms deferred for MX feedback.
+## October 11 current installed original Settings
+
+Tested runtime **3d77cdb8412a3b3750565f1c517d06a3c6c12c4c** is selected **and running** in private MX release **20261011-193147-eb68a2a1**, product 0.2.13, artifact **8668ec430afc78782fd9c215b087911ac48f13f4a0c25bedf27fd97d7f5348b3**. Corrected source and fresh ordinary bundled Node 24.19.0 each pass **206/206 across 30 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Normal immutable guarded update and stable Host/Native launch succeed; both running roots match selection, Host uses its selected bundled Node and Native is online/model-ready/idle. The full **21,761-entry** inventory passes after installed GUI reads. All eleven histories and queue item identities are preserved, with zero new histories/admissions/provider requests during both Settings adoptions/inspection. Production selection/model router and model/speech/GPU/context/concurrency/precision settings remain preserved.
+
+[Installed Settings qualification](DSH-GUI-ON-PI.md#final-installed-settings-qualification--october-11) records original navigation/Appearance, actual settled empty-MCP Escape correction, provider-free Context access, fixture/live distinctions, retained first-candidate failure and verified redundant-assembly retirement. The retained Context dashboard is selected for feedback. Full Settings/GUI/Harness/migration/public packaging/platform gates remain open and further platforms stay deferred. These qualification-only documentation edits change no runtime or selected bytes; preceding candidates below are historical checkpoints.
+
+[Original Settings qualification](DSH-GUI-ON-PI.md#final-installed-settings-qualification--october-11) records the copied MIT shell, scoped Pi handlers and corrected empty-MCP focus. Source, ordinary and installed evidence remain distinct; full Harness/migration/public packaging/platform gates stay open, with further platforms deferred for MX feedback.
 
 ## October 11 current installed original question controls
 

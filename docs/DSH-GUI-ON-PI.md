@@ -61,6 +61,33 @@ and all 404 source-hash/browser-graph/96 npm-notice checks pass. Fresh ordinary
 bundled-Node and installed acceptance follow separately; no installed version is
 changed by source qualification.
 
+### Final installed Settings qualification — October 11
+
+Tested runtime **3d77cdb8412a3b3750565f1c517d06a3c6c12c4c** is selected **and running** in private MX release **20261011-193147-eb68a2a1**, product 0.2.13, artifact **8668ec430afc78782fd9c215b087911ac48f13f4a0c25bedf27fd97d7f5348b3**. Corrected source and fresh ordinary bundled Node 24.19.0 each pass **206/206 across 30 files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Normal immutable guarded update and stable Host/Native launch succeed; both running roots match selection, Host uses its selected bundled Node and Native is online/model-ready/idle. The full **21,761-entry** inventory passes after installed GUI reads. All eleven histories and queue item identities are preserved, with zero new histories/admissions/provider requests during both Settings adoptions/inspection. Production selection/model router and model/speech/GPU/context/concurrency/precision settings remain preserved.
+
+At normal **513×715**, the installed original General/Models/Plugins shell,
+unchanged current model, revisioned reasoning access and foreground reasoning
+Escape are checked. In the corrected release the actual empty MCP catalog is
+allowed to settle; Done retains focus and one Escape closes only MCP, leaving
+Settings open. Original Open Context closes the shell and opens the retained
+Qwen dashboard. Appearance/profile/model settings are not changed during these
+installed reads; explicit theme/capture writes and read-only denial are fixture
+qualifications. No live MCP sign-in or server operation is asserted: this preview
+profile has no registered MCP server. Settings and Context screenshots are saved
+outside the immutable release. The Context tab remains selected for feedback.
+
+All 475 compiled files, 19,160 dependency files/131 npm instances, 723 licence
+files/96 browser supplier notices and six native executable paths/hashes are
+verified against the preceding qualified assembly contracts. Supplier source/CSS,
+Node and dependencies are unchanged by the empty-MCP correction. Its final
+ordinary copy is retired only after matching 20,359 core files and the four
+changed GUI/handler sources to the retained selected release; logs/proofs and
+source commits remain. The earlier Settings/MCP failure and first candidate are
+retained below. These following documentation edits change no selected/runtime
+bytes. Full DSH settings, plugin configuration/installation, command, question,
+GUI, migration, privacy, public packaging and platform gates remain open; further
+platforms remain deferred for MX feedback.
+
 ### Installed Settings follow-up — first candidate
 
 Runtime a275c43a7c02854d99e1e96ffa8e9649b808ee61 is first selected/running as
