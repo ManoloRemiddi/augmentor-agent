@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 original workspace controls
+
+The original DSH Rename/Delete registration dialogs and ordering callbacks now bind to private revisioned Pi workspace metadata. Directory selection creates exactly one conversation and survives Host refreshes through stable adapter callbacks. Removal preserves directories/history and durable tombstones; read-only inspection cannot read or mutate the global registry. Source and ordinary bundled MX cohorts each pass 84 cases across eight files, zero failures/skips/cancellations, including original rendered dialogs, no inference/replay, CAS failures and actual Host restart. [The current GUI guide](DSH-GUI-ON-PI.md#persistent-original-workspace-controls--october-11-follow-up) retains failures and the distinction between Host ordering/rendering and physical drag acceptance. Supplier GUI/CSS/dependencies and approved Native/Browser surfaces are unchanged. The immutable MX candidate awaits normal updater adoption; the following qualification record will identify selected versus running release. Full Harness completion is still open; further platforms remain deferred for MX feedback.
+
 ## October 11 original public DSH GUI
 
 The owner rejected the custom standalone GUI and explicitly requested copying the original MIT DSH interface before improving it. [Original DSH GUI on Pi](DSH-GUI-ON-PI.md) records the selected public d743267 source, 340 hashed files, original visual components/CSS, Pi prop/data bindings, 95 bundled npm notices and outstanding compatibility gaps. The default Harness is now that copied GUI; the former interface remains at /inspection for advanced controls. No DSH owner, Cordis or account/analytics runtime is bundled. Native/browser-extension approved interfaces and production selections remain unchanged.

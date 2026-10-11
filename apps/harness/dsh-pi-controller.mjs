@@ -17,7 +17,8 @@ export class DshPiController {
   async start(requestedSession){
     const access=await this.fetcher('/api/access',{headers:{Authorization:'Bearer '+this.token}}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error?.message||'Open a fresh Harness link.');return v;});
     const [host,catalog,list]=await Promise.all([this.rpc('host.describe'),this.rpc('models.list'),this.rpc('session.list')]);
-    this.update({readOnly:access.mode==='read-only',catalog,workspace:host.workspace,sessions:list.items,phase:'ready'});
+    const workspaces=access.mode==='read-only'?null:await this.rpc('workspace.list');
+    this.update({readOnly:access.mode==='read-only',catalog,workspace:host.workspace,workspaces,sessions:list.items,phase:'ready'});
     const selected=access.sessionId||requestedSession||sessionStorage.getItem('augmentor-harness-session');
     const row=list.items.find(x=>x.sessionId===selected)||list.items[0];
     if(row)await this.open(row.sessionId);
@@ -43,7 +44,13 @@ export class DshPiController {
       for(const record of requests){const result=await readDshPayload((m,p)=>this.rpc(m,p),sessionId,record);if(epoch!==this.epoch)return;if(result.available)this.update({payloads:{...this.state.payloads,[record.id]:result.value}});}
     }finally{this.hydrating=false;}
   }
-  async refresh(){const list=await this.rpc('session.list');this.update({sessions:list.items});}
+  async refresh(){const [list,workspaces]=await Promise.all([this.rpc('session.list'),this.state.readOnly?null:this.rpc('workspace.list')]);this.update({sessions:list.items,workspaces});}
+  async workspaceAction(action,params={}){
+    if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
+    try{const workspaces=await this.rpc('workspace.'+action,{...params,expectedRevision:this.state.workspaces?.revision});this.update({workspaces});return workspaces;}
+    catch(error){await this.refresh().catch(()=>{});throw error;}
+  }
+  async adoptWorkspace(path){const snapshot=await this.workspaceAction('adopt',{path});return snapshot.items.find(x=>x.workspaceId===snapshot.adoptedWorkspaceId);}
   async poll(){
     if(this.polling||!this.state.sessionId||this.state.phase!=='ready')return;
     this.polling=true;const sessionId=this.state.sessionId,epoch=this.epoch;

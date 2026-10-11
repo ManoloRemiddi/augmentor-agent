@@ -102,12 +102,23 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
  });
  await start();client=await Client.open(join(state,'runtime.sock'));
  const selection={provider:'test',model:'test'};
- let inspectionPersisted;
+ let inspectionPersisted,workspacePersisted;
  const create=async(id,policy='workspace-write')=>{const settings=await client.call('settings.describe');await client.call('settings.mutate',{ns:'permission',expectedRevision:settings.namespaces[0].revision,ops:[{op:'set',path:['defaultPreset'],value:policy}]});await client.call('session.create',{sessionId:id,cwd,selection});await client.call('events.subscribe',{sessionId:id});};
  const prompt=(id,content,requestId)=>client.call('session.prompt',{sessionId:id,content:[{type:'text',text:content}]},requestId);
  const idle=async id=>until(async()=>!(await client.call('session.list')).items.find(m=>m.sessionId===id)?.running);
  const latest=(method)=>[...client.events].reverse().find(e=>e.method===method);
  await t.test('protocol rejects incompatible clients and keeps socket private',async()=>{await assert.rejects(Client.open(join(state,'runtime.sock'),'wrong'),/Incompatible/);assert.equal(statSync(join(state,'runtime.sock')).mode&0o777,0o600);});
+ await t.test('operator workspace registration binds Host CAS without inference or conversation creation',async()=>{
+  const before=requests,beforeSessions=(await client.call('session.list')).items.length,a=join(root,'project-a'),b=join(root,'project-b');mkdirSync(a);mkdirSync(b);writeFileSync(join(b,'keep.txt'),'Keep this file.\n');
+  let list=await client.call('workspace.list');const anchor=list.items[0].workspaceId;
+  list=await client.call('workspace.adopt',{path:a,expectedRevision:list.revision});assert.equal(list.adoptedWorkspaceId,a);
+  list=await client.call('workspace.rename',{workspaceId:a,title:'Research',expectedRevision:list.revision});
+  await assert.rejects(client.call('workspace.remove',{workspaceId:a,expectedRevision:0}),/Workspaces changed/);
+  list=await client.call('workspace.move',{workspaceId:a,beforeWorkspaceId:anchor,expectedRevision:list.revision});assert.equal(list.items[0].workspaceId,a);
+  list=await client.call('workspace.adopt',{path:b,expectedRevision:list.revision});
+  list=await client.call('workspace.remove',{workspaceId:b,expectedRevision:list.revision});assert(!list.items.some(x=>x.cwd===b));assert.equal(readFileSync(join(b,'keep.txt'),'utf8'),'Keep this file.\n');
+  assert.equal((await client.call('session.list')).items.length,beforeSessions);assert.equal(requests,before);workspacePersisted={revision:list.revision,items:list.items.map(({workspaceId,title})=>({workspaceId,title})),removed:b};
+ });
  await t.test('catalog pins use the native picker contract and missing models never fall back',async()=>{await client.call('models.pin',{...selection,pinned:true});const catalog=await client.call('models.list');assert.deepEqual(catalog.pinned,['test/test']);assert.equal(catalog.groups.find(g=>g.provider==='test').models[0].location,'Local');await assert.rejects(client.call('models.validate',{...selection,model:'missing'}),/unavailable/);assert.equal(requests,0);});
  await t.test('stream, persist, history, rename, save and repeat request deduplication',async()=>{await create('basic');const id=randomUUID();await prompt('basic','hello',id);await idle('basic');assert(client.events.some(e=>e.payload?.event?.type==='assistant/chunk'));const before=requests;await prompt('basic','hello',id);assert.equal(requests,before);await client.call('session.rename',{sessionId:'basic',title:'Renamed'});await client.call('chats.saved',{sessionId:'basic',action:'save'});const row=(await client.call('session.list')).items.find(m=>m.sessionId==='basic');assert.equal(row.title,'Renamed');assert(row.saved);const history=await client.call('session.history',{sessionId:'basic'});assert(history.events.some(e=>e.event.type==='assistant/message'));});
  await t.test('Adaptive Reasoning uses received SDK requests, guards text-only tools, and persists explicit effort without fallback',async()=>{
@@ -606,6 +617,9 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   assert.deepEqual(JSON.parse(payload.text),inspectionPersisted.expected);
   assert.equal((await client.call('observation.describe')).capturePayloads,false);
   assert.equal(requests,before);
+ });
+ await t.test('workspace names, order and removed registrations survive actual Host restart without replay',async()=>{
+  const before=requests,list=await client.call('workspace.list');assert.equal(list.revision,workspacePersisted.revision);assert.deepEqual(list.items.slice(0,workspacePersisted.items.length).map(({workspaceId,title})=>({workspaceId,title})),workspacePersisted.items);assert(!list.items.some(x=>x.cwd===workspacePersisted.removed));assert.equal(readFileSync(join(workspacePersisted.removed,'keep.txt'),'utf8'),'Keep this file.\n');assert.equal(requests,before);
  });
  await t.test('saved branches resume after restart and a cold source can branch',async()=>{
   await client.call('events.subscribe',{sessionId:'edited'});await prompt('edited','AFTER_RESTART');await idle('edited');

@@ -6,6 +6,7 @@ import {piMemoryContext,piTranscriptEvent} from '../../memory/src/pi.js';
 import {memoryPackage} from '../../memory/src/index.js';
 import {promptCall} from '../../prompt-library/src/client.js';
 import {listWorkspaceDirectory,createWorkspaceDirectory} from './workspace-picker.js';
+import {WorkspaceRegistry,workspacePath} from './workspace-registry.js';
 import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -58,6 +59,7 @@ export class Host {
   readonly dirs=paths();
   readonly browser=new BrowserBroker();
   readonly metadata=new Map<string,Meta>();readonly loaded=new Map<string,Loaded>();
+  readonly workspaces=new WorkspaceRegistry(join(this.dirs.state,'workspaces.json'),()=>[resolve(process.env.AUGMENTOR_PI_WORKSPACE||process.cwd()),...[...this.metadata.values()].map(m=>resolve(m.cwd))]);
   readonly interactions:Interactions;
   modelRuntime!:ModelRuntime;
   readonly setup=new SetupConnections(join(this.dirs.agent,'models.json'));
@@ -404,6 +406,7 @@ export class Host {
     return this.branchRow(m);
   }
   branchRow(m:Meta){return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,saved:m.saved,running:m.running,selection:m.selection,fork:m.fork};}
+  workspaceSnapshot(){const data=this.workspaces.snapshot();return {revision:data.revision,items:data.items.map(row=>({...row,sessionIds:[...this.metadata.values()].filter(m=>resolve(m.cwd)===row.cwd).map(m=>m.id)})),pinnedSessionIds:[],archivedSessionIds:[]};}
   private mcpInfo(m:Meta){if(m.surface==='browser')return {available:false,reason:'MCP is unavailable in browser-only conversations.'};return {...(this.loaded.get(m.id)?.mcp?.describe()??{available:false,reason:'MCP bindings are not loaded for this saved conversation.'}),management:this.mcpManagement.describe(m.id)};}
   submit(r:Loaded,input:string,id:string){r.mcp?.assertReady();const m=r.meta;if(m.running)throw new Error('This conversation is already working');
     if(this.mcpReloading)throw Error('Finish MCP session reload before sending a chat prompt.');
@@ -521,6 +524,11 @@ export class Host {
       else try{this.observations.append(m.id,'context/budget',{changes,units:'unicode-code-points',boundary:'manual-cold-repair'});}catch{console.warn('[augmentor-inspection] Idle repair completed; its diagnostic observation could not be recorded.');}
       return {changes,units:'unicode-code-points',policy:TOOL_BUDGET};
     }
+    case 'workspace.list':return this.workspaceSnapshot();
+    case 'workspace.adopt':await this.workspaces.adopt(p.path,p.expectedRevision);return {...this.workspaceSnapshot(),adoptedWorkspaceId:workspacePath(p.path)};
+    case 'workspace.rename':this.workspaces.rename(p.workspaceId,p.title,p.expectedRevision);return this.workspaceSnapshot();
+    case 'workspace.remove':this.workspaces.remove(p.workspaceId,p.expectedRevision);return this.workspaceSnapshot();
+    case 'workspace.move':this.workspaces.move(p.workspaceId,p.beforeWorkspaceId,p.expectedRevision);return this.workspaceSnapshot();
     case 'workspace.listDirectory':return listWorkspaceDirectory(p.path);
     case 'workspace.createDirectory':return createWorkspaceDirectory(p.path,p.name);
     case 'models.list':return this.catalog();

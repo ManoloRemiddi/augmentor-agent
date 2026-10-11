@@ -30,10 +30,29 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);await panel.call('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await panel.reload();for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
  const visible=expression=>until(()=>panel.evaluate('Boolean('+expression+')'),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,fixture:stderr});throw error;});
  const click=expression=>harnessPointerClick(panel,expression,until);
+ const hover=async expression=>{const point=await panel.evaluate('(()=>{const r=('+expression+').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()');await panel.call('Input.dispatchMouseEvent',{type:'mouseMoved',...point});};
  await visible('document.querySelector("button[aria-label=\\"New session\\"]")');
  await click('document.querySelector("button[aria-label=\\"New session\\"]")');
  await visible('document.querySelector("[contenteditable=true]")&&!document.querySelector("[contenteditable=true]").hasAttribute("aria-disabled")');
- const sid=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")');assert(sid);
+ const initialCount=(await rpc('session.list')).items.length,project=join(link.home,'project');await mkdir(project);
+ const pickProject=async()=>{
+  await click('document.querySelector("button[aria-label=\\"Add workspace\\"]")');
+  const folder='Array.from(document.querySelectorAll("[role=listitem] button")).find(x=>x.textContent.trim()==="project")';
+  await visible(folder);await click(folder);
+  await visible(folder+'.getAttribute("aria-current")==="true"');await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent==="Open")');
+  await visible('!document.querySelector("[role=dialog]")');
+ };
+ await pickProject();await until(async()=>(await rpc('session.list')).items.length===initialCount+1,'one new workspace conversation');
+ assert.equal((await rpc('session.list')).items.length,initialCount+1,'adopting a folder does not also create a duplicate conversation');
+ const projectRow='Array.from(document.querySelectorAll("[data-row-key]")).find(x=>x.dataset.rowKey.includes('+JSON.stringify(project)+'))';
+ await visible(projectRow);await hover(projectRow);await click(projectRow+'.querySelector("button[aria-label^=\\"Workspace actions for\\"]")');
+ await click('Array.from(document.querySelectorAll("[role=menuitem]")).find(x=>x.textContent==="Rename")');
+ await visible('document.querySelector("input[aria-label=\\"Workspace name\\"]")');await panel.call('Input.insertText',{text:'Research'});
+ await click('Array.from(document.querySelectorAll("[role=dialog] button")).find(x=>x.textContent==="Rename")');await visible(projectRow+'.textContent.includes("Research")');
+ const catalog=await rpc('workspace.list');assert.equal(catalog.items.find(x=>x.cwd===project).title,'Research');
+ await rpc('workspace.move',{workspaceId:project,beforeWorkspaceId:link.workspace,expectedRevision:catalog.revision});await panel.reload();
+ await visible(projectRow+'.textContent.includes("Research")');assert.equal((await panel.evaluate('Array.from(document.querySelectorAll("[data-row-key^=\\"workspace:\\"]")).map(x=>x.dataset.rowKey)'))[0],'workspace:'+project);
+ const sid=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")');assert(sid);assert.equal((await rpc('session.list')).items.find(x=>x.sessionId===sid).cwd,project);
  // Extension views remain reachable before the first turn; opening them starts no work.
  await click('document.querySelector("button[aria-label=\\"Add files or run commands\\"]")');
  await click('Array.from(document.querySelectorAll("[role=menuitem]")).find(x=>x.textContent==="Goal")');
@@ -56,6 +75,12 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  await visible('document.body.innerText.includes("Stopped.")||document.body.innerText.includes("ABORTED")');
  const count=(await rpc('session.history',{sessionId:sid})).events.filter(x=>x.event.type==='user/message').length;await panel.reload();
  await visible('document.body.innerText.includes("Partial fixture output.")');assert.equal((await rpc('session.history',{sessionId:sid})).events.filter(x=>x.event.type==='user/message').length,count,'reopen never resends');
+ const originalHistory=await rpc('session.history',{sessionId:sid});await writeFile(join(project,'keep.txt'),'Preserved workspace file.\n');
+ await hover(projectRow);await click(projectRow+'.querySelector("button[aria-label^=\\"Workspace actions for\\"]")');await click('Array.from(document.querySelectorAll("[role=menuitem]")).find(x=>x.textContent==="Delete workspace")');
+ await visible('document.querySelector("[role=dialog]")');await click('Array.from(document.querySelectorAll("[role=dialog] button")).find(x=>x.textContent==="Delete workspace")');await visible('!document.querySelector("[role=dialog]")');
+ assert(!(await rpc('workspace.list')).items.some(x=>x.cwd===project));assert.equal(await readFile(join(project,'keep.txt'),'utf8'),'Preserved workspace file.\n');assert.deepEqual(await rpc('session.history',{sessionId:sid}),originalHistory);
+ await panel.reload();await visible('document.body.innerText.includes("Partial fixture output.")');assert(!await panel.evaluate(projectRow),'removed workspace registration stays removed after reload');
+ assert.equal((await readFile(link.requestLog,'utf8')).trim().split('\n').length,3,'folder operations and reload start no model request');
  const inspection=await owner.call('inspection.open',{sessionId:sid});await panel.call('Page.navigate',{url:inspection.url});
  await visible('document.querySelector("[data-composer-input][aria-disabled=true][contenteditable=false]")');
  await click(chooseTab('Chat'));await visible('document.body.innerText.includes("Partial fixture output.")');

@@ -22,6 +22,7 @@ test('original DSH approval/question components answer the selected Host interac
   if(method==='host.describe')return {workspace:profile};
   if(method==='models.list')return {groups:[{provider:'fixture',name:'Fixture',models:[{...selection,name:'Chosen'}]}],default:selection,failures:[]};
   if(method==='session.list')return {items:[{sessionId:'fixture',cwd:profile,title:'Synthetic interaction',running:false}]};
+  if(method==='workspace.list')return {revision:0,items:[{workspaceId:profile,cwd:profile,title:'Fixture',sessionIds:['fixture']}],pinnedSessionIds:[],archivedSessionIds:[]};
   if(method==='session.history')return {events:[],hasMore:false};
   if(method==='observation.list')return {records:[]};
   if(method==='session.models')return {current:selection};
@@ -37,10 +38,10 @@ test('original DSH approval/question components answer the selected Host interac
  const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(x=>x.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);await panel.call('Runtime.enable');await panel.call('Log.enable');
  const visible=expression=>until(()=>panel.evaluate('Boolean('+expression+')'),expression);
  const click=expression=>harnessPointerClick(panel,expression,until);
- await visible('document.body.innerText.includes("Waiting for approval")');await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent==="Reject")');
+ await visible('document.body?.innerText.includes("Waiting for approval")');await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent==="Reject")');
  await until(()=>answers.length===1,'approval answered');assert.equal(answers[0].sessionId,'fixture');assert.deepEqual(answers[0].value,{outcome:'denied'});
  pending={method:'question/requested',rpcId:'question',payload:{questions:[{id:'answer',header:'Choose',question:'Which fixture option?',options:[{label:'First'},{label:'Second'}]}]}};server.publish('fixture',pending);
- await visible('document.body.innerText.includes("Which fixture option?")');await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent.includes("First"))');
+ await visible('document.body?.innerText.includes("Which fixture option?")');await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent.includes("First"))');
  await click('Array.from(document.querySelectorAll("button")).find(x=>x.textContent==="Submit")');
  await until(()=>answers.length===2,'question answered');assert.equal(answers[1].rpcId,'question');assert.deepEqual(answers[1].value.answer.answers[0].selected,['First']);assert.equal(answers[1].sessionId,'fixture');assert.deepEqual(panel.errors,[]);
 });

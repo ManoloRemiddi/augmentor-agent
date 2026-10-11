@@ -28,7 +28,7 @@ The directory browser enumerates actual folders and directory symlinks, with bou
 
 | Original DSH presentation | Pi binding |
 | --- | --- |
-| Sidebar and workspaces | Existing conversation list, workspace grouping, search, new conversation, title rename and actual directory picker |
+| Sidebar and workspaces | Persistent workspace adoption/name/order/removal, conversation list/grouping/search, new conversation, title rename and actual directory picker |
 | Chat and composer | Retained/streaming Pi text, reasoning and tool output; identified Send, queue/steer and Stop |
 | Model chooser | Exact configured provider/model and supported reasoning effort; no silent substitution |
 | Trajectory | User/assistant/tool rows, timing, table/timeline and original tool detail pane with arguments, result and schema |
@@ -43,9 +43,21 @@ Trajectory joins new assistant records to provider requests by **explicit retain
 
 Unknown submission responses are retained as unconfirmed and never automatically resent. Queue edits preserve the original admission fingerprint and append a replacement identity atomically at the same position; edits cannot rewrite already-dispatching, delivered or goal-owned work. Reopen preserves partial output after Stop.
 
+## Persistent original workspace controls — October 11 follow-up
+
+The original sidebar's **Rename** and **Delete workspace** dialogs now bind to the Pi Host. Delete removes only the registration: the directory and retained conversation histories remain intact, and those sessions appear under the original ungrouped presentation. The operator can explicitly adopt the directory again. Original workspace ordering callbacks persist their order. The actual browser qualification exercises rename/delete dialogs and verifies the Host-ordered sidebar after reload; it does not certify physical drag gestures.
+
+`workspace.list/adopt/rename/remove/move` use private `workspaces.json` metadata in the selected Host profile. Adopt requires an existing absolute directory and returns its canonical registration identity. Adoption creates no AgentSession or conversation; the original picker then creates one conversation through its existing callback. Legacy working directories are inferred read-only until a mutation persists them. Removal tombstones prevent old sessions from automatically recreating a deleted registration on restart.
+
+Every mutation requires the current registry revision. Stale edits, duplicate names, missing targets, invalid paths and failed persistence leave the saved registration unchanged. The browser refreshes after a conflict and reports it in the original dialog; it never retries the mutation automatically. Read-only conversation links cannot enumerate the global workspace catalog, browse directories or change registrations. These controls make no model request and do not alter policy, tools, model/speech configuration or execution ownership.
+
+A real browser failure revealed that inline directory callbacks changed on each Host refresh, restarting the original picker's navigation and losing its selection. The adapter now supplies stable callbacks; the supplier component/CSS stays unchanged. The browser test selects a real synthetic folder, asserts exactly one new conversation, uses the original rename/delete confirmations and verifies file/history preservation and exactly three requests for its deliberate read/Stop sequence. Actual Host restart separately preserves names, order and removed registrations without replay.
+
+Final focused source and ordinary unselected bundled-Node cohorts each pass **84 cases across eight files**, zero failures/skips/cancellations, using Node 24.19.0 and the isolated QtTest interpreter. Earlier source preparation reports 72 cases/70 passes/two failures: the picker binding above and a fixture reading the document before its body exists. Later browser checks also expose fixture-only aria-label/hover preparation mistakes; corrected fixtures wait for the original visible controls without changing assertions or deadlines. The final checks retain these results as historical failed evidence. Production npm/Node/licensing and the 340 selected supplier sources are unchanged. Full migration and platform qualification remain open.
+
 ## Remaining compatibility gaps
 
-This is an original-GUI integration preview, not complete DSH backend parity. File-upload receipts, @-mention chips/autocomplete and the full slash-command catalog are not connected; use files already in the chosen workspace by path. Workspace rename/delete/reorder/archive/pin behavior and the complete original global settings/provider configuration are not connected. Unsupported operations report their missing binding.
+This is an original-GUI integration preview, not complete DSH backend parity. File-upload receipts, @-mention chips/autocomplete and the full slash-command catalog are not connected; use files already in the chosen workspace by path. Workspace archive/pin behavior and the complete original global settings/provider configuration are not connected. Unsupported operations report their missing binding.
 
 Final assistant branching uses the original DSH branch control; current-message Edit remains in the advanced inspector. The original question/approval components answer Host requests, but DSH's indefinite/take-time timing protocol is not implemented: the existing Host's finite timeout still applies. Transient request streaming is not fully projected into Trajectory, although final retained request/tool details are connected. Account/telemetry and backend-only DSH plugins are intentionally excluded.
 

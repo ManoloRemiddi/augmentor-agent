@@ -20,6 +20,7 @@ The initial selection uses the existing local Qwen 27B 262k route on the RTX 509
 
 ## What to try
 
+- Original workspace Rename/Delete dialogs, folder selection and ordering. Removing a registration preserves its directory and conversations.
 - Chat, file reading and ordinary tasks in your chosen folder; check that answers and Stop behave as expected.
 - **Trajectory**: inspect request, tool and turn order, timing and saved tool originals.
 - **Context**: inspect the structured provider request, system instructions, messages, tool declarations and reported usage. **Settings → Request payload capture** retains future diagnostic payloads locally for up to 14 days or 512 MiB; it does not reconstruct old requests. It is enabled for the demonstration profile so the first successful request can be inspected.

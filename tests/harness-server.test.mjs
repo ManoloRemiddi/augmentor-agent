@@ -30,6 +30,7 @@ test('conversation inspection isolates authority, expires links and cannot keep 
   assert.equal((await rpc(method,{sessionId:'b'})).status,400);assert.equal((await rpc(method)).status,400);assert.equal(calls.length,count,'foreign read never reaches Host');
  }
  const count=calls.length;
+ for(const method of ['workspace.list','workspace.adopt','workspace.rename','workspace.remove','workspace.move','workspace.listDirectory','workspace.createDirectory'])assert.equal((await rpc(method,{path:'/private',workspaceId:'/private',expectedRevision:0})).status,400,method);
  for(const method of ['session.create','session.prompt','session.cancel','session.branch','session.rename','session.selectModel','session.selectReasoning','session.trimTools','session.updateQueue','session.continueQueue','session.resolveQueue','chats.saved','observation.configure','observation.clear','reasoning.configure','settings.mutate','settings.describe','prompts.list','prompts.save','prompt.improve','prompt.cancelImprovement','interaction.respond','models.configure','host.shutdown','inspection.open','harness.open'])assert.equal((await rpc(method,{sessionId:'a',clientId:'same'})).status,400,method);
  assert.equal(calls.length,count,'mutations and unrelated profile reads never reach Host');
  const subscribed=(await (await rpc('events.subscribe',{sessionId:'a',clientId:'same'})).json()).result;assert.deepEqual(subscribed.pending,[]);assert(!server.connected('a'),'inspection cannot act as an approval presenter');
