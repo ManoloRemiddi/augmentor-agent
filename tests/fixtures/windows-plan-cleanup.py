@@ -7,10 +7,10 @@ import sys
 import time
 
 ROOT = Path(sys.argv[1]).resolve(strict=True)
-PRIVATE = Path(sys.argv[2]).resolve(strict=True)
+PRIVATE = Path(sys.argv[2])
 if sys.platform != 'win32' or not PRIVATE.name.startswith('augmentor-plan-'):
     raise SystemExit('An actual private Windows plan fixture is required.')
-if PRIVATE.parent != Path(os.environ['TEMP']).resolve(strict=True):
+if PRIVATE.resolve(strict=True).parent != Path(os.environ['TEMP']).resolve(strict=True):
     raise SystemExit('The fixture is outside its explicit temporary root.')
 sys.path.insert(0, str(ROOT / 'services'))
 from platform_adapters.private_files import atomic_json, require_directory
@@ -21,10 +21,12 @@ from lifecycle.windows_preparation import WindowsPreparation
 runtime, shared = PRIVATE / 'runtime', PRIVATE / 'shared-state'
 for path in (PRIVATE, runtime):
     require_directory(path)
-if Path(os.environ['XDG_RUNTIME_DIR']).resolve(strict=True) != runtime:
+if Path(os.environ['XDG_RUNTIME_DIR']).resolve(strict=True) != runtime.resolve(strict=True):
     raise SystemExit('The cleanup profile differs from the fixture.')
-if Path(os.environ['AUGMENTOR_SHARED_STATE']).resolve() != shared:
+if Path(os.environ['AUGMENTOR_SHARED_STATE']).resolve() != shared.resolve():
     raise SystemExit('The cleanup shared profile differs from the fixture.')
+# Validate physical identity above while retaining the exact endpoint spelling:
+# resolving a Windows 8.3 TEMP path would change the logical pipe-name hash.
 owner = discover_owner(ROOT, runtime)
 if owner is None:
     print(json.dumps({'privateSupervisorObserved': False}))
