@@ -461,3 +461,6 @@ source `85034ac`. Both windows closed only while idle; the primary launcher was
 invoked after its old service had exited. Desktop/Mobile report online and no
 pending update. This supersedes the preceding installed root without altering
 its preserved product, DSH or speech contract.
+
+
+The October 11 [private MX original-command-menu adoption](DSH-GUI-ON-PI.md#installed-original-command-menu-qualification--october-11) selects/runs d6010d0 in 20261011-170722-5dfb555f through normal guarded immutable maintenance. Source/final ordinary qualification each pass 139/139; all ten histories/queue item identities, production selection and existing native executable bytes remain preserved. Fresh npm hoists same-byte jiti/graceful-fs files without changing versions/content; licence tree paths are regenerated. General public Debian native collection still refuses the pre-existing Sharp binary and remains an open release gate. This is private MX preview evidence, not a public package or further-platform qualification.

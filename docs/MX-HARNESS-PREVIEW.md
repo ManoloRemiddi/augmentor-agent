@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## October 11 current installed original command menu
+
+Tested implementation **d6010d040f4533ced34f1da8453a1c15c42bcdbf** is selected **and running** in private MX release **20261011-170722-5dfb555f**, product 0.2.13, artifact **32f6005e9b8506c77bed6f92eb7591e7af2e4e7a87eca5809f729e5b73e10c36**. Normal guarded immutable update/stable Host and Native launch succeed; both running roots match selection and Native is online/model-ready/idle. Full **21,737-entry** inventory passes after GUI reads. Source and final ordinary bundled Node 24.19.0 cohorts each pass **139/139 across eighteen files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. All ten histories and queue item identities are preserved, with zero new admissions/provider requests. Actual installed original eight-row menu, `/con` filtering/Tab-to-Context and model-popup current Qwen highlight/Escape pass; the current model is not changed. Context remains selected for owner feedback. Production selection/model router/model and speech settings remain preserved.
+
+[Installed scope and retained failures](DSH-GUI-ON-PI.md#installed-original-command-menu-qualification--october-11) distinguish copied MIT menu source, same-byte dependency hoisting and the still-open public Debian Sharp gate. This qualification-only documentation changes no runtime or selected artifact. Complete command/Harness/migration/platform gates remain open; further platforms stay deferred. Preceding candidates below are historical checkpoints.
+
+
 ## October 11 original command menu candidate
 
 The [original DSH command menu](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up) replaces the simplified popup with copied MIT menu/controller/grouping/model-popup source. Eight existing Pi actions, slash filtering, keyboard selection, scoped model choice and draft/attachment/Escape guards are connected. The 28 new files bring the supplier selection to 386; all preceding hashes, visual CSS, licences and dependencies remain unchanged. Source qualification passes **139/139 across eighteen files**, zero failures/skips/cancellations, prepared QtTest/two workers/unchanged deadlines. Retained fixture failures and explicit missing commands are in the guide. Ordinary/installed acceptance remains pending for this candidate; the installed 39b9262 release below is preserved. Full Harness gates remain open and further platforms stay deferred.
@@ -47,7 +54,7 @@ The initial selection uses the existing local Qwen 27B 262k route on the RTX 509
 
 ## What to try
 
-- The **original command menu** candidate restores Add/Commands grouping, slash filtering and the original model-option popup. Its installation qualification is recorded above; `/context` opens the dashboard and `/model` opens the picker when installed. See [exact coverage](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up).
+- The installed **original command menu** restores Add/Commands grouping, slash filtering and the original model-option popup. Its installation qualification is recorded above; `/context` opens the dashboard and `/model` opens the picker when installed. See [exact coverage](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up).
 - **Context**: the original dsh-context dashboard now has Pi bindings. Inspect composition, trend, request-specific system/tools/messages, and expand **Raw Pi context and saved entries** for provenance. Check the explicit availability/estimate notes. See [current qualification](DSH-GUI-ON-PI.md#original-context-dashboard--october-11-follow-up); installation identity is recorded with each immutable adoption.
 
 - Original workspace Rename/Delete dialogs, folder selection and ordering. Removing a registration preserves its directory and conversations.
