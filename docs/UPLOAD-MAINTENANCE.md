@@ -45,3 +45,39 @@ below when complete. Existing supplier licences, dependencies and model/speech
 settings are unchanged. This shared Host change adds no OS adapter; Windows,
 macOS and other distro acceptance remain deferred for MX feedback. Full Harness,
 draft durability, migration, privacy and public-binary gates remain open.
+
+
+## Installed MX qualification — October 11
+
+Runtime **71c8295331e3ef6f1a3fadecdee2b3e16dde75cf** is selected and running in
+private MX release **20261011-230903-26a85087**, product **0.2.13**, artifact
+**a4e02988958781788a17c4e78018cbc7219c6e510e4ed41f0793584d24c3c70c**. The fresh
+ordinary bundled Node **24.19.0** also passes **256/256 across 40 files**, zero
+failures/skips/cancellations, two workers/unchanged deadlines/prepared QtTest.
+All 478 compiled files match source. Compared with the preceding installed
+Context-preferences release, only the two changed Host modules and their generated
+maps/declaration differ; the complete GUI graph and CSS are byte-identical.
+All 19,160 production dependency files, 131 npm instances, six native executables,
+723 licence files and 96 browser notice records remain preserved.
+
+Normal stage, idle/draft-empty Native maintenance close, one guarded Host shutdown
+and completed activation precede the stable Host launch. Its exact selected Node
+and entry root are verified before Native launch. Both running roots match the
+selection; Native is online/model-ready/idle. All **21,787 installed inventory
+entries** pass before and after original Context/Insights/plugin-card reads. No
+owner inference, tool, upload, preference mutation or new conversation is used
+for installed acceptance; the real HTTP failure/maintenance cases remain isolated
+synthetic evidence. The settled original Insights dashboard stays open at the
+normal 513×715 viewport for owner feedback.
+
+All eleven histories and queue identities and all private profile settings are
+preserved. Of 243 saved files, **233 are byte-identical**; four original journals
+retain exact old prefixes with only two saved-title/session_info, two session/close
+and two session/load appends, plus six corresponding counter/index derivatives.
+Production selection and the existing model router/model/speech/GPU/context/
+concurrency/precision/CPU ASR/VAD settings remain preserved. A comparison first
+expected only two generated JavaScript paths; the retained audit accounts for
+their two source maps and Host declaration as well, without changing source or
+relaxing GUI/dependency checks. This qualification-only follow-up changes no
+selected artifact. Full draft durability/migration/privacy/public packaging and
+physical platform gates remain open; DSH stays available.
