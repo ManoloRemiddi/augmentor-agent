@@ -50,7 +50,13 @@ augmentor-harness-preview --status
 
 This verifies and prints selected release/version/source/hash without starting a Host or model. Selected and running identities are distinct. The private runtime log is `<preview state>/augmentor-pi/runtime.log`. Never share `harness.json`, a real bearer link, API credentials or unreviewed conversation payloads.
 
-## Qualification scope
+## Original DSH GUI qualification
+
+The default now uses the actual public DSH interface with Pi bindings. Tested implementation **fe5edae3c44c1905692afc3f63fe3688f7fb249e** passes the final ordinary bundled-Node **77-case** cohort, zero failures/skips/cancellations. Source and actual-browser checks, public-source hashes and 95 bundled npm notice records are verified. This increment's evidence and remaining compatibility gaps are in [Original DSH GUI on Pi](DSH-GUI-ON-PI.md).
+
+Selected **and running** preview: **20261011-125858-2e384fa5**, product **0.2.13**, artifact SHA-256 **d1943d2f1cbae906f06d3277d22f90dc560bfb04105843a4ebec75b811d32899**. Both Host and native window match the selected root; native is online/model-ready. Full immutable inventory verification passes after a fresh successful Qwen request. The clean **DSH GUI on Pi · MX Linux check** conversation is left for feedback. Original Trajectory displays the read arguments, saved result, schema and six-millisecond duration; Context exposes actual provider input and afterProviderHooks composition. Live Stop/reopen on the copied-GUI implementation retains aborted output with no replay, and final adoption preserves that history. Production selection/model-router and all provider/speech/GPU settings remain unchanged. Subsequent qualification documentation does not alter runtime or selection.
+
+## Previous custom-interface qualification
 
 Runtime implementation **`0ab56432af22ec88a5b5e65e92561ab881f0c5be`** passes the final broad Linux source run: **834 cases/828 passes/six explicit optional/platform skips**, zero failures/cancellations, with two workers and unchanged deadlines. Three provider-compatibility cases pass. A separate ordinary bundled-Node artifact passes **100 cases across nine files**, zero failures/skips/cancellations, with four workers: provider compatibility/scheduling, Host lifecycle, jobs/delegation/specialists, observations, Harness chat and actual Chromium Context. All **351 compiled files** match source; **19,088 dependency files**, **709 license files** and bundled Node remain identical to the preceding ordinary stage. The final preview launcher additionally isolates the native working folder and Linux dictation state; its exact installed source/hash is available through `--status`.
 
