@@ -119,3 +119,98 @@ the wrong original wrapper state; the corrected assertion observes the
 supplier's `data-document-loading` status element. Product/source deadlines and
 concurrency remain unchanged. A fresh ordinary and installed correction must
 qualify separately; no selected release is patched in place.
+
+## Installed MX qualification — October 12
+
+Corrected runtime **65188080085323335a7c290dd5d43f5c851c0a0c** is selected
+**and running** in private MX release **20261012-031413-3c3b8dc9**, product
+**0.2.13**, artifact
+**64ab34e468f045ab5e6d580366507750d8753a0c93c77b043e8c82e41576e139**.
+The qualification publication after this runtime changes documentation only.
+
+- Corrected source and fresh ordinary bundled Node **24.19.0** each pass
+  **278/278 across 48 files**, zero failures/skips/cancellations, prepared QtTest,
+  two workers and unchanged deadlines. Two ordinary workspace-packaging cases
+  also pass. The slow actual HTTP preview case requires the original accessible
+  loading indicator, absence of the false unavailable message and current bytes.
+- The ordinary tree retains **511 compiled files**, **19,888 production
+  dependency files**, **133 npm instances**, **731 licence files**, **six native
+  executables** and **99 browser notice records**. Every production dependency
+  path/byte, Node/native byte and licence file matches the preserved first
+  Context-sidebar candidate. A separate post-assembly supplier audit agrees
+  exactly. The feature's only new dependency is pinned MIT picomatch 4.0.7;
+  preceding file-preview dependencies remain preserved.
+- Ordinary guarded stage completes, then Native maintenance close and one Host
+  shutdown complete before activation. Activation is terminal before the stable
+  Host launcher; its selected root and bundled Node are verified before the
+  stable Native launcher. Both running roots match selection, Native is
+  online/model-ready/idle, and the full **22,645-entry inventory** passes after
+  actual GUI inspection. The previous immutable candidates remain intact.
+- Actual installed browser acceptance verifies original Placement → All,
+  persistence after reload, original guide capsule/title, normal narrow
+  fullscreen and settled wide push geometry beside Chat (300-pixel sidebar,
+  708-pixel composer). The sidebar shows **2 of 2 retained Qwen request bodies**,
+  SDK-normalized 7.6k / 262.1k occupancy and explicit Fleet unavailability. File
+  Activity opens the real three-line authored note using original preview
+  controls; no unavailable message remains. These are retained-data/UI reads,
+  with no new owner model or tool action. The normal viewport and original Tab
+  preference are restored; Context Insights is left open for feedback.
+- All **eleven histories and queue item identities** remain preserved, with
+  no new conversations/admissions/provider requests/tools. Of **243 prior saved
+  files**, **233** remain identical and four journals preserve their exact old
+  prefixes with two title/session_info, two close and two load appends plus six
+  corresponding counter/index updates. Draft and attachment object sets/bytes
+  remain identical. Profile values, production selection/model router and
+  model/speech/GPU/context/concurrency/precision settings remain preserved;
+  only two temporary display writes increment the profile revision.
+
+This qualifies the original Context sidebar on the private MX preview. It does
+not close complete Harness/P0/P1 migration, Fleet, prompt wrapping, full viewers
+and keyboard/plugin administration, privacy/public packaging, public Debian
+Sharp/libvips source/collector/rebuild or physical/live/platform gates. DSH
+remains available. Windows, macOS and other Linux implementation remain deferred
+for owner MX feedback. Canonical main's 38 preceding changed paths are untouched.
+
+## Reproduce the public fixture checks
+
+After the normal check/build, use Node **24.19.0** and set `AUGMENTOR_PYTHON` to
+the prepared PySide6/QtTest interpreter. The focused original-widget checks are:
+
+```sh
+node --test --test-concurrency=2 tests/harness-context-preferences*.test.mjs tests/harness-context-sidebar-chromium.test.mjs tests/harness-file-preview-chromium.test.mjs
+python3 -m unittest discover -s tests -p test_production_workspaces.py -v
+```
+
+The 48-file qualification cohort is the following, with the same two-worker
+schedule and unchanged fixture deadlines:
+
+```sh
+node --test --test-concurrency=2 \
+  tests/harness-dsh-context.test.mjs tests/harness-dsh.test.mjs \
+  tests/harness-dsh-commands.test.mjs tests/harness-dsh-chromium.test.mjs \
+  tests/harness-dsh-interactions-chromium.test.mjs tests/harness-dsh-questions-chromium.test.mjs \
+  tests/harness-dsh-attachments-chromium.test.mjs tests/harness-dsh-settings-chromium.test.mjs \
+  tests/harness-reasoning-chromium.test.mjs tests/harness-mcp-chromium.test.mjs \
+  tests/harness-server.test.mjs tests/runtime.test.mjs tests/pi-observations.test.mjs \
+  tests/pi-prompt-queue.test.mjs tests/pi-attachments.test.mjs tests/pi-workspaces.test.mjs \
+  tests/pi-session-organization.test.mjs tests/pi-prompt-improvement.test.mjs \
+  tests/mcp-management.test.mjs tests/pi-mcp-management.test.mjs \
+  tests/jobs-registry.test.mjs tests/pi-jobs.test.mjs tests/pi-compaction.test.mjs \
+  tests/pi-interactions.test.mjs tests/pi-execution.test.mjs tests/pi-steering.test.mjs \
+  tests/pi-steering-input.test.mjs tests/pi-reasoning.test.mjs \
+  tests/pi-goals.test.mjs tests/pi-goals-barriers.test.mjs \
+  tests/harness-context-providers.test.mjs tests/harness-context-providers-chromium.test.mjs \
+  tests/harness-context-modal.test.mjs tests/harness-context-modal-chromium.test.mjs \
+  tests/harness-context-insights.test.mjs tests/harness-context-insights-chromium.test.mjs \
+  tests/harness-context-preferences.test.mjs tests/harness-context-preferences-chromium.test.mjs \
+  tests/pi-upload-maintenance.test.mjs tests/harness-upload-maintenance.test.mjs \
+  tests/harness-drafts.test.mjs tests/harness-drafts-chromium.test.mjs tests/harness-drafts-runtime.test.mjs \
+  tests/harness-file-references.test.mjs tests/harness-file-references-chromium.test.mjs \
+  tests/harness-file-preview.test.mjs tests/harness-file-preview-chromium.test.mjs \
+  tests/harness-context-sidebar-chromium.test.mjs
+```
+
+Repeat those copied tests inside a fresh ordinary assembly with its bundled
+`node/bin/node` and `AUGMENTOR_PI_TEST_ROOT` pointing to that assembly. Source,
+synthetic execution, ordinary packaging and installed owner inspection remain
+separate evidence; no private source or owner conversations are test fixtures.
