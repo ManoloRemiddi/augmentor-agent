@@ -1,6 +1,91 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-# Original Fleet migration: recorded family identities
+# Original Fleet on Pi
+
+## Installed MX qualification — October 12
+
+Corrected tested runtime **a449d28b90e0d20877daae51a7075b765ce3ad12** is
+selected **and running** in private MX release **20261012-052408-d60add65**,
+product **0.2.13**, artifact
+**3638106b09b6fcd4d15b39fedbd807e7a88e14c92a5eab20cf9ecf92920c4200**.
+The subsequent qualification publication changes documentation only. This
+current qualification supersedes the first Fleet candidate and earlier
+Context/sidebar and family-read checkpoints below.
+
+Corrected source check/build, supplier hashes, browser graph/notices and source
+and fresh ordinary bundled Node **24.19.0** cohorts each pass **283/283 across
+52 files**, zero failures/skips/cancellations, prepared PySide6/QtTest, two
+workers and unchanged deadlines. The two ordinary workspace-packaging cases
+also pass. The ordinary assembly contains **514 compiled files**, **19,888
+production dependency files**, **133 npm instances**, **731 licence files**,
+**six native executables** and **99 browser supplier notice records**. All
+dependency paths/bytes, bundled Node/native bytes and every licence file match
+the preserved first Fleet assembly exactly. A separate post-assembly supplier
+audit agrees. The caption correction changes authored locale/test/documentation,
+without another supplier or dependency change.
+
+Normal guarded update stages the separately tested ordinary artifact, waits
+for Native maintenance close and Host shutdown to finish, activates through
+`augmentor-update`, then launches the stable Host and Native sequentially. Exact
+selected roots and the Host's bundled Node are checked before Native launch.
+The full **22,657-entry inventory** passes before and after installed GUI reads;
+Native remains online/model-ready/idle with no active turns, compactions, uploads,
+operator requests, previews or unsent Harness drafts. Releases are immutable;
+the first candidate remains preserved rather than patched.
+
+Actual installed original Settings → Plugins → Fleet tab → Show exposes the
+original tab, solo graph and pinned inspector at 1440×900. The retained Qwen
+conversation has **zero verified workers** in its saved job catalogue. Its
+original graph shows the actual **7.6k / 262.1k** context, **2.9%**, **two
+recorded requests** and **15.2k own billed tokens**, with its retained reply and
+initial prompt. The corrected captions say **Recorded context and saved
+workers**, **No workers in the retained job catalogue**, and **Initial prompt /
+assigned task**. No workers are fabricated, and no new owner prompt, model
+request or tool action is submitted. Real worker graph/inspector/child-page
+behavior is qualified by the separate public SDK/HTTP/Chromium fixtures,
+not by live worker execution in this empty installed catalogue.
+
+The original **Hide** preference is restored after exactly two temporary
+display writes, retiring a selected Fleet seat back to Chat. The temporary
+viewport is reset and the original **Context Insights** overview stays open for
+MX feedback. It reads ten non-archived retained catalogue sessions, seven newest
+eligible contexts, eight nonblank cards and zero failed/partial/usage-gap reads.
+Unsupported prices, detailed active time, skill attribution, Team and mailbox
+data remain unavailable. Local screenshots stay outside Git and the immutable
+release; no private conversation content or authenticated links are published.
+
+All **eleven histories and queue identities** are preserved with zero new
+histories/admissions/provider requests/tools. Of **243 prior saved files**, **233
+remain identical**, four journals preserve exact old byte prefixes with **two
+session_info/title, two session/close and two session/load** entries, and six
+corresponding counter/index derivatives change. Draft and attachment object
+sets/bytes remain identical. Profile values, model/speech/GPU/context/concurrency/
+precision settings, production selection and model router remain preserved;
+only the two temporary display writes advance the profile revision.
+
+Qualified scope is the copied Fleet presentation and its existing inline family
+graph over exact-parent Pi retained records, bounded shared caches and narrower
+read-only child pages on private MX. The current supplier selection remains
+**483 MIT DSH files** and **107 Apache-2.0 dsh-context files: 91 verbatim / 16
+marked adaptations**, at the original public refs recorded below. Original
+CSS/icons/licence bodies remain preserved. Pi keeps one supported AgentSession
+per conversation; read-only inspection does not load a second owner.
+
+Complete Harness migration, coordinated Team/mailbox semantics, prompt wrapping,
+full viewer/reference/command/skill/admin/question/plan/provenance/effect-success
+and memory/voice/Home/browser/desktop acceptance remain open. Public Debian
+Sharp/libvips source/collector/rebuild, privacy/public packaging and physical/live/
+platform gates remain open. DSH stays available. Windows, macOS and other Linux
+implementation remain deferred for owner MX feedback. This shared browser/Host
+change adds no OS adapter; synthetic cross-boundary checks do not establish
+physical platform parity.
+
+Reproduce the final cohort with the existing [48-file Context/sidebar
+recipe](CONTEXT-SIDEBAR.md#reproduce-the-public-fixture-checks), appending
+`tests/session-family.test.mjs`, `tests/pi-session-family.test.mjs`,
+`tests/harness-fleet-data.test.mjs` and `tests/harness-fleet-chromium.test.mjs`.
+Use the assembly's bundled Node and `AUGMENTOR_PI_TEST_ROOT` for the ordinary
+run. The synthetic fixtures contain no private owner source or conversations.
 
 ## Original Fleet interface candidate — October 12
 
@@ -71,8 +156,8 @@ diagnosis was rejected. Projection values now share one page-local canonical
 derivation and a stable memoized presentation value across modal/tab/sidebar
 occurrences; these are identity/scoping safeguards, not the cause of that timeout.
 
-Source final check/build, supplier hashes/browser graph/notices and **283/283 across 52 files** pass, zero failures/skips/cancellations, Node 24.19.0, prepared QtTest, two workers and unchanged deadlines. Ordinary and installed MX qualification follow separately. The
-running installed Context/sidebar release below is not yet a Fleet installation.
+Source final check/build, supplier hashes/browser graph/notices and **283/283 across 52 files** pass, zero failures/skips/cancellations, Node 24.19.0, prepared QtTest, two workers and unchanged deadlines. Corrected ordinary and installed MX qualification is recorded above. The
+earlier Context/sidebar records below are historical checkpoints.
 Complete migration, live/physical/platform, public packaging/privacy and DSH
 retirement gates remain binding. Further OS implementation stays deferred for
 owner MX feedback. The older data-foundation records below retain their scope.
@@ -106,8 +191,10 @@ assigned task**. Original supplier widgets/strings/CSS remain preserved; the
 bindings provide honest deployment-specific labels. The strengthened Chromium
 case requires the recorded caption and absence of the live-context assertion.
 Its three focused cases pass with unchanged deadlines. This first immutable
-candidate remains historical; a fresh corrected ordinary/installed release must
-qualify before its UI acceptance is reported as current.
+candidate remains historical; the fresh corrected ordinary/installed release
+is qualified in the current section above.
+
+## Historical family-read foundation before Fleet binding
 
 The next original dsh-context view needs a trustworthy parent/worker catalogue.
 Pi's ordinary conversation forks are historical branches, while bounded jobs
