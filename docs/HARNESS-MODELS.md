@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Qualified implementation: **efc0dd564dd2ae2b68c86f50ad83fa53a8eea4a0**. Fresh strict check/build and the exact 64-file MX cohort pass **323/323**, with five separate notice/workspace cases. This is source-only qualification; ordinary and installed acceptance remain open.
+
 # Original DSH Models settings on Pi
 
 The Harness Models section now reuses the original DSH provider rows, editors,
