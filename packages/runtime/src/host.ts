@@ -13,6 +13,7 @@ import {WorkspaceRegistry,workspacePath} from './workspace-registry.js';
 import {PiAttachments,submittedParts,IMAGE_LIMITS,FILE_LIMIT} from './attachments.js';
 import {HarnessDrafts} from './harness-drafts.js';
 import {SessionOrganization} from './session-organization.js';
+import {sessionFamily} from './session-family.js';
 import {contextPreferences,contextPreferenceChange,CONTEXT_PREFERENCE_OPTIONS} from './context-preferences.js';
 import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
 import {join,resolve} from 'node:path';
@@ -578,6 +579,7 @@ export class Host {
       });
       this.queue(m).pause();return accepted;
     }
+    case 'session.family':{const m=this.getMeta(p.sessionId);return sessionFamily(m,this.jobs.list(m.id),sid=>this.metadata.get(sid),this.jobs.problem);}
     case 'session.jobs':{const m=this.getMeta(p.sessionId);return {available:!this.jobs.problem,reason:this.jobs.problem,items:this.jobs.list(m.id),scope:'exact-parent-conversation; reported producer outcomes; reads do not add usage'};}
     case 'session.job':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));return {job,output:this.jobs.output(m.id,job.id,p.from)};}
     case 'session.jobHistory':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));if(!job.childId)return {available:false,reason:'This job has no delegated conversation.'};return {available:true,childId:job.childId,...this.history(this.getMeta(job.childId)).page(p.maxMessages,p.beforeSeq)};}
