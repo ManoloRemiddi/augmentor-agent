@@ -100,3 +100,36 @@ recipe](CONTEXT-SIDEBAR.md#reproduce-the-public-fixture-checks), with these two
 new family tests appended. Ordinary runs use the assembly's bundled Node and
 `AUGMENTOR_PI_TEST_ROOT` pointing to that assembly. These synthetic fixtures do
 not contain private owner source or conversation contents.
+
+## Qualified source and ordinary checkpoint — October 12
+
+Runtime source **1936fd7756b3beefb5dc2d72e923561e3ae6e48d** passes source
+check/build and **280/280 across 50 files** in both source and a fresh ordinary
+assembly, zero failures/skips/cancellations, bundled Node **24.19.0**, prepared
+QtTest, two workers and unchanged deadlines. The ordinary assembly also passes
+the two existing workspace-packaging checks. This qualifies the family read
+contract and its actual SDK/HTTP scope; it is not original Fleet GUI acceptance.
+
+The assembly has **514 compiled files**, **19,888 production dependency files**,
+**133 npm instances**, **731 licence files**, **six native executables** and
+**99 browser supplier notice records**. All production dependency paths/bytes,
+Node/native bytes and licence files match the corrected installed Context
+sidebar release. A separate post-assembly supplier audit agrees exactly. The
+new compiled files are the authored family module and its TypeScript metadata;
+no supplier module, CSS, licence or dependency changes are introduced.
+
+The original Fleet presentation's public textual closure was also inspected
+at dsh-context **2c8095c34da3fcef729a01437d2df65c83e08499**. Excluding explicit
+type-only imports, its 31-file relative closure needs seven additional original
+files: Fleet tab/gate, Fleet view/list, comms panel, member board and task board.
+The initial textual audit followed shared wire types into Host type definitions;
+these are explicit `import type` declarations, not runtime service imports.
+Actual final browser graph, served readers and notices must still qualify after
+integration. No extra supplier files are copied or registered in this checkpoint.
+
+Selected/running private MX remains **65188080085323335a7c290dd5d43f5c851c0a0c**,
+release **20261012-031413-3c3b8dc9**. The stable Native still reports its matching
+selected root, online/model-ready/idle. Profile values and production selection
+remain preserved. No updater activation, installed family/Fleet acceptance,
+live owner inference, other-platform implementation or DSH retirement occurs.
+The subsequent qualification publication changes documentation only.
