@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original PDF preview candidate](HARNESS-PDF-PREVIEWS.md) reuses the public DSH PDF registration, page/text/zoom widgets and tab lifetimes with Pi's existing authorized byte reader. A reviewed local worker preserves the page security policy, and pinned PDF.js/font/decoder notices remain separate. Source, ordinary and installed qualifications are distinct; the prompt-wrapping preview remains selected/running until guarded promotion. Full viewer/migration/public distribution/platform gates remain open.
+
 # Original Harness file previews
 
 The copied DSH file chip now opens the original right sidebar. Chat Markdown

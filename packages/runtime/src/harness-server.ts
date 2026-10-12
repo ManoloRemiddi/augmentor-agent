@@ -244,12 +244,16 @@ export class HarnessServer {
       const web=fileURLToPath(new URL('../../harness-web/',import.meta.url));
       if(/^\/[A-Za-z0-9_@.-]+$/.test(url.pathname)){
         try{const names=JSON.parse(readFileSync(join(web,'assets.json'),'utf8')) as string[];const name=url.pathname.slice(1);
-          if(names.includes(name)){const ext=name.split('.').at(-1);staticFiles.set(url.pathname,{path:join(web,name),type:({js:'text/javascript',css:'text/css',png:'image/png',svg:'image/svg+xml',txt:'text/plain',json:'application/json',woff2:'font/woff2',woff:'font/woff',ttf:'font/ttf'} as Record<string,string>)[ext!]??'application/octet-stream'});}
+          if(names.includes(name)){const ext=name.split('.').at(-1);staticFiles.set(url.pathname,{path:join(web,name),type:({js:'text/javascript',mjs:'text/javascript',css:'text/css',png:'image/png',svg:'image/svg+xml',txt:'text/plain',json:'application/json',woff2:'font/woff2',woff:'font/woff',ttf:'font/ttf'} as Record<string,string>)[ext!]??'application/octet-stream'});}
         }catch{/* A missing GUI build leaves the reviewed source assets available. */}
       }
       const file = staticFiles.get(url.pathname);
       if (!file) {this.send(res, 404, {error: {message: 'Unknown interface asset'}}); return;}
       const bytes = readFileSync(file.path);
+      // This reviewed, self-contained parser receives bytes by postMessage and
+      // local BinaryDataFactory replies. It has no network or child-worker need.
+      // Wasm decoding is confined here; the application's script policy stays intact.
+      if(url.pathname==='/dsh-pdf-worker-6.3.289.mjs')res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'none'; worker-src 'none'");
       res.writeHead(200, {'Content-Type': file.type + '; charset=utf-8'}); res.end(bytes);
     } catch (error) {
       if (res.headersSent) {res.destroy(); return;}

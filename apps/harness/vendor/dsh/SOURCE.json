@@ -2907,6 +2907,85 @@
       "sha256": "5b58415daec7f9202bab494516bd20542ca938fbecef70b187414ac59b8b92d2",
       "upstreamPath": "packages/client/ui-sidebar-right/src/client/tab-registry.ts",
       "upstreamSha256": "5b58415daec7f9202bab494516bd20542ca938fbecef70b187414ac59b8b92d2"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/document/tab-lifetime.ts",
+      "sha256": "4bd7e785572ef05062662e9a2af79341ae7716a9f27b653860c75c0aa131f3df",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/document/tab-lifetime.ts",
+      "upstreamSha256": "4bd7e785572ef05062662e9a2af79341ae7716a9f27b653860c75c0aa131f3df"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/LazyPdfBody.tsx",
+      "sha256": "a6f9420ca8488260dbabddcdabc70a820b0706d43d6a8bb10c54a7c8d9804f24",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/LazyPdfBody.tsx",
+      "upstreamSha256": "a6f9420ca8488260dbabddcdabc70a820b0706d43d6a8bb10c54a7c8d9804f24"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/PdfBody.module.css",
+      "sha256": "6f057689cb3239eb107a6a820838badf2364cdb25adbfddb59fd0e56abb9fb6c",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/PdfBody.module.css",
+      "upstreamSha256": "6f057689cb3239eb107a6a820838badf2364cdb25adbfddb59fd0e56abb9fb6c"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/asset-imports.d.ts",
+      "sha256": "105daf6bdd9f009d4146bd814ce971f9904beab0fa8a9a2a8ecd1593df87ac83",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/asset-imports.d.ts",
+      "upstreamSha256": "105daf6bdd9f009d4146bd814ce971f9904beab0fa8a9a2a8ecd1593df87ac83"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/assets.ts",
+      "sha256": "bfce49c3fe4e6e316f4adcfddcc9a3f274f36d39d4f64d78b9546bdf9afa433c",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/assets.ts",
+      "upstreamSha256": "bfce49c3fe4e6e316f4adcfddcc9a3f274f36d39d4f64d78b9546bdf9afa433c"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/document.ts",
+      "sha256": "580881e2d93332089f2eb6f4a7851fd03e78fcfcdd876901bd49b5f2d7380936",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/document.ts",
+      "upstreamSha256": "580881e2d93332089f2eb6f4a7851fd03e78fcfcdd876901bd49b5f2d7380936"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/errors.ts",
+      "sha256": "0ff246e8f6dc151c6c40912442a2575017c5add738a3dd8416692c2374be7b25",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/errors.ts",
+      "upstreamSha256": "0ff246e8f6dc151c6c40912442a2575017c5add738a3dd8416692c2374be7b25"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/index.ts",
+      "sha256": "da2753e35d9de5d1d19307c0ad428fb1df1b6e8c57cb74cf36ff29bcf18a3bf0",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/index.ts",
+      "upstreamSha256": "da2753e35d9de5d1d19307c0ad428fb1df1b6e8c57cb74cf36ff29bcf18a3bf0"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/locales.ts",
+      "sha256": "2cc6bf377485ed2b08decff62959f761fc759426f1fc69e4d2b58a03158fa0c4",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/locales.ts",
+      "upstreamSha256": "2cc6bf377485ed2b08decff62959f761fc759426f1fc69e4d2b58a03158fa0c4"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/pdf.tsx",
+      "sha256": "62398432150c88965ad970a2bfab21aa1ac3f6908ebbd1c57ab53beb145c4b97",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/pdf.tsx",
+      "upstreamSha256": "62398432150c88965ad970a2bfab21aa1ac3f6908ebbd1c57ab53beb145c4b97"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/runtime.ts",
+      "sha256": "230d1ad540fbebbad1f9e5290110194decb49bace5e39b1ec4f4dd06abd9bdc7",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/runtime.ts",
+      "upstreamSha256": "ebb28e4a1748ce8ff1493713b2d66df855beaf22adf0d77db174acbcc1760425",
+      "modifications": "Build-reviewed same-origin PDF worker URL replaces Blob worker creation; original lifecycle and error/cleanup semantics preserved."
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/store.ts",
+      "sha256": "f4f66954114eb831d09970f4f4e44b75e87a3aa8ba7d233fe16b0be061a80bc2",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/store.ts",
+      "upstreamSha256": "f4f66954114eb831d09970f4f4e44b75e87a3aa8ba7d233fe16b0be061a80bc2"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/pdf/text.ts",
+      "sha256": "575842a362c6ddf310df42325abf251eebc461d2d2f83e49419d7d58e41f8f60",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/text.ts",
+      "upstreamSha256": "575842a362c6ddf310df42325abf251eebc461d2d2f83e49419d7d58e41f8f60"
     }
   ]
 }
