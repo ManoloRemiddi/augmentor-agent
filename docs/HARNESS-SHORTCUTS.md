@@ -75,7 +75,7 @@ Seven meaningful pure/client contracts check durable device/dormant preservation
 conflicts/reservations, corrupt/future/oversize data, write failure and explicit
 reconciliation, malformed catalogue/operation boundaries, unsupported/read-only
 authority, late/closed scopes, lost/success-shaped unconfirmed writes and settings
-revision refresh. Actual SDK/HTTP/Chromium drives two real windows and the copied
+revision refresh. Actual SDK/HTTP/Chromium drives two real browser clients (two tabs in one Chromium instance) and the copied
 registry, reference and recorder. It records/removes/restores bindings, observes
 peer updates, rejects a stale editor until explicit review/retry, tests cancellation
 and confirmation of restore-all, reloads persisted settings and executes original
@@ -151,7 +151,7 @@ Exactly **two** explicit GUI writes leave that fixture's current-device profile 
 original defaults while preserving unrelated settings. History, native bytes and
 provider log remain identical: **zero subsequent model requests**. No draft/file/
 Office/HTTP work remains. Its tab closes and its producer/Host finish terminally.
-Source/ordinary two-window stale review, other command/readonly/limits/failure
+Source/ordinary two-client stale review, other command/readonly/limits/failure
 coverage and physical other-browser/window-manager delivery remain distinct from
 this installed manual check.
 
