@@ -484,3 +484,24 @@ lifecycle. Complete OAuth/virtual/advanced GUI and Native/Browser model manageme
 full P0/P1 migration, real provider/physical/privacy/public distribution and
 other-platform gates remain open. DSH remains available; further OS implementation
 awaits owner MX feedback. No public binary is published.
+
+
+### CI publication checkpoint and platform gaps
+
+At documentation head **336d3afe5c351577c1373e9b62437f3ff1ae1687** (runtime
+79ee4ff unchanged), Linux contracts, Mac contracts, source-boundary, Home,
+shared Qt candidate and the reported desktop/component checks pass. CI is not
+fully green. Windows contracts, x64 native runtime and command-job workflows
+stop during GUI build: the spreadsheet overlay's Fortune Sheet import cannot
+find Immer's default export. [Exact Windows build failure](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38324030995/job/115058463967).
+Mac 14/26 runtime packaging reaches notice collection and refuses the unreviewed
+platform packages **@deepseek-ai/libreoffice-kit-darwin-arm64@0.1.5 (MPL-2.0)**
+and **@img/sharp-libvips-darwin-arm64@1.3.4 (LGPL-3.0-or-later)**.
+[Mac 14 packaging failure](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38324031299/job/115058700904),
+[Mac 26 packaging failure](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38324031299/job/115058700913).
+The runtime/contract tests reaching those failures do not qualify the platform
+artifacts. Debian and ARM workflow completion was still pending in the inspected
+snapshot. These are explicit unresolved build/licensing gates; no broad license
+allowlist, platform artifact adoption or further OS implementation is performed.
+The verified private MX selection and local 342-case source/ordinary evidence
+remain as recorded above. Further platform implementation awaits owner feedback.
