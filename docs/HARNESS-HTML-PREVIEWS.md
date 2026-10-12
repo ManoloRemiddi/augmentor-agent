@@ -157,3 +157,66 @@ JS
 Preserve the virtual-environment executable path instead of resolving its Python
 symlink. Installed releases deliberately exclude tests; source drivers select
 ordinary runtime bytes through `AUGMENTOR_PI_TEST_ROOT`.
+
+## Ordinary and installed MX qualification — October 12
+
+Runtime **e4c8663b2a5e57a676837e0892505fbe8b237af7** is selected and running
+in private MX **20261012-210709-6242b91f**, product **0.2.13**, artifact SHA-256
+**c02dc8cfd35bf77b9d0741412a76c1bfdc4a06d6a9989bb9124237f14dd30335**.
+A fresh ordinary bundled Node **24.19.0** repeats **307/307 across 60 files**,
+zero failures/skips/cancellations, matching QtTest **6.8.2.1**, two workers and
+unchanged deadlines. Three nested-notice and two workspace-packaging cases pass
+in that tree. Its post-assembly production npm report and all 96 collected notice
+files match staging byte-for-byte; compiled files match source after tests.
+
+The assembly has **637 compiled files**, **20,801 production dependency files**,
+**151 npm instances**, **781 licence files**, **nine native/Wasm executables** and
+**127 browser notice records for 126 supplier name/version pairs**. Inherited
+production package paths/bytes, Node/native bodies, Office/PDF assets/notices,
+spreadsheet patches/worker provenance and all prior supplier records remain
+preserved. The fourteen HTML/preference supplier additions bring the MIT GUI to
+541; Apache-2.0 dsh-context stays 108. HTML adds no production npm/native payload.
+
+A new comparator captures twelve current owner histories/queue identities and
+247 existing saved original/observation files, independently of older spreadsheet
+comparators. The updater stages a separate immutable candidate. Prior Native and
+Host complete guarded idle/draft-free shutdown before activation; stable launch
+verifies the selected Host executable/root before Native startup. All **23,813
+installed inventory entries**, matching Native root and online/model-ready state
+pass before and after actual GUI use. No selected release is patched.
+
+A disposable profile executes the actual installed Host, Node and browser assets,
+using the public independently authored HTML fixture from source because installed
+releases exclude tests. One tool-free deterministic SDK seed precedes viewing.
+Actual original @file completion/chip, static sanitization, General switch,
+interactive 300-KiB local script/Blob CSS, frame button click, automatic dependency/
+root replacement, original Read again, mode retirement and tab close pass. DOM
+observations confirm parent/storage/RTC/nested-realm/worker denial and zero repeated
+document transfers. The fixture returns to static mode with exactly two explicit
+GUI preference writes and preserved unrelated profile values. Its history, native
+original bytes and provider log remain identical: **zero subsequent inference**.
+Final draft/read/Office/HTTP work is zero; the fixture tab closes and its exact
+producer/Host finish terminally. Source/ordinary actual controlled-origin network,
+malformed/oversize/bootstrap failure/recovery, narrower authority and fullscreen
+checks stay distinct from this installed manual evidence.
+
+The owner's original Insights reads eleven non-archived metadata entries, seven
+newest eligible contexts and eight original cards, with zero failed/partial reads
+or usage gaps. It is left open. No owner prompt, model/tool action, file preview,
+draft edit or preference mutation is submitted. All twelve histories and saved
+queue items remain preserved. Of the **247** preceding files, **239** remain
+identical; **two** observation journals retain exact original prefixes with **two
+close and one load** lifecycle appends, and **six** corresponding counter/index
+derivatives update. No new session/placeholder or saved original is added/removed.
+Draft/attachment bytes, backend profile values/revision, production selection and
+model-router executable/arguments remain identical. Canonical main's 38 existing
+changes stay preserved.
+
+This qualifies the private MX HTML slice and retained original dashboard, not
+complete Harness migration, CPU/process containment or every document format.
+Broader real-world/browser/accessibility/live acceptance, native opening/downloads,
+remaining P0/P1 workflows and privacy/public distribution gates remain open,
+including prior MPL/native/Sharp/font source/rebuild and MIT-declaration notice
+sufficiency. Further OS implementation waits for owner MX feedback; no public
+binary release is published and DSH remains available. Subsequent documentation
+commits record this proof without changing the selected runtime bytes.

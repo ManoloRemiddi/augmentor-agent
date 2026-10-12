@@ -176,7 +176,7 @@ P0/P1 migration/live/privacy gates remain open; DSH remains available.
 
 ## Repeat the qualified cohort
 
-The exact [58-file cohort](../tests/cohorts/harness-mx.json) is versioned. Run from
+The current [MX cohort](../tests/cohorts/harness-mx.json) is versioned; this spreadsheet checkpoint used 58 files, and the subsequent HTML checkpoint adds two. Run from
 source or a separate ordinary assembly with Node 24.19.0 and a prepared matching
 QtTest environment; installed releases deliberately omit the test tree. Keep
 the virtual-environment executable path, rather than resolving its Python symlink.
