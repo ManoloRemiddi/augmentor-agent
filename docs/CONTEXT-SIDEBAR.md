@@ -87,3 +87,35 @@ broader migration/privacy/public packaging/live/platform gates remain open.
 DSH stays available; further OS implementation remains deferred for MX feedback.
 
 Source checks/build, supplier hashes, browser graph and notice generation pass. The 48-file cohort passes **278/278**, zero failures/skips/cancellations, prepared QtTest, two workers and unchanged deadlines. The initial focused failures exposed scrollport and absolute-resource binding gaps, corrected in the adapter and marked source. Later fixture corrections wait for settled retained reads, separate sidebar caching from legacy raw-view remount reads, and use the actual readonly composer attribute. No deadline/concurrency relaxation is used. Ordinary and installed evidence follow separately.
+
+## First MX candidate and pending-resource correction
+
+Historical first candidate runtime **08e6b6c32f42352382c14e4a8a2f347dab5efe6e**,
+private MX release **20261012-025227-5fc7637a**, product **0.2.13**, artifact
+**4a71a943bde70e26cbd296feebf3a93f7939704005983029278598393a774caa**
+passed source and ordinary **278/278 across 48 files**, plus two ordinary
+workspace-packaging cases. The ordinary tree has 511 compiled files, 19,888
+production dependency files, 133 npm instances, 731 licence files, six native
+executables and 99 browser notice records. Only pinned MIT picomatch 4.0.7 was
+added; preceding dependency, Node and native bytes remained preserved.
+
+Guarded adoption and all **22,645 installed inventory entries** passed. The
+actual MX browser verified original Placement → All, reload, guide capsule,
+narrow fullscreen and wide sidebar beside Chat, two retained Qwen request
+bodies and current File Activity text. Eleven histories/queues, original
+prefixes, drafts/attachments and settings values were preserved. The only
+profile change was two temporary display writes, All then the original Tab;
+four journals received classified title/load/close appends with six related
+derivative updates. No model or tool action was submitted.
+
+That installed inspection exposed a brief false “resource service unavailable”
+message before the first file stat completed. Preserve this candidate as
+historical evidence. The authored resource bridge now marks a pinned metadata
+source as loading before its first real stat; the original reader supplies its
+own loading indicator. The strengthened Chromium case delays the actual HTTP
+read and requires that original accessible indicator with no false unavailable
+message, then requires the actual current file bytes. Its first assertion used
+the wrong original wrapper state; the corrected assertion observes the
+supplier's `data-document-loading` status element. Product/source deadlines and
+concurrency remain unchanged. A fresh ordinary and installed correction must
+qualify separately; no selected release is patched in place.
