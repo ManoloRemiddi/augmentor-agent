@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Office previews candidate](HARNESS-OFFICE-PREVIEWS.md) connects the public MIT DSH Office registration, font notices, PDF child and bounded conversion queue to Pi's existing authorized byte reader. Source Node 24.19.0 passes 300/300 across 57 files; five notice/workspace cases pass separately. Pinned MPL-2.0 LibreOffice kit/Wasm and its nested notices retain separate provenance. Public notice sufficiency for three MIT declarations and source/rebuild/distribution gates remain open. Ordinary/installed qualification is separate; the qualified PDF private MX preview remains selected/running. Full viewers/migration/platform gates remain open.
+
 # Original Harness PDF previews
 
 ## Original viewer binding — October 12

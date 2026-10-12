@@ -178,6 +178,18 @@ export class HarnessServer {
             gap: after < (this.evicted.get(sessionId) ?? 0)});
           return;
         }
+        if(req.method==='GET'&&(url.pathname==='/api/preview/office'||url.pathname==='/api/preview/office-generation')){
+          if(access.mode!=='operator')throw Error('Office previews require operator authority.');
+          const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);
+          try{await this.host.receiveHarnessRequest(async()=>{
+            const sid=identifier(url.searchParams.get('sessionId'));
+            if(url.pathname==='/api/preview/office-generation'){this.send(res,200,{generation:this.host.officeGeneration(sid,abort.signal)});return;}
+            const value=await this.host.previewOffice(sid,{path:url.searchParams.get('path'),...(url.searchParams.has('priority')?{priority:url.searchParams.get('priority')}:{})},abort.signal);
+            const {data,...meta}=value,metadata=Buffer.from(JSON.stringify(meta)),length=Buffer.alloc(4);
+            if(metadata.length>256*1024)throw new PreviewReadError('document-render/failed','Office metadata exceeds its preview limit.',{reason:'output-too-large'});
+            length.writeUInt32BE(metadata.length);res.writeHead(200,{'Content-Type':'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Content-Length':4+metadata.length+data.byteLength});res.end(Buffer.concat([length,metadata,Buffer.from(data)]));
+          });}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}return;
+        }
         if(req.method==='GET'&&url.pathname==='/api/preview/bytes'){
           if(access.mode!=='operator')throw Error('File previews require operator authority.');
           const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);

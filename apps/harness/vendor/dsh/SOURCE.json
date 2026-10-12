@@ -2986,6 +2986,83 @@
       "sha256": "575842a362c6ddf310df42325abf251eebc461d2d2f83e49419d7d58e41f8f60",
       "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/pdf/text.ts",
       "upstreamSha256": "575842a362c6ddf310df42325abf251eebc461d2d2f83e49419d7d58e41f8f60"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/FontNotice.module.css",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/FontNotice.module.css",
+      "sourceSha256": "f872bce7851724d07c9bab7ae1029c917c473ec61c22369f265dde06b9809d76",
+      "sha256": "f872bce7851724d07c9bab7ae1029c917c473ec61c22369f265dde06b9809d76",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/FontNotice.tsx",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/FontNotice.tsx",
+      "sourceSha256": "ab1d86ed6143a38b7d046e1af78d6ec258fc78e3734e986dfda117ad859437ea",
+      "sha256": "ab1d86ed6143a38b7d046e1af78d6ec258fc78e3734e986dfda117ad859437ea",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/OfficeBody.module.css",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/OfficeBody.module.css",
+      "sourceSha256": "c04fcefadfe8b83a352f176289c59727af48af9cbeb77fbdc6c6088985d2cc73",
+      "sha256": "c04fcefadfe8b83a352f176289c59727af48af9cbeb77fbdc6c6088985d2cc73",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/OfficeBody.tsx",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/OfficeBody.tsx",
+      "sourceSha256": "8f4f13519e3938b1f4d74d5aa1ac6e53f7798b7aa2fce553aa8835dfa4e8da27",
+      "sha256": "8f4f13519e3938b1f4d74d5aa1ac6e53f7798b7aa2fce553aa8835dfa4e8da27",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/OfficeFontAction.tsx",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/OfficeFontAction.tsx",
+      "sourceSha256": "db5f238142e8e0214234abc50e1278d663d6b44e35f5cc4b48a7d5c857cb2661",
+      "sha256": "db5f238142e8e0214234abc50e1278d663d6b44e35f5cc4b48a7d5c857cb2661",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/cache.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/cache.ts",
+      "sourceSha256": "e11503554b9380427c5deff80d63107b70e2d35a91b6361f742fed8046ada1ae",
+      "sha256": "e11503554b9380427c5deff80d63107b70e2d35a91b6361f742fed8046ada1ae",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/face.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/face.ts",
+      "sourceSha256": "dd13c0bf23e83bf0927ab915af4eb7d4d4210ca1ffa8283c588ffc4b4383455a",
+      "sha256": "dd13c0bf23e83bf0927ab915af4eb7d4d4210ca1ffa8283c588ffc4b4383455a",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/index.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/index.ts",
+      "sourceSha256": "836e2b6fd4334bc52bee665bc806b58ff46b54a1dee799bf807516088b25e849",
+      "sha256": "836e2b6fd4334bc52bee665bc806b58ff46b54a1dee799bf807516088b25e849",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/locales.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/locales.ts",
+      "sourceSha256": "9e5aa9cad4386817cb6f9c6e5a07d8ec34965774b4aafd88fe9b689391f86efa",
+      "sha256": "f820d043aa3b45cc2359a4a28361591b2e9c9be164c01167d781c03d88ed7c3e",
+      "adaptation": "Unavailable-service copy names the local Augmentor service; original viewer, limits and failure labels remain."
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/office/store.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/office/store.ts",
+      "sourceSha256": "fc7bb7dc686504c3dd7eddc1b20b2f91890fce69d5c6d3916bfb6ddb907a353f",
+      "sha256": "fc7bb7dc686504c3dd7eddc1b20b2f91890fce69d5c6d3916bfb6ddb907a353f",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/document/contract.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/document/contract.ts",
+      "sourceSha256": "4af0752858bede4d19c7e45cb9bb446196238d0cecf808a606e2269fbcfa75fe",
+      "sha256": "4af0752858bede4d19c7e45cb9bb446196238d0cecf808a606e2269fbcfa75fe",
+      "adaptation": "verbatim"
     }
   ]
 }

@@ -139,6 +139,46 @@
       "url": "https://raw.githubusercontent.com/bowenliang123/dsh-context/2c8095c34da3fcef729a01437d2df65c83e08499/LICENSE",
       "sha256": "919857728c4e1d0f76be03af00437d9910c943f883d04c8c58a6a0cb1c3225b0",
       "note": "Original Apache-2.0; selected Context dashboard copied with original attribution and prominent adaptation notices. It is not MIT or relicensed under Augmentor terms."
+    },
+    "saxes-6.0.0": {
+      "file": "upstream/saxes-6.0.0.txt",
+      "url": "https://raw.githubusercontent.com/lddubeau/saxes/211fa0ebec9b628affc09219199639887174bfc3/LICENSE",
+      "sha256": "0fac2374380621b22e6b50451057721a9c52935b02d16d106a9f04897f061d0e"
+    },
+    "koffi-3.1.1": {
+      "file": "upstream/koffi-3.1.1.txt",
+      "url": "https://github.com/Koromix/koffi/tree/v3.1.1",
+      "sha256": "22bcbbbacd739b026a8dc484f62a31484ce4c4e31f3408b60b29b4e41d62b290"
+    },
+    "canonical-spdx-mit": {
+      "file": "upstream/canonical-spdx-mit.txt",
+      "url": "https://spdx.org/licenses/MIT.html",
+      "sha256": "bfdc2f417a23caae94d9cdb1e561e64faf3118ede32f19055a773722a45d6a82"
+    },
+    "brotli-1.3.3-declaration": {
+      "file": "upstream/brotli-1.3.3-declaration.json",
+      "url": "https://github.com/devongovett/brotli.js/tree/e36051345f6d27a56e5f39ea70d2f789b8574046",
+      "sha256": "943917da57088e164b395064df384f442e32d8a1d320a885ce26a166a4291086"
+    },
+    "dfa-1.2.0-declaration": {
+      "file": "upstream/dfa-1.2.0-declaration.json",
+      "url": "https://github.com/devongovett/dfa/tree/3f5e603e5082caedabefefdf53e8a6ca3111e966",
+      "sha256": "fc1409f289e26b975052bf9b9492402e99502be536effc43030a13f6391ae28a"
+    },
+    "fontkit-2.0.4-declaration": {
+      "file": "upstream/fontkit-2.0.4-declaration.json",
+      "url": "https://github.com/foliojs/fontkit/tree/fbf3b9ef21eebd219eb73e666faed573af0fba09",
+      "sha256": "e15a783fbf2e52de90c280ebab00b28a4af49e9305021a9a8b30c286f568f2be"
+    },
+    "brotli-1.3.3-decoder": {
+      "file": "upstream/brotli-1.3.3-decoder.json",
+      "url": "https://github.com/devongovett/brotli.js/tree/e36051345f6d27a56e5f39ea70d2f789b8574046/dec",
+      "sha256": "962628e530aff85b2503b6783545db6cbb19afcb7992d5438c8fc07d14f81769"
+    },
+    "apache-2.0-standard": {
+      "file": "upstream/apache-2.0-standard.txt",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
     }
   },
   "overrides": {
@@ -247,7 +287,12 @@
     "@aws-sdk/credential-provider-login@3.972.80": "aws-sdk",
     "@aws-sdk/nested-clients@3.997.47": "aws-sdk",
     "proxy-agent-negotiate@1.1.0": "proxy-agent-negotiate-1.1.0",
-    "@img/sharp-libvips-linux-x64@1.3.4": "lgpl-3.0"
+    "@img/sharp-libvips-linux-x64@1.3.4": "lgpl-3.0",
+    "saxes@6.0.0": "saxes-6.0.0",
+    "@koromix/koffi-linux-x64@3.1.1": "koffi-3.1.1",
+    "brotli@1.3.3": "canonical-spdx-mit",
+    "dfa@1.2.0": "canonical-spdx-mit",
+    "fontkit@2.0.4": "canonical-spdx-mit"
   },
   "choices": {
     "json-schema@0.4.0": {
@@ -263,7 +308,9 @@
     "@img/sharp-libvips-darwin-x64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-linux-x64@1.3.3": "LGPL-3.0-or-later",
     "@img/sharp-libvips-linux-arm64@1.3.3": "LGPL-3.0-or-later",
-    "@img/sharp-libvips-linux-x64@1.3.4": "LGPL-3.0-or-later"
+    "@img/sharp-libvips-linux-x64@1.3.4": "LGPL-3.0-or-later",
+    "@deepseek-ai/libreoffice-kit@0.1.5": "MPL-2.0",
+    "@deepseek-ai/libreoffice-kit-wasm@0.1.5": "MPL-2.0"
   },
   "additionalNotices": {
     "@openai/codex@0.159.2": [
@@ -292,6 +339,17 @@
     ],
     "@img/sharp-win32-arm64@0.35.4": [
       "lgpl-3.0"
+    ],
+    "brotli@1.3.3": [
+      "brotli-1.3.3-declaration",
+      "brotli-1.3.3-decoder",
+      "apache-2.0-standard"
+    ],
+    "dfa@1.2.0": [
+      "dfa-1.2.0-declaration"
+    ],
+    "fontkit@2.0.4": [
+      "fontkit-2.0.4-declaration"
     ]
   },
   "packageNotices": {
@@ -301,5 +359,21 @@
     "@img/sharp-win32-arm64@0.35.4": [
       "README.md"
     ]
+  },
+  "nestedPackageTexts": {
+    "@deepseek-ai/libreoffice-kit-wasm@0.1.5": {
+      "licenses/DeepSeek-Harness-MIT.txt": {
+        "sha256": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034",
+        "role": "notice"
+      },
+      "licenses/LICENSE": {
+        "sha256": "31c915ae5b7eafe51f06fc2537d2e7fefdee08e40d6b0d761d03d9f0fd58d660",
+        "role": "license"
+      },
+      "licenses/NOTICE": {
+        "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
+        "role": "notice"
+      }
+    }
   }
 }

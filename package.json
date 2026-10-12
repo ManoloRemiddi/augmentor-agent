@@ -23,6 +23,7 @@
     "prestart": "node scripts/prepare-ws.mjs"
   },
   "dependencies": {
+    "@deepseek-ai/libreoffice-kit": "0.1.5",
     "@earendil-works/pi-agent-core": "1.1.0",
     "@earendil-works/pi-ai": "1.1.0",
     "@earendil-works/pi-coding-agent": "1.1.0",

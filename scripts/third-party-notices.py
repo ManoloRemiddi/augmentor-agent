@@ -69,7 +69,19 @@ def inventory(tree, catalog_root):
         if choice and choice.get('expression')==effective_license:effective_license=choice.get('selected')
         if effective_license not in PERMISSIVE and catalog.get('additionalLicenses',{}).get(key) != effective_license:
             errors.append(f'{key}: unreviewed license {meta.get("license")}'); continue
+        nested = []
+        for name, reviewed in catalog.get('nestedPackageTexts', {}).get(key, {}).items():
+            relative_text = Path(name)
+            file = package / relative_text
+            if (relative_text.is_absolute() or '..' in relative_text.parts or
+                    not file.is_file() or file.is_symlink() or
+                    not file.resolve().is_relative_to(package.resolve()) or
+                    digest(file.read_bytes()) != reviewed.get('sha256') or
+                    reviewed.get('role') not in ('license', 'notice')):
+                errors.append(f'{key}: missing or changed reviewed nested text {name}'); continue
+            nested.append((file, reviewed['role']))
         files = [p for p in sorted(package.iterdir()) if p.is_file() and LICENSE_NAME.match(p.name)]
+        files.extend(file for file, role in nested if role == 'license')
         sources = []
         for file in files:
             content = file.read_bytes(); sha = digest(content); texts[sha] = content
@@ -94,6 +106,10 @@ def inventory(tree, catalog_root):
                     errors.append(f'{key}: missing reviewed license text'); continue
         for file in sorted(package.iterdir()):
             if file.is_file() and NOTICE_NAME.match(file.name):
+                content = file.read_bytes(); sha = digest(content); texts[sha] = content
+                sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
+        for file, role in nested:
+            if role == 'notice':
                 content = file.read_bytes(); sha = digest(content); texts[sha] = content
                 sources.append({'path': file.relative_to(tree).as_posix(), 'sha256': sha})
         # Some upstream npm wrappers omit their repository NOTICE as well as LICENSE.

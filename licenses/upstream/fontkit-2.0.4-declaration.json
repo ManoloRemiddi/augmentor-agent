@@ -1,0 +1,12 @@
+{
+  "package": "fontkit",
+  "version": "2.0.4",
+  "upstreamCommit": "fbf3b9ef21eebd219eb73e666faed573af0fba09",
+  "source": "https://github.com/foliojs/fontkit/tree/fbf3b9ef21eebd219eb73e666faed573af0fba09",
+  "licenseDeclaration": "MIT",
+  "author": "Devon Govett <devongovett@gmail.com>",
+  "packageJsonSha256": "49c60605b92316a5d5fe57b9a3bca8950ad9a8beab1cb633d6f29862d1bd163d",
+  "readmeSha256": "8a1cf12d8ae7277f047c3000af7677927f2da9243627223ba5715d40df4979d6",
+  "readmeLicenseSection": "## License\n\nMIT",
+  "review": "No root LICENSE in published package or recorded upstream commit. Canonical SPDX MIT terms supplied separately; public copyright/notice sufficiency remains unqualified."
+}

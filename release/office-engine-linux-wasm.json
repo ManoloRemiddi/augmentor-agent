@@ -1,0 +1,53 @@
+{
+  "schema": "augmentor-office-engine/1",
+  "scope": "private MX Linux Wasm preview; source/notice identities, not public redistribution or other-platform qualification",
+  "package": {
+    "name": "@deepseek-ai/libreoffice-kit-wasm",
+    "version": "0.1.5",
+    "license": "MPL-2.0"
+  },
+  "entryPackage": {
+    "name": "@deepseek-ai/libreoffice-kit",
+    "version": "0.1.5",
+    "license": "MPL-2.0",
+    "notices": {
+      "LICENSE": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+      "NOTICE": "b8841df06ad9243a1fe973f35943c68a076675829680847bc2f506e9080e8737"
+    }
+  },
+  "engine": {
+    "version": "26.8.0.3",
+    "sourceCommit": "bce0998afefdbc355585ca324285661a2170ba77",
+    "buildId": "81c24980c5de51d11e2e50d48ea2bd98f9830a97d35df551f4aed8b6ff5bfe2c"
+  },
+  "files": {
+    "assets/soffice.cjs": "d48fd47a6f61b3fe7f9ac7c66ca7b95795eb03cb3f00114c2a04ef8da4b72a92",
+    "assets/soffice.wasm": "c0a378364db66b97835fc56084146eb284f79a728aea9f6531b5ac9b24b8d46c",
+    "assets/soffice.data": "a0d4d424e00a038673c8a4c9f345462663a8a019d15eec04bf8d66e3610e44cb",
+    "assets/soffice.data.js.metadata": "ffab1d431c3ecdac3f2438f5e229b2e9a83364fed02b1732e5c327ab43d6b04d",
+    "assets/manifest.json": "b2bfffe08f97b00638fb5ff1c39ca310be9bb203e8a058397b5462feb2354363",
+    "licenses/DeepSeek-Harness-MIT.txt": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034",
+    "licenses/LICENSE": "31c915ae5b7eafe51f06fc2537d2e7fefdee08e40d6b0d761d03d9f0fd58d660",
+    "licenses/NOTICE": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b"
+  },
+  "source": {
+    "schemaVersion": 1,
+    "libreoffice": {
+      "tag": "libreoffice-26.8.0.3",
+      "version": "26.8.0.3",
+      "sourceArchive": "https://download.documentfoundation.org/libreoffice/src/26.8.0/libreoffice-26.8.0.3.tar.xz",
+      "repository": "https://github.com/LibreOffice/core.git",
+      "commit": "bce0998afefdbc355585ca324285661a2170ba77"
+    },
+    "emsdk": {
+      "repository": "https://github.com/emscripten-core/emsdk.git",
+      "commit": "5eb0bde7585670252e8ba05e9d361627bffd08b5",
+      "version": "4.0.10",
+      "releaseCommit": "8103ffedfb0c42d231c6af6859a5a1a832260b43"
+    },
+    "patches": "patches",
+    "shim": "lok.cxx"
+  },
+  "sourcesShipped": true,
+  "publicSourceRebuildGate": "open"
+}
