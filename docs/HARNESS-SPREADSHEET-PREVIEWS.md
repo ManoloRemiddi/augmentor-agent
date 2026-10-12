@@ -96,3 +96,95 @@ A subsequent environment refresh removed the temporary test environment and ordi
 ## Qualified source checkpoint — October 12
 
 Fresh source check/build and **301/301 across 58 files** pass with Node **24.19.0**, matching QtTest **6.8.2.1**, two workers and unchanged deadlines; zero failures/skips/cancellations. The cohort is the documented 57-file Office cohort plus `tests/harness-spreadsheet-chromium.test.mjs`. Three nested-notice and two workspace-packaging cases pass separately. Both real browser worker parsing and original grid/Retry/recovery run; retained original Context/Insights/sidebar/Fleet/prompt wrapping, provider formats, file/PDF/Office, lifecycle, Native and Pi protocol checks remain in the cohort. Ordinary and installed qualification remain separate pending gates at this source checkpoint.
+
+## Ordinary and installed MX qualification — October 12
+
+Runtime **64d52917684307cb2a29c75e908209c83d4f06de** is selected and running in
+private MX **20261012-190657-be20be18**, product **0.2.13**, artifact SHA-256
+**231dd41c550624399cea35a3c6e2d7244d938fb751c83d80373643f2b290e676**.
+Fresh ordinary bundled Node **24.19.0** repeats **301/301 across 58 files**, with
+zero failures/skips/cancellations, matching QtTest **6.8.2.1**, two workers and
+unchanged deadlines. The three nested-notice and two workspace-packaging cases
+pass in the ordinary tree. Its post-assembly npm report and all notice texts
+match the staging report byte-for-byte.
+
+The ordinary assembly contains **633 compiled files**, **20,801 production
+dependency files**, **151 npm instances**, **781 licence files** and **nine
+native/Wasm executables**. All inherited production dependency paths/bytes,
+Node/native bytes, PDF assets/notices and Office engine bytes/notices remain
+unchanged. No production package or native executable is added. The combined
+application/worker graphs retain **126 browser notice records for 125 unique
+name/version pairs**: FortuneSheet React's original stylesheet and patched
+module occupy separate audited input roots with the same retained MIT notice.
+All previous 507 GUI source records and the 108 Apache dsh-context records remain
+unchanged. The closed initial script graph includes the original lazy
+registration, with the actual grid and parser libraries deferred.
+
+The previous Native was already stopped after the environment refresh. A stable
+launch of the previously selected Office Host provides a separate fresh baseline.
+After ordinary checks, the updater stages a separate immutable candidate using
+its explicit Node. The prior idle Host completes one guarded shutdown before
+activation. Stable launch verifies the new Host executable/root before Native
+startup. All **23,790 installed inventory entries**, exact Native root and
+online/model-ready state pass before and after GUI acceptance. No selected
+release is patched, and no public binary is released.
+
+The separate disposable GUI profile uses the actual selected installed Host and
+Node. One deterministic tool-free SDK seed precedes viewing. Actual original
+@file completion/chip/grid acceptance shows saved **99** and formatted **12.50**,
+unsupported-feature/formula warnings, both sheets, a readonly formula bar, real
+scrolling to authored row 40, changed-file reload and original tab close. Viewing
+preserves the fixture history, native original bytes and provider request log:
+**zero subsequent model requests**. Final active file reads, Office work and HTTP requests are zero.
+The test tab closes, and its exact producer and Host finish terminally. The first
+manual preparation wrongly looked for a test fixture inside the installed
+release, which deliberately excludes tests; it is corrected to use the public
+independently authored source fixture while still executing the installed Host,
+Node and browser assets. Failed preparation never counts as GUI acceptance.
+Source/ordinary malformed input/real Retry, all parser formats and narrow
+fullscreen evidence remain separate from this manual installed check.
+
+The owner's original Context view opens **four retained Qwen request bodies**;
+Insights reads eleven non-archived metadata entries, seven newest eligible
+contexts and eight original cards, with zero failed/partial/usage-gap reads.
+No owner prompt, model/tool action, file preview, draft edit or backend preference
+write is submitted. The final original Insights dashboard is saved locally and
+left open; screenshots/authenticated links remain outside Git and the release.
+No browser viewport override is used.
+
+All **eleven pre-existing histories and queue item identities** are preserved.
+Of **243 prior saved files**, **238** remain identical; two journals preserve
+exact old prefixes with one title/session_info and one session/load append,
+plus three corresponding index/counter changes. During GUI acceptance one
+additional empty Linux-surface placeholder appears: blank title, `saved:false`,
+zero history events, requests or queued items, and no native history file. Its
+four new observation/index files contain exactly one session/load record and
+no provider payload. The first strict whole-catalogue comparison reports that
+addition; it is independently classified without replacing the comparator or
+claiming a new conversation history. Its actor is not inferred. All previous
+original files remain preserved; there are no removed originals.
+
+Draft/attachment object sets and bytes, backend profile values **and revision**,
+production selection and exact running model-router arguments remain preserved.
+This carries forward existing Qwen/Breeze/GPU/context/concurrency/precision and
+CPU ASR/VAD placement. Final Native is online/model-ready with no active owner
+turn, compaction, upload, HTTP request, dirty draft, file lookup/preview or Office
+work. Other-platform, public source/rebuild/distribution, full viewer and complete
+P0/P1 migration/live/privacy gates remain open; DSH remains available.
+
+## Repeat the qualified cohort
+
+The exact [58-file cohort](../tests/cohorts/harness-mx.json) is versioned. Run from
+source or a separate ordinary assembly with Node 24.19.0 and a prepared matching
+QtTest environment; installed releases deliberately omit the test tree. Keep
+the virtual-environment executable path, rather than resolving its Python symlink.
+
+```sh
+AUGMENTOR_PYTHON=/path/to/prepared-test-environment/bin/python node --input-type=module <<'JS'
+import {readFileSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
+const {files,concurrency}=JSON.parse(readFileSync('tests/cohorts/harness-mx.json','utf8'));
+const result=spawnSync(process.execPath,['--test','--test-concurrency='+concurrency,...files],{stdio:'inherit'});
+process.exit(result.status??1);
+JS
+```

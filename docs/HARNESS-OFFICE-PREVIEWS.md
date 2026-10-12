@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Original spreadsheet previews](HARNESS-SPREADSHEET-PREVIEWS.md#qualified-source-checkpoint--october-12): fresh source check/build and 301/301 across 58 files plus five notice/workspace cases pass. The public DSH readonly grid, parser/warnings and exact FortuneSheet/ExcelJS patches retain original UI/CSS. Ordinary and installed qualification remain separate; selected MX still uses the Office checkpoint below.
+[Installed original spreadsheet previews](HARNESS-SPREADSHEET-PREVIEWS.md#ordinary-and-installed-mx-qualification--october-12): runtime 64d52917684307cb2a29c75e908209c83d4f06de, private MX 20261012-190657-be20be18, product 0.2.13, artifact 231dd41c550624399cea35a3c6e2d7244d938fb751c83d80373643f2b290e676, selected and running. Source and ordinary Node 24.19.0 each pass 301/301 across 58 files plus five notice/workspace cases. Actual installed original grid/warnings/sheets/readonly/scroll/reload/tab acceptance preserves native history with zero subsequent inference. Eleven prior histories, drafts/attachments, profile values/revision and model-router arguments are preserved; one additional empty Linux placeholder has no history or request. All 23,790 installed entries pass. MIT GUI is 527 files; Apache dsh-context remains 108. Full migration/live/privacy/public distribution/platform gates remain open; preceding selections below are historical checkpoints.
 
 # Original Harness Office previews
 
