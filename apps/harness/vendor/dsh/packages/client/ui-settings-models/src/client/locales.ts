@@ -1,3 +1,5 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: MIT
+// Augmentor adaptation: Localized one-page and omitted-ID coverage copy for the original candidate dialog. Original MIT attribution remains in LICENSE.
 /** Copy dictionaries for the Models settings section. */
 
 /** English strings (the key-set source of truth for this pair). */
@@ -81,6 +83,8 @@ export const en = {
   fetchEmpty: 'The provider listed no models. Add them by hand.',
   fetchTitle: 'Choose models to add',
   fetchDescription: 'These are the models this provider has available. Choose the ones to add.',
+  fetchPageLimit: 'The provider reports more pages; this list contains one page.',
+  fetchOmittedRows: 'Invalid or duplicate model IDs were omitted.',
   fetchSearch: 'Search models',
   fetchNoMatches: 'No matching models.',
   fetchSelectAll: 'Select all',
@@ -201,6 +205,8 @@ export const zh: { [Key in keyof typeof en]: string } = {
   fetchEmpty: '该提供商没有列出任何模型，请手动添加。',
   fetchTitle: '选择要添加的模型',
   fetchDescription: '以下是模型提供商的可用模型，勾选要添加的模型。',
+  fetchPageLimit: '提供商报告还有更多页；此列表只包含一页。',
+  fetchOmittedRows: '无效或重复的模型 ID 已略去。',
   fetchSearch: '搜索模型',
   fetchNoMatches: '没有匹配的模型。',
   fetchSelectAll: '全选',

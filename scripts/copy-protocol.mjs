@@ -23,3 +23,7 @@ for(const name of ['LICENSE','SOURCE.json','SOURCE.md'])copyFileSync('packages/r
 const previewSelection=JSON.parse(readFileSync('packages/runtime/vendor/dsh-preview/SOURCE.json','utf8'));
 for(const row of previewSelection.files)if(createHash('sha256').update(readFileSync('packages/runtime/vendor/dsh-preview/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH file-preview source changed: '+row.path);
 for(const name of ['LICENSE','SOURCE.json','SOURCE.md'])copyFileSync('packages/runtime/vendor/dsh-preview/'+name,'dist/runtime/vendor/dsh-preview/'+name);
+
+const discoverySelection=JSON.parse(readFileSync('packages/runtime/vendor/dsh-model-discovery/SOURCE.json','utf8'));
+for(const row of discoverySelection.files)if(createHash('sha256').update(readFileSync('packages/runtime/vendor/dsh-model-discovery/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH model-discovery source changed: '+row.path);
+for(const name of ['LICENSE','SOURCE.json'])copyFileSync('packages/runtime/vendor/dsh-model-discovery/'+name,'dist/runtime/vendor/dsh-model-discovery/'+name);

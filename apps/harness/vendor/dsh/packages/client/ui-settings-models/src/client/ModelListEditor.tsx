@@ -1,3 +1,5 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: MIT
+// Augmentor adaptation: Coverage stays with each original picker response so another mounted editor cannot overwrite it; original layout/CSS and selection behavior stay unchanged. Original MIT attribution remains in LICENSE.
 /**
  * The model list of one pi-ai provider profile, plus the action that asks the
  * provider what it serves.
@@ -19,7 +21,7 @@ import type { ReactNode } from 'react'
 import type { LlmDiscoveredModel } from '@deepseek-ai/dsh-api-remotes/client'
 import { Button, IconPlusOutlineRegular, Modal } from '@deepseek-ai/dsh-client-ui-primitives'
 import { formatCapacity, parseCapacity } from './DeepSeekModelsEditor.tsx'
-import type { ModelsOperations } from './operations.ts'
+import type { ModelsOperations, ModelListingCoverage } from './operations.ts'
 import type { DeepSeekModelDraft } from './DeepSeekModelsEditor.tsx'
 import type { en } from './locales.ts'
 import { ModelRow } from './ModelRow.tsx'
@@ -102,22 +104,8 @@ export interface ModelListEditorProps {
 /** The two token counts edited as K/M-suffixed text behind a row's disclosure. */
 type CapacityField = 'contextWindow' | 'maxTokens'
 
-/**
- * What an empty capacity field is worth, shown as its placeholder so a row left
- * blank does not read as a model with no capacity at all.
- *
- * The magnitudes are the adapter's own route-level fallbacks (`llm-pi-ai`'s
- * `defaultContextWindow` and `defaultMaxTokens`), spelled the way a person
- * would say them. They are a hint, not a mirror: this page counts `K` as 1000,
- * so typing `256K` stores 256000 while leaving the field blank keeps the
- * adapter's 262144. A deployment that overrides those defaults is not
- * reflected here — nothing on this page can read them.
- */
-const CAPACITY_HINT: Readonly<Record<CapacityField, string>> = {
-  contextWindow: '256K',
-  maxTokens: '32K',
-}
-
+/** Pi model defaults vary by route/model; the original translated fallback
+ * hint replaces the DSH-only numeric constants without inventing a capacity. */
 /**
  * Spell a stored count for a field that may be unset. The spelling itself is
  * {@link formatCapacity}, shared with the DeepSeek catalog editor so both
@@ -168,6 +156,7 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
   const catalog = inheritedCatalog?.provider === catalogProvider ? inheritedCatalog?.models : undefined
   const inputDefaults = useMemo(() => new Map(catalog?.map(model => [model.id, model.inputModalities])), [catalog])
   const [candidates, setCandidates] = useState<readonly LlmDiscoveredModel[] | undefined>(undefined)
+  const [candidateCoverage, setCandidateCoverage] = useState<ModelListingCoverage | undefined>(undefined)
   const [picked, setPicked] = useState<ReadonlySet<string>>(new Set())
   const [candidateQuery, setCandidateQuery] = useState('')
   const [expanded, setExpanded] = useState<ReadonlySet<number>>(new Set())
@@ -256,6 +245,7 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
       const known = new Set(models.map(model => textOf(model, 'id')))
       setCandidateQuery('')
       setCandidates(found)
+      setCandidateCoverage(answer.coverage)
       setPicked(new Set(found.filter(model => !known.has(model.id)).map(model => model.id)))
     } finally {
       setBusy(false)
@@ -264,6 +254,7 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
 
   const closePicker = (): void => {
     setCandidates(undefined)
+    setCandidateCoverage(undefined)
     setPicked(new Set())
     setCandidateQuery('')
   }
@@ -367,12 +358,12 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
             t={t}
             contextWindow={{
               value: capacityText(model, index, 'contextWindow'),
-              placeholder: CAPACITY_HINT.contextWindow,
+              placeholder: t('contextWindowPlaceholder'),
               onChange: (text) => { editCapacity(index, 'contextWindow', text) },
             }}
             maxTokens={{
               value: capacityText(model, index, 'maxTokens'),
-              placeholder: CAPACITY_HINT.maxTokens,
+              placeholder: t('maxTokensPlaceholder'),
               onChange: (text) => { editCapacity(index, 'maxTokens', text) },
             }}
             onFieldChange={(field, value) => { patch(index, { [field]: value }) }}
@@ -408,7 +399,7 @@ export function ModelListEditor(props: ModelListEditorProps): ReactNode {
         onClose={closePicker}
         title={t('fetchTitle')}
         closeLabel={t('close')}
-        description={t('fetchDescription')}
+        description={[t('fetchDescription'), candidateCoverage?.source === 'endpoint' && candidateCoverage.providerHasMore ? t('fetchPageLimit') : '', candidateCoverage?.source === 'endpoint' && candidateCoverage.droppedRows > 0 ? t('fetchOmittedRows') : ''].filter(Boolean).join(' ')}
         className={styles['fetchDialog'] as string}
         footer={(
           <>

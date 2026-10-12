@@ -3476,9 +3476,10 @@
     },
     {
       "path": "packages/client/ui-settings-models/src/client/ModelListEditor.tsx",
-      "sha256": "90a5e9ad7a70a8c99a95b7e1379d811dae32914f245274ec034f413ec859bd5c",
+      "sha256": "cfb24dcf969b542b1bc178152a875b934fee66c5c22a156b68155cbd6e672222",
       "upstreamPath": "packages/client/ui-settings-models/src/client/ModelListEditor.tsx",
-      "upstreamSha256": "90a5e9ad7a70a8c99a95b7e1379d811dae32914f245274ec034f413ec859bd5c"
+      "upstreamSha256": "90a5e9ad7a70a8c99a95b7e1379d811dae32914f245274ec034f413ec859bd5c",
+      "adaptation": "Marked Augmentor MIT adaptation: Coverage stays with each original picker response so another mounted editor cannot overwrite it; original layout/CSS and selection behavior stay unchanged. Pi uses the original translated default hint instead of DSH-specific fallback token counts."
     },
     {
       "path": "packages/client/ui-settings-models/src/client/ModelRow.tsx",
@@ -3512,15 +3513,17 @@
     },
     {
       "path": "packages/client/ui-settings-models/src/client/locales.ts",
-      "sha256": "f7cbd24dcfcb28d7fa97aa3620bb7865b94c41ea248d12ef79286af8544750dc",
+      "sha256": "b27f18fbeb65416ce89cc96e420271299a52054e8aa722a275c86c4914eff137",
       "upstreamPath": "packages/client/ui-settings-models/src/client/locales.ts",
-      "upstreamSha256": "f7cbd24dcfcb28d7fa97aa3620bb7865b94c41ea248d12ef79286af8544750dc"
+      "upstreamSha256": "f7cbd24dcfcb28d7fa97aa3620bb7865b94c41ea248d12ef79286af8544750dc",
+      "adaptation": "Marked Augmentor MIT adaptation: Localized one-page and omitted-ID coverage copy for the original candidate dialog."
     },
     {
       "path": "packages/client/ui-settings-models/src/client/operations.ts",
-      "sha256": "0e29d80d40e05922915e0ecf8ab314678174a3371ccae170c43b24e385674e37",
+      "sha256": "a05dae51f9f8ca69278089a8d845e66998d419baf2ef3ae33a41e1448e683b27",
       "upstreamPath": "packages/client/ui-settings-models/src/client/operations.ts",
-      "upstreamSha256": "0e29d80d40e05922915e0ecf8ab314678174a3371ccae170c43b24e385674e37"
+      "upstreamSha256": "0e29d80d40e05922915e0ecf8ab314678174a3371ccae170c43b24e385674e37",
+      "adaptation": "Marked Augmentor MIT adaptation: Optional private listing coverage accompanies candidate metadata; no credential values."
     },
     {
       "path": "packages/client/ui-settings-models/src/client/protocol-label.ts",

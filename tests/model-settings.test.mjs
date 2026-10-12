@@ -41,7 +41,7 @@ test('custom creation, literal credential storage, key replacement and removal u
  const f=await fixture(t),d=await f.settings.describe();
  const out=await f.settings.mutate([{op:'set',path:['providers','fixture-b'],value:{displayName:'Fixture B',baseURL:'http://127.0.0.1:1/v1',api:'anthropic-messages',apiKeyEnv:'FIXTURE_B_API_KEY',models:[{id:'custom',contextWindow:4096,maxTokens:128,input:['text']}]}}],d.revision);assert.equal(out.kind,'written');
  const key='!literal-$NOT_AN_ENV';await f.settings.setCredential('FIXTURE_B_API_KEY',key,out.view.revision);
- assert.equal(f.stored().providers['fixture-b'].apiKey,'$!literal-$$NOT_AN_ENV');assert.equal(f.settings.credential('FIXTURE_B_API_KEY').writable,true);
+ assert.equal(f.stored().providers['fixture-b'].apiKey,'$!literal-$$NOT_AN_ENV');assert.equal((await f.settings.credential('FIXTURE_B_API_KEY')).writable,true);
  const auth=await f.runtime.getAuth('fixture-b',{signal:AbortSignal.timeout(1000)});assert.equal(auth.auth.apiKey,key);
  const fresh=await f.settings.describe();assert(!JSON.stringify(fresh).includes('NOT_AN_ENV'));
  await f.settings.setCredential('FIXTURE_B_API_KEY','replacement',fresh.revision);const latest=await f.settings.describe();await f.settings.mutate([{op:'unset',path:['providers','fixture-b']}],latest.revision);assert(!f.stored().providers['fixture-b']);assert.equal(f.stored().providers['fixture-a'].apiKey,'fixture-secret');

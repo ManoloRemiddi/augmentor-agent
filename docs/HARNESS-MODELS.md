@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-Qualified implementation: **efc0dd564dd2ae2b68c86f50ad83fa53a8eea4a0**. Fresh strict check/build and the exact 64-file MX cohort pass **323/323**, with five separate notice/workspace cases. This is source-only qualification; ordinary and installed acceptance remain open.
+Historical initial-forms implementation: **efc0dd564dd2ae2b68c86f50ad83fa53a8eea4a0**. Fresh strict check/build and the exact 64-file MX cohort pass **323/323**, with five separate notice/workspace cases. This is source-only qualification; ordinary and installed acceptance remain open.
 
 # Original DSH Models settings on Pi
 
@@ -11,13 +11,14 @@ This is a source candidate; the selected MX preview remains shortcut
 runtime **95e0fb240bb000653ff5b122ac737b59c05ee2b8**, release
 **20261012-222001-6b609cae**, product **0.2.13**. These forms are not installed yet.
 
-Seventeen files are copied byte for byte from public MIT DSH
+Seventeen files were initially copied byte for byte from public MIT DSH
 [d743267388641bc76f17c45ce8b4c231aed1d32c](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/client/ui-settings-models).
 Their public Git blob identities and SHA-256 records were verified. The
 [GUI source manifest](../apps/harness/vendor/dsh/SOURCE.json) now contains **580**
 files; all previous 563 records stay identical. Original MIT copyright and
-license text remain in source and compiled notices. No supplier UI/CSS was
-modified. The separate Apache-2.0 dsh-context selection remains **108** files.
+license text remain in source and compiled notices. No supplier UI/CSS was modified in that initial checkpoint. The discovery
+follow-up below marks three UI/type/locale files for scoped coverage and truthful
+Pi default hints; original layout, CSS and selection behavior stay unchanged. The separate Apache-2.0 dsh-context selection remains **108** files.
 The surrounding Pi transport/storage adapters retain Augmentor's authored license.
 
 ## Private profile and lifecycle
@@ -82,20 +83,18 @@ Cold opening and installed-catalog reads do not do so.
 
 ## Discovery and remaining configuration work
 
-The supplier model editor automatically reads installed defaults with a
-provider-only request. This uses the current public SDK snapshot without network
-or credential resolution. Its explicit endpoint-fetch action currently returns:
-“Endpoint discovery is not connected yet. Enter models manually; no endpoint was
-contacted.” It never substitutes installed defaults for endpoint discovery.
+The current endpoint implementation and its source qualification are recorded in
+[the discovery follow-up](#endpoint-discovery-source--october-13). Installed-catalog
+reads stay local. OpenAI Chat Completions/Responses and Anthropic endpoint listings
+now use the original bounded parser and the original candidate picker.
 
-Endpoint discovery, OAuth sign-in/out dialogs, virtual/extension-provider editing,
-advanced hidden profile controls, proactive cross-client invalidation and common
-Native/Browser provider-management parity remain open. The older full-file
-`models.configure`/guided setup path is separate from this minimal editor and
-requires further lifecycle reconciliation. This slice does not qualify the full
-P0 model-setup requirement, live providers, complete P0/P1 migration or DSH removal.
-Further OS implementation still awaits owner MX feedback. Keep DSH available for
-unqualified workflows.
+OAuth sign-in/out dialogs, virtual/extension-provider editing, advanced hidden
+profile controls, proactive cross-client invalidation and common Native/Browser
+provider-management parity remain open. The older full-file `models.configure`/
+guided setup path is separate from this minimal editor and requires further
+lifecycle reconciliation. This does not qualify the full P0 model-setup
+requirement, live providers, complete P0/P1 migration or DSH removal. Further OS
+implementation awaits owner MX feedback. Keep DSH for unqualified workflows.
 
 ## Source qualification — October 12
 
@@ -144,3 +143,108 @@ selected immutable root. The previously qualified Native **PID 429553** is now
 absent, and no Native process matches that root. Its reason for exit was not
 determined; no restart was performed. This is not a new Native-window acceptance
 claim. The previous installed/manual shortcut qualification remains dated evidence.
+
+## Endpoint discovery source — October 13
+
+The original **Fetch available models** action now opens the original candidate
+picker against the Pi operator owner. Fetching and choosing candidates changes
+only the open draft; **Apply** is the separate profile mutation. An existing
+model's tuned values win over an endpoint listing. The interface preserves the
+original checkbox defaults, toggles, dialog/focus, keyboard and layout/CSS.
+
+Three public MIT runtime files are selected at the same DSH ref in
+[`dsh-model-discovery`](../packages/runtime/vendor/dsh-model-discovery/SOURCE.json):
+the original API-key validator and coded error helpers are verbatim; the
+endpoint/body/parser module is marked for local pure dependencies/types, Pi-owned
+catalog lookup, injected request lifetime, omitted DSH attribution, refused
+redirects and reported page coverage. Original and adapted hashes and the exact
+MIT text are retained and checked during build. No DSH service, telemetry module,
+registry refresh or additional AgentSession is mounted. No npm/native dependency
+is added. Explicit listings send no DSH product-attribution header.
+
+The MIT GUI stays at **580 files**. Of the seventeen initially copied Models
+files, fourteen stay verbatim; three now carry marked MIT adaptations:
+`operations.ts` carries optional coverage, `ModelListEditor.tsx` binds it to its
+own fetched candidates and uses translated model-default hints, and `locales.ts`
+adds English/Chinese page/omitted-ID copy. This avoids another mounted form
+changing a dialog's coverage message. DSH's numeric fallback hints are not used
+as Pi limits: Pi defaults vary by model/route. All other 577 GUI records and the
+108-file Apache-2.0 dsh-context selection stay identical to the preceding source
+checkpoint. Browser dependency, PDF/Office/spreadsheet/HTML and shortcut records
+remain separate and preserved.
+
+A provider-only automatic read uses the current public Pi snapshot. Known native
+catalog providers also retain DSH's installed-catalog behavior for explicit fetch:
+that catalog is returned without contacting a draft endpoint or resolving its
+key. Custom endpoint discovery supports **openai-completions**, **openai-responses**
+and **anthropic-messages**. The original path recipe preserves deployment prefixes:
+OpenAI uses `{base}/models`; Anthropic normalizes one trailing `/v1` and uses
+`{root}/v1/models?limit=1000`, with its API-version and x-api-key headers. Standard
+`data` arrays and enriched `models` alias maps use the original parser and
+advertised capacity fields. Unknown capacities are not invented. Other APIs keep
+installed-catalog/manual entry rather than guessing an incompatible endpoint.
+
+At most **two** listings run per Host, with a **12-second** admission/auth/fetch/body
+signal and the original **4 MiB** actual-response limit. Declared and streaming
+oversize bodies refuse. Redirects are blocked. One response/page is read; a
+provider `has_more` marker is shown in that exact picker, and malformed/duplicate
+IDs omitted by the adapter are identified there. Candidate lists are bounded at
+4,096 entries; adopting still uses the existing 512-model profile limit. Reply
+bodies, credentials and internal errors never enter a refusal diagnostic. Fetch
+failure, timeout, cancellation or a changed profile returns a refusal; nothing is
+saved or retried. Endpoint HTTP is outside the Host's state-changing serial queue,
+so the operator can read settings and use cancellation while a listing waits.
+
+Stored authentication is used only for an applied, unchanged same-origin profile.
+A draft targeting another origin needs an explicit one-shot key; it receives no
+old deployment headers. A typed key overrides the stored key through supported
+Pi auth without reading, refreshing or replacing a stored credential. Same-origin
+literal deployment headers remain available, including header-only relays. Their
+literal dollar/exclamation escapes follow Pi's configuration syntax.
+Environment-backed keys/headers resolve only on explicit same-origin fetch through
+public Pi auth; their inputs remain read-only. Missing/unresolvable authentication
+refuses. Shell-command values are not executed for listing. Stored OAuth metadata,
+including expired accounts that the availability snapshot does not recognize,
+keeps the form key read-only and refuses implicit account refresh. One-shot API
+requests do not log in, log out or mutate account credentials. OAuth UI and
+command-authenticated discovery remain explicit gaps.
+
+HTTP disconnect propagates cancellation to the exact request; page refresh,
+closure and operator revocation abort the frontend transport. Host shutdown and
+accepted profile writes abort current listings. Active counts are exposed for
+maintenance. Late/revoked replies cannot publish candidates. Inspection tokens
+cannot call these profile/discovery operations.
+
+Strict source check/build and the exact **65-file** Node **24.19.0** MX cohort pass
+**334/334**, zero failures/skips/cancellations, with two workers, matching QtTest
+and unchanged deadlines. Five notice/workspace cases pass separately. New tests
+use actual loopback HTTP and the public SDK for paths, headers, alias/capacity
+parsing, partial coverage, literal/environment keys, header-only routes, expired
+OAuth, redirects, non-JSON/auth/declared/streaming failures, two-request capacity,
+caller revocation, stale profiles and the real twelve-second deadline.
+
+Actual two-tab Chromium/SDK/HTTP qualification extends the existing Models case:
+the original picker stages one newly discovered model without modifying the
+profile until Apply; old values stay intact. One existing native model boundary,
+prior native bytes, provider/model selection, display history, ordinary settings
+and the single seed request remain preserved, with **zero subsequent inference**.
+A separately admitted stalled GET does not block operator reads, and actual HTTP
+abort releases its slot and closes its server request. Disposable broken-profile
+blocking and explicit repair still pass. These are synthetic source proofs, not
+live provider or physical/installed owner acceptance.
+
+Initial failed checks remain distinct: the aggregate DSH error export required
+its local coded base alias; public discovery types needed named exports for
+TypeScript declarations; a picker selector guessed the display name instead of
+its original visible ID; and the test deselected an already-default-picked new
+model. Corrected tests retain actual pointer/checkbox/Apply actions and readiness.
+Coverage was subsequently seated on each picker and default hints aligned with Pi;
+the full cohort reran. No check, assertion, deadline or concurrency was weakened.
+
+Ordinary production assembly/qualification, immutable MX adoption, installed
+manual acceptance, live endpoints, OAuth/virtual/advanced/shared provider controls
+and all remaining P0/P1/privacy/public distribution/platform gates remain open.
+The selected MX release and running Host remain the preceding shortcut build;
+the previously qualified Native PID was absent at the preceding readback. This
+source turn performs no installed update, restart, owner prompt or model/speech/
+GPU/context/concurrency/precision change.

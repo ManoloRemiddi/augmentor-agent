@@ -6,6 +6,7 @@ import {ModelRuntime} from '@earendil-works/pi-coding-agent';
 import {InMemoryCredentialStore} from '@earendil-works/pi-ai';
 import {atomicJson} from './storage.js';
 import {type Data} from '../../protocol/src/index.js';
+import {discoverModels as discoverEndpoint} from '../vendor/dsh-model-discovery/discovery.js';
 
 export const MODEL_APIS=['openai-completions','openai-responses','anthropic-messages','mistral-conversations','azure-openai-responses','openai-codex-responses','bedrock-converse-stream','google-generative-ai','google-vertex','pi-messages'];
 const NS='llm-pi-ai',FIELDS=['displayName','baseURL','api','models','apiKeyEnv'],MODEL_FIELDS=['id','name','contextWindow','maxTokens','input','reasoning'];
@@ -15,6 +16,7 @@ const digest=(raw:string)=>createHash('sha256').update(raw).digest('hex');
 const ref=(provider:string)=>provider.toUpperCase().replace(/[^A-Z0-9]+/g,'_')+'_API_KEY';
 const literal=(value:string)=>value.replaceAll('$',()=>'$$').replace(/^!/,()=>'$!');
 const expression=(value:unknown)=>typeof value==='string'&&(value.startsWith('!')||/\$(?:\{|[A-Za-z_])/.test(value.replaceAll('$$','').replaceAll('$!','')));
+const command=(value:unknown)=>typeof value==='string'&&value.startsWith('!');
 function endpoint(value:unknown){
   if(typeof value!=='string'||value.length>2048)throw Error('Enter a model endpoint URL.');
   let url;try{url=new URL(value);}catch{throw Error('Enter a valid model endpoint URL.');}
@@ -28,7 +30,13 @@ function endpoint(value:unknown){
 export class ModelSettings {
   private hash='';private revision=randomInt(2**32,2**48);private tokens=new Map<string,{provider:string;index:number;hash:string}>();private tokenAt=new Map<string,string>();
   private defaults=ModelRuntime.create({modelsPath:null,credentials:new InMemoryCredentialStore(),refreshOnCreate:false,allowModelNetwork:false});
-  constructor(private file:string,private runtime:()=>ModelRuntime,private guard:()=>void,private apply:(config:Data,validated:ModelRuntime)=>Promise<void>){}
+  private probes=new Set<AbortController>();private appliedHash='';
+  private async oauthAccounts(signal?:AbortSignal){try{return new Set((await this.runtime().listCredentials({signal})).filter(credential=>credential.type==='oauth').map(credential=>credential.providerId));}catch{throw Error('Pi credential metadata is unavailable.');}}
+  constructor(private file:string,private runtime:()=>ModelRuntime,private guard:()=>void,private apply:(config:Data,validated:ModelRuntime)=>Promise<void>){this.markApplied();}
+  private fileHash(){return digest(existsSync(this.file)?readFileSync(this.file,'utf8'):JSON.stringify({providers:{}}));}
+  markApplied(){this.appliedHash=this.fileHash();}
+  get activeDiscoveries(){return this.probes.size;}
+  cancelDiscoveries(){for(const probe of this.probes)probe.abort();}
   private read(){
     const raw=existsSync(this.file)?readFileSync(this.file,'utf8'):JSON.stringify({providers:{}});
     if(Buffer.byteLength(raw)>4*1024*1024)throw Error('The model configuration exceeds the editor limit.');
@@ -51,6 +59,7 @@ export class ModelSettings {
   }
   async describe(){
     const defaults=await this.defaults;
+    const oauth=await this.oauthAccounts();
     const {config,hash}=this.read(),runtime=this.runtime(),user:Data={providers:Object.create(null)},base:Data={providers:Object.create(null)};
     const ids=new Set([...runtime.getProviders().map(p=>p.id),...Object.keys(config.providers)]);
     const rows=[];
@@ -59,18 +68,19 @@ export class ModelSettings {
       if(stored!==undefined&&!object(stored))throw Error('Repair a provider profile before opening Models.');
       if(stored)user.providers[id]=this.profile(id,stored,hash);
       if(defaults.getProvider(id))base.providers[id]={models:defaults.getModels(id).map(model=>Object.fromEntries(MODEL_FIELDS.filter(field=>field in model).map(field=>[field,(model as any)[field]])))};
-      const status=runtime.getProviderAuthStatus(id),credential={configured:status.configured,writable:!expression(stored?.apiKey)&&!runtime.isUsingOAuth(id),source:status.source??'none'};
+      const status=runtime.getProviderAuthStatus(id),credential={configured:status.configured,writable:!expression(stored?.apiKey)&&!oauth.has(id)&&!runtime.isUsingOAuth(id),source:status.source??'none'};
       rows.push({entry:{provider:id,displayName:stored?.name??id,settingsNs:NS,settingsPath:['providers',id],active:models.length>0,declared:!defaults.getProvider(id)},configured:!!stored||status.configured,removable:!!stored,apiKeyEnv:undefined,credential,derivedCredential:credential});
     }
     const value={providers:Object.fromEntries([...ids].map(id=>[id,{...base.providers[id],...user.providers[id]}]))};
     return {writable:true,revision:this.revision,rows,namespaces:[{ns:NS,revision:this.revision,user,base,value,schema:{apis:MODEL_APIS}}]};
   }
-  credential(reference:unknown){
+  async credential(reference:unknown){
+    const oauth=await this.oauthAccounts();
     this.read();const providers=new Set([...this.runtime().getProviders().map(p=>p.id),...Object.keys(this.read().config.providers)]);
     const matches=[...providers].filter(id=>ref(id)===reference);
     if(matches.length!==1)throw Error('This credential reference is missing or ambiguous.');
     const provider=matches[0],profile=this.read().config.providers[provider],status=this.runtime().getProviderAuthStatus(provider);
-    return {provider,configured:status.configured,writable:!expression(profile?.apiKey)&&!this.runtime().isUsingOAuth(provider),source:status.source??'none'};
+    return {provider,configured:status.configured,writable:!expression(profile?.apiKey)&&!oauth.has(provider)&&!this.runtime().isUsingOAuth(provider),source:status.source??'none'};
   }
   private models(provider:string,rows:unknown,current:Data,hash:string){
     if(!Array.isArray(rows)||rows.length>512)throw Error('Use a bounded model list.');
@@ -120,19 +130,57 @@ export class ModelSettings {
     profile[field==='displayName'?'name':field==='baseURL'?'baseUrl':field]=field==='baseURL'?endpoint(value):value;
   }
   async setCredential(reference:unknown,value:unknown,expected:unknown){
-    this.guard();const credential=this.credential(reference),{config,hash}=this.read();
+    this.guard();const credential=await this.credential(reference),{config,hash}=this.read();
     if(expected!==this.revision)throw Error('Model settings changed. Close and reopen this card.');
     if(!credential.writable)throw Error('This provider uses a command, environment expression or OAuth account. Manage that authentication through Pi before replacing it here.');
     if(typeof value!=='string'||!value.trim()||value.length>8192||/[\r\n\0]/.test(value))throw Error('Enter a valid API key.');
     const next=structuredClone(config);next.providers[credential.provider]={...next.providers[credential.provider],apiKey:literal(value.trim())};
     await this.commit(next,hash);return {revision:(await this.describe()).revision};
   }
-  async discover(request:Data){
+  async discover(request:Data,callerSignal?:AbortSignal){
+    if(!object(request)||Object.keys(request).some(key=>!['provider','baseURL','api','apiKey'].includes(key)))return {kind:'refused',message:'Use the model form discovery fields.'};
+    const provider=request.provider===undefined?undefined:this.provider(request.provider),defaults=await this.defaults;
     // The supplier editor automatically asks for defaults with provider only.
     // This cold read must never execute configured keys or contact a catalog.
-    if(Object.keys(request).some(key=>key!=='provider'))return {kind:'refused',message:'Endpoint discovery is not connected yet. Enter models manually; no endpoint was contacted.'};
-    const provider=this.provider(request.provider);
-    return {kind:'found',models:this.runtime().getModels(provider).map(model=>({id:model.id,name:model.name,contextWindow:model.contextWindow,maxTokens:model.maxTokens,inputModalities:model.input}))};
+    if(provider!==undefined&&(Object.keys(request).every(key=>key==='provider')||defaults.getModels(provider).length))return {kind:'found',models:this.runtime().getModels(provider).map(model=>({id:model.id,name:model.name,contextWindow:model.contextWindow,maxTokens:model.maxTokens,inputModalities:model.input})),coverage:{source:'installed',providerHasMore:false,droppedRows:0}};
+    let baseURL:string;try{baseURL=endpoint(request.baseURL);}catch{return {kind:'refused',message:'Enter a valid HTTPS or loopback HTTP model endpoint without credentials, queries or fragments.'};}
+    const {config,hash}=this.read(),profile=provider===undefined?undefined:config.providers[provider];
+    const api=request.api??profile?.api??'openai-completions';if(!['openai-completions','openai-responses','anthropic-messages'].includes(api))return {kind:'refused',message:'This API has no endpoint listing this build can read. Use the installed catalog or enter models manually.'};
+    if(request.apiKey!==undefined&&(typeof request.apiKey!=='string'||request.apiKey.length>8192))return {kind:'refused',message:'Enter a valid one-shot API key.'};
+    if(this.probes.size>=2)return {kind:'refused',message:'Two model listings are already running. Wait for one to finish.'};
+    const probe=new AbortController(),signal=AbortSignal.any([probe.signal,AbortSignal.timeout(12000),...(callerSignal?[callerSignal]:[])]);this.probes.add(probe);
+    try{
+      signal.throwIfAborted();let providerHasMore=false;
+      const stored=async()=>{
+        const oneShot=request.apiKey!==undefined;
+        if(hash!==this.appliedHash||this.fileHash()!==hash){if(oneShot)return undefined;throw Error('PROFILE_CHANGED');}
+        if(!provider||!profile)return undefined;
+        let sameOrigin=false;try{sameOrigin=new URL(baseURL).origin===new URL(endpoint(profile.baseUrl)).origin;}catch{}
+        if(!sameOrigin){if(oneShot)return undefined;throw Error('ENDPOINT_CHANGED');}
+        if(Object.values(profile.headers??{}).some(command)||!oneShot&&(command(profile.apiKey)||this.runtime().isUsingOAuth(provider)||(await this.oauthAccounts(signal)).has(provider)))throw Error('AUTH_UNSUPPORTED');
+        const headers=Object.fromEntries(Object.entries(profile.headers??{}).map(([name,value])=>{if(typeof value!=='string')throw Error('AUTH_UNSUPPORTED');return [name,value.replace(/\$(\$|!)/g,(_match,character)=>character)];}));
+        // A header-only relay still has discovery auth even when Pi has no
+        // API-key handler. Do not refresh an OAuth-only route for a typed key.
+        if(oneShot&&!this.runtime().getProvider(provider)?.auth.apiKey){if(Object.values(profile.headers??{}).some(expression))throw Error('AUTH_UNSUPPORTED');return {auth:{headers}};}
+        const resolved=await this.runtime().getAuth(provider,{signal,...(oneShot?{apiKey:request.apiKey}:{})});
+        if(!resolved&&Object.values(profile.headers??{}).some(expression))throw Error('AUTH_UNSUPPORTED');
+        return resolved??{auth:{headers}};
+      };
+      let auth:any;
+      // A one-shot key does not read, resolve, overwrite or fall back to stored
+      // credentials. An applied same-origin profile can still supply deployment
+      // headers through Pi's public auth API with the literal key override.
+      auth=await stored();
+      const rows=await discoverEndpoint({baseURL,api,...(request.apiKey===undefined?{}:{apiKey:request.apiKey}),signal},()=>({headers:auth?.auth?.headers,resolveApiKey:async()=>auth?.auth?.apiKey}),fetch,partial=>{providerHasMore=partial;});
+      signal.throwIfAborted();if(this.fileHash()!==hash)return {kind:'refused',message:'The model profile changed while listing. Read the current settings before fetching again.'};
+      const ids=new Set<string>();let droppedRows=0;
+      const models=rows.filter(row=>{const valid=typeof row.id==='string'&&row.id===row.id.trim()&&!!row.id&&row.id.length<=512&&typeof row.name==='string'&&row.name.length<=512&&!ids.has(row.id);if(!valid){droppedRows++;return false;}ids.add(row.id);return true;});
+      if(models.length>4096)return {kind:'refused',message:'The endpoint returned too many model candidates. Enter the needed models manually.'};
+      return {kind:'found',models,coverage:{source:'endpoint',pages:1,providerHasMore,droppedRows}};
+    }catch(error){
+      const code=(error as any)?.code,message=(error as any)?.message;
+      return {kind:'refused',message:signal.aborted?'Model listing was cancelled or exceeded its time limit. Nothing was saved or retried.':message==='PROFILE_CHANGED'?'Refresh model settings before using stored authentication.':message==='ENDPOINT_CHANGED'?'Enter a one-shot key to list models from a changed endpoint origin.':message==='AUTH_UNSUPPORTED'?'This authentication method cannot be used for endpoint listing. Enter models manually.':code==='INVALID_CREDENTIAL'?'The supplied key cannot be used in an HTTP header.':code==='DISCOVERY_UNSUPPORTED'?'This API cannot list endpoint models. Enter them manually.':'The endpoint did not return a usable model listing. Check the endpoint, protocol and authentication, or enter models manually. Nothing was saved or retried.'};
+    }finally{this.probes.delete(probe);}
   }
   private async commit(config:Data,hash:string){
     const profiles=Object.values(config.providers);if(Buffer.byteLength(JSON.stringify(config))>4*1024*1024||profiles.length>128||profiles.reduce<number>((sum,profile:any)=>sum+(Array.isArray(profile?.models)?profile.models.length:0),0)>4096||profiles.some((profile:any)=>Array.isArray(profile?.models)&&profile.models.length>512))throw Error('The model profile exceeds the bounded editor catalog limit.');
@@ -142,7 +190,7 @@ export class ModelSettings {
       const validated=await ModelRuntime.create({modelsPath:file,credentials:new InMemoryCredentialStore(),refreshOnCreate:false,allowModelNetwork:false});
       if(validated.getError())throw Error('Pi rejected this model configuration. Check the provider API and model fields.');
       this.guard();if(this.read().hash!==hash)throw Error('Model settings changed. Close and reopen the card.');
-      await this.apply(config,validated);this.read();
+      this.cancelDiscoveries();await this.apply(config,validated);this.markApplied();this.read();
     }finally{rmSync(temporary,{recursive:true,force:true});}
   }
 }

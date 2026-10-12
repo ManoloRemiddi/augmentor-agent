@@ -1,3 +1,5 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: MIT
+// Augmentor adaptation: Optional private listing coverage accompanies candidate metadata; no credential values. Original MIT attribution remains in LICENSE.
 /**
  * The Host reads and writes the Models cards perform, as callbacks built in the
  * plugin body. Cards receive these instead of a context: the outcomes name what
@@ -23,10 +25,12 @@ export type SettingsWriteOutcome =
   /** Any other refusal, with the Host's own diagnostic. */
   | { readonly kind: 'refused'; readonly message: string }
 
+export interface ModelListingCoverage { readonly source: 'installed' | 'endpoint'; readonly pages?: number; readonly providerHasMore: boolean; readonly droppedRows: number }
+
 /** What one endpoint interrogation answered. */
 export type ModelDiscoveryOutcome =
   /** The candidates the provider disclosed, in its own order. */
-  | { readonly kind: 'found'; readonly models: readonly LlmDiscoveredModel[] }
+  | { readonly kind: 'found'; readonly models: readonly LlmDiscoveredModel[]; readonly coverage?: ModelListingCoverage }
   /** The interrogation was refused, with the Host's own diagnostic. */
   | { readonly kind: 'refused'; readonly message: string }
 

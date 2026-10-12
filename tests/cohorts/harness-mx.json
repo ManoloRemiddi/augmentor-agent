@@ -68,6 +68,7 @@
     "tests/harness-shortcuts.test.mjs",
     "tests/harness-shortcuts-chromium.test.mjs",
     "tests/model-settings.test.mjs",
-    "tests/harness-models-chromium.test.mjs"
+    "tests/harness-models-chromium.test.mjs",
+    "tests/model-discovery.test.mjs"
   ]
 }

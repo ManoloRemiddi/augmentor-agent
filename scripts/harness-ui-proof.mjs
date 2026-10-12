@@ -15,6 +15,7 @@ const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
 const sharedState=join(root,'shared-state'),sharedData=join(root,'shared-data'),home=join(root,'home');
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
+const discoveryLog=process.env.AUGMENTOR_HARNESS_PROOF_MODEL_DISCOVERY==='1'?join(root,'model-listings.jsonl'):null;
 const providerApi=process.env.AUGMENTOR_HARNESS_PROOF_PROVIDER_API??'openai-completions';
 if(!['openai-completions','anthropic-messages','openai-responses','google-generative-ai'].includes(providerApi))throw Error('Unsupported authored provider fixture.');
 mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(workspace);mkdirSync(home);
@@ -25,6 +26,11 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'){
  writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}));
 }
 const model=http.createServer(async(req,res)=>{
+  if(discoveryLog&&req.method==='GET'&&new URL(req.url,'http://fixture.invalid').pathname.endsWith('/models')){
+    appendFileSync(discoveryLog,JSON.stringify({url:req.url,headers:req.headers})+'\n',{mode:0o600});
+    if(req.url.startsWith('/slow/')){res.once('close',()=>appendFileSync(discoveryLog,JSON.stringify({closed:true,url:req.url})+'\n',{mode:0o600}));return;}
+    res.writeHead(200,{'content-type':'application/json'});res.end(JSON.stringify({has_more:true,data:[{id:'harness-fixture',name:'Existing fixture'},{id:'authored-listed',name:'Authored discovered model',context_window:16000,max_output_tokens:512}]}));return;
+  }
   if(providerApi!=='openai-completions'){await serveContextProvider(providerApi,req,res,{path:join(workspace,'note.txt'),requestLog});return;}
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
   let raw='';for await(const chunk of req)raw+=chunk;
@@ -149,7 +155,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;
