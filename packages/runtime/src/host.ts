@@ -17,6 +17,7 @@ import {SessionOrganization} from './session-organization.js';
 import {sessionFamily} from './session-family.js';
 import {contextPreferences,contextPreferenceChange,CONTEXT_PREFERENCE_FIELDS} from './context-preferences.js';
 import {ShortcutPreferences} from './shortcut-preferences.js';
+import {ModelSettings} from './model-settings.js';
 import {developerTools,developerToolsChange} from './developer-tools.js';
 import {piPromptWrapping} from './prompt-wrapping.js';
 import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
@@ -103,6 +104,40 @@ export class Host {
   async attachmentImage(sid:string,ref:any){this.getMeta(sid);return this.attachments.image(sid,ref);}
   readonly interactions:Interactions;
   modelRuntime!:ModelRuntime;
+  private modelSettingsProblem=false;
+  private modelSettingsBusy=false;
+  private modelSettingsGuard(){if(this.quiescing||this.mcpReloading||this.jobs.busy||this.compactions.busy||this.improvements.busy||this.mcpManagement.busy||[...this.metadata.values()].some(m=>m.running))throw Error('Finish or stop active work before changing model settings.');}
+  private async applyModelSettings(config:Data,validated:ModelRuntime){
+    this.modelSettingsGuard();
+    for(const r of this.loaded.values()){
+      const model=validated.getModel(r.meta.selection.provider,r.meta.selection.model);
+      if(!model)throw Error('A loaded conversation uses a model this edit removes. Keep that model configured.');
+      requireThinking(model,r.session.thinkingLevel);
+    }
+    const file=join(this.dirs.agent,'models.json'),previous=readJson<Data>(file,{providers:{}});
+    const providers=[...new Set([...Object.keys(previous.providers),...Object.keys(config.providers)])].filter(id=>JSON.stringify(previous.providers[id])!==JSON.stringify(config.providers[id]));
+    if(!providers.length)return;
+    this.modelSettingsBusy=true;
+    this.modelSettingsProblem=true;
+    try{
+      try{atomicJson(file,config);}catch{throw Error('Model configuration persistence could not be confirmed. Refresh before editing again.');}
+      this.modelSettingsProblem=true;
+      await this.refreshModelSettings(providers);
+    }catch{throw Error('Model configuration application could not be confirmed. Refresh model settings before starting work. Nothing was retried.');}
+    finally{this.modelSettingsBusy=false;}
+  }
+  private async refreshModelSettings(providers?:string[]){
+    await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000),...(providers?{providers}:{})});
+    if(this.modelRuntime.getError())throw Error('Pi could not apply the model configuration.');
+    for(const r of this.loaded.values()){
+      const current=this.modelRuntime.getModel(r.meta.selection.provider,r.meta.selection.model);
+      if(!current)throw Error('A loaded model is unavailable.');
+      requireThinking(current,r.session.thinkingLevel);
+      if(JSON.stringify(current)!==JSON.stringify(r.session.model))await r.session.setModel(current);
+    }
+    this.modelSettingsProblem=false;
+  }
+  private modelSettings=new ModelSettings(join(this.dirs.agent,'models.json'),()=>this.modelRuntime,()=>this.modelSettingsGuard(),(config,validated)=>this.applyModelSettings(config,validated));
   readonly setup=new SetupConnections(join(this.dirs.agent,'models.json'));
   settings:Data;
   readonly observations:ObservationStore;
@@ -537,13 +572,13 @@ export class Host {
     if(this.pumping.has(m.id))return this.pumping.get(m.id)!;
     const run=this.serial.then(async()=>{
       const queue=this.queue(m);
-      if(this.organization.archived(m.id)||this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||this.compactions.blocked(m.id)||queue.paused||queue.uncertain)return;
+      if(this.organization.archived(m.id)||this.quiescing||this.modelSettingsProblem||this.modelSettingsBusy||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||this.compactions.blocked(m.id)||queue.paused||queue.uncertain)return;
       let item=queue.next;
       if(!item){if(this.jobs.busyOwner(m.id))return;const owner=this.loaded.get(m.id);if(!owner?.goals.armed)return;try{const source=owner.goals.reserve();if(!source)return;const requestId='goal:'+randomUUID();queue.enqueue(requestId,owner.goals.prompt(source),true,source);item=queue.next;}catch{try{owner.goals.fail('goal-queue-failed','Goal input could not be queued. Inspect the queue before explicitly resuming.');}catch{owner.goals.disarm();}return;}}
       if(!item)return;
       let r:Loaded;
       try{r=await this.load(m);}catch(error){queue.notSent(item.id);this.append(m,'runtime/error',{message:'Queued prompt was not sent: '+String(error)});return;}
-      if(this.organization.archived(m.id)||this.quiescing||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||this.compactions.blocked(m.id)||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
+      if(this.organization.archived(m.id)||this.quiescing||this.modelSettingsProblem||this.modelSettingsBusy||this.mcpReloading||this.improvements.busy||m.surface!=='browser'&&this.mcpManagement.busy||m.running||this.compactions.blocked(m.id)||queue.paused||queue.uncertain||queue.next?.id!==item.id)return;
       this.submit(r,item.input!,item.id);
     });
     this.serial=run.catch(()=>{});this.pumping.set(m.id,run);
@@ -568,6 +603,7 @@ export class Host {
     const result=await run;return result instanceof SteeringReply?result.settled.finally(()=>this.wakeGoals()):result;
   }
   async handle(method:string,p:Data,id:string):Promise<any>{
+    if((this.modelSettingsProblem||this.modelSettingsBusy)&&(['session.prompt','session.continueQueue','session.selectModel','session.selectReasoning','session.compact','session.create','session.branch','session.startJob','prompt.improve','setup.save'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Refresh model settings to confirm the stored configuration before starting or changing work.');
     if(p.sessionId&&this.organization.archived(p.sessionId)&&['session.prompt','session.continueQueue','session.startJob','session.updateGoal','session.compact','prompt.improve'].includes(method))throw Error('Restore the conversation before starting work.');
     if(this.mcpReloading&&(['prompt.improve','setup.save','models.configure','models.reload','session.create','session.branch','session.updateGoal','session.trimTools','session.compact','session.selectModel','session.selectReasoning','reasoning.configure','session.prompt','session.continueQueue'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Finish MCP session reload before changing or starting a conversation.');
     if(method.startsWith('session.')&&p.sessionId&&this.metadata.get(p.sessionId)?.delegation&&!['session.models','session.history','session.nativeHistory','session.nativeRead','session.originalSearch','session.originalRead','session.plan','session.goal','session.queue','session.compaction','session.cancel'].includes(method))throw Error('Delegated conversations are controlled by their parent job.');
@@ -575,6 +611,12 @@ export class Host {
     if(this.compactions.busy&&['setup.save','models.configure','models.reload','reasoning.configure','session.mcpConfigure','session.mcpAction','prompt.improve'].includes(method))throw Error('Finish or cancel Pi compaction before changing shared configuration.');
     if(p.sessionId&&this.compactions.blocked(p.sessionId)&&['session.create','session.branch','session.trimTools','session.selectModel','session.selectReasoning','session.prompt','session.continueQueue','session.updateGoal','session.startJob'].includes(method))throw Error('Finish compaction or inspect and acknowledge its unknown outcome before changing this conversation.');
     switch(method){
+    case 'models.settingsDescribe':{const view=await this.modelSettings.describe();return {...view,writable:!this.modelSettingsProblem,runtimeStatus:this.modelSettingsProblem?'needs-refresh':'confirmed'};}
+    case 'models.settingsMutate':return this.modelSettings.mutate(p.ops,p.revision);
+    case 'models.credentialDescribe':return this.modelSettings.credential(p.ref);
+    case 'models.credentialSet':return this.modelSettings.setCredential(p.ref,p.value,p.revision);
+    case 'models.settingsDiscover':return this.modelSettings.discover(p.request??{});
+    case 'models.settingsRefresh':{this.modelSettingsGuard();this.modelSettingsBusy=true;this.modelSettingsProblem=true;try{await this.refreshModelSettings();return await this.modelSettings.describe();}catch{throw Error('Pi could not confirm the stored model configuration. Work stays blocked. Inspect the profile and refresh again. Nothing was retried.');}finally{this.modelSettingsBusy=false;}}
     case 'session.compaction':{const m=this.getMeta(p.sessionId);return this.compactions.describe(m.id);}
     case 'session.acknowledgeCompaction':{const m=this.getMeta(p.sessionId);if(p.acknowledgeUnknownOutcome!==true)throw Error('Explicitly acknowledge that the compaction outcome remains unknown.');return this.compactions.acknowledge(m.id,identifier(p.requestId));}
     case 'session.compact':{
@@ -631,7 +673,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{shortcuts:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{modelSettings:true,shortcuts:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.compactions.busy)throw Error('Stop and settle Pi compaction before shutting down the runtime.');
       if(this.uploads)throw Error('Finish file uploads before shutting down the runtime.');

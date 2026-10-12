@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Models settings source](HARNESS-MODELS.md) adds the copied MIT provider/editor/custom/model-list forms to private Pi configuration, preserving hidden fields and native ancestry, with stale-edit and unconfirmed-application guards. MIT GUI selection is 580 files (17 new verbatim); Apache dsh-context stays 108. Endpoint discovery, OAuth/virtual/advanced controls and complete P0/P1 qualification remain open. Source checks are recorded separately from ordinary and installed acceptance; selected MX and its running Host remain shortcut runtime 95e0fb2 / 20261012-222001-6b609cae. The prior Native PID is absent; this source turn performs no Native restart.
+
 [Shortcut source selection](HARNESS-SHORTCUTS.md): public MIT DSH d743267 adds 22 GUI/pure-helper records, bringing 541 to 563 (20 verbatim/two marked Linux-binding and truthful preference-copy adaptations). Prior records and Apache dsh-context remain unchanged. A closed Node protocol graph has separate hashed source/bundle/MIT records; no npm/native dependency is added.
 
 [Original HTML source](HARNESS-HTML-PREVIEWS.md): fourteen files at public DSH d743267 bring MIT GUI selection to 541, with twelve verbatim and two marked optional transport/disabled-gate adaptations. Prior 527 GUI and 108 Apache dsh-context records stay unchanged. Exact build-only DOMPurify 3.4.16 selects Apache-2.0 from its offered Apache/MPL alternatives, retaining complete notices and Cure53/contributors attribution.

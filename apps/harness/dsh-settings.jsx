@@ -14,6 +14,7 @@ import {createSnapshotStore} from '@deepseek-ai/dsh-client-store';
 import {attachReasoning} from '../browser/extension/pi-reasoning.mjs';
 import {attachMcpManagement} from './mcp-management.js';
 import {DshContextSettingsCard} from './dsh-context-settings.jsx';
+import {OriginalModels} from './dsh-models.jsx';
 
 export const settingsShell=createSettingsShellStore().create();
 const face=value=>(select=x=>x)=>select(value);
@@ -86,7 +87,7 @@ export function OriginalSettings({wide,state,controller,preferences,developerToo
     if(name==='settings.close')return <CloseLabel t={t}/>;
     if(name==='settings.section'){
       if(options.only==='general')return <GeneralSection renderSlot={renderSlot}/>;
-      if(options.only==='models')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></div>}/>;
+      if(options.only==='models')return <OriginalModels key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></OriginalModels>;
       if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
     }
     if(name==='settings.general.item')return <><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div>{shortcutsUi?.render('settings.general.item')}<CurrentVersionRow t={t}/></>;

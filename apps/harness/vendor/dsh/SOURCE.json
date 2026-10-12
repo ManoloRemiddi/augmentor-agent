@@ -3443,6 +3443,108 @@
       "sourceSha256": "4b1d030f40d90d530be297e0509506513f98a7e482c04f0f237615cdc0099782",
       "sha256": "4b1d030f40d90d530be297e0509506513f98a7e482c04f0f237615cdc0099782",
       "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-settings-models/package.json",
+      "sha256": "1c7f86564446bfd01517846dcea146963dbf8421a8a769240a49186346ec5cc8",
+      "upstreamPath": "packages/client/ui-settings-models/package.json",
+      "upstreamSha256": "1c7f86564446bfd01517846dcea146963dbf8421a8a769240a49186346ec5cc8"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/CustomProviderCard.tsx",
+      "sha256": "b983b65b3fcdb763fd81c25c0c846ef340a1cc6540c517a8fcdfc046b486d32e",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/CustomProviderCard.tsx",
+      "upstreamSha256": "b983b65b3fcdb763fd81c25c0c846ef340a1cc6540c517a8fcdfc046b486d32e"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/DeepSeekModelsEditor.tsx",
+      "sha256": "d950be6797bfdd8112075d372b82ec74b21095980095c3eb3c11cbff24366f86",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/DeepSeekModelsEditor.tsx",
+      "upstreamSha256": "d950be6797bfdd8112075d372b82ec74b21095980095c3eb3c11cbff24366f86"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/EditorFooter.tsx",
+      "sha256": "20b6c0bfc6b4b387c4d4a98605007362077206867393eec1562a5af56e39e283",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/EditorFooter.tsx",
+      "upstreamSha256": "20b6c0bfc6b4b387c4d4a98605007362077206867393eec1562a5af56e39e283"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/ModelInputTypes.tsx",
+      "sha256": "0889f2893c6d5105440ce0d0028476f7cfd4ecc37a416f3d76eff31b2fe27cbd",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/ModelInputTypes.tsx",
+      "upstreamSha256": "0889f2893c6d5105440ce0d0028476f7cfd4ecc37a416f3d76eff31b2fe27cbd"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/ModelListEditor.tsx",
+      "sha256": "90a5e9ad7a70a8c99a95b7e1379d811dae32914f245274ec034f413ec859bd5c",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/ModelListEditor.tsx",
+      "upstreamSha256": "90a5e9ad7a70a8c99a95b7e1379d811dae32914f245274ec034f413ec859bd5c"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/ModelRow.tsx",
+      "sha256": "7fad3b60dc131f96a7df7b1cd4cbd4c7bc8ad45fc9865ef27b52c5d00ed8248a",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/ModelRow.tsx",
+      "upstreamSha256": "7fad3b60dc131f96a7df7b1cd4cbd4c7bc8ad45fc9865ef27b52c5d00ed8248a"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/ModelsSection.module.css",
+      "sha256": "0de105abac343887fbea8508fc0e20b6903505a3f689dd05b1125ff02886e801",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/ModelsSection.module.css",
+      "upstreamSha256": "0de105abac343887fbea8508fc0e20b6903505a3f689dd05b1125ff02886e801"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/ModelsSection.tsx",
+      "sha256": "a4b79e193e4b63e40f11a1adf7947d519d5977b8227807bf3500b357fb4b0251",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/ModelsSection.tsx",
+      "upstreamSha256": "a4b79e193e4b63e40f11a1adf7947d519d5977b8227807bf3500b357fb4b0251"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/ProviderEditor.tsx",
+      "sha256": "84a403e303af38740e6b72981b826093be7d3aecc4e17ff98208cfb78a0da956",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/ProviderEditor.tsx",
+      "upstreamSha256": "84a403e303af38740e6b72981b826093be7d3aecc4e17ff98208cfb78a0da956"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/apiKey.ts",
+      "sha256": "2081d9ceb971a726f74e0397d8370be401816fd6785121db6422820439b5bd68",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/apiKey.ts",
+      "upstreamSha256": "2081d9ceb971a726f74e0397d8370be401816fd6785121db6422820439b5bd68"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/locales.ts",
+      "sha256": "f7cbd24dcfcb28d7fa97aa3620bb7865b94c41ea248d12ef79286af8544750dc",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/locales.ts",
+      "upstreamSha256": "f7cbd24dcfcb28d7fa97aa3620bb7865b94c41ea248d12ef79286af8544750dc"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/operations.ts",
+      "sha256": "0e29d80d40e05922915e0ecf8ab314678174a3371ccae170c43b24e385674e37",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/operations.ts",
+      "upstreamSha256": "0e29d80d40e05922915e0ecf8ab314678174a3371ccae170c43b24e385674e37"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/protocol-label.ts",
+      "sha256": "d7b5bf8b367a7248b24de51f4a828a87abde903935d216175074d51a5e06fed7",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/protocol-label.ts",
+      "upstreamSha256": "d7b5bf8b367a7248b24de51f4a828a87abde903935d216175074d51a5e06fed7"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/schema-operations.ts",
+      "sha256": "47e323ac7fa6fafe253a15e740ebf52ad0d24eeb9a18404e0936116416586d9c",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/schema-operations.ts",
+      "upstreamSha256": "47e323ac7fa6fafe253a15e740ebf52ad0d24eeb9a18404e0936116416586d9c"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/slot-contract.ts",
+      "sha256": "1098f18d118156c7ac70a7c214d5ef6b271182680c2e3bd73e4f0ed97cef8853",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/slot-contract.ts",
+      "upstreamSha256": "1098f18d118156c7ac70a7c214d5ef6b271182680c2e3bd73e4f0ed97cef8853"
+    },
+    {
+      "path": "packages/client/ui-settings-models/src/client/store.ts",
+      "sha256": "eb0dc0d72f9441b2ff029bd352976f1b30acc1184c2ee0512d5cc0803402a45a",
+      "upstreamPath": "packages/client/ui-settings-models/src/client/store.ts",
+      "upstreamSha256": "eb0dc0d72f9441b2ff029bd352976f1b30acc1184c2ee0512d5cc0803402a45a"
     }
   ]
 }

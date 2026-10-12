@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Models settings source](HARNESS-MODELS.md) adds the copied MIT provider/editor/custom/model-list forms to private Pi configuration, preserving hidden fields and native ancestry, with stale-edit and unconfirmed-application guards. MIT GUI selection is 580 files (17 new verbatim); Apache dsh-context stays 108. Endpoint discovery, OAuth/virtual/advanced controls and complete P0/P1 qualification remain open. Source checks are recorded separately from ordinary and installed acceptance; selected MX and its running Host remain shortcut runtime 95e0fb2 / 20261012-222001-6b609cae. The prior Native PID is absent; this source turn performs no Native restart.
+
 [Original keyboard shortcut workflow](HARNESS-SHORTCUTS.md) advances original GUI parity with existing Pi action owners and private accepted preferences. Main-document input, native/guest forwarding, broader fixed-input contributions and physical delivery remain distinct; full P0/P1 and platform/privacy/public distribution gates stay binding.
 
 [Original rendered HTML](HARNESS-HTML-PREVIEWS.md) connects the copied static/interactive renderer, local asset packing and original settings switch to Pi authority. Complete P0/P1, broader document/accessibility/live/privacy/public distribution gates stay open. DSH remains available; further OS implementation awaits MX feedback.
