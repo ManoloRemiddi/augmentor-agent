@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [Context sidebar follow-up](CONTEXT-SIDEBAR.md) connects Placement as the eighth display field. The seven-field/disabled-placement qualification below is historical evidence for its recorded runtime. Fleet and prompt wrapping remain unconnected.
+
 # Original Context plugin preferences on Pi
 
 Settings → Plugins now contains the original dsh-context preference card, alongside the existing MCP control. Its headings, rows, menus, text areas and CSS come from the pinned public [0.68.1 source](https://github.com/bowenliang123/dsh-context/tree/2c8095c34da3fcef729a01437d2df65c83e08499). The newly selected `settingsCard.tsx` has verified Git blob `b9527ef13b3438381075f5e857e0ef0d466fc30f` and original SHA-256 `605120ff915f3bcd3c736d0ba39c2aa5f2c770a2d9c3be273241f5c3c0cfea61`. Its small, marked adaptation gates unsupported fields; original markup/CSS are preserved. The selection is now 99 files: 87 verbatim and 12 marked adaptations. Original Copyright 2025 bowenliang123 and Apache-2.0 remain applicable, separately from the MIT DSH shell and authored Augmentor source.

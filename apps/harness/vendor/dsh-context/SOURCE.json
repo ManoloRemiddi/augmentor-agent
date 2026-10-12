@@ -4,7 +4,7 @@
   "version": "0.68.1",
   "license": "Apache-2.0",
   "copyright": "Copyright 2025 bowenliang123",
-  "scope": "Selected original Context dashboard, slash modal, Context Insights and settings card; Pi supplies bounded retained data and private display preferences. No DSH plugin Host or second agent owner.",
+  "scope": "Selected original Context dashboard, slash modal, Context Insights, preferences and sidebar placement. Pi supplies bounded retained data and private display preferences. No DSH plugin Host or second agent owner.",
   "files": [
     {
       "path": "LICENSE",
@@ -129,8 +129,8 @@
       "path": "src/client/components/contextView.tsx",
       "sourcePath": "src/client/components/contextView.tsx",
       "sourceSha256": "74b7f1cbd92f48288b0605f833614d53a0ed3f66aa9fe7fff270b4c797f9c6aa",
-      "sha256": "29636fa217ea416a4d59f976e78296fd1fada106d77f02e21845671c62079aad",
-      "adaptation": "Forward the page-local read-only request picker projection to the original browser; supplier structure/CSS retained."
+      "sha256": "054f5a70fb068a042fb1d0b7aa48cdb4b0ddf50187b8bc7d9d7143c281a8819c",
+      "adaptation": "Forward the page-local read-only request picker projection to the original browser; supplier structure/CSS retained. Independent dock-occurrence scroll key; original tab default and presentation retained. Family navigation requires a served family face; no inferred zero-child figures. Bind sidebar scroll restoration to its original root scrollport; supplier CSS retained."
     },
     {
       "path": "src/client/components/currentComposition.tsx",
@@ -481,8 +481,8 @@
       "path": "src/client/services.ts",
       "sourcePath": "src/client/services.ts",
       "sourceSha256": "3be5873be11cfa7c3f34cee2039dd4eedbc60bc0c72c6b8ae7805c58318fb16f",
-      "sha256": "3be5873be11cfa7c3f34cee2039dd4eedbc60bc0c72c6b8ae7805c58318fb16f",
-      "adaptation": "verbatim"
+      "sha256": "7be8a5870e590e4d59dcf845a6474052f6e3931d521f46df0157b7891de51122",
+      "adaptation": "Optional dock-occurrence scroll identity; original tab default and presentation retained."
     },
     {
       "path": "src/client/sessionData.ts",
@@ -699,6 +699,13 @@
       "sourcePath": "src/shared/types.ts",
       "sourceSha256": "10ab8d9a5fbe0d4bfac50e0ae5116a91238416b366207179bf1e7cadc74885a7",
       "sha256": "10ab8d9a5fbe0d4bfac50e0ae5116a91238416b366207179bf1e7cadc74885a7",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/client/placement.ts",
+      "sourcePath": "src/client/placement.ts",
+      "sourceSha256": "1cf6ab6e1d776acd4ce424f3bcb8ec5aca2766e6860bba9a1f2ba8548e4c4c94",
+      "sha256": "1cf6ab6e1d776acd4ce424f3bcb8ec5aca2766e6860bba9a1f2ba8548e4c4c94",
       "adaptation": "verbatim"
     }
   ]

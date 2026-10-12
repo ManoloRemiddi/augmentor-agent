@@ -42,6 +42,7 @@
     "zustand": "5.0.11"
   },
   "dependencies": {
+    "picomatch": "4.0.7",
     "zod": "4.4.3"
   }
 }

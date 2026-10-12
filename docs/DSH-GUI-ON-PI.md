@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Context sidebar and placement](CONTEXT-SIDEBAR.md) connects the supplier guide/tab/placement registrations and file activity previews to the existing Pi data/IO path. Source, ordinary and installed evidence are scoped separately; complete migration/Fleet/prompt/platform gates remain open.
+
 [Installed original Harness file previews](HARNESS-FILE-PREVIEWS.md#installed-mx-qualification--october-12): corrected runtime dacba8c341e56a3265b51d36bf6a2620c3e87de7, private MX 20261012-015903-110d1bc4, product 0.2.13, artifact 24f77f8e70136a4e32d74af7e1b47a1eb1ab044d4ab65f8bc6419ab4a0a99a5a, selected/running. Source and ordinary Node 24.19.0 each pass 277/277 across 47 files; two packaging cases pass in each tree. Original chip/sidebar/context/Insights, actual file reload, cold tab/draft restoration, maintenance veto and clearing pass with 22,630 verified inventory entries. Eleven histories/queues, old original prefixes, attachment bytes and settings remain preserved. MIT supplier selection is 482 files; Apache-2.0 dsh-context remains unchanged. Pinned MIT Zod 4.4.3 and original ISC YAML frontmatter have reviewed notices. Full viewers/shortcuts/migration/privacy/public packaging/platform gates remain open.
 
 ## Installed original Context Insights — October 11

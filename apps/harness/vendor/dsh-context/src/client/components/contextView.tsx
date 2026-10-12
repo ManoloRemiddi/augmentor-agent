@@ -1,5 +1,5 @@
 // Augmentor modification, October 2026: pass the page-local read-only request
-// picker seat to the original browser. Supplier structure and CSS are unchanged.
+// picker seat, independent dock scroll identity/root and served-family navigation. Supplier structure and CSS are retained.
 // Original Copyright 2025 bowenliang123 and Apache-2.0 licence remain in force.
 import { createElement as h, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react'
 import type { Category, ContextEventRecord, RequestRecord, SurfaceNode } from '../../shared/types'
@@ -38,6 +38,7 @@ import { aggregateByTurn, attachMarkers, jumpTargetOf, makeTrendChart, turnSteps
 import { assemble } from '../assemble'
 import { trendBandsOf } from '../dna'
 
+import {sessionsFaceOf} from '../agentTree'
 import { activateViewTab, openContextSidebar, subscribeContextFocus, takeContextFocus } from '../viewFocus'
 import { revealInScrollParent } from '../revealScroll'
 import { makeErrorBoundary } from './errorBoundary'
@@ -112,6 +113,8 @@ export function makeContextView(
 
   function ContextViewBody(props: ContextViewProps): ReactElement {
     const sessionId = props.sessionId
+    // Augmentor adaptation: independent scroll ledgers for dock occurrences; tab default retained.
+    const scrollKey = props.scrollScope ?? sessionId
     const inSidebar = props.host === 'sidebar'
     const { source, data, pressure, breakdown, usage } = useContextSession(props)
     // `contextHeaders` (full system prompt + tool schemas) for the Context browser; absent on older Host halves →
@@ -178,7 +181,7 @@ export function makeContextView(
     // The stats board's family cell names the Agent Network card: its own tab when the preferences serve one,
     // else the right Sidebar panel that keeps the card inline. A deployment serving neither — a stripped
     // harness, or the tab hidden with no Sidebar — leaves the cell a plain figure instead of a dead button.
-    const hasFamilyView = settings.fleetTab() === 'show' || settings.defaultPlacement() !== 'tab'
+    const hasFamilyView = sessionsFaceOf(ctx) !== null && (settings.fleetTab() === 'show' || settings.defaultPlacement() !== 'tab')
     const onTeamClick = useCallback((): void => {
       if (!activateViewTab(t('tab.fleet'))) openContextSidebar(ctx)
     }, [t])
@@ -186,8 +189,8 @@ export function makeContextView(
     // Restore the saved position in a layout effect, so the chat's bottom-anchored position never flashes in first.
     useLayoutEffect(() => {
       if (typeof sessionId !== 'string' || sessionId === '' || data === null) return
-      if (restoredRef.current === sessionId) return
-      restoredRef.current = sessionId
+      if (restoredRef.current === scrollKey) return
+      restoredRef.current = scrollKey
       /* v8 ignore next 3 -- a layout effect body only runs while mounted and
          both render paths attach rootRef, so the null arm cannot fire. */
       const scroller = rootRef.current !== null
@@ -195,8 +198,8 @@ export function makeContextView(
         : null
       if (scroller === null) return
       scrollerRef.current = scroller as HTMLElement
-      scroller.scrollTop = viewScroll.get(sessionId) ?? 0
-    }, [sessionId, data])
+      scroller.scrollTop = viewScroll.get(scrollKey!) ?? 0
+    }, [sessionId, scrollKey, data])
 
     // Save the position in a layout-effect cleanup, so it fires before the incoming view's layout effects re-scroll the shared container.
     useLayoutEffect(() => {
@@ -204,9 +207,9 @@ export function makeContextView(
         if (typeof sessionId !== 'string' || sessionId === '') return
         const scroller = scrollerRef.current
         if (scroller === null) return
-        viewScroll.set(sessionId, scroller.scrollTop)
+        viewScroll.set(scrollKey!, scroller.scrollTop)
       }
-    }, [sessionId])
+    }, [sessionId, scrollKey])
 
     // No locale subscription here: the harness slot outlet re-renders every entry on a locale switch, and the kit's
     // bound `t` reads the active locale at call time.
@@ -383,7 +386,7 @@ export function makeContextView(
 
     if (!data) {
       return (
-        <div className="lc-root" ref={rootRef}>
+        <div className="lc-root" ref={rootRef} data-conversation-scroll={inSidebar ? '' : undefined} style={inSidebar ? { minHeight: 0 } : undefined}>
           {source.detailState === 'failed'
             ? <DetailNote state="failed" onRetry={source.retryDetail} />
             : <div className="lc-empty">{t('loading')}</div>}
@@ -556,7 +559,7 @@ export function makeContextView(
     )
 
     return (
-      <div className="lc-root" ref={rootRef}>
+      <div className="lc-root" ref={rootRef} data-conversation-scroll={inSidebar ? '' : undefined} style={inSidebar ? { minHeight: 0 } : undefined}>
 
         {inSidebar ? null : (
           <div className="lc-cols lc-head">

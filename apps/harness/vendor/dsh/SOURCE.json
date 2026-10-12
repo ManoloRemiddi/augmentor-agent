@@ -2901,6 +2901,12 @@
       "sha256": "6d314b677a163808a732c53fc509eebea1f8b8cc34b67031644dcfa4a97e28f0",
       "upstreamPath": "packages/util/crypto/src/index.ts",
       "upstreamSha256": "6d314b677a163808a732c53fc509eebea1f8b8cc34b67031644dcfa4a97e28f0"
+    },
+    {
+      "path": "packages/client/ui-sidebar-right/src/client/tab-registry.ts",
+      "sha256": "5b58415daec7f9202bab494516bd20542ca938fbecef70b187414ac59b8b92d2",
+      "upstreamPath": "packages/client/ui-sidebar-right/src/client/tab-registry.ts",
+      "upstreamSha256": "5b58415daec7f9202bab494516bd20542ca938fbecef70b187414ac59b8b92d2"
     }
   ]
 }

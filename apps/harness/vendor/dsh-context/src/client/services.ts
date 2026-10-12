@@ -1,3 +1,4 @@
+// Augmentor adaptation: optional independent dock scroll identity in presentation props; runtime services retained.
 /**
  * Client-side harness boundary: the harness web-half surface this plugin
  * consumes, plus the sanitizers that re-prove every delivered value.
@@ -145,6 +146,8 @@ export interface SessionStandardProps {
 export interface ContextViewProps extends SessionStandardProps {
   /** Set only by the right-Sidebar registration, which drops the head cards a narrow column cannot serve. */
   host?: 'sidebar'
+  /** Augmentor adaptation: optional scroll identity for independent dock occurrences. */
+  scrollScope?: string
 }
 
 /** Read one projection key through the standard seat, narrowed at the

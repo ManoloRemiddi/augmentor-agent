@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 /** Display defaults only. They never alter model input or supplier/agent ownership. */
 export const CONTEXT_PREFERENCE_OPTIONS:Record<string,readonly string[]>={
- defaultGranularity:['step','turn'],defaultTrendMode:['total','delta'],defaultDeltaBase:['step','turn'],
+ defaultPlacement:['tab','sidebar','all'],defaultGranularity:['step','turn'],defaultTrendMode:['total','delta'],defaultDeltaBase:['step','turn'],
  defaultToolSort:['size','count','name'],defaultFileSort:['count','latest','path'],insightsEntry:['show','hide'],defaultDurationCurve:['show','hide'],
 };
 const defaults:Record<string,string>={defaultPlacement:'tab',defaultGranularity:'step',defaultTrendMode:'total',defaultDeltaBase:'step',defaultToolSort:'count',defaultFileSort:'count',insightsEntry:'show',defaultDurationCurve:'show',fleetTab:'hide',promptPrefix:'',promptSuffix:''};
