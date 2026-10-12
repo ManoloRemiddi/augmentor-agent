@@ -416,3 +416,71 @@ The registered-provider follow-up includes two existing SDK owners. Pi's public 
 
 
 After the shared-registration correction, strict check/build and the complete 66-file source cohort again pass **342/342**, zero failures/skips/cancellations, using the same Node/QtTest/two-worker/deadline contract. This is the final source baseline for ordinary reassembly; the prior ordinary artifact is retained as the failing regression comparator.
+
+
+## Ordinary and installed lifecycle qualification — October 13
+
+Corrected runtime **79ee4ff4c3b7e205833f20f936843ce37886b1cd** is selected and running in private MX
+**20261013-013249-f43fa0d0**, product **0.2.13**, artifact
+**ac0a3fad21de2808a9cb37a7ec7748668234991335aea08b436fb37810144663**. Final source and ordinary bundled Node **24.19.0** each pass
+**342/342 across 66 files**, zero failures/skips/cancellations, two workers,
+unchanged deadlines and matching prepared PySide6/QtTest **6.8.2.1**. Five
+notice/workspace Python cases pass in each scope. The ordinary artifact contains
+**657 compiled files, 20,801 production dependency files, 151 npm instances,
+nine native/Wasm executables and 783 licence files**, with **127 browser notice
+records / 126 versions**. No dependency or native package is added. MIT GUI
+selection stays **580** files; Apache-2.0 dsh-context stays **108**. All supplier
+records/CSS and inherited production dependency/Node/native bytes remain unchanged.
+
+The initial 7f44288 ordinary artifact passes its original 342 cases but fails the
+new shared-registration assertion. It remains the explicit regression comparator.
+The corrected second assembly reuses the exact freshly staged dependency tree.
+Its initial seed omitted **82 Photon and 23 QuickJS** notice files; before staging,
+all 105 are restored and the complete 783-file notice inventory is verified byte
+for byte against the preceding release. First immutable adoption
+**20261013-012223-1e5fd4a4** passes runtime checks, but its later full path comparison
+exposes three missing generated distribution records: exclusions, overrides and
+prerequisites. That immutable release is preserved. The records are restored in
+the separate ordinary tree and normal staging/activation creates the final release
+above; no selected release is patched. Always preserve the entire notice set and
+these generated records when reusing a production dependency seed. The final
+inventory inherits every preceding path except the qualified generated Excel
+entry chunk replacement (YIFN2U4S → GI2BPDBV); its parser-worker/provenance records
+and original UI remain preserved.
+
+Six lifecycle cases run using the first immutable candidate's bundled Node and
+actual staged Host in isolated authored profiles, including the two SDK owners
+and the unchanged-file registration regression. The fault-injected Host module
+also matches the staged compiled bytes. Final immutable **dist, Node,
+node_modules and all licence bodies** are verified identical to that tested
+candidate; only the three restored distribution records distinguish its relevant
+packaging closure. This is synthetic immutable SDK/Host qualification, not an
+owner model/configuration test or broad live-provider acceptance.
+
+After each guarded idle close, activation finishes before stable Host startup;
+its exact bundled Node and entry are checked before the stable Native launcher.
+Final Host **958987** and Native **963077** are online/model-ready/idle at the
+same selected root. The complete **23,880-entry** immutable inventory verifies
+after actual browser use. The original Insights view is reopened at the owner's
+normal viewport, with **11 nonarchived metadata entries, seven newest contexts,
+eight cards and zero failed/partial/usage-gap reads**, and left open. Read-only
+Models description is confirmed and still contains **eleven** owner models.
+No owner model prompt, endpoint listing, credential entry or configuration write
+is performed. Existing original form/discovery manual acceptance remains its
+separate earlier evidence; this increment changes runtime lifecycle only.
+
+Both the intermediate baseline and original pre-adoption baseline verify. All
+**twelve** histories and queue-item identities, draft/attachment bytes, profile
+values/revision, explicit **models.json/auth.json** presence and bytes, production
+selection and model-router executable/arguments remain preserved. Of **247**
+preceding saved files, **243** are identical; one observation journal retains its
+exact prefix and adds one close plus one load, with three related index/counter
+derivatives. No conversation/placeholder or saved original is added/removed. Qwen
+and Breeze placement, context/concurrency/precision and CPU ASR/VAD remain
+unchanged. Canonical main retains its **38** pre-existing changed paths.
+
+This qualifies the stated Linux configuration/reload/shared-registration
+lifecycle. Complete OAuth/virtual/advanced GUI and Native/Browser model management,
+full P0/P1 migration, real provider/physical/privacy/public distribution and
+other-platform gates remain open. DSH remains available; further OS implementation
+awaits owner MX feedback. No public binary is published.
