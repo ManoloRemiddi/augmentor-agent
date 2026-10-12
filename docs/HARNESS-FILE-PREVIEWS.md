@@ -156,3 +156,60 @@ CSS, dependencies and licence bodies are unchanged. The strengthened original
 Chromium case requires “Code block” and rejects the untranslated key. Corrected
 source/ordinary/installed evidence follows separately; this first candidate is
 historical and not final GUI acceptance.
+
+## Installed MX qualification — October 12
+
+Corrected runtime **dacba8c341e56a3265b51d36bf6a2620c3e87de7** is selected **and running** in private MX
+**20261012-015903-110d1bc4**, product 0.2.13, artifact **24f77f8e70136a4e32d74af7e1b47a1eb1ab044d4ab65f8bc6419ab4a0a99a5a**.
+Corrected source and fresh ordinary bundled Node 24.19.0 each pass **277/277
+across 47 files**, zero failures/skips/cancellations, prepared QtTest, two workers
+and unchanged deadlines. Two Python workspace-packaging cases pass in both
+trees. Type/build/hash/graph/notice checks pass. The 511-file compiled tree,
+19,878 dependency files, 132 npm instances, 730 licence files, six native
+executables and 98 browser notice records are qualified; dependencies, Node,
+native binaries and every licence file match the first installed preview
+candidate exactly. This corrected adapter adds no supplier source or dependency.
+
+Guarded staging, accepted Native maintenance close, one settled Host shutdown,
+terminal activation, stable Host completion and exact selected Node/entrypoint
+verification precede stable Native launch. Running Host/Native roots match the
+selection, Native is online/model-ready/idle, and the full **22,630-entry**
+inventory passes after GUI acceptance. The first candidate remains immutable.
+
+Installed original Context and Insights read retained data. The original file
+completion/chip opens actual preview-note.txt in the narrow fullscreen sidebar;
+its original common “Code block” label is visible. Original reload re-reads the
+file. Full page reload restores the tab, actual content and exact rich draft
+metadata/revisions. The dirty fixture draft vetoes maintenance; the original
+close and editor keys end its preview and clear only the owned unsent fixture.
+No new object/receipt, prompt admission, provider request or tool action occurs.
+The Context, restored-preview and Insights screenshots are retained privately in
+outputs; the actual Insights view remains open for owner feedback.
+
+All eleven displayed histories and queue item identities remain preserved.
+All **243** preceding original files retain exact old prefixes: **233** are
+byte-identical; four journals add only two saved-title/session_info, two close
+and two load entries with six corresponding counter/index derivatives. Only the
+owned fixture draft metadata changes; all attachment bytes and file/object sets
+remain preserved. Profile/model/speech settings, production selection and the
+existing model router remain preserved. This is installed local GUI/read
+acceptance, distinct from the synthetic source fixture's explicit provider call
+and from full live migration or physical other-platform acceptance.
+
+Complete Harness/P0/P1 migration, privacy/public packaging, unbound viewers and
+keyboard commands remain open. DSH stays available. Further OS implementation
+stays deferred for owner MX feedback. The later qualification publication changes
+documentation only, not this runtime or immutable selected release.
+
+To reproduce the focused public fixtures after the normal check/build, use the
+prepared QtTest interpreter and tested Node 24.19.0:
+
+```sh
+node --test --test-concurrency=2 tests/harness-file-preview*.test.mjs
+python3 -m unittest discover -s tests -p test_production_workspaces.py -v
+```
+
+Set AUGMENTOR_PYTHON to that prepared interpreter for the wider GUI/native cohort.
+Run the same copied tests inside a fresh ordinary assembly using its own bundled
+Node and AUGMENTOR_PI_TEST_ROOT pointing to that assembly; source-only success
+is not an installed qualification.
