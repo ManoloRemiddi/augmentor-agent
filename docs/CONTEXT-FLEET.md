@@ -77,6 +77,38 @@ Complete migration, live/physical/platform, public packaging/privacy and DSH
 retirement gates remain binding. Further OS implementation stays deferred for
 owner MX feedback. The older data-foundation records below retain their scope.
 
+## First installed Fleet candidate and recorded-data captions
+
+Historical first runtime **74a0e1ff4b8860eab9fb3ba454d7925c8317ab9e**,
+private MX **20261012-051227-e53dfbe8**, product **0.2.13**, artifact
+**009ded11477e60207e456ea390161c0a082cb76059a20d324612169c278d4019**,
+passes source and ordinary **283/283 across 52 files** and two ordinary
+workspace-packaging cases. Its ordinary tree has 514 compiled files, 19,888
+dependency files, 133 npm instances, 731 licence files, six native executables
+and 99 browser supplier records. Dependencies and licence bodies are preserved;
+only four reviewed source/modification-notice files change.
+
+Guarded adoption, matching running roots/Node and all **22,657 installed inventory
+entries** pass. Actual MX original Fleet preference Show/reload/view/Hide works.
+The existing Qwen conversation has a verified empty retained worker catalogue,
+so the original solo graph shows its real 7.6k / 262.1k occupancy, two recorded
+requests, 15.2k own billed usage, retained reply and initial prompt. It does not
+invent workers or start inference. Eleven histories/queues, original prefixes,
+draft/attachment sets/bytes and settings values are preserved. Only the two
+temporary Fleet display writes increment profile revision; four journals receive
+classified title/load/close appends with six corresponding derivatives.
+
+That installed inspection exposed inherited “Live context” and “No subagents
+yet” captions, although this adapter serves retained snapshots and a retained
+job catalogue. The authored locale now says **Recorded context and saved
+workers**, **No workers in the retained job catalogue**, and **Initial prompt /
+assigned task**. Original supplier widgets/strings/CSS remain preserved; the
+bindings provide honest deployment-specific labels. The strengthened Chromium
+case requires the recorded caption and absence of the live-context assertion.
+Its three focused cases pass with unchanged deadlines. This first immutable
+candidate remains historical; a fresh corrected ordinary/installed release must
+qualify before its UI acceptance is reported as current.
+
 The next original dsh-context view needs a trustworthy parent/worker catalogue.
 Pi's ordinary conversation forks are historical branches, while bounded jobs
 have separate saved delegation identities and native histories. `session.family`
