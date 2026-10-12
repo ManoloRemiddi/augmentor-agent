@@ -92,6 +92,18 @@ job/desktop-peer property names. The fixtures now use the served contracts and
 bounded hash-verified paging. No product deadlines or two-worker schedule are
 relaxed. Source, ordinary and installed qualification are separate checkpoints.
 
+The first ordinary assembly of c9a96c2 passes **293/294 across 54 files**;
+its cold-reopen textarea assertion runs before the original form finishes
+loading. A strengthened fixture separately asserts both literal strings in the
+cold Host's namespace, then waits for the enabled original textareas to show
+those exact values. Its focused ordinary run passes **5/5 across two files**,
+including the actual SDK request/worker tests. This confirms persisted values
+and eventual original form rendering independently. The private tool gate also
+releases in a finally block so an assertion failure cannot trap cleanup. No
+runtime/supplier/GUI change or deadline/concurrency relaxation is made. A fresh
+ordinary assembly and final cohort must qualify separately; the first artifact
+and its failure remain preserved.
+
 ## Qualification and remaining work
 
 Focused source evidence passes **20/20 across four files**, Node 24.19.0, prepared
