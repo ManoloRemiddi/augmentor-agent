@@ -348,7 +348,9 @@ reloads preserve provider/model identity and the existing execution owner;
 changed definitions append Pi's ordinary model boundary. Configuration changes
 start no conversation request. A later explicit request uses the refreshed
 model. Whole-file changes do not rewrite conversation selection to setup's new
-default connection.
+default connection. An unchanged profile is a no-op only when every loaded owner
+also matches the current SDK catalog; explicit Apply still reconciles a model
+re-registered by an extension without a JSON change.
 
 Whole-file configuration retains SDK fields, headers, compatibility data and
 model overrides, and is not reduced to the minimal editor's curated fields or
@@ -407,4 +409,10 @@ implementation awaits owner MX feedback; DSH remains available.
 
 ### Lifecycle source qualification
 
-Final strict check/build and the exact 66-file MX cohort pass **342/342**, zero failures/skips/cancellations, with Node **24.19.0**, two workers, unchanged deadlines and the prepared matching PySide6/QtTest **6.8.2.1** interpreter. Focused checks pass **16/16**; five notice/workspace Python cases pass. All preceding cohort files stay included. The eight added cases comprise two complete-configuration unit checks and six Host lifecycle/registered-provider/fault checks. Ordinary and installed adoption remain separate from this source result.
+Final strict check/build and the exact 66-file MX cohort pass **342/342**, zero failures/skips/cancellations, with Node **24.19.0**, two workers, unchanged deadlines and the prepared matching PySide6/QtTest **6.8.2.1** interpreter. The initial focused checks pass **16/16**; the final two-owner registration regression passes after reproducing the missing boundary on the prior artifact. Five notice/workspace Python cases pass. All preceding cohort files stay included. The eight added cases comprise two complete-configuration unit checks and six Host lifecycle/registered-provider/fault checks. Ordinary and installed adoption remain separate from this source result.
+
+
+The registered-provider follow-up includes two existing SDK owners. Pi's public extension API refreshes the registering conversation itself, so the first single-owner expectation of an extra boundary was incorrect. The final regression explicitly seeds a second owner before a gated re-registration: identical-file Apply must leave the registering owner's native bytes unchanged and append one ordinary model boundary to the stale peer, preserving both original prefixes and all six authored requests. It fails against the preceding ordinary artifact **7f44288f5522ad3bc41f818f68b0964496e37623** at that exact missing-peer assertion and passes against the corrected source. Final broad requalification follows this correction; prior source/ordinary 342-case evidence describes its earlier checkpoint.
+
+
+After the shared-registration correction, strict check/build and the complete 66-file source cohort again pass **342/342**, zero failures/skips/cancellations, using the same Node/QtTest/two-worker/deadline contract. This is the final source baseline for ordinary reassembly; the prior ordinary artifact is retained as the failing regression comparator.

@@ -121,7 +121,8 @@ export class Host {
       if(!model)throw Error('A loaded conversation uses a model this edit removes. Keep that model configured.');
       requireThinking(model,r.session.thinkingLevel);
     }
-    if(JSON.stringify(previous)===JSON.stringify(config)&&this.modelSettings.applied&&!this.modelSettingsProblem)return;
+    const currentOwners=[...this.loaded.values()].every(r=>JSON.stringify(this.modelRuntime.getModel(r.meta.selection.provider,r.meta.selection.model))===JSON.stringify(r.session.model));
+    if(JSON.stringify(previous)===JSON.stringify(config)&&this.modelSettings.applied&&!this.modelSettingsProblem&&currentOwners)return;
     const fullRefresh=!this.modelSettings.applied||this.modelSettingsProblem||JSON.stringify({...previous,providers:undefined})!==JSON.stringify({...config,providers:undefined});
     this.modelSettingsBusy=true;
     this.modelSettingsProblem=true;
