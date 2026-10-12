@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Installed MX Models qualification](#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.
+
 Current discovery implementation: **340327d6a554094d9ce9d54dcdd0810c08e5b245**. Strict check/build and the exact 65-file MX cohort pass **334/334**, with five separate notice/workspace cases. Ordinary and installed qualification remain open.
 
 Historical initial-forms implementation: **efc0dd564dd2ae2b68c86f50ad83fa53a8eea4a0**. Fresh strict check/build and the exact 64-file MX cohort pass **323/323**, with five separate notice/workspace cases. This is source-only qualification; ordinary and installed acceptance remain open.
@@ -250,3 +252,85 @@ The selected MX release and running Host remain the preceding shortcut build;
 the previously qualified Native PID was absent at the preceding readback. This
 source turn performs no installed update, restart, owner prompt or model/speech/
 GPU/context/concurrency/precision change.
+
+## Ordinary and installed MX qualification — October 13
+
+The locked production dependency stage is fresh and separate from the selected
+release. The ordinary artifact uses runtime source
+**340327d6a554094d9ce9d54dcdd0810c08e5b245**, with documentation/source snapshot
+**9aba945a63023931729ae03af6fd84febb807bb5**. Its actual bundled Node **24.19.0**
+and exact **65-file** MX cohort pass **334/334**, zero failures/skips/cancellations,
+with matching QtTest **6.8.2.1**, two workers and unchanged deadlines. Five
+notice/workspace Python cases pass separately. No source check or fixture result
+is relabelled as ordinary evidence.
+
+Assembly contains **657 compiled files**, **20,801 production dependency files**,
+**151 npm instances**, **783 licence files**, **nine native/Wasm executables** and
+**127 browser notice records for 126 supplier name/version pairs**. All inherited
+production paths/bytes, Node/native binaries and engine/PDF/Office payloads and
+notices are preserved. Existing spreadsheet/HTML/shortcut and Apache dsh-context
+records are identical. The Models selection stays 580 GUI files, with its marked
+coverage/default-hint adaptations and three separately noticed runtime helpers.
+No npm/native dependency is added. Post-test notices/reports remain byte-exact.
+
+The stable updater stages a new immutable candidate and activates it only after
+an idle owner audit and guarded Host shutdown. The initial baseline read found a
+stale Native socket refusing connections. The known prior Native PID was absent,
+no preview Native process existed and no listener owned that endpoint. The audit
+therefore records Native as already stopped without unlinking a selected artifact
+or interrupting production windows. A separate fresh comparator is saved; the
+preceding shortcut/HTML comparators and proofs remain intact.
+
+The selected/running private MX release is **20261013-002217-5b1307b9**, product
+**0.2.13**, artifact SHA-256
+**91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**.
+The stable launcher's full inventory validation precedes sequential Host/Native
+startup. Host **PID 762282** uses the selected Node executable and exact selected
+runtime entry; Native **PID 764227** uses the matching selected root/PYTHONPATH and
+reports online/model-ready/idle. All **23,880** inventoried entries match before
+and after GUI use. Both prior and new immutable releases remain available.
+
+Actual installed manual browser acceptance uses the selected Host/Node/assets in
+a disposable, independently authored profile. One tool-free deterministic SDK
+seed precedes UI use. The copied Settings/Models provider form applies one
+non-secret display-name change. The original fetch action contacts the synthetic
+loopback endpoint, opens the original picker, shows its own one-page notice and
+uses the original checkbox defaults/toggles. Fetch and candidate adoption leave
+the saved model catalog unchanged until the separate **Apply**. That second
+explicit write saves the discovered ID/name/context/output metadata. A full
+reload visibly restores the provider name and both model rows.
+
+The disposable fixture retains exact prior native bytes, display history,
+provider/model selection, selected-model capacity, ordinary profile values and
+synthetic API key, with **zero subsequent inference** after its one seed. Manual
+acceptance does not type or replace a credential. The two GUI writes affect only
+the disposable model profile. The fixture tab is closed; the producer's exec handle
+is terminal with code 143 and both producer and fixture Host are absent. Its
+synthetic state/proofs are retained; this is not a graceful-exit claim. Source/
+ordinary tests for other creation/deletion/stale/credential/timeout/cancellation
+paths remain distinct from these specific manual actions.
+
+The owner profile is inspected without any configuration write or endpoint fetch:
+all eleven configured models are exposed through the original editor, with the
+selected Qwen route still showing **262,144** context tokens, **8,192** output
+tokens, and text/image inputs. The editor is cancelled. Original Insights is left
+open, with **eleven** non-archived metadata entries, **seven** eligible newest
+contexts, **eight** cards and **zero** failed/partial reads or usage gaps. These
+are existing retained records, not newly generated model activity.
+
+After owner UI use, all **twelve** preceding histories and queue-item identities,
+draft/attachment bytes, backend profile values/revision, production selection and
+model-router executable/arguments remain preserved. Of **247** preceding saved
+files, **243** are identical; one observation journal keeps its exact prefix and
+adds one close plus one load, with three related counter/index derivatives. No
+new conversation/placeholder or saved original is added/removed. The running
+router, Qwen/Breeze GPU placement, context/concurrency/precision and CPU ASR/VAD
+path are unchanged. Canonical main's 38 pre-existing edits remain preserved.
+
+This private installed checkpoint qualifies the stated original Forms/discovery
+scope on MX. Live endpoint/account/provider qualification, OAuth/command/virtual/
+advanced configuration, shared provider-control parity, legacy whole-file
+configuration lifecycle reconciliation and full P0/P1 migration remain open.
+Other OS implementation awaits owner MX feedback. DSH remains available; no
+public binary, complete migration, global privacy or physical voice/desktop
+acceptance is claimed.
