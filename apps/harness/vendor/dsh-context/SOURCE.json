@@ -4,7 +4,7 @@
   "version": "0.68.1",
   "license": "Apache-2.0",
   "copyright": "Copyright 2025 bowenliang123",
-  "scope": "Selected original Context dashboard, slash modal, Context Insights, preferences and sidebar placement. Pi supplies bounded retained data and private display preferences. No DSH plugin Host or second agent owner.",
+  "scope": "Selected original Context dashboard, slash modal, Insights, preferences, sidebar and Fleet. The verbatim public prompt-section registration is transpiled separately for a Pi request-time registry seat. No Cordis runtime, supplier agent Host or second agent owner.",
   "files": [
     {
       "path": "LICENSE",
@@ -713,6 +713,13 @@
       "sourcePath": "src/client/viewkit.ts",
       "sourceSha256": "aed7b7d7cccb23f911ff21ef51973ecd3476d9ab8774cc84b2f9106667f6c219",
       "sha256": "aed7b7d7cccb23f911ff21ef51973ecd3476d9ab8774cc84b2f9106667f6c219",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/host/promptInjection.ts",
+      "sourcePath": "src/host/promptInjection.ts",
+      "sourceSha256": "f5c943d3f97d7a01fdd72d762119509b48d4cc0f27a4b8736ebc61f068c46e1b",
+      "sha256": "f5c943d3f97d7a01fdd72d762119509b48d4cc0f27a4b8736ebc61f068c46e1b",
       "adaptation": "verbatim"
     },
     {

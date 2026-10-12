@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original literal prompt wrapping on Pi](CONTEXT-PROMPT-WRAPPING.md) connects the copied Prefix/Suffix card to the supplier's verbatim section registration and Pi's request-time context hook. Each conversational request records its own private preference revision; native originals, tool state and the single owner are preserved. Source, ordinary and installed qualification are distinct. The Fleet release below remains selected/running until guarded promotion; complete migration/live/public packaging/platform gates remain open.
+
 # Original Fleet on Pi
 
 ## Installed MX qualification — October 12

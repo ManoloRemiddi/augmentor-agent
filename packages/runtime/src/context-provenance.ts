@@ -38,6 +38,7 @@ export class ContextProvenance {
   }
   beginRequest(messages:unknown){this.request.clear();this.requestBytes=0;this.save(this.request,'beforeTransform',messages);this.nativeLineage();}
   transformed(messages:unknown){this.save(this.request,'afterTransform',messages);}
+  promptWrapping(record:unknown){this.save(this.request,'promptWrapping',record);}
   streaming(context:unknown){this.save(this.request,'sdkContext',context);}
   beforePayload(payload:unknown){this.save(this.request,'beforeProviderHooks',payload);}
   endRequest(){this.request.clear();this.requestBytes=0;}
@@ -95,7 +96,7 @@ export class ContextProvenance {
     this.save(this.request,'afterProviderHooks',payload);
     if(!this.capture())this.dropBodies();
     const frames=new Map([...this.run,...this.request]);
-    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks'];
+    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','promptWrapping','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks'];
     const snapshots=Object.fromEntries(names.map(key=>[key,summary(frames.get(key)??missing())]));
     const before=frames.get('beforeTransform'),after=frames.get('afterTransform');
     const difference=messageDifference(before,after);

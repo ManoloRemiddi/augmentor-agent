@@ -23,7 +23,7 @@ function setup(t){
 function body(store,record){return JSON.parse(store.payload('fixture',record.id).text);}
 
 test('metadata mode and a mid-request capture change cannot expose earlier snapshot bodies',t=>{
- const f=setup(t);f.setCapture(false);f.provenance.memory(contribution('PRIVATE_MEMORY'));
+ const f=setup(t);f.setCapture(false);f.provenance.memory(contribution('PRIVATE_MEMORY'));f.provenance.promptWrapping({sections:[{text:'PRIVATE_PREFIX'}]});
  f.provenance.beginRequest([{role:'user',content:'PRIVATE_INPUT'}]);f.provenance.transformed([{role:'user',content:'PRIVATE_CHANGED'}]);
  const disabled=f.provenance.finish({apiKey:'SECRET',content:'PRIVATE_PROVIDER'});
  assert(!JSON.stringify(disabled).includes('PRIVATE_'));assert.equal(disabled.data.snapshots.beforeTransform.state,'disabled');assert.equal(disabled.data.memory.sdkSystemPresence,'not-observed');
