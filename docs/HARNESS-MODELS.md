@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Current discovery implementation: **340327d6a554094d9ce9d54dcdd0810c08e5b245**. Strict check/build and the exact 65-file MX cohort pass **334/334**, with five separate notice/workspace cases. Ordinary and installed qualification remain open.
+
 Historical initial-forms implementation: **efc0dd564dd2ae2b68c86f50ad83fa53a8eea4a0**. Fresh strict check/build and the exact 64-file MX cohort pass **323/323**, with five separate notice/workspace cases. This is source-only qualification; ordinary and installed acceptance remain open.
 
 # Original DSH Models settings on Pi
