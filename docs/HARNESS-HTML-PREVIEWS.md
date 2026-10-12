@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original main-document shortcuts](HARNESS-SHORTCUTS.md) adds the registry/reference/recorder separately from this HTML transport. The fixed opaque frame gets no keyboard/Host action bridge; its compiled transport, supplier bodies and isolation remain preserved.
+
 # Original Harness HTML previews
 
 ## Original components and control — October 12

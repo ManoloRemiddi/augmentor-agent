@@ -19,7 +19,7 @@ const allowed = new Set([
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue', 'session.compact', 'session.compaction', 'session.acknowledgeCompaction',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.search', 'observation.payload', 'observation.clear',
-  'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
+  'shortcuts.describe', 'shortcuts.edit', 'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
 type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
@@ -176,7 +176,7 @@ export class HarnessServer {
             bytes += item.bytes; frames.push({seq: item.seq, sessionId: item.sessionId, frame: item.frame});
           }
           this.send(res, 200, {frames, cursor: frames.at(-1)?.seq ?? this.sequence, hasMore: eligible.length > frames.length,
-            gap: after < (this.evicted.get(sessionId) ?? 0)});
+            gap: after < (this.evicted.get(sessionId) ?? 0),...(access.mode==='operator'&&Number.isSafeInteger(this.host.shortcutSettingsRevision)?{settingsRevision:this.host.shortcutSettingsRevision}:{})});
           return;
         }
         if(req.method==='GET'&&(url.pathname==='/api/preview/office'||url.pathname==='/api/preview/office-generation')){

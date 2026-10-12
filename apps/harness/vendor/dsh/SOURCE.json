@@ -3289,6 +3289,160 @@
       "sha256": "37b751f8c9e41ddfd0cef0f15f6a0dd12da5d6fe704baff79c12e99c313027a9",
       "upstreamPath": "packages/client/ui-settings/package.json",
       "upstreamSha256": "37b751f8c9e41ddfd0cef0f15f6a0dd12da5d6fe704baff79c12e99c313027a9"
+    },
+    {
+      "path": "packages/client/shortcuts/package.json",
+      "sourcePath": "packages/client/shortcuts/package.json",
+      "sourceSha256": "c5d3214c925ae0fac80b828787ca6ad967031981187240278d567af4112e5691",
+      "sha256": "c5d3214c925ae0fac80b828787ca6ad967031981187240278d567af4112e5691",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/package.json",
+      "sourcePath": "packages/client/ui-shortcuts/package.json",
+      "sourceSha256": "5f72823689068655e10c95356100b0c5652f1daec76b27cb364089e5b46943a7",
+      "sha256": "5f72823689068655e10c95356100b0c5652f1daec76b27cb364089e5b46943a7",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/shortcuts/src/binding.ts",
+      "sourcePath": "packages/client/shortcuts/src/binding.ts",
+      "sourceSha256": "d5a05f440aa2115ab906ff87a44bf01baf93b3078b3e5304355bf6e9546e85c5",
+      "sha256": "4596f0fc63c7514f69fe3e18c8f09367744662638778252948d0979d02ce327e",
+      "adaptation": "Modified by Augmentor: guarded Linux browser two-modifier support; existing system/editor reservations and other profiles remain unchanged."
+    },
+    {
+      "path": "packages/client/shortcuts/src/configuration.ts",
+      "sourcePath": "packages/client/shortcuts/src/configuration.ts",
+      "sourceSha256": "d43a5b11e20c94b30398ffad0cde8037caa3c913d95b5877e2b4c4539c4ab67c",
+      "sha256": "d43a5b11e20c94b30398ffad0cde8037caa3c913d95b5877e2b4c4539c4ab67c",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/shortcuts/src/persistence.ts",
+      "sourcePath": "packages/client/shortcuts/src/persistence.ts",
+      "sourceSha256": "55f463b75739b285a654ae3517d9151571aa5aa1b674427075cc351ecabccb09",
+      "sha256": "55f463b75739b285a654ae3517d9151571aa5aa1b674427075cc351ecabccb09",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/shortcuts/src/native.ts",
+      "sourcePath": "packages/client/shortcuts/src/native.ts",
+      "sourceSha256": "07d8f94e011d377e6eb944a0f5cffb88c9ca5e4038fe06f7a6643855926076ef",
+      "sha256": "07d8f94e011d377e6eb944a0f5cffb88c9ca5e4038fe06f7a6643855926076ef",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/shortcuts/src/protocol.ts",
+      "sourcePath": "packages/client/shortcuts/src/protocol.ts",
+      "sourceSha256": "982aaf97945f8f41df647edc01ad7eb4c1aca9a60909c6ba50dc4b1484182877",
+      "sha256": "982aaf97945f8f41df647edc01ad7eb4c1aca9a60909c6ba50dc4b1484182877",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/shortcuts/src/client/types.ts",
+      "sourcePath": "packages/client/shortcuts/src/client/types.ts",
+      "sourceSha256": "6a1eca21c8e000c5c2b8a0eede33e6984a37269648872a9309da2990dd8759f8",
+      "sha256": "6a1eca21c8e000c5c2b8a0eede33e6984a37269648872a9309da2990dd8759f8",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/shortcuts/src/client/registry.ts",
+      "sourcePath": "packages/client/shortcuts/src/client/registry.ts",
+      "sourceSha256": "73c5e66a8e49235537a893cd1273321932ca69afab0a98da6c6641715756b47e",
+      "sha256": "73c5e66a8e49235537a893cd1273321932ca69afab0a98da6c6641715756b47e",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/shortcuts/src/client/dom.ts",
+      "sourcePath": "packages/client/shortcuts/src/client/dom.ts",
+      "sourceSha256": "068ecc2f5a2d65a1d67aeaa345490dbfc7b7ca08afe1afd811eba665942c8e6f",
+      "sha256": "068ecc2f5a2d65a1d67aeaa345490dbfc7b7ca08afe1afd811eba665942c8e6f",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/Reference.tsx",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/Reference.tsx",
+      "sourceSha256": "b3de5156041b1045e5ddbeb4f27a03cd88945280c472dcd0b3f9687ef0eddaa2",
+      "sha256": "b3de5156041b1045e5ddbeb4f27a03cd88945280c472dcd0b3f9687ef0eddaa2",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/store.ts",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/store.ts",
+      "sourceSha256": "51faddc0626a4516ef1461603874d58cb2ea4e8668d9ce9f45a6ae5682984e7d",
+      "sha256": "51faddc0626a4516ef1461603874d58cb2ea4e8668d9ce9f45a6ae5682984e7d",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/index.ts",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/index.ts",
+      "sourceSha256": "f53559d93db900fa14a934835dba71482e2d598b6f46e7c3d6edf6f09e159fca",
+      "sha256": "f53559d93db900fa14a934835dba71482e2d598b6f46e7c3d6edf6f09e159fca",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/feedback.ts",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/feedback.ts",
+      "sourceSha256": "0615769402db6ee6dc854fc37f4a4ae570a8a1763383a05d5be87f1b0daa8d5c",
+      "sha256": "0615769402db6ee6dc854fc37f4a4ae570a8a1763383a05d5be87f1b0daa8d5c",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/fixed.ts",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/fixed.ts",
+      "sourceSha256": "ace141f708be4bdcdc0f8e1ba20e275bd16f2816bcd293134d350beb053a6cda",
+      "sha256": "ace141f708be4bdcdc0f8e1ba20e275bd16f2816bcd293134d350beb053a6cda",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/locales.ts",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/locales.ts",
+      "sourceSha256": "ecf61d8054fc1acf34713c86c9ffc77ab34c2c840a3fa2ea426f03e8d3f284fa",
+      "sha256": "14cd64c541daccaa723574e2d99537def4359a9d6c943195cfcc3cb674c9aea9",
+      "adaptation": "Modified by Augmentor: accurate Linux browser combinations, private Host preference location and unconfirmed-binding diagnostics; original UI/CSS retained."
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/Reference.module.css",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/Reference.module.css",
+      "sourceSha256": "71ab17a0cb573e0fc02aa30077d366eb6c522e2db2151636639f278fa5672da7",
+      "sha256": "71ab17a0cb573e0fc02aa30077d366eb6c522e2db2151636639f278fa5672da7",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/Icons.tsx",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/Icons.tsx",
+      "sourceSha256": "5dd2988c9ba7335c0c9f0c56883db419a44b44faf820259cd40f77c8a6faabd5",
+      "sha256": "5dd2988c9ba7335c0c9f0c56883db419a44b44faf820259cd40f77c8a6faabd5",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-shortcuts/src/client/Editor.tsx",
+      "sourcePath": "packages/client/ui-shortcuts/src/client/Editor.tsx",
+      "sourceSha256": "8674385dc730bfaa79552e170efff9c06620f1af9b02533f96f230bddf103d25",
+      "sha256": "8674385dc730bfaa79552e170efff9c06620f1af9b02533f96f230bddf103d25",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-right/src/client/shortcuts.ts",
+      "sourcePath": "packages/client/ui-sidebar-right/src/client/shortcuts.ts",
+      "sourceSha256": "c2d13eaf2c8b81e4e26a489fcc249f0ef07b1ab03e60faa494e2564be48b2c4a",
+      "sha256": "c2d13eaf2c8b81e4e26a489fcc249f0ef07b1ab03e60faa494e2564be48b2c4a",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-right/src/client/focus.ts",
+      "sourcePath": "packages/client/ui-sidebar-right/src/client/focus.ts",
+      "sourceSha256": "9f9147ba941389b22162a718863a3a1bcb2812fcfb34e2c8224898f85c04534d",
+      "sha256": "9f9147ba941389b22162a718863a3a1bcb2812fcfb34e2c8224898f85c04534d",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-layout/src/client/shortcut-locales.ts",
+      "sourcePath": "packages/client/ui-layout/src/client/shortcut-locales.ts",
+      "sourceSha256": "4b1d030f40d90d530be297e0509506513f98a7e482c04f0f237615cdc0099782",
+      "sha256": "4b1d030f40d90d530be297e0509506513f98a7e482c04f0f237615cdc0099782",
+      "adaptation": "verbatim"
     }
   ]
 }

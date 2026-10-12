@@ -1,0 +1,46 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import test from 'node:test';import assert from 'node:assert/strict';
+import {ShortcutPreferences} from '../dist/runtime/src/shortcut-preferences.js';
+import {initialShortcutConfig,parseShortcutDocument,editShortcutDocument,bindingIssue,normalizeBinding} from '../dist/runtime/vendor/dsh-shortcuts.js';
+import {DshShortcutScope,checkedShortcutSnapshot} from '../apps/harness/dsh-shortcut-scope.mjs';
+const tick=()=>new Promise(resolve=>setImmediate(resolve));
+const binding=code=>({code,modifiers:['control','alt']});
+const definitions=[{id:'session.search',defaults:{'web:linux':binding('KeyK')}},{id:'shortcuts.open',defaults:{'web:linux':{code:'Slash',modifiers:['control']}}},{id:'fixed.select',defaults:{},fixed:[{code:'Enter',modifiers:[]}]}];
+function store(raw=null,write){const writes=[];let saved=raw;return {writes,get raw(){return saved;},change:v=>saved=v,preferences:new ShortcutPreferences(()=>saved,v=>{writes.push(v);if(write)write(v);saved=v;})};}
+test('original shortcut transactions preserve dormant/device overrides, detect another accepted writer and never alter unrelated storage',async()=>{
+ const document={schemaVersion:1,profiles:{'web:macos':{'session.search':null},'web:linux':{'plugin.dormant':binding('KeyJ')}}},f=store(JSON.stringify(document));
+ const first=await f.preferences.describe('linux',definitions);assert.deepEqual(first.document,document);assert.equal(first.status,'ready');
+ const accepted=await f.preferences.edit('linux',{type:'set',id:'session.search',binding:binding('KeyU')},first.revision);assert.equal(accepted.status,'saved');assert.equal(accepted.snapshot.sequence,first.sequence+1);assert.equal(f.writes.length,1);assert.deepEqual(accepted.snapshot.document.profiles['web:macos'],document.profiles['web:macos']);assert.deepEqual(accepted.snapshot.document.profiles['web:linux']['plugin.dormant'],binding('KeyJ'));
+ const stale=await f.preferences.edit('linux',{type:'reset-all'},first.revision);assert.equal(stale.status,'stale');assert.equal(f.writes.length,1);
+ const reset=await f.preferences.edit('linux',{type:'reset',id:'session.search'},accepted.snapshot.revision);assert.equal(reset.status,'saved');assert(!Object.hasOwn(reset.snapshot.document.profiles['web:linux'],'session.search'));assert.deepEqual(reset.snapshot.document.profiles['web:linux']['plugin.dormant'],binding('KeyJ'));
+});
+test('corrupt/future shortcuts and failed writes preserve original bytes; an explicit read reconciles an externally changed profile',async()=>{
+ for(const raw of ['{broken',JSON.stringify({schemaVersion:3,profiles:{}}),' '.repeat(64*1024+1)]){const f=store(raw),row=await f.preferences.describe('linux',definitions);assert.equal(row.status,'unreadable');assert.equal((await f.preferences.edit('linux',{type:'reset-all'},row.revision)).status,'unreadable');assert.equal(f.raw,raw);assert.deepEqual(f.writes,[]);}
+ const f=store(null,()=>{throw Error('Authored write failure');}),before=await f.preferences.describe('linux',definitions),failed=await f.preferences.edit('linux',{type:'set',id:'session.search',binding:binding('KeyU')},before.revision);assert.equal(failed.status,'write-failed');assert.equal(failed.snapshot.revision,before.revision);assert.equal(f.raw,null);
+ f.change(JSON.stringify({schemaVersion:1,profiles:{'web:linux':{'session.search':binding('KeyJ')}}}));const read=await f.preferences.describe('linux',definitions);assert.notEqual(read.revision,before.revision);assert.deepEqual(read.document.profiles['web:linux']['session.search'],binding('KeyJ'));
+});
+test('real supplier validation retains reservations/conflicts and rejects unrelated edits, malformed catalogs and oversized input',async()=>{
+ const f=store(),row=await f.preferences.describe('linux',definitions);
+ for(const candidate of [{code:'KeyC',modifiers:['control']},{code:'KeyA',modifiers:['control','alt']},{code:'KeyJ',secondCode:'KeyK',modifiers:['control','alt']},{code:'F4',modifiers:['alt']}])assert.notEqual(bindingIssue(normalizeBinding(candidate,'linux'),'web','linux'),null);
+ assert.equal(bindingIssue(normalizeBinding(binding('KeyJ'),'linux'),'web','linux'),null);
+ const collision=await f.preferences.edit('linux',{type:'set',id:'session.search',binding:{code:'Slash',modifiers:['control']}},row.revision);assert.equal(collision.status,'conflict');assert(collision.conflicts.includes('shortcuts.open'));assert.equal(f.writes.length,0);
+ for(const edit of [{type:'set',id:'session.search',binding:binding('KeyJ'),defaultPreset:'unrestricted'},{type:'reset-all',extra:true},{type:'set',id:'session.search',binding:{code:'KeyJ',modifiers:['control'],extra:true}}])await assert.rejects(()=>f.preferences.edit('linux',edit,row.revision));
+ for(const defs of [[...definitions,definitions[0]],[{id:'session.search',defaults:{'web:linux':{code:'KeyC',modifiers:['control']}}}],Array.from({length:129},()=>definitions[0]),[{id:'session.search',defaults:{},extra:'x'.repeat(64*1024)}]])await assert.rejects(()=>f.preferences.describe('linux',defs));assert.equal(f.writes.length,0);
+});
+function client(rpc,state={phase:'ready',readOnly:false,capabilities:{shortcuts:true}}){const listeners=new Set(),calls=[],controller={state,epoch:1,subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn);},rpc:async(m,p)=>{calls.push([m,p]);return rpc(m,p);},update(patch){Object.assign(this.state,patch);for(const fn of listeners)fn();}};const scope=new DshShortcutScope(controller,{platform:'linux',definitions:()=>definitions,initial:initialShortcutConfig(),validate:(row,unreadable)=>checkedShortcutSnapshot(row,parseShortcutDocument,unreadable),editDocument:(doc,edit)=>editShortcutDocument(doc,edit,'web','linux')});return {scope,controller,calls};}
+test('unsupported/read-only shortcut Hosts send no RPC, and revoked/closed scopes cannot accept late replies',async()=>{
+ for(const state of [{phase:'ready',readOnly:false},{phase:'ready',readOnly:true,capabilities:{shortcuts:true}},{phase:'ready',readOnly:false,capabilities:{shortcuts:'true'}}]){const f=client(async()=>{throw Error('Unexpected call');},state);await f.scope.load();assert.equal((await f.scope.edit({type:'reset-all'},'unconfirmed')).status,'not-ready');assert.deepEqual(f.calls,[]);f.scope.close();}
+ for(const close of [false,true]){let finish;const f=client(()=>new Promise(resolve=>finish=resolve));await tick();if(close)f.scope.close();else f.controller.update({capabilities:{}});finish({...initialShortcutConfig(),status:'ready'});await tick();assert.equal(f.scope.accepted,false);if(close){await f.scope.load();assert.equal(f.calls.length,1);}else f.scope.close();}
+});
+test('lost and success-shaped unconfirmed shortcut writes never publish candidate bindings or replay; explicit read recovers',async()=>{
+ for(const outcome of ['lost','same-revision','wrong-document','wrong-sequence']){
+  const original={...initialShortcutConfig(),status:'ready'},doc=editShortcutDocument(original.document,{type:'set',id:'session.search',binding:binding('KeyJ')},'web','linux');let accepted=original;
+  const f=client(async m=>{if(m==='shortcuts.describe')return accepted;if(outcome==='lost')throw Error('Lost reply');return {status:'saved',snapshot:{...original,revision:outcome==='same-revision'?original.revision:crypto.randomUUID(),sequence:outcome==='wrong-sequence'?original.sequence+2:original.sequence+1,document:outcome==='wrong-document'?original.document:doc}};});await tick();assert(f.scope.accepted);await f.scope.edit({type:'set',id:'session.search',binding:binding('KeyJ')},original.revision);assert.equal(f.scope.accepted,false);assert.deepEqual(f.scope.snapshot.document,original.document);await f.scope.edit({type:'reset-all'},original.revision);assert.equal(f.calls.filter(([method])=>method==='shortcuts.edit').length,1);accepted={...original,revision:crypto.randomUUID(),sequence:original.sequence+1,document:doc};await f.scope.load();assert(f.scope.accepted);assert.deepEqual(f.scope.snapshot.document,doc);f.scope.close();
+ }
+});
+test('accepted shortcut mutations and changed settings revision use only the original configuration RPCs',async()=>{
+ const fstore=store(),f=client((method,p)=>method==='shortcuts.describe'?fstore.preferences.describe(p.platform,p.definitions):fstore.preferences.edit(p.platform,p.edit,p.revision));await tick();await f.scope.load();const first=f.scope.snapshot;const edit={type:'set',id:'session.search',binding:binding('KeyJ')};assert.equal((await f.scope.edit(edit,first.revision)).status,'saved');assert.deepEqual(f.scope.snapshot.document.profiles['web:linux']['session.search'],binding('KeyJ'));const seen=f.calls.length;f.controller.update({settingsRevision:1});await tick();assert.equal(f.calls.length,seen+1);assert(f.scope.accepted);assert(f.calls.every(([m])=>m.startsWith('shortcuts.')));f.scope.close();
+});
+test('malformed shortcut snapshots never expose accepted bindings',()=>{
+ const row={...initialShortcutConfig(),status:'ready'};for(const patch of [{revision:'bad'}, {sequence:-1},{usingDefaults:'true'},{status:'ready',error:'read'},{document:{schemaVersion:1,profiles:{},permissions:'all'}}])assert.throws(()=>checkedShortcutSnapshot({...row,...patch},parseShortcutDocument));
+});

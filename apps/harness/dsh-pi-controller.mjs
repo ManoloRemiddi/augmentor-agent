@@ -115,6 +115,7 @@ export class DshPiController {
       const res=await this.fetcher('/api/events?'+new URLSearchParams({sessionId,clientId:this.clientId,after:String(this.cursor)}),{headers:{Authorization:'Bearer '+this.token}});
       const page=await res.json();if(!res.ok||page.error)throw Error(page.error?.message||'The event connection failed.');if(epoch!==this.epoch)return;
       this.cursor=page.cursor;
+      if(!this.state.readOnly&&Number.isSafeInteger(page.settingsRevision)&&page.settingsRevision!==this.state.settingsRevision)this.update({settingsRevision:page.settingsRevision});
       const events=[...this.state.events],records=new Map(this.state.records.map(x=>[x.id,x])),interactions=new Map(this.state.interactions.map(x=>[x.rpcId,x]));let queue=this.state.queue,changed=false,familyChanged=false;
       for(const {frame} of page.frames){
         if(['job/updated','job/observation'].includes(frame.method)||frame.method==='session/event'&&['user/message','assistant/message','turn/start','turn/end'].includes(frame.payload.event.type)){familyChanged=true;changed=true;}

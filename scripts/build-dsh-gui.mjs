@@ -69,13 +69,7 @@ for(const family of readdirSync(join(vendor,'packages'))){
     if(existsSync(file))packages.set(JSON.parse(readFileSync(file,'utf8')).name,directory);
   }
 }
-const result=await build({
-  absWorkingDir:root,entryPoints:[join(ui,'dsh-app.jsx')],outdir:join(root,'dist/harness-web'),
-  entryNames:'dsh-gui',bundle:true,format:'esm',platform:'browser',target:'chrome120',
-  jsx:'automatic',minify:false,metafile:true,legalComments:'eof',splitting:true,chunkNames:'[name]-[hash]',write:false,
-  nodePaths:[join(ui,'node_modules'),join(root,'node_modules')],loader:{'.woff2':'file','.woff':'file','.ttf':'file','.png':'file','.svg':'dataurl'},
-  define:{'__DSH_CTX_VERSION__':'"0.68.1"','process.env.NODE_ENV':'"production"','process.env.DSH_CLIENT_TITLE':'"Augmentor Harness"','process.env.DSH_CLIENT_VERSION':'"0.2.13"','process.env.DSH_CLIENT_COMMIT_HASH':'undefined','process.env.DSH_CLIENT_GIT_DIRTY':'"false"'},
-  plugins:[spreadsheetResolver,{name:'pinned-public-dsh',setup(b){
+const pinnedPublicResolver={name:'pinned-public-dsh',setup(b){
     b.onResolve({filter:/^(\.\.\/historyPage|\.\/historyPage|\.\.\/modelPrices)$/},args=>args.importer.startsWith(contextVendor)?{path:join(ui,'dsh-context-boundary.mjs')}:undefined);
     b.onResolve({filter:/\?inline$/},args=>({path:requireUi.resolve(args.path.slice(0,-7)),namespace:'raw'}));
     b.onResolve({filter:/\?raw$/},args=>({path:args.path.startsWith('.')?resolve(dirname(args.importer),args.path.slice(0,-4)):requireUi.resolve(args.path.slice(0,-4)),namespace:'raw'}));
@@ -93,7 +87,21 @@ const result=await build({
       if(!existsSync(path))throw Error('Unselected DSH export: '+args.path+' → '+path);
       return {path};
     });
-  }}],
+  }};
+// Shared pure shortcut protocol runs on the Host without a Cordis/native service.
+const shortcutSupplier=await build({absWorkingDir:root,entryPoints:[join(vendor,'packages/client/shortcuts/src/protocol.ts')],outfile:join(root,'dist/runtime/vendor/dsh-shortcuts.js'),bundle:true,format:'esm',platform:'node',target:'node24',metafile:true,legalComments:'eof',plugins:[pinnedPublicResolver]});
+const shortcutInputs=Object.keys(shortcutSupplier.metafile.inputs);
+if(shortcutInputs.some(path=>!/^apps\/harness\/vendor\/dsh\/packages\/(?:client\/shortcuts\/src\/(?:binding|configuration|persistence|native|protocol)\.ts|util\/(?:crypto|values)\/src\/index\.ts|util\/values\/src\/partial-json\.ts)$/.test(path))||Object.values(shortcutSupplier.metafile.outputs).some(output=>output.imports.length))throw Error('Unexpected shortcut runtime dependency.');
+const shortcutRuntime={repository:provenance.repository,commit:provenance.commit,license:'MIT',files:provenance.files.filter(row=>shortcutInputs.includes('apps/harness/vendor/dsh/'+row.path)),bundle:{name:'dsh-shortcuts.js',sha256:createHash('sha256').update(readFileSync(join(root,'dist/runtime/vendor/dsh-shortcuts.js'))).digest('hex')},build:shortcutSupplier.metafile};
+copyFileSync(join(vendor,'LICENSE'),join(root,'dist/runtime/vendor/dsh-shortcuts-LICENSE.txt'));
+writeFileSync(join(root,'dist/runtime/vendor/dsh-shortcuts-SOURCE.json'),JSON.stringify(shortcutRuntime,null,2)+'\n');
+const result=await build({
+  absWorkingDir:root,entryPoints:[join(ui,'dsh-app.jsx')],outdir:join(root,'dist/harness-web'),
+  entryNames:'dsh-gui',bundle:true,format:'esm',platform:'browser',target:'chrome120',
+  jsx:'automatic',minify:false,metafile:true,legalComments:'eof',splitting:true,chunkNames:'[name]-[hash]',write:false,
+  nodePaths:[join(ui,'node_modules'),join(root,'node_modules')],loader:{'.woff2':'file','.woff':'file','.ttf':'file','.png':'file','.svg':'dataurl'},
+  define:{'__DSH_CTX_VERSION__':'"0.68.1"','process.env.NODE_ENV':'"production"','process.env.DSH_CLIENT_TITLE':'"Augmentor Harness"','process.env.DSH_CLIENT_VERSION':'"0.2.13"','process.env.DSH_CLIENT_COMMIT_HASH':'undefined','process.env.DSH_CLIENT_GIT_DIRTY':'"false"'},
+  plugins:[spreadsheetResolver,pinnedPublicResolver],
 });
 const allBrowserInputs=[...new Set([...Object.keys(result.metafile.inputs),...Object.keys(excelWorker.metafile.inputs)])];
 const forbidden=allBrowserInputs.filter(path=>/vendor\/dsh\/.*(?:client-runtime|product-analytics|ui-settings-account|ui-settings-session-log|packages\/host)|vendor\/dsh-context\/(?:src\/host|src\/client\/(?:modelPrices|historyPage|latestVersion|settingsJump|balance|skills))|node_modules\/(?:@deepseek-ai\/cordis|@opencode-ai\/models|posthog|@sentry)/.test(path));
@@ -144,7 +152,7 @@ copyFileSync(join(vendor,'assets/favicon.svg'),join(root,'dist/harness-web/favic
 writeFileSync(join(root,'dist/harness-web/THIRD-PARTY-NOTICES.txt'),licenses.join('\n')+'\n');
 const pdfWorker=readFileSync(requireUi.resolve('pdfjs-dist/build/pdf.worker.min.mjs'));
 const hostedPdfWorker=Buffer.concat([pdfWorker,Buffer.from('\n// Modified by Augmentor: original DSH readiness handshake for the reviewed local worker.\nself.postMessage({type:"dsh-pdf-worker-ready"});\n')]);
-writeFileSync(join(root,'dist/harness-web/SOURCE.json'),JSON.stringify({dsh:provenance,dshContext:contextSource,npm:npmRecords,html:{frame:{name:'dsh-html-frame.html',sha256:createHash('sha256').update(htmlFrame).digest('hex')},loader:{path:'apps/harness/html-frame-loader.js',sha256:createHash('sha256').update(htmlLoader).digest('hex')},scope:'Original HTML bodies; fixed opaque-frame single transfer; no credentials or Host callbacks; scoped network/worker/permission restrictions'},excel:{patches:spreadsheetPatches,scope:'Original read-only spreadsheet registration/grid/conversion with isolated reviewed local module worker; no formula evaluation',worker:{name:'dsh-excel-worker-0.2.1-alpha.2.mjs',sha256:createHash('sha256').update(excelWorker.outputFiles[0].contents).digest('hex')},limits:{maxBytes:16*1024*1024,maxCells:250_000,timeoutMs:15_000},fortuneVersion:'1.0.4',sheetJsVersion:'0.20.3'},pdf:{version:'6.3.289',scope:'Deferred original PDF renderer, reviewed local module worker and local font/CMap/decoder data',notices:pdfNotices,assets:pdfAssetRecords,worker:{name:'dsh-pdf-worker-6.3.289.mjs',sourceSha256:createHash('sha256').update(pdfWorker).digest('hex'),sha256:createHash('sha256').update(hostedPdfWorker).digest('hex'),modification:'Original DSH readiness handshake appended; library body stays byte-exact.'}}},null,2)+'\n');
+writeFileSync(join(root,'dist/harness-web/SOURCE.json'),JSON.stringify({dsh:provenance,dshContext:contextSource,npm:npmRecords,shortcuts:shortcutRuntime,html:{frame:{name:'dsh-html-frame.html',sha256:createHash('sha256').update(htmlFrame).digest('hex')},loader:{path:'apps/harness/html-frame-loader.js',sha256:createHash('sha256').update(htmlLoader).digest('hex')},scope:'Original HTML bodies; fixed opaque-frame single transfer; no credentials or Host callbacks; scoped network/worker/permission restrictions'},excel:{patches:spreadsheetPatches,scope:'Original read-only spreadsheet registration/grid/conversion with isolated reviewed local module worker; no formula evaluation',worker:{name:'dsh-excel-worker-0.2.1-alpha.2.mjs',sha256:createHash('sha256').update(excelWorker.outputFiles[0].contents).digest('hex')},limits:{maxBytes:16*1024*1024,maxCells:250_000,timeoutMs:15_000},fortuneVersion:'1.0.4',sheetJsVersion:'0.20.3'},pdf:{version:'6.3.289',scope:'Deferred original PDF renderer, reviewed local module worker and local font/CMap/decoder data',notices:pdfNotices,assets:pdfAssetRecords,worker:{name:'dsh-pdf-worker-6.3.289.mjs',sourceSha256:createHash('sha256').update(pdfWorker).digest('hex'),sha256:createHash('sha256').update(hostedPdfWorker).digest('hex'),modification:'Original DSH readiness handshake appended; library body stays byte-exact.'}}},null,2)+'\n');
 writeFileSync(join(root,'dist/harness-web/build-inputs.json'),JSON.stringify(result.metafile,null,2)+'\n');
 writeFileSync(join(root,'dist/harness-web/dsh-pdf-worker-6.3.289.mjs'),hostedPdfWorker);
 rmSync(spreadsheetOverlay,{recursive:true,force:true});

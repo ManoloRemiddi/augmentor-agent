@@ -149,7 +149,7 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  const assistant=history.events.filter(x=>x.event.type==='assistant/message').map(x=>x.event);assert.equal(assistant.length,2);assert(assistant.every(x=>x.data.requestId&&typeof x.data.message.timestamp==='number'));
  const sessionRow=id=>'Array.from(document.querySelectorAll("[data-row-key]")).find(x=>x.dataset.rowKey==='+JSON.stringify('session:'+id)+')';
  const sessionMenu=async id=>{const row=sessionRow(id);await visible(row);await hover(row);await click(row+'.querySelector("button[aria-label^=\\"Session actions for\\"]")');};
- const menuItem=name=>'Array.from(document.querySelectorAll("[role=menuitem]")).find(x=>x.textContent.trim()==='+JSON.stringify(name)+')';
+ const menuItem=name=>'Array.from(document.querySelectorAll("[role=menuitem]")).find(x=>Array.from(x.children).some(child=>child.getAttribute("aria-hidden")!=="true"&&child.textContent.trim()==='+JSON.stringify(name)+'))';
  await sessionMenu(sid);await click(menuItem('Pin session'));await until(async()=>(await rpc('workspace.list')).pinnedSessionIds.includes(sid),'original Pin accepted');await visible(sessionRow(sid)+'.querySelector("[aria-label=\\"Pinned\\"]")');
  await sessionMenu(sid);await click(menuItem('Unpin session'));await until(async()=>!(await rpc('workspace.list')).pinnedSessionIds.includes(sid),'original Unpin accepted');
  const beforeFork=(await rpc('session.list')).items.length;await sessionMenu(sid);await click(menuItem('Fork session'));await until(async()=>(await rpc('session.list')).items.length===beforeFork+1,'original Fork creates one child');
