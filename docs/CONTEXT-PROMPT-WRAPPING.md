@@ -2,6 +2,66 @@
 
 # Original Context prompt wrapping on Pi
 
+## Installed MX qualification — October 12
+
+Final tested source **15e8b9e596100298ce1cb59775cf79a8a889d2a0** is selected
+**and running** in private MX **20261012-061621-f54f9969**, product **0.2.13**,
+artifact **2728f73bad451ccfb4f23886a6fa1637ecf78940a95620dcc766bf2a7a02c169**.
+The subsequent publication changes qualification documentation only. This
+supersedes the earlier candidate/failure checkpoints below.
+
+Final source and fresh ordinary bundled Node **24.19.0** each pass **294/294
+across 54 files**, zero failures/skips/cancellations, prepared QtTest, two workers
+and unchanged deadlines. Two ordinary workspace-packaging cases pass. The fresh
+assembly has **520 compiled files**, **19,888 production dependency files**,
+**133 npm instances**, **731 licence files**, **six native executables** and
+**99 browser supplier notice records**. All dependency paths/bytes and Node/native
+bytes match the preceding corrected Fleet release. Only four reviewed source/
+modification-notice files change; original licence bodies stay preserved.
+A separate post-assembly audit matches every npm notice/record. All 520 compiled
+files match the preserved first prompt-wrapping candidate; the correction changes
+only tests/qualification records. The public registration is byte-exact with its
+pinned Git blob, and its separate single-source Node graph has zero runtime imports.
+
+Guarded Native maintenance close and one Host shutdown both finish before
+activation. The first staged selection **20261012-061334-d2b499a5** inherits the
+preceding release's Node path because the staging command omitted its explicit
+bundled Node argument. The stable launcher's root guard refuses it before any
+new Host starts. That immutable candidate is preserved. A fresh normal stage
+with `--node outputs/harness-production-prompt-wrapping-mx-2/node/bin/node`
+selects the corrected release. Stable Host launch completes, its exact selected
+root and bundled Node are verified, then stable Native launches. Both roots and
+all **22,665 installed inventory entries** pass before and after GUI reads;
+Native is online/model-ready/idle. No selected release is patched.
+
+Actual installed Settings → Plugins exposes both enabled original **Prefix**
+and **Suffix** textareas at the normal narrow preview size. The original
+scrolling card shows the literal/request-scope/64 KiB guidance and empty
+`Leave empty to disable` placeholders. No private field is edited, no profile
+revision changes, and no new owner prompt/model/tool is submitted. The retained
+Qwen Context still displays its two exact saved bodies, 7.6k / 262.1k occupancy,
+original trend/browser and file activity; Insights again reads ten non-archived
+catalogue sessions, seven newest contexts, eight nonblank cards and zero failed/
+partial/usage-gap reads. Insights stays open for MX feedback. Local screenshots
+remain outside Git and the immutable release. Installed-owner effective wrapping
+is not claimed from these reads: its actual provider/worker behavior is qualified
+by the separate public SDK fixtures.
+
+All **eleven histories and queue identities** are preserved, with no new
+histories/admissions/provider requests/tools. Of **243 prior saved files**, **233
+are identical**, four journals preserve exact old prefixes with two title/
+session_info, two close and two load entries, and six corresponding counter/index
+derivatives change. Draft/attachment object sets/bytes, private profile values
+**and revision**, model/speech policy, production selection and model router
+remain preserved. All active turns, compactions, uploads, operator requests,
+previews and unsent Harness drafts are zero.
+
+The qualified increment connects the original two prompt controls to managed Pi
+conversational requests and their existing bounded provenance. Complete Harness
+migration, physical/live/provider/platform acceptance, public Debian Sharp/libvips
+source/collector/rebuild and privacy/public packaging remain open as listed below.
+DSH stays available; further OS implementation remains deferred for owner MX feedback.
+
 ## Request-time binding — October 12
 
 The original Settings → Plugins → System Prompt **Prefix** and **Suffix** fields
@@ -104,14 +164,14 @@ runtime/supplier/GUI change or deadline/concurrency relaxation is made. A fresh
 ordinary assembly and final cohort must qualify separately; the first artifact
 and its failure remain preserved.
 
-## Qualification and remaining work
+## Historical candidate qualification and reproduction
 
 Focused source evidence passes **20/20 across four files**, Node 24.19.0, prepared
 QtTest, two workers and unchanged deadlines. Source check/build, selection hashes
 and both separate browser/Node supplier graphs pass. The final wider source
 cohort passes **294/294 across 54 files**, zero failures/skips/cancellations.
-Fresh ordinary and installed MX qualification follow separately. The currently selected/running
-MX preview remains the [qualified original Fleet runtime](CONTEXT-FLEET.md#installed-mx-qualification--october-12);
+Fresh ordinary and installed MX qualification followed separately. At this checkpoint the selected/running
+MX preview remained the [qualified original Fleet runtime](CONTEXT-FLEET.md#installed-mx-qualification--october-12);
 building this candidate does not patch or activate that release.
 
 Reproduce after the normal build:
