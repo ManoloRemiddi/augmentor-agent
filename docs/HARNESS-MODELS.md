@@ -94,9 +94,10 @@ now use the original bounded parser and the original candidate picker.
 
 OAuth sign-in/out dialogs, virtual/extension-provider editing, advanced hidden
 profile controls, proactive cross-client invalidation and common Native/Browser
-provider-management parity remain open. The older full-file `models.configure`/
-guided setup path is separate from this minimal editor and requires further
-lifecycle reconciliation. This does not qualify the full P0 model-setup
+provider-management parity remain open. The complete-file `models.configure`,
+guided setup and manual reload now share the session reconciliation described in
+[the lifecycle follow-up](#model-configuration-lifecycle--october-13).
+This does not qualify the full P0 model-setup
 requirement, live providers, complete P0/P1 migration or DSH removal. Further OS
 implementation awaits owner MX feedback. Keep DSH for unqualified workflows.
 
@@ -334,3 +335,76 @@ configuration lifecycle reconciliation and full P0/P1 migration remain open.
 Other OS implementation awaits owner MX feedback. DSH remains available; no
 public binary, complete migration, global privacy or physical voice/desktop
 acceptance is claimed.
+
+
+## Model configuration lifecycle — October 13
+
+Complete-file `models.configure`, checked guided `setup.save`, manual
+`models.reload` and the original form's explicit refresh now reconcile loaded
+conversations through the same existing public Pi `AgentSession.setModel` path.
+The previous configure/reload paths refreshed the catalog while loaded owners
+could keep old model definitions, including context limits. Current writes and
+reloads preserve provider/model identity and the existing execution owner;
+changed definitions append Pi's ordinary model boundary. Configuration changes
+start no conversation request. A later explicit request uses the refreshed
+model. Whole-file changes do not rewrite conversation selection to setup's new
+default connection.
+
+Whole-file configuration retains SDK fields, headers, compatibility data and
+model overrides, and is not reduced to the minimal editor's curated fields or
+catalog limits. A 513-model authored catalog qualifies this distinction. Standard
+providers validate through a temporary, credential-blind public `ModelRuntime`
+with refresh/network catalog access disabled. Its validation never runs command
+keys or reads the owner's credential store. Known extension/native providers
+retain their actual registered defaults, custom API and authentication handlers:
+their context-dependent validation occurs in the existing runtime after storage,
+without registering handlers in a shadow validator. The public registered-ID list
+is used only to distinguish that context. Unrelated edits preserve loaded virtual
+models and their routers. This does not qualify complete virtual-provider editing
+or all custom provider types.
+
+The idle guard now also applies to manual reload, including active chats,
+background jobs, compaction, prompt improvement and MCP management/reload. A
+configuration write or explicit reload cancels in-flight listings. Provider
+refresh errors, aborted refreshes and a profile changing during reconciliation
+leave application unconfirmed and block new work, automatic queue/goal dispatch
+and discovery. There is no automatic rollback or replay after possible storage
+or SDK effects. Repair the complete profile or explicitly refresh to confirm it.
+A successful refresh attests the exact file fingerprint used by that refresh;
+persistence alone cannot authorize discovery's stored credentials. Complete
+valid configuration can repair malformed JSON. Standard loaded-model removal
+and unsupported thinking are refused before storage; context-dependent
+registered-provider failures are checked during actual runtime reconciliation.
+Public auth/availability checks during explicit application may resolve configured
+expressions or refresh accounts; cold UI/catalog reads remain distinct.
+
+The focused checks exercise the actual isolated Host/SDK with independently
+authored loopback providers: complete-file changes, two SDK model boundaries,
+next-request capacity, original-prefix preservation, one session-start before
+restart, no automatic inference, malformed reload/explicit repair, unrelated
+virtual routes, actual registered-provider overrides, and guided connection
+check/save/discovery with its existing consumed-token protection. Separate fault
+injection covers aborts, provider errors and concurrent file replacement. These
+are synthetic source checks, not owner/provider/installed acceptance. The first
+four lifecycle tests tried to read Pi's unpersisted empty transcript; each now
+performs one explicitly counted authored exchange before its baseline. The first
+full 341-case run caught a discovery test reading its remote-close log before the
+fixture's close callback; it now waits for that exact event with the unchanged
+deadline. An intermediate complete 341-case run passes; final qualification adds
+the registered-provider regression separately.
+
+Supplier GUI/CSS, the 580 MIT GUI records, 108 Apache-2.0 Context records, runtime
+supplier helpers, dependency pins, native/Office/PDF payloads and notices are
+unchanged. Shared runtime code applies across platforms; this increment qualifies
+MX first. Source, ordinary assembly and installed scope are recorded separately.
+The selected preview remains runtime 340327d / release 20261013-002217-5b1307b9
+until guarded immutable adoption; this source work changes no owner model profile,
+production model/router, GPU/speech setting or canonical main edit. Live provider,
+OAuth, advanced GUI, common Native/Browser model management, full P0/P1 migration,
+privacy/public distribution and physical/platform gates remain open. Further OS
+implementation awaits owner MX feedback; DSH remains available.
+
+
+### Lifecycle source qualification
+
+Final strict check/build and the exact 66-file MX cohort pass **342/342**, zero failures/skips/cancellations, with Node **24.19.0**, two workers, unchanged deadlines and the prepared matching PySide6/QtTest **6.8.2.1** interpreter. Focused checks pass **16/16**; five notice/workspace Python cases pass. All preceding cohort files stay included. The eight added cases comprise two complete-configuration unit checks and six Host lifecycle/registered-provider/fault checks. Ordinary and installed adoption remain separate from this source result.

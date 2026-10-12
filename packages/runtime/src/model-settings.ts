@@ -32,9 +32,13 @@ export class ModelSettings {
   private defaults=ModelRuntime.create({modelsPath:null,credentials:new InMemoryCredentialStore(),refreshOnCreate:false,allowModelNetwork:false});
   private probes=new Set<AbortController>();private appliedHash='';
   private async oauthAccounts(signal?:AbortSignal){try{return new Set((await this.runtime().listCredentials({signal})).filter(credential=>credential.type==='oauth').map(credential=>credential.providerId));}catch{throw Error('Pi credential metadata is unavailable.');}}
-  constructor(private file:string,private runtime:()=>ModelRuntime,private guard:()=>void,private apply:(config:Data,validated:ModelRuntime)=>Promise<void>){this.markApplied();}
+  // The execution owner calls markApplied after runtime/session reconciliation;
+  // persistence alone must never attest the current credential snapshot.
+  constructor(private file:string,private runtime:()=>ModelRuntime,private guard:()=>void,private apply:(config:Data,validated:ModelRuntime,deferred:ReadonlySet<string>)=>Promise<void>){this.markApplied();}
   private fileHash(){return digest(existsSync(this.file)?readFileSync(this.file,'utf8'):JSON.stringify({providers:{}}));}
-  markApplied(){this.appliedHash=this.fileHash();}
+  get fingerprint(){return this.fileHash();}
+  get applied(){return this.appliedHash===this.fileHash();}
+  markApplied(expected=this.fileHash()){if(this.fileHash()!==expected)throw Error('The model profile changed during application.');this.appliedHash=expected;}
   get activeDiscoveries(){return this.probes.size;}
   cancelDiscoveries(){for(const probe of this.probes)probe.abort();}
   private read(){
@@ -182,15 +186,25 @@ export class ModelSettings {
       return {kind:'refused',message:signal.aborted?'Model listing was cancelled or exceeded its time limit. Nothing was saved or retried.':message==='PROFILE_CHANGED'?'Refresh model settings before using stored authentication.':message==='ENDPOINT_CHANGED'?'Enter a one-shot key to list models from a changed endpoint origin.':message==='AUTH_UNSUPPORTED'?'This authentication method cannot be used for endpoint listing. Enter models manually.':code==='INVALID_CREDENTIAL'?'The supplied key cannot be used in an HTTP header.':code==='DISCOVERY_UNSUPPORTED'?'This API cannot list endpoint models. Enter them manually.':'The endpoint did not return a usable model listing. Check the endpoint, protocol and authentication, or enter models manually. Nothing was saved or retried.'};
     }finally{this.probes.delete(probe);}
   }
-  private async commit(config:Data,hash:string){
-    const profiles=Object.values(config.providers);if(Buffer.byteLength(JSON.stringify(config))>4*1024*1024||profiles.length>128||profiles.reduce<number>((sum,profile:any)=>sum+(Array.isArray(profile?.models)?profile.models.length:0),0)>4096||profiles.some((profile:any)=>Array.isArray(profile?.models)&&profile.models.length>512))throw Error('The model profile exceeds the bounded editor catalog limit.');
+  async configure(value:unknown){
+    this.guard();if(!object(value)||!object(value.providers))throw Error('Invalid providers configuration');
+    // Complete SDK configuration is not restricted to the GUI's curated fields
+    // or catalog size. Validate without resolving credentials before storing it.
+    await this.commit(structuredClone(value),this.fileHash(),false);
+  }
+  private async commit(config:Data,hash:string,bounded=true){
+    const profiles=Object.values(config.providers);if(bounded&&(Buffer.byteLength(JSON.stringify(config))>4*1024*1024||profiles.length>128||profiles.reduce<number>((sum,profile:any)=>sum+(Array.isArray(profile?.models)?profile.models.length:0),0)>4096||profiles.some((profile:any)=>Array.isArray(profile?.models)&&profile.models.length>512)))throw Error('The model profile exceeds the bounded editor catalog limit.');
     const temporary=mkdtempSync(join(dirname(this.file),'.model-settings-'));
     try{
-      const file=join(temporary,'models.json');atomicJson(file,config);
+      // Registered providers can supply defaults, custom APIs and auth handlers
+      // absent from a clean runtime. Validate these only in their actual SDK
+      // registration context; do not clone handlers or trigger shadow refreshes.
+      const deferred=new Set(this.runtime().getRegisteredProviderIds());
+      const file=join(temporary,'models.json');atomicJson(file,{...config,providers:Object.fromEntries(Object.entries(config.providers).filter(([id])=>!deferred.has(id)))});
       const validated=await ModelRuntime.create({modelsPath:file,credentials:new InMemoryCredentialStore(),refreshOnCreate:false,allowModelNetwork:false});
       if(validated.getError())throw Error('Pi rejected this model configuration. Check the provider API and model fields.');
-      this.guard();if(this.read().hash!==hash)throw Error('Model settings changed. Close and reopen the card.');
-      this.cancelDiscoveries();await this.apply(config,validated);this.markApplied();this.read();
+      this.guard();if(this.fileHash()!==hash)throw Error('Model settings changed. Read the current configuration before saving.');
+      this.cancelDiscoveries();await this.apply(config,validated,deferred);if(bounded)this.read();
     }finally{rmSync(temporary,{recursive:true,force:true});}
   }
 }

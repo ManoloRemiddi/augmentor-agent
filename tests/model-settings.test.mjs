@@ -8,7 +8,7 @@ const config=()=>({opaqueTop:{keep:true},providers:{'fixture-a':{name:'Fixture A
 async function fixture(t,initial=config()){
  const root=mkdtempSync(join(tmpdir(),'augmentor-model-settings-')),file=join(root,'models.json');writeFileSync(file,JSON.stringify(initial));t.after(()=>rmSync(root,{recursive:true,force:true}));
  const runtime=await ModelRuntime.create({modelsPath:file,credentials:new InMemoryCredentialStore(),refreshOnCreate:false,allowModelNetwork:false});let writes=0,blocked=false;
- const settings=new ModelSettings(file,()=>runtime,()=>{if(blocked)throw Error('Busy');},async next=>{writes++;writeFileSync(file,JSON.stringify(next));await runtime.refresh({allowNetwork:false,providers:['fixture-a','fixture-b']});});
+ const settings=new ModelSettings(file,()=>runtime,()=>{if(blocked)throw Error('Busy');},async next=>{writes++;writeFileSync(file,JSON.stringify(next));await runtime.refresh({allowNetwork:false,providers:['fixture-a','fixture-b']});settings.markApplied();});
  return {root,file,runtime,settings,get writes(){return writes;},block(){blocked=true;},raw(){return readFileSync(file,'utf8');},stored(){return JSON.parse(this.raw());}};
 }
 const profile=d=>d.namespaces[0].user.providers['fixture-a'];
@@ -57,4 +57,15 @@ test('lost writes retire original form authority, never replay, and explicit rea
 });
 test('late model descriptors and writes after role/epoch revocation never publish or authorize a second write',async t=>{
  const f=await fixture(t);let release;const c=client(()=>new Promise(resolve=>{release=resolve;}));t.after(()=>c.scope.close());const reading=c.scope.load();c.controller.update({readOnly:true});release(await f.settings.describe());await reading;assert(!c.scope.accepted);assert.equal(c.scope.snapshot.status,'error');assert.equal(c.scope.snapshot.rows.length,0);
+});
+test('complete SDK configuration preserves advanced fields and exceeds GUI row limits without reducing its catalog',async t=>{
+ const f=await fixture(t),next=config();next.providers['fixture-a'].baseUrl='http://authored-relay.invalid/v1';next.providers['fixture-a'].models=Array.from({length:513},(_,i)=>({...next.providers['fixture-a'].models[0],id:'authored-'+i}));
+ await f.settings.configure(next);assert.deepEqual(f.stored(),next);assert.equal(f.runtime.getModels('fixture-a').length,513);assert.equal(f.writes,1);assert(f.settings.applied);
+ await assert.rejects(f.settings.describe(),/bounded editor catalog/);await assert.rejects(f.settings.configure({providers:null}),/Invalid providers/);assert.equal(f.writes,1);
+});
+test('invalid complete configurations never persist, resolve configured commands or mark unapplied bytes as applied',async t=>{
+ const f=await fixture(t),before=f.raw(),marker=join(f.root,'must-not-execute'),next=config();next.providers['fixture-a'].apiKey='!touch '+marker;next.providers['fixture-a'].models[0].contextWindow='AUTHORED_SECRET_INVALID';
+ await assert.rejects(f.settings.configure(next),error=>error.message.includes('Pi rejected')&&!error.message.includes('AUTHORED_SECRET_INVALID'));assert.equal(f.raw(),before);assert.equal(f.writes,0);assert(!existsSync(marker));
+ writeFileSync(f.file,'{malformed');assert(!f.settings.applied);assert.throws(()=>f.settings.markApplied('incorrect-fingerprint'),/changed during/);assert(!f.settings.applied);
+ await f.settings.configure(config());assert.deepEqual(f.stored(),config());assert(f.settings.applied);
 });

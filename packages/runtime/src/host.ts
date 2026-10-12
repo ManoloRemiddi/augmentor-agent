@@ -20,7 +20,7 @@ import {ShortcutPreferences} from './shortcut-preferences.js';
 import {ModelSettings} from './model-settings.js';
 import {developerTools,developerToolsChange} from './developer-tools.js';
 import {piPromptWrapping} from './prompt-wrapping.js';
-import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync,unlinkSync} from 'node:fs';
+import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID,createHash} from 'node:crypto';
@@ -107,37 +107,50 @@ export class Host {
   private modelSettingsProblem=false;
   private modelSettingsBusy=false;
   private modelSettingsGuard(){if(this.quiescing||this.mcpReloading||this.jobs.busy||this.compactions.busy||this.improvements.busy||this.mcpManagement.busy||[...this.metadata.values()].some(m=>m.running))throw Error('Finish or stop active work before changing model settings.');}
-  private async applyModelSettings(config:Data,validated:ModelRuntime){
+  private async applyModelSettings(config:Data,validated:ModelRuntime,deferred:ReadonlySet<string>){
     this.modelSettingsGuard();
+    const file=join(this.dirs.agent,'models.json');let previous:Data|undefined;
+    try{previous=readJson<Data>(file,{providers:{}});}catch{/* A complete valid configuration can repair malformed JSON. */}
+    const prior=previous?.providers&&typeof previous.providers==='object'&&!Array.isArray(previous.providers)?previous.providers:{};
+    const providers=[...new Set([...Object.keys(prior),...Object.keys(config.providers)])].filter(id=>JSON.stringify(prior[id])!==JSON.stringify(config.providers[id]));
     for(const r of this.loaded.values()){
+      // A clean validator has no extension/virtual registrations. Unchanged
+      // providers keep their existing SDK registrations and execution owner.
+      if(!providers.includes(r.meta.selection.provider)||deferred.has(r.meta.selection.provider))continue;
       const model=validated.getModel(r.meta.selection.provider,r.meta.selection.model);
       if(!model)throw Error('A loaded conversation uses a model this edit removes. Keep that model configured.');
       requireThinking(model,r.session.thinkingLevel);
     }
-    const file=join(this.dirs.agent,'models.json'),previous=readJson<Data>(file,{providers:{}});
-    const providers=[...new Set([...Object.keys(previous.providers),...Object.keys(config.providers)])].filter(id=>JSON.stringify(previous.providers[id])!==JSON.stringify(config.providers[id]));
-    if(!providers.length)return;
+    if(JSON.stringify(previous)===JSON.stringify(config)&&this.modelSettings.applied&&!this.modelSettingsProblem)return;
+    const fullRefresh=!this.modelSettings.applied||this.modelSettingsProblem||JSON.stringify({...previous,providers:undefined})!==JSON.stringify({...config,providers:undefined});
     this.modelSettingsBusy=true;
     this.modelSettingsProblem=true;
     try{
       try{atomicJson(file,config);}catch{throw Error('Model configuration persistence could not be confirmed. Refresh before editing again.');}
       this.modelSettingsProblem=true;
-      await this.refreshModelSettings(providers);
+      await this.refreshModelSettings(fullRefresh?undefined:providers);
     }catch{throw Error('Model configuration application could not be confirmed. Refresh model settings before starting work. Nothing was retried.');}
     finally{this.modelSettingsBusy=false;}
   }
   private async refreshModelSettings(providers?:string[]){
-    await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000),...(providers?{providers}:{})});
-    if(this.modelRuntime.getError())throw Error('Pi could not apply the model configuration.');
+    const fingerprint=this.modelSettings.fingerprint;
+    const refreshed=await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000),...(providers?{providers}:{})});
+    if(refreshed.aborted||refreshed.errors.size||this.modelRuntime.getError()||this.modelSettings.fingerprint!==fingerprint)throw Error('Pi could not apply the model configuration.');
     for(const r of this.loaded.values()){
       const current=this.modelRuntime.getModel(r.meta.selection.provider,r.meta.selection.model);
       if(!current)throw Error('A loaded model is unavailable.');
       requireThinking(current,r.session.thinkingLevel);
       if(JSON.stringify(current)!==JSON.stringify(r.session.model))await r.session.setModel(current);
     }
-    this.modelSettings.markApplied();this.modelSettingsProblem=false;
+    this.modelSettings.markApplied(fingerprint);this.modelSettingsProblem=false;
   }
-  private modelSettings=new ModelSettings(join(this.dirs.agent,'models.json'),()=>this.modelRuntime,()=>this.modelSettingsGuard(),(config,validated)=>this.applyModelSettings(config,validated));
+  private async reloadModelSettings(){
+    this.modelSettingsGuard();this.modelSettingsBusy=true;this.modelSettingsProblem=true;this.modelSettings.cancelDiscoveries();
+    try{await this.refreshModelSettings();}
+    catch{throw Error('Pi could not confirm the stored model configuration. Work stays blocked. Inspect the profile and refresh again. Nothing was retried.');}
+    finally{this.modelSettingsBusy=false;}
+  }
+  private modelSettings=new ModelSettings(join(this.dirs.agent,'models.json'),()=>this.modelRuntime,()=>this.modelSettingsGuard(),(config,validated,deferred)=>this.applyModelSettings(config,validated,deferred));
   async discoverModels(request:Data,signal?:AbortSignal){if(this.quiescing||this.modelSettingsProblem||this.modelSettingsBusy)throw Error('Refresh model settings and finish maintenance before listing models.');return this.modelSettings.discover(request,signal);}
   readonly setup=new SetupConnections(join(this.dirs.agent,'models.json'));
   settings:Data;
@@ -619,7 +632,7 @@ export class Host {
     case 'models.credentialDescribe':return this.modelSettings.credential(p.ref);
     case 'models.credentialSet':return this.modelSettings.setCredential(p.ref,p.value,p.revision);
     case 'models.settingsDiscover':return this.discoverModels(p.request??{});
-    case 'models.settingsRefresh':{this.modelSettingsGuard();this.modelSettingsBusy=true;this.modelSettingsProblem=true;try{await this.refreshModelSettings();return await this.modelSettings.describe();}catch{throw Error('Pi could not confirm the stored model configuration. Work stays blocked. Inspect the profile and refresh again. Nothing was retried.');}finally{this.modelSettingsBusy=false;}}
+    case 'models.settingsRefresh':await this.reloadModelSettings();return this.modelSettings.describe();
     case 'session.compaction':{const m=this.getMeta(p.sessionId);return this.compactions.describe(m.id);}
     case 'session.acknowledgeCompaction':{const m=this.getMeta(p.sessionId);if(p.acknowledgeUnknownOutcome!==true)throw Error('Explicitly acknowledge that the compaction outcome remains unknown.');return this.compactions.acknowledge(m.id,identifier(p.requestId));}
     case 'session.compact':{
@@ -733,8 +746,8 @@ export class Host {
     }
     case 'models.validate':await this.selected(p);return {valid:true};
     case 'models.pin':{await this.selected(p);const key=p.provider+'/'+p.model;this.settings.pinned=this.settings.pinned.map((m:any)=>typeof m==='string'?m:m.provider+'/'+m.model).filter((m:string)=>m!==key);if(p.pinned)this.settings.pinned.push(key);this.persistSettings();return this.catalog();}
-    case 'models.configure':{if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before changing providers');if(!p.config||typeof p.config.providers!=='object'||Array.isArray(p.config.providers))throw new Error('Invalid providers configuration');if([...this.metadata.values()].some(m=>m.running))throw new Error('Stop active chats before changing providers');const file=join(this.dirs.agent,'models.json');const old=existsSync(file)?readFileSync(file,'utf8'):null;atomicJson(file,p.config);try{await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});if(this.modelRuntime.getError())throw new Error(this.modelRuntime.getError());}catch(error){if(old===null)unlinkSync(file);else writeFileSync(file,old,{mode:0o600});await this.modelRuntime.refresh({allowNetwork:false});throw error;}return this.catalog();}
-    case 'models.reload':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before reloading models');await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000)});return this.catalog();
+    case 'models.configure':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before changing providers');await this.modelSettings.configure(p.config);return this.catalog();
+    case 'models.reload':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before reloading models');await this.reloadModelSettings();return this.catalog();
     case 'session.create':{const sid=identifier(p.sessionId);let m=this.metadata.get(sid);if(!m){await this.selected(p.selection);const cwd=resolve(text(p.cwd,4096));m={surface:p.surface==='browser'?'browser':'linux',id:sid,cwd,selection:p.selection,title:'',saved:false,policy:this.settings.defaultPreset,updatedAt:Date.now(),requests:[],running:false};this.metadata.set(sid,m);this.save(m);await this.load(m);}return {sessionId:sid};}
     case 'session.list':return {items:[...this.metadata.values()].filter(m=>!m.delegation).sort((a,b)=>b.updatedAt-a.updatedAt).map(m=>({sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running:m.running||this.compactions.busySession(m.id),compacting:this.compactions.busySession(m.id),blank:!m.title,jobsRunning:this.jobs.busyOwner(m.id),...(m.fork?{fork:m.fork}:{})}))};
     case 'session.history':{const m=this.getMeta(p.sessionId);return this.history(m).page(p.maxMessages,p.beforeSeq);}
