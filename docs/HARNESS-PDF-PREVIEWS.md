@@ -103,11 +103,9 @@ owner inference or installed/physical platform acceptance.
 Source check/build, supplier hashes, graph/asset/worker verification and the
 focused **2/2 across two files** pass with Node 24.19.0, prepared QtTest, two
 workers and unchanged deadlines. The wider source cohort passes **295/295 across
-55 files**, zero failures/skips/cancellations. Fresh ordinary and installed MX
-qualifications follow separately. The
-currently selected/running preview remains the [qualified prompt-wrapping
-release](CONTEXT-PROMPT-WRAPPING.md#installed-mx-qualification--october-12);
-building the PDF candidate does not activate it.
+55 files**, zero failures/skips/cancellations. The ordinary and installed MX
+qualifications below supersede the preceding prompt-wrapping selection;
+implementation and qualification documentation are separate revisions.
 
 The wider recipe is the [54-file prompt-wrapping
 cohort](CONTEXT-PROMPT-WRAPPING.md#installed-mx-qualification--october-12) plus
@@ -116,6 +114,66 @@ cohort](CONTEXT-PROMPT-WRAPPING.md#installed-mx-qualification--october-12) plus
 ```sh
 AUGMENTOR_PYTHON=/path/to/prepared/python node --test --test-concurrency=2 tests/harness-pdf-chromium.test.mjs tests/harness-file-preview-chromium.test.mjs
 ```
+
+## Installed MX qualification — October 12
+
+Tested runtime source **096e34fd3c0e69b420273b454931c3156af1f9c6** is selected
+and running as private MX release **20261012-073915-27a8dcfc**, product **0.2.13**,
+artifact SHA-256 **f6ca00d4b977689b48f1bfd97724ab12c7c67ad9385641726d9a4a5e2ab84e38**.
+Subsequent qualification publication changes documentation only. The separate
+ordinary artifact repeats **295/295 across 55 files**, zero failures/skips/
+cancellations, with bundled Node **24.19.0**, prepared QtTest, two workers and
+unchanged deadlines. Both ordinary workspace-packaging cases pass. Source and
+ordinary Chromium cases exercise actual SDK/HTTP, text selection and JPX/Wasm;
+they do not establish full PDF-format or physical-platform coverage.
+
+The ordinary assembly contains **605 compiled files**, **19,888 production
+dependency files**, **133 npm instances**, **742 licence files**, **six native
+executables**, **100 browser supplier notice records** and **189 bundled PDF
+binary assets**. All production dependency paths/bytes and Node/native bytes
+match the preceding prompt-wrapping release. PDF.js and its optional Node canvas
+packages add no production npm instance. Only the existing GUI source manifest
+and modification-notice file change in the inherited licence tree; eleven
+explicit PDF build/library/font/decoder records are added. A post-assembly
+browser supplier audit agrees with the staged licence inventory. The Liberation
+font source/rebuild/distribution gate remains open alongside Sharp/libvips;
+these counts do not establish public binary compliance.
+
+Guarded immutable adoption stages a distinct artifact, closes the idle Native,
+shuts down its idle Host, activates the release, launches the stable Host and
+then launches Native. The stage explicitly uses the candidate's bundled Node;
+the Host executable/root are verified before Native startup. No selected release
+is patched. Exact Host/Native roots, stable-launcher status and all **22,776
+installed inventory entries** pass before and after the GUI checks.
+
+Installed PDF GUI acceptance uses a **separate disposable profile** with the
+actual selected installed Host and bundled Node, not the owner's saved files.
+One deterministic tool-free SDK seed obtains real native history. The actual
+original GUI selects an independently authored two-page PDF from the @file
+menu, inserts its atomic chip, displays the red-vector page and second page,
+chooses original 100% zoom and reloads changed local bytes through **Read the
+file again**. History, native originals and the request log remain unchanged
+during those actions, with **zero subsequent provider requests** and zero active
+file reads. The temporary browser tab is closed and the independently verified
+fixture producer/Host finish terminally. The saved local screenshot records
+the original installed GUI. Real text-selection/JPX evidence remains the
+separate source/ordinary Chromium qualification, not a claimed manual owner
+action.
+
+The actual owner GUI reopens the retained **DSH GUI on Pi · MX Linux check**
+conversation, reads both saved Qwen request bodies through the original Context
+trend/browser/file-activity widgets, then leaves **Context Insights** open. No
+owner prompt, model/tool action, PDF read, draft edit or preference write is
+submitted. All **eleven histories and queue identities** remain preserved, with
+no new conversations or admissions. Of **243** prior saved files, **233** stay
+identical and **four** journals retain their exact old prefixes with two
+session_info/title, two close and two load appends; **six** associated index/
+counter files change. Draft/attachment object sets and bytes are identical.
+Profile values **and revision**, model/speech/GPU/context/concurrency/precision
+settings, production selection and the model router remain preserved. Native is
+online/model-ready and no turn, compaction, upload, Harness request, dirty draft,
+file lookup or preview remains active. Installed-owner inference, effective
+prompt wrapping and live Fleet execution are not inferred from these reads.
 
 Office conversion, spreadsheets, rendered HTML, native open/download, sidebar
 keyboard commands and complete Harness/P0/P1 migration remain open. Password
