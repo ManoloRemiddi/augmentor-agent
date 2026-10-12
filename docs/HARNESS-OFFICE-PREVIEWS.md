@@ -129,9 +129,78 @@ The first build exposes a missing selected original document hook contract;
 that verbatim file is added. The first focused run exposes an incomplete Host
 fixture and a synchronous input-validation assertion; both are corrected without
 changing product behavior or weakening the assertions. Final source tests have
-zero failures/skips/cancellations. Ordinary and installed qualifications follow
-separately; the qualified PDF private MX release remains selected/running until
-guarded adoption.
+zero failures/skips/cancellations. The ordinary and installed qualifications
+below supersede the preceding PDF selection. Runtime implementation and its
+subsequent documentation-only qualification publication remain distinct.
+
+## Installed MX qualification — October 12
+
+Runtime **d0642d58f3edfbf9211e61ef60ffbe636141e301** is selected and running as
+private MX **20261012-084425-89e511a9**, product **0.2.13**, artifact SHA-256
+**731357a72f03ac54deb57973b9d51b3c140f9f5ada6c29f0c0220d153165e983**.
+Fresh ordinary bundled Node **24.19.0** repeats **300/300 across 57 files**, zero
+failures/skips/cancellations, with prepared QtTest, two workers and unchanged
+deadlines. Three nested-notice and two workspace-packaging cases pass in the
+ordinary tree too. The failed first staging attempt remains a failed checkpoint;
+a distinct fresh dependency stage passes after the reviewed notice additions.
+
+The ordinary assembly has **629 compiled files**, **20,801 dependency files**,
+**151 npm instances**, **780 licence files**, **nine native/Wasm executables**
+and **100 browser supplier notice records**. All **133 inherited npm instances**,
+their paths/bytes, and existing Node/native bytes are preserved. The eighteen
+new instances supply the kit, Linux Wasm engine and parsing/font/FFI support.
+The three added executable bodies are the pinned LibreOffice Wasm and the two
+Koffi glibc/musl carriers; Linux rendering does not invoke the Windows native
+pipe/FFI path. Their exact hashes/notices and the unchanged inherited native
+records are verified separately. Browser npm supplier records remain identical
+to the qualified PDF artifact. A post-assembly npm audit agrees byte-for-byte
+with the staged report and licence texts. Public MPL/native, three MIT declaration
+notice-sufficiency, Sharp/libvips and font source/rebuild gates remain open.
+
+Guarded adoption stages a separate immutable artifact with the explicit
+candidate Node, closes the idle Native through maintenance, completes one Host
+shutdown, activates the candidate and launches the stable Host. Exact selected
+Host executable/root are verified before stable Native startup. All **23,764
+installed inventory entries**, stable-launcher status and exact Native root pass
+before and after the GUI acceptance; no selected release is patched.
+
+The installed Office GUI acceptance uses a separate disposable profile with the
+actual selected Host and Node. One deterministic tool-free SDK seed creates real
+native history. The original @file completion/chip opens an independently authored
+two-page DOCX; actual GUI inspection verifies both pages, original missing-font
+warning/details, 100% zoom and **Read the file again** against changed bytes.
+Native originals, history and provider request log remain identical during
+these actions, with **zero subsequent provider requests**, file reads, Office
+work and Harness requests. The temporary browser tab is closed; the verified
+fixture producer and Host finish terminally. The saved local screenshot shows
+the actual installed original viewer and font warning. Source/ordinary malformed
+file/Retry and narrow-fullscreen evidence remain separate from this manual check.
+
+An initial manual idle probe used HTTP and counted its own request. The supported
+native IPC probe verifies zero outstanding requests without changing the
+expectation. Initial preservation reads before GUI connection correctly observed
+only close appends; opening the original owner GUI supplies its explicit
+load/title receipt. No process is restarted or expectation relaxed to satisfy
+these observations.
+
+The owner GUI reads both retained Qwen request bodies in the original Context
+trend/browser/file-activity widgets and leaves **Context Insights** open. No
+owner prompt/model/tool, Office file read, draft edit or preference write occurs.
+All **eleven histories and queue identities** remain intact, with no new owner
+conversations/admissions. Of **243** saved files, **233** are identical and four
+journals retain exact old prefixes with two title/session_info, two close and
+two load appends, plus six associated index/counter changes. Draft/attachment
+object sets and bytes, profile values **and revision**, Qwen/Breeze/GPU/context/
+concurrency/precision and ASR/VAD settings, production selection and router are
+preserved. Native is online/model-ready; no active owner turn, compaction,
+upload, Harness request, dirty draft, file lookup/preview or Office work remains.
+
+One read-only pre-promotion capture inadvertently reused the PDF baseline filename.
+Its completed before/after-GUI proof files remain retained. Office uses a separate
+snapshot of the selected PDF state; an additional comparison against the retained
+earlier prompt-wrapping baseline verifies unchanged histories/queues/drafts/
+attachments/profile/production and all old original prefixes. This is not a
+reconstruction or rerun of the overwritten PDF comparison snapshot.
 
 Real DOC/PPT/PPTX samples, complex OOXML/layout/font cases, password handling and
 full converter format coverage remain separate evidence gaps. The original
