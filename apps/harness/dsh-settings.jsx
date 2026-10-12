@@ -5,6 +5,7 @@ import {createSettingsShellStore} from '@dsh-gui/ui-settings-general/src/client/
 import {TriggerContent,HeaderContent,CloseLabel} from '@dsh-gui/ui-settings-general/src/client/chrome.tsx';
 import {GeneralSection} from '@dsh-gui/ui-settings-general/src/client/GeneralSection.tsx';
 import {CurrentVersionRow} from '@dsh-gui/ui-settings-general/src/client/CurrentVersionRow.tsx';
+import {DeveloperToolsRow} from '@dsh-gui/ui-settings-general/src/client/DeveloperToolsRow.tsx';
 import {en as settingsEn} from '@dsh-gui/ui-settings-general/src/client/locales.ts';
 import {AppearanceRow} from '@dsh-gui/ui-theme/src/client/AppearanceRow.tsx';
 import {en as themeEn} from '@dsh-gui/ui-theme/src/client/locales.ts';
@@ -69,8 +70,16 @@ function InspectionSettings({state,controller}){
   </>;
 }
 
+
+function HtmlPreviewSetting({developerTools,state}){
+ const accepted=useSyncExternalStore(developerTools.subscribe,developerTools.getSnapshot),source=developerTools.preference.enabled;
+ const useDeveloperTools=selector=>selector(useSyncExternalStore(source.subscribe,source.getSnapshot));
+ const copy=translate({...settingsEn,'developerTools.title':'Interactive HTML previews','developerTools.description':'Run scripts from previewed HTML documents in an isolated frame. External requests are blocked.','developerTools.error':'The setting could not be confirmed. Refresh before choosing again.'});
+ return <><DeveloperToolsRow t={copy} useDeveloperTools={useDeveloperTools} setEnabled={enabled=>developerTools.preference.setEnabled(enabled)} disabled={state.readOnly||accepted.busy||!accepted.writable}/>{accepted.error&&<div className="augmentor-extension"><p role="status">{accepted.error}</p><Button disabled={accepted.busy} onClick={()=>void developerTools.load()}>Refresh HTML preview setting</Button></div>}</>;
+}
+
 /** Pure supplier shell; section contents call the existing Pi owner. */
-export function OriginalSettings({wide,state,controller,preferences,onPrompts,onContext,notice}){
+export function OriginalSettings({wide,state,controller,preferences,developerTools,onPrompts,onContext,notice}){
   const renderSlot=(name,owner={},options={})=>{
     if(name==='settings.trigger')return <TriggerContent {...owner} t={t}/>;
     if(name==='settings.header')return <HeaderContent t={t}/>;
@@ -80,7 +89,7 @@ export function OriginalSettings({wide,state,controller,preferences,onPrompts,on
       if(options.only==='models')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></div>}/>;
       if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
     }
-    if(name==='settings.general.item')return <><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/><div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div><CurrentVersionRow t={t}/></>;
+    if(name==='settings.general.item')return <><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div><CurrentVersionRow t={t}/></>;
     return options.fallback??null;
   };
   return <SettingsRoot wide={wide} t={t} useStore={useShell} actions={settingsShell.actions} renderSlot={renderSlot} useSections={face(sections)} useOnboardingSteps={face([])} useSessions={face({phase:state.phase,byId:{}})} useShortcuts={face([])} useDesktopUpdate={face({failed:false,opening:false})} openDesktopUpdate={()=>{}} useConnectionState={face(state.phase==='ready'?'connected':state.phase==='connecting'?'connecting':'disconnected')} reconnect={()=>void controller.start(controller.state.sessionId).catch(e=>notice(e.message))}/>;

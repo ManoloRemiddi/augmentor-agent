@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original HTML previews](HARNESS-HTML-PREVIEWS.md) now supplies rendered HTML separately from this readonly grid. The installed spreadsheet checkpoint below is retained as historical evidence once a newer candidate qualifies; parser patches/worker/native dependencies remain preserved.
+
 # Original Harness spreadsheet previews
 
 ## Registration, original UI and limits — October 12

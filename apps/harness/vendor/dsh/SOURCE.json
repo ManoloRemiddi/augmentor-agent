@@ -3203,6 +3203,92 @@
       "sourceSha256": "c1bf8ac8f319dab382f08e3a669b715e691d46c703ac5a4163eb383fbedd1d48",
       "sha256": "c1bf8ac8f319dab382f08e3a669b715e691d46c703ac5a4163eb383fbedd1d48",
       "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/DeveloperToolsRow.module.css",
+      "sha256": "0912de3a4e55db10b01e11d00a22d94e88131843b02ad734343ef7680b7444f0",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/DeveloperToolsRow.module.css",
+      "upstreamSha256": "0912de3a4e55db10b01e11d00a22d94e88131843b02ad734343ef7680b7444f0"
+    },
+    {
+      "path": "packages/client/ui-settings-general/src/client/DeveloperToolsRow.tsx",
+      "sha256": "68de323b4f17d5981b63712b2d5ad88738f4e59ea7746b0de7e4561d22ac3d4e",
+      "upstreamPath": "packages/client/ui-settings-general/src/client/DeveloperToolsRow.tsx",
+      "upstreamSha256": "826d5a0f4981770dd994a754a8c4fbf29819d3db11080311f7a465d74371446b",
+      "modification": "Optional unsupported/read-only authority gate; original switch, layout and CSS preserved."
+    },
+    {
+      "path": "packages/client/ui-settings/src/client/developer-tools.ts",
+      "sha256": "ae20384e33da5370a85ff2c29aedf71f08b9e832b57e6549c0c483a0e69177be",
+      "upstreamPath": "packages/client/ui-settings/src/client/developer-tools.ts",
+      "upstreamSha256": "ae20384e33da5370a85ff2c29aedf71f08b9e832b57e6549c0c483a0e69177be"
+    },
+    {
+      "path": "packages/client/ui-settings/src/developer-tools-settings.ts",
+      "sha256": "ed8af896b0b0fe4be432842d8b837b43d6e7a14e0c3f5030d54e274c3149ff78",
+      "upstreamPath": "packages/client/ui-settings/src/developer-tools-settings.ts",
+      "upstreamSha256": "ed8af896b0b0fe4be432842d8b837b43d6e7a14e0c3f5030d54e274c3149ff78"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/HtmlBody.module.css",
+      "sha256": "39a8e289e5bf57e19d63342fa81bcb8d879c3c9151399608974816376cd2d4e4",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/HtmlBody.module.css",
+      "upstreamSha256": "39a8e289e5bf57e19d63342fa81bcb8d879c3c9151399608974816376cd2d4e4"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/HtmlBody.tsx",
+      "sha256": "e496a696f787bcc331496da8145a9b46f87809c046f5ddf79565da08ba6d8257",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/HtmlBody.tsx",
+      "upstreamSha256": "e10a34ded1bc1f3fceff037756bee3408c2feec34061c96fa925c1dcd6d63dc5",
+      "modification": "Optional isolated interactive-frame transport; original iframe structure/default/CSS preserved."
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/basic-document.ts",
+      "sha256": "d229243c4fc237c4a6a423a9c73b29153b7a2ab4cc0f29b9d1a715044ef82922",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/basic-document.ts",
+      "upstreamSha256": "d229243c4fc237c4a6a423a9c73b29153b7a2ab4cc0f29b9d1a715044ef82922"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/bootstrap.ts",
+      "sha256": "4c9c9834166fdde444659d4bd311d07b080ce087d229064536fc665ec199dd52",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/bootstrap.ts",
+      "upstreamSha256": "4c9c9834166fdde444659d4bd311d07b080ce087d229064536fc665ec199dd52"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/bytes.ts",
+      "sha256": "b6da60105672540f9352db43d4d12b6bb937c80e8c14b0093cc9311766cbc130",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/bytes.ts",
+      "upstreamSha256": "b6da60105672540f9352db43d4d12b6bb937c80e8c14b0093cc9311766cbc130"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/index.ts",
+      "sha256": "753710efbe3c42d608f79d49c92cb647f65496f8b03a303386209fd8703d288e",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/index.ts",
+      "upstreamSha256": "753710efbe3c42d608f79d49c92cb647f65496f8b03a303386209fd8703d288e"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/locales.ts",
+      "sha256": "d528547e8aa3aa17256f19e3ee17a98a86597b5eb1385e374d053696f77da28c",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/locales.ts",
+      "upstreamSha256": "d528547e8aa3aa17256f19e3ee17a98a86597b5eb1385e374d053696f77da28c"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/pack.ts",
+      "sha256": "7b63276004fb6b3eea706051fa23027b5291be1a1741ecaeb061093006e0d67e",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/pack.ts",
+      "upstreamSha256": "7b63276004fb6b3eea706051fa23027b5291be1a1741ecaeb061093006e0d67e"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/html/read-relative.ts",
+      "sha256": "ed161215d99b5f1c19bbcc46bfdd4ac63e59caf7fc49edc0e556ab43270c954e",
+      "upstreamPath": "packages/client/ui-sidebar-documentpreview/src/client/html/read-relative.ts",
+      "upstreamSha256": "ed161215d99b5f1c19bbcc46bfdd4ac63e59caf7fc49edc0e556ab43270c954e"
+    },
+    {
+      "path": "packages/client/ui-settings/package.json",
+      "sha256": "37b751f8c9e41ddfd0cef0f15f6a0dd12da5d6fe704baff79c12e99c313027a9",
+      "upstreamPath": "packages/client/ui-settings/package.json",
+      "upstreamSha256": "37b751f8c9e41ddfd0cef0f15f6a0dd12da5d6fe704baff79c12e99c313027a9"
     }
   ]
 }

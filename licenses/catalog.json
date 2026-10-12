@@ -305,6 +305,11 @@
       "expression": "(AFL-2.1 OR BSD-3-Clause)",
       "selected": "BSD-3-Clause",
       "note": "The package LICENSE expressly offers either license; distribution selects BSD-3-Clause and retains the full original notice."
+    },
+    "dompurify@3.4.16": {
+      "expression": "(MPL-2.0 OR Apache-2.0)",
+      "selected": "Apache-2.0",
+      "note": "Original package expressly offers either licence. Browser distribution selects Apache-2.0 and retains the complete original LICENSE/copyright text."
     }
   },
   "additionalLicenses": {

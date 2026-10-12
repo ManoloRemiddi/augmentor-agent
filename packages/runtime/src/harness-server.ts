@@ -118,7 +118,8 @@ export class HarnessServer {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('Cross-Origin-Resource-Policy', 'same-origin');
-    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; img-src 'self' data: blob:; base-uri 'none'; frame-ancestors 'none'");
+    res.setHeader('X-DNS-Prefetch-Control','off');
+    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; img-src 'self' data: blob:; frame-src 'self'; base-uri 'none'; frame-ancestors 'none'");
     try {
       if (!this.base || req.headers.host !== new URL(this.base).host ||
         (req.headers.origin !== undefined && req.headers.origin !== this.base)) {
@@ -256,7 +257,7 @@ export class HarnessServer {
       const web=fileURLToPath(new URL('../../harness-web/',import.meta.url));
       if(/^\/[A-Za-z0-9_@.-]+$/.test(url.pathname)){
         try{const names=JSON.parse(readFileSync(join(web,'assets.json'),'utf8')) as string[];const name=url.pathname.slice(1);
-          if(names.includes(name)){const ext=name.split('.').at(-1);staticFiles.set(url.pathname,{path:join(web,name),type:({js:'text/javascript',mjs:'text/javascript',css:'text/css',png:'image/png',svg:'image/svg+xml',txt:'text/plain',json:'application/json',woff2:'font/woff2',woff:'font/woff',ttf:'font/ttf'} as Record<string,string>)[ext!]??'application/octet-stream'});}
+          if(names.includes(name)){const ext=name.split('.').at(-1);staticFiles.set(url.pathname,{path:join(web,name),type:({html:'text/html',js:'text/javascript',mjs:'text/javascript',css:'text/css',png:'image/png',svg:'image/svg+xml',txt:'text/plain',json:'application/json',woff2:'font/woff2',woff:'font/woff',ttf:'font/ttf'} as Record<string,string>)[ext!]??'application/octet-stream'});}
         }catch{/* A missing GUI build leaves the reviewed source assets available. */}
       }
       const file = staticFiles.get(url.pathname);
@@ -266,6 +267,7 @@ export class HarnessServer {
       // local BinaryDataFactory replies. It has no network or child-worker need.
       // Wasm decoding is confined here; the application's script policy stays intact.
       if(url.pathname==='/dsh-pdf-worker-6.3.289.mjs')res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'none'; worker-src 'none'");
+      if(url.pathname==='/dsh-html-frame.html'){res.setHeader('X-Frame-Options','SAMEORIGIN');res.setHeader('X-DNS-Prefetch-Control','off');res.setHeader('Content-Security-Policy',"sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline' blob:; style-src 'unsafe-inline' blob:; img-src data: blob:; font-src data: blob:; media-src data: blob:; connect-src 'none'; worker-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; frame-ancestors 'self'");res.setHeader('Referrer-Policy','no-referrer');res.setHeader('Permissions-Policy','camera=(), microphone=(), geolocation=(), display-capture=(), payment=(), usb=(), serial=(), clipboard-read=(), clipboard-write=()');}
       if(url.pathname==='/dsh-excel-worker-0.2.1-alpha.2.mjs')res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self'; connect-src 'none'; worker-src 'none'");
       res.writeHead(200, {'Content-Type': file.type + '; charset=utf-8'}); res.end(bytes);
     } catch (error) {

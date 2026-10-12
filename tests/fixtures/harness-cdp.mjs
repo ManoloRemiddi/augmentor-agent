@@ -13,7 +13,7 @@ export async function harnessCdp(url){
     if(frame.method==='Page.javascriptDialogOpening'){dialogs.push(frame.params.message);void call('Page.handleJavaScriptDialog',{accept:api.acceptDialog}).catch(error=>errors.push(error.message));}
     if(row){pending.delete(frame.id);clearTimeout(row.timer);frame.error?row.reject(Error(frame.error.message)):row.resolve(frame.result);}
   });
-  const call=(method,params={})=>new Promise((resolve,reject)=>{const key=++id,timer=setTimeout(()=>{pending.delete(key);reject(Error('CDP timeout: '+method));},10000);pending.set(key,{resolve,reject,timer});ws.send(JSON.stringify({id:key,method,params}));});
+  const call=(method,params={},sessionId)=>new Promise((resolve,reject)=>{const key=++id,timer=setTimeout(()=>{pending.delete(key);reject(Error('CDP timeout: '+method));},10000);pending.set(key,{resolve,reject,timer});ws.send(JSON.stringify({id:key,method,params,...(sessionId?{sessionId}:{})}));});
   return Object.assign(api,{call,async reload(){
     const key='__augmentor_test_reload_'+crypto.randomUUID().replaceAll('-','');await api.evaluate('globalThis['+JSON.stringify(key)+']=true');await call('Page.reload');
     const end=Date.now()+10000;while(Date.now()<end){try{if(await api.evaluate('globalThis['+JSON.stringify(key)+']===undefined&&document.readyState==="complete"'))return;}catch{}await new Promise(resolve=>setTimeout(resolve,30));}

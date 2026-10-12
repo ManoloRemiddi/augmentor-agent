@@ -62,6 +62,8 @@
     "tests/harness-pdf-chromium.test.mjs",
     "tests/harness-office-preview.test.mjs",
     "tests/harness-office-chromium.test.mjs",
-    "tests/harness-spreadsheet-chromium.test.mjs"
+    "tests/harness-spreadsheet-chromium.test.mjs",
+    "tests/harness-html-preview.test.mjs",
+    "tests/harness-html-chromium.test.mjs"
   ]
 }
