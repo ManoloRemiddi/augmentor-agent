@@ -116,3 +116,62 @@ also pass together (five cases across two files). Prior Context/Insights/Fleet/
 sidebar/wrapping, file/PDF/Office/spreadsheet/HTML, approval/question, native and
 Pi lifecycle contracts remain in the cohort. This is source evidence; fresh
 ordinary, installed/manual and physical/platform acceptance remain separate.
+
+## Ordinary and installed MX qualification — October 12
+
+Runtime **95e0fb240bb000653ff5b122ac737b59c05ee2b8** is selected and running in
+private MX **20261012-222001-6b609cae**, product **0.2.13**, artifact SHA-256
+**3a469a23bcb0e07524b96952ee637e73e70d148bf9c565a6d500ef140ed73238**.
+Fresh ordinary bundled Node **24.19.0** repeats **315/315 across 62 files**, zero
+failures/skips/cancellations, matching QtTest **6.8.2.1**, two workers and unchanged
+deadlines. Five notice/workspace cases pass in the ordinary tree. Its post-assembly
+production npm report and all 96 collected notice files match staging exactly;
+compiled bytes match source after tests.
+
+The assembly has **643 compiled files**, **20,801 production dependency files**,
+**151 npm instances**, **781 licence files**, **nine native/Wasm executables** and
+**127 browser notice records for 126 supplier name/version pairs**. All inherited
+production paths/bytes, Node/native bodies, PDF/Office assets/notices, spreadsheet
+patch/worker provenance, HTML transport/provenance and preceding supplier records
+stay preserved. The shortcut slice adds no npm/native dependency. The MIT GUI
+selection is 563; Apache-2.0 dsh-context remains 108.
+
+A separate comparator captures twelve owner histories/queue identities and 247
+existing saved original/observation files. Previous Native and Host complete
+one guarded idle/draft-free shutdown before immutable candidate activation.
+Sequential stable launch verifies the new Host executable/root before Native.
+All **23,844 installed inventory entries**, matching Native root and online/model-
+ready state pass before and after actual GUI use; no selected release is patched.
+
+The disposable GUI profile uses the actual selected Host, Node and browser assets.
+One tool-free SDK seed precedes testing. Actual `Ctrl+/`, the original General row,
+released `Ctrl+Alt+J` recording, search focus, reload persistence, restore-all
+cancellation/confirmation and restored `Ctrl+Alt+K` work through copied controls.
+Exactly **two** explicit GUI writes leave that fixture's current-device profile at
+original defaults while preserving unrelated settings. History, native bytes and
+provider log remain identical: **zero subsequent model requests**. No draft/file/
+Office/HTTP work remains. Its tab closes and its producer/Host finish terminally.
+Source/ordinary two-window stale review, other command/readonly/limits/failure
+coverage and physical other-browser/window-manager delivery remain distinct from
+this installed manual check.
+
+The owner preview opens the original reference without changing any preference,
+then returns to original Insights: eleven non-archived metadata entries, seven
+newest eligible contexts, eight original cards and zero failed/partial reads or
+usage gaps. It stays open. No owner prompt, model/tool action, draft edit or
+preference mutation is sent. All **twelve** histories and queue identities remain
+preserved. Of **247** preceding files, **243** are identical; **one** observation
+journal retains its exact prior prefix with **one close and one load** lifecycle
+append plus **three** corresponding counter/index derivatives. No new session or
+saved original is added/removed. Draft/attachment bytes, backend profile values/
+revision, production selection and router executable/arguments remain unchanged.
+Canonical main's 38 prior changes remain preserved.
+
+This qualifies the private MX main-document shortcut workflow; broader fixed-input
+reference contributions, native/guest forwarding, physical browser/OS delivery,
+remaining command/resource/skill/provider/plan/memory/voice/Home/desktop acceptance
+and complete P0/P1 privacy/live/public distribution/platform gates remain open.
+Previous MPL/native/Sharp/font source/rebuild and MIT-declaration notice-sufficiency
+requirements stay open. DSH remains available; further OS implementation waits
+for owner MX feedback. No public binary is published. Later documentation commits
+record the proof without changing selected runtime bytes.
