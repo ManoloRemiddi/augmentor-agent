@@ -3,6 +3,7 @@ import React,{useSyncExternalStore} from 'react';
 import {DocumentPreviewRegistry} from '@dsh-gui/ui-sidebar-documentpreview/src/client/document/registry.ts';
 import {apply as registerPdf} from '@dsh-gui/ui-sidebar-documentpreview/src/client/pdf/index.ts';
 import {apply as registerOffice} from '@dsh-gui/ui-sidebar-documentpreview/src/client/office/index.ts';
+import {apply as registerExcel} from '@dsh-gui/ui-sidebar-documentpreview/src/client/excel/index.ts';
 import {en as documentEn} from '@dsh-gui/ui-sidebar-documentpreview/src/client/locales.ts';
 
 /** UI-only seats for original metadata, keyed slots, locale and tab lifetimes.
@@ -23,6 +24,7 @@ export class DshDocumentPreviews {
   };
   registerPdf(ctx);
   registerOffice(ctx,{maxCachedEntries:8,maxCachedBytes:64*1024*1024,maxPending:8,maxReaders:32});
+  registerExcel(ctx,{maxBytes:16*1024*1024,maxCells:250_000,timeoutMs:15_000});
   this.useDefinitions=(selector=value=>value)=>selector(useSyncExternalStore(this.registry.subscribe,this.registry.getSnapshot));
  }
  render(key,sessionId,props,name='sidebar.right.tab.document'){const entry=this.slots.get(name+':'+key);if(!entry)return null;

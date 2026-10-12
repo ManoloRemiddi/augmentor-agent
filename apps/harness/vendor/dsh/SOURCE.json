@@ -3063,6 +3063,146 @@
       "sourceSha256": "4af0752858bede4d19c7e45cb9bb446196238d0cecf808a606e2269fbcfa75fe",
       "sha256": "4af0752858bede4d19c7e45cb9bb446196238d0cecf808a606e2269fbcfa75fe",
       "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/ExcelBody.module.css",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/ExcelBody.module.css",
+      "sourceSha256": "2d5a0130b0ccb63d5c1e387eec4f608f9bea96a0379d79027b279cb64be426bb",
+      "sha256": "2d5a0130b0ccb63d5c1e387eec4f608f9bea96a0379d79027b279cb64be426bb",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/LazyExcelBody.tsx",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/LazyExcelBody.tsx",
+      "sourceSha256": "5ddd0d15063725fce40ffa7e8e4ed7346aa83da9b19df434f7ddb766c2de6255",
+      "sha256": "5ddd0d15063725fce40ffa7e8e4ed7346aa83da9b19df434f7ddb766c2de6255",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/asset-imports.d.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/asset-imports.d.ts",
+      "sourceSha256": "c72887b222cc409811bf2956788324a5465d0e1395c1e45a8d85b3721d18687f",
+      "sha256": "c72887b222cc409811bf2956788324a5465d0e1395c1e45a8d85b3721d18687f",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/convert.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/convert.ts",
+      "sourceSha256": "fd41b4dd3e0edfe25e61f24a0d4e5032ba924c97d8428105a9c4bce438c2ecab",
+      "sha256": "fd41b4dd3e0edfe25e61f24a0d4e5032ba924c97d8428105a9c4bce438c2ecab",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/delimited.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/delimited.ts",
+      "sourceSha256": "bff9ad20c71c4cf2caaf7bf5aad0f22e30f574fbac978bccb36eff629dabc46f",
+      "sha256": "bff9ad20c71c4cf2caaf7bf5aad0f22e30f574fbac978bccb36eff629dabc46f",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/error.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/error.ts",
+      "sourceSha256": "af0d846d2c7caa19ff17f9922f35d9ea4c65b18b6c7db8d7e9f7c779b4b5307e",
+      "sha256": "af0d846d2c7caa19ff17f9922f35d9ea4c65b18b6c7db8d7e9f7c779b4b5307e",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/excel.tsx",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/excel.tsx",
+      "sourceSha256": "37ffe5e647aec51d99ce2352bd1b5d475200e885fe4dccf3b24da0654b03b5e5",
+      "sha256": "37ffe5e647aec51d99ce2352bd1b5d475200e885fe4dccf3b24da0654b03b5e5",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/format.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/format.ts",
+      "sourceSha256": "719e9fd036f3a58485dc99a40f2d3b3c68e73821507e2153e32f7f5020ffa9d1",
+      "sha256": "719e9fd036f3a58485dc99a40f2d3b3c68e73821507e2153e32f7f5020ffa9d1",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/index.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/index.ts",
+      "sourceSha256": "5b01ab5915a6e4b8c8acd80b90175d0b33b4e25435c0c06cabc07e95ec897094",
+      "sha256": "5b01ab5915a6e4b8c8acd80b90175d0b33b4e25435c0c06cabc07e95ec897094",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/locales.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/locales.ts",
+      "sourceSha256": "f0a4c6e82e24161885fb8150c866a6ae1e5d5f43cbe73ca514aa9a821784a40d",
+      "sha256": "f0a4c6e82e24161885fb8150c866a6ae1e5d5f43cbe73ca514aa9a821784a40d",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/model.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/model.ts",
+      "sourceSha256": "e8f26157fac1cc0a6942c30212dacb24da191d0cb733973f1538402d064a030d",
+      "sha256": "e8f26157fac1cc0a6942c30212dacb24da191d0cb733973f1538402d064a030d",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/parse.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/parse.ts",
+      "sourceSha256": "8d403f32f4631ab04c486a83a43246f1f7b722d87cc63ad47e04957cdbaf7581",
+      "sha256": "68bd1f92e119c820a8afa2ded20b06e9377ec86215714b789efe612b76304df2",
+      "adaptation": "Fixed reviewed same-origin module worker replaces Blob creation/revocation; original bounds, validation, copied buffers, cancellation and termination remain."
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/worker.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/worker.ts",
+      "sourceSha256": "7df26329b6e5fe3c18c43e10c55782541afa5de0a11817524f91618f6446d713",
+      "sha256": "7df26329b6e5fe3c18c43e10c55782541afa5de0a11817524f91618f6446d713",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/xls.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/xls.ts",
+      "sourceSha256": "ef04356ac4bc63d15f992695eedf5e3c383332f30cd045036b46e7531858970d",
+      "sha256": "ef04356ac4bc63d15f992695eedf5e3c383332f30cd045036b46e7531858970d",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/xlsx-archive.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/xlsx-archive.ts",
+      "sourceSha256": "ffd99f6b2424122b427754e53f6c2cc9f68ff7fa783e0f1816b3998ceb3b6618",
+      "sha256": "ffd99f6b2424122b427754e53f6c2cc9f68ff7fa783e0f1816b3998ceb3b6618",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/src/client/excel/xlsx.ts",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/src/client/excel/xlsx.ts",
+      "sourceSha256": "7192d771db899ece3d7c300ec4cf5f7f1a77c664cd0d0db7a82c2932831178bf",
+      "sha256": "ca54be2252f998e777949b7e1ddb19f6a4e68540b9dbe0cd04e1c7b3be23be68",
+      "adaptation": "Omit unavailable/non-finite default row heights so valid workbooks without optional sheetFormatPr retain the original grid default instead of NaN geometry; existing explicit heights remain."
+    },
+    {
+      "path": "packages/client/ui-sidebar-documentpreview/licenses/FortuneSheet.txt",
+      "sourcePath": "packages/client/ui-sidebar-documentpreview/licenses/FortuneSheet.txt",
+      "sourceSha256": "5fec1b755e7753254cb63ca9400ef0159ebf6bcf05357b72f3e42e0c462a29f9",
+      "sha256": "5fec1b755e7753254cb63ca9400ef0159ebf6bcf05357b72f3e42e0c462a29f9",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "patches/@fortune-sheet__core@1.0.4.patch",
+      "sourcePath": "patches/@fortune-sheet__core@1.0.4.patch",
+      "sourceSha256": "8791a230763dbf853fd65d627c68c31de37209992851377855e16cf08ea70532",
+      "sha256": "8791a230763dbf853fd65d627c68c31de37209992851377855e16cf08ea70532",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "patches/@fortune-sheet__react@1.0.4.patch",
+      "sourcePath": "patches/@fortune-sheet__react@1.0.4.patch",
+      "sourceSha256": "2932e52e79afcd4ced08cfa123b5eded786c85043da32f622f3e80af6fc96c37",
+      "sha256": "2932e52e79afcd4ced08cfa123b5eded786c85043da32f622f3e80af6fc96c37",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "patches/exceljs@4.4.0.patch",
+      "sourcePath": "patches/exceljs@4.4.0.patch",
+      "sourceSha256": "c1bf8ac8f319dab382f08e3a669b715e691d46c703ac5a4163eb383fbedd1d48",
+      "sha256": "c1bf8ac8f319dab382f08e3a669b715e691d46c703ac5a4163eb383fbedd1d48",
+      "adaptation": "verbatim"
     }
   ]
 }

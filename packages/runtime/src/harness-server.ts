@@ -266,6 +266,7 @@ export class HarnessServer {
       // local BinaryDataFactory replies. It has no network or child-worker need.
       // Wasm decoding is confined here; the application's script policy stays intact.
       if(url.pathname==='/dsh-pdf-worker-6.3.289.mjs')res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'none'; worker-src 'none'");
+      if(url.pathname==='/dsh-excel-worker-0.2.1-alpha.2.mjs')res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self'; connect-src 'none'; worker-src 'none'");
       res.writeHead(200, {'Content-Type': file.type + '; charset=utf-8'}); res.end(bytes);
     } catch (error) {
       if (res.headersSent) {res.destroy(); return;}

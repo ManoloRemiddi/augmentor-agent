@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original spreadsheet previews](HARNESS-SPREADSHEET-PREVIEWS.md#qualified-source-checkpoint--october-12): fresh source check/build and 301/301 across 58 files plus five notice/workspace cases pass. The public DSH readonly grid, parser/warnings and exact FortuneSheet/ExcelJS patches retain original UI/CSS. Ordinary and installed qualification remain separate; selected MX still uses the Office checkpoint below.
+
 # Original Harness Office previews
 
 ## Original document registration — October 12
