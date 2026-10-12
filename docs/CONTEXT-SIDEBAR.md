@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Fleet interface candidate](CONTEXT-FLEET.md#original-fleet-interface-candidate--october-12) binds the copied graph/inspector/roster/comms widgets and original preference gate to exact-parent Pi records, scoped caches and narrower read-only child links. Source/ordinary/installed acceptance is recorded separately; the running Context sidebar remains its qualified release until guarded promotion. Coordinated Teams/mailbox data and complete migration/platform gates remain open.
+
 # Original Context sidebar and placement
 
 The copied dsh-context dashboard now serves the original right sidebar beside

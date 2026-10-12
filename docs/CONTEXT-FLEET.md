@@ -2,6 +2,81 @@
 
 # Original Fleet migration: recorded family identities
 
+## Original Fleet interface candidate — October 12
+
+The original Fleet tab registration and `makeFleetView` now bind the recorded
+family catalogue to the copied graph, cursor/pinned inspector, roster filters,
+sorting and comms controls. Settings → Plugins → Fleet tab is the ninth scalar
+display field, with the existing **Hide** default preserved. Its original
+show/hide gate and Tab/Sidebar/All placement own registrations; hiding a selected
+Fleet seat returns it to Chat. Original layout, widgets, icons and CSS remain
+in use. The sidebar's original inline graph uses the same catalogue and readers.
+
+The UI bridge holds one catalogue for the current Host epoch, operator role and
+selected parent. Unknown/inaccessible catalogue data is unavailable rather than
+an empty family. Identity changes retire pending reads and caches. At most four
+bounded child reads run concurrently; obsolete stamp entries and pending work
+are pruned. Each worker reads at most 100 newest observation metadata rows and
+one eligible immutable request body up to 1 MiB. That body is shared across
+widgets/status updates, with only its latest identity retained per worker while
+the family is mounted. Task/reply details use 30-message bounded parent-owned
+history pages and 16,384-character display caps. A final family occurrence's
+unmount, role/parent/epoch change or unavailable catalogue retires private caches.
+
+Original roster spawn order follows the saved catalogue. Worker labels retain
+the reported disposition; a completed dot requires that producer's completed
+receipt. Root idle state does not imply task completion. Uncaptured newest
+composition stays unknown and never becomes zero occupancy. Worker tokens use
+the saved producer aggregation, separately from the parent's own observed
+requests, without re-attribution. Active-time, coordinated Team and mailbox/relay
+domains remain unavailable; the original Comms caption makes that absence
+explicit. The task briefing is the assigned saved task, while the actual
+effective request remains inspectable in Context.
+
+The original **Open session** action asks the authenticated HTTP
+`session.jobInspection` endpoint for a narrower child link. Parent, job and saved
+child identity are checked again before minting it. Parent-owned child history,
+native and observation readers now recheck that relationship before IO too.
+Read-only parent inspectors may open only their own verified children; the
+child link cannot outlive its parent link. Operator-created links retain the
+existing four-hour maximum and ephemeral Host-only token store.
+
+That link opens the same original DSH shell under read-only child credentials.
+Its session list contains only the bound child's safe row; its model getter
+reads only the saved selection, without loading an AgentSession. Chat,
+Trajectory, Context and original/native evidence remain inspectable. The link
+grants no parent/sibling catalogue, worker prompt/Stop, preferences, approvals
+or local preview authority. Existing global operator session lists still exclude
+workers. Link creation does not prove page opening; the actual browser fixture
+qualifies the second page and read-only composer separately.
+
+Current dsh-context selection is **107 files: 91 verbatim / 16 marked
+adaptations**, at the same Apache-2.0 0.68.1 public ref. Seven additional original
+Fleet/gate/view/list/comms/member/task files are selected. FleetView and
+fleetDetail add optional scoped cache/read/invalidation seats; agentTree accepts
+optional reported request/disposition and composition-availability fields. The
+already adapted Context view requires a genuinely served catalogue for family
+navigation. Original licence/icon/CSS bodies and MIT DSH's 483-file selection
+remain preserved. No supplier Host/Cordis or extra agent owner is mounted.
+
+Actual SDK/HTTP/Chromium focused evidence verifies the original settings gate,
+graph/roster, pinned task/reply inspector, one shared newest body, cache retirement,
+real second child page, recorded Context and no subsequent inference/native
+original changes. Initial fixture failures used “Open” instead of the original
+“Open session,” then waited for animation frames in the inactive parent after
+the child page opened. Phase diagnostics proved the child Context and originals
+had passed; activating the parent before its pointer checks fixes the observer.
+Deadlines and two-worker scheduling are unchanged. A false rendering-stall
+diagnosis was rejected. Projection values now share one page-local canonical
+derivation and a stable memoized presentation value across modal/tab/sidebar
+occurrences; these are identity/scoping safeguards, not the cause of that timeout.
+
+Source final check/build, supplier hashes/browser graph/notices and **283/283 across 52 files** pass, zero failures/skips/cancellations, Node 24.19.0, prepared QtTest, two workers and unchanged deadlines. Ordinary and installed MX qualification follow separately. The
+running installed Context/sidebar release below is not yet a Fleet installation.
+Complete migration, live/physical/platform, public packaging/privacy and DSH
+retirement gates remain binding. Further OS implementation stays deferred for
+owner MX feedback. The older data-foundation records below retain their scope.
+
 The next original dsh-context view needs a trustworthy parent/worker catalogue.
 Pi's ordinary conversation forks are historical branches, while bounded jobs
 have separate saved delegation identities and native histories. `session.family`

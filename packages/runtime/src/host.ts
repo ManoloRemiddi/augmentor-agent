@@ -166,6 +166,18 @@ export class Host {
     return {groups:[...groups.values()],pinned:this.settings.pinned.map((p:any)=>typeof p==='string'?p:p.provider+'/'+p.model),hidden:this.settings.hidden,default:this.settings.defaultModel,failures:[]};
   }
   getMeta(id:unknown){const m=this.metadata.get(identifier(id));if(!m)throw new Error('Conversation not found');return m;}
+  jobInspectionTarget(parentId:unknown,jobId:unknown){
+    const parent=this.getMeta(parentId);
+    if(parent.delegation||this.jobs.problem)throw Error('The parent job catalogue is unavailable for child inspection.');
+    const job=this.jobs.lookup(parent.id,identifier(jobId)),child=job.childId?this.metadata.get(job.childId):undefined;
+    if(!['delegate','desktop'].includes(job.spec.kind)||!child||child.id===parent.id||child.delegation?.parentId!==parent.id||child.delegation.jobId!==job.id)throw Error('This saved job has no verified child conversation.');
+    return child.id;
+  }
+  inspectionSessionRow(id:unknown){
+    const m=this.getMeta(id);let running=m.running;
+    if(m.delegation){try{const job=this.jobs.lookup(m.delegation.parentId,m.delegation.jobId);running=job.childId===m.id&&['starting','running','stopping'].includes(job.state);}catch{running=false;}}
+    return {sessionId:m.id,cwd:m.cwd,agentPreset:m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',title:m.title,updatedAt:m.updatedAt,saved:m.saved,running,blank:!m.title};
+  }
   reasoningSettings(m:Meta){return savedReasoning(m.reasoning,m.file&&existsSync(m.file)?SessionManager.open(m.file).buildSessionContext().thinkingLevel:'off');}
   async reasoningState(m:Meta){const loaded=await this.load(m),config=reasoningConfig(this.settings.reasoning),saved=this.reasoningSettings(m),model=loaded.session.model!;
     const preset=m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi';
@@ -545,7 +557,7 @@ export class Host {
   async handle(method:string,p:Data,id:string):Promise<any>{
     if(p.sessionId&&this.organization.archived(p.sessionId)&&['session.prompt','session.continueQueue','session.startJob','session.updateGoal','session.compact','prompt.improve'].includes(method))throw Error('Restore the conversation before starting work.');
     if(this.mcpReloading&&(['prompt.improve','setup.save','models.configure','models.reload','session.create','session.branch','session.updateGoal','session.trimTools','session.compact','session.selectModel','session.selectReasoning','reasoning.configure','session.prompt','session.continueQueue'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Finish MCP session reload before changing or starting a conversation.');
-    if(method.startsWith('session.')&&p.sessionId&&this.metadata.get(p.sessionId)?.delegation&&!['session.history','session.nativeHistory','session.nativeRead','session.originalSearch','session.originalRead','session.plan','session.goal','session.queue','session.compaction','session.cancel'].includes(method))throw Error('Delegated conversations are controlled by their parent job.');
+    if(method.startsWith('session.')&&p.sessionId&&this.metadata.get(p.sessionId)?.delegation&&!['session.models','session.history','session.nativeHistory','session.nativeRead','session.originalSearch','session.originalRead','session.plan','session.goal','session.queue','session.compaction','session.cancel'].includes(method))throw Error('Delegated conversations are controlled by their parent job.');
     if(this.jobs.busy&&['models.configure','models.reload','setup.save','reasoning.configure','session.mcpConfigure','session.mcpAction'].includes(method))throw Error('Stop and settle background jobs before changing their shared configuration.');
     if(this.compactions.busy&&['setup.save','models.configure','models.reload','reasoning.configure','session.mcpConfigure','session.mcpAction','prompt.improve'].includes(method))throw Error('Finish or cancel Pi compaction before changing shared configuration.');
     if(p.sessionId&&this.compactions.blocked(p.sessionId)&&['session.create','session.branch','session.trimTools','session.selectModel','session.selectReasoning','session.prompt','session.continueQueue','session.updateGoal','session.startJob'].includes(method))throw Error('Finish compaction or inspect and acknowledge its unknown outcome before changing this conversation.');
@@ -582,11 +594,11 @@ export class Host {
     case 'session.family':{const m=this.getMeta(p.sessionId);return sessionFamily(m,this.jobs.list(m.id),sid=>this.metadata.get(sid),this.jobs.problem);}
     case 'session.jobs':{const m=this.getMeta(p.sessionId);return {available:!this.jobs.problem,reason:this.jobs.problem,items:this.jobs.list(m.id),scope:'exact-parent-conversation; reported producer outcomes; reads do not add usage'};}
     case 'session.job':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));return {job,output:this.jobs.output(m.id,job.id,p.from)};}
-    case 'session.jobHistory':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));if(!job.childId)return {available:false,reason:'This job has no delegated conversation.'};return {available:true,childId:job.childId,...this.history(this.getMeta(job.childId)).page(p.maxMessages,p.beforeSeq)};}
+    case 'session.jobHistory':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));if(!job.childId)return {available:false,reason:'This job has no delegated conversation.'};const childId=this.jobInspectionTarget(m.id,job.id);return {available:true,childId,...this.history(this.getMeta(childId)).page(p.maxMessages,p.beforeSeq)};}
     case 'session.jobNativeHistory':case 'session.jobNativeRead':case 'session.jobObservations':case 'session.jobPayload':{
       const parent=this.getMeta(p.sessionId),job=this.jobs.lookup(parent.id,identifier(p.jobId));if(!job.childId)return {available:false,reason:'This job has no child native history.'};
       const childMethod=({ 'session.jobNativeHistory':'session.nativeHistory','session.jobNativeRead':'session.nativeRead','session.jobObservations':'observation.list','session.jobPayload':'observation.payload'} as Record<string,string>)[method]!;
-      return this.handle(childMethod,{...p,sessionId:job.childId},id);
+      const childId=this.jobInspectionTarget(parent.id,job.id);return this.handle(childMethod,{...p,sessionId:childId},id);
     }
     case 'session.startJob':{const m=this.getMeta(p.sessionId);await this.load(m);return this.startJob(m,p.spec);}
     case 'session.removeJob':{const m=this.getMeta(p.sessionId);return this.jobs.remove(m.id,identifier(p.jobId));}

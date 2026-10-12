@@ -13,7 +13,7 @@ const allowed = new Set([
   'session.fileReferences','workspaceFiles.stat','workspaceFiles.read','workspaceFiles.readBytes',
   'draft.describe','draft.text','draft.remove','draft.prepare','draft.settle','draft.acknowledge',
   'host.describe', 'session.organize', 'workspace.list', 'workspace.adopt', 'workspace.rename', 'workspace.remove', 'workspace.move', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
-  'session.family', 'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
+  'session.jobInspection', 'session.family', 'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
@@ -23,7 +23,7 @@ const allowed = new Set([
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
 type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
-const inspectionReads=new Set(['session.family','session.jobs','session.job','session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','session.compaction','observation.describe','observation.list', 'observation.search','observation.payload']);
+const inspectionReads=new Set(['session.jobInspection','session.family','session.jobs','session.job','session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','session.compaction','observation.describe','observation.list', 'observation.search','observation.payload']);
 interface LiveFrame {seq: number; sessionId: string; frame: Data}
 const LIVE_BYTES = 16 * 1024 * 1024;
 
@@ -57,12 +57,13 @@ export class HarnessServer {
     }
     return [...this.watches.values()].some(watch => watch.sessionId === sessionId&&watch.interactive);
   }
-  openInspection(sessionId:string){
+  openInspection(sessionId:string,through?:number){
     this.host.getMeta(sessionId);
     for(const [token,scope] of this.inspections)if(scope.expiresAt<=Date.now())this.inspections.delete(token);
     if(!this.base)throw Error('The conversation inspector is not available.');
     if(this.inspections.size>=128)throw Error('Too many active inspector links. Wait for a link to expire or restart the Pi runtime while idle.');
-    const token=randomBytes(32).toString('hex'),expiresAt=Date.now()+4*60*60*1000;
+    const token=randomBytes(32).toString('hex'),expiresAt=Math.min(Date.now()+4*60*60*1000,through??Infinity);
+    if(!Number.isFinite(expiresAt)||expiresAt<=Date.now())throw Error('The parent inspector has expired. Open a fresh parent link.');
     this.inspections.set(token,{mode:'read-only',token,sessionId,expiresAt});
     return {url:this.base+'/#token='+token+'&session='+encodeURIComponent(sessionId)+'&view=trajectory',origin:this.base,sessionId,mode:'read-only',expiresAt};
   }
@@ -90,8 +91,9 @@ export class HarnessServer {
   private async inspect(access:Extract<Access,{mode:'read-only'}>,method:string,params:Data,id:string){
     if(!inspectionReads.has(method))throw Error('This conversation inspector is read-only.');
     if(method.startsWith('session.')&&method!=='session.list'||method.startsWith('observation.')&&method!=='observation.describe')this.scopedSession(access,params.sessionId);
+    if(method==='session.jobInspection')return this.openInspection(this.host.jobInspectionTarget(params.sessionId,params.jobId),access.expiresAt);
     const result=await this.host.dispatch(method,params,id),meta=this.host.getMeta(access.sessionId);
-    if(method==='session.list')return {items:result.items.filter((row:Data)=>row.sessionId===access.sessionId)};
+    if(method==='session.list')return {items:meta.delegation?[this.host.inspectionSessionRow(access.sessionId)]:result.items.filter((row:Data)=>row.sessionId===access.sessionId)};
     if(method==='host.describe')return {protocol:result.protocol,version:result.version,piVersion:result.piVersion,workspace:meta.cwd,capabilities:{inspection:true}};
     if(method==='models.list')return {groups:result.groups.map((group:Data)=>({provider:group.provider,name:group.name,models:group.models.filter((model:Data)=>model.provider===meta.selection.provider&&model.model===meta.selection.model)})).filter((group:Data)=>group.models.length),default:meta.selection,pinned:[],hidden:[],failures:[]};
     return result;
@@ -204,6 +206,7 @@ export class HarnessServer {
           let result;
           if(['workspaceFiles.stat','workspaceFiles.read','workspaceFiles.readBytes'].includes(rpc.method)){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{const paramsRead=rpc.method==='workspaceFiles.readBytes'&&params.range===undefined?{...params,range:{offset:0,length:256*1024}}:params;try{result={ok:true,value:await this.host.previewFile(params.sessionId,rpc.method==='workspaceFiles.stat'?'stat':rpc.method==='workspaceFiles.read'?'read':'bytes',paramsRead,abort.signal)};}catch(error){const e=error as any;result={ok:false,error:{code:e.code??'gateway/internal',message:e.message,details:e.details??{}}};}}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
           else if(rpc.method==='session.fileReferences'){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{result=await this.host.listFileReferences(params.sessionId,params.query,abort.signal);}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
+          else if(rpc.method==='session.jobInspection')result=this.openInspection(this.host.jobInspectionTarget(params.sessionId,params.jobId));
           else result = await this.host.dispatch(rpc.method, params, rpc.id);
           this.send(res, 200, {id: rpc.id, result}); return;
           };

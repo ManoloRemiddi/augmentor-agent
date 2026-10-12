@@ -1,3 +1,4 @@
+// Modified by Augmentor: optional scoped read and invalidation seats; original sanitizers and presentation contract retained. SPDX-License-Identifier: Apache-2.0
 /**
  * The client half of the Fleet detail route (`/api/dsh-context/fleet`, host/fleet.ts): a
  * sanitizing fetcher, a page-scope promise ledger keyed by session id, and the cross-session
@@ -126,12 +127,13 @@ interface FleetDetailEntry {
  * promise, a NEWER stamp refetches once, and a settled failure stays cached so a broken session
  * never hammers the route per render. */
 export class FleetDetailCache {
+  constructor(private reader?: (id: string) => Promise<FleetDetail | null>, private onInvalidate?: (id: string) => void) {}
   private readonly entries = new Map<string, FleetDetailEntry>()
 
   fetch(id: string, updatedAt: number): Promise<FleetDetail | null> {
     const known = this.entries.get(id)
     if (known !== undefined && known.updatedAt >= updatedAt) return known.pending
-    const fetcher = makeFleetDetailFetcher(id)
+    const fetcher = this.reader !== undefined ? () => this.reader!(id).then(value => value === null ? null : fleetDetailOf(value)) : makeFleetDetailFetcher(id)
     const pending = fetcher !== undefined
       ? fetcher().catch((): FleetDetail | null => null)
       : Promise.resolve(null)
@@ -142,6 +144,7 @@ export class FleetDetailCache {
   /** Drop one session's ledger line so the next `fetch` reads again (the comms panel's refresh). */
   invalidate(id: string): void {
     this.entries.delete(id)
+    this.onInvalidate?.(id)
   }
 }
 

@@ -38,8 +38,8 @@
       "path": "src/client/agentTree.ts",
       "sourcePath": "src/client/agentTree.ts",
       "sourceSha256": "8b6e29e3fb9f8a5b87535da60ea24fb7ea3e6fd60f50d3a7c6f4bde8d1a0a0c6",
-      "sha256": "8b6e29e3fb9f8a5b87535da60ea24fb7ea3e6fd60f50d3a7c6f4bde8d1a0a0c6",
-      "adaptation": "verbatim"
+      "sha256": "04de9e3eadc22212f59dd9b6ff899ed60f34c2d13205665978ba1549bed5f295",
+      "adaptation": "optional reported requests/disposition and composition availability prevent inferred completed dots and zero occupancy on Pi rows"
     },
     {
       "path": "src/client/assemble.ts",
@@ -112,6 +112,13 @@
       "adaptation": "verbatim"
     },
     {
+      "path": "src/client/components/commsPanel.tsx",
+      "sourcePath": "src/client/components/commsPanel.tsx",
+      "sourceSha256": "475f47f8ca6dc184b0f4be4a11e6aaf5428c2dd070ee045d5066b86b99d8fe47",
+      "sha256": "475f47f8ca6dc184b0f4be4a11e6aaf5428c2dd070ee045d5066b86b99d8fe47",
+      "adaptation": "verbatim"
+    },
+    {
       "path": "src/client/components/commsRow.tsx",
       "sourcePath": "src/client/components/commsRow.tsx",
       "sourceSha256": "1dc5e49c0322b9a5f702d181658b6b7cb690673aa5418c4b348057e22e4f7ac9",
@@ -129,8 +136,8 @@
       "path": "src/client/components/contextView.tsx",
       "sourcePath": "src/client/components/contextView.tsx",
       "sourceSha256": "74b7f1cbd92f48288b0605f833614d53a0ed3f66aa9fe7fff270b4c797f9c6aa",
-      "sha256": "054f5a70fb068a042fb1d0b7aa48cdb4b0ddf50187b8bc7d9d7143c281a8819c",
-      "adaptation": "Forward the page-local read-only request picker projection to the original browser; supplier structure/CSS retained. Independent dock-occurrence scroll key; original tab default and presentation retained. Family navigation requires a served family face; no inferred zero-child figures. Bind sidebar scroll restoration to its original root scrollport; supplier CSS retained."
+      "sha256": "05c7534c52cf656dbec58e8c079d64cc9b37a7d5130775bef69c47c1f3843093",
+      "adaptation": "existing retained-data/request/scroll adaptations; family navigation requires a served catalogue"
     },
     {
       "path": "src/client/components/currentComposition.tsx",
@@ -196,6 +203,20 @@
       "adaptation": "verbatim"
     },
     {
+      "path": "src/client/components/fleetList.tsx",
+      "sourcePath": "src/client/components/fleetList.tsx",
+      "sourceSha256": "312a0c7e2247213b9127c97f80f76c0b01b2ca9549c99a07233b4b75d43d6ca7",
+      "sha256": "312a0c7e2247213b9127c97f80f76c0b01b2ca9549c99a07233b4b75d43d6ca7",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/client/components/fleetView.tsx",
+      "sourcePath": "src/client/components/fleetView.tsx",
+      "sourceSha256": "718681bb83ade90736a2e3421e994ec264bc059fec5da7c487846a8c0da0b62c",
+      "sha256": "1b0fbc0083dae3e86036e631e46b7d27143ab1e2f113f23c26ad92f308b66447",
+      "adaptation": "optional scoped detail cache; original Fleet structure/widgets/CSS retained"
+    },
+    {
       "path": "src/client/components/heatmap.tsx",
       "sourcePath": "src/client/components/heatmap.tsx",
       "sourceSha256": "b2492ac5ba0f70c781f3a0bfe03e1d9a7b385b5cb2eabdaa1552e356023ae99f",
@@ -214,6 +235,13 @@
       "sourcePath": "src/client/components/images.tsx",
       "sourceSha256": "96c35dcc2dd7d6239ff4762b0867c1a9a9a01d2f7e715ec953827e8951257ec8",
       "sha256": "96c35dcc2dd7d6239ff4762b0867c1a9a9a01d2f7e715ec953827e8951257ec8",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/client/components/memberBoard.tsx",
+      "sourcePath": "src/client/components/memberBoard.tsx",
+      "sourceSha256": "3a4fc51e2e1d77a38dd3bb75208a848e6e06f2032427803bb058e38a6a5a584b",
+      "sha256": "3a4fc51e2e1d77a38dd3bb75208a848e6e06f2032427803bb058e38a6a5a584b",
       "adaptation": "verbatim"
     },
     {
@@ -317,6 +345,13 @@
       "adaptation": "verbatim"
     },
     {
+      "path": "src/client/components/taskBoard.tsx",
+      "sourcePath": "src/client/components/taskBoard.tsx",
+      "sourceSha256": "b4d46be3613119f1b002c20476fca3c086d40704198d1518d6b1730d573c65b2",
+      "sha256": "b4d46be3613119f1b002c20476fca3c086d40704198d1518d6b1730d573c65b2",
+      "adaptation": "verbatim"
+    },
+    {
       "path": "src/client/components/timingStrip.tsx",
       "sourcePath": "src/client/components/timingStrip.tsx",
       "sourceSha256": "4ea2e3fd71e8c7ef372456af13d4cf2f4297fd7447d34130dde4e3818f33973b",
@@ -369,14 +404,21 @@
       "path": "src/client/fleetDetail.ts",
       "sourcePath": "src/client/fleetDetail.ts",
       "sourceSha256": "51cb010e6d7a4842fb6a86dee0504aac0be4dc220b43a779d0c22184021b83ee",
-      "sha256": "51cb010e6d7a4842fb6a86dee0504aac0be4dc220b43a779d0c22184021b83ee",
-      "adaptation": "verbatim"
+      "sha256": "b0cefbb88d9a65b77ffd9a2b8fd523a6b91c1f3504df8d996f11ffc41b5f5fbb",
+      "adaptation": "optional scoped read/invalidation seats; original cache/sanitization retained"
     },
     {
       "path": "src/client/fleetModel.ts",
       "sourcePath": "src/client/fleetModel.ts",
       "sourceSha256": "d8e9822c701fdf93c84fe344b0024ca2e62acab2e1518fc9078005a2e0d31951",
       "sha256": "d8e9822c701fdf93c84fe344b0024ca2e62acab2e1518fc9078005a2e0d31951",
+      "adaptation": "verbatim"
+    },
+    {
+      "path": "src/client/fleetTab.ts",
+      "sourcePath": "src/client/fleetTab.ts",
+      "sourceSha256": "c99f6299b20780882953cc901ab1053d352be653c1c80039f2efce909eec067d",
+      "sha256": "c99f6299b20780882953cc901ab1053d352be653c1c80039f2efce909eec067d",
       "adaptation": "verbatim"
     },
     {
@@ -462,6 +504,13 @@
       "sourceSha256": "c9d5858e3c879e9cc1b8c27b5897890dce3964520f8b0e7cdb6708d86ba0cee6",
       "sha256": "beed0f190e7da142f9756e3fdb6d7d2b5897894e6f122bd95c2cf97a63fc8a10",
       "adaptation": "Pi read-only Insights seats and explicit unavailable data; original structure/CSS preserved"
+    },
+    {
+      "path": "src/client/placement.ts",
+      "sourcePath": "src/client/placement.ts",
+      "sourceSha256": "1cf6ab6e1d776acd4ce424f3bcb8ec5aca2766e6860bba9a1f2ba8548e4c4c94",
+      "sha256": "1cf6ab6e1d776acd4ce424f3bcb8ec5aca2766e6860bba9a1f2ba8548e4c4c94",
+      "adaptation": "verbatim"
     },
     {
       "path": "src/client/primitives.ts",
@@ -646,6 +695,13 @@
       "adaptation": "verbatim"
     },
     {
+      "path": "src/client/toggleGate.ts",
+      "sourcePath": "src/client/toggleGate.ts",
+      "sourceSha256": "d6b85ebba40d6a6f1fd4b85333e553cf5c197361129e35143ede1b69a164fe35",
+      "sha256": "d6b85ebba40d6a6f1fd4b85333e553cf5c197361129e35143ede1b69a164fe35",
+      "adaptation": "verbatim"
+    },
+    {
       "path": "src/client/viewFocus.ts",
       "sourcePath": "src/client/viewFocus.ts",
       "sourceSha256": "1cc17d84f4b0a4b932ada15e158f4b4d59a974ed9748c9957a7bf8f31b5815fb",
@@ -699,13 +755,6 @@
       "sourcePath": "src/shared/types.ts",
       "sourceSha256": "10ab8d9a5fbe0d4bfac50e0ae5116a91238416b366207179bf1e7cadc74885a7",
       "sha256": "10ab8d9a5fbe0d4bfac50e0ae5116a91238416b366207179bf1e7cadc74885a7",
-      "adaptation": "verbatim"
-    },
-    {
-      "path": "src/client/placement.ts",
-      "sourcePath": "src/client/placement.ts",
-      "sourceSha256": "1cf6ab6e1d776acd4ce424f3bcb8ec5aca2766e6860bba9a1f2ba8548e4c4c94",
-      "sha256": "1cf6ab6e1d776acd4ce424f3bcb8ec5aca2766e6860bba9a1f2ba8548e4c4c94",
       "adaptation": "verbatim"
     }
   ]

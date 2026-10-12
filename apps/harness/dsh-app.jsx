@@ -76,7 +76,7 @@ import {ComposerAttachments} from '@dsh-gui/ui-attachment/src/client/ComposerAtt
 import {MessageImages} from '@dsh-gui/ui-attachment/src/client/MessageImages.tsx';
 import {DshPiController} from './dsh-pi-controller.mjs';
 import {projectDsh} from './dsh-pi-projection.mjs';
-import {DshContextDashboard,DshContextOverlay,createDshContextModalBinding,bindContextNavigation} from './dsh-context.jsx';
+import {DshContextDashboard,DshContextFleet,DshContextOverlay,createDshContextModalBinding,bindContextNavigation} from './dsh-context.jsx';
 import {DshContextInsights} from './dsh-insights.jsx';
 import {DshContextPreferences} from './dsh-context-preferences.mjs';
 import {contextSettings} from './dsh-context-settings.jsx';
@@ -98,7 +98,7 @@ const contextPreferences=new DshContextPreferences(controller);contextSettings.a
 const contextModal=createDshContextModalBinding(controller);
 const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
 const filePreviews=new DshFilePreviews(controller,layout);bindContextNavigation(filePreviews);
-const contextTab=bindContextSidebar(filePreviews,contextSettings,DshContextDashboard);
+const contextTab=bindContextSidebar(filePreviews,contextSettings,DshContextDashboard,DshContextFleet);
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
 const attachmentDrafts=new DshAttachments(controller);let openFiles=null;
 const questionDrafts=new Map();
@@ -252,10 +252,11 @@ function CommandOverlays(){
 }
 function App(){
   const hasContextTab=useSyncExternalStore(contextTab.subscribe,contextTab.getSnapshot);
+  const hasFleetTab=useSyncExternalStore(contextTab.fleet.subscribe,contextTab.fleet.getSnapshot);
   const contextPrefs=useSyncExternalStore(contextPreferences.subscribe,contextPreferences.getSnapshot);
   const settingsState=useSyncExternalStore(settingsShell.subscribe,settingsShell.getSnapshot);
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
-  React.useLayoutEffect(()=>{if(!hasContextTab&&view==='context')setView('chat');contextModal.sync();if(state.phase!=='ready'||state.readOnly||contextPrefs.value.insightsEntry==='hide')layout.actions.selectPanel(null);});
+  React.useLayoutEffect(()=>{if(!hasContextTab&&view==='context'||!hasFleetTab&&view==='fleet')setView('chat');contextModal.sync();if(state.phase!=='ready'||state.readOnly||contextPrefs.value.insightsEntry==='hide')layout.actions.selectPanel(null);});
   useEffect(()=>{commandMenu.deps.actions={compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:()=>setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:(scope,segment,consume)=>contextModal.open(scope,segment,consume),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
@@ -268,7 +269,7 @@ function App(){
     return {phase:'ready',state:'ready',items:paths.map(cwd=>({workspaceId:cwd,cwd,title:cwd.split('/').filter(Boolean).at(-1)||cwd,sessionIds:state.sessions.filter(x=>x.cwd===cwd).map(x=>x.sessionId)})),pinnedSessionIds:[],archivedSessionIds:[]};
   },[state.sessions,state.workspace,state.workspaces]);
   const list=useMemo(()=>({projectionsBySession:{},ids:state.sessions.map(x=>x.sessionId),byId:Object.fromEntries(state.sessions.map(x=>[x.sessionId,{...x,id:x.sessionId,displayTitle:x.title||'New conversation',origin:'main',retainedBy:{mainView:x.sessionId===state.sessionId?1:0}}]))}),[state.sessions,state.sessionId]);
-  const tabs=[{id:'chat',label:'Chat'},{id:'trajectory',label:'Trajectory'},...(hasContextTab?[{id:'context',label:'Context'}]:[]),{id:'plan',label:'Plan'},{id:'goal',label:'Goal'},{id:'jobs',label:'Jobs'}];
+  const tabs=[{id:'chat',label:'Chat'},{id:'trajectory',label:'Trajectory'},...(hasContextTab?[{id:'context',label:'Context'}]:[]),...(hasFleetTab?[{id:'fleet',label:'Fleet'}]:[]),{id:'plan',label:'Plan'},{id:'goal',label:'Goal'},{id:'jobs',label:'Jobs'}];
   const useSession=selectorFace({...composed.session,blank:composed.session.blank&&view==='chat'&&!state.compactionPending&&!state.compaction?.blocked&&state.unconfirmed?.kind!=='compaction'}),useSessions=selectorFace(list),useWorkspaces=selectorFace(workspaces),useConversation=selectorFace(composed.conversation),useChat=selectorFace(composed.chat),useProjection=(name,selector=x=>x)=>selector(name==='imageLimits'?state.attachmentLimits:composed.projection[name]);
   const open=sid=>{layout.actions.selectPanel(null);void control.run(()=>controller.open(sid));},startSession=cwd=>{layout.actions.selectPanel(null);void control.run(()=>controller.create(cwd||current?.cwd||state.workspace));};
   const restoreSession=sid=>controller.organize('restore',sid);
@@ -312,6 +313,7 @@ function App(){
         const id=options.only||view;
         if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={async(path,options)=>{if(!filePreviews.open(path,{params:options?.line===undefined?undefined:{line:options.line}}))throw Error('File preview is unavailable in this conversation.');}} openSkill={unsupported} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={loadImage} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={unsupported} fileMentions={()=>undefined}/>;
         if(id==='trajectory')return <TrajectoryView {...p} t={t.trajectory} useTrajectory={selectorFace(composed.trajectory)} useDuration={useDuration} setActualDuration={value=>duration.set(value)} jsonStringWrapping={{getDefault:()=>wrapping.getSnapshot(),setDefault:value=>wrapping.set(value)}} loadOlder={()=>controller.older()} loadImage={loadImage} viewRequest={null}/>;
+        if(id==='fleet'&&hasFleetTab)return <DshContextFleet key={state.sessionId} state={state} controller={controller}/>;
         if(id==='context'&&hasContextTab)return <DshContextDashboard key={state.sessionId} state={state} controller={controller}><ContextView state={state}/></DshContextDashboard>;
         return <ExtensionView key={id+state.sessionId} kind={id} state={state}/>;
       }

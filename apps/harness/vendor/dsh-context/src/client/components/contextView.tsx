@@ -181,7 +181,8 @@ export function makeContextView(
     // The stats board's family cell names the Agent Network card: its own tab when the preferences serve one,
     // else the right Sidebar panel that keeps the card inline. A deployment serving neither — a stripped
     // harness, or the tab hidden with no Sidebar — leaves the cell a plain figure instead of a dead button.
-    const hasFamilyView = sessionsFaceOf(ctx) !== null && (settings.fleetTab() === 'show' || settings.defaultPlacement() !== 'tab')
+    const familyFace = sessionsFaceOf(ctx)
+    const hasFamilyView = familyFace?.list?.getSnapshot() != null && (settings.fleetTab() === 'show' || settings.defaultPlacement() !== 'tab')
     const onTeamClick = useCallback((): void => {
       if (!activateViewTab(t('tab.fleet'))) openContextSidebar(ctx)
     }, [t])

@@ -5,7 +5,7 @@ import {appendDisplay} from './chat-projection.js';
 /** Browser transport to the existing Pi Host; never owns an agent or retries a mutation. */
 export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
-  state={phase:'connecting',sessionId:null,readOnly:false,sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,goal:null,workspace:'',error:null,hasMore:false};
+  state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
@@ -115,8 +115,9 @@ export class DshPiController {
       const res=await this.fetcher('/api/events?'+new URLSearchParams({sessionId,clientId:this.clientId,after:String(this.cursor)}),{headers:{Authorization:'Bearer '+this.token}});
       const page=await res.json();if(!res.ok||page.error)throw Error(page.error?.message||'The event connection failed.');if(epoch!==this.epoch)return;
       this.cursor=page.cursor;
-      const events=[...this.state.events],records=new Map(this.state.records.map(x=>[x.id,x])),interactions=new Map(this.state.interactions.map(x=>[x.rpcId,x]));let queue=this.state.queue,changed=false;
+      const events=[...this.state.events],records=new Map(this.state.records.map(x=>[x.id,x])),interactions=new Map(this.state.interactions.map(x=>[x.rpcId,x]));let queue=this.state.queue,changed=false,familyChanged=false;
       for(const {frame} of page.frames){
+        if(['job/updated','job/observation'].includes(frame.method)||frame.method==='session/event'&&['user/message','assistant/message','turn/start','turn/end'].includes(frame.payload.event.type)){familyChanged=true;changed=true;}
         if(frame.method==='session/event'){appendDisplay(events,frame.payload.event);changed=true;}
         if(frame.method==='observation/event'){const r=frame.payload.observation;records.set(r.id,r);changed=true;}
         if(frame.method==='session/queue'){queue=frame.payload;changed=true;}
@@ -125,7 +126,7 @@ export class DshPiController {
         if(frame.method==='interaction/updated'){const old=interactions.get(frame.rpcId);if(old?.method==='question/requested'&&(old.payload.wait?.revision??-1)<=frame.payload.wait?.revision){interactions.set(frame.rpcId,{...old,payload:{...old.payload,wait:frame.payload.wait}});changed=true;}}
         if(['interaction/resolved'].includes(frame.method)){interactions.delete(frame.rpcId);this.heldQuestions.delete(frame.rpcId);changed=true;}
       }
-      if(changed)this.update({events,records:[...records.values()].sort((a,b)=>a.seq-b.seq),queue,interactions:[...interactions.values()]});
+      if(changed)this.update({familyRevision:this.state.familyRevision+(familyChanged?1:0),events,records:[...records.values()].sort((a,b)=>a.seq-b.seq),queue,interactions:[...interactions.values()]});
       if(changed)void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
       if(page.gap){await this.open(sessionId);return;}
       if(page.frames.length||!this.lastRefresh||Date.now()-this.lastRefresh>3000){this.lastRefresh=Date.now();await this.refresh();}

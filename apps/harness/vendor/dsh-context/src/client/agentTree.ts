@@ -1,3 +1,4 @@
+// Modified by Augmentor: optional reported disposition governs completed dots for Pi rows; original derivation and layout retained. SPDX-License-Identifier: Apache-2.0
 /** Agent-graph derivation — the pure model behind the Agent network card. The
  * session-list snapshot carries everything the card needs, and this folds it
  * into the current session's family: the topmost known ancestor's whole subtree, per-node stats, and a depth/DFS layout. */
@@ -19,6 +20,8 @@ export interface SessionsFaceLike {
 }
 
 export interface AgentRow {
+  reportedState?: string;
+  reportedRequests?: number;
   displayTitle?: string
   title?: string
   parentId?: string
@@ -108,6 +111,8 @@ export function agentRowOf(value: unknown): AgentRow | null {
     ...(typeof rec.title === 'string' ? { title: rec.title } : {}),
     ...(typeof rec.parentId === 'string' ? { parentId: rec.parentId } : {}),
     ...(typeof rec.origin === 'string' ? { origin: rec.origin } : {}),
+    ...(typeof rec.reportedState === 'string' ? { reportedState: rec.reportedState } : {}),
+    ...(typeof rec.reportedRequests === 'number' && Number.isSafeInteger(rec.reportedRequests) && rec.reportedRequests >= 0 ? { reportedRequests: rec.reportedRequests } : {}),
     running: rec.running === true,
     blank: rec.blank === true,
     updatedAt: numOf(rec.updatedAt),
@@ -150,7 +155,7 @@ export function agentStatsOf(values: Record<string, unknown> | undefined): Agent
   const breakdown = contextBreakdownOf(values?.contextBreakdown)
   const usage = tokenUsageOf(values?.tokenUsage)
   let head: Headline | null = null
-  if (timeline !== null) {
+  if (timeline !== null && asRecord(timeline)?.augmentorCompositionAvailable !== false) {
     head = headlineOf(timeline, pressure, breakdown)
   } else if (pressure !== null) {
     const tokens = typeof pressure.projectedTokens === 'number' ? pressure.projectedTokens
@@ -198,7 +203,7 @@ export function agentSelfOf(
   usage: TokenUsage | null,
 ): AgentSelfStats {
   return {
-    head: headlineOf(timeline, pressure, breakdown),
+    head: asRecord(timeline)?.augmentorCompositionAvailable === false ? null : headlineOf(timeline, pressure, breakdown),
     billed: billedOf(usage),
     // The split generation's slim head counts the retained steps itself; the inline generation's value serves them.
     requests: timeline.counts?.steps ?? timeline.requests.length,
@@ -328,6 +333,7 @@ export function agentForestOf(
       stats.costUsage = self.costUsage ?? stats.costUsage
       stats.durationMs = self.durationMs ?? stats.durationMs
     }
+    if (row.reportedRequests !== undefined) stats.requests = row.reportedRequests
     const subagent = row.origin === 'subagent' || identity !== null
     const node: AgentNode = {
       ...stats,
@@ -342,7 +348,7 @@ export function agentForestOf(
       // last closed subagent turn finishing normally. A session that is not a subagent never
       // carries that projection, so its own folded steps stand in for it.
       completed: !row.running
-        && (agentTurnCompletedOf(values?.subagentTiming) || (!subagent && stats.requests > 0)),
+        && (row.reportedState !== undefined ? row.reportedState === 'completed' : (agentTurnCompletedOf(values?.subagentTiming) || (!subagent && stats.requests > 0))),
       subagent,
       updatedAt: row.updatedAt,
     }
