@@ -1,0 +1,79 @@
+{
+  "schema": "augmentor-office-public-source-review/1",
+  "reviewDate": "2026-10-13",
+  "npmVersion": "0.1.5",
+  "repository": "https://github.com/deepseek-ai/dsh-libreoffice-kit",
+  "publicCommit": "b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+  "publicRefsInspected": [
+    "refs/heads/master"
+  ],
+  "publicArchiveUrl": "https://codeload.github.com/deepseek-ai/dsh-libreoffice-kit/tar.gz/b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+  "publicArchiveSha256": "33839347e44b8df44c59115b566e9664e7db04a612a8f37ee2b220d7e501c036",
+  "publicEntryVersion": "0.1.3",
+  "npmGitHeadPresent": false,
+  "matchingEngineSourceFiles": [
+    "engine/build-identity.mjs",
+    "engine/core-source.mjs",
+    "engine/document-operations.hxx",
+    "engine/wasm-source/autogen.input",
+    "engine/wasm-source/build.mjs",
+    "engine/wasm-source/lok.cxx",
+    "engine/wasm-source/patches/0001-macos-build-tools.patch",
+    "engine/wasm-source/patches/0002-system-font-demand.patch",
+    "engine/wasm-source/patches/0003-node-runtime.patch",
+    "engine/wasm-source/patches/0004-system-fonts-only.patch",
+    "engine/wasm-source/patches/0005-cross-build-rules.patch",
+    "engine/wasm-source/patches/0006-wasm-external-platforms.patch",
+    "engine/wasm-source/patches/0008-disable-link-updates.patch",
+    "engine/wasm-source/patches/0009-disable-optional-curl.patch",
+    "engine/wasm-source/patches/0010-refresh-component-registry.patch",
+    "engine/wasm-source/patches/0011-preserve-optimization-with-prefix-maps.patch",
+    "engine/wasm-source/patches/0012-anonymize-explicit-source-paths.patch",
+    "engine/wasm-source/patches/0023-pdfium-for-embedded-graphics.patch",
+    "engine/wasm-source/patches/0024-pdfium-emscripten-platform.patch",
+    "engine/wasm-source/patches/0025-browser-editing.patch",
+    "engine/wasm-source/patches/0028-synchronous-workbook-calculation.patch",
+    "engine/wasm-source/patches/0029-unloaded-external-blip.patch",
+    "engine/wasm-source/patches/0030-no-password-strength-ui.patch",
+    "engine/wasm-source/patches/0031-size-optimization-lto.patch",
+    "engine/wasm-source/slim.mjs",
+    "engine/wasm-source/source.json",
+    "engine/wasm-source/source.mjs",
+    "engine/wasm-source/stage.mjs",
+    "scripts/checkout-wasm.mjs",
+    "scripts/core-checkout.mjs",
+    "scripts/minimize-ui-resources.py",
+    "scripts/pack-utils.mjs",
+    "scripts/platform-matrix.mjs",
+    "scripts/verify-artifacts.mjs"
+  ],
+  "differentEngineSourceFiles": [
+    {
+      "path": "docs/ui-resources.md",
+      "npmSha256": "0bd35571ca3cc57c6e9b927402b0bb789cedf8755dce7e3e9de00ff3226d9c07",
+      "publicCheckoutSha256": "b0a7613d440ffb675b8ac0465f88cb2a84fc4876b264ee95138b5c9a17ede743"
+    },
+    {
+      "path": "engine/ui-resource-policy.mjs",
+      "npmSha256": "be3dfc3dcf102e9da060ea0c6564a781e81ff8413de1696e0c099e05fd29431b",
+      "publicCheckoutSha256": "5e6aa316bc63e94ae11394ebdb59a2f82120d15e60d36c4ab7c38880a8140967"
+    }
+  ],
+  "generatedEngineFilesAbsentFromCheckout": [
+    {
+      "path": "build-autogen.input",
+      "npmSha256": "d3b017df5f5daade84df90ae94f628b29a902aae3f6bbab58d12b54a2ade46f8"
+    },
+    {
+      "path": "core-source.json",
+      "npmSha256": "39340edab26fd8f702380a0b9fedcfcc6a181793b46dd6d7dee01fa80a2458f0"
+    },
+    {
+      "path": "source-changes.patch",
+      "npmSha256": "d91124546ab0502728693e537c9570b0290c8bbc2bf06d063551a0960da459cc"
+    }
+  ],
+  "entryPreferredSourceBundled": false,
+  "correspondingSourceQualified": false,
+  "scope": "Comparison of the public branch at this date with the pinned npm 0.1.5 payload. A differing package version is not by itself proof of different compiled code. This comparison does not qualify the exact entry source or an engine rebuild; it does not establish that no other source can exist."
+}

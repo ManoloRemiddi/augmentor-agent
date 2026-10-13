@@ -22,6 +22,7 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts'))
 import quickjs_engine
+import office_engine
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
 
 
@@ -65,6 +66,7 @@ def node_runtime(app, configuration, cache):
 
 def native_notices(app, configuration):
     expected = {'node/bin/node': 'node', 'node_modules/@esbuild/linux-x64/bin/esbuild': 'esbuild',
+                office_engine.ENGINE + '/assets/soffice.wasm': 'office',
                 'node_modules/@earendil-works/pi-coding-agent/node_modules/@esbuild/linux-x64/bin/esbuild': 'esbuild',
                 'node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm': 'photon',
                 'node_modules/@earendil-works/pi-coding-agent/node_modules/@silvia-odwyer/photon-node/photon_rs_bg.wasm': 'photon',
@@ -88,6 +90,9 @@ def native_notices(app, configuration):
         if relative not in expected:
             raise ValueError('Unreviewed native executable in distribution: ' + relative)
         component = expected[relative]
+        if component == 'office':
+            components.append(office_engine.validate_bundle(app))
+            continue
         content = path.read_bytes()
         if component == 'quickjs':
             item = quickjs_engine.validate_bundle(app)

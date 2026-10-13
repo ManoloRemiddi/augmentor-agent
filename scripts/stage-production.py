@@ -14,6 +14,7 @@ sys.path.insert(0, str(ROOT/'scripts'))
 sys.path.insert(0, str(ROOT/'services'))
 from build_support import npm_command
 import quickjs_engine
+import office_engine
 
 
 def stage_workspace_manifests(target, root=ROOT):
@@ -198,6 +199,8 @@ def main():
         overrides['quickjs'] = quickjs_override
     (target / 'distribution-overrides.json').write_text(json.dumps(overrides, indent=2) + '\n')
     (target / 'distribution-exclusions.json').write_text(json.dumps(excluded, indent=2) + '\n')
+    if node_target['os'] == 'linux':
+        office_engine.stage_engine(target)
     subprocess.run([sys.executable, str(ROOT / 'scripts/third-party-notices.py'), '--tree', str(target),
                     '--out', str(target / 'licenses/npm')], check=True)
     print(target)
