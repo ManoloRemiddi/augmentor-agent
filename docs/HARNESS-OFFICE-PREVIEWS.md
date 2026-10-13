@@ -162,6 +162,14 @@ the preceding ordinary navigation candidate before Node is added. Private-source
 boundary and version checks pass. These **28 focused cases** and fresh staging
 are packaging evidence, not another full GUI cohort or a new installed artifact.
 
+Preceding remote CI **f2e2d3e / run 38437616022** fails before packaging: of 1,129
+Node cases, 1,103 pass, three fail and 23 skip. Brand sidebar expansion and streamed
+Trajectory arguments time out; the Metafolder browser target closes or navigates.
+Those three actual-browser cases pass locally together with two workers and the
+same deadlines, but that isolated result does not resolve the remote failures or
+establish their cause. The navigation case passes in that CI run. Full CI and GUI
+reliability remain open; new-head CI is separate from focused packaging evidence.
+
 The selected appearance runtime **97897cf** and unselected navigation runtime
 **dfcdfb9 / 20261013-190500-3bf1e21f** remain as previously qualified. No activation,
 shutdown, public binary release or DSH retirement occurs. Public Debian packaging,

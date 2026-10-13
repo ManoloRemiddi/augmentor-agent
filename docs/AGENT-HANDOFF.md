@@ -11,6 +11,11 @@ verifies the bundle and explicitly refuses public redistribution; no Wasm-wide
 exception or binary release occurs. Installed 97897cf, its Native draft and the
 unselected dfcdfb9 navigation candidate remain unchanged. Full migration gates
 remain open; this packaging scope is distinct from previous GUI qualification.
+Preceding f2e2d3e CI fails three original-browser cases before packaging (brand
+expansion, Metafolder target retirement and streamed arguments). All three pass
+locally together at two workers, without deadline changes; their remote cause is
+unresolved. Inspect run 38437616022 and the shared pointer/fixture lifecycle before
+claiming reliability or changing test expectations. New-head CI remains separate.
 
 [Metafolder navigation follow-up](HARNESS-METAFOLDERS.md#navigation-follow-up--october-13)
 repairs the actual staged collapsed-rail Search gap without changing original UI
