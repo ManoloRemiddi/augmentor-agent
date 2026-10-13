@@ -7,7 +7,11 @@ export async function harnessCdp(url){
     const frame=JSON.parse(event.data),row=pending.get(frame.id);
     if(frame.method==='Network.requestWillBeSent')urls.push(frame.params.request.url);
     if(frame.method==='Runtime.exceptionThrown')errors.push(frame.params.exceptionDetails);
-    if(frame.method==='Fetch.requestPaused')pausedRequests.push({id:frame.params.requestId,url:frame.params.request.url});
+    if(frame.method==='Fetch.requestPaused'){
+      let rpcMethod;try{rpcMethod=JSON.parse(frame.params.request.postData).method;}catch{}
+      if(api.pauseRpcMethods&&!api.pauseRpcMethods.has(rpcMethod))void call('Fetch.continueRequest',{requestId:frame.params.requestId}).catch(error=>errors.push(error.message));
+      else pausedRequests.push({id:frame.params.requestId,url:frame.params.request.url,rpcMethod,networkId:frame.params.networkId});
+    }
     if(frame.method==='Log.entryAdded'&&['warning','error'].includes(frame.params.entry.level))errors.push(frame.params.entry);
     if(frame.method==='Network.requestWillBeSent'&&frame.params.request.postData){try{requests.set(frame.params.requestId,JSON.parse(frame.params.request.postData));}catch{}}
     if(frame.method==='Network.responseReceived'&&frame.params.response.status>=400)failedResponses.push({id:frame.params.requestId,...frame.params.response});

@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Branch/Fork ownership](HARNESS-BRANCH-CONTROLS.md) guards duplicate and late
+operations, changed drafts and explicit same-child reconciliation. Qualification
+is recorded separately from the selected preview.
+
 - [Recorded Trajectory requests](TRAJECTORY-REQUEST-NUMBERING.md): original controls count only observed Pi provider requests; unlinked SDK receipts remain visible.
 [Nested original tool rows](TRAJECTORY-NESTED-TOOLS.md) binds public Pi child
 starts/results to existing SUBTOOL details, preserves scoped arguments/outcomes

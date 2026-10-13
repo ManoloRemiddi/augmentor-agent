@@ -1,10 +1,11 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {readDshPayload} from './dsh-payload.mjs';
-import {appendDisplay} from './chat-projection.js';
+import {appendDisplay,messageTargets} from './chat-projection.js';
 
 /** Browser transport to the existing Pi Host; never owns an agent or retries a mutation. */
 export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
+  branchFlight=null; branchIntents=new Map();
   state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
@@ -96,11 +97,53 @@ export class DshPiController {
     try{const result=await this.rpc('session.organize',{sessionId,action,stop,expectedRevision:this.state.workspaces?.organizationRevision});this.update({workspaces:result.workspaces});if(result.workspaces.archivedSessionIds.includes(this.state.sessionId))this.clearSelection();return result;}
     catch(error){await this.refresh().catch(()=>{});throw error;}
   }
-  async forkLast(sessionId){
-    if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
-    const history=await this.rpc('session.history',{sessionId,maxMessages:100}),last=[...history.events].reverse().find(x=>x.event.type==='assistant/message'&&x.event.data?.message?.stopReason==='stop');
-    if(!last)throw Error('This conversation has no completed assistant turn to fork.');
-    const row=await this.rpc('session.branch',{sessionId,newSessionId:crypto.randomUUID(),messageSeq:last.event.seq,mode:'reply'});await this.refresh();await this.open(row.sessionId);return row;
+  forkAt(messageSeq,canSelect=()=>true){return this.forkBoundary(this.state.sessionId,messageSeq,canSelect);}
+  forkLast(sessionId,canSelect=()=>true){return this.forkBoundary(sessionId,null,canSelect);}
+  async forkBoundary(sessionId,messageSeq,canSelect){
+    // One UI operation, using the Host's existing idempotent branch boundary.
+    // Neither unknown acknowledgments nor a retired read can dispatch a retry.
+    if(this.branchFlight)return null;
+    const scope={epoch:this.epoch,sessionId:this.state.sessionId};
+    const current=()=>scope.epoch===this.epoch&&scope.sessionId===this.state.sessionId&&!this.state.readOnly;
+    const flight={sessionId,messageSeq};let intent,key,attempted=false;
+    this.branchFlight=flight;
+    try{
+      if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
+      if(this.state.phase!=='ready'||!sessionId||this.state.unconfirmed||this.state.compactionPending||this.state.compaction?.blocked)throw Error('Review the current conversation state before branching.');
+      if(this.state.sessions.find(row=>row.sessionId===sessionId)?.running)throw Error('Stop the current response before branching.');
+      if(messageSeq!==null&&(!Number.isSafeInteger(messageSeq)||!messageTargets(this.state.events).replies.has(messageSeq)))throw Error('Choose a loaded assistant reply after its tools have finished.');
+      this.update({branchPending:flight,error:null});
+      if(messageSeq===null){
+        const history=await this.rpc('session.history',{sessionId,maxMessages:100});
+        if(!current())return null;
+        const last=[...history.events].reverse().find(x=>x.event.type==='assistant/message'&&x.event.data?.message?.stopReason==='stop');
+        if(!last||!Number.isSafeInteger(last.event.seq)||last.event.seq<1)throw Error('This conversation has no completed assistant reply in its recent history.');
+        messageSeq=last.event.seq;
+      }
+      if(!current())return null;
+      key=JSON.stringify([sessionId,messageSeq,'reply']);intent=this.branchIntents.get(key);
+      if(!intent){
+        if(this.branchIntents.size>=64)throw Error('Review unconfirmed branch operations before starting another.');
+        intent={sessionId,newSessionId:crypto.randomUUID(),messageSeq,mode:'reply'};this.branchIntents.set(key,intent);
+      }
+      attempted=true;const row=await this.rpc('session.branch',intent);
+      if(row?.sessionId!==intent.newSessionId||row?.fork?.sessionId!==sessionId||row?.fork?.messageSeq!==messageSeq||row?.fork?.mode!=='reply')throw Error('The branch response did not match the requested boundary.');
+      this.branchIntents.delete(key);
+      if(!current())return row;
+      await this.refresh();
+      if(current()&&canSelect()&&!this.state.sessions.find(value=>value.sessionId===scope.sessionId)?.running)await this.open(row.sessionId);
+      return row;
+    }catch(error){
+      if(error.authoritative&&key)this.branchIntents.delete(key);
+      if(current()){
+        this.update({error:attempted&&!error.authoritative?'Branch creation unconfirmed. Inspect the conversation list; an explicit click at the same boundary reconciles the same child. No prompt was sent or operation retried.':error.message});
+        error.presentedByBranch=true;
+        throw error;
+      }
+      return null;
+    }finally{
+      if(this.branchFlight===flight){this.branchFlight=null;if(this.state.branchPending===flight)this.update({branchPending:null});}
+    }
   }
   async workspaceAction(action,params={}){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
