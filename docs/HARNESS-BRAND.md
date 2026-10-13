@@ -20,6 +20,12 @@ theme foreground contrast; they preserve the exact original shape/flow/breath
 keyframes and **7/9/4-second** timings. The website motion is preserved. The
 favicon is its original static companion asset.
 
+Installed inspection found that the original 24-pixel brand button clips a
+full-size rotating outline. The binding centers a 19-pixel outline within the
+24-pixel decorative slot, so the original rotation fits without cropping. The
+actual browser case checks containment in both seats and both themes. Supplier
+layout/CSS and the original motion keyframes remain unchanged.
+
 The brand is decorative and inherits the existing control's accessible action.
 Original reduced-motion and motion-off CSS behavior is retained. No JavaScript
 animation loop, remote asset, model/tool call, dependency or supplier-source edit
@@ -46,11 +52,15 @@ establish physical Windows/macOS acceptance.
 
 ## Source qualification — October 13
 
-Strict check/build and the 75-file MX cohort pass **381/381**, with five separate
+The initial strict check/build and 75-file MX cohort pass **381/381**, with five separate
 notice/workspace packaging cases. Node 24.19.0, the prepared PySide6/shiboken6
 6.8.2.1 QtTest interpreter, two workers and the established deadlines are retained.
-The focused actual Chromium brand case passes twice, including both existing
+The initial focused actual Chromium brand case passes twice, including both existing
 sidebar seats, real shape changes in Light/Dark and the reduced-motion policy.
 The original 580 DSH and 108 dashboard records, licence bodies, dependency pins
 and model/speech configuration are preserved. Separate ordinary and immutable
 artifact qualification and installed acceptance follow before adoption.
+
+Installed inspection additionally found the clipped full-size mark described
+above. The corrected containment fixture and strict check/build pass. Final source,
+ordinary, immutable and installed qualification below applies to that correction.
