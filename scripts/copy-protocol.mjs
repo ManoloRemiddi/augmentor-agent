@@ -27,3 +27,9 @@ for(const name of ['LICENSE','SOURCE.json','SOURCE.md'])copyFileSync('packages/r
 const discoverySelection=JSON.parse(readFileSync('packages/runtime/vendor/dsh-model-discovery/SOURCE.json','utf8'));
 for(const row of discoverySelection.files)if(createHash('sha256').update(readFileSync('packages/runtime/vendor/dsh-model-discovery/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH model-discovery source changed: '+row.path);
 for(const name of ['LICENSE','SOURCE.json'])copyFileSync('packages/runtime/vendor/dsh-model-discovery/'+name,'dist/runtime/vendor/dsh-model-discovery/'+name);
+
+for(const name of ['dsh-plugin-wiki-tools','dsh-plugin-wiki-skills']){
+ const source='packages/runtime/vendor/'+name;const selection=JSON.parse(readFileSync(source+'/SOURCE.json','utf8'));
+ for(const row of selection.files)if(createHash('sha256').update(readFileSync(source+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Public Wiki source changed: '+row.path);
+ cpSync(source,'dist/runtime/vendor/'+name,{recursive:true});
+}

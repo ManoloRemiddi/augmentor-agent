@@ -14,6 +14,7 @@ const source=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('
 const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
 const sharedState=join(root,'shared-state'),sharedData=join(root,'shared-data'),home=join(root,'home');
+const wikiVault=process.env.AUGMENTOR_HARNESS_PROOF_WIKI==='1'?join(root,'wiki-vault'):null;
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
 const discoveryLog=process.env.AUGMENTOR_HARNESS_PROOF_MODEL_DISCOVERY==='1'?join(root,'model-listings.jsonl'):null;
 const providerApi=process.env.AUGMENTOR_HARNESS_PROOF_PROVIDER_API??'openai-completions';
@@ -25,6 +26,11 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'){
  const extension=join(root,'question-ui.mjs');
  writeFileSync(extension,`export default pi=>pi.registerTool({name:'ask_user',label:'Fixture question',description:'Ask an independently authored test question; no external action.',parameters:{type:'object',properties:{}},async execute(_id,_args,signal,_update,ctx){const answer=await ctx.ui.select('Keep the authored fixture going?',['Keep going','Stop here'],{timeout:3000,signal});return {content:[{type:'text',text:answer===undefined?'No fixture answer.':'Fixture choice: '+answer}],details:{}};}});`);
  writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}));
+}
+if(wikiVault){
+ mkdirSync(join(wikiVault,'.raw'),{recursive:true});writeFileSync(join(wikiVault,'.raw/source.txt'),'AUTHORED WIKI RAW SOURCE\n');
+ if(process.env.AUGMENTOR_HARNESS_PROOF_WIKI_FAILURE==='1'){mkdirSync(join(wikiVault,'.archive'));writeFileSync(join(wikiVault,'.raw/conflict.txt'),'AUTHORED NEW RAW');writeFileSync(join(wikiVault,'.archive/conflict.txt'),'AUTHORED OLDER ARCHIVE');}
+ writeFileSync(join(config,'wiki.json'),JSON.stringify({schema:'augmentor-wiki/1',enabled:true,vaultPath:wikiVault}),{mode:0o600});
 }
 const model=http.createServer(async(req,res)=>{
   if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'&&req.method==='POST'&&req.url==='/fixture/release-nested'){
@@ -46,6 +52,29 @@ const model=http.createServer(async(req,res)=>{
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null,usage)=>res.write('data: '+JSON.stringify({id:'fixture',object:'chat.completion.chunk',model:'harness-fixture',choices:[{index:0,delta,finish_reason:finish}],...(usage?{usage}:{})})+'\n\n');
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
+  const wikiUser=wikiVault?[...body.messages].reverse().find(message=>message.role==='user'&&JSON.stringify(message.content).includes('WIKI_')):undefined;
+  if(wikiUser){
+    if(JSON.stringify(wikiUser.content).includes('WIKI_BROWSER_CATALOG')){chunk({role:'assistant',content:'Authored browser catalog inspection only.'},'stop',{prompt_tokens:10,completion_tokens:10,total_tokens:20});res.end('data: [DONE]\n\n');return;}
+    const readonly=JSON.stringify(wikiUser.content).includes('WIKI_READONLY');
+    const unknown=JSON.stringify(wikiUser.content).includes('WIKI_UNKNOWN');
+    const sequence=unknown?[['wiki_archive',{source_path:'.raw/conflict.txt'}],['wiki_write',{type:'concept',title:'Never Reached',content:'MUST NOT WRITE AFTER UNCERTAINTY'}]]:readonly?[
+      ['wiki_write',{type:'concept',title:'Not Allowed',content:'READONLY MUST NOT WRITE'}],
+      ['wiki_query',{query:'Authored',mode:'quick'}],
+    ]:[
+      ['wiki_scaffold',{mode:'generic',purpose:'Independent Augmentor wiki qualification'}],
+      ['wiki_query',{query:'Authored',mode:'quick'}],
+      ['wiki_write',{type:'concept',title:'Authored Page',content:'AUTHORED WIKI CONTENT',source_path:'.raw/source.txt'}],
+      ['wiki_write',{type:'concept',title:'Authored Link',content:'See [[Authored Page]].'}],
+      ['wiki_rename',{title:'Authored Page',new_title:'Renamed Authored Page'}],
+      ['wiki_archive',{source_path:'.raw/source.txt'}],
+      ['wiki_lint',{}],
+      ['wiki_query',{query:'AUTHORED WIKI CONTENT',mode:'standard'}],
+    ];
+    const step=body.messages.filter(message=>message.role==='tool').length;
+    if(step<sequence.length){const [name,args]=sequence[step];chunk({role:'assistant',tool_calls:[{index:0,id:'wiki_'+step,type:'function',function:{name,arguments:JSON.stringify(args)}}]},'tool_calls');}
+    else chunk({role:'assistant',content:'The authored Wiki sequence ended; effects require independent verification.'},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});
+    res.end('data: [DONE]\n\n');return;
+  }
   if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'&&JSON.stringify(lastUser?.content).includes('NESTED_TRAJECTORY')){
     if(!afterTool)chunk({role:'assistant',tool_calls:[{index:0,id:'fixture_nested_root',type:'function',function:{name:'fixture_outer',arguments:JSON.stringify({path:join(workspace,'note.txt'),label:JSON.stringify(lastUser.content).includes('STOP')?'nested-stop':'nested-complete'})}}]},'tool_calls');
     else chunk({role:'assistant',content:'The authored nested trajectory fixture finished.'},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});
@@ -105,7 +134,8 @@ const selection={provider:'fixture',model:'harness-fixture'};
 // Anthropic's client appends /v1/messages; the other fixture clients use /v1
 // as their base. This is test endpoint configuration, never owner model setup.
 writeFileSync(join(config,'agent/models.json'),JSON.stringify({providers:{fixture:{api:providerApi,baseUrl:'http://127.0.0.1:'+model.address().port+(providerApi==='anthropic-messages'?'':'/v1'),apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Harness deterministic fixture',reasoning:providerApi==='openai-completions',...(providerApi==='openai-completions'?{compat:{supportsReasoningEffort:true}}:{}),input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
-writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'workspace-write',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
+writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:wikiVault?'danger-full-access':'workspace-write',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
+if(wikiVault){mkdirSync(join(state,'sessions'),{recursive:true});writeFileSync(join(state,'sessions','wiki-readonly.meta.json'),JSON.stringify({id:'wiki-readonly',cwd:workspace,selection,title:'Authored read-only Wiki fixture',saved:false,policy:'read-only',updatedAt:1,requests:[],running:false}),{mode:0o600});}
 // Large independently authored native context exercises default Pi compaction;
 // these saved messages do not represent executed actions or private history.
 if(process.env.AUGMENTOR_HARNESS_PROOF_COMPACTION==='1'){
@@ -182,7 +212,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(wikiVault?{wikiVault}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;

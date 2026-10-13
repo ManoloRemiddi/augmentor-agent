@@ -1,0 +1,36 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Linux descriptor-relative IO for the original wiki operations; no model-selected root.
+import {AsyncLocalStorage} from 'node:async_hooks';
+import * as fs from 'node:fs/promises';
+import * as sync from 'node:fs';
+import {basename,dirname,isAbsolute,relative,resolve,sep} from 'node:path';
+
+type Access={root:string;handle:fs.FileHandle;write:boolean;signal?:AbortSignal;attempted:()=>void};
+const access=new AsyncLocalStorage<Access>();
+const directoryFlags=sync.constants.O_RDONLY|sync.constants.O_DIRECTORY|sync.constants.O_NOFOLLOW;
+const FILE_BYTES=64*1024*1024;
+function scope(){const value=access.getStore();if(!value)throw Error('Wiki IO has no admitted vault scope.');return value;}
+function parts(path:string){const a=scope();if(!isAbsolute(path))throw Error('Wiki IO requires an absolute vault path.');const rel=relative(a.root,resolve(path));if(rel==='..'||rel.startsWith('..'+sep)||isAbsolute(rel))throw Error('Wiki path is outside the configured vault.');return rel?rel.split(sep):[];}
+function live(write=false,cleanup=false){const a=scope();if(write&&!a.write)throw Error('Wiki query cannot change vault files.');if(!cleanup)a.signal?.throwIfAborted();return a;}
+function checked(info:sync.Stats){if((!info.isFile()&&!info.isDirectory())||info.isFile()&&info.nlink!==1||info.uid!==process.getuid!())throw Error('Wiki IO refuses linked, shared-owner or special files.');if(info.isFile()&&info.size>FILE_BYTES)throw Error('Wiki file exceeds the bounded 64 MiB IO limit.');return info;}
+async function parent<T>(path:string,fn:(path:string)=>Promise<T>){const a=scope(),segments=parts(path),leaf=segments.pop()??'.',handles:fs.FileHandle[]=[];let fd=a.handle.fd;try{for(const segment of segments){const next=await fs.open(`/proc/self/fd/${fd}/${segment}`,directoryFlags);checked(await next.stat());handles.push(next);fd=next.fd;}return await fn(`/proc/self/fd/${fd}/${leaf}`);}finally{for(const handle of handles.reverse())await handle.close();}}
+async function file<T>(path:string,flags:number,fn:(handle:fs.FileHandle)=>Promise<T>){return parent(path,async pinned=>{const handle=await fs.open(pinned,flags|sync.constants.O_NOFOLLOW,0o600);try{checked(await handle.stat());return await fn(handle);}finally{await handle.close();}});}
+
+export async function withWikiFs<T>(root:string,write:boolean,signal:AbortSignal|undefined,fn:()=>Promise<T>,attempted:()=>void=()=>{},createRoot=false){
+ if(process.platform!=='linux')throw Error('The Wiki vault IO binding is qualified for Linux first.');
+ if(!isAbsolute(root)||resolve(root)!==root||root===sep)throw Error('Configure an absolute, normalized Wiki vault directory.');
+ signal?.throwIfAborted();
+ if(createRoot){try{await fs.lstat(root);}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;const p=dirname(root);if(await fs.realpath(p)!==p)throw Error('Linked Wiki root parent is refused.');const h=await fs.open(p,directoryFlags);try{if(!(await h.stat()).isDirectory())throw Error('Wiki parent is not a directory.');attempted();await fs.mkdir(`/proc/self/fd/${h.fd}/${basename(root)}`,{mode:0o700});}finally{await h.close();}}}
+ const before=checked(await fs.lstat(root));if(!before.isDirectory()||await fs.realpath(root)!==root)throw Error('Linked Wiki vault root is refused.');
+ const handle=await fs.open(root,directoryFlags);try{const after=checked(await handle.stat());if(after.ino!==before.ino||after.dev!==before.dev)throw Error('Wiki root changed before admission.');return await access.run({root,handle,write,signal,attempted},fn);}finally{await handle.close();}
+}
+export async function readFile(path:string,options?:any):Promise<any>{live();return file(path,sync.constants.O_RDONLY,async handle=>{const value=await handle.readFile(typeof options==='string'?{encoding:options as BufferEncoding,signal:scope().signal}:{...options,signal:scope().signal});live();return value;});}
+export async function stat(path:string){live();return parent(path,async pinned=>{const info=await fs.lstat(pinned);if(info.isSymbolicLink())throw Error('Linked Wiki leaf is refused.');return checked(info);});}
+export async function readdir(path:string,options?:any):Promise<any>{live();return file(path,directoryFlags,handle=>fs.readdir(`/proc/self/fd/${handle.fd}`,options));}
+export async function mkdir(path:string,_options?:any){const a=live(true),segments=parts(path),handles:fs.FileHandle[]=[];let fd=a.handle.fd;try{for(const segment of segments){const pinned=`/proc/self/fd/${fd}/${segment}`;try{a.attempted();await fs.mkdir(pinned,{mode:0o700});}catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;}const next=await fs.open(pinned,directoryFlags);checked(await next.stat());handles.push(next);fd=next.fd;}}finally{for(const handle of handles.reverse())await handle.close();}}
+export async function writeFile(path:string,data:any,options?:any){const a=live(true),next=Buffer.isBuffer(data)?data:Buffer.from(String(data),typeof options==='string'?options:options?.encoding??'utf8');if(next.length>FILE_BYTES)throw Error('Wiki write exceeds the bounded 64 MiB IO limit.');return parent(path,async pinned=>{a.attempted();const handle=await fs.open(pinned,sync.constants.O_RDWR|sync.constants.O_CREAT|sync.constants.O_NOFOLLOW,0o600);try{const info=checked(await handle.stat());if(!info.isFile())throw Error('Wiki write target is not a regular file.');if(parts(path)[0]==='.archive'&&info.size){const old=await handle.readFile();if(!old.equals(next))throw Error('Existing archive has different bytes; the raw source is preserved.');}live(true);await handle.truncate(0);let offset=0;while(offset<next.length){live(true);const result=await handle.write(next,offset,next.length-offset,offset);if(!result.bytesWritten)throw Error('Wiki write did not advance.');offset+=result.bytesWritten;}await handle.sync();}finally{await handle.close();}});}
+export async function open(path:string,flags:string){const a=live(true);if(flags!=='wx')throw Error('Unexpected Wiki file-open mode.');return parent(path,async pinned=>{a.attempted();const handle=await fs.open(pinned,sync.constants.O_WRONLY|sync.constants.O_CREAT|sync.constants.O_EXCL|sync.constants.O_NOFOLLOW,0o600);checked(await handle.stat());return handle;});}
+export async function rm(path:string,options?:{force?:boolean;recursive?:boolean}){const cleanup=parts(path).slice(0,2).join('/')==='.vault-meta/locks',a=live(true,cleanup);if(options?.recursive)throw Error('Recursive Wiki deletion is not admitted.');return parent(path,async pinned=>{try{const info=await fs.lstat(pinned);if(info.isSymbolicLink())throw Error('Linked Wiki removal target is refused.');checked(info);a.attempted();await fs.unlink(pinned);}catch(error){if(!options?.force||(error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}});}
+// Optional upstream git bookkeeping is not enabled in this first Pi binding.
+export function readFileSync(_path:string,_options?:unknown):never{throw Error('Wiki synchronous git bookkeeping is not enabled.');}
+export function appendFileSync(_path:string,_data:unknown,_options?:unknown):never{throw Error('Wiki synchronous git bookkeeping is not enabled.');}
