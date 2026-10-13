@@ -32,7 +32,7 @@ separate required workflows under the accepted migration specification.
 
 ## Free Search settings and original card — October 14
 
-This extends the preceding public MIT provider library into the original Plugins
+Implementation **1612f20b85ae9b98f2331c59cdc017f2aa41b270** extends the preceding public MIT provider library into the original Plugins
 page. The full supplier card is mounted with its collapsible header, all nine
 engines, multiline keys, drag ordering, fetch switch, signup links, staged Save/
 Discard and two-click Clear. Its original browser-derived English/Chinese

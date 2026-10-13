@@ -1,7 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Original Free Search card/private Pi settings](HARNESS-PLUGIN-PARITY.md#free-search-settings-and-original-card--october-14)
-mounts the complete MIT supplier card in Plugins with multiline keys, original
+at **1612f20b85ae9b98f2331c59cdc017f2aa41b270** mounts the complete MIT supplier card in Plugins with multiline keys, original
 pointer drag/fetch/clear/discard and DSH theme controls. Mode-0600 exact-revision
 operator settings bind opt-in tools only to Linux Native non-delegated owners;
 public AgentSession reload retains those owners and checks both reserved names.

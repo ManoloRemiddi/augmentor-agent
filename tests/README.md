@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-`search-settings.test.mjs` covers private exact-revision field saves/unsets, default
+Implementation **1612f20b85ae9b98f2331c59cdc017f2aa41b270**: `search-settings.test.mjs` covers private exact-revision field saves/unsets, default
 versus user layers, unsafe/invalid originals, admission loss, lost write replies,
 retired operator scopes and pending application. `harness-search-settings-chromium.test.mjs`
 drives the full original MIT card through actual Pi owners: multiline keys,
