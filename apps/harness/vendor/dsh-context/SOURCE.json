@@ -262,8 +262,8 @@
       "path": "src/client/components/overviewPanel.tsx",
       "sourcePath": "src/client/components/overviewPanel.tsx",
       "sourceSha256": "8edbd5e38c1d5d6b6b8760b488dc1e55ebf084a4028156a089f6a1dda9558794",
-      "sha256": "967c481fed0d8040c12fd6a67d489a8979d86fa1a8c6c861eebfd1d7393604dd",
-      "adaptation": "Pi read-only Insights seats and explicit unavailable data; original structure/CSS preserved"
+      "sha256": "72a930c03a64b63a4ce190c04665228cf49cdcf83f8da84a9382859d88039c2f",
+      "adaptation": "Pi read-only Insights seats and explicit unavailable data; original structure/CSS preserved; optional measured SDK timing totals/card-only labels, original layout and CSS unchanged"
     },
     {
       "path": "src/client/components/overviewTokens.tsx",

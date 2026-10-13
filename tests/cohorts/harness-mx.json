@@ -70,6 +70,8 @@
     "tests/model-settings.test.mjs",
     "tests/harness-models-chromium.test.mjs",
     "tests/model-discovery.test.mjs",
-    "tests/pi-model-configuration.test.mjs"
+    "tests/pi-model-configuration.test.mjs",
+    "tests/step-timing.test.mjs",
+    "tests/pi-step-timing.test.mjs"
   ]
 }

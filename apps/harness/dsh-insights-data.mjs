@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {projectDshContext} from './dsh-context-projection.mjs';
+import {foldTimingRecords,timingSummary} from './dsh-context-timing.mjs';
 const fields=['input','cacheRead','cacheWrite','output'];
 const safeName=value=>typeof value==='string'&&value.length>0&&value.length<=1024&&!['__proto__','prototype','constructor'].includes(value);
 const number=value=>typeof value==='number'&&Number.isFinite(value)&&value>=0;
@@ -9,9 +10,10 @@ export function insightMetadata(record){
  if(typeof record?.id!=='string'||record.id.length>128||!Number.isSafeInteger(record.seq)||record.seq<1||!number(record.time)||!Number.isFinite(new Date(record.time).getTime()))throw Error('Invalid retained observation identity.');
  const base={id:record.id,seq:record.seq,time:record.time,kind:record.kind,requestId:record.requestId,turnId:record.turnId};
  const data=record.data??{};
- if(record.kind==='model/request')return {...base,data:{model:data.model,provider:data.provider,api:data.api,capacity:data.capacity},payload:record.payload?{state:record.payload.state,bytes:record.payload.bytes,sha256:record.payload.sha256}:undefined};
+ if(record.kind==='model/request')return {...base,data:{model:data.model,provider:data.provider,api:data.api,capacity:data.capacity,...(data.purpose==='manual-compaction'?{purpose:data.purpose}:{})},payload:record.payload?{state:record.payload.state,bytes:record.payload.bytes,sha256:record.payload.sha256}:undefined};
  if(record.kind==='model/complete')return {...base,data:{usage:data.usage?Object.fromEntries(fields.map(key=>[key,data.usage[key]])):undefined,durationMs:data.durationMs}};
  if(record.kind==='turn/start'||record.kind==='tool/end')return {...base,data:{durationMs:data.durationMs}};
+ if(['step/start','step/end','step/incomplete'].includes(record.kind))return {...base,data:record.kind==='step/end'?timingSummary(data)??{schema:data.schema,stepId:data.stepId}:{schema:data.schema,stepId:data.stepId,boundary:data.boundary,clock:data.clock}};
  return null;
 }
 function addCost(cost,provider,model,usage){const branch=cost[provider]??={};const bucket=(branch[model]??={peak:{uncached:0,cacheRead:0,cacheWrite:0,output:0}}).peak;for(const [i,key] of fields.entries())bucket[['uncached','cacheRead','cacheWrite','output'][i]]+=usage[key];}
@@ -37,7 +39,8 @@ export function foldInsightRecords(records){
   if(!Number.isSafeInteger(billedTotal+total)){gaps.invalidBilling++;continue;}
   billedTotal+=total;addCost(cost,request.data.provider,request.data.model,usage);addCost(day.cost,request.data.provider,request.data.model,usage);day.tokens+=total;accepted.push(end);
  }
- return {cost,days,accepted,latest:[...requests.values()].sort((a,b)=>a.seq-b.seq).at(-1),turns:turns.size,requests:requests.size,tools,modelMs,timedCalls,gaps};
+ const stepTiming=foldTimingRecords(records);
+ return {cost,days,accepted,latest:[...requests.values()].sort((a,b)=>a.seq-b.seq).at(-1),turns:turns.size,requests:requests.size,tools,modelMs,timedCalls,gaps,stepTiming:{timing:stepTiming.timing,coverage:stepTiming.coverage}};
 }
 export function insightProjection(records,payload){
  const summary=foldInsightRecords(records),latest=summary.latest;

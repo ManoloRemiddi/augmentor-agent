@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {contextFrame} from './dsh-context-frame.mjs';
+import {foldTimingRecords} from './dsh-context-timing.mjs';
 const number=x=>typeof x==='number'&&Number.isFinite(x)&&x>=0?x:0;
 const empty=()=>({system:0,tools:0,user:0,inject:0,skill:0,assistant:0,tool:0,total:0});
 const estimate=text=>text?Math.ceil(text.length/4)+4:0;
@@ -94,9 +95,10 @@ export function projectDshContext(state){
   const fileOps=[];
   for(const result of completed.filter(e=>e.type==='tool/result')){const call=toolCalls.get(result.data.toolCallId),kind={read:'read',write:'write',edit:'write',grep:'search',glob:'search'}[call?.name],path=call?.arguments?.path;if(!kind||typeof path!=='string')continue;
     fileOps.push({seq:[...nodes,...archive].find(n=>n.callId===result.data.toolCallId)?.seq??++ordinal,path,kind,tool:call.name,time:(state.records??[]).find(r=>r.kind==='tool/end'&&r.data.toolCallId===result.data.toolCallId)?.time,err:result.data.isError===true,added:0,removed:0});}
-  const timeline={ok:true,model:latest?.data.model,provider:latest?.data.provider,...(capacity?{contextWindow:capacity}:{}),current,nodes,archive,droppedNodes:0,requests:requestRecords,events,fileOps,cost,
+  const timing=foldTimingRecords(state.records??[]);
+  const timeline={ok:true,model:latest?.data.model,provider:latest?.data.provider,...(capacity?{contextWindow:capacity}:{}),current,nodes,archive,droppedNodes:0,requests:requestRecords,events,fileOps,cost,...(timing.timing?{timing:timing.timing,...(timing.spans?{spans:timing.spans}:{})}:{}),
     counts:{turns:turns.size,steps:requests.length,injects:0,compactions:events.filter(e=>e.kind==='compaction'&&e.committed).length,prunes:events.filter(e=>e.kind==='prune').length},
     humanInputs:completed.filter(e=>e.type==='user/message').length,answers:completed.filter(e=>e.type==='assistant/message'&&e.data.message?.content?.some(p=>p.type==='text'&&p.text?.trim())).length,toolCalls:completed.filter(e=>e.type==='tool/result').length,images:nodes.reduce((sum,n)=>sum+(n.imgs??0),0)};
   return {timeline,headers:{headers},headerContent,conversationNodes,requestIds,requestChoices,usage,pressure:latestAvailable&&prompt>0?{pressureTokens:prompt,...(capacity?{contextWindow:capacity}:{})}:null,
-    coverage:{observed:requests.length,available:requestRecords.length,latestAvailable,compactionAttempts:compactionAttempts.length,confirmedCompactions:events.length,historyPartial:state.hasMore===true||state.observationHasMore===true,unsupported:requests.filter(r=>state.payloads?.[r.id]&&!contextFrame(state.payloads[r.id],r.data.api)).length,opaque:requestChoices.filter(r=>r.gaps?.length).length}};
+    coverage:{observed:requests.length,available:requestRecords.length,latestAvailable,compactionAttempts:compactionAttempts.length,confirmedCompactions:events.length,historyPartial:state.hasMore===true||state.observationHasMore===true,unsupported:requests.filter(r=>state.payloads?.[r.id]&&!contextFrame(state.payloads[r.id],r.data.api)).length,opaque:requestChoices.filter(r=>r.gaps?.length).length,timing:timing.coverage}};
 }

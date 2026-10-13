@@ -1,5 +1,6 @@
 // Augmentor modification, October 2026: read-only Pi Insights seats; unavailable
-// skills/prices/timing stay explicit, with original structure and CSS preserved.
+// skills/prices/coverage stay explicit, with original structure and CSS preserved.
+// Measured Pi timing uses optional range-scoped totals and card-only labels.
 // Original Copyright 2025 bowenliang123 and Apache-2.0 licence remain in force.
 /**
  * The Context Insights page: the plugin's first-level panel, registered on the layout's keyed `main` slot, so its
@@ -40,6 +41,7 @@ import { useHoverTip } from './hoverTip'
 import { makeOverviewTokens } from './overviewTokens'
 import { makeOverviewUsage } from './overviewUsage'
 import { makeStatsTiming } from './statsTiming'
+import type { TimingTotals } from '../../shared/types'
 import { makeOverviewCard } from './overviewCard'
 import { IconSettings } from '../primitives'
 
@@ -49,6 +51,7 @@ export interface OverviewPanelProps {
   openSettings?: () => void
   reportedTokens?: (rows: readonly OverviewRow[]) => unknown
   recordedMetrics?: (ids: readonly string[]) => { tools: number; modelMs: number; timedCalls: number } | null
+  recordedTiming?: (ids: readonly string[]) => TimingTotals | null
   currentAvailable?: (id: string) => boolean
 }
 
@@ -57,13 +60,13 @@ const SORTS: readonly OverviewSort[] = ['recent', 'tokens', 'context']
 /** The heatmap's depth metrics, in toggle order (steps is the default). */
 const METRICS: readonly HeatMetric[] = ['sessions', 'steps']
 
-export function makeOverviewPanel(ctx: ClientCtx, kit: ViewKit): (props: OverviewPanelProps) => ReactElement | null {
+export function makeOverviewPanel(ctx: ClientCtx, kit: ViewKit, timingLabels: Readonly<Record<string, string>> = {}): (props: OverviewPanelProps) => ReactElement | null {
   const { t, fmtDuration } = kit
   const Heatmap = makeHeatmap(kit)
   const OverviewCard = makeOverviewCard(kit)
   const DateRange = makeDateRange(kit)
   const OverviewTokens = makeOverviewTokens(kit, Donut)
-  const StatsTiming = makeStatsTiming(kit, Donut)
+  const StatsTiming = makeStatsTiming({ ...kit, t: (key, args) => timingLabels[key] === undefined ? kit.t(key, args) : Object.entries(args ?? {}).reduce((text, [name, value]) => text.replaceAll(`{${name}}`, String(value)), timingLabels[key]) }, Donut)
   const OverviewUsage = makeOverviewUsage(kit)
   const ErrorBoundary = makeErrorBoundary(t)
 
@@ -228,7 +231,7 @@ export function makeOverviewPanel(ctx: ClientCtx, kit: ViewKit): (props: Overvie
                 </div>
                 <div className="lc-ov-stats">
                   <OverviewTokens tokens={kpi.tokenParts} reported={reported as Parameters<typeof OverviewTokens>[0]['reported']} />
-                  <StatsTiming timing={kpi.timing} />
+                  <StatsTiming timing={props.recordedTiming === undefined ? kpi.timing : props.recordedTiming(ranged.map(row => row.id))} />
                 </div>
                 <div className="lc-ov-body">
                   <div className="lc-ov-left">

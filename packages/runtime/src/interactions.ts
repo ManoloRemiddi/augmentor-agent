@@ -6,9 +6,10 @@ type QuestionWait={revision:number;state:'counting'|'focused'|'editing'|'waiting
 type PendingInteraction={sessionId:string;ownerId:string;frame:Data;finish:(value:any,reason?:string)=>void;timer?:ReturnType<typeof setTimeout>;wait?:QuestionWait;focus:Map<string,number>};
 export class Interactions {
   pending=new Map<string,PendingInteraction>();
-  constructor(private publish:(sessionId:string,frame:Data)=>void,private connected:(sessionId:string)=>boolean,private timeout=120000,private focusLeaseMs=15000){
+  constructor(private publish:(sessionId:string,frame:Data)=>void,private connected:(sessionId:string)=>boolean,private timeout=120000,private focusLeaseMs=15000,private observeWait?:(ownerId:string,id:string,kind:string,active:boolean)=>void){
     if(!Number.isFinite(timeout)||timeout<0||!Number.isFinite(focusLeaseMs)||focusLeaseMs<=0)throw Error('Invalid interaction timeout');
   }
+  private observed(ownerId:string,id:string,kind:string,active:boolean){try{this.observeWait?.(ownerId,id,kind,active);}catch{/* Diagnostics cannot alter dialog ownership or settlement. */}}
   private waitSnapshot(item:PendingInteraction){const wait=item.wait!;return {...wait,remainingMs:wait.deadline===undefined?wait.remainingMs:Math.max(0,wait.deadline-Date.now())};}
   private updateFrame(item:PendingInteraction){item.frame={...item.frame,payload:{...item.frame.payload,wait:this.waitSnapshot(item)}};}
   private changed(item:PendingInteraction){item.wait!.revision++;this.updateFrame(item);this.publish(item.sessionId,{method:'interaction/updated',rpcId:item.frame.rpcId,payload:{sessionId:item.sessionId,wait:item.frame.payload.wait}});}
@@ -32,10 +33,11 @@ export class Interactions {
       const duration=Math.min(options?.timeout??this.timeout,this.timeout);
       if(!Number.isFinite(duration)||duration<0)throw Error('Invalid dialog timeout');
       const frame={method,rpcId:id,payload:{...payload,sessionId,approvalId:id}};
-      const finish=(value:any,reason='answered')=>{if(!this.pending.delete(id))return;clearTimeout(item.timer);options?.signal?.removeEventListener('abort',abort);this.publish(sessionId,{method:'interaction/resolved',rpcId:id,payload:{sessionId,rpcId:id,reason}});resolve(value);};
+      const finish=(value:any,reason='answered')=>{if(!this.pending.delete(id))return;clearTimeout(item.timer);options?.signal?.removeEventListener('abort',abort);this.observed(ownerId,id,method,false);this.publish(sessionId,{method:'interaction/resolved',rpcId:id,payload:{sessionId,rpcId:id,reason}});resolve(value);};
       const abort=()=>finish(undefined,'aborted');
       const item:PendingInteraction={sessionId,ownerId,frame,finish,focus:new Map(),...(method==='question/requested'?{wait:{revision:0,state:'counting',remainingMs:duration,deadline:Date.now()+duration}}:{})};
       this.pending.set(id,item);options?.signal?.addEventListener('abort',abort,{once:true});
+      this.observed(ownerId,id,method,true);
       if(item.wait){this.updateFrame(item);this.schedule(item);}else item.timer=setTimeout(()=>finish(undefined,'timed-out'),duration);
       this.publish(sessionId,item.frame);
     });

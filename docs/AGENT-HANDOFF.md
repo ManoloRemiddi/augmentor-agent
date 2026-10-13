@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original measured Context timing](CONTEXT-TIMING.md): the copied Apache-2.0
+Timing Stats card and strip now receive bounded public Pi SDK step/model/tool/UI
+intervals, with explicit partial/older-log coverage and no inferred throughput.
+Original layout/CSS remain intact; only one already-marked supplier seat changes.
+Strict source check/build and 68 MX files pass **349/349**, plus five notice/workspace
+cases. Ordinary artifact and installed acceptance are separate gates; selected MX
+remains model-lifecycle runtime 79ee4ff / 20261013-013249-f43fa0d0. Full migration,
+live/privacy/public distribution and further-platform gates remain open.
+
 [CI publication checkpoint](HARNESS-MODELS.md#ci-publication-checkpoint-and-platform-gaps): inspected head 336d3af is not fully green. Windows build fails on the spreadsheet overlay/Immer default export; Mac packaging refuses unreviewed Darwin Office/libvips licences. Other reported contracts/component/desktop/source/Home checks pass; Debian/ARM completion remains unverified. No platform implementation or blanket licence approval is added. The verified selected/running MX lifecycle below is unchanged.
 
 [Installed MX model lifecycle](HARNESS-MODELS.md#ordinary-and-installed-lifecycle-qualification--october-13): runtime **79ee4ff4c3b7e205833f20f936843ce37886b1cd**, release **20261013-013249-f43fa0d0**, product **0.2.13**, artifact **ac0a3fad21de2808a9cb37a7ec7748668234991335aea08b436fb37810144663**, selected and running. Source and ordinary each pass **342/342 across 66 files** plus five notice/workspace cases. Six immutable candidate lifecycle cases and final byte/inventory/owner GUI proofs pass; all **23,880** entries, twelve histories/queues, draft/attachment/profile/auth bytes and production/router state are preserved. Original GUI/CSS/580 MIT/108 Apache records remain unchanged. Full migration/model-management/live/privacy/public distribution/platform gates stay open; prior installed selections below are historical checkpoints.

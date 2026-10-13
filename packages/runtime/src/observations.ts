@@ -3,6 +3,7 @@ import type {AgentSession} from '@earendil-works/pi-coding-agent';
 import {ObservationStore,payloadText} from '../../observation/src/store.js';
 import type {Data} from '../../protocol/src/index.js';
 import type {ContextProvenance} from './context-provenance.js';
+import {StepTiming} from './step-timing.js';
 
 /** Observe the supported SDK pipeline after all registered payload transforms. */
 export function observeSession(session: AgentSession, store: ObservationStore, sessionId: string,
@@ -19,9 +20,10 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     captureProvider = store.policy().capturePayloads;
   };
   const tools = new Map<string, number>();
+  const timing=new StepTiming();
   const record = (kind: string, data: Record<string, unknown>, payload?: unknown) => {
     try {
-      const event = store.append(sessionId, kind, data, {turnId: current().turnId, requestId:kind.startsWith('execution/')?undefined:requestId}, payload);
+      const event = store.append(sessionId, kind, data, {turnId: current().turnId, requestId:kind.startsWith('execution/')||kind.startsWith('step/')?undefined:requestId}, payload);
       notify(event); return event;
     } catch (error) {warning('Local inspection could not record an observation: ' + String(error));}
   };
@@ -80,6 +82,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
       boundary: 'provider-payload-after-hooks', transportAttempts: 'not-observed',
     }, effective);
     requestId = event?.id;
+    inspect(()=>timing.modelStart(requestId));
     if(requestId&&provenance)inspect(()=>{const contribution=provenance.finish(effective);record('context/provenance',contribution.data,contribution.payload);});
     return transformed;
   };
@@ -109,6 +112,11 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
   };
   session.agent.onProviderStreamEvent = providerHook;
   const unsubscribe = session.subscribe(event => {
+    if(event.type==='turn_start')inspect(()=>{
+      const abandoned=timing.abandon('superseded-by-sdk-turn-start');if(abandoned)record('step/incomplete',abandoned);
+      record('step/start',timing.begin());
+    });
+    if(event.type==='message_update')inspect(()=>timing.stream(event.assistantMessageEvent.type));
     if (event.type === 'message_start' && event.message.role === 'assistant' && !requestOpen) {
       // Unsupported/custom adapters may not invoke request hooks. A new
       // assistant message must not inherit the previous request's identity.
@@ -122,6 +130,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
       firstToken = true; record('model/firstToken', {elapsedMs: performance.now() - started});
     }
     if (event.type === 'message_end' && event.message.role === 'assistant') {
+      inspect(()=>timing.modelEnd());
       const observedProviderCount = providerCount;
       if (providerCount) record('provider/stream', {boundary: 'parsed-provider-events-after-hooks-before-normalization',
         observedEvents: providerCount, capturedEvents: providerEvents.length, droppedEvents: providerDropped,
@@ -141,10 +150,12 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
       provenance?.endRequest();
     }
     if (event.type === 'tool_execution_start') {
+      inspect(()=>timing.toolStart(event.toolCallId,event.toolName,event.parentToolCallId));
       tools.set(event.toolCallId, performance.now());
       record('tool/start', {name: event.toolName, toolCallId: event.toolCallId,...(event.parentToolCallId?{parentToolCallId:event.parentToolCallId}:{}),boundary:'proposed-before-validation'}, event.args);
     }
     if (event.type === 'tool_execution_end') {
+      inspect(()=>timing.toolEnd(event.toolCallId));
       const start = tools.get(event.toolCallId); tools.delete(event.toolCallId);
       record('tool/end', {name: event.toolName, toolCallId: event.toolCallId,...(event.parentToolCallId?{parentToolCallId:event.parentToolCallId}:{}), isError: event.isError,
         ...(start === undefined ? {} : {durationMs: performance.now() - start})}, event.result);
@@ -161,14 +172,18 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     if (event.type === 'auto_retry_start' || event.type === 'auto_retry_end') {
       record(event.type.replaceAll('_', '/'), {}, event);
     }
+    if(event.type==='turn_end')inspect(()=>{const result=timing.end();if(result)record('step/end',result);});
+    if(event.type==='agent_end')inspect(()=>{const incomplete=timing.abandon('agent-ended-without-sdk-turn-end');if(incomplete)record('step/incomplete',incomplete);});
   });
-  return {record,currentRequestId:()=>requestId, beginTurn(data: Record<string, unknown>) {
+  return {record:(kind:string,data:Record<string,unknown>,payload?:unknown)=>{if(kind==='turn/end')inspect(()=>{const incomplete=timing.abandon('host-turn-ended-without-sdk-turn-end');if(incomplete)record('step/incomplete',incomplete);});return record(kind,data,payload);},waiting:(id:string,kind:string,active:boolean)=>inspect(()=>timing.wait(id,kind,active)),currentRequestId:()=>requestId, beginTurn(data: Record<string, unknown>) {
+    inspect(()=>{const incomplete=timing.abandon('superseded-by-host-turn');if(incomplete)record('step/incomplete',incomplete);});
     requestId = undefined; started = 0; firstToken = false;
     requestedThinking=undefined;
     provenance?.beginTurn();
     resetProvider(); requestOpen = false;
     return record('turn/start', data);
   }, dispose() {
+    inspect(()=>{const incomplete=timing.abandon('observer-disposed-without-sdk-turn-end');if(incomplete)record('step/incomplete',incomplete);});
     unsubscribe();
     if (session.agent.onPayload === payloadHook) session.agent.onPayload = previousPayload;
     if (session.agent.onResponse === responseHook) session.agent.onResponse = previousResponse;

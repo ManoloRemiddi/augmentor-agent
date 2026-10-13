@@ -43,6 +43,7 @@ test('original Context Insights uses retained records, filters, refresh and exac
  const wire=await readFile(link.requestLog,'utf8');assert.equal(wire.trim().split('\n').length,4);
  const openInsights=async()=>{await click('document.querySelector("button[aria-label=\\"Context Insights\\"]")');await visible('document.querySelector(".lc-ov-search")&&document.querySelector("[role=status]")?.innerText.includes("2 sessions")');};
  await openInsights();
+ const timingCard='Array.from(document.querySelectorAll(".lc-ov-stats .lc-card")).find(row=>row.querySelector(".lc-card-title-text")?.textContent==="Timing Stats")';await visible(timingCard+'?.innerText.includes("Measured SDK step time")');assert(await panel.evaluate(timingCard+'.innerText.includes("Text stream")&&'+timingCard+'.innerText.includes("Tool intervals")'));assert(await panel.evaluate('document.querySelector("[role=status]").innerText.includes("Measured SDK steps: 4")'),'cross-session timing coverage matches four actual SDK steps');
  assert.equal(await panel.evaluate('document.querySelectorAll(".lc-ov-session").length'),2);
  assert(await panel.evaluate('document.querySelector(".lc-ov-kpis").innerText.includes("Recorded turns")'));
  assert(await panel.evaluate('document.body.innerText.includes("Reported token buckets")&&document.body.innerText.includes("Skill-load attribution is not captured by Pi.")'));

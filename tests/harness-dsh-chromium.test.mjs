@@ -59,6 +59,7 @@ test('original Context tool-result arguments survive a fresh Host process withou
  assert.equal(before.events.filter(row=>row.event.type==='tool/result').length,1);assert.equal(wire.trim().split('\n').length,2);
  const showCall=async()=>{
   await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Context")');await visible('document.querySelector(".lc-root")&&document.querySelectorAll("[data-seq]").length===2');
+  const timing='Array.from(document.querySelectorAll(".lc-card")).find(row=>row.querySelector(".lc-card-title-text")?.textContent==="Timing Stats")';await visible(timing+'?.innerText.includes("Measured SDK step time")');assert(await panel.evaluate(timing+'.innerText.includes("Text stream")&&'+timing+'.innerText.includes("Tool intervals")'));assert(await panel.evaluate(timing+'.querySelector(".lc-tstrip-seg")!==null'),'original timing strip renders recorded SDK spans');
   // The supplier auto-expands a category with one result; another click closes it.
   await click('Array.from(document.querySelectorAll(".lc-br-cat-row")).find(x=>x.textContent.includes("Tool Results"))');await visible('document.querySelector(".lc-br-elem-on")');
   await visible('document.querySelector(".lc-ts-arg-val")?.textContent==='+JSON.stringify(join(link.workspace,'note.txt')));

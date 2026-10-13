@@ -177,7 +177,7 @@ export class Host {
       capturePayloads:this.settings.observation?.capturePayloads===true || (this.settings.observation?.capturePayloads===undefined && process.env.AUGMENTOR_PI_CAPTURE_PAYLOADS==='1'),
       ...DEFAULT_RETENTION,
     }));
-    this.interactions=new Interactions(publish,connected,Number(process.env.AUGMENTOR_PI_INTERACTION_TIMEOUT||120000));
+    this.interactions=new Interactions(publish,connected,Number(process.env.AUGMENTOR_PI_INTERACTION_TIMEOUT||120000),15000,(ownerId,id,kind,active)=>this.loaded.get(ownerId)?.observation?.waiting(id,kind,active));
     for(const file of readdirSync(this.dirs.sessions).filter(f=>f.endsWith('.meta.json'))){const m=readJson<Meta>(join(this.dirs.sessions,file),null as any);identifier(m.id);this.metadata.set(m.id,m);}
     this.compactions=new PiCompactions(join(this.dirs.state,'compactions.json'),row=>{
       this.publish(row.sessionId,{method:'session/compaction',payload:{sessionId:row.sessionId,...this.compactions.describe(row.sessionId)}});
