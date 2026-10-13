@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`pi-wiki.test.mjs` checks all six original Wiki operations through the actual
+SDK/HTTP owner, independently observed vault effects, approved query-skill content,
+read-only permissions, Browser exclusion and owner Stop after an uncertain archive.
+`wiki-scope.test.mjs` checks descriptor-scoped IO, linked/hardlinked/outside paths,
+private configuration preservation, cold uncertainty and native-action replay.
+The six focused cases and source/separate ordinary 90-file MX cohorts pass;
+installed vault and GUI acceptance remain separate. See
+[Wiki scope and qualification](../docs/HARNESS-PLUGIN-PARITY.md#wiki-core-source-binding--october-13).
+
 `pi-branch-publication-recovery.test.mjs` verifies actual denied writes, SIGKILL
 after each filesystem link, fresh Host recovery, later committed child work and
 exact parent/native preservation. Public persisted SDK label/compaction/discovery

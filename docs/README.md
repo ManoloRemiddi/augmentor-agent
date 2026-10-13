@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Wiki tools and skills on Pi](HARNESS-PLUGIN-PARITY.md#wiki-core-source-binding--october-13)
+records pinned MIT source, explicit vault configuration, six supported SDK tools,
+source/ordinary qualification and the remaining GUI/installed workflows.
+
 [Current original-GUI motion/navigation qualification](DSH-GUI-ON-PI.md#original-gui-qualification-motion-and-navigation--october-13)
 records 458 passing MX cases, the reproduced misdirected-click correction and
 document readiness; application code and installed artifacts are unchanged.

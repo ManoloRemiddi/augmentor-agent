@@ -15,8 +15,8 @@ not qualify DSH retirement or infer parity from the total test count.
 | Prompt Library, reference 0.2.9 | One shared private library, original submissions, picker/editor/conflicts and isolated improvement; [prompt qualification](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor). | Loaded Native/Browser/embedded editor acceptance, complete approved instruction/resource composition and live model improvement. |
 | Context, reference 0.48.0 | Copied dsh-context 0.68.1 Apache-2.0 composition/browser/trends/Insights/sidebar/Fleet and original Trajectory, including timing and nested arguments; [GUI qualification](DSH-GUI-ON-PI.md). | Complete causal/provenance/skill attribution, representative large histories, wider live provider formats and physical entry points. |
 | Adaptive Reasoning, reference 0.2.0 | Selected public policy and supported Pi hooks, saved/effective effort and shared forms; [reasoning scope](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls). | Representative configured real/virtual model acceptance. Stored effort does not prove a backend honors it. |
-| Wiki Skills 0.2.1 | Approved Pi skill/resource loading exists; the reference package's vault workflow is a separate DSH baseline. | Identify the exact public licensed supplier, bind its vault/catalog/query workflow and prove loading plus actual use. Generic skill loading alone is insufficient. |
-| Wiki Tools 0.14.0 | The DSH baseline has temporary-vault query/write/rename/link-update/archive evidence. | Public source/licence selection and real Pi registered-tool vault operations, including preserved raw-source archive and authorization. No Pi vault parity is claimed. |
+| Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. | Operator configuration/UI, installed-owner acceptance, representative use of the other skill workflows and companion CLIs/services. |
+| Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; query, scaffold, write, inbound-link rename, byte-preserving archive and lint-report effects are checked independently. Read-only, Browser exclusion and unknown-outcome fences qualify. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, receipt inspection/reconciliation UI and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
 | Free Web Search 0.1.0 | The DSH baseline has live documentation search; managed Pi MCP/tool search is independently implemented. | Select the actual licensed search supplier and prove inspectable results/source attribution through its Pi workflow. A generic MCP catalog is not this plugin. |
 | Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
@@ -29,6 +29,108 @@ its own [voice protocol](VOICE-SINGLE-BUTTON.md) and physical/audio lifecycle ga
 It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision and
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
+
+## Wiki core source binding — October 13
+
+Implementation **53ea139**, with exact published-byte preservation at
+**64ae1fcbcb9c339c450a04a978c9527e06f0f508**, binds the public
+[Wiki Tools 0.14.0](https://github.com/Lion-1209/dsh-plugin-wiki-tools/tree/85de359ccd9af268fe2bd7aa3069d0aaef00259f)
+and [Wiki Skills 0.2.1](https://github.com/Lion-1209/dsh-plugin-wiki-skills/tree/c56a4018053af7e1a96ebc09f69242e63535a7f0)
+source to Pi's supported ExtensionAPI in the existing conversation AgentSession.
+No Cordis host or second agent loop is mounted. The six original operation bodies,
+schemas and model-facing renderers are retained; marked adapters replace the DSH
+registration/configuration seam and route filesystem IO through a Linux vault
+descriptor. Original snapshots of the five modified JavaScript files remain.
+
+The publisher's complete **MIT / Copyright 2026 Lion** texts are preserved for
+both packages, along with the skill suite's **MIT / Copyright 2026 AgriciDaniel
+(AI Marketing Hub)** ORIGINAL_LICENSE. Selected npm archive SHA-256 identities are
+**f32e5a9b27b9fa1434708fe1d9a18d5076065cd4f26bde94bc454a514e15efa5** (tools)
+and **162c001724d7faf3816ecb312a79c93b43537c6db566edad00ce6cc6bf2c1d4d** (skills).
+SOURCE.json records the npm and public Git provenance separately. Tools match all
+ten public Git files exactly; skills match fourteen exactly and eight after CRLF
+normalization. The **published npm bytes are retained**, including those original
+line endings; scoped Git attributes prevent checkout conversion. There are **39
+source/binding records**, with authored declarations retaining their own terms.
+All nine skill Markdown files and their reference resources are copied verbatim.
+YAML 2.9.0, already present in the lock, is now an explicit pinned dependency.
+
+Wiki is disabled when the private profile is absent. To configure this source
+preview, an operator supplies `config/wiki.json` in its existing separate Pi
+configuration directory, owned by the current user and mode **0600**:
+
+```json
+{
+  "schema": "augmentor-wiki/1",
+  "enabled": true,
+  "vaultPath": "/absolute/path/to/the/operator-selected-vault",
+  "maxQueryResults": 10,
+  "typeFolders": {}
+}
+```
+
+The path is an explicit normalized absolute vault directory, distinct from the
+conversation workspace. No DSH private profile or vault content is discovered,
+copied or migrated automatically. Query limits range from 1 to 100; existing page
+type-folder mappings use the supplier's routing contract. Missing/linked/public/
+hardlinked/foreign-owner or invalid configuration is preserved rather than reset.
+Configuration is read at conversation load; this source phase supplies no GUI
+toggle/editor or live reload. Operator setting changes require a fresh conversation
+load or guarded Host restart. Do not edit a selected immutable release to configure it.
+
+Native conversations mount the six tools and approved bundled skills only when
+configured. Existing explicitly approved skill paths precede the bundled suite.
+Duplicate Wiki tool names reject loading rather than shadowing another resource.
+Browser sessions and delegated workers receive no implicit vault grant. The source
+phase does not qualify standalone terminal Pi packages or other-platform execution.
+
+`wiki_query` is read-only. Write, rename, scaffold, archive and **lint** require the
+existing change permission/approval path: lint writes its dated report. Each tool
+uses the configured root, not a model-selected root or conversation cwd. Linux IO
+holds directory descriptors and opens children without following links; linked
+roots/leaves/parents, shared hardlinks, different-owner and special files are
+refused. File IO is bounded to 64 MiB. Root creation is explicit scaffold work with
+an existing parent, not startup discovery. A different existing archive is never
+overwritten; both raw and old archive bytes remain available for inspection.
+
+Mutations reserve private hash-named receipts before attempting IO. Identity uses
+the native owner, assistant entry and SDK call ID; changed arguments cannot replay
+that same native action, while a different native entry may reuse an SDK ID.
+Receipts retain status/identity hashes, not page bodies or raw source text. A
+possible partial mutation remains unknown, stops its Pi owner before another
+provider request, and blocks further Wiki changes after a fresh binding. Queries
+remain available for inspection. A process lock is not automatically removed after
+an interrupted operation. Operator receipt/vault inspection and reconciliation
+remain necessary; no model-facing acknowledgment tool bypasses that fence.
+
+The original bookkeeping spans several files; this is not a transactional-vault
+claim. Concurrent external editors, shared ownership, crash publication/cleanup,
+large-vault performance and every skill's companion tool workflow remain separate
+qualification work. Optional supplier git auto-commit is not enabled by this
+binding; unsupported configuration is rejected instead of silently committing
+unrelated vault work. The complete migration retains these requirements.
+
+Strict type check/build and six focused cases pass. Actual SDK/HTTP flow verifies
+scaffold, quick/standard query, page write, inbound-link rename, raw-source archive,
+manifest removal and a saved lint report. The actual approved wiki-query body
+reaches the model. Read-only denies a write while query remains available; Browser
+catalogs exclude Wiki tools. A real archive collision preserves both versions and
+ends the owner before a second provider request. Link/hardlink/outside-root,
+configuration-original preservation, cold uncertainty and changed-argument replay
+cases use independent temporary data. The mock provider follows the original
+authored user marker across Pi's advisory checkpoints; no runtime checkpoint or
+request policy is removed to satisfy the fixture.
+
+The final source and separate ordinary MX cohorts each pass **464/464 across 90 files**, Node 24.19.0,
+verified QtTest/PySide6/shiboken6 6.8.2.1, two workers, unchanged deadlines and no
+skips. Fresh production staging retains 151 npm instances and all eight pre-Node
+native binary bytes; all 39 compiled supplier/binding records verify. These are source/private
+fixture results, not an installed owner vault or public binary release.
+
+Selected **97897cf**, the unselected **dfcdfb9** Metafolder artifact, owner drafts,
+models and speech services remain unchanged. Configuration/UI, owner migration,
+git/reconciliation/large-corpus and live companion workflows, sealed/installed
+qualification, public source/rebuild obligations and the full migration remain open.
 
 ## Metafolder source selection — October 13
 

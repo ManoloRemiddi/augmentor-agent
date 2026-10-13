@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Wiki core source binding](HARNESS-PLUGIN-PARITY.md#wiki-core-source-binding--october-13)
+at **53ea139**, with exact supplier CRLF bytes preserved by **64ae1fc**, mounts
+the six original MIT Wiki Tools operations and nine original MIT skill bodies
+through the existing supported Pi owner. Strict check/build and source/separate
+ordinary MX cohorts each pass **464/464 across 90 files**, two workers, matching
+Node/QtTest and no skips. Actual SDK checks verify all six operations, read-only
+and Browser boundaries, the approved query skill and uncertain-action owner Stop.
+Fresh production staging retains 151 npm instances and eight pre-Node native
+files; all 39 copied/adapted records verify. Wiki requires an explicit private
+vault profile; GUI configuration, reconciliation and installed acceptance remain
+open. It is not present in the older dfcdfb9 immutable candidate. Selected/running
+97897cf and the owner's draft, models and speech remain preserved.
+
+Hosted run **38444711258** at published **a9ba86a** passes the GUI/SDK stage and
+fails the later Debian build on the explicit Office public source/rebuild gate.
+This supersedes the preceding head's GUI failure statement for that run only;
+new-head hosted validation and full migration/public distribution remain open.
+
 [Original GUI readiness qualification](DSH-GUI-ON-PI.md#original-gui-qualification-motion-and-navigation--october-13),
 driver **d77a436**, passes **458/458 across 88 MX files**, two workers, unchanged
 deadlines and no skips. The actual rail-motion case reproduces a click reaching a

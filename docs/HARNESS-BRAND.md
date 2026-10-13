@@ -6,6 +6,14 @@ Brand sources/CSS and original supplier seats remain unchanged; the authored
 Settings binding now persists explicit profile choices. Current candidate GUI
 checks pass; a new installed-owner visual read remains separate.
 
+A fresh read-only owner-feedback check confirms that runtime **97897cf**, release
+**20261013-142001-1f7f7f96**, is still running online and all **23,914** installed
+entries match their sealed inventory. It retains the 2px circle in all three seats,
+transparent surfaces and the primary-label theme correction qualified below.
+The current private link is refreshed from that existing Host. The Native window
+has an unsent draft/busy flag; no restart or palette change is attempted. This
+check confirms build identity, not a new visual inspection of the owner's tab.
+
 # Original Augmentor motion in the Harness brand slot
 
 The owner requested replacing the remaining DeepSeek header mark with the moving
