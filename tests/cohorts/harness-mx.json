@@ -72,6 +72,8 @@
     "tests/model-discovery.test.mjs",
     "tests/pi-model-configuration.test.mjs",
     "tests/step-timing.test.mjs",
-    "tests/pi-step-timing.test.mjs"
+    "tests/pi-step-timing.test.mjs",
+    "tests/tool-argument-snapshots.test.mjs",
+    "tests/harness-tool-arguments-chromium.test.mjs"
   ]
 }

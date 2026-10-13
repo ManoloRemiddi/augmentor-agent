@@ -17,6 +17,7 @@ const sharedState=join(root,'shared-state'),sharedData=join(root,'shared-data'),
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
 const discoveryLog=process.env.AUGMENTOR_HARNESS_PROOF_MODEL_DISCOVERY==='1'?join(root,'model-listings.jsonl'):null;
 const providerApi=process.env.AUGMENTOR_HARNESS_PROOF_PROVIDER_API??'openai-completions';
+let releaseArguments=null;
 if(!['openai-completions','anthropic-messages','openai-responses','google-generative-ai'].includes(providerApi))throw Error('Unsupported authored provider fixture.');
 mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(workspace);mkdirSync(home);
 writeFileSync(join(workspace,'note.txt'),'Harness fixture ready.\n');
@@ -26,6 +27,9 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'){
  writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}));
 }
 const model=http.createServer(async(req,res)=>{
+  if(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'&&req.method==='POST'&&req.url==='/fixture/release-arguments'){
+    if(!releaseArguments){res.writeHead(409).end();return;}releaseArguments();res.writeHead(204).end();return;
+  }
   if(discoveryLog&&req.method==='GET'&&new URL(req.url,'http://fixture.invalid').pathname.endsWith('/models')){
     appendFileSync(discoveryLog,JSON.stringify({url:req.url,headers:req.headers})+'\n',{mode:0o600});
     if(req.url.startsWith('/slow/')){res.once('close',()=>appendFileSync(discoveryLog,JSON.stringify({closed:true,url:req.url})+'\n',{mode:0o600}));return;}
@@ -39,6 +43,15 @@ const model=http.createServer(async(req,res)=>{
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null,usage)=>res.write('data: '+JSON.stringify({id:'fixture',object:'chat.completion.chunk',model:'harness-fixture',choices:[{index:0,delta,finish_reason:finish}],...(usage?{usage}:{})})+'\n\n');
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
+  if(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'&&JSON.stringify(lastUser?.content).includes('ARGUMENT_STREAM')){
+    if(afterTool){chunk({role:'assistant',content:'The authored argument stream completed one real read.'},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});res.end('data: [DONE]\n\n');return;}
+    const args=JSON.stringify({path:join(workspace,'note.txt')}),middle=Math.floor(args.length/2),almost=args.length-3;
+    chunk({role:'assistant',tool_calls:[{index:0,id:'fixture_argument_read',type:'function',function:{name:'read',arguments:args.slice(0,middle)}}]});
+    let middleSent=false;
+    const timer=setTimeout(()=>{middleSent=true;chunk({tool_calls:[{index:0,function:{arguments:args.slice(middle,almost)}}]});},100);
+    const release=()=>{clearTimeout(timer);releaseArguments=null;chunk({tool_calls:[{index:0,function:{arguments:args.slice(middleSent?almost:middle)}}]},'tool_calls');res.end('data: [DONE]\n\n');};
+    releaseArguments=release;res.once('close',()=>{clearTimeout(timer);if(releaseArguments===release)releaseArguments=null;});return;
+  }
   if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'&&JSON.stringify(lastUser?.content).includes('QUESTION_FIXTURE')){
     if(!afterTool)chunk({role:'assistant',tool_calls:[{index:0,id:'authored_question',type:'function',function:{name:'ask_user',arguments:'{}'}}]},'tool_calls');
     else chunk({role:'assistant',content:'Original question answer received: '+JSON.stringify(body.messages.at(-1).content)},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});
@@ -155,7 +168,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{})}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;

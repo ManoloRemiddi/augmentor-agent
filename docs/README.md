@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Streamed Trajectory tool arguments](TRAJECTORY-TOOL-ARGUMENTS.md) connects public
+Pi argument snapshots to the original pending Tool/Payload seats, with bounded
+patch capture, explicit gaps and no dispatch from inspection.
+
 [Original Timing Stats on Pi](CONTEXT-TIMING.md) documents public SDK step/stream/tool/UI-wait capture, bounded private records, original Context/Insights presentation and qualification/deployment boundaries.
 
 [Installed MX Models qualification](HARNESS-MODELS.md#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.

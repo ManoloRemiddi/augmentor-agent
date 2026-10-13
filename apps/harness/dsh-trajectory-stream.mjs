@@ -14,11 +14,22 @@ export function trajectoryStream(state,nodes,turnIds){
     if(['user/message','turn/start'].includes(event.type)){finish();if(t!==turn)activeCalls.clear();turn=t;}
     if(event.type==='assistant/chunk'){
       const chunk=data.chunk||{},kind=chunk.type==='text-delta'?'text':chunk.type==='reasoning-delta'?'reasoning':null;
-      if(!kind||!chunk.text)continue;
+      const patch=chunk.argsPatch,hasPatch=patch?.units==='utf16-code-units'&&Number.isSafeInteger(patch.prefix)&&patch.prefix>=0&&Number.isSafeInteger(patch.remove)&&patch.remove>=0&&typeof patch.insert==='string';
+      const tool=chunk.type==='tool-call-snapshot'&&chunk.boundary==='public-sdk-partial-tool-call-arguments'&&Number.isSafeInteger(chunk.index)&&chunk.index>=0&&chunk.index<=4095&&typeof chunk.callId==='string'&&chunk.callId.length>0&&chunk.callId.length<=256&&typeof chunk.name==='string'&&chunk.name.length>0&&chunk.name.length<=256&&(typeof chunk.argsRaw==='string'||chunk.argsRaw===null||hasPatch);
+      if((!kind||!chunk.text)&&!tool)continue;
       // A missing identity must never inherit a preceding observed request.
       if(pending&&(pending.requestId!==data.requestId||pending.turn!==t))finish();
-      pending??={turn:t,step:nextStep(t),requestId:data.requestId,firstSeq:event.seq,lastSeq:event.seq,blocks:[]};
+      pending??={turn:t,step:nextStep(t),requestId:data.requestId,firstSeq:event.seq,lastSeq:event.seq,blocks:[],calls:new Map()};
       pending.lastSeq=event.seq;
+      if(tool){
+        let position=pending.calls.get(chunk.index);
+        if(position===undefined){position=pending.blocks.length;pending.calls.set(chunk.index,position);}
+        const previous=pending.blocks[position];let raw=chunk.argsRaw,reason=chunk.reason;
+        if(hasPatch){if(previous?.kind==='tool-call'&&previous.callId===chunk.callId&&previous.name===chunk.name&&patch.prefix+patch.remove<=previous.argsRaw.length)raw=previous.argsRaw.slice(0,patch.prefix)+patch.insert+previous.argsRaw.slice(patch.prefix+patch.remove);else{raw=null;reason='Live SDK argument patch has no available base; inspect the native message.';}}
+        if(typeof raw==='string'&&raw.length>512*1024){raw=null;reason='Live SDK argument display limit exceeded; inspect the native message.';}
+        pending.blocks[position]=raw===null?{kind:'other',block:{type:'pi-sdk-tool-arguments',callId:chunk.callId,name:chunk.name,status:'unavailable',reason}}:{kind:'tool-call',callId:chunk.callId,name:chunk.name,argsRaw:raw,subCalls:[]};
+        continue;
+      }
       const last=pending.blocks.at(-1);if(last?.kind===kind)last.text+=chunk.text;else pending.blocks.push({kind,text:chunk.text});
     }
     if(event.type==='assistant/message'){

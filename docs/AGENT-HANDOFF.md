@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Streamed Trajectory arguments](TRAJECTORY-TOOL-ARGUMENTS.md) connects public Pi
+argument snapshots to the original pending Tool/Payload seats. Strict check/build
+and 70 source MX files pass **354/354**; the held-provider original GUI test proves
+zero dispatch before release/Stop and one real read after completion, with no replay
+on browser reopening. Bounded Unicode patches preserve request/call scope and show
+missing/invalid/overflow gaps. Supplier layout/CSS/580 MIT/108 Apache records remain
+unchanged. Ordinary/installed acceptance follows separately; selected MX remains
+timing 008ef295 / 20261013-030020-abfa89ec. Full migration and platform gates stay open.
+
 [Installed original Context timing](CONTEXT-TIMING.md#ordinary-and-installed-mx-qualification--october-13): runtime **008ef29551406fa08f21508d548603a6f9200f81**, private MX **20261013-030020-abfa89ec**, product **0.2.13**, artifact **5d6596b90da90856cfa1b670bf5be6f6c58c52e0ea3b08786bbc22ae6a19253e**, selected and running. Source and ordinary each pass **349/349 across 68 files** plus five packaging cases; thirteen immutable tests and actual original Context/Insights acceptance pass. All **23,885** entries and twelve histories/queues, drafts, profile/auth/model and production/router state are preserved. Apache-2.0 dashboard layout/CSS/card/strip and all 580 MIT GUI records remain intact; one already-marked timing seat changes. Older logs stay explicit. Full migration/live/privacy/public distribution/platform and known CI gaps remain open; prior selection statements below are historical checkpoints.
 
 [Original measured Context timing](CONTEXT-TIMING.md): the copied Apache-2.0

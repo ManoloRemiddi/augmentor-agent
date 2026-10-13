@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`tool-argument-snapshots.test.mjs` checks public snapshot sampling, exact Unicode
+patches, missing/foreign/invalid bases, interleaving, completion/Stop, content/count/
+capture bounds and next-message recovery. `harness-tool-arguments-chromium.test.mjs`
+uses an actual isolated SDK/Host and original pending Tool/Payload view with a held
+deterministic provider: zero dispatch before release or Stop, one actual read after
+completion, and unchanged history/request counts after browser reopening.
+[Contract and source/ordinary/installed qualification](../docs/TRAJECTORY-TOOL-ARGUMENTS.md).
+
 [Installed original Context timing](../docs/CONTEXT-TIMING.md#ordinary-and-installed-mx-qualification--october-13): runtime **008ef29551406fa08f21508d548603a6f9200f81**, private MX **20261013-030020-abfa89ec**, product **0.2.13**, artifact **5d6596b90da90856cfa1b670bf5be6f6c58c52e0ea3b08786bbc22ae6a19253e**, selected and running. Source and ordinary each pass **349/349 across 68 files** plus five packaging cases; thirteen immutable tests and actual original Context/Insights acceptance pass. All **23,885** entries and twelve histories/queues, drafts, profile/auth/model and production/router state are preserved. Apache-2.0 dashboard layout/CSS/card/strip and all 580 MIT GUI records remain intact; one already-marked timing seat changes. Older logs stay explicit. Full migration/live/privacy/public distribution/platform and known CI gaps remain open; prior selection statements below are historical checkpoints.
 
 [Installed MX Models qualification](../docs/HARNESS-MODELS.md#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.

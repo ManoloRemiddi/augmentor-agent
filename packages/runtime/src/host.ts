@@ -18,6 +18,7 @@ import {sessionFamily} from './session-family.js';
 import {contextPreferences,contextPreferenceChange,CONTEXT_PREFERENCE_FIELDS} from './context-preferences.js';
 import {ShortcutPreferences} from './shortcut-preferences.js';
 import {ModelSettings} from './model-settings.js';
+import {ToolArgumentSnapshots} from './tool-argument-snapshots.js';
 import {developerTools,developerToolsChange} from './developer-tools.js';
 import {piPromptWrapping} from './prompt-wrapping.js';
 import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync} from 'node:fs';
@@ -346,6 +347,7 @@ export class Host {
       surface:m.surface??'linux',policy:m.policy,...(m.fork?{fork:m.fork}:{})});
     if(mcp){const info=mcp.describe();if(info.servers.length||info.configurationErrors)installed.record('integration/mcp',info);if(info.configurationErrors)this.append(m,'runtime/warning',{message:'Managed MCP configuration contains errors. Some servers are unavailable; ordinary chat remains available.'});}
     if(repaired.length)installed.record('context/budget',{changes:repaired,units:'unicode-code-points',boundary:'before-session-owner-load'});
+    const toolArguments=new ToolArgumentSnapshots();
     created.session.subscribe(e=>{
       if(e.type==='message_start'&&e.message.role==='user'){
         const correction=record!.steering?.delivery(e.message);
@@ -363,8 +365,11 @@ export class Host {
         const a=e.assistantMessageEvent,requestId=record!.observation?.currentRequestId();
         if(a.type==='text_delta')this.append(m,'assistant/chunk',{requestId,chunk:{type:'text-delta',text:a.delta}});
         if(a.type==='thinking_delta')this.append(m,'assistant/chunk',{requestId,chunk:{type:'reasoning-delta',text:a.delta}});
+        try{const chunk=toolArguments.update(a);if(chunk)this.append(m,'assistant/chunk',{requestId,chunk});}catch{/* Inspection cannot change tool dispatch. */}
       }
+      if(e.type==='message_start'&&e.message.role==='assistant')toolArguments.begin();
       if(e.type==='message_end'&&e.message.role==='assistant'){
+        toolArguments.end();
         this.append(m,'assistant/message',{requestId:record!.observation?.currentRequestId(),message:{content:e.message.content,stopReason:e.message.stopReason,timestamp:e.message.timestamp,usage:e.message.usage}});
         record!.failed=e.message.stopReason==='error';if(record!.failed&&!record!.steering?.waiting)this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});
       }
