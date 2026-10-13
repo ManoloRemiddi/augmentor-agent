@@ -161,23 +161,35 @@ test('loaded Pi Browser executes tools and identified steering, restores paused 
  await settingsUntil('document.querySelector("#pi-inspector")&&!document.querySelector("#pi-inspector").disabled');await clickSetting('document.querySelector("#pi-inspector")');
  let inspectorInfo;await until(async()=>{inspectorInfo=(await targets()).find(row=>row.url.startsWith('http://127.0.0.1:')&&row.url!==base+'/page');return inspectorInfo;},'conversation inspector tab');
  const inspector=await cdp(inspectorInfo.webSocketDebuggerUrl);sockets.push(inspector);await inspector.call('Runtime.enable');
- await until(()=>inspector.evaluate('document.title==="Conversation inspector · Augmentor Harness"&&document.querySelector("[data-view=trajectory]").getAttribute("aria-selected")==="true"&&document.querySelectorAll("#ledger .record").length>0'),'read-only trajectory');
+ const inspectorTab=name=>'Array.from(document.querySelectorAll("[role=tab]")).find(e=>e.textContent==='+JSON.stringify(name)+')';
+ await until(()=>inspector.evaluate('document.title==="Conversation inspector · Augmentor Harness"&&'+inspectorTab('Trajectory')+'?.getAttribute("aria-selected")==="true"&&Boolean(document.querySelector("[data-record-index]"))'),'read-only original trajectory');
  assert.equal(await inspector.evaluate('location.hash'),'', 'bearer fragment removed from visible history');
- assert.deepEqual(await inspector.evaluate('["new-chat","composer","stop","trim-tools","prompt-library","reasoning-settings","prompt-queue","continue-queue"].map(id=>({id,visible:document.getElementById(id).getClientRects().length>0}))'),['new-chat','composer','stop','trim-tools','prompt-library','reasoning-settings','prompt-queue','continue-queue'].map(id=>({id,visible:false})));
- assert.equal(await inspector.evaluate('document.querySelector("#model").disabled&&document.querySelector("#capture").disabled'),true);
+ assert.equal(await inspector.evaluate('document.querySelector("[data-augmentor-access=read-only]")?.textContent'), 'Read-only');
  const scoped=async(method,params={})=>inspector.evaluate('fetch("/api/rpc",{method:"POST",headers:{Authorization:"Bearer "+sessionStorage.getItem("augmentor-harness-token"),"Content-Type":"application/json"},body:JSON.stringify('+JSON.stringify({id:'inspection-contract',method,params})+')}).then(async response=>({status:response.status,...await response.json()}))');
  assert.deepEqual((await scoped('session.list')).result.items.map(row=>row.sessionId),[draftSession]);
- assert.equal((await scoped('session.prompt',{sessionId:draftSession,requestId:'inspection-forbidden',content:[{type:'text',text:'Do not run'}]})).status,400);
+ for(const method of ['session.prompt','session.cancel','session.prepareBranch','session.rename','session.selectModel','session.updateQueue','appearance.describe','appearance.set','settings.describe','prompts.list','observation.configure'])assert.equal((await scoped(method,{sessionId:draftSession,requestId:'inspection-forbidden',content:[{type:'text',text:'Do not run'}]})).status,400,method);
  assert.equal((await scoped('session.history',{sessionId:sourceId})).status,400);
- await inspector.evaluate('document.querySelector("[data-view=context]").click()');await until(()=>inspector.evaluate('document.querySelector("#context-content").textContent.includes("PI_BROWSER_EDITED")'),'saved effective context');
- const userSummary=await inspector.evaluate('(()=>{const e=Array.from(document.querySelectorAll("#context-content details")).find(e=>e.querySelector("summary")?.textContent.endsWith(". user")&&e.textContent.includes("PI_BROWSER_EDITED")).querySelector("summary");e.scrollIntoView({block:"center"});const r=e.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()');await inspector.call('Input.dispatchMouseEvent',{type:'mousePressed',...userSummary,button:'left',clickCount:1});await inspector.call('Input.dispatchMouseEvent',{type:'mouseReleased',...userSummary,button:'left',clickCount:1});assert.equal(await inspector.evaluate('document.querySelector("#context-content").innerText.includes("PI_BROWSER_EDITED")'),true);
+ await inspector.evaluate(inspectorTab('Chat')+'.click()');await until(()=>inspector.evaluate('document.querySelector("[data-composer-input][aria-disabled=true][contenteditable=false]")&&document.querySelector("button[aria-label=\\"Add files or run commands\\"]")?.disabled===true'),'original read-only composer');
+ assert.equal(await inspector.evaluate('!!document.querySelector("button[aria-label=\\"Branch into a new conversation\\"]")'),false);
+ assert.equal(await inspector.evaluate('document.querySelector("button[aria-label=\\"Rename conversation\\"]")?.disabled'),true);
  const observed=(await scoped('observation.list',{sessionId:draftSession})).result.records.find(row=>row.kind==='model/request');assert(observed);
+ await inspector.evaluate(inspectorTab('Context')+'.click()');await until(()=>inspector.evaluate('Boolean(document.querySelector(".lc-root"))'),'original saved context');
+ await inspector.evaluate('Array.from(document.querySelectorAll(".lc-br-cat-row")).find(e=>e.textContent.includes("User Messages")).click()');
+ await until(()=>inspector.evaluate('document.querySelectorAll(".lc-br-elem-row").length===5'),'original user context rows');
+ let editedVisible=false;
+ for(let i=0;i<5;i++){
+  await inspector.evaluate('document.querySelectorAll(".lc-br-elem-row")['+i+'].click()');
+  await until(()=>inspector.evaluate('Boolean(document.querySelector(".lc-br-content"))'),'expanded original user context');
+  if(await inspector.evaluate('document.querySelector(".lc-br-content").innerText.includes("PI_BROWSER_EDITED")')){editedVisible=true;break;}
+ }
+ assert(editedVisible,'original expandable user context exposes the actual edited input');
  let offset=0,raw='';while(true){const response=await scoped('observation.payload',{sessionId:draftSession,eventId:observed.id,offset,limit:65536});assert.equal(response.status,200,JSON.stringify(response.error));const part=response.result;assert(part.available);raw+=part.text;offset=part.nextOffset;if(!part.hasMore)break;}
  const captured=JSON.parse(raw);assert.deepEqual(captured,inputs.find(body=>JSON.stringify(body.messages.at(-1)?.content).includes('PI_BROWSER_EDITED')),'Context equals actual post-hook provider input');
  await inspector.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});
- assert.equal(await inspector.evaluate('document.querySelector("#runtime").textContent.endsWith(" · Read-only")&&document.querySelector("#runtime").getClientRects().length>0'),true,'read-only cue remains visible in narrow windows');
+ assert.equal(await inspector.evaluate('(()=>{const e=document.querySelector("[data-augmentor-access=read-only]");const r=e?.getBoundingClientRect();return e?.textContent==="Read-only"&&r.width>0&&r.left>=0&&r.right<=innerWidth})()'),true,'original header read-only cue remains visible in narrow windows');
  if(process.env.AUGMENTOR_PI_INSPECTION_SCREENSHOT)await writeFile(process.env.AUGMENTOR_PI_INSPECTION_SCREENSHOT,Buffer.from((await inspector.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
- await inspector.reload();await until(()=>inspector.evaluate('document.querySelector(".local")?.textContent==="Read-only conversation inspector"&&document.querySelector("#ledger .record")'),'reload retains only scoped authority');
+ await inspector.reload();await until(()=>inspector.evaluate('document.querySelector("[data-augmentor-access=read-only]")?.textContent==="Read-only"&&Boolean(document.querySelector("[data-composer-input][aria-disabled=true][contenteditable=false]"))'),'reload retains original interface and scoped authority');
+ assert.equal((await scoped('session.prompt',{sessionId:draftSession})).status,400,'reload cannot gain operator authority');
  assert.equal(inputs.length,inspectionCount);assert.deepEqual(await client.call('session.history',{sessionId:draftSession,maxMessages:100}),draftHistory);
  const diagnostics=JSON.stringify(await message({type:'log'}));assert.doesNotMatch(diagnostics,/#token=|"url":"http:\/\/127\.0\.0\.1:/,'wire diagnostics must not retain bearer links');assert.deepEqual(inspector.errors,[]);
 });

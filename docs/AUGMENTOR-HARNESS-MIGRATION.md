@@ -155,6 +155,12 @@ The separate [dsh-context plugin](https://github.com/bowenliang123/dsh-context),
 
 ## Required feature parity
 
+The [custom-plugin parity register](HARNESS-PLUGIN-PARITY.md) enumerates the twelve
+active reference integrations and separates their source/installed/live evidence.
+Its Metafolder selection and service-readiness boundary complement the general
+rows below; seeing a generic resource/MCP capability does not qualify a named
+plugin's selected workflow.
+
 P0 means required before making Pi the default for the affected existing workflow. P1 means required before removing that DSH dependency. P2 means an optional enhancement. A workflow can move individually; an unmet gate remains visible and keeps its matching DSH path available.
 
 | Priority | Feature and current owner | Pi migration approach | Acceptance outcome |

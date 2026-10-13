@@ -1,6 +1,49 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current installed MX preview](HARNESS-BRAND.md#ordinary-and-installed-mx-qualification--october-13): runtime **efa411b**,
+## Original scoped inspector — October 13 source follow-up
+
+The Browser Models/Inspector entry now opens the original DSH GUI. The preceding
+Linux CI at `ec87b3b` ran 1,119 Node cases: 1,096 passed, 22 skipped and one failed
+because `pi-browser-chromium.test.mjs` still expected the prototype's
+`data-view`/`ledger`/`context-content` controls. This is a stale integration test,
+not evidence that increasing its timeout would repair the interface.
+
+The original inspector also lacked a persistent scope cue outside Chat. The
+authored Pi binding now puts **Read-only** in DSH's existing
+`conversation.header.leading` slot and sets the inspector tab title. Operator
+presentation, copied components/CSS and the 580 MIT/108 Apache supplier records
+stay unchanged. An empty or loading inspector retains the resident header slot;
+the cue grants no action authority and does not add another agent or provider probe.
+
+The updated loaded Browser/native-bridge test uses the original Trajectory tabs,
+record rows, disabled Chat composer/rename action and Context Browser's
+expandable user rows. It proves the actual edited input is visible, compares a
+complete retained request to the synthetic provider's post-hook wire input,
+checks scoped/profile mutation and foreign-history rejection, narrow-window
+scope visibility and cold browser reload. Inspector reads add no provider request
+and leave the selected native history identical. The existing original-GUI,
+theme/brand and server authority cases remain relevant regression checks.
+
+Source check/build and final focused qualification are recorded after the
+implementation commit. Earlier local attempts are retained: the first updated
+predicate returned a DOM element to CDP instead of a boolean; later predicates
+expected text before expanding the supplier's user rows. Corrected tests use the
+actual public controls without changing deadlines, supplier folding or provider
+data. No private owner source, conversations or browser tab is used.
+
+This follow-up is source-only. Installed MX remains appearance runtime
+`97897cf` / `20261013-142001-1f7f7f96`; the separately qualified combined candidate
+`2c4ca0b` remains unselected and does not contain this later cue. Its prior
+443/443 source/ordinary and 192 sealed results are not qualification of this
+follow-up. A new staged artifact and guarded installed acceptance remain required.
+The Native unsent draft is preserved. The [plugin/live-service register](HARNESS-PLUGIN-PARITY.md)
+owns the missing named workflows and Qwen/speech boundary; full migration,
+distribution, other-platform CI/physical acceptance and DSH retirement stay open.
+
+[Current installed MX appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification)
+supersedes the dated brand checkpoint below.
+
+[Preceding installed MX brand checkpoint](HARNESS-BRAND.md#ordinary-and-installed-mx-qualification--october-13): runtime **efa411b**,
 release **20261013-100304-45f0b71b**, product **0.2.13**, selected and running.
 Artifact **440fdce7fa8033aaa42d8cacfb04f9d23c4d60f1121508fe7250a91b39cb2067**.
 The website's original elastic mark occupies the original DSH header/rail seats,

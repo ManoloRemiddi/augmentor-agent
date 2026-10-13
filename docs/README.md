@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original scoped inspector](DSH-GUI-ON-PI.md#original-scoped-inspector--october-13-source-follow-up)
+records the restored header cue and actual Browser/bridge read-only qualification.
+
+[Required custom-plugin parity](HARNESS-PLUGIN-PARITY.md) maps the twelve recorded
+reference integrations to actual Pi evidence and remaining end-to-end workflows.
+It pins Metafolder's public MIT source and documents its original UI adapter needs.
+
 [Linux branch publication recovery](HARNESS-BRANCH-PUBLICATION.md) finishes attested
 partial Fork/Edit saves on an explicit retry, with source/ordinary/installed scope.
 

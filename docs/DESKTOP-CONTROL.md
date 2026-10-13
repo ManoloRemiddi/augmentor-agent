@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+In Pi Native maintenance, `online` describes the local controller connection.
+Legacy `modelReady` is computed from the picker selection; it is configuration readiness,
+not a provider health/inference probe. The [current live-service boundary](HARNESS-PLUGIN-PARITY.md#current-live-service-boundary)
+records an unreachable configured endpoint while both flags remain true. Do not
+use these maintenance fields as live provider or speech qualification.
+
 # Linux desktop control preview
 
 Pi, DSH and opt-in Codex development source use the same per-user desktop executor. It captures a consented screen

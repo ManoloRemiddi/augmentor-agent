@@ -268,6 +268,7 @@ function App(){
   const settingsState=useSyncExternalStore(settingsShell.subscribe,settingsShell.getSnapshot);
   const shortcutRename=useWorkspaceShortcuts(state=>state.renameTarget);
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
+  useEffect(()=>{document.title=state.readOnly?'Conversation inspector · Augmentor Harness':'Augmentor Harness';},[state.readOnly]);
   React.useLayoutEffect(()=>{if(!hasContextTab&&view==='context'||!hasFleetTab&&view==='fleet')setView('chat');contextModal.sync();if(state.phase!=='ready'||state.readOnly||contextPrefs.value.insightsEntry==='hide')layout.actions.selectPanel(null);});
   useEffect(()=>{commandMenu.deps.actions={compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:()=>setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:(scope,segment,consume)=>contextModal.open(scope,segment,consume),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
@@ -319,6 +320,7 @@ function App(){
       case 'rightbar':return <DshPreviewSidebar previews={filePreviews} state={state} {...owner}/>;
       case 'conversation.session.header.corner':return <DshPreviewExpand previews={filePreviews} state={state}/>;
       case 'conversation.header':return <ConversationHeader {...p}/>;
+      case 'conversation.header.leading':return state.readOnly?<span role="status" aria-label="Read-only conversation inspector" data-augmentor-access="read-only">Read-only</span>:options.fallback??null;
       case 'conversation.session.header':return <ConversationSessionHeader {...p} open={open} selectView={setView}/>;
       case 'conversation.session.header.actions':return <Button variant="ghost" disabled={state.readOnly} aria-label="Rename conversation" onClick={()=>setDialog({kind:'rename',sid:state.sessionId,title:current?.title||''})}><IconEditOutlineRegular/></Button>;
       case 'conversation.hero.workspace':return <WorkspacePicker {...p} t={t.workspace} useDirectoryFlow={selectorFace(!state.readOnly)} createWorkspace={createWorkspace}/>;

@@ -1,5 +1,24 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original scoped inspector source follow-up](DSH-GUI-ON-PI.md#original-scoped-inspector--october-13-source-follow-up)
+restores the persistent read-only cue in an existing DSH header slot. The loaded
+Browser/bridge test now exercises the original Trajectory/Context controls rather
+than prototype IDs, retaining scoped rejection, native-history equality and zero
+extra inference. Source qualification follows in the owning guide. No installed
+release is patched; current Native draft and combined unselected candidate remain.
+
+[Custom-plugin parity and live-service audit](HARNESS-PLUGIN-PARITY.md) identifies
+all twelve reference integrations and the missing named Pi workflows. Metafolder
+1.2.1 public MIT source is pinned at a5332d9; it can be reused but its old full-seat
+shadow needs adapters preserving current pin/archive/keyboard/draft owners. It is
+not mounted or qualified yet. No private source or owner grouping data is copied.
+At the October 13 audit the configured local Qwen endpoint is unreachable; the GPU manager
+serves no model and speech services are stopped. Native `modelReady` means picker
+configuration, not provider health. No live inference/speech success is claimed.
+Owner stop/restore preference is pending; no service/settings/draft is changed.
+Current installed appearance runtime and latest combined unselected candidate
+below remain preserved. Full migration/platform/live/privacy gates remain open.
+
 [Qualified unselected combined Linux branch publication](HARNESS-BRANCH-PUBLICATION.md#qualified-ordinary-and-immutable-candidate)
 finishes attested Fork/Edit saves after denied writes or SIGKILL at each link.
 The same native child and later user work survive explicit recovery with no
