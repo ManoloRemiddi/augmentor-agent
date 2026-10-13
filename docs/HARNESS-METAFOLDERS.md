@@ -64,6 +64,9 @@ no new agent, provider request, tool grant or independent execution loop.
 
 ## Qualification and remaining work
 
+Tested implementation: **207aed299534801637e4c3263f1166d3fe532936**. Subsequent
+qualification-record edits change documentation only.
+
 Focused feature qualification passes **9/9 across two files**: eight profile,
 failure, cold-Host and supplier-closure cases plus the actual copied-interface
 Chromium workflow. It exercises enable, group creation/color, workspace menus,
