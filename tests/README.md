@@ -996,3 +996,5 @@ Original shortcuts: `harness-shortcuts.test.mjs` checks original durable/dormant
 
 
 `step-timing.test.mjs` checks deterministic SDK-relative intervals, stream buckets, overlapping/nested tool sums versus strip union, observed UI windows, malformed/missing/duplicate boundaries, bounded/escaped metadata and secret pruning. `pi-step-timing.test.mjs` uses a real isolated SDK/Host and actual question wait, verifying two steps and cold reopen without provider/native replay. Existing original Context and Insights Chromium cases verify their measured card/strip/aggregate presentation; sidebar coverage derives from its actual bounded metadata page. [Contracts, licensing and qualification](../docs/CONTEXT-TIMING.md).
+
+The shortcut fixtures now retain actual focus/DOM/error diagnostics and wait for the selected document to have keyboard focus before input. A new scope contract checks attested self settings notifications, mandatory peer reads and authority invalidation. [Observed race and correction](../docs/HARNESS-SHORTCUTS.md#attested-settings-revisions--october-13).

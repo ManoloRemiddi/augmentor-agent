@@ -14,18 +14,22 @@ export function trajectoryStream(state,nodes,turnIds){
     if(['user/message','turn/start'].includes(event.type)){finish();if(t!==turn)activeCalls.clear();turn=t;}
     if(event.type==='assistant/chunk'){
       const chunk=data.chunk||{},kind=chunk.type==='text-delta'?'text':chunk.type==='reasoning-delta'?'reasoning':null;
-      const patch=chunk.argsPatch,hasPatch=patch?.units==='utf16-code-units'&&Number.isSafeInteger(patch.prefix)&&patch.prefix>=0&&Number.isSafeInteger(patch.remove)&&patch.remove>=0&&typeof patch.insert==='string';
-      const tool=chunk.type==='tool-call-snapshot'&&chunk.boundary==='public-sdk-partial-tool-call-arguments'&&Number.isSafeInteger(chunk.index)&&chunk.index>=0&&chunk.index<=4095&&typeof chunk.callId==='string'&&chunk.callId.length>0&&chunk.callId.length<=256&&typeof chunk.name==='string'&&chunk.name.length>0&&chunk.name.length<=256&&(typeof chunk.argsRaw==='string'||chunk.argsRaw===null||hasPatch);
+      const patch=chunk.argsPatch,hasPatch=patch?.units==='utf16-code-units'&&Number.isSafeInteger(patch.baseRevision)&&patch.baseRevision>=1&&Number.isSafeInteger(patch.prefix)&&patch.prefix>=0&&Number.isSafeInteger(patch.remove)&&patch.remove>=0&&typeof patch.insert==='string';
+      const tool=chunk.type==='tool-call-snapshot'&&chunk.boundary==='public-sdk-partial-tool-call-arguments'&&typeof chunk.captureId==='string'&&chunk.captureId.length>0&&chunk.captureId.length<=128&&Number.isSafeInteger(chunk.index)&&chunk.index>=0&&chunk.index<=4095&&typeof chunk.callId==='string'&&chunk.callId.length>0&&chunk.callId.length<=256&&typeof chunk.name==='string'&&chunk.name.length>0&&chunk.name.length<=256;
       if((!kind||!chunk.text)&&!tool)continue;
       // A missing identity must never inherit a preceding observed request.
-      if(pending&&(pending.requestId!==data.requestId||pending.turn!==t))finish();
-      pending??={turn:t,step:nextStep(t),requestId:data.requestId,firstSeq:event.seq,lastSeq:event.seq,blocks:[],calls:new Map()};
+      if(pending&&(pending.requestId!==data.requestId||pending.turn!==t||tool&&pending.captureId&&pending.captureId!==chunk.captureId))finish();
+      pending??={turn:t,step:nextStep(t),requestId:data.requestId,firstSeq:event.seq,lastSeq:event.seq,blocks:[],calls:new Map(),revisions:new Map()};
       pending.lastSeq=event.seq;
       if(tool){
+        pending.captureId??=chunk.captureId;
         let position=pending.calls.get(chunk.index);
         if(position===undefined){position=pending.blocks.length;pending.calls.set(chunk.index,position);}
-        const previous=pending.blocks[position];let raw=chunk.argsRaw,reason=chunk.reason;
-        if(hasPatch){if(previous?.kind==='tool-call'&&previous.callId===chunk.callId&&previous.name===chunk.name&&patch.prefix+patch.remove<=previous.argsRaw.length)raw=previous.argsRaw.slice(0,patch.prefix)+patch.insert+previous.argsRaw.slice(patch.prefix+patch.remove);else{raw=null;reason='Live SDK argument patch has no available base; inspect the native message.';}}
+        const previous=pending.blocks[position],expected=pending.revisions.get(chunk.index),same=expected?.callId===chunk.callId&&expected.name===chunk.name,validRevision=Number.isSafeInteger(chunk.revision)&&chunk.revision>=1;let raw=chunk.argsRaw,reason=chunk.reason;
+        if(!validRevision||same&&chunk.revision<=expected.revision){raw=null;reason='Live SDK argument revision is invalid or out of order; inspect the native message.';}
+        else if(hasPatch){if(previous?.kind==='tool-call'&&same&&expected.revision===patch.baseRevision&&chunk.revision===patch.baseRevision+1&&patch.prefix+patch.remove<=previous.argsRaw.length)raw=previous.argsRaw.slice(0,patch.prefix)+patch.insert+previous.argsRaw.slice(patch.prefix+patch.remove);else{raw=null;reason='Live SDK argument patch has no available base; inspect the native message.';}}
+        else if(typeof raw!=='string'&&raw!==null){raw=null;reason='Live SDK argument update is invalid; inspect the native message.';}
+        if(validRevision&&(!same||chunk.revision>expected.revision))pending.revisions.set(chunk.index,{callId:chunk.callId,name:chunk.name,revision:chunk.revision});
         if(typeof raw==='string'&&raw.length>512*1024){raw=null;reason='Live SDK argument display limit exceeded; inspect the native message.';}
         pending.blocks[position]=raw===null?{kind:'other',block:{type:'pi-sdk-tool-arguments',callId:chunk.callId,name:chunk.name,status:'unavailable',reason}}:{kind:'tool-call',callId:chunk.callId,name:chunk.name,argsRaw:raw,subCalls:[]};
         continue;

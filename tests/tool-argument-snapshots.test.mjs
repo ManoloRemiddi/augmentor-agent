@@ -14,8 +14,8 @@ test('public SDK snapshots sample growing objects, flush final updates and encod
  const trajectory=projectDsh(state([display(1,first),display(2,growing),display(3,final)])).trajectory;assert.equal(trajectory.partial.blocks[0].argsRaw,JSON.stringify({path:'f😀.txt',line:2}));assert.equal(trajectory.runningCalls.length,0,'streamed proposals are not dispatched tools');capture.end();assert.equal(capture.update(update('toolcall_delta',{path:'after'})),undefined);
 });
 test('missing bases, foreign request identities, changed calls and malformed patches stay unavailable instead of borrowing an old argument object',()=>{
- const base={type:'tool-call-snapshot',index:0,callId:'call',name:'read',boundary:'public-sdk-partial-tool-call-arguments',argsRaw:'{"path":"first"}'};
- const patch={...base,argsRaw:undefined,argsPatch:{units:'utf16-code-units',prefix:9,remove:5,insert:'next'}};
+ const base={type:'tool-call-snapshot',captureId:'capture-one',revision:1,index:0,callId:'call',name:'read',boundary:'public-sdk-partial-tool-call-arguments',argsRaw:'{"path":"first"}'};
+ const patch={...base,revision:2,argsRaw:undefined,argsPatch:{units:'utf16-code-units',baseRevision:1,prefix:9,remove:5,insert:'next'}};
  assert.equal(projectDsh(state([display(1,patch)])).trajectory.partial.blocks[0].kind,'other');
  const foreign=projectDsh(state([display(1,base),display(2,patch,'other')])).trajectory;assert(foreign.eventNodes.some(n=>n.interrupted));assert.equal(foreign.partial.blocks[0].kind,'other');assert.equal(foreign.partial.timing,undefined);
  assert.equal(projectDsh(state([display(1,base),display(2,{...patch,callId:'other'})])).trajectory.partial.blocks[0].kind,'other');
@@ -34,4 +34,9 @@ test('oversized, cyclic and excessive live captures expose a gap and reset safel
  const cycle={};cycle.self=cycle;clock=60;assert.equal(capture.update(update('toolcall_delta',cycle)).argsRaw,null);
  capture.begin();for(let i=0;i<128;i++){clock+=60;assert(capture.update(update('toolcall_start',{path:'small'},{index:i,id:'call'+i})));}const overflow=capture.update(update('toolcall_start',{path:'extra'},{index:128,id:'extra'}));assert.equal(overflow.argsRaw,null);clock+=60;assert.equal(capture.update(update('toolcall_delta',{path:'after cap'})),undefined);
  capture.begin();let bytes=0,gap;for(let i=0;i<12;i++){clock+=60;const row=capture.update(update(i?'toolcall_delta':'toolcall_start',{text:(i%2?'b':'a').repeat(450000)}));if(!row)break;if(row.argsRaw===null){gap=row;break;}bytes+=Buffer.byteLength(JSON.stringify(row));}assert(gap);assert(bytes<=2*1024*1024);assert.match(gap.reason,/budget/);capture.begin();assert.equal(capture.update(update('toolcall_start',{path:'recovered'})).argsRaw,'{"path":"recovered"}');
+});
+test('a lost intermediate SDK snapshot cannot make a later patch fabricate valid but different arguments',()=>{
+ let clock=0;const capture=new ToolArgumentSnapshots(()=>clock);capture.begin();const first=capture.update(update('toolcall_start',{path:'aaaa'}));clock=60;capture.update(update('toolcall_delta',{path:'bbbb'}));clock=120;const last=capture.update(update('toolcall_delta',{path:'bcbb'}));
+ const value=projectDsh(state([display(1,first),display(3,last)])).trajectory.partial.blocks[0];assert.equal(value.kind,'other','a missing patch base must show a gap, never the fabricated {path:"acaa"}');
+ capture.begin();clock=180;const fresh=capture.update(update('toolcall_start',{path:'fresh'}));const unknown=chunk=>({type:'assistant/chunk',turnId:'turn',data:{chunk}});const unlinked=projectDsh(state([{seq:1,...unknown(first)},{seq:2,...unknown(fresh)}])).trajectory;assert.equal(unlinked.partial.blocks[0].argsRaw,'{"path":"fresh"}');assert.equal(unlinked.partial.timing,undefined);assert.equal(unlinked.runningCalls.length,0);assert.equal(unlinked.eventNodes[0].interrupted,true,'a new capture never extends an earlier unlinked message');
 });

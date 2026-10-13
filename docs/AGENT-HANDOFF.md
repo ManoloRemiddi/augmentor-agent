@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified streamed arguments source](TRAJECTORY-TOOL-ARGUMENTS.md): final strict
+check/build and 70 MX files pass **357/357**, plus five packaging cases. Capture IDs
+and exact predecessor revisions reject lost updates without inventing arguments.
+Observed two-window shortcut races now use attested settings revisions and defer
+notifications during a pending edit; genuine peer/authority changes and unknown
+writes remain fenced, with no replay. Supplier GUI/CSS/records and dependencies
+remain unchanged. Ordinary/installed acceptance follows; selected MX stays timing
+008ef295 / 20261013-030020-abfa89ec. Earlier source counts below are checkpoints.
+
 [Streamed Trajectory arguments](TRAJECTORY-TOOL-ARGUMENTS.md) connects public Pi
 argument snapshots to the original pending Tool/Payload seats. Strict check/build
 and 70 source MX files pass **354/354**; the held-provider original GUI test proves

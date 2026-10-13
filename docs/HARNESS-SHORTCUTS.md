@@ -175,3 +175,46 @@ Previous MPL/native/Sharp/font source/rebuild and MIT-declaration notice-suffici
 requirements stay open. DSH remains available; further OS implementation waits
 for owner MX feedback. No public binary is published. Later documentation commits
 record the proof without changing selected runtime bytes.
+
+
+## Attested settings revisions — October 13
+
+The actual two-window original shortcut test exposes a delayed self-notification
+race: after a confirmed edit, the first window's later profile-revision poll
+starts another preference read. A keyboard press during that redundant read is
+silently passed through while the reference stays closed. A captured dispatch
+trace proves current/accepted state is false because preferences are loading;
+waiting for document focus alone does not resolve it. No argument proposal runs
+in this test's single tool-free seeded chat. Temporary source diagnostics are
+removed before qualification.
+
+The existing shortcuts.describe and shortcuts.edit replies now carry an optional
+settingsRevision from the current serialized Host settings. Accepted preference
+snapshots attest that profile revision. In the same operator scope, an older or
+matching delayed notification keeps those already-confirmed bindings available.
+A newer peer revision still requires a read and blocks dispatch until accepted;
+a changed epoch/connection/authority clears the attestation. Missing tags retain
+the older reload behavior, and malformed tags refuse. Lost/unconfirmed edits never
+attest a candidate or retry a write. A second full-run failure (355/356 passes)
+exposes the self notification arriving before its save reply. Same-scope
+notifications are now deferred while one edit is pending; no second edit is
+admitted. An exact tagged reply can confirm it without an intervening reload.
+A newer observed revision or a lost reply keeps the write unconfirmed and triggers
+a separate read of current stored bindings; that read does not convert a lost
+write into Saved or replay it. Authority/epoch loss still invalidates the receipt.
+Original persistence/registry/reference/
+recorder, gestures, markup and CSS remain unchanged.
+
+The new deterministic regression checks a confirmed self edit without a second
+read, a real peer edit requiring a fresh read and read-only/operator authority
+changes. The actual two-window record/stale review/reset/navigation/file/fork/new
+workflow passes with the original key gestures, unchanged deadlines and two
+workers. Its fixture additionally waits for actual document focus before input
+and retains DOM/focus/error diagnostics; it does not repeat lost keyboard actions.
+Combined argument/shortcut contracts and actual Chromium pass 15/15.
+The pending-write confirmed/peer/lost-reply regression and combined Chromium
+qualification then pass **16/16**. Final strict check/build and the complete source
+MX cohort pass **357/357 across 70 files**. Ordinary and installed qualification
+follows in the argument guide. This is shared
+profile/GUI code with Linux qualification; further OS implementation still awaits
+owner MX feedback and full migration/privacy/live/distribution gates stay open.

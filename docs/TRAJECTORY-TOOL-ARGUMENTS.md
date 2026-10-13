@@ -21,10 +21,13 @@ One message-scoped observer samples delta snapshots at most every 50 ms per call
 start/end updates are not delayed. Identical snapshots are omitted. Changes use
 bounded prefix/remove/insert patches in UTF-16 code units, preserving exact JS
 strings, including Unicode, without journaling repeated complete JSON prefixes.
-The first snapshot carries its full JSON base. A missing base, changed call identity,
-wrong request scope or invalid patch shows an explicit unavailable block rather
-than borrowing earlier arguments. Per-request timings still require an actual
-recorded request identity.
+The first snapshot carries its full JSON base. Every update carries an opaque
+message-capture ID and per-call revision; patches name their exact predecessor
+revision. These are observer identities, not invented provider/request IDs. A
+missing base or update, changed call identity, wrong request/message scope or
+invalid patch shows an explicit unavailable block rather than borrowing earlier
+arguments. A new unlinked SDK message cannot extend an older one. Per-request
+timings still require an actual recorded request identity.
 
 Capture is bounded to 128 calls per message, 512 KiB per serialized argument object,
 2 MiB of retained latest arguments and 2 MiB of encoded snapshot/patch capture.
@@ -47,7 +50,7 @@ layout, CSS and all 580 MIT/108 Apache supplier source records are unchanged.
 
 ## Qualification and deployment boundary
 
-Four deterministic contracts cover sampling/final flush, exact Unicode patches,
+Five deterministic contracts cover sampling/final flush, exact Unicode patches,
 interleaved calls, private-extra-field omission, missing/foreign/malformed bases,
 Stop/completion, cyclic/oversized/count/budget failures and next-message recovery.
 An actual isolated SDK/Host/Chromium test holds a deterministic provider's proposal,
@@ -58,11 +61,31 @@ preserves its history with exactly three wire requests across the two turns.
 The first focused GUI check expects an internal call ID as visible text; inspection
 shows the original Payload panel renders arguments and Pending/unknown-start status.
 The check is corrected to those actual controls without supplier changes. Final
-focused source qualification passes **14/14**, zero failures/skips/cancellations.
-Strict check/build pass. The complete source MX cohort passes **354/354 across
-70 files**, zero failures/skips/cancellations, with Node **24.19.0**, two workers,
-unchanged deadlines and matching isolated QtTest. Ordinary, immutable and manual
-installed qualification follow separately.
+focused source qualification initially passes **14/14**, and the first complete
+source MX cohort passes **354/354 across 70 files**. Review then adds a lost-update
+regression: the preceding d4e9510 code incorrectly applies a later patch to an old
+base, yielding a valid but different argument value. The failure is reproduced
+and retained before correcting capture/revision checks. Final focused source
+qualification passes **15/15**, zero failures/skips/cancellations, including lost
+updates and new unlinked messages. The revised complete run has **354/355 passes**:
+the original shortcut test times out reopening the first window's reference while
+the second window records a binding. An unchanged focused pair passes once, then
+the failure reproduces; an explicit document-focus wait does not resolve it.
+Temporary source diagnostics prove the first client is ready but its preference
+scope is loading after a delayed self settings notification. The source probe and
+its bundle are removed. [Attested shortcut settings revisions](HARNESS-SHORTCUTS.md#attested-settings-revisions--october-13)
+prevent that redundant self reload while retaining peer/authority invalidation.
+The combined argument/shortcut contracts and actual Chromium pair pass **15/15**.
+The next full run has **355/356 passes**, exposing the same notification arriving
+before an in-flight save reply. The scope now defers that notification until the
+write settles, accepting only an exact tagged confirmation or reconciling newer
+stored state without replay. Confirmed/peer/lost-reply contracts and the actual
+Chromium pair pass **16/16**. Earlier failures and source diagnostics are retained.
+Final strict check/build pass; the final complete source cohort passes **357/357
+across 70 files**, zero failures/skips/cancellations, with Node **24.19.0**, two
+workers, unchanged deadlines and matching isolated QtTest. Five notice/workspace
+packaging cases also pass. Ordinary, immutable and manual installed qualification
+follow separately.
 
 Current selected/running private MX remains timing runtime 008ef295 / release
 20261013-030020-abfa89ec; this source increment has not replaced it. The binding is
