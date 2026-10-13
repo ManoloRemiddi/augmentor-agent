@@ -1,6 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Latest qualified unselected Metafolder candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate):
+[Latest qualified unselected Metafolder navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate):
+runtime dfcdfb9 / private MX 20261013-190500-3bf1e21f has source/ordinary 454/454,
+five packaging and seven licence cases each, 204 sealed checks and 23,940 verified
+entries. It fixes rail Search and verifies directory/keyboard/view navigation.
+Current 97897cf Native retains a busy/unsent draft; no shutdown or activation occurs.
+Require a fresh comparator, guarded startup and installed acceptance. The Debian
+Office Wasm notice policy and wider migration/platform gates remain open.
+
+[Preceding qualified unselected Metafolder candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate):
 runtime 207aed2 / private MX 20261013-183219-4621b4e3 has source/ordinary 453/453,
 five packaging and seven licence cases each, 203 sealed checks and 23,940 verified
 entries. It includes the inspector cue, privacy guard and Linux branch recovery.

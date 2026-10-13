@@ -5,10 +5,16 @@ repairs the actual staged collapsed-rail Search gap without changing original UI
 geometry/CSS. Strict check/build and 12 focused cases pass; folder/Home/Up/hidden,
 keyboard/rail/focus/view choices create one workspace conversation, preserving
 parent history and request counts. The 86-file cohort adds the navigation case.
-New artifact qualification follows; current Native draft and both old selected
-and qualified immutable checkpoints are preserved. Full migration gates stay open.
+Runtime **dfcdfb9 / 20261013-190500-3bf1e21f** is qualified and unselected: source/
+ordinary **454/454 across 86 files**, five packaging/seven licence cases each,
+**204 sealed checks across 28 files**, all **23,940** entries verified. Artifact
+**59d2bb7bebd6869379e87a00200fb7e234b306e6af2a5ee8d38b4ee76dfb1b2b**.
+Only the Meta client/provenance changes; original CSS/dependencies/notices remain.
+Current Native draft and old selected/immutable checkpoints are preserved. Fresh
+idle/guarded installed acceptance and full migration gates stay open. Prior Linux
+CI now reaches Debian packaging, where Office Wasm notice policy remains a gap.
 
-[Latest qualified unselected Metafolder candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate)
+[Preceding qualified unselected Metafolder candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate)
 is runtime **207aed2 / 20261013-183219-4621b4e3**, product **0.2.13**, artifact
 **7907ad98577ca21c1444957fb5c21aa8ecef553a0e64d6021d83629ae7939276**.
 Final source/ordinary each pass **453/453 across 85 files** plus five packaging

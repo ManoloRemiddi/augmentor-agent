@@ -17,10 +17,42 @@ disable back to the original browser. Parent history and the real synthetic
 provider log stay identical; the existing fixture folder retains its exact bytes.
 Strict check/build and 12/12 focused cases across five files pass, including
 Metafolder private/failure/supplier/GUI, brand and original keyboard regression.
-The 86-file MX cohort now includes this case. Ordinary/sealed/new installed
-qualification follows; the immutable `207aed2` checkpoint below is not patched.
+The 86-file MX cohort now includes this case. Ordinary/sealed qualification is
+recorded below; installed acceptance remains separate and the immutable `207aed2`
+checkpoint is not patched.
 Live services, owner grouping import, broad corpus search, manual pointer ordering,
 accessibility, optional physical moves and the wider migration gates remain open.
+
+### Qualified navigation candidate
+
+Runtime **dfcdfb99987178d39249d61b8c8b2b98a5805ce0**, product **0.2.13**, is staged
+as **20261013-190500-3bf1e21f**, artifact
+**59d2bb7bebd6869379e87a00200fb7e234b306e6af2a5ee8d38b4ee76dfb1b2b**.
+Source and separate ordinary each pass **454/454 across 86 files**, plus five
+packaging and seven licence cases each. Actual sealed Node/runtime/SDK/GUI pass
+**204/204 across 28 files**, with matching ordinary drivers. Two workers, Node
+24.19.0, deadlines and no-skip scope are preserved. All **23,940** entries verify
+after testing; compiled, binding, licence and Node bytes match ordinary inputs.
+
+This is the latest **qualified unselected** candidate. It keeps the inspector cue,
+privacy and branch recovery. DSH's 580 MIT and Context's 108 Apache records,
+original brand/CSS, 151 npm instances/20,801 dependency files, nine native/Wasm
+binaries and all licence bodies remain unchanged. Only the marked Metafolder
+client and its two provenance records change from `207aed2`; the 788-record
+licence/provenance inventory has no additions. Original Meta CSS stays identical.
+
+Current **97897cf** remains selected/running, Native online with a busy/unsent
+draft. No owner shutdown/activation occurs. A fresh comparator including grouping
+record presence/bytes, normal guarded update/startup and installed acceptance are
+still required. Existing grouping/source/live/privacy/platform/full migration
+gates remain; older qualified candidates below are retained checkpoints.
+
+At prior `c7260c4`, Linux CI advances past Node/Qt validation and reaches Debian
+packaging. Native notice policy rejects
+`node_modules/@deepseek-ai/libreoffice-kit-wasm/assets/soffice.wasm` as unreviewed.
+The private preview's prior binary/notice manifest remains distinct; this public
+distribution gap must be resolved with exact reviewed provenance and notices,
+without broadening the executable whitelist. New-head CI stays separate.
 
 The Harness source now offers **Settings → Plugins → Metafolders**. Enabling it
 mounts the original public Metafolder browser; disabling it restores the existing

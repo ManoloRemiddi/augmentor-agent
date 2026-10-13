@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified Metafolder navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate)
+records the original directory/keyboard/rail/view checks and retained installation boundary.
+
 [Qualified unselected Metafolder artifact](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate)
 owns the combined source/ordinary/sealed evidence and guarded installation boundary.
 
