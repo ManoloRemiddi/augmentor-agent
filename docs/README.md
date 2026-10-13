@@ -1,15 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Original Branch/Fork ownership](HARNESS-BRANCH-CONTROLS.md) guards duplicate and late
-operations, changed drafts and explicit same-child reconciliation. Qualification
-is recorded separately from the selected preview.
+operations, changed drafts and explicit same-child reconciliation. The [current installed qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13) records source/ordinary
+380/380, immutable 68/68 and preserved owner state.
 
 - [Recorded Trajectory requests](TRAJECTORY-REQUEST-NUMBERING.md): original controls count only observed Pi provider requests; unlinked SDK receipts remain visible.
+
 [Nested original tool rows](TRAJECTORY-NESTED-TOOLS.md) binds public Pi child
 starts/results to existing SUBTOOL details, preserves scoped arguments/outcomes
 and corrects Context File Activity's reused-ID attribution. Source, ordinary and
-installed qualification are recorded separately. The current recorded-request correction is
-[selected/running in private MX](TRAJECTORY-REQUEST-NUMBERING.md#ordinary-and-installed-mx-qualification--october-13); full migration/platform
+installed qualification are recorded separately. The [current private MX selection](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13) retains these
+behaviors; full migration/platform
 gates remain open.
 
 [Streamed Trajectory tool arguments](TRAJECTORY-TOOL-ARGUMENTS.md) connects public

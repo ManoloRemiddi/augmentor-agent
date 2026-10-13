@@ -77,3 +77,46 @@ notice/workspace cases pass separately. Strict check/build also pass. This is
 source qualification; separate ordinary/immutable and installed read acceptance
 follow before changing the selected preview. Supplier records and CSS remain
 identical to the recorded-request selection.
+
+## Ordinary and installed MX qualification — October 13
+
+Runtime **a0c201174cf6f3ac7c5235a9b119d1a6e85b9bff**, private release **20261013-090703-abddfcd6**,
+product **0.2.13**, artifact **c92e6dbec5f8f113a5b01357675aa0eb50a71c4dddd7545e7fb36334fa019f66**, is selected and running.
+The separate ordinary assembly passes **380/380 across 74 files** and five
+packaging cases with the same Node 24.19.0, matching isolated QtTest, two workers
+and unchanged deadlines. It preserves 20,801 dependency files, 151 npm instances,
+nine native/Wasm executables, all 783 licence files and the three generated
+distribution records. All 580 MIT GUI/108 Apache dashboard records and supplier
+CSS are unchanged from the preceding selection; no pin or supplier notice changes.
+The compiled graph contains 663 files.
+
+The sealed candidate passes **68/68** argument, nested tool/Stop, original
+DSH/Context, shortcut, Branch/Fork and session-organization cases. Actual
+SDK/Host/browser fixtures use the candidate's bundled Node and compiled runtime
+and GUI; pure drivers match assembly source. Held/corrupt response tests retain
+exactly two wire requests and one read from the initial deliberate prompt;
+branching/reconciliation/reloading sends no additional model or tool work.
+Parents remain byte-identical, native prior tool messages survive in the child,
+and the newer unsent parent draft restores after browser reload. This is an
+authored provider qualification, separate from live-owner model evidence.
+
+Fresh maintenance audits show all nine counters zero and Native idle without a
+draft. Guarded close verifies previous process absence. Supported staging and
+activation explicitly select this candidate's own bundled Node; stable startup
+verifies the actual Host executable/main and Native's selected root. All
+**23,895** installed inventory entries pass before and after original-GUI reads.
+Twelve histories/queues and session identities remain unchanged; no new empty
+placeholder or request is created. Of 247 saved files, 243 remain identical, one
+journal retains its exact old prefix with one close/load each, and three related
+index/counter derivatives update. Draft/attachment bytes, settings/revision,
+auth/model profile presence/bytes, production selection and model-router
+executables/arguments remain preserved. Private PIDs/logs/comparators stay local.
+
+Installed owner acceptance opens original Context Insights: eleven nonarchived
+retained sessions, seven newest available contexts, zero failures/partial reads/
+usage gaps and explicit older/unlinked timing coverage. No owner prompt, branch,
+credential edit, model configuration write or endpoint discovery occurs. The
+dashboard remains open for feedback; screenshot/private proofs remain local.
+Earlier immutable releases are preserved. Full migration, cold unconfirmed-branch
+recovery, live/privacy/public-distribution/physical/platform gates and known CI
+failures remain open. Further OS implementation awaits owner MX feedback.

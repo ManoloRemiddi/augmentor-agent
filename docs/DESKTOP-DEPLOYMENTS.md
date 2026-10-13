@@ -1,16 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current installed MX preview](TRAJECTORY-REQUEST-NUMBERING.md#ordinary-and-installed-mx-qualification--october-13): runtime **1feaac8**,
-release **20261013-082620-e77f3b09**, product **0.2.13**, selected and running.
-Artifact **89829618c08be141af900cf630142df8e37e92a247745dfb608f302bdeecd125**.
-Original Trajectory numbers only recorded provider requests, preserving unlinked
-SDK receipts and nested details. Source/ordinary each pass **369/369 across 72
-files** plus five packaging cases; **52 immutable tests** and installed original
-Context Insights reads pass. All **23,894** entries and twelve histories/queues,
-drafts, profiles and model processes verify. One MIT view/provenance/notice changes;
-original layout/CSS and Apache dashboard records remain intact. Full migration,
-live/privacy/public-distribution/platform gates and CI failures stay open.
-Further OS implementation awaits owner MX feedback.
+[Current installed MX preview](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13): runtime **a0c2011**,
+release **20261013-090703-abddfcd6**, product **0.2.13**, selected and running.
+Artifact **c92e6dbec5f8f113a5b01357675aa0eb50a71c4dddd7545e7fb36334fa019f66**.
+Original message Branch and sidebar/keyboard Fork guard duplicate clicks, late
+responses, changed drafts and explicit same-child reconciliation. Source/ordinary
+each pass **380/380 across 74 files** plus five packaging cases; **68 immutable
+tests** and installed original Context Insights reads pass. All **23,895** entries
+and twelve histories/queues, drafts, profiles and model processes verify. Supplier
+GUI/CSS, 580 MIT/108 Apache records, licence bodies and dependencies are unchanged.
+Full migration, cold unconfirmed-branch recovery, live/privacy/distribution/platform
+gates and CI failures remain open. Further OS implementation awaits MX feedback.
 
 The dated selection statements below are historical checkpoints, superseded by
 the current qualification above.

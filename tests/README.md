@@ -14,16 +14,16 @@ retired selection/metadata responses and keep failed reads unconfirmed without a
 cancel/work retry. The exact held-poll browser regression fails on the interim
 02a55a9 immutable GUI and passes on corrected source/artifact.
 
-[Latest qualified MX cohort](../docs/TRAJECTORY-REQUEST-NUMBERING.md#ordinary-and-installed-mx-qualification--october-13): runtime **1feaac8**,
-release **20261013-082620-e77f3b09**, product **0.2.13**, selected and running.
-Original Trajectory numbers only recorded provider requests, preserving unlinked
-SDK receipts and nested details. Source/ordinary each pass **369/369 across 72
-files** plus five packaging cases; **52 immutable tests** and installed original
-Context Insights reads pass. All **23,894** entries and twelve histories/queues,
-drafts, profiles and model processes verify. One MIT view/provenance/notice changes;
-original layout/CSS and Apache dashboard records remain intact. Full migration,
-live/privacy/public-distribution/platform gates and CI failures stay open.
-Further OS implementation awaits owner MX feedback.
+[Latest qualified MX cohort](../docs/HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13): runtime **a0c2011**,
+release **20261013-090703-abddfcd6**, product **0.2.13**, selected and running.
+Original message Branch and sidebar/keyboard Fork guard duplicate clicks, late
+responses, changed drafts and explicit same-child reconciliation. Source/ordinary
+each pass **380/380 across 74 files** plus five packaging cases; **68 immutable
+tests** and installed original Context Insights reads pass. All **23,895** entries
+and twelve histories/queues, drafts, profiles and model processes verify. Supplier
+GUI/CSS, 580 MIT/108 Apache records, licence bodies and dependencies are unchanged.
+Full migration, cold unconfirmed-branch recovery, live/privacy/distribution/platform
+gates and CI failures remain open. Further OS implementation awaits MX feedback.
 
 Earlier counts/deployment statements below are historical checkpoints.
 
@@ -1027,3 +1027,12 @@ Original shortcuts: `harness-shortcuts.test.mjs` checks original durable/dormant
 The shortcut fixtures now retain actual focus/DOM/error diagnostics and wait for the selected document to have keyboard focus before input. A new scope contract checks attested self settings notifications, mandatory peer reads and authority invalidation. [Observed race and correction](../docs/HARNESS-SHORTCUTS.md#attested-settings-revisions--october-13).
 
 Trajectory tool identity additionally covers reused SDK IDs across Host turns and SDK requests in one turn, exact chat/argument/result/schema/timing ownership, raw-ID preservation and unlinked captures. The Chromium check selects the second same-ID proposal and retains its details through actual completion at an explicit 1280×720 viewport. The old authored projection can be selected with AUGMENTOR_DSH_PROJECTION_OVERRIDE for the retained failing comparator; defaults always use current source.
+
+Original Branch/Fork: `harness-branch-controls.test.mjs` qualifies loaded-controller
+identity/navigation/error ownership; `harness-branch-controls-chromium.test.mjs`
+holds/corrupts actual RPC acknowledgments through original controls, verifies one
+child per intent, exact native tool context, unchanged parent originals and
+restored newer drafts with two initial wire requests/one read and no replay. The
+old immutable 1feaac8 fails the duplicate-click case. Closing the original error
+modal and waiting for a ready composer are user lifecycle steps, not relaxed
+assertions. Cold unconfirmed-operation recovery and broader migration remain open.

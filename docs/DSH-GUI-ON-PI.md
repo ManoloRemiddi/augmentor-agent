@@ -1,15 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current installed MX preview](TRAJECTORY-REQUEST-NUMBERING.md#ordinary-and-installed-mx-qualification--october-13): runtime **1feaac8**,
-release **20261013-082620-e77f3b09**, product **0.2.13**, selected and running.
-Original Trajectory numbers only recorded provider requests, preserving unlinked
-SDK receipts and nested details. Source/ordinary each pass **369/369 across 72
-files** plus five packaging cases; **52 immutable tests** and installed original
-Context Insights reads pass. All **23,894** entries and twelve histories/queues,
-drafts, profiles and model processes verify. One MIT view/provenance/notice changes;
-original layout/CSS and Apache dashboard records remain intact. Full migration,
-live/privacy/public-distribution/platform gates and CI failures stay open.
-Further OS implementation awaits owner MX feedback.
+[Current installed MX preview](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13): runtime **a0c2011**,
+release **20261013-090703-abddfcd6**, product **0.2.13**, selected and running.
+Original message Branch and sidebar/keyboard Fork guard duplicate clicks, late
+responses, changed drafts and explicit same-child reconciliation. Source/ordinary
+each pass **380/380 across 74 files** plus five packaging cases; **68 immutable
+tests** and installed original Context Insights reads pass. All **23,895** entries
+and twelve histories/queues, drafts, profiles and model processes verify. Supplier
+GUI/CSS, 580 MIT/108 Apache records, licence bodies and dependencies are unchanged.
+Full migration, cold unconfirmed-branch recovery, live/privacy/distribution/platform
+gates and CI failures remain open. Further OS implementation awaits MX feedback.
 
 [Installed original Context timing](CONTEXT-TIMING.md#ordinary-and-installed-mx-qualification--october-13): runtime **008ef29551406fa08f21508d548603a6f9200f81**, private MX **20261013-030020-abfa89ec**, product **0.2.13**, artifact **5d6596b90da90856cfa1b670bf5be6f6c58c52e0ea3b08786bbc22ae6a19253e**, selected and running. Source and ordinary each pass **349/349 across 68 files** plus five packaging cases; thirteen immutable tests and actual original Context/Insights acceptance pass. All **23,885** entries and twelve histories/queues, drafts, profile/auth/model and production/router state are preserved. Apache-2.0 dashboard layout/CSS/card/strip and all 580 MIT GUI records remain intact; one already-marked timing seat changes. Older logs stay explicit. Full migration/live/privacy/public distribution/platform and known CI gaps remain open; prior selection statements below are historical checkpoints.
 

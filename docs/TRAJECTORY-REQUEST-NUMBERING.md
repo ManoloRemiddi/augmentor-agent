@@ -2,6 +2,9 @@
 
 # Recorded provider requests in original Trajectory
 
+[Current selected/running qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13) supersedes the dated
+recorded-request installation below; its behavior remains part of the current build.
+
 The original DSH Trajectory inferred request controls for every unmatched assistant
 step. Pi can emit an empty aborted assistant receipt after a tool Stop without a
 new provider payload hook. That receipt must remain visible, but it cannot attest
