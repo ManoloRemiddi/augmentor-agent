@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Latest qualified unselected combined candidate](HARNESS-BRANCH-PUBLICATION.md#qualified-ordinary-and-immutable-candidate):
+runtime 2c4ca0b / private MX 20261013-160540-d88ebd3c has source/ordinary 443/443,
+five packaging cases each, 192 sealed checks and 23,922 verified entries. It retains
+the privacy guard below and adds Linux attested branch publication. Current
+appearance selection remains online/ready with a Native draft/busy flag. No
+shutdown/activation is attempted; later adoption requires a new idle comparator
+and guarded updater/startup/installed checks. Other platform/full migration gates
+remain open. The preceding privacy-only artifact below is a retained checkpoint.
+
 [Qualified unselected privacy candidate](PI-PRIVACY.md#qualified-ordinary-and-immutable-candidate):
 runtime 4f017bf / private MX 20261013-145220-9a44aaaa has source/ordinary 432/432,
 five packaging cases each, 181 sealed checks and 23,918 verified entries. Current

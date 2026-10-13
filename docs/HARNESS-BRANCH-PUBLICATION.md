@@ -96,3 +96,31 @@ cases and the existing original GUI/cold branch/goal/first-input Edit contracts.
 It covers the final dangling-directory fix and confirmed commitment despite
 cleanup refusal. Ordinary/immutable and later installed adoption are separate
 gates; current Native remains online/model-ready with a busy/draft flag.
+
+### Qualified ordinary and immutable candidate
+
+Implementation **2c4ca0be1fa37392f894539ba785e2f22b584b96** is separately staged as
+**20261013-160540-d88ebd3c**, product **0.2.13**, artifact
+**e04c46a57b8fd6a013551418c4271337a181136ccb49ca2ab5d07e17219432ce**.
+This combined candidate includes the qualified [managed Pi privacy guard](PI-PRIVACY.md).
+It is **qualified and unselected**. Source and separate ordinary each pass
+**443/443 across 82 files** plus five packaging cases; **192 sealed checks across
+23 files** pass with actual bundled Node **24.19.0**, candidate runtime/SDK/GUI and
+matching ordinary drivers. All **23,922** immutable entries verify after testing;
+compiled runtime/GUI, app bindings, licences and Node match ordinary inputs.
+
+GUI inputs and runtime supplier source remain byte-identical to the preceding
+privacy artifact. Its 151 npm instances/20,801 dependency files, nine native/Wasm
+binaries, 786 licence/provenance files and 580 MIT/108 Apache records retain their
+bytes. Fresh GUI rebuilding can change temporary spreadsheet-overlay paths and
+derived chunk names; original controls qualify without a source/layout change.
+No selected artifact is patched.
+
+Current selected/running MX remains **97897cf / 20261013-142001-1f7f7f96**.
+A fresh Native maintenance read is online/model-ready but busy with an unsent
+draft; no shutdown or activation is attempted. Adoption requires a new idle
+comparator, guarded updater/startup and installed acceptance. The older privacy
+candidate remains a retained checkpoint; this combined candidate is the latest
+qualified implementation. Installed-owner visual acceptance, ambiguous legacy
+repair, Windows/macOS adapters, live/privacy/public distribution/CI and complete
+migration gates remain separate. DSH remains available for unqualified workflows.

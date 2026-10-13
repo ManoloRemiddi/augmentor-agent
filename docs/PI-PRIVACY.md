@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [latest qualified combined candidate](HARNESS-BRANCH-PUBLICATION.md#qualified-ordinary-and-immutable-candidate)
+retains this guard and adds Linux branch publication recovery. The privacy-only
+artifact below is its preceding unselected checkpoint; installed MX remains the
+appearance runtime until guarded idle adoption qualifies.
+
 # Managed Pi privacy
 
 Augmentor-managed SDK sessions disable install reporting, experimental analytics,

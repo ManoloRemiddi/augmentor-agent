@@ -1,14 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Qualified Linux branch publication source](HARNESS-BRANCH-PUBLICATION.md#qualified-source)
+[Qualified unselected combined Linux branch publication](HARNESS-BRANCH-PUBLICATION.md#qualified-ordinary-and-immutable-candidate)
 finishes attested Fork/Edit saves after denied writes or SIGKILL at each link.
 The same native child and later user work survive explicit recovery with no
 inference or child agent creation during publication. Public persisted SDK label/
 compaction/discovery equivalence, changed/foreign/private records and cleanup
 refusal pass. Strict check/build, **443/443 across 82 MX files** and five packaging
-cases pass. Ordinary/immutable/adoption evidence follows separately. Unattested
-legacy partial children and further-platform adapters remain open. Current Native
-has a draft/busy flag; no shutdown or activation is attempted.
+cases pass. Separate ordinary matches those counts; **192 sealed checks** and all
+**23,922** entries verify in candidate **20261013-160540-d88ebd3c**, runtime
+**2c4ca0b**, artifact **e04c46a57b8fd6a013551418c4271337a181136ccb49ca2ab5d07e17219432ce**.
+It includes the privacy guard below, preserving GUI inputs, suppliers/dependencies
+and licence bytes. Unattested legacy partial children and further-platform adapters
+remain open. Current Native has a draft/busy flag; no shutdown/activation occurs.
+Require a fresh idle comparator and guarded adoption/installed acceptance. This
+is the latest qualified candidate; the older privacy artifact remains a checkpoint.
 
 [Qualified unselected managed Pi privacy](PI-PRIVACY.md#qualified-ordinary-and-immutable-candidate) enforces
 the process opt-out at all three SDK creation paths. Real preceding chat,
