@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`harness-nested-tools.test.mjs` checks scoped parent trees, independent outcomes,
+legal long IDs, unavailable legacy arguments and Context File Activity's exact
+earlier inputs. `harness-nested-tools-chromium.test.mjs` uses the public SDK,
+original approval/SUBTOOL UI, real reads, a held child, Stop, repeated IDs, an error
+sibling and a fresh Host, with unchanged native/display originals and no replay.
+It accepts only exact departing old-Host polling refusal during deliberate shutdown;
+new-Host/UI errors fail. The existing argument test additionally checks encoded
+shared/count/per-call limits. See [nested tool boundaries and qualification](../docs/TRAJECTORY-NESTED-TOOLS.md).
+
 [Latest qualified MX cohort](../docs/TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13):
 runtime **a49d58d**, final source and separate ordinary **358/358 across 70 files**,
 five packaging cases in each, zero failures/skips/cancellations, Node **24.19.0**,

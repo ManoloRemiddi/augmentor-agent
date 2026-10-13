@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 /** Read-only display projection. Native Pi history remains authoritative. */
-export function projectChat(events,{running=false}={}){
+export function projectChat(events,{running=false,toolBindings}={}){
  const items=[],tools=new Map();let pending={text:'',thinking:''},pendingItem;
  const flush=(status=running?'streaming':'partial',keep=false)=>{
   if(pending.text||pending.thinking){
@@ -32,10 +32,10 @@ export function projectChat(events,{running=false}={}){
    items.push({kind:'user',seq:event.seq,text:(data.submittedContent??data.content??[]).filter(p=>p.type==='text').map(p=>p.text||'').join('\n')});
   }else if(event.type==='tool/call'){
    flush('complete');const item={kind:'tool',seq:event.seq,name:data.name,toolCallId:data.toolCallId,status:'pending'};
-   items.push(item);tools.set(data.toolCallId,item);
+   items.push(item);tools.set(toolBindings?.get(event.seq)?.id??data.toolCallId,item);
   }else if(event.type==='tool/result'){
-   const tool=tools.get(data.toolCallId);
-   if(tool){tool.status=data.isError?'error':'finished';tools.delete(data.toolCallId);}
+   const id=toolBindings?.get(event.seq)?.id??data.toolCallId,tool=tools.get(id);
+   if(tool){tool.status=data.isError?'error':'finished';tools.delete(id);}
   }else if(event.type==='turn/end'){
    const reason=data.reason?.kind||'interrupted';flush(reason);
    for(const tool of tools.values())tool.status='outcome unknown';tools.clear();

@@ -9,10 +9,22 @@ export class ToolArgumentSnapshots {
   private captureId='';
   private capturedBytes=0;
   private exhausted=false;
+  private executionCalls=0;
   constructor(private clock=()=>performance.now()){}
   identity(){return this.captureId||undefined;}
-  begin(){this.calls.clear();this.captureId=randomUUID();this.capturedBytes=0;this.exhausted=false;this.active=true;}
+  begin(){this.calls.clear();this.captureId=randomUUID();this.capturedBytes=0;this.executionCalls=0;this.exhausted=false;this.active=true;}
   end(){this.calls.clear();this.active=false;}
+  /** Nested starts have no assistant proposal. Retain bounded public arguments only. */
+  captureExecutionArguments(args:unknown){
+    const base={argsBoundary:'public-sdk-tool-execution-start-before-validation'};
+    if(this.executionCalls++>=256)return {...base,argsRaw:null,argsUnavailableReason:'Nested SDK argument call-count limit reached.'};
+    let raw:string|undefined;try{raw=JSON.stringify(args);}catch{/* Display cannot affect the SDK pipeline. */}
+    const bytes=raw===undefined?0:Buffer.byteLength(raw);
+    const snapshot={...base,argsRaw:raw},encoded=raw===undefined||bytes>512*1024?0:Buffer.byteLength(JSON.stringify(snapshot));
+    const reason=raw===undefined?'SDK arguments cannot be represented as JSON.':bytes>512*1024?'Nested SDK arguments exceed the per-call display limit.':this.capturedBytes+encoded>2*1024*1024?'SDK message argument capture budget reached.':undefined;
+    if(reason)return {...base,argsRaw:null,argsUnavailableReason:reason};
+    this.capturedBytes+=encoded;return {...base,argsRaw:raw!};
+  }
   update(event:AssistantMessageEvent){
     if(!this.active||this.exhausted||!['toolcall_start','toolcall_delta','toolcall_end'].includes(event.type)||!('contentIndex' in event)||!Number.isSafeInteger(event.contentIndex)||event.contentIndex<0||event.contentIndex>4095)return;
     const call=event.type==='toolcall_end'?event.toolCall:'partial' in event?event.partial.content[event.contentIndex]:undefined;

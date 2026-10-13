@@ -27,6 +27,9 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'){
  writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[extension],skills:[]}));
 }
 const model=http.createServer(async(req,res)=>{
+  if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'&&req.method==='POST'&&req.url==='/fixture/release-nested'){
+    writeFileSync(join(root,'release-nested'),'Authored fixture release.');res.writeHead(204).end();return;
+  }
   if(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'&&req.method==='POST'&&req.url==='/fixture/release-arguments'){
     if(!releaseArguments){res.writeHead(409).end();return;}releaseArguments();res.writeHead(204).end();return;
   }
@@ -43,6 +46,11 @@ const model=http.createServer(async(req,res)=>{
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null,usage)=>res.write('data: '+JSON.stringify({id:'fixture',object:'chat.completion.chunk',model:'harness-fixture',choices:[{index:0,delta,finish_reason:finish}],...(usage?{usage}:{})})+'\n\n');
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
+  if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'&&JSON.stringify(lastUser?.content).includes('NESTED_TRAJECTORY')){
+    if(!afterTool)chunk({role:'assistant',tool_calls:[{index:0,id:'fixture_nested_root',type:'function',function:{name:'fixture_outer',arguments:JSON.stringify({path:join(workspace,'note.txt'),label:JSON.stringify(lastUser.content).includes('STOP')?'nested-stop':'nested-complete'})}}]},'tool_calls');
+    else chunk({role:'assistant',content:'The authored nested trajectory fixture finished.'},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});
+    res.end('data: [DONE]\n\n');return;
+  }
   if(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'&&JSON.stringify(lastUser?.content).includes('ARGUMENT_STREAM')){
     if(afterTool){chunk({role:'assistant',content:'The authored argument stream completed one real read.'},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});res.end('data: [DONE]\n\n');return;}
     const args=JSON.stringify({path:join(workspace,'note.txt')}),middle=Math.floor(args.length/2),almost=args.length-3;
@@ -131,6 +139,12 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
 }
 const lazy=process.env.AUGMENTOR_HARNESS_PROOF_LAZY==='1';
 const fixtureEnv={...process.env,HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
+if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'){
+ const extension=join(root,'nested-tools.mjs'),resourcePath=join(config,'resources.json');
+ writeFileSync(extension,readFileSync(join(source,'scripts/fixtures/nested-tool-extension.mjs'),'utf8'));
+ const resources=existsSync(resourcePath)?JSON.parse(readFileSync(resourcePath,'utf8')):{sources:[],skills:[]};resources.sources.push(extension);writeFileSync(resourcePath,JSON.stringify(resources));
+ fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_RELEASE=join(root,'release-nested');
+}
 const prompts=process.env.AUGMENTOR_HARNESS_PROOF_PROMPTS==='1'?spawn(process.env.AUGMENTOR_PYTHON??'python3',['-Xutf8','-B',join(source,'services/prompt-library/service.py')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','ignore','pipe']}):null;
 prompts?.stderr.on('data',data=>process.stderr.write(data));
 prompts?.on('error',error=>process.stderr.write('Fixture prompt service: '+error.message+'\n'));
@@ -168,7 +182,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{})}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;

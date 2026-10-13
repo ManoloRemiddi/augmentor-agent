@@ -1,6 +1,8 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {contextFrame} from './dsh-context-frame.mjs';
 import {foldTimingRecords} from './dsh-context-timing.mjs';
+import {toolOwnership,observedTool} from './dsh-call-identity.mjs';
+import {scopedToolResults} from './dsh-tool-tree.mjs';
 const number=x=>typeof x==='number'&&Number.isFinite(x)&&x>=0?x:0;
 const empty=()=>({system:0,tools:0,user:0,inject:0,skill:0,assistant:0,tool:0,total:0});
 const estimate=text=>text?Math.ceil(text.length/4)+4:0;
@@ -90,11 +92,11 @@ export function projectDshContext(state){
   // The supplier marker asserts a saved compaction. Attempts remain in raw
   // records/coverage; feeding them here would falsely label them completed.
   const events=compactionAttempts.filter(r=>receipts.get(r.data.operationId)?.state==='completed'||r.data.returnedSummary===true).map(r=>{const receipt=receipts.get(r.data.operationId);return {seq:nextSeq(r)!==undefined?nextSeq(r)-0.5:++ordinal,time:r.time,kind:'compaction',committed:true,detail:`Pi summary saved${receipt?.entryId?` as native entry ${receipt.entryId}`:''}. SDK context estimate before: ${receipt?.tokensBefore??r.data.tokensBefore??'unavailable'}; after: ${receipt?.estimatedTokensAfter??r.data.estimatedTokensAfter??'unavailable'}. Original history is preserved.`};});
-  const completed=state.events??[],toolCalls=new Map();
-  for(const event of completed)for(const block of event.data?.message?.content??[])if(block.type==='toolCall')toolCalls.set(block.id,block);
+  const completed=state.events??[],ownership=toolOwnership(completed);
   const fileOps=[];
-  for(const result of completed.filter(e=>e.type==='tool/result')){const call=toolCalls.get(result.data.toolCallId),kind={read:'read',write:'write',edit:'write',grep:'search',glob:'search'}[call?.name],path=call?.arguments?.path;if(!kind||typeof path!=='string')continue;
-    fileOps.push({seq:[...nodes,...archive].find(n=>n.callId===result.data.toolCallId)?.seq??++ordinal,path,kind,tool:call.name,time:(state.records??[]).find(r=>r.kind==='tool/end'&&r.data.toolCallId===result.data.toolCallId)?.time,err:result.data.isError===true,added:0,removed:0});}
+  for(const {event:result,binding,call} of scopedToolResults(completed,ownership)){const kind={read:'read',write:'write',edit:'write',grep:'search',glob:'search'}[call.name],path=(call.arguments??call.args)?.path;if(!kind||typeof path!=='string')continue;
+    // Operation ordinals are presentation-only, not provider message identities.
+    fileOps.push({seq:++ordinal,path,kind,tool:call.name,time:observedTool(state.records??[],'tool/end',result,binding)?.time,err:result.data.isError===true,added:0,removed:0});}
   const timing=foldTimingRecords(state.records??[]);
   const timeline={ok:true,model:latest?.data.model,provider:latest?.data.provider,...(capacity?{contextWindow:capacity}:{}),current,nodes,archive,droppedNodes:0,requests:requestRecords,events,fileOps,cost,...(timing.timing?{timing:timing.timing,...(timing.spans?{spans:timing.spans}:{})}:{}),
     counts:{turns:turns.size,steps:requests.length,injects:0,compactions:events.filter(e=>e.kind==='compaction'&&e.committed).length,prunes:events.filter(e=>e.kind==='prune').length},

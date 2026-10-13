@@ -11,7 +11,8 @@ Earlier checkpoints below are historical, including the interim reused-ID failur
 The copied DSH Trajectory now receives tool-call argument updates from the public
 Pi SDK while the assistant is still generating. Its existing pending Tool row and
 Payload panel show the proposed arguments; Started remains unavailable until a
-real SDK tool dispatch is observed. Streaming a proposal grants no execution
+public SDK tool-execution-start is observed. That event marks the pipeline before
+validation/approval, not proof of approved dispatch or effects. Streaming a proposal grants no execution
 authority, creates no running-tool receipt and invokes no tool.
 
 ## Ownership, representation and limits
@@ -50,8 +51,10 @@ No telemetry exporter, credential UI, model settings or network dependency is ad
 
 Final assistant messages replace the provisional blocks, including SDK-aborted
 messages. An absent final message freezes its captured prefix as interrupted;
-completion time/usage remain unknown. Only actual public tool dispatch/results
-populate running/settled tool seats. The original supplier renderer, widgets,
+completion time/usage remain unknown. Public SDK tool-execution-start/end events
+populate running/settled seats; an error/result does not certify effects.
+[Nested tools](TRAJECTORY-NESTED-TOOLS.md) retain explicit child relationships and
+bounded start arguments without changing execution. The original supplier renderer, widgets,
 layout, CSS and all 580 MIT/108 Apache supplier source records are unchanged.
 
 ## Qualification and deployment boundary

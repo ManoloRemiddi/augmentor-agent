@@ -74,6 +74,8 @@
     "tests/step-timing.test.mjs",
     "tests/pi-step-timing.test.mjs",
     "tests/tool-argument-snapshots.test.mjs",
-    "tests/harness-tool-arguments-chromium.test.mjs"
+    "tests/harness-tool-arguments-chromium.test.mjs",
+    "tests/harness-nested-tools.test.mjs",
+    "tests/harness-nested-tools-chromium.test.mjs"
   ]
 }

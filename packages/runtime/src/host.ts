@@ -374,7 +374,7 @@ export class Host {
         this.append(m,'assistant/message',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,message:{content:e.message.content,stopReason:e.message.stopReason,timestamp:e.message.timestamp,usage:e.message.usage}});
         record!.failed=e.message.stopReason==='error';if(record!.failed&&!record!.steering?.waiting)this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});
       }
-      if(e.type==='tool_execution_start')this.append(m,'tool/call',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId}:{})});
+      if(e.type==='tool_execution_start')this.append(m,'tool/call',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId,...toolArguments.captureExecutionArguments(e.args)}:{})});
       if(e.type==='tool_execution_end')this.fileReferences.invalidate(m.id);
       if(e.type==='tool_execution_end')this.append(m,'tool/result',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId}:{}),isError:e.isError,result:{...e.result,content:e.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Tool image omitted from this display projection; inspect native evidence]'}:part)}});
       if(e.type==='agent_end'){messageCaptureId=undefined;toolArguments.end();}

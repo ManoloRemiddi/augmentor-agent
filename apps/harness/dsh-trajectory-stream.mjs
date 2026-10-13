@@ -42,8 +42,8 @@ export function trajectoryStream(state,nodes,turnIds,ownership=toolOwnership(sta
       // The final SDK message owns all its delta bytes, including Stop/error.
       pending=null;const node=bySeq.get(event.seq);if(node){node.step=nextStep(t);steps.set(t,node.step);}
     }
-    if(event.type==='tool/call'&&!data.parentToolCallId)activeCalls.set(data.toolCallId,{event,turn:t});
-    if(event.type==='tool/result')activeCalls.delete(data.toolCallId);
+    if(event.type==='tool/call'&&!data.parentToolCallId)activeCalls.set(ownership.get(event.seq)?.id,{event,turn:t});
+    if(event.type==='tool/result')activeCalls.delete(ownership.get(event.seq)?.id);
     if(event.type==='turn/end'){finish();activeCalls.clear();}
   }
   const running=state.sessions.find(row=>row.sessionId===state.sessionId)?.running===true;

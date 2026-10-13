@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Nested original tool rows](TRAJECTORY-NESTED-TOOLS.md) binds public Pi child
+starts/results to existing SUBTOOL details, preserves scoped arguments/outcomes
+and corrects Context File Activity's reused-ID attribution. Source, ordinary and
+installed qualification are recorded separately; the selected preview is unchanged
+until guarded immutable adoption.
+
 [Streamed Trajectory tool arguments](TRAJECTORY-TOOL-ARGUMENTS.md) connects public
 Pi argument snapshots to the original pending Tool/Payload seats, with bounded
 patch capture, explicit gaps and no dispatch from inspection.

@@ -2,6 +2,7 @@
 import {projectChat} from './chat-projection.js';
 import {trajectoryStream} from './dsh-trajectory-stream.mjs';
 import {callScope,callViewId,toolOwnership,observedTool} from './dsh-call-identity.mjs';
+import {attachToolChildren,retainedToolArguments} from './dsh-tool-tree.mjs';
 const blocks=(content,scope)=>(content||[]).flatMap(p=>p.type==='text'?[{kind:'text',text:p.text||''}]:['thinking','reasoning'].includes(p.type)?[{kind:'reasoning',text:p.thinking??p.text??''}]:['toolCall','tool-call'].includes(p.type)?[{kind:'tool-call',callId:callViewId(scope,p.id??p.callId),sdkCallId:p.id??p.callId,name:p.name,argsRaw:JSON.stringify(p.arguments??p.args??{}),subCalls:[]}]:[]);
 const usage=u=>u?{inputTokens:u.input,outputTokens:u.output,cacheReadTokens:u.cacheRead,cacheWriteTokens:u.cacheWrite}:undefined;
 /** Pure projection into DSH presentation contracts. Missing timestamps remain absent. */
@@ -28,9 +29,10 @@ export function projectDsh(state){
     if(n){eventNodes.push(n);locations.set(e.seq,{kind:'session'});}
   }
   const live=trajectoryStream(state,eventNodes,turnIds,ownership);
+  const trajectoryNodes=attachToolChildren(state,eventNodes,live.runningCalls,ownership);
   for(const node of eventNodes)locations.set(node.seq,{kind:'session'});
   // The existing streaming projection removes overlaps with durable final messages.
-  const visible=projectChat(state.events,{running});let ordinal=0,currentTurn=0;
+  const visible=projectChat(state.events,{running,toolBindings:ownership});let ordinal=0,currentTurn=0;
   for(const item of visible){
     const key=item.seq?'event:'+item.seq:'tail:'+ordinal,anchorSeq=item.seq??state.events.at(-1)?.seq??0;
     let n;
@@ -39,7 +41,7 @@ export function projectDsh(state){
       n={kind:'user',data};navigation.push({turn:currentTurn,anchorKey:key,prompt:item.text.slice(0,100),response:''});
     }
     if(item.kind==='assistant')n={kind:'assistant-step',data:{blocks:[...(item.thinking?[{kind:'reasoning',text:item.thinking}]:[]),...(item.text?[{kind:'text',text:item.text}]:[])],step:ordinal,status:item.status==='streaming'?'running':item.partial?'interrupted':'complete',...(item.seq?{finalNode:{seq:item.seq}}:{})}};
-    if(item.kind==='tool'){const binding=ownership.get(item.seq),proposal=state.events.find(e=>e.seq===binding?.proposalSeq);n={kind:'pi-tool',data:{...item,call:proposal?.data.message?.content?.find(p=>(p.id??p.callId)===item.toolCallId),result:state.events.find(e=>e.type==='tool/result'&&ownership.get(e.seq)?.id===binding?.id)?.data.result}};}
+    if(item.kind==='tool'){const binding=ownership.get(item.seq),proposal=state.events.find(e=>e.seq===binding?.proposalSeq),start=state.events.find(e=>e.seq===item.seq),raw=retainedToolArguments(start?.data??{}),call=proposal?.data.message?.content?.find(p=>(p.id??p.callId)===item.toolCallId)??(raw===undefined?undefined:{name:item.name,arguments:JSON.parse(raw)});n={kind:'pi-tool',data:{...item,call,result:state.events.find(e=>e.type==='tool/result'&&ownership.get(e.seq)?.id===binding?.id&&ownership.get(e.seq)?.startSeq===item.seq)?.data.result}};}
     if(['status','warning'].includes(item.kind))n={kind:'pi-notice',data:item};
     if(n)chatNodes.set(key,{...n,key,anchorSeq,location:{kind:'session'}});ordinal++;
   }
@@ -64,5 +66,5 @@ export function projectDsh(state){
     return [{purpose:'assistant',startSeq:previous?.seq??result?.seq??pending.firstSeq,...(result?{resultSeq:result.seq}:{}),turn,step,startedAt:r.time,completedAt:end?.time??null,status:end?['aborted','error'].includes(end.data.stopReason)?'error':'complete':'running',requestConfig:{provider:r.data.provider,model:r.data.model,reasoningEffort:r.data.thinkingLevel},providerMetadata:{provider:r.data.provider,model:r.data.model},usage:end?.data.usage,...(prompt?{prompt}:{})}];
   });
   const inbox={'next-turn':(state.queue?.items||[]).filter(x=>x.canRemove).map(x=>({id:x.id,source:{kind:'user',rpcId:x.id},content:x.message?.content||[]})),'next-step':[]};
-  return {chat,trajectory:{eventNodes,eventLocations:locations,requests,callSchemas,partial:live.partial,runningCalls:live.runningCalls},session:{running,blank:!visible.length,openState:state.phase==='loading'?'loading':'open',openError:null,hasMore:state.hasMore,loadingOlder:false,pendingSubmissions:[],subagent:null,removed:false,promptError:null},conversation:{activeTargets:new Set(visible.length?['chat','trajectory']:[]),views:{get:()=>undefined,grouped:()=>undefined}},projection:{contextPressure:pressure,inbox,goal:state.goal?.goal}};
+  return {chat,trajectory:{eventNodes:trajectoryNodes,eventLocations:locations,requests,callSchemas,partial:live.partial,runningCalls:live.runningCalls},session:{running,blank:!visible.length,openState:state.phase==='loading'?'loading':'open',openError:null,hasMore:state.hasMore,loadingOlder:false,pendingSubmissions:[],subagent:null,removed:false,promptError:null},conversation:{activeTargets:new Set(visible.length?['chat','trajectory']:[]),views:{get:()=>undefined,grouped:()=>undefined}},projection:{contextPressure:pressure,inbox,goal:state.goal?.goal}};
 }
