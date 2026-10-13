@@ -5,7 +5,8 @@
 The Harness source now offers **Settings → Plugins → Metafolders**. Enabling it
 mounts the original public Metafolder browser; disabling it restores the existing
 DSH workspace browser and retains saved groups. A new profile defaults to the
-existing workspace browser. This is source qualification, not installed rollout.
+existing workspace browser. Source and the private artifact qualify below;
+installed rollout remains separate.
 The [plugin parity register](HARNESS-PLUGIN-PARITY.md) retains the wider migration gates.
 
 ## Public source and original presentation
@@ -64,8 +65,9 @@ no new agent, provider request, tool grant or independent execution loop.
 
 ## Qualification and remaining work
 
-Tested implementation: **207aed299534801637e4c3263f1166d3fe532936**. Subsequent
-qualification-record edits change documentation only.
+Tested runtime implementation: **207aed299534801637e4c3263f1166d3fe532936**.
+Subsequent qualification records and test-driver repairs do not change runtime,
+GUI, supplier or dependency inputs.
 
 Focused feature qualification passes **9/9 across two files**: eight profile,
 failure, cold-Host and supplier-closure cases plus the actual copied-interface
@@ -79,7 +81,7 @@ with Node 24.19.0, two workers, no skips and unchanged deadlines.
 Strict check/build passes; seven corrected licence-inventory fixtures and five
 existing notice/production-workspace packaging cases pass.
 
-This does not yet qualify ordinary/sealed/installed artifacts, owner grouping
+This does not yet qualify installed adoption, owner grouping
 import, broad corpus search, every directory/keyboard/rail/manual-order flow,
 all accessibility behavior or physical workspace moves. Further tests and the
 owner's MX feedback remain required for full plugin parity. Live Qwen/speech,
@@ -98,3 +100,50 @@ unqualified. Prior `835ec1a` Linux CI passed the Node stage and then failed the
 seven minimal licence fixtures; their missing synthetic root manifest is now
 corrected. The production inventory rules are unchanged. New-head remote CI
 and known further-platform failures remain separate from these source results.
+
+## Qualified ordinary and immutable candidate
+
+The separately staged product 0.2.13 candidate is **20261013-183219-4621b4e3**,
+runtime **207aed2**, artifact
+**7907ad98577ca21c1444957fb5c21aa8ecef553a0e64d6021d83629ae7939276**,
+with **23,940** inventoried entries. It includes Metafolder, the original inspector
+cue, inherited-telemetry guards and Linux branch publication recovery. Staging
+preserves current selection, its exact Python venv path and the owner draft.
+
+The ordinary assembly preserves 151 npm instances/20,801 dependency files, bundled
+Node 24.19.0, nine native/Wasm binaries, 580 DSH MIT and 108 Apache supplier records
+and original brand assets. Of the preceding 786 licence/provenance files, 784 are
+identical; GUI provenance and combined notices now include Metafolder. Two new
+Metafolder licence/provenance files bring that inventory to 788. Complete MIT text,
+original/adapted client hashes and unchanged supplier CSS are verified.
+
+Final source and ordinary each pass **453/453 across the same 85 files**, plus
+five packaging and seven licence cases. Final sealed qualification passes
+**203/203 across 27 files**, with the actual bundled Node/runtime/SDK/GUI and
+matching ordinary test drivers. No skips or deadlines change. All **23,940**
+entries verify afterward; compiled assets, bindings, Node and licences match the
+ordinary inputs. The candidate is **qualified and unselected**.
+
+The first sealed qualification passes
+203/203 across 27 files; inventory then detects one diagnostic screenshot written
+by the Browser test under the candidate. Every original file remains identical.
+The exact owned diagnostic is retained outside the candidate, its empty test-only
+directories are removed and all 23,940 entries verify. The Browser driver now
+writes under its test workspace. Corrected Fleet, streamed-argument and Browser
+drivers pass against the actual candidate. Subsequent final source, ordinary and
+sealed cohorts pass serially, followed by another complete inventory comparison.
+
+Prior `b27bd92` Linux CI fails two browser assertions: Fleet checks availability
+before asynchronous retained-body hydration, and a reused argument-call selection
+runs before its second rendered row arrives. The repaired tests await the same
+1-of-1 body and select a different stable original row identity, retaining exact
+Turn 2 detail, Stop, original-history and provider-request counts. Existing
+deadlines and runtime code are unchanged. Remote CI remains a separate gate.
+
+Current selected/running preview remains **97897cf / 20261013-142001-1f7f7f96**,
+with Native online and a busy/unsent-draft flag. No owner shutdown or activation
+is attempted. A later adoption requires a new idle comparator including grouping
+record presence/bytes, original histories/queues/drafts/attachments, settings,
+appearance, model/auth/router and production selection, then the normal guarded
+updater/startup and installed acceptance. Older qualified `2c4ca0b` is retained
+as a checkpoint. Full migration/platform/live/privacy/distribution gates remain.

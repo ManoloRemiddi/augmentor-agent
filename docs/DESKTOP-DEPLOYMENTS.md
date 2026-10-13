@@ -1,6 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Latest qualified unselected combined candidate](HARNESS-BRANCH-PUBLICATION.md#qualified-ordinary-and-immutable-candidate):
+[Latest qualified unselected Metafolder candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate):
+runtime 207aed2 / private MX 20261013-183219-4621b4e3 has source/ordinary 453/453,
+five packaging and seven licence cases each, 203 sealed checks and 23,940 verified
+entries. It includes the inspector cue, privacy guard and Linux branch recovery.
+Current 97897cf Native is online with an unsent draft; no shutdown/activation occurs.
+Require a new idle comparator including Metafolder profile presence/bytes and
+normal guarded updater/startup/installed acceptance. Full migration and further
+platform gates stay open. Older unselected artifacts below remain checkpoints.
+
+[Preceding qualified unselected combined candidate](HARNESS-BRANCH-PUBLICATION.md#qualified-ordinary-and-immutable-candidate):
 runtime 2c4ca0b / private MX 20261013-160540-d88ebd3c has source/ordinary 443/443,
 five packaging cases each, 192 sealed checks and 23,922 verified entries. It retains
 the privacy guard below and adds Linux attested branch publication. Current

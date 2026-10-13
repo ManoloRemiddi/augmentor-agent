@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified unselected Metafolder artifact](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate)
+owns the combined source/ordinary/sealed evidence and guarded installation boundary.
+
 [Original Metafolders on Pi](HARNESS-METAFOLDERS.md) records the copied MIT interface,
 revisioned private grouping and retained Pi action owners, with source/install scope.
 

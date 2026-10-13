@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Latest qualified unselected Metafolder candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate)
+is runtime **207aed2 / 20261013-183219-4621b4e3**, product **0.2.13**, artifact
+**7907ad98577ca21c1444957fb5c21aa8ecef553a0e64d6021d83629ae7939276**.
+Final source/ordinary each pass **453/453 across 85 files** plus five packaging
+and seven licence cases; **203 sealed checks across 27 files** and all **23,940**
+entries pass. It combines the copied Metafolder UI, inspector cue, managed privacy
+and Linux branch recovery. Supplier/dependency/native/brand bytes are preserved;
+the two updated GUI notice/provenance records and two added MIT records are explicit.
+Current **97897cf** remains online with a Native busy/draft flag; no shutdown or
+activation occurs. A fresh comparator and guarded installed acceptance remain
+required. Earlier unselected candidates are retained checkpoints. Full migration,
+owner/plugin/live/privacy/distribution/platform and remote CI gates stay open.
+
 [Original Metafolder source binding](HARNESS-METAFOLDERS.md) adds an explicit Plugins
 toggle, the copied MIT UI and private revisioned grouping while retaining current
 pin/archive/Fork/shortcut owners. Nine focused feature cases pass, including actual
@@ -7,8 +20,9 @@ pointer grouping, colour/rename/order/delete, cold origins and zero added infere
 Tested implementation is **207aed2**; subsequent records are documentation-only.
 The full 85-file MX cohort passes **453/453** with two workers and no skips; the seven old licence fixture failures now
 pass with a proper synthetic root manifest and unchanged production inventory rules.
-No selected artifact, owner draft, model or speech service is changed. Ordinary,
-sealed/installed, remaining plugin flows and all wider migration gates stay open.
+No selected artifact, owner draft, model or speech service is changed. The packaged
+qualification above supersedes the source-only scope; installed acceptance,
+remaining plugin flows and all wider migration gates stay open.
 
 [Original scoped inspector source follow-up](DSH-GUI-ON-PI.md#original-scoped-inspector--october-13-source-follow-up)
 restores the persistent read-only cue in an existing DSH header slot. The loaded
@@ -20,9 +34,10 @@ release is patched; current Native draft and combined unselected candidate remai
 
 [Custom-plugin parity and live-service audit](HARNESS-PLUGIN-PARITY.md) identifies
 all twelve reference integrations and the missing named Pi workflows. Metafolder
-1.2.1 public MIT source is pinned at a5332d9; it can be reused but its old full-seat
-shadow needs adapters preserving current pin/archive/keyboard/draft owners. It is
-not mounted or qualified yet. No private source or owner grouping data is copied.
+1.2.1 public MIT source is pinned at a5332d9. At that inspection its old full-seat
+shadow needed adapters preserving current pin/archive/keyboard/draft owners.
+The subsequent source binding above now supplies those faces; installed and full
+plugin acceptance remain open. No private source or owner grouping data is copied.
 At the October 13 audit the configured local Qwen endpoint is unreachable; the GPU manager
 serves no model and speech services are stopped. Native `modelReady` means picker
 configuration, not provider health. No live inference/speech success is claimed.

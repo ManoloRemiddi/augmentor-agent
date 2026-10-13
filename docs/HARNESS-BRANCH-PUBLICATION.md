@@ -99,6 +99,11 @@ gates; current Native remains online/model-ready with a busy/draft flag.
 
 ### Qualified ordinary and immutable candidate
 
+The subsequent [Metafolder combined candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate)
+retains this implementation and privacy guard, adding the original inspector cue
+and copied grouping interface. It supersedes the checkpoint below as the latest
+qualified unselected candidate; current installed adoption remains separate.
+
 Implementation **2c4ca0be1fa37392f894539ba785e2f22b584b96** is separately staged as
 **20261013-160540-d88ebd3c**, product **0.2.13**, artifact
 **e04c46a57b8fd6a013551418c4271337a181136ccb49ca2ab5d07e17219432ce**.
