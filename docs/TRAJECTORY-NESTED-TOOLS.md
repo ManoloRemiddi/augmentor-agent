@@ -113,8 +113,64 @@ reproduces two defects in that interim source: escaped stored arguments exceed t
 encoded budget, and long legal child IDs lose clocks/ancestry. Both are corrected
 before final source/artifact qualification. Historical failures remain retained.
 
-Final tested ref, ordinary artifact and installed qualification are recorded below
-when verified. Until a separate immutable preview is adopted, the selected/running
-private MX remains **a49d58d / 20261013-054009-ab664123**; source changes do not patch
-that release. Full P0/P1, live/privacy/public distribution and physical/platform
-gates remain open. Further OS implementation awaits owner MX feedback.
+At this historical source checkpoint, private MX remains a49d58d /
+20261013-054009-ab664123. The following interim qualification and Stop correction
+supersede that checkpoint; full migration/platform gates remain open.
+
+## Interim installed qualification and Stop correction
+
+Runtime **02a55a922e1ff6a09ce6fcd1717590e260d35f0f** passes strict source check/build,
+**366/366 across 72 files**, and five notice/workspace cases. A separate ordinary
+artifact passes the same checks, preserving 663 compiled files, 20,801 production
+dependency files, 151 npm instances, nine native/Wasm executables, 783 licence
+files and all generated distribution/supplier records. The first unselected
+staging inherits the preceding release's Node path. It is retained as a comparator;
+a fresh staging explicitly selects its own bundled Node and verifies identical
+files/artifact digest. Each immutable staging passes **49/49** targeted cases.
+
+The corrected staging is selected through guarded idle shutdown and stable
+Host/Native startup in private MX **20261013-064451-6b04982b**, product **0.2.13**,
+artifact **f7d0af14733a58ac964af60f423a7f21fa4a0178c449b42ad21b02df8359988d**.
+All **23,893** entries and twelve histories/queues verify. Of 247 saved files,
+243 are identical; one journal preserves its exact prefix plus one close, with
+three related derivatives. Draft/attachment, settings/model/auth and production
+selection/router bytes are preserved. This is interim qualification, not passing
+evidence for complete live Stop presentation.
+
+Manual installed acceptance executes the real read, retains exact pending child
+arguments/schema/start, and Stops the held executor with four SDK starts/results
+and one provider request. After Stop, the current client loses the nested detail
+tree until reload, although its saved history is intact. A separate buffer read
+finds **74 frames with no gap**, and all sixteen display events match canonical
+history exactly. Reload restores the full error/read tree. The failure is a
+client reconciliation gap when idle metadata precedes its event poll; no SDK or
+saved-history corruption is observed. The interim tab and exact fixture supervisor
+are closed without altering the selected artifact.
+
+The authored controller now reads canonical display history and observation
+metadata after an acknowledged cancellation, merges them with newer already-live
+events/older loaded records, then refreshes idle metadata. Stable original call IDs
+retain selected child details. Family readers receive a revision notification.
+Selection/epoch retirement drops late reads; general metadata refresh also refuses
+retired responses. A failed receipt read reports the acknowledged Stop and unknown
+details, preserving the prior ledger and submitting no cancellation or work retry.
+No new endpoint, permission, execution owner, supplier/CSS or dependency is added.
+
+Pure regressions reproduce missing receipts and foreign-selection replacement on
+the interim controller. The corrected contracts preserve a later live diagnostic,
+exact terminal children, family notification, retired readonly state and no replay
+after a failed read. The initial revised fixture used observation records without
+required IDs; assigning its authored IDs corrects the count assertion without a
+product change. The enhanced actual SDK/Chromium case holds only its own event poll
+at the request boundary, then Stops through the original button. Failed child
+details, the completed read and Turn 1 selection must remain visible without
+releasing that poll or reloading. The old immutable 02a55a9 fails this exact check;
+corrected source passes it. A first assertion wrongly looked for the inner tool's
+error inside the selected wait child's panel; it now checks the wait's actual SDK
+abort result. Deadlines, 1280×720 geometry and two workers remain unchanged.
+
+Final corrected source/ordinary/installed qualification follows separately. Current
+selected/running remains the interim 02a55a9 until a new immutable release qualifies;
+it is not patched in place. Full P0/P1, live/privacy/public distribution and
+physical/platform gates remain open. Further OS implementation awaits owner MX
+feedback.

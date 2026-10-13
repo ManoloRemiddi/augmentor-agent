@@ -90,7 +90,7 @@ export class DshPiController {
     try{await job.promise;}finally{if(this.contextPaging===job)this.contextPaging=null;}
   }
   clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,goal:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
-  async refresh(){const [list,workspaces]=await Promise.all([this.rpc('session.list'),this.state.readOnly?null:this.rpc('workspace.list')]);this.update({sessions:list.items,workspaces});if(!this.state.readOnly&&workspaces?.archivedSessionIds?.includes(this.state.sessionId))this.clearSelection();}
+  async refresh(){const epoch=this.epoch,sessionId=this.state.sessionId;const [list,workspaces]=await Promise.all([this.rpc('session.list'),this.state.readOnly?null:this.rpc('workspace.list')]);if(epoch!==this.epoch||sessionId!==this.state.sessionId)return;this.update({sessions:list.items,workspaces});if(!this.state.readOnly&&workspaces?.archivedSessionIds?.includes(this.state.sessionId))this.clearSelection();}
   async organize(action,sessionId,stop=false){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
     try{const result=await this.rpc('session.organize',{sessionId,action,stop,expectedRevision:this.state.workspaces?.organizationRevision});this.update({workspaces:result.workspaces});if(result.workspaces.archivedSessionIds.includes(this.state.sessionId))this.clearSelection();return result;}
@@ -202,7 +202,25 @@ export class DshPiController {
     await this.rpc('interaction.respond',{sessionId,clientId:this.clientId,rpcId:frame.rpcId,value});
     if(epoch===this.epoch)this.update({interactions:this.state.interactions.filter(x=>x.rpcId!==frame.rpcId)});
   }
-  async stop(){await this.rpc('session.cancel',{sessionId:this.state.sessionId});await this.refresh();}
+  async stop(){
+    const epoch=this.epoch,sessionId=this.state.sessionId;
+    await this.rpc('session.cancel',{sessionId});
+    if(epoch!==this.epoch||sessionId!==this.state.sessionId)return;
+    try{
+      // Stop may settle before this client's next event poll. Read canonical
+      // receipts before idle metadata removes the original running seats.
+      const [history,observations]=await Promise.all([this.rpc('session.history',{sessionId,maxMessages:100}),this.rpc('observation.list',{sessionId})]);
+      if(epoch!==this.epoch||sessionId!==this.state.sessionId)return;
+      const events=new Map([...this.state.events,...history.events.map(row=>row.event)].map(event=>[event.seq,event])),records=new Map([...this.state.records,...observations.records].map(record=>[record.id,record]));
+      this.update({familyRevision:this.state.familyRevision+1,events:[...events.values()].sort((a,b)=>a.seq-b.seq),records:[...records.values()].sort((a,b)=>a.seq-b.seq),hasMore:this.state.hasMore||history.hasMore===true,observationHasMore:this.state.observationHasMore||observations.hasMore===true});
+    }catch{
+      if(epoch!==this.epoch||sessionId!==this.state.sessionId)return;
+      await this.refresh().catch(()=>{});
+      if(epoch!==this.epoch||sessionId!==this.state.sessionId)return;
+      throw Error('Stop was acknowledged, but its saved details could not be loaded. Refresh to inspect the outcome.');
+    }
+    await this.refresh();
+  }
   async older(){
     const epoch=this.epoch,sessionId=this.state.sessionId,beforeSeq=this.state.events[0]?.seq;
     const page=await this.rpc('session.history',{sessionId,maxMessages:100,beforeSeq});if(epoch!==this.epoch)return;

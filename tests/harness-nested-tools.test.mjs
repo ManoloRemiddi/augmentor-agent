@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {projectDsh} from '../apps/harness/dsh-pi-projection.mjs';
 import {projectDshContext} from '../apps/harness/dsh-context-projection.mjs';
+import {DshPiController} from '../apps/harness/dsh-pi-controller.mjs';
 const boundary='public-sdk-tool-execution-start-before-validation';
 function fixture({requestId='request',turnId='turn',offset=0,legacy=false}={}){
  const identity=legacy?{}:{requestId,captureId:'capture-'+requestId};
@@ -61,4 +62,28 @@ test('missing legacy arguments and foreign or absent parents retain results with
  const view=projectDsh({...foreign.state,events}).trajectory;assert.equal(view.runningCalls[0].subCalls.length,0,'a parent from another request cannot own this child');
  const orphan=projectDsh({...foreign.state,sessions:[{sessionId:'s',running:false}],events:foreign.state.events.filter(e=>e.seq>=5)}).trajectory;
  assert.equal(orphan.eventNodes.filter(n=>n.kind==='tool-result').length,1);assert.equal(orphan.eventNodes.find(n=>n.kind==='tool-result').call.argsRaw,'{"path":"request.txt"}');
+});
+test('acknowledged Stop reads and merges canonical receipts before idle metadata, preserving late live events without replay',async()=>{
+ const f=fixture(),events=[...f.state.events,...f.settle],records=[...f.state.records,...f.completedRecords].map((r,i)=>({...r,id:r.id??'record-'+i})),calls=[];let finishHistory;
+ const waiting=new Promise(resolve=>finishHistory=resolve),controller=new DshPiController('authored-fixture',async(_url,options)=>{
+  const {method,params}=JSON.parse(options.body);calls.push({method,params});
+  const result=method==='session.history'?await waiting:method==='observation.list'?{records,hasMore:false}:method==='session.list'?{items:[{sessionId:'s',running:false}]}:method==='workspace.list'?{items:[],archivedSessionIds:[]}:{};
+  return {ok:true,json:async()=>({result})};
+ });
+ controller.update({...f.state,records:records.slice(0,f.state.records.length),phase:'ready'});const stopping=controller.stop();await Promise.resolve();
+ const late={seq:100,type:'runtime/warning',turnId:'turn',data:{message:'Authored later diagnostic'}};controller.update({events:[...controller.state.events,late]});finishHistory({events:events.map(event=>({event})),hasMore:false});await stopping;
+ const root=projectDsh(controller.state).trajectory.eventNodes.find(n=>n.kind==='tool-result');assert(root?.subCalls[0],'idle metadata must not discard terminal child receipts');assert.equal(root.subCalls[0].subCalls[0].content[0].text,'Exact nested read: request');assert.equal(root.subCalls[0].subCalls[1].isError,true);
+ assert(controller.state.events.some(e=>e.seq===100));assert.deepEqual(controller.state.events.map(e=>e.seq),[...events.map(e=>e.seq),100]);assert.equal(controller.state.records.length,records.length);
+ assert.equal(controller.state.familyRevision,1,'canonical receipts notify retained family readers');
+ assert(calls.some(c=>c.method==='session.history'&&c.params.sessionId==='s'));assert(calls.every(c=>['session.cancel','session.history','observation.list','session.list','workspace.list'].includes(c.method)),'receipt reads never submit or replay work');
+});
+test('failed receipt reads report an acknowledged Stop and retain unknown details without retrying cancellation or work',async()=>{
+ const f=fixture(),calls=[],controller=new DshPiController('authored-fixture',async(_url,options)=>{const {method}=JSON.parse(options.body);calls.push(method);if(method==='session.history')throw Error('Authored unavailable history');const result=method==='observation.list'?{records:[],hasMore:false}:method==='session.list'?{items:[{sessionId:'s',running:false}]}:method==='workspace.list'?{items:[],archivedSessionIds:[]}:{};return {ok:true,json:async()=>({result})};});
+ controller.update({...f.state,phase:'ready'});await assert.rejects(controller.stop(),/Stop was acknowledged.*saved details/);assert.deepEqual(controller.state.events,f.state.events);assert.equal(controller.state.sessions[0].running,false);assert.equal(calls.filter(x=>x==='session.cancel').length,1);assert(calls.every(x=>['session.cancel','session.history','observation.list','session.list','workspace.list'].includes(x)));
+});
+test('a Stop receipt read retiring into a foreign or readonly selection never changes that new conversation',async()=>{
+ const f=fixture();let finishHistory;const waiting=new Promise(resolve=>finishHistory=resolve);
+ const controller=new DshPiController('authored-fixture',async(_url,options)=>{const {method}=JSON.parse(options.body);const result=method==='session.history'?await waiting:method==='observation.list'?{records:[],hasMore:false}:method==='session.list'?{items:[]}:{};return {ok:true,json:async()=>({result})};});
+ controller.update({...f.state,phase:'ready'});const stopping=controller.stop();await Promise.resolve();controller.epoch++;controller.update({sessionId:'foreign',readOnly:true,events:[],records:[],sessions:[{sessionId:'foreign',running:false}]});
+ finishHistory({events:[...f.state.events,...f.settle].map(event=>({event})),hasMore:false});await stopping;assert.equal(controller.state.sessionId,'foreign');assert.equal(controller.state.readOnly,true);assert.deepEqual(controller.state.events,[]);assert.deepEqual(controller.state.sessions,[{sessionId:'foreign',running:false}]);
 });
