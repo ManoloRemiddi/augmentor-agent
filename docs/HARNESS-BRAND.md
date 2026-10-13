@@ -81,8 +81,8 @@ Private MX release **20261013-100304-45f0b71b**, product **0.2.13**, artifact
 and running through the stable preview launcher. Guarded idle shutdown and
 sequential startup verify actual bundled Node/Host and Native roots. All **23,906**
 inventory entries verify before and after installed GUI inspection. The ordinary
-assembly contains 663 compiled files, 20,801 production dependency files, 151 npm
-instances and nine native executables, retaining their existing bytes. The 580
+assembly contains 663 compiled files. All 20,801 production dependency files, 151
+npm instances and nine native executables retain their preceding bytes. The 580
 DSH and 108 dashboard supplier records remain unchanged. Three brand notice/source
 files bring staged licence/provenance files to **786**; only the compiled GUI's
 combined notice and SOURCE.json change among the preceding licence records.
@@ -92,7 +92,7 @@ Light and Dark, all three original animation names, contrasting outlines and the
 19-pixel mark within the existing 24-pixel slot. The owner's Light preference is
 restored and original Context Insights stays open with eleven retained nonarchived
 sessions, seven newest bodies, zero failed/partial reads or usage gaps and explicit
-older timing coverage. There are no page errors and no new owner prompt/tool/model
+older timing coverage. There are no page errors and no new owner prompt/tool/model inference
 request. Screenshots and private profile evidence stay local.
 
 All twelve histories, queue items and session identities remain unchanged. Of 247
