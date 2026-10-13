@@ -7,7 +7,7 @@
 @import './vendor/dsh/packages/client/ui-theme/src/styles/shiki.css';
 @import './vendor/dsh/packages/client/ui-theme/src/styles/gradient-shadow-text.css';
 html,body,#root {height:100%;margin:0;}
-body {font-family:var(--dsw-font-family);font-size:var(--dsw-font-size,14px);background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-text-primary);}
+body {font-family:var(--dsw-font-family);font-size:var(--dsw-font-size,14px);background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);}
 
 .augmentor-extension {padding:24px;display:flex;flex-direction:column;gap:16px;max-width:100%;overflow:auto;}
 .augmentor-extension label {display:flex;flex-direction:column;gap:8px;}

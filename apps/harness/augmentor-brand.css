@@ -28,7 +28,8 @@ body:not([data-ds-dark-theme]) .augmentor-brand-orb::after {
   box-sizing:border-box;
   flex:none;
   margin-right:0;
-  color:var(--dsw-alias-text-primary);
+  color:var(--dsw-alias-label-primary);
+  border-width:2px;
   border-color:currentColor;
   box-shadow:inset 2px 1px 8px color-mix(in srgb,currentColor 30%,transparent),0 0 12px color-mix(in srgb,currentColor 18%,transparent);
   pointer-events:none;

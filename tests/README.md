@@ -8,9 +8,10 @@ partial child publication remains fenced, not repaired. See
 [recovery scope](../docs/HARNESS-BRANCH-CONTROLS.md#durable-exact-boundary-recovery--october-13).
 
 `harness-brand-chromium.test.mjs` exercises both original sidebar seats and their
-actions, website-derived shape/flow/breath timings, changing Light/Dark outlines,
+actions and the welcome hero mark, 2px stroke, transparent fill, website-derived
+shape/flow/breath timings, changing Light/Dark outlines,
 outline containment, visible brand-row overflow, black Light smoke/unchanged Dark
-flare, contrast, reduced-motion restoration
+flare, actual settings label/inherited text contrast, reduced-motion restoration
 and the exact favicon. The isolated Host makes no provider/tool request and the
 page fetches no remote logo asset. See [brand qualification](../docs/HARNESS-BRAND.md).
 

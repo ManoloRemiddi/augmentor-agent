@@ -268,6 +268,21 @@ Native MCP is now available in the candidate Pi SDK, but CLI defaults do not aut
 
 Prefer the shared Prompt Library, Hindsight, Resonant Voice and existing browser/desktop services over replacing them with new community equivalents. Model Picker and Adaptive Reasoning need Pi-specific bindings, not duplicate stores. Plugin migration inventory must include active versus disabled status, owned configuration and a representative workflow; a failed Metafolder read or unavailable Comfy service is a qualification gap, not proof that an equivalent tool works.
 
+## Accepted oh-my-pi direction — October 13
+
+The owner accepted selective component reuse from
+[oh-my-pi 818dd42](https://github.com/can1357/oh-my-pi/tree/818dd42b73ab1caad17fa06d4edcc3a97086dc57),
+while keeping the supported Pi owner and original DSH GUI. The inspected
+coding-agent 18.10.3 is a Bun-based Pi fork with its own package/native dependency
+closure; it is not a drop-in extension for the tested Pi 1.1.0 family. Agent
+registry/lifecycle, LSP, editing and search components are possible later selections,
+each requiring exact source/licence/dependency, supported SDK, privacy and workflow
+qualification. First-party MIT notices do not cover every transitive supplier.
+Its memory automation and telemetry defaults require their own audit before reuse;
+upstream branding does not qualify European jurisdiction or our privacy policy.
+No oh-my-pi code, dependency, runtime or second conversation owner is installed by
+this decision. MX feedback and the remaining accepted parity gates stay binding.
+
 ## Licensing and attribution
 
 The pinned [DSH MIT license](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/LICENSE) and [Pi MIT license](https://github.com/earendil-works/pi/blob/42a3497d03ad17e308a2299fa824727894f2c0ec/LICENSE) permit source reuse subject to their notice requirements. Copied files must retain copyright and license text; an attribution manifest should record source repository, exact commit, file paths, modifications and bundled dependencies. Audit assets, fonts, samples and dependencies individually. A root MIT license does not make every dependency MIT, confer trademark rights or grant publication permission for private project source.

@@ -153,3 +153,35 @@ checkpoint, not a passing suite or an application assertion failure. The complet
 second run supplies this qualification. Isolated visual Light/Dark inspection
 also passes. Ordinary, sealed and installed qualification follows separately;
 the selected MX preview remains efa411b until guarded adoption.
+
+
+## Owner feedback: thicker circle, welcome mark and Dark text — October 13
+
+The owner then requested a slightly thicker circle, replacement of the remaining
+welcome fish beside “Into the Unknown Preview,” and readable Dark settings text.
+The shared mark now has a 2-pixel border and occupies the original
+`conversation.hero.brand.mark` seat as well as both sidebar seats. It receives the
+supplier's existing hero class/34-pixel square geometry and preserves surrounding
+headline/badge and sidebar actions. Both mark elements have transparent surfaces;
+the alpha smoke overlays the actual app background without a rectangular plate.
+
+The settings reproduction found black inherited body/panel text on a dark panel.
+Authored base CSS referred to the undefined `--dsw-alias-text-primary`; it now uses
+DSH's existing `--dsw-alias-label-primary`, which changes with the original theme.
+The mark uses that same token. No supplier CSS or settings layout changes. The
+actual browser case checks the welcome mark, 2-pixel stroke, transparent fill,
+original rail/header actions and readable inherited settings/actual labels at
+4.5:1 contrast in both themes. Dark flare colors/timings remain unchanged.
+
+The preceding dd3c706 source and separate ordinary snapshot both pass 398/398,
+with five packaging cases each; its unselected immutable release is retained as
+a superseded checkpoint. It was not activated while owner feedback was arriving.
+The final feedback correction requires its own source/ordinary/sealed and installed
+qualification, recorded below. The selected preview stays efa411b until that gate.
+
+The final owner-feedback source passes strict check/build and **398/398 across
+76 MX files**, with zero failures/skips/cancellations and five notice/workspace
+packaging cases. Matching Node/QtTest, two workers and deadlines are retained.
+Its focused actual Chromium case verifies all three mark seats, inherited settings
+ink and sampled real labels in both themes. Ordinary/sealed/installed qualification
+remains separate; the earlier unselected dd3c706 artifact is not promoted.
