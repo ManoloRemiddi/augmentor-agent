@@ -98,8 +98,73 @@ deadlines and matching isolated QtTest. Five notice/workspace Python cases pass.
 Focused actual Chromium Context/Insights acceptance passes **5/5**. This is source
 and authored-fixture evidence; ordinary and installed proof follow separately.
 
-Current selected/running MX remains model lifecycle runtime 79ee4ff / release
-20261013-013249-f43fa0d0. This source increment has not replaced it. Ordinary
-artifact, immutable adoption and manual installed acceptance are separate gates.
+At this source checkpoint, selected/running MX remains model lifecycle runtime
+79ee4ff / release 20261013-013249-f43fa0d0; the installed qualification below
+supersedes that selection. Source implementation is
+**008ef29551406fa08f21508d548603a6f9200f81**.
 The full P0/P1 migration, live/privacy/public distribution and platform requirements
 remain open; further OS implementation awaits owner MX feedback and DSH is retained.
+
+## Ordinary and installed MX qualification — October 13
+
+Implementation **008ef29551406fa08f21508d548603a6f9200f81** is selected and running
+in private MX release **20261013-030020-abfa89ec**, product **0.2.13**, artifact
+**5d6596b90da90856cfa1b670bf5be6f6c58c52e0ea3b08786bbc22ae6a19253e**.
+The complete source and ordinary MX cohorts each pass **349/349 across 68 files**,
+zero failures/skips/cancellations, with bundled Node **24.19.0**, two workers,
+unchanged deadlines and matching isolated QtTest. Five notice/workspace Python
+cases pass on both source and the ordinary artifact's actual packaging scripts.
+
+The separate ordinary candidate contains **660 compiled files**, **20,801 production
+dependency files**, **151 npm instances**, nine native/Wasm executables, **783 licence
+files** and 127 browser notice records for 126 versions. It reuses the complete
+previously reviewed production dependency seed, including all Photon/QuickJS notices
+and the three generated exclusion/override/prerequisite records. Dependency paths,
+Node/native binaries and notice bodies are unchanged. Only three source provenance
+files differ: the two Apache adaptation records and the browser source manifest.
+All other 107 Apache records and all 580 MIT GUI records remain unchanged. Existing
+Office/PDF/HTML/spreadsheet/shortcut provenance checks pass.
+
+The supported updater stages a fresh immutable release. Its dist, Node,
+node_modules, licences and generated distribution records match the ordinary
+candidate exactly. **Thirteen** focused immutable tests pass, including actual
+public SDK/Host steps/questions, original Context/Insights/sidebar Chromium and
+bounded/privacy/invalid metadata contracts. This is isolated authored-provider
+evidence; it does not claim owner live-provider or physical speech acceptance.
+
+A fresh owner-state comparator and actual idle/no-draft checks precede guarded
+Native/Host shutdown. Terminal absence is confirmed before activation. Stable
+configuration starts the selected Host; its actual Node executable and main entry
+are verified before Native starts. Selected/running identities match, Native is
+online/model-ready/idle, and all **23,885** immutable inventory entries verify both
+before and after GUI inspection. No selected release is patched in place.
+
+Actual owner Insights shows eleven nonarchived metadata entries, seven newest
+contexts, zero failed/partial/usage-gap reads and **21 older/unlinked calls** with
+no invented measured step times. A separate manual test profile runs the same
+immutable Host with an authored deterministic provider: one conversation, two wire
+requests, two complete measured steps and one read tool. Original Context displays
+the timing ring/stream slices/tool interval/session strip; original Insights shows
+the same step totals. Browser reload returns to the original Chat panel; an initial
+wait for the unopened Insights panel times out. Explicitly reopening Insights
+preserves identical timing card text and the provider request count remains two.
+This preparation correction is retained separately from the passing checks; no
+panel persistence feature is added. Screenshots/proofs remain private, and the
+isolated fixture is closed with both its supervisor and Host terminal.
+
+All **twelve** preceding owner histories and queue items, draft/attachment bytes,
+profile values/revision, models.json/auth.json presence and bytes, production
+selection and router executable/arguments are preserved. Of 247 saved files,
+**243 are byte-identical**; one journal retains its exact old prefix plus one
+session close/one load, with three corresponding counter/index derivatives.
+No new owner conversation, placeholder or saved original is added or removed.
+No owner prompt, endpoint discovery, credential entry or configuration write is
+performed. Qwen/Breeze GPU placement and CPU ASR/VAD remain unchanged; canonical
+main's 38 pre-existing changed paths are preserved. Earlier immutable releases
+and all original comparators remain available.
+
+This qualifies the private MX timing increment. Full migration, live/privacy/public
+distribution and platform gates remain open. The previously recorded Windows
+Immer build and Darwin Office/libvips licence CI gaps are not resolved by these
+Linux checks; see the [CI checkpoint](HARNESS-MODELS.md#ci-publication-checkpoint-and-platform-gaps).
+Further OS implementation still awaits owner MX feedback, and DSH remains available.

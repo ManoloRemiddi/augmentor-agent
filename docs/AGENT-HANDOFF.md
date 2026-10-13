@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Installed original Context timing](CONTEXT-TIMING.md#ordinary-and-installed-mx-qualification--october-13): runtime **008ef29551406fa08f21508d548603a6f9200f81**, private MX **20261013-030020-abfa89ec**, product **0.2.13**, artifact **5d6596b90da90856cfa1b670bf5be6f6c58c52e0ea3b08786bbc22ae6a19253e**, selected and running. Source and ordinary each pass **349/349 across 68 files** plus five packaging cases; thirteen immutable tests and actual original Context/Insights acceptance pass. All **23,885** entries and twelve histories/queues, drafts, profile/auth/model and production/router state are preserved. Apache-2.0 dashboard layout/CSS/card/strip and all 580 MIT GUI records remain intact; one already-marked timing seat changes. Older logs stay explicit. Full migration/live/privacy/public distribution/platform and known CI gaps remain open; prior selection statements below are historical checkpoints.
+
 [Original measured Context timing](CONTEXT-TIMING.md): the copied Apache-2.0
 Timing Stats card and strip now receive bounded public Pi SDK step/model/tool/UI
 intervals, with explicit partial/older-log coverage and no inferred throughput.
