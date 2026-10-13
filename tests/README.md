@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current unselected Wiki MX artifact](../docs/HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13)
+passes 471/471 across the same 94 files with actual bundled Node/runtime/SDK/GUI
+and external standalone client/schema inputs, followed by all 24,045 inventory
+entries. Source and separate ordinary also pass 471/471. `test_harness_notice_assembly.py`
+adds three private filesystem publication cases per tree; five existing packaging
+and seven licence cases per tree pass. Missing notices and the initial standalone
+client-schema import failure remain recorded. One isolated real Qwen Wiki query
+is separate from these synthetic cohorts and from installed owner acceptance.
+
 `wiki-receipts.test.mjs` covers exact-byte unknown review, stale authority,
 real live/SIGKILL process identity, retained dead leases, legacy-lock refusal and
 lost replies/retired vault scope. `harness-wiki-review-chromium.test.mjs` exercises

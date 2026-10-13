@@ -30,6 +30,65 @@ It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision a
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
 
+## Qualified unselected Wiki MX candidate — October 13
+
+Source snapshot **12b403f3c707c829d6936797e2a73ed35078ec94**, product **0.2.13**,
+is staged as **20261013-232107-a7bb6ab7**, artifact
+**ca1736dd3a109fb5c7a08c356fbfc16bdfff753d7edecabe292dc6ec1c0da6c3**.
+It combines the original GUI, Metafolder/navigation, managed privacy, branch
+recovery, six Wiki tools, nine skills, original Plugins settings and action review.
+The preceding source and separate ordinary runtime cohorts pass **471/471 across
+94 files**. The full candidate-backed cohort also passes **471/471 across 94
+files**, two workers, Node 24.19.0, matching QtTest, unchanged deadlines and no
+skips. External unit drivers use byte-identical client source with its public
+TypeScript schema inputs; integration fixtures use the candidate's actual bundled
+Node, compiled runtime, SDK and GUI. No fixture files are added inside the release.
+All **734** compiled files match the ordinary inputs and all **24,045** inventory
+entries verify after the tests and isolated live query.
+
+The complete assembly retains 151 npm instances, 20,801 dependency files and one
+internal workspace link, bundled Node and all nine dependency/Node native bytes.
+All 580 DSH MIT and 108 Context Apache supplier selections and original brand
+assets stay unchanged. Its **833** licence/provenance files retain every preceding
+788 record; only the already-reviewed Office BUILD metadata changes. The 45
+additions are the previously implemented Office preferred-source/native records
+and five Wiki notice/provenance files. Full original licence bodies, including
+Node/PDF/font notices and the skills' prior AgriciDaniel notice, remain present.
+
+The first assembly **20261013-230647-5f3ea419** is preserved as **unqualified**:
+its fresh npm-only notice tree omitted 38 generated records. The comparison
+caught this before any activation. A separate candidate is built after
+`scripts/assemble-harness-notices.py` restores the verified baseline notices,
+checks identical dependency/native bytes, refreshes current supplier provenance
+and requires Wiki originals. It refuses staged-release or linked-destination
+writes, changed native bytes, missing inputs and a tampered baseline. Three
+independent filesystem cases pass in source and ordinary, alongside five existing
+packaging and seven licence cases in each tree. This private assembly step does
+not bypass the Office/font/native public redistribution gates.
+
+The first candidate-backed run also fails a standalone Metafolder test import:
+linking raw client source directly into the release makes its development-only
+TypeScript schema path unavailable. The corrected external driver copies the
+same client bytes alongside public schema source. The bundled application is
+unchanged, and the full second run passes; the failed run remains retained.
+
+One actual current-Qwen Pi session, using this candidate's Node/runtime/SDK and
+an independently authored private vault, executes **one `wiki_query`**, returns
+the page marker and completes normally. The page remains byte-identical; cold
+history inspection preserves the native file and creates no new agent or
+inference. Qwen/Breeze process identities, context/concurrency/precision and CPU
+ASR/VAD stay unchanged. This is live read-query evidence, not a live write,
+physical voice or owner-vault migration claim.
+
+The candidate is **qualified and unselected**. The current **97897cf /
+20261013-142001-1f7f7f96** Native/Host remain online; Native still reports a
+busy/unsent draft, so no shutdown or activation is attempted. A fresh idle
+comparator, guarded adoption and installed owner acceptance remain required.
+Other plugin workflows, mid-supplier-mutation crash repair/concurrent editors,
+optional git, physical voice, public source/rebuild obligations and further
+platform/full migration qualification remain open. The earlier **dfcdfb9**
+candidate is a retained checkpoint; it does not contain Wiki.
+
 ## Wiki action inspection and explicit review — October 13
 
 Implementation **92195a815a8b9871321ec6197c8dc70780a1ac0d** uses the original

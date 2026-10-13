@@ -1,5 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified unselected Wiki MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13),
+source **12b403f3c707c829d6936797e2a73ed35078ec94**, product **0.2.13**,
+release **20261013-232107-a7bb6ab7**, artifact
+**ca1736dd3a109fb5c7a08c356fbfc16bdfff753d7edecabe292dc6ec1c0da6c3**,
+combines the preceding Metafolder/privacy/branch work with original Wiki tools,
+skills, Plugins settings and explicit action review. Source/ordinary and the
+full candidate-backed cohort each pass **471/471 across 94 MX files**, two workers,
+matching Node/QtTest, unchanged deadlines/no skips. Five packaging/seven licence/
+three assembly cases per source/ordinary tree pass. All **24,045** entries verify;
+734 compiled files, dependency/native bytes and supplier/brand selections match.
+Its 833 notice/provenance files retain all preceding 788, add Office/Wiki records
+and preserve original bodies. New private notice assembly refuses changed native
+bytes/tampered baselines/staged or linked destinations. The first incomplete
+candidate and standalone-driver import failure remain labelled unqualified.
+One isolated current-Qwen `wiki_query` through the candidate succeeds, preserving
+its page and exact cold history. Current 97897cf Native/Host, owner draft and
+Qwen/Breeze remain unchanged; Native is busy with a draft, so no activation occurs.
+Fresh idle/guarded installed acceptance and wider plugin/live/crash/distribution/
+platform/full migration gates remain open. Hosted new-head CI is separate.
+
 [Original Wiki action review](HARNESS-PLUGIN-PARITY.md#wiki-action-inspection-and-explicit-review--october-13),
 implementation **92195a815a8b9871321ec6197c8dc70780a1ac0d**, uses original
 DSH disclosure/JSON/risk controls in Plugins and links exact loaded native actions

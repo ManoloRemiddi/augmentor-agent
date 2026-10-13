@@ -1,6 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Latest qualified unselected Metafolder navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate):
+[Current qualified unselected Wiki MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13):
+source 12b403f / release 20261013-232107-a7bb6ab7 combines Wiki with the earlier
+Metafolder/privacy/branch work. Candidate-backed 471/471 and all 24,045 entries
+pass, with one isolated real Qwen Wiki query. It is unselected; Native retains its
+busy/unsent draft. Current 97897cf stays selected/running. Fresh idle comparison,
+guarded adoption and installed acceptance remain required.
+
+For a private assembly retaining the same reviewed native dependencies, run
+`python3 scripts/assemble-harness-notices.py --app /path/to/unselected-assembly --baseline /path/to/verified-release`
+before normal staging. The assembly must include built GUI/runtime, public
+preferred supplier source, locked production dependencies and bundled Node.
+This completes generated supplier/Node/PDF/Wiki notice records omitted by a
+fresh npm-only tree, verifies the immutable baseline and rejects native drift,
+missing inputs and staged/linked destinations before publication. The helper is
+Linux-only and never grants public Office/font/native redistribution approval.
+The owning candidate record retains the initial incomplete-assembly failure.
+
+[Preceding qualified unselected Metafolder navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate):
 runtime dfcdfb9 / private MX 20261013-190500-3bf1e21f has source/ordinary 454/454,
 five packaging and seven licence cases each, 204 sealed checks and 23,940 verified
 entries. It fixes rail Search and verifies directory/keyboard/view navigation.

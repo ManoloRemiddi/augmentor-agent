@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified unselected Wiki MX artifact](HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13)
+records the full 471-case candidate-backed cohort, complete 24,045-entry inventory,
+notice assembly correction and one real Qwen Wiki query. The owner draft and
+current installation remain preserved; guarded installed acceptance is separate.
+
 [Wiki action inspection and explicit review](HARNESS-PLUGIN-PARITY.md#wiki-action-inspection-and-explicit-review--october-13)
 records original DSH controls, preserved uncertain originals, attested dead-lease
 recovery and the separate installed/vault-crash qualification boundary.

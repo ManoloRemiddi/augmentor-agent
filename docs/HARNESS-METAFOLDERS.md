@@ -34,7 +34,9 @@ packaging and seven licence cases each. Actual sealed Node/runtime/SDK/GUI pass
 24.19.0, deadlines and no-skip scope are preserved. All **23,940** entries verify
 after testing; compiled, binding, licence and Node bytes match ordinary inputs.
 
-This is the latest **qualified unselected** candidate. It keeps the inspector cue,
+This is the preceding **qualified unselected** navigation candidate. The
+[current combined Wiki candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13)
+also retains this Metafolder behavior. It keeps the inspector cue,
 privacy and branch recovery. DSH's 580 MIT and Context's 108 Apache records,
 original brand/CSS, 151 npm instances/20,801 dependency files, nine native/Wasm
 binaries and all licence bodies remain unchanged. Only the marked Metafolder
