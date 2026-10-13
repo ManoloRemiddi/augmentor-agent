@@ -2,6 +2,7 @@
 import {SessionManager,CURRENT_SESSION_VERSION} from '@earendil-works/pi-coding-agent';
 import {constants,openSync,closeSync,readSync,fstatSync,lstatSync,existsSync,writeFileSync,fsyncSync} from 'node:fs';
 import {type DisplayEvent} from '../../protocol/src/index.js';
+import {identifier} from '../../protocol/src/index.js';
 import {GOAL_ROUND_TYPE,goalUserHash,goalProjection} from './goals.js';
 
 const messageText=(content:any):string=>typeof content==='string'?content:(content??[]).filter((p:any)=>p.type==='text').map((p:any)=>p.text).join('\n');
@@ -70,4 +71,18 @@ export function branchContext(file:string,directory:string,events:DisplayEvent[]
     manager=SessionManager.open(fileName,directory);
   }
   return {manager,file:fileName,events:plan.events};
+}
+
+/** Public SDK projection prepared in memory before filesystem publication. */
+export function branchPublicationContext(file:string,events:DisplayEvent[],seq:number,mode:'reply'|'edit'){
+  const plan=inspectBranchContext(file,'',events,seq,mode);
+  if(!plan.leaf)return {events:plan.events};
+  const manager=SessionManager.inMemory(plan.manager.getCwd(),undefined,[plan.manager.getHeader()!,...plan.manager.getEntries()]);
+  manager.createBranchedSession(plan.leaf);
+  const header=manager.getHeader();if(!header||header.version!==CURRENT_SESSION_VERSION)throw Error('The projected branch header is unavailable.');
+  const name=identifier(header.id)+'.jsonl';
+  // parentSession is a documented native header field. The in-memory SDK has
+  // no source filename; retain the same original-file lineage as persisted SDK branching.
+  const native=[{...header,parentSession:file},...manager.getEntries()].map(row=>JSON.stringify(row)+'\n').join('');
+  return {events:plan.events,native,name};
 }

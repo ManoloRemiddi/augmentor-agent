@@ -37,7 +37,8 @@ import {piScheduling} from './scheduling.js';
 import {piLlamaCppSchemas} from './provider-compat.js';
 import {Interactions} from './interactions.js';
 import {isRoutineQuery} from './permissions.js';
-import {branchContext,inspectBranchContext} from './branches.js';
+import {branchContext,inspectBranchContext,branchPublicationContext} from './branches.js';
+import {BranchPublications} from './branch-publications.js';
 import {BranchIntents,branchBoundary,branchIntent,type BranchIntent} from './branch-intents.js';
 import {SetupConnections} from './setup.js';
 import {RELEASE} from '../../contracts/src/release.js';
@@ -80,6 +81,7 @@ export class Host {
   readonly workspaces=new WorkspaceRegistry(join(this.dirs.state,'workspaces.json'),()=>[resolve(process.env.AUGMENTOR_PI_WORKSPACE||process.cwd()),...[...this.metadata.values()].map(m=>resolve(m.cwd))]);
   readonly organization=new SessionOrganization(join(this.dirs.state,'session-organization.json'));
   readonly branchIntents=new BranchIntents(join(this.dirs.state,'branch-intents.json'));
+  private branchPublications=new BranchPublications(join(this.dirs.state,'branch-publications'),this.dirs.sessions);
   readonly appearance=new AppearancePreferences(join(this.dirs.config,'harness-appearance.json'));
   appearanceRevision=0;
   readonly attachments=new PiAttachments(this.dirs.state,(sid,part)=>this.events(this.getMeta(sid)).some(event=>event.type==='user/message'&&event.data.source?.sessionId!==sid&&(event.data.submittedContent??event.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))));
@@ -526,6 +528,7 @@ export class Host {
   }
   private branchTargetEmpty(sid:string){
     if(this.loaded.has(sid)||this.metadata.has(sid))return false;
+    if(process.platform==='linux'&&this.branchPublications.has(sid))return false;
     for(const name of readdirSync(this.dirs.sessions).filter(name=>name===sid||name.startsWith(sid+'.'))){
       const path=join(this.dirs.sessions,name),info=lstatSync(path);
       if(name!==sid||!info.isDirectory()||info.isSymbolicLink()||readdirSync(path).length)return false;
@@ -536,6 +539,7 @@ export class Host {
     const row=this.metadata.get(intent.newSessionId),fork={sessionId:intent.sessionId,messageSeq:intent.messageSeq,mode:intent.mode};
     const disk=readJson<Meta|null>(join(this.dirs.sessions,intent.newSessionId+'.meta.json'),null);
     if(!row||JSON.stringify(row.fork)!==JSON.stringify(fork)||!disk||disk.id!==row.id||JSON.stringify(disk.fork)!==JSON.stringify(fork)||disk.file&&!existsSync(disk.file)||!existsSync(join(this.dirs.sessions,row.id+'.events.jsonl')))throw Error('The branch is not fully published. Preserve its original files for recovery.');
+    if(process.platform==='linux'&&this.branchPublications.has(intent.newSessionId))this.branchPublications.finish(intent);
     return row;
   }
   settleBranch(p:Data){
@@ -554,12 +558,26 @@ export class Host {
     if(!Number.isSafeInteger(p.messageSeq)||p.messageSeq<1||!['reply','edit'].includes(p.mode))throw new Error('Invalid branch target');
     const fork={sessionId:source.id,messageSeq:p.messageSeq,mode:p.mode as 'reply'|'edit'};
     const existing=this.metadata.get(sid);
+    if(p.prepared===true&&process.platform==='linux'&&this.branchPublications.has(sid)){
+      if(!existing){if(source.running)throw Error('Stop the current response before recovering its prepared branch.');this.branchIntents.begin(branchIntent(p));}
+      const recovered=this.branchPublications.finish(branchIntent(p)) as Meta;
+      if(!existing)this.metadata.set(sid,recovered);return this.branchRow(existing??recovered);
+    }
     if(existing){if(JSON.stringify(existing.fork)!==JSON.stringify(fork))throw new Error('Conversation ID already exists');if(p.prepared===true)this.committedBranch(branchIntent(p));return this.branchRow(existing);}
     if(source.running)throw new Error('Stop the current response before branching or editing.');
     if(!source.file||!existsSync(source.file))throw new Error('This conversation has no persisted Pi history yet.');
     const reserved=this.branchIntents.list().find(row=>row.newSessionId===sid);
     if(p.prepared===true){this.branchIntents.begin(branchIntent(p));if(!this.branchTargetEmpty(sid))throw Error('Branch publication is incomplete. Original files were preserved; no branch was repeated.');}
     else if(p.prepared!==undefined&&p.prepared!==false||reserved)throw Error('Use the exact prepared branch identity before creating its child.');
+    if(p.prepared===true&&process.platform==='linux'){
+      const context=branchPublicationContext(source.file,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
+      const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.name?join(this.dirs.sessions,sid,context.name):undefined,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
+      const inherited=context.events.map(event=>event.type==='user/message'?{...event,data:{...event.data,source:{...event.data.source,sessionId:event.data.source?.sessionId??source.id}}}:event);
+      let seq=inherited.at(-1)?.seq??0;if(p.mode==='reply')inherited.push({seq:++seq,type:'turn/end',data:{reason:{kind:'completed'}}});inherited.push({seq:++seq,type:'session/title',data:{title:m.title}});
+      if(!Number.isSafeInteger(seq))throw Error('The branch display sequence is exhausted; originals preserved.');
+      this.branchPublications.prepare(branchIntent(p),[...(context.name?[{kind:'native' as const,name:context.name,data:context.native!}]:[]),{kind:'events',name:'events.jsonl',data:inherited.map(e=>JSON.stringify(e)+'\n').join('')},{kind:'meta',name:'meta.json',data:JSON.stringify(m)+'\n'}]);
+      const committed=this.branchPublications.finish(branchIntent(p)) as Meta;this.metadata.set(sid,committed);return this.branchRow(committed);
+    }
     const directory=privateDir(join(this.dirs.sessions,sid));
     const context=branchContext(source.file,directory,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
     const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
@@ -736,7 +754,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{durableBranches:true,modelSettings:true,modelDiscovery:true,shortcuts:true,appearancePreferences:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelDiscovery:true,shortcuts:true,appearancePreferences:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.compactions.busy)throw Error('Stop and settle Pi compaction before shutting down the runtime.');
       if(this.uploads)throw Error('Finish file uploads before shutting down the runtime.');

@@ -9,6 +9,15 @@ Native and standalone Browser reasoning controls are clients of the existing pri
 
 # Data, permissions and support
 
+[Linux branch publication recovery](HARNESS-BRANCH-PUBLICATION.md) temporarily
+stages the intended ordinary native/display branch history and metadata privately,
+with a scalar path/size/hash manifest. It can contain the same prompt/tool/memory
+content as the intended branch. Pending recovery survives restart; successful
+commit cleanup removes known aliases and bookkeeping. Unpublished or unknown
+temporary originals are preserved for explicit cleanup. Diagnostic clearing does
+not delete these ordinary recovery records. No external request, inference,
+additional support export or automatic tool replay is introduced.
+
 [Managed Pi privacy](PI-PRIVACY.md) now applies the process telemetry opt-out at
 each SDK creation path as well as in launchers. An inherited CLI environment
 cannot override the product's false install-reporting setting and add unsolicited

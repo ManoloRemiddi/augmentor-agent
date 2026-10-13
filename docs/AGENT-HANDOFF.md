@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified Linux branch publication source](HARNESS-BRANCH-PUBLICATION.md#qualified-source)
+finishes attested Fork/Edit saves after denied writes or SIGKILL at each link.
+The same native child and later user work survive explicit recovery with no
+inference or child agent creation during publication. Public persisted SDK label/
+compaction/discovery equivalence, changed/foreign/private records and cleanup
+refusal pass. Strict check/build, **443/443 across 82 MX files** and five packaging
+cases pass. Ordinary/immutable/adoption evidence follows separately. Unattested
+legacy partial children and further-platform adapters remain open. Current Native
+has a draft/busy flag; no shutdown or activation is attempted.
+
 [Qualified unselected managed Pi privacy](PI-PRIVACY.md#qualified-ordinary-and-immutable-candidate) enforces
 the process opt-out at all three SDK creation paths. Real preceding chat,
 improvement and specialist wire cases fail when inherited telemetry overrides

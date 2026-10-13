@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux branch publication recovery](HARNESS-BRANCH-PUBLICATION.md) is authored
+code using Pi 1.1.0's public in-memory branch projection, header/entry and native
+file APIs. No SDK algorithm/private import/patch, supplier source, GUI/CSS or
+dependency is introduced. The Linux filesystem adapter has separate OS gates.
+
 [Managed Pi privacy](PI-PRIVACY.md) adds an authored shared settings helper using
 Pi 1.1.0's public SettingsManager. Existing chat/improvement/specialist SDK owners,
 supplier files/licences and dependency pins remain; no supplier source or SDK

@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux branch publication recovery](HARNESS-BRANCH-PUBLICATION.md) finishes attested
+partial Fork/Edit saves on an explicit retry, with source/ordinary/installed scope.
+
 [Managed Pi privacy](PI-PRIVACY.md) documents the inherited telemetry/header fix,
 shared SDK policy, destination inventory and source/ordinary/installed boundaries.
 

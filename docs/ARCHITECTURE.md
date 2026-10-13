@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux attested branch publication](HARNESS-BRANCH-PUBLICATION.md) projects the
+public SDK ancestry without an AgentSession, stages ordinary payloads privately,
+and publishes complete metadata last. It adds no second conversation loop or
+automatic replay; the original GUI retains its existing explicit action owners.
+
 [Managed Pi privacy](PI-PRIVACY.md) is shared SDK creation policy for existing
 conversation, isolated improvement and bounded specialist owners. It enforces
 the process environment opt-out before their public SettingsManager/SDK creation;

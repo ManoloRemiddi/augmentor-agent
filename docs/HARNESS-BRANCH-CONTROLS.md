@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux attested publication recovery](HARNESS-BRANCH-PUBLICATION.md) extends the
+exact-boundary journal below. Explicit retries finish a verified native/display/
+metadata publication after denied writes or process death, preserving the same
+native child and later work without inference. Older unmanifested partial children
+remain fenced; further-platform adapters and complete migration stay open.
+
 The dated installed checkpoint below is superseded by the
 [current pre-input ancestry qualification](#ordinary-and-installed-pre-input-ancestry-qualification--october-13).
 The dated loaded-controller limitation is superseded only within the durable

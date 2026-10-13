@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`pi-branch-publication-recovery.test.mjs` verifies actual denied writes, SIGKILL
+after each filesystem link, fresh Host recovery, later committed child work and
+exact parent/native preservation. Public persisted SDK label/compaction/discovery
+is compared with the new staged projection. Private/corrupt/changed payloads,
+aliases, cleanup failure and dangling directories remain protected. The test-only
+preload wraps Node's filesystem export to kill at a real link; product SDK methods
+are never patched. See [publication scope](../docs/HARNESS-BRANCH-PUBLICATION.md).
+
 `pi-privacy.test.mjs` verifies fresh/cold real Host behavior without offline flags,
 TCP destinations, immutable synthetic settings and inherited telemetry suppression
 on actual provider headers. A standalone prompt improvement and the specialist's
