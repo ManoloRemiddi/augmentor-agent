@@ -1,7 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 The dated installed checkpoint below is superseded by the
-[current MX brand qualification](HARNESS-BRAND.md#ordinary-and-installed-owner-feedback-qualification--october-13).
+[current pre-input ancestry qualification](#ordinary-and-installed-pre-input-ancestry-qualification--october-13).
 The dated loaded-controller limitation is superseded only within the durable
 Host capability described below; partial filesystem publication remains open.
 
@@ -254,3 +254,54 @@ files** pass with no failures/skips/cancellations. Five notice/workspace packagi
 cases pass. Node 24.19.0, matching isolated QtTest, two workers and existing
 deadlines remain. Ordinary/sealed and installed qualification follows separately;
 the current logo/theme runtime e0c60f1 remains selected until guarded adoption.
+
+
+## Ordinary and installed pre-input ancestry qualification — October 13
+
+Qualified runtime **d79e4769a20f9ec1edf26c36e9303ca0e21bfc7c**, private MX release
+**20261013-124421-a8c9d4c5**, product **0.2.13**, artifact
+**ca3a937eb4ec8cd286b62032accf1cbffdf8efe2b064eb03b699989438493266**, is selected and running. Strict check/build,
+final source and separate ordinary **402/402 across 77 files**, five packaging cases
+per tree and sealed **149/149 across 16 files** pass. Actual SDK/Host/browser fixtures
+use the candidate's bundled Node/compiled files; pure drivers match the ordinary
+source snapshot. Matching isolated QtTest, two workers and deadlines remain.
+The installed e0c60f1 comparator fails on the missing native file and cold goal;
+corrected public-SDK and real-Host fixtures retain exact custom ancestry and the
+first replacement append, preserve parents, create no child AgentSession during
+publication and add no inference during creation/reconciliation/cold reopening.
+
+All **23,909** sealed inventory entries, 666 compiled files, 20,801 dependency
+files, 151 npm instances, nine native/Wasm binaries, 786 licence/provenance files
+and three distribution records verify. Supplier and licence bytes remain unchanged,
+including 580 DSH MIT/108 dashboard Apache records. GUI source/dependency bytes and
+canonical executable code/input graphs match e0c60f1. Rebuilding its original
+spreadsheet overlay changes temporary-path comments, derived Excel chunk names
+and their sorted asset inventory. The first private assembly refused the raw GUI
+hash change. After proving those exact differences, a fresh ordinary assembly
+retains the **byte-exact installed e0c60f1 GUI**, including all logo/theme fixes.
+No supplier code or GUI behavior changes; the first unselected assembly is not
+promoted. No selected file is patched.
+
+Fresh idle audits and exact comparator checks precede guarded Native/Host closure.
+Stable startup verifies actual selected Node/Host and Native roots; Native is
+online/model-ready. Twelve histories, queue items and session identities remain
+unchanged; there is no new placeholder or owner prompt/branch/model inference.
+Of 247 saved originals, 243 are identical, one journal retains its exact prefix
+with one Host close, and three corresponding derivatives update. Draft/attachment
+bytes, profile values/revision, model/auth files and production selection/router
+arguments remain preserved. All nine maintenance counters are zero. Private
+comparators/links/logs stay local.
+
+The installed browser tab entered a `data:` error page at the former Host address.
+Browser URL policy rejected reading/navigating that tab. Automation stops there;
+the owner receives the verified fresh HTTP link for manual opening. No alternate
+browser, raw CDP or error-page bypass is used. This increment does not claim a new
+installed-owner visual read; its GUI is byte-identical and sealed original-GUI
+fixtures pass. The preceding [installed logo/theme visual acceptance](HARNESS-BRAND.md#ordinary-and-installed-owner-feedback-qualification--october-13)
+retains that evidence. Browser origin/theme/placement persistence across runtime
+replacement remains a separate packaging/UX qualification concern.
+
+Partial multi-file publication repair and full P0/P1/custom-plugin/live/privacy/
+public binary distribution/platform/CI gates remain open. Further OS work awaits
+MX feedback. No public binary release, merge or DSH retirement occurs. Later
+qualification documentation changes no installed file.

@@ -38,6 +38,13 @@ Exact confirmed-child settlement clears its own entry. Diagnostic clearing does
 not erase it; corrupt/partial records are preserved for explicit recovery. The
 journal does not send external traffic or authorize broader support exports.
 
+A custom-only first-input Edit now writes the SDK's exact selected header/entries
+as ordinary child native history before reporting creation. Earlier goal/planning
+records therefore persist even when that child has no user/assistant message yet.
+It adds no synthetic message, provider request, external traffic or diagnostic
+payload copy. Native conversation retention applies; clearing diagnostics does
+not erase these records. Parent files remain unchanged.
+
 Pi display history now retains the originating conversation ID with each human message. A branch copies its selected history prefix into the child's private display journal while preserving that origin; it also owns a separate native Pi session file. Inherited request IDs cannot acknowledge a child's new submission. Parent history is preserved. Harness stores the selected conversation ID in that tab's origin-scoped session storage, beside its existing operator token. Branch/Edit operation state, edited text and prior composer drafts remain in memory and are not restored after tab reload. Diagnostic clearing does not erase these ordinary native/display histories or session storage.
 
 The [managed Mac setup](MACOS-MANAGED-SETUP.md) source feature stores its key in

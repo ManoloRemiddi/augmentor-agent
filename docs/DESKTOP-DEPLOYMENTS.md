@@ -1,18 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current installed MX logo, theme and branch qualification](HARNESS-BRAND.md#ordinary-and-installed-owner-feedback-qualification--october-13): runtime **e0c60f1**,
-release **20261013-114829-e268e31c**, product **0.2.13**, selected and running.
-Artifact **ddb1d7445910764841cf34e23d91da87b5fb8bd22f68765ea194b02d2a6eedd3**.
-The thicker elastic circle uses the original header/rail/welcome seats, with black
-Light smoke, preserved Dark flare and transparent surfaces. Dark settings inherit
-DSH's actual primary label token. Source/ordinary each pass **398/398 across 76
-files** plus five packaging cases; **145 sealed checks** and installed visual/theme
-acceptance pass. All **23,909** entries, twelve histories/queues, drafts, profiles
-and model processes verify. DSH/dashboard CSS and 580 MIT/108 Apache records, all
-licence bodies and dependencies remain unchanged. Durable exact-boundary branch
-identity survives fresh browser/Host processes; partial child publication repair
-and full migration/custom-plugin/live/privacy/distribution/platform/CI gates stay
-open. Further OS implementation awaits MX feedback.
+[Current installed MX ancestry recovery](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13): runtime **d79e476**,
+release **20261013-124421-a8c9d4c5**, product **0.2.13**, selected and running.
+Artifact **ca3a937eb4ec8cd286b62032accf1cbffdf8efe2b064eb03b699989438493266**.
+First-input Edit persists earlier custom/goal ancestry before returning creation,
+without a synthetic message, extra inference or child AgentSession at publication.
+Source/ordinary each pass **402/402 across 77 files** plus five packaging cases;
+**149 sealed checks** pass. All **23,909** entries, twelve histories/queues, drafts,
+profiles and model processes verify. The installed e0c60f1 logo/theme GUI remains
+byte-exact, with identical dependencies, licence bodies and 580 MIT/108 Apache
+records. Browser automation is blocked on the old error tab; manual opening uses
+the current private HTTP link. Partial publication repair, browser origin/theme
+persistence and full migration/custom-plugin/live/privacy/distribution/platform/CI
+gates stay open. Further OS implementation awaits MX feedback.
+
 
 
 The dated selection statements below are historical checkpoints, superseded by

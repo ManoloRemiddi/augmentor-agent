@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The dated logo/theme installed checkpoint below is superseded for runtime identity
+by [current ancestry recovery qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13).
+That runtime retains this exact GUI payload and preceding visual evidence.
+
 # Original Augmentor motion in the Harness brand slot
 
 The owner requested replacing the remaining DeepSeek header mark with the moving
