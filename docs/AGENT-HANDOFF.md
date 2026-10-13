@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Plugins Wiki settings](HARNESS-PLUGIN-PARITY.md#wiki-settings-in-the-original-plugins-page--october-13),
+implementation **24bd37297acd417d9e64013e61d440e6b1cc7c52**, stages enable/vault/
+query/routing in the copied DSH form and applies the profile through existing Pi
+owners. Public resources discovery supplies/removes bundled skills; original
+Vault routing now receives configured folders. Strict check/build, 13 focused
+cases and source/separate ordinary MX cohorts pass **467/467 across 92 files**,
+two workers, matching Node/QtTest and no skips. Actual GUI/SDK checks preserve
+native history/Host PID/raw vault data, reject stale peers and active turns,
+retain failed application as pending, recover explicitly and cold-open the form.
+Inspectors receive no configuration/path grant. Fresh production retains 151 npm
+instances/eight pre-Node native files and all 39 Wiki records plus two SOURCE files.
+Current installed 97897cf and unselected dfcdfb9 remain unchanged; neither contains
+this Wiki work. Owner draft/model/speech state is preserved. Sealed/installed and
+live acceptance, receipt reconciliation, optional git and full migration/public
+distribution/platform gates remain open. New-head hosted CI is separate.
+
 [Wiki core source binding](HARNESS-PLUGIN-PARITY.md#wiki-core-source-binding--october-13)
 at **53ea139**, with exact supplier CRLF bytes preserved by **64ae1fc**, mounts
 the six original MIT Wiki Tools operations and nine original MIT skill bodies

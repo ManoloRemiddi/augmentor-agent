@@ -3,6 +3,9 @@
 [Original Wiki tools and skills on Pi](HARNESS-PLUGIN-PARITY.md#wiki-core-source-binding--october-13)
 records pinned MIT source, explicit vault configuration, six supported SDK tools,
 source/ordinary qualification and the remaining GUI/installed workflows.
+The [original Plugins settings](HARNESS-PLUGIN-PARITY.md#wiki-settings-in-the-original-plugins-page--october-13)
+now stage the profile and apply it through the same Pi owners, with explicit
+pending-state recovery; installed-owner acceptance remains separate.
 
 [Current original-GUI motion/navigation qualification](DSH-GUI-ON-PI.md#original-gui-qualification-motion-and-navigation--october-13)
 records 458 passing MX cases, the reproduced misdirected-click correction and

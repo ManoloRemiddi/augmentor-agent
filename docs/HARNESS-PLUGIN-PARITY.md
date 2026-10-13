@@ -16,7 +16,7 @@ not qualify DSH retirement or infer parity from the total test count.
 | Context, reference 0.48.0 | Copied dsh-context 0.68.1 Apache-2.0 composition/browser/trends/Insights/sidebar/Fleet and original Trajectory, including timing and nested arguments; [GUI qualification](DSH-GUI-ON-PI.md). | Complete causal/provenance/skill attribution, representative large histories, wider live provider formats and physical entry points. |
 | Adaptive Reasoning, reference 0.2.0 | Selected public policy and supported Pi hooks, saved/effective effort and shared forms; [reasoning scope](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls). | Representative configured real/virtual model acceptance. Stored effort does not prove a backend honors it. |
 | Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. | Operator configuration/UI, installed-owner acceptance, representative use of the other skill workflows and companion CLIs/services. |
-| Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; query, scaffold, write, inbound-link rename, byte-preserving archive and lint-report effects are checked independently. Read-only, Browser exclusion and unknown-outcome fences qualify. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, receipt inspection/reconciliation UI and standalone add-on/platform qualification. |
+| Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, receipt inspection/reconciliation UI and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
 | Free Web Search 0.1.0 | The DSH baseline has live documentation search; managed Pi MCP/tool search is independently implemented. | Select the actual licensed search supplier and prove inspectable results/source attribution through its Pi workflow. A generic MCP catalog is not this plugin. |
 | Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
@@ -30,7 +30,69 @@ It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision a
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
 
+## Wiki settings in the original Plugins page — October 13
+
+Implementation **24bd372** uses DSH's copied `SettingsForm`, `SettingsValueField`
+and toggle row in the existing **Settings → Plugins** section. It stages enable,
+absolute vault path, query limit and JSON page-type routing together; only
+**Save Wiki settings** writes. Leaving the section discards its unsaved form.
+The copied components/CSS and supplier notices are unchanged. There is no new
+dependency or replacement settings layout. Dark-theme field/label contrast is
+checked against the actual original Settings panel.
+
+The existing private `config/wiki.json` schema stays `augmentor-wiki/1`; its
+revision is the hash of the exact stored bytes, or `missing`. Reads create neither
+a profile nor a vault. Saves compare that revision, validate all staged values
+and publish a private 0600 file. Unsupported, malformed, public, linked or
+hardlinked originals are preserved; those invalid originals require explicit
+operator repair. A stale form cannot overwrite a peer's newer save. A missing
+reply is not retried: **Refresh Wiki settings** reads the stored profile and
+replaces the unsaved form before another explicit action.
+
+The Host exposes `wiki.describe`, `wiki.set` and `wiki.refresh` only to operator
+Harness access. Read-only conversation inspectors cannot read the vault path or
+configure it. Browser/delegated sessions still receive no Wiki vault/tool grant.
+Status reports the saved profile and applied/loaded Native conversation counts.
+
+Saving checks that turns, jobs, compaction, improvement and shared management are
+idle and queued prompts/goals are paused. Pi's public `AgentSession.reload` then
+rebuilds resources in **the same existing owners**. No new conversation, provider
+request, tool operation or vault creation is part of settings application. The
+public `resources_discover` extension hook supplies the nine bundled skill paths
+when enabled and removes them on disabled reload. All six reserved tool names
+are checked again before session start. Original page-folder mappings now reach
+the Vault constructor; the earlier binding validated but did not apply them.
+
+A saved profile whose application fails stays visible as pending. Native prompts
+remain blocked until **Apply stored Wiki settings** / `wiki.refresh` explicitly
+succeeds. Refreshing the form alone does not apply or retry. Other Wiki mutation
+receipts remain independent: applying settings never clears uncertainty or
+replays a vault action. Concurrent external edits during application are refused.
+
+Strict check/build and **13 focused cases** pass. The actual original GUI/SDK case
+checks staged saving, unchanged native history/Host PID/raw vault bytes, stale
+peer edits, disable/enable tool catalogs, a real approved-resource tool collision,
+failed-application admission, explicit repair, an active held provider request,
+private-file permissions, inspector rejection and a fresh Host/browser opening.
+The supplier query skill and all six original operation effects remain checked;
+the core flow now independently verifies the configured `wiki/areas` routing.
+The source and separate ordinary MX cohorts each pass **467/467 across 92 files**, two workers, Node 24.19.0,
+matching QtTest/PySide6/shiboken6 6.8.2.1, unchanged deadlines and no skips.
+The fresh production assembly retains **151 npm instances** and all **eight**
+pre-Node ELF/Wasm dependency files. All **39** supplier/binding records and both
+SOURCE.json files match the copied compiled packages byte-for-byte. These are
+isolated source/production-tree fixtures, not an installed owner-vault test.
+
+The selected/running **97897cf** preview and older unselected **dfcdfb9** artifact
+remain unchanged. This source feature is not installed there. Owner draft/model/
+speech state remains preserved. Sealed/installed acceptance, receipt reconciliation,
+optional git, larger/concurrent vaults, live companion workflows and the broader
+migration/public distribution/platform gates remain open.
+
 ## Wiki core source binding — October 13
+
+This preceding checkpoint's manual configuration and no-GUI statements describe
+the initial binding; the Plugins settings qualification above supersedes them.
 
 Implementation **53ea139**, with exact published-byte preservation at
 **64ae1fcbcb9c339c450a04a978c9527e06f0f508**, binds the public

@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`wiki-settings.test.mjs` checks no-write reads, private revision-fenced saves,
+stale/unsafe original preservation and a lost save reply with no retry.
+`harness-wiki-settings-chromium.test.mjs` uses the original Plugins form and actual
+SDK owners for save/routing/catalog changes, Dark contrast, unchanged native/raw
+bytes, stale peers, a real resource collision, pending application, explicit repair,
+an active provider request, inspector rejection and cold Host/browser recovery.
+The only permitted browser error is the exact deliberately stale save's 400;
+the browser leaves the old document before the intentional Host shutdown.
+Source and separate ordinary 92-file MX qualification each pass 467/467. See
+[settings scope](../docs/HARNESS-PLUGIN-PARITY.md#wiki-settings-in-the-original-plugins-page--october-13).
+
 `pi-wiki.test.mjs` checks all six original Wiki operations through the actual
 SDK/HTTP owner, independently observed vault effects, approved query-skill content,
 read-only permissions, Browser exclusion and owner Stop after an uncertain archive.
