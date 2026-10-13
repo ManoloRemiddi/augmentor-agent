@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current original-GUI motion/navigation qualification](DSH-GUI-ON-PI.md#original-gui-qualification-motion-and-navigation--october-13)
+records 458 passing MX cases, the reproduced misdirected-click correction and
+document readiness; application code and installed artifacts are unchanged.
+
 [Current Office packaging source review](HARNESS-OFFICE-PREVIEWS.md#linux-packaging-source-review--october-13)
 records exact private-preview source/notice validation and the remaining public
 corresponding-source/rebuild boundary. Existing preview artifacts are unchanged.

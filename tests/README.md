@@ -157,6 +157,18 @@ Direct SDK MCP fixtures explicitly set `PI_CODING_AGENT_DIR` to each temporary a
 
 Context pointer preparation now reobserves and scrolls a replacement target within the fixture's existing deadline, checks the actual center hit, and dispatches only one click after readiness. `harness-pointer-chromium.test.mjs` replaces a control with an offscreen button during animation-frame rendering and verifies zero clicks on the original and exactly one real pointer click on its replacement. A readiness failure includes target/viewport/hit geometry. The prior published Debian `Control is not hit` failure did not retain that geometry, so its exact trigger remains unproved. Product UI/layout and fixture deadlines are unchanged. The public-client MCP fixture loads declared ESM exports from the selected artifact to preserve OAuth/abort/timeout class identity.
 
+The expanded pointer case uses actual copied rail CSS and a delayed dispatch to
+reproduce a click reaching an authored neighbour. Preparation now observes stable
+geometry and active finite animations, while retaining infinite decoration and
+clickable toast actions during a future fade delay. Three actual-pointer cases
+cover replacement, rail movement and the original toast hold. The independent
+`harness-navigation-chromium.test.mjs` holds a local script to demonstrate that
+Page.navigate acknowledgment is not completed-document readiness; the Metafolder
+inspector now waits for document replacement/completion. Original workspace Rename
+input is explicitly focused, selected and observed before confirmation. The
+declared MX cohort has 88 files; [qualification and scope](../docs/DSH-GUI-ON-PI.md#original-gui-qualification-motion-and-navigation--october-13)
+record 458 passing source cases and the still-separate hosted/installed gates.
+
 Initial MCP authorization lifecycle: `pi-mcp-parallel.test.mjs` uses an actual public SDK session, synthetic HTTP/provider wire and the staged managed MCP factories with **test-only parallel execution**. One/two scope failures retain a delayed sibling receipt and the SDK sign-in result. The Native private owner stays sequential; `pi-mcp.test.mjs` separately qualifies its actual OAuth error, next read, recorded requirement and display notice. Public-client cases add callback-message privacy, sibling/failed-call/both cancellation, both timeout positions, cancellation wire delivery and explicit close. [The current owning scope](../docs/MCP-TRANSPORT.md#authorization-errors-and-parallel-receipts) includes the additional observation/resource/GET/admission fixtures above; live OAuth acceptance remains open. Build first; use the existing isolated Qt interpreter for broader Native fixtures.
 
 MCP HTTP excerpt follow-up: `pi-tool-budget.test.mjs` selects budget/original implementations from `AUGMENTOR_PI_TEST_ROOT` when staging is requested. It adds Unicode metadata-only listing/explicit reads, partial/unavailable coverage, binary withholding, prefix/shape corruption rejection and current-branch isolation. `pi-mcp.test.mjs` verifies through the actual owner/synthetic provider that the HTTP body first enters provider context after the excerpt tool explicitly reads it, with capture off and no failed-action replay. [The owning contract](../docs/MCP-TRANSPORT.md#agent-recovery-of-retained-http-bodies) keeps transport IDs separate from canonical agent call IDs. Use `AUGMENTOR_PYTHON` with the existing isolated QtTest interpreter for broader Native fixtures; the first wider run without it failed those Qt imports, and the corrected full run is recorded separately in the handoff.

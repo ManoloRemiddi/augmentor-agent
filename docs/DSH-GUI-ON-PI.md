@@ -1,5 +1,68 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Original GUI qualification: motion and navigation — October 13
+
+Driver implementation **d77a4367aec3ee9505bace3591a5502f12efb082** fixes a
+reproduced pointer-preparation defect. The actual copied rail CSS moves a control
+49 pixels over 150 milliseconds. A fixture delaying the one mouse dispatch by
+170 milliseconds makes the preceding helper click an authored neighbour instead:
+zero intended presses/clicks and one neighbour click. The updated helper observes
+stable geometry over animation frames and waits for finite control/ancestor
+animations that are active now. It dispatches once after readiness, without
+replaying a click. The same case now records one intended press/click and no
+neighbour click. Infinite decorative motion remains enabled.
+
+Delayed fade-out is not active movement: the original toast's future fade must
+not block its Undo action during the six-second hold. The first broad run exposed
+that overreach in the initial helper change. The corrected preparation ignores
+the delayed phase while retaining the original entry animation; an actual copied
+toast-CSS fixture and the complete original archive/Undo workflow pass. Supplier
+CSS, control layout, timings, labels and application code are unchanged.
+
+The navigation fixture demonstrates that Chrome acknowledges Page.navigate while
+a new document is still loading a held local script. The Metafolder inspector
+check now uses a helper that waits for the old document to be replaced and the
+new document to complete before inspecting it. It does not replay navigation or
+ignore errors outside that explicit transition. Exact parent history, grouping
+and provider request counts remain covered by the existing Metafolder workflow.
+The original workspace Rename test now explicitly focuses/selects the field and
+observes the accepted Research value before confirmation; it retains the original
+form and exact catalog-title assertion.
+
+Final source validation passes **458/458 across 88 MX files**, with Node 24.19.0,
+two workers, unchanged deadlines and no skips. The pointer and navigation cases
+are now part of the declared MX cohort. The focused Native/UI recovery run passes
+**65/65**, using the existing verified PySide6/shiboken6/QtTest 6.8.2.1 environment.
+The first broad run records 450/457 passing, six Qt-related result failures from
+using the runtime interpreter without QtTest, and the toast wait defect above;
+that run is not a passing qualification. Final verification uses the correct
+qualification interpreter and corrected helper.
+
+Preceding hosted CI **a9e8966 / run 38440321456** runs 1,129 Node cases, with 1,105
+passing, one failing and 23 skips. Its Rename confirmation stays disabled before
+packaging. Earlier f2e2d3e has three different browser failures. The concrete rail
+and document-readiness cases establish defects in preparation, but do not prove
+the sole cause of any unretained hosted click. The new source passes locally;
+new-head hosted CI remains separate and the streamed-argument failure's remote
+cause remains unproved. No deadline, worker count or CI expectation is relaxed.
+
+The selected **97897cf / 20261013-142001-1f7f7f96** runtime and unselected
+**dfcdfb9 / 20261013-190500-3bf1e21f** navigation artifact remain unchanged. These
+are qualification-driver changes, not a new application deployment. Full migration,
+owner/plugin/live/privacy/distribution and platform acceptance remains open; further
+OS implementation awaits owner MX feedback.
+
+Additional staged verification uses driver **d77a436** outside the immutable
+candidate and its actual bundled Node/runtime/SDK/GUI. **11/11 cases across six
+files** pass, covering the pointer/navigation proofs, all brand seats/themes,
+Metafolder cold/scoped reads, streamed arguments and complete original Context/
+workspace/archive/Undo/Stop flows. All **23,940** artifact entries verify afterward;
+the actual copied rail/toast CSS used by the authored cases matches candidate
+supplier bytes. Artifact remains
+**59d2bb7bebd6869379e87a00200fb7e234b306e6af2a5ee8d38b4ee76dfb1b2b**.
+This additional driver scope does not replace or add totals to the earlier 204-case
+sealed qualification, and does not establish installed-owner or hosted acceptance.
+
 ## Original scoped inspector — October 13 source follow-up
 
 The Browser Models/Inspector entry now opens the original DSH GUI. The preceding

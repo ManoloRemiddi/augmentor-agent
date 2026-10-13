@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original GUI readiness qualification](DSH-GUI-ON-PI.md#original-gui-qualification-motion-and-navigation--october-13),
+driver **d77a436**, passes **458/458 across 88 MX files**, two workers, unchanged
+deadlines and no skips. The actual rail-motion case reproduces a click reaching a
+neighbour; stable geometry/active finite animation preparation now dispatches once
+to the intended control, retaining infinite decoration and original Undo holds.
+Metafolder inspection waits for document replacement/completion; workspace Rename
+uses observed input focus/value. The matching QtTest focused run passes 65/65.
+No application, supplier, dependency or installed artifact changes. Preceding
+a9e8966 CI has one Rename failure before packaging; earlier remote causes and
+new-head hosted qualification remain separate. Owner draft, selected 97897cf and
+unselected dfcdfb9 remain preserved. Full migration and release gates stay open.
+Additional driver d77a436 checks against that candidate's actual bundled Node/
+runtime/SDK/GUI pass 11/11 across six files; all 23,940 entries verify afterward.
+The driver stays outside the immutable artifact. These additional cases do not
+alter the older sealed count or qualify installed-owner/hosted acceptance.
+
 [Office production source/notice validation](HARNESS-OFFICE-PREVIEWS.md#linux-packaging-source-review--october-13),
 implementation **647dd1a**, passes **28 focused packaging/security cases** and fresh
 151-instance production staging. It pins 49 engine/41 entry files and exports the
