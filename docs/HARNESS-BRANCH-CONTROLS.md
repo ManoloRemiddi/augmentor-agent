@@ -210,3 +210,47 @@ does not branch the owner's conversations. See [complete installed qualification
 The reproduced cold identity gap is closed for the modern capability. Partial
 child publication repair and full migration/live/privacy/distribution/platform/CI
 gates remain open. Further OS implementation awaits MX feedback.
+
+
+## Persisting pre-input custom ancestry — October 13
+
+A new installed-runtime comparator at **e0c60f1** reproduces two failures: the
+public SDK leaves a custom-only Edit child without its planned native file, and
+editing a first input loses its earlier disarmed goal after a fresh Host. The
+source had attempted to load an AgentSession to force persistence, but Pi only
+flushes a deferred session after a user/assistant message exists. Custom goal,
+planning and policy ancestry alone does not trigger that flush. Creating a child
+or reading it must not invent a model message to work around this rule.
+
+The binding now materializes that deferred branch's exact public SDK `getHeader()`
+and `getEntries()` into its new native file using exclusive mode-0600 creation,
+file sync and Unix directory sync, inside a checked private directory; a linked
+target cannot redirect the write. It reopens through public `SessionManager.open`
+so subsequent SDK input appends once rather than trying to create the same file
+again. It calls no private SDK method and changes no upstream source. Normal
+SDK-persisted branches retain their existing behavior. Parent bytes are preserved;
+failed writes are not reported as successful creation or cleaned up by overwriting
+possible partial history. Incomplete publication stays fenced for explicit recovery.
+The Host no longer loads resources/an AgentSession merely to publish this branch.
+One child AgentSession starts when its actual conversation is opened for use.
+
+Four new cases exercise exact custom ancestry, a fresh manager's first append,
+private mode, real Host first-input Edit with an earlier goal, cold goal replay and
+no extra inference/child load during publication, plus a real denied write and linked target. The
+installed comparator fails on native-file existence and then on the missing cold
+goal. All fixtures are independently authored, private and disposable. Owner
+conversations/model/speech state and the running logo/theme preview are not used.
+The shared implementation adds no OS-specific feature; Windows directory syncing
+retains its existing platform boundary. Physical Windows/macOS qualification remains
+open, and further OS implementation awaits MX feedback.
+
+Strict/focused/full source, ordinary and sealed qualification follow separately.
+Partial multi-file publication repair, complete migration/custom-plugin/live/
+privacy/distribution/platform/CI gates remain open. This corrects custom-only
+ancestry durability without claiming all branch crash boundaries complete.
+
+Final strict check/build, twenty focused cases and **402/402 across 77 MX source
+files** pass with no failures/skips/cancellations. Five notice/workspace packaging
+cases pass. Node 24.19.0, matching isolated QtTest, two workers and existing
+deadlines remain. Ordinary/sealed and installed qualification follows separately;
+the current logo/theme runtime e0c60f1 remains selected until guarded adoption.

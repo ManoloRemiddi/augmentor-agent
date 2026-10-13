@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`pi-branch-publication.test.mjs` verifies persistence of a first-input Edit's
+custom-only SDK ancestry, private/exclusive writes and a fresh manager's first
+append. A real Host retains an earlier disarmed goal across process replacement
+without another provider request or child AgentSession at publication. A denied
+write and linked target preserve source originals. The installed e0c60f1 comparator reproduces the
+missing-file and cold-goal failures. See [publication scope](../docs/HARNESS-BRANCH-CONTROLS.md#persisting-pre-input-custom-ancestry--october-13).
+
 `pi-branch-recovery.test.mjs` checks private bounded durable branch identity, cold
 reads, conditional settlement, failed publication, invalid data/link/mode guards
 and refusal of SDK header migration. Controller/real Host/original GUI cases test

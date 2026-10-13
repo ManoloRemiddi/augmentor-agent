@@ -561,8 +561,6 @@ export class Host {
     const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
     const inherited=context.events.map(event=>event.type==='user/message'?{...event,data:{...event.data,source:{...event.data.source,sessionId:event.data.source?.sessionId??source.id}}}:event);
     writeFileSync(join(this.dirs.sessions,sid+'.events.jsonl'),inherited.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600});
-    // Pi defers writing branches with no assistant messages until a reply.
-    if(context.manager&&context.file&&!existsSync(context.file))await this.load(m,context.manager);
     this.save(m);this.metadata.set(sid,m);
     if(p.mode==='reply')this.append(m,'turn/end',{reason:{kind:'completed'}});
     this.append(m,'session/title',{title:m.title});

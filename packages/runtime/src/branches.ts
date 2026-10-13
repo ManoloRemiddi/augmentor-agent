@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {SessionManager,CURRENT_SESSION_VERSION} from '@earendil-works/pi-coding-agent';
-import {constants,openSync,closeSync,readSync,fstatSync} from 'node:fs';
+import {constants,openSync,closeSync,readSync,fstatSync,lstatSync,existsSync,writeFileSync,fsyncSync} from 'node:fs';
 import {type DisplayEvent} from '../../protocol/src/index.js';
 import {GOAL_ROUND_TYPE,goalUserHash,goalProjection} from './goals.js';
 
@@ -50,7 +50,24 @@ export function inspectBranchContext(file:string, directory:string, events:Displ
 }
 
 export function branchContext(file:string,directory:string,events:DisplayEvent[],seq:number,mode:'reply'|'edit'){
+  const info=lstatSync(directory);
+  if(!info.isDirectory()||info.isSymbolicLink()||process.platform!=='win32'&&(info.uid!==process.getuid!()||(info.mode&0o077)!==0))throw Error('Use the private branch directory; originals were preserved.');
   const plan=inspectBranchContext(file,directory,events,seq,mode);
   const fileName=plan.leaf?plan.manager.createBranchedSession(plan.leaf):undefined;
-  return {manager:plan.leaf?plan.manager:undefined,file:fileName,events:plan.events};
+  let manager=plan.leaf?plan.manager:undefined;
+  if(manager&&fileName&&!existsSync(fileName)){
+    // The SDK defers a custom-only branch until its first conversation message.
+    // Persist its exact public header/entries without inventing a message or
+    // loading extensions/an AgentSession just to force a file into existence.
+    const header=manager.getHeader();if(!header||header.version!==CURRENT_SESSION_VERSION)throw Error('The native branch header is unavailable; originals were preserved.');
+    const fd=openSync(fileName,constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);
+    try{for(const entry of [header,...manager.getEntries()])writeFileSync(fd,JSON.stringify(entry)+'\n');fsyncSync(fd);}finally{closeSync(fd);}
+    if(process.platform!=='win32'){
+      const fd=openSync(directory,constants.O_RDONLY|(constants.O_DIRECTORY??0)|(constants.O_NOFOLLOW??0));try{fsyncSync(fd);}finally{closeSync(fd);}
+    }
+    // A fresh supported manager recognizes the existing file and appends once;
+    // the original deferred manager must not later try to create it with "wx".
+    manager=SessionManager.open(fileName,directory);
+  }
+  return {manager,file:fileName,events:plan.events};
 }
