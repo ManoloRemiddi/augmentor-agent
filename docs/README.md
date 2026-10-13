@@ -1,5 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+- [Recorded Trajectory requests](TRAJECTORY-REQUEST-NUMBERING.md): original controls count only observed Pi provider requests; unlinked SDK receipts remain visible.
 [Nested original tool rows](TRAJECTORY-NESTED-TOOLS.md) binds public Pi child
 starts/results to existing SUBTOOL details, preserves scoped arguments/outcomes
 and corrects Context File Activity's reused-ID attribution. Source, ordinary and

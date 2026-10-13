@@ -2033,9 +2033,10 @@
     },
     {
       "path": "packages/client/ui-trajectory/src/client/TrajectoryView.tsx",
-      "sha256": "a70e847f6c8be56db799faf664ee01449b2c15061f1452d1f4a6a505a1cefd16",
+      "sha256": "4ba11acfde3df286b2c7e8868889d98505e865b0e89fe1ea023e7defcc056828",
       "upstreamPath": "packages/client/ui-trajectory/src/client/TrajectoryView.tsx",
-      "upstreamSha256": "a70e847f6c8be56db799faf664ee01449b2c15061f1452d1f4a6a505a1cefd16"
+      "upstreamSha256": "a70e847f6c8be56db799faf664ee01449b2c15061f1452d1f4a6a505a1cefd16",
+      "modification": "Optional recorded-only request numbering for Pi; unmatched SDK receipts remain visible without inferred provider request controls. Original default behavior, layout, controls and CSS preserved."
     },
     {
       "path": "packages/client/ui-trajectory/src/client/code-program.ts",

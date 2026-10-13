@@ -1,4 +1,6 @@
 /** Trajectory view: compact summary over a turn-aware event ledger. */
+// Modified by Augmentor: optional recorded-only request numbering for Pi bindings;
+// unmatched SDK assistant receipts remain visible without inferred request controls.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type {
@@ -75,6 +77,8 @@ function partialStructureSignature(partial: TrajectorySnapshot['partial']): stri
 
 /** Session-bound controls not already supplied by the conversation view slot. */
 export interface TrajectoryViewInjected {
+  /** Require an observed provider request; keep legacy inference by default. */
+  recordedRequestsOnly?: boolean
   /** Shared wrapping preference read by expansion handlers. */
   jsonStringWrapping?: Omit<NonNullable<JsonTreeProps['stringWrapping']>, 'label'>
   hooks: {
@@ -131,7 +135,7 @@ function addUsage(
 
 export function TrajectoryView({
   useSession, useTrajectory, useDuration, loadOlder, loadImage, setActualDuration,
-  viewRequest, completeViewRequest, renderSlot, t, jsonStringWrapping,
+  viewRequest, completeViewRequest, renderSlot, t, jsonStringWrapping, recordedRequestsOnly,
 }: ConvViewProps
   & PropsRenderSlots<'conversation.trajectory.images'>
   & InjectFace<TrajectoryViewInjected>
@@ -233,7 +237,7 @@ export function TrajectoryView({
           : undefined,
       })),
       ...[...assistantsByStep.entries()].flatMap(([key, node]) =>
-        requestsByStep.has(key)
+        recordedRequestsOnly === true || requestsByStep.has(key)
           ? []
           : [{
             seq: node.seq,
@@ -312,7 +316,7 @@ export function TrajectoryView({
 
     return numbered
   }, [
-    completeInspection.eventNodes, completeInspection.requests, t,
+    completeInspection.eventNodes, completeInspection.requests, t, recordedRequestsOnly,
   ])
   const partialTurn = partial?.turn ?? null
   const partialStep = partial?.step ?? null
