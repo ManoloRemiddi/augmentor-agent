@@ -3,17 +3,22 @@
 `harness-nested-tools.test.mjs` checks scoped parent trees, independent outcomes,
 legal long IDs, unavailable legacy arguments and Context File Activity's exact
 earlier inputs. `harness-nested-tools-chromium.test.mjs` uses the public SDK,
-original approval/SUBTOOL UI, real reads, a held child, Stop, repeated IDs, an error
+original approval/SUBTOOL UI, real reads, a held child and event poll, Stop, repeated IDs, an error
 sibling and a fresh Host, with unchanged native/display originals and no replay.
 It accepts only exact departing old-Host polling refusal during deliberate shutdown;
 new-Host/UI errors fail. The existing argument test additionally checks encoded
 shared/count/per-call limits. See [nested tool boundaries and qualification](../docs/TRAJECTORY-NESTED-TOOLS.md).
 
-[Latest qualified MX cohort](../docs/TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13):
-runtime **a49d58d**, final source and separate ordinary **358/358 across 70 files**,
+Canonical Stop contracts preserve late live events, notify family readers, refuse
+retired selection/metadata responses and keep failed reads unconfirmed without a
+cancel/work retry. The exact held-poll browser regression fails on the interim
+02a55a9 immutable GUI and passes on corrected source/artifact.
+
+[Latest qualified MX cohort](../docs/TRAJECTORY-NESTED-TOOLS.md#final-ordinary-and-installed-mx-qualification--october-13):
+runtime **743bc47**, final source and separate ordinary **369/369 across 72 files**,
 five packaging cases in each, zero failures/skips/cancellations, Node **24.19.0**,
 two workers, unchanged deadlines and matching isolated QtTest. Final immutable
-**26/26** and separate manual installed original-GUI acceptance pass. Synthetic
+**52/52** and separate manual installed original-GUI acceptance pass. Synthetic
 provider checks and actual owner retained-data reads have distinct scopes; local
 MX passes do not qualify Debian/Windows/macOS or the new publication head's CI.
 Earlier counts/deployment statements below are historical checkpoints. Remaining

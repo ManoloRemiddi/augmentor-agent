@@ -1,12 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current installed MX preview](TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13):
-runtime **a49d58da343e17f7e671b203906979384b49528c**, release
-**20261013-054009-ab664123**, product **0.2.13**, selected and running. Source and
-ordinary each pass **358/358 across 70 files** plus five packaging cases;
-**26 immutable tests** and manual original-GUI acceptance pass. Streamed arguments,
-lost-patch refusal, request-scoped call details and attested shortcut revisions
-preserve the supplier GUI/CSS/licences and owner state. All **23,890** installed
+[Current installed MX preview](TRAJECTORY-NESTED-TOOLS.md#final-ordinary-and-installed-mx-qualification--october-13):
+runtime **743bc47306dd84e6e4c20a646bc7077e5a146203**, release
+**20261013-074420-902c1a6c**, product **0.2.13**, selected and running. Source and
+ordinary each pass **369/369 across 72 files** plus five packaging cases;
+**52 immutable tests** and manual original-GUI acceptance pass. Nested argument/
+result trees, independent outcomes, canonical Stop receipts and scoped File
+Activity preserve supplier GUI/CSS/licences and owner state. All **23,893** installed
 entries verify. Full migration/live/privacy/public-distribution/platform gates
 and CI failures remain open; further OS implementation awaits owner MX feedback.
 

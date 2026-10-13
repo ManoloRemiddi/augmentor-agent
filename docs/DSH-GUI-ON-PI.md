@@ -1,10 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current installed original GUI](TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13):
-runtime **a49d58d**, private MX **20261013-054009-ab664123**, selected and running.
-Original pending Trajectory payloads now receive bounded public Pi argument
-snapshots; request/message-scoped details preserve repeated SDK call IDs across
-turns. Source/ordinary **358/358**, **26 immutable tests** and manual original-GUI
+[Current installed original GUI](TRAJECTORY-NESTED-TOOLS.md#final-ordinary-and-installed-mx-qualification--october-13):
+runtime **743bc47**, private MX **20261013-074420-902c1a6c**, selected and running.
+Original SUBTOOL rows show bounded public Pi child arguments, results and exact
+parent trees; acknowledged Stop reconciles canonical receipts before idle metadata.
+Scoped File Activity retains the right paths across reused IDs. Source/ordinary
+**369/369**, **52 immutable tests** and manual original-GUI
 acceptance pass. The original Context/Insights dashboard, supplier layout/CSS and
 all **580 MIT/108 Apache-2.0** records remain unchanged by this increment.
 Unavailable data and full migration/live/privacy/distribution/platform gaps remain

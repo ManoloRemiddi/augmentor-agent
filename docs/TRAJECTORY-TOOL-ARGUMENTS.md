@@ -2,11 +2,12 @@
 
 # Streamed tool arguments in the original Trajectory
 
-Current private MX selection is runtime **a49d58da343e17f7e671b203906979384b49528c**,
-release **20261013-054009-ab664123**, selected and running. See
-[ordinary and installed qualification](#ordinary-and-installed-mx-qualification--october-13)
+Current private MX selection is runtime **743bc47306dd84e6e4c20a646bc7077e5a146203**,
+release **20261013-074420-902c1a6c**, selected and running. See
+[nested tools and current installed qualification](TRAJECTORY-NESTED-TOOLS.md#final-ordinary-and-installed-mx-qualification--october-13)
 for final source/artifact checks, manual acceptance and preservation evidence.
-Earlier checkpoints below are historical, including the interim reused-ID failure.
+Earlier checkpoints below are historical, including the interim reused-ID failure
+and preceding a49d58d installed qualification.
 
 The copied DSH Trajectory now receives tool-call argument updates from the public
 Pi SDK while the assistant is still generating. Its existing pending Tool row and

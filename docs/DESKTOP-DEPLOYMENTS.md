@@ -1,13 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current private MX selection](TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13):
-runtime **a49d58da343e17f7e671b203906979384b49528c**, release
-**20261013-054009-ab664123**, product **0.2.13**, artifact
-**f8d7431feb00d883dca0efe91dbc26a389835fa05ed13333ef0be7908a592f45**,
+[Current private MX selection](TRAJECTORY-NESTED-TOOLS.md#final-ordinary-and-installed-mx-qualification--october-13):
+runtime **743bc47306dd84e6e4c20a646bc7077e5a146203**, release
+**20261013-074420-902c1a6c**, product **0.2.13**, artifact
+**a19df7e1d6a54f9651c541f799e6dd553d0cf01510e8b2844fad21b905a68d69**,
 selected and running after separate immutable staging and guarded activation.
-All **23,890** entries and owner-state preservation verify before and after GUI
+All **23,893** entries and owner-state preservation verify before and after GUI
 reads. Stable launchers resolve this selection; earlier releases remain preserved.
-Source/ordinary each pass **358/358**; immutable/manual acceptance is recorded in
+Source/ordinary each pass **369/369**; 52 immutable tests and manual acceptance are recorded in
 the linked guide. Public distribution and full migration/platform gates remain open.
 
 The dated selection statements below are historical checkpoints, superseded by

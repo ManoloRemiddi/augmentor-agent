@@ -3,8 +3,9 @@
 [Nested original tool rows](TRAJECTORY-NESTED-TOOLS.md) binds public Pi child
 starts/results to existing SUBTOOL details, preserves scoped arguments/outcomes
 and corrects Context File Activity's reused-ID attribution. Source, ordinary and
-installed qualification are recorded separately; the selected preview is unchanged
-until guarded immutable adoption.
+installed qualification are recorded separately. Corrected runtime 743bc47 is
+selected/running in private MX 20261013-074420-902c1a6c; full migration/platform
+gates remain open.
 
 [Streamed Trajectory tool arguments](TRAJECTORY-TOOL-ARGUMENTS.md) connects public
 Pi argument snapshots to the original pending Tool/Payload seats, with bounded

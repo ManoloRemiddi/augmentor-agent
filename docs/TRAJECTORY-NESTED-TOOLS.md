@@ -2,7 +2,12 @@
 
 # Nested tools in the original DSH interface
 
-The source adapter connects Pi's public nested tool events to the copied DSH
+[Current installed qualification](#final-ordinary-and-installed-mx-qualification--october-13):
+runtime **743bc47306dd84e6e4c20a646bc7077e5a146203**, private MX
+**20261013-074420-902c1a6c**, selected and running. Earlier checkpoints below are
+historical, including the interim live Stop failure.
+
+The Augmentor adapter connects Pi's public nested tool events to the copied DSH
 Trajectory's existing **SUBTOOL** rows. A running parent carries both settled and
 pending children; its final result retains their argument/result trees. Nested
 results appear once in that tree. The original renderer, layout, inspector, CSS,
@@ -174,3 +179,71 @@ selected/running remains the interim 02a55a9 until a new immutable release quali
 it is not patched in place. Full P0/P1, live/privacy/public distribution and
 physical/platform gates remain open. Further OS implementation awaits owner MX
 feedback.
+
+## Final ordinary and installed MX qualification — October 13
+
+Corrected runtime **743bc47306dd84e6e4c20a646bc7077e5a146203** passes strict
+check/build and **369/369 across 72 files**, zero failures/skips/cancellations,
+with Node **24.19.0**, matching isolated QtTest, two workers and unchanged
+deadlines. The separate ordinary artifact passes the same cohort and five
+notice/workspace cases; source also passes all five. All **663 compiled files**,
+**20,801 production dependency files**, **151 npm instances**, **nine native/Wasm
+executables**, **783 licence files**, generated distribution records and inherited
+Node/native bytes match the reviewed assembly. All **580 MIT/108 Apache-2.0**
+supplier records, licence bodies and original GUI/CSS remain unchanged.
+
+The fresh immutable candidate explicitly selects its own bundled Node, then
+passes **52/52** argument, nested tree/Stop, original DSH/Context, shortcut and
+actual Chromium cases. Its actual SDK/Host/GUI exercise includes the held-poll
+Stop regression and fresh Host reopening; pure drivers use the matching assembly
+source. Guarded idle/draft checks, actual prior Native/Host absence, supported
+activation and sequential stable-launcher Host/Native startup select private MX
+**20261013-074420-902c1a6c**, product **0.2.13**, artifact
+**a19df7e1d6a54f9651c541f799e6dd553d0cf01510e8b2844fad21b905a68d69**.
+The actual selected Node/main, Native root and all **23,893** entries verify before
+and after GUI reads. Earlier releases remain immutable comparators. Documentation
+closeout does not replace the runtime.
+
+Manual acceptance on a separate authored installed profile verifies pending
+child payload/schema/start and the real read beneath its parent. Original Stop
+retains **Turn 1 · Step 1**, the selected child's Failed/SDK abort result, its
+completed read and the parent error tree **without reload**. The second turn uses
+the same raw IDs with distinct recorded request/capture identities, opens its
+own **Turn 2 · Step 1**, and preserves that selection through completion. The
+deliberately failed sibling stays independent from the completed parent/held
+child. Original Context shows **three retained request bodies**, **nine tool
+settlements** and **two reads of one file**. Exactly nine SDK starts/results, two
+real reads and three wire requests occur across both turns.
+
+Explicit Trajectory reopening and second-child selection after browser reload
+retain the correct payload/result/schema and measured interval. Display history
+and native originals remain byte-identical across reload; request count stays
+three. Fixture stderr is empty, and the temporary tab and exact supervisor/Host
+are closed with actual process absence verified. Screenshot/recorded intervals
+come from this authored provider and approval/wait workflow, not an owner
+live-provider or performance benchmark.
+
+Actual owner Insights opens with **eleven nonarchived metadata entries**, **seven
+newest contexts** and **zero failed/partial/usage-gap reads**. Its **21 older calls**
+have no invented SDK timings. No owner prompt, endpoint listing, credential entry
+or configuration write is performed. Twelve total owner histories and queue
+identities remain preserved, with no new empty placeholder or request. Before GUI
+use all **247 saved files are identical**; afterwards **243 remain identical**,
+one journal preserves its exact prefix plus **one load**, and three corresponding
+derivatives update. Draft/attachment bytes, settings values/revision, model/auth
+profile presence and bytes, production selection/router executable/arguments,
+Qwen/Breeze placement and CPU ASR/VAD remain preserved. Canonical main's 38
+pre-existing changes remain untouched. Original owner Insights is left open.
+
+The old immutable Stop failure remains a comparator; the corrected held-poll and
+manual checks above qualify this behavior. A status snapshot at preceding
+published head **7d3febb51a4a11f93ebc24443278c9697869a355** still reports Windows
+contracts/command/native-runtime, Mac bundled-runtime and Debian failures, with
+installation/browser package jobs skipped. It does not qualify the new publication
+head. Detailed earlier failure causes are retained in the preceding guides; no
+other-platform fix or licence allowlist relaxation is introduced here.
+
+Unlinked request/SDK-step attribution, remaining full P0/P1, owner live-provider,
+privacy/public distribution and physical/platform gates remain open. Further OS
+implementation awaits owner MX feedback. DSH remains available for unqualified
+workflows; no public binary is published.
