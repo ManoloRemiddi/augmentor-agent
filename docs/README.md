@@ -2,9 +2,10 @@
 
 [Harness appearance persistence](HARNESS-APPEARANCE.md) keeps the original
 Light/Dark/System row while carrying explicit choices across Host/browser origins.
-Source, ordinary and installed qualification are recorded separately there.
+Source, ordinary and installed qualification are recorded separately there;
+current MX runtime is 97897cf / 20261013-142001-1f7f7f96.
 
-[Current installed MX ancestry recovery](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13): runtime **d79e476**,
+[Preceding installed MX ancestry recovery](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13): runtime **d79e476**,
 release **20261013-124421-a8c9d4c5**, product **0.2.13**, selected and running.
 Artifact **ca3a937eb4ec8cd286b62032accf1cbffdf8efe2b064eb03b699989438493266**.
 First-input Edit persists earlier custom/goal ancestry before returning creation,

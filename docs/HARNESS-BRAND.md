@@ -1,8 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-The dated logo/theme installed checkpoint below is superseded for runtime identity
-by [current ancestry recovery qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13).
-That runtime retains this exact GUI payload and preceding visual evidence.
+The dated logo/theme checkpoint below is superseded for runtime identity by
+[current installed appearance qualification](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification).
+Brand sources/CSS and original supplier seats remain unchanged; the authored
+Settings binding now persists explicit profile choices. Current candidate GUI
+checks pass; a new installed-owner visual read remains separate.
 
 # Original Augmentor motion in the Harness brand slot
 

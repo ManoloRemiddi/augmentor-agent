@@ -1,6 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current installed MX ancestry recovery](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13): runtime **d79e476**,
+[Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):
+runtime **97897cf**, private MX **20261013-142001-1f7f7f96**, product **0.2.13**,
+artifact **05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**,
+selected and running. Original Light/Dark/System choices persist across origins;
+System and live peer hints work without creating agent work or a conversation.
+Source/ordinary each pass **415/415 across 79 files** plus five packaging cases;
+**163 sealed checks** pass. All **23,914** entries verify, with twelve histories,
+drafts/profiles/router state preserved and all 247 saved files identical at adoption. Supplier
+sources/CSS/licences/dependencies remain unchanged. A fresh private HTTP link is
+provided for manual owner opening; browser policy prevents reading the old error
+tab. Stable address/authentication/reconnect/placement, partial publication repair,
+full migration/live/privacy/public distribution/platform/CI gates remain open.
+Further OS implementation awaits owner MX feedback. Earlier selections below
+are dated checkpoints superseded by this installed qualification.
+
+
+[Preceding installed MX ancestry recovery](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13): runtime **d79e476**,
 release **20261013-124421-a8c9d4c5**, product **0.2.13**, selected and running.
 Artifact **ca3a937eb4ec8cd286b62032accf1cbffdf8efe2b064eb03b699989438493266**.
 First-input Edit persists earlier custom/goal ancestry before returning creation,

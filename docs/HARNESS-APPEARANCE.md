@@ -88,3 +88,44 @@ also pass. The strengthened cold/System/welcome-peer case passes in this complet
 cohort, after retaining the failed no-conversation comparator. The selected
 installed preview remains **d79e476 / 20261013-124421-a8c9d4c5** until a separate
 ordinary assembly, sealed qualification and guarded idle adoption succeed.
+
+### Ordinary and installed MX qualification
+
+Runtime **97897cf82eee3277ae7ad664d695571eb5de112a** is selected and running in
+private MX release **20261013-142001-1f7f7f96**, product **0.2.13**, artifact
+**05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**.
+The earlier source-only selection paragraph records the preceding checkpoint.
+
+Source and separate ordinary artifact each pass **415/415 across 79 files**, plus
+five packaging cases. **163 sealed checks across 19 files** pass with the actual
+bundled Node **24.19.0**, candidate runtime/SDK/GUI and matching ordinary pure
+drivers. Final candidate and selected inventories match all **23,914** entries.
+Compiled GUI/JS, app bindings, licences and Node match the tested ordinary inputs;
+no selected release is patched. The preceding **151 npm instances**, **20,801
+dependency files**, nine native/Wasm binaries, 786 licence/provenance files and
+580 MIT/108 Apache supplier records retain their bytes. Only authored bindings
+and the new authored profile module change; no supplier source/CSS is changed.
+
+Fresh idle maintenance closes the exact prior Native/Host before normal updater
+activation and stable detached Native startup. Selected/running roots agree and
+Native is online/model-ready. At adoption, all **twelve histories/queues/session IDs**, drafts,
+attachments, settings/revision, model/auth profiles, production selection and
+model-router arguments remain preserved. All **247 prior saved files** are
+byte-identical; no placeholder, provider request or automatic preference write
+is added. The actual installed Host advertises appearance and its absent-record
+read still creates no file. Choosing Light/Dark/System once now saves that choice
+to the profile; existing browser-local style is not silently promoted.
+
+The old owner browser tab remains a blocked error page under browser URL policy.
+The independent original-GUI candidate cases qualify cold recovery, System,
+peer updates, logos and settings colors; a new installed-owner visual read is
+not claimed. The owner receives the fresh private HTTP link for manual opening.
+Private links, profiles and logs are excluded from publication. Stable addresses,
+authentication/reconnect/placement, full migration, live/privacy/public
+distribution and platform/CI gates remain open. The preceding runtime stays
+available for rollback; further OS implementation awaits MX feedback.
+
+A later read-only maintenance check observes a Native draft/busy flag while the
+new roots remain online/model-ready and all installed entries still verify. That
+new owner activity is preserved; no second restart or palette change is attempted.
+The initial idle adoption proof remains distinct from this later running check.

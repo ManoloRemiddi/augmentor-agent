@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):
+runtime **97897cf**, private MX **20261013-142001-1f7f7f96**, product **0.2.13**,
+artifact **05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**,
+selected and running. Original Light/Dark/System choices persist across origins;
+System and live peer hints work without creating agent work or a conversation.
+Source/ordinary each pass **415/415 across 79 files** plus five packaging cases;
+**163 sealed checks** pass. All **23,914** entries verify, with twelve histories,
+drafts/profiles/router state preserved and all 247 saved files identical at adoption. Supplier
+sources/CSS/licences/dependencies remain unchanged. A fresh private HTTP link is
+provided for manual owner opening; browser policy prevents reading the old error
+tab. Stable address/authentication/reconnect/placement, partial publication repair,
+full migration/live/privacy/public distribution/platform/CI gates remain open.
+Further OS implementation awaits owner MX feedback. Earlier selections below
+are dated checkpoints superseded by this installed qualification.
+
+
 [Installed MX Models qualification](HARNESS-MODELS.md#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.
 
 Qualified implementation **340327d6a554094d9ce9d54dcdd0810c08e5b245**: [Original endpoint discovery](HARNESS-MODELS.md#endpoint-discovery-source--october-13) now connects the copied candidate picker to bounded OpenAI/Anthropic listings, with local installed catalogs, public Pi credential resolution, scoped page coverage and cancellation. Strict source check/build and 65 MX files pass 334/334 plus five notice/workspace cases. Three new runtime MIT files retain two verbatim/one marked records; three existing GUI files are marked for coverage/default hints, with layout/CSS and other supplier records preserved. Ordinary/installed/live/OAuth/virtual/advanced/full P0/P1 gates remain open; selected MX stays 95e0fb2 / 20261012-222001-6b609cae. No installed restart or owner state change occurs.
