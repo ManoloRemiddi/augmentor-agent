@@ -1,6 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {WikiBinding} from './wiki.js';
 import {WikiPreferences} from './wiki-preferences.js';
+import {WikiReceipts,wikiActionKey} from './wiki-receipts.js';
 import {PiFilePreview,PreviewReadError} from './file-preview.js';
 import {PiOfficePreview} from './office-preview.js';
 import {PiFileReferences} from './file-references.js';
@@ -90,6 +91,12 @@ export class Host {
   readonly wikiPreferences=new WikiPreferences(join(this.dirs.config,'wiki.json'));
   private wikiFailed=false;
   private wikiSnapshot(){const profile=this.wikiPreferences.describe(),targets=[...this.loaded.values()].filter(r=>r.meta.surface!=='browser'&&!r.meta.delegation);const appliedSessions=targets.filter(r=>r.wikiRevision===profile.revision).length;return {...profile,loadedSessions:targets.length,appliedSessions,pending:this.wikiFailed||appliedSessions!==targets.length};}
+  private wikiReceipts(){
+    const profile=this.wikiPreferences.describe();if(!profile.value.vaultPath)return {configured:false,profileRevision:profile.revision,revision:null,rows:[],lock:null,blocked:false};
+    const view=new WikiReceipts(this.dirs.state,profile.value.vaultPath).describe(),keys=new Set(view.rows.map(row=>row.key)),links=new Map<string,{sessionId:string;nativeEntryId:string;toolCallId:string}|null>();
+    for(const owner of this.loaded.values())if(owner.meta.surface!=='browser'&&!owner.meta.delegation){for(const entry of owner.manager.getEntries().slice(-10000))if(entry.type==='message'&&entry.message.role==='assistant')for(const part of entry.message.content)if(part.type==='toolCall'){const key=wikiActionKey(owner.manager.getSessionId(),entry.id,part.id);if(keys.has(key))links.set(key,links.has(key)?null:{sessionId:owner.meta.id,nativeEntryId:entry.id,toolCallId:part.id});}}
+    return {...view,configured:true,profileRevision:profile.revision,rows:view.rows.map(row=>({...row,source:links.get(row.key)??null}))};
+  }
   private wikiReady(m:Meta){if(m.surface!=='browser'&&!m.delegation&&process.platform==='linux'&&this.wikiSnapshot().pending)throw Error('Wiki settings are not confirmed in loaded conversations. Refresh Wiki settings before starting another Native turn.');}
   private wikiGuard(){this.modelSettingsGuard();if(this.modelSettingsBusy||this.modelSettingsProblem||[...this.metadata.values()].some(m=>!this.queue(m).paused&&!!this.queue(m).next)||[...this.loaded.values()].some(r=>r.goals.armed))throw Error('Finish active work and pause queued prompts or goals before changing Wiki settings.');}
   private async applyWiki(){
@@ -994,6 +1001,8 @@ export class Host {
     case 'chats.saved':{if(p.action&&p.action!=='state'){if(!['save','unsave'].includes(p.action))throw new Error('Invalid saved-chat action');const m=this.getMeta(p.sessionId);m.saved=p.action==='save';this.save(m);}return {saved:[...this.metadata.values()].filter(m=>m.saved).map(m=>m.id)};}
     case 'shortcuts.describe':return {...await this.shortcutPreferences.describe(p.platform,p.definitions),settingsRevision:this.shortcutSettingsRevision};
     case 'shortcuts.edit':{const value=await this.shortcutPreferences.edit(p.platform,p.edit,p.revision);return {...value,snapshot:{...value.snapshot,settingsRevision:this.shortcutSettingsRevision}};}
+    case 'wiki.receipts':return this.wikiReceipts();
+    case 'wiki.review':{this.wikiGuard();const profile=this.wikiPreferences.describe();if(profile.revision!==p.expectedProfileRevision||!profile.value.vaultPath)throw Error('The stored Wiki vault changed. Refresh its receipt inspection before reviewing.');new WikiReceipts(this.dirs.state,profile.value.vaultPath).review(p as any);return this.wikiReceipts();}
     case 'wiki.describe':return this.wikiSnapshot();
     case 'wiki.set':{this.wikiGuard();this.wikiPreferences.set(p.value,p.expectedRevision,()=>{this.wikiFailed=true;});return this.applyWiki();}
     case 'wiki.refresh':return this.applyWiki();

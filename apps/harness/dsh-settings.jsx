@@ -84,7 +84,7 @@ function HtmlPreviewSetting({developerTools,state}){
 }
 
 /** Pure supplier shell; section contents call the existing Pi owner. */
-export function OriginalSettings({wide,state,controller,preferences,developerTools,appearanceProfile,metafolders,shortcutsUi,onPrompts,onContext,notice}){
+export function OriginalSettings({wide,state,controller,preferences,developerTools,appearanceProfile,metafolders,shortcutsUi,onPrompts,onContext,onTrajectory,notice}){
   const palette=useSyncExternalStore(appearanceProfile.subscribe,appearanceProfile.getSnapshot,appearanceProfile.getSnapshot);
   const settingsOpen=useShell(s=>s.open),shownAppearanceError=useRef(null);
   useEffect(()=>{if(!settingsOpen||!palette.error){shownAppearanceError.current=null;return;}if(shownAppearanceError.current!==palette.error){shownAppearanceError.current=palette.error;notice(palette.error);}},[settingsOpen,palette.error,notice]);
@@ -97,7 +97,7 @@ export function OriginalSettings({wide,state,controller,preferences,developerToo
     if(name==='settings.section'){
       if(options.only==='general')return <GeneralSection renderSlot={renderSlot}/>;
       if(options.only==='models')return <OriginalModels key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></OriginalModels>;
-      if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><MetafolderSettings profile={metafolders}/><WikiSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
+      if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><MetafolderSettings profile={metafolders}/><WikiSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller} onTrajectory={sid=>{settingsShell.actions.close();onTrajectory(sid);}}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
     }
     if(name==='settings.general.item')return <><fieldset disabled={!palette.writable||palette.busy} style={{display:"contents",border:0,padding:0,margin:0}}><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/></fieldset>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div>{shortcutsUi?.render('settings.general.item')}<CurrentVersionRow t={t}/></>;
     return options.fallback??null;

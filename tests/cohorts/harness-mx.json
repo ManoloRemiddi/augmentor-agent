@@ -96,6 +96,8 @@
     "tests/pi-wiki.test.mjs",
     "tests/wiki-scope.test.mjs",
     "tests/wiki-settings.test.mjs",
-    "tests/harness-wiki-settings-chromium.test.mjs"
+    "tests/harness-wiki-settings-chromium.test.mjs",
+    "tests/wiki-receipts.test.mjs",
+    "tests/harness-wiki-review-chromium.test.mjs"
   ]
 }

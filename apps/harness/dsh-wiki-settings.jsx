@@ -3,8 +3,9 @@ import React,{useEffect,useMemo,useSyncExternalStore} from 'react';
 import {SettingsForm,SettingsValueField,Button} from '@deepseek-ai/dsh-client-ui-primitives';
 import {DeveloperToolsRow} from '@dsh-gui/ui-settings-general/src/client/DeveloperToolsRow.tsx';
 import {DshWikiProfile} from './dsh-wiki-profile.mjs';
+import {WikiReceiptInspection} from './dsh-wiki-receipts.jsx';
 /** Original supplier form/control chrome; only the Pi settings owner is adapted. */
-export function WikiSettings({controller}){
+export function WikiSettings({controller,onTrajectory}){
  const profile=useMemo(()=>new DshWikiProfile(controller),[controller]);useEffect(()=>()=>profile.close(),[profile]);
  const s=useSyncExternalStore(profile.subscribe,profile.getSnapshot),d=s.draft;let invalid=false;try{profile.proposed();}catch{invalid=true;}
  const t=key=>({'developerTools.title':'Wiki tools and skills','developerTools.description':'Six original Wiki tools and nine skills for Native conversations. Changes apply when saved; the vault is never created by Settings.','developerTools.error':'The change could not be staged.'}[key]??key);
@@ -15,5 +16,5 @@ export function WikiSettings({controller}){
  {field('maxQueryResults','Maximum query results','From 1 to 100 pages per standard query.',true)}
  {field('typeFolders','Page type folders','JSON mapping, for example {"concept":"wiki/concepts"}. Leave {} for the original routing.')}
  {s.accepted&&<p role="status">{s.accepted.pending?'Stored profile awaiting application.':s.accepted.value.enabled?'Wiki enabled.':'Wiki disabled.'} Applied to {s.accepted.appliedSessions} of {s.accepted.loadedSessions} loaded Native conversations.</p>}
- </SettingsForm>{s.error&&<p role="alert">{s.error}</p>}<Button disabled={!profile.current()||s.busy} onClick={()=>void profile.load()}>Refresh Wiki settings</Button>{s.accepted?.pending&&<Button disabled={!s.writable||s.busy||profile.dirty()} onClick={()=>void profile.apply(true).catch(()=>{})}>Apply stored Wiki settings</Button>}</div>;
+ </SettingsForm>{s.error&&<p role="alert">{s.error}</p>}<Button disabled={!profile.current()||s.busy} onClick={()=>void profile.load()}>Refresh Wiki settings</Button>{s.accepted?.pending&&<Button disabled={!s.writable||s.busy||profile.dirty()} onClick={()=>void profile.apply(true).catch(()=>{})}>Apply stored Wiki settings</Button>}<WikiReceiptInspection controller={controller} profileRevision={s.accepted?.revision} onTrajectory={onTrajectory}/></div>;
 }

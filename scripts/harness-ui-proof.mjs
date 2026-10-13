@@ -58,12 +58,13 @@ const model=http.createServer(async(req,res)=>{
   if(wikiUser){
     if(JSON.stringify(wikiUser.content).includes('WIKI_SETTINGS_HOLD')){res.write(': Authored held provider request.\n\n');return;}
     if(JSON.stringify(wikiUser.content).includes('WIKI_BROWSER_CATALOG')||JSON.stringify(wikiUser.content).includes('WIKI_SETTINGS_CATALOG')){chunk({role:'assistant',content:'Authored browser catalog inspection only.'},'stop',{prompt_tokens:10,completion_tokens:10,total_tokens:20});res.end('data: [DONE]\n\n');return;}
+    const reviewNext=JSON.stringify(wikiUser.content).includes('WIKI_REVIEW_NEXT');
     const readonly=JSON.stringify(wikiUser.content).includes('WIKI_READONLY');
     const unknown=JSON.stringify(wikiUser.content).includes('WIKI_UNKNOWN');
     const sequence=unknown?[['wiki_archive',{source_path:'.raw/conflict.txt'}],['wiki_write',{type:'concept',title:'Never Reached',content:'MUST NOT WRITE AFTER UNCERTAINTY'}]]:readonly?[
       ['wiki_write',{type:'concept',title:'Not Allowed',content:'READONLY MUST NOT WRITE'}],
       ['wiki_query',{query:'Authored',mode:'quick'}],
-    ]:[
+    ]:reviewNext?[['wiki_scaffold',{mode:'generic',purpose:'Authored explicit review qualification'}],['wiki_write',{type:'concept',title:'After Explicit Review',content:'AUTHORED NEW INTENT AFTER REVIEW'}]]:[
       ['wiki_scaffold',{mode:'generic',purpose:'Independent Augmentor wiki qualification'}],
       ['wiki_query',{query:'Authored',mode:'quick'}],
       ['wiki_write',{type:'concept',title:'Authored Page',content:'AUTHORED WIKI CONTENT',source_path:'.raw/source.txt'}],
