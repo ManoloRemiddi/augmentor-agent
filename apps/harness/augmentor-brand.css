@@ -8,6 +8,22 @@
   flex:none;
   pointer-events:none;
 }
+/* Let the decorative smoke leave its seat without changing the supplier layout.
+   The span form is the original macOS drag identity; buttons own Linux/rail actions. */
+button:has(.augmentor-brand),
+span:has(> span > span > .augmentor-brand),
+div[data-window-drag]:has(.augmentor-brand) {
+  overflow:visible;
+}
+body:not([data-ds-dark-theme]) .augmentor-brand-orb {
+  color:#000;
+}
+body:not([data-ds-dark-theme]) .augmentor-brand-orb::before {
+  background:conic-gradient(from 40deg,transparent,#00000065,transparent 50%,#00000080,transparent);
+}
+body:not([data-ds-dark-theme]) .augmentor-brand-orb::after {
+  background:#00000030;
+}
 .augmentor-brand-orb {
   box-sizing:border-box;
   flex:none;

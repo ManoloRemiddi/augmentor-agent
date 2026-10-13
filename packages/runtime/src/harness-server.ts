@@ -16,7 +16,7 @@ const allowed = new Set([
   'session.jobInspection', 'session.family', 'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
-  'session.prompt', 'session.cancel', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
+  'session.prompt', 'session.cancel', 'session.prepareBranch', 'session.settleBranch', 'session.branchRecovery', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue', 'session.compact', 'session.compaction', 'session.acknowledgeCompaction',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.search', 'observation.payload', 'observation.clear',
   'shortcuts.describe', 'shortcuts.edit', 'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',

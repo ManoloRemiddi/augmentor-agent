@@ -16,14 +16,16 @@ MIT text and original Copyright 2026 Manolo Remiddi. The live CSS/icon match tho
 bytes; source paths and SHA-256 are in
 `apps/harness/vendor/augmentor-brand/SOURCE.json`. DSH's MIT and dsh-context's
 Apache notices remain separate. Authored JSX/CSS only adapt the 24-pixel slot and
-theme foreground contrast; they preserve the exact original shape/flow/breath
+theme foreground contrast, the requested black Light palette and brand-row
+overflow; they preserve the exact original shape/flow/breath
 keyframes and **7/9/4-second** timings. The website motion is preserved. The
 favicon is its original static companion asset.
 
 Installed inspection found that the original 24-pixel brand button clips a
 full-size rotating outline. The binding centers a 19-pixel outline within the
 24-pixel decorative slot, so the original rotation fits without cropping. The
-actual browser case checks containment in both seats and both themes. Supplier
+actual browser case checks containment in both seats and both themes. The outline
+fits its slot; the glow needs separate overflow treatment, described below. Supplier
 layout/CSS and the original motion keyframes remain unchanged.
 
 The brand is decorative and inherits the existing control's accessible action.
@@ -115,3 +117,39 @@ awaits owner MX feedback; no public binary release, merge or DSH retirement occu
 The qualification documentation published after this runtime changes no installed
 file. [Preceding Branch/Fork qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13)
 retains the earlier runtime, failure evidence and controller limitations.
+
+
+## Black Light smoke and sidebar integration — October 13
+
+After reviewing the preceding screenshots, the owner requested a black mark with
+black smoke/flare in Light and the existing appearance in Dark. Inspection found
+that DSH's original brand button clipped the glow to a rectangle even though the
+19-pixel rotating outline fit its 24-pixel slot. Authored CSS now releases overflow
+only on the brand control/identity and its original drag row. No supplier file,
+spacing, control, label or action changes. Light uses a black outline and black
+alpha gradient/fill; Dark retains the preceding purple/blue flare and foreground.
+Website keyframes, 7/9/4-second motion and reduced-motion behavior stay unchanged.
+The selected original CSS/favicon/MIT text remain byte-exact; only the authored
+scope explanation in SOURCE.json/SOURCE.md changes among those records.
+
+The focused actual Chromium/Pi case checks both original seats/actions, outline
+containment, visible brand-control/row overflow, every Light gradient stop's black
+RGB values and the unchanged Dark flare, as well as motion, theme contrast, the
+served favicon, reduced motion and zero inference/remote asset requests. The first
+new driver run expected an alpha serialization of 0.188; the compiled CSS serializes
+it as 0.19. The assertion now uses the actual compiled value for both palettes.
+Ordinary/immutable and installed qualification follow separately before adoption.
+
+
+## Combined source qualification — October 13
+
+Final strict check/build and the 76-file MX cohort pass **398/398**, with zero
+failures/skips/cancellations and five separate notice/workspace packaging cases.
+Node 24.19.0, matching isolated PySide6/shiboken6 6.8.2.1 QtTest, two workers and
+existing deadlines are retained. The combined source contains the requested
+black Light flare/clipping correction and durable branch identity recovery. The
+first full run ended by SIGTERM before a terminal result; it is an interrupted
+checkpoint, not a passing suite or an application assertion failure. The complete
+second run supplies this qualification. Isolated visual Light/Dark inspection
+also passes. Ordinary, sealed and installed qualification follows separately;
+the selected MX preview remains efa411b until guarded adoption.

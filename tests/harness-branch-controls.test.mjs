@@ -51,3 +51,55 @@ test('navigation during list refresh retires child selection and clears only the
 test('running and unconfirmed parent state prevents any branch dispatch',async()=>{
  const f=fixture();f.controller.update({sessions:[{sessionId:'parent',running:true}]});await assert.rejects(()=>f.controller.forkAt(8),/Stop the current response/);assert.deepEqual(f.calls,[]);f.controller.update({sessions:[{sessionId:'parent',running:false}],unconfirmed:{kind:'prompt'}});await assert.rejects(()=>f.controller.forkLast('parent'),/Review the current/);assert.deepEqual(f.calls,[]);f.controller.update({phase:'connecting',unconfirmed:null});await assert.rejects(()=>f.controller.forkLast('parent'),/Review the current/);assert.deepEqual(f.calls,[]);
 });
+
+function durableFixture(journal=new Map()){
+ const f=fixture();f.controller.update({capabilities:{durableBranches:true}});
+ f.controller.rpc=async(method,p)=>{
+  f.calls.push({method,params:p});const key=JSON.stringify([p.sessionId,p.messageSeq,p.mode]);
+  if(method==='session.history')return {events:[{event:reply}],hasMore:false};
+  if(method==='session.prepareBranch'){
+   if(!journal.has(key))journal.set(key,{intent:{...p,newSessionId:crypto.randomUUID()},created:false});
+   return {...journal.get(key).intent};
+  }
+  if(method==='session.branch'){const row=journal.get(key);assert.equal(row.intent.newSessionId,p.newSessionId);row.created=true;return f.response(p);}
+  if(method==='session.settleBranch'){
+   const row=journal.get(key),matches=row?.intent.newSessionId===p.newSessionId;
+   if(p.outcome==='not-created'){const settled=matches&&!row.created;if(settled)journal.delete(key);return {settled,outcome:p.outcome,newSessionId:p.newSessionId};}
+   if(matches)journal.delete(key);return {settled:true,cleared:matches,outcome:p.outcome,...f.response(p)};
+  }
+  throw Error('Unexpected durable branch fixture method: '+method);
+ };
+ return {...f,journal};
+}
+test('fresh controllers prepare the same persisted child after a lost creation acknowledgment, and a confirmed later click gets a new child',async()=>{
+ const journal=new Map(),first=durableFixture(journal),rpc=first.controller.rpc;
+ first.controller.rpc=async(m,p)=>{const result=await rpc(m,p);if(m==='session.branch')throw Error('Authored lost creation acknowledgment');return result;};
+ await assert.rejects(()=>first.controller.forkAt(8),/lost creation/);const original=first.calls.find(x=>x.method==='session.branch').params;
+ const cold=durableFixture(journal);assert.equal(cold.calls.length,0);await cold.controller.forkAt(8);assert.equal(cold.calls.find(x=>x.method==='session.branch').params.newSessionId,original.newSessionId);assert.deepEqual(cold.selected,[original.newSessionId]);assert.equal(journal.size,0);
+ const later=durableFixture(journal);await later.controller.forkAt(8);assert.notEqual(later.calls.find(x=>x.method==='session.branch').params.newSessionId,original.newSessionId);
+});
+test('duplicate clicks while durable preparation is held acquire one identity and dispatch one branch',async()=>{
+ const f=durableFixture(),held=deferred(),started=deferred(),rpc=f.controller.rpc;f.controller.rpc=async(m,p)=>{if(m==='session.prepareBranch'){started.resolve();await held.promise;}return rpc(m,p);};
+ const first=f.controller.forkAt(8);await started.promise;await f.controller.forkAt(8);held.resolve();await first;assert.equal(f.calls.filter(x=>x.method==='session.prepareBranch').length,1);assert.equal(f.calls.filter(x=>x.method==='session.branch').length,1);
+});
+test('retired preparation releases only its uncreated reservation and cannot create a child or overwrite another notice',async()=>{
+ const f=durableFixture(),held=deferred(),started=deferred(),rpc=f.controller.rpc;f.controller.rpc=async(m,p)=>{const row=await rpc(m,p);if(m==='session.prepareBranch'){started.resolve();await held.promise;}return row;};
+ const pending=f.controller.forkAt(8);await started.promise;f.controller.epoch++;f.controller.update({sessionId:'other',error:'Other notice'});held.resolve();await pending;assert.equal(f.calls.filter(x=>x.method==='session.branch').length,0);assert.equal(f.journal.size,0);assert.equal(f.controller.state.error,'Other notice');assert.deepEqual(f.selected,[]);
+});
+test('foreign or malformed preparation has no child-creation authority and never falls back to volatile identity',async()=>{
+ const f=durableFixture(),rpc=f.controller.rpc;f.controller.rpc=async(m,p)=>m==='session.prepareBranch'?{sessionId:'foreign',messageSeq:8,mode:'reply',newSessionId:'child'}:rpc(m,p);
+ await assert.rejects(()=>f.controller.forkAt(8),/preparation is unconfirmed/);assert.deepEqual(f.calls,[]);assert.equal(f.controller.branchIntents.size,0);assert.equal(f.controller.state.branchPending,null);
+});
+test('lost settlement acknowledgment preserves confirmed creation and reports bookkeeping uncertainty without another branch',async()=>{
+ const f=durableFixture(),rpc=f.controller.rpc;f.controller.rpc=async(m,p)=>{const result=await rpc(m,p);if(m==='session.settleBranch')throw Error('Authored lost cleanup acknowledgment');return result;};
+ const row=await f.controller.forkAt(8);assert.deepEqual(f.selected,[row.sessionId]);assert.match(f.controller.state.error,/Branch created.*Recovery acknowledgment is unconfirmed/);assert.equal(f.calls.filter(x=>x.method==='session.branch').length,1);assert.equal(f.journal.size,0);
+});
+test('failed refresh after creation cannot falsely report uncertain creation or automatically branch again',async()=>{
+ const f=durableFixture();f.controller.refresh=async()=>{throw Error('Authored lost list response');};await assert.rejects(()=>f.controller.forkAt(8),/lost list/);assert.match(f.controller.state.error,/Branch created.*list could not be refreshed/);assert.deepEqual(f.selected,[]);assert.equal(f.calls.filter(x=>x.method==='session.branch').length,1);assert.equal(f.journal.size,0);
+});
+test('an authoritative branch error clears identity only after the Host confirms no child exists',async()=>{
+ for(const published of [false,true]){
+  const f=durableFixture(),rpc=f.controller.rpc;f.controller.rpc=async(m,p)=>{if(m==='session.branch'){if(published)await rpc(m,p);throw Object.assign(Error('Authored branch refusal'),{authoritative:true});}return rpc(m,p);};
+  await assert.rejects(()=>f.controller.forkAt(8),/branch refusal/);assert.equal(f.journal.size,published?1:0);assert(published?f.controller.state.error.startsWith('Branch creation unconfirmed.'):f.controller.state.error==='Authored branch refusal');assert.deepEqual(f.selected,[]);
+ }
+});

@@ -5,7 +5,7 @@ import http from 'node:http';
 import net from 'node:net';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,appendFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,readdirSync,appendFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
@@ -603,6 +603,25 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const context=JSON.stringify(received.at(-1).messages);assert(context.includes('FIRST_CONTEXT'));assert(!context.includes('LATER_CONTEXT'));
   await prompt('branched','WRITE');await idle('branched');
   const h=await client.call('session.history',{sessionId:'branched'});assert(h.events.some(e=>e.event.type==='tool/result'&&e.event.data.isError));
+ });
+ await t.test('durable Host branch preparation is metadata-only, peer-safe and conditionally settled without inference',async()=>{
+  const source='branch-source',history=await client.call('session.history',{sessionId:source}),seq=history.events.find(x=>x.event.type==='assistant/message').event.seq,params={sessionId:source,messageSeq:seq,mode:'reply'};
+  const before=requests,meta=JSON.parse(readFileSync(join(state,'sessions',source+'.meta.json'),'utf8')),original=readFileSync(meta.file,'utf8'),files=readdirSync(join(state,'sessions')).sort();
+  const [intent,peer]=await Promise.all([client.call('session.prepareBranch',params),client.call('session.prepareBranch',params)]);assert.deepEqual(peer,intent);assert.deepEqual(readdirSync(join(state,'sessions')).sort(),files);assert.equal(requests,before);assert.equal((await client.call('host.describe')).capabilities.durableBranches,true);
+  await assert.rejects(client.call('session.prepareBranch',{...params,messageSeq:999999}),/Choose a message/);assert.equal((await client.call('session.branchRecovery',{sessionId:source})).items.length,1);
+  await assert.rejects(client.call('session.branch',{...intent,mode:'edit',prepared:true}),/prepared branch identity/);
+  const child=await client.call('session.branch',{...intent,prepared:true});assert.equal(child.sessionId,intent.newSessionId);assert.deepEqual(await client.call('session.branch',{...intent,prepared:true}),child);
+  const refused=await client.call('session.settleBranch',{...intent,outcome:'not-created'});assert.equal(refused.settled,false);assert.equal((await client.call('session.branchRecovery',{sessionId:source})).items[0].phase,'creating');
+  const confirmed=await client.call('session.settleBranch',{...intent,outcome:'created'});assert.equal(confirmed.settled,true);assert.equal(confirmed.cleared,true);
+  const later=await client.call('session.prepareBranch',params);assert.notEqual(later.newSessionId,intent.newSessionId);const late=await client.call('session.settleBranch',{...intent,outcome:'created'});assert.equal(late.cleared,false);assert.equal((await client.call('session.branchRecovery',{sessionId:source})).items[0].newSessionId,later.newSessionId);
+  let revision=(await client.call('workspace.list')).organizationRevision;await client.call('session.organize',{sessionId:source,action:'archive',expectedRevision:revision});
+  await assert.rejects(client.call('session.prepareBranch',params),/Restore/);await assert.rejects(client.call('session.branch',{...later,prepared:true}),/Restore/);assert.equal((await client.call('session.settleBranch',{...later,outcome:'not-created'})).settled,true);
+  revision=(await client.call('workspace.list')).organizationRevision;const restored=await client.call('session.organize',{sessionId:source,action:'restore',expectedRevision:revision});assert.equal(restored.workspaces.organizationRevision,revision+1);assert.deepEqual(restored.workspaces.pinnedSessionIds,organizationPersisted.pinnedSessionIds);assert.deepEqual(restored.workspaces.archivedSessionIds,organizationPersisted.archivedSessionIds);organizationPersisted.organizationRevision=restored.workspaces.organizationRevision;assert.equal((await client.call('session.branchRecovery',{sessionId:source})).items.length,0);
+  const partial=await client.call('session.prepareBranch',params),partialDirectory=join(state,'sessions',partial.newSessionId),partialFile=join(partialDirectory,'partial-native.jsonl');mkdirSync(partialDirectory,{mode:0o700});writeFileSync(partialFile,'Authored incomplete publication sentinel.\n',{mode:0o600});
+  await assert.rejects(client.call('session.branch',{...partial,prepared:true}),/publication is incomplete/);assert.equal((await client.call('session.settleBranch',{...partial,outcome:'not-created'})).settled,false);assert.deepEqual(await client.call('session.prepareBranch',params),partial);assert.equal(readFileSync(partialFile,'utf8'),'Authored incomplete publication sentinel.\n');
+  // Remove only this deliberately injected, disposable fault after proving preservation.
+  rmSync(partialDirectory,{recursive:true});assert.equal((await client.call('session.settleBranch',{...partial,outcome:'not-created'})).settled,true);
+  assert.equal(readFileSync(meta.file,'utf8'),original);assert.deepEqual(await client.call('session.history',{sessionId:source}),history);assert.equal(requests,before);
  });
  await t.test('editing branches before the latest input, preserving the earlier context',async()=>{
   const h=await client.call('session.history',{sessionId:'branch-source'});const users=h.events.filter(e=>e.event.type==='user/message');

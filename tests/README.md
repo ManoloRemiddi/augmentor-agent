@@ -1,8 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`pi-branch-recovery.test.mjs` checks private bounded durable branch identity, cold
+reads, conditional settlement, failed publication, invalid data/link/mode guards
+and refusal of SDK header migration. Controller/real Host/original GUI cases test
+fresh browser and Host reconciliation with no additional provider/tool requests;
+partial child publication remains fenced, not repaired. See
+[recovery scope](../docs/HARNESS-BRANCH-CONTROLS.md#durable-exact-boundary-recovery--october-13).
+
 `harness-brand-chromium.test.mjs` exercises both original sidebar seats and their
 actions, website-derived shape/flow/breath timings, changing Light/Dark outlines,
-containment within the clipped brand row, contrast, reduced-motion restoration
+outline containment, visible brand-row overflow, black Light smoke/unchanged Dark
+flare, contrast, reduced-motion restoration
 and the exact favicon. The isolated Host makes no provider/tool request and the
 page fetches no remote logo asset. See [brand qualification](../docs/HARNESS-BRAND.md).
 

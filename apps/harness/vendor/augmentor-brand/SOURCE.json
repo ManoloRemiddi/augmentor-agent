@@ -24,5 +24,5 @@
       "upstreamSha256": "deed36d28283e9cd6fa78b50e729d83026fbeaae6f5dd44eadbedf9d92d07b91"
     }
   ],
-  "scope": "Verbatim website header motion and companion favicon. Authored wrapper changes only sizing and theme-aware contrast in the original DSH brand slot."
+  "scope": "Verbatim website header motion and companion favicon. Authored wrapper fits the original DSH brand slot, uses black outline/smoke in Light, retains the current Dark palette, and releases only brand-row clipping without changing layout or actions."
 }

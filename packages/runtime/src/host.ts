@@ -21,7 +21,7 @@ import {ModelSettings} from './model-settings.js';
 import {ToolArgumentSnapshots} from './tool-argument-snapshots.js';
 import {developerTools,developerToolsChange} from './developer-tools.js';
 import {piPromptWrapping} from './prompt-wrapping.js';
-import {mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync} from 'node:fs';
+import {lstatSync,mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync} from 'node:fs';
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID,createHash} from 'node:crypto';
@@ -35,7 +35,8 @@ import {piScheduling} from './scheduling.js';
 import {piLlamaCppSchemas} from './provider-compat.js';
 import {Interactions} from './interactions.js';
 import {isRoutineQuery} from './permissions.js';
-import {branchContext} from './branches.js';
+import {branchContext,inspectBranchContext} from './branches.js';
+import {BranchIntents,branchBoundary,branchIntent,type BranchIntent} from './branch-intents.js';
 import {SetupConnections} from './setup.js';
 import {RELEASE} from '../../contracts/src/release.js';
 import {DisplayHistory} from './display-history.js';
@@ -76,6 +77,7 @@ export class Host {
   readonly metadata=new Map<string,Meta>();readonly loaded=new Map<string,Loaded>();
   readonly workspaces=new WorkspaceRegistry(join(this.dirs.state,'workspaces.json'),()=>[resolve(process.env.AUGMENTOR_PI_WORKSPACE||process.cwd()),...[...this.metadata.values()].map(m=>resolve(m.cwd))]);
   readonly organization=new SessionOrganization(join(this.dirs.state,'session-organization.json'));
+  readonly branchIntents=new BranchIntents(join(this.dirs.state,'branch-intents.json'));
   readonly attachments=new PiAttachments(this.dirs.state,(sid,part)=>this.events(this.getMeta(sid)).some(event=>event.type==='user/message'&&event.data.source?.sessionId!==sid&&(event.data.submittedContent??event.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))));
   private uploads=0;
   private harnessRequests=0;
@@ -511,14 +513,49 @@ export class Host {
     this.append(m,'runtime/notice',{message:'Steering accepted. Obsolete generation is stopping; any dispatched tools will settle before the correction.',incomplete:false});
     const result=await pending;return {accepted:true,turnId,...(result.action==='handled'?{handled:true}:result.action==='cancelled'?{interruptedPreparation:true}:{})};
   }
+  prepareBranch(p:Data){
+    const boundary=branchBoundary(p),source=this.getMeta(boundary.sessionId);
+    if(source.running)throw Error('Stop the current response before preparing a branch.');
+    if(!source.file||!existsSync(source.file))throw Error('This conversation has no persisted Pi history yet.');
+    inspectBranchContext(source.file,this.dirs.sessions,this.loaded.get(source.id)?.events??this.events(source),boundary.messageSeq,boundary.mode);
+    return this.branchIntents.reserve(boundary,randomUUID());
+  }
+  private branchTargetEmpty(sid:string){
+    if(this.loaded.has(sid)||this.metadata.has(sid))return false;
+    for(const name of readdirSync(this.dirs.sessions).filter(name=>name===sid||name.startsWith(sid+'.'))){
+      const path=join(this.dirs.sessions,name),info=lstatSync(path);
+      if(name!==sid||!info.isDirectory()||info.isSymbolicLink()||readdirSync(path).length)return false;
+    }
+    return true;
+  }
+  private committedBranch(intent:BranchIntent){
+    const row=this.metadata.get(intent.newSessionId),fork={sessionId:intent.sessionId,messageSeq:intent.messageSeq,mode:intent.mode};
+    const disk=readJson<Meta|null>(join(this.dirs.sessions,intent.newSessionId+'.meta.json'),null);
+    if(!row||JSON.stringify(row.fork)!==JSON.stringify(fork)||!disk||disk.id!==row.id||JSON.stringify(disk.fork)!==JSON.stringify(fork)||disk.file&&!existsSync(disk.file)||!existsSync(join(this.dirs.sessions,row.id+'.events.jsonl')))throw Error('The branch is not fully published. Preserve its original files for recovery.');
+    return row;
+  }
+  settleBranch(p:Data){
+    const intent=branchIntent(p);this.getMeta(intent.sessionId);
+    if(p.outcome==='created'){
+      const row=this.committedBranch(intent),cleared=this.branchIntents.settle(intent);
+      return {settled:true,cleared,outcome:'created',...this.branchRow(row)};
+    }
+    if(p.outcome!=='not-created')throw Error('Choose an explicit branch settlement outcome.');
+    if(!this.branchTargetEmpty(intent.newSessionId))return {settled:false,outcome:'not-created',newSessionId:intent.newSessionId};
+    return {settled:this.branchIntents.settle(intent),outcome:'not-created',newSessionId:intent.newSessionId};
+  }
   async branch(p:Data){
+    if(p.prepared!==undefined&&typeof p.prepared!=='boolean')throw Error('Invalid prepared branch flag.');
     const source=this.getMeta(p.sessionId),sid=identifier(p.newSessionId);
     if(!Number.isSafeInteger(p.messageSeq)||p.messageSeq<1||!['reply','edit'].includes(p.mode))throw new Error('Invalid branch target');
     const fork={sessionId:source.id,messageSeq:p.messageSeq,mode:p.mode as 'reply'|'edit'};
     const existing=this.metadata.get(sid);
-    if(existing){if(JSON.stringify(existing.fork)!==JSON.stringify(fork))throw new Error('Conversation ID already exists');return this.branchRow(existing);}
+    if(existing){if(JSON.stringify(existing.fork)!==JSON.stringify(fork))throw new Error('Conversation ID already exists');if(p.prepared===true)this.committedBranch(branchIntent(p));return this.branchRow(existing);}
     if(source.running)throw new Error('Stop the current response before branching or editing.');
     if(!source.file||!existsSync(source.file))throw new Error('This conversation has no persisted Pi history yet.');
+    const reserved=this.branchIntents.list().find(row=>row.newSessionId===sid);
+    if(p.prepared===true){this.branchIntents.begin(branchIntent(p));if(!this.branchTargetEmpty(sid))throw Error('Branch publication is incomplete. Original files were preserved; no branch was repeated.');}
+    else if(p.prepared!==undefined&&p.prepared!==false||reserved)throw Error('Use the exact prepared branch identity before creating its child.');
     const directory=privateDir(join(this.dirs.sessions,sid));
     const context=branchContext(source.file,directory,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
     const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
@@ -526,7 +563,7 @@ export class Host {
     writeFileSync(join(this.dirs.sessions,sid+'.events.jsonl'),inherited.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600});
     // Pi defers writing branches with no assistant messages until a reply.
     if(context.manager&&context.file&&!existsSync(context.file))await this.load(m,context.manager);
-    this.metadata.set(sid,m);this.save(m);
+    this.save(m);this.metadata.set(sid,m);
     if(p.mode==='reply')this.append(m,'turn/end',{reason:{kind:'completed'}});
     this.append(m,'session/title',{title:m.title});
     return this.branchRow(m);
@@ -627,13 +664,13 @@ export class Host {
     const result=await run;return result instanceof SteeringReply?result.settled.finally(()=>this.wakeGoals()):result;
   }
   async handle(method:string,p:Data,id:string):Promise<any>{
-    if((this.modelSettingsProblem||this.modelSettingsBusy)&&(['session.prompt','session.continueQueue','session.selectModel','session.selectReasoning','session.compact','session.create','session.branch','session.startJob','prompt.improve','setup.save'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Refresh model settings to confirm the stored configuration before starting or changing work.');
-    if(p.sessionId&&this.organization.archived(p.sessionId)&&['session.prompt','session.continueQueue','session.startJob','session.updateGoal','session.compact','prompt.improve'].includes(method))throw Error('Restore the conversation before starting work.');
-    if(this.mcpReloading&&(['prompt.improve','setup.save','models.configure','models.reload','session.create','session.branch','session.updateGoal','session.trimTools','session.compact','session.selectModel','session.selectReasoning','reasoning.configure','session.prompt','session.continueQueue'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Finish MCP session reload before changing or starting a conversation.');
+    if((this.modelSettingsProblem||this.modelSettingsBusy)&&(['session.prompt','session.continueQueue','session.selectModel','session.selectReasoning','session.compact','session.create','session.branch','session.prepareBranch','session.startJob','prompt.improve','setup.save'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Refresh model settings to confirm the stored configuration before starting or changing work.');
+    if(p.sessionId&&this.organization.archived(p.sessionId)&&(['session.prompt','session.continueQueue','session.startJob','session.updateGoal','session.compact','prompt.improve','session.prepareBranch'].includes(method)||method==='session.branch'&&p.prepared===true))throw Error('Restore the conversation before starting work.');
+    if(this.mcpReloading&&(['prompt.improve','setup.save','models.configure','models.reload','session.create','session.branch','session.prepareBranch','session.updateGoal','session.trimTools','session.compact','session.selectModel','session.selectReasoning','reasoning.configure','session.prompt','session.continueQueue'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Finish MCP session reload before changing or starting a conversation.');
     if(method.startsWith('session.')&&p.sessionId&&this.metadata.get(p.sessionId)?.delegation&&!['session.models','session.history','session.nativeHistory','session.nativeRead','session.originalSearch','session.originalRead','session.plan','session.goal','session.queue','session.compaction','session.cancel'].includes(method))throw Error('Delegated conversations are controlled by their parent job.');
     if(this.jobs.busy&&['models.configure','models.reload','setup.save','reasoning.configure','session.mcpConfigure','session.mcpAction'].includes(method))throw Error('Stop and settle background jobs before changing their shared configuration.');
     if(this.compactions.busy&&['setup.save','models.configure','models.reload','reasoning.configure','session.mcpConfigure','session.mcpAction','prompt.improve'].includes(method))throw Error('Finish or cancel Pi compaction before changing shared configuration.');
-    if(p.sessionId&&this.compactions.blocked(p.sessionId)&&['session.create','session.branch','session.trimTools','session.selectModel','session.selectReasoning','session.prompt','session.continueQueue','session.updateGoal','session.startJob'].includes(method))throw Error('Finish compaction or inspect and acknowledge its unknown outcome before changing this conversation.');
+    if(p.sessionId&&this.compactions.blocked(p.sessionId)&&['session.create','session.branch','session.prepareBranch','session.trimTools','session.selectModel','session.selectReasoning','session.prompt','session.continueQueue','session.updateGoal','session.startJob'].includes(method))throw Error('Finish compaction or inspect and acknowledge its unknown outcome before changing this conversation.');
     switch(method){
     case 'models.settingsDescribe':{const view=await this.modelSettings.describe();return {...view,writable:!this.modelSettingsProblem,runtimeStatus:this.modelSettingsProblem?'needs-refresh':'confirmed'};}
     case 'models.settingsMutate':return this.modelSettings.mutate(p.ops,p.revision);
@@ -697,7 +734,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{modelSettings:true,modelDiscovery:true,shortcuts:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{durableBranches:true,modelSettings:true,modelDiscovery:true,shortcuts:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.compactions.busy)throw Error('Stop and settle Pi compaction before shutting down the runtime.');
       if(this.uploads)throw Error('Finish file uploads before shutting down the runtime.');
@@ -716,6 +753,9 @@ export class Host {
     case 'draft.prepare':{this.draftAuthority(p.sessionId);if(!Array.isArray(p.content)||p.content.some((part:Data)=>part.type!=='text'&&!part.attachment))throw Error('Prepare only already-uploaded draft parts.');const parts=await this.attachments.admit(p.sessionId,p.content);if(parts.input!==this.harnessDrafts.describe(p.sessionId).text)throw Error('The submitted text differs from the saved draft.');return this.harnessDrafts.prepare(p.sessionId,p.expectedRevision,p.requestId,p.mode,parts.attachments);}
     case 'draft.settle':{this.draftAuthority(p.sessionId);const m=this.getMeta(p.sessionId),submission=this.harnessDrafts.describe(m.id).submission;if(!submission||submission.requestId!==p.requestId)throw Error('The saved submission identity differs.');const receipt=this.queue(m).lookup(p.requestId,submission.text,submission.attachments);if(!receipt||receipt.status==='unconfirmed'||receipt.status==='failed'&&receipt.input!==undefined)throw Error('The Pi queue has no accepted prompt with this identity; the draft is preserved.');return this.harnessDrafts.settle(m.id,p.requestId,true);}
     case 'draft.acknowledge':{this.draftAuthority(p.sessionId);if(p.acknowledgeUnknownOutcome!==true)throw Error('Acknowledge the uncertain draft without retrying.');return this.harnessDrafts.settle(p.sessionId,p.requestId,false);}
+    case 'session.prepareBranch':return this.prepareBranch(p);
+    case 'session.settleBranch':return this.settleBranch(p);
+    case 'session.branchRecovery':{this.getMeta(p.sessionId);return {items:this.branchIntents.list(identifier(p.sessionId))};}
     case 'session.branch':return this.branch(p);
     case 'session.trimTools':{
       const m=this.getMeta(p.sessionId);if(m.running)throw Error('Stop the current turn before repairing tool context.');

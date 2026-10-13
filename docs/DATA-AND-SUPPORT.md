@@ -29,6 +29,15 @@ The [Harness shared editor](AUGMENTOR-HARNESS.md#shared-prompt-library-and-edito
 
 The [October 10 Harness candidate](AUGMENTOR-HARNESS.md#native-branchedit-and-ordinary-sdk-inputs) preserves original submissions when approved Pi input handlers, skills or templates change ordinary, queued or steering input. Its private display history keeps the original user text alongside the actual prepared SDK content; native Pi history keeps the prepared conversation. Chat/copy/edit and Pi automatic conversational memory use the original submission. Context shows the expanded provider input. An input handled entirely by an extension is retained as a status notice without a fabricated model message or memory item. Pending queue inputs persist privately; completed/failed/cancelled receipts discard their queue text while normal display/native history remains. Unknown preparation receipts retain their original queue text until explicitly acknowledged, including after late native delivery. Preparation interruption is not automatically replayed. These are ordinary history/queue records, not optional diagnostic captures. Input extensions are trusted configured code and may have their own effects or data practices. Stop blocks provider dispatch but does not promise to cancel an arbitrary handler; the ordinary SDK owner waits for its settlement and marks uncertain effects unknown. This source qualification uses isolated synthetic extensions.
 
+The modern Harness Host's [branch recovery journal](HARNESS-BRANCH-CONTROLS.md#durable-exact-boundary-recovery--october-13)
+is private profile metadata, bounded to 64 pending entries/64 KiB. It stores only
+parent/child identifiers, message sequence, reply/edit mode and publication phase;
+no prompt, tool output, credential or model context is copied. Pending unknown
+identities survive browser/Host replacement without automatic replay or eviction.
+Exact confirmed-child settlement clears its own entry. Diagnostic clearing does
+not erase it; corrupt/partial records are preserved for explicit recovery. The
+journal does not send external traffic or authorize broader support exports.
+
 Pi display history now retains the originating conversation ID with each human message. A branch copies its selected history prefix into the child's private display journal while preserving that origin; it also owns a separate native Pi session file. Inherited request IDs cannot acknowledge a child's new submission. Parent history is preserved. Harness stores the selected conversation ID in that tab's origin-scoped session storage, beside its existing operator token. Branch/Edit operation state, edited text and prior composer drafts remain in memory and are not restored after tab reload. Diagnostic clearing does not erase these ordinary native/display histories or session storage.
 
 The [managed Mac setup](MACOS-MANAGED-SETUP.md) source feature stores its key in

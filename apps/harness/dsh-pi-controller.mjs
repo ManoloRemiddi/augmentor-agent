@@ -100,12 +100,18 @@ export class DshPiController {
   forkAt(messageSeq,canSelect=()=>true){return this.forkBoundary(this.state.sessionId,messageSeq,canSelect);}
   forkLast(sessionId,canSelect=()=>true){return this.forkBoundary(sessionId,null,canSelect);}
   async forkBoundary(sessionId,messageSeq,canSelect){
-    // One UI operation, using the Host's existing idempotent branch boundary.
-    // Neither unknown acknowledgments nor a retired read can dispatch a retry.
+    // One explicit UI action. The Host retains prepared child identity across
+    // process replacement; cleanup never retries branch creation or inference.
     if(this.branchFlight)return null;
     const scope={epoch:this.epoch,sessionId:this.state.sessionId};
     const current=()=>scope.epoch===this.epoch&&scope.sessionId===this.state.sessionId&&!this.state.readOnly;
-    const flight={sessionId,messageSeq};let intent,key,attempted=false;
+    const durable=this.state.capabilities?.durableBranches===true;
+    const flight={sessionId,messageSeq};let intent,key,attempted=false,creationConfirmed=false,warning=null;
+    const matches=row=>row?.sessionId===intent.newSessionId&&row?.fork?.sessionId===sessionId&&row?.fork?.messageSeq===messageSeq&&row?.fork?.mode==='reply';
+    const releaseUncreated=async()=>{
+      const row=await this.rpc('session.settleBranch',{...intent,outcome:'not-created'});
+      return row?.settled===true&&row?.outcome==='not-created'&&row?.newSessionId===intent.newSessionId;
+    };
     this.branchFlight=flight;
     try{
       if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
@@ -121,24 +127,41 @@ export class DshPiController {
         messageSeq=last.event.seq;
       }
       if(!current())return null;
-      key=JSON.stringify([sessionId,messageSeq,'reply']);intent=this.branchIntents.get(key);
-      if(!intent){
-        if(this.branchIntents.size>=64)throw Error('Review unconfirmed branch operations before starting another.');
-        intent={sessionId,newSessionId:crypto.randomUUID(),messageSeq,mode:'reply'};this.branchIntents.set(key,intent);
+      key=JSON.stringify([sessionId,messageSeq,'reply']);
+      if(durable){
+        intent=await this.rpc('session.prepareBranch',{sessionId,messageSeq,mode:'reply'});
+        if(intent?.sessionId!==sessionId||intent?.messageSeq!==messageSeq||intent?.mode!=='reply'||typeof intent?.newSessionId!=='string'||!/^[a-zA-Z0-9_-]{1,128}$/.test(intent.newSessionId)||intent.newSessionId===sessionId){intent=null;throw Error('Branch preparation is unconfirmed. No child was requested; an explicit click can read its saved identity.');}
+        if(!current()){await releaseUncreated().catch(()=>false);return null;}
+      }else{
+        // Explicit compatibility with older Hosts; their loaded-controller
+        // recovery scope stays separate from the advertised durable protocol.
+        intent=this.branchIntents.get(key);
+        if(!intent){
+          if(this.branchIntents.size>=64)throw Error('Review unconfirmed branch operations before starting another.');
+          intent={sessionId,newSessionId:crypto.randomUUID(),messageSeq,mode:'reply'};this.branchIntents.set(key,intent);
+        }
       }
-      attempted=true;const row=await this.rpc('session.branch',intent);
-      if(row?.sessionId!==intent.newSessionId||row?.fork?.sessionId!==sessionId||row?.fork?.messageSeq!==messageSeq||row?.fork?.mode!=='reply')throw Error('The branch response did not match the requested boundary.');
-      this.branchIntents.delete(key);
+      attempted=true;const row=await this.rpc('session.branch',{...intent,...(durable?{prepared:true}:{})});
+      if(!matches(row))throw Error('The branch response did not match the requested boundary.');
+      creationConfirmed=true;
+      if(durable){
+        try{const settled=await this.rpc('session.settleBranch',{...intent,outcome:'created'});if(settled?.settled!==true||settled?.outcome!=='created'||!matches(settled))throw Error('Recovery acknowledgment mismatch.');}
+        catch{warning='Branch created. Recovery acknowledgment is unconfirmed; inspect the child in the conversation list.';}
+      }else this.branchIntents.delete(key);
       if(!current())return row;
       await this.refresh();
-      if(current()&&canSelect()&&!this.state.sessions.find(value=>value.sessionId===scope.sessionId)?.running)await this.open(row.sessionId);
+      if(current()&&canSelect()&&!this.state.sessions.find(value=>value.sessionId===scope.sessionId)?.running){
+        const childEpoch=this.epoch+1;await this.open(row.sessionId);
+        if(warning&&this.epoch===childEpoch&&this.state.sessionId===row.sessionId&&!this.state.readOnly)this.update({error:warning});
+      }else if(warning&&current())this.update({error:warning});
       return row;
     }catch(error){
-      if(error.authoritative&&key)this.branchIntents.delete(key);
+      let noChild=false;
+      if(!creationConfirmed&&durable&&intent&&error.authoritative)noChild=await releaseUncreated().catch(()=>false);
+      if(error.authoritative&&key&&!durable)this.branchIntents.delete(key);
       if(current()){
-        this.update({error:attempted&&!error.authoritative?'Branch creation unconfirmed. Inspect the conversation list; an explicit click at the same boundary reconciles the same child. No prompt was sent or operation retried.':error.message});
-        error.presentedByBranch=true;
-        throw error;
+        this.update({error:creationConfirmed?'Branch created. The conversation list could not be refreshed; inspect the child before branching again.':attempted&&(!error.authoritative||durable&&!noChild)?'Branch creation unconfirmed. Inspect the conversation list; an explicit click at the same boundary uses the same child identity. No prompt was sent or operation retried.':error.message});
+        error.presentedByBranch=true;throw error;
       }
       return null;
     }finally{

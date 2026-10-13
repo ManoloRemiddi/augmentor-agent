@@ -2,7 +2,8 @@
 
 The dated installed checkpoint below is superseded by the
 [current MX brand qualification](HARNESS-BRAND.md#ordinary-and-installed-mx-qualification--october-13).
-The Branch/Fork behavior and cold-recovery limitation remain applicable.
+The dated loaded-controller limitation is superseded only within the durable
+Host capability described below; partial filesystem publication remains open.
 
 # Original Branch and Fork operation ownership
 
@@ -124,3 +125,72 @@ dashboard remains open for feedback; screenshot/private proofs remain local.
 Earlier immutable releases are preserved. Full migration, cold unconfirmed-branch
 recovery, live/privacy/public-distribution/physical/platform gates and known CI
 failures remain open. Further OS implementation awaits owner MX feedback.
+
+
+## Durable exact-boundary recovery — October 13
+
+The installed predecessor efa411b reproduces a cold-recovery failure: corrupt the
+branch acknowledgment, fully replace both Chromium and the Host on the same
+fixture profile, and an explicit same-boundary Fork creates a different child.
+The new Host advertises `durableBranches` and owns a private bounded
+`branch-intents.json` journal. A prepare request validates the exact source and
+reply/edit boundary before reserving a child UUID; a fresh browser/Host reuses
+that pending identity. Creation marks the reservation before publishing child
+files. A confirmed existing child reconciles idempotently; explicit settlement
+conditionally clears only that exact child. A late acknowledgment cannot clear
+a newer intentional branch. Nothing automatically retries branching, a prompt,
+a model request or a tool.
+
+The journal holds at most 64 pending boundaries and 64 KiB, refuses new entries
+rather than evicting unknown outcomes, and contains scalar identifiers/sequence/
+mode/phase only. It contains no prompt, model context or tool output. Reads validate
+private regular single-link files and a private profile directory; bounded reads
+refuse symlinks, corruption, foreign schema/duplicate entries and oversized data
+without overwriting or echoing its contents. Unix publication uses a private
+exclusive temporary, file sync, rename and directory sync. The existing hardened
+Windows JSON helper is retained; physical Windows acceptance is unproven.
+
+Prepare is a read-only boundary inspection: no child file, SDK AgentSession,
+provider or tool is created. It refuses unreviewed native SDK header versions
+before the SDK could migrate the original source file. Read-only inspector and
+delegated child routes cannot call prepare/create/settle/recovery methods. Current
+model/MCP, compaction, archive and running gates remain enforced. Old Hosts without
+the capability retain their explicitly limited loaded-controller behavior; a new
+Host prepare error never silently falls back to a browser-only identity.
+
+Known creation with lost bookkeeping acknowledgment or failed list refresh stays
+reported as creation confirmed. A retired preparation releases only a proven
+uncreated reservation. A changed selection/draft cannot be displaced by a late
+result. An incomplete multi-file child is preserved and refused for recreation,
+overwrite or uncreated settlement. Repair/reconciliation of partially published
+children remains a separate open crash-recovery gate.
+
+Nine journal cases, seventeen controller cases, the real Host lifecycle and original
+GUI cold-process fixture pass the focused **87/87** checks with no failures/skips.
+The original-GUI fixture deliberately submits its two initial wire requests and
+one read; cold reconciliation adds none. Exact child native tool context survives,
+parent display history is unchanged, original native prefixes survive with only
+matching title bookkeeping, and the newer parent draft restores. An explicit
+partial-child fault retains its file and reserved identity. Archive/restore checks
+account for their exact organization revision increments while preserving the
+original pins/archive arrays. Strict check/build pass; full source, ordinary,
+immutable and installed qualification follows separately.
+
+This closes the reproduced browser/Host replacement identity problem only after
+its candidate qualification, not every crash/publication case. Full P0/P1,
+custom plugin inventory, live/privacy/distribution/platform and known CI gates
+remain open. MX feedback still precedes other OS implementation.
+
+
+## Combined source qualification — October 13
+
+Final strict check/build and the 76-file MX cohort pass **398/398**, with zero
+failures/skips/cancellations and five separate notice/workspace packaging cases.
+Node 24.19.0, matching isolated PySide6/shiboken6 6.8.2.1 QtTest, two workers and
+existing deadlines are retained. The combined source contains the requested
+black Light flare/clipping correction and durable branch identity recovery. The
+first full run ended by SIGTERM before a terminal result; it is an interrupted
+checkpoint, not a passing suite or an application assertion failure. The complete
+second run supplies this qualification. Isolated visual Light/Dark inspection
+also passes. Ordinary, sealed and installed qualification follows separately;
+the selected MX preview remains efa411b until guarded adoption.
