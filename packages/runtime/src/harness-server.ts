@@ -19,7 +19,7 @@ const allowed = new Set([
   'session.prompt', 'session.cancel', 'session.prepareBranch', 'session.settleBranch', 'session.branchRecovery', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue', 'session.compact', 'session.compaction', 'session.acknowledgeCompaction',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.search', 'observation.payload', 'observation.clear',
-  'metafolders.describe','metafolders.set','appearance.describe','appearance.set','shortcuts.describe', 'shortcuts.edit', 'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
+  'wiki.describe','wiki.set','wiki.refresh','metafolders.describe','metafolders.set','appearance.describe','appearance.set','shortcuts.describe', 'shortcuts.edit', 'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
   'models.settingsDescribe','models.settingsMutate','models.settingsDiscover','models.credentialDescribe','models.credentialSet','models.settingsRefresh',
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}

@@ -11,18 +11,22 @@ import {createTools,type OriginalWikiTool} from '../vendor/dsh-plugin-wiki-tools
 import {Vault} from '../vendor/dsh-plugin-wiki-tools/lib/vault.js';
 
 export interface WikiConfig {enabled:true;vaultPath:string;maxQueryResults:number;typeFolders:Record<string,string>}
+export interface WikiProfile {enabled:boolean;vaultPath:string;maxQueryResults:number;typeFolders:Record<string,string>}
+export function checkedWikiProfile(value:any):WikiProfile {
+ if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).some(k=>!['enabled','vaultPath','maxQueryResults','typeFolders'].includes(k))||typeof value.enabled!=='boolean')throw Error('Invalid Wiki configuration; its original is preserved.');
+ const vaultPath=value.vaultPath??'',maxQueryResults=value.maxQueryResults??10,typeFolders=value.typeFolders??{};
+ if(typeof vaultPath!=='string'||vaultPath.length>4096||vaultPath.includes('\0')||vaultPath&&(vaultPath==='/'||!isAbsolute(vaultPath)||resolve(vaultPath)!==vaultPath)||value.enabled&&!vaultPath)throw Error('Wiki vaultPath must be an explicit absolute normalized directory.');
+ if(!Number.isSafeInteger(maxQueryResults)||maxQueryResults<1||maxQueryResults>100||!typeFolders||typeof typeFolders!=='object'||Array.isArray(typeFolders)||Object.values(typeFolders).some(v=>typeof v!=='string'))throw Error('Invalid Wiki query/routing configuration.');
+ if(value.enabled&&process.platform!=='linux')throw Error('The Wiki binding currently requires Linux qualification.');
+ if(vaultPath)new Vault(vaultPath,{typeFolders});
+ return {enabled:value.enabled,vaultPath,maxQueryResults,typeFolders:structuredClone(typeFolders)};
+}
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
 function privateFile(path:string){const info=lstatSync(path);if(!info.isFile()||info.isSymbolicLink()||info.nlink!==1||info.size>16384||info.uid!==process.getuid!()||(info.mode&0o077)!==0)throw Error('Wiki private configuration/receipt is unsafe; its original is preserved.');return readFileSync(path,'utf8');}
 export function wikiConfig(configDir:string):WikiConfig|undefined{
  const path=join(configDir,'wiki.json');try{lstatSync(path);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return;throw error;}
  const value=JSON.parse(privateFile(path));if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).some(k=>!['schema','enabled','vaultPath','maxQueryResults','typeFolders'].includes(k))||value.schema!=='augmentor-wiki/1'||typeof value.enabled!=='boolean')throw Error('Invalid Wiki configuration; its original is preserved.');
- if(!value.enabled)return;
- if(process.platform!=='linux')throw Error('The Wiki binding currently requires Linux qualification.');
- if(typeof value.vaultPath!=='string'||!isAbsolute(value.vaultPath)||resolve(value.vaultPath)!==value.vaultPath||value.vaultPath==='/'||value.vaultPath.length>4096)throw Error('Wiki vaultPath must be an explicit absolute normalized directory.');
- const maxQueryResults=value.maxQueryResults??10,typeFolders=value.typeFolders??{};
- if(!Number.isSafeInteger(maxQueryResults)||maxQueryResults<1||maxQueryResults>100||!typeFolders||typeof typeFolders!=='object'||Array.isArray(typeFolders))throw Error('Invalid Wiki query/routing configuration.');
- new Vault(value.vaultPath,{typeFolders});
- return {enabled:true,vaultPath:value.vaultPath,maxQueryResults,typeFolders};
+ const {schema:_schema,...fields}=value,profile=checkedWikiProfile(fields);return profile.enabled?{...profile,enabled:true}:undefined;
 }
 type Receipt={schema:'augmentor-wiki-action/1';key:string;tool:string;state:'started'|'completed'|'refused'|'unknown'};
 function directory(path:string){const missing:string[]=[];let existing=path;while(!existsSync(existing)){try{lstatSync(existing);throw Error('Linked Wiki receipt parent is unsafe.');}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}missing.unshift(existing);existing=dirname(existing);}if(realpathSync(existing)!==resolve(existing))throw Error('Linked Wiki receipt parent is unsafe.');for(const next of missing)mkdirSync(next,{mode:0o700});const info=lstatSync(path);if(!info.isDirectory()||info.isSymbolicLink()||info.uid!==process.getuid!()||(info.mode&0o077)!==0)throw Error('Wiki receipt directory is unsafe.');}
@@ -35,10 +39,11 @@ async function serial<T>(key:string,fn:()=>Promise<T>){const prior=writers.get(k
 export class WikiBinding {
  readonly skillPath=fileURLToPath(new URL('../vendor/dsh-plugin-wiki-skills/skills',import.meta.url));
  private definitions:OriginalWikiTool[];private receipts:string;
- constructor(readonly config:WikiConfig,stateDir:string){this.definitions=createTools(new Vault(config.vaultPath),config);this.receipts=join(stateDir,'wiki-actions',hash(config.vaultPath));}
+ constructor(readonly config:WikiConfig,stateDir:string){this.definitions=createTools(new Vault(config.vaultPath,{typeFolders:config.typeFolders}),config);this.receipts=join(stateDir,'wiki-actions',hash(config.vaultPath));}
  isRead(name:string){return name==='wiki_query';}
  private known(){directory(this.receipts);const names=readdirSync(this.receipts);if(names.length>2048||names.some(name=>!/^([a-f0-9]{64}\.json|\.operation-lock)$/.test(name)))throw Error('Wiki action receipts need operator inspection; no mutation is admitted.');return names.filter(name=>name.endsWith('.json')).map(name=>{const value=JSON.parse(privateFile(join(this.receipts,name))) as Receipt;if(value.schema!=='augmentor-wiki-action/1'||value.key+'.json'!==name||!['started','completed','refused','unknown'].includes(value.state))throw Error('Invalid Wiki action receipt; its original is preserved.');return value;});}
  factory=(pi:ExtensionAPI)=>{
+  pi.on('resources_discover',()=>({skillPaths:[this.skillPath]}));
   pi.on('tool_result',(event,ctx)=>{if(this.definitions.some(tool=>tool.name===event.toolName)&&!this.isRead(event.toolName)&&(event.details as {stop?:boolean})?.stop)ctx.abort();});
   for(const original of this.definitions){const read=this.isRead(original.name);
   const definition:ToolDefinition&{augmentorExecution:ExecutionContract}={name:original.name,label:original.name,description:original.description,parameters:schema(original),annotations:{readOnlyHint:read,idempotentHint:read,openWorldHint:false},augmentorExecution:{effect:()=>read?'read':'change',outcome:(_args,result)=>({status:(result.details as {outcome?:'completed'|'unknown'|'failed-before-dispatch'})?.outcome??(read?'completed':'unknown')})},

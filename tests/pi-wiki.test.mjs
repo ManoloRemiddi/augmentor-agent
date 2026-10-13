@@ -14,12 +14,14 @@ test('original six Wiki tools and bundled skill execute through one Pi owner, pr
  await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'Host');
  const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token');
  const rpc=async(method,params={})=>{const response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})}),frame=await response.json();if(frame.error)throw Error(frame.error.message);return frame.result;};
+ const wikiProfile=await rpc('wiki.describe');await rpc('wiki.set',{expectedRevision:wikiProfile.revision,value:{...wikiProfile.value,typeFolders:{concept:'wiki/areas'}}});
  const selection={provider:'fixture',model:'harness-fixture'},sid='wiki-core';
  await rpc('session.create',{sessionId:sid,selection,cwd:link.workspace});
  await rpc('session.prompt',{sessionId:sid,requestId:crypto.randomUUID(),content:[{type:'text',text:'/skill:wiki-query WIKI_CORE_FLOW'}]});
  await until(async()=>!(await rpc('session.list')).items.find(row=>row.sessionId===sid).running,'Wiki flow completed');
  const history=await rpc('session.history',{sessionId:sid,maxMessages:100}),events=history.events.map(row=>row.event);
  const results=events.filter(event=>event.type==='tool/result');assert.equal(results.length,8,JSON.stringify({results:results.map(e=>({name:e.data.name,isError:e.data.isError,text:JSON.stringify(e.data.result).slice(0,160)})),notices:events.filter(e=>e.type==='runtime/notice').map(e=>e.data)}));assert(results.every(result=>!result.data.isError),JSON.stringify(results));
+ assert((await stat(join(link.wikiVault,'wiki/areas/Renamed Authored Page.md'))).isFile(),'configured routing reaches the original Vault');
  const wiki=join(link.wikiVault,'wiki');
  const paths=[];async function walk(path){for(const entry of await readdir(path,{withFileTypes:true})){const p=join(path,entry.name);if(entry.isDirectory())await walk(p);else if(entry.name.endsWith('.md'))paths.push(p);}}await walk(wiki);
  const pages=await Promise.all(paths.map(p=>readFile(p,'utf8')));assert(pages.some(body=>body.includes('title: Renamed Authored Page')&&body.includes('AUTHORED WIKI CONTENT')));assert(pages.some(body=>body.includes('[[Renamed Authored Page]]')));assert(!pages.some(body=>body.includes('[[Authored Page]]')&&!body.includes('Wiki Log')));

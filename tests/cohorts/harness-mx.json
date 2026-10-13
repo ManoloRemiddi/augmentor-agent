@@ -94,6 +94,8 @@
     "tests/harness-pointer-chromium.test.mjs",
     "tests/harness-navigation-chromium.test.mjs",
     "tests/pi-wiki.test.mjs",
-    "tests/wiki-scope.test.mjs"
+    "tests/wiki-scope.test.mjs",
+    "tests/wiki-settings.test.mjs",
+    "tests/harness-wiki-settings-chromium.test.mjs"
   ]
 }

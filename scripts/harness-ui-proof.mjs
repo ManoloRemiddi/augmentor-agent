@@ -15,6 +15,7 @@ const root=mkdtempSync(join(tmpdir(),'augmentor-harness-ui-'));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
 const sharedState=join(root,'shared-state'),sharedData=join(root,'shared-data'),home=join(root,'home');
 const wikiVault=process.env.AUGMENTOR_HARNESS_PROOF_WIKI==='1'?join(root,'wiki-vault'):null;
+const wikiExtension=process.env.AUGMENTOR_HARNESS_PROOF_WIKI_SETTINGS==='1'?join(root,'wiki-settings-resource.mjs'):null;
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
 const discoveryLog=process.env.AUGMENTOR_HARNESS_PROOF_MODEL_DISCOVERY==='1'?join(root,'model-listings.jsonl'):null;
 const providerApi=process.env.AUGMENTOR_HARNESS_PROOF_PROVIDER_API??'openai-completions';
@@ -32,6 +33,7 @@ if(wikiVault){
  if(process.env.AUGMENTOR_HARNESS_PROOF_WIKI_FAILURE==='1'){mkdirSync(join(wikiVault,'.archive'));writeFileSync(join(wikiVault,'.raw/conflict.txt'),'AUTHORED NEW RAW');writeFileSync(join(wikiVault,'.archive/conflict.txt'),'AUTHORED OLDER ARCHIVE');}
  writeFileSync(join(config,'wiki.json'),JSON.stringify({schema:'augmentor-wiki/1',enabled:true,vaultPath:wikiVault}),{mode:0o600});
 }
+if(wikiExtension){writeFileSync(wikiExtension,`import {existsSync} from 'node:fs';export default pi=>{if(existsSync(${JSON.stringify(wikiExtension+'.collision')}))pi.registerTool({name:'wiki_query',label:'Authored collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[wikiExtension],skills:[]}));}
 const model=http.createServer(async(req,res)=>{
   if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'&&req.method==='POST'&&req.url==='/fixture/release-nested'){
     writeFileSync(join(root,'release-nested'),'Authored fixture release.');res.writeHead(204).end();return;
@@ -54,7 +56,8 @@ const model=http.createServer(async(req,res)=>{
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
   const wikiUser=wikiVault?[...body.messages].reverse().find(message=>message.role==='user'&&JSON.stringify(message.content).includes('WIKI_')):undefined;
   if(wikiUser){
-    if(JSON.stringify(wikiUser.content).includes('WIKI_BROWSER_CATALOG')){chunk({role:'assistant',content:'Authored browser catalog inspection only.'},'stop',{prompt_tokens:10,completion_tokens:10,total_tokens:20});res.end('data: [DONE]\n\n');return;}
+    if(JSON.stringify(wikiUser.content).includes('WIKI_SETTINGS_HOLD')){res.write(': Authored held provider request.\n\n');return;}
+    if(JSON.stringify(wikiUser.content).includes('WIKI_BROWSER_CATALOG')||JSON.stringify(wikiUser.content).includes('WIKI_SETTINGS_CATALOG')){chunk({role:'assistant',content:'Authored browser catalog inspection only.'},'stop',{prompt_tokens:10,completion_tokens:10,total_tokens:20});res.end('data: [DONE]\n\n');return;}
     const readonly=JSON.stringify(wikiUser.content).includes('WIKI_READONLY');
     const unknown=JSON.stringify(wikiUser.content).includes('WIKI_UNKNOWN');
     const sequence=unknown?[['wiki_archive',{source_path:'.raw/conflict.txt'}],['wiki_write',{type:'concept',title:'Never Reached',content:'MUST NOT WRITE AFTER UNCERTAINTY'}]]:readonly?[
@@ -212,7 +215,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(wikiVault?{wikiVault}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;
