@@ -94,3 +94,49 @@ other-OS implementation remains deferred for owner MX feedback. Nested running-c
 presentation, unlinked request attribution and the complete P0/P1/live/privacy/public
 distribution/platform gates remain open. DSH remains available for unqualified
 workflows.
+
+
+## Request-scoped presentation identity — October 13 correction
+
+The initial runtime b80c609 is selected in immutable private MX release
+20261013-044026-4424a11e (artifact
+a7905617fcadf79105104f9f09830ec4d50cad228d650524db957c53e4b30715).
+Source and ordinary each pass 357/357 across 70 files and five packaging cases;
+25 immutable contracts/Chromium cases pass. A separate actual installed manual
+check confirms live pending arguments and zero dispatch on Stop, with an aborted
+assistant retained as Failed. Owner Insights and the shortcut reference open
+without a model request or preference edit; all twelve histories/queues and
+23,889 entries verify. This evidence does not qualify complete reused-ID behavior.
+
+The second manual held proposal uses the same provider call ID. Selecting its
+second-turn Tool row opens the first turn's details: the copied renderer expects
+unique presentation IDs, while valid Pi call IDs can repeat across requests. The
+failure is retained as an installed screenshot and a pure regression reproduces
+against the exact b80c609 authored projection. The immutable artifact remains
+unchanged; the corrected source below is not installed yet. The held fixture later
+settles without exposing Stop; it is inspected as terminal and its exact supervisor
+is closed. That wait is not used as completion or tool-effect evidence.
+
+The authored adapter now namespaces internal call identifiers by the Host turn
+and actual request ID, or the observed message-capture ID when no request hook
+exists. SDK IDs remain unchanged in native/recorded events, and are retained
+separately as sdkCallId in presentation data. Final messages and actual tool
+start/end display events carry the capture identity from the existing subscription.
+There is no invented provider request, another SDK owner or supplier UI change.
+
+Older events use their retained same-owner proposal/dispatch ordering. Tool results,
+running seats, schema lookups and timings bind the same request; missing/ambiguous
+timing records remain unknown. Chat tool rows gain their real dispatch sequence and
+read that dispatch's proposal/result, avoiding an earlier same-ID argument object.
+Projection never modifies the source events. The test checks repeated IDs across
+turns and SDK requests within one Host turn, raw-ID preservation, exact result/
+argument/schema/timing association, and unlinked message captures without invented
+request timing. The enhanced actual Chromium case selects the second proposal and
+keeps its details through completion. Its first check is occluded by the composer
+at Chromium's small default viewport; the test now states its actual 1280×720
+acceptance geometry without changing product layout, deadlines or concurrency.
+Focused source passes 16/16 and strict check/build pass. Final source/ordinary/
+immutable/manual qualification follows; full migration and platform gates remain
+open, and further OS implementation still awaits owner MX feedback.
+
+Final corrected source check/build and the complete Node 24.19.0 MX cohort pass **358/358 across 70 files**, zero failures/skips/cancellations, two workers/unchanged deadlines/matching QtTest. The old b80c609 projection fails the exact reused-ID regression; corrected source passes it. Ordinary and final installed acceptance follow separately.

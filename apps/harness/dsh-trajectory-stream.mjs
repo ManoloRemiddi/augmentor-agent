@@ -1,6 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 /** Read-only live seats for the original DSH Trajectory. No provider work. */
-export function trajectoryStream(state,nodes,turnIds){
+import {callScope,callViewId,toolOwnership,observedTool} from './dsh-call-identity.mjs';
+export function trajectoryStream(state,nodes,turnIds,ownership=toolOwnership(state.events)){
   const steps=new Map(),bySeq=new Map(nodes.map(node=>[node.seq,node])),activeCalls=new Map();
   let pending=null,turn=1;
   const nextStep=t=>(steps.get(t)||0)+1;
@@ -25,13 +26,13 @@ export function trajectoryStream(state,nodes,turnIds){
         pending.captureId??=chunk.captureId;
         let position=pending.calls.get(chunk.index);
         if(position===undefined){position=pending.blocks.length;pending.calls.set(chunk.index,position);}
-        const previous=pending.blocks[position],expected=pending.revisions.get(chunk.index),same=expected?.callId===chunk.callId&&expected.name===chunk.name,validRevision=Number.isSafeInteger(chunk.revision)&&chunk.revision>=1;let raw=chunk.argsRaw,reason=chunk.reason;
+        const scopedId=callViewId(callScope({requestId:data.requestId,captureId:chunk.captureId},event.turnId,event.seq),chunk.callId),previous=pending.blocks[position],expected=pending.revisions.get(chunk.index),same=expected?.callId===scopedId&&expected.name===chunk.name,validRevision=Number.isSafeInteger(chunk.revision)&&chunk.revision>=1;let raw=chunk.argsRaw,reason=chunk.reason;
         if(!validRevision||same&&chunk.revision<=expected.revision){raw=null;reason='Live SDK argument revision is invalid or out of order; inspect the native message.';}
         else if(hasPatch){if(previous?.kind==='tool-call'&&same&&expected.revision===patch.baseRevision&&chunk.revision===patch.baseRevision+1&&patch.prefix+patch.remove<=previous.argsRaw.length)raw=previous.argsRaw.slice(0,patch.prefix)+patch.insert+previous.argsRaw.slice(patch.prefix+patch.remove);else{raw=null;reason='Live SDK argument patch has no available base; inspect the native message.';}}
         else if(typeof raw!=='string'&&raw!==null){raw=null;reason='Live SDK argument update is invalid; inspect the native message.';}
-        if(validRevision&&(!same||chunk.revision>expected.revision))pending.revisions.set(chunk.index,{callId:chunk.callId,name:chunk.name,revision:chunk.revision});
+        if(validRevision&&(!same||chunk.revision>expected.revision))pending.revisions.set(chunk.index,{callId:scopedId,name:chunk.name,revision:chunk.revision});
         if(typeof raw==='string'&&raw.length>512*1024){raw=null;reason='Live SDK argument display limit exceeded; inspect the native message.';}
-        pending.blocks[position]=raw===null?{kind:'other',block:{type:'pi-sdk-tool-arguments',callId:chunk.callId,name:chunk.name,status:'unavailable',reason}}:{kind:'tool-call',callId:chunk.callId,name:chunk.name,argsRaw:raw,subCalls:[]};
+        pending.blocks[position]=raw===null?{kind:'other',block:{type:'pi-sdk-tool-arguments',callId:chunk.callId,name:chunk.name,status:'unavailable',reason}}:{kind:'tool-call',callId:scopedId,sdkCallId:chunk.callId,name:chunk.name,argsRaw:raw,subCalls:[]};
         continue;
       }
       const last=pending.blocks.at(-1);if(last?.kind===kind)last.text+=chunk.text;else pending.blocks.push({kind,text:chunk.text});
@@ -56,10 +57,10 @@ export function trajectoryStream(state,nodes,turnIds){
   };
   const partial=pending?{turn:pending.turn,step:pending.step,blocks:pending.blocks,...(timing(pending.requestId)?{timing:timing(pending.requestId)}:{})}:null;
   const runningCalls=running?[...activeCalls.values()].flatMap(({event,turn})=>{
-    const id=event.data.toolCallId,parent=[...nodes].reverse().find(node=>node.kind==='assistant'&&node.turn===turn&&node.seq<event.seq&&node.blocks.some(block=>block.kind==='tool-call'&&block.callId===id));
+    const binding=ownership.get(event.seq),id=binding?.id,parent=[...nodes].reverse().find(node=>node.kind==='assistant'&&node.turn===turn&&node.seq<event.seq&&node.blocks.some(block=>block.kind==='tool-call'&&block.callId===id));
     // Only an actual dispatch with a retained proposal can supply arguments.
     if(!parent)return [];
-    const block=parent.blocks.find(block=>block.kind==='tool-call'&&block.callId===id),start=state.records.find(row=>row.kind==='tool/start'&&row.data.toolCallId===id);
+    const block=parent.blocks.find(block=>block.kind==='tool-call'&&block.callId===id),start=observedTool(state.records,'tool/start',event,binding);
     return [{callId:id,name:event.data.name,turn:parent.turn,step:parent.step,phase:'start',time:start?.time??null,argsRaw:block.argsRaw,subCalls:[]}];
   }):[];
   nodes.sort((a,b)=>a.seq-b.seq);

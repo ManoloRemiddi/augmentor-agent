@@ -10,6 +10,7 @@ export class ToolArgumentSnapshots {
   private capturedBytes=0;
   private exhausted=false;
   constructor(private clock=()=>performance.now()){}
+  identity(){return this.captureId||undefined;}
   begin(){this.calls.clear();this.captureId=randomUUID();this.capturedBytes=0;this.exhausted=false;this.active=true;}
   end(){this.calls.clear();this.active=false;}
   update(event:AssistantMessageEvent){

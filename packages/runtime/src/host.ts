@@ -347,8 +347,9 @@ export class Host {
       surface:m.surface??'linux',policy:m.policy,...(m.fork?{fork:m.fork}:{})});
     if(mcp){const info=mcp.describe();if(info.servers.length||info.configurationErrors)installed.record('integration/mcp',info);if(info.configurationErrors)this.append(m,'runtime/warning',{message:'Managed MCP configuration contains errors. Some servers are unavailable; ordinary chat remains available.'});}
     if(repaired.length)installed.record('context/budget',{changes:repaired,units:'unicode-code-points',boundary:'before-session-owner-load'});
-    const toolArguments=new ToolArgumentSnapshots();
+    const toolArguments=new ToolArgumentSnapshots();let messageCaptureId:string|undefined;
     created.session.subscribe(e=>{
+      if(e.type==='agent_start')messageCaptureId=undefined;
       if(e.type==='message_start'&&e.message.role==='user'){
         const correction=record!.steering?.delivery(e.message);
         const requestId=correction??(!record!.initialDelivered?record!.activeRequestId:undefined);
@@ -367,15 +368,16 @@ export class Host {
         if(a.type==='thinking_delta')this.append(m,'assistant/chunk',{requestId,chunk:{type:'reasoning-delta',text:a.delta}});
         try{const chunk=toolArguments.update(a);if(chunk)this.append(m,'assistant/chunk',{requestId,chunk});}catch{/* Inspection cannot change tool dispatch. */}
       }
-      if(e.type==='message_start'&&e.message.role==='assistant')toolArguments.begin();
+      if(e.type==='message_start'&&e.message.role==='assistant'){toolArguments.begin();messageCaptureId=toolArguments.identity();}
       if(e.type==='message_end'&&e.message.role==='assistant'){
         toolArguments.end();
-        this.append(m,'assistant/message',{requestId:record!.observation?.currentRequestId(),message:{content:e.message.content,stopReason:e.message.stopReason,timestamp:e.message.timestamp,usage:e.message.usage}});
+        this.append(m,'assistant/message',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,message:{content:e.message.content,stopReason:e.message.stopReason,timestamp:e.message.timestamp,usage:e.message.usage}});
         record!.failed=e.message.stopReason==='error';if(record!.failed&&!record!.steering?.waiting)this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});
       }
-      if(e.type==='tool_execution_start')this.append(m,'tool/call',{name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId}:{})});
+      if(e.type==='tool_execution_start')this.append(m,'tool/call',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId}:{})});
       if(e.type==='tool_execution_end')this.fileReferences.invalidate(m.id);
-      if(e.type==='tool_execution_end')this.append(m,'tool/result',{name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId}:{}),isError:e.isError,result:{...e.result,content:e.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Tool image omitted from this display projection; inspect native evidence]'}:part)}});
+      if(e.type==='tool_execution_end')this.append(m,'tool/result',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId}:{}),isError:e.isError,result:{...e.result,content:e.result.content.map((part:Data)=>part.type==='image'?{type:'text',text:'[Tool image omitted from this display projection; inspect native evidence]'}:part)}});
+      if(e.type==='agent_end'){messageCaptureId=undefined;toolArguments.end();}
     });void this.flushJobReceipts(m.id).catch(()=>{});return record;
   }
   private savedJobEntry(m:Meta,id:string){

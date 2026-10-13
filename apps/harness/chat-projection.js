@@ -31,7 +31,7 @@ export function projectChat(events,{running=false}={}){
    flush('partial');
    items.push({kind:'user',seq:event.seq,text:(data.submittedContent??data.content??[]).filter(p=>p.type==='text').map(p=>p.text||'').join('\n')});
   }else if(event.type==='tool/call'){
-   flush('complete');const item={kind:'tool',name:data.name,toolCallId:data.toolCallId,status:'pending'};
+   flush('complete');const item={kind:'tool',seq:event.seq,name:data.name,toolCallId:data.toolCallId,status:'pending'};
    items.push(item);tools.set(data.toolCallId,item);
   }else if(event.type==='tool/result'){
    const tool=tools.get(data.toolCallId);
