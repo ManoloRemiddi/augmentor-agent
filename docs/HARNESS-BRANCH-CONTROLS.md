@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The dated installed checkpoint below is superseded by the
+[current MX brand qualification](HARNESS-BRAND.md#ordinary-and-installed-mx-qualification--october-13).
+The Branch/Fork behavior and cold-recovery limitation remain applicable.
+
 # Original Branch and Fork operation ownership
 
 The original DSH message Branch control and sidebar/keyboard Fork use the existing

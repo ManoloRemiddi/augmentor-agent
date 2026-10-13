@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`harness-brand-chromium.test.mjs` exercises both original sidebar seats and their
+actions, website-derived shape/flow/breath timings, changing Light/Dark outlines,
+containment within the clipped brand row, contrast, reduced-motion restoration
+and the exact favicon. The isolated Host makes no provider/tool request and the
+page fetches no remote logo asset. See [brand qualification](../docs/HARNESS-BRAND.md).
+
 `harness-nested-tools.test.mjs` checks scoped parent trees, independent outcomes,
 legal long IDs, unavailable legacy arguments and Context File Activity's exact
 earlier inputs. `harness-nested-tools-chromium.test.mjs` uses the public SDK,
@@ -14,16 +20,19 @@ retired selection/metadata responses and keep failed reads unconfirmed without a
 cancel/work retry. The exact held-poll browser regression fails on the interim
 02a55a9 immutable GUI and passes on corrected source/artifact.
 
-[Latest qualified MX cohort](../docs/HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13): runtime **a0c2011**,
-release **20261013-090703-abddfcd6**, product **0.2.13**, selected and running.
-Original message Branch and sidebar/keyboard Fork guard duplicate clicks, late
-responses, changed drafts and explicit same-child reconciliation. Source/ordinary
-each pass **380/380 across 74 files** plus five packaging cases; **68 immutable
-tests** and installed original Context Insights reads pass. All **23,895** entries
-and twelve histories/queues, drafts, profiles and model processes verify. Supplier
-GUI/CSS, 580 MIT/108 Apache records, licence bodies and dependencies are unchanged.
-Full migration, cold unconfirmed-branch recovery, live/privacy/distribution/platform
-gates and CI failures remain open. Further OS implementation awaits MX feedback.
+[Latest qualified MX cohort](../docs/HARNESS-BRAND.md#ordinary-and-installed-mx-qualification--october-13): runtime **efa411b**,
+release **20261013-100304-45f0b71b**, product **0.2.13**, selected and running.
+Artifact **440fdce7fa8033aaa42d8cacfb04f9d23c4d60f1121508fe7250a91b39cb2067**.
+The website's original elastic mark occupies the original DSH header/rail seats,
+with uncropped light/dark motion, restored Light preference and reduced-motion
+behavior. Source/ordinary each pass **381/381 across 75 files** plus five packaging
+cases; **69 immutable tests**, installed theme checks and Context Insights reads
+pass. All **23,906** entries and twelve histories/queues, drafts, profiles and model
+processes verify. DSH/dashboard source/CSS and 580 MIT/108 Apache records remain
+unchanged; three original MIT brand notice/source files bring staged records to 786.
+Full migration, custom plugin inventory, cold unconfirmed-branch recovery,
+live/privacy/distribution/platform gates and CI failures remain open. Further OS
+implementation awaits MX feedback.
 
 Earlier counts/deployment statements below are historical checkpoints.
 

@@ -64,3 +64,54 @@ artifact qualification and installed acceptance follow before adoption.
 Installed inspection additionally found the clipped full-size mark described
 above. The corrected containment fixture and strict check/build pass. Final source,
 ordinary, immutable and installed qualification below applies to that correction.
+
+## Ordinary and installed MX qualification — October 13
+
+Qualified runtime: **efa411b2811c89343ac424c56be47ad9908c57a2**. The correction's
+strict check/build and both source and separate ordinary 75-file cohorts pass
+**381/381**, each with five separate notice/workspace packaging cases. The sealed
+candidate passes **69/69** matching-source drivers, including actual Pi Host and
+Chromium brand, Branch/Fork, original Context, keyboard, argument and nested-Stop
+checks. Fixture Host/SDK/runtime/GUI use the candidate's bundled Node and compiled
+files; pure drivers match the ordinary source snapshot. Deadlines remain unchanged.
+No selected file is patched.
+
+Private MX release **20261013-100304-45f0b71b**, product **0.2.13**, artifact
+**440fdce7fa8033aaa42d8cacfb04f9d23c4d60f1121508fe7250a91b39cb2067** is selected
+and running through the stable preview launcher. Guarded idle shutdown and
+sequential startup verify actual bundled Node/Host and Native roots. All **23,906**
+inventory entries verify before and after installed GUI inspection. The ordinary
+assembly contains 663 compiled files, 20,801 production dependency files, 151 npm
+instances and nine native executables, retaining their existing bytes. The 580
+DSH and 108 dashboard supplier records remain unchanged. Three brand notice/source
+files bring staged licence/provenance files to **786**; only the compiled GUI's
+combined notice and SOURCE.json change among the preceding licence records.
+
+Actual installed inspection verifies the uncropped outline changing shape in
+Light and Dark, all three original animation names, contrasting outlines and the
+19-pixel mark within the existing 24-pixel slot. The owner's Light preference is
+restored and original Context Insights stays open with eleven retained nonarchived
+sessions, seven newest bodies, zero failed/partial reads or usage gaps and explicit
+older timing coverage. There are no page errors and no new owner prompt/tool/model
+request. Screenshots and private profile evidence stay local.
+
+All twelve histories, queue items and session identities remain unchanged. Of 247
+saved files, 243 are identical, one journal retains its exact original prefix with
+one close/load each, and three corresponding derivatives update. There are no new
+Linux placeholders. Draft/attachment bytes, settings/revision, auth/model profiles,
+production selection and model-router arguments remain preserved. All nine Host
+maintenance counters are zero; Native is online/model-ready. The earlier full-size
+brand candidate is retained as a superseded checkpoint; this qualification applies
+to the fitting correction, not that cropped presentation.
+
+Published predecessor **bb31bc1** completed 24 CI checks with eight failures:
+Windows commands/jobs and Native (x64/ARM), Windows contracts, macOS bundled runtime
+(14/26), and Debian. New publication CI is tracked separately. This Linux branding
+qualification does not close those failures, complete the owner's custom plugin
+inventory, recover cold unconfirmed Branch identities, or qualify the full
+migration/live/privacy/public-distribution/platform gates. Further OS implementation
+awaits owner MX feedback; no public binary release, merge or DSH retirement occurs.
+
+The qualification documentation published after this runtime changes no installed
+file. [Preceding Branch/Fork qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13)
+retains the earlier runtime, failure evidence and controller limitations.
