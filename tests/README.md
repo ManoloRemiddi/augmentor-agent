@@ -1,13 +1,26 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`search-settings.test.mjs` covers private exact-revision field saves/unsets, default
+versus user layers, unsafe/invalid originals, admission loss, lost write replies,
+retired operator scopes and pending application. `harness-search-settings-chromium.test.mjs`
+drives the full original MIT card through actual Pi owners: multiline keys,
+Chromium pointer drag, fetch, discard/clear, stale drafts, same-owner enable/reload,
+active-turn refusal, collision recovery, Browser/inspector exclusions, cold reopen
+and settled light/dark heading/badge/input contrast. No owner keys or paid APIs
+are used. The final search focus has ten passes; source and separate ordinary **482/482 across 97 MX files**, two workers, Node 24.19.0, matching QtTest/PySide6/shiboken6 6.8.2.1, unchanged deadlines and no skips.
+Separate source/ordinary current-Qwen requests each confirm the newly mounted
+unconfigured tool result with one call and exact cold history; credentialed external engine and
+physical voice acceptance remain open. See [current settings scope](../docs/HARNESS-PLUGIN-PARITY.md#free-search-settings-and-original-card--october-14).
+
 `free-search.test.mjs` uses copied original provider logic and a real Pi owner/local
 HTTP fixture. Four cases cover request-frozen order/key rotation, raw/JSON/URL
 credential redaction, partial results, Stop, private/public fetch targets,
 response/request budgets and SDK argument validation before actual HTTP dispatch.
 Source and separate ordinary pass **476/476 across 95 MX files**, two workers,
 matching Node/QtTest, unchanged deadlines and no skips; the nine-case pointer/
-HTML/search focus also passes. No owner profile/key or live paid provider is used. The original client source is
-retained but not mounted or GUI-qualified by these tests. See [source scope](../docs/HARNESS-PLUGIN-PARITY.md#free-search-public-source-and-sdk-binding--october-14).
+HTML/search focus also passes. No owner profile/key or live paid provider is used. At this preceding provider-library ref, the original client source was
+retained but not mounted or GUI-qualified; the newer settings cases above close
+that boundary for their stated source/ordinary scope. See [source scope](../docs/HARNESS-PLUGIN-PARITY.md#free-search-public-source-and-sdk-binding--october-14).
 
 [Current unselected Wiki MX artifact](../docs/HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13)
 passes 471/471 across the same 94 files with actual bundled Node/runtime/SDK/GUI

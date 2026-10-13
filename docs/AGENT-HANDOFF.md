@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Free Search card/private Pi settings](HARNESS-PLUGIN-PARITY.md#free-search-settings-and-original-card--october-14)
+mounts the complete MIT supplier card in Plugins with multiline keys, original
+pointer drag/fetch/clear/discard and DSH theme controls. Mode-0600 exact-revision
+operator settings bind opt-in tools only to Linux Native non-delegated owners;
+public AgentSession reload retains those owners and checks both reserved names.
+Unknown/stale writes fence their supplier sequence and retain staged drafts;
+inspectors/Browser gain no configuration/tool grant. Strict check/build, ten focused cases and source and separate ordinary **482/482 across 97 MX files**, two workers, Node 24.19.0, matching QtTest/PySide6/shiboken6 6.8.2.1, unchanged deadlines and no skips..
+All 32 server/client selection records and compiled ordinary bytes verify;
+production retains 154 npm instances/eight unchanged pre-Node native files.
+Qwen/Breeze/Resonant Voice are healthy, CPU recognizer loads without recording,
+and source/ordinary isolated real Qwen search calls each confirm the unconfigured result with
+exact cold history. Source/ordinary qualification does not establish paid-engine,
+keyless, sealed/installed or other-platform acceptance. Source selection is public;
+owner keys/profile are not copied. The selected 97897cf and qualified Wiki candidate
+stay unchanged; fresh Native status remains busy with a draft, so no shutdown or
+activation occurs. All wider accepted migration/distribution gates remain open.
+
 [Free Search public source and SDK library](HARNESS-PLUGIN-PARITY.md#free-search-public-source-and-sdk-binding--october-14),
 implementation **baf8b7708a50df0f88e1e4f94d61556fbd98e300**, retains public MIT
 MochiNek0 1.6.0 / 2fab277 provider and original 1,598-line card source. All 29

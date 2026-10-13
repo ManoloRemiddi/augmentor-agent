@@ -504,14 +504,17 @@ const isConfigured = (
  * form alone. It is absent on the dsh <= 0.1.5 seat, where the card owns its
  * whole chrome — so undefined keeps the original collapsible card.
  */
-function WebSearchFreeCard({
+// Augmentor adaptation: export the original card, suppress DSH-only migration, retain drafts after unconfirmed field sequences, and use DSH theme foreground/thumb tokens.
+export function WebSearchFreeCard({
   scope,
   locale,
   view,
+  legacyMigration = true,
 }: {
   scope: any;
   locale?: any;
   view?: "summary" | "page";
+  legacyMigration?: boolean;
 }) {
   const snapshot: Snapshot = React.useSyncExternalStore(
     React.useCallback(
@@ -628,6 +631,11 @@ function WebSearchFreeCard({
     // Writes swallow wire and revision failures and reload instead of throwing,
     // so the Host's readback is the only authority on what actually landed.
     const after = scope.getSnapshot();
+    if (after.writable === false) {
+      setFailed(t("error.save"));
+      setSaving(false);
+      return;
+    }
     const rejectedKeys = pending.filter(
       ({ field, value }) =>
         (after.value?.[
@@ -645,8 +653,8 @@ function WebSearchFreeCard({
         rejectedKeys.map(({ field, value }) => [field, value]),
       ),
     );
-    if (!orderLanded) setOrderDraft(null);
-    if (!enableFetchLanded) setEnableFetchDraft(null);
+    if (orderLanded) setOrderDraft(null);
+    if (enableFetchLanded) setEnableFetchDraft(null);
     if (rejectedKeys.length > 0 || !orderLanded || !enableFetchLanded)
       setFailed(t("error.save"));
     setSaving(false);
@@ -674,6 +682,11 @@ function WebSearchFreeCard({
       "enableFetch",
     ]) {
       await scope.unset(field);
+    }
+    if (scope.getSnapshot().writable === false) {
+      setFailed(t("error.save"));
+      setClearing(false);
+      return;
     }
     // Drop the drafts too: they were edits against a section that no longer
     // exists, and keeping them would re-show the cleared keys as unsaved.
@@ -727,7 +740,7 @@ function WebSearchFreeCard({
     // the accurate version of this on startup). So the copy is written to be
     // true either way: it asks rather than asserts, and costs a first-time user
     // one line they can ignore.
-    if (!configured) {
+    if (!configured && legacyMigration) {
       children.push(
         React.createElement(
           "div",
@@ -862,7 +875,7 @@ function WebSearchFreeCard({
               height: 16,
               borderRadius: "50%",
               ...roundCorners,
-              background: "#fff",
+              background: "var(--dsw-alias-switch-thumb)",
               transition: "left .16s",
               boxShadow: "0 1px 3px rgba(0,0,0,.2)",
             },
@@ -1452,7 +1465,7 @@ function WebSearchFreeCard({
                   style: {
                     whiteSpace: "nowrap",
                     background: "var(--dsw-alias-brand-primary)",
-                    color: "#fff",
+                    color: "var(--dsw-alias-label-primary-foreground)",
                     borderRadius: 999,
                     ...roundCorners,
                     padding: "1px 8px",

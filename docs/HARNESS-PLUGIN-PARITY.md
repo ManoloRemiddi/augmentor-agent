@@ -18,7 +18,7 @@ not qualify DSH retirement or infer parity from the total test count.
 | Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. The original Plugins form enables/disables the suite through public resource discovery on the same owners. | Installed-owner configuration/UI acceptance, representative use of the other skill workflows and companion CLIs/services. |
 | Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
-| Free Web Search, historical 0.1.0 reference | [Public 1.6.0 source and opt-in SDK binding](#free-search-public-source-and-sdk-binding--october-14) preserve nine original API engines, key rotation, search/fetch and configuration-card source; independent SDK/HTTP cases qualify the provider layer. Installed package presence does not establish current active composition. | Original settings-card/Host wiring, explicit private configuration and scope grants, keyless reference behavior, representative live engines and installed owner acceptance. The provider library alone does not close this row. |
+| Free Web Search, historical 0.1.0 reference | [Original 1.6.0 card and private Pi settings](#free-search-settings-and-original-card--october-14) preserve the nine API engines, key rotation, drag order, fetch, clear/discard and enable lifecycle through existing Native owners. SDK/HTTP and actual GUI fixtures qualify these boundaries; current Qwen confirms the unconfigured result. | Historical keyless behavior, proof of active reference composition, representative credentialed live engines, sealed/installed owner acceptance and other OS qualification. No owner keys are migrated. |
 | Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
 | Comfy MCP | Same managed-core binding; the reference service previously refused connection. | Service availability and a representative authorized workflow; no successful Comfy operation is claimed. |
 | Blender MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Blender operation and verified effect/Stop/retained evidence. |
@@ -29,6 +29,78 @@ its own [voice protocol](VOICE-SINGLE-BUTTON.md) and physical/audio lifecycle ga
 It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision and
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
+
+## Free Search settings and original card — October 14
+
+This extends the preceding public MIT provider library into the original Plugins
+page. The full supplier card is mounted with its collapsible header, all nine
+engines, multiline keys, drag ordering, fetch switch, signup links, staged Save/
+Discard and two-click Clear. Its original browser-derived English/Chinese
+behavior is retained. The only card adaptations export it to the Pi scope,
+suppress the DSH-only prompt to pass legacy credentials through a model, retain
+unconfirmed drafts, clear landed order/fetch drafts, and bind badge/thumb colors
+to existing DSH theme tokens. Layout and provider metadata stay original. The
+byte-exact 1,598-line original and MIT notice remain alongside the adapted card;
+the build verifies all three client and 29 server records, bundles the notice and
+records the selection in GUI SOURCE.json. A copied price/free-tier hint is supplier
+copy, not new live pricing qualification.
+
+`SearchPreferences` stores only explicit operator choices in mode-0600
+`config/free-search.json`, schema `augmentor-free-search/1`, with outer `enabled`
+and a separate partial `config` user layer. Missing means disabled, no keys,
+original provider order and fetch on. Reads create nothing. Individual set/unset
+edits compare an exact-byte revision, validate bounded known fields, fsync an
+exclusive temporary file, recheck and publish atomically. Public/linked/hardlinked,
+malformed, oversized or unsupported originals are preserved. Clear removes the
+user layer, including credentials, without implicitly disabling the feature.
+There is no automatic import of DSH keys or choice of a keyless backend.
+
+The connected operator receives `search.describe`, `search.set` and
+`search.refresh`; read-only inspector RPCs cannot access them. Configuration is
+excluded from automatic model payloads and observations. The original scope
+sequence stops after its first stale, failed or uncertain response: no following
+field write, automatic refresh or retry is admitted, and staged drafts survive.
+Explicit Refresh inspects stored state; pending catalog application has a separate
+Apply control. Connection/role/epoch changes retire the scope and its credentials.
+
+Only Linux Native non-delegated owners mount the opt-in tools; Browser/delegated
+owners receive no implicit grants. Enabling/disabling reloads the same public
+AgentSession/resource loader, retaining its model, PID, native history and prompt
+wrapping. Key/order/fetch edits use the live getter without a catalog reload;
+each actual request still freezes its complete configuration. Both reserved tool
+names are checked after load/reload. A failed or externally changed enable
+application stays pending and fences new Native turns until explicit refresh.
+Shared management, active turns/jobs/compaction/improvement, unpaused queues and
+armed goals guard edits. Owned search/fetch operations are admitted as reads;
+unrecognized extension tools do not gain that exemption.
+
+Strict check/build and the ten-case search focus pass; source and separate ordinary **482/482 across 97 MX files**, two workers, Node 24.19.0, matching QtTest/PySide6/shiboken6 6.8.2.1, unchanged deadlines and no skips. Actual GUI checks cover all supplier controls, two loaded owners, unchanged native history/PID, dark/light heading/badge/input contrast, stale revisions, active turns, failed collision application, explicit recovery, Browser/inspector boundaries and cold reopen. The final ordinary tree has 154 npm instances and all eight preceding pre-Node native files byte-identical. All 32 selected supplier records and the complete 853-file compiled tree match source. This is ordinary production qualification, not immutable/installed acceptance.
+
+Three initial GUI fixture assertions were corrected at unchanged deadlines:
+metadata paging is not a body read, configured engine order is the filtered
+original full order, and inspection links require the supported local
+`inspection.open` boundary. The first broad command resolved the test Python
+symlink to system Python and failed six QtTest cases; the prepared interpreter
+itself imports QtTest correctly. Its direct absolute path is used by the final
+cohorts. Initial visual captures occurred during the original theme transition;
+settled captures and heading/input contrast checks now verify both themes.
+The engine-count badge's fixed white text was unreadable against the current
+DSH dark brand token; the marked semantic-token adaptation fixes that defect.
+
+Fresh service inspection finds current Qwen, Breeze and Resonant Voice healthy;
+RTX 5090 placement, Qwen context/concurrency/precision and CPU ASR/VAD are retained.
+The cached CPU recognizer loads without recording. Separate source and ordinary isolated current-Qwen
+requests each call the newly mounted `web_search` once and receive its explicit
+unconfigured result, then end without another tool. Cold history is byte-exact;
+no owner profile/data/keys are used. This is live model/tool qualification,
+**not** a credentialed external-engine success or physical voice acceptance.
+
+The selected/running 97897cf preview and qualified unselected Wiki 12b403f
+artifact remain unchanged. Fresh maintenance reports Native online, busy, with a
+draft and no accepted shutdown; no activation occurs. This source/ordinary work
+is not yet a sealed or installed Free Search artifact. Historical keyless search,
+active-reference comparison, representative live engines, installed acceptance,
+macOS/Windows/other distributions and all wider migration/release gates stay open.
 
 ## Free Search public source and SDK binding — October 14
 
@@ -97,8 +169,10 @@ preparation; the new nine-case search/pointer/HTML focus passes with unchanged
 deadlines. No application, supplier UI or HTML sandbox behavior is altered by
 this driver correction.
 
-This is an **opt-in source provider library**, not a deployed application feature
-or complete Free Search parity. The original card still needs operator-only
+This earlier checkpoint was an **opt-in source provider library**. The
+[current card/settings checkpoint](#free-search-settings-and-original-card--october-14)
+supersedes its app-wiring gap while preserving the remaining deployment/parity
+gates. At this earlier ref, the original card still needed operator-only
 revisioned private configuration, Host/resource collision/scope wiring and actual
 GUI acceptance. It must preserve key/order/fetch edits, clear/discard, locale and
 readback without redesign or automatic credential migration. Version 1.6.0's API

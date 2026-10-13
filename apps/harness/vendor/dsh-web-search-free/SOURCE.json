@@ -10,13 +10,20 @@
     {
       "upstreamPath": "src/client.tsx",
       "path": "client.tsx",
-      "sha256": "4b1fb00b9927b95d4c86f03df07cb3f1703198519e872ff93b1bf0d05ddd03f2",
-      "modified": false
+      "sha256": "4f6b32e4523a1cbd44c6356b3769eac4a5f6fdc52d9b4875f95685c7d7666d79",
+      "modified": true,
+      "adaptation": "Export original card for Pi scope, suppress DSH-only model migration prompt, retain drafts after unconfirmed sequences and clear landed order/fetch drafts. Layout, engine controls and provider metadata remain original. Bind engine badge and fetch thumb to DSH semantic theme tokens."
     },
     {
       "upstreamPath": "LICENSE",
       "path": "LICENSE",
       "sha256": "945c6c871dab7c804cb629e9e903e99f3ae794ca18521805340c96c4f6797eae",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/client.tsx",
+      "path": "original/client.tsx",
+      "sha256": "4b1fb00b9927b95d4c86f03df07cb3f1703198519e872ff93b1bf0d05ddd03f2",
       "modified": false
     }
   ]

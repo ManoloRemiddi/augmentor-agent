@@ -16,6 +16,7 @@ const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'w
 const sharedState=join(root,'shared-state'),sharedData=join(root,'shared-data'),home=join(root,'home');
 const wikiVault=process.env.AUGMENTOR_HARNESS_PROOF_WIKI==='1'?join(root,'wiki-vault'):null;
 const wikiExtension=process.env.AUGMENTOR_HARNESS_PROOF_WIKI_SETTINGS==='1'?join(root,'wiki-settings-resource.mjs'):null;
+const searchExtension=process.env.AUGMENTOR_HARNESS_PROOF_SEARCH_SETTINGS==='1'?join(root,'search-settings-resource.mjs'):null;
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
 const discoveryLog=process.env.AUGMENTOR_HARNESS_PROOF_MODEL_DISCOVERY==='1'?join(root,'model-listings.jsonl'):null;
 const providerApi=process.env.AUGMENTOR_HARNESS_PROOF_PROVIDER_API??'openai-completions';
@@ -34,6 +35,7 @@ if(wikiVault){
  writeFileSync(join(config,'wiki.json'),JSON.stringify({schema:'augmentor-wiki/1',enabled:true,vaultPath:wikiVault}),{mode:0o600});
 }
 if(wikiExtension){writeFileSync(wikiExtension,`import {existsSync} from 'node:fs';export default pi=>{if(existsSync(${JSON.stringify(wikiExtension+'.collision')}))pi.registerTool({name:'wiki_query',label:'Authored collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[wikiExtension],skills:[]}));}
+if(searchExtension){writeFileSync(searchExtension,`import {existsSync} from 'node:fs';export default pi=>{if(existsSync(${JSON.stringify(searchExtension+'.collision')}))pi.registerTool({name:'web_search',label:'Authored search collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[searchExtension],skills:[]}));}
 const model=http.createServer(async(req,res)=>{
   if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'&&req.method==='POST'&&req.url==='/fixture/release-nested'){
     writeFileSync(join(root,'release-nested'),'Authored fixture release.');res.writeHead(204).end();return;
@@ -54,6 +56,13 @@ const model=http.createServer(async(req,res)=>{
   res.writeHead(200,{'content-type':'text/event-stream'});
   const chunk=(delta,finish=null,usage)=>res.write('data: '+JSON.stringify({id:'fixture',object:'chat.completion.chunk',model:'harness-fixture',choices:[{index:0,delta,finish_reason:finish}],...(usage?{usage}:{})})+'\n\n');
   const lastUser=[...body.messages].reverse().find(message=>message.role==='user');
+  if(searchExtension&&JSON.stringify(lastUser?.content).includes('SEARCH_')){
+    const input=JSON.stringify(lastUser.content);
+    if(input.includes('SEARCH_HOLD')){res.write(': Authored held provider request.\n\n');return;}
+    if(!afterTool&&(input.includes('SEARCH_UNAVAILABLE')||input.includes('SEARCH_FETCH_OFF')))chunk({role:'assistant',tool_calls:[{index:0,id:'search_fixture',type:'function',function:{name:input.includes('SEARCH_FETCH_OFF')?'web_fetch':'web_search',arguments:JSON.stringify(input.includes('SEARCH_FETCH_OFF')?{urls:['https://example.org/']}:{queries:['Authored unavailable search']})}}]},'tool_calls');
+    else chunk({role:'assistant',content:'Authored search catalog/result inspection only.'},'stop',{prompt_tokens:10,completion_tokens:10,total_tokens:20});
+    res.end('data: [DONE]\n\n');return;
+  }
   const wikiUser=wikiVault?[...body.messages].reverse().find(message=>message.role==='user'&&JSON.stringify(message.content).includes('WIKI_')):undefined;
   if(wikiUser){
     if(JSON.stringify(wikiUser.content).includes('WIKI_SETTINGS_HOLD')){res.write(': Authored held provider request.\n\n');return;}
@@ -140,6 +149,7 @@ const selection={provider:'fixture',model:'harness-fixture'};
 writeFileSync(join(config,'agent/models.json'),JSON.stringify({providers:{fixture:{api:providerApi,baseUrl:'http://127.0.0.1:'+model.address().port+(providerApi==='anthropic-messages'?'':'/v1'),apiKey:'synthetic-not-a-real-key',models:[{id:selection.model,name:'Harness deterministic fixture',reasoning:providerApi==='openai-completions',...(providerApi==='openai-completions'?{compat:{supportsReasoningEffort:true}}:{}),input:['text','image'],contextWindow:32000,maxTokens:2048}]}}}));
 writeFileSync(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:wikiVault?'danger-full-access':'workspace-write',defaultModel:selection,pinned:[],hidden:[],observation:{capturePayloads:true}}));
 if(wikiVault){mkdirSync(join(state,'sessions'),{recursive:true});writeFileSync(join(state,'sessions','wiki-readonly.meta.json'),JSON.stringify({id:'wiki-readonly',cwd:workspace,selection,title:'Authored read-only Wiki fixture',saved:false,policy:'read-only',updatedAt:1,requests:[],running:false}),{mode:0o600});}
+if(searchExtension){mkdirSync(join(state,'sessions'),{recursive:true});writeFileSync(join(state,'sessions','search-readonly.meta.json'),JSON.stringify({id:'search-readonly',cwd:workspace,selection,title:'Authored read-only Search fixture',saved:false,policy:'read-only',updatedAt:1,requests:[],running:false}),{mode:0o600});}
 // Large independently authored native context exercises default Pi compaction;
 // these saved messages do not represent executed actions or private history.
 if(process.env.AUGMENTOR_HARNESS_PROOF_COMPACTION==='1'){
@@ -216,7 +226,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),...(searchExtension?{searchExtension}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;

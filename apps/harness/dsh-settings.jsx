@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {SearchSettings} from './dsh-search-settings.jsx';
 import React,{useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {DshAppearance} from './dsh-appearance.mjs';
 import {SettingsRoot} from '@dsh-gui/ui-settings-general/src/client/SettingsRoot.tsx';
@@ -97,7 +98,7 @@ export function OriginalSettings({wide,state,controller,preferences,developerToo
     if(name==='settings.section'){
       if(options.only==='general')return <GeneralSection renderSlot={renderSlot}/>;
       if(options.only==='models')return <OriginalModels key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></OriginalModels>;
-      if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><MetafolderSettings profile={metafolders}/><WikiSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller} onTrajectory={sid=>{settingsShell.actions.close();onTrajectory(sid);}}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
+      if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><MetafolderSettings profile={metafolders}/><WikiSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller} onTrajectory={sid=>{settingsShell.actions.close();onTrajectory(sid);}}/><SearchSettings key={['search',controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
     }
     if(name==='settings.general.item')return <><fieldset disabled={!palette.writable||palette.busy} style={{display:"contents",border:0,padding:0,margin:0}}><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/></fieldset>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div>{shortcutsUi?.render('settings.general.item')}<CurrentVersionRow t={t}/></>;
     return options.fallback??null;

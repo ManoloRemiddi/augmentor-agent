@@ -1,9 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Free Search source and SDK provider binding](HARNESS-PLUGIN-PARITY.md#free-search-public-source-and-sdk-binding--october-14)
-records public MIT 1.6.0 provenance, original API engines/card source, request-local
-privacy/Stop bounds and actual SDK/HTTP fixtures. App settings, keyless behavior,
-active-reference and live/installed acceptance remain separate requirements.
+[Original Free Search card and private Pi settings](HARNESS-PLUGIN-PARITY.md#free-search-settings-and-original-card--october-14)
+records public MIT source, existing Native owner enable/reload, private credentials,
+original engine controls, stale/uncertain drafts, scope boundaries and live Qwen's
+unconfigured result. Keyless, live credentialed engines and installed acceptance
+remain open; the preceding provider-library checkpoint retains its dated evidence.
 
 [Qualified unselected Wiki MX artifact](HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13)
 records the full 471-case candidate-backed cohort, complete 24,045-entry inventory,
