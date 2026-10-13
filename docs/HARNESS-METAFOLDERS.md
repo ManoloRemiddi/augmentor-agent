@@ -2,6 +2,26 @@
 
 # Original Metafolder interface on Pi
 
+## Navigation follow-up — October 13
+
+The staged `207aed2` candidate reproduces a collapsed-rail Search gap: its button
+expands the sidebar without opening the search input. The marked supplier binding
+now also opens that existing input; original CSS, geometry, icons and action owners
+remain unchanged. The original client copy and updated adapted hash are retained.
+
+The new actual-browser navigation case verifies Ctrl+Alt+K search/focus,
+Ctrl+Alt+B collapse and rail Search/focus, Ctrl+Alt+O workspace opening, typed path
+browsing, hidden-folder toggling, Home/Up/child navigation, one conversation for
+one adopted directory, Workspace/Flat and Manual/Updated choices and explicit
+disable back to the original browser. Parent history and the real synthetic
+provider log stay identical; the existing fixture folder retains its exact bytes.
+Strict check/build and 12/12 focused cases across five files pass, including
+Metafolder private/failure/supplier/GUI, brand and original keyboard regression.
+The 86-file MX cohort now includes this case. Ordinary/sealed/new installed
+qualification follows; the immutable `207aed2` checkpoint below is not patched.
+Live services, owner grouping import, broad corpus search, manual pointer ordering,
+accessibility, optional physical moves and the wider migration gates remain open.
+
 The Harness source now offers **Settings → Plugins → Metafolders**. Enabling it
 mounts the original public Metafolder browser; disabling it restores the existing
 DSH workspace browser and retains saved groups. A new profile defaults to the

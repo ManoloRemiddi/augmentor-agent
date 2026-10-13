@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Metafolder navigation follow-up](HARNESS-METAFOLDERS.md#navigation-follow-up--october-13)
+repairs the actual staged collapsed-rail Search gap without changing original UI
+geometry/CSS. Strict check/build and 12 focused cases pass; folder/Home/Up/hidden,
+keyboard/rail/focus/view choices create one workspace conversation, preserving
+parent history and request counts. The 86-file cohort adds the navigation case.
+New artifact qualification follows; current Native draft and both old selected
+and qualified immutable checkpoints are preserved. Full migration gates stay open.
+
 [Latest qualified unselected Metafolder candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate)
 is runtime **207aed2 / 20261013-183219-4621b4e3**, product **0.2.13**, artifact
 **7907ad98577ca21c1444957fb5c21aa8ecef553a0e64d6021d83629ae7939276**.

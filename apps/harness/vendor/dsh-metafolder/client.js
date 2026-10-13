@@ -1090,7 +1090,7 @@ return {
       if (!wide) {
         return h('div', { className: 'wsg-root' },
           h('div', { className: 'wsg-head wsg-head-rail' },
-            h('button', { type: 'button', className: 'wsg-btn', 'aria-label': t('search.sessions.aria'), title: t('search.sessions.aria'), onClick: () => { if (props.expandSidebar !== undefined) props.expandSidebar() } }, icoSearch(16)),
+            h('button', { type: 'button', className: 'wsg-btn', 'aria-label': t('search.sessions.aria'), title: t('search.sessions.aria'), onClick: () => { if (props.expandSidebar !== undefined) props.expandSidebar(); setSearchExpanded(true) } }, icoSearch(16)),
             h('button', {
               type: 'button', className: 'wsg-btn wsg-newgroup', 'aria-label': tm('addGroup'), title: tm('addGroup'),
               onClick: () => { if (props.expandSidebar !== undefined) props.expandSidebar(); setNameModal({ kind: 'newGroup', initial: '', title: tm('newGroup') }) },
