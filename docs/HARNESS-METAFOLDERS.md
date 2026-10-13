@@ -123,6 +123,9 @@ five packaging and seven licence cases. Final sealed qualification passes
 matching ordinary test drivers. No skips or deadlines change. All **23,940**
 entries verify afterward; compiled assets, bindings, Node and licences match the
 ordinary inputs. The candidate is **qualified and unselected**.
+Final test-driver/qualification ref: **4c9d015da59c618a8a8fe3839df867e527725219**;
+artifact code remains runtime **207aed2**, assembled with documentation snapshot
+`b27bd92`. Later record edits do not change the immutable artifact.
 
 The first sealed qualification passes
 203/203 across 27 files; inventory then detects one diagnostic screenshot written
