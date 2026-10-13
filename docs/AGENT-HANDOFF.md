@@ -1,14 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current installed MX preview](TRAJECTORY-NESTED-TOOLS.md#final-ordinary-and-installed-mx-qualification--october-13):
-runtime **743bc47306dd84e6e4c20a646bc7077e5a146203**, release
-**20261013-074420-902c1a6c**, product **0.2.13**, selected and running. Source and
-ordinary each pass **369/369 across 72 files** plus five packaging cases;
-**52 immutable tests** and manual original-GUI acceptance pass. Nested argument/
-result trees, independent outcomes, canonical Stop receipts and scoped File
-Activity preserve supplier GUI/CSS/licences and owner state. All **23,893** installed
-entries verify. Full migration/live/privacy/public-distribution/platform gates
-and CI failures remain open; further OS implementation awaits owner MX feedback.
+[Current installed MX preview](TRAJECTORY-REQUEST-NUMBERING.md#ordinary-and-installed-mx-qualification--october-13): runtime **1feaac8**,
+release **20261013-082620-e77f3b09**, product **0.2.13**, selected and running.
+Original Trajectory numbers only recorded provider requests, preserving unlinked
+SDK receipts and nested details. Source/ordinary each pass **369/369 across 72
+files** plus five packaging cases; **52 immutable tests** and installed original
+Context Insights reads pass. All **23,894** entries and twelve histories/queues,
+drafts, profiles and model processes verify. One MIT view/provenance/notice changes;
+original layout/CSS and Apache dashboard records remain intact. Full migration,
+live/privacy/public-distribution/platform gates and CI failures stay open.
+Further OS implementation awaits owner MX feedback.
 
 The dated records below are historical checkpoints. Their source-only and
 selected/running statements apply to those checkpoints; the linked current

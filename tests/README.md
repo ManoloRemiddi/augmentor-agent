@@ -14,15 +14,18 @@ retired selection/metadata responses and keep failed reads unconfirmed without a
 cancel/work retry. The exact held-poll browser regression fails on the interim
 02a55a9 immutable GUI and passes on corrected source/artifact.
 
-[Latest qualified MX cohort](../docs/TRAJECTORY-NESTED-TOOLS.md#final-ordinary-and-installed-mx-qualification--october-13):
-runtime **743bc47**, final source and separate ordinary **369/369 across 72 files**,
-five packaging cases in each, zero failures/skips/cancellations, Node **24.19.0**,
-two workers, unchanged deadlines and matching isolated QtTest. Final immutable
-**52/52** and separate manual installed original-GUI acceptance pass. Synthetic
-provider checks and actual owner retained-data reads have distinct scopes; local
-MX passes do not qualify Debian/Windows/macOS or the new publication head's CI.
-Earlier counts/deployment statements below are historical checkpoints. Remaining
-full migration/live/privacy/public-distribution/platform gates stay open.
+[Latest qualified MX cohort](../docs/TRAJECTORY-REQUEST-NUMBERING.md#ordinary-and-installed-mx-qualification--october-13): runtime **1feaac8**,
+release **20261013-082620-e77f3b09**, product **0.2.13**, selected and running.
+Original Trajectory numbers only recorded provider requests, preserving unlinked
+SDK receipts and nested details. Source/ordinary each pass **369/369 across 72
+files** plus five packaging cases; **52 immutable tests** and installed original
+Context Insights reads pass. All **23,894** entries and twelve histories/queues,
+drafts, profiles and model processes verify. One MIT view/provenance/notice changes;
+original layout/CSS and Apache dashboard records remain intact. Full migration,
+live/privacy/public-distribution/platform gates and CI failures stay open.
+Further OS implementation awaits owner MX feedback.
+
+Earlier counts/deployment statements below are historical checkpoints.
 
 `tool-argument-snapshots.test.mjs` checks public snapshot sampling, exact Unicode
 patches, missing/foreign/invalid bases, interleaving, completion/Stop, content/count/
