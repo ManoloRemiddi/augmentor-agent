@@ -1,7 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 The dated installed checkpoint below is superseded by the
-[current MX brand qualification](HARNESS-BRAND.md#ordinary-and-installed-mx-qualification--october-13).
+[current MX brand qualification](HARNESS-BRAND.md#ordinary-and-installed-owner-feedback-qualification--october-13).
 The dated loaded-controller limitation is superseded only within the durable
 Host capability described below; partial filesystem publication remains open.
 
@@ -194,3 +194,19 @@ checkpoint, not a passing suite or an application assertion failure. The complet
 second run supplies this qualification. Isolated visual Light/Dark inspection
 also passes. Ordinary, sealed and installed qualification follows separately;
 the selected MX preview remains efa411b until guarded adoption.
+
+
+## Ordinary and installed durable-recovery qualification — October 13
+
+Runtime **e0c60f1ac1101cf7dca357c898cbe57007d62759** is selected/running in the private MX
+release **20261013-114829-e268e31c**, artifact **ddb1d7445910764841cf34e23d91da87b5fb8bd22f68765ea194b02d2a6eedd3**.
+Final source and separate ordinary each pass **398/398 across 76 files**, plus five
+packaging cases. Sealed candidate **145/145** checks include journal, controller,
+real Host and original GUI cold-reconciliation cases on actual bundled/compiled
+files. The efa411b cold-process negative and positive exact-child result remain
+separate evidence. Installed read-only acceptance preserves twelve histories,
+queues, drafts, profile/model/router state and all 23,909 inventory entries; it
+does not branch the owner's conversations. See [complete installed qualification](HARNESS-BRAND.md#ordinary-and-installed-owner-feedback-qualification--october-13).
+The reproduced cold identity gap is closed for the modern capability. Partial
+child publication repair and full migration/live/privacy/distribution/platform/CI
+gates remain open. Further OS implementation awaits MX feedback.

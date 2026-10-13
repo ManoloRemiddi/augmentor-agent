@@ -185,3 +185,53 @@ packaging cases. Matching Node/QtTest, two workers and deadlines are retained.
 Its focused actual Chromium case verifies all three mark seats, inherited settings
 ink and sampled real labels in both themes. Ordinary/sealed/installed qualification
 remains separate; the earlier unselected dd3c706 artifact is not promoted.
+
+
+## Ordinary and installed owner-feedback qualification — October 13
+
+Qualified runtime **e0c60f1ac1101cf7dca357c898cbe57007d62759**, private MX release
+**20261013-114829-e268e31c**, product **0.2.13**, artifact
+**ddb1d7445910764841cf34e23d91da87b5fb8bd22f68765ea194b02d2a6eedd3**, is selected and running. Final source and separate
+ordinary 76-file cohorts each pass **398/398**, with five packaging cases each.
+The sealed candidate passes **145/145 across 15 files**, including real Pi
+Host/provider/Chromium branch recovery and all three brand seats, theme/contrast,
+reduced motion, nested Stop, arguments and keyboard checks. Matching-source pure
+drivers use the ordinary snapshot; actual runtime/SDK/GUI use the candidate's
+bundled Node and compiled files. Deadlines and two-worker cohorts are unchanged.
+
+The separately assembled and sealed release has **23,909** exact inventory entries
+and 666 compiled files. All 20,801 dependency files, 151 npm instances, nine native/
+Wasm executables, 786 licence/provenance files and three distribution records retain
+their preceding contents apart from the explicit authored brand scope explanations
+in brand SOURCE.json/SOURCE.md and compiled GUI SOURCE.json. All licence bodies,
+580 DSH MIT/108 dashboard Apache records, supplier CSS and original website CSS/icon
+remain unchanged. Staging explicitly selects its bundled Node. Guarded idle close
+verifies previous Host absence; stable startup verifies actual selected Node/Host
+and Native roots. No selected file is patched.
+
+Actual installed inspection confirms the thicker transparent circle in expanded
+and collapsed sidebar seats and beside “Into the Unknown Preview,” black outline/
+smoke in Light and the preceding Dark flare. The requested CSS border is 2px;
+browser device scaling can quantize its computed painted width. The original
+settings now inherit rgb(249,250,251) in Dark on rgb(44,44,46), including Appearance,
+Prompt library, Full Pi record inspector and Keyboard shortcuts. There is no black
+background plate or supplier-layout change. Light and the expanded sidebar are
+restored, and the owner's empty conversation remains selected. No owner New Session,
+prompt, branch, model configuration, endpoint discovery or inference is exercised.
+Private screenshots/links/profile evidence stay local.
+
+All twelve histories/queues/session identities and all 247 saved originals verify
+before and after GUI inspection: 243 identical, one exact-prefix journal with one
+Host close/load each, and three corresponding derivatives. No new placeholder is
+created. Draft/attachment bytes, profile values/revision, auth/model files,
+production selection and model-router executable/arguments remain preserved. All
+nine maintenance counters are zero; Native is online/model-ready. The temporary
+foreground Native test session terminated with SIGTERM; the stable launcher was
+reopened in its own process session and its actual selected root/readiness verified.
+
+This qualification includes [durable branch identity recovery](HARNESS-BRANCH-CONTROLS.md#durable-exact-boundary-recovery--october-13).
+Partial multi-file child publication repair remains open; it is preserved/refused
+rather than replayed or overwritten. Full P0/P1/custom-plugin/live/privacy/public
+binary distribution/platform and known CI gates remain open. Further OS work
+awaits MX feedback. No public binary release, merge or DSH retirement occurs.
+Documentation published after this runtime changes no installed file.

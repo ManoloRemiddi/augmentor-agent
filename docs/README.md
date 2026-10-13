@@ -1,32 +1,34 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Original Augmentor brand motion and current MX qualification](HARNESS-BRAND.md#ordinary-and-installed-mx-qualification--october-13): runtime **efa411b**,
-release **20261013-100304-45f0b71b**, product **0.2.13**, selected and running.
-Artifact **440fdce7fa8033aaa42d8cacfb04f9d23c4d60f1121508fe7250a91b39cb2067**.
-The website's original elastic mark occupies the original DSH header/rail seats,
-with uncropped light/dark motion, restored Light preference and reduced-motion
-behavior. Source/ordinary each pass **381/381 across 75 files** plus five packaging
-cases; **69 immutable tests**, installed theme checks and Context Insights reads
-pass. All **23,906** entries and twelve histories/queues, drafts, profiles and model
-processes verify. DSH/dashboard source/CSS and 580 MIT/108 Apache records remain
-unchanged; three original MIT brand notice/source files bring staged records to 786.
-Full migration, custom plugin inventory, cold unconfirmed-branch recovery,
-live/privacy/distribution/platform gates and CI failures remain open. Further OS
-implementation awaits MX feedback.
+[Current installed MX logo, theme and branch qualification](HARNESS-BRAND.md#ordinary-and-installed-owner-feedback-qualification--october-13): runtime **e0c60f1**,
+release **20261013-114829-e268e31c**, product **0.2.13**, selected and running.
+Artifact **ddb1d7445910764841cf34e23d91da87b5fb8bd22f68765ea194b02d2a6eedd3**.
+The thicker elastic circle uses the original header/rail/welcome seats, with black
+Light smoke, preserved Dark flare and transparent surfaces. Dark settings inherit
+DSH's actual primary label token. Source/ordinary each pass **398/398 across 76
+files** plus five packaging cases; **145 sealed checks** and installed visual/theme
+acceptance pass. All **23,909** entries, twelve histories/queues, drafts, profiles
+and model processes verify. DSH/dashboard CSS and 580 MIT/108 Apache records, all
+licence bodies and dependencies remain unchanged. Durable exact-boundary branch
+identity survives fresh browser/Host processes; partial child publication repair
+and full migration/custom-plugin/live/privacy/distribution/platform/CI gates stay
+open. Further OS implementation awaits MX feedback.
+
 
 [Original Branch/Fork ownership](HARNESS-BRANCH-CONTROLS.md) guards duplicate and late
-operations, changed drafts and explicit same-child reconciliation. The [preceding Branch/Fork qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13) records source/ordinary
+operations, changed drafts and durable exact-boundary recovery across browser/Host
+replacement. Partial child publication repair remains open. The [preceding Branch/Fork qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13) records source/ordinary
 380/380, immutable 68/68 and preserved owner state.
 
 The dated qualification/selection statements below are historical checkpoints;
-the current brand qualification above supersedes their installed identities.
+the current owner-feedback qualification above supersedes their installed identities.
 
 - [Recorded Trajectory requests](TRAJECTORY-REQUEST-NUMBERING.md): original controls count only observed Pi provider requests; unlinked SDK receipts remain visible.
 
 [Nested original tool rows](TRAJECTORY-NESTED-TOOLS.md) binds public Pi child
 starts/results to existing SUBTOOL details, preserves scoped arguments/outcomes
 and corrects Context File Activity's reused-ID attribution. Source, ordinary and
-installed qualification are recorded separately. The [current private MX selection](HARNESS-BRAND.md#ordinary-and-installed-mx-qualification--october-13) retains these
+installed qualification are recorded separately. The [current private MX selection](HARNESS-BRAND.md#ordinary-and-installed-owner-feedback-qualification--october-13) retains these
 behaviors; full migration/platform
 gates remain open.
 
