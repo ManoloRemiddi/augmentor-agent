@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Selected Metafolder 1.2.1 MIT client](HARNESS-METAFOLDERS.md) is pinned to public
+commit a5332d902e147e824231a5470d3e2822b9288719. Original/adapted hashes, complete
+licence, exact CSS and the shared React/browser closure are qualified separately
+from ordinary/sealed/installed rollout. The supplier Host/mover is not selected.
+
 [Linux branch publication recovery](HARNESS-BRANCH-PUBLICATION.md) is authored
 code using Pi 1.1.0's public in-memory branch projection, header/entry and native
 file APIs. No SDK algorithm/private import/patch, supplier source, GUI/CSS or

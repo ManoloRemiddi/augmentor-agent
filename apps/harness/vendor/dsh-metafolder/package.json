@@ -1,0 +1,69 @@
+{
+  "name": "dsh-metafolder-plugin",
+  "version": "1.2.1",
+  "description": "DSH Metafolder Plugin \u2014 visual meta-folders for the DeepSeek Harness sidebar workspaces: nest real workspace folders under named, collapsible groups, by drag and drop or the row menu. Paths, permissions, sessions and workspace ordering are untouched.",
+  "license": "MIT",
+  "author": {
+    "name": "Manolo Remiddi"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "plugin",
+    "metafolder",
+    "workspaces",
+    "sidebar",
+    "ui"
+  ],
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "client.js",
+    "tools",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ManoloRemiddi/DSH-Metafolder-Plugin.git"
+  },
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.1.5-rc.1"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-workspace"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
+  },
+  "scripts": {
+    "build": "node tools/build-client.mjs",
+    "smoke": "node tools/smoke-client.mjs",
+    "check": "node tools/build-client.mjs && node --check lib/client.js && node tools/smoke-client.mjs",
+    "test": "node tools/test-directory-picker.mjs"
+  },
+  "homepage": "https://github.com/ManoloRemiddi/DSH-Metafolder-Plugin#readme",
+  "bugs": {
+    "url": "https://github.com/ManoloRemiddi/DSH-Metafolder-Plugin/issues"
+  }
+}

@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Metafolders on Pi](HARNESS-METAFOLDERS.md) records the copied MIT interface,
+revisioned private grouping and retained Pi action owners, with source/install scope.
+
 [Original scoped inspector](DSH-GUI-ON-PI.md#original-scoped-inspector--october-13-source-follow-up)
 records the restored header cue and actual Browser/bridge read-only qualification.
 

@@ -16,6 +16,7 @@ class LicenseInventoryTests(unittest.TestCase):
     def setUp(self):
         directory = tempfile.TemporaryDirectory(); self.addCleanup(directory.cleanup)
         self.root = Path(directory.name)
+        (self.root / 'package.json').write_text(json.dumps({'private': True, 'workspaces': []}))
         self.package = self.root / 'node_modules/example'
         self.package.mkdir(parents=True)
         self.catalog = self.root / 'licenses'; self.catalog.mkdir()

@@ -183,6 +183,7 @@ export class DshPiController {
       if(sessionId)this.cursor=page.cursor;
       if(!this.state.readOnly&&Number.isSafeInteger(page.settingsRevision)&&page.settingsRevision!==this.state.settingsRevision)this.update({settingsRevision:page.settingsRevision});
       if(!this.state.readOnly&&Number.isSafeInteger(page.appearanceRevision)&&page.appearanceRevision>(this.state.appearanceRevision??-1))this.update({appearanceRevision:page.appearanceRevision});
+      if(!this.state.readOnly&&Number.isSafeInteger(page.metafoldersRevision)&&page.metafoldersRevision>(this.state.metafoldersRevision??-1))this.update({metafoldersRevision:page.metafoldersRevision});
       if(!sessionId)return;
       const events=[...this.state.events],records=new Map(this.state.records.map(x=>[x.id,x])),interactions=new Map(this.state.interactions.map(x=>[x.rpcId,x]));let queue=this.state.queue,changed=false,familyChanged=false;
       for(const {frame} of page.frames){

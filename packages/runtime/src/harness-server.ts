@@ -19,7 +19,7 @@ const allowed = new Set([
   'session.prompt', 'session.cancel', 'session.prepareBranch', 'session.settleBranch', 'session.branchRecovery', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue', 'session.compact', 'session.compaction', 'session.acknowledgeCompaction',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.search', 'observation.payload', 'observation.clear',
-  'appearance.describe','appearance.set','shortcuts.describe', 'shortcuts.edit', 'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
+  'metafolders.describe','metafolders.set','appearance.describe','appearance.set','shortcuts.describe', 'shortcuts.edit', 'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
   'models.settingsDescribe','models.settingsMutate','models.settingsDiscover','models.credentialDescribe','models.credentialSet','models.settingsRefresh',
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
@@ -134,7 +134,7 @@ export class HarnessServer {
         if(req.method==='GET'&&url.pathname==='/api/access'){this.send(res,200,{mode:access.mode,...(access.mode==='read-only'?{sessionId:access.sessionId,expiresAt:access.expiresAt}:{})});return;}
         if(req.method==='GET'&&url.pathname==='/api/appearance/revision'){
           if(access.mode!=='operator')throw Error('Appearance profile revisions require operator authority.');
-          this.send(res,200,{appearanceRevision:this.host.appearanceRevision});return;
+          this.send(res,200,{appearanceRevision:this.host.appearanceRevision,metafoldersRevision:this.host.metafoldersRevision});return;
         }
         if(req.method==='POST'&&url.pathname==='/api/drafts/attachment'){
           if(access.mode!=='operator')throw Error('This conversation inspector cannot read or edit unsent drafts.');
@@ -181,7 +181,7 @@ export class HarnessServer {
             bytes += item.bytes; frames.push({seq: item.seq, sessionId: item.sessionId, frame: item.frame});
           }
           this.send(res, 200, {frames, cursor: frames.at(-1)?.seq ?? this.sequence, hasMore: eligible.length > frames.length,
-            gap: after < (this.evicted.get(sessionId) ?? 0),...(access.mode==='operator'&&Number.isSafeInteger(this.host.shortcutSettingsRevision)?{settingsRevision:this.host.shortcutSettingsRevision}:{}),...(access.mode==='operator'&&Number.isSafeInteger(this.host.appearanceRevision)?{appearanceRevision:this.host.appearanceRevision}:{})});
+            gap: after < (this.evicted.get(sessionId) ?? 0),...(access.mode==='operator'&&Number.isSafeInteger(this.host.shortcutSettingsRevision)?{settingsRevision:this.host.shortcutSettingsRevision}:{}),...(access.mode==='operator'&&Number.isSafeInteger(this.host.appearanceRevision)?{appearanceRevision:this.host.appearanceRevision}:{}),...(access.mode==='operator'&&Number.isSafeInteger(this.host.metafoldersRevision)?{metafoldersRevision:this.host.metafoldersRevision}:{})});
           return;
         }
         if(req.method==='GET'&&(url.pathname==='/api/preview/office'||url.pathname==='/api/preview/office-generation')){

@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Metafolder presentation](HARNESS-METAFOLDERS.md) binds private revisioned
+display metadata and existing conversation/workspace actions. It adds no agent
+owner, model request, tool grant or filesystem mover. Restricted inspectors retain
+their narrower original workspace presentation and cannot read the group profile.
+
 [Linux attested branch publication](HARNESS-BRANCH-PUBLICATION.md) projects the
 public SDK ancestry without an AgentSession, stages ordinary payloads privately,
 and publishes complete metadata last. It adds no second conversation loop or

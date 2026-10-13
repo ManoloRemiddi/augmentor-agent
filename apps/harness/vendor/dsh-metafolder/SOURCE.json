@@ -1,0 +1,41 @@
+{
+  "repository": "https://github.com/ManoloRemiddi/DSH-Metafolder-Plugin",
+  "commit": "a5332d902e147e824231a5470d3e2822b9288719",
+  "version": "1.2.1",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Manolo Remiddi",
+  "scope": "Original browser presentation; no DSH Host/plugin loader or filesystem mover selected",
+  "files": [
+    {
+      "path": "client.js",
+      "sha256": "250d3af3913f7e158eec56075a48804116a9c9ca88af8eaadff281168d9790d2",
+      "sourceSha256": "0cf980cca9bac80c3f82fdad8632d455de332d097f177ac0523385ed810665ac",
+      "modified": true,
+      "modification": "Pi revisioned metadata hook, original action owners, shortcut requests, pin/archive controls, semantic menu clicks and React SVG attribute spelling; original layout/CSS retained. Original runtime fallbacks remain for unadapted clients. Explicit group deletion also removes its session assignments and collapse entry."
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "deed36d28283e9cd6fa78b50e729d83026fbeaae6f5dd44eadbedf9d92d07b91",
+      "sourceSha256": "deed36d28283e9cd6fa78b50e729d83026fbeaae6f5dd44eadbedf9d92d07b91",
+      "modified": false
+    },
+    {
+      "path": "package.json",
+      "sha256": "57707afbdd10127c6e09e71c3c789e0251205a23d17bf1e74e953bdf9d1fe2f6",
+      "sourceSha256": "57707afbdd10127c6e09e71c3c789e0251205a23d17bf1e74e953bdf9d1fe2f6",
+      "modified": false
+    },
+    {
+      "path": "README.md",
+      "sha256": "b6ba391aebb3a7bd10e30ee6ca78da6e1d7f59698c6decaed79ed2d1fc135ba7",
+      "sourceSha256": "b6ba391aebb3a7bd10e30ee6ca78da6e1d7f59698c6decaed79ed2d1fc135ba7",
+      "modified": false
+    },
+    {
+      "path": "original-client.js",
+      "sourceSha256": "0cf980cca9bac80c3f82fdad8632d455de332d097f177ac0523385ed810665ac",
+      "sha256": "0cf980cca9bac80c3f82fdad8632d455de332d097f177ac0523385ed810665ac",
+      "modified": false
+    }
+  ]
+}

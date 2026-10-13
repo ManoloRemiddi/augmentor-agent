@@ -86,6 +86,9 @@
     "tests/harness-appearance-chromium.test.mjs",
     "tests/pi-privacy.test.mjs",
     "tests/desktop-specialist.test.mjs",
-    "tests/pi-branch-publication-recovery.test.mjs"
+    "tests/pi-branch-publication-recovery.test.mjs",
+    "tests/harness-metafolders.test.mjs",
+    "tests/harness-metafolders-chromium.test.mjs",
+    "tests/pi-browser-chromium.test.mjs"
   ]
 }

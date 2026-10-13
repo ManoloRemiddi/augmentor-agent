@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Metafolder source binding](HARNESS-METAFOLDERS.md) adds an explicit Plugins
+toggle, the copied MIT UI and private revisioned grouping while retaining current
+pin/archive/Fork/shortcut owners. Nine focused feature cases pass, including actual
+pointer grouping, colour/rename/order/delete, cold origins and zero added inference.
+The full 85-file MX cohort passes **453/453** with two workers and no skips; the seven old licence fixture failures now
+pass with a proper synthetic root manifest and unchanged production inventory rules.
+No selected artifact, owner draft, model or speech service is changed. Ordinary,
+sealed/installed, remaining plugin flows and all wider migration gates stay open.
+
 [Original scoped inspector source follow-up](DSH-GUI-ON-PI.md#original-scoped-inspector--october-13-source-follow-up)
 restores the persistent read-only cue in an existing DSH header slot. The loaded
 Browser/bridge test now exercises the original Trajectory/Context controls rather

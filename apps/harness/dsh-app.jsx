@@ -91,6 +91,8 @@ import {attachPlans} from './plans.js';
 import {attachGoals} from './goals.js';
 import {attachJobs} from './jobs.js';
 import {AugmentorBrand} from './augmentor-brand.jsx';
+import {DshMetafolderProfile} from './dsh-metafolder-profile.mjs';
+import {MetafolderSidebar} from './dsh-metafolder.jsx';
 import './dsh-base.css';
 
 const hash=new URLSearchParams(location.hash.slice(1));
@@ -102,6 +104,7 @@ history.replaceState(null,'',location.pathname);
 addEventListener('hashchange',()=>{if(new URLSearchParams(location.hash.slice(1)).has('token'))location.reload();});
 const controller=new DshPiController(token);
 const appearanceProfile=connectAppearance(controller);
+const metafolders=new DshMetafolderProfile(controller);
 const developerTools=new DshDeveloperTools(controller);developerTools.preference=new DeveloperToolsPreference(developerTools);
 const contextPreferences=new DshContextPreferences(controller);contextSettings.attach(contextPreferences);
 const contextModal=createDshContextModalBinding(controller);
@@ -265,6 +268,7 @@ function App(){
   const hasContextTab=useSyncExternalStore(contextTab.subscribe,contextTab.getSnapshot);
   const hasFleetTab=useSyncExternalStore(contextTab.fleet.subscribe,contextTab.fleet.getSnapshot);
   const contextPrefs=useSyncExternalStore(contextPreferences.subscribe,contextPreferences.getSnapshot);
+  const metafolderState=useSyncExternalStore(metafolders.subscribe,metafolders.getSnapshot);
   const settingsState=useSyncExternalStore(settingsShell.subscribe,settingsShell.getSnapshot);
   const shortcutRename=useWorkspaceShortcuts(state=>state.renameTarget);
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
@@ -310,9 +314,9 @@ function App(){
       case 'sidebar.brand.mark':return <AugmentorBrand size={owner.size}/>;
       case 'conversation.hero.brand.mark':return <AugmentorBrand size={owner.size} className={owner.className}/>;
       case 'sidebar.brand.name':return <span className={sidebarCss.fallbackBrandName}>Augmentor Harness</span>;
-      case 'sidebar.workspaces':return <WorkspaceBrowser {...p} t={t.workspace} useStore={useWorkspaceView} actions={workspaceView.actions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} useHostInfo={selectorFace({home:''})} useWorkspaceShortcuts={useWorkspaceShortcuts} useShortcuts={harnessShortcuts.useCatalog} useDirectoryFlow={selectorFace(!state.readOnly)} open={open} startSession={startSession} searchResultLimit={100} searchSessions={async query=>({items:state.sessions.filter(x=>x.title.toLowerCase().includes(query.toLowerCase())).map(x=>({sessionId:x.sessionId,title:x.title,cwd:x.cwd}))})} requestSearch={shortcuts.search} requestAddWorkspace={shortcuts.add} closeAddWorkspace={shortcuts.closeAdd} setDirectoryBusy={shortcuts.directoryBusy} dismissForkError={shortcuts.dismissForkError} requestSessionRename={(sid,title)=>{setDialog({kind:'rename',sid,title});}} notifyArchivedNotOpenable={()=>notifyRow('archivedNotOpenable')} renameWorkspace={(workspaceId,title)=>controller.workspaceAction('rename',{workspaceId,title})} deleteWorkspace={workspaceId=>controller.workspaceAction('remove',{workspaceId})} insertWorkspaceBefore={(workspaceId,beforeWorkspaceId)=>controller.workspaceAction('move',{workspaceId,beforeWorkspaceId})} unarchiveSession={restoreSession} createWorkspace={createWorkspace}/>;
+      case 'sidebar.workspaces':if(!state.readOnly&&metafolderState.value.enabled)return <MetafolderSidebar {...owner} state={state} controller={controller} profile={metafolders} workspaces={workspaces} list={list} layout={layout} workspaceView={workspaceView} shortcuts={shortcuts} t={t.workspace} open={open} startSession={startSession} sessionActions={sessionActions} rowActions={sid=><><ArchiveSessionRowButton sessionId={sid} {...sessionActions}/><PinSessionRowButton sessionId={sid} {...sessionActions}/></>} searchSessions={async query=>({items:state.sessions.filter(x=>x.title.toLowerCase().includes(query.toLowerCase())).map(x=>({sessionId:x.sessionId,title:x.title,cwd:x.cwd}))})}/>;return <WorkspaceBrowser {...p} t={t.workspace} useStore={useWorkspaceView} actions={workspaceView.actions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} useHostInfo={selectorFace({home:''})} useWorkspaceShortcuts={useWorkspaceShortcuts} useShortcuts={harnessShortcuts.useCatalog} useDirectoryFlow={selectorFace(!state.readOnly)} open={open} startSession={startSession} searchResultLimit={100} searchSessions={async query=>({items:state.sessions.filter(x=>x.title.toLowerCase().includes(query.toLowerCase())).map(x=>({sessionId:x.sessionId,title:x.title,cwd:x.cwd}))})} requestSearch={shortcuts.search} requestAddWorkspace={shortcuts.add} closeAddWorkspace={shortcuts.closeAdd} setDirectoryBusy={shortcuts.directoryBusy} dismissForkError={shortcuts.dismissForkError} requestSessionRename={(sid,title)=>{setDialog({kind:'rename',sid,title});}} notifyArchivedNotOpenable={()=>notifyRow('archivedNotOpenable')} renameWorkspace={(workspaceId,title)=>controller.workspaceAction('rename',{workspaceId,title})} deleteWorkspace={workspaceId=>controller.workspaceAction('remove',{workspaceId})} insertWorkspaceBefore={(workspaceId,beforeWorkspaceId)=>controller.workspaceAction('move',{workspaceId,beforeWorkspaceId})} unarchiveSession={restoreSession} createWorkspace={createWorkspace}/>;
       case 'sidebar.workspaces.directoryFlow':return DirectoryFlow(owner);
-      case 'sidebar.settings':return <OriginalSettings wide={owner.wide} state={state} controller={controller} preferences={contextPreferences} developerTools={developerTools} appearanceProfile={appearanceProfile} shortcutsUi={harnessShortcuts} notice={settingsNotice} onPrompts={()=>setDialog({kind:'prompts'})} onContext={()=>{layout.actions.selectPanel(null);if(hasContextTab)setView('context');else{setView('chat');filePreviews.openTab(state.sessionId,'dsh-context');}}}/>;
+      case 'sidebar.settings':return <OriginalSettings wide={owner.wide} state={state} controller={controller} preferences={contextPreferences} developerTools={developerTools} appearanceProfile={appearanceProfile} metafolders={metafolders} shortcutsUi={harnessShortcuts} notice={settingsNotice} onPrompts={()=>setDialog({kind:'prompts'})} onContext={()=>{layout.actions.selectPanel(null);if(hasContextTab)setView('context');else{setView('chat');filePreviews.openTab(state.sessionId,'dsh-context');}}}/>;
       case 'sidebar.workspaces.session.menu.item':{if(state.readOnly)return null;const props={...p,...sessionActions,useMenuOpenState:()=>options.hookContext||[false,noOp]};return <><PinSessionMenuItem {...props}/><RenameSessionMenuItem {...props}/><ForkSessionMenuItem {...props}/><ArchiveSessionMenuItem {...props}/></>;}
       case 'sidebar.workspaces.session.row.action':return state.readOnly?null:<><ArchiveSessionRowButton {...p} {...sessionActions}/><PinSessionRowButton {...p} {...sessionActions}/></>;
       case 'sidebar.panellist':return options.only==='dsh-context'?<InsightPanelIcon size={owner.size}/>:null;
