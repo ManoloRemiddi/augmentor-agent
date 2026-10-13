@@ -2,6 +2,12 @@
 
 # Streamed tool arguments in the original Trajectory
 
+Current private MX selection is runtime **a49d58da343e17f7e671b203906979384b49528c**,
+release **20261013-054009-ab664123**, selected and running. See
+[ordinary and installed qualification](#ordinary-and-installed-mx-qualification--october-13)
+for final source/artifact checks, manual acceptance and preservation evidence.
+Earlier checkpoints below are historical, including the interim reused-ID failure.
+
 The copied DSH Trajectory now receives tool-call argument updates from the public
 Pi SDK while the assistant is still generating. Its existing pending Tool row and
 Payload panel show the proposed arguments; Started remains unavailable until a
@@ -87,8 +93,9 @@ workers, unchanged deadlines and matching isolated QtTest. Five notice/workspace
 packaging cases also pass. Ordinary, immutable and manual installed qualification
 follow separately.
 
-Current selected/running private MX remains timing runtime 008ef295 / release
-20261013-030020-abfa89ec; this source increment has not replaced it. The binding is
+At this historical source-only checkpoint, selected/running private MX remains
+timing runtime 008ef295 / release 20261013-030020-abfa89ec. This checkpoint is
+superseded by the final installed qualification below. The binding is
 shared platform-neutral SDK/presentation code, with Linux Chromium qualification;
 other-OS implementation remains deferred for owner MX feedback. Nested running-call
 presentation, unlinked request attribution and the complete P0/P1/live/privacy/public
@@ -98,7 +105,7 @@ workflows.
 
 ## Request-scoped presentation identity — October 13 correction
 
-The initial runtime b80c609 is selected in immutable private MX release
+The historical interim runtime b80c609 is selected in immutable private MX release
 20261013-044026-4424a11e (artifact
 a7905617fcadf79105104f9f09830ec4d50cad228d650524db957c53e4b30715).
 Source and ordinary each pass 357/357 across 70 files and five packaging cases;
@@ -113,7 +120,7 @@ second-turn Tool row opens the first turn's details: the copied renderer expects
 unique presentation IDs, while valid Pi call IDs can repeat across requests. The
 failure is retained as an installed screenshot and a pure regression reproduces
 against the exact b80c609 authored projection. The immutable artifact remains
-unchanged; the corrected source below is not installed yet. The held fixture later
+unchanged; the corrected source is not installed at this checkpoint. The held fixture later
 settles without exposing Stop; it is inspected as terminal and its exact supervisor
 is closed. That wait is not used as completion or tool-effect evidence.
 
@@ -140,3 +147,79 @@ immutable/manual qualification follows; full migration and platform gates remain
 open, and further OS implementation still awaits owner MX feedback.
 
 Final corrected source check/build and the complete Node 24.19.0 MX cohort pass **358/358 across 70 files**, zero failures/skips/cancellations, two workers/unchanged deadlines/matching QtTest. The old b80c609 projection fails the exact reused-ID regression; corrected source passes it. Ordinary and final installed acceptance follow separately.
+
+## Ordinary and installed MX qualification — October 13
+
+Final tested runtime **a49d58da343e17f7e671b203906979384b49528c** is selected and
+running in private MX release **20261013-054009-ab664123**, product **0.2.13**,
+artifact SHA-256
+**f8d7431feb00d883dca0efe91dbc26a389835fa05ed13333ef0be7908a592f45**.
+The final source and separate ordinary artifact each pass **358/358 across 70
+files**, zero failures/skips/cancellations, with Node **24.19.0**, two workers,
+unchanged deadlines and matching isolated QtTest. Each also passes the five
+notice/workspace packaging cases; final strict check and build pass.
+
+The ordinary assembly matches **663 compiled files**, **20,801 production
+dependency files**, **151 npm instances**, **nine native/Wasm executables** and
+**783 licence files**. All three generated distribution records and inherited
+dependency/Node/native/licence bytes remain unchanged. All **580 MIT DSH GUI** and
+**108 Apache-2.0 dsh-context** supplier records, layout and CSS remain unchanged
+by this increment. No supplier or dependency is added. This is qualification of
+the private MX preview; public distribution requirements remain open.
+
+Supported update staging creates a separate immutable candidate. Explicit idle
+and draft checks precede guarded Native/Host shutdown, actual process absence,
+activation and sequential stable-launcher Host/Native startup. The selected Node
+executable and runtime main match the candidate, and all **23,890** inventory
+entries verify before and after GUI reads. Earlier immutable releases are retained
+without modification. Documentation closeout does not replace this runtime.
+
+**26 immutable tests** pass: six argument contracts, nine shortcut scope
+contracts, the two actual original-GUI Chromium cases and nine existing DSH
+contracts. The SDK/Host/browser cases use the immutable runtime and bundled Node
+with authored controlled providers; pure projection/scope checks exercise the
+matching assembly source. This is separate from owner live-provider evidence.
+
+Manual acceptance on a separate authored installed profile uses two turns and the
+same raw SDK call ID. The first held proposal displays pending arguments and is
+Stopped with **zero dispatches**; its assistant stays aborted/Failed without a
+fabricated result. The second proposal opens **Turn 2**, stays selected through
+completion, and shows its own `note.txt` arguments, real read result, schema and
+measured tool interval. Exactly **one tool dispatch/result** and **three wire
+requests** occur across both turns. Explicit Trajectory reopening and second-call
+selection after browser reload retain the correct Turn 2 details and request
+count, without replay. Raw SDK IDs remain unchanged; distinct observer captures
+and the actual request bind the second proposal/dispatch/result. Fixture stderr
+is empty. Its browser tab and exact supervisor/Host are closed and actual process
+absence is checked. The recorded 6 ms fixture read is not a performance claim.
+
+Actual owner Insights opens with **eleven nonarchived metadata entries**, **seven
+newest contexts** and **zero failed/partial/usage-gap reads**; its **21 older calls**
+receive no invented SDK timing. No owner prompt, endpoint listing, credential
+entry or configuration write is performed. After GUI reads, all **twelve** owner
+histories/queue identities remain preserved, with twelve total sessions and no new
+empty placeholder or request. Of **247 saved files**, **243 are byte-identical**;
+one journal retains its exact prior prefix plus one close/one load, with three
+corresponding derivative updates. Draft/attachment bytes, profile values/revision,
+model/auth profile presence and bytes, production selection and router
+executable/arguments remain preserved. Qwen/Breeze GPU placement and CPU ASR/VAD
+remain unchanged. Canonical main's 38 pre-existing changes remain untouched.
+
+Earlier lost-patch, shortcut notification and reused-ID failures remain retained
+comparators, not passing evidence. The final source/ordinary/immutable/manual
+checks above supersede the interim b80c609 qualification. CI at preceding published
+head **188d9a1f7be85d1e4de61c78f3073a6d650294ff** is not fully green: inspected
+Windows command-job logs fail on FortuneSheet's missing Immer default export;
+Mac 14/26 packaging refuses unreviewed Darwin Office MPL-2.0/libvips
+LGPL-3.0-or-later and missing reviewed Koffi licence text. Debian logs contain
+file-preview, shortcut-recorder and Pi Browser trajectory timeouts; packaged
+installation/browser jobs are skipped. Other reported contracts, desktop,
+component, shared Qt, source-boundary and Home checks have successes. These are
+prior-head results, not qualification of the new publication head; local MX
+passes do not establish Debian or other-platform acceptance.
+
+Full P0/P1 migration, nested running-call presentation, unlinked request
+attribution, owner live-provider/privacy/public-distribution and physical/platform
+gates remain open. Other-OS implementation remains deferred for owner MX
+feedback. DSH remains available for unqualified workflows; no public binary is
+published.

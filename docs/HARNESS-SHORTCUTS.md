@@ -218,3 +218,9 @@ MX cohort pass **357/357 across 70 files**. Ordinary and installed qualification
 follows in the argument guide. This is shared
 profile/GUI code with Linux qualification; further OS implementation still awaits
 owner MX feedback and full migration/privacy/live/distribution gates stay open.
+
+That source checkpoint is historical. [Final ordinary and installed qualification](TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13)
+records the corrected a49d58d runtime, source/ordinary **358/358**, **26 immutable
+tests**, manual original GUI and preserved owner state in private MX
+**20261013-054009-ab664123**. Earlier selected/running statements in this guide
+apply to their dated checkpoints.

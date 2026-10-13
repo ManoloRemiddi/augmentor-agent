@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current private MX selection](TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13):
+runtime **a49d58da343e17f7e671b203906979384b49528c**, release
+**20261013-054009-ab664123**, product **0.2.13**, artifact
+**f8d7431feb00d883dca0efe91dbc26a389835fa05ed13333ef0be7908a592f45**,
+selected and running after separate immutable staging and guarded activation.
+All **23,890** entries and owner-state preservation verify before and after GUI
+reads. Stable launchers resolve this selection; earlier releases remain preserved.
+Source/ordinary each pass **358/358**; immutable/manual acceptance is recorded in
+the linked guide. Public distribution and full migration/platform gates remain open.
+
+The dated selection statements below are historical checkpoints, superseded by
+the current qualification above.
+
 [Installed original Context timing](CONTEXT-TIMING.md#ordinary-and-installed-mx-qualification--october-13): runtime **008ef29551406fa08f21508d548603a6f9200f81**, private MX **20261013-030020-abfa89ec**, product **0.2.13**, artifact **5d6596b90da90856cfa1b670bf5be6f6c58c52e0ea3b08786bbc22ae6a19253e**, selected and running. Source and ordinary each pass **349/349 across 68 files** plus five packaging cases; thirteen immutable tests and actual original Context/Insights acceptance pass. All **23,885** entries and twelve histories/queues, drafts, profile/auth/model and production/router state are preserved. Apache-2.0 dashboard layout/CSS/card/strip and all 580 MIT GUI records remain intact; one already-marked timing seat changes. Older logs stay explicit. Full migration/live/privacy/public distribution/platform and known CI gaps remain open; prior selection statements below are historical checkpoints.
 
 [Installed MX model lifecycle](HARNESS-MODELS.md#ordinary-and-installed-lifecycle-qualification--october-13): runtime **79ee4ff4c3b7e205833f20f936843ce37886b1cd**, release **20261013-013249-f43fa0d0**, product **0.2.13**, artifact **ac0a3fad21de2808a9cb37a7ec7748668234991335aea08b436fb37810144663**, selected and running. Source and ordinary each pass **342/342 across 66 files** plus five notice/workspace cases. Six immutable candidate lifecycle cases and final byte/inventory/owner GUI proofs pass; all **23,880** entries, twelve histories/queues, draft/attachment/profile/auth bytes and production/router state are preserved. Original GUI/CSS/580 MIT/108 Apache records remain unchanged. Full migration/model-management/live/privacy/public distribution/platform gates stay open; prior installed selections below are historical checkpoints.

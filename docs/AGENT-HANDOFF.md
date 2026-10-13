@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current installed MX preview](TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13):
+runtime **a49d58da343e17f7e671b203906979384b49528c**, release
+**20261013-054009-ab664123**, product **0.2.13**, selected and running. Source and
+ordinary each pass **358/358 across 70 files** plus five packaging cases;
+**26 immutable tests** and manual original-GUI acceptance pass. Streamed arguments,
+lost-patch refusal, request-scoped call details and attested shortcut revisions
+preserve the supplier GUI/CSS/licences and owner state. All **23,890** installed
+entries verify. Full migration/live/privacy/public-distribution/platform gates
+and CI failures remain open; further OS implementation awaits owner MX feedback.
+
+The dated records below are historical checkpoints. Their source-only and
+selected/running statements apply to those checkpoints; the linked current
+qualification supersedes them.
+
 [Qualified streamed arguments source](TRAJECTORY-TOOL-ARGUMENTS.md): final strict
 check/build and 70 MX files pass **357/357**, plus five packaging cases. Capture IDs
 and exact predecessor revisions reject lost updates without inventing arguments.

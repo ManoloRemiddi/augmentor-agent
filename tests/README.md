@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Latest qualified MX cohort](../docs/TRAJECTORY-TOOL-ARGUMENTS.md#ordinary-and-installed-mx-qualification--october-13):
+runtime **a49d58d**, final source and separate ordinary **358/358 across 70 files**,
+five packaging cases in each, zero failures/skips/cancellations, Node **24.19.0**,
+two workers, unchanged deadlines and matching isolated QtTest. Final immutable
+**26/26** and separate manual installed original-GUI acceptance pass. Synthetic
+provider checks and actual owner retained-data reads have distinct scopes; local
+MX passes do not qualify Debian/Windows/macOS or the new publication head's CI.
+Earlier counts/deployment statements below are historical checkpoints. Remaining
+full migration/live/privacy/public-distribution/platform gates stay open.
+
 `tool-argument-snapshots.test.mjs` checks public snapshot sampling, exact Unicode
 patches, missing/foreign/invalid bases, interleaving, completion/Stop, content/count/
 capture bounds and next-message recovery. `harness-tool-arguments-chromium.test.mjs`
