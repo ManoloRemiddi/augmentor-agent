@@ -1,5 +1,30 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Wiki action review](HARNESS-PLUGIN-PARITY.md#wiki-action-inspection-and-explicit-review--october-13),
+implementation **92195a815a8b9871321ec6197c8dc70780a1ac0d**, uses original
+DSH disclosure/JSON/risk controls in Plugins and links exact loaded native actions
+to Trajectory. Explicit hash-bound review preserves unknown originals and permits
+new intent; the original native call never replays. Attested dead Linux leases
+are retained before explicit release; live/unattested owners remain fenced.
+Strict check/build, eight focused cases and source/separate ordinary **471/471 across
+94 MX files** pass, with absolute prepared QtTest Python, matching Node/QtTest,
+two workers, unchanged deadlines and no skips. Production retains 151 npm instances,
+eight previous pre-Node native files and all 39 Wiki records plus two SOURCE files.
+Selected/running 97897cf and unselected dfcdfb9 are unchanged; the installed Native
+window remains online with its draft. Sealed/installed vault acceptance,
+mid-supplier-mutation crash repair, external editors, optional git and wider
+migration/distribution/platform gates remain open. New-head hosted CI is separate.
+
+[Current live-service check](HARNESS-PLUGIN-PARITY.md#current-live-service-readiness-and-isolated-qwen-test--october-13)
+supersedes the earlier stopped-service/pending-preference checkpoint. The owner
+authorizes restoration if offline; Qwen/Breeze/Resonant Voice are already online,
+so no restart occurs. Qwen/Breeze stay on RTX 5090 with unchanged context/
+concurrency/precision and CPU ASR/VAD. The cached CPU recognizer loads, and one
+isolated current-Qwen Pi read completes with exact cold history and no owner data
+copied. Its initial missing-adapter grammar error is corrected using the same
+named llama.cpp adapter already enabled in the preview; product/server settings
+are unchanged. Physical voice and wider live-provider/plugin acceptance stay open.
+
 [Original Plugins Wiki settings](HARNESS-PLUGIN-PARITY.md#wiki-settings-in-the-original-plugins-page--october-13),
 implementation **24bd37297acd417d9e64013e61d440e6b1cc7c52**, stages enable/vault/
 query/routing in the copied DSH form and applies the profile through existing Pi
@@ -119,10 +144,13 @@ all twelve reference integrations and the missing named Pi workflows. Metafolder
 shadow needed adapters preserving current pin/archive/keyboard/draft owners.
 The subsequent source binding above now supplies those faces; installed and full
 plugin acceptance remain open. No private source or owner grouping data is copied.
-At the October 13 audit the configured local Qwen endpoint is unreachable; the GPU manager
-serves no model and speech services are stopped. Native `modelReady` means picker
+At the earlier October 13 audit the configured local Qwen endpoint was unreachable;
+the GPU manager served no model and speech services were stopped. The
+[current live check](HARNESS-PLUGIN-PARITY.md#current-live-service-readiness-and-isolated-qwen-test--october-13)
+above supersedes that stopped/pending-preference status. Native `modelReady` means picker
 configuration, not provider health. No live inference/speech success is claimed.
-Owner stop/restore preference is pending; no service/settings/draft is changed.
+At that historical inspection the owner stop/restore preference was pending;
+no service/settings/draft was changed.
 Current installed appearance runtime and latest combined unselected candidate
 below remain preserved. Full migration/platform/live/privacy gates remain open.
 

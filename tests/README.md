@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`wiki-receipts.test.mjs` covers exact-byte unknown review, stale authority,
+real live/SIGKILL process identity, retained dead leases, legacy-lock refusal and
+lost replies/retired vault scope. `harness-wiki-review-chromium.test.mjs` exercises
+original Settings/Trajectory/risk controls, cancel/acknowledgement, new explicit
+Wiki intent and cold review retention through the actual Pi owner. The extended
+`wiki-scope.test.mjs` refuses the original native action even after review.
+Eight focused cases and source/separate ordinary **471/471 across 94 MX files**
+pass, two workers, matching Node/QtTest, unchanged deadlines and no skips, using
+the prepared absolute QtTest Python path. These fixtures do not establish mid-supplier-mutation crash repair or installed owner
+acceptance. See [review contract](../docs/HARNESS-PLUGIN-PARITY.md#wiki-action-inspection-and-explicit-review--october-13).
+
 `wiki-settings.test.mjs` checks no-write reads, private revision-fenced saves,
 stale/unsafe original preservation and a lost save reply with no retry.
 `harness-wiki-settings-chromium.test.mjs` uses the original Plugins form and actual

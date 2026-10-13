@@ -16,7 +16,7 @@ not qualify DSH retirement or infer parity from the total test count.
 | Context, reference 0.48.0 | Copied dsh-context 0.68.1 Apache-2.0 composition/browser/trends/Insights/sidebar/Fleet and original Trajectory, including timing and nested arguments; [GUI qualification](DSH-GUI-ON-PI.md). | Complete causal/provenance/skill attribution, representative large histories, wider live provider formats and physical entry points. |
 | Adaptive Reasoning, reference 0.2.0 | Selected public policy and supported Pi hooks, saved/effective effort and shared forms; [reasoning scope](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls). | Representative configured real/virtual model acceptance. Stored effort does not prove a backend honors it. |
 | Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. The original Plugins form enables/disables the suite through public resource discovery on the same owners. | Installed-owner configuration/UI acceptance, representative use of the other skill workflows and companion CLIs/services. |
-| Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, receipt inspection/reconciliation UI and standalone add-on/platform qualification. |
+| Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
 | Free Web Search 0.1.0 | The DSH baseline has live documentation search; managed Pi MCP/tool search is independently implemented. | Select the actual licensed search supplier and prove inspectable results/source attribution through its Pi workflow. A generic MCP catalog is not this plugin. |
 | Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
@@ -29,6 +29,65 @@ its own [voice protocol](VOICE-SINGLE-BUTTON.md) and physical/audio lifecycle ga
 It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision and
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
+
+## Wiki action inspection and explicit review — October 13
+
+Implementation **92195a815a8b9871321ec6197c8dc70780a1ac0d** uses the original
+**Settings → Plugins** page and DSH's copied disclosure,
+JSON inspector, status and risk-confirmation components for recorded Wiki actions.
+An exact native session/entry/tool-call identity links an unambiguous loaded
+receipt to the existing **Trajectory** view. No new layout, supplier edit or
+agent loop is introduced. Unloaded or ambiguous source links remain unavailable.
+
+`wiki.receipts` and `wiki.review` are operator-only Harness methods. They use the
+stored vault profile; a caller cannot supply a different vault or receipt path.
+Read-only inspectors cannot read or review them. Review checks the profile hash,
+aggregate ledger hash and exact original receipt hash, requires idle owner work
+and an explicit unknown-outcome acknowledgement, and persists a separate private
+`augmentor-wiki-review/1` record. The original `started`/`unknown` receipt remains
+byte-identical. Review makes no model request or vault write and never claims
+completion. New user intent can perform new actions; the same native action
+identity remains refused even after review. A missing reply is never retried;
+explicit inspection reads the saved result. A changed vault/profile retires the
+old view and confirmation, and a changed original invalidates its review.
+
+New operation leases record PID, Linux process start time, boot ID and a random
+nonce. A live owner or unattested legacy lock cannot be released through review.
+After a proven dead/reused process identity, explicit review retains the exact
+lease bytes before removing the active lock. Reviewing only a dead lease leaves
+its uncertain action blocked until that action is separately acknowledged.
+Reads create no directory. Private ownership, no-follow reads, single links,
+bounds and file identity checks preserve unsafe/malformed/replaced originals.
+This is a Linux metadata recovery contract; it is not automatic vault repair.
+
+Eight focused cases pass. Actual Chromium/SDK controls open the recorded
+Trajectory, cancel review, require the risk checkbox and save one acknowledgement
+without provider work, vault changes or history rewriting. A later explicit
+conversation scaffolds/writes a new page while both colliding source versions
+remain intact. Cold Host/browser reopening retains the unknown reviewed record.
+A real SIGKILL test preserves a started receipt and dead lease, rejects live and
+unattested owners and explicitly releases only the attested dead lease. Changed
+profile/hash and lost-reply cases refuse stale authority and replay. Final source and fresh separate ordinary MX trees each pass **471/471 across
+94 files**, two workers, Node 24.19.0, matching QtTest/PySide6/shiboken6 6.8.2.1,
+unchanged deadlines and no skips. Fresh production retains 151 npm instances,
+all eight preceding pre-Node ELF/Wasm dependency bytes, all 39 Wiki supplier/
+binding records and both SOURCE.json files. These are separate source and
+production-tree fixture results, not sealed or installed owner-vault acceptance.
+
+Two initial focused runs used a relative qualification-Python path; the temporary
+Host could not start its private memory companion, and the new-intent case timed
+out after tool execution. The prepared interpreter's absolute path resolves that
+fixture setup error; the same original deadline passes. No product deadline or
+memory behavior changes to obtain the result.
+
+The selected/running **97897cf** preview and unselected **dfcdfb9** candidate
+remain unchanged and do not contain Wiki settings or review. The Native window
+has an unsent draft and remains online; no activation or shutdown occurs.
+Sealed/installed owner-vault acceptance, arbitrary concurrent external editors,
+SIGKILL during the supplier's multi-file mutation/inner metadata lock, malformed
+partial publication repair, optional git automation and broader plugin/live/
+public distribution/platform gates remain open. Acknowledgement preserves an
+unknown outcome; it does not establish what happened in the vault.
 
 ## Wiki settings in the original Plugins page — October 13
 
@@ -85,8 +144,9 @@ isolated source/production-tree fixtures, not an installed owner-vault test.
 
 The selected/running **97897cf** preview and older unselected **dfcdfb9** artifact
 remain unchanged. This source feature is not installed there. Owner draft/model/
-speech state remains preserved. Sealed/installed acceptance, receipt reconciliation,
-optional git, larger/concurrent vaults, live companion workflows and the broader
+speech state remains preserved. At this preceding checkpoint, receipt review was still open; the
+[explicit review source](#wiki-action-inspection-and-explicit-review--october-13)
+above supersedes that limitation. Sealed/installed acceptance, optional git, larger/concurrent vaults, live companion workflows and the broader
 migration/public distribution/platform gates remain open.
 
 ## Wiki core source binding — October 13
@@ -241,7 +301,34 @@ implementation at that inspection checkpoint. The [subsequent copied source bind
 now implements the presentation/profile/action faces; installed acceptance and
 complete plugin parity remain separate.
 
-## Current live-service boundary
+## Current live-service readiness and isolated Qwen test — October 13
+
+The owner's reply authorizes restoring offline services through the existing GPU
+manager and continuing independent Harness work if restoration is unavailable.
+A fresh check finds the saved Qwen model, Resonant Breeze and Resonant Voice
+already active and healthy. No restart is needed. Qwen and Breeze retain RTX 5090
+placement; Qwen advertises a 262,144-token per-slot context. Context, concurrency,
+precision and CPU ASR/VAD settings are unchanged. The configured cached CPU
+`small.en`/int8 recognizer loads without microphone capture. Breeze advertises
+24 kHz; Resonant Voice is idle. The separate legacy TTS service on the other GPU
+is not the configured Resonant companion and remains untouched.
+
+An independently created private Host/SDK session uses the current exact Qwen
+selection for one real `read` of an authored temporary file. It completes with
+one tool call, preserves that file and cold-opens its byte-identical saved history
+without creating another agent. Its declared context/output limits match the
+preview. No owner profile, credentials, conversations, draft or vault are copied.
+An initial diagnostic request omitted the existing named-provider llama.cpp
+schema adapter and received a sampler grammar error. The corrected isolated
+profile uses that already-installed adapter and passes; no server setting or
+product code changes. The live model/Breeze process identities remain unchanged.
+
+This proves one real Pi read and configured service/recognizer readiness. It does
+not qualify physical recording/playback, a speech/model round trip, wider provider
+formats, MCP/Home workflows or owner acceptance of the new Wiki feature. The
+current preview/draft remain intact and the newer candidate remains unselected.
+
+## Historical stopped-service inspection — October 13
 
 At the October 13 inspection the configured preview Qwen endpoint is unreachable and the
 existing GPU manager reports no served model on either slot. Speech companions
@@ -251,9 +338,12 @@ probe the provider. Those flags establish local connection/configuration, not li
 inference or speech readiness. This contradicts a broader interpretation of
 “model-ready” and must not be counted as a successful live-model gate.
 
-The owner has been asked whether to leave the services stopped or restore the
-existing managed setup. No service, GPU placement, model/context/concurrency/
-precision or ASR/VAD setting is changed while that preference remains pending.
+At that earlier checkpoint the owner had been asked whether to leave the services
+stopped or restore the existing managed setup. The subsequent reply and
+[current check](#current-live-service-readiness-and-isolated-qwen-test--october-13)
+supersede its pending-preference/stopped-service status. At that inspection no
+service, GPU placement, model/context/concurrency/precision or ASR/VAD setting
+was changed while the preference was pending.
 The older standalone Qwen unit differs from the preview's current route, so it is
 not substituted for the saved GPU-manager setup. No real-provider request, tool
 or live speech qualification is claimed from this inspection. The current preview

@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Wiki action inspection and explicit review](HARNESS-PLUGIN-PARITY.md#wiki-action-inspection-and-explicit-review--october-13)
+records original DSH controls, preserved uncertain originals, attested dead-lease
+recovery and the separate installed/vault-crash qualification boundary.
+[Current service readiness](HARNESS-PLUGIN-PARITY.md#current-live-service-readiness-and-isolated-qwen-test--october-13)
+records online Qwen/Resonant companions, CPU recognizer readiness and one isolated
+real Pi read, superseding the earlier stopped-service inspection.
+
 [Original Wiki tools and skills on Pi](HARNESS-PLUGIN-PARITY.md#wiki-core-source-binding--october-13)
 records pinned MIT source, explicit vault configuration, six supported SDK tools,
 source/ordinary qualification and the remaining GUI/installed workflows.
