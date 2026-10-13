@@ -78,6 +78,7 @@
     "tests/harness-nested-tools.test.mjs",
     "tests/harness-nested-tools-chromium.test.mjs",
     "tests/harness-branch-controls.test.mjs",
-    "tests/harness-branch-controls-chromium.test.mjs"
+    "tests/harness-branch-controls-chromium.test.mjs",
+    "tests/harness-brand-chromium.test.mjs"
   ]
 }

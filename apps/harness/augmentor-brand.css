@@ -1,0 +1,12 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+@import './vendor/augmentor-brand/brand-orb.css';
+/* Keep the exact website motion; the existing sidebar owns spacing and actions. */
+.augmentor-brand-orb {
+  box-sizing:border-box;
+  flex:none;
+  margin-right:0;
+  color:var(--dsw-alias-text-primary);
+  border-color:currentColor;
+  box-shadow:inset 2px 1px 8px color-mix(in srgb,currentColor 30%,transparent),0 0 12px color-mix(in srgb,currentColor 18%,transparent);
+  pointer-events:none;
+}

@@ -90,6 +90,7 @@ import {InsightPanelIcon} from './vendor/dsh-context/src/client/icon.tsx';
 import {attachPlans} from './plans.js';
 import {attachGoals} from './goals.js';
 import {attachJobs} from './jobs.js';
+import {AugmentorBrand} from './augmentor-brand.jsx';
 import './dsh-base.css';
 
 const hash=new URLSearchParams(location.hash.slice(1));
@@ -304,6 +305,7 @@ function App(){
     const p={...common,...owner,renderSlot:render,renderSlotChain:(name,owner,opts)=>name==='conversation.composer'&&!state.readOnly&&state.interactions.length?<InteractionTakeover frame={state.interactions[0]} state={state}/>:opts.fallback,renderFactorySlot:(name,owner,opts)=><ConversationContent {...common} {...owner} renderSlot={render} renderSlotChain={(name,owner,o)=>name==='conversation.composer'&&!state.readOnly&&state.interactions.length?<InteractionTakeover frame={state.interactions[0]} state={state}/>:o.fallback} useFactorySlot={(key,fallback)=>key==='views'?BoundSession:opts.slots?.[key]||fallback}/>};
     switch(name){
       case 'sidebar':return <SidebarRoot {...p} t={t.sidebar} usePanels={selectorFace(state.readOnly||contextPrefs.value.insightsEntry==='hide'?[]:[{id:'dsh-context',label:'Context Insights'}])} useShortcuts={harnessShortcuts.useCatalog} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} startSession={()=>startSession()} toggleSidebar={layout.actions.toggleSidebar} selectPanel={layout.actions.selectPanel}/>;
+      case 'sidebar.brand.mark':return <AugmentorBrand size={owner.size}/>;
       case 'sidebar.brand.name':return <span className={sidebarCss.fallbackBrandName}>Augmentor Harness</span>;
       case 'sidebar.workspaces':return <WorkspaceBrowser {...p} t={t.workspace} useStore={useWorkspaceView} actions={workspaceView.actions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} useHostInfo={selectorFace({home:''})} useWorkspaceShortcuts={useWorkspaceShortcuts} useShortcuts={harnessShortcuts.useCatalog} useDirectoryFlow={selectorFace(!state.readOnly)} open={open} startSession={startSession} searchResultLimit={100} searchSessions={async query=>({items:state.sessions.filter(x=>x.title.toLowerCase().includes(query.toLowerCase())).map(x=>({sessionId:x.sessionId,title:x.title,cwd:x.cwd}))})} requestSearch={shortcuts.search} requestAddWorkspace={shortcuts.add} closeAddWorkspace={shortcuts.closeAdd} setDirectoryBusy={shortcuts.directoryBusy} dismissForkError={shortcuts.dismissForkError} requestSessionRename={(sid,title)=>{setDialog({kind:'rename',sid,title});}} notifyArchivedNotOpenable={()=>notifyRow('archivedNotOpenable')} renameWorkspace={(workspaceId,title)=>controller.workspaceAction('rename',{workspaceId,title})} deleteWorkspace={workspaceId=>controller.workspaceAction('remove',{workspaceId})} insertWorkspaceBefore={(workspaceId,beforeWorkspaceId)=>controller.workspaceAction('move',{workspaceId,beforeWorkspaceId})} unarchiveSession={restoreSession} createWorkspace={createWorkspace}/>;
       case 'sidebar.workspaces.directoryFlow':return DirectoryFlow(owner);

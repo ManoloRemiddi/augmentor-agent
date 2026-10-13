@@ -485,3 +485,15 @@ The October 11 [original live Trajectory binding](DSH-GUI-ON-PI.md#original-live
 
 
 The October 11 [original command menu](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up) adds 28 verbatim public MIT menu/controller/grouping/popup/coordinate/grammar files from the same DSH d743267 pin, bringing the GUI selection to 386. The preceding supplier records, visual source/CSS and production dependencies remain unchanged. Pi action/scope/revision bindings are independently authored; no supplier owner or telemetry runtime is selected. Complete command and platform parity remain open.
+
+## Harness website brand selection — October 13
+
+[The requested Augmentor mark](HARNESS-BRAND.md) reuses the public website header
+CSS and companion favicon at commit 68a59fd7c485a12d5d7befc448b5692343901f64. Both
+assets and the original MIT licence are verbatim, with SHA-256 and public paths
+in `apps/harness/vendor/augmentor-brand/SOURCE.json`. Live asset hashes match.
+Authored local slot sizing/theme contrast preserve original 7/9/4-second motion
+and reduced-motion policy. Compiled/staged notices include the supplier text;
+DSH/dashboard records, dependency pins and model/runtime ownership are unchanged.
+Source/ordinary/installed qualification is recorded in the owning guide; full
+migration and distribution gates remain open.

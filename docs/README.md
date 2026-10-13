@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Augmentor brand motion](HARNESS-BRAND.md) restores the website’s elastic
+circle in the original header/rail seats, with light/dark contrast and retained
+reduced-motion behavior. Qualification and installed scope are recorded separately.
+
 [Original Branch/Fork ownership](HARNESS-BRANCH-CONTROLS.md) guards duplicate and late
 operations, changed drafts and explicit same-child reconciliation. The [current installed qualification](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-mx-qualification--october-13) records source/ordinary
 380/380, immutable 68/68 and preserved owner state.
