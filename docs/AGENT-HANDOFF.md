@@ -1,5 +1,27 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Free Search public source and SDK library](HARNESS-PLUGIN-PARITY.md#free-search-public-source-and-sdk-binding--october-14),
+implementation **baf8b7708a50df0f88e1e4f94d61556fbd98e300**, retains public MIT
+MochiNek0 1.6.0 / 2fab277 provider and original 1,598-line card source. All 29
+installed supplier files match the public npm archive; active composition remains
+unproved and no private source/config/key is copied. One existing Pi owner's
+extension executes original API-provider search/fetch, with frozen config,
+credential redaction, partial-result retention, Stop and HTTP/body budgets.
+Four cases and a nine-case search/pointer/HTML focus pass. A moving-frame fixture
+reproduces the old coordinate strategy losing a click; two-space preparation
+fixes that strategy without product/CSS/deadline changes. The prior broad HTML
+failure remains explicit. Three pure-JS MIT dependencies bring production to 154
+instances; eight existing pre-Node native bytes stay identical. Final source/separate
+ordinary **476/476 across 95 MX files** pass at two workers with matching Node/
+QtTest, unchanged deadlines/no skips. All 29 server/two client source records and
+compiled supplier/notice bytes verify. This is an opt-in library:
+Host/private settings/original GUI wiring, scope/collision checks, keyless-reference
+behavior and representative live/installed acceptance remain required. No default
+backend or owner credentials are migrated. The optional owner question is pending;
+preserve both historical keyless and configured API paths. Selected 97897cf and
+qualified Wiki artifact 12b403f remain unchanged, with a Native draft. All other
+accepted migration/platform/distribution gates remain open.
+
 [Qualified unselected Wiki MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13),
 source **12b403f3c707c829d6936797e2a73ed35078ec94**, product **0.2.13**,
 release **20261013-232107-a7bb6ab7**, artifact

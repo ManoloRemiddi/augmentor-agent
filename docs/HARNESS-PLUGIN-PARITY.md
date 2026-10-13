@@ -18,7 +18,7 @@ not qualify DSH retirement or infer parity from the total test count.
 | Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. The original Plugins form enables/disables the suite through public resource discovery on the same owners. | Installed-owner configuration/UI acceptance, representative use of the other skill workflows and companion CLIs/services. |
 | Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
-| Free Web Search 0.1.0 | The DSH baseline has live documentation search; managed Pi MCP/tool search is independently implemented. | Select the actual licensed search supplier and prove inspectable results/source attribution through its Pi workflow. A generic MCP catalog is not this plugin. |
+| Free Web Search, historical 0.1.0 reference | [Public 1.6.0 source and opt-in SDK binding](#free-search-public-source-and-sdk-binding--october-14) preserve nine original API engines, key rotation, search/fetch and configuration-card source; independent SDK/HTTP cases qualify the provider layer. Installed package presence does not establish current active composition. | Original settings-card/Host wiring, explicit private configuration and scope grants, keyless reference behavior, representative live engines and installed owner acceptance. The provider library alone does not close this row. |
 | Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
 | Comfy MCP | Same managed-core binding; the reference service previously refused connection. | Service availability and a representative authorized workflow; no successful Comfy operation is claimed. |
 | Blender MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Blender operation and verified effect/Stop/retained evidence. |
@@ -29,6 +29,85 @@ its own [voice protocol](VOICE-SINGLE-BUTTON.md) and physical/audio lifecycle ga
 It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision and
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
+
+## Free Search public source and SDK binding — October 14
+
+Implementation **baf8b7708a50df0f88e1e4f94d61556fbd98e300** selects the
+installed package metadata `dsh-web-search-free` **1.6.0**, rather
+than the historical 0.1.0 reference. Its public npm gitHead and tag resolve to
+[MochiNek0 2fab277](https://github.com/MochiNek0/dsh-web-search-free/tree/2fab2772b822caeea742003a781f6c492c72c5d2).
+The exact [MIT notice](https://github.com/MochiNek0/dsh-web-search-free/blob/2fab2772b822caeea742003a781f6c492c72c5d2/LICENSE)
+is retained. The public npm archive has SHA-256
+`617377340e144f77c69dcd39d3d4c22680ce6dbdfe112dde6a93eb82b2abd896`;
+all **29** installed supplier/notice files match its public bytes. Only public
+preferred source is copied; no installed private source/configuration or key is
+published. Current active composition is **not proven** by that comparison.
+
+The server selection retains 29 original/adapted source records and the client
+selection retains the complete original 1,598-line card and MIT notice. Original
+snapshots remain beside the marked adaptations. Nine provider bodies retain
+TinyFish, AnySearch, Exa, Tavily, Firecrawl, Serping API, Brave, SerpApi and Jina.
+The original server manages provider ordering, multiline key rotation,
+search-only versus fetch-capable engines, source dates and provider truncation.
+Its legacy settings shape is supplied by an authored in-memory boundary;
+there is no Cordis runtime, DSH startup, legacy-profile read or second agent loop.
+Pinned Schemastery 3.18.3, locked Cosmokit 1.8.5 and Standard Schema Spec 1.1.0
+are three additional pure-JavaScript MIT suppliers; production inventory grows
+from 151 to 154 instances. Existing eight pre-Node native bytes stay identical.
+
+`freeSearchExtension` registers `web_search` (`queries`) and `web_fetch` (`urls`)
+through supported Pi ExtensionAPI in an existing owner. A caller supplies explicit
+configuration; this source slice does not grant or migrate owner credentials.
+The getter is read afresh for later calls but each admitted request freezes its
+values/order. Original provider bodies use a request-local transport, fixed
+provider origins, denied redirects, an 8 MiB response bound, 32 HTTP attempts and
+a 30-second deadline. Stop fences both admission and fallback. Fetch rejects
+credential-bearing, non-HTTP and local/private literal targets while retaining
+public address support. This remote-provider URL validation is not a qualified
+general browser/private-network or keyless local-fetch adapter.
+
+Returned content is labelled external untrusted data. Credentials, their JSON/
+URL spellings and raw provider errors are withheld from model output; origin-only
+attempt metadata remains inspectable. Earlier completed items survive a later
+failure or cancellation. No root logger reports credential prefixes/suffixes.
+Applying/inspecting the provider factory makes no HTTP or model request.
+
+Four focused cases pass: changed/in-place-mutated config with original key
+rotation, escaped-secret redaction and retained partial reads; Stop/disabled-fetch/
+private/public-address admissions; actual oversized responses/request exhaustion;
+and one actual Pi owner with a local HTTP model/provider fixture. Invalid singular
+`query` dispatches no provider request; validated search/fetch use original HTTP
+headers/body shapes and retain source URL/truncation with no model-visible key.
+Strict check/build, four focused cases, the nine-case pointer/HTML/search focus
+and final source/separate ordinary cohorts each pass as scoped: **476/476 across
+95 MX files**, two workers, Node 24.19.0, matching QtTest/PySide6/shiboken6 6.8.2.1,
+unchanged deadlines and no skips. All 29 server and two client selection records
+verify; all compiled server source/notice bytes match ordinary inputs. Fresh
+production retains 154 npm instances, the three original MIT notice bodies and
+all eight preceding pre-Node native bytes. This is not sealed/installed acceptance.
+These are synthetic provider cases, not live success for all nine engines.
+
+One complete source run at the preceding driver passes 475/475; a later run fails
+the existing HTML frame button click (474/475). The same HTML/search focused pair
+passes, which does not prove that failure's root cause. Its old driver dispatches
+from two immediate coordinate snapshots. A new independent moving-frame fixture
+shows that strategy missing after motion, while preparation in both coordinate
+spaces dispatches once to the inner control. The HTML driver now uses that
+preparation; the new nine-case search/pointer/HTML focus passes with unchanged
+deadlines. No application, supplier UI or HTML sandbox behavior is altered by
+this driver correction.
+
+This is an **opt-in source provider library**, not a deployed application feature
+or complete Free Search parity. The original card still needs operator-only
+revisioned private configuration, Host/resource collision/scope wiring and actual
+GUI acceptance. It must preserve key/order/fetch edits, clear/discard, locale and
+readback without redesign or automatic credential migration. Version 1.6.0's API
+engines require configured keys; they do not replace the historical keyless
+workflow. The owner preference question remains optional/pending; preserving both
+paths remains the working direction, without choosing a new default backend.
+The qualified Wiki candidate and selected/running 97897cf remain unchanged, with
+Native busy/draft flags; no shutdown, activation or real credentialed search occurs.
+All other accepted plugin/live/installed/platform/distribution gates stay open.
 
 ## Qualified unselected Wiki MX candidate — October 13
 

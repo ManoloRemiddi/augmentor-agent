@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`free-search.test.mjs` uses copied original provider logic and a real Pi owner/local
+HTTP fixture. Four cases cover request-frozen order/key rotation, raw/JSON/URL
+credential redaction, partial results, Stop, private/public fetch targets,
+response/request budgets and SDK argument validation before actual HTTP dispatch.
+Source and separate ordinary pass **476/476 across 95 MX files**, two workers,
+matching Node/QtTest, unchanged deadlines and no skips; the nine-case pointer/
+HTML/search focus also passes. No owner profile/key or live paid provider is used. The original client source is
+retained but not mounted or GUI-qualified by these tests. See [source scope](../docs/HARNESS-PLUGIN-PARITY.md#free-search-public-source-and-sdk-binding--october-14).
+
 [Current unselected Wiki MX artifact](../docs/HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13)
 passes 471/471 across the same 94 files with actual bundled Node/runtime/SDK/GUI
 and external standalone client/schema inputs, followed by all 24,045 inventory
