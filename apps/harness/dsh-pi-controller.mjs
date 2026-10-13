@@ -175,13 +175,15 @@ export class DshPiController {
   }
   async adoptWorkspace(path){const snapshot=await this.workspaceAction('adopt',{path});return snapshot.items.find(x=>x.workspaceId===snapshot.adoptedWorkspaceId);}
   async poll(){
-    if(this.polling||!this.state.sessionId||this.state.phase!=='ready')return;
+    if(this.polling||this.state.phase!=='ready'||!this.state.sessionId&&(this.state.readOnly||this.state.capabilities?.appearancePreferences!==true))return;
     this.polling=true;const sessionId=this.state.sessionId,epoch=this.epoch;
     try{
-      const res=await this.fetcher('/api/events?'+new URLSearchParams({sessionId,clientId:this.clientId,after:String(this.cursor)}),{headers:{Authorization:'Bearer '+this.token}});
+      const res=await this.fetcher(sessionId?'/api/events?'+new URLSearchParams({sessionId,clientId:this.clientId,after:String(this.cursor)}):'/api/appearance/revision',{headers:{Authorization:'Bearer '+this.token}});
       const page=await res.json();if(!res.ok||page.error)throw Error(page.error?.message||'The event connection failed.');if(epoch!==this.epoch)return;
-      this.cursor=page.cursor;
+      if(sessionId)this.cursor=page.cursor;
       if(!this.state.readOnly&&Number.isSafeInteger(page.settingsRevision)&&page.settingsRevision!==this.state.settingsRevision)this.update({settingsRevision:page.settingsRevision});
+      if(!this.state.readOnly&&Number.isSafeInteger(page.appearanceRevision)&&page.appearanceRevision>(this.state.appearanceRevision??-1))this.update({appearanceRevision:page.appearanceRevision});
+      if(!sessionId)return;
       const events=[...this.state.events],records=new Map(this.state.records.map(x=>[x.id,x])),interactions=new Map(this.state.interactions.map(x=>[x.rpcId,x]));let queue=this.state.queue,changed=false,familyChanged=false;
       for(const {frame} of page.frames){
         if(['job/updated','job/observation'].includes(frame.method)||frame.method==='session/event'&&['user/message','assistant/message','turn/start','turn/end'].includes(frame.payload.event.type)){familyChanged=true;changed=true;}

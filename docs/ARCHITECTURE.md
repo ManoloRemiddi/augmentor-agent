@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Harness appearance](HARNESS-APPEARANCE.md) is a UI preference owned by the private
+Host profile with a separate revision. It uses operator reads/CAS writes and
+cached live hints, including the welcome page without a conversation. It creates
+no agent owner or model work and leaves other surface preferences separate.
+
 [Original keyboard shortcuts](HARNESS-SHORTCUTS.md) is a UI-only command seat plus the copied pure preference coordinator on private Pi storage. It reuses existing action owners and live pane/tab identities; opaque HTML frames receive no action bridge.
 
 [Original HTML previews](HARNESS-HTML-PREVIEWS.md) adds a UI-only original DSH registration behind the existing authorized file reader. The copied preference class receives accepted Pi Host settings; static and interactive frames retire with their existing tab/session/file lifetimes. No second agent or model-facing bridge is introduced.

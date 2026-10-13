@@ -36,8 +36,8 @@ test('original DSH Settings exposes Pi controls, owns modal focus and persists a
  await visible(settings);await click(settings);
  await visible(shell+'&&'+shell+'.querySelector("button[aria-current=true]").textContent.trim()==="General"');
  assert(await panel.evaluate(shell+'.contains(document.activeElement)'),'original shell owns focus');
- await click(button('Dark',shell));assert(await panel.evaluate('document.body.hasAttribute("data-ds-dark-theme")'));
- await click(button('Light',shell));assert(!await panel.evaluate('document.body.hasAttribute("data-ds-dark-theme")'));
+ await click(button('Dark',shell));await visible('document.body.hasAttribute("data-ds-dark-theme")');
+ await click(button('Light',shell));await visible('!document.body.hasAttribute("data-ds-dark-theme")');
  await panel.call('Emulation.setEmulatedMedia',{features:[{name:'prefers-color-scheme',value:'dark'}]});await click(button('System',shell));
  await visible('document.body.hasAttribute("data-ds-dark-theme")');
  await panel.reload();await visible(settings);await click(settings);await visible(button('System',shell)+'.getAttribute("aria-pressed")==="true"');

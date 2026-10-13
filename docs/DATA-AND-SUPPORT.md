@@ -9,6 +9,14 @@ Native and standalone Browser reasoning controls are clients of the existing pri
 
 # Data, permissions and support
 
+The [Harness appearance preference](HARNESS-APPEARANCE.md) stores only Light,
+Dark or System and a separate revision in private `config/harness-appearance.json`.
+Reads create no record; an explicit operator choice persists across browser
+origins. System resolves locally without further writes. Inspectors cannot access
+the profile. The existing local browser cache remains; no credential, prompt,
+conversation, remote request or diagnostic payload is added. Diagnostic clearing
+does not erase this ordinary display preference.
+
 The October 10 Harness reasoning candidate stores global enable/text-only/preset/model mappings in the private Pi profile settings, and saved effort/mode/revision in each conversation's metadata. Explicit effort changes also create the SDK's native thinking-level history entries. Adaptive request effort, task-tier reasons, input character/media counts and fixed MIT editing guidance are private diagnostic records under existing retention/capture rules; classification does not send an extra request or persist another copy of the submitted text. Conversation history and diagnostic retention remain separate. Context labels SDK-requested effort separately from saved effort and any exposed provider result; it does not assert the backend honored a setting. See [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls).
 
 Augmentor runs under your Linux account. Pi is bundled; DSH is optional. The Linux

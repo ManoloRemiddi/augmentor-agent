@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified Harness appearance source](HARNESS-APPEARANCE.md#qualified-source):
+original Light/Dark/System controls now persist explicit choices in a separate
+private profile record across Host/browser origins. Live peer hints work with or
+without a conversation; System OS changes add no writes. Strict check/build and
+the same 79-file MX cohort pass **415/415**, plus five packaging cases. Source is
+qualified; ordinary/sealed/installed adoption follows separately. Current selected
+preview remains d79e476 / 20261013-124421-a8c9d4c5. Authentication/link/reconnect,
+full migration and platform/CI gates remain open.
+
 [Current installed MX ancestry recovery](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13): runtime **d79e476**,
 release **20261013-124421-a8c9d4c5**, product **0.2.13**, selected and running.
 Artifact **ca3a937eb4ec8cd286b62032accf1cbffdf8efe2b064eb03b699989438493266**.

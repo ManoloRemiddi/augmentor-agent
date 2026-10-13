@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import React,{useEffect,useRef,useState,useSyncExternalStore} from 'react';
+import {DshAppearance} from './dsh-appearance.mjs';
 import {SettingsRoot} from '@dsh-gui/ui-settings-general/src/client/SettingsRoot.tsx';
 import {createSettingsShellStore} from '@dsh-gui/ui-settings-general/src/client/shell-store.ts';
 import {TriggerContent,HeaderContent,CloseLabel} from '@dsh-gui/ui-settings-general/src/client/chrome.tsx';
@@ -29,7 +30,8 @@ const persisted=localStorage.getItem('augmentor.dsh.theme');
 const appearance=createSnapshotStore({preference:['light','dark','system'].includes(persisted)?persisted:localStorage.getItem('augmentor.dsh.dark')==='1'?'dark':'light'});
 const useAppearance=bind(appearance),systemTheme=matchMedia('(prefers-color-scheme: dark)');
 const applyTheme=()=>document.body.toggleAttribute('data-ds-dark-theme',appearance.getSnapshot().preference==='dark'||appearance.getSnapshot().preference==='system'&&systemTheme.matches);
-const setTheme=preference=>{localStorage.setItem('augmentor.dsh.theme',preference);appearance.set({preference});applyTheme();localStorage.setItem('augmentor.dsh.dark',document.body.hasAttribute('data-ds-dark-theme')?'1':'0');};
+const setLocalTheme=preference=>{try{localStorage.setItem('augmentor.dsh.theme',preference);}catch{}appearance.set({preference});applyTheme();try{localStorage.setItem('augmentor.dsh.dark',document.body.hasAttribute('data-ds-dark-theme')?'1':'0');}catch{}};
+export const connectAppearance=controller=>new DshAppearance(controller,setLocalTheme);
 systemTheme.addEventListener('change',applyTheme);applyTheme();
 
 /** Existing Pi handlers retain their scoped authority and dialog lifecycle. */
@@ -80,7 +82,12 @@ function HtmlPreviewSetting({developerTools,state}){
 }
 
 /** Pure supplier shell; section contents call the existing Pi owner. */
-export function OriginalSettings({wide,state,controller,preferences,developerTools,shortcutsUi,onPrompts,onContext,notice}){
+export function OriginalSettings({wide,state,controller,preferences,developerTools,appearanceProfile,shortcutsUi,onPrompts,onContext,notice}){
+  const palette=useSyncExternalStore(appearanceProfile.subscribe,appearanceProfile.getSnapshot,appearanceProfile.getSnapshot);
+  const settingsOpen=useShell(s=>s.open),shownAppearanceError=useRef(null);
+  useEffect(()=>{if(!settingsOpen||!palette.error){shownAppearanceError.current=null;return;}if(shownAppearanceError.current!==palette.error){shownAppearanceError.current=palette.error;notice(palette.error);}},[settingsOpen,palette.error,notice]);
+  useEffect(()=>{let open=settingsShell.getSnapshot().open;return settingsShell.subscribe(()=>{const next=settingsShell.getSnapshot().open;if(next&&!open)void appearanceProfile.load();open=next;});},[appearanceProfile]);
+  const setTheme=preference=>{void appearanceProfile.set(preference).catch(error=>notice(error.message));};
   const renderSlot=(name,owner={},options={})=>{
     if(name==='settings.trigger')return <TriggerContent {...owner} t={t}/>;
     if(name==='settings.header')return <HeaderContent t={t}/>;
@@ -90,7 +97,7 @@ export function OriginalSettings({wide,state,controller,preferences,developerToo
       if(options.only==='models')return <OriginalModels key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></OriginalModels>;
       if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
     }
-    if(name==='settings.general.item')return <><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div>{shortcutsUi?.render('settings.general.item')}<CurrentVersionRow t={t}/></>;
+    if(name==='settings.general.item')return <><fieldset disabled={!palette.writable||palette.busy} style={{display:"contents",border:0,padding:0,margin:0}}><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/></fieldset>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div>{shortcutsUi?.render('settings.general.item')}<CurrentVersionRow t={t}/></>;
     return options.fallback??null;
   };
   return <SettingsRoot wide={wide} t={t} useStore={useShell} actions={settingsShell.actions} renderSlot={renderSlot} useSections={face(sections)} useOnboardingSteps={face([])} useSessions={face({phase:state.phase,byId:{}})} useShortcuts={shortcutsUi?.useCatalog??face([])} useDesktopUpdate={face({failed:false,opening:false})} openDesktopUpdate={()=>{}} useConnectionState={face(state.phase==='ready'?'connected':state.phase==='connecting'?'connecting':'disconnected')} reconnect={()=>void controller.start(controller.state.sessionId).catch(e=>notice(e.message))}/>;

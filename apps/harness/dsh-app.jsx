@@ -46,7 +46,7 @@ import {DshShortcuts} from './dsh-shortcuts.jsx';
 import {en as layoutShortcutEn} from '@dsh-gui/ui-layout/src/client/shortcut-locales.ts';
 import {en as sidebarRightEn} from '@dsh-gui/ui-sidebar-right/src/client/locales.ts';
 import {en as settingsEn} from '@dsh-gui/ui-settings-general/src/client/locales.ts';
-import {OriginalSettings,settingsShell} from './dsh-settings.jsx';
+import {OriginalSettings,settingsShell,connectAppearance} from './dsh-settings.jsx';
 import {TrajectoryView} from '@dsh-gui/ui-trajectory/src/client/TrajectoryView.tsx';
 import {WorkspaceBrowser} from '@dsh-gui/ui-workspace/src/client/rows/WorkspaceBrowser.tsx';
 import {PinSessionMenuItem,PinSessionRowButton} from '@dsh-gui/ui-workspace/src/client/session-actions/PinSession.tsx';
@@ -101,6 +101,7 @@ history.replaceState(null,'',location.pathname);
 // the controller so a scoped inspector never retains the previous authority.
 addEventListener('hashchange',()=>{if(new URLSearchParams(location.hash.slice(1)).has('token'))location.reload();});
 const controller=new DshPiController(token);
+const appearanceProfile=connectAppearance(controller);
 const developerTools=new DshDeveloperTools(controller);developerTools.preference=new DeveloperToolsPreference(developerTools);
 const contextPreferences=new DshContextPreferences(controller);contextSettings.attach(contextPreferences);
 const contextModal=createDshContextModalBinding(controller);
@@ -310,7 +311,7 @@ function App(){
       case 'sidebar.brand.name':return <span className={sidebarCss.fallbackBrandName}>Augmentor Harness</span>;
       case 'sidebar.workspaces':return <WorkspaceBrowser {...p} t={t.workspace} useStore={useWorkspaceView} actions={workspaceView.actions} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} useHostInfo={selectorFace({home:''})} useWorkspaceShortcuts={useWorkspaceShortcuts} useShortcuts={harnessShortcuts.useCatalog} useDirectoryFlow={selectorFace(!state.readOnly)} open={open} startSession={startSession} searchResultLimit={100} searchSessions={async query=>({items:state.sessions.filter(x=>x.title.toLowerCase().includes(query.toLowerCase())).map(x=>({sessionId:x.sessionId,title:x.title,cwd:x.cwd}))})} requestSearch={shortcuts.search} requestAddWorkspace={shortcuts.add} closeAddWorkspace={shortcuts.closeAdd} setDirectoryBusy={shortcuts.directoryBusy} dismissForkError={shortcuts.dismissForkError} requestSessionRename={(sid,title)=>{setDialog({kind:'rename',sid,title});}} notifyArchivedNotOpenable={()=>notifyRow('archivedNotOpenable')} renameWorkspace={(workspaceId,title)=>controller.workspaceAction('rename',{workspaceId,title})} deleteWorkspace={workspaceId=>controller.workspaceAction('remove',{workspaceId})} insertWorkspaceBefore={(workspaceId,beforeWorkspaceId)=>controller.workspaceAction('move',{workspaceId,beforeWorkspaceId})} unarchiveSession={restoreSession} createWorkspace={createWorkspace}/>;
       case 'sidebar.workspaces.directoryFlow':return DirectoryFlow(owner);
-      case 'sidebar.settings':return <OriginalSettings wide={owner.wide} state={state} controller={controller} preferences={contextPreferences} developerTools={developerTools} shortcutsUi={harnessShortcuts} notice={settingsNotice} onPrompts={()=>setDialog({kind:'prompts'})} onContext={()=>{layout.actions.selectPanel(null);if(hasContextTab)setView('context');else{setView('chat');filePreviews.openTab(state.sessionId,'dsh-context');}}}/>;
+      case 'sidebar.settings':return <OriginalSettings wide={owner.wide} state={state} controller={controller} preferences={contextPreferences} developerTools={developerTools} appearanceProfile={appearanceProfile} shortcutsUi={harnessShortcuts} notice={settingsNotice} onPrompts={()=>setDialog({kind:'prompts'})} onContext={()=>{layout.actions.selectPanel(null);if(hasContextTab)setView('context');else{setView('chat');filePreviews.openTab(state.sessionId,'dsh-context');}}}/>;
       case 'sidebar.workspaces.session.menu.item':{if(state.readOnly)return null;const props={...p,...sessionActions,useMenuOpenState:()=>options.hookContext||[false,noOp]};return <><PinSessionMenuItem {...props}/><RenameSessionMenuItem {...props}/><ForkSessionMenuItem {...props}/><ArchiveSessionMenuItem {...props}/></>;}
       case 'sidebar.workspaces.session.row.action':return state.readOnly?null:<><ArchiveSessionRowButton {...p} {...sessionActions}/><PinSessionRowButton {...p} {...sessionActions}/></>;
       case 'sidebar.panellist':return options.only==='dsh-context'?<InsightPanelIcon size={owner.size}/>:null;

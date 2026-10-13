@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`harness-appearance.test.mjs` covers private bounded profile storage, stale/failed
+writes, no implicit migration, scope changes, peer hints and unknown-save recovery;
+a real Host cold read preserves unrelated settings/model/auth bytes with no
+conversations or inference. `harness-appearance-chromium.test.mjs` uses the original
+Light/Dark/System row across fresh Host/Chrome origins, OS color changes and a
+peer save on the welcome page. The original shell/focus/brand cases remain in the
+79-file MX cohort. See [scope and qualification](../docs/HARNESS-APPEARANCE.md).
+
 `pi-branch-publication.test.mjs` verifies persistence of a first-input Edit's
 custom-only SDK ancestry, private/exclusive writes and a fresh manager's first
 append. A real Host retains an earlier disarmed goal across process replacement

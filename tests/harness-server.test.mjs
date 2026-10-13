@@ -5,12 +5,14 @@ import {mkdtempSync, writeFileSync, rmSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {request as httpRequest} from 'node:http';
-import {HarnessServer} from '../dist/runtime/src/harness-server.js';
-import {MAX_FRAME} from '../dist/protocol/src/index.js';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+const runtimeRoot=process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('..',import.meta.url));
+const {HarnessServer}=await import(pathToFileURL(join(runtimeRoot,'dist/runtime/src/harness-server.js')));
+const {MAX_FRAME}=await import(pathToFileURL(join(runtimeRoot,'dist/protocol/src/index.js')));
 
 test('conversation inspection isolates authority, expires links and cannot keep approvals alive',async t=>{
  const calls=[],selection={provider:'fixture',model:'selected'};
- const host={getMeta:id=>{if(!['a','b'].includes(id))throw Error('Conversation not found');return {id,cwd:'/fixture/'+id,selection};},
+ const host={appearanceRevision:7,getMeta:id=>{if(!['a','b'].includes(id))throw Error('Conversation not found');return {id,cwd:'/fixture/'+id,selection};},
   queueSnapshot:()=>({revision:0,paused:false,activeTurnId:null,items:[]}),interactions:{frames:()=>[{method:'interaction/request'}]},
   dispatch:async(method,params)=>{calls.push({method,params});if(method==='session.list')return {items:[{sessionId:'a'},{sessionId:'b'}]};
    if(method==='host.describe')return {protocol:'fixture',version:'1',piVersion:'1.1.0',dirs:{state:'/private/profile'},capabilities:{all:true}};
@@ -22,6 +24,9 @@ test('conversation inspection isolates authority, expires links and cannot keep 
  const headers={Authorization:'Bearer '+token,'Content-Type':'application/json'};
  const rpc=(method,params={},auth=headers)=>fetch(link.origin+'/api/rpc',{method:'POST',headers:auth,body:JSON.stringify({id:'inspect',method,params})});
  const access=await (await fetch(link.origin+'/api/access',{headers})).json();assert.deepEqual(access,{mode:'read-only',sessionId:'a',expiresAt:link.expiresAt});assert(!JSON.stringify(access).includes(token));
+ assert.equal((await fetch(link.origin+'/api/appearance/revision',{headers})).status,400);
+ assert.equal((await fetch(link.origin+'/api/appearance/revision')).status,401);
+ assert.deepEqual(await (await fetch(link.origin+'/api/appearance/revision',{headers:{Authorization:'Bearer '+server.token}})).json(),{appearanceRevision:7});
  assert.deepEqual((await (await rpc('session.list')).json()).result.items,[{sessionId:'a'}]);
  assert.deepEqual((await (await rpc('host.describe')).json()).result,{protocol:'fixture',version:'1',piVersion:'1.1.0',workspace:'/fixture/a',capabilities:{inspection:true}});
  const catalog=(await (await rpc('models.list')).json()).result;assert.deepEqual(catalog.groups[0].models,[selection]);assert.deepEqual(catalog.default,selection);assert.deepEqual(catalog.pinned,[]);assert.deepEqual(catalog.failures,[]);
@@ -31,11 +36,12 @@ test('conversation inspection isolates authority, expires links and cannot keep 
  }
  const count=calls.length;
  for(const method of ['session.organize','workspace.list','workspace.adopt','workspace.rename','workspace.remove','workspace.move','workspace.listDirectory','workspace.createDirectory'])assert.equal((await rpc(method,{path:'/private',workspaceId:'/private',expectedRevision:0})).status,400,method);
- for(const method of ['session.prepareBranch','session.settleBranch','session.branchRecovery','session.create','session.prompt','session.cancel','session.branch','session.rename','session.selectModel','session.selectReasoning','session.trimTools','session.updateQueue','session.continueQueue','session.resolveQueue','chats.saved','observation.configure','observation.clear','reasoning.configure','settings.mutate','settings.describe','prompts.list','prompts.save','prompt.improve','prompt.cancelImprovement','interaction.respond','interaction.wait','models.configure','host.shutdown','inspection.open','harness.open'])assert.equal((await rpc(method,{sessionId:'a',clientId:'same'})).status,400,method);
+ for(const method of ['appearance.describe','appearance.set','session.prepareBranch','session.settleBranch','session.branchRecovery','session.create','session.prompt','session.cancel','session.branch','session.rename','session.selectModel','session.selectReasoning','session.trimTools','session.updateQueue','session.continueQueue','session.resolveQueue','chats.saved','observation.configure','observation.clear','reasoning.configure','settings.mutate','settings.describe','prompts.list','prompts.save','prompt.improve','prompt.cancelImprovement','interaction.respond','interaction.wait','models.configure','host.shutdown','inspection.open','harness.open'])assert.equal((await rpc(method,{sessionId:'a',clientId:'same'})).status,400,method);
  assert.equal(calls.length,count,'mutations and unrelated profile reads never reach Host');
  const subscribed=(await (await rpc('events.subscribe',{sessionId:'a',clientId:'same'})).json()).result;assert.deepEqual(subscribed.pending,[]);assert(!server.connected('a'),'inspection cannot act as an approval presenter');
  server.publish('a',{method:'session/event',payload:{text:'selected'}});server.publish('b',{method:'session/event',payload:{text:'foreign'}});
  const page=await (await fetch(link.origin+'/api/events?sessionId=a&clientId=same&after=0',{headers})).json();assert.equal(page.frames.length,1);assert.equal(page.frames[0].frame.payload.text,'selected');
+ assert.equal('appearanceRevision' in page,false,'inspector events cannot disclose profile preferences');
  assert.equal((await fetch(link.origin+'/api/events?sessionId=b&clientId=same&after=0',{headers})).status,400);assert.equal((await rpc('events.subscribe',{sessionId:'b',clientId:'same'})).status,400);
  const operatorHeaders={...headers,Authorization:'Bearer '+server.token};
  assert.equal((await rpc('events.subscribe',{sessionId:'b',clientId:'same'},operatorHeaders)).status,200);assert(server.connected('b'));assert(!server.connected('a'));
