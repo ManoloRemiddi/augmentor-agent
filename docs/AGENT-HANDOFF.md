@@ -4,7 +4,8 @@
 restores the persistent read-only cue in an existing DSH header slot. The loaded
 Browser/bridge test now exercises the original Trajectory/Context controls rather
 than prototype IDs, retaining scoped rejection, native-history equality and zero
-extra inference. Source qualification follows in the owning guide. No installed
+extra inference. Implementation **d42b3f9** passes strict check/build and **10/10
+focused cases across four files**; new-head remote CI remains separate. No installed
 release is patched; current Native draft and combined unselected candidate remain.
 
 [Custom-plugin parity and live-service audit](HARNESS-PLUGIN-PARITY.md) identifies

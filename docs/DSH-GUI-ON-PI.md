@@ -5,8 +5,8 @@
 The Browser Models/Inspector entry now opens the original DSH GUI. The preceding
 Linux CI at `ec87b3b` ran 1,119 Node cases: 1,096 passed, 22 skipped and one failed
 because `pi-browser-chromium.test.mjs` still expected the prototype's
-`data-view`/`ledger`/`context-content` controls. This is a stale integration test,
-not evidence that increasing its timeout would repair the interface.
+`data-view`/`ledger`/`context-content` controls. The failure comes from stale
+integration selectors; existing deadlines are preserved.
 
 The original inspector also lacked a persistent scope cue outside Chat. The
 authored Pi binding now puts **Read-only** in DSH's existing
@@ -24,8 +24,14 @@ scope visibility and cold browser reload. Inspector reads add no provider reques
 and leave the selected native history identical. The existing original-GUI,
 theme/brand and server authority cases remain relevant regression checks.
 
-Source check/build and final focused qualification are recorded after the
-implementation commit. Earlier local attempts are retained: the first updated
+Implementation **d42b3f994db16e04c3462de3bb9c2f3a0d2ab0bf** passes strict
+`npm run check`/`npm run build` and **10/10 focused cases across four files**:
+`pi-browser-chromium`, `harness-server`, `harness-brand-chromium` and
+`harness-dsh-chromium`, using Node 24.19.0 and two workers. There are no skips or
+deadline changes. Supplier inputs/dependencies/licences have no Git changes;
+the rebuilt provenance still contains 580 MIT and 108 Apache records. Remote CI
+for the new published head remains separate from this source qualification.
+Earlier local attempts are retained: the first updated
 predicate returned a DOM element to CDP instead of a boolean; later predicates
 expected text before expanding the supplier's user rows. Corrected tests use the
 actual public controls without changing deadlines, supplier folding or provider
