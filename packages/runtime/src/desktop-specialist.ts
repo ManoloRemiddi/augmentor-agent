@@ -1,10 +1,11 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {Type} from 'typebox';
-import {createAgentSession, DefaultResourceLoader, SessionManager, SettingsManager,
+import {createAgentSession, DefaultResourceLoader, SessionManager,
   type AgentSession, type ExtensionAPI, type ExtensionFactory, type ModelRuntime, type ToolDefinition} from '@earendil-works/pi-coding-agent';
 import type {Context, Model, Api,Usage} from '@earendil-works/pi-ai';
 import type {ThinkingLevel} from '@earendil-works/pi-agent-core';
 import {privateDir} from './storage.js';
+import {managedPiSettings} from './pi-privacy.js';
 import {piScheduling} from './scheduling.js';
 import {piLlamaCppSchemas} from './provider-compat.js';
 import {join} from 'node:path';
@@ -166,7 +167,7 @@ export class DesktopSpecialist {
           evidence!.save(); return reply({accepted: true});
         }),
       });
-      const settingsManager = SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:false},packages:[],defaultProjectTrust:'never'});
+      const settingsManager = managedPiSettings(false);
       const resourceLoader = new DefaultResourceLoader({cwd: options.cwd, agentDir: options.agentDir, settingsManager,
         noExtensions: true, noSkills: true, noPromptTemplates: true, noContextFiles: true, noThemes: true,
         extensionFactories:[piScheduling,piLlamaCppSchemas,...(options.extensionFactories??[])],

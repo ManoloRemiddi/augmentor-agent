@@ -9,6 +9,14 @@ Native and standalone Browser reasoning controls are clients of the existing pri
 
 # Data, permissions and support
 
+[Managed Pi privacy](PI-PRIVACY.md) now applies the process telemetry opt-out at
+each SDK creation path as well as in launchers. An inherited CLI environment
+cannot override the product's false install-reporting setting and add unsolicited
+provider attribution. Explicit configured headers and on-disk CLI settings are
+preserved. This adds no history/payload store or external request. Configured
+providers, companions and extensions retain their separate data practices;
+pinned-core synthetic evidence is distinct from live network qualification.
+
 The [Harness appearance preference](HARNESS-APPEARANCE.md) stores only Light,
 Dark or System and a separate revision in private `config/harness-appearance.json`.
 Reads create no record; an explicit operator choice persists across browser

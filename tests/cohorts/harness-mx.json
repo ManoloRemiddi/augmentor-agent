@@ -83,6 +83,8 @@
     "tests/pi-branch-recovery.test.mjs",
     "tests/pi-branch-publication.test.mjs",
     "tests/harness-appearance.test.mjs",
-    "tests/harness-appearance-chromium.test.mjs"
+    "tests/harness-appearance-chromium.test.mjs",
+    "tests/pi-privacy.test.mjs",
+    "tests/desktop-specialist.test.mjs"
   ]
 }

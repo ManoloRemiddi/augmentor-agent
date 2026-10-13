@@ -245,6 +245,13 @@ The established Desktop and Browser layout stays the baseline. Implementing an i
 
 ## Privacy and network policy
 
+The [October 13 managed SDK privacy correction](PI-PRIVACY.md) closes inherited
+environment precedence over a false Host setting, proven through real provider
+headers in three synthetic managed paths. Its destination inventory and pinned
+core tests advance this P0 row; fresh-user/live/extension/update and full migration
+qualification remain required. The normal preview launchers already opt out;
+installed adoption of the additional SDK guard is a separate checkpoint.
+
 DSH's inspected telemetry plugin defaults to feedback-only export, and its official desktop has a separate analytics path. Disabling one is insufficient. Pi also defaults to install reporting, while its separate experimental analytics setting defaults off. Our existing Pi host already disables install telemetry. A new Pi pin must preserve and verify that behavior. See [DSH telemetry](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/session/session-telemetry-otel/README.md) and [Pi settings](https://github.com/earendil-works/pi/blob/42a3497d03ad17e308a2299fa824727894f2c0ec/packages/coding-agent/docs/settings.md).
 
 Managed operation must enforce these requirements:

@@ -19,16 +19,16 @@ const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwM
 const brief = {task: 'Click the test button once.', successCriteria: 'The desktop displays DONE.', constraints: 'Do not open other applications.'};
 const finish = {name: 'desktop_finish', args: {status: 'completed', summary: 'Clicked the button.', verification: 'The new screenshot displays DONE.'}};
 const steps = [{name: 'desktop_connect'}, {name: 'desktop_snapshot'}, {name: 'desktop_action', args: {token: 'fresh-2', kind: 'click', x: 10, y: 10}}, {name: 'desktop_snapshot'}, finish];
-async function fixture(t, script = (_body, index) => steps[index], limits = {}) {
+async function fixture(t, script = (_body, index) => steps[index], limits = {}, providerName = 'fixture') {
   const root = mkdtempSync(join(tmpdir(), 'augmentor-specialist-'));
   const agentDir = join(root, 'agent'), cwd = join(root, 'work'), evidenceRoot = join(root, 'evidence');
   mkdirSync(agentDir); mkdirSync(cwd);
   writeFileSync(join(cwd, 'AGENTS.md'), 'UNRELATED_PROJECT_CONTEXT');
   writeFileSync(join(agentDir, 'APPEND_SYSTEM.md'), 'UNRELATED_GLOBAL_CONTEXT');
-  const requests = [], calls = [], progress = [];
+  const requests = [], calls = [], progress = [], requestHeaders=[];
   const server = http.createServer(async (req, res) => {
     let raw = ''; for await (const chunk of req) raw += chunk;
-    const body = JSON.parse(raw); requests.push(body);
+    const body = JSON.parse(raw); requests.push(body);requestHeaders.push(req.headers);
     const step = script(body, requests.length - 1);
     if (step?.hang) {res.writeHead(200, {'content-type': 'text/event-stream'}); res.flushHeaders(); return;}
     res.writeHead(200, {'content-type': 'text/event-stream'});
@@ -42,7 +42,7 @@ async function fixture(t, script = (_body, index) => steps[index], limits = {}) 
   });
   server.listen(0, '127.0.0.1'); await once(server, 'listening');
   t.after(() => {server.closeAllConnections(); server.close(); rmSync(root, {recursive: true, force: true});});
-  writeFileSync(join(agentDir, 'models.json'), JSON.stringify({providers: {fixture: {baseUrl: `http://127.0.0.1:${server.address().port}/v1`, api: 'openai-completions', apiKey: 'dummy', models: [{id: 'vision', name: 'Fixture vision', reasoning: false, input: ['text', 'image'], contextWindow: 32768, maxTokens: 2048}]}}}));
+  writeFileSync(join(agentDir, 'models.json'), JSON.stringify({providers: {[providerName]: {baseUrl: `http://127.0.0.1:${server.address().port}/v1`, api: 'openai-completions', apiKey: 'dummy', ...(providerName==='openrouter'?{headers:{'X-Owner-Header':'keep-explicit-header'}}:{}),models: [{id: 'vision', name: 'Fixture vision', reasoning: false, input: ['text', 'image'], contextWindow: 32768, maxTokens: 2048}]}}}));
   const modelRuntime = await ModelRuntime.create({authPath: join(agentDir, 'auth.json'), modelsPath: join(agentDir, 'models.json'), modelsStorePath: join(agentDir, 'store.json'), allowModelNetwork: false});
   const executor = {id: 'fixture-desktop', domainInstructions: 'Fixture desktop; one test button.',
     async control(method, owner, args) {
@@ -56,9 +56,15 @@ async function fixture(t, script = (_body, index) => steps[index], limits = {}) 
     async observe() {return {applications: ['Fixture']};},
   };
   const worker = new DesktopSpecialist(evidenceRoot, executor, {...DEFAULT_DESKTOP_LIMITS, ...limits});
-  const options = {owner: 'pi:test', cwd, agentDir, modelRuntime, model: modelRuntime.getModel('fixture', 'vision'), policy: 'danger-full-access', approve: async () => true, cancelInteractions() {}, progress: value => progress.push(value)};
-  return {root, agentDir, cwd, evidenceRoot, worker, options, requests, calls, progress, executor};
+  const options = {owner: 'pi:test', cwd, agentDir, modelRuntime, model: modelRuntime.getModel(providerName, 'vision'), policy: 'danger-full-access', approve: async () => true, cancelInteractions() {}, progress: value => progress.push(value)};
+  return {root, agentDir, cwd, evidenceRoot, worker, options, requests, requestHeaders, calls, progress, executor};
 }
+
+test('standalone specialist opt-out precedes its first request and preserves explicit headers',async t=>{
+  const inherited=process.env.PI_TELEMETRY;t.after(()=>{if(inherited===undefined)delete process.env.PI_TELEMETRY;else process.env.PI_TELEMETRY=inherited;});
+  const f=await fixture(t,undefined,{},'openrouter');process.env.PI_TELEMETRY='true';const result=await f.worker.run(f.options,brief);assert.equal(result.status,'completed');assert.equal(f.requests.length,5);
+  for(const headers of f.requestHeaders){for(const name of ['http-referer','x-openrouter-title','x-openrouter-categories'])assert.equal(headers[name],undefined,name);assert.equal(headers['x-owner-header'],'keep-explicit-header');}
+});
 
 test('isolated Pi worker verifies a task, persists evidence and preserves selected model', async t => {
   const f = await fixture(t);

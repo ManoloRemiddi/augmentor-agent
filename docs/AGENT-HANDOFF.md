@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified managed Pi privacy source](PI-PRIVACY.md#qualified-source) enforces
+the process opt-out at all three SDK creation paths. Real preceding chat,
+improvement and specialist wire cases fail when inherited telemetry overrides
+SettingsManager; corrected fixtures preserve explicit headers without attribution.
+Strict check/build, **432/432 across 81 MX files** and five packaging cases pass.
+Ordinary/immutable/adoption evidence follows separately. Current installed MX
+remains the appearance runtime below; no active window or draft is restarted.
+
 [Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):
 runtime **97897cf**, private MX **20261013-142001-1f7f7f96**, product **0.2.13**,
 artifact **05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**,

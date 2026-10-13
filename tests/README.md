@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`pi-privacy.test.mjs` verifies fresh/cold real Host behavior without offline flags,
+TCP destinations, immutable synthetic settings and inherited telemetry suppression
+on actual provider headers. A standalone prompt improvement and the specialist's
+five-request fixture exercise their first SDK owner with explicit inherited opt-in.
+The preceding immutable runtime fails all three cases; corrected focused checks
+pass 18/18. Source, ordinary and installed scope live in [Pi privacy](../docs/PI-PRIVACY.md).
+
 `harness-appearance.test.mjs` covers private bounded profile storage, stale/failed
 writes, no implicit migration, scope changes, peer hints and unknown-save recovery;
 a real Host cold read preserves unrelated settings/model/auth bytes with no

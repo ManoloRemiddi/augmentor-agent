@@ -26,7 +26,8 @@ import {lstatSync,mkdirSync,existsSync,readFileSync,readdirSync,writeFileSync} f
 import {join,resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomUUID,createHash} from 'node:crypto';
-import {createAgentSession,ModelRuntime,SessionManager,SettingsManager,DefaultResourceLoader,type AgentSession,type ExtensionAPI} from '@earendil-works/pi-coding-agent';
+import {createAgentSession,ModelRuntime,SessionManager,DefaultResourceLoader,type AgentSession,type ExtensionAPI} from '@earendil-works/pi-coding-agent';
+import {managedPiSettings} from './pi-privacy.js';
 import {BrowserBroker} from '../../pi-browser/src/index.js';
 import {homePackage} from '../../home-client/src/pi.js';
 import {linuxPackage} from '../../pi-linux/src/index.js';
@@ -291,7 +292,7 @@ export class Host {
       const definition=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()]).find(tool=>tool.definition.name===name)?.definition;
       return (definition as (typeof definition & {augmentorExecution?:ExecutionContract}))?.augmentorExecution??(mcp?.isRead(name)?{effect:()=> 'read'}:undefined);
     },(toolCallId,toolName)=>mcp?.takeResultIdentity(toolCallId,toolName));
-    const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:!m.delegation},packages:[],defaultProjectTrust:'never'});
+    const settingsManager=managedPiSettings(!m.delegation);
     const resources=m.delegation?.resources??readJson<Data>(join(this.dirs.config,'resources.json'),{sources:[],skills:[]});
     const goals=new PiGoals({getBranch:()=>manager.getBranch(),appendCustomEntry:(type,data)=>manager.appendCustomEntry(type,data),getSessionId:()=>manager.getSessionId()},()=>{this.publish(m.id,{method:'goal/updated',payload:{sessionId:m.id}});record?.observation?.record('goal/update',{activation:goals.armed?'armed':'disarmed'});});
     const provenance=new ContextProvenance(()=>this.observations.policy().capturePayloads);

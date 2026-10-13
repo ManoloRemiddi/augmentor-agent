@@ -1,5 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed Pi privacy](PI-PRIVACY.md) documents the inherited telemetry/header fix,
+shared SDK policy, destination inventory and source/ordinary/installed boundaries.
+
 [Harness appearance persistence](HARNESS-APPEARANCE.md) keeps the original
 Light/Dark/System row while carrying explicit choices across Host/browser origins.
 Source, ordinary and installed qualification are recorded separately there;

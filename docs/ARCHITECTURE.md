@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed Pi privacy](PI-PRIVACY.md) is shared SDK creation policy for existing
+conversation, isolated improvement and bounded specialist owners. It enforces
+the process environment opt-out before their public SettingsManager/SDK creation;
+one conversation still has one AgentSession, and explicit provider headers remain.
+
 [Harness appearance](HARNESS-APPEARANCE.md) is a UI preference owned by the private
 Host profile with a separate revision. It uses operator reads/CAS writes and
 cached live hints, including the welcome page without a conversation. It creates

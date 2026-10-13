@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed Pi privacy](PI-PRIVACY.md) adds an authored shared settings helper using
+Pi 1.1.0's public SettingsManager. Existing chat/improvement/specialist SDK owners,
+supplier files/licences and dependency pins remain; no supplier source or SDK
+patch/private import is introduced. Actual fixture headers establish precedence.
+
 [Harness appearance persistence](HARNESS-APPEARANCE.md) adds authored profile and
 UI coordination only. The original DSH Appearance row/shell/CSS, all 580 MIT GUI
 and 108 Apache dsh-context records, brand sources, dependency pins and supplier
