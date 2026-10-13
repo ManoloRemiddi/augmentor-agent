@@ -33,3 +33,8 @@ for(const name of ['dsh-plugin-wiki-tools','dsh-plugin-wiki-skills']){
  for(const row of selection.files)if(createHash('sha256').update(readFileSync(source+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Public Wiki source changed: '+row.path);
  cpSync(source,'dist/runtime/vendor/'+name,{recursive:true});
 }
+
+const searchSource='packages/runtime/vendor/dsh-web-search-free';
+const searchSelection=JSON.parse(readFileSync(searchSource+'/SOURCE.json','utf8'));
+for(const row of searchSelection.files)if(createHash('sha256').update(readFileSync(searchSource+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Public free search source changed: '+row.path);
+cpSync(searchSource,'dist/runtime/vendor/dsh-web-search-free',{recursive:true});

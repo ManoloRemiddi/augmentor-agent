@@ -1,0 +1,23 @@
+{
+  "schema": "augmentor-public-source-selection/1",
+  "package": "dsh-web-search-free",
+  "version": "1.6.0",
+  "repository": "https://github.com/MochiNek0/dsh-web-search-free",
+  "commit": "2fab2772b822caeea742003a781f6c492c72c5d2",
+  "license": "MIT",
+  "scope": "Public preferred source for inspected installed package version; original provider/key-rotation/search/fetch logic and full configuration-card source. Pi integration is qualified separately; installed presence alone does not prove active composition. No private profile source or credentials are copied.",
+  "files": [
+    {
+      "upstreamPath": "src/client.tsx",
+      "path": "client.tsx",
+      "sha256": "4b1fb00b9927b95d4c86f03df07cb3f1703198519e872ff93b1bf0d05ddd03f2",
+      "modified": false
+    },
+    {
+      "upstreamPath": "LICENSE",
+      "path": "LICENSE",
+      "sha256": "945c6c871dab7c804cb629e9e903e99f3ae794ca18521805340c96c4f6797eae",
+      "modified": false
+    }
+  ]
+}

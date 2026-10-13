@@ -29,3 +29,25 @@ export async function harnessPointerClick(panel,expression,until){
  await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});
  await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});
 }
+
+// Opaque frame controls need both coordinate spaces ready before one dispatch.
+export async function harnessFramePointerClick(panel,frameEvaluate,iframeExpression,controlExpression,until){
+ const geometry=expression=>`(async()=>{
+  const e=(${expression});if(!e||!e.isConnected||e.disabled)return null;
+  e.scrollIntoView({block:"center",inline:"nearest"});let previous=e.getBoundingClientRect();
+  for(let n=0;n<2;n++){await new Promise(requestAnimationFrame);const now=e.getBoundingClientRect();if(["x","y","width","height"].some(k=>Math.abs(now[k]-previous[k])>.1))return null;previous=now;}
+  for(let p=e;p;p=p.parentElement)if(p.getAnimations().some(a=>{const t=a.effect?.getComputedTiming();return (a.playState==="running"||a.pending)&&Number.isFinite(t?.endTime)&&t.progress!==null;}))return null;
+  const r=e.getBoundingClientRect();if(!r.width||!r.height||!e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)))return null;
+  return {x:r.x,y:r.y,width:r.width,height:r.height};
+ })()`;
+ let point,diagnostic;
+ await until(async()=>{
+  const outer=await panel.evaluate(geometry(iframeExpression)),inner=await frameEvaluate(geometry(controlExpression));if(!outer||!inner){diagnostic={outer,inner};return false;}
+  const fresh=await panel.evaluate(`(()=>{const f=(${iframeExpression});if(!f)return null;const r=f.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()`);
+  if(!fresh||Object.keys(outer).some(k=>Math.abs(outer[k]-fresh[k])>.1)){diagnostic={outer,inner,fresh};return false;}
+  point={x:outer.x+inner.x+inner.width/2,y:outer.y+inner.y+inner.height/2};
+  const hit=await panel.evaluate(`(()=>{const f=(${iframeExpression});return f===document.elementFromPoint(${point.x},${point.y});})()`);diagnostic={outer,inner,point,hit};return hit;
+ },'frame pointer ready').catch(error=>{error.message+=' '+JSON.stringify(diagnostic);throw error;});
+ await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});
+ await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});
+}

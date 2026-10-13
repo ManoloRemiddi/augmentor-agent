@@ -98,6 +98,7 @@
     "tests/wiki-settings.test.mjs",
     "tests/harness-wiki-settings-chromium.test.mjs",
     "tests/wiki-receipts.test.mjs",
-    "tests/harness-wiki-review-chromium.test.mjs"
+    "tests/harness-wiki-review-chromium.test.mjs",
+    "tests/free-search.test.mjs"
   ]
 }

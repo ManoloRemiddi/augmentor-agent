@@ -1,0 +1,208 @@
+{
+  "schema": "augmentor-public-source-selection/1",
+  "package": "dsh-web-search-free",
+  "version": "1.6.0",
+  "repository": "https://github.com/MochiNek0/dsh-web-search-free",
+  "commit": "2fab2772b822caeea742003a781f6c492c72c5d2",
+  "license": "MIT",
+  "scope": "Public preferred source for inspected installed package version; original provider/key-rotation/search/fetch logic and full configuration-card source. Pi integration is qualified separately; installed presence alone does not prove active composition. No private profile source or credentials are copied.",
+  "files": [
+    {
+      "upstreamPath": "LICENSE",
+      "path": "LICENSE",
+      "sha256": "945c6c871dab7c804cb629e9e903e99f3ae794ca18521805340c96c4f6797eae",
+      "modified": false
+    },
+    {
+      "upstreamPath": "README.en.md",
+      "path": "README.en.md",
+      "sha256": "c5def880881f6308e6976839f890b73d1b1ea96539c6d49bb4db778fcaf95e65",
+      "modified": false
+    },
+    {
+      "upstreamPath": "package.json",
+      "path": "package.json",
+      "sha256": "65edb8d2fbb24f55d5f55ec5f3148946abb13d8cca348111808ec2a3421f6e0d",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/types.ts",
+      "path": "types.ts",
+      "sha256": "18d5473cd6687244dc939f0508f16e66a270c9498108f1c7c92ad3af09c10972",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/index.ts",
+      "path": "index.ts",
+      "sha256": "68e33de52fce0f941cd6cb5dd3430a0a400c40b3bb0803ba23ba2b01f0e0d14f",
+      "modified": true,
+      "originalSha256": "166cc0f4c16bf54dd7e31df196d33aa1702f60942cebf808217a6b957b4e9ee5",
+      "modification": "Cancellation fences before admission and fallback; provider order/keys/original result bodies unchanged."
+    },
+    {
+      "upstreamPath": "src/providers/fields.ts",
+      "path": "providers/fields.ts",
+      "sha256": "6716ed9db0c6278402d70b20194c71095056982462b900e9abdaa44b83caf71c",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/tavily.ts",
+      "path": "providers/tavily.ts",
+      "sha256": "6234332381bccc9cc2b0cbf209edf012e2a8bf80b9f57042d8bc5d0c2f9b2f92",
+      "modified": true,
+      "originalSha256": "54c988863765a133f8103ac7757e1fd3cf54f5b2e66e980ec3eba86e8ecd3acd",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/providers/serpapi.ts",
+      "path": "providers/serpapi.ts",
+      "sha256": "3e919380050ed92864eca03b2f9b5da2695e1712f2da3fb331e627247f47c9cd",
+      "modified": true,
+      "originalSha256": "395cc94f10371f9018261e656a9f6e344fdf49494ebdb9a018c93516ca799619",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/providers/serpingapi.ts",
+      "path": "providers/serpingapi.ts",
+      "sha256": "3bc96b51713fc007d3d89a0e545f6d95c557ea0d3375b7b815bfb2fb3aaf1afc",
+      "modified": true,
+      "originalSha256": "d5718c8a2f035bf3f93df538dbe7ee6fa2da96f75b342463caab4140c987f531",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/providers/index.ts",
+      "path": "providers/index.ts",
+      "sha256": "70b0f2b1b8f750d96e802c0bbfc1def4e6adf60e45475978b3ae79da9b8203b9",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/brave.ts",
+      "path": "providers/brave.ts",
+      "sha256": "5a2cfd7586d703b83d5fdc26660cce7b04372fcaac9d8593e1709fdea8b35142",
+      "modified": true,
+      "originalSha256": "405969485864735ad883b568930733a240d9180679c5294c94e99a4007d85ef8",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/providers/anysearch.ts",
+      "path": "providers/anysearch.ts",
+      "sha256": "11760e3d1f5738b7f30a8800830afc3a29ffff4917a64163181dc01eed0ddb40",
+      "modified": true,
+      "originalSha256": "a4f7e1e7ec987fec10ab0640508563380a4279dbd4db297f9184d942e713d735",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/providers/jina.ts",
+      "path": "providers/jina.ts",
+      "sha256": "e74ed183c9b943795d9f9708edf682128eccea5475c526898c323f4786155215",
+      "modified": true,
+      "originalSha256": "a981b75bdb5e9fea5497ca01148c0fd61acfb6afde3658dc6bb92fda0f6b9be8",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/providers/tinyfish.ts",
+      "path": "providers/tinyfish.ts",
+      "sha256": "c6af2a80052a0d80df7218f47a414fe0d2bf2aa4cf3043ee93e84918b1625b7f",
+      "modified": true,
+      "originalSha256": "afd392e279c574940c3cda43f6e09261e3d943d5be54395b103a88197858c26e",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/providers/exa.ts",
+      "path": "providers/exa.ts",
+      "sha256": "6837fd8878d9a8c31b5acee8c3356cf4b0d620204f81138bc3fac8047b2e819e",
+      "modified": true,
+      "originalSha256": "da2b848cf706f809bad5ac8aa22f80f5dbd0fbf0fb11ae6aed502d35574f0cae",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/providers/firecrawl.ts",
+      "path": "providers/firecrawl.ts",
+      "sha256": "3d3b7cd7d3b4b9b40380f30061dfe1773423ea36fb9e321a383a1be0abfd5db5",
+      "modified": true,
+      "originalSha256": "9ee89d5668053b853168b2c234685775cd95a2caf249806e2a982be85f0b205e",
+      "modification": "Import a request-local bounded/cancellable transport without changing original provider bodies."
+    },
+    {
+      "upstreamPath": "src/types.ts",
+      "path": "original/types.ts",
+      "sha256": "18d5473cd6687244dc939f0508f16e66a270c9498108f1c7c92ad3af09c10972",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/index.ts",
+      "path": "original/index.ts",
+      "sha256": "166cc0f4c16bf54dd7e31df196d33aa1702f60942cebf808217a6b957b4e9ee5",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/fields.ts",
+      "path": "original/providers/fields.ts",
+      "sha256": "6716ed9db0c6278402d70b20194c71095056982462b900e9abdaa44b83caf71c",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/tavily.ts",
+      "path": "original/providers/tavily.ts",
+      "sha256": "54c988863765a133f8103ac7757e1fd3cf54f5b2e66e980ec3eba86e8ecd3acd",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/serpapi.ts",
+      "path": "original/providers/serpapi.ts",
+      "sha256": "395cc94f10371f9018261e656a9f6e344fdf49494ebdb9a018c93516ca799619",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/serpingapi.ts",
+      "path": "original/providers/serpingapi.ts",
+      "sha256": "d5718c8a2f035bf3f93df538dbe7ee6fa2da96f75b342463caab4140c987f531",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/index.ts",
+      "path": "original/providers/index.ts",
+      "sha256": "70b0f2b1b8f750d96e802c0bbfc1def4e6adf60e45475978b3ae79da9b8203b9",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/brave.ts",
+      "path": "original/providers/brave.ts",
+      "sha256": "405969485864735ad883b568930733a240d9180679c5294c94e99a4007d85ef8",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/anysearch.ts",
+      "path": "original/providers/anysearch.ts",
+      "sha256": "a4f7e1e7ec987fec10ab0640508563380a4279dbd4db297f9184d942e713d735",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/jina.ts",
+      "path": "original/providers/jina.ts",
+      "sha256": "a981b75bdb5e9fea5497ca01148c0fd61acfb6afde3658dc6bb92fda0f6b9be8",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/tinyfish.ts",
+      "path": "original/providers/tinyfish.ts",
+      "sha256": "afd392e279c574940c3cda43f6e09261e3d943d5be54395b103a88197858c26e",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/exa.ts",
+      "path": "original/providers/exa.ts",
+      "sha256": "da2b848cf706f809bad5ac8aa22f80f5dbd0fbf0fb11ae6aed502d35574f0cae",
+      "modified": false
+    },
+    {
+      "upstreamPath": "src/providers/firecrawl.ts",
+      "path": "original/providers/firecrawl.ts",
+      "sha256": "9ee89d5668053b853168b2c234685775cd95a2caf249806e2a982be85f0b205e",
+      "modified": false
+    }
+  ],
+  "npmTarball": "https://registry.npmjs.org/dsh-web-search-free/-/dsh-web-search-free-1.6.0.tgz",
+  "npmTarballSha256": "617377340e144f77c69dcd39d3d4c22680ce6dbdfe112dde6a93eb82b2abd896",
+  "verifiedInstalledSupplierFiles": 29
+}

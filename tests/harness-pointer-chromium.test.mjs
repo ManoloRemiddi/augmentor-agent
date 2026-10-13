@@ -10,7 +10,7 @@ import {tmpdir} from 'node:os';
 import {setTimeout as delay} from 'node:timers/promises';
 import {chromiumPort} from './fixtures/chromium-ready.mjs';
 import {harnessCdp} from './fixtures/harness-cdp.mjs';
-import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
+import {harnessPointerClick,harnessFramePointerClick} from './fixtures/harness-pointer.mjs';
 async function until(fn,label){const end=Date.now()+12000;while(Date.now()<end){if(await fn())return;await delay(30);}throw Error('Pointer fixture timeout: '+label);}
 test('real Chromium reobserves a replaced offscreen target before one pointer click',{skip:process.platform!=='linux',timeout:30000},async t=>{
  const profile=await mkdtemp(join(tmpdir(),'augmentor-pointer-chrome-'));let chrome,panel;
@@ -64,4 +64,15 @@ test('an original toast action remains clickable during its delayed fade hold',{
  assert.equal(await panel.evaluate('document.querySelector("#notice").getAnimations().some(a=>a.animationName==="dsh-toast-fade"&&a.effect.getComputedTiming().progress===null)'),true,'the original delayed fade is waiting');
  await harnessPointerClick(panel,'document.querySelector("#undo")',until);
  assert.deepEqual(await panel.evaluate('({count:receipts,present:!!document.querySelector("#undo"),waiting:document.querySelector("#notice").getAnimations().some(a=>a.animationName==="dsh-toast-fade"&&a.effect.getComputedTiming().progress===null)})'),{count:1,present:true,waiting:true});assert.deepEqual(panel.errors,[]);
+});
+
+// Independent motion reproduces the old two-space snapshot losing its click.
+test('a moving iframe and its inner control settle before one real frame click',{skip:process.platform!=='linux',timeout:30000},async t=>{
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-frame-pointer-'));let chrome,panel;
+ const child='<button id="target" style="position:fixed;left:30px;top:30px;width:60px;height:30px" onclick="parent.receipts++">Authored</button>';
+ const server=http.createServer((_,res)=>res.writeHead(200,{'content-type':'text/html'}).end('<!doctype html><title>Authored frame motion</title><iframe id="frame" style="position:fixed;left:60px;top:60px;width:300px;height:180px;border:0" srcdoc='+JSON.stringify(child.replaceAll('"','&quot;'))+'></iframe><script>globalThis.receipts=0;globalThis.move=()=>frame.animate([{transform:"translateX(0px)"},{transform:"translateX(120px)"}],{duration:150,fill:"forwards"});</script>'));server.listen(0,'127.0.0.1');await once(server,'listening');
+ t.after(async()=>{panel?.close();if(chrome?.pid&&chrome.exitCode===null){const end=once(chrome,'exit');chrome.kill('SIGTERM');await end;}server.closeAllConnections();await new Promise(done=>server.close(done));await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,'http://127.0.0.1:'+server.address().port],{stdio:'ignore'});let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'frame Chrome');const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(r=>r.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);await panel.call('Runtime.enable');await until(()=>panel.evaluate('!!document.querySelector("#frame")?.contentDocument?.querySelector("#target")'),'frame document');
+ const old=await panel.evaluate('(()=>{const a=frame.getBoundingClientRect(),b=frame.contentDocument.querySelector("#target").getBoundingClientRect();move();return {x:a.x+b.x+b.width/2,y:a.y+b.y+b.height/2}})()');await delay(170);for(const type of ['mousePressed','mouseReleased'])await panel.call('Input.dispatchMouseEvent',{type,...old,button:'left',clickCount:1});assert.equal(await panel.evaluate('receipts'),0,'old geometry cannot hit the moved frame');
+ await panel.evaluate('(()=>{frame.getAnimations().forEach(a=>a.cancel());move();})()');let dispatched=0;const actual=panel.call.bind(panel),delayed={evaluate:panel.evaluate.bind(panel),call:async(method,params)=>{if(method==='Input.dispatchMouseEvent'&&params.type==='mousePressed'){dispatched++;await delay(170);}return actual(method,params);}},inner=expression=>panel.evaluate('frame.contentWindow.eval('+JSON.stringify(expression)+')');await harnessFramePointerClick(delayed,inner,'document.querySelector("#frame")','document.querySelector("#target")',until);assert.equal(dispatched,1);assert.equal(await panel.evaluate('receipts'),1);assert.deepEqual(panel.errors,[]);
 });
