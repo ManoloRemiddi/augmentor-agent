@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified unselected privacy candidate](PI-PRIVACY.md#qualified-ordinary-and-immutable-candidate):
+runtime 4f017bf / private MX 20261013-145220-9a44aaaa has source/ordinary 432/432,
+five packaging cases each, 181 sealed checks and 23,918 verified entries. Current
+appearance selection below remains running, with Native busy/draft flags. No
+shutdown/activation is attempted; normal launch already opts out. Use a fresh idle
+comparator and normal guarded updater for later adoption. Live/fresh-user/public
+distribution/platform/CI and full migration qualification remain separate.
+
 [Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):
 runtime **97897cf**, private MX **20261013-142001-1f7f7f96**, product **0.2.13**,
 artifact **05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**,

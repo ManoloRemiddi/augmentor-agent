@@ -90,3 +90,31 @@ corrected comparator then observes the actual attribution defect. Both results
 are retained. The three predecessor header failures and corrected wire cases
 are distinct from full migration acceptance. Ordinary/immutable/installed
 qualification follows separately; selected/running MX remains 97897cf meanwhile.
+
+### Qualified ordinary and immutable candidate
+
+Implementation **4f017bf0852e92e665928d8771030e513d3b1aba** is staged separately
+as **20261013-145220-9a44aaaa**, product **0.2.13**, artifact
+**747ed46b92cf5ebf95ba42c3aa4b2039d3d87c72ea1be05b14f4c6cff4c5d826**.
+It is **qualified and unselected**. Source and separate ordinary each pass
+**432/432 across 81 files** plus five packaging cases. **181 sealed checks across
+22 files** pass using the actual candidate Node **24.19.0**, runtime/SDK/GUI and
+matching ordinary drivers. The candidate's **23,918** entries verify after tests;
+compiled runtime/GUI, bindings, licences and Node match ordinary inputs.
+
+All GUI inputs and runtime supplier source bytes match the preceding appearance
+artifact. The 151 npm instances/20,801 dependency files, nine native/Wasm binaries,
+786 licence/provenance files and 580 MIT/108 Apache records retain their bytes.
+No GUI/layout/control/CSS, supplier source, dependency or model/speech configuration
+changes. A fresh GUI rebuild qualifies through the original controls; temporary
+spreadsheet-overlay paths can change generated chunk names without changing GUI
+inputs. No selected release is patched.
+
+The current selected/running MX remains **97897cf / 20261013-142001-1f7f7f96**.
+A fresh maintenance read finds its Native online/model-ready with a busy/draft
+flag, and confirms the normal launcher already passes `PI_TELEMETRY=0`. The owner
+window/draft is left intact: no shutdown or activation is attempted. Adoption
+requires a new idle comparator and ordinary guarded maintenance/updater/startup
+verification; this candidate must not be forced into active work. Installed header
+acceptance, complete live/privacy/fresh-user/public distribution, platform and CI
+gates remain open. Source publication does not establish installed adoption.
