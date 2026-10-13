@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current Office packaging source review](HARNESS-OFFICE-PREVIEWS.md#linux-packaging-source-review--october-13)
+records exact private-preview source/notice validation and the remaining public
+corresponding-source/rebuild boundary. Existing preview artifacts are unchanged.
+
 [Qualified Metafolder navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate)
 records the original directory/keyboard/rail/view checks and retained installation boundary.
 

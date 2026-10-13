@@ -2,6 +2,11 @@
 
 [Original HTML previews](HARNESS-HTML-PREVIEWS.md) now supplies rendered HTML separately from Office conversion. Office/PDF engine and native supplier bytes/notices remain preserved; ordinary/installed qualification and full migration/public distribution gates stay distinct.
 
+[Linux packaging source review](#linux-packaging-source-review--october-13) now
+exports the exact Office engine notices and build sources through production
+staging. Private payload identity passes; public source/rebuild approval remains
+open. Existing installed and unselected runtime artifacts are unchanged.
+
 [Installed original spreadsheet previews](HARNESS-SPREADSHEET-PREVIEWS.md#ordinary-and-installed-mx-qualification--october-12): runtime 64d52917684307cb2a29c75e908209c83d4f06de, private MX 20261012-190657-be20be18, product 0.2.13, artifact 231dd41c550624399cea35a3c6e2d7244d938fb751c83d80373643f2b290e676, selected and running. Source and ordinary Node 24.19.0 each pass 301/301 across 58 files plus five notice/workspace cases. Actual installed original grid/warnings/sheets/readonly/scroll/reload/tab acceptance preserves native history with zero subsequent inference. Eleven prior histories, drafts/attachments, profile values/revision and model-router arguments are preserved; one additional empty Linux placeholder has no history or request. All 23,790 installed entries pass. MIT GUI is 527 files; Apache dsh-context remains 108. Full migration/live/privacy/public distribution/platform gates remain open; preceding selections below are historical checkpoints.
 
 # Original Harness Office previews
@@ -101,6 +106,67 @@ Public MPL engine/wrapper source, third-party notice/rebuild sufficiency and any
 native dependency qualification remain separate from private MX testing, as do
 the existing Sharp/libvips and Liberation-font gates. No public binary release
 or all-MIT product licence claim follows from this source change.
+
+## Linux packaging source review — October 13
+
+Implementation **647dd1a9d60ea53c716929481a3c28e19aa80615** adds
+`scripts/office_engine.py` to production staging and the Debian native inventory.
+The reviewed record now pins all **49 engine-package files**, including **39
+engine recipe/patch/source files**, and all **41 entry-package files**. It checks
+the locked npm integrity, installed package identity, complete file inventory,
+engine manifest/source/build identity and every hash. Missing, changed, linked
+or extra content is rejected. No supplier payload, dependency version, Office
+runtime, GUI, model or speech setting changes.
+
+Staging exports five original licence/notice bodies, the original engine manifest,
+the 39 source files and the reviewed build record into `licenses/office-engine`.
+The component inventory records **46 source/notice references** and explicitly
+marks public redistribution unqualified. Exported copies are verified against
+the reviewed package inputs; rehashing a local BUILD.json or relabelling the
+component cannot authorize changed bytes. This corrects the earlier broad
+`sourcesShipped` field: `engineBuildSourcesShipped` covers the shipped engine
+recipes, while the entry's preferred-source gate remains separately open.
+
+The actual preceding Debian exporter rejects the real staged `soffice.wasm` as
+an unreviewed filename. The new exporter first verifies its full source/notice
+bundle, then deliberately refuses public packaging with an explicit corresponding
+source/rebuild error. It does not whitelist Wasm globally or produce a public
+package from a private-preview identity. Changing approval labels alone cannot
+close the gate. Unknown native files remain rejected by the existing policy.
+
+The public source review is recorded in
+`release/office-engine-public-source-review.json`. At the October 13 inspection,
+the only public branch is master, commit **b19bb73c74ed893b8a5d1716d32df32a113ed31b**,
+whose entry package identifies itself as **0.1.3**. Both pinned npm **0.1.5**
+metadata records omit gitHead. Of the shipped 39 engine source files, **34 match**
+this public checkout, **two differ** (`engine/ui-resource-policy.mjs` and
+`docs/ui-resources.md`), and **three generated build/source files** have no same
+path there. The archive and differing files have exact recorded hashes. The npm
+entry package contains compiled JavaScript/declarations, without preferred
+TypeScript source. A version difference alone does not prove a compiled-code
+difference, and this snapshot comparison does not prove no other source exists;
+it does not establish corresponding source for the exact 0.1.5 entry either.
+
+The supplier describes the source/build materials carried with its engines in
+[the public repository](https://github.com/deepseek-ai/dsh-libreoffice-kit).
+[Mozilla's MPL guidance](https://www.mozilla.org/en-US/MPL/2.0/FAQ/)
+explains informing recipients where to obtain covered source. The exported engine
+recipes and licence texts establish identity; the exact entry source, engine
+rebuild and full linked third-party obligations still need qualification.
+
+Validation on MX/Linux: **nine new Office packaging cases**, four existing Codex
+packaging cases, eight QuickJS packaging cases and three nested-notice cases pass.
+Fresh `stage-production.py` completes with **151 npm instances**; its four actual
+staged WebSocket security cases pass. All **eight native dependency files** match
+the preceding ordinary navigation candidate before Node is added. Private-source
+boundary and version checks pass. These **28 focused cases** and fresh staging
+are packaging evidence, not another full GUI cohort or a new installed artifact.
+
+The selected appearance runtime **97897cf** and unselected navigation runtime
+**dfcdfb9 / 20261013-190500-3bf1e21f** remain as previously qualified. No activation,
+shutdown, public binary release or DSH retirement occurs. Public Debian packaging,
+Sharp/libvips/font and declaration-notice obligations, owner/plugin/live acceptance
+and the full migration remain open. Further OS work awaits owner MX feedback.
 
 ## Qualification and remaining work
 

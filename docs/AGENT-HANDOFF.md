@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Office production source/notice validation](HARNESS-OFFICE-PREVIEWS.md#linux-packaging-source-review--october-13),
+implementation **647dd1a**, passes **28 focused packaging/security cases** and fresh
+151-instance production staging. It pins 49 engine/41 entry files and exports the
+39 engine source/recipe files with original notices; all eight dependency-native
+files retain preceding ordinary bytes. The public source snapshot identifies
+entry 0.1.3 while npm is 0.1.5, and two shipped engine source files differ. Exact
+entry preferred-source and engine rebuild qualification remain open. Debian now
+verifies the bundle and explicitly refuses public redistribution; no Wasm-wide
+exception or binary release occurs. Installed 97897cf, its Native draft and the
+unselected dfcdfb9 navigation candidate remain unchanged. Full migration gates
+remain open; this packaging scope is distinct from previous GUI qualification.
+
 [Metafolder navigation follow-up](HARNESS-METAFOLDERS.md#navigation-follow-up--october-13)
 repairs the actual staged collapsed-rail Search gap without changing original UI
 geometry/CSS. Strict check/build and 12 focused cases pass; folder/Home/Up/hidden,
