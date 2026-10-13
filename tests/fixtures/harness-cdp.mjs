@@ -19,7 +19,12 @@ export async function harnessCdp(url){
     if(row){pending.delete(frame.id);clearTimeout(row.timer);frame.error?row.reject(Error(frame.error.message)):row.resolve(frame.result);}
   });
   const call=(method,params={},sessionId)=>new Promise((resolve,reject)=>{const key=++id,timer=setTimeout(()=>{pending.delete(key);reject(Error('CDP timeout: '+method));},10000);pending.set(key,{resolve,reject,timer});ws.send(JSON.stringify({id:key,method,params,...(sessionId?{sessionId}:{})}));});
-  return Object.assign(api,{call,async reload(){
+  return Object.assign(api,{call,async navigate(url){
+    const key='__augmentor_test_navigation_'+crypto.randomUUID().replaceAll('-','');await api.evaluate('globalThis['+JSON.stringify(key)+']=true');
+    const result=await call('Page.navigate',{url});if(result.errorText)throw Error('CDP navigation failed: '+result.errorText);
+    const end=Date.now()+10000;while(Date.now()<end){try{if(await api.evaluate('globalThis['+JSON.stringify(key)+']===undefined&&document.readyState==="complete"'))return;}catch{}await new Promise(resolve=>setTimeout(resolve,30));}
+    throw Error('CDP navigation did not replace and finish the document');
+  },async reload(){
     const key='__augmentor_test_reload_'+crypto.randomUUID().replaceAll('-','');await api.evaluate('globalThis['+JSON.stringify(key)+']=true');await call('Page.reload');
     const end=Date.now()+10000;while(Date.now()<end){try{if(await api.evaluate('globalThis['+JSON.stringify(key)+']===undefined&&document.readyState==="complete"'))return;}catch{}await new Promise(resolve=>setTimeout(resolve,30));}
     throw Error('CDP reload did not replace the document');

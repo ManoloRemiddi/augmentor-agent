@@ -106,7 +106,8 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  const projectRow='Array.from(document.querySelectorAll("[data-row-key]")).find(x=>x.dataset.rowKey.includes('+JSON.stringify(project)+'))';
  await visible(projectRow);await hover(projectRow);await click(projectRow+'.querySelector("button[aria-label^=\\"Workspace actions for\\"]")');
  await click('Array.from(document.querySelectorAll("[role=menuitem]")).find(x=>x.textContent==="Rename")');
- await visible('document.querySelector("input[aria-label=\\"Workspace name\\"]")');await panel.call('Input.insertText',{text:'Research'});
+ const renameInput='document.querySelector("input[aria-label=\\"Workspace name\\"]")';await visible(renameInput);await click(renameInput);await visible('document.activeElement==='+renameInput);
+ await panel.call('Input.dispatchKeyEvent',{type:'keyDown',key:'a',code:'KeyA',windowsVirtualKeyCode:65,modifiers:2});await panel.call('Input.dispatchKeyEvent',{type:'keyUp',key:'a',code:'KeyA',windowsVirtualKeyCode:65,modifiers:2});await panel.call('Input.insertText',{text:'Research'});await visible(renameInput+'.value===\"Research\"');
  await click('Array.from(document.querySelectorAll("[role=dialog] button")).find(x=>x.textContent==="Rename")');await visible(projectRow+'.textContent.includes("Research")');
  const catalog=await rpc('workspace.list');assert.equal(catalog.items.find(x=>x.cwd===project).title,'Research');
  await rpc('workspace.move',{workspaceId:project,beforeWorkspaceId:link.workspace,expectedRevision:catalog.revision});await panel.reload();

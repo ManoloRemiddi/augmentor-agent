@@ -1,9 +1,29 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Repeat preparation within the caller's deadline; never retry a dispatched click.
+// Original rail/dock controls can remain hit-testable while their positions move.
 export async function harnessPointerClick(panel,expression,until){
  let point,diagnostic;
  try{await until(async()=>{
-  const result=await panel.evaluate('(async()=>{const find=()=>('+expression+');const describe=e=>e?{tag:e.tagName,id:e.id,text:e.textContent?.slice(0,100)}:null;let e=find();const fail=reason=>({reason,target:describe(e),viewport:{width:innerWidth,height:innerHeight}});if(!e||!e.isConnected||e.disabled)return fail("unavailable");const original=e;e.scrollIntoView({block:"center",inline:"nearest"});await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));e=find();if(e!==original||!e?.isConnected||e.disabled)return fail("changed during scroll");const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(!r.width||!r.height||!e.contains(hit))return {...fail("center not hit"),rect:{x:r.x,y:r.y,width:r.width,height:r.height},hit:describe(hit)};return {point:{x,y}};})()');
+  const result=await panel.evaluate(`(async()=>{
+   const find=()=>(${expression});
+   const describe=e=>e?{tag:e.tagName,id:e.id,text:e.textContent?.slice(0,100)}:null;
+   let e=find();const fail=reason=>({reason,target:describe(e),viewport:{width:innerWidth,height:innerHeight}});
+   if(!e||!e.isConnected||e.disabled)return fail("unavailable");
+   const original=e;e.scrollIntoView({block:"center",inline:"nearest"});let previous=e.getBoundingClientRect();
+   for(let frame=0;frame<2;frame++){
+    await new Promise(requestAnimationFrame);e=find();
+    if(e!==original||!e?.isConnected||e.disabled)return fail("changed during scroll");
+    const next=e.getBoundingClientRect();
+    if(["x","y","width","height"].some(key=>Math.abs(next[key]-previous[key])>.1))return fail("control geometry is moving");
+    previous=next;
+   }
+   for(let ancestor=e;ancestor;ancestor=ancestor.parentElement){
+    if(ancestor.getAnimations().some(animation=>{const timing=animation.effect?.getComputedTiming();return (animation.playState==="running"||animation.pending)&&Number.isFinite(timing?.endTime)&&timing.progress!==null;}))return fail("finite control or ancestor animation is active");
+   }
+   const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);
+   if(!r.width||!r.height||!e.contains(hit))return {...fail("center not hit"),rect:{x:r.x,y:r.y,width:r.width,height:r.height},hit:describe(hit)};
+   return {point:{x,y}};
+  })()`);
   diagnostic=result;point=result?.point;return !!point;
  },'pointer ready: '+expression);}catch(error){error.message+=' '+JSON.stringify(diagnostic);throw error;}
  await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});

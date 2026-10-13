@@ -90,6 +90,8 @@
     "tests/harness-metafolders.test.mjs",
     "tests/harness-metafolders-chromium.test.mjs",
     "tests/pi-browser-chromium.test.mjs",
-    "tests/harness-metafolder-navigation-chromium.test.mjs"
+    "tests/harness-metafolder-navigation-chromium.test.mjs",
+    "tests/harness-pointer-chromium.test.mjs",
+    "tests/harness-navigation-chromium.test.mjs"
   ]
 }
