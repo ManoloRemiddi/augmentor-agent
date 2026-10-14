@@ -20,9 +20,9 @@ their empty private state, before starting their Host. A bounded read-only
 `memory.dual.describe` exchange must confirm the actual child PID and absent
 engine configuration. The service stays alive across cold Host reopen and is
 stopped after the Host during fixture cleanup. No owner configuration, engine,
-provider key, transcript or private source is imported. Failed startup cleans
-only those owned fixture processes/directories. Disconnected, oversized, invalid
-or different-owner responses cannot grant readiness.
+provider key, transcript or private source is imported. Failed memory readiness
+cleans only those owned fixture processes/directories. Disconnected, oversized,
+invalid or different-owner responses cannot grant readiness.
 
 The same 1,500 ms barrier with confirmed readiness passes **2/2**, as does the
 normal focused pair. Existing one-second product activity bounds, warnings,
@@ -39,7 +39,45 @@ history/request diagnostics on a second-proposal timeout. No text/prompt/click
 is replayed. The preceding hosted **second held proposal** timeout is still
 unresolved; successful local runs do not establish its cause or fix. No editor,
 Trajectory projection or runtime behavior is changed on that assumption.
-Wider exact-source/ordinary and new-head hosted qualification is pending.
+
+At **0b72246f9215b5a84d7d46e4951fa42c556da86c**, strict type/version/source-boundary
+checks and source/fresh ordinary **252/252 each across 62 files** pass, including
+all **44 Harness Chromium files** and the eight explicit native Office cases.
+Both runs retain two workers, existing deadlines and zero skips/cancellations.
+All **921 compiled files** match each other and the preceding qualified native
+tree; **2,047 executable source/test/fixture files** match the ordinary copy.
+The **20,847 dependency entries**, 155 production npm instances and bundled
+Node **24.19.0** remain unchanged. Eleven packaging/source-boundary cases pass
+with the public Office gate still closed. Read-only postflight verifies the
+current/prior review inventories (**24,305/24,288 entries**), all four review
+processes, selected configuration and 38 pre-existing canonical changes, with
+Qwen models HTTP 200. No owner history, credentials or draft is read.
+
+The preceding unchanged application head **b6f0155** [Validate 38635451143](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38635451143)
+passes both named Trajectory tests but fails the shared prompt editor's
+**cancel delete confirmation** wait: main Node **1,201 pass / one fail / 29
+identified skips**, zero cancellation. This does not resolve the older second
+held-proposal cause or qualify that prompt-editor failure. Its
+[SDK 38635451187](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38635451187)
+passes Linux/macOS/Windows and [Windows desktop 38635451053](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38635451053)
+passes; separate Windows command/native and macOS feasibility workflows fail.
+New-head hosted, installed/physical, complete memory/recovery and wider migration
+qualification remain open. This fixture change makes no platform feature or
+adapter change and is not an installed update or release.
+
+[Portable scope/count record](../release/harness-trajectory-readiness.json)
+identifies the exact cohort without private paths, processes or transcripts.
+The focused test command uses the normal development prerequisites:
+
+```sh
+node --test --test-concurrency=2 tests/harness-nested-tools-chromium.test.mjs tests/harness-tool-arguments-chromium.test.mjs
+```
+
+`AUGMENTOR_HARNESS_PROOF_MEMORY_START_DELAY=1500` exercises the same startup
+barrier with confirmed readiness. Adding
+`AUGMENTOR_HARNESS_PROOF_MEMORY_READY=0` deliberately selects the retained
+on-demand comparator; its final strict stderr assertion is expected to fail.
+These flags belong only to authored fixtures, not product configuration.
 
 ## New Session input ownership — October 14
 
