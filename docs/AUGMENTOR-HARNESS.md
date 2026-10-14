@@ -606,6 +606,11 @@ health return 200; Qwen retains two slots with **262,144** context each. No serv
 restart or model/speech/GPU setting occurs. New-head hosted and full migration/
 installed/public-distribution gates remain open.
 
+Other preceding 60b7c54 workflows: SDK platform **38556138697** passes;
+Windows desktop **38556138822**, command **38556138802**, qualification
+**38556138648** and macOS **38556138837** fail. This Linux listener correction
+does not establish their causes or full new-head hosted/platform acceptance.
+
 ## Instruction source links — October 14
 
 The managed context observer now adds an optional `instructionSources` snapshot
