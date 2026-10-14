@@ -1491,3 +1491,6 @@ restored newer drafts with two initial wire requests/one read and no replay. The
 old immutable 1feaac8 fails the duplicate-click case. Closing the original error
 modal and waiting for a ready composer are user lifecycle steps, not relaxed
 assertions. Cold unconfirmed-operation recovery and broader migration remain open.
+
+
+The October 14 [account private-storage fixture correction](../docs/HARNESS-MODEL-ACCOUNTS.md#hosted-private-storage-fixture-correction) uses an uncreated private child through the shared OS adapter. ce22's real Windows inherited-ACL temporary-root refusals are retained; Linux/macOS hosted contracts pass. The corrected Linux common account/runtime/scope 24/24 pass. Windows must also preserve refusal of the ordinary parent and native verification of the actual receipt; new-head hosted confirmation is pending. Production runtime/compiled/GUI and sealed review bytes remain unchanged.

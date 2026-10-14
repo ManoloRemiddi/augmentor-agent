@@ -7,6 +7,51 @@ operator link is supplied privately in the chat/browser panel, never in this
 repository. The installed desktop preview, its draft and the earlier feedback
 profile keep their own settings and history.
 
+## Current separate review — account controls, October 14
+
+The newer private review is **20261014-185647-8f0be3ed**, product **0.2.13** /
+Pi **1.1.0**, public source **ce22aada5865fb72cb2ecedf895a0cc6496bcaf8** and
+tested application **039308ef0c7dee6e9089789f3652ef7590e31d10**. Its artifact is
+**284285891fa618ff29cff2922f5689f0d1b892fa288f9ef451e6c4637c8b42ff**, with
+**24,305 inventory entries**. It includes the original DSH account sign-in/sign-out
+dialogs and later Pi keep-original draft guidance; the latter's
+[semantic/live limits](AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14)
+remain separate from this owner-profile check.
+
+The immediate verified base is the earlier 14:51 review described below. Exactly
+35 reviewed public artifact files and the full **911-file compiled tree** overlay
+that base. Dependencies (155 production npm instances), Node **24.19.0**,
+components and **846 notice files** retain their complete byte/link inventory.
+Provenance explicitly records this composition; this is a private review artifact,
+not a newly distributed release or a claim of a fresh installer build.
+
+Source, fresh ordinary and the sealed-candidate-selected 60-file cohort each pass
+**236/236**, including all 44 Harness Chromium files, with two workers, unchanged
+existing deadlines, no skips or cancellations. Candidate-selected drivers/static
+imports run from the test checkout; actual Host/Harness/native targets use the
+sealed candidate, and direct-import compiled bytes match it exactly. The full
+24,305-entry inventory verifies after that cohort and after runtime/browser startup.
+No selected or sealed artifact is patched to obtain those results.
+
+The new empty profile uses the same local Qwen model/context/output declaration,
+read-only preset, keyless Search and local diagnostic capture. It imports no
+personal credentials, conversations, MCP, voice or memory-engine configuration.
+Actual Chromium pointer/keyboard QA confirms the original empty start page, both
+Augmentor marks, Settings → Models, **nine registered sign-in choices**, no stored
+OAuth account and the original sign-in confirmation opening/closing. It does not
+press the confirmation's Sign in action: **zero SDK logins, model requests, tool
+actions, sessions, active turns or drafts** are created during this owner QA.
+There are no browser errors or failed responses. Runtime executable/PID/profile,
+private descriptor/socket modes and product/SDK are confirmed locally.
+
+The existing 14:51 review's full 24,288-entry artifact verifies unchanged and its
+process remains running, along with the two preceding review processes. The
+installed preview/selection and retained draft are preserved. The new private
+operator link is supplied only in chat; the browser opening is queued for this
+chat and is not evidence of owner interaction. Test **New Session**, Models,
+Trajectory and Context at the supplied link. Real provider login, subscriptions,
+physical/installed rollout and complete migration remain unqualified.
+
 ## Start testing
 
 Open the review link and choose **New Session**. The original DSH start page
@@ -31,7 +76,7 @@ observes the legitimate disabled start-page composer. A malformed selector in th
 first external QA driver was corrected without restarting the owner runtime or
 submitting any model/tool work; that preparation failure is retained separately.
 
-## Artifact and qualification — October 14 refresh
+## Earlier review — October 14, 14:51 refresh
 
 - Product **0.2.13**, Pi SDK **1.1.0**; public source
   **9f5bc70a2aac9a974aa656cfadd53cca08737048**, tested application change
@@ -105,6 +150,8 @@ and public distribution remain separate. DSH is retained; the full Harness migra
 is still active.
 
 The later [Pi keep-original draft guidance](AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14)
-is source-qualified separately and is **not** in this running review artifact.
+is source-qualified separately and is **not** in the earlier 14:51 artifact. The
+new account-controls review above includes it; that does not establish semantic
+or latency acceptance.
 Its live functional checks do not resolve semantic/timing acceptance; no review
 profile or immutable release is patched to adopt it.

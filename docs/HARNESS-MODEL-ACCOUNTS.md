@@ -4,8 +4,9 @@
 
 The source candidate adds supported Pi OAuth sign-in to the original DSH sign-in
 and sign-out dialogs. MX Linux remains the first owner-testing target. The current
-running review and selected installation are preserved; this source change is not
-an installed update. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict
+earlier review and selected installation are preserved. A newer
+[separate MX review](HARNESS-MX-REVIEW.md#current-separate-review--account-controls-october-14)
+now includes these controls; the selected installed preview is unchanged. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict
 check/build, focused **41/41 across seven files** and full source/fresh ordinary
 **236/236 each across 60 files** pass, including all 44 Harness Chromium files.
 The cohort uses two workers, unchanged existing deadlines and no skips or
@@ -235,8 +236,9 @@ unchanged dependency entries, 155 production npm instances and bundled Node
 review's full 24,288-entry inventory, artifact identity and process remain intact,
 as do earlier review processes and the installed selection. Read-only local-Qwen
 catalog access responds successfully. No owner credentials/conversations are
-copied, no installed artifact is patched, and this account feature is not yet
-installed in the running review. Production model/speech settings remain intact.
+copied and no installed artifact is patched. That initial source checkpoint did
+not update the then-running review; the later separate MX review linked above
+now includes the feature. Production model/speech settings remain intact.
 
 At the preceding published c9d872f checkpoint, hosted SDK platform and Windows
 desktop jobs pass. Validate passes the GUI/core/native checks and then refuses
@@ -246,3 +248,21 @@ results do not qualify the new sign-in source; its new-head hosted results remai
 pending. The independent Debian 13 Office attempt reaches final WebAssembly
 linking but exits 1 with OOMKilled=true at its 6 GiB limit; its failed state is
 retained, with no engine receipt/output qualification or release-gate relaxation.
+
+## Hosted private-storage fixture correction
+
+At **ce22aada5865fb72cb2ecedf895a0cc6496bcaf8**, hosted SDK contracts pass on
+Linux and macOS, but Windows fails eight account-login cases before SDK admission
+and reports a private-record refusal. The test fixture supplied Node's pre-existing
+ordinary temporary directory, whose inherited ACL does not meet the existing
+Windows protected-owner ACL contract. The native adapter refuses it as designed;
+no product permission check is relaxed.
+
+The fixture now creates an uncreated private child through the existing shared
+`privateDir` adapter. Windows additionally checks that the ordinary temporary
+parent is still refused and that the actual saved receipt passes native private-
+file verification. Linux's corrected common account/runtime/scope **24/24** pass.
+The new hosted Windows run must confirm the corrected fixture; prior failures
+and Linux/macOS successes remain separate evidence. Production runtime, compiled
+files, original GUI and the sealed review artifact are unchanged by this test-only
+correction. Physical Windows and real account/provider acceptance remain open.
