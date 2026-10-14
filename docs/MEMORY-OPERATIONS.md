@@ -17,6 +17,13 @@ The installer needs Docker and an existing local compatible model endpoint.
 It does not install or reconfigure the model server. Use `augmentor-update` for installed artifacts; preserve matching DSH integration.
 Fresh package/source sessions can journal text before the engine is configured.
 
+The controlled installer sets `HINDSIGHT_API_LLM_TIMEOUT` to the shared managed
+call ceiling (45 seconds), including Reflect's inherited timeout. This aligns
+pinned Hindsight 0.10.0 with the existing gateway limit; it does not extend batch
+budgets or enable retries. Existing incompatible running engines are refused;
+use deliberate maintenance rather than silently replacing production. See
+[selection and timeout evidence](CONTROLLED-MEMORY.md#extracted-claims-and-engine-deadlines--october-14).
+
 The companion initializes its journal, schema and processing configuration before
 publishing its local endpoint. A client must not connect to an uninitialized
 service and spend its response timeout waiting for durable startup I/O. A gated

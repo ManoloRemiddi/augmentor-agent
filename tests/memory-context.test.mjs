@@ -38,3 +38,15 @@ test('page headings do not consume fact slots or displace personal reply prefere
 test('a page fragment containing a heading and factual text remains verbatim',()=>{
  const content='## Atlas database\nAtlas uses SQLite.';const selected=selectContinuity({work:{pages:[{name:'Current project state',content}]}},'Atlas database');assert.equal(selected[0].content,content);
 });
+test('eligible extracted claims take precedence over synthesized pages in the same scope',()=>{
+ const value={relationship:{pages:[{name:'Preferences and boundaries',content:'No preferred reply style is recorded.\n\nNo concise reply preference is recorded.\n\nThere are no supported communication preferences.\n\nThe current preferred reply style is unknown.'}],items:[{id:'preference',text:'User prefers concise replies.'},{id:'boundary',text:'User asked Augmentor not to start downloads.'}]},work:{items:[{id:'database',text:'Atlas uses SQLite as its database.'}]}};
+ const selected=selectContinuity(value,'State the Atlas database and my preferred reply style using recalled memory.');
+ assert(selected.some(row=>row.source==='preference'),'synthesized page prose cannot crowd out the extracted preference');
+ assert(selected.some(row=>row.source==='boundary'));assert(selected.some(row=>row.source==='database'));
+ assert(!selected.some(row=>row.content.includes('is recorded')),'pages remain available through explicit recall rather than contradicting eligible extracted claims in the automatic brief');
+ assert(selected.every(row=>row.provenance==='derived claim; authorization and verification not established'));
+});
+test('pages remain a fallback when a scope has no eligible extracted claims',()=>{
+ const value={work:{pages:[{name:'Current project state',content:'Atlas uses SQLite as its database.'}],items:[{text:'The unrelated renderer uses Vulkan.'}]}};
+ const selected=selectContinuity(value,'Atlas database');assert.equal(selected.length,1);assert.equal(selected[0].content,'Atlas uses SQLite as its database.');
+});

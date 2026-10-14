@@ -2,6 +2,45 @@
 
 # Context selection and controlled memory processing
 
+## Extracted claims and engine deadlines — October 14
+
+Following **83a4ce14aba52f89f97664106dcc5a14097523ca**, automatic brief selection
+prefers eligible extracted claims over generated pages in the same relationship
+or work scope. A real synthetic Hindsight/Qwen run completed all six processing
+stages but its generated page said there were no preferences, while independently
+cached items contained the requested concise-reply preference. Page prose displaced
+that item; Qwen consequently answered that no preference was recorded. Completion
+and a non-stale page flag did not establish semantic correctness.
+
+Selection now uses eligible extracted items for that scope when available;
+otherwise eligible page/legacy fragments remain a fallback. Explicit recall still
+exposes the pages. Heading-only fragments are excluded from automatic selection;
+heading-plus-fact blocks remain verbatim. These are deterministic local selection
+rules, not a truth classifier or permission grant. The four-claim, 1,800-character
+excerpt and 6,000-character complete brief limits, unverified labels, direct user
+receipts and historical native snapshots remain unchanged. Full semantic coverage
+and contradictory/superseded claim resolution remain open.
+
+The installer explicitly sets Hindsight's global LLM timeout to the existing
+**45-second** managed call ceiling. Pinned Hindsight 0.10.0 otherwise gives Reflect
+its own **30-second** default despite the longer global default. An earlier live
+page update stopped at phase four with a single-attempt API timeout and remaining
+budget; the job remains stopped. This correction does not increase the existing
+call/batch/window/token budgets, enable autonomous workers/retries or restart the
+production engine. An incompatible existing running engine still requires explicit
+operator maintenance through the installer's existing checks.
+
+Strict check/build and focused SDK/context/client/provenance **18/18** pass.
+A synthetic regression fails before the extracted-claim correction; heading,
+verbatim fragment and page-fallback checks remain. The installer/common memory
+Python cohort at 83a4ce1 passes **30/30**. Final combined source/ordinary and new
+actual Pi/Hindsight/Qwen acceptance are pending; earlier 175/175 results at 83a4ce1
+qualify only its heading/deadline changes. The shared Node selector applies to
+Pi/DSH consumers; the Python installer affects supported Docker engine setup.
+Actual macOS/Windows engine/transport, installed and owner feedback acceptance
+remain separate. The selected preview/draft, Search candidate, feedback profile
+and production model/speech/memory configuration are preserved.
+
 ## Native managed-memory request snapshots — October 14
 
 Source **6027df00dc0456b2b63b5263b402ba0f5761997d** closes the managed-brief
