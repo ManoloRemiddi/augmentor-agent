@@ -13,11 +13,13 @@ import os
 from pathlib import Path
 import re
 import resource
+import select
 import shutil
 import signal
 import stat
 import subprocess
 import sys
+import time
 import unicodedata
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
@@ -254,6 +256,124 @@ def parent_death(expected: int) -> None:
         raise InterruptedError('Office owner exited before admission.')
 
 
+def remove_owned_root(root: Path, identity: tuple[int, int]) -> None:
+    try:
+        current = root.lstat()
+    except FileNotFoundError:
+        return
+    if not stat.S_ISDIR(current.st_mode) or current.st_uid != os.getuid() or stat.S_IMODE(current.st_mode) != 0o700 or (current.st_dev, current.st_ino) != identity:
+        raise Failure('failed')
+    shutil.rmtree(root)
+
+
+def start_cleanup_guard(root: Path, identity: tuple[int, int], owner: int) -> tuple[int, int]:
+    """Acquire exact process handles before copying any document/font bytes.
+
+    The guard has its own session and remains responsive if the conversion
+    group is stopped/killed. It never scans directories or replays conversion.
+    Its stdout handle also keeps Node's close barrier held until cleanup ends.
+    """
+    if owner <= 1 or os.getppid() != owner or not shutil.rmtree.avoids_symlink_attacks or not callable(getattr(os, 'pidfd_open', None)) or not callable(getattr(signal, 'pidfd_send_signal', None)):
+        raise Failure('unavailable')
+    descriptors = []
+    try:
+        owner_fd = os.pidfd_open(owner)
+        descriptors.append(owner_fd)
+        broker_fd = os.pidfd_open(os.getpid())
+        descriptors.append(broker_fd)
+        ready_read, ready_write = os.pipe2(os.O_CLOEXEC)
+        descriptors.extend((ready_read, ready_write))
+        done_read, done_write = os.pipe2(os.O_CLOEXEC)
+        descriptors.extend((done_read, done_write))
+        guard = os.fork()
+    except (AttributeError, OSError):
+        for descriptor in descriptors:
+            os.close(descriptor)
+        raise Failure('unavailable') from None
+    if guard == 0:
+        code = 1
+        try:
+            os.close(ready_read)
+            os.close(done_write)
+            os.close(0)  # No document/request input is retained by the guard.
+            os.setsid()
+            libc = ctypes.CDLL(None, use_errno=True)
+            if libc.prctl(15, ctypes.c_char_p(b'aug-office-gc'), 0, 0, 0) != 0:
+                raise Failure('unavailable')
+            cancelled = False
+
+            def cancel(_signum, _frame):
+                nonlocal cancelled
+                cancelled = True
+
+            signal.signal(signal.SIGTERM, cancel)
+            signal.signal(signal.SIGINT, cancel)
+            os.write(ready_write, b'R')
+            os.close(ready_write)
+            terminate_at = None
+            forced = False
+            while True:
+                watched = [owner_fd, broker_fd] + ([done_read] if done_read is not None else [])
+                ready, _, _ = select.select(watched, [], [], 0.05)
+                if done_read is not None and done_read in ready:
+                    completed = os.read(done_read, 1)
+                    if completed == b'C':
+                        break  # Broker's subprocess/final cleanup has settled.
+                    # EOF after hard broker loss is not proof of settled writes;
+                    # keep the exact broker descriptor in the exit barrier.
+                    os.close(done_read)
+                    done_read = None
+                if broker_fd in ready:
+                    break
+                if cancelled or owner_fd in ready or done_read is None:
+                    if terminate_at is None:
+                        try:
+                            signal.pidfd_send_signal(broker_fd, signal.SIGTERM)
+                        except ProcessLookupError:
+                            pass
+                        terminate_at = time.monotonic() + 2
+                    elif not forced and time.monotonic() >= terminate_at:
+                        try:
+                            signal.pidfd_send_signal(broker_fd, signal.SIGKILL)
+                        except ProcessLookupError:
+                            pass
+                        forced = True
+            remove_owned_root(root, identity)
+            code = 0
+        except BaseException:
+            # Refuse an unknown/replaced root; no diagnostic body or path leaves
+            # this process, and the live Node parent retains its own fallback.
+            pass
+        finally:
+            os._exit(code)
+    os.close(owner_fd)
+    os.close(broker_fd)
+    os.close(ready_write)
+    os.close(done_read)
+    try:
+        if not select.select([ready_read], [], [], 5)[0] or os.read(ready_read, 1) != b'R':
+            raise Failure('unavailable')
+    except BaseException:
+        os.close(done_write)
+        raise
+    finally:
+        os.close(ready_read)
+    return guard, done_write
+
+
+def finish_cleanup_guard(guard: tuple[int, int]) -> None:
+    pid, descriptor = guard
+    try:
+        os.write(descriptor, b'C')
+    except BrokenPipeError:
+        pass
+    finally:
+        os.close(descriptor)
+    _, status = os.waitpid(pid, 0)
+    if status != 0:
+        raise Failure('failed')
+
+
 def main(root: Path) -> dict:
     source_data = sys.stdin.buffer.read(256 * 1024 + 1)
     if len(source_data) > 256 * 1024:
@@ -311,8 +431,10 @@ if __name__ == '__main__':
     resource.setrlimit(resource.RLIMIT_AS, (2 * 1024**3, 2 * 1024**3))
     root = None
     identity = None
+    guard = None
     try:
         root, identity = owned_root(sys.argv)
+        guard = start_cleanup_guard(root, identity, int(sys.argv[1]))
         parent_death(int(sys.argv[1]))
         print(json.dumps(main(root)), flush=True)
     except Failure as error:
@@ -325,10 +447,9 @@ if __name__ == '__main__':
         # A repeated graceful signal must not interrupt owned scratch cleanup.
         # The surviving parent can still force the entire group if necessary.
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
-        if root is not None:
-            try:
-                current = root.lstat()
-                if stat.S_ISDIR(current.st_mode) and (current.st_dev, current.st_ino) == identity:
-                    shutil.rmtree(root)
-            except FileNotFoundError:
-                pass
+        try:
+            if root is not None:
+                remove_owned_root(root, identity)
+        finally:
+            if guard is not None:
+                finish_cleanup_guard(guard)

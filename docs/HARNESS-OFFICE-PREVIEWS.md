@@ -11,6 +11,55 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Independent native scratch cleanup — October 14
+
+The preceding native adapter still leaves a real document/font/profile copy
+after simultaneous Node-owner and broker-group loss. If the conversion tree is
+stopped when its owner dies, it also cannot settle or clean up. Two real-native
+comparators against **271e1aedba84976129f00490b96f27f0893357af** demonstrate the
+retained directory and stopped-process barrier failure. Their inputs are authored
+fixtures, and cleanup signals target only proven owned processes.
+
+Before reading/copying document or font bytes, the trusted broker now acquires
+Linux process descriptors for its actual Node owner and itself, then starts a
+small private cleanup guard. The guard confirms readiness in its own session,
+outside the conversion process group. Owner loss requests graceful broker exit;
+an unresponsive broker is killed after the existing two-second grace period.
+The exact broker descriptor remains an exit barrier. On normal work, the broker
+joins its guard after final subprocess/root cleanup. On hard broker loss, the
+guard holds stdout open until owned scratch cleanup settles, retaining Node's
+existing close/capacity barrier. No conversion or unknown action is replayed.
+
+Python's [process descriptor](https://docs.python.org/3/library/os.html#os.pidfd_open)
+and [descriptor signalling](https://docs.python.org/3/library/signal.html#signal.pidfd_send_signal)
+APIs avoid signalling a reused numeric PID. Unsupported APIs fail before document
+work; there is no weaker fallback. The guard receives existing root/device/inode
+and process ownership metadata, not document/request input. It removes only the
+confirmed private directory and uses Python's
+[descriptor-protected recursive removal](https://docs.python.org/3/library/shutil.html#shutil.rmtree).
+A changed link, identity, owner or mode is refused. It neither scans a temporary
+directory nor deletes a caller-owned input/PDF or a moved/unknown root.
+
+Focused **11/11** real/common cases pass. New scenarios freeze the renderer then
+kill the actual owner and stopped broker group, or freeze all conversion actors
+then kill their owner. The independently owned guard drains the observed actors
+and removes the actual copied document/fonts/profile, leaving the original
+fixture intact and publishing no PDF. Another real case replaces the scratch
+directory's identity and verifies its new data and the moved original survive.
+The latter is refusal evidence, not recovery of the moved directory. The existing
+hard-stop case still freezes the same broker/monitor/renderer actors; its new
+independent guard remains responsive. Tests confirm that guard's separate session.
+
+Exact-ref source/ordinary/original-viewer qualification remains pending at this
+implementation checkpoint. The pinned kit remains default and the native backend
+stays an explicit Linux x64 development opt-in. GUI/CSS/supplier source, converter
+contract, dependency pins and running/selected artifacts are unchanged.
+Guardian loss or stall, allocation before guard readiness, successful caller-PDF
+and original provider outer-scratch crash recovery, power loss/durable indexing,
+font/layout/security/distribution and other OS adapters remain required. This
+improves two known native-scratch failures without qualifying all crash privacy or
+promoting a native default, installed review, binary or DSH retirement.
+
 ## Native forced cleanup and parent ownership — October 14
 
 A new real-native regression freezes the **owned broker, monitors and renderer**

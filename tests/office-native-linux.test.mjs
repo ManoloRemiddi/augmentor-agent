@@ -1,11 +1,11 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mkdtemp,writeFile,readFile,rm,readdir,stat} from 'node:fs/promises';
+import {mkdtemp,writeFile,readFile,rm,readdir,stat,mkdir,rename} from 'node:fs/promises';
 import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFile,spawn} from 'node:child_process';import {promisify} from 'node:util';import {once} from 'node:events';
 import {PiOfficePreview} from '../dist/runtime/src/office-preview.js';import {PiFilePreview} from '../dist/runtime/src/file-preview.js';
 import {createLinuxNativeOfficeConverter} from '../dist/runtime/src/office-native-linux.js';
 import {previewDocx} from './fixtures/preview-office.mjs';import {previewPdf} from './fixtures/preview-pdf.mjs';import {zipSync,strToU8} from 'fflate';
-import {ownedProcesses,signalOwned,stillOwned} from './fixtures/native-office-processes.mjs';
+import {ownedProcesses,signalOwned,signalStoppedOwnedGroup,stillOwned} from './fixtures/native-office-processes.mjs';
 const exec=promisify(execFile),native=process.platform==='linux'&&process.arch==='x64'&&process.env.AUGMENTOR_NATIVE_OFFICE_TEST==='1';
 const requires='explicit AUGMENTOR_NATIVE_OFFICE_TEST=1 and real Linux x64 sandbox/Office dependencies';
 async function until(fn){const end=Date.now()+10000;while(Date.now()<end){if(await fn())return;await new Promise(resolve=>setTimeout(resolve,10));}throw Error('Owned native conversion phase was not observed.');}
@@ -66,7 +66,7 @@ test('hard termination drains a stopped native broker/monitor/renderer and remov
  t.after(async()=>{for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');await converter.dispose();await rm(root,{recursive:true,force:true});});
  await until(async()=>{owned=await ownedProcesses();return owned.some(row=>row.name==='soffice.bin');});const broker=owned.find(row=>row.name==='python3'&&row.group===row.pid);assert(broker,'Proven owned native broker must be present.');
  // Freeze only the proven owned tree. Graceful cancellation cannot settle it.
- for(const identity of owned)await signalOwned(identity,'SIGSTOP');abort.abort();await new Promise(resolve=>setTimeout(resolve,100));assert.equal(settled,false);await rejection;
+ for(const identity of owned)if(identity.name!=='aug-office-gc')await signalOwned(identity,'SIGSTOP');abort.abort();await new Promise(resolve=>setTimeout(resolve,100));assert.equal(settled,false);await rejection;
  const retained=[];for(const identity of owned)if(await stillOwned(identity))retained.push(identity.name);assert.deepEqual(retained,[],'all observed descendants must be gone when the operation settles');assert.deepEqual(await readdir(root),['authored.docx'],'the trusted parent must remove scratch after hard broker termination');
 });
 
@@ -78,4 +78,28 @@ test('native broker observes an actual owner crash and removes its known private
  // death and join cleanup. This is not the simultaneous-unresponsive case.
  for(const identity of owned)if(identity.name==='soffice.bin')await signalOwned(identity,'SIGSTOP');const end=once(owner,'exit');owner.kill('SIGKILL');await end;
  await until(async()=>{for(const identity of owned)if(await stillOwned(identity))return false;return true;});await until(async()=>(await readdir(root)).every(name=>!name.startsWith('augmentor-native-office-')));assert.deepEqual(await readdir(root),['authored.docx']);
+});
+
+for(const frozen of [false,true])test('native cleanup survives owner loss with '+(frozen?'an unresponsive conversion tree':'simultaneous broker loss'),{skip:native?false:requires,timeout:20000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-independent-cleanup-')),owner=spawn(process.execPath,['tests/fixtures/native-office-owner.mjs',root],{stdio:'ignore'});let owned=[];
+ t.after(async()=>{if(owner.exitCode===null&&owner.signalCode===null){const end=once(owner,'exit');owner.kill('SIGKILL');await end;}for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');await rm(root,{recursive:true,force:true});});
+ await until(async()=>{assert.equal(owner.exitCode,null);owned=await ownedProcesses(owner.pid);return owned.some(row=>row.name==='soffice.bin');});
+ const broker=owned.find(row=>row.name==='python3'&&row.group===row.pid);assert(broker);const scratch=(await readdir(root)).find(name=>name.startsWith('augmentor-native-office-'));assert(scratch);
+ assert.deepEqual(await readFile(join(root,scratch,'source.docx')),await readFile(join(root,'authored.docx')),'the native scratch really holds the authorized document copy');
+ for(const identity of owned)if(identity.name!=='aug-office-gc'&&(frozen||identity.name==='soffice.bin'||identity.pid===broker.pid))await signalOwned(identity,'SIGSTOP');
+ const ended=once(owner,'exit');owner.kill('SIGKILL');if(!frozen)await signalStoppedOwnedGroup(broker,'SIGKILL');await ended;
+ await until(async()=>{for(const identity of owned)if(await stillOwned(identity))return false;return true;});
+ assert.deepEqual(await readdir(root),['authored.docx'],'independent cleanup must remove native copies, profiles/fonts and unpublished output without replay');
+ const guard=owned.find(row=>row.name==='aug-office-gc');assert(guard);assert.equal(guard.group,guard.pid);assert.notEqual(guard.group,broker.group,'the cleanup process must own a separate session');
+});
+
+test('independent native cleanup refuses a replacement scratch identity instead of deleting unknown data',{skip:native?false:requires,timeout:20000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-replaced-scratch-')),owner=spawn(process.execPath,['tests/fixtures/native-office-owner.mjs',root],{stdio:'ignore'});let owned=[];
+ t.after(async()=>{if(owner.exitCode===null&&owner.signalCode===null){const end=once(owner,'exit');owner.kill('SIGKILL');await end;}for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');await rm(root,{recursive:true,force:true});});
+ await until(async()=>{assert.equal(owner.exitCode,null);owned=await ownedProcesses(owner.pid);return owned.some(row=>row.name==='soffice.bin');});const broker=owned.find(row=>row.name==='python3'&&row.group===row.pid);assert(broker);
+ for(const identity of owned)if(identity.name!=='aug-office-gc')await signalOwned(identity,'SIGSTOP');const name=(await readdir(root)).find(value=>value.startsWith('augmentor-native-office-'));assert(name);
+ const scratch=join(root,name),moved=join(root,'authored-moved-scratch');await rename(scratch,moved);await mkdir(scratch,{mode:0o700});await writeFile(join(scratch,'keep.txt'),'AUTHORED_REPLACEMENT_MUST_SURVIVE');
+ const ended=once(owner,'exit');owner.kill('SIGKILL');await signalOwned(broker,'SIGKILL');await ended;await until(async()=>{for(const identity of owned)if(await stillOwned(identity))return false;return true;});
+ assert.equal(await readFile(join(scratch,'keep.txt'),'utf8'),'AUTHORED_REPLACEMENT_MUST_SURVIVE');assert.deepEqual(await readFile(join(moved,'source.docx')),await readFile(join(root,'authored.docx')));
+ await assert.rejects(stat(join(root,'converted.pdf')),error=>error.code==='ENOENT');
 });
