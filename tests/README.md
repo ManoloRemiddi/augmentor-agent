@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-`keyless-search.test.mjs` qualifies original MIT engine functions and copied DSH
+Implementation **68ab32100ac0fef63374d8cb17618d174d72095e**: `keyless-search.test.mjs` qualifies original MIT engine functions and copied DSH
 HTTP/address/body policy: frozen configs/rules, no ambient key read, Stop/failover/
 partial reads, response/attempt caps, explicit SearXNG instances, private/mixed/
 NAT64/DNS/connector behavior, public cross-origin redirects, charset/truncation,

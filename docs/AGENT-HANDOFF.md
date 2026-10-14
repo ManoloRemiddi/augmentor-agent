@@ -1,7 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [MIT keyless engine/public fetch library](HARNESS-PLUGIN-PARITY.md#mit-keyless-engine-and-public-fetch-library--october-14)
-selects public DDDMUC 6c39792 engines, shinjiyu 0ceaa19 helpers and original DSH
+at **68ab32100ac0fef63374d8cb17618d174d72095e** selects public DDDMUC 6c39792 engines, shinjiyu 0ceaa19 helpers and original DSH
 MIT d743267 HTTP provider/address/body policy. It preserves keyless search/fetch
 through one supported Pi SDK owner with frozen config, bounded and cancellable
 fallback, safe source filtering, per-hop public DNS/address pinning and original

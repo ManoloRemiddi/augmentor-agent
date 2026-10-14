@@ -1,7 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [MIT keyless library selection](HARNESS-PLUGIN-PARITY.md#mit-keyless-engine-and-public-fetch-library--october-14)
-pins DDDMUC 0.8.9 / 6c3979202bcbda6dc52e0bd17cf34edad4bac5ed preferred engine
+at **68ab32100ac0fef63374d8cb17618d174d72095e** pins DDDMUC 0.8.9 / 6c3979202bcbda6dc52e0bd17cf34edad4bac5ed preferred engine
 functions, shinjiyu 0ceaa1985ad2e7774cd8f06890c4a9b1a7125955 Tavily helpers,
 and original DSH d743267388641bc76f17c45ce8b4c231aed1d32c HTTP/address/body
 policy. Original MIT files/notices and marked adaptations remain in twenty hashed

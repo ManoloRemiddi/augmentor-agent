@@ -32,7 +32,7 @@ separate required workflows under the accepted migration specification.
 
 ## MIT keyless engine and public fetch library — October 14
 
-This source checkpoint preserves the keyless workflow alongside the preceding
+Implementation **68ab32100ac0fef63374d8cb17618d174d72095e** preserves the keyless workflow alongside the preceding
 configured-engine work. It is a library for the supported Pi ExtensionAPI and one
 existing SDK owner; **default Host/GUI mode selection is not wired yet**. The
 installed preview and its draft remain unchanged. Source fixtures, SDK/live
