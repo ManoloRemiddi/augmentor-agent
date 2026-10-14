@@ -1164,7 +1164,7 @@ all three cases fail. Preparation now respects the browser's inherited-disabled
 predicate, including during frame/scroll checks. The first-legend exception remains
 usable. Main, hover and frame tests each observe an actual disabled barrier, release
 it explicitly, then deliver one pointer action; a dispatched click is never retried.
-The original supplier controls, settings writes, logo/CSS and product remain unchanged.
+The original supplier controls, settings writes, logo/CSS and application runtime remain unchanged.
 
 The nested test's optional authored extension holds only the final public SDK
 provider-request boundary. It retains real pointer approvals, nine actual nested
@@ -1181,7 +1181,21 @@ Focused pointer/brand/appearance checks pass **22/22**; the controlled original
 nested case passes **1/1** after the barrier correction. All **three** inherited-
 disable cases and the old nested immediate assertion fail before their respective
 driver corrections. This independently reproduces the failure classes, not every
-hosted interleaving. Broader source/ordinary qualification is pending. Changes are
+hosted interleaving. Qualification source **be7bcb4634df94ac1587d80b9dcf70a9c93fd65c**
+passes source/fresh ordinary **182/182 each across 52 files**, all **43 Harness
+Chromium files**, existing Host/queue and affected controller contracts. Two workers,
+unchanged deadlines, zero skips/cancellations. All **908 compiled files** match,
+as do all tests/fixtures and the complete ordinary dependency/Node bytes; **155
+production npm instances** and Node **24.19.0** retain the verified c543b75 base.
+No application runtime, original GUI, supplier source/CSS or dependency changes.
+
+The intervening a0c0101 [Validate 38575561202](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38575561202)
+passes these original cases, SDK/core and subsequent native interaction/recovery/
+first-run checks, production inventory and extension notices before refusing the
+retained Office exact-source/engine-rebuild gate. This preceding pass does not
+establish the precise 81094b3 failure ordering or new-head acceptance. The controlled
+failures and their fixes remain independently reproducible. New-head hosted gates,
+engine build and broader migration qualification remain open. Changes are
 to Linux Chromium qualification; no macOS/Windows/physical or installed acceptance
 is inferred. Owner review builds, drafts and model/speech settings stay preserved;
 all full migration, live and source/rebuild/public-distribution gates remain open.

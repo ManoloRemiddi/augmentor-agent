@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[GUI qualification readiness](DSH-GUI-ON-PI.md#gui-qualification-readiness--october-14)
+at **be7bcb4634df94ac1587d80b9dcf70a9c93fd65c** fixes test drivers' inherited-fieldset
+readiness and final request-metadata barriers. Controlled main/hover/frame cases
+fail before the native-disabled predicate correction; the first legend stays usable.
+The old nested immediate assertion fails against a held client event poll despite
+three canonical received requests; after release the original view/cold reopen show
+all three with unchanged calls/results/Stop/no-replay checks. Focused **22+1** and
+source/fresh ordinary **182/182 each across 52 files** pass, all 43 Harness Chromium
+files, unchanged workers/deadlines/no skips. Runtime/GUI/908 compiled files and
+complete dependency/Node bytes remain unchanged. a0c0101 CI passes prior GUI/core/
+native checks then refuses Office packaging; exact older hosted ordering and new-
+head/full migration acceptance remain open. Owner review/install/services survive.
+
 [Linux Office engine source preparation](HARNESS-OFFICE-PREVIEWS.md#isolated-linux-engine-build--october-14)
 verifies the exact official Core/Emsdk, shipped patches/shim and Emscripten 4.0.10.
 Actual Core diff matches the shipped source patch. Debian 12/GCC 12 configuration

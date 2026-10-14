@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[GUI readiness qualification](../docs/DSH-GUI-ON-PI.md#gui-qualification-readiness--october-14)
+at **be7bcb4634df94ac1587d80b9dcf70a9c93fd65c** adds three actual Chromium native-fieldset
+contracts for main/hover/frame preparation, explicit release and the first-legend
+exception. All three fail with the old helper; final focused pointer/brand/appearance
+checks pass 22/22. An optional authored SDK final-request barrier and held event poll
+reproduce the old nested count assertion; its corrected metadata barrier passes 1/1
+while preserving exact labels/three provider requests, nine original calls/results,
+Stop, reused IDs, cold reopening and no replay. Fixture teardown releases its barrier.
+Source/ordinary **182/182 each across 52 files**, all 43 Harness Chromium files,
+two workers, unchanged deadlines, zero skips/cancellations. Full 908 compiled-file,
+all-test/fixture and complete dependency/Node parity verifies; runtime/GUI bytes and
+155 production npm instances remain unchanged. Preceding a0c0101 hosted pass reaches
+the Office gate; exact older CI ordering and new-head/physical/platform gates remain.
+
 The [Office engine source-build trial](../docs/HARNESS-OFFICE-PREVIEWS.md#isolated-linux-engine-build--october-14)
 uses actual pinned Core/Emsdk/toolchain and shipped patches, not synthetic engine
 outputs. Nine existing packaging cases still pass and refuse public packaging.
