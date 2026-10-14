@@ -849,3 +849,32 @@ This closes the specialist’s separate ephemeral lifecycle gap within the recor
 
 
 [Installed original live Trajectory qualification](DSH-GUI-ON-PI.md#installed-live-trajectory-qualification--october-11) records corrected implementation 39b92629ba51bccdeb81018960ef3ee4bd11427e in private MX release 20261011-161859-071bde6e, paired 135-case source/ordinary cohorts, original local Qwen live output/completed timing, preserved ten histories and zero replay. Both native/Host roots match and full inventory passes; production/model/speech placement remains unchanged. This does not close full P0/P1, migration, live-service, privacy/package/physical-platform gates or authorize DSH retirement.
+
+## Live prompt improvement and ambiguity — October 14
+
+A real local-Qwen test of the original Harness Improve control exposed a semantic
+failure that deterministic fixtures do not measure. The authored fragment
+`mention AX-417 end Next review: Friday` was rewritten as an assertion that the
+item had ended. The model returned valid rewrite JSON, but added a fact absent
+from the draft. The rendered result and Undo worked; this result is retained as
+a failed meaning-preservation case, not a successful prompt improvement.
+
+The Pi inline-editor override now explicitly takes precedence over earlier saved
+editing advice to choose an interpretation or ask questions. It limits editing
+to wording/grammar/organization, preserves factual claims, negation, uncertainty,
+quantities, identifiers, dates, conditions and output constraints, and distinguishes
+mentioning an item or output placement from asserting a state about that item.
+When clearer wording requires guessing, it asks for the original text unchanged.
+This is model guidance, not an automatic semantic verifier or a guarantee that
+arbitrary rewrites preserve meaning. Existing editable draft/Undo remains required.
+The one-request, tool-free transaction, structured response validation, privacy,
+receipts, cancellation and conversation ownership are unchanged. Native, Browser
+and original Harness Pi controls use this same runtime policy; no layout, supplier
+source, dependency or production model/voice setting changes.
+
+The initial private driver also looked for the wrong metadata filename. It resumed
+its saved seed conversation without repeating the exchange. A later native-byte
+assertion used a baseline from before cold GUI loading: the sole appended
+`session_info` title predates the improvement receipt, while prior bytes and
+conversation content remain unchanged. Both preparation failures remain retained.
+Qualification of the corrected guidance and loaded surfaces is pending.
