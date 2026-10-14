@@ -35,8 +35,11 @@ if(wikiVault){
  writeFileSync(join(config,'wiki.json'),JSON.stringify({schema:'augmentor-wiki/1',enabled:true,vaultPath:wikiVault}),{mode:0o600});
 }
 if(wikiExtension){writeFileSync(wikiExtension,`import {existsSync} from 'node:fs';export default pi=>{if(existsSync(${JSON.stringify(wikiExtension+'.collision')}))pi.registerTool({name:'wiki_query',label:'Authored collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[wikiExtension],skills:[]}));}
-if(searchExtension){writeFileSync(searchExtension,`import {existsSync} from 'node:fs';export default pi=>{if(existsSync(${JSON.stringify(searchExtension+'.collision')}))pi.registerTool({name:'web_search',label:'Authored search collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[searchExtension],skills:[]}));}
+if(searchExtension){writeFileSync(searchExtension,`import {existsSync,writeFileSync} from 'node:fs';export default pi=>{pi.on('input',async(e,ctx)=>{if(e.text==='SEARCH_PREPARE_HOLD'){writeFileSync(ctx.cwd+'/search-input-started','started');const end=Date.now()+10000;while(!existsSync(ctx.cwd+'/search-input-release')){if(Date.now()>end)throw Error('Authored input release was not received');await new Promise(r=>setTimeout(r,10));}}});if(existsSync(${JSON.stringify(searchExtension+'.collision')}))pi.registerTool({name:'web_search',label:'Authored search collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[searchExtension],skills:[]}));}
 const model=http.createServer(async(req,res)=>{
+  if(searchExtension&&req.method==='POST'&&req.url==='/fixture/release-search-input'){
+    writeFileSync(join(workspace,'search-input-release'),'Authored input release.');res.writeHead(204).end();return;
+  }
   if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'&&req.method==='POST'&&req.url==='/fixture/release-nested'){
     writeFileSync(join(root,'release-nested'),'Authored fixture release.');res.writeHead(204).end();return;
   }
@@ -226,7 +229,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),...(searchExtension?{searchExtension}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),...(searchExtension?{searchExtension,searchInputStarted:join(workspace,'search-input-started'),searchInputControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-search-input'}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;

@@ -1,5 +1,42 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Cold-reopen and input-admission test barriers — October 14
+
+The original nested-tool GUI and Search settings tests now prepare the specific
+state their assertions require. Product runtime, supplier GUI/layout, CSS, SDK,
+dependencies and selected/running releases are unchanged.
+
+A controlled real-Chromium reproduction holds a departing `/api/rpc` refresh,
+stops its old synthetic Host and releases that request. It reproduces the refused
+RPC errors retained in Validate 38544790754. The cold-reopen driver now holds an
+actual refresh, navigates to a fully replaced blank document while the old Host
+is still alive, and then disables interception before stopping it. A fresh Host/
+document must retain the exact completed history, three request labels, reused
+nested-call identities, original argument/result/error details and one-time tool
+execution. The final error assertion is strengthened to **zero errors**, replacing
+the earlier allowance for departing event-poll refusals. No timer/deadline grows,
+failed RPC is retried, polling is disabled in the product or network error ignored.
+
+Search has a separate admission boundary. Host `running` becomes true before
+asynchronous SDK input preparation/delivery. An independently authored public
+input-hook gate reproduces Stop before that boundary: its unknown receipt blocks
+new intent, matching the earlier collision-probe error. The actual Search workflow
+now explicitly exercises this early Stop, inspects the saved notice/queue and
+acknowledges only that synthetic receipt. The original ID remains a duplicate;
+acknowledgment performs zero provider requests or input replay. Later, the intended
+held-provider Stop waits for the exact request's native user receipt and actual
+fixture HTTP request, then verifies no unknown preparation receipt remains to
+mask the settings collision. Original collision refusals, explicit recovery,
+keys/drafts/modes/themes/scopes and all original workflow assertions remain.
+
+Both unchanged baseline cases pass locally. Both controlled pre-fix cases fail
+with the same two error classes; corrected focused cases pass **2/2**, two workers,
+unchanged deadlines/no skips. These reproductions establish the mechanisms, not
+all scheduling details of the older hosted run. Broader source/ordinary and new-head
+hosted acceptance remain pending at this checkpoint. All data and provider/tool
+work are independently authored synthetic fixtures; no owner models, credentials,
+conversations, installed draft or service configuration is used or changed.
+
 ## Hover-only workspace actions — October 14
 
 Qualification driver **36024aae780635daaa38f9920b5f6750611c08cc** prepares the

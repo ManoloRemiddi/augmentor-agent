@@ -44,9 +44,13 @@ test('original nested tool rows expose live arguments, real read/error results, 
  assert.deepEqual(await requestLabels(),['Request #1','Request #2','Request #3'],'original request controls match actual recorded wire requests across both Host turns');
  const first=completed.events.filter(x=>x.event.type==='tool/call'&&x.event.data.name==='fixture_wait');assert.equal(first[0].event.data.toolCallId,first[1].event.data.toolCallId);assert.notEqual(first[0].event.data.requestId,first[1].event.data.requestId);
  assert.equal(panel.errors.length,0);const oldOrigin=new URL(link.url).origin,oldPid=link.pid;
+ // Retire the departing document before stopping its Host. Hold a real RPC
+ // refresh so this boundary is exercised even when polling would otherwise idle.
+ panel.pausedRequests.splice(0);await panel.call('Fetch.enable',{patterns:[{urlPattern:oldOrigin+'/api/rpc',requestStage:'Request'}]});await until(()=>panel.pausedRequests.some(row=>row.url===oldOrigin+'/api/rpc'),'departing RPC refresh held');
+ await panel.navigate('about:blank');await panel.call('Fetch.disable');
  fixture.send({type:'reopen'});await until(()=>{const line=output.trim().split('\n').find(line=>line.startsWith('{"fixture"')&&JSON.parse(line).reopened);if(!line)return false;link=JSON.parse(line);return true;},'fresh Host');assert.notEqual(link.pid,oldPid);
- await panel.call('Page.navigate',{url:link.url});await visible('location.origin==='+JSON.stringify(new URL(link.url).origin)+'&&document.readyState==="complete"&&document.querySelector("[role=tab]")');await click(tab('Trajectory'));await visible(row('fixture_wait'));await click(row('fixture_wait'));await visible('document.body.innerText.includes("Turn 2 · Step 1")&&document.body.innerText.includes("Held child released: nested-complete")');
+ await panel.navigate(link.url);await visible('location.origin==='+JSON.stringify(new URL(link.url).origin)+'&&document.readyState==="complete"&&document.querySelector("[role=tab]")');await click(tab('Trajectory'));await visible(row('fixture_wait'));await click(row('fixture_wait'));await visible('document.body.innerText.includes("Turn 2 · Step 1")&&document.body.innerText.includes("Held child released: nested-complete")');
  assert.deepEqual(await history(),completed);assert.equal((await readFile(link.requestLog,'utf8')).trim().split('\n').length,3);
  assert.deepEqual(await requestLabels(),['Request #1','Request #2','Request #3'],'cold reopening preserves request numbering without borrowing the unlinked abort receipt');
- assert.deepEqual(panel.errors.filter(error=>!(error.source==='network'&&error.text==='Failed to load resource: net::ERR_CONNECTION_REFUSED'&&error.url?.startsWith(oldOrigin+'/api/events?'))),[],'only departing-client polling at the explicitly stopped old Host may fail');assert.equal(stderr,'');
+ assert.deepEqual(panel.errors,[],'retiring the old document before shutdown preserves a clean cold reopen');assert.equal(stderr,'');
 });

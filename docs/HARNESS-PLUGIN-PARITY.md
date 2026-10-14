@@ -45,6 +45,13 @@ separate required workflows under the accepted migration specification.
 
 ## CI readiness barriers and retained failures — October 14
 
+The [cold-reopen/input-admission follow-up](DSH-GUI-ON-PI.md#cold-reopen-and-input-admission-test-barriers--october-14)
+reproduces both 617eccd failure classes with actual SDK/Chromium barriers. It
+retires a held-refresh old document before deliberate Host shutdown and distinguishes
+early input Stop/explicit unknown-receipt review from delivered-provider Stop.
+The focused cases pass 2/2; broad source/ordinary/new-head acceptance remains pending.
+Product/UI/supplier/dependency/installed state and earlier failed runs stay preserved.
+
 [Validate 38544790754](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38544790754)
 at **617eccd13404b41a5617af87a60c8f711e420ad6** fails Debian's SDK/core cohort:
 the nested-tool GUI records refused `/api/rpc` requests during cold reopening,
