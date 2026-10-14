@@ -11,6 +11,50 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Native forced cleanup and parent ownership — October 14
+
+A new real-native regression freezes the **owned broker, monitors and renderer**
+before cancellation. At preceding `c6c229a`, the two-second forced group kill
+drains every observed process but leaves the broker-created font/profile scratch
+directory behind. The retained failing comparator proves a cleanup gap; normal
+cancellation passes did not cover it.
+
+The trusted Node parent now creates the private scratch directory and keeps its
+device/inode identity. It passes that exact directory, identity and creator PID
+to the broker at startup. The broker refuses an unexpected root, link, owner,
+mode or identity. The parent independently removes the same root after helper
+exit, including hard termination; a changed identity is refused rather than
+removing an unknown directory. The original provider's outer scratch and held
+queue/maintenance lifetime remain intact. No GUI, default engine, data format,
+model/speech/GPU setting, dependency pin or installed selection changes.
+
+The Linux broker arms `PR_SET_PDEATHSIG(SIGTERM)` and verifies its creator both
+before and after arming, before document/font work. The
+[Linux interface documentation](https://man7.org/linux/man-pages/man2/PR_SET_PDEATHSIG.2const.html)
+defines a creator-thread death notification and warns that it is not retroactive;
+the two checks close the observed startup race. A repeated graceful signal cannot
+interrupt the broker's final owned-root cleanup. Native descendants retain the
+separate PID/network/user namespace and Bubblewrap parent-death ownership.
+
+Initial dependency-backed checks pass **8/8**. The new hard-stop case observes
+all recorded descendants gone **when the operation settles**, and direct-converter
+scratch removed. Another case kills an actual authored Node owner while holding
+the renderer; its responsive broker drains descendants/removes its known root
+and publishes no PDF or replay. The tests inspect only their own process tree,
+include children launched by worker threads, and use start-time identity tokens
+before cleanup signals. No unrelated process/environment or owner profile is read.
+Wider exact-source/ordinary qualification is pending below.
+
+This does not yet qualify simultaneous loss of owner and broker, an unresponsive
+broker after owner loss, allocation before helper startup, post-publication crash
+boundaries or power-loss recovery. Those cases need durable owned-root recovery
+or an independently owned supervisor before promotion; unknown directories must
+not be scanned/deleted as a shortcut. Default kit preferred-source/rebuild and
+native distribution/font/layout/security/other-OS gates remain open. This Linux
+adapter fix preserves the shared converter/view contract and does not implement
+the missing macOS/Windows sandbox mechanisms. Running MX review/drafts remain
+unchanged.
+
 ## Opt-in native provider integration — October 14
 
 An authored Linux x64 adapter now connects to the **original MIT Office provider,
@@ -104,7 +148,7 @@ AUGMENTOR_HARNESS_PROOF_NATIVE_OFFICE=1 node --test --test-concurrency=1 tests/h
 ```
 
 The native tests are explicit dependency-backed checks; without their opt-in,
-four real-native cases are identified as skipped rather than reported as fixture
+six real-native cases are identified as skipped rather than reported as fixture
 passes. Two common converter-seat cases run independently of the OS adapter.
 The default original viewer/real Wasm checks remain mandatory and separate.
 The [Fontconfig reference](https://fontconfig.pages.freedesktop.org/fontconfig/fontconfig-user.html)

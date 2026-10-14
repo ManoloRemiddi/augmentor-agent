@@ -1,9 +1,9 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {spawn} from 'node:child_process';
 import {homedir} from 'node:os';
-import {join} from 'node:path';
+import {join,dirname} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {readFile,lstat,rm} from 'node:fs/promises';
+import {readFile,lstat,rm,mkdtemp} from 'node:fs/promises';
 import type {ConverterOptions} from '@deepseek-ai/libreoffice-kit';
 import type {OfficeConverter} from '../vendor/dsh-office/index.js';
 import {OfficeToPdfError} from '../vendor/dsh-office/errors.js';
@@ -34,10 +34,12 @@ export async function createLinuxNativeOfficeConverter(options:ConverterOptions=
     if(typeof request.outputPath!=='string'||!request.outputPath.startsWith('/')||request.outputPath.includes('\0'))throw new OfficeToPdfError('invalid-output','Invalid native Office output.');
     try{await lstat(request.outputPath);throw new OfficeToPdfError('invalid-output','Native Office output already exists.');}catch(cause){if((cause as NodeJS.ErrnoException).code!=='ENOENT')throw cause;}
     let succeeded=false;
-    try{const result=await new Promise<{missingFonts:string[]}>((resolve,reject)=>{
+    const scratch=await mkdtemp(join(dirname(request.outputPath),'augmentor-native-office-'));
+    const identity=await lstat(scratch,{bigint:true});
+    try{upstream.throwIfAborted();const result=await new Promise<{missingFonts:string[]}>((resolve,reject)=>{
       // The helper group contains the trusted broker and sandbox monitor only.
       // --die-with-parent owns the native descendants in a separate PID namespace.
-      const child=spawn('/usr/bin/python3',['-I','-B',helper],{detached:true,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8',TZ:'UTC'},stdio:['pipe','pipe','ignore']});
+      const child=spawn('/usr/bin/python3',['-I','-B',helper,String(process.pid),scratch,String(identity.dev),String(identity.ino)],{detached:true,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8',TZ:'UTC'},stdio:['pipe','pipe','ignore']});
       let data='',overflow=false,error:unknown,killTimer:NodeJS.Timeout|undefined;
       const kill=(kind:NodeJS.Signals)=>{if(child.pid&&child.exitCode===null){try{process.kill(-child.pid,kind);}catch(cause){if((cause as NodeJS.ErrnoException).code!=='ESRCH')error=cause;}}};
       const abort=()=>{kill('SIGTERM');killTimer=setTimeout(()=>kill('SIGKILL'),2000);killTimer.unref();};
@@ -57,7 +59,10 @@ export async function createLinuxNativeOfficeConverter(options:ConverterOptions=
       child.stdin.end(JSON.stringify({request,options:resolved}));
     });
     upstream.throwIfAborted();succeeded=true;return result;
-    }finally{if(!succeeded)await rm(request.outputPath,{force:true});}
+    }finally{
+      try{const current=await lstat(scratch,{bigint:true});if(current.dev!==identity.dev||current.ino!==identity.ino||!current.isDirectory())throw new OfficeToPdfError('failed','Native Office scratch identity changed.');await rm(scratch,{recursive:true,force:true});}catch(cause){if((cause as NodeJS.ErrnoException).code!=='ENOENT')throw cause;}
+      if(!succeeded)await rm(request.outputPath,{force:true});
+    }
   };
   return {
     render(request,signal){const task=tail.then(()=>{lifetime.signal.throwIfAborted();signal?.throwIfAborted();return perform(request,signal);});tail=task.catch(()=>{});return task;},

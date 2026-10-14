@@ -8,6 +8,7 @@ Linux x64/Debian payload layout is explicit; other OS adapters remain separate.
 from __future__ import annotations
 
 import json
+import ctypes
 import os
 from pathlib import Path
 import re
@@ -17,7 +18,6 @@ import signal
 import stat
 import subprocess
 import sys
-import tempfile
 import unicodedata
 import xml.etree.ElementTree as ET
 from xml.sax.saxutils import escape
@@ -229,7 +229,32 @@ def run(cmd: list[str], root: Path, options: dict, *, catalog: bool = False) -> 
     return read_regular(root / 'catalog.log', 256 * 1024, 'unavailable') if catalog else b''
 
 
-def main() -> dict:
+def owned_root(arguments: list[str]) -> tuple[Path, tuple[int, int]]:
+    if len(arguments) != 5:
+        raise Failure('failed')
+    root = Path(arguments[2])
+    info = root.lstat()
+    identity = (int(arguments[3]), int(arguments[4]))
+    if not root.is_absolute() or not re.fullmatch(r'augmentor-native-office-[A-Za-z0-9]+', root.name) or not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o700 or (info.st_dev, info.st_ino) != identity:
+        raise Failure('failed')
+    return root, identity
+
+
+def parent_death(expected: int) -> None:
+    # PR_SET_PDEATHSIG is not retroactive. Check the creator before and after
+    # arming, so losing it during interpreter startup cannot admit document work.
+    if expected <= 1 or os.getppid() != expected:
+        raise InterruptedError('Office owner exited before admission.')
+    libc = ctypes.CDLL(None, use_errno=True)
+    libc.prctl.argtypes = [ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong]
+    libc.prctl.restype = ctypes.c_int
+    if libc.prctl(1, signal.SIGTERM, 0, 0, 0) != 0:
+        raise Failure('unavailable')
+    if os.getppid() != expected:
+        raise InterruptedError('Office owner exited before admission.')
+
+
+def main(root: Path) -> dict:
     source_data = sys.stdin.buffer.read(256 * 1024 + 1)
     if len(source_data) > 256 * 1024:
         raise Failure('failed')
@@ -243,7 +268,8 @@ def main() -> dict:
     extension = source.suffix[1:].lower()
     data = read_regular(source, options['maxInputBytes'], 'input-too-large')
     families = declared_fonts(data, extension, options)
-    root = Path(tempfile.mkdtemp(prefix='augmentor-native-office-', dir=output.parent))
+    if root.parent != output.parent:
+        raise Failure('failed')
     published = False
     try:
         snapshot_fonts(root, options)
@@ -277,18 +303,32 @@ def main() -> dict:
     finally:
         if published:
             output.unlink(missing_ok=True)
-        shutil.rmtree(root)
 
 
 if __name__ == '__main__':
     signal.signal(signal.SIGTERM, interrupted)
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     resource.setrlimit(resource.RLIMIT_AS, (2 * 1024**3, 2 * 1024**3))
+    root = None
+    identity = None
     try:
-        print(json.dumps(main()), flush=True)
+        root, identity = owned_root(sys.argv)
+        parent_death(int(sys.argv[1]))
+        print(json.dumps(main(root)), flush=True)
     except Failure as error:
         print(json.dumps({'error': {'code': error.code}}), flush=True)
         sys.exit(1)
     except BaseException:
         print(json.dumps({'error': {'code': 'failed'}}), flush=True)
         sys.exit(1)
+    finally:
+        # A repeated graceful signal must not interrupt owned scratch cleanup.
+        # The surviving parent can still force the entire group if necessary.
+        signal.signal(signal.SIGTERM, signal.SIG_IGN)
+        if root is not None:
+            try:
+                current = root.lstat()
+                if stat.S_ISDIR(current.st_mode) and (current.st_dev, current.st_ino) == identity:
+                    shutil.rmtree(root)
+            except FileNotFoundError:
+                pass

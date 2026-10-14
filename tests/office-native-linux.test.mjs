@@ -1,10 +1,11 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtemp,writeFile,readFile,rm,readdir,stat} from 'node:fs/promises';
-import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFile} from 'node:child_process';import {promisify} from 'node:util';
+import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFile,spawn} from 'node:child_process';import {promisify} from 'node:util';import {once} from 'node:events';
 import {PiOfficePreview} from '../dist/runtime/src/office-preview.js';import {PiFilePreview} from '../dist/runtime/src/file-preview.js';
 import {createLinuxNativeOfficeConverter} from '../dist/runtime/src/office-native-linux.js';
 import {previewDocx} from './fixtures/preview-office.mjs';import {previewPdf} from './fixtures/preview-pdf.mjs';import {zipSync,strToU8} from 'fflate';
+import {ownedProcesses,signalOwned,stillOwned} from './fixtures/native-office-processes.mjs';
 const exec=promisify(execFile),native=process.platform==='linux'&&process.arch==='x64'&&process.env.AUGMENTOR_NATIVE_OFFICE_TEST==='1';
 const requires='explicit AUGMENTOR_NATIVE_OFFICE_TEST=1 and real Linux x64 sandbox/Office dependencies';
 async function until(fn){const end=Date.now()+10000;while(Date.now()<end){if(await fn())return;await new Promise(resolve=>setTimeout(resolve,10));}throw Error('Owned native conversion phase was not observed.');}
@@ -57,4 +58,24 @@ test('native cancellation, timeout and disposal settle owned processes and remov
  let owned;await until(async()=>{owned=await descendants();for(const pid of owned)try{if((await readFile('/proc/'+pid+'/comm','utf8')).trim()==='soffice.bin')return true;}catch(error){if(error.code!=='ENOENT')throw error;}return false;});abort.abort();await rejected;await until(async()=>{for(const pid of owned)try{await stat('/proc/'+pid);return false;}catch(error){if(error.code!=='ENOENT')throw error;}return true;});assert.deepEqual(await readdir(root),['authored.docx']);assert.deepEqual(await readFile(inputPath),Buffer.from(body));await converter.dispose();await assert.rejects(converter.render({inputPath,outputPath}),/closed/);
  const timed=await createLinuxNativeOfficeConverter({timeoutMs:20});try{await assert.rejects(timed.render({inputPath,outputPath:join(root,'timed.pdf')}),e=>e.code==='timeout');assert.deepEqual(await readdir(root),['authored.docx']);}finally{await timed.dispose();}
  const disposed=await createLinuxNativeOfficeConverter(),pending=disposed.render({inputPath,outputPath:join(root,'disposed.pdf')}),disposedRejection=assert.rejects(pending);await until(async()=>(await readdir(root)).some(name=>name.startsWith('augmentor-native-office-')));await disposed.dispose();await disposedRejection;assert.deepEqual(await readdir(root),['authored.docx']);
+});
+
+test('hard termination drains a stopped native broker/monitor/renderer and removes direct-converter scratch',{skip:native?false:requires,timeout:20000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-hard-stop-')),inputPath=join(root,'authored.docx'),outputPath=join(root,'failed.pdf');await writeFile(inputPath,previewDocx('AUTHORED_HARD_STOP_'+ 'x'.repeat(100000)));
+ const converter=await createLinuxNativeOfficeConverter(),abort=new AbortController(),work=converter.render({inputPath,outputPath},abort.signal);let owned=[],settled=false;const rejection=assert.rejects(work).then(()=>settled=true);
+ t.after(async()=>{for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');await converter.dispose();await rm(root,{recursive:true,force:true});});
+ await until(async()=>{owned=await ownedProcesses();return owned.some(row=>row.name==='soffice.bin');});const broker=owned.find(row=>row.name==='python3'&&row.group===row.pid);assert(broker,'Proven owned native broker must be present.');
+ // Freeze only the proven owned tree. Graceful cancellation cannot settle it.
+ for(const identity of owned)await signalOwned(identity,'SIGSTOP');abort.abort();await new Promise(resolve=>setTimeout(resolve,100));assert.equal(settled,false);await rejection;
+ const retained=[];for(const identity of owned)if(await stillOwned(identity))retained.push(identity.name);assert.deepEqual(retained,[],'all observed descendants must be gone when the operation settles');assert.deepEqual(await readdir(root),['authored.docx'],'the trusted parent must remove scratch after hard broker termination');
+});
+
+test('native broker observes an actual owner crash and removes its known private scratch without publishing or replay',{skip:native?false:requires,timeout:20000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-parent-crash-'));const owner=spawn(process.execPath,['tests/fixtures/native-office-owner.mjs',root],{stdio:'ignore'});let owned=[];
+ t.after(async()=>{if(owner.exitCode===null&&owner.signalCode===null){const end=once(owner,'exit');owner.kill('SIGKILL');await end;}for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');await rm(root,{recursive:true,force:true});});
+ await until(async()=>{assert.equal(owner.exitCode,null);owned=await ownedProcesses(owner.pid);return owned.some(row=>row.name==='soffice.bin');});
+ // Hold the renderer, while its responsive trusted broker can handle owner
+ // death and join cleanup. This is not the simultaneous-unresponsive case.
+ for(const identity of owned)if(identity.name==='soffice.bin')await signalOwned(identity,'SIGSTOP');const end=once(owner,'exit');owner.kill('SIGKILL');await end;
+ await until(async()=>{for(const identity of owned)if(await stillOwned(identity))return false;return true;});await until(async()=>(await readdir(root)).every(name=>!name.startsWith('augmentor-native-office-')));assert.deepEqual(await readdir(root),['authored.docx']);
 });
