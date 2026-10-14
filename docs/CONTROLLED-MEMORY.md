@@ -4,37 +4,89 @@
 
 ## Memory-only llama.cpp request mode — October 14
 
-The installer accepts **`--llama-cpp-thinking default|off`**. Fresh setup defaults
-to the server's existing behavior. Omission on a configured installation preserves
-its saved `llamaCppThinking` choice. `off` uses pinned Hindsight 0.10.0's supported
-extra-body settings to send `chat_template_kwargs.enable_thinking=false` on memory
-retain, consolidation and Reflect requests only. It requires a compatible server
-template; it is not a universal provider reasoning switch. Chat/voice requests,
-server configuration, model/context/concurrency/precision and budgets are unchanged.
-`default` explicitly removes this memory override. A mode mismatch refuses a
-running engine, using the existing deliberate stopped-replacement path; no live
-engine is silently changed. Missing legacy extra-body settings match default.
+Source **5318959c1b4346bcaa293983206e767a45d4e1f2** adds the explicit installer
+option **`--llama-cpp-thinking default|off`**. Fresh setup uses the server's existing
+behavior. Omission on a configured installation preserves its saved
+`llamaCppThinking` choice. `off` uses pinned Hindsight 0.10.0's supported extra-body
+settings to send `chat_template_kwargs.enable_thinking=false` on memory retain,
+consolidation and Reflect requests only. It requires a compatible server template;
+it is not a universal provider reasoning switch. Chat/voice, server configuration,
+model/context/concurrency/precision and all processing budgets remain unchanged.
+`default` explicitly removes this memory override. Mode mismatch refuses a running
+engine, using the existing deliberate stopped-replacement path. Missing legacy
+extra-body settings match default. **Production has not adopted this option.**
 
-A new synthetic diagnostic with the unchanged default observes 29.393 seconds,
-821 answer characters and 2,965 thinking characters on its first extraction.
-The next extraction stops at phase one after a single timeout; its job and budget
-remain retained. Repeating only that captured synthetic **model request**, with
-thinking explicitly disabled and no memory-stage replay, returns valid JSON in
-44.444 seconds with 381 completion tokens and zero thinking characters. Response
-headers alone take 37.928 seconds. Another current-Qwen slot is processing a much
-larger request, so these timings are load-confounded: the switch is **not proven
-to solve the timeouts**. No model-server setting or production service is changed.
+A fresh synthetic diagnostic with unchanged default behavior observes 29.393
+seconds, 821 answer characters and 2,965 thinking characters on its first
+extraction. The next extraction stops at phase one after one timeout; its job and
+budget remain retained. Repeating only that captured synthetic **model request**,
+with thinking disabled and no memory-stage replay, returns valid JSON in 44.444
+seconds with 381 completion tokens and zero thinking characters. Headers alone
+take 37.928 seconds. Another Qwen slot is processing a much larger request, so
+these timings are load-confounded and do not establish a timeout cure. Neither
+server configuration nor another owner's request is changed or stopped.
 
 The exact pinned disposable image parses the global/three operation overrides,
 45-second timeout and disabled workers/retries. Its public fixture proof passes:
-four model calls all carry the explicit false flag; the deliberately failed stage
-stops at attempt zero, does not retry and preserves the unrelated archive fact.
-The fixture backend sends no work to Qwen. Common Python **35/35** pass, including
-actual installer argument/filesystem/loopback-HTTP flow with Docker mocked, saved
-choice preservation, legacy default reuse, refusal before a running mode change
-or invalid saved choice, and unchanged configuration on refusal. Ordinary-tree
-and complete live engine/model acceptance of this option remain pending here.
-Linux image evidence does not qualify native macOS/Windows Docker operation.
+four calls all carry the explicit false flag; the deliberately failed stage stops
+at attempt zero, does not retry and preserves the unrelated archive fact. This
+backend sends no work to Qwen. After both real Qwen slots are observed idle, the
+same image with the explicit mode completes the public live-engine proof in
+**18.90 seconds**, all six stages, attempt zero, zero failures, with **102.26
+seconds / 45,934 tokens** remaining. Non-empty pages are not by themselves proof
+of semantic correctness.
+
+A separate fresh synthetic Pi proof at the same source uses the actual Host/
+AgentSession, shared prompt/memory companions, controlled Hindsight 0.10.0 and
+current Qwen. Both slots are observed idle before starting. It passes in **53.90
+seconds**:
+
+- The SQLite/concise-preference seed and PostgreSQL update each complete all six
+  stages, six calls, attempt zero, no failures or retries. Their original budgets
+  retain **102.50 seconds / 45,800 tokens** and **102.72 seconds / 45,204 tokens**.
+- The first Pi answer correctly recalls concise replies. One actual SDK file
+  read executes; its two provider requests persist matching native memory briefs.
+  A later parent request receives the new PostgreSQL memory.
+- The historical branch restores the exact old SQLite brief and hidden tool
+  receipt, excludes PostgreSQL/later parent input, performs no new recall or tool
+  execution, and preserves the parent's bytes. Capture contains only the new
+  branch user/assistant pair, excluding inherited input.
+- Cold history creates no AgentSession/recall, does not change native files or the
+  parent memory journal; cold branch prompting restores the same old brief without
+  recall/tool replay. Compiled source hashes verify against the tested tree.
+
+Common source/separate ordinary Python **35/35 each** pass. Tests cover actual
+installer parsing/private files/loopback HTTP with Docker mocked, saved choice,
+legacy default reuse, all operation flags and refusal before running mode changes
+or invalid saved choices, preserving configuration. Source/ordinary Node memory/
+client/SDK/provenance **18/18 each** pass at two workers, unchanged deadlines/no
+skips. All **905 compiled files/set** and **155 production npm instances** remain
+unchanged from the prior ordinary tree; no Node runtime/GUI/dependency is modified.
+
+All data is independently authored and synthetic. Earlier failed/default jobs
+are retained without retry, reset or success relabelling. Owned companions exit
+before the labelled fixture is stopped; restart policy is `no`, volumes retained.
+Production Qwen/memory remain healthy, Qwen keeps two slots/262,144 context, and
+selected preview/draft/Search candidate/manual feedback are unchanged. Physical
+voice, owner migration, installed acceptance, broader semantics/load/default mode,
+full historical system/instruction/resource fidelity and Windows/macOS Docker/
+transport acceptance remain required. The earlier default-mode failures below
+remain valid; this explicit idle-start qualification does not close them.
+
+Reproduce the common tests with:
+
+```sh
+python3 -m unittest tests.test_hindsight_setup tests.test_memory_budget tests.test_hindsight_memory tests.test_dual_memory
+```
+
+For the public engine proofs, use a disposable engine installed with the explicit
+option and the [independent PostgreSQL/API/gateway recipe](#isolated-current-qwen-engine-qualification--october-14).
+Run `scripts/proof-controlled-memory.py --configuration /absolute/fixture/hindsight.json`
+for the injected failure/flag checks; add `--live` for actual model stages. Observe
+live model availability before starting and inspect stopped outcomes without retry.
+The full Pi sequence above uses a separate synthetic SDK driver; the public
+`pi-memory-snapshot` tests qualify its native branch/cold contracts with authored
+provider/memory fixtures, separately from actual-engine/model evidence.
 
 ## Extracted claims and engine deadlines — October 14
 

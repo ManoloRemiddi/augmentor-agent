@@ -1,11 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Explicit memory-only llama.cpp mode](CONTROLLED-MEMORY.md#memory-only-llamacpp-request-mode--october-14)
-adds an opt-in request override, saved-choice preservation and running-engine
-refusal. Common Python 35/35 and the actual pinned-engine four-call fixture pass.
-Default/live diagnostics confirm thinking output and a valid no-thinking JSON
-response, but long pre-response time/another active Qwen slot confound performance.
-No timeout cure, production adoption or full live acceptance is claimed here.
+at **5318959c1b4346bcaa293983206e767a45d4e1f2** preserves saved/default choices
+and refuses running-engine changes. Source/ordinary Python **35/35 each**, Node
+**18/18 each** and pinned-engine four-call failure/flag/archive checks pass.
+Idle-start real Qwen/Hindsight completes six stages in **18.90 seconds**; the fresh
+actual Pi/shared-companion sequence passes in **53.90 seconds**, both six-stage
+batches, correct preference/new parent facts, exact old branch/cold brief/tool
+receipt, one tool execution, no new branch recall, inherited capture exclusion and
+unchanged parent bytes. Earlier default/load-confounded failures stay retained.
+The option is not adopted in production; models/services/preview/draft/candidate/
+feedback remain preserved. Fixtures are stopped/no-restart/data retained. Broader
+load/semantics/installed/physical/platform/distribution acceptance remains open.
 
 [Memory claim selection and engine deadlines](CONTROLLED-MEMORY.md#extracted-claims-and-engine-deadlines--october-14)
 at **aac3bad18f38ca61fa4129b414849758ecdb22fa** prefers eligible extracted claims

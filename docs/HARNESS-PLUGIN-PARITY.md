@@ -45,6 +45,20 @@ separate required workflows under the accepted migration specification.
 
 ## CI readiness barriers and retained failures — October 14
 
+[Validate 38544790754](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38544790754)
+at **617eccd13404b41a5617af87a60c8f711e420ad6** fails Debian's SDK/core cohort:
+the nested-tool GUI records refused `/api/rpc` requests during cold reopening,
+and the Search settings collision probe encounters an earlier unknown prompt
+outcome instead of the expected pending-settings refusal. Both failures are
+retained; their exact causes are unproven and the local memory cohort does not
+qualify them. Later Debian/native/package steps are skipped. SDK platform
+**38544790663** and Windows desktop **38544790562** pass. Windows command
+**38544790664** retains x64 delegation/settlement failures and arm64 unconfirmed
+Stop; qualification **38544790650** remains in progress at this checkpoint.
+macOS **38544790803** retains Office MPL, Sharp/libvips LGPL and missing Koffi
+licence-text package gates. These are preceding-head results, distinct from the
+later memory-only request option; no rerun or weakened assertion closes them.
+
 [Validate 38537127275](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38537127275)
 at **5abd48f0f1b17922a86ca7a2be138ca51a3b4172** passes the locked-DSH build/SDK,
 all subsequent Debian native/interaction/recovery/first-run checks, dependency

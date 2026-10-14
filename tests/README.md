@@ -1,14 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-The memory-only request-mode follow-up passes common Python **35/35** across
-`test_hindsight_setup`, `test_memory_budget`, `test_hindsight_memory` and
-`test_dual_memory`. Installer tests exercise actual parsing, private files and
-loopback health/policy endpoints with Docker mocked; default compatibility,
-saved choices and refusals preserve configuration. A real pinned Hindsight image
-and the public synthetic failure proof verify all four measured request flags,
-one stopped operation/no retry and archive preservation. This is separate from
-load-confounded real-Qwen request diagnostics and pending complete live/ordinary/
-installed/platform acceptance. See [scope](../docs/CONTROLLED-MEMORY.md#memory-only-llamacpp-request-mode--october-14).
+At **5318959c1b4346bcaa293983206e767a45d4e1f2**, memory-only mode source/
+ordinary Python **35/35 each** and Node context/client/native/provenance **18/18
+each** pass, no skips, two Node workers/unchanged deadlines. All 905 compiled
+files/set and 155 production npm instances remain unchanged. Actual installer
+argument/filesystem/loopback-HTTP tests mock Docker and verify saved/default/mode
+refusal boundaries. The exact pinned image/four-call fixture verifies false flags,
+one deliberate stopped stage/no retry and unrelated archive preservation. A real
+idle-start six-stage engine proof passes in 18.90 seconds; the fresh actual Pi/
+shared-companion/Hindsight/Qwen sequence passes in 53.90 seconds with both batches
+complete, correct preference/new facts, historical/cold exact brief/tool retention,
+one SDK read, no branch recall/replay and preserved parent files/capture exclusions.
+Default/load-confounded failures retain their stopped state; the new opt-in is
+not activated in production. See [exact evidence and limits](../docs/CONTROLLED-MEMORY.md#memory-only-llamacpp-request-mode--october-14).
 
 At **aac3bad18f38ca61fa4129b414849758ecdb22fa**, strict check/build and source/
 fresh ordinary **177/177 each** pass across the same 24-file native-memory cohort,
