@@ -30,6 +30,36 @@ export async function harnessPointerClick(panel,expression,until){
  await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});
 }
 
+// Hover-only supplier actions need the row and control prepared together.
+// Row scrolling/hover may repeat; the single eventual click never does.
+export async function harnessHoverPointerClick(panel,rowExpression,controlExpression,until){
+ let point,diagnostic;
+ const stable=(expression,scroll)=>`(async()=>{
+  const find=()=>(${expression});let e=find();
+  const fail=reason=>({reason,target:e?{tag:e.tagName,id:e.id,text:e.textContent?.slice(0,100)}:null});
+  if(!e||!e.isConnected||e.disabled)return fail("hover target unavailable");
+  const original=e;${scroll?'e.scrollIntoView({block:"center",inline:"nearest"});':''}let previous=e.getBoundingClientRect();
+  for(let n=0;n<2;n++){
+   await new Promise(requestAnimationFrame);e=find();if(e!==original||!e?.isConnected||e.disabled)return fail("hover target replaced");
+   const next=e.getBoundingClientRect();if(["x","y","width","height"].some(k=>Math.abs(next[k]-previous[k])>.1))return fail("hover geometry is moving");previous=next;
+  }
+  for(let p=e;p;p=p.parentElement)if(p.getAnimations().some(a=>{const t=a.effect?.getComputedTiming();return (a.playState==="running"||a.pending)&&Number.isFinite(t?.endTime)&&t.progress!==null;}))return fail("hover ancestor animation is active");
+  const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2;
+  if(!r.width||!r.height||!e.contains(document.elementFromPoint(x,y)))return {...fail("hover center not hit"),rect:{x:r.x,y:r.y,width:r.width,height:r.height}};
+  return {point:{x,y},rect:{x:r.x,y:r.y,width:r.width,height:r.height}};
+ })()`;
+ try{await until(async()=>{
+  const row=await panel.evaluate(stable(rowExpression,true));diagnostic={row};if(!row.point)return false;
+  await panel.call('Input.dispatchMouseEvent',{type:'mouseMoved',...row.point});
+  const control=await panel.evaluate(stable(controlExpression,false));
+  const current=await panel.evaluate(`(()=>{const row=(${rowExpression}),control=(${controlExpression});if(!row||!control)return null;const r=row.getBoundingClientRect();return {hovered:row.matches(":hover"),contains:row.contains(control),rect:{x:r.x,y:r.y,width:r.width,height:r.height}};})()`);
+  diagnostic={row,control,current};if(!control.point||!current?.hovered||!current.contains||Object.keys(row.rect).some(k=>Math.abs(row.rect[k]-current.rect[k])>.1))return false;
+  point=control.point;return true;
+ },'hover pointer ready: '+controlExpression);}catch(error){error.message+=' '+JSON.stringify(diagnostic);throw error;}
+ await panel.call('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});
+ await panel.call('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});
+}
+
 // Opaque frame controls need both coordinate spaces ready before one dispatch.
 export async function harnessFramePointerClick(panel,frameEvaluate,iframeExpression,controlExpression,until){
  const geometry=expression=>`(async()=>{

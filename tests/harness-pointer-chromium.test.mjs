@@ -10,8 +10,21 @@ import {tmpdir} from 'node:os';
 import {setTimeout as delay} from 'node:timers/promises';
 import {chromiumPort} from './fixtures/chromium-ready.mjs';
 import {harnessCdp} from './fixtures/harness-cdp.mjs';
-import {harnessPointerClick,harnessFramePointerClick} from './fixtures/harness-pointer.mjs';
+import {harnessPointerClick,harnessFramePointerClick,harnessHoverPointerClick} from './fixtures/harness-pointer.mjs';
 async function until(fn,label){const end=Date.now()+12000;while(Date.now()<end){if(await fn())return;await delay(30);}throw Error('Pointer fixture timeout: '+label);}
+test('original hover-only row actions recover after a row moves without repeating a click',{skip:process.platform!=='linux',timeout:30000},async t=>{
+ const css=await readFile(new URL('../apps/harness/vendor/dsh/packages/client/ui-workspace/src/client/rows/Rows.module.css',import.meta.url),'utf8');let chrome,panel;const profile=await mkdtemp(join(tmpdir(),'augmentor-hover-pointer-'));
+ const server=http.createServer((_,res)=>res.writeHead(200,{'content-type':'text/html'}).end(`<!doctype html><title>Authored hover motion</title><style>${css}\n.projectRow{position:absolute;left:80px;top:80px;width:300px;height:34px;display:flex}.projectText{flex:1}</style><div id="row" class="projectRow"><span class="projectText">Synthetic workspace</span><span class="rowActions"><button id="target">Actions</button></span></div><script>
+ globalThis.receipts={pressed:0,clicked:0,hovers:0};row.addEventListener('mouseenter',()=>{receipts.hovers++;if(receipts.hovers<=2)requestAnimationFrame(()=>row.style.top=(80+receipts.hovers*100)+'px');});target.addEventListener('mousedown',()=>receipts.pressed++);target.addEventListener('click',()=>receipts.clicked++);
+ </script>`));server.listen(0,'127.0.0.1');await once(server,'listening');
+ t.after(async()=>{panel?.close();if(chrome?.exitCode===null){const ended=once(chrome,'exit');chrome.kill('SIGTERM');await ended;}server.closeAllConnections();await new Promise(done=>server.close(done));await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,'http://127.0.0.1:'+server.address().port],{stdio:'ignore'});let port;
+ await until(async()=>{assert.equal(chrome.exitCode,null);try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'hover Chrome');const page=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(r=>r.type==='page');panel=await harnessCdp(page.webSocketDebuggerUrl);await panel.call('Runtime.enable');await until(()=>panel.evaluate('document.readyState==="complete"&&!!document.querySelector("#target")'),'hover document');
+ const old=await panel.evaluate('(()=>{const r=document.querySelector("#row").getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()');await panel.call('Input.dispatchMouseEvent',{type:'mouseMoved',...old});await panel.evaluate('new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done)))');
+ assert.equal(await panel.evaluate('document.querySelector("#target").getBoundingClientRect().width'),0,'the original CSS hides actions after a one-position hover loses its row');assert.equal(await panel.evaluate('receipts.clicked'),0);
+ await harnessHoverPointerClick(panel,'document.querySelector("#row")','document.querySelector("#target")',until);
+ const receipts=await panel.evaluate('receipts');assert.equal(receipts.pressed,1);assert.equal(receipts.clicked,1);assert(receipts.hovers>=3,'preparation reacquires hover after another movement');assert.deepEqual(panel.errors,[]);
+});
 test('real Chromium reobserves a replaced offscreen target before one pointer click',{skip:process.platform!=='linux',timeout:30000},async t=>{
  const profile=await mkdtemp(join(tmpdir(),'augmentor-pointer-chrome-'));let chrome,panel;
  const server=http.createServer((_,res)=>res.writeHead(200,{'content-type':'text/html'}).end(`<!doctype html><title>Authored pointer fixture</title><button id="target">Authored control</button><script>
