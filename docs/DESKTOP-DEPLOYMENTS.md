@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Qualified unselected search MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-search-mx-candidate--october-14),
+source **454db9d9915724b53998e187c30c2943a0d7d3b2**, product **0.2.13**,
+release **20261014-032413-b4cd8c8b**, artifact
+**964d1cdef122aab51fd46510f897a35d1bd391e97d4f7ae1f52983160569f3e5**, passes source/ordinary/
+complete candidate **491/491 across 98 MX files**, two workers, matching Node/QtTest,
+unchanged deadlines/no skips. All 24,279 entries/902 compiled files/52 search
+records verify; 155 npm instances, nine unchanged dependency/Node native bytes,
+846 notices retaining the preceding 833 and original bodies qualify. Separate
+managed Qwen source/ordinary/candidate owners each switch mode on the same
+AgentSession and perform two official Debian search-turn reads with exact cold
+history and no saved synthetic key in model events. The initial candidate fetch
+failure remains WEB_PROVIDER_ERROR with transport cause unresolved; later success
+does not close outage/quota acceptance. Current 97897cf remains selected/running
+with Native busy/draft flags, so no shutdown/activation occurs. Guarded installed
+owner acceptance and the wider migration/live/privacy/distribution/platform gates
+remain open; no merge/public binary/DSH retirement occurs.
+
 [Current qualified unselected Wiki MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13):
 source 12b403f / release 20261013-232107-a7bb6ab7 combines Wiki with the earlier
 Metafolder/privacy/branch work. Candidate-backed 471/471 and all 24,045 entries

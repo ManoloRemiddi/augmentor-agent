@@ -18,7 +18,7 @@ not qualify DSH retirement or infer parity from the total test count.
 | Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. The original Plugins form enables/disables the suite through public resource discovery on the same owners. | Installed-owner configuration/UI acceptance, representative use of the other skill workflows and companion CLIs/services. |
 | Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
-| Free Web Search, historical 0.1.0 reference | [Original API card and keyless controls](#keyless-and-api-modes-in-the-original-plugins-page--october-14) bind both workflows through existing Native owners, retaining separate keys/settings/drafts, same-owner mode reload, collision/pending recovery, scope boundaries and actual Light/Dark GUI qualification. Source/ordinary managed Qwen search and public fetch qualify. | Historical identity and 360 behavior, proof of active reference composition, representative credentialed engines/outage/quota, standalone add-ons, sealed/installed owner acceptance and other OS qualification remain. No owner keys are migrated. |
+| Free Web Search, historical 0.1.0 reference | [Original API card and keyless controls](#keyless-and-api-modes-in-the-original-plugins-page--october-14) bind both workflows through existing Native owners, retaining separate keys/settings/drafts, same-owner mode reload, collision/pending recovery, scope boundaries and actual Light/Dark GUI qualification. Source/ordinary managed Qwen search and public fetch qualify. | Historical identity and 360 behavior, proof of active reference composition, representative credentialed engines/outage/quota, standalone add-ons, guarded installed owner acceptance and other OS qualification remain. No owner keys are migrated. |
 | Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
 | Comfy MCP | Same managed-core binding; the reference service previously refused connection. | Service availability and a representative authorized workflow; no successful Comfy operation is claimed. |
 | Blender MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Blender operation and verified effect/Stop/retained evidence. |
@@ -30,9 +30,69 @@ It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision a
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
 
+## Qualified unselected search MX candidate — October 14
+
+Implementation **454db9d9915724b53998e187c30c2943a0d7d3b2**, product **0.2.13**,
+is separately staged as **20261014-032413-b4cd8c8b**, artifact
+**964d1cdef122aab51fd46510f897a35d1bd391e97d4f7ae1f52983160569f3e5**. It includes the
+preceding original GUI/context/Metafolder/privacy/branch/Wiki work plus the full
+original API Search card and the keyless mode/settings binding below. Source,
+fresh ordinary production and the complete candidate-backed cohort each pass
+**491/491 across 98 MX files**, two workers, Node 24.19.0, matching
+QtTest/PySide6/shiboken6 6.8.2.1, unchanged deadlines and no skips. The external
+driver is archived from that reviewed commit. Raw standalone client/schema inputs
+are byte-identical external copies; integration uses the candidate's actual
+bundled Node/runtime/SDK/GUI. No fixture or output is written inside the release.
+
+All **24,279** inventory entries verify after fixtures and live use, and all
+**902** compiled files match ordinary inputs. All **52** server/client search
+source records verify. Production retains **155** npm instances, unchanged from
+the qualified keyless library, and **nine** identical dependency/Node native
+files against the preceding Wiki artifact (eight pre-Node files plus Node).
+Original DSH/Context/Metafolder/brand/HTML/Office/PDF/shortcuts selections remain
+unchanged. Its **846** notice/provenance files retain all preceding **833**;
+only npm inventory and generated GUI provenance/combined notices change. The
+13 additions retain API client/runtime, keyless and original DSH fetch notices,
+source-selection and preferred-source metadata. Original licence bodies and Node
+notice remain. Source/ordinary pass five notice-assembly integrity, seven licence
+and nine Office packaging cases each. Public Office/font/native redistribution
+approval is not inferred from this private assembly.
+
+One isolated managed current-Qwen owner through the candidate's Node/runtime/SDK
+switches from API to keyless mode on the same AgentSession without changing its
+native history or exposing the synthetic stored API key to the model. Its search
+and fetch each run once, returning an official Debian source and the exact
+Debian documentation page with HTTP 200/body marker. Completion and byte-exact
+cold history pass; the baseline has no tool calls. No owner profile, keys,
+conversation/vault data or audio is used. Existing model/context/concurrency/
+precision/GPU placement remains unchanged.
+
+The first candidate live request has successful search but failed fetch with
+**WEB_PROVIDER_ERROR**, without a retained transport cause. A later direct read
+through the same packaged original HTTP provider returns HTTP 200, and the final
+managed-owner trial succeeds. A scoped transport-error observer is added only
+to the external diagnostic driver; the product artifact is unchanged. These
+later successes do not explain the earlier failure or qualify general network/
+engine outage/quota reliability. The earlier source/ordinary live outcomes below
+also remain retained, rather than being relabelled by the passing final trial.
+
+This candidate is **unselected and not activated**. The selected/running preview
+remains **97897cf82eee3277ae7ad664d695571eb5de112a**, release
+**20261013-142001-1f7f7f96**, artifact
+**05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**.
+Fresh maintenance remains online/busy with an unsent draft and no accepted
+shutdown, so no forced stop or activation occurs. Before later adoption, obtain
+a fresh idle comparator including Free Search profile presence/bytes alongside
+model/auth/GUI/Wiki/Metafolder/branch/history/queue state, use the normal guarded
+updater and qualify the actual installed owner GUI/tools/history. Wider named
+plugin, OAuth/MCP/Home/embedded/physical voice/privacy/crash/network/public
+release and platform gates, historical 0.1.0 identity/360 behavior, active-reference
+composition and standalone add-on packaging remain open. DSH retirement, a merge
+or a public binary release is not authorized by these checks.
+
 ## Keyless and API modes in the original Plugins page — October 14
 
-The October 14 Host/settings implementation binds the previously qualified MIT
+Implementation **454db9d9915724b53998e187c30c2943a0d7d3b2** binds the previously qualified MIT
 keyless library alongside the full original API-engine card. Settings → Plugins
 uses the pinned original DSH segmented control, form, value fields, disclosure,
 switches and buttons. API mode retains the complete supplier card; keyless mode
@@ -118,7 +178,7 @@ passing later request does not explain those earlier live outcomes. GUI driver
 corrections wait for editable/focused controls, guard cold selectors and fix an
 invalid quoted selector; product layout and test deadlines are unchanged.
 
-This is source/ordinary qualification, not a sealed or installed search update.
+This section owns source/ordinary qualification; the [candidate record above](#qualified-unselected-search-mx-candidate--october-14) records separate sealed acceptance. Installed search adoption remains unqualified.
 Selected/running runtime **97897cf82eee3277ae7ad664d695571eb5de112a**, release
 **20261013-142001-1f7f7f96**, and the qualified unselected Wiki candidate stay
 unchanged. Fresh Native maintenance is online/busy with an unsent draft and

@@ -1,6 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-The October 14 Host/settings implementation extends `search-settings.test.mjs`
+The [qualified search candidate](../docs/HARNESS-PLUGIN-PARITY.md#qualified-unselected-search-mx-candidate--october-14)
+is **20261014-032413-b4cd8c8b**, source **454db9d9915724b53998e187c30c2943a0d7d3b2**,
+artifact **964d1cdef122aab51fd46510f897a35d1bd391e97d4f7ae1f52983160569f3e5**. Its full external
+98-file driver, archived from that commit, uses the candidate's bundled
+Node/runtime/SDK/GUI and byte-identical raw client/schema inputs and passes
+**491/491** at two workers, matching QtTest, unchanged deadlines/no skips. All
+24,279 inventory entries verify afterward. The isolated real Qwen managed-owner
+mode/search/fetch/cold-history proof also passes; the first candidate's fetch
+WEB_PROVIDER_ERROR remains unexplained after later direct/managed success.
+Installed-owner adoption, other live/platform and public redistribution gates
+remain separate. Fixtures/outputs are external to the immutable release.
+
+Implementation **454db9d9915724b53998e187c30c2943a0d7d3b2** extends `search-settings.test.mjs`
 to eight cases for legacy byte preservation, independent mode/config/key layers,
 form units/order/limits and uncertain-save draft retention. The original Chromium
 case now covers both mode panels, staged drafts across switches, same-owner/history
