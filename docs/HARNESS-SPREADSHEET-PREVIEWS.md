@@ -4,6 +4,52 @@
 
 # Original Harness spreadsheet previews
 
+## Portable GUI dependency resolution — October 14
+
+The October 14 build correction preserves the original package's nested
+resolution when compiling patched spreadsheet entries from temporary overlays.
+In [Application SDK run 38496466360](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38496466360),
+Linux/macOS contracts pass but Windows stops during the shared GUI build:
+FortuneSheet's default Immer import reaches project **11.1.4** instead of its
+nested **9.0.21**, and that export is absent. The old importer test concatenates
+`/` to a native overlay path, which contains backslashes on Windows. It therefore
+misses the original-package mapping. This is a shared build defect; no Windows
+installer or GUI redesign is introduced by its correction.
+
+The authored `scripts/harness-build-resolution.mjs` compares absolute paths
+through native `relative`, separator, root and drive rules instead of text
+prefixes. Actual overlay descendants resolve at the corresponding original
+package subdirectory; sibling/parent/virtual paths do not. The existing recursion
+marker and entry selection remain. The same comparison bounds dsh-context's
+history/pricing imports to its selected directory, maintaining the Pi boundary
+on mixed Windows paths. Original supplier sources, patches, locks, dependency
+versions, runtime/GUI ownership and layout remain unchanged. No shim replaces
+Immer, no package version is changed and no workspace/selected release is patched.
+
+Three source build regressions pass: descendant/sibling/parent/virtual boundaries;
+Windows mixed separators/case/UNC/drives and original resolution/recursion; and a
+real esbuild fixture with incompatible project versus valid nested exports,
+retaining both authored original and overlay bytes. The SDK platform workflow
+runs these before the real GUI build on Linux/macOS/Windows. Strict check/build
+pass locally; the source focus passes **19/19** (three build plus sixteen original
+spreadsheet/context cases), and separate ordinary production passes **16/16**
+spreadsheet/context cases with matching prepared QtTest, two workers, unchanged
+deadlines and no skips. Real workbook parser/grid/sheet/readonly/lifecycle and
+retained Context provider formats remain covered. Hosted verification of this
+new source is separate and pending; local Windows path tests are not a Windows
+application qualification.
+
+The new build's GUI `SOURCE.json`, selected supplier/patch hashes and fixed worker
+body match the qualified 454db9d search candidate. An initial whole-tree byte
+comparison fails because generated spreadsheet comments contain a random overlay
+directory, changing the lazy chunk hash, its loader reference and build/asset
+records. The old/new chunk bodies match after normalizing that generated directory;
+this explains the comparison failure without weakening the runtime tests. Fresh
+GUI builds are not claimed byte-identical or fully reproducible. Preferred-source
+and public engine/rebuild gates remain open. The **20261014-032413-b4cd8c8b** search
+candidate and **97897cf** selected/running preview remain untouched; this build
+correction is source qualification, not new immutable or installed acceptance.
+
 ## Registration, original UI and limits — October 12
 
 The original public DSH spreadsheet registration serves `.xlsx`, `.xls`, `.csv`

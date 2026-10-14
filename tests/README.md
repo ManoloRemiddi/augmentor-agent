@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`harness-build-resolution.test.mjs` has three source/build-only cases for native
+path boundaries, Windows mixed separators/case/UNC/drives and a real esbuild
+fixture proving nested supplier exports beat an incompatible project package.
+The SDK platform matrix runs these before building the original GUI. Source
+check/build and the nineteen-case build/spreadsheet/context focus pass; separate
+ordinary production passes sixteen GUI/context cases at two workers with matching
+QtTest, unchanged deadlines/no skips. These build-tool cases are separate from
+the 491-case packaged runtime cohort. See [scope and retained comparison failure](../docs/HARNESS-SPREADSHEET-PREVIEWS.md#portable-gui-dependency-resolution--october-14).
+
 The [qualified search candidate](../docs/HARNESS-PLUGIN-PARITY.md#qualified-unselected-search-mx-candidate--october-14)
 is **20261014-032413-b4cd8c8b**, source **454db9d9915724b53998e187c30c2943a0d7d3b2**,
 artifact **964d1cdef122aab51fd46510f897a35d1bd391e97d4f7ae1f52983160569f3e5**. Its full external

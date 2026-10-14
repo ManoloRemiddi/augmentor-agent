@@ -31,6 +31,8 @@ jobs:
         run: uv pip install --python .sdk-test-python/Scripts/python.exe pywin32==312
       - run: npm ci --ignore-scripts
       - run: npm run check
+      - name: Verify original GUI dependency resolution on this platform
+        run: node --test tests/harness-build-resolution.test.mjs
       - run: npm run build
       - name: Verify OS private files and startup contracts
         run: node -e "const cp=require('child_process'); const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-m','unittest','discover','-s','tests','-p','test_app_sdk_platform.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"

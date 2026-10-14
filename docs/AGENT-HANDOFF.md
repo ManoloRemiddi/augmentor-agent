@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Portable original-GUI dependency resolution](HARNESS-SPREADSHEET-PREVIEWS.md#portable-gui-dependency-resolution--october-14)
+fixes the Windows temporary-overlay path comparison so FortuneSheet resolves its
+original nested Immer 9.0.21, rather than incompatible project 11.1.4. The same
+path boundary preserves the selected Context adapter. Three build regressions,
+strict check/build, nineteen source and sixteen ordinary spreadsheet/context
+cases pass. Source/supplier/layout/dependency pins and existing candidate/installed
+identities stay preserved. Random generated overlay comments explain changed
+chunk hashes; fresh GUI build byte reproducibility is not claimed. New-head
+hosted platform build/contract acceptance is pending; broader platform rollout
+still follows MX owner acceptance.
+
 [Qualified unselected search MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-search-mx-candidate--october-14),
 source **454db9d9915724b53998e187c30c2943a0d7d3b2**, product **0.2.13**,
 release **20261014-032413-b4cd8c8b**, artifact

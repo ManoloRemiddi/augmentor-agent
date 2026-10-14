@@ -6,6 +6,7 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {tmpdir} from 'node:os';
 import {fileURLToPath} from 'node:url';
+import {relativeBuildInput,spreadsheetOverlayResolver} from './harness-build-resolution.mjs';
 const root=resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ui=join(root,'apps/harness'),vendor=join(ui,'vendor/dsh');
 const provenance=JSON.parse(readFileSync(join(vendor,'SOURCE.json'),'utf8'));
@@ -59,11 +60,7 @@ for(const [name,version,patchName] of [['@fortune-sheet/core','1.0.4','@fortune-
  if(typeof entry!=='string')throw Error('Spreadsheet patched browser entry is unavailable.');spreadsheetEntries.set(name,join(overlay,entry));
  spreadsheetPatches.push({name,version,patch:'patches/'+patchName,patchSha256:createHash('sha256').update(body).digest('hex'),files:paths.map(path=>({path,sourceSha256:createHash('sha256').update(readFileSync(join(original,path))).digest('hex'),sha256:createHash('sha256').update(readFileSync(join(overlay,path))).digest('hex')}))});
 }
-const spreadsheetResolver={name:'original-spreadsheet-patches',setup(b){b.onResolve({filter:/^[^./]/},async args=>{
- if(args.pluginData?.spreadsheetOriginalResolution)return;
- if(spreadsheetEntries.has(args.path))return {path:spreadsheetEntries.get(args.path)};
- for(const [overlay,original] of spreadsheetOrigins)if(args.importer.startsWith(overlay+'/'))return b.resolve(args.path,{resolveDir:dirname(join(original,args.importer.slice(overlay.length))),kind:args.kind,pluginData:{spreadsheetOriginalResolution:true}});
-});}};
+const spreadsheetResolver=spreadsheetOverlayResolver(spreadsheetEntries,spreadsheetOrigins);
 // Port the original isolated parser build; its graph participates in notices and
 // remains outside the application's initial module closure.
 const excelWorker=await build({absWorkingDir:root,entryPoints:[join(vendor,'packages/client/ui-sidebar-documentpreview/src/client/excel/worker.ts')],outfile:join(root,'dist/harness-web/dsh-excel-worker-0.2.1-alpha.2.mjs'),bundle:true,format:'esm',platform:'browser',target:'chrome120',minify:true,metafile:true,legalComments:'eof',write:false,nodePaths:[join(ui,'node_modules'),join(root,'node_modules')],plugins:[spreadsheetResolver],mainFields:['browser','module','main'],define:{'process.env.NODE_ENV':'"production"'}});
@@ -78,7 +75,7 @@ for(const family of readdirSync(join(vendor,'packages'))){
 const pinnedPublicResolver={name:'pinned-public-dsh',setup(b){
     b.onResolve({filter:/^@dsh-metafolder$/},()=>({path:join(metafolderVendor,'client.js'),namespace:'metafolder'}));
     b.onLoad({filter:/.*/,namespace:'metafolder'},args=>({contents:'import React from \"react\";\nexport default (function(React){\n'+readFileSync(args.path,'utf8')+'\n})(React);',loader:'js',resolveDir:ui}));
-    b.onResolve({filter:/^(\.\.\/historyPage|\.\/historyPage|\.\.\/modelPrices)$/},args=>args.importer.startsWith(contextVendor)?{path:join(ui,'dsh-context-boundary.mjs')}:undefined);
+    b.onResolve({filter:/^(\.\.\/historyPage|\.\/historyPage|\.\.\/modelPrices)$/},args=>relativeBuildInput(contextVendor,args.importer)!==undefined?{path:join(ui,'dsh-context-boundary.mjs')}:undefined);
     b.onResolve({filter:/\?inline$/},args=>({path:requireUi.resolve(args.path.slice(0,-7)),namespace:'raw'}));
     b.onResolve({filter:/\?raw$/},args=>({path:args.path.startsWith('.')?resolve(dirname(args.importer),args.path.slice(0,-4)):requireUi.resolve(args.path.slice(0,-4)),namespace:'raw'}));
     b.onLoad({filter:/.*/,namespace:'raw'},args=>({contents:readFileSync(args.path,'utf8'),loader:'text'}));
