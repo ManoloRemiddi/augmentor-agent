@@ -148,3 +148,10 @@ rollout, complete migration/privacy/recovery and public distribution remain open
 Office exact-entry-source/actual engine rebuild and native/font notice gates are
 not relaxed; the isolated engine compile is independent of account work. Production
 Qwen/Breeze GPU placement, context/concurrency/precision and CPU ASR/VAD are preserved.
+
+A subsequent visual check of the same authored account flow confirms readable
+light/dark dialog text. The follow-up restores the sentence separator after the
+copy-link button and labels the completed sign-in receipt as historical, so a
+later sign-out is not confused with current stored credential state. Original
+layout, control placement and CSS remain unchanged; final-cohort qualification
+is pending for that copy-only follow-up.

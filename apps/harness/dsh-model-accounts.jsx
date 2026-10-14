@@ -30,7 +30,7 @@ export function DshModelAccounts({scope}){
    {auth.busy&&<p className={css.notice} role="status">{auth.receipt?.state==='cancel-requested'?'Waiting for Pi to settle account cancellation.':'Account sign-in is active for '+auth.receipt?.provider+'.'} {auth.receipt?.state==='running'&&<button type="button" className={css.secondaryButton} onClick={()=>setSignIn(auth.receipt.provider)}>Continue sign-in</button>}</p>}
    {auth.needsRefresh&&!auth.busy&&<p className={css.notice}>Inspect the account result, then use Refresh model settings before starting work or another sign-in.</p>}
    {auth.error&&<p className={css.error} role="alert">{auth.error}</p>}
-   {auth.receipt&&!auth.busy&&<p className={css.intro}>{auth.receipt.provider}: {auth.receipt.state==='completed'?'Pi stored the account credential.':auth.receipt.state==='cancelled'?'Cancellation settled; inspect the stored account before continuing.':auth.receipt.state==='interrupted'?'Pi stopped before the sign-in outcome was confirmed.':'Sign-in needs review before continuing.'}</p>}
+   {auth.receipt&&!auth.busy&&<p className={css.intro}>Last sign-in for {auth.receipt.provider}: {auth.receipt.state==='completed'?'Pi stored the account credential.':auth.receipt.state==='cancelled'?'Cancellation settled; inspect the stored account before continuing.':auth.receipt.state==='interrupted'?'Pi stopped before the sign-in outcome was confirmed.':'Sign-in needs review before continuing.'}</p>}
    {signIn&&<DshAccountDialog scope={login} provider={signIn} close={()=>setSignIn(null)}/>}
   </>}
   {account&&editable&&<SignOutDialog running={false} close={()=>setTarget(null)} signOut={()=>scope.logoutAccount(account.provider)} t={key=>copy[key]??key}/>}

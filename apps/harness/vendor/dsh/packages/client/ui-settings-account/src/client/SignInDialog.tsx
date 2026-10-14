@@ -73,7 +73,7 @@ export function SignInDialog({ account, colorScheme, start, cancel, close, useAp
         {t('browserPrompt')}<button type="button" className={css.link} disabled={!authorizeUrl}
           onClick={authorizeUrl ? () => { void copyLink(authorizeUrl) } : undefined}>
           {t(copyResult?.messageKey ?? 'copyLink')}
-        </button>{t('browserDescription')}
+        </button>{'. '}{t('browserDescription')}
       </p> : <p className={css.description}>
         {error ? t(failureKey) : expired ? t('timeoutDescription') : waiting ? t('browserDescription') : t('loginDescription')}
       </p>}

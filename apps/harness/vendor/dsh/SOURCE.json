@@ -3564,7 +3564,7 @@
     },
     {
       "path": "packages/client/ui-settings-account/src/client/SignInDialog.tsx",
-      "sha256": "a3a9b377ca555c203d65e2992921bb41ec92deee12c9e3c9b2c25f40b4a78ce8",
+      "sha256": "743671dac1200b4c6da43a8ea36025c7c455a34158d7f6c542269305e7369d8a",
       "upstreamPath": "packages/client/ui-settings-account/src/client/SignInDialog.tsx",
       "upstreamSha256": "3e28a98b67c0dfc16186de24ab15a6fffd7213d1a3e59ef5931f0217bf2161d3",
       "adaptation": "Modified by Augmentor (MIT): optional child holds supported Pi auth prompts; provider URLs are copied exactly without DSH theme query parameters; waiting copy supports non-browser steps. Original dialog layout/CSS/actions retained."
