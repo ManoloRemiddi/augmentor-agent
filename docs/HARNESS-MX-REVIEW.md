@@ -103,3 +103,8 @@ validation reaches the Office exact preferred-source/full-engine-rebuild packagi
 gate; that gate remains. New-head hosted results, Office/font/native licence/rebuild
 and public distribution remain separate. DSH is retained; the full Harness migration
 is still active.
+
+The later [Pi keep-original draft guidance](AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14)
+is source-qualified separately and is **not** in this running review artifact.
+Its live functional checks do not resolve semantic/timing acceptance; no review
+profile or immutable release is patched to adopt it.

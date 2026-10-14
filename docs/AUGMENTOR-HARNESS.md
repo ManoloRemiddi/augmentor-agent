@@ -885,4 +885,51 @@ its saved seed conversation without repeating the exchange. A later native-byte
 assertion used a baseline from before cold GUI loading: the sole appended
 `session_info` title predates the improvement receipt, while prior bytes and
 conversation content remain unchanged. Both preparation failures remain retained.
-Qualification of the corrected guidance and loaded surfaces is pending.
+Qualification source **c543b75e1cbed744b4c94030e3d61a0dc2d5d43c**, product **0.2.13**/Pi **1.1.0**,
+passes strict check/build and focused source/fresh ordinary **5/5 each across four
+files**, two workers, unchanged deadlines, no skips. The actual SDK/HTTP tests
+accept a one-key unchanged response without trimming Unicode/whitespace, reject
+an unchanged response carrying replacement text, and retain no-replay, cancellation,
+revision, tool refusal, Native and loaded Browser contracts. All **908 compiled
+files** match; the isolated base's complete dependency/Node bytes and 155 production
+npm instances remain unchanged. These are Linux tests, not installed Mac/Windows
+or physical acceptance.
+
+A fresh real local-Qwen profile passes functional transaction checks through the
+original Harness, production Qt window and loaded Chromium extension. Three
+completed draft transactions each make one request. Undo restores each original;
+parent display history, native bytes and observations remain exact. A fourth
+transaction is canceled through Browser Escape after actual upstream Qwen output
+arrives: its draft remains intact, connection closes and no retry occurs. Including
+one authored seed exchange, **five provider requests** are observed. Draft calls
+have no tools, one user input and no parent chat, workspace sentinel/path or memory
+context. Application improvement receipts retain metadata, not draft/result bodies.
+The original UI, native and 640×900 Browser screenshots are inspected. Owned Host,
+Browser, Native and prompt processes settle; a separately auto-started private
+memory service is identified by exact test HOME/command and stopped gracefully.
+No owned process remains; owner review processes and installed selection survive.
+
+Functional success does not establish semantic acceptance: Harness returns the
+ambiguous draft exactly; Native preserves the requested identifier and final line;
+Browser still attaches the identifier/ending wording unclearly. All three retain
+Undo. The earlier added-state and first Native placement errors remain failures,
+and arbitrary rewrite quality is unqualified. There is no automatic semantic
+verification or automatic submission of an improved draft.
+
+A preceding run reaches the unchanged **60-second** request limit with reasoning
+output and no answer; the original draft survives and the receipt is canceled.
+The inherited local model definition has `reasoning:false`. Pi therefore sends no
+thinking control, despite the draft session requesting thinking off. Adding public
+`compat.thinkingFormat: qwen-chat-template` in the disposable profile also sends no
+control while that capability remains false. The later passing run does **not**
+prove that attempted mapping changed behavior or resolved latency. No owner model
+metadata, context/concurrency/precision, service or GPU placement is changed.
+Correct explicit provider capability/mapping and representative timing/semantic
+acceptance remain open; no deadline is increased or unknown request replayed.
+
+The current owner review still runs **9f5bc70**, with its full **24,288-entry**
+inventory verified afterward; these newer source changes have not replaced it.
+The preceding cfe5fab [Validate 38568478466](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38568478466)
+passes SDK/core, native interaction/recovery/first-run, production inventory and
+extension notices before refusing the retained Office exact-source/engine-rebuild
+packaging gate. New-head hosted and all broader migration/release gates remain.

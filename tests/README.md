@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi keep-original draft responses](../docs/AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14) qualify exact
+Unicode/whitespace preservation and reject mixed unchanged/replacement objects in
+the actual SDK/HTTP transaction. Source **c543b75e1cbed744b4c94030e3d61a0dc2d5d43c** passes strict check/build
+and focused source/ordinary **5/5 each across four files**: Pi improvement/privacy,
+shared Harness prompts and loaded Browser. All 908 compiled files and complete
+ordinary dependency/Node bytes match; two workers/deadlines are unchanged. Actual
+Qwen functional surface evidence, mixed semantic results, a retained 60-second
+reasoning-only timeout and ineffective reasoning:false mapping trial are separately
+recorded. A passing transaction driver does not certify rewrite meaning.
+
 [New Session ownership](../docs/DSH-GUI-ON-PI.md#new-session-input-ownership--october-14)
 adds actual original-GUI/CDP held creation with durable old/new draft and exact
 prompt-owner assertions. Four controller contracts and the qualified old-tree

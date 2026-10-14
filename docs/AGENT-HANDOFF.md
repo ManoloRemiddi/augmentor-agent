@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi draft meaning preservation](AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14) at **c543b75e1cbed744b4c94030e3d61a0dc2d5d43c**
+adds a strict keep-original model response and explicit precedence over ambiguous
+editing advice. Source/ordinary **5/5 each across four files** pass with 908 matching
+compiled files and unchanged dependencies/Node. Actual local-Qwen original Harness,
+Qt and loaded Browser pass three transactions/Undo plus one delivered-output cancel,
+five requests including a seed, exact parent history/native bytes and private input
+boundaries. Semantic results remain mixed and one 60-second timeout is retained;
+this is not a semantic or latency guarantee. The attempted disposable Qwen mapping
+has no effect with inherited reasoning:false. No owner profile/service/review build
+changes. The owning guide records failures, cleanup, platform and release limits.
+
 [New Session input ownership](DSH-GUI-ON-PI.md#new-session-input-ownership--october-14)
 at **7987447efc56146e47f919322d514916b0cb69ef**
 freezes outgoing input before asynchronous creation, preserves its old draft,
