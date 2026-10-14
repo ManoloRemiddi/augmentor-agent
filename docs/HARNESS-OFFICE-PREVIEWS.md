@@ -57,9 +57,12 @@ isolation denies owner files/process/environment/network and source/system write
 Broker/renderer address space is bounded, the native child has CPU/file-size/FD
 limits and lower priority, and the parent deadline covers all font/conversion
 work. These are not an aggregate cgroup/scratch-quota qualification. SIGTERM,
-forced group termination and sandbox parent-death ownership await actual process
-exit before scratch removal/slot reuse. Disposal also cancels and settles work;
-unknown outcomes are never replayed automatically.
+group termination and sandbox parent-death ownership request teardown. Normal
+cancellation/disposal checks observe all owned descendants exit before the
+operation settles, with the original provider retaining its private scratch
+cleanup and slot ownership. Forced-termination/parent-crash races and direct-
+converter scratch cleanup still need qualification before promotion; the normal
+checks do not stand in for that evidence. Unknown outcomes are not replayed.
 
 Initial local focused checks pass **6/6** with explicit native dependencies: lazy
 provider seat/cache/authorization and retained cleanup, actual DOC/DOCX/XLS/XLSX/
@@ -68,8 +71,28 @@ bounds and existing-output refusal, real built-command negative isolation, and
 native cancellation/timeout/disposal. The actual original Chromium viewer passes
 with the opt-in Host: two pages, original font warning/details, 100% zoom, changed
 bytes, malformed-file Retry/recovery, narrow fullscreen close, unchanged native
-history and **zero subsequent provider requests**. Wider exact-source/ordinary
-qualification is pending below; these initial checks are not an installed proof.
+history and **zero subsequent provider requests**.
+
+At **15b1d8d22c25bcfae015c8ba836b7ad2e07052b5**, strict TypeScript/build and source/
+fresh ordinary **250/250 each across 62 files** pass, including all **44** existing
+Harness Chromium files, with two workers and unchanged deadlines, zero skips or
+cancellations. The six native/converter-seat checks run with real prerequisites;
+all preceding 244 cases retain the default engine and their existing assertions.
+Separate source and ordinary actual original Office viewer runs also pass with
+the explicit native Host, including the same history/no-further-inference contract.
+These are source/ordinary qualifications, not an installed proof.
+
+All **921 compiled files**, **2,045 executable source/test/fixture files**, and the
+unchanged **20,847 dependency entries / 155 npm instances / Node 24.19.0** match.
+The first ordinary command fails to launch Node because a relative root is reused
+under its own cwd; no test/Host is started. That preparation failure is retained.
+The corrected absolute-root invocation supplies the successful ordinary evidence.
+The nine Office packaging and two private-source cases pass (**11/11**) without
+changing the gate. Read-only postflight verifies current/prior review inventories
+of **24,305 / 24,288**, all four review processes, unchanged selection and **38**
+canonical modifications; Qwen's read-only models endpoint returns **200**. Owner
+histories/credentials are not read and services/GPU/voice placement remain intact.
+No review/installed update, public binary, merge or DSH retirement occurs.
 
 Reproduce only in fresh isolated test profiles with installed native prerequisites:
 
@@ -91,7 +114,7 @@ this implementation does not import the owner's global font configuration.
 Remaining gates include large/custom/glyph/font fallback and complex layout
 parity; executable macro/external-resource/password cases; archive repair/error
 classification, aggregate scratch/resource bounds and cancellation races; ordinary
-and installed GUI/artifact source/notice qualification; and other Linux layouts/
+artifact source/notice and installed GUI qualification; and other Linux layouts/
 architectures/macOS/Windows sandbox adapters with the **same feature contract**.
 The exact preferred-source/full rebuild gate for the still-default npm kit/Wasm
 remains closed. Retain DSH and the owner's working installed/review artifacts.
