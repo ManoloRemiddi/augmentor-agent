@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+At **8a441bb76e83eef509f6f0cd26e958736d5b6d7b**, strict check/build and
+source/ordinary **32/32 each** pass across `harness-jobs-chromium`, `jobs-registry`,
+`pi-jobs`, `pi-desktop-jobs`, `harness-goals-chromium` and
+`harness-search-settings-chromium`, two workers, unchanged deadlines, no skips.
+Jobs holds actual old list responses, dispatches one Start/Stop, delivers older
+responses last and verifies evidence reads do no inference. A separate controlled
+frontend owner-switch receipt proves no old evidence/busy clearing and correct
+disabled-field/draft recovery. Exact cold duplicate lookup avoids parent loading;
+actual public SDK Plan persistence and byte comparisons catch the before-fix load.
+Real isolated current-Qwen source evidence has one child request/zero tools,
+one usage/notification, no parent transcript copy and exact no-agent cold reads.
+See [evidence and limits](../docs/PI-JOBS.md#displayed-controls-cold-receipts-and-current-qwen--october-14).
+Preceding 092e5a1/Validate 38516251396 still fails one workspace-menu pointer
+observation; its cause/new-head hosted acceptance and wider platform/installed/
+live/distribution requirements remain separate. Before-fix runs remain unqualified.
+
 At **1598961772d31848291559d8755f491af702b09e**, the Office review includes an
 actual frozen public b19bb73 adapter build. All 36 pinned entry code/declarations
 are compared: 28 byte matches, seven differences and one missing native-process

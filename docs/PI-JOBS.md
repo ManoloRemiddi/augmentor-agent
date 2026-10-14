@@ -2,6 +2,72 @@
 
 # Pi background jobs and delegation
 
+## Displayed controls, cold receipts and current Qwen — October 14
+
+Source **8a441bb76e83eef509f6f0cd26e958736d5b6d7b** includes the shared Jobs
+frontend correction introduced at **b814d11afd047f8ee1798027cb57f6af9cd5f22d**.
+Previously, starting an inspection invalidated callbacks on the controls still
+displayed. An enabled Start/Stop/evidence button could silently ignore a click.
+The original DSH Jobs view and its inspection view use the same component.
+
+A displayed control now checks connected DOM, exact conversation, connection
+generation and read-only mode. Explicit work invalidates older reads. Controls
+are disabled during that work and recover their prior disabled states, including
+the fixed desktop tool-grant field. Delayed responses cannot erase an evidence
+view, restore stale job state, clear another owner's busy state or insert that
+owner's data. Failed/unconfirmed Start retains its draft and stable request ID.
+New admissions, grants, budgets, Stop and producer dispositions are unchanged;
+there is no layout, supplier, model/voice, dependency or OS-adapter change.
+
+Actual Chromium/Host/SDK tests hold older list responses, submit one Start and
+one Stop and deliver stale responses last. Native evidence inspection still
+works and performs no inference; the old list cannot erase its result. Separate
+controlled frontend receipts switch owners while an evidence read and another
+Start are pending: the old reply cannot enable the new Start, leak its evidence
+or reset that owner's state. Unconfirmed new-owner Start preserves its desktop
+draft, kind, disabled grants and request ID. This last check is frontend-only
+scope evidence; actual producer/permission tests remain separate.
+
+The live current-Qwen check exposed another boundary: the operator's cold
+duplicate path loaded its parent before returning an existing job. The exact
+owner/request fingerprint lookup now precedes parent loading. It returns only
+that stored receipt; changed parameters are refused. Existing authorization and
+owner guards still apply, and new work retains ordinary loading/admission checks.
+The actual SDK regression observes saved-native Plan replay before and after a
+cold duplicate, no new provider request and exact parent/child bytes. Its
+before-fix result switches to loaded session memory, proving the unwanted load.
+
+Strict check/build and source/separate ordinary **32/32 each** pass at two workers
+with unchanged deadlines and no skips. The cohort covers Jobs GUI, registry,
+delegated/desktop producers, ownership, limits, approval/Stop, unknown recovery,
+attribution, cold originals, and the existing Goal/Search regressions. All
+**902 compiled files** match the updated unselected ordinary tree, with **155**
+production npm instances unchanged. A before-fix held Start fails admission;
+original failing probes remain separate from final qualification.
+
+An isolated source Host using the actual current
+**Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k** completes a synthetic text-only background
+reply through one distinct native SDK child: **one child model request**, **zero
+tools**, the parent's selected provider/model preserved, and no parent transcript
+copied into the recorded child provider body. The original parent AgentSession
+remains unchanged; usage and notification are each recorded once. A cold
+duplicate and parent-owned native inspection create no agent/inference and
+preserve both native files byte-for-byte. No owner profile, provider credential
+or real task is used. The initial live run passed the producer checks but failed
+its cold-loaded-agent assertion; that failure prompted the runtime fix and is
+retained. Its original log's base-ref shorthand is corrected by the actual
+tested Host source hash in the local proof, rather than claiming unchanged
+b814d11 runtime bytes. This qualifies a real bounded reply, not physical desktop,
+shell/live-service effects or every concurrent workflow.
+
+The working app/draft, immutable candidate and separate owner-feedback profile
+stay unchanged. Full new-head hosted, installed-owner, live/privacy/migration,
+platform and distribution gates remain required. Preceding Validate
+**38516251396** at **092e5a114206c621a13c944640eaa2fe190f088b** fails one original
+composition workspace-menu pointer observation (zero-sized target); its cause is
+unproven. Keep that failure and the Office source/rebuild, Windows lease/teardown
+and macOS notice/package requirements separate from this Jobs qualification.
+
 The shared Host owns a private durable job registry. A delegated worker has one
 distinct Pi AgentSession and its own native history, queue and observations.
 The parent continues through its existing owner. Background commands own separate

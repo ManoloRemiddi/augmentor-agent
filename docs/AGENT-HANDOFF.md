@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Jobs controls, cold receipts and current Qwen](PI-JOBS.md#displayed-controls-cold-receipts-and-current-qwen--october-14)
+at **8a441bb76e83eef509f6f0cd26e958736d5b6d7b** keep displayed Start/Stop/evidence
+usable during inspection, fence older replies and preserve each control's disabled
+state. Actual held-response GUI cases and a controlled owner-switch probe qualify
+no lost actions/old data or cross-owner busy clearing. Operator exact duplicate
+lookup now precedes cold parent loading, with changed fingerprints refused.
+Strict check/build and source/ordinary **32/32 each**, no skips/deadline changes,
+902 matching compiled files/155 unchanged npm instances pass. A real isolated
+current-Qwen reply uses one distinct SDK child, one request/zero tools, the same
+parent owner/model, no copied parent transcript and single accounting/notification.
+Cold duplicate/native reads create no agent and preserve both files exactly.
+Before-fix failures/provenance corrections are retained; broader live/physical/
+installed/platform/distribution work remains. App/draft/candidate/feedback unchanged.
+Validate **38516251396** at 092e5a1 fails one composition workspace-menu pointer
+observation (zero-sized target), cause unproven. Investigate with actual UI evidence;
+keep that hosted failure and Office/Windows/macOS release gates separate.
+
 [Actual public Office wrapper rebuild](HARNESS-OFFICE-PREVIEWS.md#actual-public-wrapper-rebuild--october-14)
 at **1598961772d31848291559d8755f491af702b09e** builds public b19bb73 with its
 frozen lock/original command and recorded Node/pnpm/TypeScript/tsdown. Of all

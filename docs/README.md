@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Jobs inspection and cold receipt qualification](PI-JOBS.md#displayed-controls-cold-receipts-and-current-qwen--october-14)
+records 8a441bb: displayed actions/evidence survive pending reads, stale replies
+respect owner/busy/disabled state, and exact cold duplicates avoid parent loading.
+Strict check/build and source/ordinary 32/32 each plus an isolated real current-Qwen
+child reply qualify those boundaries, single attribution and exact cold files.
+No model/voice/pin/layout/installed changes occur. Earlier failures are retained;
+latest preceding CI has a separate workspace-menu pointer failure, while broader
+live/migration/platform/installed/public distribution work remains.
+
 [Actual Office preferred-source build](HARNESS-OFFICE-PREVIEWS.md#actual-public-wrapper-rebuild--october-14)
 records 1598961: the original frozen public wrapper build succeeds, but only
 28/36 pinned code/declaration files match. The missing native-process source and
