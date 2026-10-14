@@ -1,5 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Displayed Goal actions during pending inspection](PI-GOALS.md#displayed-actions-during-pending-inspection--october-14)
+at **552ba40f16cb0823b60796f014eca4ff37e0ad0d** qualify a shared original-DSH/
+inspection frontend fix: a pending read no longer silently discards an enabled
+Pause click. A held older active response cannot undo the one admitted pause;
+exact references, stale drafts, owner scope and no retry remain. A deterministic
+two-read Search fixture also releases all held inspections once, preserving
+disabled-before-confirmation and the complete original card workflow. Source/
+ordinary **12/12 each**, strict check/build and 902 matching compiled files pass,
+155 npm instances unchanged. Failed preparation/before-fix probes are retained;
+older intermittent CI causes are unproven. App/draft/candidate/feedback are unchanged.
+
+[Validate 38510383733](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14)
+at d1fce92 passes locked-DSH build/SDK, existing Goal/Search cases and all later
+native/recovery/interaction/first-run checks. Debian packaging then refuses the
+unqualified Office preferred-source/rebuild requirement. Keep that gate; do not
+infer public redistribution from private-preview identity. New-head hosted,
+live/migration/installed and macOS/Windows distribution acceptance remain required.
+Jobs has a similar read-ticket/action pattern worth investigating with actual
+held-response evidence; it is not changed or qualified by the Goal correction.
+
 [Actual Pi memory boundaries and unfinished-page fix](CONTROLLED-MEMORY.md#actual-pi-memory-boundaries-and-unfinished-pages--october-14)
 at **1b69cc79d045c0a7bcc6861fbae2ae38d45d8ec6** excludes whitespace-terminated
 engine markers from new/old cached pages without rewriting cache or retrying.

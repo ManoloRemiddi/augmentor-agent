@@ -11,6 +11,39 @@ migration work; this guide does not close their combined P1 gate.
 
 ## State and authority
 
+### Displayed actions during pending inspection — October 14
+
+Source **552ba40f16cb0823b60796f014eca4ff37e0ad0d** qualifies the frontend fix
+introduced at **30ac12da06e820b056e99a92aed6206211bed44b**. Previously, starting
+an asynchronous goal inspection invalidated the callbacks of the controls still
+displayed on screen. An enabled Pause button could silently discard a click
+while waiting for that read. The original DSH Goal view and the inspection view
+use the same shared `attachGoals` component, so both receive the correction.
+
+A displayed control now checks its connected DOM, conversation and connection
+generation. Its mutation invalidates older reads; the server still checks the
+exact goal reference. Delayed read responses cannot restore an older phase or
+erase the mutation result. Stale writes retain visible errors and drafts; owner
+changes invalidate old callbacks. No mutation is retried and no UI layout,
+supplier fold, policy, runtime loop or OS adapter changes.
+
+The actual Chromium regression holds an older active-goal response, clicks the
+enabled Pause button once, observes the backend paused state, then releases that
+older response and the following inspection. Before the fix, the pause is never
+admitted; after it, exactly one pause request is recorded and the UI stays paused.
+Existing stale-edit/draft, safe text, narrow viewport, continuation, limits,
+crash/unknown, branch and read-only cold inspection assertions remain.
+
+Strict check/build and **12/12 source plus 12/12 separate ordinary** cases pass
+with two workers, unchanged deadlines and no skips. All **902 compiled files**
+match the assembled tree, which retains **155** production npm instances.
+An earlier dependency-only stage lacked runtime files and was unqualified;
+the passing stage explicitly assembles public tracked source and current compiled
+output. This is shared-component/Linux synthetic-provider GUI evidence, not
+sealed/installed adoption, physical macOS/Windows GUI or full Harness acceptance.
+The selected app/draft, immutable candidate and owner-feedback profile stay
+unchanged. Broader live, migration, platform and distribution gates remain open.
+
 Goal snapshots contain a stable UUID, positive integer revision, objective,
 active/paused/blocked/complete phase and positive safe-integer round limit.
 The default is 256 rounds; objectives are bounded to 8192 JavaScript string units.

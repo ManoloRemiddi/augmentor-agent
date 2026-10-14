@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Source **552ba40f16cb0823b60796f014eca4ff37e0ad0d** passes strict check/build and
+**12/12 source plus 12/12 ordinary** across `harness-goals-chromium`,
+`harness-search-settings-chromium`, `pi-goals`, `pi-goals-barriers` and
+`goals-history`, two workers, unchanged deadlines, no skips. The Goal case holds
+an actual older active inspection, submits one Pause and proves its later release
+cannot undo paused state. A Search case explicitly holds two operator reads;
+single release reproduces disabled controls, while all held reads are released
+once by the corrected driver. Source Search behavior is unchanged. The fixture
+uses its own credential because the app removes credentials from the URL hash.
+See [Goal scope](../docs/PI-GOALS.md#displayed-actions-during-pending-inspection--october-14)
+and [retained failures/CI](../docs/HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14).
+Validate 38510383733 at d1fce92 passes locked-DSH/core/native checks then stops at
+the Office preferred-source/rebuild packaging gate. It does not qualify new-head
+held-response cases or public distribution. Earlier failed/incomplete probes
+remain separate from final evidence; installed/candidate/feedback state is preserved.
+
 At **1b69cc79d045c0a7bcc6861fbae2ae38d45d8ec6**, unfinished Hindsight pages
 with surrounding whitespace are excluded in fresh and legacy cached recall;
 real body text, independent facts, source cache bytes and offline capture remain.

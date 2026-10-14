@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Goal actions during pending inspection](PI-GOALS.md#displayed-actions-during-pending-inspection--october-14)
+records source 552ba40: one displayed Pause action survives a pending read and
+an older response cannot restore active state. Strict check/build and source/
+ordinary 12/12 each qualify shared GUI/lifecycle/history and explicit two-read
+Search readiness without layout/policy/dependency/deadline changes. Latest
+[Validate 38510383733](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14)
+passes the preceding locked-DSH/core/native checks, then stops at the retained
+Office preferred-source/rebuild packaging gate. Earlier intermittent failures,
+new-head/full platform/installed/public distribution and wider Harness work remain.
+
 [Actual Pi memory boundaries and unfinished pages](CONTROLLED-MEMORY.md#actual-pi-memory-boundaries-and-unfinished-pages--october-14)
 records source 1b69cc7, common Python 37/37/Node 12/12 and isolated actual
 Pi/shared-companion/Hindsight/Qwen recall, capture, newer-parent facts, earlier

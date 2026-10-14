@@ -32,6 +32,33 @@ separate required workflows under the accepted migration specification.
 
 ## CI readiness barriers and retained failures — October 14
 
+Current source **552ba40f16cb0823b60796f014eca4ff37e0ad0d** includes the
+[displayed Goal action correction](PI-GOALS.md#displayed-actions-during-pending-inspection--october-14)
+and a deterministic two-read Search fixture. An independent operator read is
+held before the mounted card's actual read. The previous single-release driver
+leaves the active form disabled; the corrected driver clears the hold set and
+releases every already-held inspection once. Both actual requests succeed and
+the existing card workflow completes. Future reads continue normally; no click,
+mutation or provider request is retried. The fixture waits for the app and uses
+its private fixture credential, preserving the app's normal URL-hash removal.
+Search product behavior/UI and assertions remain unchanged. Source/ordinary
+Goal/Search/goal-history/lifecycle cases pass **12/12 each**, two workers,
+unchanged deadlines and no skips. The two-read reproduction establishes this
+driver mechanism; exact causes of the older intermittent hosted timeouts remain
+unproven. Failed fixture-preparation attempts remain unqualified.
+
+The later [Validate 38510383733](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38510383733)
+at **d1fce92c3078bd2c812e345d415cbc497df0b3b3** passes the locked-DSH build/SDK
+contract step, both existing GUI cases and all subsequent setup, approval,
+branch, recovery, Qt/Wayland/prompt-editor/clipboard/flare/first-run checks.
+It reaches Debian packaging, where `office_engine.validate_bundle` correctly
+refuses the unqualified exact Office entry preferred source/engine rebuild.
+That gate is retained: private-preview identity does not approve public
+redistribution. This run is not fully qualified, does not cover the new
+held-response regression and does not explain earlier intermittent failures.
+New-head hosted, installed-owner, Windows lease/teardown, macOS notice/package
+and broader platform/distribution acceptance remain separate.
+
 The later [Validate 38507846631](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38507846631)
 at **1a903df1894766c5cc8dbd53a22556b1c9819ff3** completes with Debian failure:
 the goal GUI does not observe its paused state and the Search GUI remains in
