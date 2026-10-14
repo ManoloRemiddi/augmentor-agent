@@ -1,12 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [New Session input ownership](DSH-GUI-ON-PI.md#new-session-input-ownership--october-14)
-now freezes outgoing input before asynchronous creation, preserves its old draft,
+at **7987447efc56146e47f919322d514916b0cb69ef**
+freezes outgoing input before asynchronous creation, preserves its old draft,
 confirms the requested owner and rejects stale selection/error updates. Controlled
 old-tree Chromium reproduces new intent saved to the old draft and empty new
 Send, matching the retained narrow Insights failure class; exact hosted ordering
-is unobserved. Focused 7/7 pass with original layout/deadlines. Owner builds and
-production model/speech state are preserved; wider hosted/installed gates remain.
+is unobserved. Source/ordinary **179/179 each across 51 files**, all 42 Harness
+Chromium files, 908 matching compiled files and unchanged 155 production npm
+instances/Node qualify. Five pure cases now join the existing three-platform CI
+matrix; new-head hosted/installed gates stay open. Owner builds, drafts and
+production model/speech state are preserved.
 
 [Actual Blender CLI workflow](HARNESS-PLUGIN-PARITY.md#live-blender-cli-workflow-and-retained-inspection--october-14)
 at public **1d6c30f**/runtime **737bdf9** uses local Qwen, an isolated external MCP

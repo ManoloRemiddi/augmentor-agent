@@ -54,6 +54,19 @@ runs the five pure creation/draft-scope cases on Linux, macOS and Windows; its
 hosted results remain separate from local Linux execution. Owner reviews, installed 97897cf/draft, production services/settings and
 all wider P0/P1/plugin/privacy/migration/platform/public-release gates stay intact.
 
+Qualification source: **7987447efc56146e47f919322d514916b0cb69ef**, product **0.2.13**/Pi
+**1.1.0**. Strict check/build and source/fresh ordinary **179/179 each across 51
+files** pass with two workers, unchanged deadlines and no skips. This includes
+all **42 original Harness Chromium files**, native/Host lifecycle and input queues,
+affected draft/branch/session/workspace/projection units and the new scoped
+creation cases. The entire **908-file compiled set/bytes**, 51 test files and
+changed authored frontend files match the ordinary assembly. Its **155 production
+npm instances**, complete dependency bytes and bundled Node **24.19.0** retain the
+previous isolated base. The three-platform workflow parses with its matrix
+unchanged and the new pure test step; hosted outcomes are not inferred locally.
+Public source/history and whitespace checks pass. This source increment does not
+replace either owner review or the selected installed artifact.
+
 ## Read-only release qualification output — October 14
 
 The indexed-history Chromium test keeps diagnostics in the test checkout's

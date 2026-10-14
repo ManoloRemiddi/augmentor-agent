@@ -9,6 +9,12 @@ stale success/failure, duplicate/wrong acknowledgments, refusal/draft restoratio
 read-only, unrelated-open behavior and original Insights. Initial quoting/captured-
 fetch preparation errors stay distinct; actual request interception, original
 assertions, two workers and deadlines remain unchanged.
+Source **7987447efc56146e47f919322d514916b0cb69ef** passes strict check/build and source/fresh
+ordinary **179/179 each across 51 files**, including all 42 Harness Chromium
+files and native/Host/queue/affected controller contracts, no skips. All 908
+compiled files and 51 tests match; 155 production npm instances/Node remain.
+The existing Linux/macOS/Windows matrix now triggers for Harness and runs the
+five pure creation-scope cases; hosted and physical acceptance remain separate.
 
 [Actual Blender CLI evidence](../docs/HARNESS-PLUGIN-PARITY.md#live-blender-cli-workflow-and-retained-inspection--october-14)
 at public 1d6c30f/runtime 737bdf9 uses real Qwen, installed external server/Blender,
