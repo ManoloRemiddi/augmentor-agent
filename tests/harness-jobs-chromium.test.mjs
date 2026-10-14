@@ -9,6 +9,7 @@ import {join} from 'node:path';
 import {planFixture,until} from './fixtures/plans.mjs';
 import {chromiumPort} from './fixtures/chromium-ready.mjs';
 import {harnessCdp} from './fixtures/harness-cdp.mjs';
+import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
 test('actual Harness job controls show output safely, stop a child and enforce scoped cold read-only evidence',{skip:process.platform!=='linux',timeout:60000},async t=>{
  const f=await planFixture(t,{jobMode:{}}),sid='jobs-ui',profile=await mkdtemp(join(tmpdir(),'augmentor-jobs-chrome-'));let chrome,panel;
  t.after(async()=>{panel?.close();if(chrome?.exitCode===null){const ended=once(chrome,'exit');chrome.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
@@ -18,11 +19,52 @@ test('actual Harness job controls show output safely, stop a child and enforce s
  const visible=expression=>until(()=>panel.evaluate(expression),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,owner:f.errors()});throw error;});
  await visible('document.querySelector("#runtime")?.textContent.includes("Pi 1.1.0")&&!document.querySelector("#send").disabled');await panel.evaluate('Array.from(document.querySelectorAll("#sessions button")).find(b=>b.textContent==="Jobs UI fixture").click()');await visible('sessionStorage.getItem("augmentor-harness-session")==="jobs-ui"&&!document.querySelector("#send").disabled');await panel.evaluate('document.querySelector("[data-view=jobs]").click()');await visible('document.querySelector("#jobs-content").textContent.includes("No background jobs")');
  const literal='<img src=x onerror="globalThis.jobsInjected=true"> café 日本語';
- const launch=async task=>{await panel.evaluate('(()=>{const el=document.querySelector("[aria-label=\\"Background job task\\"]");el.value='+JSON.stringify(JSON.stringify(task))+';el.dispatchEvent(new Event("input"));Array.from(document.querySelectorAll("#jobs-content button")).find(b=>b.textContent==="Start job").click();})()');};
- await panel.evaluate('document.querySelector("#jobs-content details summary").click()');await launch({kind:'worker-reply',reply:literal});await visible('document.querySelector("#jobs-content").textContent.includes("recorded once")&&document.querySelector("#jobs-content").textContent.includes('+JSON.stringify(literal)+')');assert.equal(await panel.evaluate('document.querySelectorAll("#jobs-content img").length'),0);assert.equal(await panel.evaluate('globalThis.jobsInjected===true'),false);
+ const control=label=>'Array.from(document.querySelectorAll("#jobs-content button")).find(b=>b.textContent==='+JSON.stringify(label)+')',click=label=>harnessPointerClick(panel,control(label),until);
+ const stage=async task=>{await panel.evaluate('(()=>{const el=document.querySelector("[aria-label=\\"Background job task\\"]");el.value='+JSON.stringify(JSON.stringify(task))+';el.dispatchEvent(new Event("input"));})()');},launch=async task=>{await stage(task);await click('Start job');};
+ await panel.call('Network.enable');panel.pauseRpcMethods=new Set();await panel.call('Fetch.enable',{patterns:[{urlPattern:'*/api/rpc',requestStage:'Response'}]});
+ const holdInspection=async()=>{const before=panel.pausedRequests.length;panel.pauseRpcMethods=new Set(['session.jobs']);await panel.evaluate('document.querySelector("[data-view=jobs]").click()');await until(()=>panel.pausedRequests.length>before,'actual older job list held');return {before,release:async()=>{panel.pauseRpcMethods.clear();const reads=panel.pausedRequests.slice(before);for(const read of reads.reverse()){await panel.call('Fetch.continueRequest',{requestId:read.id});await until(()=>panel.finishedRequests.has(read.networkId),'held job response delivered');}}};};
+ await panel.evaluate('document.querySelector("#jobs-content details summary").click()');await stage({kind:'worker-reply',reply:literal});const initial=await holdInspection(),body=await panel.call('Fetch.getResponseBody',{requestId:panel.pausedRequests[initial.before].id});assert.equal(JSON.parse(body.base64Encoded?Buffer.from(body.body,'base64').toString():body.body).result.items.length,0);
+ await click('Start job');await until(async()=>(await f.call('session.jobs',{sessionId:sid})).items.length===1,'displayed Start admitted during inspection');await until(()=>panel.pausedRequests.length>initial.before+1,'post-start job list held');await initial.release();
+ await visible('document.querySelector("#jobs-content").textContent.includes("recorded once")&&document.querySelector("#jobs-content").textContent.includes('+JSON.stringify(literal)+')');assert.equal(await panel.evaluate('document.querySelectorAll("#jobs-content img").length'),0);assert.equal(await panel.evaluate('globalThis.jobsInjected===true'),false);
+ assert.equal([...panel.requests.values()].filter(row=>row.method==='session.startJob').length,1,'one Start request, without retry');
  const job=(await f.call('session.jobs',{sessionId:sid})).items[0];assert.equal(job.state,'completed');
- await panel.evaluate('document.querySelector("#jobs-content details summary").click()');await launch({kind:'worker-hold'});await visible('document.querySelector("#jobs-content").textContent.includes("worker holding")');await panel.evaluate('Array.from(document.querySelectorAll("#jobs-content button")).find(b=>b.textContent==="Stop job").click()');await visible('document.querySelector("#jobs-content h3")?.textContent.startsWith("cancelled")');
+ const sourceSummary='Array.from(document.querySelectorAll("#jobs-content summary")).find(e=>e.textContent==="Child originals and provider observations")';await visible(sourceSummary);await harnessPointerClick(panel,sourceSummary,until);
+ const heldEvidence=await holdInspection(),requestsBeforeRead=f.requests.length;await click('Inspect child native originals');await visible('document.querySelector("#jobs-content").textContent.includes("indexed original selected ancestry")');await heldEvidence.release();assert.equal(await panel.evaluate('document.querySelector("#jobs-content").textContent.includes("indexed original selected ancestry")'),true,'older list response cannot erase the explicit evidence view');assert.equal(f.requests.length,requestsBeforeRead,'explicit evidence inspection starts no inference');
+ await panel.evaluate('document.querySelector("#jobs-content details summary").click()');await launch({kind:'worker-hold'});await visible('document.querySelector("#jobs-content").textContent.includes("worker holding")');const stopping=await holdInspection();await click('Stop job');await until(async()=>(await f.call('session.jobs',{sessionId:sid})).items.some(j=>j.state==='cancelled'),'displayed Stop admitted during inspection');await until(()=>panel.pausedRequests.length>stopping.before+1,'post-stop job list held');await stopping.release();await visible('document.querySelector("#jobs-content h3")?.textContent.startsWith("cancelled")');
+ assert.equal([...panel.requests.values()].filter(row=>row.method==='session.startJob').length,2);assert.equal([...panel.requests.values()].filter(row=>row.method==='session.cancelJob').length,1,'one child Stop request, without retry');
  await panel.call('Emulation.setDeviceMetricsOverride',{width:640,height:900,deviceScaleFactor:1,mobile:false});assert.equal(await panel.evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
+ // Controlled frontend receipts exercise owner replacement while two different
+ // operations are pending. The actual producers/permissions are covered above.
+ const modelCount=f.requests.length;
+ const ownerProbe=await panel.evaluate('('+String(async()=>{
+  const {attachJobs}=await import('/jobs.js'),container=document.createElement('div');document.body.append(container);
+  let context={sessionId:'probe-old-owner',epoch:1,readOnly:false},releaseOld,failNew;const writes=[];
+  const oldJob={id:'probe-old-job',kind:'delegate',state:'completed',childId:'probe-old-child',owner:'probe-old-owner',spec:{task:'Synthetic old task',allowedTools:[],limits:{}},usageAccounted:true};
+  const rpc=async(method,params)=>{
+   if(method==='session.jobs')return {items:context.sessionId==='probe-old-owner'?[oldJob]:[]};
+   if(method==='session.job')return {job:oldJob,output:{chunks:[],next:0,lossy:false}};
+   if(method==='session.jobHistory')return {events:[]};
+   if(method==='session.jobNativeHistory')return new Promise(resolve=>{releaseOld=resolve;});
+   if(method==='session.startJob'){writes.push(params);return new Promise((_resolve,reject)=>{failNew=reject;});}
+   throw Error('Unexpected controlled frontend method');
+  };
+  const view=attachJobs({container,rpc,current:()=>context}),frames=()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))),button=label=>[...container.querySelectorAll('button')].find(el=>el.textContent===label),input=label=>container.querySelector('[aria-label="'+label+'"]');
+  try{
+   await view.refresh();button('delegate · completed · probe-old-job').click();await frames();button('Inspect child native originals').click();await frames();
+   if(!releaseOld)throw Error('Controlled old-owner evidence request was not dispatched');
+   context={sessionId:'probe-new-owner',epoch:2,readOnly:false};view.reset();await view.refresh();
+   input('Background job kind').value='desktop';input('Background job kind').dispatchEvent(new Event('input'));
+   input('Background job task').value='Preserve this new-owner draft';input('Background job task').dispatchEvent(new Event('input'));button('Start job').click();await frames();
+   if(!failNew)throw Error('Controlled new-owner Start was not dispatched');
+   const disabledBefore=button('Start job').disabled;
+   releaseOld({coverage:{marker:'OLD_OWNER_PRIVATE_EVIDENCE'},entries:[]});await frames();
+   const isolated={startDisabled:button('Start job').disabled,grantsDisabled:input('Delegated tool grants').disabled,oldEvidenceAbsent:!container.textContent.includes('OLD_OWNER_PRIVATE_EVIDENCE')};
+   button('Start job').click();await frames();const writesWhilePending=writes.length;
+   failNew(Error('Synthetic unconfirmed acknowledgement'));await frames();
+   return {disabledBefore,isolated,writesWhilePending,writes:writes.map(row=>({sessionId:row.sessionId,requestId:row.spec.requestId})),draftPreserved:input('Background job task').value==='Preserve this new-owner draft',kindPreserved:input('Background job kind').value==='desktop',grantsStillDisabled:input('Delegated tool grants').disabled,recovered:!button('Start job').disabled,status:container.textContent.includes('The draft and request ID are preserved.')};
+  }finally{view.reset();container.remove();}
+ })+')()');
+ assert.equal(ownerProbe.disabledBefore,true);assert.deepEqual(ownerProbe.isolated,{startDisabled:true,grantsDisabled:true,oldEvidenceAbsent:true});assert.equal(ownerProbe.writesWhilePending,1);assert.equal(ownerProbe.writes.length,1);assert.equal(ownerProbe.writes[0].sessionId,'probe-new-owner');assert(ownerProbe.writes[0].requestId);for(const key of ['draftPreserved','kindPreserved','grantsStillDisabled','recovered','status'])assert.equal(ownerProbe[key],true,key);assert.equal(f.requests.length,modelCount);
  const count=f.requests.length;await f.stop();await f.start();const inspection=await f.call('inspection.open',{sessionId:sid}),link=new URL(inspection.url.replace('/#','/inspection#')),token=new URLSearchParams(link.hash.slice(1)).get('token');
  await panel.call('Page.navigate',{url:inspection.url.replace('/#','/inspection#')});await panel.reload();await visible('document.querySelector("#runtime")?.textContent.includes("Read-only")');await panel.evaluate('document.querySelector("[data-view=jobs]").click()');await visible('document.querySelector("#jobs-content").textContent.includes("completed")');assert.equal(await panel.evaluate('document.querySelectorAll("#jobs-content textarea").length'),0);
  for(const [method,params,reason] of [['session.job',{sessionId:'other',jobId:job.id},/selected conversation/],['session.startJob',{sessionId:sid,spec:{}},/read-only/]]){const response=await fetch(link.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});assert.match((await response.json()).error.message,reason);}

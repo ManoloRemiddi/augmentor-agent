@@ -1,11 +1,12 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {once} from "node:events";
 export async function harnessCdp(url){
-  const ws=new WebSocket(url);await once(ws,'open');let id=0;const pending=new Map(),errors=[],dialogs=[],requests=new Map(),failedResponses=[],urls=[],pausedRequests=[];
-  const api={acceptDialog:true,errors,dialogs,requests,failedResponses,urls,pausedRequests};
+  const ws=new WebSocket(url);await once(ws,'open');let id=0;const pending=new Map(),errors=[],dialogs=[],requests=new Map(),failedResponses=[],urls=[],pausedRequests=[],finishedRequests=new Set();
+  const api={acceptDialog:true,errors,dialogs,requests,failedResponses,urls,pausedRequests,finishedRequests};
   ws.addEventListener('message',event=>{
     const frame=JSON.parse(event.data),row=pending.get(frame.id);
     if(frame.method==='Network.requestWillBeSent')urls.push(frame.params.request.url);
+    if(frame.method==='Network.loadingFinished')finishedRequests.add(frame.params.requestId);
     if(frame.method==='Runtime.exceptionThrown')errors.push(frame.params.exceptionDetails);
     if(frame.method==='Fetch.requestPaused'){
       let rpcMethod;try{rpcMethod=JSON.parse(frame.params.request.postData).method;}catch{}

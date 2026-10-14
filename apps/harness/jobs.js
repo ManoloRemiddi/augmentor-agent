@@ -5,13 +5,24 @@ export function attachJobs({container,rpc,current}){
  const reset=()=>{ticket++;busy=false;selected=null;draft=null;container.replaceChildren(node('p','Select a conversation to inspect its background jobs.'));};
  async function refresh(){
   if(busy)return;const context=current(),request=++ticket;if(!context.sessionId){reset();return;}
-  const valid=()=>{const now=current();return request===ticket&&now.sessionId===context.sessionId&&now.epoch===context.epoch;};
+  const sameContext=()=>{const now=current();return now.sessionId===context.sessionId&&now.epoch===context.epoch&&now.readOnly===context.readOnly;};
+  const valid=()=>request===ticket&&sameContext();
   try{
    const result=await rpc('session.jobs',{sessionId:context.sessionId});if(!valid())return;
    container.replaceChildren(node('h2','Background jobs'),node('p','Each delegated job has its own Pi conversation and explicit tool grants. Completed is a producer report to verify. Stop cancels this conversation’s jobs. Restart leaves unfinished outcomes unknown and never replays them.','job-boundary'));
    const status=node('p');status.setAttribute('role','status');container.append(status);
-   async function action(method,params){if(busy||!valid())return;busy=true;try{await rpc(method,{sessionId:context.sessionId,...params});busy=false;if(valid())await refresh();}catch(error){busy=false;if(valid())status.textContent=error.message;}}
-   const button=(label,fn)=>{const el=node('button',label);el.type='button';el.onclick=fn;return el;};
+   const displayed=()=>sameContext()&&container.contains(status);
+   function beginWork(){
+    if(busy||!displayed())return;
+    // Keep displayed controls usable during a read, but fence that older read
+    // once an explicit action or evidence inspection owns this generation.
+    const work=++ticket,controls=[...container.querySelectorAll('button,input,textarea,select')].map(el=>[el,el.disabled]);
+    busy=true;for(const [el] of controls)el.disabled=true;
+    const active=()=>work===ticket&&sameContext();
+    return {active,finish(){if(!active())return;busy=false;for(const [el,disabled] of controls)if(el.isConnected)el.disabled=disabled;}};
+   }
+   async function action(method,params){const work=beginWork();if(!work)return;try{await rpc(method,{sessionId:context.sessionId,...params});if(work.active()){work.finish();await refresh();}}catch(error){if(work.active()){work.finish();status.textContent=error.message;}}}
+   const button=(label,fn)=>{const el=node('button',label);el.type='button';el.onclick=()=>{if(!busy&&displayed()&&el.isConnected)return fn();};return el;};
    if(result.available===false)container.append(node('p',result.reason));
    if(!context.readOnly&&result.available!==false){
     const editor=node('details');editor.append(node('summary','Start a bounded job'));container.append(editor);
@@ -25,7 +36,7 @@ export function attachJobs({container,rpc,current}){
     const tokens=node('input');tokens.type='number';tokens.min='1';tokens.max='131072';tokens.setAttribute('aria-label','Delegated output token limit');tokens.value=draft?.tokens??'8192';
     const preserve=()=>{draft={requestId:draft?.requestId??crypto.randomUUID(),kind:kind.value,task:task.value,criteria:criteria.value,constraints:constraints.value,grants:grants.value,duration:duration.value,requests:requests.value,tools:tools.value,tokens:tokens.value};};for(const el of [kind,task,criteria,constraints,grants,duration,requests,tools,tokens])el.oninput=preserve;
     kind.oninput=()=>{if(kind.value==='desktop'&&draft?.kind!=='desktop'){duration.value='180';requests.value='24';tools.value='40';tokens.value='24576';}desktopFields.hidden=kind.value!=='desktop';grants.disabled=kind.value==='desktop';task.maxLength=kind.value==='desktop'?2000:16384;preserve();};
-    const start=button('Start job',async()=>{if(busy||!valid())return;preserve();const value={...draft};try{busy=true;const result=await rpc('session.startJob',{sessionId:context.sessionId,spec:{requestId:value.requestId,kind:value.kind,task:value.kind==='desktop'?JSON.stringify({task:value.task,successCriteria:value.criteria,constraints:value.constraints}):value.task,allowedTools:value.kind==='delegate'?value.grants.split(',').map(s=>s.trim()).filter(Boolean):[],limits:{timeoutMs:Number(value.duration)*1000,maxRequests:Number(value.requests),maxTools:Number(value.tools),maxOutputTokens:Number(value.tokens)}}});busy=false;if(valid()){selected=result.job.id;draft=null;await refresh();}}catch(error){busy=false;if(valid())status.textContent=error.message+' The draft and request ID are preserved.';}});
+    const start=button('Start job',async()=>{const work=beginWork();if(!work)return;preserve();const value={...draft};try{const result=await rpc('session.startJob',{sessionId:context.sessionId,spec:{requestId:value.requestId,kind:value.kind,task:value.kind==='desktop'?JSON.stringify({task:value.task,successCriteria:value.criteria,constraints:value.constraints}):value.task,allowedTools:value.kind==='delegate'?value.grants.split(',').map(s=>s.trim()).filter(Boolean):[],limits:{timeoutMs:Number(value.duration)*1000,maxRequests:Number(value.requests),maxTools:Number(value.tools),maxOutputTokens:Number(value.tokens)}}});if(work.active()){selected=result.job.id;draft=null;work.finish();await refresh();}}catch(error){if(work.active()){work.finish();status.textContent=error.message+' The draft and request ID are preserved.';}}});
     editor.append(node('label','Job kind'),kind,node('label','Task or command, including constraints'),task,desktopFields,node('label','Explicit delegated tool grants'),grants,node('label','Time limit in seconds'),duration,node('label','Provider request limit'),requests,node('label','Tool dispatch limit'),tools,node('label','Reported output token limit'),tokens,start);
    }
    if(!result.items.length)container.append(node('p','No background jobs recorded.'));
@@ -37,7 +48,7 @@ export function attachJobs({container,rpc,current}){
     const evidence=node('details');evidence.append(node('summary','Job scope and evidence'),node('pre',JSON.stringify({parent:job.owner,child:job.childId,task:job.spec.task,desktop:job.desktop,tools:job.spec.allowedTools,limits:job.spec.limits,requests:job.requests,toolDispatches:job.tools,reportedOutputTokens:job.outputTokens,usage:job.usage,notification:job.notified},null,2)));container.append(evidence);
     if(job.childId){const history=await rpc('session.jobHistory',{sessionId:context.sessionId,jobId:job.id,maxMessages:20});if(!valid())return;const original=node('details');original.append(node('summary','Delegated conversation evidence'),node('pre',JSON.stringify(history,null,2)));container.append(original);
      const source=node('details'),native=node('div'),observations=node('div');source.append(node('summary','Child originals and provider observations'),node('p','Native originals preserve the child’s screenshots and tool pairs. Provider observations show retained requests after SDK hooks. Read bounded excerpts here; inspection does not run tools or add usage.'),native,observations);container.append(source);
-     const inspect=async(method,params,render)=>{if(busy||!valid())return;busy=true;try{const value=await rpc(method,{sessionId:context.sessionId,jobId:job.id,...params});if(valid())render(value);}catch(error){if(valid())status.textContent=error.message;}finally{busy=false;}};
+     const inspect=async(method,params,render)=>{const work=beginWork();if(!work)return;try{const value=await rpc(method,{sessionId:context.sessionId,jobId:job.id,...params});if(work.active())render(value);}catch(error){if(work.active())status.textContent=error.message;}finally{work.finish();}};
      const excerpt=(target,method,params)=>{const show=value=>{target.replaceChildren(node('pre',value.available?value.text:value.reason));if(value.available&&value.hasMore)target.append(button('Next excerpt',()=>void inspect(method,{...params,offset:value.nextOffset,limit:8192},show)));};void inspect(method,{...params,offset:0,limit:8192},show);};
      const nativePage=page=>{native.replaceChildren(node('h4','Child native originals'),node('pre',JSON.stringify(page.coverage??{reason:page.reason},null,2)));for(const entry of page.entries??[]){const row=node('div'),text=node('div');row.append(button(entry.type+' · '+(entry.role??'')+' · '+entry.entryId,()=>excerpt(text,'session.jobNativeRead',{entryId:entry.entryId,pathHash:entry.pathHash,entryHash:entry.entryHash,nativeSessionId:page.nativeSessionId})),text);native.append(row);}if(page.nextCursor)native.append(button('Older native originals',()=>void inspect('session.jobNativeHistory',{cursor:page.nextCursor,limit:20},nativePage)));};
      native.append(button('Inspect child native originals',()=>void inspect('session.jobNativeHistory',{limit:20},nativePage)));
