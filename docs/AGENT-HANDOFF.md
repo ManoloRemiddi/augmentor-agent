@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Actual Playwright workflow](HARNESS-PLUGIN-PARITY.md#live-playwright-workflow-and-retained-inspection--october-14)
+at public **60b7c54**/runtime **7b9a703** proves a fresh external 0.0.79 MCP process,
+local Qwen, one navigation/click/random receipt/close and two owned snapshot reads.
+Six requests/three successful MCP originals, then one held-navigation Stop with
+aborted generation/unknown effect/no replay qualify. Cold original Trajectory and
+reload preserve seven requests/four originals/native bytes without reconnecting
+MCP or inference. Fixture failures remain retained. Owner review/installation,
+production settings and broader plugin/live/platform/release gates stay preserved.
+
 [Instruction source links](AUGMENTOR-HARNESS.md#instruction-source-links--october-14)
 at **7b9a7037c3433f8ad25760c3bdd2a0f4182cd253**
 reference captured Pi run options and distinguish literal current SDK/provider

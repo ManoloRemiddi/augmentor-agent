@@ -32,7 +32,7 @@ No saved owner key or profile is imported by this choice.
 | Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
 | Free Web Search, historical 0.1.0 reference | [Original API card and keyless controls](#keyless-and-api-modes-in-the-original-plugins-page--october-14) bind both workflows through existing Native owners, retaining separate keys/settings/drafts, same-owner mode reload, collision/pending recovery, scope boundaries and actual Light/Dark GUI qualification. Source/ordinary managed Qwen search and public fetch qualify. The owner chooses these tested MIT alternatives. | Historical identity/360 parity remain unconfirmed; identity does not block the accepted source choice. Representative credentialed engines/outage/quota, standalone add-ons, guarded installed owner acceptance and other OS qualification remain. No owner keys are migrated. |
-| Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
+| Playwright MCP | Managed-core synthetic contracts plus [actual local-Qwen/Playwright 0.0.79](#live-playwright-workflow-and-retained-inspection--october-14): one owned navigation/click/receipt/close, approved effects, snapshot reads, held navigation Stop and original cold Trajectory inspection with no replay. | Owner configuration/installed adoption, broader browser workflows, external sites/credentials and physical/platform acceptance. |
 | Comfy MCP | Same managed-core binding; the reference service previously refused connection. | Service availability and a representative authorized workflow; no successful Comfy operation is claimed. |
 | Blender MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Blender operation and verified effect/Stop/retained evidence. |
 | Unreal MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Unreal operation and verified effect/Stop/retained evidence. |
@@ -42,6 +42,59 @@ its own [voice protocol](VOICE-SINGLE-BUTTON.md) and physical/audio lifecycle ga
 It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision and
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
+
+## Live Playwright workflow and retained inspection — October 14
+
+Public source **60b7c54e5af5001e8109086d47c13a061f41d95d** (runtime unchanged
+from **7b9a7037c3433f8ad25760c3bdd2a0f4182cd253**), product **0.2.13**/Pi **1.1.0**,
+now has one actual local-Qwen/Playwright MCP workflow. The already installed
+**@playwright/mcp 0.0.79**, **Apache-2.0**, runs as a separate SDK-owned stdio
+process with its existing Chromium executable, a fresh private browser profile
+and an explicit private output directory. It remains an external service, with
+no new packaged dependency or copied service source. The existing DSH/Playwright
+process and browser profile are preserved; no owner credentials, history, MCP
+configuration or tabs are imported.
+
+The actual model navigates once to an independently authored loopback page,
+clicks its confirmation button once, reads the server-generated random receipt
+and reports that exact receipt in its final answer, then leaves no open test tabs.
+The three MCP effects cross the real operator approval boundary once each.
+Playwright returns snapshot files; two actual Pi `read` calls are verified by
+realpath and content inside that explicitly configured private output directory.
+There are **six provider requests**, three successful MCP calls and **three native
+MCP originals**. This is service/model execution, not a catalog-only or scripted
+provider result. Both production Qwen slots were observed busy during the proof;
+no latency, load isolation or universal semantic acceptance is inferred.
+
+A separate explicit Stop turn begins one real held HTTP navigation. Stop ends
+that turn as **aborted**, with one provider request, no replay/recovery and the
+action's effect **unknown**. Generation cancellation is not evidence that browser
+navigation had no effect. Its fourth MCP original and action/connection records
+remain retained. After terminal process inspection confirms the test owners and
+browser children have stopped, a cold owner opens only scoped retained reads.
+Original DSH Trajectory displays the real click arguments/results, tool reads and
+stopped navigation. Actual Chromium/reload at **1440×1000** passes with zero
+browser errors/failed responses, unchanged native SHA-256 and equal display
+history, seven total model requests/four MCP originals, no new provider request,
+MCP connection or tool replay. The actual original view is visually inspected.
+
+Retained private fixture failures are explicit: the first driver rejects normal
+snapshot reads with an incorrect all-MCP-only assertion; a follow-up HTTP handler
+rejects Chromium's favicon after the already-recorded Stop. The page records one
+held navigation; native events independently prove aborted/unknown/no retry, and
+all owned processes are terminal. No browser action is repeated to hide either
+failure. Read-only verification first assumes reload retains Trajectory; the
+original opens Chat, so the corrected driver explicitly selects its existing
+Trajectory tab. An existing temporary browser directory is also rejected before
+using a fresh directory. Final cold/render checks pass without another model
+request or browser effect. Private profiles, transcripts, paths, URLs and logs
+stay outside GitHub.
+
+This advances the named Playwright acceptance only. Owner configuration/installed
+adoption, broader browser workflows, external sites/credentials, Comfy/Blender/
+Unreal, physical browser/voice and full P0/P1/privacy/platform/release gates remain.
+The separately running f98424b owner review and selected 97897cf/draft stay intact.
+No Qwen/Breeze/GPU/context/concurrency/precision/CPU ASR setting or service changes.
 
 ## CI readiness barriers and retained failures — October 14
 

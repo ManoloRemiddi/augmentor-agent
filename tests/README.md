@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live Playwright evidence](../docs/HARNESS-PLUGIN-PARITY.md#live-playwright-workflow-and-retained-inspection--october-14)
+at source 60b7c54/runtime 7b9a703 uses actual local Qwen and installed external
+Playwright MCP 0.0.79, an authored loopback page and fresh profile. Native receipts,
+owned snapshot reads, real Stop/unknown effect and cold original rendered evidence
+are distinct from the synthetic managed-MCP suite. Initial fixture constraint,
+favicon and reload-preparation failures remain; no browser action is replayed.
+The successful cold inspector performs no inference or MCP reconnect. This is
+separate from installed-owner/physical/platform acceptance.
+
 [Instruction source links](../docs/AUGMENTOR-HARNESS.md#instruction-source-links--october-14)
 add actual Pi SDK/received-HTTP proof for a loaded synthetic context file surviving
 as a catalog/options entry while an opaque override removes it from current system
