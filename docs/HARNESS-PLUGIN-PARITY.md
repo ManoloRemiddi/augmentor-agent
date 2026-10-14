@@ -32,6 +32,18 @@ separate required workflows under the accepted migration specification.
 
 ## CI readiness barriers and retained failures — October 14
 
+Implementation **16db511cd9534c16c5210dc200682ccbc69a9b65** receives new hosted
+evidence in [Validate 38504933586](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38504933586):
+the archive/workspace cases and all Search GUI workflow assertions complete, but
+the final browser-error assertion catches a fixture `Fetch domain is not enabled`
+error. Disabling DevTools interception after the first held read races its queued
+automatic continuations. The corrected driver clears the hold set before release
+and keeps interception enabled until normal browser teardown; future RPCs
+continue once. It does not ignore the error or weaken any assertion/deadline.
+The complete original GUI case passes in source and ordinary after that correction.
+Runtime and product/candidate/installed bytes remain unchanged. Exact new-head
+hosted validation remains separate; the earlier TinyFish cause is still unproven.
+
 The Debian [Validate run 38500788831](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38500788831)
 at 20141bc passes the build but fails the original Search card's TinyFish
 observation and the running-archive request count (3 versus 2). Two later runtime

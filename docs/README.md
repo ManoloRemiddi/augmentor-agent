@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Search test interception lifetime](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14)
+keeps the selective DevTools channel open through the original GUI workflow,
+preventing queued continuations from racing channel disable. Source/ordinary
+actual GUI cases pass without product/dependency/UI or assertion/deadline changes.
+Hosted 38504933586 reaches all archive/workspace/Search workflow assertions at
+16db511, then fails only that driver-error check. Its older GUI timeout remains
+unproven; new-head full Debian acceptance is still separate. Working preview,
+draft, immutable candidate and feedback profile remain unchanged.
+
 [CI readiness barriers and retained failures](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14)
 wait for both admitted archive provider receipts before counting requests and
 for a confirmed private Search snapshot before the original card's single click.
