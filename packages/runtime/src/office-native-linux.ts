@@ -7,6 +7,7 @@ import {readFile,lstat,rm,mkdtemp} from 'node:fs/promises';
 import type {ConverterOptions} from '@deepseek-ai/libreoffice-kit';
 import type {OfficeConverter} from '../vendor/dsh-office/index.js';
 import {OfficeToPdfError} from '../vendor/dsh-office/errors.js';
+import {createLinuxOfficeScratch} from './office-scratch-linux.js';
 
 const helper=fileURLToPath(new URL('./office-native-linux.py',import.meta.url));
 const defaults=fileURLToPath(new URL('../vendor/office-font-fallbacks/groups.json',import.meta.url));
@@ -65,6 +66,7 @@ export async function createLinuxNativeOfficeConverter(options:ConverterOptions=
     }
   };
   return {
+    createScratch:createLinuxOfficeScratch,
     render(request,signal){const task=tail.then(()=>{lifetime.signal.throwIfAborted();signal?.throwIfAborted();return perform(request,signal);});tail=task.catch(()=>{});return task;},
     async dispose(){lifetime.abort(new Error('Native Office converter closed.'));await tail;},
   };

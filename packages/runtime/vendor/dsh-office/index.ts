@@ -1,4 +1,4 @@
-// Copyright © 2026 Manolo Remiddi. MIT supplier adaptation: Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original queue/scratch/error logic retained. Active teardown is exposed for maintenance; font disk cache is disabled. An explicit converter seat preserves the lazy pinned default and admits an authored native adapter.
+// Copyright © 2026 Manolo Remiddi. MIT supplier adaptation: Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original queue/scratch/error logic retained. Active teardown is exposed for maintenance; font disk cache is disabled. An explicit converter seat preserves the lazy pinned default and admits an authored native adapter; an optional backend-owned scratch seat establishes cleanup before copying and retains capacity until release.
 /** Host LibreOffice kit provider with reusable converters and private disk input/output. */
 import { randomUUID } from 'node:crypto'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
@@ -20,9 +20,12 @@ export * from './types.js'
 
 /** Backend seat used by the original provider; no image/agent API is needed. */
 export interface OfficeConverter {
+  /** Optional OS-owned scratch lifetime; absence retains original temporary files. */
+  createScratch?(): Promise<OfficeScratch>
   render(request: { inputPath: string; outputPath: string }, signal?: AbortSignal): Promise<{ missingFonts: string[] }>
   dispose(): Promise<void>
 }
+export interface OfficeScratch { directory: string; signal?: AbortSignal; dispose(): Promise<void> }
 export type OfficeConverterFactory = (options: ConverterOptions) => Promise<OfficeConverter>
 const pinnedConverter: OfficeConverterFactory = async options => (await import('@deepseek-ai/libreoffice-kit')).createConverter(options)
 
@@ -202,6 +205,7 @@ export class OfficeToPdf {
     if (slot === undefined) { slot = { busy: false }; this.slots.push(slot) }
     slot.busy = true
     let directory: string | undefined
+    let scratch: OfficeScratch | undefined
     try {
       if (slot.converter === undefined) {
         slot.converter = (this.config.converterFactory ?? pinnedConverter)(this.options).catch((error: unknown) => {
@@ -211,7 +215,10 @@ export class OfficeToPdf {
       }
       const converter = await slot.converter
       signal.throwIfAborted()
-      directory = await mkdtemp(join(tmpdir(), 'dsh-office-to-pdf-'))
+      scratch = await converter.createScratch?.()
+      directory = scratch?.directory ?? await mkdtemp(join(tmpdir(), 'dsh-office-to-pdf-'))
+      if (scratch?.signal) signal = AbortSignal.any([signal, scratch.signal])
+      signal.throwIfAborted()
       const inputPath = join(directory, `source.${extension}`)
       const outputPath = join(directory, 'converted.pdf')
       await writeFile(inputPath, bytes, { flag: 'wx', mode: 0o600, signal })
@@ -237,7 +244,7 @@ export class OfficeToPdf {
         default: throw new OfficeToPdfError('failed', 'LibreOffice conversion failed.', { cause })
       }
     } finally {
-      try { if (directory !== undefined) await rm(directory, { recursive: true, force: true }) }
+      try { if (scratch) await scratch.dispose(); else if (directory !== undefined) await rm(directory, { recursive: true, force: true }) }
       finally { slot.busy = false }
     }
   }

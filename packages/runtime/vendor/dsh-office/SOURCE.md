@@ -10,7 +10,9 @@ source and adapted SHA-256 values, and explicit changes.
 The original provider, bounded queue, regular complete-PDF validator, errors,
 identities and branded primitives remain in use. Local NodeNext imports and a
 Pi lifecycle/authorized byte-reader seat replace Cordis, schema/decorator wiring
-and its filesystem service. Queue/provider cleanup state is exposed to Pi
+and its filesystem service. The optional backend-owned scratch seat establishes
+cleanup before source copying and awaits release before slot reuse; backends
+without it keep the original temporary-directory behavior. Queue/provider cleanup state is exposed to Pi
 maintenance; engine font disk caching is disabled. No supplier service Host,
 tool/Session/model owner or second agent loop is copied.
 

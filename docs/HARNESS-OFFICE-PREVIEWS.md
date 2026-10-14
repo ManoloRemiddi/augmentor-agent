@@ -11,6 +11,60 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Original provider scratch ownership — October 15
+
+A real original-provider crash fixture against **04613ad09786c0ed6eb764cc304d09e40bb9ccb6**
+reproduces a separate source-copy leak: the native conversion actors exit and
+inner scratch is removed, but the provider's `dsh-office-to-pdf-` directory still
+contains the authorized document. Existing direct-converter cleanup does not
+own that outer directory. The fixture uses only an authored document/workspace
+and proven owned processes; it neither reads owner history nor performs model work.
+
+The original MIT provider now accepts an optional backend-owned scratch seat.
+Backends without it retain the existing temporary-directory path. The opt-in
+Linux native backend acquires a small independent cleanup owner before returning
+scratch admission. That owner opens the actual Node process descriptor, creates
+one private directory relative to an open parent descriptor, records its exact
+identity and sends a bounded readiness receipt. Only then does the provider copy
+source bytes. The helper receives lifecycle metadata/control, no document bytes,
+model/profile input, network access or directory-scan authority.
+
+The provider retains its original source authorization, content cache, queue and
+PDF reader. It awaits scratch release before freeing its conversion slot. Native
+supervision and its broker hold a shared parent-directory lease; cleanup acquires
+the exclusive lease after those trusted actors exit. The implementation uses
+[descriptor locks](https://docs.python.org/3/library/fcntl.html#fcntl.flock) and
+[descriptor-relative, symlink-resistant removal](https://docs.python.org/3/library/shutil.html#shutil.rmtree)
+with exact device/inode, owner and mode checks. A renamed/replaced root is refused
+rather than adopted or scanned. Unknown/moved directories and the authorized
+workspace source are preserved.
+
+Normal release follows complete PDF reading. Owner death independently removes
+the outer source/PDF directory. Guard loss with a live provider aborts conversion;
+the existing backend exit barrier precedes the provider's known-root fallback.
+Release has a two-second forced-exit bound for a stopped cleanup process, while
+capacity remains held through fallback cleanup. Existing native conversion
+limits, default pinned engine and GUI remain unchanged. No unknown action or
+conversion is replayed.
+
+The focused **19/19** common/real checks pass, including actual provider owner
+crash, owner loss after readiness/before copying, killed cleanup-owner recovery,
+replacement-root refusal, stopped-cleanup-owner release and held scratch
+admission/release with original cache behavior. Full exact-ref source/ordinary/GUI
+cohort qualification remains pending at this implementation checkpoint. Initial TypeScript
+path narrowing and the intentionally stale adapted-source receipt refused build;
+both preparation errors remain retained and are corrected against authored source.
+The seven MIT provider inputs retain their exact upstream identities; only the
+adapted provider index and its modification record change. New helpers are
+independently authored, with no dependency/version or private-source import.
+
+All-cleanup-owner loss, empty allocation before readiness, direct caller-PDF
+publication, durable owned-root indexing/power loss, adversarial concurrent
+same-user directory replacement and physical/font/layout/security/source-notice/
+distribution/other-OS gates remain open. The new ownership path is Linux x64
+opt-in; the common optional seat has unchanged default behavior on other OSes.
+No owner review/selection, speech/model/GPU settings or public binary is updated.
+
 ## Native guard loss and bounded live-owner drain — October 15
 
 Two real-native fixtures against **2929c6076741786efcc881b8ccc0ca83e691f97b**

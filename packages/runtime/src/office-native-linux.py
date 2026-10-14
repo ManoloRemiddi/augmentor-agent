@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import ctypes
+import fcntl
 import os
 from pathlib import Path
 import re
@@ -456,8 +457,11 @@ if __name__ == '__main__':
     resource.setrlimit(resource.RLIMIT_AS, (2 * 1024**3, 2 * 1024**3))
     root = None
     identity = None
+    parent_lease = None
     try:
         root, identity = owned_root(sys.argv)
+        parent_lease = os.open(root.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
+        fcntl.flock(parent_lease, fcntl.LOCK_SH)
         reply, code = supervise(root, identity, int(sys.argv[1]))
         sys.stdout.buffer.write(reply)
         sys.stdout.buffer.flush()
@@ -472,3 +476,5 @@ if __name__ == '__main__':
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         if root is not None:
             remove_owned_root(root, identity)
+        if parent_lease is not None:
+            os.close(parent_lease)

@@ -4,6 +4,7 @@ import {mkdtemp,writeFile,readFile,rm,readdir,stat,mkdir,rename} from 'node:fs/p
 import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFile,spawn} from 'node:child_process';import {promisify} from 'node:util';import {once} from 'node:events';
 import {PiOfficePreview} from '../dist/runtime/src/office-preview.js';import {PiFilePreview} from '../dist/runtime/src/file-preview.js';
 import {createLinuxNativeOfficeConverter} from '../dist/runtime/src/office-native-linux.js';
+import {createLinuxOfficeScratch} from '../dist/runtime/src/office-scratch-linux.js';
 import {previewDocx} from './fixtures/preview-office.mjs';import {previewPdf} from './fixtures/preview-pdf.mjs';import {zipSync,strToU8} from 'fflate';
 import {ownedProcesses,signalOwned,signalStoppedOwnedGroup,stillOwned} from './fixtures/native-office-processes.mjs';
 const exec=promisify(execFile),native=process.platform==='linux'&&process.arch==='x64'&&process.env.AUGMENTOR_NATIVE_OFFICE_TEST==='1';
@@ -26,6 +27,19 @@ test('converter seat cancellation retains the original provider capacity until b
  const converter=new PiOfficePreview((scope,kind,p,signal)=>reader.read(scope.workspaceRoot,kind,p,signal),async()=>({render:async({outputPath},signal)=>{entered=true;await new Promise(resolve=>release=resolve);signal.throwIfAborted();await writeFile(outputPath,previewPdf());return {missingFonts:[]};},async dispose(){}}));
  t.after(async()=>{release?.();await converter.close();await rm(root,{recursive:true,force:true});});const path=join(root,'authored.docx');await writeFile(path,previewDocx());const abort=new AbortController(),work=converter.render({sessionId:'cancel-seat',workspaceRoot:root},{path},abort.signal),rejection=assert.rejects(work);
  await until(()=>entered);abort.abort();await rejection;assert.equal(converter.busy,true);let closed=false;const close=converter.close().then(()=>closed=true);await new Promise(resolve=>setTimeout(resolve,10));assert.equal(closed,false);release();await close;assert.equal(converter.busy,false);assert.deepEqual(await readdir(root),['authored.docx']);
+});
+
+test('original provider writes only after scratch admission and keeps capacity until scratch release settles',async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-office-scratch-seat-')),reader=new PiFilePreview();let allocate,release,admitted=false,releasing=false,renders=0;
+ const allocation=new Promise(resolve=>allocate=resolve),cleanup=new Promise(resolve=>release=resolve);
+ const directory=join(root,'private-scratch'),provider=new PiOfficePreview((scope,kind,p,signal)=>reader.read(scope.workspaceRoot,kind,p,signal),async()=>({
+  createScratch:async()=>{admitted=true;await allocation;await mkdir(directory,{mode:0o700});return {directory,dispose:async()=>{releasing=true;await cleanup;await rm(directory,{recursive:true});}};},
+  render:async({inputPath,outputPath})=>{renders++;assert.deepEqual(await readFile(inputPath),Buffer.from(previewDocx()));await writeFile(outputPath,previewPdf());return {missingFonts:[]};},dispose:async()=>{},
+ }));t.after(async()=>{allocate?.();release?.();await provider.close();await rm(root,{recursive:true,force:true});});
+ const path=join(root,'authored.docx');await writeFile(path,previewDocx());let settled=false;const work=provider.render({sessionId:'scratch-seat',workspaceRoot:root},{path},new AbortController().signal).then(result=>{settled=true;return result;});
+ await until(()=>admitted);await assert.rejects(stat(directory),e=>e.code==='ENOENT');assert.equal(renders,0);allocate();await until(()=>releasing);assert.equal(settled,false);assert.equal(provider.busy,true);assert.equal(renders,1);
+ release();assert((await work).data.byteLength>0);assert.equal(provider.busy,false);assert.deepEqual(await readdir(root),['authored.docx']);
+ await provider.render({sessionId:'scratch-seat',workspaceRoot:root},{path},new AbortController().signal);assert.equal(renders,1,'original content cache remains intact');
 });
 
 test('actual native converter renders all six independently authored formats with original missing-font semantics',{skip:native?false:requires,timeout:120000},async t=>{
@@ -112,4 +126,43 @@ for(const fault of ['stopped','killed'])test('live native owner settles when its
  if(fault==='stopped'){for(const identity of owned)await signalOwned(identity,'SIGSTOP');abort.abort();}else{for(const identity of owned)if(identity.name==='soffice.bin')await signalOwned(identity,'SIGSTOP');await signalOwned(guard,'SIGKILL');}
  await until(()=>settled);const retained=[];for(const identity of owned)if(await stillOwned(identity))retained.push(identity.name);assert.deepEqual(retained,[],'lost/stopped guard must not retain conversion actors or admission');
  assert.deepEqual(await readdir(root),['authored.docx']);assert.deepEqual(await readFile(inputPath),Buffer.from(original));assert.equal(guard.parent,process.pid,'the live owner must directly own the cleanup helper');await converter.dispose();await assert.rejects(converter.render({inputPath,outputPath}),/closed/);
+});
+
+test('original native-backed provider removes its outer authorized copy after an actual owner crash',{skip:native?false:requires,timeout:20000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-provider-crash-')),owner=spawn(process.execPath,['tests/fixtures/native-office-provider-owner.mjs',root],{env:{...process.env,TMPDIR:root},stdio:'ignore'});let owned=[];
+ t.after(async()=>{if(owner.exitCode===null&&owner.signalCode===null){const end=once(owner,'exit');owner.kill('SIGKILL');await end;}for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');await rm(root,{recursive:true,force:true});});
+ await until(async()=>{assert.equal(owner.exitCode,null);owned=await ownedProcesses(owner.pid);return owned.some(row=>row.name==='soffice.bin');});
+ const name=(await readdir(root)).find(value=>value.startsWith('dsh-office-to-pdf-'));assert(name);
+ const original=await readFile(join(root,'workspace/authored.docx'));assert.deepEqual(await readFile(join(root,name,'source.docx')),original,'the original provider really holds an authorized source copy');
+ for(const identity of owned)if(identity.name==='soffice.bin')await signalOwned(identity,'SIGSTOP');
+ const ended=once(owner,'exit');owner.kill('SIGKILL');await ended;
+ await until(async()=>{for(const identity of owned)if(await stillOwned(identity))return false;return true;});
+ assert.deepEqual(await readdir(root),['workspace'],'outer provider source/PDF scratch must be removed after the native actors drain');
+ assert.deepEqual(await readFile(join(root,'workspace/authored.docx')),original);
+});
+
+test('native original-provider scratch is already owned when its owner exits before copying',{skip:native?false:requires,timeout:20000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-pre-copy-')),owner=spawn(process.execPath,['tests/fixtures/native-office-provider-owner.mjs',root,'pre-copy'],{env:{...process.env,TMPDIR:root},stdio:'ignore'});let owned=[];
+ t.after(async()=>{if(owner.exitCode===null&&owner.signalCode===null){const end=once(owner,'exit');owner.kill('SIGKILL');await end;}for(const identity of owned)await signalOwned(identity,'SIGKILL');await rm(root,{recursive:true,force:true});});
+ let receipt;await until(async()=>{try{receipt=JSON.parse(await readFile(join(root,'allocated.json'),'utf8'));return true;}catch(error){if(error.code==='ENOENT')return false;throw error;}});
+ owned=await ownedProcesses(owner.pid);assert.equal(owned.length,1);assert.equal(owned[0].name,'aug-office-temp');assert.deepEqual(await readdir(receipt.directory),[]);
+ const ended=once(owner,'exit');owner.kill('SIGKILL');await ended;await until(async()=>!await stillOwned(owned[0]));await assert.rejects(stat(receipt.directory),e=>e.code==='ENOENT');
+ assert.deepEqual((await readdir(root)).sort(),['allocated.json','workspace']);
+});
+
+for(const fault of ['killed','stopped'])test('live original provider drains its known outer copy when the scratch guard is '+fault,{skip:native?false:requires,timeout:20000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-outer-guard-loss-')),owner=spawn(process.execPath,['tests/fixtures/native-office-provider-owner.mjs',root],{env:{...process.env,TMPDIR:root},stdio:'ignore'});let owned=[];
+ t.after(async()=>{if(owner.exitCode===null&&owner.signalCode===null){const end=once(owner,'exit');owner.kill('SIGKILL');await end;}for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');await rm(root,{recursive:true,force:true});});
+ await until(async()=>{owned=await ownedProcesses(owner.pid);return owned.some(row=>row.name==='soffice.bin');});const guard=owned.find(row=>row.name==='aug-office-temp');assert(guard);
+ for(const identity of owned)if(identity.name==='soffice.bin')await signalOwned(identity,'SIGSTOP');
+ if(fault==='killed')await signalOwned(guard,'SIGKILL');else{await signalOwned(guard,'SIGSTOP');owner.kill('SIGUSR1');}
+ let receipt;await until(async()=>{try{receipt=JSON.parse(await readFile(join(root,'settled.json'),'utf8'));return true;}catch(error){if(error.code==='ENOENT')return false;throw error;}});assert.equal(receipt.failed,true);
+ for(const identity of owned)assert.equal(await stillOwned(identity),false,'failure settles only after every observed conversion actor exits');
+ assert.equal(owner.exitCode,null);assert.deepEqual((await readdir(root)).sort(),['settled.json','workspace']);
+});
+
+test('scratch guard and live provider fallback refuse a replaced outer directory',{skip:native?false:requires,timeout:20000},async t=>{
+ const scratch=await createLinuxOfficeScratch(),moved=scratch.directory+'-moved';t.after(async()=>{await scratch.dispose().catch(()=>{});await rm(scratch.directory,{recursive:true,force:true});await rm(moved,{recursive:true,force:true});});
+ await writeFile(join(scratch.directory,'original.txt'),'AUTHORED_ORIGINAL');await rename(scratch.directory,moved);await mkdir(scratch.directory,{mode:0o700});await writeFile(join(scratch.directory,'replacement.txt'),'AUTHORED_REPLACEMENT');
+ await assert.rejects(scratch.dispose(),/identity changed/);assert.equal(await readFile(join(moved,'original.txt'),'utf8'),'AUTHORED_ORIGINAL');assert.equal(await readFile(join(scratch.directory,'replacement.txt'),'utf8'),'AUTHORED_REPLACEMENT');
 });

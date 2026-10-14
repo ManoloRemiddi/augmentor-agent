@@ -7,6 +7,7 @@ const fontPreferenceSelection=JSON.parse(readFileSync(fontPreferenceRoot+'/SOURC
 for(const row of fontPreferenceSelection.files)if(createHash('sha256').update(readFileSync(fontPreferenceRoot+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Native Office font preferences differ from public source: '+row.path);
 cpSync(fontPreferenceRoot,'dist/runtime/vendor/office-font-fallbacks',{recursive:true});
 copyFileSync('packages/runtime/src/office-native-linux.py','dist/runtime/src/office-native-linux.py');
+copyFileSync('packages/runtime/src/office-scratch-linux.py','dist/runtime/src/office-scratch-linux.py');
 for(const row of attachmentSelection.files)if(createHash('sha256').update(readFileSync('packages/runtime/vendor/dsh-attachment/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH attachment source changed: '+row.path);
 mkdirSync('dist/protocol',{recursive:true});
 copyFileSync('packages/protocol/schema.json','dist/protocol/schema.json');
