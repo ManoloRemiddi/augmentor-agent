@@ -16,6 +16,7 @@ class Engine:
         self.lost_ack = False
         self.ids = []
         self.version = '0.10.0'
+        self.page_body = None
 
     def __call__(self, config, method, path, body=None):
         if path == '/openapi.json': return {'info': {'version': self.version}}
@@ -35,7 +36,7 @@ class Engine:
             return page
         if '/knowledge-base/pages/' in path:
             page = state['pages'][int(path.rsplit('/', 1)[-1])]
-            return {**page, 'body': 'Relationship continuity' if 'relationship' in bank else 'Project current state'}
+            return {**page, 'body': self.page_body if self.page_body is not None else ('Relationship continuity' if 'relationship' in bank else 'Project current state')}
         if path.endswith('/memories'):
             self.ids.append(body['operation_id'])
             self.operations.setdefault(body['operation_id'], body)
@@ -77,6 +78,48 @@ class HindsightTests(unittest.TestCase):
 
     def finish(self):
         for _ in range(10): self.store.step()
+
+    def test_unfinished_pages_are_not_facts_and_real_page_text_is_preserved(self):
+        self.controlled(); self.live_append(); self.finish()
+        with self.store.connect() as db:
+            banks = [dict(row) for row in db.execute('SELECT * FROM hindsight_banks')]
+        for marker in ('Generating content...', 'Generating content...\n', ' \tGenerating content...\r\n'):
+            with self.subTest(marker=repr(marker)):
+                self.engine.page_body = marker
+                for bank in banks: self.store.snapshot(bank)
+                recalled = self.call('recall')
+                for kind in ('relationship', 'work'):
+                    self.assertEqual(recalled[kind]['summary'], '')
+                    self.assertTrue(recalled[kind]['items'], 'Independent extracted facts remain available')
+                    self.assertEqual(recalled[kind]['pages'][0]['content'], '')
+        real = '\nAuthored note: the UI says Generating content... during startup.\n'
+        self.engine.page_body = real
+        for bank in banks: self.store.snapshot(bank)
+        self.assertEqual(self.call('recall')['work']['pages'][0]['content'], real)
+
+    def test_existing_unfinished_cache_is_hidden_offline_without_rewrite_or_retry(self):
+        self.controlled(); self.live_append(); self.finish()
+        snapshots = {}
+        with self.store.connect() as db:
+            for row in db.execute('SELECT bank,snapshot FROM hindsight_banks').fetchall():
+                value = json.loads(row['snapshot'])
+                value['pages'][0]['content'] = 'Generating content...\n'
+                value['summary'] = '## ' + value['pages'][0]['name'] + '\nGenerating content...\n'
+                snapshots[row['bank']] = json.dumps(value)
+                db.execute('UPDATE hindsight_banks SET snapshot=? WHERE bank=?', (snapshots[row['bank']], row['bank']))
+        self.call('processing', paused=True)
+        def offline(*args): raise AssertionError('Cached recall must not request engine work')
+        self.store = HindsightMemory(self.path, self.config, offline, lambda: self.now)
+        self.append('new-capture')
+        recalled = self.call('recall')
+        for kind in ('relationship', 'work'):
+            self.assertEqual(recalled[kind]['summary'], '')
+            self.assertEqual(recalled[kind]['pages'][0]['content'], '')
+            self.assertTrue(recalled[kind]['items'])
+        with self.store.connect() as db:
+            self.assertEqual(dict(db.execute('SELECT bank,snapshot FROM hindsight_banks')), snapshots)
+        self.assertEqual(len(self.call('export')['events']), 2)
+        self.assertTrue(self.call('processing')['paused'])
 
     def test_archive_never_implicitly_migrates_and_explicit_import_is_bounded(self):
         self.append()

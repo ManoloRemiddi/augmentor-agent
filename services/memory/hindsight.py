@@ -28,6 +28,12 @@ PAGES = {
     'work': [('Current project state', 'What are the current project facts, decisions and reasons, constraints, blockers and next steps? Distinguish plans from completed work and explicitly supersede outdated decisions.')]}
 
 
+def page_content(value):
+    # The engine may terminate its unfinished-page marker with a newline.
+    # Keep real page text byte-for-byte; only the whole marker is unavailable.
+    return '' if isinstance(value, str) and value.strip() == 'Generating content...' else (value or '')
+
+
 class HindsightMemory(DualMemory):
     def __init__(self, path, configuration=None, request=http, clock=time.time):
         super().__init__(path, clock)
@@ -124,7 +130,12 @@ class HindsightMemory(DualMemory):
             if action == 'recall':
                 for kind, bank in selected.items():
                     cached = json.loads(bank['snapshot']) if bank else {}
-                    result[kind] = {'summary': cached.get('summary', ''), 'items': cached.get('items', []), 'pages': cached.get('pages', []),
+                    original_pages = cached.get('pages', [])
+                    pages = [{**page, 'content': page_content(page.get('content'))} for page in original_pages]
+                    # Also protect snapshots saved before marker normalization,
+                    # without rewriting the cache or requesting engine work.
+                    summary = cached.get('summary', '') if pages == original_pages else '\n\n'.join('## ' + p['name'] + '\n' + p['content'] for p in pages if p['content'])
+                    result[kind] = {'summary': summary, 'items': cached.get('items', []), 'pages': pages,
                                     'through': bank['cursor'] if bank else 0, 'updated': bank['updated'] if bank else 0,
                                     'stale': cached.get('stale', True)}
                 rows = db.execute("SELECT * FROM events WHERE session=? AND role='user' ORDER BY seq DESC LIMIT 24", (session['id'],)).fetchall()
@@ -193,7 +204,7 @@ class HindsightMemory(DualMemory):
             if node['kind'] != 'page':
                 continue
             page = self.api('GET', self.route(bank['bank'], 'knowledge-base/pages/' + quote(node['id'], safe='')))
-            pages.append({'id': node['id'], 'name': page['name'], 'content': ('' if page.get('body') == 'Generating content...' else (page.get('body') or ''))[:4000], 'stale': node.get('is_stale', True)})
+            pages.append({'id': node['id'], 'name': page['name'], 'content': page_content(page.get('body'))[:4000], 'stale': node.get('is_stale', True)})
         facts = self.api('POST', self.route(bank['bank'], 'memories/recall'), {
             'query': 'Communication preferences, explicit boundaries and relational feedback.' if bank['kind'] == 'relationship' else 'Current project facts, constraints, decisions and verified outcomes.',
             'types': ['world', 'observation'], 'prefer_observations': True, 'budget': 'low', 'max_tokens': 1200, 'trace': False})
