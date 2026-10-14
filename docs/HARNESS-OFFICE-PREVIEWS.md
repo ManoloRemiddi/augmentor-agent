@@ -11,6 +11,55 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Isolated Linux engine build — October 14
+
+The [rebuild environment](../release/office-rebuild/README.md) now records an actual
+isolated attempt using the pinned npm engine's **39 verified recipe/source files**.
+The official Core checkout is **bce0998afefdbc355585ca324285661a2170ba77**;
+Emsdk is **5eb0bde7585670252e8ba05e9d361627bffd08b5** and the verified Emscripten
+version is **4.0.10**. After applying only the shipped patches, the actual Core
+binary diff has SHA-256 **d91124546ab0502728693e537c9570b0290c8bbc2bf06d063551a0960da459cc**,
+exactly matching the shipped `sources/source-changes.patch`. The recipe's patch,
+shim/header and toolchain verification succeeds. This advances source preparation;
+it does not prove a completed engine build or output correspondence.
+
+The first Debian 12 attempt stops at configuration: GCC **12.2.0** is below the
+pinned Core's **GCC >=13** requirement. That image, inventory, log and failed build
+are retained. The Debian 13 definition uses GCC **14.2.0** and a separate fresh
+build directory. Its verification/configuration succeeds and the upstream
+**compile stage is running**: checksum-verified archives are fetched, and real
+C++ host tools (`embindmaker`/`wasmbridgegen`) have compiled/linked before the ICU
+build work at this checkpoint. The container enforces two CPU cores, 6 GiB RAM/no extra swap,
+1,024 processes and one make job with lower CPU priority. No GPU or owner model,
+voice, profile, installed engine or review artifact changes. These are a local
+trial's limits, not qualification of upstream automated-release resource gates.
+
+The base digests, actual host package inventories, Node 24.19.0/hash and observed
+preparation state are in [the environment record](../release/office-rebuild/environment.json).
+Apt content can change; image/engine bit reproducibility is not claimed. An initial
+image-ID equality assertion fails even though the rebuilt Debian 12 definition has
+matching filesystem layers/environment; those properties are recorded separately.
+The nine existing Office packaging/export/refusal cases pass. No gate is relaxed.
+Full compile/receipt, actual generated artifacts and rendering/conversion/cancel
+comparison, linked notices and exact entry preferred source remain unqualified.
+
+A fresh source-location check still finds public master at **b19bb73**, one branch
+and no tags. Pinned 0.1.5/latest 0.2.0 npm metadata provide neither `gitHead` nor
+an attestation. The complete pinned DSH tree has kit references/adapters but no
+`packages/entry` source directory. This bounded check does not prove that no other
+source exists. The [review record](../release/office-engine-public-source-review.json)
+keeps corresponding-source qualification false. The [supplier build guide](https://github.com/deepseek-ai/dsh-libreoffice-kit/blob/b19bb73c74ed893b8a5d1716d32df32a113ed31b/docs/building.md)
+and [Mozilla guidance](https://www.mozilla.org/en-US/MPL/2.0/FAQ/) remain source/licence
+references; these components retain their own terms rather than becoming MIT.
+
+At application source **81094b3**, [Validate 38571935767](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38571935767)
+records **1,187 cases: 1,162 pass, two fail, 23 existing skips, zero cancellations**.
+The failures are original brand interaction and nested tool request controls after
+cold reopening; their causes remain unproven. Later native/package stages are
+not qualified by that run. The earlier cfe5fab Office packaging refusal remains a
+separate release gate. Build preparation and nine focused gate passes do not
+establish full GUI or release acceptance.
+
 ## Actual public wrapper rebuild — October 14
 
 At **1598961772d31848291559d8755f491af702b09e**, the public-source review now

@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [Office engine source-build trial](../docs/HARNESS-OFFICE-PREVIEWS.md#isolated-linux-engine-build--october-14)
+uses actual pinned Core/Emsdk/toolchain and shipped patches, not synthetic engine
+outputs. Nine existing packaging cases still pass and refuse public packaging.
+Debian 12 compiler failure and Debian 13 configuration/active compile are distinct
+from a successful build receipt, actual conversion/output comparison or installed
+acceptance. The Docker definitions/inventories are build evidence, not runtime
+replacement or a reason to bypass source/licence gates. The preceding 81094b3
+full hosted run has 1,162 pass, two brand/nested-tool GUI failures, 23 existing skips
+and no cancellation; its causes remain open.
+
 [Pi keep-original draft responses](../docs/AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14) qualify exact
 Unicode/whitespace preservation and reject mixed unchanged/replacement objects in
 the actual SDK/HTTP transaction. Source **c543b75e1cbed744b4c94030e3d61a0dc2d5d43c** passes strict check/build

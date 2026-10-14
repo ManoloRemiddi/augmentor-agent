@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux Office engine source preparation](HARNESS-OFFICE-PREVIEWS.md#isolated-linux-engine-build--october-14)
+verifies the exact official Core/Emsdk, shipped patches/shim and Emscripten 4.0.10.
+Actual Core diff matches the shipped source patch. Debian 12/GCC 12 configuration
+fails and is retained; Debian 13/GCC 14 with a fresh build passes configuration and
+has a resource-limited compile stage running. Reproducible definitions, inventories
+and pins are public; private process identity stays local. Nine existing gate tests
+pass without relaxing refusal. No engine binary, exact entry source, rendering or
+public distribution qualification is claimed; installed/review/services are unchanged.
+Latest 81094b3 Validate 38571935767 has 1,162 pass/two original GUI failures/23
+existing skips and no cancellation; causes and new-head acceptance remain open.
+
 [Pi draft meaning preservation](AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14) at **c543b75e1cbed744b4c94030e3d61a0dc2d5d43c**
 adds a strict keep-original model response and explicit precedence over ambiguous
 editing advice. Source/ordinary **5/5 each across four files** pass with 908 matching

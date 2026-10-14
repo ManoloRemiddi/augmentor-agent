@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux Office engine source preparation](HARNESS-OFFICE-PREVIEWS.md#isolated-linux-engine-build--october-14)
+verifies the exact official Core/Emsdk, shipped patches/shim and Emscripten 4.0.10.
+Actual Core diff matches the shipped source patch. Debian 12/GCC 12 configuration
+fails and is retained; Debian 13/GCC 14 with a fresh build passes configuration and
+has a resource-limited compile stage running. Reproducible definitions, inventories
+and pins are public; private process identity stays local. Nine existing gate tests
+pass without relaxing refusal. No engine binary, exact entry source, rendering or
+public distribution qualification is claimed; installed/review/services are unchanged.
+
 [External live MCP compatibility](HARNESS-PLUGIN-PARITY.md#live-blender-cli-workflow-and-retained-inspection--october-14):
 installed Blender 5.2.1 LTS (9e2066aef7ef), Python blender-mcp distribution 1.0.3
 and its separately advertised MCP serverInfo 1.30.0 qualify the bounded CLI test.

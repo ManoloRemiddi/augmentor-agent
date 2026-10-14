@@ -445,5 +445,21 @@
     "sourceScope": "Native frame-forwarding C++ sources are shipped, but no entry TypeScript preferred source is included. This is a package inventory, not semantic compatibility or an engine rebuild. No upgrade or source/redistribution qualification is inferred.",
     "optionalKoffiVersion": "3.1.1",
     "pinnedDependenciesChanged": false
+  },
+  "sourceLocationRecheck": {
+    "date": "2026-10-14",
+    "publicHead": "b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+    "branches": [
+      "master"
+    ],
+    "tags": [],
+    "pinnedNpmVersion": "0.1.5",
+    "latestNpmVersion": "0.2.0",
+    "pinnedAndLatestNpmGitHeadPresent": false,
+    "pinnedAndLatestNpmAttestationPresent": false,
+    "dshTreeRef": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+    "dshTreeTruncated": false,
+    "dshEntryPackageSourceDirectoryPresent": false,
+    "scope": "Checked public branch/tags, package metadata and the pinned DSH tree. No corresponding entry source is established; this does not prove no other source exists."
   }
 }
