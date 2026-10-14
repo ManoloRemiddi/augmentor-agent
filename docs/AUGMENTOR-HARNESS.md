@@ -587,6 +587,25 @@ startup/crash/installed/update qualification. New-head hosted acceptance, broade
 migration and public packaging gates remain open. No selected artifact, launcher,
 owner review/draft, production service, model or speech configuration changes.
 
+Qualification source: **737bdf92f3a4c8166c3600e5a0c3cf25c4bab6f8**. Strict check/build and
+source/fresh ordinary **145/145 each across 23 files**, two workers, unchanged
+deadlines and no skips pass. The cohort includes all three owner cases, managed
+MCP wire/policy/shutdown and public-loader recovery, Host/native Qt lifecycle,
+branch/cold persistence, memory/privacy/payload bounds and original Context.
+All **908 compiled files** and the 23 selected test files match the ordinary
+assembly; **155 production npm instances**, dependency bytes and bundled Node
+**24.19.0** retain the preceding isolated base. The raw controlled pre-fix listener
+stays alive while its path is removed; the final actual-connect assertion passes.
+Public tracked/history source-boundary and whitespace checks pass. This source
+fix is separate from the earlier real Playwright proof at 60b7c54/runtime 7b9a703.
+
+The f98424b review process/root and installed 97897cf selection digest are
+unchanged. The reference DSH-owned Playwright PID/arguments are unchanged; all
+proof-owned browser/MCP/owner processes are terminal. Qwen and production memory
+health return 200; Qwen retains two slots with **262,144** context each. No service
+restart or model/speech/GPU setting occurs. New-head hosted and full migration/
+installed/public-distribution gates remain open.
+
 ## Instruction source links — October 14
 
 The managed context observer now adds an optional `instructionSources` snapshot

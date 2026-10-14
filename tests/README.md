@@ -7,6 +7,11 @@ three passes and two fail; after it all three pass without model requests,
 private-source fixtures, weakened deadlines or altered assertions. The broader
 runtime/native/MCP/context cohort remains required; hosted cancellation and
 wider platform/installed gates stay explicit.
+Qualification source **737bdf92f3a4c8166c3600e5a0c3cf25c4bab6f8** passes strict check/build
+and source/fresh ordinary **145/145 each across 23 files**, two workers, unchanged
+deadlines/no skips. It includes managed MCP wire/shutdown/loader recovery, actual
+native Qt controls and original Context. All 908 compiled files match; 155
+production npm instances and bundled Node 24.19.0 retain the isolated base.
 
 [Live Playwright evidence](../docs/HARNESS-PLUGIN-PARITY.md#live-playwright-workflow-and-retained-inspection--october-14)
 at source 60b7c54/runtime 7b9a703 uses actual local Qwen and installed external

@@ -1,11 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Runtime listener ownership](AUGMENTOR-HARNESS.md#runtime-listener-ownership--october-14)
-now preserves a winning socket after a failed bind and holds the listener until
+at **737bdf92f3a4c8166c3600e5a0c3cf25c4bab6f8**
+preserves a winning socket after a failed bind and holds the listener until
 public SDK shutdown finishes. Real-main bind/drain fixtures reproduce both old
 violations, then pass with the existing launch/journal test and unchanged deadlines.
 The 60b7c54 CI owner-test cancellation remains recorded; its precise interleaving
-is unproven. No owner artifact or model/speech configuration changes.
+is unproven. Source/ordinary **145/145 each across 23 files** pass, 908 compiled
+files match, and 155 production npm instances/Node stay unchanged. No owner
+artifact or model/speech configuration changes. New-head hosted and release gates
+remain open.
 
 [Actual Playwright workflow](HARNESS-PLUGIN-PARITY.md#live-playwright-workflow-and-retained-inspection--october-14)
 at public **60b7c54**/runtime **7b9a703** proves a fresh external 0.0.79 MCP process,
