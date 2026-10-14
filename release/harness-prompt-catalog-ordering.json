@@ -115,7 +115,7 @@
     "macOS",
     "Windows"
   ],
-  "newCommonDomCiExecuted": false,
+  "newCommonDomCiExecuted": true,
   "preservation": {
     "currentReviewInventoryVerified": 24305,
     "priorReviewInventoryVerified": 24288,
@@ -142,5 +142,19 @@
     "Older Trajectory held-proposal timeout cause",
     "Full instruction/semantic/resource workflows and broader migration",
     "Retained Office source/rebuild/distribution and native crash/font/security gates"
-  ]
+  ],
+  "sharedDomHostedQualification": {
+    "sourceRef": "271e1aedba84976129f00490b96f27f0893357af",
+    "run": 38641804850,
+    "platforms": [
+      "Linux",
+      "macOS",
+      "Windows"
+    ],
+    "casesEach": 15,
+    "passEach": 15,
+    "failEach": 0,
+    "skipEach": 0,
+    "installedOrPhysicalAcceptance": false
+  }
 }

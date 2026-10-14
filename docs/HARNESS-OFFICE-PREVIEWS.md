@@ -11,7 +11,7 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
-## Independent native scratch cleanup — October 14
+## Independent native scratch cleanup — October 15
 
 The preceding native adapter still leaves a real document/font/profile copy
 after simultaneous Node-owner and broker-group loss. If the conversion tree is
@@ -50,10 +50,41 @@ The latter is refusal evidence, not recovery of the moved directory. The existin
 hard-stop case still freezes the same broker/monitor/renderer actors; its new
 independent guard remains responsive. Tests confirm that guard's separate session.
 
-Exact-ref source/ordinary/original-viewer qualification remains pending at this
-implementation checkpoint. The pinned kit remains default and the native backend
-stays an explicit Linux x64 development opt-in. GUI/CSS/supplier source, converter
-contract, dependency pins and running/selected artifacts are unchanged.
+At **8ce4334dde84af07625dbc51c5f21b1be35e4240**, strict check/build, version and
+source-boundary checks pass. Source/fresh ordinary **270/270 each across 64 files**
+include all **44 Harness Chromium files**, 15 shared prompt DOM checks and the
+11 explicit common/real native Office cases. Both use two workers, unchanged
+existing deadlines and zero skips/cancellations. Separate original native-backend
+Office viewers pass on both trees, including font notices, PDF, zoom, reload and
+Retry with preserved native/request evidence.
+
+All **921 compiled** and **2,048 executable source/test/fixture files** match the
+ordinary tree. The native helper's copied bytes match its source; other fresh
+compiled differences are the existing temporary spreadsheet overlay/chunk names
+and associated build metadata, with normalized GUI/worker bodies verified.
+Production **20,847 dependency entries / 155 npm instances / Node 24.19.0** and
+the existing **1,932 Browser-only test dependency entries** remain matched.
+Eleven packaging/source-boundary cases pass; public Office approval stays closed.
+Read-only postflight verifies both **24,305/24,288-entry** review inventories, all
+four review processes, unchanged selected configuration and 38 canonical changes.
+Qwen models returns HTTP 200; no owner history/profile/credentials or draft is
+read or changed, and model/speech/GPU settings are preserved.
+
+The preceding **271e1ae** [SDK 38641804850](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38641804850)
+passes Linux/macOS/Windows, including the new shared prompt DOM step **15/15 on
+each platform**; [Windows desktop 38641804839](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38641804839)
+also passes. [Validate 38641805015](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38641805015)
+passes main Node **1,202 / 29 identified skips / zero failures or cancellations**,
+secondary Browser **121/121**, and Python/Qt **875 / 45 identified skips**, then
+refuses the retained exact-entry-source/full-engine-rebuild packaging gate.
+Those runs do not contain this new guard. Exact new-head hosted and installed/
+physical acceptance remains open.
+
+[Portable qualification record](../release/office-rebuild/native-independent-cleanup.json)
+records the actual failure comparators, process barriers and limited scope.
+The pinned kit remains default and the native backend stays an explicit Linux
+x64 development opt-in. GUI/CSS/supplier source, converter contract, dependency
+pins and running/selected artifacts are unchanged.
 Guardian loss or stall, allocation before guard readiness, successful caller-PDF
 and original provider outer-scratch crash recovery, power loss/durable indexing,
 font/layout/security/distribution and other OS adapters remain required. This

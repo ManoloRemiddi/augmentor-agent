@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Independent native scratch guard qualification](native-independent-cleanup.json) at 8ce4334 adds actual owner/converter-group and stopped-tree recovery, with source/ordinary 270-case and both original-viewer proofs. It preserves the default engine/public gate; guard loss, durable/outer/caller-PDF recovery, fonts/security/native distribution and other OS mechanisms remain open. See [the owning contract](../../docs/HARNESS-OFFICE-PREVIEWS.md#independent-native-scratch-cleanup--october-15).
+
 # Pinned Linux Office engine rebuild
 
 This is a build environment and preparation record, not a qualified replacement

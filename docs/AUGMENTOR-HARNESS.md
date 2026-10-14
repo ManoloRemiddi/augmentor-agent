@@ -415,8 +415,7 @@ placement and installed/review artifacts remain unchanged.
 
 The preceding **6cb41d1** [three-platform SDK 38639750952](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38639750952)
 and [Windows desktop 38639750927](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38639750927)
-pass; those do not include this new editor or its added DOM step. Exact new-head
-hosted/platform, installed/physical, older Trajectory timeout causality, full
+pass; those do not include this new editor or its added DOM step. Follow-up **271e1aedba84976129f00490b96f27f0893357af** [SDK 38641804850](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38641804850) passes all three platforms with the new editor and **15/15 shared prompt DOM cases each**, zero failures/skips/cancellations. Its [Validate 38641805015](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38641805015) passes main Node 1,202/29 identified skips, Browser 121/121 and Python/Qt 875/45 identified skips, then refuses the retained Office gate. Wider hosted/platform, installed/physical, older Trajectory timeout causality, full
 instruction/semantic behavior and broader migration/release gates remain open.
 Running owner previews retain their preceding editor until separately qualified
 activation. No binary publication or DSH retirement follows.
