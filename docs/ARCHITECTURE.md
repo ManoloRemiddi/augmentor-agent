@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Runtime listener ownership](AUGMENTOR-HARNESS.md#runtime-listener-ownership--october-14)
+keeps the process admission fence through public SDK shutdown. Only a successful
+bind grants Unix socket cleanup identity; a failed process cannot remove another
+owner's listener. Windows retains named-pipe semantics. This is runtime lifecycle
+coordination, separate from the AgentSession's conversation/execution ownership.
+
 [Instruction source links](AUGMENTOR-HARNESS.md#instruction-source-links--october-14)
 are a derived diagnostic view of already captured public SDK options and recognized
 system text. They neither compose context nor load files or own native state.

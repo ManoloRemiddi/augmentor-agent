@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Runtime ownership fixtures](../docs/AUGMENTOR-HARNESS.md#runtime-listener-ownership--october-14)
+add a controlled real-main bind collision and actual held SDK shutdown/follower
+alongside the existing fresh-launch/journal/protocol case. Before the fix one of
+three passes and two fail; after it all three pass without model requests,
+private-source fixtures, weakened deadlines or altered assertions. The broader
+runtime/native/MCP/context cohort remains required; hosted cancellation and
+wider platform/installed gates stay explicit.
+
 [Live Playwright evidence](../docs/HARNESS-PLUGIN-PARITY.md#live-playwright-workflow-and-retained-inspection--october-14)
 at source 60b7c54/runtime 7b9a703 uses actual local Qwen and installed external
 Playwright MCP 0.0.79, an authored loopback page and fresh profile. Native receipts,

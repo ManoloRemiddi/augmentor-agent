@@ -35,6 +35,13 @@ async function openHarness(){
   return openingHarness;
 }
 const path=paths().socket;
+let ownedSocket:{dev:number;ino:number}|undefined;
+function unlinkOwnedSocket(){
+  if(!ownedSocket)return;
+  const expected=ownedSocket;ownedSocket=undefined;
+  try{const current=lstatSync(path);if(current.dev===expected.dev&&current.ino===expected.ino)unlinkSync(path);}
+  catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}
+}
 if(process.platform!=='win32'&&existsSync(path)){
   if(!lstatSync(path).isSocket()||lstatSync(path).uid!==process.getuid?.())throw new Error('Runtime socket path is not an owned socket');
   const live=await new Promise<boolean>((resolve,reject)=>{const probe=net.createConnection(path);probe.on('connect',()=>{probe.destroy();resolve(true);});probe.on('error',(error:NodeJS.ErrnoException)=>{if(error.code==='ECONNREFUSED'||error.code==='ENOENT')resolve(false);else reject(error);});});
@@ -64,14 +71,14 @@ const server=localServer(socket=>{
   });
 });
 server.on('error',()=>{process.exitCode=1;void shutdown();});
-await new Promise<void>((resolve,reject)=>{server.once('error',reject);server.listen(path,()=>{if(process.platform!=='win32')chmodSync(path,0o600);resolve();});});
+await new Promise<void>((resolve,reject)=>{server.once('error',reject);server.listen(path,()=>{if(process.platform!=='win32'){const stat=lstatSync(path);ownedSocket={dev:stat.dev,ino:stat.ino};chmodSync(path,0o600);}resolve();});});
 // Bind the owned socket before opening session journals. Concurrent fresh
 // launches therefore cannot both recover/prune the same profile.
 try{
   host=new Host((sid,frame)=>{harness?.publish(sid,frame);for(const [socket,session] of clients)if(session===sid)write(socket,{event:frame});},connected);
   await host.init();readyOwner!();
-}catch(error){failedOwner!(error);for(const socket of clients.keys())socket.destroy();server.close();if(process.platform!=='win32'&&existsSync(path))unlinkSync(path);throw error;}
+}catch(error){failedOwner!(error);for(const socket of clients.keys())socket.destroy();server.close();unlinkOwnedSocket();throw error;}
 if(process.env.AUGMENTOR_HARNESS==='1')await openHarness();
 console.log(JSON.stringify({ready:true,socket:path,protocol:PROTOCOL}));
-async function shutdown(){if(closing)return;closing=true;server.close();await harness?.close();await host?.close();for(const client of clients.keys())client.destroy();if(process.platform!=='win32'&&existsSync(path))unlinkSync(path);if(host){const descriptor=join(host.dirs.state,'harness.json');if(readJson<Data>(descriptor,{}).pid===process.pid)unlinkSync(descriptor);}}
+async function shutdown(){if(closing)return;closing=true;await harness?.close();await host?.close();server.close();for(const client of clients.keys())client.destroy();unlinkOwnedSocket();if(host){const descriptor=join(host.dirs.state,'harness.json');if(readJson<Data>(descriptor,{}).pid===process.pid)unlinkSync(descriptor);}}
 process.on('SIGTERM',()=>void shutdown());process.on('SIGINT',()=>void shutdown());

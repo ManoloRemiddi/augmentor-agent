@@ -547,6 +547,46 @@ Composition qualification source: **`1d8923586fe70e01a42f95bdbeb9d5fc0d5eca97`**
 
 Preceding published **`08c13fe4bac63b5cbb4078e4ce3cf9704f518b6f`** has **17 hosted successes**, with no live or failed job at this observation. No job was restarted. New matching-head hosted and physical platform/installed acceptance remain required; prior unproved failure causes are not declared resolved by green runs.
 
+## Runtime listener ownership — October 14
+
+Two real-main fixtures reproduce losing a live Unix listener before this fix.
+A process that misses a concurrent bind receives `EADDRINUSE`, but its failure
+shutdown previously unlinked the winning process's socket. Separately, normal
+shutdown closed/unlinked the listener before public SDK session shutdown finished;
+a new process could enter while the old session was still draining. The original
+simultaneous-launch test can then wait indefinitely for a follower that has become
+a second owner instead of exiting. Hosted 60b7c54/Validate **38556138638** records
+that case cancelled at its unchanged 20-second test deadline: **1,155 pass, zero
+assertion failures, one cancelled, 23 existing skips**. The exact hosted
+interleaving remains unobserved; controlled fixtures prove these independent
+ownership violations without inferring a cause from a timeout alone.
+
+The runtime now records its Unix socket's device/inode only after successful
+binding. Shutdown and initialization-failure cleanup can remove only that recorded
+socket, tolerating an already removed path and preserving a replacement path.
+A bind loser never owns a cleanup target. The listener stays bound while the
+Harness and SDK Host close; the existing closing flag rejects new work. It closes
+after the loaded SDK owners/companions have settled, before remaining clients and
+the matching socket/descriptor are released. No SDK-private field, second agent,
+new lock service, dependency or UI change is introduced.
+
+The controlled bind fixture uses only an independently authored, one-check public
+Node fs preloader for its own temporary path, producing a real `EADDRINUSE` against
+an actual listener. The draining fixture holds a real public `session_shutdown`
+hook; a fresh follower must exit without becoming ready until that hook is released.
+Neither starts a model request or reads an owner profile. The existing fresh-
+launch/journal/protocol test remains, with all original deadlines/assertions.
+Before the fix **one of three passes and two fail**; after it **three of three
+pass**. The broader cohort retains native Qt, MCP managed reload/shutdown and
+original Context contracts rather than substituting these small fixtures for them.
+
+Socket cleanup identity applies to Unix platforms; Windows keeps its named-pipe
+path and receives the same delayed listener close, without filesystem unlink.
+Linux fixture acceptance does not establish physical macOS/Windows or complete
+startup/crash/installed/update qualification. New-head hosted acceptance, broader
+migration and public packaging gates remain open. No selected artifact, launcher,
+owner review/draft, production service, model or speech configuration changes.
+
 ## Instruction source links — October 14
 
 The managed context observer now adds an optional `instructionSources` snapshot
