@@ -4,6 +4,59 @@
 
 # Original Harness spreadsheet previews
 
+## Hosted contracts and isolated MX feedback — October 14
+
+The complete [Application SDK platform matrix 38498734917](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38498734917)
+passes on Ubuntu 24.04, macOS 14 and Windows 2025 at source
+**abfb9395044286e6fa4e504aa3dd8904247cb49a**. Each runs the three build regressions
+and actual GUI build, then private-file/startup and workspace capability checks;
+Unix also runs the pinned Codex workspace fixtures, and Linux runs the source
+embedding proof. The preceding Windows command-job run 38498150694 reaches
+successful shared builds on both x64 and ARM64 at 7cbc431; that build evidence
+does not qualify the complete command job or installed Windows application.
+The old failed ESM fixture and original Immer-export failure remain recorded
+below. Later documentation-only publication is not relabelled as this tested ref.
+
+To support MX owner feedback while preserving the working draft, the qualified
+Linux search candidate **454db9d / 20261014-032413-b4cd8c8b**, artifact
+**964d1cdef122aab51fd46510f897a35d1bd391e97d4f7ae1f52983160569f3e5**,
+now runs a separate private test Host/profile. Its bundled Node/runtime/GUI are
+unchanged. The profile uses current local Qwen with the same declared context,
+read-only chat and explicit keyless search/fetch settings. API credentials,
+working conversations/vaults, prompt/memory settings and provider credential
+environment variables are not imported. Default desktop tools are disabled.
+This is a manual feedback environment, not installed-owner migration or a new
+product default. User-created test conversations belong to this profile.
+
+The live authenticated operator verifies its PID and exact configuration/state
+paths, Linux search-settings/mode capabilities, enabled keyless mode with empty
+API keys, and initially empty independent history. Opening the Codex browser
+panel is queued; no existing browser tab or Native window is replaced. The
+private operator URL/Host PID/profile/socket identity live only in ignored
+`outputs/harness-owner-feedback-current.json`; never copy its bearer URL to
+GitHub or a public report. The test Host is detached from this tool invocation,
+with no login service, startup launcher or automatic activation installed.
+Verify its live peer and activity before later cleanup; use its normal guarded
+Host shutdown and preserve any new drafts/history, rather than killing a PID
+from a stale record.
+
+The first operator launch uses an overlong Unix socket path below the worktree
+and terminates with EINVAL before Host initialization. Its private log is retained;
+the process is confirmed terminal and no ready descriptor exists. The corrected
+operator uses a private short `/run/user/<uid>` directory, as the normal preview
+launch already does. No product code, assertions, deadline or selected release
+is changed to hide that setup failure.
+
+Fresh working-preview maintenance reports **running false**, **draft present**,
+**busy true** and **accepted false**. Busy includes the unsent draft; it does not
+establish active model work. The selected/running preview remains 97897cf and
+is not restarted or updated. Its draft remains untouched. Owner feedback and
+guarded installed adoption are still required; the separate test URL does not
+close those gates. Other live/plugin/voice/privacy/engine-rebuild/public binary
+and platform requirements remain. In the prior Mac feasibility run, packaging
+stops at the unreviewed Koffi Darwin ARM64 3.1.1 notice; that notice policy is not
+relaxed and full macOS binary acceptance is not claimed.
+
 ## Portable GUI dependency resolution — October 14
 
 Implementation **7cbc4311cc5a7bb0a6200d73b888063ea746b840** preserves the original package's nested

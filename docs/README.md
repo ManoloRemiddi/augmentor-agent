@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original GUI build and separate MX feedback profile](HARNESS-SPREADSHEET-PREVIEWS.md#hosted-contracts-and-isolated-mx-feedback--october-14):
+source **abfb9395044286e6fa4e504aa3dd8904247cb49a** passes the complete Application
+SDK platform matrix on Linux/macOS/Windows after the portable overlay and test
+file-URL corrections. The qualified 454db9d Linux search candidate is also running
+in a separate private read-only/local-Qwen feedback profile with keyless search,
+no imported owner data/credentials and no provider credentials inherited from
+its launcher. Its live operator RPC, exact profile paths, PID, modes and initially
+empty history verify. The private URL is retained only in ignored local state;
+its Codex browser opening is queued. The installed 97897cf preview remains idle
+with an unsent draft; busy is a maintenance veto, not proof of active inference.
+No selection/restart/draft removal occurs. Broader installed/live/privacy/public
+redistribution and platform rollout gates remain open.
+
 [Portable original-GUI dependency resolution](HARNESS-SPREADSHEET-PREVIEWS.md#portable-gui-dependency-resolution--october-14)
 fixes the Windows temporary-overlay path comparison so FortuneSheet resolves its
 original nested Immer 9.0.21, rather than incompatible project 11.1.4. The same

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Source **abfb9395044286e6fa4e504aa3dd8904247cb49a** passes the complete [Application SDK Linux/macOS/Windows matrix](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38498734917), including the three GUI build regressions, actual build and platform/workspace contracts. This is shared build/contract evidence, not installed platform or full Harness acceptance. The separate MX candidate feedback profile verifies authenticated operator readiness, isolated paths, keyless configuration and initially empty history; it is manual owner feedback, not another fixture/live-model pass. See [current scope and setup failures](../docs/HARNESS-SPREADSHEET-PREVIEWS.md#hosted-contracts-and-isolated-mx-feedback--october-14).
+
 `harness-build-resolution.test.mjs` has three source/build-only cases for native
 path boundaries, Windows mixed separators/case/UNC/drives and a real esbuild
 fixture proving nested supplier exports beat an incompatible project package.
