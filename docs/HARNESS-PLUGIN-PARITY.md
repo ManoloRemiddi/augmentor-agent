@@ -30,6 +30,54 @@ It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision a
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
 
+## CI readiness barriers and retained failures — October 14
+
+The Debian [Validate run 38500788831](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38500788831)
+at 20141bc passes the build but fails the original Search card's TinyFish
+observation and the running-archive request count (3 versus 2). Two later runtime
+cases then fail because their expected organization checkpoint is assigned only
+after that archive case completes. These are retained failures, separate from
+the passing GUI-builder platform matrix and the qualified immutable candidate.
+
+The test changes leave runtime, supplier/UI source, configuration and all request,
+mutation, history, scope, theme and collision assertions unchanged. The archive
+driver previously waited only for the foreign model receipt before sampling its
+inference count. An already admitted target prompt could still be preparing;
+it now waits for both target and foreign provider receipts before the same
+no-extra-request assertion. This tests Stop during active generation explicitly,
+without treating late admission of the original prompt as inference caused by
+archive. Stale Stop still cannot cancel, and confirmed Stop still affects only
+the target while the foreign owner remains running.
+
+The Search GUI driver waits for its enable switch to be writable (a confirmed
+private configuration snapshot) before dispatching the original card's single
+click. Its first read is held through the existing CDP request boundary; the
+actual original controls remain disabled while the snapshot is unavailable and
+become writable after the read continues. This exercises a real pending-read
+condition without altering product code or repeating a dispatched click. A
+failed observation now retains synthetic-only body/language/control evidence;
+it never logs the operator URL/token. The preceding TinyFish timeout lacks that
+evidence, so its exact cause remains unproven. A passing later run does not
+relabel it as a diagnosed product fix.
+
+The final source and separate ordinary focus each pass **57/57**, two workers,
+Node 24.19.0 and matching prepared QtTest, unchanged 15-second observation and
+90-second GUI/120-second runtime deadlines, no skips. The complete local Node
+suite at two workers passes **1,150** of **1,156** cases with no failures; six
+existing skips are two opt-in real Codex memory pipelines and four tests requiring
+Windows Job objects. Its global DSH is **0.2.0-rc.2**, rather than the CI's explicit
+locked installation, so this is not relabelled as exact Debian/DSH qualification.
+New-head hosted acceptance remains separate. These test-only changes do not
+modify the selected 97897cf preview, its draft, the 454db9d immutable candidate,
+or the private manual-feedback Host/profile.
+
+The same source's Windows command tests retain separate failures: x64 memory
+processing lease availability and ARM64 unknown-versus-cancelled teardown. Unknown
+producer outcomes remain unknown; no cancellation assertion is weakened and no
+Windows adapter is changed in this checkpoint. Mac packaging retains its Sharp/
+libvips and Koffi notice/source gates. Owner-installed, physical voice, broader
+plugin/live/privacy/rebuild and platform migration acceptance remain required.
+
 ## Qualified unselected search MX candidate — October 14
 
 Implementation **454db9d9915724b53998e187c30c2943a0d7d3b2**, product **0.2.13**,

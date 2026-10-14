@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[CI readiness barriers and retained failures](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14)
+wait for both admitted archive provider receipts before counting requests and
+for a confirmed private Search snapshot before the original card's single click.
+A held actual UI read verifies disabled/writable controls; observation failures
+retain synthetic DOM evidence without bearer URLs. Source/ordinary 57/57 and
+local Node 1,150 passes/six existing skips qualify at two workers with unchanged
+assertions/deadlines. Earlier Debian TinyFish and archive/cascading failures remain
+explicit; exact old GUI cause and new-head hosted acceptance are unproven.
+Product, candidate, working draft and feedback profile stay unchanged. Separate
+Windows lease/teardown and Mac notice gates remain; no unknown action is replayed.
+
 [Original GUI build and separate MX feedback profile](HARNESS-SPREADSHEET-PREVIEWS.md#hosted-contracts-and-isolated-mx-feedback--october-14):
 source **abfb9395044286e6fa4e504aa3dd8904247cb49a** passes the complete Application
 SDK platform matrix on Linux/macOS/Windows after the portable overlay and test
