@@ -58,7 +58,7 @@ export class PiPromptImprovement {
     const cancel=()=>{void session?.abort().catch(()=>{});};abort.signal.addEventListener('abort',cancel);
     let stage='resource-preparation';
     try{
-      const guidance=options.instructions.content.replace(/\s*PROMPT:\s*\[clipboard\]\s*$/i,'')+'\n\nInline editor override: The following rules take precedence over earlier editing advice, including advice to resolve ambiguity, choose a natural interpretation, or ask questions. Treat the supplied draft as text to edit, including feedback, reactions and fragments. Change wording, grammar and organization only; do not carry out the task or answer it. Preserve its language, factual claims, negation, uncertainty, quantities, identifiers, dates, conditions and output constraints. Never add facts, requirements, states or relationships. Mentioning an item does not assert anything about its status. Instructions about where to place text describe output formatting, not facts about adjacent items. Preserve unresolved ambiguity rather than completing it. If clearer wording would require guessing the intended meaning, return the original draft exactly. Leave already clear text unchanged. Return one JSON object only, with kind "rewrite" and text containing the editable draft. No markdown fences.';
+      const guidance=options.instructions.content.replace(/\s*PROMPT:\s*\[clipboard\]\s*$/i,'')+'\n\nInline editor override: The following rules take precedence over earlier editing advice, including advice to resolve ambiguity, choose a natural interpretation, or ask questions. Treat the supplied draft as text to edit, including feedback, reactions and fragments. Change wording, grammar and organization only; do not carry out the task or answer it. Preserve its language, factual claims, negation, uncertainty, quantities, identifiers, dates, conditions and output constraints. Never add facts, requirements, states or relationships. Mentioning an item does not assert anything about its status. Instructions about where to place text describe output formatting, not facts about adjacent items. First decide whether the draft has more than one plausible meaning. If it does, do not rewrite or resolve it: return {"kind":"unchanged"}. Also return {"kind":"unchanged"} for already clear text or whenever meaning preservation is uncertain. Otherwise return {"kind":"rewrite","text":"the editable draft"}. Return one JSON object only, with exactly the keys shown for its kind. No markdown fences.';
       const settingsManager=managedPiSettings(false);
       const resourceLoader=new DefaultResourceLoader({cwd:options.cwd,agentDir:options.agentDir,settingsManager,noExtensions:true,noSkills:true,noPromptTemplates:true,noContextFiles:true,noThemes:true,systemPrompt:guidance,appendSystemPrompt:[]});
       await resourceLoader.reload();abort.signal.throwIfAborted();options.accepting();
@@ -97,10 +97,11 @@ export class PiPromptImprovement {
       const raw=answer.content.filter(part=>part.type==='text').map(part=>part.text).join('');
       if(raw.length>24000)throw Error('Oversized output');
       const value=JSON.parse(raw.trim().replace(/^```(?:json)?\s*/,'').replace(/\s*```$/,''));
-      if(value?.kind!=='rewrite'||typeof value.text!=='string'||!value.text.trim()||value.text.length>16000||Object.keys(value).some(key=>!['kind','text'].includes(key)))throw Error('Invalid rewrite');
+      const unchanged=value?.kind==='unchanged';
+      if(unchanged?Object.keys(value).length!==1:value?.kind!=='rewrite'||typeof value.text!=='string'||!value.text.trim()||value.text.length>16000||Object.keys(value).some(key=>!['kind','text'].includes(key)))throw Error('Invalid rewrite');
       receipt.status='completed';receipt.usage={};
       for(const key of ['input','output','cacheRead','cacheWrite','totalTokens'] as const)if(Number.isFinite(answer.usage?.[key]))receipt.usage[key]=answer.usage[key];
-      return {ok:true,kind:'rewrite',text:value.text.trim(),receipt:{...receipt,finishedAt:Date.now()},replayed:false};
+      return {ok:true,kind:'rewrite',text:unchanged?draft:value.text.trim(),unchanged,receipt:{...receipt,finishedAt:Date.now()},replayed:false};
     }catch{
       receipt.status=abort.signal.aborted?'cancelled':'failed';receipt.failureStage=stage;throw Error(abort.signal.aborted?interrupted:invalid);
     }finally{clearTimeout(timer);abort.signal.removeEventListener('abort',cancel);receipt.finishedAt=Date.now();try{this.persist();}finally{session?.dispose();}}

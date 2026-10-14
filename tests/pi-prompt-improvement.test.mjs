@@ -37,7 +37,9 @@ test('real Pi draft transactions are tool-free, isolated, cancellable and never 
   assert.deepEqual(await rpc('observation.list',{sessionId}),observationsBefore);
   const receipt=(await rpc('prompt.improvementStatus',{requestId:one.requestId}));assert.equal(receipt.payloadsRetained,false);assert.equal(receipt.receipt.requests,1);
   await assert.rejects(rpc('prompt.improve',one),/not replayed/);assert.equal((await requests()).length,1);
-  for(const text of ['IMPROVE_INVALID','IMPROVE_TOOL','IMPROVE_TRUNCATED']){const p=params(text),n=(await requests()).length;await assert.rejects(rpc('prompt.improve',p),/valid rewrite/);assert.equal((await requests()).length,n+1);assert.equal((await rpc('prompt.improvementStatus',{requestId:p.requestId})).receipt.status,'failed');}
+  const ambiguous='  IMPROVE_UNCHANGED café 🌞\n',kept=await rpc('prompt.improve',params(ambiguous));
+  assert.equal(kept.text,ambiguous,'an unchanged response restores exact input, including whitespace');assert.equal(kept.unchanged,true);assert.equal(kept.kind,'rewrite');assert.equal(kept.receipt.requests,1);
+  for(const text of ['IMPROVE_INVALID','IMPROVE_TOOL','IMPROVE_TRUNCATED','IMPROVE_UNCHANGED_EXTRA']){const p=params(text),n=(await requests()).length;await assert.rejects(rpc('prompt.improve',p),/valid rewrite/);assert.equal((await requests()).length,n+1);assert.equal((await rpc('prompt.improvementStatus',{requestId:p.requestId})).receipt.status,'failed');}
   await assert.rejects(access(join(link.workspace,'must-not-exist')));
   const cancelled=params('never submitted');await rpc('prompt.cancelImprovement',{requestId:cancelled.requestId,scopeId:cancelled.scopeId});const count=(await requests()).length;await assert.rejects(rpc('prompt.improve',cancelled),/not replayed/);assert.equal((await requests()).length,count);
   const slow=params('IMPROVE_SLOW'),pending=rpc('prompt.improve',slow),rejected=assert.rejects(pending,/interrupted/);

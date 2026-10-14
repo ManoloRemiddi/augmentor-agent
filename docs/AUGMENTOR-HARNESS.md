@@ -864,7 +864,15 @@ editing advice to choose an interpretation or ask questions. It limits editing
 to wording/grammar/organization, preserves factual claims, negation, uncertainty,
 quantities, identifiers, dates, conditions and output constraints, and distinguishes
 mentioning an item or output placement from asserting a state about that item.
-When clearer wording requires guessing, it asks for the original text unchanged.
+A first live guidance-only retest removed the explicit ended-state claim, but a
+Native rewrite still assigned the identifier an unintended output position. That
+result remains an incomplete meaning-preservation outcome. The model now has an
+explicit `{"kind":"unchanged"}` response for ambiguous/uncertain or already clear
+input. The runtime accepts only that one-key shape and returns the exact original
+draft, including whitespace, through the existing rewrite reply with an optional
+`unchanged` flag. A model-provided replacement on that shape is refused. The model
+continues to have one request; no automatic second attempt or semantic judging
+loop is added.
 This is model guidance, not an automatic semantic verifier or a guarantee that
 arbitrary rewrites preserve meaning. Existing editable draft/Undo remains required.
 The one-request, tool-free transaction, structured response validation, privacy,

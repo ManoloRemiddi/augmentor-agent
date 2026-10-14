@@ -117,7 +117,7 @@ const model=http.createServer(async(req,res)=>{
     const draft=typeof lastUser?.content==='string'?lastUser.content:lastUser?.content?.map(part=>part.text??'').join('');
     if(draft?.includes('IMPROVE_SLOW')){const timer=setInterval(()=>chunk({content:' '}),50);res.once('close',()=>clearInterval(timer));return;}
     if(draft?.includes('IMPROVE_TOOL'))chunk({role:'assistant',tool_calls:[{index:0,id:'forbidden',type:'function',function:{name:'bash',arguments:JSON.stringify({command:'touch '+join(workspace,'must-not-exist')})}}]},'tool_calls');
-    else chunk({role:'assistant',content:draft?.includes('IMPROVE_INVALID')?'not json':JSON.stringify({kind:'rewrite',text:'Improved '+draft})},draft?.includes('IMPROVE_TRUNCATED')?'length':'stop',{prompt_tokens:81,completion_tokens:12,total_tokens:93});
+    else chunk({role:'assistant',content:draft?.includes('IMPROVE_INVALID')?'not json':JSON.stringify(draft?.includes('IMPROVE_UNCHANGED_EXTRA')?{kind:'unchanged',text:'Unrequested replacement'}:draft?.includes('IMPROVE_UNCHANGED')?{kind:'unchanged'}:{kind:'rewrite',text:'Improved '+draft})},draft?.includes('IMPROVE_TRUNCATED')?'length':'stop',{prompt_tokens:81,completion_tokens:12,total_tokens:93});
     res.end('data: [DONE]\n\n');return;
   }
   const original=[...body.messages].reverse().filter(message=>message.role==='user').map(message=>JSON.stringify(message.content)).find(content=>content.includes('EMPTY_FIXTURE')||content.includes('RECOVER_FIXTURE'));
