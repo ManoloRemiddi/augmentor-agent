@@ -5,7 +5,7 @@
 The source candidate adds supported Pi OAuth sign-in to the original DSH sign-in
 and sign-out dialogs. MX Linux remains the first owner-testing target. The current
 running review and selected installation are preserved; this source change is not
-an installed update. The initial strict check/build and focused **39/39 across
+an installed update. The initial strict check/build and focused **41/41 across
 seven files** pass. Full source/ordinary qualification is pending at this checkpoint.
 
 ## User workflow and provider scope
@@ -124,10 +124,10 @@ add nothing. Cold model/credential status requires explicit reconciliation.
 
 Nine runtime cases cover sequential prompts, committed/cancelled storage,
 synchronization failure, callback races, cold metadata, unsafe/bounded input,
-receipt failure and lazy identity. Seven pure browser-scope cases cover lost writes,
+receipt failure and lazy identity. Nine pure browser-scope cases cover lost writes,
 current-step response, wrong action/provider, role revocation and unsafe/inconsistent
 descriptors. Existing account/settings/model-configuration and original Models
-Chromium tests remain in the 39-case cohort. An added common CI step runs the 22
+Chromium tests remain in the 41-case cohort. An added common CI step runs the 24
 account/runtime/scope cases on Linux, macOS and Windows; new-head hosted results
 are not yet qualified. Shared TypeScript/browser behavior has no new OS adapter;
 SDK callback/browser handoff, private storage and installed/physical acceptance
@@ -172,7 +172,40 @@ is removed, the backend remains busy before cancellation, retry is disabled,
 Cancel settles the same request, the old credential survives, old prompt answers
 are refused and the six-attempt/no-additional-inference/native-prefix checks still
 pass. The pure operator-scope case separately proves a lost status does not
-prevent exact-ID cancellation or permit new login/answer replay. Focused 39/39
+prevent exact-ID cancellation or permit new login/answer replay. Focused 41/41
 across seven files pass. Earlier 7140ea7 and 3bfb841 source/ordinary 233/233 runs
 remain retained; they did not cover this failure. Final full source/ordinary
 qualification remains pending for this follow-up.
+
+
+## Late status and unadmitted preparation
+
+Against **fb2d963**, controlled actual Chromium delivery of an older secret-step
+status after a newer answer/step restores the answered prompt and loses the
+new step's typed label. A separate request-stage refusal before SDK admission
+leaves the error dialog unable to dismiss. Both product failures are retained;
+the earlier full 234-case source pass did not cover these orderings.
+
+The client now retires older poll generations on answer/cancel intent, clears the
+prompt immediately on cancellation, and distinguishes an observed backend receipt
+from a local unconfirmed admission. A refused preparation can close without
+claiming an active or completed SDK action. A known active receipt keeps exact-ID
+cancellation, while retry remains blocked. Dismissing a failed cancellation reply
+leaves the retained unknown state and footer control available; it does not report
+that the SDK settled. Role revocation/closure also clears receipt observation.
+
+The actual pointer/keyboard test delivers the old response after the new step and
+its typed label, verifies that both survive, and retains all six admitted SDK
+attempts plus one explicitly refused preparation with no additional provider call
+or credential change. The refused nonce's one real HTTP 400 lookup is matched to
+its exact request/method and checked for the expected not-found response; other
+JavaScript/network errors remain failures. An explicit fresh read recovers the
+unadmitted preparation. The pure cases also cover older reads after cancellation
+and distinguish a never-observed admission. Focused **41/41 across seven files**
+pass; full source/ordinary qualification is pending for this follow-up.
+
+An initial maintenance/quiescing probe displayed the existing reconnect cover
+before reaching the target action; it is retained as a preparation failure. The
+final refusal fixture holds the exact request before it reaches the SDK. Earlier
+whole-test error checks were refined only to recognize that exact expected
+negative lookup, without ignoring other HTTP or JavaScript failures.

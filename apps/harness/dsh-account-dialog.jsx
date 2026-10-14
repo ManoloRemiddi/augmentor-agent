@@ -21,12 +21,15 @@ export function DshAccountDialog({scope,provider,close}){
  const state=useSyncExternalStore(scope.subscribe,scope.getSnapshot);
  const [requestId,setRequestId]=useState(()=>state.busy&&state.receipt?.provider===provider?state.receipt.requestId:null);
  const owns=!!requestId&&state.receipt?.requestId===requestId&&state.receipt?.provider===provider;
- const row=owns?state.receipt:null,interaction=owns?state.interaction:null,active=owns&&state.busy;
+ const row=owns?state.receipt:null,interaction=owns?state.interaction:null,active=owns&&state.busy&&(state.status!=='error'||scope.known(requestId));
  const uncertain=state.status==='error'||state.needsRefresh&&!state.busy;
  const account={view:uncertain&&!active?undefined:{status:row?.state==='completed'?'credential-stored':'idle',...(row?{attempt:{id:row.requestId,phase:active?'waiting-browser':row.state==='completed'?'complete':'failed',authorizeUrl:interaction?.authorizationUrl}}:{})},failed:uncertain||!!row&&!active&&row.state!=='completed'};
  const copy={loginTitle:'Sign in to '+provider,loginDescription:'Pi will use this provider’s sign-in flow. A successful sign-in replaces the credential currently stored for this provider. Profile and environment keys are kept.',signIn:'Sign in',failureTitle:'Account sign-in needs review',failed:'Sign-in could not be confirmed. Close this dialog, inspect account status and refresh model settings before trying again. Nothing was retried.',noResponse:'No provider response was confirmed. Refresh model settings before trying again.',browserTitle:'Sign in to '+provider,browserPrompt:'Open the provider page or ',copyLink:'copy sign-in link',copiedLink:'link copied',copyFailed:'could not copy link',browserDescription:active?'Complete the current provider step below.':'',timeoutTitle:'Account sign-in expired',timeoutDescription:'Inspect account status and refresh model settings before another attempt.',close:'Close',cancel:'Cancel',addApiKey:'Close',waiting:'Waiting for provider',retry:'Sign in'};
  const start=async()=>{const id=crypto.randomUUID();setRequestId(id);await scope.start(provider,id);};
- return <SignInDialog account={account} retryDisabled={uncertain} colorScheme={document.documentElement.dataset.theme==='dark'?'dark':'light'} start={start} cancel={id=>scope.cancel(id)} close={close} useApiKey={close} t={key=>copy[key]??key}>
+ // Dismissing a view never reports cancellation as settled. Its retained scope
+ // error and exact-ID footer control remain available after a failed reply.
+ const cancel=async id=>{try{await scope.cancel(id);}catch{}};
+ return <SignInDialog account={account} retryDisabled={uncertain||state.busy} colorScheme={document.documentElement.dataset.theme==='dark'?'dark':'light'} start={start} cancel={cancel} close={close} useApiKey={close} t={key=>copy[key]??key}>
   {interaction?.message&&<p className={css.description}>{interaction.message}</p>}
   {interaction?.authorizationUrl&&<p className={css.description}><a className={css.link} href={interaction.authorizationUrl} target="_blank" rel="noopener noreferrer">Open sign-in page</a></p>}
   {interaction?.deviceCode&&<p className={css.description}>Device code: <strong>{interaction.deviceCode}</strong>{interaction.verificationUri&&<> · <a className={css.link} href={interaction.verificationUri} target="_blank" rel="noopener noreferrer">Open verification page</a></>}</p>}

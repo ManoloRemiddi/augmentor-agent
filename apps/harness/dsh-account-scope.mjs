@@ -5,12 +5,13 @@ const active=row=>row&&['running','cancel-requested'].includes(row.state);
 const string=(value,max)=>typeof value==='string'&&value.length<=max;
 const link=value=>{try{const url=new URL(value);return string(value,32768)&&!url.username&&!url.password&&(url.protocol==='https:'||url.protocol==='http:'&&['localhost','127.0.0.1','[::1]'].includes(url.hostname));}catch{return false;}};
 export class DshAccountScope {
- listeners=new Set();generation=0;closed=false;timer=null;pending=new Set();snapshot=empty();finishedId=null;
+ listeners=new Set();generation=0;closed=false;timer=null;pending=new Set();snapshot=empty();finishedId=null;confirmedId=null;
  constructor(models){this.models=models;this.controller=models.controller;this.epoch=this.controller.epoch;let ready=models.snapshot.status==='ready';this.unsubscribe=this.controller.subscribe(()=>{if(!this.current())this.retire();});this.unsubscribeModels=models.subscribe(()=>{const next=models.snapshot.status==='ready',reload=next&&!ready;ready=next;if(this.current()&&reload&&!this.snapshot.busy)void this.load();});}
  current(){return !this.closed&&this.models.current()&&this.controller.epoch===this.epoch&&this.controller.state.capabilities?.modelAccountLogin===true;}
  subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};getSnapshot=()=>this.snapshot;
  publish(value){this.snapshot=value;for(const fn of this.listeners)fn();}
- retire(){this.generation++;clearTimeout(this.timer);for(const request of this.pending)request.abort();this.publish({...empty(),status:'error',error:'The account connection changed. Reopen Settings.'});}
+ known(requestId){return this.current()&&!!requestId&&this.confirmedId===requestId;}
+ retire(){this.generation++;this.confirmedId=null;clearTimeout(this.timer);for(const request of this.pending)request.abort();this.publish({...empty(),status:'error',error:'The account connection changed. Reopen Settings.'});}
  checked(value,id,provider){
   if(!value||typeof value.available!=='boolean'||typeof value.busy!=='boolean'||typeof value.needsRefresh!=='boolean'||JSON.stringify(value).length>256*1024)throw Error('Invalid account status.');
   const row=value.receipt;
@@ -37,6 +38,7 @@ export class DshAccountScope {
  adopt(value,ticket){
   if(ticket!==this.generation||!this.current())return;
   const previous=this.snapshot;
+  this.confirmedId=value.receipt?.requestId??null;
   this.publish({status:'ready',available:value.available,busy:value.busy,needsRefresh:value.needsRefresh,receipt:value.receipt,interaction:value.interaction,providers:value.providers??previous.providers,accounts:value.accounts??previous.accounts,error:null});
   if(value.busy){this.models.suspend();clearTimeout(this.timer);this.timer=setTimeout(()=>void this.read(value.receipt?.requestId,value.receipt?.provider,ticket),400);}
   else if(previous.busy&&value.receipt?.requestId!==this.finishedId){this.finishedId=value.receipt?.requestId;void this.models.load();}
@@ -52,20 +54,21 @@ export class DshAccountScope {
  }
  async start(provider,requestId){
   if(!this.current()||!this.models.accepted||!this.models.snapshot.writable||!this.snapshot.available||this.snapshot.busy||this.snapshot.needsRefresh||!this.snapshot.providers.some(row=>row.provider===provider))throw Error('Refresh model settings before signing in.');
-  const ticket=++this.generation,revision=this.models.revision;clearTimeout(this.timer);this.models.suspend();
+  const ticket=++this.generation,revision=this.models.revision;this.confirmedId=null;clearTimeout(this.timer);this.models.suspend();
   this.publish({...this.snapshot,busy:true,receipt:{requestId,provider,state:'running',result:'pending'},interaction:null,error:null});
   try{this.adopt(this.checked(await this.rpc('models.accountStart',{provider,revision,requestId},ticket),requestId,provider),ticket);}
   catch{await this.read(requestId,provider,ticket);if(this.snapshot.status==='error')throw Error('Account sign-in admission is unconfirmed.');}
  }
  async respond(requestId,promptId,value){
   if(!this.current()||this.snapshot.receipt?.requestId!==requestId||this.snapshot.interaction?.prompt?.id!==promptId||!this.snapshot.busy)throw Error('This account prompt is no longer active.');
-  const ticket=this.generation,provider=this.snapshot.receipt.provider;
+  const ticket=++this.generation,provider=this.snapshot.receipt.provider;clearTimeout(this.timer);
   this.publish({...this.snapshot,interaction:{...this.snapshot.interaction,prompt:undefined}});
   try{const reply=await this.rpc('models.accountRespond',{requestId,promptId,value},ticket);if(reply?.accepted!==true||reply.requestId!==requestId||reply.promptId!==promptId)throw Error('Unconfirmed account response.');}finally{await this.read(requestId,provider,ticket);}
  }
  async cancel(requestId){
-  const ticket=this.generation,provider=this.snapshot.receipt?.provider;
+  const ticket=++this.generation,provider=this.snapshot.receipt?.provider;clearTimeout(this.timer);
+  if(this.snapshot.busy&&this.snapshot.receipt?.requestId===requestId)this.publish({...this.snapshot,receipt:{...this.snapshot.receipt,state:'cancel-requested',cancelRequested:true},interaction:null});
   try{this.adopt(this.checked(await this.rpc('models.accountCancel',{requestId},ticket),requestId,provider),ticket);}catch{await this.read(requestId,provider,ticket);if(this.snapshot.status==='error')throw Error('Account cancellation is unconfirmed.');}
  }
- close(){this.closed=true;this.generation++;clearTimeout(this.timer);for(const request of this.pending)request.abort();this.unsubscribe?.();this.unsubscribeModels?.();this.snapshot=empty();this.listeners.clear();}
+ close(){this.closed=true;this.generation++;this.confirmedId=null;clearTimeout(this.timer);for(const request of this.pending)request.abort();this.unsubscribe?.();this.unsubscribeModels?.();this.snapshot=empty();this.listeners.clear();}
 }

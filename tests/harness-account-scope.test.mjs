@@ -32,3 +32,18 @@ test('an unconfirmed active status retains only the known action identity for ex
  const calls=[],f=fixture(t,async(method,p)=>{calls.push({method,p});if(method==='models.accountDescribe')return running();if(method==='models.accountStatus')throw Error('Authored status reply lost');if(method==='models.accountCancel')return state({needsRefresh:true,receipt:{requestId:'request',provider:'authored',state:'cancelled',result:'unknown'}});throw Error('No new login is authorized');});
  await f.scope.load();await f.scope.read('request','authored');assert.equal(f.scope.snapshot.status,'error');assert.equal(f.scope.snapshot.busy,true);assert.equal(f.scope.snapshot.receipt.requestId,'request');assert.equal(f.scope.snapshot.interaction,null);await assert.rejects(f.scope.start('authored','must-not-retry'),/Refresh model settings/);await f.scope.cancel('request');assert.equal(f.scope.snapshot.receipt.state,'cancelled');assert.equal(f.scope.snapshot.needsRefresh,true);assert.equal(f.scope.snapshot.busy,false);assert.equal(calls.filter(row=>row.method==='models.accountCancel').length,1);assert(!calls.some(row=>row.method==='models.accountStart'||row.method==='models.accountRespond'));
 });
+test('a newer prompt answer or cancellation retires an older in-flight status read',async t=>{
+ for(const action of ['respond','cancel']){
+  let release,reads=0;const f=fixture(t,async(method,p)=>{
+   if(method==='models.accountDescribe')return running();
+   if(method==='models.accountStatus'){if(++reads===1)return new Promise(resolve=>release=resolve);return {...running(),interaction:{prompt:{id:'next',type:'text',message:'Current next step'}}};}
+   if(method==='models.accountRespond')return {accepted:true,requestId:p.requestId,promptId:p.promptId};
+   if(method==='models.accountCancel')return state({needsRefresh:true,receipt:{requestId:'request',provider:'authored',state:'cancelled',result:'unknown'}});
+  });await f.scope.load();const stale=f.scope.read('request','authored');await new Promise(resolve=>setImmediate(resolve));
+  if(action==='respond')await f.scope.respond('request','prompt','AUTHORED_ANSWER');else await f.scope.cancel('request');
+  const accepted=f.scope.snapshot;release(running());await stale;assert.deepEqual(f.scope.snapshot,accepted,action+' must not restore an older prompt/active state');
+ }
+});
+test('unconfirmed admission is distinguishable from a previously observed active receipt without starting or replaying another login',async t=>{
+ let starts=0;const f=fixture(t,async method=>{if(method==='models.accountDescribe')return state();if(method==='models.accountStart')starts++;throw Error('No account receipt was confirmed');});await f.scope.load();await assert.rejects(f.scope.start('authored','unconfirmed'));assert.equal(starts,1);assert.equal(f.scope.known('unconfirmed'),false);assert.equal(f.scope.snapshot.interaction,null);assert.equal(f.scope.snapshot.status,'error');
+});
