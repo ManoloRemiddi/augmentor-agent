@@ -39,6 +39,13 @@ program/interpreter; all 22 dictation cases then pass with unchanged deadlines,
 saved-preference/child-recovery and no real microphone/service activity. An
 initial external-move probe's blocking sync/edge placement was invalid and is
 retained; the valid positive-coordinate proof uses the actual native event.
+An ordinary-tree full Python run also exposes five packaging fixtures that assume
+the optional QuickJS extensions are present in runtime dependencies. Those assets
+are deliberately excluded. A separate test-only upstream selector now verifies
+every original WASM/extension hash before creating the same synthetic packages;
+no optional extension is added to the ordinary runtime or its release approval.
+The eight focused packaging cases pass on the source inputs; full ordinary
+follow-up qualification remains pending.
 
 The animated baseline and diagnostic trace pass locally; the trace observes
 late canvas moves repaired by the old animation tick. **2929c60 / Validate

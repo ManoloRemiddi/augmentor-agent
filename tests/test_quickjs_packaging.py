@@ -2,6 +2,7 @@
 """Distribution failure contracts and actual Node resolution of codemode assets."""
 import importlib.util
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -42,8 +43,14 @@ class QuickJSPackagingTests(unittest.TestCase):
         package = (codemode / 'node_modules' if nested else self.app / 'node_modules') / 'quickjs-wasi'
         write(package / 'package.json', {'name': 'quickjs-wasi', 'version': '3.6.2',
               'exports': {'./package.json': './package.json', './quickjs.wasm': './quickjs.wasm'}})
-        upstream = ROOT / 'node_modules/quickjs-wasi'
-        for name in ['quickjs.wasm', *engine.reviewed(self.root)[1]['excludedAssets']]:
+        # Ordinary runtime dependencies deliberately omit optional extensions.
+        # These rejection tests need their original public npm bytes as fixture
+        # inputs, separately from the ordinary application being tested.
+        upstream = Path(os.environ.get('AUGMENTOR_QUICKJS_TEST_UPSTREAM', ROOT / 'node_modules/quickjs-wasi'))
+        record = engine.reviewed(self.root)[1]
+        fixtures = {'quickjs.wasm': record['originalNpmWasmSha256'], **record['excludedAssets']}
+        for name, expected in fixtures.items():
+            self.assertEqual(engine.sha(upstream / name), expected, 'Unconfirmed QuickJS test fixture: '+name)
             target = package / name; target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(upstream / name, target)
         return package
