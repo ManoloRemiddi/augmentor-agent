@@ -4,13 +4,13 @@
 
 ## Extracted claims and engine deadlines — October 14
 
-Following **83a4ce14aba52f89f97664106dcc5a14097523ca**, automatic brief selection
-prefers eligible extracted claims over generated pages in the same relationship
-or work scope. A real synthetic Hindsight/Qwen run completed all six processing
-stages but its generated page said there were no preferences, while independently
-cached items contained the requested concise-reply preference. Page prose displaced
-that item; Qwen consequently answered that no preference was recorded. Completion
-and a non-stale page flag did not establish semantic correctness.
+Source **aac3bad18f38ca61fa4129b414849758ecdb22fa**, following
+**83a4ce14aba52f89f97664106dcc5a14097523ca**, prefers eligible extracted claims
+over generated pages in the same relationship or work scope. A real synthetic
+Hindsight/Qwen run completed all six stages, but its generated page said there
+were no preferences while independently cached items contained the concise-reply
+preference. Page prose displaced that item; Qwen answered that no preference was
+recorded. Completion and a non-stale page flag did not establish correctness.
 
 Selection now uses eligible extracted items for that scope when available;
 otherwise eligible page/legacy fragments remain a fallback. Explicit recall still
@@ -23,23 +23,67 @@ and contradictory/superseded claim resolution remain open.
 
 The installer explicitly sets Hindsight's global LLM timeout to the existing
 **45-second** managed call ceiling. Pinned Hindsight 0.10.0 otherwise gives Reflect
-its own **30-second** default despite the longer global default. An earlier live
-page update stopped at phase four with a single-attempt API timeout and remaining
-budget; the job remains stopped. This correction does not increase the existing
-call/batch/window/token budgets, enable autonomous workers/retries or restart the
-production engine. An incompatible existing running engine still requires explicit
-operator maintenance through the installer's existing checks.
+its own **30-second** default despite the longer global default. This correction
+does not increase existing call/batch/window/token budgets, enable autonomous
+workers/retries or restart production. Existing incompatible running engines
+still require deliberate operator maintenance through the installer's checks.
+The exact pinned image configuration confirms explicit global 45, inherited
+Reflect timeout, and zero retries; the production engine was not adopted/replaced.
 
-Strict check/build and focused SDK/context/client/provenance **18/18** pass.
-A synthetic regression fails before the extracted-claim correction; heading,
-verbatim fragment and page-fallback checks remain. The installer/common memory
-Python cohort at 83a4ce1 passes **30/30**. Final combined source/ordinary and new
-actual Pi/Hindsight/Qwen acceptance are pending; earlier 175/175 results at 83a4ce1
-qualify only its heading/deadline changes. The shared Node selector applies to
-Pi/DSH consumers; the Python installer affects supported Docker engine setup.
-Actual macOS/Windows engine/transport, installed and owner feedback acceptance
-remain separate. The selected preview/draft, Search candidate, feedback profile
-and production model/speech/memory configuration are preserved.
+Strict check/build and final source/separate ordinary **177/177 each** pass across
+**24 files**, two workers, unchanged deadlines and no skips. The exact **905-file**
+compiled set/bytes and bundled Node 24.19.0 match; the same **155 production npm
+instances** remain. The common installer/budget/Hindsight/dual-memory Python cohort
+passes **30/30**. A regression fails before the claim-selection correction; heading,
+verbatim fragment, page fallback, actual SDK/native snapshots and existing Host/
+branch/GUI/queue/goal/job/recovery contracts remain. An ordinary-tree preparation
+caught one stale generated output; the mutable test tree was freshly copied and
+its whole compiled set verified before the final run. No installed release was
+patched. Earlier 175/175 source/ordinary runs belong to 83a4ce1 only.
+
+Actual-engine/model results have narrower, separate scopes:
+
+- At **6027df00dc0456b2b63b5263b402ba0f5761997d**, a real Pi Host, actual shared
+  prompt/memory companions, controlled Hindsight 0.10.0 and current Qwen complete
+  the native-snapshot sequence in **126.98 seconds**. One SDK file read executes;
+  two parent requests store the applied brief. Later cached PostgreSQL replaces
+  SQLite in the current parent, while the earlier branch restores the exact old
+  brief and hidden tool receipt, excludes later memory/input, adds no recall or
+  tool execution, preserves parent bytes and captures only its new user/assistant
+  pair. Cold history creates no agent/recall or file changes; cold branch prompting
+  restores the same original. This proves these memory boundaries, not preference
+  quality: headings displaced the old preference. The initial six-stage seed
+  completed; the update stopped at phase four with a single Reflect timeout under
+  the old 30-second default, retaining cached facts and remaining budget.
+- With the **45-second fixture** at **83a4ce1**, the initial synthetic seed completes
+  all six stages in **78.16 seconds**, attempt zero, six calls, zero failures,
+  **47.30 seconds / 39,112 tokens** remaining. A driver naming error occurs before
+  any Pi conversation. Its completed seed is reused without processing or budget
+  reset. A later first-parent run exposes the conflicting generated-page problem;
+  its failed preference assertion remains retained.
+- At **aac3bad**, reusing that same completed seed without processing, the actual
+  Pi request includes the extracted concise preference and Qwen answers it
+  correctly. Exactly one SDK file read and two matching native snapshots pass.
+  A fresh PostgreSQL update then stops at **phase two, relationship consolidation**:
+  one LLM call times out at **45.003 seconds**. The job remains attempt zero with
+  **38.14 seconds / 34,137 tokens** left, three calls and one failure. It is not
+  retried or relabelled completed. Cached SQLite/preference originals remain;
+  the subsequent update/branch/cold sequence is **not qualified at this ref**.
+
+These runs use independently authored synthetic people/projects/transcripts and
+separate configuration, journals, container/data volume and API/gateway/PostgreSQL
+ports. No owner conversations or credentials are imported. Initial readiness and
+private driver errors are preparation failures, not successful acceptance. Owned
+companions exit before fixture shutdown; both test engines are stopped, restart
+policy `no`, synthetic volumes retained. Production Qwen/memory health is 200;
+Qwen retains two slots and 262,144 context. Production model/speech configuration,
+selected preview/draft, immutable Search candidate and owner feedback are preserved.
+
+The shared Node selector applies to Pi/DSH consumers; Python installation changes
+supported Docker setup. The source and ordinary checks do not establish installed
+or macOS/Windows engine/transport acceptance. Reliable update/consolidation/page
+semantics within unchanged budgets, full historical instruction/resource fidelity,
+migration, physical voice, privacy/erase and owner acceptance remain required.
 
 ## Native managed-memory request snapshots — October 14
 
@@ -108,10 +152,11 @@ Earlier fixture/tool-grant and before-system-boundary prototypes are retained as
 preparations, not final qualification. These tests use authored memory/provider/
 desktop fixtures. All ten pinned API families have shape-level checks; the new
 actual SDK/native/provider request sequence uses the OpenAI-compatible API.
-Earlier real Hindsight/Qwen evidence below keeps its tested ref
-and does not qualify this new snapshot path. Actual current-engine/model snapshot
-acceptance, semantic quality, full historical request fidelity, migration/physical
-voice and installed/macOS/Windows acceptance remain required.
+This fixture checkpoint predates the actual 6027df0 snapshot run documented
+[above](#extracted-claims-and-engine-deadlines--october-14). Its live evidence
+qualifies the stated branch/cold boundaries; preference quality, reliable update/
+page completion, full historical request fidelity, migration/physical voice and
+installed/macOS/Windows acceptance remain required.
 
 The selected/running preview and its draft, immutable Search candidate and
 manual-feedback profile are unchanged. [Data scope](DATA-AND-SUPPORT.md#native-managed-memory-originals)

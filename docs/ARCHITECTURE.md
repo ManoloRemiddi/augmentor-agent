@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Memory claim selection and engine deadlines](CONTROLLED-MEMORY.md#extracted-claims-and-engine-deadlines--october-14)
+at **aac3bad18f38ca61fa4129b414849758ecdb22fa** prefers eligible extracted claims
+per scope over generated pages, with page fallback and unchanged limits/labels.
+Heading-only blocks are excluded; the installer aligns Reflect with the existing
+45-second ceiling. Strict check/build and source/ordinary **177/177 each**, 24 files,
+905 matching compiled files/155 unchanged npm instances, plus Python **30/30** pass.
+Real 6027df0 Pi/Hindsight/Qwen proves exact native brief/tool/branch/cold boundaries;
+its old preference was wrong and page update stopped. The new 45-second seed
+completes six stages. Current-source first-parent preference/read/native snapshots
+pass, but its next update stops at relationship consolidation after one 45-second
+timeout, attempt zero, budget retained. No retry/reset or full current live-sequence
+pass is claimed. Fixtures are stopped/no-restart/data retained; production Qwen/
+memory healthy, installed preview/draft/candidate/feedback preserved. Broader
+semantic/live/installed/physical/platform/distribution acceptance remains open.
+
 [Native managed-memory originals](CONTROLLED-MEMORY.md#native-managed-memory-request-snapshots--october-14)
 are ordinary Pi conversation data owned by the memory/runtime adapter. Its
 existing before-start hook composes bounded memory; the owned final-payload

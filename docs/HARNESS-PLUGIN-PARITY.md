@@ -45,6 +45,22 @@ separate required workflows under the accepted migration specification.
 
 ## CI readiness barriers and retained failures — October 14
 
+[Validate 38537127275](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38537127275)
+at **5abd48f0f1b17922a86ca7a2be138ca51a3b4172** passes the locked-DSH build/SDK,
+all subsequent Debian native/interaction/recovery/first-run checks, dependency
+inventory and extension notices. Packaging stops at the retained Office exact-entry
+preferred-source/engine-rebuild gate; installed/browser package jobs are skipped.
+The SDK platform matrix **38537127235** and Windows desktop **38537127364** pass.
+Windows command **38537127271** has an unconfirmed Stop (`unknown` rather than
+`cancelled`), with one child request, no tools, aborted native stop and private
+companions drained. Qualification **38537127283** retains arm64/x64 delegation/
+settlement/Stop assertions/timeouts and native Office/Sharp/Koffi notice failures.
+macOS **38537127333** retains native Office MPL, Sharp/libvips LGPL and missing
+Koffi licence-text packaging failures. Causes of the Windows producer-settlement
+failures remain unproven; do not broaden Linux evidence to close them. These are
+5abd48f results, distinct from later local claim/deadline fixes and new-head CI.
+No retry, assertion weakening or release-gate bypass was performed.
+
 Current source **552ba40f16cb0823b60796f014eca4ff37e0ad0d** includes the
 [displayed Goal action correction](PI-GOALS.md#displayed-actions-during-pending-inspection--october-14)
 and a deterministic two-read Search fixture. An independent operator read is

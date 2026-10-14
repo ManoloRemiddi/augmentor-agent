@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+At **aac3bad18f38ca61fa4129b414849758ecdb22fa**, strict check/build and source/
+fresh ordinary **177/177 each** pass across the same 24-file native-memory cohort,
+two workers, unchanged deadlines/no skips; 905 compiled files match exactly,
+155 production npm instances/bundled Node unchanged. Common installer/budget/
+Hindsight/dual-memory Python **30/30** pass. Added regressions cover heading-only
+crowd-out, verbatim mixed fragments, extracted claims ahead of contradictory page
+prose, fallback with no eligible items and operation timeout/retry configuration.
+The claim-selection case fails before the fix. Actual current-Qwen preference,
+one SDK read and native snapshots pass, but the subsequent real relationship
+consolidation times out at the unchanged 45-second ceiling; the full sequence
+fails and is not retried. Earlier real 6027df0 branch/cold proof and all preparation/
+semantic/page failures retain their refs. See [exact evidence and limits](../docs/CONTROLLED-MEMORY.md#extracted-claims-and-engine-deadlines--october-14).
+
 At **6027df00dc0456b2b63b5263b402ba0f5761997d**, strict check/build and final
 source/fresh ordinary **173/173 each** pass across 24 files, two workers, unchanged
 deadlines/no skips; exact 905-file compiled set/bytes, 155 npm instances and bundled
