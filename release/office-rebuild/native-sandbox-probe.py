@@ -14,6 +14,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import resource
 import signal
 import socket
@@ -323,9 +324,14 @@ def cancellation_probe(root: Path, phase: str = 'startup') -> dict:
 
 
 def main() -> None:
+    def source_ref(value: str) -> str:
+        if not re.fullmatch(r'[0-9a-f]{40}', value):
+            raise argparse.ArgumentTypeError('Use the complete 40-character reviewed source commit.')
+        return value
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True, help='New private directory; existing paths are refused.')
-    parser.add_argument('--source-ref', default=None, help='Exact reviewed source commit, for the private receipt.')
+    parser.add_argument('--source-ref', type=source_ref, default=None, help='Exact reviewed source commit, for the private receipt.')
     args = parser.parse_args()
     root = args.output.absolute()
     root.mkdir(mode=0o700, parents=False, exist_ok=False)
