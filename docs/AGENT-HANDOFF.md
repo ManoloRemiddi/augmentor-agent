@@ -1,12 +1,32 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[MIT keyless engine/public fetch library](HARNESS-PLUGIN-PARITY.md#mit-keyless-engine-and-public-fetch-library--october-14)
+selects public DDDMUC 6c39792 engines, shinjiyu 0ceaa19 helpers and original DSH
+MIT d743267 HTTP provider/address/body policy. It preserves keyless search/fetch
+through one supported Pi SDK owner with frozen config, bounded and cancellable
+fallback, safe source filtering, per-hop public DNS/address pinning and original
+charset/status/truncation. Twenty source/notice records verify; only ipaddr.js
+2.5.0 adds one pure-JS MIT supplier, for 155 instances, with eight previous native
+bytes identical. Strict check/build, six focused cases and source/separate ordinary
+**488/488 across 98 MX files** pass, two workers, matching Node/QtTest, unchanged
+deadlines/no skips; all 902 compiled files match. Source/ordinary current-Qwen
+owners each search official Debian sources and fetch its documentation with two
+calls (source observes Bing-empty → DuckDuckGo; ordinary uses Bing) and exact cold history, without owner data/keys/model/GPU changes.
+This is an unmounted library: Host/private mode/config/GUI and role/collision/
+reload/inspection qualification, historical 0.1.0 identity/360 behavior, sealed/
+installed and broader migration/platform gates remain. The matching-name public
+0.1.0 candidate has conflicting MIT metadata/Apache file notices and is not
+copied; identity is unproven and an optional owner question remains pending.
+Current API settings/card, selected 97897cf and the qualified Wiki candidate
+remain unchanged; no default backend migration or preview activation occurs.
+
 [Original Free Search card/private Pi settings](HARNESS-PLUGIN-PARITY.md#free-search-settings-and-original-card--october-14)
 at **1612f20b85ae9b98f2331c59cdc017f2aa41b270** mounts the complete MIT supplier card in Plugins with multiline keys, original
 pointer drag/fetch/clear/discard and DSH theme controls. Mode-0600 exact-revision
 operator settings bind opt-in tools only to Linux Native non-delegated owners;
 public AgentSession reload retains those owners and checks both reserved names.
 Unknown/stale writes fence their supplier sequence and retain staged drafts;
-inspectors/Browser gain no configuration/tool grant. Strict check/build, ten focused cases and source and separate ordinary **482/482 across 97 MX files**, two workers, Node 24.19.0, matching QtTest/PySide6/shiboken6 6.8.2.1, unchanged deadlines and no skips..
+inspectors/Browser gain no configuration/tool grant. Strict check/build, ten focused cases and source/separate ordinary **482/482 across 97 MX files**, two workers, Node 24.19.0, matching QtTest/PySide6/shiboken6 6.8.2.1, unchanged deadlines and no skips.
 All 32 server/client selection records and compiled ordinary bytes verify;
 production retains 154 npm instances/eight unchanged pre-Node native files.
 Qwen/Breeze/Resonant Voice are healthy, CPU recognizer loads without recording,

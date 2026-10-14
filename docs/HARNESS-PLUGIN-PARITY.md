@@ -18,7 +18,7 @@ not qualify DSH retirement or infer parity from the total test count.
 | Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. The original Plugins form enables/disables the suite through public resource discovery on the same owners. | Installed-owner configuration/UI acceptance, representative use of the other skill workflows and companion CLIs/services. |
 | Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
-| Free Web Search, historical 0.1.0 reference | [Original 1.6.0 card and private Pi settings](#free-search-settings-and-original-card--october-14) preserve the nine API engines, key rotation, drag order, fetch, clear/discard and enable lifecycle through existing Native owners. SDK/HTTP and actual GUI fixtures qualify these boundaries; current Qwen confirms the unconfigured result. | Historical keyless behavior, proof of active reference composition, representative credentialed live engines, sealed/installed owner acceptance and other OS qualification. No owner keys are migrated. |
+| Free Web Search, historical 0.1.0 reference | [Original 1.6.0 card and private Pi settings](#free-search-settings-and-original-card--october-14) preserve the nine API engines, key rotation, drag order, fetch, clear/discard and enable lifecycle through existing Native owners. SDK/HTTP and actual GUI fixtures qualify these boundaries; current Qwen confirms the unconfigured result. | [MIT keyless library and live SDK reads](#mit-keyless-engine-and-public-fetch-library--october-14) qualify the engine layer; private mode/GUI/Host wiring, historical identity, proof of active reference composition, representative credentialed live engines, sealed/installed owner acceptance and other OS qualification remain. No owner keys are migrated. |
 | Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
 | Comfy MCP | Same managed-core binding; the reference service previously refused connection. | Service availability and a representative authorized workflow; no successful Comfy operation is claimed. |
 | Blender MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Blender operation and verified effect/Stop/retained evidence. |
@@ -29,6 +29,80 @@ its own [voice protocol](VOICE-SINGLE-BUTTON.md) and physical/audio lifecycle ga
 It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision and
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
+
+## MIT keyless engine and public fetch library — October 14
+
+This source checkpoint preserves the keyless workflow alongside the preceding
+configured-engine work. It is a library for the supported Pi ExtensionAPI and one
+existing SDK owner; **default Host/GUI mode selection is not wired yet**. The
+installed preview and its draft remain unchanged. Source fixtures, SDK/live
+results and ordinary production qualification do not establish installed parity.
+
+The recorded active reference names `dsh-web-search-free` 0.1.0; the inspected
+installed 1.6.0 package is a separate API-engine implementation. The public
+[0.1.0 candidate metadata](https://github.com/sjlgg/dsh-free-web-search/blob/9bfbd111ea5c84a9dba86d8ca613d33ca3e12dd5/package.json)
+says MIT, while its [licence file](https://github.com/sjlgg/dsh-free-web-search/blob/9bfbd111ea5c84a9dba86d8ca613d33ca3e12dd5/LICENSE)
+is Apache-2.0. Package name/version do not prove that it is the historical
+installed artifact. That conflicting candidate's code is not copied. An optional
+owner identity question is pending; no licence exception or private source/key
+publication is inferred.
+
+Instead the selected public MIT sources are:
+
+- [DDDMUC dsh-free-search 0.8.9 / 6c39792](https://github.com/DDDMUC/dsh-free-search/tree/6c3979202bcbda6dc52e0bd17cf34edad4bac5ed): the 23 preferred-source declarations needed by Bing, DuckDuckGo HTML/Lite and SearXNG, plus original domain filtering. Original parsers, URL decoding, relevance filtering and deduplication remain; request scope, cancellation checks, retry delay and timer/listener cleanup are marked seams. The full unmodified original source/package/notice and exact selection ranges remain beside the adapter. No supplier host, updater, legacy profile/environment read, paid/platform/research tool or browser subprocess is imported into the runtime graph. This is not a port of that entire plugin.
+- [shinjiyu dsh-plugin-search / 0ceaa19](https://github.com/shinjiyu/dsh-plugin-search/tree/0ceaa1985ad2e7774cd8f06890c4a9b1a7125955): original Tavily request/response helpers, with only a request-local transport import. The caller always supplies no API key; the environment-reading Host entry is excluded. Its anonymous header returns results in the observed live probe, while [official API examples](https://docs.tavily.com/documentation/api-reference/endpoint/search) document authenticated calls. A lasting anonymous service/quota contract is not qualified.
+- [DSH web-fetch-http at the existing MIT d743267 baseline](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/web/web-fetch-http): original provider, content-type/charset policy, public address classification, NAT64 handling and pinned lookup/transport. Imports bind a typed Pi value/error/deadline boundary. Each public redirect is resolved and pinned; the ambient proxy shortcut is removed, and optional search POST/test transport injection is marked. Original decoding, declared/actual byte limits, char limits, status, truncation and cancellation remain. No browser cookie, API credential, global fetch/dispatcher or DNS override is installed.
+
+`keylessSearchExtension` supplies `web_search` (`queries`) and `web_fetch` (`urls`),
+with the same bounded array input contract as the configured-engine library.
+Read configuration is frozen per tool request; origin-only attempts and explicit
+completed/empty/failed/unconfigured engine receipts accompany untrusted content.
+Unsafe or duplicate sources and configured blocked domains are filtered. A failed
+later read retains earlier completed items. Stop fences retries and failover;
+32 requests, a 30-second outer deadline and a 2 MiB engine-response bound stop
+unbounded work. No public SearXNG instance is contacted without explicit instance
+configuration. The original direct fetch limits default to 5,000,000 bytes /
+100,000 chars / five hops / 30 seconds; explicit bounded overrides remain available.
+Known policy failures expose safe codes, including WEB_BLOCKED_URL, with raw
+provider/network messages withheld. HTML/text remains typed provider data; full
+Host/tool presentation, mode/configuration and GUI lifecycle remain required.
+
+Strict check/build, six focused cases and final source/separate ordinary cohorts
+pass **488/488 across 98 MX files**, two workers, Node 24.19.0, matching
+QtTest/PySide6/shiboken6 6.8.2.1, unchanged deadlines and no skips. Actual SDK/HTTP
+cases validate arguments before requests, real request headers/body, URL/body
+results and no credential/cookie transmission. Resolver/connector cases cover
+mixed/private/NAT64 answers, already-stopped/pending DNS, real pinned HTTP Host,
+public cross-origin redirects, blocked private targets, charset decoding and
+actual oversized chunks. Frozen order/rules, no ambient key read, cancellation,
+partial reads, limits and explicit-instance behavior qualify independently.
+
+All **20** new supplier/adapter/notice records verify, and the complete **902-file**
+compiled tree matches ordinary inputs. Production has **155** npm instances;
+only pure-JS MIT ipaddr.js 2.5.0 is added. Undici is now directly declared at its
+already locked 8.10.2 version. All eight previous pre-Node native bytes are
+identical. Original notices remain intact; standalone Augmentor boundaries retain
+their separately declared terms. The source/ordinary library is not an immutable
+or installed artifact.
+
+The selected code returns live Bing sources including official Debian URLs, then
+reads Debian's official documentation through the pinned fetcher. Separate source
+and ordinary current-Qwen SDK owners each execute those two tools once, complete
+normally and preserve byte-exact cold history without owner state/keys. Strengthened
+proof requires an exact official-domain source, the exact documentation URL, HTTP
+200 and HTML body marker. Source uses observed Bing-empty → DuckDuckGo fallback;
+ordinary uses Bing. Both read the official page without repeating tools. Configured
+model/context/precision/GPU placement is not changed. Further engine/service outage/
+quota behavior and physical voice remain separate acceptance.
+
+Remaining work includes explicit private Host/GUI mode selection and configuration,
+role/collision/reload/inspection qualification, complete historical source/backend
+identity (including the candidate's 360 route), other service/format acceptance,
+standalone add-on packaging and guarded sealed/installed qualification. This does
+not close all search/plugin/migration/platform gates. Fresh Native maintenance remains online/busy with a draft and refused shutdown;
+no activation occurs. The current API feature and
+its original card remain available in source; no default application backend or
+owner credentials are migrated.
 
 ## Free Search settings and original card — October 14
 

@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[MIT keyless search/public fetch library](HARNESS-PLUGIN-PARITY.md#mit-keyless-engine-and-public-fetch-library--october-14)
+records selected public MIT engines and original DSH address-pinned fetch, SDK/live
+Qwen evidence, production bytes and the historical-source licence ambiguity.
+Private app mode/GUI wiring and installed acceptance remain separate requirements.
+
 [Original Free Search card and private Pi settings](HARNESS-PLUGIN-PARITY.md#free-search-settings-and-original-card--october-14)
 records public MIT source, existing Native owner enable/reload, private credentials,
 original engine controls, stale/uncertain drafts, scope boundaries and live Qwen's

@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[MIT keyless library selection](HARNESS-PLUGIN-PARITY.md#mit-keyless-engine-and-public-fetch-library--october-14)
+pins DDDMUC 0.8.9 / 6c3979202bcbda6dc52e0bd17cf34edad4bac5ed preferred engine
+functions, shinjiyu 0ceaa1985ad2e7774cd8f06890c4a9b1a7125955 Tavily helpers,
+and original DSH d743267388641bc76f17c45ce8b4c231aed1d32c HTTP/address/body
+policy. Original MIT files/notices and marked adaptations remain in twenty hashed
+records; unrelated supplier Host/updater/profile/env/paid/platform workflows are
+outside the executable graph. ipaddr.js 2.5.0 adds one pure-JS MIT dependency;
+Undici is directly declared at its unchanged locked 8.10.2. Source/ordinary 488/488,
+real SDK/HTTP and isolated current-Qwen official search/page reads qualify this
+library. Private Host/GUI mode, historical 0.1.0 identity/licence and installed/
+standalone/platform acceptance remain open; no owner configuration/key is copied.
+
 [Selected Metafolder 1.2.1 MIT client](HARNESS-METAFOLDERS.md) is pinned to public
 commit a5332d902e147e824231a5470d3e2822b9288719. Original/adapted hashes, complete
 licence, exact CSS and the shared React/browser closure are qualified separately

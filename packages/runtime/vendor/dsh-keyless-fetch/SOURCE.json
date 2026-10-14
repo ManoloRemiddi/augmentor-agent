@@ -1,0 +1,65 @@
+{
+  "schema": "augmentor-public-source-selection/1",
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "commit": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+  "version": "0.2.1-alpha.2",
+  "license": "MIT",
+  "scope": "Public preferred source only. Original snapshots and notices retained; typed Pi boundaries, request-scoped transport, abortable fallback and public per-hop HTTP pinning. This is a library, not historical 0.1.0 byte parity or Host/GUI/installed acceptance. No private source, profile or key copied. Original suppliers retain MIT; separately authored boundaries retain their declared Augmentor terms.",
+  "files": [
+    {
+      "path": "LICENSE",
+      "sha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be",
+      "modified": false,
+      "upstreamPath": "LICENSE"
+    },
+    {
+      "path": "boundary.ts",
+      "sha256": "dd8ba77fec77fdbf1f98c3d4c09a3f40ca0f2a735397b531f4b72cde50e38926",
+      "modified": true,
+      "license": "LicenseRef-Augmentor-MIT-Resale-1.0",
+      "source": "Augmentor-authored integration boundary"
+    },
+    {
+      "path": "network.ts",
+      "sha256": "2374888c21e1d3ca0afae70ffab523b219b4010f4613d67cc2507dc840ce68c2",
+      "modified": true,
+      "upstreamPath": "packages/web/web-fetch-http/src/network.ts"
+    },
+    {
+      "path": "original/network.ts.source",
+      "sha256": "e4d2f6091fbda36e19297ee67b45da44d171cf1b2177aef2b1f9175c75e1faf3",
+      "modified": false,
+      "upstreamPath": "packages/web/web-fetch-http/src/network.ts"
+    },
+    {
+      "path": "original/policy.ts.source",
+      "sha256": "dd53d2c6d462e53d891da289e5595ebb0563385ec07c6339e6d8ba3a8f38373a",
+      "modified": false,
+      "upstreamPath": "packages/web/web-fetch-http/src/policy.ts"
+    },
+    {
+      "path": "original/provider.ts.source",
+      "sha256": "f7f291e08f0650b860d23af496327468b2a4f74b4d0c5ecc95741b869d1e970d",
+      "modified": false,
+      "upstreamPath": "packages/web/web-fetch-http/src/provider.ts"
+    },
+    {
+      "path": "package.json",
+      "sha256": "a857f977dcd742ed71df750f34ce80cfb6058810d3a718a537f504ff4b2e6b4a",
+      "modified": false,
+      "upstreamPath": "packages/web/web-fetch-http/package.json"
+    },
+    {
+      "path": "policy.ts",
+      "sha256": "95f7d4d22def31591273bad40d03bfcb7c0c3f63c3171ec9bf8ddceba8d4a3c2",
+      "modified": true,
+      "upstreamPath": "packages/web/web-fetch-http/src/policy.ts"
+    },
+    {
+      "path": "provider.ts",
+      "sha256": "b01fb44b2a58f2cb83f9434a68e48e3c1c0da973235024072d255155bf06102f",
+      "modified": true,
+      "upstreamPath": "packages/web/web-fetch-http/src/provider.ts"
+    }
+  ]
+}

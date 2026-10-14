@@ -1,0 +1,88 @@
+{
+  "schema": "augmentor-public-source-selection/1",
+  "repository": "https://github.com/DDDMUC/dsh-free-search",
+  "commit": "6c3979202bcbda6dc52e0bd17cf34edad4bac5ed",
+  "version": "0.8.9",
+  "license": "MIT",
+  "scope": "Public preferred source only. Original snapshots and notices retained; typed Pi boundaries, request-scoped transport, abortable fallback and public per-hop HTTP pinning. This is a library, not historical 0.1.0 byte parity or Host/GUI/installed acceptance. No private source, profile or key copied. Original suppliers retain MIT; separately authored boundaries retain their declared Augmentor terms.",
+  "files": [
+    {
+      "path": "LICENSE-dddmuc",
+      "sha256": "c309db44e6675dc222fe20e84ad02e9ae951a48ff67ae6a07a05ca8139a030f1",
+      "modified": false,
+      "upstreamPath": "LICENSE"
+    },
+    {
+      "path": "LICENSE-shinjiyu",
+      "sha256": "d056403373b4c7e962672091e6d339e77a2516c909efc3a8a7d832f70ce7061e",
+      "modified": false,
+      "repository": "https://github.com/shinjiyu/dsh-plugin-search",
+      "commit": "0ceaa1985ad2e7774cd8f06890c4a9b1a7125955",
+      "upstreamPath": "LICENSE",
+      "version": "0.1.0"
+    },
+    {
+      "path": "SELECTION.json",
+      "sha256": "b4c1a65ab1db953d6d06d1a5c67273301de512a104735068b8fd670facdb30dd",
+      "modified": true,
+      "license": "LicenseRef-Augmentor-MIT-Resale-1.0",
+      "source": "Augmentor-authored source-selection metadata"
+    },
+    {
+      "path": "domain-filter.ts",
+      "sha256": "081115f7bd114579191ee6e92c4a382c99a252a6058bb4243251db81a01e1d01",
+      "modified": true,
+      "upstreamPath": "lib/domain_filter.js"
+    },
+    {
+      "path": "engines.ts",
+      "sha256": "b45f676d7286dce3fe760c7eede05129f6e365e3aace27112bdf0e6ddf1fc787",
+      "modified": true,
+      "upstreamPath": "lib/index.js",
+      "selection": "SELECTION.json; 23 selected public declarations. Original parsers retained, import/export/request scope and cancellation seams marked."
+    },
+    {
+      "path": "original/dddmuc-index.js",
+      "sha256": "ba4281149ce6913d80e1dc6fe0c020d1bc1ad74885f65131e3e6c00057e6f9db",
+      "modified": false,
+      "upstreamPath": "lib/index.js"
+    },
+    {
+      "path": "original/dddmuc-package.json",
+      "sha256": "0da59f3effadbceaed6a426b81ce959b7a611fb345fad2a5e09b0a85831e3774",
+      "modified": false,
+      "upstreamPath": "package.json"
+    },
+    {
+      "path": "original/domain_filter.js",
+      "sha256": "cf465c259e99996931afb193f19d51a32db67733b03d4780095c7fcc1d94a1e9",
+      "modified": false,
+      "upstreamPath": "lib/domain_filter.js"
+    },
+    {
+      "path": "original/tavily.ts.source",
+      "sha256": "2500b0975c345736ac463651491131374c608808b434691bbd871dda8585ee14",
+      "modified": false,
+      "repository": "https://github.com/shinjiyu/dsh-plugin-search",
+      "commit": "0ceaa1985ad2e7774cd8f06890c4a9b1a7125955",
+      "upstreamPath": "src/tavily.ts",
+      "version": "0.1.0"
+    },
+    {
+      "path": "tavily.ts",
+      "sha256": "4c86d2698faa724a219cd7934481804706974d1efd1634bd697e06bce43d4bac",
+      "modified": true,
+      "repository": "https://github.com/shinjiyu/dsh-plugin-search",
+      "commit": "0ceaa1985ad2e7774cd8f06890c4a9b1a7125955",
+      "upstreamPath": "src/tavily.ts",
+      "version": "0.1.0"
+    },
+    {
+      "path": "transport.ts",
+      "sha256": "8b02c23e42414a6e35522da6681c4ce42b1b6cf6d721df5a8b204a4507f0b021",
+      "modified": true,
+      "license": "LicenseRef-Augmentor-MIT-Resale-1.0",
+      "source": "Augmentor-authored integration boundary"
+    }
+  ]
+}

@@ -101,6 +101,7 @@
     "tests/harness-wiki-review-chromium.test.mjs",
     "tests/free-search.test.mjs",
     "tests/search-settings.test.mjs",
-    "tests/harness-search-settings-chromium.test.mjs"
+    "tests/harness-search-settings-chromium.test.mjs",
+    "tests/keyless-search.test.mjs"
   ]
 }

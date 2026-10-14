@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`keyless-search.test.mjs` qualifies original MIT engine functions and copied DSH
+HTTP/address/body policy: frozen configs/rules, no ambient key read, Stop/failover/
+partial reads, response/attempt caps, explicit SearXNG instances, private/mixed/
+NAT64/DNS/connector behavior, public cross-origin redirects, charset/truncation,
+configuration limits and actual supported Pi SDK/HTTP dispatch. Six focused cases
+and source/separate ordinary **488/488 across 98 MX files** pass at two workers,
+matching Node/QtTest, unchanged deadlines and no skips. Separate live Qwen owners
+read official Debian sources/page and exact cold history; Host/GUI/installed scope
+and historical source/360 identity remain unqualified. See [keyless scope](../docs/HARNESS-PLUGIN-PARITY.md#mit-keyless-engine-and-public-fetch-library--october-14).
+
 Implementation **1612f20b85ae9b98f2331c59cdc017f2aa41b270**: `search-settings.test.mjs` covers private exact-revision field saves/unsets, default
 versus user layers, unsafe/invalid originals, admission loss, lost write replies,
 retired operator scopes and pending application. `harness-search-settings-chromium.test.mjs`

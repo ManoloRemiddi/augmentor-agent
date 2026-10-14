@@ -38,3 +38,8 @@ const searchSource='packages/runtime/vendor/dsh-web-search-free';
 const searchSelection=JSON.parse(readFileSync(searchSource+'/SOURCE.json','utf8'));
 for(const row of searchSelection.files)if(createHash('sha256').update(readFileSync(searchSource+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Public free search source changed: '+row.path);
 cpSync(searchSource,'dist/runtime/vendor/dsh-web-search-free',{recursive:true});
+for(const name of ['keyless-search','dsh-keyless-fetch']){
+ const source='packages/runtime/vendor/'+name,selection=JSON.parse(readFileSync(source+'/SOURCE.json','utf8'));
+ for(const row of selection.files)if(createHash('sha256').update(readFileSync(source+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Public keyless source changed: '+name+'/'+row.path);
+ cpSync(source,'dist/runtime/vendor/'+name,{recursive:true});
+}
