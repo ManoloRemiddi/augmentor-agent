@@ -1,7 +1,7 @@
 {
   "schema": "augmentor-office-engine-rebuild-environment/1",
   "date": "2026-10-14",
-  "scope": "Linux x64 isolated source-build preparation and live compile; no public binary qualification",
+  "scope": "Linux x64 isolated source-build attempt; final link OOM; no public binary qualification",
   "applicationSourceRef": "81094b3ea6f104428e6c3d7e110b5121aead8d75",
   "recipePackage": "@deepseek-ai/libreoffice-kit-wasm@0.1.5",
   "verifiedRecipeFileCount": 39,
@@ -40,14 +40,20 @@
     "freshBuildDirectory": true,
     "pinnedRecipeVerifyPassed": true,
     "configurePassed": true,
-    "observedPhase": "compile",
+    "observedPhase": "failed-final-link",
     "compileComplete": false,
     "outputQualification": false,
     "observedHostTargetsBuilt": [
       "embindmaker",
       "wasmbridgegen"
     ],
-    "observedExternalTarget": "icu"
+    "observedExternalTarget": "pdfium",
+    "exitCode": 1,
+    "oomKilled": true,
+    "finishedAt": "2026-10-14T16:38:59.953806239Z",
+    "failure": "wasm-ld received SIGKILL during final soffice.js link under the 6 GiB memory limit",
+    "failedTarget": "instdir/program/soffice.js",
+    "retainedBuildAndContainer": true
   },
   "installedArtifactsOrProviderSettingsChanged": false,
   "publicRedistributionQualified": false,

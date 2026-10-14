@@ -1,8 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. Strict check/build and focused 41/41 across seven files pass with an authored provider, real FileAuthStorage/Host/Chromium and cold interruption; wider source/ordinary and real provider/installed acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
+[Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict check/build, focused 41/41 and source/fresh ordinary **236/236 each across 60 files** pass, including all 44 Harness Chromium files. Authored-provider evidence uses real FileAuthStorage/Host/Chromium, callback/manual-code races and cold interruption. All 911 compiled files match; 20,847 dependency entries/155 production npm instances/Node 24.19.0 stay unchanged. Real provider, installed and new-head hosted acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
 
-[Stored Pi account sign-out](#stored-pi-account-sign-out--october-14) adds the original MIT DSH confirmation dialog and separate OAuth credential management. This source candidate is not installed in the owner review build; sign-in remains open.
+[Stored Pi account sign-out](#stored-pi-account-sign-out--october-14) adds the original MIT DSH confirmation dialog and separate OAuth credential management. This source candidate is not installed in the owner review build; current supported sign-in qualification is recorded in the owning guide above.
 
 [Installed MX Models qualification](#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.
 
@@ -98,9 +98,10 @@ now use the original bounded parser and the original candidate picker.
 
 The initial forms left OAuth sign-in/out dialogs open. The current
 [stored-account sign-out](#stored-pi-account-sign-out--october-14) adds the separate
-logout control; sign-in, virtual/extension-provider editing, advanced hidden
-profile controls, proactive cross-client invalidation and common Native/Browser
-provider-management parity remain open. The complete-file `models.configure`,
+logout control; [supported sign-in](HARNESS-MODEL-ACCOUNTS.md) now qualifies the
+original dialog with an authored provider. Virtual/extension-provider editing,
+advanced hidden profile controls, proactive cross-client invalidation, real
+provider and common Native/Browser provider-management parity remain open. The complete-file `models.configure`,
 guided setup and manual reload now share the session reconciliation described in
 [the lifecycle follow-up](#model-configuration-lifecycle--october-13).
 This does not qualify the full P0 model-setup
@@ -571,9 +572,11 @@ provider or account-service acceptance claim. Wider source/ordinary qualificatio
 was pending at that initial implementation checkpoint; the completed scope is
 recorded below.
 
-OAuth sign-in and interactive auth/callback cancellation, remote revocation,
-unregistered-account removal, proactive cross-client invalidation, common Native/
-Browser controls and broader model/provider/live/migration acceptance remain open.
+This historical sign-out checkpoint preceded the current
+[sign-in/callback/cancellation qualification](HARNESS-MODEL-ACCOUNTS.md). Real
+provider login, remote revocation, unregistered-account removal, proactive
+cross-client invalidation, common Native/Browser controls and broader
+model/provider/live/migration acceptance remain open.
 The owner review release/selected installation, drafts, production Qwen/speech
 settings and independent Office build are not replaced by this source change.
 

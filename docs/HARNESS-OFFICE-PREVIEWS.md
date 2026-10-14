@@ -26,13 +26,18 @@ it does not prove a completed engine build or output correspondence.
 The first Debian 12 attempt stops at configuration: GCC **12.2.0** is below the
 pinned Core's **GCC >=13** requirement. That image, inventory, log and failed build
 are retained. The Debian 13 definition uses GCC **14.2.0** and a separate fresh
-build directory. Its verification/configuration succeeds and the upstream
-**compile stage is running**: checksum-verified archives are fetched, and real
-C++ host tools (`embindmaker`/`wasmbridgegen`) have compiled/linked before the ICU
-build work at this checkpoint. The container enforces two CPU cores, 6 GiB RAM/no extra swap,
-1,024 processes and one make job with lower CPU priority. No GPU or owner model,
-voice, profile, installed engine or review artifact changes. These are a local
-trial's limits, not qualification of upstream automated-release resource gates.
+build directory. Verification/configuration succeeds, and compilation reaches
+final WebAssembly linking of `soffice.js`. The pinned `wasm-ld` receives SIGKILL;
+the actual container exits **1**, with **OOMKilled=true**, at **16:38:59 UTC**.
+The 6 GiB memory limit is insufficient for this final-link trial. Its failed
+receipt, logs, build directory and container are retained; no completed engine
+or output comparison is claimed. A further attempt requires a separately assessed
+resource profile before resuming the retained build.
+
+The container enforced two CPU cores, 6 GiB RAM/no extra swap, 1,024 processes and
+one make job with lower CPU priority. No GPU or owner model, voice, profile,
+installed engine or review artifact changes. These are a local trial's limits,
+not qualification of upstream automated-release resource gates.
 
 The base digests, actual host package inventories, Node 24.19.0/hash and observed
 preparation state are in [the environment record](../release/office-rebuild/environment.json).

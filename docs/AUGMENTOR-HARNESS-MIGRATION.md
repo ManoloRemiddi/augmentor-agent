@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current Pi accounts](HARNESS-MODEL-ACCOUNTS.md) qualifies supported sign-in and
+local sign-out in the original DSH dialogs with authored providers, real SDK/
+FileAuthStorage/Chromium and source/ordinary 236-case runs at 039308e. Real provider,
+registered-extension diversity, common Native/Browser management and installed/
+platform/migration acceptance remain open. Earlier OAuth gaps below are dated
+checkpoints, not a claim that the new source dialogs are absent.
+
 [Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):
 runtime **97897cf**, private MX **20261013-142001-1f7f7f96**, product **0.2.13**,
 artifact **05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**,

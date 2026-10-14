@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current Pi accounts](HARNESS-MODEL-ACCOUNTS.md) qualifies supported sign-in and
+local sign-out in the original DSH dialogs with authored providers, real SDK/
+FileAuthStorage/Chromium and source/ordinary 236-case runs at 039308e. Real provider,
+registered-extension diversity, common Native/Browser management and installed/
+platform/migration acceptance remain open. Earlier OAuth gaps below are dated
+checkpoints, not a claim that the new source dialogs are absent.
+
 # Required custom-plugin parity on Pi
 
 The owner requested the original DSH interface and useful installed additions.

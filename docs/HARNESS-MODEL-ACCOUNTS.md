@@ -5,8 +5,14 @@
 The source candidate adds supported Pi OAuth sign-in to the original DSH sign-in
 and sign-out dialogs. MX Linux remains the first owner-testing target. The current
 running review and selected installation are preserved; this source change is not
-an installed update. The initial strict check/build and focused **41/41 across
-seven files** pass. Full source/ordinary qualification is pending at this checkpoint.
+an installed update. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict
+check/build, focused **41/41 across seven files** and full source/fresh ordinary
+**236/236 each across 60 files** pass, including all 44 Harness Chromium files.
+The cohort uses two workers, unchanged existing deadlines and no skips or
+cancellations. All **911 compiled files** match; **20,847 dependency entries**, 155
+production npm instances and bundled **Node 24.19.0** stay unchanged. This is shared
+source/Linux fixture qualification; real-provider and installed acceptance remain
+open.
 
 ## User workflow and provider scope
 
@@ -153,8 +159,9 @@ A subsequent visual check of the same authored account flow confirms readable
 light/dark dialog text. The follow-up restores the sentence separator after the
 copy-link button and labels the completed sign-in receipt as historical, so a
 later sign-out is not confused with current stored credential state. Original
-layout, control placement and CSS remain unchanged; final-cohort qualification
-is pending for that copy-only follow-up.
+layout, control placement and CSS remain unchanged. The final qualified cohort
+includes this follow-up; the latest-source actual light/dark visual run passes
+separately with all login/callback/cancel/interruption checks retained.
 
 
 ## Unconfirmed active-status cancellation
@@ -174,8 +181,8 @@ are refused and the six-attempt/no-additional-inference/native-prefix checks sti
 pass. The pure operator-scope case separately proves a lost status does not
 prevent exact-ID cancellation or permit new login/answer replay. Focused 41/41
 across seven files pass. Earlier 7140ea7 and 3bfb841 source/ordinary 233/233 runs
-remain retained; they did not cover this failure. Final full source/ordinary
-qualification remains pending for this follow-up.
+remain retained; they did not cover this failure. The final 039308e source/ordinary
+236-case runs include the new cancellation probe.
 
 
 ## Late status and unadmitted preparation
@@ -202,10 +209,40 @@ its exact request/method and checked for the expected not-found response; other
 JavaScript/network errors remain failures. An explicit fresh read recovers the
 unadmitted preparation. The pure cases also cover older reads after cancellation
 and distinguish a never-observed admission. Focused **41/41 across seven files**
-pass; full source/ordinary qualification is pending for this follow-up.
+pass; both final source/ordinary 236-case runs include these new orderings.
 
 An initial maintenance/quiescing probe displayed the existing reconnect cover
 before reaching the target action; it is retained as a preparation failure. The
 final refusal fixture holds the exact request before it reaches the SDK. Earlier
 whole-test error checks were refined only to recognize that exact expected
 negative lookup, without ignoring other HTTP or JavaScript failures.
+
+## Final qualification and preserved owner state — October 14
+
+Source **039308ef0c7dee6e9089789f3652ef7590e31d10** passes **236/236** in
+140,762 ms; its fresh unselected ordinary production-dependency tree passes the
+same **236/236** in 144,808 ms. These exact 60-file cohorts include all 44 Harness
+Chromium files, runtime lifecycle/queue/organization/workspace cases and account/
+model configuration contracts. Two workers and existing deadlines are unchanged;
+no skips, cancellations or automatic failed-action replay occur. The separate
+latest-source visual flow passes **1/1**, and the unchanged Office export/refusal
+suite passes **9/9**. Earlier narrower successful cohorts and reproduced failures
+above remain distinct evidence.
+
+Complete compiled file sets/bytes match (911). The ordinary tree retains 20,847
+unchanged dependency entries, 155 production npm instances and bundled Node
+24.19.0; executable public source/tests/fixtures match. The existing running owner
+review's full 24,288-entry inventory, artifact identity and process remain intact,
+as do earlier review processes and the installed selection. Read-only local-Qwen
+catalog access responds successfully. No owner credentials/conversations are
+copied, no installed artifact is patched, and this account feature is not yet
+installed in the running review. Production model/speech settings remain intact.
+
+At the preceding published c9d872f checkpoint, hosted SDK platform and Windows
+desktop jobs pass. Validate passes the GUI/core/native checks and then refuses
+the retained Office exact-source/full-engine-rebuild packaging gate. Separate
+Windows command/delegation/assembly and macOS packaging gates remain open. These
+results do not qualify the new sign-in source; its new-head hosted results remain
+pending. The independent Debian 13 Office attempt reaches final WebAssembly
+linking but exits 1 with OOMKilled=true at its 6 GiB limit; its failed state is
+retained, with no engine receipt/output qualification or release-gate relaxation.

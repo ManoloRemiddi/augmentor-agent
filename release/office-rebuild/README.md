@@ -85,3 +85,10 @@ The supplier refuses changed input or incomplete output identity. No copied
 prebuilt `soffice.wasm`, changed approval label or successful configuration can
 stand in for a successful compile receipt. Keep generated source, toolchain,
 external archives, logs and binaries outside Git; publish only reviewed evidence.
+
+The October 14 Debian 13 trial passed configuration and reached final `soffice.js`
+linking, but `wasm-ld` received SIGKILL and the container exited 1 with
+`OOMKilled=true` under the 6 GiB limit. That profile is insufficient for the
+observed final link. Keep its failed state; assess available host resources and
+record a separate resource profile before any resumed attempt. No engine receipt
+or conversion/rendering comparison is qualified.

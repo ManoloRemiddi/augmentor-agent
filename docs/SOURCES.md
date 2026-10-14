@@ -8,8 +8,9 @@
 verifies the exact official Core/Emsdk, shipped patches/shim and Emscripten 4.0.10.
 Actual Core diff matches the shipped source patch. Debian 12/GCC 12 configuration
 fails and is retained; Debian 13/GCC 14 with a fresh build passes configuration and
-has a resource-limited compile stage running. Reproducible definitions, inventories
-and pins are public; private process identity stays local. Nine existing gate tests
+reaches final WebAssembly linking, where `wasm-ld` is killed and the container
+exits 1 with OOMKilled=true under its 6 GiB limit. Failed state is retained.
+Reproducible definitions, inventories and pins are public; private process identity stays local. Nine existing gate tests
 pass without relaxing refusal. No engine binary, exact entry source, rendering or
 public distribution qualification is claimed; installed/review/services are unchanged.
 
