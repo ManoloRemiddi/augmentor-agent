@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live-owner guard fault qualification](native-guard-drain.json) at edf50db closes stopped/killed guard admission stalls with direct Node supervision and broker death ownership. Source/ordinary 272-case and both original-viewer proofs pass; default/public/installed and full durable/crash/font/security/OS gates remain open. [Owning contract](../../docs/HARNESS-OFFICE-PREVIEWS.md#native-guard-loss-and-bounded-live-owner-drain--october-15).
+
 [Independent native scratch guard qualification](native-independent-cleanup.json) at 8ce4334 adds actual owner/converter-group and stopped-tree recovery, with source/ordinary 270-case and both original-viewer proofs. It preserves the default engine/public gate; guard loss, durable/outer/caller-PDF recovery, fonts/security/native distribution and other OS mechanisms remain open. See [the owning contract](../../docs/HARNESS-OFFICE-PREVIEWS.md#independent-native-scratch-cleanup--october-15).
 
 # Pinned Linux Office engine rebuild

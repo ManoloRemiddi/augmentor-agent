@@ -43,8 +43,44 @@ Focused **13/13** common/real checks pass, including both new faults with all
 observed actors gone at settlement, unchanged original input, no leftover native
 scratch/output and the helper's actual direct parent confirmed. Earlier owner/
 broker-group, stopped-tree and replacement-root refusal checks also pass.
-Exact-ref source/ordinary/original-viewer qualification remains pending at this
-implementation checkpoint. All-cleanup-owner loss, pre-admission allocation,
+At **edf50db97437fc4212e7f9c33bc800bd08d423aa**, strict type/build/version/source-
+boundary checks pass. Source/fresh ordinary **272/272 each across 64 files**
+include all **44 Harness Chromium files**, 15 shared DOM cases and 13 explicit
+common/real native cases. Both retain two workers, unchanged existing deadlines
+and zero skips/cancellations. Both separate original native-backend Office
+viewers pass font notices, PDF/zoom/reload/Retry and preserved request/native
+evidence. The two failing old guard comparators remain retained.
+
+All **921 compiled / 2,048 executable source/test/fixture files** match the
+ordinary copy; copied helper bytes match source. The Node converter's functional
+bytes are unchanged; its ownership comment/source map changed. Fresh spreadsheet
+overlay/chunk metadata differences are separately verified by exact normalization
+and actual asset sets/references. Initial preparation used an incorrect dated
+dependency-snapshot filename; the completed unselected tree was then verified
+against the correct immutable snapshot. The initial inventory assumption omitted
+the changed source map and was corrected against actual files. Both preparation
+failures are retained; no failed test was dropped or artifact rehashed to pass.
+Production **20,847 dependency entries / 155 npm instances / Node 24.19.0** and
+**1,932 existing Browser test dependency entries** remain matched. Eleven
+packaging/source-boundary cases pass with the Office public gate unchanged.
+
+Read-only postflight verifies current/prior **24,305/24,288-entry** inventories,
+all four review processes, selected configuration and 38 canonical changes.
+Qwen models returns HTTP 200; owner history/profile/credentials/drafts and
+model/speech/GPU settings remain untouched. [Portable qualification record](../release/office-rebuild/native-guard-drain.json)
+owns the exact scope and remaining work.
+
+Preceding **2929c60** [SDK 38646604104](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38646604104)
+passes Linux/macOS/Windows and [Windows desktop 38646603991](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38646603991)
+passes. [Validate 38646604138](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38646604138)
+passes main Node **1,202 / 32 identified skips / zero failures**, secondary
+Browser **121/121** and Python/Qt **875 / 45 identified skips**, then fails the
+real flare workspace/stacking proof's post-move geometry assertion. Canvas and
+window rectangles disagree; its cause is unproven. That run does not reach Office
+packaging and does not contain this new drain correction. Exact new-head hosted,
+installed/physical and wider platform acceptance remains open.
+
+All-cleanup-owner loss, pre-admission allocation,
 caller-PDF/original provider outer scratch, durable/power-loss and physical/
 font/layout/security/source-notice/distribution/other-OS gates remain open.
 This is source development; no running review/default/installed/binary promotion
