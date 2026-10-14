@@ -50,7 +50,41 @@ tests the existing Debian **LibreOffice 4:25.2.3-2+deb13u8** and
 application runtime: no default, supplier pin, GUI, licence gate, selected build,
 review process or user data changes. Reproduce only in a new private output
 directory using [the probe recipe](../release/office-rebuild/README.md#native-sandbox-feasibility-probe).
-The exact-source combined receipt is pending publication in this checkpoint.
+At **af60044882dd576d7a5a202791092d324b3bd383**, the exact-source combined probe
+passes. [The reviewed feasibility record](../release/office-rebuild/native-feasibility.json)
+pins its driver hash, installed package/source versions and complete format/
+isolation/cancellation/raster evidence. DOC, DOCX, XLS, XLSX, PPT and PPTX each
+produce actual PDF text containing the authored marker; Writer and slide second
+pages retain their second marker. All original source bytes remain unchanged.
+This is simple authored format coverage, not complex layout fidelity or bit-
+reproducible native output.
+
+Negative checks verify that the child cannot access an outside authored file,
+host process environment, inherited authored environment sentinel or host loopback
+listener, or write the read-only input/system payload. The bounded font catalog
+contains Liberation Sans and excludes the authored missing family. Startup and
+post-export-dispatch cancellation both observe the actual owned `soffice.bin`
+and await all descendants' exit. A **1,200 × 1,200** image at **two inches** is
+actually exported as **384 × 384 at 192 × 192 DPI**, measured by `pdfimages`.
+That confirms this image's result rather than inferring it from an accepted flag.
+
+The nine existing Office packaging/export/refusal cases and two private-source
+boundary cases pass: **11/11**, with the real tracked/history boundary check and
+shell/Python syntax checks. Existing output is refused before engine admission;
+an incomplete commit identity is also refused before output creation. An earlier
+otherwise passing preparation used an incorrect abbreviated ref, so it is
+retained separately and does not supply exact-ref qualification. No new runtime
+cohort is inferred from these diagnostic checks: the unchanged application's
+244-case source/ordinary Models qualification remains its own evidence.
+
+Read-only postflight verifies all **24,305** current-review and **24,288** prior-
+review inventory entries, their running processes and two earlier reviews. The
+selected configuration hash and **38** pre-existing canonical changes remain
+unchanged; Qwen's read-only model endpoint returns **200**. No owner history or
+credential data is read, no draft is discarded, and no model/speech/GPU settings
+or running/selected artifacts are changed. The prototype is not deployed to the MX
+review. Additional GUI/installed/native packaging and complete migration remain
+required.
 
 Each conversion uses the installed `oosplash` launcher and fresh private profile,
 home and cache directories. It exposes a fixed read-only system/library/registry/
@@ -92,6 +126,19 @@ original actual GUI and ordinary/installed artifacts, native dependency/source/
 notice policy and OS adapters. macOS/Windows remain explicit adapter gaps with the
 same feature contract. No fallback to a weaker unisolated process is authorized
 by this feasibility evidence. DSH and running review drafts remain available.
+
+The unchanged application's documentation head **d31c580** has now completed
+[Validate 38609853288](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609853288):
+main Node **1,200 pass / 23 existing skips / zero failure**, secondary **116/116**,
+Python **875 pass / 45 existing skips**, then the retained Office corresponding-
+source/rebuild packaging refusal. [SDK 38609852865](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609852865)
+and [Windows desktop 38609852788](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609852788)
+pass. Separate [macOS packaging 38609852832](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609852832)
+refuses unreviewed Darwin Office MPL/libvips LGPL terms. [Windows native
+38609852802](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38609852802)
+retains real job/delegation/goal fixture failures and refuses unreviewed Office/
+Sharp native terms. The timeout causes remain unproven. This Linux diagnostic
+does not fix those platform gates or establish new-head hosted qualification.
 
 ## Isolated Linux engine build — October 14
 
@@ -274,8 +321,9 @@ Linux **0.1.5 Wasm** package uses LibreOffice **26.8.0.3**, source
 **bce0998afefdbc355585ca324285661a2170ba77**, build identity
 **81c24980c5de51d11e2e50d48ea2bd98f9830a97d35df551f4aed8b6ff5bfe2c**.
 The package manifest, engine payload hashes, source/rebuild recipe and licence
-paths are recorded in `release/office-engine-linux-wasm.json`. The local system
-LibreOffice is neither invoked nor used as a fallback.
+paths are recorded in `release/office-engine-linux-wasm.json`. The application's
+pinned provider does not invoke system LibreOffice. The standalone native
+diagnostic above has not replaced it or added an automatic fallback.
 
 The [kit](https://github.com/deepseek-ai/dsh-libreoffice-kit) and LibreOffice
 engine are **MPL-2.0**, with their separate bundled third-party terms, MIT Harness
