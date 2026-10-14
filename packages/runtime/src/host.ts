@@ -7,6 +7,7 @@ import {keylessSearchExtension} from './keyless-search.js';
 import {WikiReceipts,wikiActionKey} from './wiki-receipts.js';
 import {PiFilePreview,PreviewReadError} from './file-preview.js';
 import {PiOfficePreview} from './office-preview.js';
+import {createLinuxNativeOfficeConverter} from './office-native-linux.js';
 import {PiFileReferences} from './file-references.js';
 import {FILE_REFERENCE_PROMPT} from '../vendor/dsh-file-reference/guidance.js';
 import {desktopCapabilities} from '../../desktop/src/capabilities.js';
@@ -129,7 +130,12 @@ export class Host {
   private previewAuthority(sid:string){const m=this.getMeta(sid);if(this.quiescing||m.surface==='browser'||m.delegation||this.organization.archived(sid))throw new PreviewReadError('gateway/forbidden','File previews are unavailable in this conversation.');return m;}
   async previewFile(sid:string,kind:'stat'|'read'|'bytes',p:Data,signal=new AbortController().signal){const m=this.previewAuthority(sid),cwd=m.cwd;this.previewReads++;try{const result=await this.filePreview.read(cwd,kind,p,signal);if(this.previewAuthority(sid).cwd!==cwd)throw new PreviewReadError('gateway/forbidden','The preview workspace changed.');return result;}finally{this.previewReads--;}}
   private officePreview?:PiOfficePreview;
-  private office(){return this.officePreview??=new PiOfficePreview(async(scope,kind,p,signal)=>{if(this.previewAuthority(scope.sessionId).cwd!==scope.workspaceRoot)throw new PreviewReadError('gateway/forbidden','The preview workspace changed.');return this.previewFile(scope.sessionId,kind,p,signal);});}
+  private office(){
+    if(this.officePreview)return this.officePreview;
+    const backend=process.env.AUGMENTOR_OFFICE_BACKEND;
+    if(backend&&backend!=='pinned-kit'&&backend!=='linux-native')throw new PreviewReadError('gateway/service-unavailable','Unknown Office backend.');
+    return this.officePreview=new PiOfficePreview(async(scope,kind,p,signal)=>{if(this.previewAuthority(scope.sessionId).cwd!==scope.workspaceRoot)throw new PreviewReadError('gateway/forbidden','The preview workspace changed.');return this.previewFile(scope.sessionId,kind,p,signal);},backend==='linux-native'?createLinuxNativeOfficeConverter:undefined);
+  }
   officeGeneration(sid:string,signal:AbortSignal){this.previewAuthority(sid);return this.office().generation(signal);}
   async previewOffice(sid:string,p:Data,signal:AbortSignal){const cwd=this.previewAuthority(sid).cwd;const result=await this.office().render({sessionId:sid,workspaceRoot:cwd},p,signal);if(this.previewAuthority(sid).cwd!==cwd)throw new PreviewReadError('gateway/forbidden','The preview workspace changed.');return result;}
   readonly fileReferences=new PiFileReferences();

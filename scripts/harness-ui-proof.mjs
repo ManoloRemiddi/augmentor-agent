@@ -201,6 +201,7 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
 }
 const lazy=process.env.AUGMENTOR_HARNESS_PROOF_LAZY==='1';
 const fixtureEnv={...process.env,HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
+if(process.env.AUGMENTOR_HARNESS_PROOF_NATIVE_OFFICE==='1')fixtureEnv.AUGMENTOR_OFFICE_BACKEND='linux-native';
 if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'){
  const extension=join(root,'nested-tools.mjs'),resourcePath=join(config,'resources.json');
  writeFileSync(extension,readFileSync(join(source,'scripts/fixtures/nested-tool-extension.mjs'),'utf8'));

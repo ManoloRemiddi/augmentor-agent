@@ -1,10 +1,10 @@
-// Copyright © 2026 Manolo Remiddi. MIT supplier adaptation: Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original converter/queue/scratch/error logic retained. Active teardown is exposed for maintenance; engine font disk cache is disabled.
+// Copyright © 2026 Manolo Remiddi. MIT supplier adaptation: Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original queue/scratch/error logic retained. Active teardown is exposed for maintenance; font disk cache is disabled. An explicit converter seat preserves the lazy pinned default and admits an authored native adapter.
 /** Host LibreOffice kit provider with reusable converters and private disk input/output. */
 import { randomUUID } from 'node:crypto'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { extname, isAbsolute, join } from 'node:path'
-import { createConverter, type Converter, type ConverterOptions } from '@deepseek-ai/libreoffice-kit'
+import type { ConverterOptions } from '@deepseek-ai/libreoffice-kit'
 import type { OfficePreviewSeat as Context, WorkspaceFileScope, WorkspaceFileStat } from '../../src/office-preview.js'
 import { brandString } from './brand.js'
 import { PreviewReadError as RemoteError } from '../../src/file-preview.js'
@@ -18,8 +18,18 @@ export * from './errors.js'
 export * from './identity.js'
 export * from './types.js'
 
+/** Backend seat used by the original provider; no image/agent API is needed. */
+export interface OfficeConverter {
+  render(request: { inputPath: string; outputPath: string }, signal?: AbortSignal): Promise<{ missingFonts: string[] }>
+  dispose(): Promise<void>
+}
+export type OfficeConverterFactory = (options: ConverterOptions) => Promise<OfficeConverter>
+const pinnedConverter: OfficeConverterFactory = async options => (await import('@deepseek-ai/libreoffice-kit')).createConverter(options)
+
 /** Provider concurrency and kit rendering/font configuration. */
 export interface Config {
+  /** Explicit backend seat; absence retains the pinned kit. */
+  converterFactory?: OfficeConverterFactory
   /** Maximum simultaneous conversions; queued callers remain cancellable. */
   maxConcurrentConversions: number
   /** Maximum metadata-only jobs awaiting source admission. */
@@ -62,7 +72,7 @@ export interface Config {
 
 interface Slot {
   busy: boolean
-  converter?: Promise<Converter>
+  converter?: Promise<OfficeConverter>
 }
 
 /** A provider lifetime owns all converters, queued calls, and temporary files. */
@@ -194,7 +204,7 @@ export class OfficeToPdf {
     let directory: string | undefined
     try {
       if (slot.converter === undefined) {
-        slot.converter = createConverter(this.options).catch((error: unknown) => {
+        slot.converter = (this.config.converterFactory ?? pinnedConverter)(this.options).catch((error: unknown) => {
           delete slot.converter
           throw error
         })

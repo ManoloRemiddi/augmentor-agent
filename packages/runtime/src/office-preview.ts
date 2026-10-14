@@ -1,5 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {OfficeToPdf,type Config} from '../vendor/dsh-office/index.js';
+import {OfficeToPdf,type Config,type OfficeConverterFactory} from '../vendor/dsh-office/index.js';
 import {PreviewReadError} from './file-preview.js';
 
 export interface WorkspaceFileScope {sessionId:string;workspaceRoot:string;}
@@ -30,10 +30,10 @@ export class PiOfficePreview {
   private readonly provider:OfficeToPdf;
   private readonly disposers:Array<()=>Promise<void>>=[];
   private closing?:Promise<void>;
-  constructor(read:AuthorizedRead){
+  constructor(read:AuthorizedRead,converterFactory?:OfficeConverterFactory){
     const files={readBytes:(scope:WorkspaceFileScope,path:string,params:any,signal:AbortSignal)=>read(scope,'bytes',{path,...params},signal),
       stat:(scope:WorkspaceFileScope,path:string,signal:AbortSignal)=>read(scope,'stat',{path},signal)};
-    this.provider=new OfficeToPdf({get:()=>files,effect:setup=>{this.disposers.push(setup());}}, {...OFFICE_PREVIEW_LIMITS});
+    this.provider=new OfficeToPdf({get:()=>files,effect:setup=>{this.disposers.push(setup());}}, {...OFFICE_PREVIEW_LIMITS,...(converterFactory?{converterFactory}:{})});
   }
   get busy(){return this.provider.busy;}
   generation(signal:AbortSignal){if(this.closing)throw new PreviewReadError('gateway/service-unavailable','Office previews are unavailable.');return this.provider.getGeneration(signal);}

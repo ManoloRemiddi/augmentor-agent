@@ -11,6 +11,91 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Opt-in native provider integration — October 14
+
+An authored Linux x64 adapter now connects to the **original MIT Office provider,
+queue and viewer**, through an explicit converter-factory seat. The pinned kit
+remains the default and is lazily imported when rendering is needed. Development
+Hosts can choose `AUGMENTOR_OFFICE_BACKEND=linux-native`; `pinned-kit` or omission
+keeps the preceding engine. Unknown choices are refused. This is a source-only
+opt-in candidate, not an installed update or public distribution approval.
+Existing owner review processes, selections and drafts must remain intact.
+
+`packages/runtime/src/office-native-linux.ts` owns a serial converter and a
+trusted Python helper/process group. The original provider retains authorized
+stat/complete bytes/current-version checks, content-addressed caching, shared
+readers and held cancellation/maintenance capacity. A fresh provider generation
+prevents cross-lifetime cache reuse. The helper receives only provider-owned
+scratch paths and validated limits; the native renderer sees an immutable copied
+input, private profile/home/cache, bounded font snapshot and read-only system
+payload. No agent loop, Session, model/tool request or permanent document storage
+is added. There is no unisolated or different-engine automatic fallback.
+
+The helper validates all six extensions, binary CFB signatures and bounded OOXML
+membership/entry/uncompressed limits, before font/converter work. It supplies
+declared-font metadata using XML namespaces, preserves excluded font-table/theme
+and generic-theme handling, and matches normalized family/full/PostScript aliases
+from the actual sandbox font catalog. Default platform/user font roots and custom
+roots/groups are supported. Physical fonts are deduplicated, oversized files
+omitted, and the **whole copied font snapshot** is bounded by the current loaded-
+font budget. This allocation strategy needs large-catalog/required-font parity
+evaluation before promotion; it must not silently narrow the final font contract.
+Cache files are transient within the owned scratch tree. Complete, regular,
+bounded PDF publication is exclusive, and existing output is preserved on refusal.
+
+The twelve original fallback groups come from the verified **public preferred
+0.1.3** entry source at `b19bb73`, not the opaque pinned 0.1.5 bundle. Their JSON
+adaptation, complete original preferred file, MPL LICENSE/NOTICE and hash-bound
+selection live in `packages/runtime/vendor/office-font-fallbacks`. Build copying
+checks those exact bytes. These data retain **MPL-2.0**, separately from the MIT
+provider/GUI and authored application portions. Native binaries/fonts and linked
+source/notice closure still require distribution review; no policy is relaxed.
+
+Fresh profile settings disable macro execution, active OLE/DDE content and the
+Office Python runtime; the installed registry contains those keys. Namespace
+isolation denies owner files/process/environment/network and source/system writes.
+Broker/renderer address space is bounded, the native child has CPU/file-size/FD
+limits and lower priority, and the parent deadline covers all font/conversion
+work. These are not an aggregate cgroup/scratch-quota qualification. SIGTERM,
+forced group termination and sandbox parent-death ownership await actual process
+exit before scratch removal/slot reuse. Disposal also cancels and settles work;
+unknown outcomes are never replayed automatically.
+
+Initial local focused checks pass **6/6** with explicit native dependencies: lazy
+provider seat/cache/authorization and retained cleanup, actual DOC/DOCX/XLS/XLSX/
+PPT/PPTX conversion and missing-font metadata, malformed/archive/font/input/output
+bounds and existing-output refusal, real built-command negative isolation, and
+native cancellation/timeout/disposal. The actual original Chromium viewer passes
+with the opt-in Host: two pages, original font warning/details, 100% zoom, changed
+bytes, malformed-file Retry/recovery, narrow fullscreen close, unchanged native
+history and **zero subsequent provider requests**. Wider exact-source/ordinary
+qualification is pending below; these initial checks are not an installed proof.
+
+Reproduce only in fresh isolated test profiles with installed native prerequisites:
+
+```sh
+npm run check
+npm run build
+AUGMENTOR_NATIVE_OFFICE_TEST=1 node --test --test-concurrency=1 tests/office-native-linux.test.mjs
+AUGMENTOR_HARNESS_PROOF_NATIVE_OFFICE=1 node --test --test-concurrency=1 tests/harness-office-chromium.test.mjs
+```
+
+The native tests are explicit dependency-backed checks; without their opt-in,
+four real-native cases are identified as skipped rather than reported as fixture
+passes. Two common converter-seat cases run independently of the OS adapter.
+The default original viewer/real Wasm checks remain mandatory and separate.
+The [Fontconfig reference](https://fontconfig.pages.freedesktop.org/fontconfig/fontconfig-user.html)
+describes private configuration, family preferences and the full matching catalog;
+this implementation does not import the owner's global font configuration.
+
+Remaining gates include large/custom/glyph/font fallback and complex layout
+parity; executable macro/external-resource/password cases; archive repair/error
+classification, aggregate scratch/resource bounds and cancellation races; ordinary
+and installed GUI/artifact source/notice qualification; and other Linux layouts/
+architectures/macOS/Windows sandbox adapters with the **same feature contract**.
+The exact preferred-source/full rebuild gate for the still-default npm kit/Wasm
+remains closed. Retain DSH and the owner's working installed/review artifacts.
+
 ## Controlled linker resources — October 14
 
 The actual pinned toolchain reports **LLD 21.0.0**. A tiny independently authored

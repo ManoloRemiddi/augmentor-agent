@@ -9,8 +9,8 @@
       "path": "index.ts",
       "upstreamPath": "packages/document/office-to-pdf/src/index.ts",
       "upstreamSha256": "5e7030469a5ec1f432c6a2e8a2de10b5fb3b02d76bf27d3c8c59da00e913fbfb",
-      "sha256": "19d67c8f287efca2593304caaf6e02715ccbf174014f690eed7c06fb5762050f",
-      "adaptation": "Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original converter/queue/scratch/error logic retained. Active teardown is exposed for maintenance; engine font disk cache is disabled."
+      "sha256": "aadc85f6633068da6ebe168702d3ceaef795472b982e10c45ac04ab9b1e0b742",
+      "adaptation": "Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original converter/queue/scratch/error logic retained. Active teardown is exposed for maintenance; engine font disk cache is disabled. An explicit converter factory seat retains the original queue and lazy pinned default while allowing an independently authored native adapter."
     },
     {
       "path": "errors.ts",
