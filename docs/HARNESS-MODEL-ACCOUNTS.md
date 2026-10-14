@@ -262,7 +262,12 @@ The fixture now creates an uncreated private child through the existing shared
 `privateDir` adapter. Windows additionally checks that the ordinary temporary
 parent is still refused and that the actual saved receipt passes native private-
 file verification. Linux's corrected common account/runtime/scope **24/24** pass.
-The new hosted Windows run must confirm the corrected fixture; prior failures
-and Linux/macOS successes remain separate evidence. Production runtime, compiled
+At **9a27612c60618741811a2dd49ba07456904f1f14**, the corrected
+[SDK workflow 38603587310](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38603587310)
+passes on **Windows, macOS and Linux**, including the full common **24/24 account
+cases** on each. Windows confirms both the ordinary-parent refusal and native
+receipt verification; the remaining OS-private/startup/workspace steps also pass.
+This confirms the fixture diagnosis. Prior failures and preceding Linux/macOS
+successes remain separate evidence. Production runtime, compiled
 files, original GUI and the sealed review artifact are unchanged by this test-only
 correction. Physical Windows and real account/provider acceptance remain open.

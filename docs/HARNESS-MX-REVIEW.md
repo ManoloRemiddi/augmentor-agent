@@ -44,6 +44,14 @@ actions, sessions, active turns or drafts** are created during this owner QA.
 There are no browser errors or failed responses. Runtime executable/PID/profile,
 private descriptor/socket modes and product/SDK are confirmed locally.
 
+The later test-only fixture correction at
+**9a27612c60618741811a2dd49ba07456904f1f14** passes
+[SDK contracts 38603587310](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38603587310)
+on Linux, macOS and Windows, including 24 common account cases per platform and
+subsequent OS-private/workspace steps. It changes no production/compiled/GUI
+bytes in this sealed review. This shared-contract evidence does not qualify
+physical Windows/macOS account callbacks, packaging or installed acceptance.
+
 The existing 14:51 review's full 24,288-entry artifact verifies unchanged and its
 process remains running, along with the two preceding review processes. The
 installed preview/selection and retained draft are preserved. The new private
