@@ -383,10 +383,51 @@ synthetic provider; they import no owner prompt, key, profile or history.
 The editor is shared source for Linux/macOS/Windows; no OS adapter, protocol,
 data format, supplier selection, dependency pin or native UI change is needed.
 Its 15 common DOM checks are added to all three SDK-platform jobs using the
-existing locked Browser test dependencies. Exact-ref source/ordinary, new-head
-hosted, installed and broader migration qualification is still pending at this
-implementation checkpoint. Running owner previews and installed selections
-retain their preceding editor until separately qualified activation.
+existing locked Browser test dependencies.
+
+At **5eeaf86710524b4f444dac96a7a905484000b438**, strict check/build, version and
+source-boundary checks pass. Source/fresh ordinary **267/267 each across 64 files**
+include all **44 Harness Chromium files**, the 15 common DOM cases and eight
+explicit native Office cases, with two workers, unchanged existing deadlines
+and zero skips/cancellations. Full Browser **121/121** and the real Qt/shared-
+service prompt-editor proof pass Save/Rename, external conflict/draft retention,
+stale-save refusal, Cancel/Confirm and clipboard insertion without automatic Send.
+The Qt check is an offscreen Linux fixture, not physical Mac/Windows acceptance.
+
+All **921 compiled files** and **2,048 executable source/test/fixture files**
+match the fresh ordinary tree. The separately served shared editor source has
+changed. Compiled differences from the preceding build are the existing temporary
+spreadsheet overlay identity, its referencing chunk name and build/asset metadata;
+the original GUI/worker bodies match after those exact names are normalized.
+Initial single-file/set-order inventory assumptions failed and remain retained;
+the corrected check verifies actual matching source/ordinary bytes, both asset
+sets and referenced files without changing a build or supplier input. Original
+GUI/CSS and supplier records are unchanged. Production **20,847 dependency
+entries / 155 npm instances / Node 24.19.0** remain unchanged; the existing
+**1,932 Browser test dependency entries** also match their test-only copy.
+Eleven packaging/source-boundary cases pass with the Office gate still closed.
+
+Read-only postflight verifies current/prior review inventories
+**24,305/24,288 entries**, all four review processes, selected configuration and
+38 canonical pre-existing changes; Qwen models remains HTTP 200. No owner prompt,
+profile, history, credential or draft is read or replaced. Model/speech/GPU
+placement and installed/review artifacts remain unchanged.
+
+The preceding **6cb41d1** [three-platform SDK 38639750952](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38639750952)
+and [Windows desktop 38639750927](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38639750927)
+pass; those do not include this new editor or its added DOM step. Exact new-head
+hosted/platform, installed/physical, older Trajectory timeout causality, full
+instruction/semantic behavior and broader migration/release gates remain open.
+Running owner previews retain their preceding editor until separately qualified
+activation. No binary publication or DSH retirement follows.
+
+[Portable qualification record](../release/harness-prompt-catalog-ordering.json)
+records the exact cohort and limits. With existing development prerequisites:
+
+```sh
+node --test apps/browser/test/prompt-editor-ordering.test.mjs apps/browser/test/prompts.test.mjs
+node --test tests/harness-prompts-chromium.test.mjs
+```
 
 ## Shared prompt library and editor
 
