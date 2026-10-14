@@ -21,6 +21,40 @@ function setup(t){
  return {store,provenance,setCapture:value=>capture=value};
 }
 function body(store,record){return JSON.parse(store.payload('fixture',record.id).text);}
+function preparation(provenance,options,files=[]){
+ const handlers=new Map();provenance.attach({resourceLoader:{getSkills:()=>({skills:[]}),getPrompts:()=>({prompts:[]}),getAgentsFiles:()=>({agentsFiles:files}),getExtensions:()=>({extensions:[]})}});
+ provenance.extension({on:(name,fn)=>handlers.set(name,fn)});handlers.get('before_agent_start')({prompt:'authored question',systemPrompt:'observed preparation',systemPromptOptions:options});
+}
+
+test('instruction links distinguish current system text, source hashes, duplicate texts and quotations',t=>{
+ const f=setup(t),text='AUTHORED_FILE_INSTRUCTION',file={path:'/authored/AGENTS.md',content:text};
+ preparation(f.provenance,{contextFiles:[file,{...file,path:'/authored/SECOND.md'}],sections:{'custom/section~name':'NEW_SYSTEM_SECTION'},appendSystemPrompt:'OLD_REMOVED_SECTION'},[file]);
+ f.provenance.streaming({messages:[{role:'system',content:'',sections:{addendum:'OLD_REMOVED_SECTION'},timestamp:0},{role:'system',content:'',sections:{addendum:null,project_context:text,custom:'NEW_SYSTEM_SECTION'},timestamp:1},{role:'user',content:'OLD_REMOVED_SECTION',timestamp:2}]});
+ const payload={messages:[{role:'system',content:text+' NEW_SYSTEM_SECTION'},{role:'user',content:'OLD_REMOVED_SECTION'},{role:'assistant',content:'OLD_REMOVED_SECTION'}],metadata:'OLD_REMOVED_SECTION'},result=f.provenance.finish(payload,'openai-completions'),sources=result.payload.snapshots.instructionSources;
+ assert.equal(result.data.snapshots.instructionSources.state,'retained');assert.equal(sources.providerApi,'openai-completions');assert.equal(sources.rows.length,4);
+ const a=sources.rows.find(row=>row.valuePointer.endsWith('/contextFiles/0/content')),b=sources.rows.find(row=>row.valuePointer.endsWith('/contextFiles/1/content'));
+ assert.equal(a.sdkSystemPresence,'present');assert.equal(a.providerSystemPresence,'present');assert.equal(a.capturedTextSha256,createHash('sha256').update(text).digest('hex'));assert.equal(a.sameTextSourceCount,2);assert.equal(b.sameTextSourceCount,2);
+ assert.equal(a.loadedCatalogMatch,'same-path-and-loaded-content-hash');assert.deepEqual(a.loadedCatalogPointers,['/snapshots/resources/contextFiles/0']);assert.equal(b.loadedCatalogMatch,'not-listed');
+ const old=sources.rows.find(row=>row.valuePointer.endsWith('/appendSystemPrompt'));assert.equal(old.sdkSystemPresence,'not-present');assert.equal(old.providerSystemPresence,'not-present');
+ assert(sources.rows.some(row=>row.valuePointer.endsWith('/sections/custom~1section~0name')));assert(!JSON.stringify(sources).includes(text),'links do not duplicate instruction bodies');
+ preparation(f.provenance,{contextFiles:[{...file,content:'CHANGED_TEXT'}]},[file]);const changed=f.provenance.finish({messages:[{role:'system',content:'CHANGED_TEXT'}]},'unknown-api').payload.snapshots.instructionSources.rows[0];assert.equal(changed.loadedCatalogMatch,'same-path-content-differs');assert.equal(changed.providerSystemPresence,'unavailable');
+ preparation(f.provenance,{contextFiles:[file],sections:{apiKey:'SYNTHETIC_CREDENTIAL'}},[file]);const redacted=f.provenance.finish({messages:[]},'openai-completions');assert(!JSON.stringify(redacted).includes('SYNTHETIC_CREDENTIAL'));assert.equal(redacted.payload.snapshots.instructionSources.rows.find(row=>row.kind==='context-file').loadedCatalogMatch,'not-compared-redacted');
+});
+test('instruction annotation is bounded after primary capture and never replaces retained provider evidence',t=>{
+ const f=setup(t),options={sections:Object.fromEntries(Array.from({length:300},(_,i)=>['section'+i,'SOURCE_'+i]))};preparation(f.provenance,options);
+ const sources=f.provenance.finish({messages:[]},'openai-completions').payload.snapshots.instructionSources;assert.equal(sources.rows.length,256);assert.equal(sources.total,300);assert.equal(sources.omitted,44);
+ f.provenance.beginTurn();preparation(f.provenance,{customPrompt:'small instruction'});
+ f.provenance.streaming({messages:[]});const after={messages:[{role:'user',content:'x'.repeat(PROVENANCE_LIMIT-1300)}]};
+ const result=f.provenance.finish(after,'openai-completions');assert.equal(result.data.snapshots.afterProviderHooks.state,'retained');assert.deepEqual(result.payload.snapshots.afterProviderHooks,after);assert.equal(result.data.snapshots.instructionSources.state,'too-large');
+ assert(Object.values(result.data.snapshots).filter(frame=>frame.state==='retained').reduce((n,frame)=>n+frame.bytes,0)<=PROVENANCE_LIMIT);
+ f.provenance.beginTurn();preparation(f.provenance,{sections:{['large-pointer-'.repeat(12000)]:'small text'}});const capped=f.provenance.finish({messages:[]},'openai-completions');assert.equal(capped.data.snapshots.preparation.state,'retained');assert.equal(capped.data.snapshots.afterProviderHooks.state,'retained');assert.equal(capped.data.snapshots.instructionSources.state,'too-large');assert(capped.data.snapshots.instructionSources.bytes>128*1024);
+});
+test('instruction links follow capture policy and do not reappear after capture is disabled',t=>{
+ const f=setup(t);f.setCapture(false);preparation(f.provenance,{customPrompt:'PRIVATE_INSTRUCTION',contextFiles:[{path:'PRIVATE_PATH',content:'PRIVATE_BODY'}]});
+ const disabled=f.provenance.finish({messages:[]},'openai-completions');assert.equal(disabled.data.snapshots.instructionSources.state,'disabled');assert(!JSON.stringify(disabled).includes('PRIVATE_'));
+ f.setCapture(true);preparation(f.provenance,{customPrompt:'EARLIER_INSTRUCTION'});f.setCapture(false);f.provenance.streaming({messages:[]});f.setCapture(true);
+ const changed=f.provenance.finish({messages:[]},'openai-completions');assert.equal(changed.data.snapshots.instructionSources.state,'not-observed');assert(!JSON.stringify(changed).includes('EARLIER_INSTRUCTION'));
+});
 
 test('metadata mode and a mid-request capture change cannot expose earlier snapshot bodies',t=>{
  const f=setup(t);f.setCapture(false);f.provenance.memory(contribution('PRIVATE_MEMORY'));f.provenance.promptWrapping({sections:[{text:'PRIVATE_PREFIX'}]});
@@ -90,16 +124,16 @@ test('real Pi SDK records template expansion, managed memory, aggregate omission
  writeFileSync(join(agentDir,'models.json'),JSON.stringify({providers:{fixture:{baseUrl:'http://127.0.0.1:'+server.address().port+'/v1',api:'openai-completions',apiKey:'synthetic-only',models:[{id:'context',name:'Context fixture',reasoning:false,input:['text'],contextWindow:32768,maxTokens:1024}]}}}));
  const modelRuntime=await ModelRuntime.create({authPath:join(agentDir,'auth.json'),modelsPath:join(agentDir,'models.json'),modelsStorePath:join(agentDir,'store.json'),allowModelNetwork:false});
  const settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:false},defaultProjectTrust:'never'});
- const f=setup(t);let override=false;const recalled=[];
+ const f=setup(t);let override=false;const recalled=[],instruction={path:join(cwd,'AGENTS.md'),content:'AUTHORED_LOADED_FILE_INSTRUCTION'};
  const memory={session:'pi:fixture',recall:async(mode,query)=>{recalled.push({mode,query});return memoryText;},activity:async()=>{},close(){}};
  const loader=new DefaultResourceLoader({cwd,agentDir,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
-  additionalSkillPaths:[skill],additionalPromptTemplatePaths:[prompts],systemPrompt:'AUTHORED_BASE',appendSystemPrompt:['MANAGED_INSTRUCTION'],
+  additionalSkillPaths:[skill],additionalPromptTemplatePaths:[prompts],systemPrompt:'AUTHORED_BASE',appendSystemPrompt:['MANAGED_INSTRUCTION'],agentsFilesOverride:()=>({agentsFiles:[instruction]}),
   extensionFactories:[{name:'fixture-input',factory:pi=>pi.on('input',event=>({action:'transform',text:event.text.replace('RAW_TEXT','INPUT_TEXT')}))},
    {name:'fixture-memory',factory:piMemoryContext(memory,true,row=>f.provenance.memory(row))},
    {name:'fixture-opaque',factory:pi=>{
     pi.on('before_agent_start',()=>override?{systemPrompt:'OPAQUE_OVERRIDE_WITHOUT_MEMORY'}:undefined);
     pi.on('context_with_system',event=>({messages:[...event.messages.filter(message=>message.content!=='PRIOR_QUESTION'),{role:'system',content:'EPHEMERAL_SYSTEM_ADDITION',timestamp:2}]}));
-    pi.on('before_provider_request',event=>{event.payload.fixtureMutation='AFTER_PROVIDER_HOOK';});
+    pi.on('before_provider_request',event=>{event.payload.fixtureMutation='AFTER_PROVIDER_HOOK';if(override){event.payload.metadata={quotedInstruction:instruction.content};}});
    }},{name:'augmentor-context-observer',factory:f.provenance.extension}]});
  await loader.reload();assert.deepEqual(loader.getExtensions().errors,[]);
  const manager=SessionManager.inMemory(cwd);manager.appendMessage({role:'user',content:'PRIOR_QUESTION',timestamp:1});
@@ -113,10 +147,13 @@ test('real Pi SDK records template expansion, managed memory, aggregate omission
  assert(snapshots.nativeLineage.messages.some(row=>row.role==='user'&&row.state==='exact-entry-projection-match'&&row.candidates.some(source=>manager.getEntry(source.entryId).type==='message')));
  assert.equal(snapshots.memory.context,memoryText);assert.equal(lineage.data.memory.sdkSystemPresence,'exact-text-present');assert.equal(lineage.data.memory.providerStringPresence,'exact-text-present-in-a-string-field');
  assert(snapshots.resources.skills.some(row=>row.name==='unused'));assert.equal(snapshots.resources.boundary,'loaded-resource-catalog; consumption not established');assert(!JSON.stringify(received[0]).includes('UNUSED_SKILL_BODY'));
+ const firstSource=snapshots.instructionSources.rows.find(row=>row.kind==='context-file');assert.equal(firstSource.loadedCatalogMatch,'same-path-and-loaded-content-hash');assert.equal(firstSource.sdkSystemPresence,'present');assert.equal(firstSource.providerSystemPresence,'present');assert(received[0].messages.some(row=>row.role==='system'&&row.content.includes(instruction.content)));
  assert(lineage.data.difference.removedCount>0);assert.equal(lineage.requestId,request.id);assert.equal(lineage.data.native.sessionId,manager.getSessionId());assert.equal(manager.getEntry(lineage.data.native.leafId).type,'message');
  assert(manager.getBranch().some(entry=>entry.type==='message'&&entry.message.content==='PRIOR_QUESTION'));assert(!JSON.stringify(manager.getBranch()).includes('EPHEMERAL_SYSTEM_ADDITION'));
- override=true;observer.beginTurn({});await session.prompt('SECOND_QUESTION');assert.equal(received.length,2);
+ override=true;observer.beginTurn({});await session.prompt('SECOND_QUESTION quoting '+instruction.content);assert.equal(received.length,2);
  const latest=f.store.page('fixture').records.filter(row=>row.kind==='context/provenance').at(-1),second=body(f.store,latest).snapshots;
  assert.equal(second.preparation.systemPrompt,'OPAQUE_OVERRIDE_WITHOUT_MEMORY');assert.equal(latest.data.memory.sdkSystemPresence,'exact-text-absent');assert.equal(latest.data.memory.providerStringPresence,'exact-text-absent-from-string-fields');
  assert(second.preparation.systemPromptOptions.forceSystemPrompt);assert(!JSON.stringify(received[1]).includes(memoryText));assert.equal(latest.data.coverage,'public-boundaries-and-managed-memory; incomplete source attribution');
+ const secondSource=second.instructionSources.rows.find(row=>row.kind==='context-file');assert.equal(secondSource.loadedCatalogMatch,'same-path-and-loaded-content-hash');assert.equal(secondSource.sdkSystemPresence,'not-present');assert.equal(secondSource.providerSystemPresence,'not-present');assert(JSON.stringify(received[1]).includes(instruction.content),'user/metadata quotations remain distinct from current system text');
+ assert.equal(second.instructionSources.rows.find(row=>row.kind==='forced-prompt').providerSystemPresence,'present');
 });

@@ -547,6 +547,57 @@ Composition qualification source: **`1d8923586fe70e01a42f95bdbeb9d5fc0d5eca97`**
 
 Preceding published **`08c13fe4bac63b5cbb4078e4ce3cf9704f518b6f`** has **17 hosted successes**, with no live or failed job at this observation. No job was restarted. New matching-head hosted and physical platform/installed acceptance remain required; prior unproved failure causes are not declared resolved by green runs.
 
+## Instruction source links — October 14
+
+The managed context observer now adds an optional `instructionSources` snapshot
+to each recorded request. It references text already retained under the public
+Pi 1.1.0 `before_agent_start.systemPromptOptions` boundary: custom/forced/appended
+instructions, custom sections, context-file content, prompt guidelines and tool
+snippets/guidelines. JSON pointers lead to those captured values; SHA-256 hashes
+identify the captured, credential-field-redacted text. Instruction bodies are not
+duplicated and no extra file is read. The existing Host still disables automatic
+context-file discovery; this observer does not grant or load resources.
+
+Each retained row compares its complete literal text separately with the current
+canonical SDK system state and the actual request API's recognized provider system
+fields after payload hooks. Public `normalizeContext`/`getCurrentSystemPrompt`
+replay excludes superseded system patches; user/assistant quotations, unrelated
+metadata and fields belonging to another API cannot establish current system
+presence. Results are `present`, `not-present`, `empty` or `unavailable`. Unknown
+APIs, missing snapshots and malformed canonical SDK context remain unavailable.
+This is literal text evidence: formatting changes can prevent a match, matching
+text does not prove source authority or causal handler attribution, and observed
+options can remain loaded while an opaque full-prompt override excludes them.
+
+Context-file rows also link same-path entries in the existing loaded catalog.
+A matching loaded-content hash, a changed hash, no listed source and unavailable
+catalog are distinguished. Hash comparison is withheld when either relevant
+snapshot reports credential-field redaction. Repeated identical text retains
+separate source pointers and an explicitly retained-row-only candidate count.
+Invoked skill bodies, generated SDK defaults and individual opaque handler
+contributions remain outside these links. `sourceProvenance` stays **false**;
+`instructionSourceLinks` advertises this narrower capability.
+
+The annotation keeps at most **256 rows**, total/omitted counts and a **128 KiB**
+serialized cap inside the existing **8 MiB aggregate** snapshot budget. Primary
+request snapshots are saved first; annotation overflow cannot replace their
+retained evidence. Capture-disabled and observed mid-request policy changes drop
+these links with the existing diagnostic bodies. Existing retention, deletion and private-payload access apply. Content may contain
+private text despite credential-field redaction. No native
+conversation schema, prompt composition, memory policy or tool grant changes.
+The strict provider-system predicate is moved unchanged into a shared pure helper;
+core native-memory persistence keeps its independent failure policy.
+
+The existing Context details list exposes a friendly label for the new snapshot;
+original DSH/dashboard layout and controls stay intact. This is shared Node/SDK
+behavior with no new dependency, copied supplier source, native component or OS
+adapter. Synthetic SDK/HTTP, native Qt, Chromium and ordinary-tree evidence does
+not qualify live/installed or physical Mac/Windows behavior. Full instruction,
+resource and historical context fidelity, owner MX feedback and all remaining
+[P0/P1/platform/distribution gates](AUGMENTOR-HARNESS-MIGRATION.md) remain open.
+The separately running f98424b MX review and selected 97897cf installation are
+preserved; this source checkpoint is not an installed update or DSH retirement.
+
 ## Indexed native entries and canonical message lineage
 
 The next Pi 1.1.0 checkpoint adds read-only `session.nativeHistory` and `session.nativeRead` to the existing owner. Managed conversation metadata resolves the original file; clients cannot supply a filesystem path. Loaded and cold inspection use the same independently authored `NativeHistory` reader without opening a new SDK session or running inference. Only version-3 native sessions are supported. Complete corrupt records, invalid UTF-8, unknown versions and orphan/duplicate identities are refused with original bytes preserved; an incomplete final record is reported without trimming or repairing the native file. A record above 64 MiB is explicitly refused. The public SDK parser and types are used without private imports, a fork or another agent loop.

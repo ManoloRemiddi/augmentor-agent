@@ -86,7 +86,7 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     }, effective);
     requestId = event?.id;
     inspect(()=>timing.modelStart(requestId));
-    if(requestId&&provenance)inspect(()=>{const contribution=provenance.finish(effective);record('context/provenance',contribution.data,contribution.payload);});
+    if(requestId&&provenance)inspect(()=>{const contribution=provenance.finish(effective,model.api);record('context/provenance',contribution.data,contribution.payload);});
     return transformed;
   };
   session.agent.onPayload = payloadHook;

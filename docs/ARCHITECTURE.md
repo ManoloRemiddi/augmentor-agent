@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Instruction source links](AUGMENTOR-HARNESS.md#instruction-source-links--october-14)
+are a derived diagnostic view of already captured public SDK options and recognized
+system text. They neither compose context nor load files or own native state.
+The shared pure API-specific system recognizer preserves core memory disposition;
+optional diagnostic capture remains separate from native persistence policy.
+
 [Memory claim selection and engine deadlines](CONTROLLED-MEMORY.md#extracted-claims-and-engine-deadlines--october-14)
 at **aac3bad18f38ca61fa4129b414849758ecdb22fa** prefers eligible extracted claims
 per scope over generated pages, with page fallback and unchanged limits/labels.

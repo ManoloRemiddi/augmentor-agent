@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Instruction source links](AUGMENTOR-HARNESS.md#instruction-source-links--october-14)
+now reference captured Pi run options and distinguish literal current SDK/provider
+system presence, loaded-file hashes and ambiguous equal text. The bounded optional
+annotation preserves capture policy and primary snapshots; complete source
+attribution remains unavailable. The existing DSH layout, automatic-resource
+loading policy, installed selection and fresh owner review remain unchanged.
+
 [Fresh private MX review](HARNESS-MX-REVIEW.md) is running from public
 **f98424b0a240b4b0c9d5e475d6e77ee4d2706312** over verified 454db9d private payloads, product
 0.2.13/Pi1.1.0. Release **20261014-123717-b98af12b**, artifact

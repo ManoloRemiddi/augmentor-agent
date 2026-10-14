@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Instruction source links](../docs/AUGMENTOR-HARNESS.md#instruction-source-links--october-14)
+add actual Pi SDK/received-HTTP proof for a loaded synthetic context file surviving
+as a catalog/options entry while an opaque override removes it from current system
+text. Checks distinguish canonical superseded patches, user/assistant/metadata
+quotations, API uncertainty, duplicate/source hashes and pointers, redaction,
+row/annotation/aggregate bounds and capture transitions. Existing native memory,
+branch/cold/recovery, privacy, wrapping and original Context cases remain required.
+
 The fresh [MX review artifact](../docs/HARNESS-MX-REVIEW.md) at source
 f98424b passes candidate-selected **120/120 across 43 files**, two workers,
 unchanged deadlines/no skips, followed by complete 24,284-entry verification.
