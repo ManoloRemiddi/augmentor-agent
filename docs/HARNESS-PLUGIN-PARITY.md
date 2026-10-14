@@ -46,11 +46,25 @@ separate required workflows under the accepted migration specification.
 ## CI readiness barriers and retained failures — October 14
 
 The [cold-reopen/input-admission follow-up](DSH-GUI-ON-PI.md#cold-reopen-and-input-admission-test-barriers--october-14)
-reproduces both 617eccd failure classes with actual SDK/Chromium barriers. It
-retires a held-refresh old document before deliberate Host shutdown and distinguishes
-early input Stop/explicit unknown-receipt review from delivered-provider Stop.
-The focused cases pass 2/2; broad source/ordinary/new-head acceptance remains pending.
-Product/UI/supplier/dependency/installed state and earlier failed runs stay preserved.
+at **7910acdac34d4c72c7e35a7752ae740a99165246** reproduces both 617eccd failure
+classes with actual SDK/Chromium barriers. It retires a held-refresh old document
+before deliberate Host shutdown and distinguishes early input Stop/explicit
+unknown-receipt review from delivered-provider Stop. Focused cases pass 2/2;
+source/ordinary **120/120 each across 43 files** pass, two workers, unchanged
+deadlines/no skips, 905 unchanged matching compiled files/155 npm instances.
+Product/UI/supplier/dependency/installed state and earlier failures are preserved.
+New-head hosted and broader physical/installed/platform acceptance remain open.
+
+[Validate 38547232811](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38547232811)
+at preceding **37da933a0b2d623088d9233264816c23c85cb074** fails two different
+SDK/core GUI observations: Insights cannot prepare its Send control at a recorded
+513×715 viewport; Jobs Start's center hits the composer textarea at 780×437.
+Causes remain unproven. The two recovery cases corrected above pass in that run;
+this does not establish full GUI readiness. Later Debian/native/package steps are
+skipped. SDK platform **38547232810** and Windows desktop **38547233186** pass;
+macOS **38547232904** fails packaging. Windows command **38547232990** and
+qualification **38547232932** remain in progress at this checkpoint. Retain the
+separate prior Windows producer-settlement and Office/native-notice gates.
 
 [Validate 38544790754](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38544790754)
 at **617eccd13404b41a5617af87a60c8f711e420ad6** fails Debian's SDK/core cohort:

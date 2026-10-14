@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+At **7910acdac34d4c72c7e35a7752ae740a99165246**, all 41 Harness Chromium
+files plus `runtime.test.mjs` and `pi-prompt-queue.test.mjs` pass **120/120 each**
+in source and separate ordinary production: two workers, unchanged deadlines/no
+skips. The 905 compiled-file set/bytes, 155 production npm instances and bundled
+Node 24.19.0 remain unchanged. A real held departing RPC reproduces refused reads;
+retiring its document before deliberate Host shutdown preserves exact native/
+request/tool evidence with zero browser errors. An actual SDK input gate reproduces
+early Stop's unknown receipt; explicit inspection/acknowledgment makes no provider
+request/replay, while the delivered-provider case waits for native delivery and
+actual HTTP receipt. Both controlled pre-fix cases fail; focused corrected cases
+pass 2/2. Original GUI/settings/drafts/collisions/themes/scopes and Host/queue
+assertions remain. [Qualification and remaining CI failures](../docs/DSH-GUI-ON-PI.md#cold-reopen-and-input-admission-test-barriers--october-14)
+keep later Insights/Jobs viewport failures separate; local passing runs do not
+close them or qualify installed/platform/public distribution acceptance.
+
 At **5318959c1b4346bcaa293983206e767a45d4e1f2**, memory-only mode source/
 ordinary Python **35/35 each** and Node context/client/native/provenance **18/18
 each** pass, no skips, two Node workers/unchanged deadlines. All 905 compiled

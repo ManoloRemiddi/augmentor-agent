@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[GUI recovery preparation](DSH-GUI-ON-PI.md#cold-reopen-and-input-admission-test-barriers--october-14)
+at **7910acdac34d4c72c7e35a7752ae740a99165246** reproduces departing cold-Host
+RPC refusals and early input Stop's unknown receipt. The tests retire a held-refresh
+document before shutdown and distinguish inspected/acknowledged preparation from
+actual delivered-provider Stop. No product/UI/dependency changes occur. Source/
+ordinary **120/120 each across 43 files** pass at two workers, unchanged deadlines/
+no skips; compiled 905-file set/bytes, 155 npm instances and Node stay unchanged.
+Preceding 37da933/Validate38547232811 passes these two older cases but fails narrow
+Insights Send readiness and Jobs pointer hit-testing; causes/new-head acceptance
+remain unproven. Keep these failures, broader live/installed/physical/platform and
+release gates open. Current owner preview/draft/candidate/feedback are preserved;
+a fresh review build still needs qualification before any installed adoption.
+
 [Explicit memory-only llama.cpp mode](CONTROLLED-MEMORY.md#memory-only-llamacpp-request-mode--october-14)
 at **5318959c1b4346bcaa293983206e767a45d4e1f2** preserves saved/default choices
 and refuses running-engine changes. Source/ordinary Python **35/35 each**, Node

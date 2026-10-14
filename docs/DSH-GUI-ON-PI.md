@@ -2,8 +2,8 @@
 
 ## Cold-reopen and input-admission test barriers — October 14
 
-The original nested-tool GUI and Search settings tests now prepare the specific
-state their assertions require. Product runtime, supplier GUI/layout, CSS, SDK,
+Source **7910acdac34d4c72c7e35a7752ae740a99165246** prepares the specific
+state required by the original nested-tool GUI and Search settings tests. Product runtime, supplier GUI/layout, CSS, SDK,
 dependencies and selected/running releases are unchanged.
 
 A controlled real-Chromium reproduction holds a departing `/api/rpc` refresh,
@@ -30,12 +30,24 @@ mask the settings collision. Original collision refusals, explicit recovery,
 keys/drafts/modes/themes/scopes and all original workflow assertions remain.
 
 Both unchanged baseline cases pass locally. Both controlled pre-fix cases fail
-with the same two error classes; corrected focused cases pass **2/2**, two workers,
-unchanged deadlines/no skips. These reproductions establish the mechanisms, not
-all scheduling details of the older hosted run. Broader source/ordinary and new-head
-hosted acceptance remain pending at this checkpoint. All data and provider/tool
-work are independently authored synthetic fixtures; no owner models, credentials,
-conversations, installed draft or service configuration is used or changed.
+with the same two error classes; corrected focused cases pass **2/2**. Final source
+and separate ordinary production each pass **120/120 across 43 files**, two workers,
+unchanged deadlines and no skips. The cohort covers all 41 original/inspection
+Chromium files plus actual Host lifecycle/input and durable queue contracts.
+Original appearance/branding, Context/Insights/sidebar/Fleet/provider views,
+workspace/draft/navigation/branch, tools/attachments/previews, settings/models,
+reasoning/prompts, plans/goals/jobs, MCP and Wiki/Search cases remain. All **905
+compiled files and their relative set** match, **155 production npm instances**
+and bundled Node 24.19.0 are unchanged. Only fixtures/tests/documentation change;
+there is no rebuilt application, UI redesign, supplier/dependency or installed update.
+
+The reproductions establish these mechanisms, not all scheduling details of the
+older hosted run. Later preceding **37da933 / Validate 38547232811** fails different
+Insights send-control and Jobs pointer observations at narrow viewports; their
+causes remain unproven. Local passes do not close those or qualify new-head hosted,
+physical/installed/platform acceptance. All provider/tool work is independently
+authored synthetic data; no owner model, credentials, conversations, installed draft
+or service configuration is used or changed.
 
 ## Hover-only workspace actions — October 14
 
