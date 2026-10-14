@@ -786,7 +786,13 @@ export class Host {
       const childMethod=({ 'session.jobNativeHistory':'session.nativeHistory','session.jobNativeRead':'session.nativeRead','session.jobObservations':'observation.list','session.jobPayload':'observation.payload'} as Record<string,string>)[method]!;
       const childId=this.jobInspectionTarget(parent.id,job.id);return this.handle(childMethod,{...p,sessionId:childId},id);
     }
-    case 'session.startJob':{const m=this.getMeta(p.sessionId);await this.load(m);return this.startJob(m,p.spec);}
+    case 'session.startJob':{
+      const m=this.getMeta(p.sessionId),existing=this.jobs.existing(m.id,p.spec);
+      // The exact owner/request fingerprint is a retained receipt, not a new
+      // admission. Inspect it before constructing a cold parent or integrations.
+      if(existing)return existing;
+      await this.load(m);return this.startJob(m,p.spec);
+    }
     case 'session.removeJob':{const m=this.getMeta(p.sessionId);return this.jobs.remove(m.id,identifier(p.jobId));}
     case 'prompt.improve':{
       const model=await this.selected(p.selection);
