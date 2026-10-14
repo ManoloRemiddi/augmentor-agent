@@ -25,7 +25,7 @@ function receipt(value:AccountLoginReceipt):AccountLoginReceipt{
  * and SDK errors never enter this file or conversation/observation history. */
 export class ModelAccountLogin {
  private rows=new Map<string,AccountLoginReceipt>();private current?:Current;
- private refreshNeeded=false;private storageError=false;
+ private refreshNeeded=false;private storageError=false;private changes=0;
  constructor(private file:string){
   try{
    if(!existsSync(file))return;
@@ -38,8 +38,9 @@ export class ModelAccountLogin {
   }catch{this.storageError=true;this.refreshNeeded=true;}
  }
  get busy(){return !!this.current;}
+ get revision(){return this.changes;}
  get needsRefresh(){return this.refreshNeeded||this.storageError;}
- private persist(){atomicJson(this.file,{version:'augmentor-model-account-login/1',needsRefresh:this.refreshNeeded,receipts:[...this.rows.values()]});}
+ private persist(){atomicJson(this.file,{version:'augmentor-model-account-login/1',needsRefresh:this.refreshNeeded,receipts:[...this.rows.values()]});this.changes++;}
  describe(requestId?:unknown){
   const row=requestId===undefined?[...this.rows.values()].at(-1):this.rows.get(identifier(requestId));if(requestId!==undefined&&!row)throw Error('Account sign-in receipt not found.');
   return {available:!this.storageError,busy:this.busy,needsRefresh:this.needsRefresh,receipt:row?{...row}:null,interaction:row&&this.current?.row===row?structuredClone(this.current.display):null,retention:'metadata-only; active interaction is transient',maxReceipts:256};
@@ -120,6 +121,7 @@ export class ModelAccountLogin {
  reconcile(){
   if(this.busy)throw Error('Wait for account sign-in to settle before refreshing models.');
   if(this.storageError)throw Error('Account receipt storage needs repair before reconciliation.');
+  if(!this.refreshNeeded)return;
   this.refreshNeeded=false;try{this.persist();}catch{this.storageError=true;this.refreshNeeded=true;throw Error('Account reconciliation could not be saved.');}
  }
  async close(){const current=this.current;if(current){this.cancel(current.row.requestId);await current.task;}}

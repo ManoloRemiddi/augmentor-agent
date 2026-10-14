@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {createHash,randomInt,randomUUID} from 'node:crypto';
-import {existsSync,readFileSync,mkdtempSync,rmSync} from 'node:fs';
+import {existsSync,readFileSync,mkdtempSync,rmSync,statSync} from 'node:fs';
 import {join,dirname} from 'node:path';
 import {ModelRuntime} from '@earendil-works/pi-coding-agent';
 import {InMemoryCredentialStore} from '@earendil-works/pi-ai';
@@ -30,15 +30,18 @@ function endpoint(value:unknown){
 export class ModelSettings {
   private hash='';private revision=randomInt(2**32,2**48);private tokens=new Map<string,{provider:string;index:number;hash:string}>();private tokenAt=new Map<string,string>();
   private defaults=ModelRuntime.create({modelsPath:null,credentials:new InMemoryCredentialStore(),refreshOnCreate:false,allowModelNetwork:false});
-  private probes=new Set<AbortController>();private appliedHash='';
+  private probes=new Set<AbortController>();private appliedHash='';private appliedChanges=0;
   private async oauthAccounts(signal?:AbortSignal){try{return new Set((await this.runtime().listCredentials({signal})).filter(credential=>credential.type==='oauth').map(credential=>credential.providerId));}catch{throw Error('Pi credential metadata is unavailable.');}}
   // The execution owner calls markApplied after runtime/session reconciliation;
   // persistence alone must never attest the current credential snapshot.
   constructor(private file:string,private runtime:()=>ModelRuntime,private guard:()=>void,private apply:(config:Data,validated:ModelRuntime,deferred:ReadonlySet<string>)=>Promise<void>){this.markApplied();}
   private fileHash(){return digest(existsSync(this.file)?readFileSync(this.file,'utf8'):JSON.stringify({providers:{}}));}
   get fingerprint(){return this.fileHash();}
+  // Non-authoritative change hint: bound periodic observation without parsing or
+  // exposing private profile bytes. Normal writes still check exact fingerprints.
+  get observationFingerprint(){try{if(existsSync(this.file)){const info=statSync(this.file);if(!info.isFile())return 'not-regular';if(info.size>4*1024*1024)return 'oversized:'+info.size+':'+info.mtimeMs+':'+info.ctimeMs;}return this.fileHash()+':'+this.appliedChanges+':'+this.revision;}catch{return 'unavailable';}}
   get applied(){return this.appliedHash===this.fileHash();}
-  markApplied(expected=this.fileHash()){if(this.fileHash()!==expected)throw Error('The model profile changed during application.');this.appliedHash=expected;}
+  markApplied(expected=this.fileHash()){if(this.fileHash()!==expected)throw Error('The model profile changed during application.');if(this.appliedHash!==expected)this.appliedChanges++;this.appliedHash=expected;}
   get activeDiscoveries(){return this.probes.size;}
   cancelDiscoveries(){for(const probe of this.probes)probe.abort();}
   private read(){

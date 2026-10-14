@@ -19,7 +19,7 @@ export class DshPiController {
     const access=await this.fetcher('/api/access',{headers:{Authorization:'Bearer '+this.token}}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error?.message||'Open a fresh Harness link.');return v;});
     const [host,catalog,list]=await Promise.all([this.rpc('host.describe'),this.rpc('models.list'),this.rpc('session.list')]);
     const workspaces=access.mode==='read-only'?null:await this.rpc('workspace.list');
-    this.update({readOnly:access.mode==='read-only',catalog,workspace:host.workspace,workspaces,sessions:list.items,phase:'ready',attachmentLimits:host.attachmentLimits,capabilities:host.capabilities??{}});
+    this.update({modelsRevision:undefined,readOnly:access.mode==='read-only',catalog,workspace:host.workspace,workspaces,sessions:list.items,phase:'ready',attachmentLimits:host.attachmentLimits,capabilities:host.capabilities??{}});
     const selected=access.sessionId||requestedSession||sessionStorage.getItem('augmentor-harness-session');
     const available=list.items.filter(x=>access.mode==='read-only'||!workspaces?.archivedSessionIds?.includes(x.sessionId));
     const row=available.find(x=>x.sessionId===selected)||available[0];
@@ -184,6 +184,7 @@ export class DshPiController {
       if(!this.state.readOnly&&Number.isSafeInteger(page.settingsRevision)&&page.settingsRevision!==this.state.settingsRevision)this.update({settingsRevision:page.settingsRevision});
       if(!this.state.readOnly&&Number.isSafeInteger(page.appearanceRevision)&&page.appearanceRevision>(this.state.appearanceRevision??-1))this.update({appearanceRevision:page.appearanceRevision});
       if(!this.state.readOnly&&Number.isSafeInteger(page.metafoldersRevision)&&page.metafoldersRevision>(this.state.metafoldersRevision??-1))this.update({metafoldersRevision:page.metafoldersRevision});
+      if(!this.state.readOnly&&this.state.capabilities?.modelSettingsRevisions===true&&Number.isSafeInteger(page.modelsRevision)&&page.modelsRevision>=0&&page.modelsRevision!==this.state.modelsRevision)this.update({modelsRevision:page.modelsRevision});
       if(!sessionId)return;
       const events=[...this.state.events],records=new Map(this.state.records.map(x=>[x.id,x])),interactions=new Map(this.state.interactions.map(x=>[x.rpcId,x]));let queue=this.state.queue,changed=false,familyChanged=false;
       for(const {frame} of page.frames){

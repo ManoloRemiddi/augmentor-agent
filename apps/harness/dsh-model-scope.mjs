@@ -2,13 +2,15 @@
 /** Private provider-edit seat. Accepted reads fence original supplier drafts;
  * ambiguous writes retire the page until an explicit fresh read. */
 export class DshModelScope {
- listeners=new Set();generation=0;closed=false;revision=null;accepted=false;pendingDiscoveries=new Set();
+ listeners=new Set();generation=0;closed=false;revision=null;accepted=false;pendingDiscoveries=new Set();mutations=0;acceptedHint=0;observedHint=0;
  snapshot={status:'idle',error:null,credentialError:null,writable:false,rows:[],accounts:[],namespaces:new Map()};
- constructor(controller){this.controller=controller;this.epoch=controller.epoch;this.store={getSnapshot:this.getSnapshot,subscribe:this.subscribe};this.unsubscribe=controller.subscribe(()=>{if(!this.current())this.fail('The model settings connection changed. Reopen Settings.');});}
+ constructor(controller){this.controller=controller;this.epoch=controller.epoch;this.store={getSnapshot:this.getSnapshot,subscribe:this.subscribe};this.unsubscribe=controller.subscribe(()=>{if(!this.current())this.fail('The model settings connection changed. Reopen Settings.');else this.observe();});this.observe();}
  subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};getSnapshot=()=>this.snapshot;
  current(){return !this.closed&&this.epoch===this.controller.epoch&&this.controller.state.phase==='ready'&&!this.controller.state.readOnly&&this.controller.state.capabilities?.modelSettings===true;}
  publish(value){this.snapshot=value;for(const fn of this.listeners)fn();}
  cancelDiscoveries(){for(const request of this.pendingDiscoveries)request.abort();}
+ observe(){const hint=this.controller.state.modelsRevision;if(this.controller.state.capabilities?.modelSettingsRevisions!==true||!Number.isSafeInteger(hint)||hint<0)return;this.observedHint=Math.max(this.observedHint,hint);if(this.accepted&&!this.mutations&&this.observedHint>this.acceptedHint){this.generation++;this.accepted=false;this.cancelDiscoveries();this.publish({...this.snapshot,writable:false,error:'Model settings changed. Refresh before editing. Unsaved form text is retained until you close or refresh.'});}}
+ acceptHint(value){if(this.controller.state.capabilities?.modelSettingsRevisions!==true)return;if(!Number.isSafeInteger(value?.modelsRevision)||value.modelsRevision<0||value.modelsRevision<this.observedHint)throw Error('The model settings view changed.');this.acceptedHint=value.modelsRevision;}
  suspend(){this.accepted=false;this.cancelDiscoveries();this.publish({...this.snapshot,status:'loading',writable:false,error:null});}
  fail(message){this.generation++;this.accepted=false;this.cancelDiscoveries();this.publish({...this.snapshot,status:'error',writable:false,error:message,rows:[],accounts:[],namespaces:new Map()});}
  checked(value){if(!value||value.writable!==true||!Number.isSafeInteger(value.revision)||!Array.isArray(value.rows)||!Array.isArray(value.namespaces)||value.namespaces.length!==1||value.namespaces[0]?.ns!=='llm-pi-ai'||value.namespaces[0].revision!==value.revision)throw Error('Invalid model settings descriptor.');return value;}
@@ -22,7 +24,7 @@ export class DshModelScope {
  adopt(value){
   const accounts=value.accounts??[];
   if(!Array.isArray(accounts)||accounts.length>256||accounts.some(row=>!row||typeof row.provider!=='string'||!row.provider||row.provider.length>256||typeof row.registered!=='boolean')||new Set(accounts.map(row=>row.provider)).size!==accounts.length)throw Error('Invalid stored account descriptor.');
-  this.revision=value.revision;this.accepted=true;this.publish({status:'ready',error:null,credentialError:null,writable:true,rows:value.rows,accounts,namespaces:new Map(value.namespaces.map(ns=>[ns.ns,ns]))});
+  this.acceptHint(value);this.revision=value.revision;this.accepted=true;this.publish({status:'ready',error:null,credentialError:null,writable:true,rows:value.rows,accounts,namespaces:new Map(value.namespaces.map(ns=>[ns.ns,ns]))});
  }
  async logoutAccount(provider){
   if(this.controller.state.capabilities?.modelAccountLogout!==true)throw Error('Stored account management is unavailable.');
@@ -31,8 +33,9 @@ export class DshModelScope {
  }
  async call(method,params={},mutation=false,signal){
   if(!this.current()||!this.accepted)throw Error('Refresh model settings before editing.');
-  const ticket=this.generation;try{const value=await this.controller.rpc(method,params,signal);if(ticket!==this.generation||!this.current())throw Error('The model settings scope changed.');return value;}
+  const ticket=this.generation;if(mutation)this.mutations++;try{const value=await this.controller.rpc(method,params,signal);if(ticket!==this.generation||!this.current())throw Error('The model settings scope changed.');if(mutation)this.acceptHint(value);return value;}
   catch{if(mutation&&ticket===this.generation&&!this.closed)this.fail('The edit outcome could not be confirmed. Refresh model settings before editing again. Nothing was retried.');throw Error(mutation?'The edit outcome could not be confirmed. Refresh before editing again. Nothing was retried.':'The model settings read could not be confirmed.');}
+  finally{if(mutation)this.mutations--;if(this.current())this.observe();}
  }
  operations={
   describeCredential:async ref=>{try{return await this.call('models.credentialDescribe',{ref});}catch{return undefined;}},

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cross-window Models invalidation](#cross-window-models-invalidation--october-14) adds non-secret operator revision hints to the existing poll transport. A changed view loses edit/discovery authority while preserving original open forms and unsaved text. Fresh reads are explicit; confirmed own saves carry settled stamps, and late reads/replies cannot restore stale authority. The original GUI/CSS and 583 supplier records remain unchanged. Initial strict check/build and focused 49/49 across eight files pass; complete source/ordinary qualification is pending. The current owner review and installed selection remain preserved.
+
 [Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict check/build, focused 41/41 and source/fresh ordinary **236/236 each across 60 files** pass, including all 44 Harness Chromium files. Authored-provider evidence uses real FileAuthStorage/Host/Chromium, callback/manual-code races and cold interruption. All 911 compiled files match; 20,847 dependency entries/155 production npm instances/Node 24.19.0 stay unchanged. Real provider, installed and new-head hosted acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
 
 [Stored Pi account sign-out](#stored-pi-account-sign-out--october-14) adds the original MIT DSH confirmation dialog and separate OAuth credential management. The newer separate MX review includes these controls; the selected installed preview is preserved. Current supported sign-in qualification is recorded in the owning guide above.
@@ -623,3 +625,69 @@ retain ARM parent-Stop and x64 assertion/settlement failures; macOS packaging
 retains Office MPL/libvips LGPL review gates. Their causes and new-head hosted
 acceptance remain open. The isolated Office source build is still running in
 compile stage; no finished engine or public-release qualification follows.
+
+## Cross-window Models invalidation — October 14
+
+The original DSH Models store expects pushed invalidations. The Pi seat previously
+checked stale profile revisions only on an attempted write. Two actual operator
+tabs can therefore show an old editable card after the other saves. A controlled
+new-contract probe against the preceding 039308e ordinary tree fails at automatic
+read-only retirement; its preceding compare-and-swap guard was already working.
+This is an added workflow contract, not evidence that stale writes had succeeded.
+
+The Host now exposes one ephemeral, non-secret `modelsRevision` hint through the
+existing operator-only welcome-page revision response and conversation event poll.
+No new timer, agent owner, SSE server, SDK session or background mutation is added.
+Read-only inspectors receive no hint and cannot access the welcome revision route.
+`modelSettingsRevisions` advertises the capability. The hint changes for observed
+profile bytes/revisions, applied profile round trips, managed account receipt
+transitions and admitted sign-out settlement, including unknown outcomes. It also
+reflects observed busy/unconfirmed state. Periodic profile observation is bounded
+at four MiB; oversized/unavailable/non-regular profiles yield opaque state markers,
+without parsing or publishing their contents or reading credential storage.
+
+The number belongs to this Host lifetime. It is a notification, not a profile CAS
+revision, credential identity, proof of application or authorization token. Existing
+profile checks, work/queue/goal guards, SDK reconciliation and no-replay policy
+remain authoritative. External credential replacement of the same type, complete
+virtual-provider/catalog changes, OS-global file watching and cross-process locks
+remain separate gaps. A profile restored between polls after an observed/applied
+change still retires an earlier namespace revision. A no-op refresh that completes
+between observations does not manufacture a changed profile/account receipt.
+
+A stale page retains its original rows/namespaces and mounted form state, disables
+editing through the original read-only controls, and cancels its own outstanding
+model discovery. It performs no automatic read, save or retry. Explicit Reload/
+Refresh or reopening obtains a new confirmed descriptor. The original read-only
+notice explains this state; supplier layout, CSS and control placement are intact.
+Role/connection revocation still clears private data, rather than retaining it.
+
+Settled model mutation/credential/sign-out/refresh replies carry the same hint.
+While its own write is pending, the scope records newer observations without
+mistaking its intermediate busy notification for another writer. A response may
+restore authority only if its settled stamp covers the newest observed hint.
+An older reply is unconfirmed, is never replayed, and requires a fresh read. Old
+polls cannot invalidate a newer accepted descriptor; reconnect clears the cached
+Host hint and old operator epochs cannot regain authority.
+
+Initial evidence: strict check/build and focused **49/49 across eight files**,
+two workers, unchanged existing deadlines and no skips/cancellations. Seven pure
+scope/transport cases cover preserved views, discovery cancellation, old hints/
+reads, own busy/save races, newer peers, revocation and operator-only polling. A
+bounded backend case covers applied A-to-B-to-A changes, no-op application and
+oversized private input. Actual original Chromium preserves a typed peer draft,
+disables its old Apply/input without a save, preserves server CAS refusal, and
+recovers after explicit refresh. It also checks welcome/inspection transport
+boundaries and retains all original account/endpoint/provider/history/no-new-
+inference checks. The prior account callback/cancel/cold-interruption flow passes.
+
+Earlier qualification preparation failures are retained: a poll stub lacked the
+ordinary refresh dependencies; an isolated Host-method fixture lacked initialized
+notification state and left its authored release barrier pending after refusal.
+Only that owned test child was stopped. Optional/default notification state fixes
+that fixture boundary; no test deadline is extended, privacy check bypassed or
+owner runtime restarted. Full source/ordinary/new-head hosted qualification is
+pending at this implementation checkpoint. This shared TypeScript/browser feature
+has no new OS adapter; seven pure cases join the existing three-platform SDK
+workflow (31 common account/model cases). Physical/installed/live-provider,
+complete model-management, broader migration/privacy/distribution gates remain.

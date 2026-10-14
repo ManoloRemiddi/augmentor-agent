@@ -69,3 +69,9 @@ test('invalid complete configurations never persist, resolve configured commands
  writeFileSync(f.file,'{malformed');assert(!f.settings.applied);assert.throws(()=>f.settings.markApplied('incorrect-fingerprint'),/changed during/);assert(!f.settings.applied);
  await f.settings.configure(config());assert.deepEqual(f.stored(),config());assert(f.settings.applied);
 });
+
+test('model change observation detects applied round trips, ignores no-op application and bounds oversized profile hints',async t=>{
+ const f=await fixture(t),before=f.settings.observationFingerprint,original=f.raw();f.settings.markApplied();assert.equal(f.settings.observationFingerprint,before);
+ const next=f.stored();next.providers['fixture-a'].name='Another authored name';writeFileSync(f.file,JSON.stringify(next));f.settings.markApplied();writeFileSync(f.file,original);f.settings.markApplied();assert.notEqual(f.settings.observationFingerprint,before,'an applied A-to-B-to-A change cannot disappear between polls');
+ const large='AUTHORED_PRIVATE_BODY'.repeat(230000);writeFileSync(f.file,large);const hint=f.settings.observationFingerprint;assert(hint.startsWith('oversized:'));assert(hint.length<160);assert(!hint.includes('AUTHORED'));assert.equal(f.raw(),large);
+});
