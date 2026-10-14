@@ -24,6 +24,7 @@ import {sessionFamily} from './session-family.js';
 import {contextPreferences,contextPreferenceChange,CONTEXT_PREFERENCE_FIELDS} from './context-preferences.js';
 import {ShortcutPreferences} from './shortcut-preferences.js';
 import {ModelSettings} from './model-settings.js';
+import {ModelAccountLogin,accountDeviceId} from './model-account-login.js';
 import {ToolArgumentSnapshots} from './tool-argument-snapshots.js';
 import {developerTools,developerToolsChange} from './developer-tools.js';
 import {AppearancePreferences} from './appearance-preferences.js';
@@ -148,9 +149,14 @@ export class Host {
   async attachmentImage(sid:string,ref:any){this.getMeta(sid);return this.attachments.image(sid,ref);}
   readonly interactions:Interactions;
   modelRuntime!:ModelRuntime;
-  private modelSettingsProblem=false;
-  private modelSettingsBusy=false;
-  private modelSettingsGuard(){if(this.quiescing||this.mcpReloading||this.jobs.busy||this.compactions.busy||this.improvements.busy||this.mcpManagement.busy||[...this.metadata.values()].some(m=>m.running))throw Error('Finish or stop active work before changing model settings.');}
+  private modelConfigurationProblem=false;
+  private modelConfigurationBusy=false;
+  private modelAccounts=new ModelAccountLogin(join(this.dirs.state,'model-account-logins.json'));
+  private get modelSettingsProblem(){return !!(this.modelConfigurationProblem||this.modelAccounts?.needsRefresh);}
+  private set modelSettingsProblem(value:boolean){this.modelConfigurationProblem=value;}
+  private get modelSettingsBusy(){return !!(this.modelConfigurationBusy||this.modelAccounts?.busy);}
+  private set modelSettingsBusy(value:boolean){this.modelConfigurationBusy=value;}
+  private modelSettingsGuard(){if(this.quiescing||this.modelSettingsBusy||this.mcpReloading||this.jobs.busy||this.compactions.busy||this.improvements.busy||this.mcpManagement.busy||[...this.metadata.values()].some(m=>m.running))throw Error('Finish or stop active work before changing model settings.');}
   private async applyModelSettings(config:Data,validated:ModelRuntime,deferred:ReadonlySet<string>){
     this.modelSettingsGuard();
     const file=join(this.dirs.agent,'models.json');let previous:Data|undefined;
@@ -182,7 +188,7 @@ export class Host {
     const refreshed=await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000),...(providers?{providers}:{})});
     if(refreshed.aborted||refreshed.errors.size||this.modelRuntime.getError()||this.modelSettings.fingerprint!==fingerprint)throw Error('Pi could not apply the model configuration.');
     await this.reconcileModelOwners();
-    this.modelSettings.markApplied(fingerprint);this.modelSettingsProblem=false;
+    this.modelSettings.markApplied(fingerprint);this.modelAccounts?.reconcile();this.modelSettingsProblem=false;
   }
   private async reconcileModelOwners(){
     for(const r of this.loaded.values()){
@@ -210,6 +216,27 @@ export class Host {
       return view;
     }catch{throw Error('Account sign-out could not be confirmed. Refresh model settings before starting work or trying again. Nothing was retried.');}
     finally{this.modelSettingsBusy=false;}
+  }
+  private async describeModelAccounts(){
+    const credentials=await this.modelRuntime.listCredentials({signal:AbortSignal.timeout(5000)}).catch(()=>{throw Error('Pi credential metadata is unavailable.');});
+    const providers=this.modelRuntime.getProviders().filter(provider=>typeof provider.auth.oauth?.login==='function').map(provider=>({provider:provider.id,name:provider.auth.oauth!.name}));
+    if(providers.length>256||credentials.length>256)throw Error('The account catalog exceeds the editor limit.');
+    return {...this.modelAccounts.describe(),providers,accounts:credentials.filter(row=>row.type==='oauth').map(row=>({provider:row.providerId,registered:!!this.modelRuntime.getProvider(row.providerId)}))};
+  }
+  private startModelAccount(provider:unknown,revision:unknown,requestId:unknown){
+    this.modelSettingsGuard();
+    if(this.modelSettingsProblem||!this.modelSettings.applied)throw Error('Refresh model settings before signing in.');
+    if([...this.metadata.values()].some(m=>!this.queue(m).paused&&!!this.queue(m).next)||[...this.loaded.values()].some(r=>r.goals.armed))throw Error('Pause queued prompts and goals before signing in.');
+    const account=this.modelSettings.requireOAuthLogin(provider,revision),fingerprint=this.modelSettings.fingerprint;
+    this.modelSettings.cancelDiscoveries();
+    return this.modelAccounts.start(account,requestId,async interaction=>{
+      await this.modelRuntime.login(account,'oauth',interaction,{agentName:'Augmentor Harness',getDeviceId:()=>accountDeviceId(join(this.dirs.agent,'account-device.json'))});
+      if(this.quiescing||this.modelRuntime.getError()||this.modelSettings.fingerprint!==fingerprint)throw Error('Account configuration is unconfirmed.');
+      await this.reconcileModelOwners();
+      const credentials=await this.modelRuntime.listCredentials({signal:interaction.signal});
+      if(!credentials.some(row=>row.providerId===account&&row.type==='oauth'))throw Error('Account credential is unconfirmed.');
+      this.modelSettings.markApplied(fingerprint);
+    });
   }
   private async reloadModelSettings(){
     this.modelSettingsGuard();this.modelSettingsBusy=true;this.modelSettingsProblem=true;this.modelSettings.cancelDiscoveries();
@@ -741,7 +768,10 @@ export class Host {
     if(this.quiescing&&method!=='host.describe')throw new Error('Runtime is closing for maintenance. No action was submitted.');
     if(['workspaceFiles.stat','workspaceFiles.read','workspaceFiles.readBytes'].includes(method)){try{const pRead=method==='workspaceFiles.readBytes'&&p.range===undefined?{...p,range:{offset:0,length:256*1024}}:p;return {ok:true,value:await this.previewFile(p.sessionId,method==='workspaceFiles.stat'?'stat':method==='workspaceFiles.read'?'read':'bytes',pRead)};}catch(error){const e=error as any;return {ok:false,error:{code:e.code??'gateway/internal',message:e.message,details:e.details??{}}};}}
     if(method==='session.fileReferences')return this.listFileReferences(p.sessionId,p.query);
-    if(method==='setup.test')return this.setup.test(p);
+    if(method==='models.accountStatus')return this.modelAccounts.describe(p.requestId);
+    if(method==='models.accountRespond')return this.modelAccounts.respond(p.requestId,p.promptId,p.value);
+    if(method==='models.accountCancel')return this.modelAccounts.cancel(p.requestId);
+    if(method==='setup.test'){if(this.modelSettingsBusy)throw Error('Finish model account changes before testing another connection.');return this.setup.test(p);}
     if(method==='setup.cancel')return this.setup.cancel();
     if(method==='models.settingsDiscover')return this.discoverModels(p.request??{});
     if(method==='session.cancel')return this.cancel(p.sessionId);
@@ -757,6 +787,7 @@ export class Host {
     const result=await run;return result instanceof SteeringReply?result.settled.finally(()=>this.wakeGoals()):result;
   }
   async handle(method:string,p:Data,id:string):Promise<any>{
+    if(this.modelAccounts?.busy&&['session.updateGoal','session.updateQueue','session.mcpConfigure','session.mcpAction','session.organize','session.trimTools','workspace.remove','workspace.move','reasoning.configure'].includes(method))throw Error('Finish or cancel account sign-in before changing shared model execution settings.');
     if((this.modelSettingsProblem||this.modelSettingsBusy)&&(['session.prompt','session.continueQueue','session.selectModel','session.selectReasoning','session.compact','session.create','session.branch','session.prepareBranch','session.startJob','prompt.improve','setup.save'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Refresh model settings to confirm the stored configuration before starting or changing work.');
     if(p.sessionId&&this.organization.archived(p.sessionId)&&(['session.prompt','session.continueQueue','session.startJob','session.updateGoal','session.compact','prompt.improve','session.prepareBranch'].includes(method)||method==='session.branch'&&p.prepared===true))throw Error('Restore the conversation before starting work.');
     if(this.mcpReloading&&(['prompt.improve','setup.save','models.configure','models.reload','session.create','session.branch','session.prepareBranch','session.updateGoal','session.trimTools','session.compact','session.selectModel','session.selectReasoning','reasoning.configure','session.prompt','session.continueQueue'].includes(method)||method==='session.updateQueue'&&p.action?.kind==='steer'))throw Error('Finish MCP session reload before changing or starting a conversation.');
@@ -770,6 +801,8 @@ export class Host {
     case 'models.credentialDescribe':return this.modelSettings.credential(p.ref);
     case 'models.credentialSet':return this.modelSettings.setCredential(p.ref,p.value,p.revision);
     case 'models.accountLogout':return this.logoutModelAccount(p.provider,p.revision);
+    case 'models.accountDescribe':return this.describeModelAccounts();
+    case 'models.accountStart':return this.startModelAccount(p.provider,p.revision,p.requestId);
     case 'models.settingsDiscover':return this.discoverModels(p.request??{});
     case 'models.settingsRefresh':await this.reloadModelSettings();return this.modelSettings.describe();
     case 'session.compaction':{const m=this.getMeta(p.sessionId);return this.compactions.describe(m.id);}
@@ -834,8 +867,9 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{searchSettings:process.platform==='linux',searchModes:process.platform==='linux',wikiSettings:process.platform==='linux',durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelDiscovery:true,modelAccountLogout:true,shortcuts:true,appearancePreferences:true,metafolders:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,activeModelAccountLogins:this.modelAccounts?.busy?1:0,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{searchSettings:process.platform==='linux',searchModes:process.platform==='linux',wikiSettings:process.platform==='linux',durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelDiscovery:true,modelAccountLogout:true,modelAccountLogin:true,shortcuts:true,appearancePreferences:true,metafolders:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
+      if(this.modelAccounts?.busy)throw Error('Cancel and settle account sign-in before shutting down the runtime.');
       if(this.compactions.busy)throw Error('Stop and settle Pi compaction before shutting down the runtime.');
       if(this.uploads)throw Error('Finish file uploads before shutting down the runtime.');
       if(this.previewReads)throw Error('Finish file-preview reads before shutting down the runtime.');
@@ -1074,7 +1108,7 @@ export class Host {
     case 'prompts.improvementSave':return promptCall('prompts.improvement.save',p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.quiescing=true;this.modelSettings.cancelDiscoveries();await this.officePreview?.close();this.fileReferences.close();this.setup.cancel();await this.jobs.close();await this.improvements.close();for(const m of this.metadata.values())if(this.compactions.busySession(m.id)){this.compactions.cancelSession(m.id);await this.compactions.waitSession(m.id);}for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}await this.mcpManagement.settled();}
+  async close(){this.quiescing=true;await this.modelAccounts.close();this.modelSettings.cancelDiscoveries();await this.officePreview?.close();this.fileReferences.close();this.setup.cancel();await this.jobs.close();await this.improvements.close();for(const m of this.metadata.values())if(this.compactions.busySession(m.id)){this.compactions.cancelSession(m.id);await this.compactions.waitSession(m.id);}for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}await this.mcpManagement.settled();}
 }
 
 /** Normalized public native usage, including nested tools, with one owner. */

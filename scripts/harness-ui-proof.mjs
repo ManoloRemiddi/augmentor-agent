@@ -38,6 +38,15 @@ if(wikiVault){
 if(wikiExtension){writeFileSync(wikiExtension,`import {existsSync} from 'node:fs';export default pi=>{if(existsSync(${JSON.stringify(wikiExtension+'.collision')}))pi.registerTool({name:'wiki_query',label:'Authored collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[wikiExtension],skills:[]}));}
 if(searchExtension){writeFileSync(searchExtension,`import {existsSync,writeFileSync} from 'node:fs';export default pi=>{pi.on('input',async(e,ctx)=>{if(e.text==='SEARCH_PREPARE_HOLD'){writeFileSync(ctx.cwd+'/search-input-started','started');const end=Date.now()+10000;while(!existsSync(ctx.cwd+'/search-input-release')){if(Date.now()>end)throw Error('Authored input release was not received');await new Promise(r=>setTimeout(r,10));}}});if(existsSync(${JSON.stringify(searchExtension+'.collision')}))pi.registerTool({name:'web_search',label:'Authored search collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[searchExtension],skills:[]}));}
 const model=http.createServer(async(req,res)=>{
+  if(process.env.AUGMENTOR_HARNESS_PROOF_ACCOUNT_LOGIN==='1'&&req.url?.startsWith('/fixture/account-authorization')){
+    const nonce=new URL(req.url,'http://fixture.invalid').searchParams.get('state');if(!nonce||!/^[-a-f0-9]{36}$/.test(nonce)){res.writeHead(400).end();return;}
+    res.writeHead(200,{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"});res.end('<!doctype html><title>Authored account provider</title><h1>Authored account provider</h1><form method="post" action="/fixture/account-callback"><input type="hidden" name="nonce" value="'+nonce+'"><button type="submit">Authorize fixture account</button></form>');return;
+  }
+  if(process.env.AUGMENTOR_HARNESS_PROOF_ACCOUNT_LOGIN==='1'&&req.method==='POST'&&req.url==='/fixture/account-callback'){
+    let body='';for await(const chunk of req){body+=chunk;if(body.length>4096){res.writeHead(413).end();return;}}
+    const nonce=new URLSearchParams(body).get('nonce');if(!nonce||!/^[-a-f0-9]{36}$/.test(nonce)){res.writeHead(400).end();return;}
+    writeFileSync(join(root,'account-login-callback.json'),JSON.stringify({nonce,code:'fixture-code'}),{mode:0o600});res.writeHead(200,{'content-type':'text/plain'}).end('Authored account callback delivered.');return;
+  }
   if(searchExtension&&req.method==='POST'&&req.url==='/fixture/release-search-input'){
     writeFileSync(join(workspace,'search-input-release'),'Authored input release.');res.writeHead(204).end();return;
   }
@@ -147,6 +156,11 @@ const model=http.createServer(async(req,res)=>{
   res.end('data: [DONE]\n\n');
 });
 model.listen(0,'127.0.0.1');await once(model,'listening');
+if(process.env.AUGMENTOR_HARNESS_PROOF_ACCOUNT_LOGIN==='1'){
+ const extension=join(root,'account-login-provider.mjs'),resourcePath=join(config,'resources.json'),helper=new URL('./fixtures/account-login-provider.mjs',import.meta.url).href;
+ writeFileSync(extension,'import register from '+JSON.stringify(helper)+';export default pi=>register(pi,'+JSON.stringify({root,authorizeUrl:'http://127.0.0.1:'+model.address().port+'/fixture/account-authorization'})+');');
+ const resources=existsSync(resourcePath)?JSON.parse(readFileSync(resourcePath,'utf8')):{sources:[],skills:[]};resources.sources.push(extension);writeFileSync(resourcePath,JSON.stringify(resources));
+}
 const selection={provider:'fixture',model:'harness-fixture'};
 // Anthropic's client appends /v1/messages; the other fixture clients use /v1
 // as their base. This is test endpoint configuration, never owner model setup.
@@ -221,7 +235,7 @@ process.on('SIGINT',()=>void close());process.on('SIGTERM',()=>void close());
 // Explicit test-only cold reopen: keep independently authored state and the
 // synthetic provider, stop the idle Host, then construct a fresh Host process.
 process.on('message',message=>{
-  if(process.env.AUGMENTOR_HARNESS_PROOF_REOPEN==='1'&&message?.type==='reopen'&&!closing&&!reopenRequested&&child.exitCode===null){reopenRequested=true;child.kill('SIGTERM');}
+  if(process.env.AUGMENTOR_HARNESS_PROOF_REOPEN==='1'&&message?.type==='reopen'&&!closing&&!reopenRequested&&child.exitCode===null){reopenRequested=true;child.kill(process.env.AUGMENTOR_HARNESS_PROOF_ACCOUNT_LOGIN==='1'&&process.env.AUGMENTOR_HARNESS_PROOF_ACCOUNT_CRASH==='1'?'SIGKILL':'SIGTERM');}
 });
 process.channel?.unref();
 while(!closing){

@@ -9,6 +9,7 @@ export class DshModelScope {
  current(){return !this.closed&&this.epoch===this.controller.epoch&&this.controller.state.phase==='ready'&&!this.controller.state.readOnly&&this.controller.state.capabilities?.modelSettings===true;}
  publish(value){this.snapshot=value;for(const fn of this.listeners)fn();}
  cancelDiscoveries(){for(const request of this.pendingDiscoveries)request.abort();}
+ suspend(){this.accepted=false;this.cancelDiscoveries();this.publish({...this.snapshot,status:'loading',writable:false,error:null});}
  fail(message){this.generation++;this.accepted=false;this.cancelDiscoveries();this.publish({...this.snapshot,status:'error',writable:false,error:message,rows:[],accounts:[],namespaces:new Map()});}
  checked(value){if(!value||value.writable!==true||!Number.isSafeInteger(value.revision)||!Array.isArray(value.rows)||!Array.isArray(value.namespaces)||value.namespaces.length!==1||value.namespaces[0]?.ns!=='llm-pi-ai'||value.namespaces[0].revision!==value.revision)throw Error('Invalid model settings descriptor.');return value;}
  async load(){

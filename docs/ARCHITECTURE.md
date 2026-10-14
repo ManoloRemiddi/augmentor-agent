@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. Strict check/build and focused 38/38 across seven files pass with an authored provider, real FileAuthStorage/Host/Chromium and cold interruption; wider source/ordinary and real provider/installed acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
+
 [New Session input ownership](DSH-GUI-ON-PI.md#new-session-input-ownership--october-14)
 advances only the Harness view epoch/creation scope. The existing Host still creates
 one AgentSession per conversation and owns drafts/queues. Loading disables the old

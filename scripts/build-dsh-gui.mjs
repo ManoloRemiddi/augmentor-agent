@@ -110,8 +110,8 @@ const result=await build({
 });
 const allBrowserInputs=[...new Set([...Object.keys(result.metafile.inputs),...Object.keys(excelWorker.metafile.inputs)])];
 // Exact reviewed presentation files only. DSH account controllers, transport,
-// sign-in/backend and analytics remain excluded from the Pi browser graph.
-const accountPresentation=new Set(['apps/harness/vendor/dsh/packages/client/ui-settings-account/src/client/SignOutDialog.tsx','apps/harness/vendor/dsh/packages/client/ui-settings-account/src/client/SignInDialog.module.css']);
+// backend and analytics remain excluded from the Pi browser graph.
+const accountPresentation=new Set(['apps/harness/vendor/dsh/packages/client/ui-settings-account/src/client/SignOutDialog.tsx','apps/harness/vendor/dsh/packages/client/ui-settings-account/src/client/SignInDialog.module.css','apps/harness/vendor/dsh/packages/client/ui-settings-account/src/client/SignInDialog.tsx']);
 const forbidden=allBrowserInputs.filter(path=>!accountPresentation.has(path)&&/vendor\/dsh\/.*(?:client-runtime|product-analytics|ui-settings-account|ui-settings-session-log|packages\/host)|vendor\/dsh-context\/(?:src\/host|src\/client\/(?:modelPrices|historyPage|latestVersion|settingsJump|balance|skills))|node_modules\/(?:@deepseek-ai\/cordis|@opencode-ai\/models|posthog|@sentry)/.test(path));
 if(forbidden.length)throw Error('Supplier runtime/analytics entered the browser graph: '+forbidden.join(', '));
 const npmRoots=new Map();

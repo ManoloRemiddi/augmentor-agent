@@ -11,5 +11,5 @@ export function OriginalModels({controller,children}){
  const scope=useMemo(()=>new DshModelScope(controller),[controller]);
  useEffect(()=>()=>scope.close(),[scope]);
  const useSnapshot=selector=>selector(useSyncExternalStore(scope.subscribe,scope.getSnapshot));
- return <><ModelsSection controller={scope} useSnapshot={useSnapshot} operations={scope.operations} schema={modelSchema} t={t} renderSlot={(name,owner,options={})=>name==='settings.models.footer'?<DshModelAccounts scope={scope}/>:options.fallback??null}/><div className="augmentor-extension"><Button disabled={!scope.current()} onClick={()=>void scope.refresh()}>Refresh model settings</Button>{children}</div></>;
+ return <><ModelsSection controller={scope} useSnapshot={useSnapshot} operations={scope.operations} schema={modelSchema} t={t} renderSlot={(name,owner,options={})=>options.fallback??null}/><DshModelAccounts scope={scope}/><div className="augmentor-extension"><Button disabled={!scope.current()} onClick={()=>void scope.refresh()}>Refresh model settings</Button>{children}</div></>;
 }

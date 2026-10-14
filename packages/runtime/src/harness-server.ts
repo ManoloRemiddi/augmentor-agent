@@ -21,6 +21,7 @@ const allowed = new Set([
   'observation.describe', 'observation.configure', 'observation.list', 'observation.search', 'observation.payload', 'observation.clear',
   'search.describe','search.set','search.refresh','wiki.describe','wiki.set','wiki.refresh','wiki.receipts','wiki.review','metafolders.describe','metafolders.set','appearance.describe','appearance.set','shortcuts.describe', 'shortcuts.edit', 'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
   'models.settingsDescribe','models.settingsMutate','models.settingsDiscover','models.credentialDescribe','models.credentialSet','models.settingsRefresh','models.accountLogout',
+  'models.accountDescribe','models.accountStart','models.accountStatus','models.accountRespond','models.accountCancel',
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
 type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};

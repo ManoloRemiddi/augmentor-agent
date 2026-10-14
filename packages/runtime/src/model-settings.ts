@@ -87,6 +87,12 @@ export class ModelSettings {
     if(!this.runtime().getProvider(provider))throw Error('Register this provider in Pi before managing its stored account.');
     return provider;
   }
+  requireOAuthLogin(value:unknown,revision:unknown){
+    const provider=this.provider(value);this.read();
+    if(revision!==this.revision)throw Error('Model settings changed. Refresh before signing in.');
+    if(typeof this.runtime().getProvider(provider)?.auth.oauth?.login!=='function')throw Error('This registered provider has no OAuth sign-in method.');
+    return provider;
+  }
   async credential(reference:unknown){
     const oauth=await this.oauthAccounts();
     this.read();const providers=new Set([...this.runtime().getProviders().map(p=>p.id),...Object.keys(this.read().config.providers)]);

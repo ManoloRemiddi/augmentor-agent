@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi account dialogs](HARNESS-MODEL-ACCOUNTS.md) add one verified upstream MIT SignInDialog blob at d743267388641bc76f17c45ce8b4c231aed1d32c, with marked child/prompt and exact-provider-URL adaptation. All prior 582 source records remain unchanged; the current selection is 583 files and the actual account browser graph is exactly sign-in/sign-out/CSS. Supported Pi 1.1.0 APIs own OAuth; no DSH account backend or new npm dependency is included.
+
 [Stored Pi accounts](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) selects two additional exact public MIT DSH blobs, `ui-settings-account/src/client/SignOutDialog.tsx` and `SignInDialog.module.css`, at d743267388641bc76f17c45ce8b4c231aed1d32c. The retained public licence matches, all previous 580 source records stay identical, and the GUI selection is now 582 files. Only those two account presentation inputs enter the actual browser graph; account controllers/transport/backend/analytics remain excluded. Supported Pi 1.1.0 logout and source/fresh ordinary 217/217 qualification add no npm dependency or installed promotion.
 
 [Linux Office engine source preparation](HARNESS-OFFICE-PREVIEWS.md#isolated-linux-engine-build--october-14)
