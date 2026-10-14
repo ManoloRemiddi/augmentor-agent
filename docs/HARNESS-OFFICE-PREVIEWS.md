@@ -11,6 +11,88 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Controlled linker resources — October 14
+
+The actual pinned toolchain reports **LLD 21.0.0**. A tiny independently authored
+C++ probe compiles and executes with `--threads=1` and `--thinlto-jobs=1`; the
+captured actual native-linker invocation verifies both flags, beyond setting a
+compiler-helper environment variable. A separate private copy of the retained
+configured Debian 13 tree then receives the same controls through the
+[published driver](../release/office-rebuild/run-thread-limited.sh). Original
+Core/recipe/configuration identities are checked before copying. Full LTO and
+the engine's runtime memory/thread flags remain unchanged; helper/debug output
+goes to disk. Extra resource flags have a separate provenance receipt because
+the supplier's build identity does not capture them.
+
+The actual full-engine relink receives both native flags but still terminates
+**exit 1 / OOMKilled=true at 18:20:29 UTC**, with a **6,442,450,944-byte** cgroup
+peak, exactly the **6 GiB** cap. Two CPUs, one make job, no extra swap and 1,024
+processes remain enforced. Both failed trees/containers/logs are retained;
+there is no completed engine, output comparison or new source approval. The
+[environment record](../release/office-rebuild/environment.json) distinguishes
+this trial from the earlier GCC/configuration and ordinary-link failures.
+No larger-memory retry, service shutdown, cache eviction, model/GPU/voice change
+or installed/review mutation is made. The existing nine packaging/export/refusal
+cases pass; the public gate remains closed.
+
+[Emscripten's FAQ](https://emscripten.org/docs/getting_started/FAQ.html) documents
+compiler helper concurrency, and [LLVM's linker options](https://github.com/llvm/llvm-project/blob/main/lld/wasm/Options.td)
+describe native thread controls. Current online documentation is supplementary;
+the pinned tool's own help and captured command establish what this trial used.
+Those controls do not reduce full LTO to a different optimization mode or prove
+that the preferred-entry source gap is resolved.
+
+## Native Linux Office feasibility — October 14
+
+The [standalone authored probe](../release/office-rebuild/native-sandbox-probe.py)
+tests the existing Debian **LibreOffice 4:25.2.3-2+deb13u8** and
+**bubblewrap 0.12.0-1~deb13u1** as a possible Linux backend. It is outside the
+application runtime: no default, supplier pin, GUI, licence gate, selected build,
+review process or user data changes. Reproduce only in a new private output
+directory using [the probe recipe](../release/office-rebuild/README.md#native-sandbox-feasibility-probe).
+The exact-source combined receipt is pending publication in this checkpoint.
+
+Each conversion uses the installed `oosplash` launcher and fresh private profile,
+home and cache directories. It exposes a fixed read-only system/library/registry/
+language payload and bounded Liberation font files, a read-only authored input,
+and owned writable scratch only. Network/PID/user namespaces, dropped capabilities,
+cleared environment, no display/DBus/GPU and per-process resource limits preserve
+isolation. This is a Debian x64 prototype; other architectures/layouts are not
+silently declared supported. `soffice.bin` alone initially returns profile-startup
+code 81; the installed launcher handles that initialization instead of a new
+generic action-replay loop. Earlier missing-registry and direct-launch failures
+are retained.
+
+The installed package's source version exists in
+[Debian Sources](https://sources.debian.org/src/libreoffice/4:25.2.3-2%2Bdeb13u8).
+That establishes availability of the version's public preferred source, not an
+actual native rebuild, complete linked closure or public redistribution approval.
+The installed Debian copyright record retains **MPL-2.0** and separate Apache/
+third-party terms. System LibreOffice is not MIT and is not relabelled as such.
+No library, font, system binary or generated document is copied into the app.
+
+[Official PDF export parameters](https://help.libreoffice.org/latest/en-US/text/shared/guide/pdf_params.html)
+describe CLI filter properties. Merely accepting the requested 192 DPI would not
+establish rendering parity; the probe includes an actual raster measurement.
+Two preliminary combined attempts already convert all six formats and pass the
+isolation/font checks, then fail their cancellation observer. That observer
+misses children spawned by a worker thread and cannot qualify termination from
+the main thread's child list. The corrected probe walks every thread in its own
+process tree; separate actual startup and export-dispatch cancellation checks
+pass. These failures remain explicit rather than being relabelled as full passes.
+
+This path could eliminate reliance on the opaque npm entry/Wasm closure in a
+future Linux distribution while keeping the original MIT DSH GUI and provider/
+queue. It is not yet integrated or promoted. Before adopting it, preserve all six
+formats, authorized complete-byte/current-version reads, original missing-font
+metadata/custom roots/fallbacks and budgets, ZIP/malformed/password/error/output
+bounds, shared-reader cancellation/cache/maintenance/timeout/disposal and transient
+scratch guarantees. Qualify macro/external-resource negatives, complex layouts,
+original actual GUI and ordinary/installed artifacts, native dependency/source/
+notice policy and OS adapters. macOS/Windows remain explicit adapter gaps with the
+same feature contract. No fallback to a weaker unisolated process is authorized
+by this feasibility evidence. DSH and running review drafts remain available.
+
 ## Isolated Linux engine build — October 14
 
 The [rebuild environment](../release/office-rebuild/README.md) now records an actual

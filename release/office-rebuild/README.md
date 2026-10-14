@@ -92,3 +92,72 @@ linking, but `wasm-ld` received SIGKILL and the container exited 1 with
 observed final link. Keep its failed state; assess available host resources and
 record a separate resource profile before any resumed attempt. No engine receipt
 or conversion/rendering comparison is qualified.
+
+## Controlled final-link experiment — October 14
+
+`run-thread-limited.sh` resumes verify/compile/package in a **separate copy** of
+the configured Debian 13 trial, preserving the failed original tree and the same
+container-local `/office` paths. The driver expects `core`, `emsdk`, `recipe`,
+`tools/node`, `tarballs` and `build-debian13` under that private root. Copy these
+inputs with their original paths before invoking it; do not run it in a selected
+application or the original failed-build directory. Mount the reviewed driver
+read-only in the same pinned container, with the preceding CPU/RAM/swap/PID caps.
+
+The actual pinned linker reports **LLD 21.0.0**. `EMCC_CORES=1` and
+`BINARYEN_CORES=1` limit compiler helpers; `EMCC_CFLAGS` explicitly forwards
+`-Wl,--threads=1,--thinlto-jobs=1` to native `wasm-ld`. Full `-flto`, runtime
+Pthread pool and memory flags remain unchanged. Debug intermediates go to disk.
+The driver records these extra resource flags separately because the supplier's
+existing build identity does **not** capture them. Never infer byte identity or
+public approval from that original identity after adding flags.
+
+A tiny authored C++ probe first compiles and runs with both native flags. The
+actual full-engine relink also receives both flags, but exits **1 / OOMKilled**
+at **18:20:29 UTC**, with a **6,442,450,944-byte** cgroup peak, exactly its limit.
+Both original and controlled failures remain retained. Reducing linker threads
+alone does not qualify a 6 GiB build or solve the missing preferred-entry source.
+See the [environment record](environment.json) and
+[Office guide](../../docs/HARNESS-OFFICE-PREVIEWS.md#controlled-linker-resources--october-14).
+
+## Native sandbox feasibility probe
+
+`native-sandbox-probe.py` is an independently authored **Linux x64 diagnostic**,
+not a shipped Host helper, automatic fallback or qualified replacement engine.
+It requires already installed Debian-compatible LibreOffice Writer/Calc/Impress,
+bubblewrap, Liberation fonts, fontconfig, liblangtag, Python 3.13 and Poppler.
+It installs no package and refuses an existing output directory:
+
+```sh
+python3 -B release/office-rebuild/native-sandbox-probe.py \
+  --source-ref "$(git rev-parse HEAD)" \
+  --output "$PWD/outputs/native-office-new-attempt"
+```
+
+The script creates independent flat ODF fixtures, exports all six required Office
+formats, then reads actual converted PDF text. Each command gets fresh private
+profile/home/cache directories, a read-only input and bounded read-only system
+payload, dropped capabilities, cleared environment and separate network/PID/user
+namespaces. No owner home, GPU, display, DBus, service, model or personal document
+is exposed. The fixed payload is deliberately x64/Debian-specific; a different
+architecture or filesystem layout needs its own adapter qualification.
+
+Synthetic negative checks cover outside-file/host-environment/process/loopback
+access, read-only input/system files, bounded Liberation font availability and
+owned-process cancellation at startup and after export dispatch. A 1,200-pixel
+image at two inches tests actual 192 DPI PDF downsampling. Host deadlines,
+per-process address-space/CPU/file-size limits and disabled core dumps bound the
+experiment. Those limits are not a full engine cgroup or production archive,
+aggregate scratch, admission and font-contract qualification.
+
+Retain failures and their private diagnostics. The cancellation observer walks
+children of every thread in the **owned** tree; a main-thread-only list misses
+LibreOffice's worker-thread child. No unrelated processes are enumerated or
+terminated. Generated profiles/documents/PDFs stay outside Git.
+
+The original MIT GUI/provider/queue and pinned kit/Wasm remain unchanged. Native
+integration still requires complete authorized-read/error/queue/cache/font/ZIP/
+timeout/disposal semantics, macro/external-resource negative cases, complex
+layout and original-GUI proofs, dependency/source/notice packaging and explicit
+platform gaps. LibreOffice and its linked dependencies retain their own licences.
+The [owning Office guide](../../docs/HARNESS-OFFICE-PREVIEWS.md#native-linux-office-feasibility--october-14)
+records exact-source results; this diagnostic never relaxes the packaging gate.
