@@ -7,6 +7,12 @@ text. Checks distinguish canonical superseded patches, user/assistant/metadata
 quotations, API uncertainty, duplicate/source hashes and pointers, redaction,
 row/annotation/aggregate bounds and capture transitions. Existing native memory,
 branch/cold/recovery, privacy, wrapping and original Context cases remain required.
+Source **7b9a7037c3433f8ad25760c3bdd2a0f4182cd253** passes core/native 130/130 (14 files)
+and Context Chromium 8/8 (six files); a fresh ordinary tree passes 138/138 across
+all 20 with matching 908 compiled files/155 production npm instances and Node.
+Two workers, unchanged deadlines, no skips. The first missing-link failures and
+system-Python QtTest failure are retained; final source/ordinary runs use the
+existing isolated QtTest interpreter. Full live/installed/platform gates remain.
 
 The fresh [MX review artifact](../docs/HARNESS-MX-REVIEW.md) at source
 f98424b passes candidate-selected **120/120 across 43 files**, two workers,

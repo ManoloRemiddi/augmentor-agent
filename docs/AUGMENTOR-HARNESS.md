@@ -598,6 +598,40 @@ resource and historical context fidelity, owner MX feedback and all remaining
 The separately running f98424b MX review and selected 97897cf installation are
 preserved; this source checkpoint is not an installed update or DSH retirement.
 
+Qualification source: **7b9a7037c3433f8ad25760c3bdd2a0f4182cd253**, product **0.2.13**, Pi **1.1.0**.
+Strict check/build passes. Source core/native **130/130 across 14 files** plus
+rendered Context **8/8 across six files** and a fresh ordinary tree **138/138
+across the same 20 files** pass with two workers, unchanged deadlines and no
+skips. All **908 compiled files** match; **155 production npm instances**, their
+file bytes/paths and bundled Node **24.19.0** match the prior isolated base. The
+actual SDK/received-HTTP fixture distinguishes a loaded file in the first system
+request from the same options/catalog source omitted by a forced second prompt;
+user/metadata quotations do not make it present. Original Context, branch/cold/
+recovery, memory, wrapping, privacy and actual native controls remain passing.
+The existing Context screenshot was visually inspected; its layout is preserved.
+
+Before implementation, the expanded ten-case provenance test passes six and
+fails four for absent source links. The first broader run passes 125/130 because
+four Native children and their enclosing group lack QtTest under system Python.
+The preserved final source/ordinary runs use the existing isolated
+PySide6/shiboken/QtTest **6.8.2.1** interpreter; no test, deadline or assertion is
+removed. Credentials, private logs and machine paths are excluded from source.
+The unchanged generic recognizer body is compared directly with its former core
+memory implementation; its existing ten-API shape, quotation and fail-closed
+native-persistence checks pass. Running owner review and installed-selection
+identity checks pass; production Qwen and memory health return 200, with no
+configuration change or service restart.
+
+Preceding public **b2fc5ce539acdaf333ed7a769735f29c95dd0304** / Validate
+**38553019182** passes locked DSH SDK/core and later native/recovery/first-run,
+inventory and extension-notice steps, then refuses the exact Office preferred-
+source/full-engine-rebuild packaging gate; installed/browser package jobs are
+skipped. SDK platform **38553019272** and Windows desktop **38553019231** pass.
+Windows command **38553019198** and macOS **38553019369** fail; Windows
+qualification **38553019429** is still running at this checkpoint. Retain their
+prior failure histories; new-head hosted and wider installed/platform acceptance
+are not inferred from local fixtures.
+
 ## Indexed native entries and canonical message lineage
 
 The next Pi 1.1.0 checkpoint adds read-only `session.nativeHistory` and `session.nativeRead` to the existing owner. Managed conversation metadata resolves the original file; clients cannot supply a filesystem path. Loaded and cold inspection use the same independently authored `NativeHistory` reader without opening a new SDK session or running inference. Only version-3 native sessions are supported. Complete corrupt records, invalid UTF-8, unknown versions and orphan/duplicate identities are refused with original bytes preserved; an incomplete final record is reported without trimming or repairing the native file. A record above 64 MiB is explicitly refused. The public SDK parser and types are used without private imports, a fork or another agent loop.
