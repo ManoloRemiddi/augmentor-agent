@@ -5,7 +5,7 @@
 The source candidate adds supported Pi OAuth sign-in to the original DSH sign-in
 and sign-out dialogs. MX Linux remains the first owner-testing target. The current
 running review and selected installation are preserved; this source change is not
-an installed update. The initial strict check/build and focused **38/38 across
+an installed update. The initial strict check/build and focused **39/39 across
 seven files** pass. Full source/ordinary qualification is pending at this checkpoint.
 
 ## User workflow and provider scope
@@ -124,10 +124,10 @@ add nothing. Cold model/credential status requires explicit reconciliation.
 
 Nine runtime cases cover sequential prompts, committed/cancelled storage,
 synchronization failure, callback races, cold metadata, unsafe/bounded input,
-receipt failure and lazy identity. Six pure browser-scope cases cover lost writes,
+receipt failure and lazy identity. Seven pure browser-scope cases cover lost writes,
 current-step response, wrong action/provider, role revocation and unsafe/inconsistent
 descriptors. Existing account/settings/model-configuration and original Models
-Chromium tests remain in the 38-case cohort. An added common CI step runs the 21
+Chromium tests remain in the 39-case cohort. An added common CI step runs the 22
 account/runtime/scope cases on Linux, macOS and Windows; new-head hosted results
 are not yet qualified. Shared TypeScript/browser behavior has no new OS adapter;
 SDK callback/browser handoff, private storage and installed/physical acceptance
@@ -155,3 +155,24 @@ copy-link button and labels the completed sign-in receipt as historical, so a
 later sign-out is not confused with current stored credential state. Original
 layout, control placement and CSS remain unchanged; final-cohort qualification
 is pending for that copy-only follow-up.
+
+
+## Unconfirmed active-status cancellation
+
+A controlled response-stage Chromium fixture against **3bfb841** returns one
+operator account-status error while the real SDK secret prompt is still pending.
+The prior adapter hides Cancel in its original error dialog, reproducing an
+unusable held action. The follow-up preserves only the known action identity for
+cancellation, clears its transient prompt, and disables retry in the original
+primary action. The Models footer also exposes explicit cancellation for the
+known held attempt. Cancel never selects another action or restarts login.
+
+The corrected actual original-dialog pointer flow verifies that the secret input
+is removed, the backend remains busy before cancellation, retry is disabled,
+Cancel settles the same request, the old credential survives, old prompt answers
+are refused and the six-attempt/no-additional-inference/native-prefix checks still
+pass. The pure operator-scope case separately proves a lost status does not
+prevent exact-ID cancellation or permit new login/answer replay. Focused 39/39
+across seven files pass. Earlier 7140ea7 and 3bfb841 source/ordinary 233/233 runs
+remain retained; they did not cover this failure. Final full source/ordinary
+qualification remains pending for this follow-up.

@@ -1,5 +1,5 @@
 /** Account authorization dialog; errors allow retry after cancelling any active attempt. */
-// Modified by Augmentor (MIT): transient Pi prompt child; preserve provider URLs exactly.
+// Modified by Augmentor (MIT): Pi prompts/exact URLs; retain cancellation and fence unknown retries.
 import { useEffect, useState, type ReactNode } from 'react'
 import { Button, IconCloseOutlineRegular, IconLoadingOutlineRegular, Modal } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { AccountSnapshot } from './AccountSection.tsx'
@@ -8,9 +8,10 @@ import type { AccountKey } from './locales.ts'
 import css from './SignInDialog.module.css'
 
 /** @param props - safe account state, localized copy, and user actions. @returns login dialog. */
-export function SignInDialog({ account, colorScheme, start, cancel, close, useApiKey, t, children }: {
+export function SignInDialog({ account, colorScheme, start, cancel, close, useApiKey, t, children, retryDisabled = false }: {
   account: AccountSnapshot
   children?: ReactNode
+  retryDisabled?: boolean
   /** Resolved scheme retained for the original caller contract; provider URLs stay exact. */
   colorScheme: 'light' | 'dark'
   start: () => Promise<void>
@@ -82,7 +83,7 @@ export function SignInDialog({ account, colorScheme, start, cancel, close, useAp
     <div className={css.actions}>
       <Button variant="outline" className={css.secondaryButton} disabled={committing || busy}
         onClick={active ? dismiss : useApiKey}>{t(active ? 'cancel' : 'addApiKey')}</Button>
-      <Button variant="primary" className={css.primaryButton} disabled={busy || committing || waiting || account.view === undefined}
+      <Button variant="primary" className={css.primaryButton} disabled={busy || committing || waiting || account.view === undefined || retryDisabled}
         aria-label={waiting ? t('waiting') : undefined} onClick={() => { void run(retry) }}>
         {waiting ? <IconLoadingOutlineRegular className={css.spinner} /> : t(expired || error ? 'retry' : 'signIn')}
       </Button>
