@@ -6,7 +6,7 @@
 
 ## Portable GUI dependency resolution — October 14
 
-The October 14 build correction preserves the original package's nested
+Implementation **7cbc4311cc5a7bb0a6200d73b888063ea746b840** preserves the original package's nested
 resolution when compiling patched spreadsheet entries from temporary overlays.
 In [Application SDK run 38496466360](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38496466360),
 Linux/macOS contracts pass but Windows stops during the shared GUI build:
@@ -36,8 +36,12 @@ spreadsheet/context cases), and separate ordinary production passes **16/16**
 spreadsheet/context cases with matching prepared QtTest, two workers, unchanged
 deadlines and no skips. Real workbook parser/grid/sheet/readonly/lifecycle and
 retained Context provider formats remain covered. Hosted verification of this
-new source is separate and pending; local Windows path tests are not a Windows
-application qualification.
+new source is separate; local Windows path tests are not a Windows application
+qualification. In [run 38498150703](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38498150703), Linux/macOS pass and Windows passes both path cases, but the real-build
+fixture imports an absolute drive path as an ESM URL and stops before bundling.
+The driver now converts that dependency path through `pathToFileURL`; its three
+source cases pass again. This correction does not alter the product resolver,
+supplier code, assertions or deadlines. Hosted confirmation remains pending.
 
 The new build's GUI `SOURCE.json`, selected supplier/patch hashes and fixed worker
 body match the qualified 454db9d search candidate. An initial whole-tree byte

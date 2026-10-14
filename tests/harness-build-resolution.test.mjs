@@ -5,6 +5,7 @@ import {posix,win32,join} from 'node:path';
 import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {createRequire} from 'node:module';
+import {pathToFileURL} from 'node:url';
 import {relativeBuildInput,spreadsheetOverlayResolver} from '../scripts/harness-build-resolution.mjs';
 
 test('build input boundaries distinguish actual descendants from siblings, parents and virtual entries',()=>{
@@ -36,7 +37,7 @@ test('real browser build preserves the nested supplier export instead of falling
  await file(join(root,'node_modules/fixture-choice/package.json'),JSON.stringify({name:'fixture-choice',version:'11.0.0',module:'index.mjs'}));await file(join(root,'node_modules/fixture-choice/index.mjs'),'export const incompatible = "AUTHORED WRONG PROJECT EXPORT";');
  await file(join(original,'node_modules/fixture-choice/package.json'),JSON.stringify({name:'fixture-choice',version:'9.0.0',module:'index.mjs'}));await file(join(original,'node_modules/fixture-choice/index.mjs'),'export default "AUTHORED LOCKED NESTED EXPORT";');
  const entries=new Map([['fixture-sheet',join(overlay,'dist/index.mjs')]]),origins=new Map([[overlay,original]]);
- const requireUi=createRequire(new URL('../apps/harness/package.json',import.meta.url)),{build}=await import(requireUi.resolve('esbuild'));
+ const requireUi=createRequire(new URL('../apps/harness/package.json',import.meta.url)),{build}=await import(pathToFileURL(requireUi.resolve('esbuild')).href);
  const result=await build({absWorkingDir:root,stdin:{contents:'import sheet from "fixture-sheet"; export default sheet;',resolveDir:root},bundle:true,format:'esm',platform:'browser',write:false,logLevel:'silent',plugins:[spreadsheetOverlayResolver(entries,origins)],mainFields:['browser','module','main'],nodePaths:[join(root,'node_modules')]});
  assert.equal((await import('data:text/javascript;base64,'+Buffer.from(result.outputFiles[0].contents).toString('base64'))).default,'AUTHORED LOCKED NESTED EXPORT');
  assert.equal(await readFile(join(original,'dist/index.mjs'),'utf8'),importer);assert.equal(await readFile(join(overlay,'dist/index.mjs'),'utf8'),importer);
