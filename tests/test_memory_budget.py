@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import json
 import io
+import importlib.util
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import sys
@@ -13,9 +14,23 @@ import urllib.request
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'services'))
 from memory.dual import DualMemory
-from memory.budget import InferenceBudget, BudgetDenied, JOB_SECONDS, JOB_TOKENS
+from memory.budget import InferenceBudget, BudgetDenied, JOB_SECONDS, JOB_TOKENS, CALL_SECONDS
 from memory.gateway import Gateway, completion
 from lifecycle.admission import Admission, MaintenanceBusy
+
+
+class InstallerBudgetTests(unittest.TestCase):
+    def test_operation_clients_use_the_existing_call_ceiling_without_enabling_retries(self):
+        path = Path(__file__).resolve().parents[1] / 'scripts/setup-hindsight.py'
+        spec = importlib.util.spec_from_file_location('controlled_hindsight_setup', path)
+        setup = importlib.util.module_from_spec(spec); spec.loader.exec_module(setup)
+        value = setup.environment('explicit-synthetic-model', 18440, 18441)
+        self.assertEqual(float(value['HINDSIGHT_API_LLM_TIMEOUT']), CALL_SECONDS)
+        self.assertEqual(value['HINDSIGHT_API_LLM_MODEL'], 'explicit-synthetic-model')
+        self.assertEqual(value['HINDSIGHT_API_WORKER_ENABLED'], 'false')
+        for key in ('HINDSIGHT_API_LLM_MAX_RETRIES', 'HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES',
+                    'HINDSIGHT_API_REFLECT_LLM_MAX_RETRIES', 'HINDSIGHT_API_CONSOLIDATION_LLM_MAX_RETRIES'):
+            self.assertEqual(value[key], '0')
 
 
 class BudgetTests(unittest.TestCase):

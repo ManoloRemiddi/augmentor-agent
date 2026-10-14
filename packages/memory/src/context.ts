@@ -17,6 +17,9 @@ export function selectContinuity(value:any,query:string){
       // of every interaction's default context.
       if(/shared moments|commitments|our relationship/i.test(page.name))continue;
       for(const content of parts(page.content||'')){
+        // Knowledge-page navigation is not a recalled claim. Heading-only
+        // fragments otherwise outrank short preferences and consume fact slots.
+        if(content.split('\n').filter(line=>line.trim()).every(line=>/^\s{0,3}#{1,6}(?:\s|$)/.test(line)))continue;
         if(content.length>1000)continue; // no misleading first-N-character excerpt
         const termsHere=words(content);
         const score=[...terms].filter(term=>termsHere.has(term)).length;

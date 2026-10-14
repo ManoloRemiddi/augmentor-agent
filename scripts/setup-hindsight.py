@@ -9,9 +9,13 @@ import os
 from pathlib import Path
 import secrets
 import subprocess
+import sys
 import time
 import urllib.request
 from urllib.parse import urlsplit
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'services'))
+from memory.budget import CALL_SECONDS
 
 IMAGE = 'ghcr.io/vectorize-io/hindsight@sha256:3edcb6165cefdeaa6721dd0fce43cfd13b7a9c346ce0d2c5f4b4bf7bc3c8ac0b'
 PROTOCOL = 'augmentor-memory-processing/1'
@@ -21,6 +25,9 @@ def environment(model, port, gateway_port):
     return {'HINDSIGHT_API_LLM_MODEL': model, 'HINDSIGHT_API_LLM_BASE_URL': f'http://127.0.0.1:{gateway_port}/v1',
         'HINDSIGHT_API_PORT': str(port), 'HINDSIGHT_ENABLE_CP': 'false', 'HINDSIGHT_API_HOST': '127.0.0.1',
         'HINDSIGHT_API_LLM_PROVIDER': 'openai', 'HINDSIGHT_API_WORKER_ENABLED': 'false',
+        # Hindsight 0.10.0 otherwise selects its shorter 30-second Reflect
+        # default. All operation clients must honor our existing call ceiling.
+        'HINDSIGHT_API_LLM_TIMEOUT': str(CALL_SECONDS),
         'HINDSIGHT_API_ENABLE_AUTO_CONSOLIDATION': 'false', 'HINDSIGHT_API_CONSOLIDATION_RECONCILE_INTERVAL_SECONDS': '0',
         'HINDSIGHT_API_MENTAL_MODEL_REFRESH_TICK_SECONDS': '0', 'HINDSIGHT_API_SKIP_LLM_VERIFICATION': 'true',
         'HINDSIGHT_API_LLM_MAX_RETRIES': '0', 'HINDSIGHT_API_WORKER_MAX_RETRIES': '0',
