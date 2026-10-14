@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native managed-memory request originals](CONTROLLED-MEMORY.md#native-managed-memory-request-snapshots--october-14)
+records 6027df0: final applied bounded briefs survive historical branch/cold reopen,
+with no new recall/tool replay or stale fallback. Source/ordinary 173/173 each and
+strict check/build pass; known text-boundary fixtures are distinct from new live/
+installed/full-context acceptance. [Data scope](DATA-AND-SUPPORT.md#native-managed-memory-originals)
+explains unredacted native retention independent of optional diagnostics/banks.
+Preceding 8ff9ed5 CI now passes Debian core/native checks before the retained Office
+public gate; SDK matrix/Windows desktop pass, Windows settlement and macOS notice
+failures remain scoped. Owner preview/draft/candidate/feedback are preserved.
+
 [Jobs evidence through fresh refreshes](PI-JOBS.md#inspected-evidence-survives-fresh-refreshes--october-14)
 records d88b1d4: opened bounded native/provider evidence survives summary updates
 in both the original DSH tab and inspector; owner/access/child/error/reset scope

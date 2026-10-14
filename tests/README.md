@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+At **6027df00dc0456b2b63b5263b402ba0f5761997d**, strict check/build and final
+source/fresh ordinary **173/173 each** pass across 24 files, two workers, unchanged
+deadlines/no skips; exact 905-file compiled set/bytes, 155 npm instances and bundled
+Node contract match. New `pi-memory-snapshot` cases use the actual SDK, native
+files/public branch projection and authored provider/memory/tool fixtures. They
+cover old/new/empty briefs, inherited tools executed once, branch/cold/edit cuts,
+capture-off, opaque system override, schema/hash/size/unknown coverage and core
+persistence failure before inference. System-field checks exclude assistant text,
+type names and provider metadata. The cohort includes existing memory/provenance,
+branch/recovery/GUI, goals, queues/steering, tool budgets/wrapping, provider,
+observation/inspection, compaction/timing, jobs/desktop and Host lifecycle tests.
+An old-factory component baseline on the same driver/SDK fails zero native brief
+records after its tool executes; initial fixture/grant/boundary prototypes are
+not final qualification. See [exact source/data scope and remaining live gates](../docs/CONTROLLED-MEMORY.md#native-managed-memory-request-snapshots--october-14).
+Preceding 8ff9ed5 CI passes Debian core/native checks but refuses the Office public
+source/rebuild gate; new-head hosted and installed/platform acceptance are separate.
+
 At **d88b1d441d58839b099d47bead423867d4e9bd02**, strict check/build and final
 source/fresh ordinary **42/42 each** pass at two workers, unchanged deadlines and
 no skips across `harness-jobs-chromium`, `jobs-registry`, `pi-jobs`,

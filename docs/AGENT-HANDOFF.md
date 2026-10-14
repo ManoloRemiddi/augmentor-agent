@@ -1,5 +1,29 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native managed-memory originals](CONTROLLED-MEMORY.md#native-managed-memory-request-snapshots--october-14)
+at **6027df00dc0456b2b63b5263b402ba0f5761997d** persist applied bounded briefs
+in native request ancestry after final payload hooks. Historical branches/cold
+reopen restore selected originals without current recall; empty/invalid/unavailable
+records do not fall back. Edit cuts exclude later request snapshots. System text
+recognition excludes assistant/user/metadata quotations; unsupported encodings stay
+unavailable. Native-write refusal stops dispatch, independent of optional capture.
+Strict check/build and source/fresh ordinary **173/173 each**, 24 files, two workers,
+unchanged deadlines/no skips pass; exact 905-file compiled tree/155 npm instances
+and Node contract match. SDK/provider/native fixtures qualify tool context, one
+execution, unchanged parents, cold replay, capture-off, override and failure paths.
+Earlier real Hindsight/Qwen proofs retain their refs; new live/installed/physical/
+full-context/platform acceptance remains. Native unredacted 6,000-character-per-
+request retention is documented separately from diagnostic/bank deletion policy.
+Preview/draft/candidate/feedback preserved; no service/model/dependency/UI change.
+
+Published **8ff9ed5 / Validate 38526385602** passes locked-DSH build/SDK and all
+subsequent native/interaction/recovery/first-run checks, dependency inventory and
+extension notices. Debian packaging then refuses the existing Office exact-source/
+engine-rebuild gate. Its SDK platform matrix and Windows desktop workflow pass.
+The x64 Windows command/delegation qualification has job-settlement timeouts,
+root cause unproven; macOS 14/26 packaging retains unreviewed Sharp/libvips licence
+and missing Koffi licence-text failures. Keep these scopes/new-head CI separate.
+
 [Jobs evidence retention](PI-JOBS.md#inspected-evidence-survives-fresh-refreshes--october-14)
 at **d88b1d441d58839b099d47bead423867d4e9bd02** preserves opened native/provider
 evidence and excerpts through legitimate fresh summary refreshes. Snapshot reads

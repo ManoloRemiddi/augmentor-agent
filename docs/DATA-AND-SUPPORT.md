@@ -134,6 +134,32 @@ HTTP supports local services. There are two distinct memory integrations:
   bindings. Manual deletion follows that provider's semantics and does not
   delete automatic-memory banks, earlier model context, backups or provider logs.
 
+### Native managed-memory originals
+
+The Pi Host now retains the applied managed-memory brief as ordinary native
+conversation state, up to the existing 6,000-character limit per provider request.
+It records exact unredacted text, source-session identity, schema/version,
+application/coverage disposition and a text hash in the selected native tree.
+Private native-history retention applies; this is separate from optional full
+diagnostic capture and its 14-day/512-MiB additional-store limits. Disabling or
+clearing diagnostics does not remove these originals. Support-export authorization
+is unchanged; do not publish native files because diagnostic bodies were disabled.
+
+A branch reads only its selected stored original, not current person/project
+banks. Whole-memory pause prevents fresh automatic recall/capture; it does not
+erase earlier model context already retained in conversation history. Processing
+pause and engine outages retain their existing meanings. Bank changes/erasure do
+not erase earlier native model context, and native-history removal does not erase
+the banks, transcript journal, backups or provider logs. Existing independent-store
+operations still apply; no coordinated erase UI is added by this change.
+
+Missing/invalid/unavailable originals remain explicitly unavailable rather than
+triggering a fresh recall or fallback to a different historical brief. Native
+snapshot persistence occurs before dispatch and adds no separate model request or
+network destination. See [source, exact tests and remaining live/installed scope](CONTROLLED-MEMORY.md#native-managed-memory-request-snapshots--october-14).
+
+### Speech data
+
 Browser speech now uses the same native microphone/playback engine as Desktop,
 activated by the sidebar's voice gestures. Closing the panel cancels capture; a
 lost UI heartbeat expires within six seconds. The private stdio control bridge

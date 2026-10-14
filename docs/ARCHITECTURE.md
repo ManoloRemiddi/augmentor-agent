@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native managed-memory originals](CONTROLLED-MEMORY.md#native-managed-memory-request-snapshots--october-14)
+are ordinary Pi conversation data owned by the memory/runtime adapter. Its
+existing before-start hook composes bounded memory; the owned final-payload
+binding persists only verified declared system text/coverage through the public
+native-entry API. Historical restoration reads selected ancestry without a
+current bank lookup. Optional observation storage does not own this state or
+authorize replay; a failed core native receipt stops dispatch independently of
+diagnostic capture. This shared contract adds no agent owner or OS adapter.
+
 [Original Metafolder presentation](HARNESS-METAFOLDERS.md) binds private revisioned
 display metadata and existing conversation/workspace actions. It adds no agent
 owner, model request, tool grant or filesystem mover. Restricted inspectors retain

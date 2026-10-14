@@ -2,6 +2,83 @@
 
 # Context selection and controlled memory processing
 
+## Native managed-memory request snapshots — October 14
+
+Source **6027df00dc0456b2b63b5263b402ba0f5761997d** closes the managed-brief
+storage gap in the earlier Pi checkpoint. A normal Host now records the bounded
+managed text actually present in recognized system fields of the final provider
+payload, after the SDK and existing payload hook finish. This uses the existing
+native SessionManager custom-entry API, not the optional observation payload
+store. `augmentor.memory-context.v1` records schema/version, source session, text
+mode, the boundary, disposition, exact brief and SHA-256. The existing **6,000
+character** selection limit applies per request, including tool continuations.
+It is ordinary private conversation state and is not automatically redacted.
+
+The Host binds `managedPiMemory.extension` to its existing AgentSession and
+`managedPiMemory.finalPayload` to the final owned request boundary. The legacy
+`piMemoryContext` helper composes memory only; standalone SDK consumers need the
+owned final-payload binding to produce these native originals. No new agent loop,
+memory service, model request, tool grant or external destination is introduced.
+A failed core snapshot write stops provider dispatch with an SDK error; optional
+inspection failures retain their existing non-blocking behavior.
+
+Branches read only their selected native ancestry. A valid last brief is appended
+through the ordinary system hook without querying current memory; cold reopening
+uses the same original. An explicit empty record prevents fallback to an older
+non-empty brief. Invalid/unknown-schema or unavailable latest records do not fall
+back either. Missing originals in older histories remain unavailable; observation
+capture cannot retroactively reconstruct them. Edit cuts exclude snapshots after
+the removed input and retain the earlier selected request's brief. Parent files,
+prior tool context and inherited capture exclusions keep their existing owners.
+
+Recording a recalled candidate before later hooks finish would be insufficient:
+an opaque system override may remove it. The final recorder checks the actual
+SDK API's recognized system/developer/instruction text fields only. It uses the
+pinned **Pi 1.1.0** adapter shapes: chat-completions/Mistral messages;
+Responses/Azure/Codex input and instructions; Anthropic/Bedrock system blocks;
+Google/Vertex nested `config.systemInstruction`; and Pi messages through the
+SDK's canonical current-system renderer. Fields belonging to another API are
+not evidence of application. User/assistant quotations, type
+names and provider metadata cannot establish system application. Non-present or
+unsupported/unavailable payloads save a coverage marker without the unused brief;
+branches do not restore it or substitute an older one. Traversal is bounded to
+10,000 nodes. This is exact managed-text evidence at that adapter boundary, not
+proof of server-side context, every provider encoding or the entire historical
+system/instruction/resource composition.
+
+Strict check/build and final source/separate ordinary production **173/173 each**
+pass across **24 files**, two workers, unchanged deadlines, no skips. All **905
+compiled files and their relative file set** match the fresh ordinary tree;
+**155 production npm instances** and bundled Node 24.19.0 remain unchanged.
+Actual public SDK/native-file/branch-publication/provider tests demonstrate:
+
+- Two managed briefs and a completed synthetic tool turn; a branch and cold
+  reopen preserve the old brief/tool receipt, exclude the later brief/input,
+  create no additional recall and execute the tool exactly once.
+- Empty completed recall, edit-before-input cutoff, an opaque system override,
+  disabled diagnostic body capture and a native-write refusal before network
+  dispatch. The unused recalled candidate is not restored into another branch.
+- Strict schema/hash/size checks, cloned reads, unknown/unavailable coverage and
+  metadata/assistant-text exclusion. The rest of the cohort retains actual Host
+  lifecycle/recovery, goals, queues/steering, compaction, observations/inspection,
+  provider contracts, delegation and desktop-job contracts.
+
+An isolated old-factory component baseline on the same SDK/driver performs the
+synthetic tool once but has zero native brief records, failing the new assertion.
+Earlier fixture/tool-grant and before-system-boundary prototypes are retained as
+preparations, not final qualification. These tests use authored memory/provider/
+desktop fixtures. All ten pinned API families have shape-level checks; the new
+actual SDK/native/provider request sequence uses the OpenAI-compatible API.
+Earlier real Hindsight/Qwen evidence below keeps its tested ref
+and does not qualify this new snapshot path. Actual current-engine/model snapshot
+acceptance, semantic quality, full historical request fidelity, migration/physical
+voice and installed/macOS/Windows acceptance remain required.
+
+The selected/running preview and its draft, immutable Search candidate and
+manual-feedback profile are unchanged. [Data scope](DATA-AND-SUPPORT.md#native-managed-memory-originals)
+distinguishes native retention from memory banks and optional diagnostics. DSH
+retirement and the remaining P0/P1/privacy/platform/distribution gates stay open.
+
 Current Pi qualification is recorded below on `feat/augmentor-harness`.
 Earlier `productization/shared-memory-and-desktop` and installed artifact evidence
 are historical checkpoints; source qualification does not activate an installed build.
@@ -75,8 +152,10 @@ Production Qwen/Breeze/Resonant Voice/Hindsight remain healthy. Installed previe
 unsent draft, immutable candidate and manual-feedback profile are not updated.
 
 This qualifies those source Pi boundaries, including recall from a stopped
-projection. It does not establish exact replay of an earlier recalled system
-brief: branches deliberately skip current managed memory. Full historical memory
+projection. At that ref it does not establish exact replay of an earlier recalled
+system brief: branches skip current managed memory. The later native-snapshot
+checkpoint above adds managed brief storage/restoration without reclassifying
+this earlier live proof. Full historical memory
 snapshot fidelity, semantic quality, broader failures/concurrency, person/project
 migration, physical voice, sealed/installed adoption and cross-platform/public
 distribution remain required. Latest full CI acceptance is also separate; see
