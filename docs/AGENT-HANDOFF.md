@@ -1,5 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Actual Pi memory boundaries and unfinished-page fix](CONTROLLED-MEMORY.md#actual-pi-memory-boundaries-and-unfinished-pages--october-14)
+at **1b69cc79d045c0a7bcc6861fbae2ae38d45d8ec6** excludes whitespace-terminated
+engine markers from new/old cached pages without rewriting cache or retrying.
+Common Python 37/37 and Node context/client/provenance 12/12 pass, no skips.
+An isolated real shared companion/controlled Hindsight/current-Qwen Pi sequence
+passes recall/capture, same-parent newer facts, historical branch exclusion,
+inherited-capture exclusion and exact cold native history in 92.57 seconds.
+The new six-stage job completes at attempt zero; the older page timeout remains
+stopped and is not relabelled successful. Exact earlier memory-system snapshot
+replay is unqualified; branches skip current recall. Synthetic evidence is
+retained with the fixture stopped/no-restart; production services are healthy.
+Installed preview/draft, sealed candidate and feedback profile stay unchanged.
+Broader live/migration/voice/platform/distribution gates remain open.
+
+[Latest hosted CI result](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14):
+Validate 38507846631 at 1a903df completes with Debian Goal paused-state and Search
+pending-save GUI failures; causes remain unresolved. Source/Home/all Handy jobs
+pass, package jobs are skipped. Local success does not close these failures;
+Windows lease/teardown and macOS notice/package gates also remain required.
+
 [Isolated current-Qwen memory-engine qualification](CONTROLLED-MEMORY.md#isolated-current-qwen-engine-qualification--october-14)
 at **ada6e4378093bf50613e07b6f35702fbab6a24c0** passes actual controlled Hindsight
 0.10.0 failure/no-retry/archive preservation and live six-stage relationship/

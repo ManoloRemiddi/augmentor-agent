@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+At **1b69cc79d045c0a7bcc6861fbae2ae38d45d8ec6**, unfinished Hindsight pages
+with surrounding whitespace are excluded in fresh and legacy cached recall;
+real body text, independent facts, source cache bytes and offline capture remain.
+Run `PYTHONPATH=tests python3 -m unittest test_memory test_dual_memory test_hindsight_memory test_memory_budget`
+(37/37) and `node --test --test-concurrency=2 tests/memory-context.test.mjs tests/memory-client.test.mjs tests/pi-context-provenance.test.mjs`
+(12/12), no skips. Separate isolated real Pi/shared companion/Hindsight/Qwen
+evidence qualifies current recall/capture, newer-parent facts, branch cutoff and
+exact cold history in 92.57 seconds, retaining an older stopped page timeout
+without retry. See [scope and reproduction procedure](../docs/CONTROLLED-MEMORY.md#actual-pi-memory-boundaries-and-unfinished-pages--october-14).
+Latest full hosted acceptance remains failed at 1a903df/38507846631, with Goal
+paused-state and Search pending-save GUI observations unresolved; source/Home/
+Handy pass and package jobs are skipped. No assertion/deadline is weakened.
+
 At **ada6e4378093bf50613e07b6f35702fbab6a24c0**, the opt-in public controlled-memory proof passes fake failure/no-retry/unrelated archive retention and current-Qwen live completion of both scoped facts/pages in 75.42 seconds with unchanged budgets. Separate database/API/gateway ports, new labelled container/volume and exact extension/image bytes isolate it from production. The fixture is stopped and synthetic evidence retained. This is controlled-engine evidence, not actual Pi branch/capture/recall or physical voice acceptance. See [proof scope and parallel fixture recipe](../docs/CONTROLLED-MEMORY.md#isolated-current-qwen-engine-qualification--october-14).
 
 The Search GUI driver leaves Fetch interception enabled through the test after releasing its initial read, so queued automatic continuations cannot race channel disable. Source and ordinary full GUI cases pass. In hosted 38504933586, archive/workspace and all Search workflow assertions pass before the remaining driver error; that failure is retained and no browser-error assertion is relaxed. See [lifetime and validation scope](../docs/HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14).

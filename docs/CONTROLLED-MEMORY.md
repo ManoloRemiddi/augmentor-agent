@@ -2,8 +2,85 @@
 
 # Context selection and controlled memory processing
 
-Implemented and qualified in source on `productization/shared-memory-and-desktop`.
-Installed artifact identity and activation are recorded separately below.
+Current Pi qualification is recorded below on `feat/augmentor-harness`.
+Earlier `productization/shared-memory-and-desktop` and installed artifact evidence
+are historical checkpoints; source qualification does not activate an installed build.
+
+## Actual Pi memory boundaries and unfinished pages — October 14
+
+Implementation **1b69cc79d045c0a7bcc6861fbae2ae38d45d8ec6** fixes a failure
+observed with the actual controlled Hindsight **0.10.0** engine: its unfinished
+page body was `Generating content...\n`, while the existing exclusion matched
+only the marker without whitespace. New snapshots and cached recall now exclude
+that whole marker, including surrounding whitespace. Real page text remains
+unchanged, including text that merely mentions the marker. Reading an older
+cache does not rewrite it, contact the engine, reset budgets or retry processing;
+independently extracted facts and new transcript capture remain available.
+This changes the shared Python memory service on every platform, with Linux
+live evidence and common tests; actual macOS/Windows engine/transport acceptance
+remains separate. There is no UI, SDK/dependency, schema or model-setting change.
+
+The isolated Linux proof uses a real managed Pi Host/AgentSession, the actual
+shared memory companion and the independently owned engine described in the
+next section. It has fresh synthetic conversation identities and a private
+test journal/person/project, rather than an owner profile or production bank.
+Its final sequence completes in **92.57 seconds**:
+
+- Cached SQLite/project and concise-reply facts survive an earlier stopped page
+  stage. Managed recall reaches the recorded SDK system context and provider
+  body with exact-text presence. The unfinished page marker is absent.
+- Pi captures the new user/assistant pair through its normal committed-event
+  path. A separate synthetic source then changes Atlas to PostgreSQL through
+  real Qwen extraction, consolidation and page generation. This new job completes
+  all six stages at attempt zero, with **41.29 seconds / 40,852 tokens** remaining
+  in the unchanged budget. The same parent AgentSession sees the updated facts.
+- A branch at the first assistant boundary skips current memory recall, retains
+  SQLite conversation evidence and excludes PostgreSQL/later parent messages
+  from its recorded provider body. The parent native file is unchanged. Only
+  the branch's new user/assistant pair is captured; inherited events are excluded.
+- Cold history inspection preserves both native files byte-for-byte, creates
+  no AgentSession/inference and leaves the exported memory journal unchanged.
+
+The original synthetic job remains stopped at phase four with
+`APITimeoutError`, attempt zero and **35.15 seconds / 36,271 tokens** remaining.
+It is not retried or relabelled completed. Later page success does not establish
+the cause or reliability of that earlier timeout. One intermediate probe also
+failed because it parsed only the first 64-KiB observation page; the final probe
+assembles the existing UTF-8 cursor pages. That was a qualification-driver error,
+not evidence of corrupt stored context. Original failed attempts are retained
+locally; credentials, transcripts and private URLs are excluded from publication.
+
+To reproduce the boundaries, use a separate engine/data volume and the recipe
+below; create separate shared state/data and Pi configuration/workspace paths,
+with only that fixture's configuration. Start the normal shared memory service,
+configure a synthetic person, bind a synthetic source and append one live user
+record under its renewable tool-window lease. Pause processing after completed
+fact extraction. Start the normal Host with the explicit existing local Qwen
+model, read-only policy and payload capture; inspect `context/provenance` through
+all payload cursor pages. Use the normal committed transcript/export APIs to
+count captures. Derive the new fact under a different source lease, pause again,
+and prompt the same parent owner. Branch through `session.branch` at the earlier
+assistant sequence; compare recorded context, exact native bytes, exported
+events and cold `session.history` inspection. Stop only the independently owned
+companion/container after its work settles. Preserve absolute windows, request
+limits, stopped receipts and Qwen/voice configuration throughout.
+
+Validation: **37/37** common Python memory/provider/journal/budget cases, including
+two new unfinished-page regressions; **12/12** Node context/client/provenance
+cases, no skips. The twelve-case Hindsight focus is a subset of the Python total.
+The live proof uses current Qwen and unchanged CPU ASR/VAD/GPU placement; voice
+health is checked without recording or claiming physical speech acceptance.
+The fixture is stopped with restart policy `no`; synthetic evidence is retained.
+Production Qwen/Breeze/Resonant Voice/Hindsight remain healthy. Installed preview,
+unsent draft, immutable candidate and manual-feedback profile are not updated.
+
+This qualifies those source Pi boundaries, including recall from a stopped
+projection. It does not establish exact replay of an earlier recalled system
+brief: branches deliberately skip current managed memory. Full historical memory
+snapshot fidelity, semantic quality, broader failures/concurrency, person/project
+migration, physical voice, sealed/installed adoption and cross-platform/public
+distribution remain required. Latest full CI acceptance is also separate; see
+[retained GUI failures](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14).
 
 ## Intent
 

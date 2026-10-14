@@ -32,6 +32,17 @@ separate required workflows under the accepted migration specification.
 
 ## CI readiness barriers and retained failures — October 14
 
+The later [Validate 38507846631](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38507846631)
+at **1a903df1894766c5cc8dbd53a22556b1c9819ff3** completes with Debian failure:
+the goal GUI does not observe its paused state and the Search GUI remains in
+`Saving keyless settings…` rather than confirming writable controls. Both
+failures are retained; their causes are unresolved. Passing local cases and the
+earlier interception fix do not qualify that hosted run. Source-boundary, Home
+and all three Handy component jobs pass; package jobs are skipped. No assertion,
+timeout, provider configuration or product behavior is weakened to obtain green
+results. New source acceptance, Windows lease/teardown and macOS notice/package
+gates remain separate from the qualified unselected Linux candidate.
+
 Implementation **16db511cd9534c16c5210dc200682ccbc69a9b65** receives new hosted
 evidence in [Validate 38504933586](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38504933586):
 the archive/workspace cases and all Search GUI workflow assertions complete, but

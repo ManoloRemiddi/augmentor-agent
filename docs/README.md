@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Actual Pi memory boundaries and unfinished pages](CONTROLLED-MEMORY.md#actual-pi-memory-boundaries-and-unfinished-pages--october-14)
+records source 1b69cc7, common Python 37/37/Node 12/12 and isolated actual
+Pi/shared-companion/Hindsight/Qwen recall, capture, newer-parent facts, earlier
+branch exclusion and exact cold history. Whitespace-terminated unfinished page
+markers are excluded without cache rewrite or retry. The original page timeout
+stays stopped; a later six-stage job succeeds within unchanged budgets. Exact
+earlier memory brief replay, migration/voice/platform/installed/public acceptance
+remain open. [Validate 38507846631](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14)
+retains Goal/Search GUI failures and does not qualify new-head full CI.
+
 [Isolated current-Qwen memory-engine qualification](CONTROLLED-MEMORY.md#isolated-current-qwen-engine-qualification--october-14)
 at **ada6e4378093bf50613e07b6f35702fbab6a24c0** passes actual controlled Hindsight
 0.10.0 failure/no-retry/archive preservation and live six-stage relationship/
