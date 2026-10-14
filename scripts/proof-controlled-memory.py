@@ -32,12 +32,13 @@ def main():
     config = json.loads(args.configuration.read_text())
     if config['endpoint'] == 'http://127.0.0.1:8889' or config['gatewayPort'] == 8890:
         parser.error('Use a disposable engine with separate data and non-production ports.')
-    calls = []
+    calls, thinking_modes = [], []
     class Model(BaseHTTPRequestHandler):
         def log_message(self, *_): pass
         def do_POST(self):
             body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
             calls.append(body['max_tokens'])
+            thinking_modes.append(body.get('chat_template_kwargs', {}).get('enable_thinking'))
             if len(calls) > 3:
                 self.send_response(500); self.end_headers(); return
             content = json.dumps({'facts': [{'what': 'Legacy archive sentinel.' if len(calls) == 1 else 'Atlas uses SQLite.', 'when': 'N/A',
@@ -97,6 +98,8 @@ def main():
                 assert all(recalled[k]['summary'] for k in ('relationship', 'work'))
             else:
                 assert len(calls) == 4 and status['jobs'].get('stopped') == 1
+                if config.get('llamaCppThinking') == 'off':
+                    assert all(value is False for value in thinking_modes), 'Every measured memory request must carry the explicit no-thinking choice'
                 for _ in range(5): memory.step()
                 assert len(calls) == 4, 'A failed operation must not retry automatically'
                 old = memory.api('GET', memory.route(bank, 'memories/list?document_id=archive-sentinel&consolidation_state=pending'))
@@ -106,7 +109,9 @@ def main():
             for _ in range(5): memory.step()
             assert len(calls) == count and len(call('export')['events']) == 1
             print(json.dumps({'proof': 'PASS', 'live': args.live, 'elapsed': round(time.monotonic()-started, 2),
-                              'jobs': call('jobs')['jobs'], 'fixtureCalls': len(calls)}))
+                              'jobs': call('jobs')['jobs'], 'fixtureCalls': len(calls),
+                              'llamaCppThinking': config.get('llamaCppThinking', 'default'),
+                              'fixtureThinkingChoiceVerified': all(value is False for value in thinking_modes) if calls and config.get('llamaCppThinking') == 'off' else None}))
         finally:
             stop.set(); call('activity', owner=sid, phase='stop')
             gate.shutdown(); gate.server_close()

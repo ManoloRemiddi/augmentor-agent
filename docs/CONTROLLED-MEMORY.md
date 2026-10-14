@@ -2,6 +2,40 @@
 
 # Context selection and controlled memory processing
 
+## Memory-only llama.cpp request mode — October 14
+
+The installer accepts **`--llama-cpp-thinking default|off`**. Fresh setup defaults
+to the server's existing behavior. Omission on a configured installation preserves
+its saved `llamaCppThinking` choice. `off` uses pinned Hindsight 0.10.0's supported
+extra-body settings to send `chat_template_kwargs.enable_thinking=false` on memory
+retain, consolidation and Reflect requests only. It requires a compatible server
+template; it is not a universal provider reasoning switch. Chat/voice requests,
+server configuration, model/context/concurrency/precision and budgets are unchanged.
+`default` explicitly removes this memory override. A mode mismatch refuses a
+running engine, using the existing deliberate stopped-replacement path; no live
+engine is silently changed. Missing legacy extra-body settings match default.
+
+A new synthetic diagnostic with the unchanged default observes 29.393 seconds,
+821 answer characters and 2,965 thinking characters on its first extraction.
+The next extraction stops at phase one after a single timeout; its job and budget
+remain retained. Repeating only that captured synthetic **model request**, with
+thinking explicitly disabled and no memory-stage replay, returns valid JSON in
+44.444 seconds with 381 completion tokens and zero thinking characters. Response
+headers alone take 37.928 seconds. Another current-Qwen slot is processing a much
+larger request, so these timings are load-confounded: the switch is **not proven
+to solve the timeouts**. No model-server setting or production service is changed.
+
+The exact pinned disposable image parses the global/three operation overrides,
+45-second timeout and disabled workers/retries. Its public fixture proof passes:
+four model calls all carry the explicit false flag; the deliberately failed stage
+stops at attempt zero, does not retry and preserves the unrelated archive fact.
+The fixture backend sends no work to Qwen. Common Python **35/35** pass, including
+actual installer argument/filesystem/loopback-HTTP flow with Docker mocked, saved
+choice preservation, legacy default reuse, refusal before a running mode change
+or invalid saved choice, and unchanged configuration on refusal. Ordinary-tree
+and complete live engine/model acceptance of this option remain pending here.
+Linux image evidence does not qualify native macOS/Windows Docker operation.
+
 ## Extracted claims and engine deadlines — October 14
 
 Source **aac3bad18f38ca61fa4129b414849758ecdb22fa**, following

@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Explicit memory-only llama.cpp mode](CONTROLLED-MEMORY.md#memory-only-llamacpp-request-mode--october-14)
+adds an opt-in request override, saved-choice preservation and running-engine
+refusal. Common Python 35/35 and the actual pinned-engine four-call fixture pass.
+Default/live diagnostics confirm thinking output and a valid no-thinking JSON
+response, but long pre-response time/another active Qwen slot confound performance.
+No timeout cure, production adoption or full live acceptance is claimed here.
+
 [Memory claim selection and engine deadlines](CONTROLLED-MEMORY.md#extracted-claims-and-engine-deadlines--october-14)
 at **aac3bad18f38ca61fa4129b414849758ecdb22fa** prefers eligible extracted claims
 per scope over generated pages, with page fallback and unchanged limits/labels.

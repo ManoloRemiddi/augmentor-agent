@@ -21,8 +21,11 @@ IMAGE = 'ghcr.io/vectorize-io/hindsight@sha256:3edcb6165cefdeaa6721dd0fce43cfd13
 PROTOCOL = 'augmentor-memory-processing/1'
 
 
-def environment(model, port, gateway_port):
-    return {'HINDSIGHT_API_LLM_MODEL': model, 'HINDSIGHT_API_LLM_BASE_URL': f'http://127.0.0.1:{gateway_port}/v1',
+def environment(model, port, gateway_port, *, llama_cpp_thinking='default'):
+    if llama_cpp_thinking not in ('default', 'off'):
+        raise ValueError('Invalid memory-only llama.cpp thinking mode.')
+    extra = json.dumps({'chat_template_kwargs': {'enable_thinking': False}}, separators=(',', ':')) if llama_cpp_thinking == 'off' else 'null'
+    value = {'HINDSIGHT_API_LLM_MODEL': model, 'HINDSIGHT_API_LLM_BASE_URL': f'http://127.0.0.1:{gateway_port}/v1',
         'HINDSIGHT_API_PORT': str(port), 'HINDSIGHT_ENABLE_CP': 'false', 'HINDSIGHT_API_HOST': '127.0.0.1',
         'HINDSIGHT_API_LLM_PROVIDER': 'openai', 'HINDSIGHT_API_WORKER_ENABLED': 'false',
         # Hindsight 0.10.0 otherwise selects its shorter 30-second Reflect
@@ -41,6 +44,18 @@ def environment(model, port, gateway_port):
         'HINDSIGHT_API_RERANKER_LOCAL_MAX_CONCURRENT': '1',
         'HINDSIGHT_API_HTTP_EXTENSION': 'augmentor_memory:ControlledMemory',
         'HINDSIGHT_API_HTTP_GATEWAY': f'http://127.0.0.1:{gateway_port}', 'PYTHONPATH': '/augmentor'}
+    # Use the pinned engine's supported request-body configuration for every
+    # operation. This affects only this memory client, never the model server.
+    for operation in ('', 'RETAIN_', 'REFLECT_', 'CONSOLIDATION_'):
+        value['HINDSIGHT_API_' + operation + 'LLM_EXTRA_BODY'] = extra
+    return value
+
+
+def environment_matches(actual, expected):
+    # Missing extra-body settings are the pinned engine's JSON-null defaults.
+    # A configured off mode must not be silently reused as default or vice versa.
+    return all(actual.get(key, 'null' if key.endswith('_LLM_EXTRA_BODY') else None) == value
+               for key, value in expected.items())
 
 
 def main():
@@ -53,6 +68,8 @@ def main():
     parser.add_argument('--volume', default='augmentor-hindsight-data')
     parser.add_argument('--sudo-docker', action='store_true')
     parser.add_argument('--api-key-env')
+    parser.add_argument('--llama-cpp-thinking', choices=('default', 'off'),
+                        help='Memory requests only: use the server default or send enable_thinking=false. Requires a compatible llama.cpp template. Omission preserves a saved choice.')
     parser.add_argument('--replace-stopped', action='store_true', help='Back up and replace a stopped older engine; never stop an active one.')
     args = parser.parse_args()
     if not all(1024 <= p <= 65535 for p in (args.port, args.gateway_port)) or args.port == args.gateway_port:
@@ -67,6 +84,9 @@ def main():
     data.mkdir(parents=True, exist_ok=True, mode=0o700)
     path = data / 'hindsight.json'
     previous = json.loads(path.read_text()) if path.exists() else {}
+    thinking = args.llama_cpp_thinking or previous.get('llamaCppThinking', 'default')
+    if thinking not in ('default', 'off'):
+        raise SystemExit('Saved memory thinking mode is invalid; configuration was not changed.')
     endpoint = f'http://127.0.0.1:{args.port}'
     if previous and previous.get('endpoint') != endpoint:
         raise SystemExit('Refusing to silently change the memory destination.')
@@ -83,13 +103,13 @@ def main():
         raise SystemExit('Controlled memory artifact differs from its recorded hash.')
     if not extension.exists():
         extension.write_bytes(content); extension.chmod(0o444)
-    expected = environment(args.model, args.port, args.gateway_port)
+    expected = environment(args.model, args.port, args.gateway_port, llama_cpp_thinking=thinking)
     existing = subprocess.run(docker + ['inspect', args.name], capture_output=True, text=True)
     create = existing.returncode != 0
     if not create:
         container = json.loads(existing.stdout)[0]
         env = dict(e.split('=', 1) for e in container['Config']['Env'])
-        matches = (container['Config']['Image'] == IMAGE and all(env.get(k) == v for k, v in expected.items()) and
+        matches = (container['Config']['Image'] == IMAGE and environment_matches(env, expected) and
                    env.get('HINDSIGHT_API_HTTP_KEY') == key and
                    any(m.get('Source') == str(artifact) and m.get('Destination') == '/augmentor' for m in container['Mounts']))
         if not matches:
@@ -133,7 +153,7 @@ def main():
         raise SystemExit('Controlled engine did not become ready. Configuration was not changed; engine stopped.')
     value = {'endpoint': endpoint, 'version': '0.10.0', 'image': IMAGE, 'processingProtocol': PROTOCOL,
              'gatewayPort': args.gateway_port, 'gatewayKey': key, 'modelUrl': args.model_url.rstrip('/'),
-             'modelKey': model_key, 'extensionSha256': digest}
+             'modelKey': model_key, 'extensionSha256': digest, 'llamaCppThinking': thinking}
     temporary = path.with_suffix('.tmp')
     fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, 'w') as stream:

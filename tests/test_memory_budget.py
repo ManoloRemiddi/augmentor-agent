@@ -20,10 +20,14 @@ from lifecycle.admission import Admission, MaintenanceBusy
 
 
 class InstallerBudgetTests(unittest.TestCase):
-    def test_operation_clients_use_the_existing_call_ceiling_without_enabling_retries(self):
+    def setup_module(self):
         path = Path(__file__).resolve().parents[1] / 'scripts/setup-hindsight.py'
         spec = importlib.util.spec_from_file_location('controlled_hindsight_setup', path)
         setup = importlib.util.module_from_spec(spec); spec.loader.exec_module(setup)
+        return setup
+
+    def test_operation_clients_use_the_existing_call_ceiling_without_enabling_retries(self):
+        setup = self.setup_module()
         value = setup.environment('explicit-synthetic-model', 18440, 18441)
         self.assertEqual(float(value['HINDSIGHT_API_LLM_TIMEOUT']), CALL_SECONDS)
         self.assertEqual(value['HINDSIGHT_API_LLM_MODEL'], 'explicit-synthetic-model')
@@ -31,6 +35,26 @@ class InstallerBudgetTests(unittest.TestCase):
         for key in ('HINDSIGHT_API_LLM_MAX_RETRIES', 'HINDSIGHT_API_RETAIN_LLM_MAX_RETRIES',
                     'HINDSIGHT_API_REFLECT_LLM_MAX_RETRIES', 'HINDSIGHT_API_CONSOLIDATION_LLM_MAX_RETRIES'):
             self.assertEqual(value[key], '0')
+
+    def test_memory_only_thinking_is_explicit_pinned_for_all_operations_and_not_silently_reused(self):
+        setup = self.setup_module()
+        default = setup.environment('synthetic-model', 18440, 18441)
+        disabled = setup.environment('synthetic-model', 18440, 18441, llama_cpp_thinking='off')
+        keys = {'HINDSIGHT_API_' + operation + 'LLM_EXTRA_BODY' for operation in ('', 'RETAIN_', 'REFLECT_', 'CONSOLIDATION_')}
+        self.assertEqual({k for k in default if default[k] != disabled[k]}, keys)
+        for key in keys:
+            self.assertIsNone(json.loads(default[key]))
+            self.assertEqual(json.loads(disabled[key]), {'chat_template_kwargs': {'enable_thinking': False}})
+        legacy = {k: v for k, v in default.items() if k not in keys}
+        self.assertTrue(setup.environment_matches(legacy, default))
+        self.assertTrue(setup.environment_matches(disabled, disabled))
+        self.assertFalse(setup.environment_matches(legacy, disabled))
+        self.assertFalse(setup.environment_matches(disabled, default))
+        self.assertFalse(setup.environment_matches(default, disabled))
+        for key in keys:
+            mixed = {**disabled, key: 'null'}
+            self.assertFalse(setup.environment_matches(mixed, disabled), key)
+        with self.assertRaises(ValueError): setup.environment('synthetic-model', 18440, 18441, llama_cpp_thinking='automatic')
 
 
 class BudgetTests(unittest.TestCase):
