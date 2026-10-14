@@ -11,6 +11,62 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Actual public wrapper rebuild — October 14
+
+At **1598961772d31848291559d8755f491af702b09e**, the public-source review now
+includes an actual build of public commit **b19bb73c74ed893b8a5d1716d32df32a113ed31b**,
+not only package-version comparison. Its recorded archive SHA-256 verifies.
+The original frozen lock installs with lifecycle scripts disabled and isolated
+registry configuration. The original `pnpm run build:adapter` succeeds using
+Node **24.19.0**, pnpm **11.7.0**, TypeScript **6.0.3** and tsdown **0.22.14**.
+No owner profile, provider key, private repository or installed engine is used.
+
+Comparison covers all **36** JavaScript/declaration files of the pinned entry
+package. **28 match byte-for-byte**: the font-snapshot worker and 27 declarations.
+Three main/CLI/worker bundles and four existing declarations differ; the new
+`native-process.d.ts` has no corresponding public build output. The differences
+include the API version, RTL tile unmirroring and native printer-discovery
+suppression. This demonstrates a code gap beyond a version-label difference;
+it does not establish that corresponding source cannot exist elsewhere.
+The checked public branch and all **190** available history commits contain
+neither `native-process.ts` nor the `unmirrorRtlTile` TypeScript addition.
+The alternative repository named in that public checkout's metadata returns
+404/repository-not-found. The reviewed JSON records every compared hash, size,
+missing file, lock hash, toolchain and scope without machine-specific paths.
+
+The current npm `latest` is **0.2.0**, so that entry archive is also inspected
+without changing the dependency pin. Its official SHA-512 integrity verifies;
+it contains **105 files**, native frame-forwarding C++ sources/prebuilds and an
+optional Koffi **3.1.1** dependency. It does not include entry TypeScript preferred
+source. That inventory does not qualify its semantic compatibility, native
+suppliers or engine rebuild, and it does not close the existing entry source
+gate. The original **0.1.5** payloads, source/notice exports and GUI remain pinned.
+
+The official LibreOffice tag resolves to the recorded Core commit
+**bce0998afefdbc355585ca324285661a2170ba77**. The shipped engine recipe independently
+requires that checkout, its exact Emsdk checkout, applied patches/shim/header and
+Emscripten **4.0.10** before compiling. Its build identity rejects whitespace in
+build paths, so a future isolated engine build must use suitable container/cache
+paths. No Core/toolchain checkout, engine compilation, replacement artifact or
+public redistribution qualification is claimed by this wrapper proof.
+
+Reproduce the wrapper comparison from the hash-verified public archive recorded
+in `release/office-engine-public-source-review.json`: install its original frozen
+pnpm lock with `--ignore-scripts`, run the original adapter build, then compare
+each `entryPackage.files` path under `lib/` to the exact hashes in
+`release/office-engine-linux-wasm.json`. Use an isolated npm configuration/cache,
+the recorded toolchain and a separate output directory; keep installed files
+unchanged. The review's `entryRebuildComparison` stores the complete result.
+
+The **nine existing Office packaging cases pass**, including actual exported
+source/notice identities and rejection after forged approval labels or altered
+bytes. This is source-availability/build evidence, not another rendering/live
+GUI, installed, cross-platform or public-binary qualification. Exact entry
+preferred source, actual engine rebuild, full linked notices and distribution
+acceptance remain open. The [upstream repository](https://github.com/deepseek-ai/dsh-libreoffice-kit)
+and [MPL guidance](https://www.mozilla.org/en-US/MPL/2.0/FAQ/) remain the primary
+source/licence references; component terms are not relabelled MIT.
+
 ## Original document registration — October 12
 
 The original public DSH Office registration selects `.doc`, `.docx`, `.ppt` and

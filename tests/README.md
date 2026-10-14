@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+At **1598961772d31848291559d8755f491af702b09e**, the Office review includes an
+actual frozen public b19bb73 adapter build. All 36 pinned entry code/declarations
+are compared: 28 byte matches, seven differences and one missing native-process
+output. Public history/latest 0.2.0 inventory do not close the preferred-source
+gap; pins and rendering behavior remain unchanged. Existing
+`python3 -m unittest discover -s tests -p test_office_engine_packaging.py -v`
+passes **9/9**, retaining actual input/export and public-gate checks. See
+[toolchain, evidence and reproduction scope](../docs/HARNESS-OFFICE-PREVIEWS.md#actual-public-wrapper-rebuild--october-14).
+No engine rebuild, new runtime/candidate/installed GUI or public-binary acceptance
+is claimed by this source comparison.
+
 Source **552ba40f16cb0823b60796f014eca4ff37e0ad0d** passes strict check/build and
 **12/12 source plus 12/12 ordinary** across `harness-goals-chromium`,
 `harness-search-settings-chromium`, `pi-goals`, `pi-goals-barriers` and

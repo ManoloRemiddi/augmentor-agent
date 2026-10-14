@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Actual public Office wrapper rebuild](HARNESS-OFFICE-PREVIEWS.md#actual-public-wrapper-rebuild--october-14)
+at **1598961772d31848291559d8755f491af702b09e** builds public b19bb73 with its
+frozen lock/original command and recorded Node/pnpm/TypeScript/tsdown. Of all
+36 pinned entry code/declaration files, 28 match; three bundles/four declarations
+differ and native-process output is absent. RTL/printer-discovery differences
+show a code gap beyond a version label. The available 190-commit history lacks
+the corresponding module/RTL addition. Latest npm 0.2.0 archive integrity verifies
+but ships no entry TypeScript source; native frame-forwarding source/prebuilds
+and Koffi are not a wrapper-source or full-engine qualification. Nine existing
+Office gate tests pass. Pins, runtime/GUI, app/draft/candidate/feedback are unchanged.
+Keep the public gate: exact entry preferred source, actual engine rebuild and
+linked/native/notice/distribution acceptance remain required. The Core tag and
+recipe prerequisites verify; no engine compilation or new artifact is claimed.
+
 [Displayed Goal actions during pending inspection](PI-GOALS.md#displayed-actions-during-pending-inspection--october-14)
 at **552ba40f16cb0823b60796f014eca4ff37e0ad0d** qualify a shared original-DSH/
 inspection frontend fix: a pending read no longer silently discards an enabled

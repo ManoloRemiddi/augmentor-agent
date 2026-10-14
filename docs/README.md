@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Actual Office preferred-source build](HARNESS-OFFICE-PREVIEWS.md#actual-public-wrapper-rebuild--october-14)
+records 1598961: the original frozen public wrapper build succeeds, but only
+28/36 pinned code/declaration files match. The missing native-process source and
+RTL/printer-discovery differences retain the exact-entry gate. Latest npm 0.2.0
+archive also lacks entry TypeScript; no upgrade or full-engine qualification is
+inferred. Nine Office packaging cases pass; source/engine/linked notice and public
+distribution work remains, with runtime/app/draft/candidate/feedback preserved.
+
 [Goal actions during pending inspection](PI-GOALS.md#displayed-actions-during-pending-inspection--october-14)
 records source 552ba40: one displayed Pause action survives a pending read and
 an older response cannot restore active state. Strict check/build and source/
