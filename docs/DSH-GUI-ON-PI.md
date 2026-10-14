@@ -1,5 +1,46 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Hover-only workspace actions — October 14
+
+Qualification driver **36024aae780635daaa38f9920b5f6750611c08cc** prepares the
+original row and its hover-only action together. The copied Rows CSS intentionally
+uses `display:none` until its workspace/session row is hovered or its menu is
+open. The former driver observes one hover position and subsequently scrolls/
+prepares the child button independently. Row motion can leave the pointer behind
+and hide that button, producing the zero-sized target reported by hosted CI.
+
+An independently authored moving-row fixture uses the exact original Rows CSS.
+After a one-position hover loses its row, the action has zero width. The row also
+moves on the next hover, so successful preparation must reobserve and reacquire
+hover rather than dispatching at a cached position. The new helper scrolls and
+checks the row, uses actual mouse movement, then observes its original control
+without separately scrolling it. Both geometries and finite active animations
+must settle, the pointer must still hover the same row, and the target must be
+hit-testable. Preparations may repeat; its one mouse press/click does not.
+The fixture records one press/click and at least three hover entries. No supplier
+CSS, layout, control, timing, application code or expectation is changed.
+
+The same preparation covers the complete original workspace/session Rename,
+Pin, archive/Stop/Undo, Unarchive and workspace removal workflow. Exact folder
+adoption, catalog name/order, preserved drafts/history/files, context inspection,
+native compaction and no-replay assertions remain. Source and separate ordinary
+production-backed pointer/composition/navigation cases pass **10/10 each**, two
+workers, unchanged deadlines, no skips. The ordinary runtime/SDK/GUI/Node are
+the existing unselected production assembly; no new product build or installed
+selection is inferred from these test-only changes.
+
+Preceding Validate **38516251396** at 092e5a1 and **38521486184** at 4c58e2b both
+report a zero-sized workspace-actions target. The authored case proves this hover
+preparation mechanism, but exact motion in those hosted runs was not captured.
+The latter also fails the Jobs assertion that an older list response cannot erase
+explicit native evidence. Preserve that separate failure; cause/new-head hosted
+acceptance are unproven. Investigate ordinary background refresh/state retention
+without weakening the evidence assertion or disabling product polling.
+
+The installed app/draft, immutable candidate, manual-feedback profile and all
+runtime/supplier/dependency identities remain unchanged. Full owner, plugin,
+live/privacy, platform and public-distribution requirements remain open.
+
 ## Original GUI qualification: motion and navigation — October 13
 
 Driver implementation **d77a4367aec3ee9505bace3591a5502f12efb082** fixes a

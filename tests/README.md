@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+At **36024aae780635daaa38f9920b5f6750611c08cc**, pointer/composition/navigation
+source and ordinary **10/10 each** pass across `harness-pointer-chromium`,
+`harness-dsh-chromium` and `harness-navigation-chromium`, two workers, unchanged
+deadlines, no skips. The original Rows CSS is used by an authored moving-row case:
+one-position hover leaves a zero-width action; row/control preparation reacquires
+hover after another move, then records one press/click. Full original workspace,
+session, Context, compaction and no-replay assertions remain. See
+[scope and retained CI failures](../docs/DSH-GUI-ON-PI.md#hover-only-workspace-actions--october-14).
+Preceding 4c58e2b/38521486184 also fails Jobs native-evidence retention; source/
+ordinary passing runs do not explain that failure or qualify full hosted acceptance.
+Runtime/layout/dependency/installed/candidate/feedback identities are unchanged.
+
 At **8a441bb76e83eef509f6f0cd26e958736d5b6d7b**, strict check/build and
 source/ordinary **32/32 each** pass across `harness-jobs-chromium`, `jobs-registry`,
 `pi-jobs`, `pi-desktop-jobs`, `harness-goals-chromium` and

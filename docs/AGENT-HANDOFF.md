@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original hover-only action preparation](DSH-GUI-ON-PI.md#hover-only-workspace-actions--october-14)
+at **36024aae780635daaa38f9920b5f6750611c08cc** uses row scroll/stability, actual
+hover and stable control hit-testing before one click. The original Rows CSS
+fixture reproduces zero width after row movement and reacquires hover after two
+moves. Complete workspace/session/Context/native-compaction/navigation source
+and ordinary **10/10 each** pass, two workers, unchanged deadlines/no skips.
+Application/supplier/layout/dependency and installed/candidate/feedback/draft
+identities stay preserved. Latest preceding 4c58e2b/Validate 38521486184 retains
+workspace zero-target and Jobs native-evidence erasure assertions. Exact old
+motion and Jobs erasure causes/new-head CI are unproven; investigate state retention
+without weakening assertions or disabling normal product polling.
+
+[Accepted Search choice](HARNESS-PLUGIN-PARITY.md#accepted-search-source-choice--october-14):
+owner chooses the tested MIT alternatives. Historical 0.1.0 repository identity
+is no longer required for that source choice; identity/360 behavior remain
+unconfirmed, with representative/installed/platform acceptance still required.
+
 [Jobs controls, cold receipts and current Qwen](PI-JOBS.md#displayed-controls-cold-receipts-and-current-qwen--october-14)
 at **8a441bb76e83eef509f6f0cd26e958736d5b6d7b** keep displayed Start/Stop/evidence
 usable during inspection, fence older replies and preserve each control's disabled

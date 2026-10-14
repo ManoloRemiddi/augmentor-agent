@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Hover-only original actions](DSH-GUI-ON-PI.md#hover-only-workspace-actions--october-14)
+records source 36024aa and source/ordinary 10/10, preserving original CSS/layout
+and all workflow assertions. Row/control preparation now reacquires hover before
+one click. Preceding CI retains a workspace pointer and separate Jobs evidence
+assertion; causes/full new-head acceptance remain unproven. The owner also
+[chooses tested MIT Search alternatives](HARNESS-PLUGIN-PARITY.md#accepted-search-source-choice--october-14),
+while historical identity/behavior and broader installed/live/platform gaps stay scoped.
+
 [Jobs inspection and cold receipt qualification](PI-JOBS.md#displayed-controls-cold-receipts-and-current-qwen--october-14)
 records 8a441bb: displayed actions/evidence survive pending reads, stale replies
 respect owner/busy/disabled state, and exact cold duplicates avoid parent loading.

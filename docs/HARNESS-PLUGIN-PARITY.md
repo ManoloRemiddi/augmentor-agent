@@ -9,6 +9,19 @@ workflow. This register separates implemented Pi behavior, copied presentation,
 source fixtures, installed acceptance and live-service qualification. It does
 not qualify DSH retirement or infer parity from the total test count.
 
+### Accepted Search source choice — October 14
+
+The owner confirms: **“Not sure—continue with the tested MIT alternatives.”**
+Use the already qualified public MIT configured-API card/provider and keyless
+engine/public-fetch implementations as the chosen Search path. Identifying the
+historical Free Web Search **0.1.0** repository is no longer a prerequisite for
+that implementation choice. Its identity and exact historical behavior remain
+unconfirmed; this does not establish 360 support or retire the reference plugin.
+Keep original interface/keys/drafts, explicit mode selection, verified supplier
+notices and public-source/privacy boundaries. Representative engines/outage/quota,
+owner configuration and installed/platform acceptance still require evidence.
+No saved owner key or profile is imported by this choice.
+
 | Reference integration | Current Pi evidence | Required remaining workflow |
 | --- | --- | --- |
 | Model Picker Augmented 1.1.2 | Existing curation/pin/hide state, original Models forms, explicit endpoint discovery and configuration lifecycle; source/ordinary/installed checkpoints in [Models](HARNESS-MODELS.md). | Representative live provider/OAuth/virtual-router configuration and preserved owner choices; a configured picker is not endpoint health. |
@@ -18,7 +31,7 @@ not qualify DSH retirement or infer parity from the total test count.
 | Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. The original Plugins form enables/disables the suite through public resource discovery on the same owners. | Installed-owner configuration/UI acceptance, representative use of the other skill workflows and companion CLIs/services. |
 | Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | Installed-owner configuration/migration, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
-| Free Web Search, historical 0.1.0 reference | [Original API card and keyless controls](#keyless-and-api-modes-in-the-original-plugins-page--october-14) bind both workflows through existing Native owners, retaining separate keys/settings/drafts, same-owner mode reload, collision/pending recovery, scope boundaries and actual Light/Dark GUI qualification. Source/ordinary managed Qwen search and public fetch qualify. | Historical identity and 360 behavior, proof of active reference composition, representative credentialed engines/outage/quota, standalone add-ons, guarded installed owner acceptance and other OS qualification remain. No owner keys are migrated. |
+| Free Web Search, historical 0.1.0 reference | [Original API card and keyless controls](#keyless-and-api-modes-in-the-original-plugins-page--october-14) bind both workflows through existing Native owners, retaining separate keys/settings/drafts, same-owner mode reload, collision/pending recovery, scope boundaries and actual Light/Dark GUI qualification. Source/ordinary managed Qwen search and public fetch qualify. The owner chooses these tested MIT alternatives. | Historical identity/360 parity remain unconfirmed; identity does not block the accepted source choice. Representative credentialed engines/outage/quota, standalone add-ons, guarded installed owner acceptance and other OS qualification remain. No owner keys are migrated. |
 | Playwright MCP | Managed MCP registration/resources/direct/deferred/codemode, scopes/Stop and retained originals qualify with synthetic servers. | Existing configured Playwright catalog and representative browser workflow with actual scope/effects. |
 | Comfy MCP | Same managed-core binding; the reference service previously refused connection. | Service availability and a representative authorized workflow; no successful Comfy operation is claimed. |
 | Blender MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Blender operation and verified effect/Stop/retained evidence. |
