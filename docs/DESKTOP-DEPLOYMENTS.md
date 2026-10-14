@@ -11,9 +11,11 @@ For a private assembly retaining the same reviewed native dependencies, run
 `python3 scripts/assemble-harness-notices.py --app /path/to/unselected-assembly --baseline /path/to/verified-release`
 before normal staging. The assembly must include built GUI/runtime, public
 preferred supplier source, locked production dependencies and bundled Node.
-This completes generated supplier/Node/PDF/Wiki notice records omitted by a
-fresh npm-only tree, verifies the immutable baseline and rejects native drift,
-missing inputs and staged/linked destinations before publication. The helper is
+This completes generated supplier/Node/PDF/Wiki and API/keyless search notice
+records omitted by a fresh npm-only tree. It verifies the immutable baseline, all
+52 search selection records in preferred/compiled inputs and the client selection
+against compiled GUI provenance, rejecting native/source drift, missing notices,
+stale provenance and staged/linked or escaping destinations before publication. The helper is
 Linux-only and never grants public Office/font/native redistribution approval.
 The owning candidate record retains the initial incomplete-assembly failure.
 

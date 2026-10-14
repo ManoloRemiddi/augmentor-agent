@@ -48,6 +48,7 @@ at every dependency upgrade.
 | Chat, compaction, prompt improvement and specialist inference | The explicitly selected/configured provider; ordinary conversation or the documented isolated transformation/worker content. |
 | Model discovery or credential operations | Authorized model/setup/refresh/login workflows and configured provider endpoints; SDK credential refresh and live endpoints require separate observation. |
 | Memory and speech | Separately configured companions/services under their existing pause, capture, provider and placement policies. |
+| Free Search | Explicit Native opt-in and selected API/keyless mode. Queries may reach selected/fallback engines; direct pages follow pinned public redirects. Stored API keys are excluded from keyless requests. See [settings/request disclosure](DATA-AND-SUPPORT.md#free-search-settings-and-requests); fixtures/live representatives are not an exhaustive destination audit. |
 | Browser, web and MCP operations | Approved tools/resources and reviewed configured server startup; each service and extension has separate data practices. |
 | Harness transport/assets/previews | Authenticated local Host and local bundled assets/workers; inspectors retain their narrower scope. |
 | Install analytics/cache warming | Disabled in managed Pi sessions; unexpected reporting is a qualification failure. |

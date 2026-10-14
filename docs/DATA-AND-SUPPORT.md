@@ -78,6 +78,33 @@ and the runtime uses its owned service's environment; the key is absent from
 command-line arguments and the login-service plist. Connect sends a short test
 message to the configured provider. Keep its profile and diagnostic logs private.
 
+## Free Search settings and requests
+
+The [Linux Native search feature](HARNESS-PLUGIN-PARITY.md#keyless-and-api-modes-in-the-original-plugins-page--october-14)
+is opt-in. Its private mode-0600 `config/free-search.json` stores mode, keyless
+engine/instance/domain/fetch preferences and separate unencrypted API keys.
+Switching modes keeps both saved configurations and in-memory drafts. Resetting
+keyless preferences does not remove API credentials. No DSH profile or keys are
+imported automatically. Operator configuration is unavailable to read-only
+inspectors; Browser/delegated owners receive no implicit search tool grant.
+
+Search sends tool queries to the selected engines and, when needed, fallback
+engines. Configured mode uses the original nine API providers and configured
+keys. Keyless mode supports Bing, DuckDuckGo HTML/Lite, anonymous Tavily and
+explicit public SearXNG instances; no instance is contacted by default. Keyless
+requests exclude stored API keys and browser cookies. Anonymous Tavily availability
+and quotas are not a guaranteed service contract. Public-page fetch sends the
+requested URL and user agent to public destinations, including permitted public
+redirects; each address is resolved and pinned. Search/fetch results are untrusted
+external content passed to the selected conversational model and retained with
+ordinary private tool history. Bounds, cancellation and blocked-domain rules
+limit reads; they are not an OS firewall or European data-residency guarantee.
+The managed Pi telemetry policy still applies, and live destination/upgrade audits
+remain part of release qualification. This source/ordinary feature has not replaced
+the running owner preview.
+
+## Model credentials and memory
+
 Model keys are stored in private user configuration without encryption. Remote
 model and Hindsight endpoints require HTTPS and authentication; numeric loopback
 HTTP supports local services. There are two distinct memory integrations:

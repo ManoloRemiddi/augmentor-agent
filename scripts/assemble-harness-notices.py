@@ -71,6 +71,46 @@ def assemble(app, baseline):
         for filename in ('SOURCE.md', 'ORIGINAL_LICENSE'):
             if (vendor / filename).exists():
                 require('licenses/' + name + '/' + filename, vendor / filename)
+    search_records = 0
+    def search_selection(vendor, seat, expected=None, *, notices=('LICENSE',), count=True):
+        nonlocal search_records
+        if vendor.is_symlink() or not vendor.resolve().is_relative_to(app):
+            raise ValueError('Search source escapes its unselected assembly.')
+        metadata = vendor / 'SOURCE.json'
+        if metadata.is_symlink() or not metadata.resolve().is_relative_to(vendor.resolve()):
+            raise ValueError('Search source escapes its selected directory.')
+        selected = json.loads(metadata.read_text())
+        if expected is not None and selected != expected:
+            raise ValueError('Compiled search provenance differs from its selected source.')
+        records = selected.get('files')
+        if not isinstance(records, list) or not records or not set(notices).issubset({row['path'] for row in records}):
+            raise ValueError('Search source selection is missing.')
+        for row in records:
+            relative = Path(row['path'])
+            source = vendor / relative
+            if relative.is_absolute() or '..' in relative.parts or source.is_symlink() or not source.resolve().is_relative_to(vendor.resolve()):
+                raise ValueError('Search source escapes its selected directory.')
+            if not source.is_file() or hashlib.sha256(source.read_bytes()).hexdigest() != row['sha256']:
+                raise ValueError('Selected search source changed: ' + str(relative))
+        if count:
+            search_records += len(records)
+        for filename in ('SOURCE.json', *notices):
+            require('licenses/' + seat + '/' + filename, vendor / filename)
+        for filename in ('SOURCE.md', 'SELECTION.json'):
+            if (vendor / filename).exists():
+                require('licenses/' + seat + '/' + filename, vendor / filename)
+        return selected
+    for name in ('dsh-web-search-free', 'keyless-search', 'dsh-keyless-fetch'):
+        preferred = app / 'packages/runtime/vendor' / name
+        compiled = app / 'dist/runtime/vendor' / name
+        notices = ('LICENSE-dddmuc', 'LICENSE-shinjiyu') if name == 'keyless-search' else ('LICENSE',)
+        # Validate both trees before any destination is changed; only count the
+        # selection once, while preserving the original supplier notices.
+        selected = search_selection(preferred, name + '/runtime', notices=notices)
+        search_selection(compiled, name + '/runtime', selected, notices=notices, count=False)
+        if (preferred / 'SOURCE.json').read_bytes() != (compiled / 'SOURCE.json').read_bytes():
+            raise ValueError('Compiled search selection differs from its preferred source.')
+    search_selection(app / 'apps/harness/vendor/dsh-web-search-free', 'dsh-web-search-free/client', provenance.get('dshFreeSearch', {}))
     for relative in closure:
         target = app / relative
         if target.is_symlink() or not target.resolve().is_relative_to(app):
@@ -81,7 +121,8 @@ def assemble(app, baseline):
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(content)
     return {'baselineArtifactSha256': previous['artifactSha256'], 'dependencyNativeFiles': len(native_files(app)),
-            'writtenNoticeFiles': len(closure), 'publicBinaryRedistributionQualified': False}
+            'writtenNoticeFiles': len(closure), 'verifiedSearchSourceRecords': search_records,
+            'publicBinaryRedistributionQualified': False}
 
 
 if __name__ == '__main__':

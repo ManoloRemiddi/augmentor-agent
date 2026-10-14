@@ -1,5 +1,29 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 14 Host/settings implementation extends `search-settings.test.mjs`
+to eight cases for legacy byte preservation, independent mode/config/key layers,
+form units/order/limits and uncertain-save draft retention. The original Chromium
+case now covers both mode panels, staged drafts across switches, same-owner/history
+reload, advanced fields, active-work refusal, mode collision/pending/explicit
+recovery, Browser/inspector boundaries, cold reopen and settled Light/Dark contrast.
+Six SDK/HTTP keyless cases remain. Source/fresh ordinary production each pass
+**491/491 across 98 MX files**, matching Node/QtTest, two workers, unchanged
+deadlines and no skips. All 52 search records and 902 compiled files match;
+155 npm instances/eight pre-Node native files are unchanged. Separate real Qwen
+managed Hosts each switch mode on the same AgentSession and perform two search-turn
+tools against official Debian sources/page with exact cold history and no saved
+synthetic key in model-visible events. Initial live/driver failures retain their
+own limitations. Sealed/installed, historical identity/360, live credentialed engines
+and other platform acceptance remain open. See [current mode qualification](../docs/HARNESS-PLUGIN-PARITY.md#keyless-and-api-modes-in-the-original-plugins-page--october-14).
+
+`test_harness_notice_assembly.py` now has five filesystem integrity cases for
+original notice closure, native/baseline refusal, source/hash/client-provenance
+drift, missing search notices, path/link escapes and staged/linked destinations.
+Source and ordinary pass these plus seven licence and nine Office packaging
+cases; public binary/Office/font licensing gates remain separate.
+
+Historical library-only checkpoint (Host/settings scope superseded above):
+
 Implementation **68ab32100ac0fef63374d8cb17618d174d72095e**: `keyless-search.test.mjs` qualifies original MIT engine functions and copied DSH
 HTTP/address/body policy: frozen configs/rules, no ambient key read, Stop/failover/
 partial reads, response/attempt caps, explicit SearXNG instances, private/mixed/

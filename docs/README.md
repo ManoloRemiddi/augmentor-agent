@@ -1,9 +1,24 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Keyless and API modes in the original Plugins page](HARNESS-PLUGIN-PARITY.md#keyless-and-api-modes-in-the-original-plugins-page--october-14)
+bind both search workflows to existing Linux Native owners using original DSH
+controls. Separate settings/keys/drafts, same-AgentSession mode reload and pending
+collision recovery qualify. Strict check/build, source/ordinary **491/491 across
+98 MX files**, matching Node/QtTest, two workers, unchanged deadlines/no skips,
+all 52 selection records/902 compiled files and 155 unchanged npm instances/eight
+unchanged native files pass. Source/ordinary real Qwen managed Hosts each search
+and fetch official Debian data with two search-turn tools and exact cold history;
+earlier failed live outcomes remain scoped and unexplained. Qwen/Breeze/Resonant
+Voice are online without restart/tuning. Current 97897cf preview and its busy
+owner draft stay preserved; sealed/installed, historical identity/360, broader
+plugin/live/privacy/distribution and platform acceptance remain open.
+
+Historical library-only checkpoint (Host/settings scope superseded above):
+
 [MIT keyless search/public fetch library](HARNESS-PLUGIN-PARITY.md#mit-keyless-engine-and-public-fetch-library--october-14)
 records selected public MIT engines and original DSH address-pinned fetch, SDK/live
 Qwen evidence, production bytes and the historical-source licence ambiguity.
-Private app mode/GUI wiring and installed acceptance remain separate requirements.
+Its Host/private mode/GUI gap is superseded above; installed acceptance remains separate.
 
 [Original Free Search card and private Pi settings](HARNESS-PLUGIN-PARITY.md#free-search-settings-and-original-card--october-14)
 records public MIT source, existing Native owner enable/reload, private credentials,
