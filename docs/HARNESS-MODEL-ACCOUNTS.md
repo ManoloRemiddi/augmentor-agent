@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared Models notifications](HARNESS-MODELS.md#cross-window-models-invalidation--october-14) now retire stale operator model/account controls through non-secret existing poll hints. Account receipt transitions advance an ephemeral Host hint; the durable schema/secrecy and SDK action ownership remain unchanged. Reconciliation that is already confirmed leaves its metadata file untouched; unknown/cold receipts still require explicit reconciliation. Source/ordinary 244/244 each and three-platform 31-case SDK contracts pass at 8ed59df. This follow-up does not patch the running review.
+
 # Pi accounts in the original DSH Models page
 
 The source candidate adds supported Pi OAuth sign-in to the original DSH sign-in

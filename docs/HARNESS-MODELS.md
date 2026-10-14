@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Cross-window Models invalidation](#cross-window-models-invalidation--october-14) adds non-secret operator revision hints to the existing poll transport. A changed view loses edit/discovery authority while preserving original open forms and unsaved text. Fresh reads are explicit; confirmed own saves carry settled stamps, and late reads/replies cannot restore stale authority. The original GUI/CSS and 583 supplier records remain unchanged. Initial strict check/build and focused 49/49 across eight files pass; complete source/ordinary qualification is pending. The current owner review and installed selection remain preserved.
+[Cross-window Models invalidation](#cross-window-models-invalidation--october-14) adds non-secret operator revision hints to the existing poll transport. A changed view loses edit/discovery authority while preserving original open forms and unsaved text. Fresh reads are explicit; confirmed own saves carry settled stamps, and late reads/replies cannot restore stale authority. The original GUI/CSS and 583 supplier records remain unchanged. At **8ed59df73540f85134ea9bd08348e60be063b99c**, strict check/build, initial focused 49/49 and source/fresh ordinary **244/244 each across 61 files** pass, all 44 Harness Chromium files, two workers, unchanged deadlines/no skips. All 911 compiled files and 2,034 executable source/test/fixture files match; 20,847 dependency entries/155 npm instances/Node 24.19.0 stay unchanged. [SDK workflow 38607443364](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38607443364) passes all three platforms, including 31 account/model cases on each. The current owner review and installed selection remain preserved.
 
 [Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict check/build, focused 41/41 and source/fresh ordinary **236/236 each across 60 files** pass, including all 44 Harness Chromium files. Authored-provider evidence uses real FileAuthStorage/Host/Chromium, callback/manual-code races and cold interruption. All 911 compiled files match; 20,847 dependency entries/155 production npm instances/Node 24.19.0 stay unchanged. Real provider, installed and new-head hosted acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
 
@@ -102,8 +102,10 @@ The initial forms left OAuth sign-in/out dialogs open. The current
 [stored-account sign-out](#stored-pi-account-sign-out--october-14) adds the separate
 logout control; [supported sign-in](HARNESS-MODEL-ACCOUNTS.md) now qualifies the
 original dialog with an authored provider. Virtual/extension-provider editing,
-advanced hidden profile controls, proactive cross-client invalidation, real
-provider and common Native/Browser provider-management parity remain open. The complete-file `models.configure`,
+advanced hidden profile controls, cross-process credential/catalog invalidation,
+real provider and common Native/Browser provider-management parity remain open.
+[Managed cross-window invalidation](#cross-window-models-invalidation--october-14)
+now covers the shared Harness profile/account scope. The complete-file `models.configure`,
 guided setup and manual reload now share the session reconciliation described in
 [the lifecycle follow-up](#model-configuration-lifecycle--october-13).
 This does not qualify the full P0 model-setup
@@ -649,8 +651,8 @@ without parsing or publishing their contents or reading credential storage.
 The number belongs to this Host lifetime. It is a notification, not a profile CAS
 revision, credential identity, proof of application or authorization token. Existing
 profile checks, work/queue/goal guards, SDK reconciliation and no-replay policy
-remain authoritative. External credential replacement of the same type, complete
-virtual-provider/catalog changes, OS-global file watching and cross-process locks
+remain authoritative. Credential changes made by another Pi process (including same-type replacement),
+complete virtual-provider/catalog changes, OS-global file watching and cross-process locks
 remain separate gaps. A profile restored between polls after an observed/applied
 change still retires an earlier namespace revision. A no-op refresh that completes
 between observations does not manufacture a changed profile/account receipt.
@@ -686,8 +688,63 @@ ordinary refresh dependencies; an isolated Host-method fixture lacked initialize
 notification state and left its authored release barrier pending after refusal.
 Only that owned test child was stopped. Optional/default notification state fixes
 that fixture boundary; no test deadline is extended, privacy check bypassed or
-owner runtime restarted. Full source/ordinary/new-head hosted qualification is
-pending at this implementation checkpoint. This shared TypeScript/browser feature
+owner runtime restarted. Full source/ordinary/new-head hosted qualification was
+pending at this initial implementation checkpoint; the completed scope follows. This shared TypeScript/browser feature
 has no new OS adapter; seven pure cases join the existing three-platform SDK
 workflow (31 common account/model cases). Physical/installed/live-provider,
 complete model-management, broader migration/privacy/distribution gates remain.
+
+### Qualified source and ordinary — cross-window Models
+
+Tested **8ed59df73540f85134ea9bd08348e60be063b99c** passes strict check/build and
+source/fresh ordinary **244/244 each across the same 61 files**, including all
+**44 Harness Chromium files**. Source duration is 161,119 ms; ordinary is
+154,030 ms. Two workers and existing deadlines are unchanged; there are no skips
+or cancellations. The cohort retains the original account manual/callback/cancel/
+unknown-commit/cold-interruption sequence, provider/discovery, Native/Browser,
+context, history, queue and lifecycle checks. The new two-window flow checks
+preserved text and disabled stale controls, exact stale-CAS refusal, explicit
+recovery, operator welcome hints and both inspector transport exclusions.
+
+All **911 compiled files** match by set and bytes; **2,034 executable source/test/
+fixture files** match, with the ordinary test guide compared to this tested ref.
+The complete **20,847-entry** dependency inventory, 155 production npm instances
+and bundled **Node 24.19.0** stay unchanged. All **583 supplier manifest records**,
+original UI/CSS and separate component notices remain unchanged. No npm dependency
+or new OS adapter is added.
+
+[SDK workflow 38607443364](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38607443364)
+at that same source **passes Linux, macOS and Windows**, including the **31 common
+account/model cases on each** and subsequent OS-private/startup/workspace checks.
+This is shared contract evidence, not physical or installed account/model acceptance.
+
+The running account review's complete **24,305-entry** artifact/identity and the
+prior **24,288-entry** review verify unchanged after both cohorts. Both and the two
+older review processes remain live; installed selection, retained drafts and
+canonical main's 38 pre-existing changes are preserved. Only immutable code/
+inventory and process identity are inspected, not owner history/credentials.
+Read-only local Qwen catalog access returns successfully; no production service,
+GPU, model/context/concurrency/precision or CPU ASR/VAD setting changes. This
+Models follow-up is source-qualified and **not deployed into the running review**.
+
+At preceding **1b5143e**, hosted SDK and Windows desktop pass. Actual Validate
+[38604087591](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38604087591)
+refuses later Debian packaging on the retained Office exact-entry-source/full-
+engine-rebuild gate. macOS [38604087510](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38604087510)
+refuses unreviewed Darwin LibreOffice MPL-2.0/libvips LGPL notices; Windows command
+[38604087474](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38604087474)
+retains delegation/usage/goal and ARM parent-Stop assertion failures. Those logs
+are distinct from this shared SDK pass. The Office final-link OOM remains terminal
+and retained; no engine rebuild/redistribution approval is manufactured. Broader
+new-head validation, model/provider/virtual controls, real services, owner feedback,
+physical/platform/installed rollout and full migration/privacy/release remain open.
+
+At this same **8ed59df** implementation,
+[Validate 38607443464](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38607443464)
+completes source/Home/Handy and Debian GUI/core/native/inventory checks. Its main
+Node cohort records **1,223 total: 1,200 pass, zero fail/cancelled, 23 existing
+skips**, followed by **116/116** secondary Node cases. The Qt/licensing Python
+cohort records **920 total: 875 pass, 45 existing skips**. Later packaging refuses
+the exact Office preferred-entry-source/full-engine-rebuild gate; installed and
+browser package jobs are skipped downstream. This proves the preceding test
+stages, not a green distribution or physical/native acceptance. No gate is relaxed.
