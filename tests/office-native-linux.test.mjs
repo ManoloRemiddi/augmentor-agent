@@ -103,3 +103,13 @@ test('independent native cleanup refuses a replacement scratch identity instead 
  assert.equal(await readFile(join(scratch,'keep.txt'),'utf8'),'AUTHORED_REPLACEMENT_MUST_SURVIVE');assert.deepEqual(await readFile(join(moved,'source.docx')),await readFile(join(root,'authored.docx')));
  await assert.rejects(stat(join(root,'converted.pdf')),error=>error.code==='ENOENT');
 });
+
+for(const fault of ['stopped','killed'])test('live native owner settles when its cleanup guard is '+fault,{skip:native?false:requires,timeout:20000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-guard-drain-')),inputPath=join(root,'authored.docx'),outputPath=join(root,'converted.pdf'),original=previewDocx('AUTHORED_GUARD_DRAIN_'+ 'x'.repeat(100000));await writeFile(inputPath,original);
+ const converter=await createLinuxNativeOfficeConverter(),abort=new AbortController(),work=converter.render({inputPath,outputPath},abort.signal);let owned=[],settled=false;const rejection=assert.rejects(work).then(()=>settled=true);
+ t.after(async()=>{for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');abort.abort();await rejection;await converter.dispose();await rm(root,{recursive:true,force:true});});
+ await until(async()=>{owned=await ownedProcesses();return owned.some(row=>row.name==='soffice.bin');});const guard=owned.find(row=>row.name==='aug-office-gc');assert(guard);
+ if(fault==='stopped'){for(const identity of owned)await signalOwned(identity,'SIGSTOP');abort.abort();}else{for(const identity of owned)if(identity.name==='soffice.bin')await signalOwned(identity,'SIGSTOP');await signalOwned(guard,'SIGKILL');}
+ await until(()=>settled);const retained=[];for(const identity of owned)if(await stillOwned(identity))retained.push(identity.name);assert.deepEqual(retained,[],'lost/stopped guard must not retain conversion actors or admission');
+ assert.deepEqual(await readdir(root),['authored.docx']);assert.deepEqual(await readFile(inputPath),Buffer.from(original));assert.equal(guard.parent,process.pid,'the live owner must directly own the cleanup helper');await converter.dispose();await assert.rejects(converter.render({inputPath,outputPath}),/closed/);
+});

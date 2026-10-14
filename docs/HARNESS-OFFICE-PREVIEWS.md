@@ -11,6 +11,45 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Native guard loss and bounded live-owner drain — October 15
+
+Two real-native fixtures against **2929c6076741786efcc881b8ccc0ca83e691f97b**
+reproduce an admission stall when the separate cleanup guard is stopped or
+killed. The frozen guard holds stdout after Node kills the broker; a killed
+guard also cannot drain a held renderer on its own. Neither operation settles
+within the existing observed ten-second barrier. This is a live-owner lifecycle
+gap, distinct from simultaneous loss of every cleanup owner.
+
+Node now owns the cleanup supervisor directly in its existing detached helper
+group. The supervisor owns a separate-session broker and exact process
+descriptors; it does not read document/request input. A private admission pipe
+and owner check precede document work. The broker arms a kernel **SIGKILL** death
+signal before restoring interrupts or accepting admission, so supervisor death
+kills even a stopped broker and cascades through the existing namespace monitors.
+Normal cancellation uses the same two-second graceful-to-forced interval. If
+the supervisor stops, the existing Node group kill remains effective; the live
+Node removes its already known root after the helper's close barrier.
+
+Broker results travel through a bounded private pipe. The supervisor joins the
+actual broker, removes confirmed scratch, then relays its existing JSON reply.
+A private Node-pipe hold keeps the ordinary close barrier valid on supervisor
+loss; that descriptor is not passed to native children. Startup failure can kill
+only an unreaped direct child, without numeric process discovery or a weaker
+descriptor fallback. Changed-root refusal, caller input, byte/font/time limits,
+ordinary provider queue/cache, GUI and default pinned backend remain intact.
+No action or unknown conversion is replayed.
+
+Focused **13/13** common/real checks pass, including both new faults with all
+observed actors gone at settlement, unchanged original input, no leftover native
+scratch/output and the helper's actual direct parent confirmed. Earlier owner/
+broker-group, stopped-tree and replacement-root refusal checks also pass.
+Exact-ref source/ordinary/original-viewer qualification remains pending at this
+implementation checkpoint. All-cleanup-owner loss, pre-admission allocation,
+caller-PDF/original provider outer scratch, durable/power-loss and physical/
+font/layout/security/source-notice/distribution/other-OS gates remain open.
+This is source development; no running review/default/installed/binary promotion
+is performed.
+
 ## Independent native scratch cleanup — October 15
 
 The preceding native adapter still leaves a real document/font/profile copy

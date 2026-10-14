@@ -242,7 +242,7 @@ def owned_root(arguments: list[str]) -> tuple[Path, tuple[int, int]]:
     return root, identity
 
 
-def parent_death(expected: int) -> None:
+def parent_death(expected: int, death_signal: int = signal.SIGTERM) -> None:
     # PR_SET_PDEATHSIG is not retroactive. Check the creator before and after
     # arming, so losing it during interpreter startup cannot admit document work.
     if expected <= 1 or os.getppid() != expected:
@@ -250,7 +250,7 @@ def parent_death(expected: int) -> None:
     libc = ctypes.CDLL(None, use_errno=True)
     libc.prctl.argtypes = [ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong, ctypes.c_ulong]
     libc.prctl.restype = ctypes.c_int
-    if libc.prctl(1, signal.SIGTERM, 0, 0, 0) != 0:
+    if libc.prctl(1, death_signal, 0, 0, 0) != 0:
         raise Failure('unavailable')
     if os.getppid() != expected:
         raise InterruptedError('Office owner exited before admission.')
@@ -266,112 +266,137 @@ def remove_owned_root(root: Path, identity: tuple[int, int]) -> None:
     shutil.rmtree(root)
 
 
-def start_cleanup_guard(root: Path, identity: tuple[int, int], owner: int) -> tuple[int, int]:
-    """Acquire exact process handles before copying any document/font bytes.
+def process_name(name: bytes) -> None:
+    libc = ctypes.CDLL(None, use_errno=True)
+    if libc.prctl(15, ctypes.c_char_p(name), 0, 0, 0) != 0:
+        raise Failure('unavailable')
 
-    The guard has its own session and remains responsive if the conversion
-    group is stopped/killed. It never scans directories or replays conversion.
-    Its stdout handle also keeps Node's close barrier held until cleanup ends.
+
+def broker(root: Path, guardian: int, owner_fd: int, admit: int, write: int, blocked: set) -> None:
+    # Keep the Node pipe open through broker death, without exposing its handle
+    # to native children. Only the guardian relays this private result pipe.
+    hold = os.dup(1)
+    os.dup2(write, 1)
+    os.close(write)
+    code = 1
+    try:
+        os.setsid()
+        process_name(b'python3')
+        parent_death(guardian, signal.SIGKILL)
+        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
+        if os.read(admit, 1) != b'R' or select.select([owner_fd], [], [], 0)[0]:
+            raise Failure('failed')
+        os.close(admit)
+        print(json.dumps(main(root)), flush=True)
+        code = 0
+    except Failure as error:
+        print(json.dumps({'error': {'code': error.code}}), flush=True)
+    except BaseException:
+        print(json.dumps({'error': {'code': 'failed'}}), flush=True)
+    finally:
+        os.close(hold)
+        os._exit(code)
+
+
+def supervise(root: Path, identity: tuple[int, int], owner: int) -> tuple[bytes, int]:
+    """Node owns the guard directly; the guard owns one isolated broker.
+
+    Guard loss kills even a stopped broker through a kernel death signal.
+    A surviving Node owns the same root fallback and ordinary close barrier.
+    The guard reads metadata/result bytes only, never the request/document.
     """
-    if owner <= 1 or os.getppid() != owner or not shutil.rmtree.avoids_symlink_attacks or not callable(getattr(os, 'pidfd_open', None)) or not callable(getattr(signal, 'pidfd_send_signal', None)):
+    if owner <= 1 or os.getppid() != owner or os.getpgrp() != os.getpid() or not shutil.rmtree.avoids_symlink_attacks or not callable(getattr(os, 'pidfd_open', None)) or not callable(getattr(signal, 'pidfd_send_signal', None)):
         raise Failure('unavailable')
     descriptors = []
+    blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGTERM, signal.SIGINT})
+    pid = None
+    joined = False
     try:
         owner_fd = os.pidfd_open(owner)
         descriptors.append(owner_fd)
-        broker_fd = os.pidfd_open(os.getpid())
+        result_read, result_write = os.pipe2(os.O_CLOEXEC)
+        descriptors.extend((result_read, result_write))
+        admit_read, admit_write = os.pipe2(os.O_CLOEXEC)
+        descriptors.extend((admit_read, admit_write))
+        process_name(b'aug-office-gc')
+        guardian = os.getpid()
+        pid = os.fork()
+        if pid == 0:
+            try:
+                os.close(result_read)
+                os.close(admit_write)
+                broker(root, guardian, owner_fd, admit_read, result_write, blocked)
+            except BaseException:
+                os._exit(1)  # Child startup must never enter parent's cleanup.
+        os.close(result_write)
+        descriptors.remove(result_write)
+        os.close(admit_read)
+        descriptors.remove(admit_read)
+        sys.stdin.close()
+        broker_fd = os.pidfd_open(pid)
         descriptors.append(broker_fd)
-        ready_read, ready_write = os.pipe2(os.O_CLOEXEC)
-        descriptors.extend((ready_read, ready_write))
-        done_read, done_write = os.pipe2(os.O_CLOEXEC)
-        descriptors.extend((done_read, done_write))
-        guard = os.fork()
+        cancelled = False
+
+        def cancel(_signum, _frame):
+            nonlocal cancelled
+            cancelled = True
+
+        signal.signal(signal.SIGTERM, cancel)
+        signal.signal(signal.SIGINT, cancel)
+        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
+        if not cancelled and not select.select([owner_fd], [], [], 0)[0]:
+            os.write(admit_write, b'R')
+        os.close(admit_write)
+        descriptors.remove(admit_write)
+        os.set_blocking(result_read, False)
+        data = bytearray()
+        readable = True
+        terminate_at = None
+        forced = False
+        status = None
+        while status is None or readable:
+            watched = [owner_fd, broker_fd] + ([result_read] if readable else [])
+            ready, _, _ = select.select(watched, [], [], 0.05)
+            if readable and result_read in ready:
+                chunk = os.read(result_read, 65536)
+                if not chunk:
+                    readable = False
+                elif len(data) + len(chunk) > 256 * 1024:
+                    cancelled = True
+                else:
+                    data.extend(chunk)
+            if status is None and broker_fd in ready:
+                _, status = os.waitpid(pid, 0)
+                joined = True
+            if status is None and (cancelled or owner_fd in ready):
+                if terminate_at is None:
+                    try:
+                        signal.pidfd_send_signal(broker_fd, signal.SIGTERM)
+                    except ProcessLookupError:
+                        pass
+                    terminate_at = time.monotonic() + 2
+                elif not forced and time.monotonic() >= terminate_at:
+                    try:
+                        signal.pidfd_send_signal(broker_fd, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    forced = True
+        remove_owned_root(root, identity)
+        return bytes(data), os.waitstatus_to_exitcode(status)
     except (AttributeError, OSError):
+        raise Failure('unavailable') from None
+    finally:
+        # The child cannot be reused while it remains an unreaped direct child.
+        # Startup failures never send admission; no numeric process discovery.
+        if pid is not None and not joined:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            os.waitpid(pid, 0)
         for descriptor in descriptors:
             os.close(descriptor)
-        raise Failure('unavailable') from None
-    if guard == 0:
-        code = 1
-        try:
-            os.close(ready_read)
-            os.close(done_write)
-            os.close(0)  # No document/request input is retained by the guard.
-            os.setsid()
-            libc = ctypes.CDLL(None, use_errno=True)
-            if libc.prctl(15, ctypes.c_char_p(b'aug-office-gc'), 0, 0, 0) != 0:
-                raise Failure('unavailable')
-            cancelled = False
-
-            def cancel(_signum, _frame):
-                nonlocal cancelled
-                cancelled = True
-
-            signal.signal(signal.SIGTERM, cancel)
-            signal.signal(signal.SIGINT, cancel)
-            os.write(ready_write, b'R')
-            os.close(ready_write)
-            terminate_at = None
-            forced = False
-            while True:
-                watched = [owner_fd, broker_fd] + ([done_read] if done_read is not None else [])
-                ready, _, _ = select.select(watched, [], [], 0.05)
-                if done_read is not None and done_read in ready:
-                    completed = os.read(done_read, 1)
-                    if completed == b'C':
-                        break  # Broker's subprocess/final cleanup has settled.
-                    # EOF after hard broker loss is not proof of settled writes;
-                    # keep the exact broker descriptor in the exit barrier.
-                    os.close(done_read)
-                    done_read = None
-                if broker_fd in ready:
-                    break
-                if cancelled or owner_fd in ready or done_read is None:
-                    if terminate_at is None:
-                        try:
-                            signal.pidfd_send_signal(broker_fd, signal.SIGTERM)
-                        except ProcessLookupError:
-                            pass
-                        terminate_at = time.monotonic() + 2
-                    elif not forced and time.monotonic() >= terminate_at:
-                        try:
-                            signal.pidfd_send_signal(broker_fd, signal.SIGKILL)
-                        except ProcessLookupError:
-                            pass
-                        forced = True
-            remove_owned_root(root, identity)
-            code = 0
-        except BaseException:
-            # Refuse an unknown/replaced root; no diagnostic body or path leaves
-            # this process, and the live Node parent retains its own fallback.
-            pass
-        finally:
-            os._exit(code)
-    os.close(owner_fd)
-    os.close(broker_fd)
-    os.close(ready_write)
-    os.close(done_read)
-    try:
-        if not select.select([ready_read], [], [], 5)[0] or os.read(ready_read, 1) != b'R':
-            raise Failure('unavailable')
-    except BaseException:
-        os.close(done_write)
-        raise
-    finally:
-        os.close(ready_read)
-    return guard, done_write
-
-
-def finish_cleanup_guard(guard: tuple[int, int]) -> None:
-    pid, descriptor = guard
-    try:
-        os.write(descriptor, b'C')
-    except BrokenPipeError:
-        pass
-    finally:
-        os.close(descriptor)
-    _, status = os.waitpid(pid, 0)
-    if status != 0:
-        raise Failure('failed')
+        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
 
 
 def main(root: Path) -> dict:
@@ -431,25 +456,19 @@ if __name__ == '__main__':
     resource.setrlimit(resource.RLIMIT_AS, (2 * 1024**3, 2 * 1024**3))
     root = None
     identity = None
-    guard = None
     try:
         root, identity = owned_root(sys.argv)
-        guard = start_cleanup_guard(root, identity, int(sys.argv[1]))
-        parent_death(int(sys.argv[1]))
-        print(json.dumps(main(root)), flush=True)
+        reply, code = supervise(root, identity, int(sys.argv[1]))
+        sys.stdout.buffer.write(reply)
+        sys.stdout.buffer.flush()
+        sys.exit(code)
     except Failure as error:
         print(json.dumps({'error': {'code': error.code}}), flush=True)
         sys.exit(1)
-    except BaseException:
+    except Exception:
         print(json.dumps({'error': {'code': 'failed'}}), flush=True)
         sys.exit(1)
     finally:
-        # A repeated graceful signal must not interrupt owned scratch cleanup.
-        # The surviving parent can still force the entire group if necessary.
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
-        try:
-            if root is not None:
-                remove_owned_root(root, identity)
-        finally:
-            if guard is not None:
-                finish_cleanup_guard(guard)
+        if root is not None:
+            remove_owned_root(root, identity)

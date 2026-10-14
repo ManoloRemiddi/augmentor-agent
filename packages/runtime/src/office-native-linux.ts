@@ -37,8 +37,8 @@ export async function createLinuxNativeOfficeConverter(options:ConverterOptions=
     const scratch=await mkdtemp(join(dirname(request.outputPath),'augmentor-native-office-'));
     const identity=await lstat(scratch,{bigint:true});
     try{upstream.throwIfAborted();const result=await new Promise<{missingFonts:string[]}>((resolve,reject)=>{
-      // The helper group contains the trusted broker and sandbox monitor only.
-      // --die-with-parent owns the native descendants in a separate PID namespace.
+      // Node owns the cleanup helper directly. Its separate-session broker has
+      // a kernel death kill; namespace monitors own the native descendants.
       const child=spawn('/usr/bin/python3',['-I','-B',helper,String(process.pid),scratch,String(identity.dev),String(identity.ino)],{detached:true,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8',TZ:'UTC'},stdio:['pipe','pipe','ignore']});
       let data='',overflow=false,error:unknown,killTimer:NodeJS.Timeout|undefined;
       const kill=(kind:NodeJS.Signals)=>{if(child.pid&&child.exitCode===null){try{process.kill(-child.pid,kind);}catch(cause){if((cause as NodeJS.ErrnoException).code!=='ESRCH')error=cause;}}};
