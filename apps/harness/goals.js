@@ -6,7 +6,8 @@ export function attachGoals({container,rpc,current}){
  async function refresh(){
   if(busy)return;
   const context=current(),ticket=++request;if(!context.sessionId){reset();return;}
-  const valid=()=>{const now=current();return ticket===request&&context.sessionId===now.sessionId&&context.epoch===now.epoch;};
+  const sameContext=()=>{const now=current();return context.sessionId===now.sessionId&&context.epoch===now.epoch;};
+  const valid=()=>ticket===request&&sameContext();
   try{
    const result=await rpc('session.goal',{sessionId:context.sessionId});if(!valid())return;
    container.replaceChildren();
@@ -19,9 +20,13 @@ export function attachGoals({container,rpc,current}){
    if(!context.readOnly){
     const controls=node('div',undefined,'goal-controls');container.append(controls);
     async function change(operation,extra={}){
-     if(busy||!valid())return;busy=true;controls.querySelectorAll('button,input,textarea').forEach(el=>el.disabled=true);
-     try{await rpc('session.updateGoal',{sessionId:context.sessionId,change:{operation,expectedRef,...extra}});if(!valid())return;draft=null;busy=false;await refresh();}
-     catch(error){if(valid()){status.textContent=error.message+' Read current state before retrying.';busy=false;controls.querySelectorAll('button,input,textarea').forEach(el=>el.disabled=false);}}
+     // A pending read must not invalidate the still-displayed control. Its exact
+     // goal reference remains authoritative for the server's revision check.
+     if(busy||!sameContext()||!container.contains(controls))return;
+     const mutationTicket=++request,active=()=>mutationTicket===request&&sameContext();
+     busy=true;controls.querySelectorAll('button,input,textarea').forEach(el=>el.disabled=true);
+     try{await rpc('session.updateGoal',{sessionId:context.sessionId,change:{operation,expectedRef,...extra}});if(!active())return;draft=null;busy=false;await refresh();}
+     catch(error){if(active()){status.textContent=error.message+' Read current state before retrying.';busy=false;controls.querySelectorAll('button,input,textarea').forEach(el=>el.disabled=false);}}
     }
     const button=(label,action)=>{const el=node('button',label);el.type='button';el.disabled=busy;el.onclick=action;controls.append(el);return el;};
     const editor=node('details'),summary=node('summary',goal&&goal.phase!=='complete'?'Edit objective and round limit':'Start a goal');editor.append(summary);controls.append(editor);

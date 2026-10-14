@@ -9,6 +9,7 @@ import {tmpdir} from 'node:os';
 import {planFixture,until} from './fixtures/plans.mjs';
 import {chromiumPort} from './fixtures/chromium-ready.mjs';
 import {harnessCdp} from './fixtures/harness-cdp.mjs';
+import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
 test('actual Harness goal controls preserve Stop, drafts, revisions, safe text and scoped cold inspection',{skip:process.platform!=='linux',timeout:60000},async t=>{
  const f=await planFixture(t,{goalMode:{hold:true}}),profile=await mkdtemp(join(tmpdir(),'augmentor-goal-chrome-'));let chrome,panel;
  t.after(async()=>{panel?.close();if(chrome?.exitCode===null){const ended=once(chrome,'exit');chrome.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
@@ -20,7 +21,17 @@ test('actual Harness goal controls preserve Stop, drafts, revisions, safe text a
  const text='<img src=x onerror="globalThis.goalInjected=true"> café 日本語';
  await panel.evaluate('(()=>{document.querySelector("#goal-content details summary").click();const el=document.querySelector("[aria-label=\\"Goal objective\\"]");el.value='+JSON.stringify(text)+';el.dispatchEvent(new Event("input"));const limit=document.querySelector("[aria-label=\\"Maximum goal rounds\\"]");limit.value="2";limit.dispatchEvent(new Event("input"));Array.from(document.querySelectorAll("#goal-content button")).find(b=>b.textContent==="Start goal and continue").click();})()');
  await visible('document.querySelector("#goal-content .goal-state")?.textContent.includes("1 of 2")');assert.equal(await panel.evaluate('document.querySelectorAll("#goal-content img").length'),0);assert.equal(await panel.evaluate('globalThis.goalInjected===true'),false);
- await panel.evaluate('Array.from(document.querySelectorAll("#goal-content button")).find(b=>b.textContent==="Pause goal").click()');await visible('document.querySelector("#goal-content .goal-state")?.textContent.includes("paused · continuation disarmed")');await f.settled('goal-ui');
+ const pause='Array.from(document.querySelectorAll("#goal-content button")).find(b=>b.textContent==="Pause goal")';
+ await visible(pause+'&&!'+pause+'.disabled');
+ // Keep an actual older inspection response pending while the displayed control
+ // accepts its one click. A refresh ticket must not silently discard that action.
+ await panel.call('Network.enable');panel.pauseRpcMethods=new Set(['session.goal']);await panel.call('Fetch.enable',{patterns:[{urlPattern:'*/api/rpc',requestStage:'Response'}]});
+ await panel.evaluate('document.querySelector("[data-view=goal]").click()');await until(()=>panel.pausedRequests.length>=1,'older goal inspection held');
+ const older=await panel.call('Fetch.getResponseBody',{requestId:panel.pausedRequests[0].id}),olderGoal=JSON.parse(older.base64Encoded?Buffer.from(older.body,'base64').toString():older.body);assert.equal(olderGoal.result.goal.phase,'active');
+ await harnessPointerClick(panel,pause,until);await until(async()=>(await f.call('session.goal',{sessionId:'goal-ui'})).goal.phase==='paused','one displayed Pause action admitted during inspection');
+ await until(()=>panel.pausedRequests.length>=2,'post-pause goal inspection held');panel.pauseRpcMethods.clear();for(const held of panel.pausedRequests)await panel.call('Fetch.continueRequest',{requestId:held.id});
+ await visible('document.querySelector("#goal-content .goal-state")?.textContent.includes("paused · continuation disarmed")');await f.settled('goal-ui');
+ assert.equal([...panel.requests.values()].filter(row=>row.method==='session.updateGoal'&&row.params.change.operation==='pause').length,1,'the UI submits one pause and never retries it');
  const paused=await f.call('session.goal',{sessionId:'goal-ui'});assert.equal(paused.goal.roundsStarted,1);
  await panel.evaluate('(()=>{const el=document.querySelector("[aria-label=\\"Goal objective\\"]");el.value="Preserve this stale draft";el.dispatchEvent(new Event("input"));})()');
  await f.call('session.updateGoal',{sessionId:'goal-ui',change:{operation:'edit',expectedRef:{id:paused.goal.id,revision:paused.goal.revision},objective:'Concurrent operator revision'}});await visible('document.querySelector("#goal-content .goal-objective")?.textContent==="Concurrent operator revision"');assert.equal(await panel.evaluate('document.querySelector("[aria-label=\\"Goal objective\\"]").value'),'Preserve this stale draft');
