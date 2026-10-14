@@ -191,6 +191,7 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'){
  writeFileSync(extension,readFileSync(join(source,'scripts/fixtures/nested-tool-extension.mjs'),'utf8'));
  const resources=existsSync(resourcePath)?JSON.parse(readFileSync(resourcePath,'utf8')):{sources:[],skills:[]};resources.sources.push(extension);writeFileSync(resourcePath,JSON.stringify(resources));
  fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_RELEASE=join(root,'release-nested');
+ if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_REQUEST_HOLD==='1')fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_FINAL_RELEASE=join(root,'release-nested-final');
 }
 const prompts=process.env.AUGMENTOR_HARNESS_PROOF_PROMPTS==='1'?spawn(process.env.AUGMENTOR_PYTHON??'python3',['-Xutf8','-B',join(source,'services/prompt-library/service.py')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','ignore','pipe']}):null;
 prompts?.stderr.on('data',data=>process.stderr.write(data));
@@ -210,6 +211,7 @@ const startRuntime=()=>{
 let child=startRuntime(),closing=false,reopenRequested=false,reopened=false;
 async function close(){
   if(closing)return;closing=true;
+  if(fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_FINAL_RELEASE&&existsSync(root))writeFileSync(fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_FINAL_RELEASE,'fixture closing',{mode:0o600});
   for(const owned of [child,prompts])if(owned?.pid&&owned.exitCode===null){const exit=once(owned,'exit');owned.kill('SIGTERM');await exit;}
   model.closeAllConnections();await new Promise(resolve=>model.close(resolve));
   rmSync(root,{recursive:true,force:true});

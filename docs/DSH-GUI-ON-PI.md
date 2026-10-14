@@ -1149,3 +1149,39 @@ The [installed refusal follow-up](PI-COMPACTION.md#installed-refusal-follow-up--
 ## Original persistent composer drafts
 
 [Original Harness drafts](HARNESS-DRAFTS.md) restores private text, real file/image bytes and exact receipts behind the copied composer. Revision checks freeze stale writes; durable uncertain submission markers prevent replay; unsent drafts veto guarded shutdown. Source/ordinary/installed qualification is recorded separately. Supplier presentation and the single Pi owner remain preserved; broader migration and platform gates stay open.
+
+## GUI qualification readiness — October 14
+
+The preceding **81094b3** hosted Validate **38571935767** fails two original GUI
+checks: Dark does not become active after a click, and final nested request controls
+show two entries while the provider has received three requests. A fresh unmodified
+local baseline passes both; exact hosted ordering remains unobserved.
+
+Controlled real Chromium cases reproduce a pointer-driver defect in all three
+preparation helpers: a button inside a disabled fieldset has `disabled === false`
+but matches `:disabled`. The old helper attempts dispatch before native enablement;
+all three cases fail. Preparation now respects the browser's inherited-disabled
+predicate, including during frame/scroll checks. The first-legend exception remains
+usable. Main, hover and frame tests each observe an actual disabled barrier, release
+it explicitly, then deliver one pointer action; a dispatched click is never retried.
+The original supplier controls, settings writes, logo/CSS and product remain unchanged.
+
+The nested test's optional authored extension holds only the final public SDK
+provider-request boundary. It retains real pointer approvals, nine actual nested
+calls/results and reused call IDs. Tool completion becomes visible before request
+three is sent; then only this client's event poll is held while the final provider
+response settles. The old immediate assertion deterministically sees two controls
+against three received requests. After event delivery resumes, the original view
+renders all three. The test now waits for that exact metadata barrier, keeping the
+same expected labels, native/history/Stop/cold-reopen/no-replay assertions, workers
+and deadlines. Fixture shutdown releases its owned request barrier before draining;
+no runtime polling delay, automatic retry, product hook or supplier UI changes.
+
+Focused pointer/brand/appearance checks pass **22/22**; the controlled original
+nested case passes **1/1** after the barrier correction. All **three** inherited-
+disable cases and the old nested immediate assertion fail before their respective
+driver corrections. This independently reproduces the failure classes, not every
+hosted interleaving. Broader source/ordinary qualification is pending. Changes are
+to Linux Chromium qualification; no macOS/Windows/physical or installed acceptance
+is inferred. Owner review builds, drafts and model/speech settings stay preserved;
+all full migration, live and source/rebuild/public-distribution gates remain open.

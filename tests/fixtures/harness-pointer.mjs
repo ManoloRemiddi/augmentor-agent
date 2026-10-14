@@ -8,11 +8,11 @@ export async function harnessPointerClick(panel,expression,until){
    const find=()=>(${expression});
    const describe=e=>e?{tag:e.tagName,id:e.id,text:e.textContent?.slice(0,100)}:null;
    let e=find();const fail=reason=>({reason,target:describe(e),viewport:{width:innerWidth,height:innerHeight}});
-   if(!e||!e.isConnected||e.disabled)return fail("unavailable");
+   if(!e||!e.isConnected||(e.disabled||e.matches(":disabled")))return fail("unavailable");
    const original=e;e.scrollIntoView({block:"center",inline:"nearest"});let previous=e.getBoundingClientRect();
    for(let frame=0;frame<2;frame++){
     await new Promise(requestAnimationFrame);e=find();
-    if(e!==original||!e?.isConnected||e.disabled)return fail("changed during scroll");
+    if(e!==original||!e?.isConnected||(e.disabled||e.matches(":disabled")))return fail("changed during scroll");
     const next=e.getBoundingClientRect();
     if(["x","y","width","height"].some(key=>Math.abs(next[key]-previous[key])>.1))return fail("control geometry is moving");
     previous=next;
@@ -37,10 +37,10 @@ export async function harnessHoverPointerClick(panel,rowExpression,controlExpres
  const stable=(expression,scroll)=>`(async()=>{
   const find=()=>(${expression});let e=find();
   const fail=reason=>({reason,target:e?{tag:e.tagName,id:e.id,text:e.textContent?.slice(0,100)}:null});
-  if(!e||!e.isConnected||e.disabled)return fail("hover target unavailable");
+  if(!e||!e.isConnected||(e.disabled||e.matches(":disabled")))return fail("hover target unavailable");
   const original=e;${scroll?'e.scrollIntoView({block:"center",inline:"nearest"});':''}let previous=e.getBoundingClientRect();
   for(let n=0;n<2;n++){
-   await new Promise(requestAnimationFrame);e=find();if(e!==original||!e?.isConnected||e.disabled)return fail("hover target replaced");
+   await new Promise(requestAnimationFrame);e=find();if(e!==original||!e?.isConnected||(e.disabled||e.matches(":disabled")))return fail("hover target replaced");
    const next=e.getBoundingClientRect();if(["x","y","width","height"].some(k=>Math.abs(next[k]-previous[k])>.1))return fail("hover geometry is moving");previous=next;
   }
   for(let p=e;p;p=p.parentElement)if(p.getAnimations().some(a=>{const t=a.effect?.getComputedTiming();return (a.playState==="running"||a.pending)&&Number.isFinite(t?.endTime)&&t.progress!==null;}))return fail("hover ancestor animation is active");
@@ -63,9 +63,9 @@ export async function harnessHoverPointerClick(panel,rowExpression,controlExpres
 // Opaque frame controls need both coordinate spaces ready before one dispatch.
 export async function harnessFramePointerClick(panel,frameEvaluate,iframeExpression,controlExpression,until){
  const geometry=expression=>`(async()=>{
-  const e=(${expression});if(!e||!e.isConnected||e.disabled)return null;
+  const e=(${expression});if(!e||!e.isConnected||(e.disabled||e.matches(":disabled")))return null;
   e.scrollIntoView({block:"center",inline:"nearest"});let previous=e.getBoundingClientRect();
-  for(let n=0;n<2;n++){await new Promise(requestAnimationFrame);const now=e.getBoundingClientRect();if(["x","y","width","height"].some(k=>Math.abs(now[k]-previous[k])>.1))return null;previous=now;}
+  for(let n=0;n<2;n++){await new Promise(requestAnimationFrame);if(!e.isConnected||e.disabled||e.matches(":disabled"))return null;const now=e.getBoundingClientRect();if(["x","y","width","height"].some(k=>Math.abs(now[k]-previous[k])>.1))return null;previous=now;}
   for(let p=e;p;p=p.parentElement)if(p.getAnimations().some(a=>{const t=a.effect?.getComputedTiming();return (a.playState==="running"||a.pending)&&Number.isFinite(t?.endTime)&&t.progress!==null;}))return null;
   const r=e.getBoundingClientRect();if(!r.width||!r.height||!e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)))return null;
   return {x:r.x,y:r.y,width:r.width,height:r.height};

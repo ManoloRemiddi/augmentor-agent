@@ -4,6 +4,9 @@ import {existsSync,writeFileSync} from 'node:fs';
 import {dirname,join} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
 export default function(pi){
+ // The fixture owner releases this final-request barrier before shutdown.
+ const finalRelease=process.env.AUGMENTOR_HARNESS_PROOF_NESTED_FINAL_RELEASE;let requests=0;
+ if(finalRelease)pi.on('before_provider_request',async()=>{if(++requests!==3)return;writeFileSync(join(dirname(finalRelease),'nested-final-started'),'held',{mode:0o600});while(!existsSync(finalRelease))await delay(25);});
  const parameters={type:'object',properties:{path:{type:'string'},label:{type:'string'}},required:['path','label']};
  pi.registerTool({name:'fixture_outer',label:'Authored outer tool',description:'Run an isolated nested read, held child and explicit failed child.',parameters,async execute(_id,args,_signal,_update,ctx){
   const inner=await ctx.executeTool('fixture_inner',args);if(inner.isError)throw Error('Authored inner tool failed.');

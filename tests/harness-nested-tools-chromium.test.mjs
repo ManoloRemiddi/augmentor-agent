@@ -2,7 +2,7 @@
 // Public SDK nested pipeline and original DSH SUBTOOL rows; no owner model/state.
 import test from 'node:test';import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';import {once} from 'node:events';
-import {mkdtemp,readFile,rm} from 'node:fs/promises';import {join,dirname} from 'node:path';import {tmpdir} from 'node:os';import {fileURLToPath} from 'node:url';import {setTimeout as delay} from 'node:timers/promises';
+import {mkdtemp,readFile,writeFile,rm} from 'node:fs/promises';import {join,dirname} from 'node:path';import {tmpdir} from 'node:os';import {fileURLToPath} from 'node:url';import {setTimeout as delay} from 'node:timers/promises';
 import {chromiumPort} from './fixtures/chromium-ready.mjs';import {harnessCdp} from './fixtures/harness-cdp.mjs';import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label){const end=Date.now()+12000;while(Date.now()<end){if(await fn())return;await delay(30);}throw Error('Nested trajectory timeout: '+label);}
@@ -10,7 +10,7 @@ test('original nested tool rows expose live arguments, real read/error results, 
  const profile=await mkdtemp(join(tmpdir(),'augmentor-nested-tools-'));let fixture,chrome,panel,link,output='',stderr='';
  t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
- fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS:'1',AUGMENTOR_HARNESS_PROOF_REOPEN:'1'},stdio:['ignore','pipe','pipe','ipc']});fixture.stdout.on('data',d=>output+=d);fixture.stderr.on('data',d=>stderr+=d);
+ fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS:'1',AUGMENTOR_HARNESS_PROOF_NESTED_REQUEST_HOLD:'1',AUGMENTOR_HARNESS_PROOF_REOPEN:'1'},stdio:['ignore','pipe','pipe','ipc']});fixture.stdout.on('data',d=>output+=d);fixture.stderr.on('data',d=>stderr+=d);
  await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'isolated Host ready');
  const rpc=async(method,params={})=>{const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token'),response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})}),frame=await response.json();if(frame.error)throw Error(frame.error.message);return frame.result;};
  chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,link.url],{env,stdio:'ignore'});let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'Chrome ready');
@@ -38,9 +38,16 @@ test('original nested tool rows expose live arguments, real read/error results, 
  assert.deepEqual(await requestLabels(),['Request #1'],'the empty SDK abort receipt is retained without inventing a second provider request');
  await panel.call('Fetch.disable');
  await send('NESTED_TRAJECTORY_COMPLETE');await click(tab('Trajectory'));await visible(row('fixture_wait'));await click(row('fixture_wait'));await visible('document.body.innerText.includes("Turn 2 · Step 1")&&document.body.innerText.includes("nested-complete")');
- assert.equal((await fetch(link.nestedControlUrl,{method:'POST'})).status,204);await approveUntil(async()=>!(await rpc('session.list')).items.find(x=>x.sessionId===sid).running,'nested completion');await visible('document.body.innerText.includes("Turn 2 · Step 1")&&document.body.innerText.includes("Held child released: nested-complete")&&document.body.innerText.includes("Completed")');
+ assert.equal((await fetch(link.nestedControlUrl,{method:'POST'})).status,204);await approveUntil(async()=>{try{return await readFile(join(dirname(link.state),'nested-final-started'),'utf8')==='held';}catch{return false;}},'last provider request held before delivery');await visible('document.body.innerText.includes("Turn 2 · Step 1")&&document.body.innerText.includes("Held child released: nested-complete")&&document.body.innerText.includes("Completed")');
  await visible(row('fixture_fail'));await click(row('fixture_fail'));await visible('document.body.innerText.includes("Authored nested failure.")&&document.body.innerText.includes("Failed")');
+ // A completed nested tool is not a barrier for its following provider request.
+ assert.equal((await readFile(link.requestLog,'utf8')).trim().split('\n').length,2);assert.deepEqual(await requestLabels(),['Request #1','Request #2']);
+ panel.pausedRequests.splice(0);await panel.call('Fetch.enable',{patterns:[{urlPattern:new URL(link.url).origin+'/api/events?*',requestStage:'Request'}]});await until(()=>panel.pausedRequests.length>0,'final metadata event poll held');
+ await writeFile(join(dirname(link.state),'release-nested-final'),'release',{mode:0o600});await until(async()=>!(await rpc('session.list')).items.find(x=>x.sessionId===sid).running,'actual final provider response settled');
  const completed=await history();assert.equal(completed.events.filter(x=>x.event.type==='tool/call').length,9);assert.equal(completed.events.filter(x=>x.event.type==='tool/result').length,9);assert.equal((await readFile(link.requestLog,'utf8')).trim().split('\n').length,3);
+ assert.deepEqual(await requestLabels(),['Request #1','Request #2'],'a held event poll cannot invent the final provider request');
+ await panel.call('Fetch.disable');
+ await until(async()=>JSON.stringify(await requestLabels())===JSON.stringify(['Request #1','Request #2','Request #3']),'all actual provider request metadata rendered');
  assert.deepEqual(await requestLabels(),['Request #1','Request #2','Request #3'],'original request controls match actual recorded wire requests across both Host turns');
  const first=completed.events.filter(x=>x.event.type==='tool/call'&&x.event.data.name==='fixture_wait');assert.equal(first[0].event.data.toolCallId,first[1].event.data.toolCallId);assert.notEqual(first[0].event.data.requestId,first[1].event.data.requestId);
  assert.equal(panel.errors.length,0);const oldOrigin=new URL(link.url).origin,oldPid=link.pid;
