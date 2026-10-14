@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Read-only release qualification output — October 14
+
+The indexed-history Chromium test keeps diagnostics in the test checkout's
+`outputs/harness-proof`, independently of `AUGMENTOR_PI_TEST_ROOT`. That setting
+selects the runtime under test; it does not authorize writing screenshots into
+an immutable release. Runtime selection and all search/excerpt/identity/no-inference
+assertions remain unchanged, with the same deadlines and actual pointer controls.
+
+A managed private MX candidate based on public e2beaf5 over the verified 454db9d
+artifact passed the 120-case GUI/Host/queue cohort but failed its subsequent full
+inventory check. The sole addition was the test's `outputs/harness-proof/payload-search.png`;
+no runtime/dependency/component/notice file changed. That staged artifact is
+retained as a failed qualification and is not activated or used for owner feedback.
+Do not delete the added file or rewrite its manifest to relabel it successful.
+The corrected driver must qualify a newly staged clean artifact and verify its
+complete inventory afterward. The selected preview/draft remain unchanged.
+
 ## Cold-reopen and input-admission test barriers — October 14
 
 Source **7910acdac34d4c72c7e35a7752ae740a99165246** prepares the specific
