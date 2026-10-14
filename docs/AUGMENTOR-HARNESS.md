@@ -351,6 +351,43 @@ Preceding published head `b5fc588b23d1410c2b63d6ba01c6d7f35eb48fb8` has a termin
 
 The accepted full P0/P1 scope remains binding. Adaptive routing/settings, source provenance and indexed history, Native/Browser inspection entry points, Harness Prompt Library/editor and command composition, live memory/control/cutoff acceptance, integration job receipts, actual Resonant Voice/audio, wiki/search/MCP operations, plans/goals/jobs/delegation, Home/embedded/mobile/multiple windows and complete OS/installed/update/rollback qualification remain. No release promotion or DSH retirement is qualified.
 
+## Prompt editor catalog ordering — October 14
+
+The shared Browser/Harness editor could apply an older automatic catalog response
+after a confirmed Save. That response removes the newly saved choice from the
+list. Selecting its absent ID leaves no selected record, so Delete opens no
+confirmation. An authored Chromium barrier holds an actual pre-create service
+snapshot until after Save and reproduces the **cancel delete confirmation**
+timeout from b6/Validate **38635451143**. This establishes the failure class;
+the precise hosted response order was not captured.
+
+Catalog reads now carry a view epoch. A newer read, admitted mutation or closed
+editor retires older replies/errors before they can paint the list, draft or
+notice. A retired Reload selected cannot replace edited fields. Automatic polling
+permits one read at a time, so a slow service neither accumulates requests nor
+perpetually invalidates its own replies. Explicit Refresh/Reload remain available.
+The service owns all revisions and mutations; confirmations, stale-write refusal,
+unknown-write handling, layout/CSS and two-step clipboard/Send behavior remain.
+No request, click or uncertain mutation is automatically repeated.
+
+Five common DOM regressions fail against the preceding editor and pass with the
+fix. The strengthened real Chromium test fails against the preceding ordinary
+tree at the lost saved option; with the fix it retains that option and completes
+actual Cancel/Confirm, Native conflicts, clipboard insertion, draft improvement
+and no-replay assertions. The existing original test, under the controlled old
+response ordering, fails at the exact confirmation timeout. Focused DOM checks
+pass **15/15**, full Browser checks **121/121**, and the actual GUI case passes.
+These use independently authored records, a private real service/Host and a
+synthetic provider; they import no owner prompt, key, profile or history.
+
+The editor is shared source for Linux/macOS/Windows; no OS adapter, protocol,
+data format, supplier selection, dependency pin or native UI change is needed.
+Its 15 common DOM checks are added to all three SDK-platform jobs using the
+existing locked Browser test dependencies. Exact-ref source/ordinary, new-head
+hosted, installed and broader migration qualification is still pending at this
+implementation checkpoint. Running owner previews and installed selections
+retain their preceding editor until separately qualified activation.
+
 ## Shared prompt library and editor
 
 Implementation source `88569bb54d03c0e549101be33fcc0c67310ac86a` reuses Augmentor's existing public Browser picker, editor, clipboard rule and presentation dependencies through a fixed Harness asset allowlist. `apps/harness/prompt-library.js` adapts requests to the same Pi Host/shared service. Stable IDs, numeric revisions, validation, transactional writes and unknown-write/no-replay semantics remain owned by `services/prompt-library`. There is no second prompt database, importer or agent loop. Harness `prompts.improvementSave` maps to the existing service `prompts.improvement.save`, preserving the ordinary two-component RPC method format.
