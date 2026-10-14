@@ -24,39 +24,55 @@ No real model request or tool action was submitted during the initial owner-prof
 browser check; its history was empty when handed over.
 
 The Codex browser opening was **queued for this chat**. Actual owner interaction
-or feedback is not inferred from that request. A separate real Chromium check
-renders the original interface and both Augmentor marks with zero browser errors.
-The initial QA predicate incorrectly required an editable composer before selecting
-a session; its timeout is a preparation failure, not a runtime restart or a model
-failure. The corrected check observes the legitimate disabled start-page composer.
+or feedback is not inferred from that request. A separate real Chromium check at
+1440×1000 renders the original interface, sidebar and central Augmentor marks,
+Settings and Connected state with zero browser errors or failed responses. It
+observes the legitimate disabled start-page composer. A malformed selector in the
+first external QA driver was corrected without restarting the owner runtime or
+submitting any model/tool work; that preparation failure is retained separately.
 
-## Artifact and qualification
+## Artifact and qualification — October 14 refresh
 
-- Product **0.2.13**, Pi SDK **1.1.0**; public source **f98424b0a240b4b0c9d5e475d6e77ee4d2706312**.
-- Unselected review release **20261014-123717-b98af12b**, artifact
-  **6ae1d969a68f48027fee1392a19b92a66bf3619707fca5871b2785249c125331**, **24,284 inventory entries**.
-- Base **454db9d9915724b53998e187c30c2943a0d7d3b2**, artifact
-  **964d1cdef122aab51fd46510f897a35d1bd391e97d4f7ae1f52983160569f3e5**. The candidate records this mixed provenance.
-  Twenty-three newer public artifact files and the complete 905-file compiled tree
-  are applied over the verified private base; bundled dependencies, Node,
-  components and all 846 notice files retain their bytes. The later screenshot
-  correction changes the external test driver, not application behavior.
-- The candidate-selected executable/runtime cohort passes **120/120 across 43
-  files**, two workers, unchanged deadlines, no skips. It includes all 41 Harness
-  Chromium files plus Host lifecycle/input and durable queues. Static driver
-  imports share the verified matching compiled/dependency bytes.
+- Product **0.2.13**, Pi SDK **1.1.0**; public source
+  **9f5bc70a2aac9a974aa656cfadd53cca08737048**, tested application change
+  **7987447efc56146e47f919322d514916b0cb69ef**.
+- Unselected review release **20261014-145102-22cbe428**, artifact
+  **f55e256e80c1c5345b17a65b24e3d01694fdbc99799e4325dd558173e3357e35**,
+  **24,288 inventory entries**. It includes the [New Session input ownership
+  fix](DSH-GUI-ON-PI.md#new-session-input-ownership--october-14),
+  [runtime listener ownership](AUGMENTOR-HARNESS.md#runtime-listener-ownership--october-14)
+  and [instruction links](AUGMENTOR-HARNESS.md#instruction-source-links--october-14).
+- Immediate base: public **f98424b0a240b4b0c9d5e475d6e77ee4d2706312**, artifact
+  **6ae1d969a68f48027fee1392a19b92a66bf3619707fca5871b2785249c125331**.
+  Original base: **454db9d9915724b53998e187c30c2943a0d7d3b2**, artifact
+  **964d1cdef122aab51fd46510f897a35d1bd391e97d4f7ae1f52983160569f3e5**.
+  The candidate records this mixed provenance. Twelve changed public artifact
+  files and the complete **908-file compiled tree** overlay the verified immediate
+  base; **155 production npm instances**, bundled Node **24.19.0**, components
+  and all **846 notice files** retain their bytes/link inventory.
+- Source and fresh ordinary checks each pass **179/179 across 51 files**. The
+  candidate-selected executable/runtime cohort also passes **179/179 across the
+  same 51 files**, two workers, unchanged deadlines, no skips. It includes all
+  **42 Harness Chromium files**, Host lifecycle/input, durable queues and affected
+  pure contracts. Drivers/static imports run from the test checkout; selected
+  Host/Harness/native targets use the sealed stage, with matching compiled and
+  dependency bytes verified for direct static imports.
 - The **full inventory verifies after the cohort and again after runtime/browser
-  startup**. Live RPC checks confirm the exact PID/profile, product/SDK, local
-  model selection, keyless settings, local capture, zero sessions and active turns,
-  private file/socket modes and no inherited provider credentials. Runtime paths
-  and operator URLs are retained only in private local state.
+  startup**. Live RPC/process checks confirm the exact executable, PID/profile,
+  product/SDK, read-only local model selection, keyless settings, local capture,
+  zero sessions/active turns/drafts and private descriptor/socket modes. Runtime
+  paths and operator URLs remain private. No model request or tool work is sent
+  during the owner-profile check.
 
-The earlier separately staged e2beaf5 candidate passed the same cohort but its
-post-test inventory failed because the indexed-history test wrote one screenshot
-inside the artifact. No code/dependency/component/notice bytes changed. That
-artifact is retained as a failed qualification, never patched, activated or
-relabelled successful. The [driver output fix](DSH-GUI-ON-PI.md#read-only-release-qualification-output--october-14)
-keeps diagnostics in the test checkout; this replacement is a new managed stage.
+The prior **20261014-123717-b98af12b** review remains running with its own profile;
+its local receipt/link is preserved. Its earlier 120/120/43-file qualification
+applies to that artifact, not this newer source. The still earlier e2beaf5 stage
+whose indexed-history test added a screenshot remains a failed inventory
+qualification. It was never patched/resealed; the [output fix](DSH-GUI-ON-PI.md#read-only-release-qualification-output--october-14)
+keeps diagnostics outside staged artifacts. A new preparation check initially
+inventoried a dependency subtree in isolation and falsely rejected its valid
+internal workspace link. That mutable preparation was corrected before invoking
+the managed stage; the sealed artifact was never repaired.
 
 ## Remaining acceptance
 
@@ -68,12 +84,22 @@ configuration and placement remain unchanged. This profile does not activate the
 
 Owner MX feedback, complete P0/P1/reference-plugin behavior, actual credentials/
 services, full historical context fidelity, migration/privacy/recovery, physical
-voice/desktop and broader Linux/macOS/Windows acceptance remain required. The
-latest preceding e2beaf5 Validate **38549263115** passes locked-DSH SDK/core and all
-subsequent Debian native/interaction/recovery/first-run checks, inventory and
-extension notices, then refuses the existing Office exact-source/engine-rebuild
-packaging gate. That run passes the previously failing viewport cases but does
-not establish their root cause or all future scheduling. The controlled 780×437
-Jobs probe also passes; viewport size alone does not reproduce its older failure.
-New-head hosted acceptance and public Office/font/native licence/rebuild gates
-remain separate. DSH is retained; the full Harness migration is still active.
+voice/desktop and broader Linux/macOS/Windows acceptance remain required. This
+review profile does not import the external Blender or Playwright configuration;
+their [live workflow proofs](HARNESS-PLUGIN-PARITY.md) have separate exact refs,
+fixtures, licensing and limits.
+
+At this source, [SDK platform contracts 38566691857](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38566691857)
+and [Windows desktop 38566691858](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38566691858)
+pass. Validate **38566691854** and Windows qualification **38566691841** are still
+running at this checkpoint. Windows command jobs **38566691869** fails, including
+missing shared-companion state in x64 delegation and ARM64 Stop assertions; its
+root cause remains unproven. macOS
+**38566691882** refuses unreviewed Darwin LibreOffice MPL-2.0/libvips LGPL-3.0-or-later
+packaging. The preceding 1d6c30f Validate has 1,157 pass, one narrow Insights/New
+Session failure and 23 existing skips; the new ownership fix reproduces the failure
+class independently, without claiming the exact hosted interleaving. Earlier Linux
+validation reaches the Office exact preferred-source/full-engine-rebuild packaging
+gate; that gate remains. New-head hosted results, Office/font/native licence/rebuild
+and public distribution remain separate. DSH is retained; the full Harness migration
+is still active.

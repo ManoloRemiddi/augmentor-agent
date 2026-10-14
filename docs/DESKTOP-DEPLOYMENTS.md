@@ -1,11 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[The fresh MX review instance](HARNESS-MX-REVIEW.md) uses a new managed, unselected
-private stage and separate empty operator profile. The complete inventory is
-verified after tests and browser startup; the selected preview/draft and existing
-feedback remain preserved. An earlier stage's added test screenshot is retained
-as a failed qualification rather than removed from its sealed contents. This
-review instance is not an installed activation or public distribution approval.
+[The refreshed MX review instance](HARNESS-MX-REVIEW.md) runs source **9f5bc70**
+in managed, unselected release **20261014-145102-22cbe428**, artifact
+**f55e256e80c1c5345b17a65b24e3d01694fdbc99799e4325dd558173e3357e35**.
+All **24,288 entries** verify after 179/179/51-file candidate qualification and
+actual runtime/browser startup. Its new read-only profile imports no owner history
+or credentials. Installed 97897cf/draft and older review processes/profiles remain
+preserved; no launcher/global selection changes. Private preparation failures and
+mixed provenance are recorded in the guide. This browser instance is not an installed
+activation or public distribution approval; platform/licence/rebuild gates remain.
 
 [Qualified unselected search MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-search-mx-candidate--october-14),
 source **454db9d9915724b53998e187c30c2943a0d7d3b2**, product **0.2.13**,

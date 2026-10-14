@@ -62,18 +62,19 @@ Two workers, unchanged deadlines, no skips. The first missing-link failures and
 system-Python QtTest failure are retained; final source/ordinary runs use the
 existing isolated QtTest interpreter. Full live/installed/platform gates remain.
 
-The fresh [MX review artifact](../docs/HARNESS-MX-REVIEW.md) at source
-f98424b passes candidate-selected **120/120 across 43 files**, two workers,
-unchanged deadlines/no skips, followed by complete 24,284-entry verification.
-The indexed-history test now places diagnostics under the test checkout, separate
-from `AUGMENTOR_PI_TEST_ROOT`; its source case passes 1/1. The preceding staged
-artifact's sole added screenshot remains a recorded inventory failure; it was
-not patched/resealed. A new stage verifies after runtime/browser startup, with
-zero initial history/turns, local capture and private profile/credential boundaries.
-A first manual-render predicate incorrectly required an editable pre-session
-composer; the corrected real-browser check observes the normal disabled start
-page and zero errors. Earlier GUI/viewport/live/installed/platform/public-release
-limits remain scoped; these checks do not establish owner acceptance.
+The refreshed [MX review artifact](../docs/HARNESS-MX-REVIEW.md) at public
+**9f5bc70a2aac9a974aa656cfadd53cca08737048** passes candidate-selected
+**179/179 across 51 files**, all 42 Harness Chromium files, two workers, unchanged
+deadlines/no skips. Full **24,288-entry** inventory verifies after this cohort and
+again after actual isolated runtime/Chromium startup. Drivers/static imports run
+from the checkout, while executable targets use the staged root; complete 908
+compiled-file and dependency parity is checked. No model/tool work is submitted
+in the fresh owner profile. Original start page/both marks/Settings/Connected,
+local capture, read-only default, zero sessions/turns/drafts and descriptor/socket
+modes pass. First external QA selector syntax and dependency-subtree preparation
+failures remain distinct from product failures; no runtime restart or sealed-artifact
+repair conceals them. Earlier 120/120/43-file review and its screenshot-mutated
+predecessor retain their own results. Owner acceptance and broad gates remain open.
 
 At **7910acdac34d4c72c7e35a7752ae740a99165246**, all 41 Harness Chromium
 files plus `runtime.test.mjs` and `pi-prompt-queue.test.mjs` pass **120/120 each**
