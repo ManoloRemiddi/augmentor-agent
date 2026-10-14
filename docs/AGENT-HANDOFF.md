@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Isolated current-Qwen memory-engine qualification](CONTROLLED-MEMORY.md#isolated-current-qwen-engine-qualification--october-14)
+at **ada6e4378093bf50613e07b6f35702fbab6a24c0** passes actual controlled Hindsight
+0.10.0 failure/no-retry/archive preservation and live six-stage relationship/
+project memory in 75.42 seconds, within unchanged budgets. A labelled disposable
+container/volume and explicit independent PostgreSQL/API/gateway ports preserve
+production services and owner data. The exact source extension hash verifies;
+the fixture is stopped/no-restart, synthetic data retained and production memory/
+Qwen healthy. This is engine-layer evidence; Pi capture/recall/branches, physical
+voice, migration and broader platform/live/privacy/distribution remain required.
+Current app, draft, candidate and manual feedback profile remain unchanged.
+
 [Search test interception lifetime](HARNESS-PLUGIN-PARITY.md#ci-readiness-barriers-and-retained-failures--october-14)
 keeps the selective DevTools channel open through the original GUI workflow,
 preventing queued continuations from racing channel disable. Source/ordinary

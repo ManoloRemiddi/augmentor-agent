@@ -134,6 +134,52 @@ eight focused budget tests pass with that addition. Lifecycle integration was
 rerun after the final admission-order correction. No private conversation text
 belongs in these fixtures or in public documentation.
 
+## Isolated current-Qwen engine qualification — October 14
+
+At source **ada6e4378093bf50613e07b6f35702fbab6a24c0**, the existing public
+`proof-controlled-memory.py` passes both the deliberate-failure and live-model
+checks through a disposable Hindsight **0.10.0** engine, pinned image
+**3edcb6165cefdeaa6721dd0fce43cfd13b7a9c346ce0d2c5f4b4bf7bc3c8ac0b**.
+The mounted authored extension is byte-identical to current source, SHA-256
+**f301dccab0c2874eb66c8f9f2b344ef553a7f05f78aa99e441730803c232d092**.
+Separate container/data volume and API/gateway/database ports prevent access to
+production PostgreSQL and journals. The engine reports the controlled protocol,
+worker disabled, zero reconciliation and zero LLM retries. Its restart policy is
+`no`; no production engine, model/speech configuration or user data is changed.
+
+The fake-model check makes exactly four calls, stops the failed operation for
+review with zero retries and retains the unrelated old fact. The live check uses
+current **Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k** through its existing loopback endpoint.
+It completes all six stages in **75.42 seconds**, with **45.97 seconds** and
+**39,883 tokens** remaining in the original job budget, zero failures and attempt
+zero. Both relationship/project scopes have cached facts and completed summaries/
+pages. The input is one independently authored synthetic text record; it includes
+communication preference, project fact and a restriction, rather than private
+owner conversation or audio. Stop closes the activity lease; subsequent steps
+do not submit new work. Processing limits and model context/concurrency/precision/
+GPU placement are unchanged.
+
+This qualifies the actual controlled Hindsight/gateway/current-Qwen engine layer.
+It does **not** qualify automatic Pi capture/recall/branch cutoff, actual person/
+project migration, semantic relationship quality, physical ASR/TTS or all OS
+memory transports. The temporary proof journal is disposable. The stopped test
+container/labelled synthetic volume and metadata logs are retained privately for
+follow-up; production Hindsight and Qwen still report healthy. The installed
+97897cf preview, owner draft, 454db9d immutable candidate and manual feedback
+profile are untouched. The full migration remains open.
+
+A production engine can remain online for this fixture when the pinned engine is
+explicitly configured with a different embedded PostgreSQL port. The inspected
+0.10.0 `parse_pg0_url` supports `pg0://instance-name:port`. This proof uses Docker
+environment `HINDSIGHT_API_DATABASE_URL=pg0://hindsight:18442`, separate API/gateway
+18440/18441, a new labelled container/volume, the cached exact image, the same
+`setup-hindsight.environment` policy and a read-only preferred-source extension
+mount. Ports must be unused, and the container/volume must be new. No installer
+or production descriptor is rewritten. The older default-port recipe below still
+requires avoiding a production embedded-port collision. Stop only the exact
+owned fixture after verifying its container identity/label and confirming its
+proof handle is terminal; retain its data if further inspection is needed.
+
 ## Reproduce the real-engine checks
 
 Use a disposable engine/volume and ports, with no production PostgreSQL instance
