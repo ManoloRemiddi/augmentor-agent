@@ -45,6 +45,19 @@ separate required workflows under the accepted migration specification.
 
 ## CI readiness barriers and retained failures — October 14
 
+[Validate 38549263115](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38549263115)
+at **e2beaf56e816eb0134f6fd7f0e70402b8e5f9f4e** passes locked-DSH SDK/core,
+all later native/interaction/recovery/first-run checks, dependency inventory and
+extension notices. Debian packaging then refuses the retained Office exact-entry
+preferred-source/engine-rebuild gate. The older Insights/Jobs viewport observations
+pass in this run; causes and broader scheduling acceptance remain unproven. A
+controlled Jobs check at the reported 780×437 also passes, so size alone does not
+establish the earlier mechanism. SDK platform **38549262965** and Windows desktop
+**38549263029** pass. macOS **38549262947** and Windows command **38549262937** fail;
+Windows qualification **38549262976** remains in progress at this checkpoint.
+Retain the earlier producer-settlement and native source/notice gates, distinct
+from the new [private owner-review artifact](HARNESS-MX-REVIEW.md) and new-head CI.
+
 The [cold-reopen/input-admission follow-up](DSH-GUI-ON-PI.md#cold-reopen-and-input-admission-test-barriers--october-14)
 at **7910acdac34d4c72c7e35a7752ae740a99165246** reproduces both 617eccd failure
 classes with actual SDK/Chromium barriers. It retires a held-refresh old document

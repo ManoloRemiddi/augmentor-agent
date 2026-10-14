@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Fresh private MX review](HARNESS-MX-REVIEW.md) is running from public
+**f98424b0a240b4b0c9d5e475d6e77ee4d2706312** over verified 454db9d private payloads, product
+0.2.13/Pi1.1.0. Release **20261014-123717-b98af12b**, artifact
+**6ae1d969a68f48027fee1392a19b92a66bf3619707fca5871b2785249c125331**, **24,284 entries** verifies after candidate-selected
+120/120/43-file checks and actual runtime/browser startup. A fresh read-only local-
+Qwen/keyless profile has local request inspection, no imported history/credentials,
+no initial turns and a private operator link; browser opening is queued in this
+chat. The earlier screenshot-mutated staged artifact is retained as failed; a
+new stage follows the test-output correction. Installed 97897cf/draft, prior
+feedback and production services are preserved. Owner feedback, broader P0/P1/live/
+physical/installed/platform/public gates remain open. Latest preceding e2beaf5 CI
+passes core/native checks then refuses Office packaging; older viewport causes
+remain unproven, not reproduced by size alone.
+
 [GUI recovery preparation](DSH-GUI-ON-PI.md#cold-reopen-and-input-admission-test-barriers--october-14)
 at **7910acdac34d4c72c7e35a7752ae740a99165246** reproduces departing cold-Host
 RPC refusals and early input Stop's unknown receipt. The tests retire a held-refresh

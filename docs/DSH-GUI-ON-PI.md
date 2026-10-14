@@ -17,6 +17,11 @@ Do not delete the added file or rewrite its manifest to relabel it successful.
 The corrected driver must qualify a newly staged clean artifact and verify its
 complete inventory afterward. The selected preview/draft remain unchanged.
 
+The [replacement MX review](HARNESS-MX-REVIEW.md) at f98424b now passes the
+candidate-selected 120-case cohort and complete inventory checks after both
+qualification and actual browser/runtime startup. Its isolated empty profile is
+running for owner feedback; no installed selection or original draft is changed.
+
 ## Cold-reopen and input-admission test barriers — October 14
 
 Source **7910acdac34d4c72c7e35a7752ae740a99165246** prepares the specific

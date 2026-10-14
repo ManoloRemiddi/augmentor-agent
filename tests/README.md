@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The fresh [MX review artifact](../docs/HARNESS-MX-REVIEW.md) at source
+f98424b passes candidate-selected **120/120 across 43 files**, two workers,
+unchanged deadlines/no skips, followed by complete 24,284-entry verification.
+The indexed-history test now places diagnostics under the test checkout, separate
+from `AUGMENTOR_PI_TEST_ROOT`; its source case passes 1/1. The preceding staged
+artifact's sole added screenshot remains a recorded inventory failure; it was
+not patched/resealed. A new stage verifies after runtime/browser startup, with
+zero initial history/turns, local capture and private profile/credential boundaries.
+A first manual-render predicate incorrectly required an editable pre-session
+composer; the corrected real-browser check observes the normal disabled start
+page and zero errors. Earlier GUI/viewport/live/installed/platform/public-release
+limits remain scoped; these checks do not establish owner acceptance.
+
 At **7910acdac34d4c72c7e35a7752ae740a99165246**, all 41 Harness Chromium
 files plus `runtime.test.mjs` and `pi-prompt-queue.test.mjs` pass **120/120 each**
 in source and separate ordinary production: two workers, unchanged deadlines/no
