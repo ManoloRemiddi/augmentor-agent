@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Actual Blender CLI workflow](HARNESS-PLUGIN-PARITY.md#live-blender-cli-workflow-and-retained-inspection--october-14)
+at public **1d6c30f**/runtime **737bdf9** uses local Qwen, an isolated external MCP
+process and Blender 5.2.1 on a disposable scene. One create/save, summary and reopen
+verify an eight-vertex/six-face cube, material and unknown-to-prompt receipt; an
+independent Blender reopen agrees. Four requests/three originals plus one held-code
+Stop retain aborted generation/unknown effect/no replay and an unchanged scene.
+Cold original TOOL/Result/reload preserves five requests/four originals/native bytes
+without new execution. No external GPL-marked source is copied/bundled; owner
+processes/artifacts/model/speech settings and broader acceptance gates remain.
+
 [Runtime listener ownership](AUGMENTOR-HARNESS.md#runtime-listener-ownership--october-14)
 at **737bdf92f3a4c8166c3600e5a0c3cf25c4bab6f8**
 preserves a winning socket after a failed bind and holds the listener until

@@ -34,7 +34,7 @@ No saved owner key or profile is imported by this choice.
 | Free Web Search, historical 0.1.0 reference | [Original API card and keyless controls](#keyless-and-api-modes-in-the-original-plugins-page--october-14) bind both workflows through existing Native owners, retaining separate keys/settings/drafts, same-owner mode reload, collision/pending recovery, scope boundaries and actual Light/Dark GUI qualification. Source/ordinary managed Qwen search and public fetch qualify. The owner chooses these tested MIT alternatives. | Historical identity/360 parity remain unconfirmed; identity does not block the accepted source choice. Representative credentialed engines/outage/quota, standalone add-ons, guarded installed owner acceptance and other OS qualification remain. No owner keys are migrated. |
 | Playwright MCP | Managed-core synthetic contracts plus [actual local-Qwen/Playwright 0.0.79](#live-playwright-workflow-and-retained-inspection--october-14): one owned navigation/click/receipt/close, approved effects, snapshot reads, held navigation Stop and original cold Trajectory inspection with no replay. | Owner configuration/installed adoption, broader browser workflows, external sites/credentials and physical/platform acceptance. |
 | Comfy MCP | Same managed-core binding; the reference service previously refused connection. | Service availability and a representative authorized workflow; no successful Comfy operation is claimed. |
-| Blender MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Blender operation and verified effect/Stop/retained evidence. |
+| Blender MCP | [Actual local-Qwen/Blender CLI workflow](#live-blender-cli-workflow-and-retained-inspection--october-14): bounded owned create/save/reopen, independently verified mesh/material/receipt, Stop/unknown/no replay and cold original TOOL/Result inspection. External GPL-marked helper remains unbundled. | Owner installed setup, interactive scenes, wider modeling/rendering, concurrency and physical/platform acceptance. |
 | Unreal MCP | Same managed-core binding; reference catalog count does not establish application use. | Representative actual Unreal operation and verified effect/Stop/retained evidence. |
 
 Resonant Voice is an additional separately versioned companion integration, with
@@ -42,6 +42,60 @@ its own [voice protocol](VOICE-SINGLE-BUTTON.md) and physical/audio lifecycle ga
 It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision and
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
+
+## Live Blender CLI workflow and retained inspection — October 14
+
+Public source **1d6c30faaed5c8fc392ed34cedc77eeed4d05677**, runtime unchanged
+from **737bdf92f3a4c8166c3600e5a0c3cf25c4bab6f8**, product **0.2.13**/Pi **1.1.0**,
+qualifies one actual local-Qwen/Blender MCP workflow on MX Linux. The installed
+Python distribution reports **blender-mcp 1.0.3**; its MCP initialize response
+advertises **1.30.0**, a distinct observed identity. Its helper source declares
+**GPL-3.0-or-later**, while distribution metadata supplies no licence expression.
+Blender is **5.2.1 LTS**, build **9e2066aef7ef**. These are external, already
+installed executables, not newly locked/bundled Augmentor dependencies. No Blender
+or server source is copied or approved for redistribution by this qualification.
+
+A fresh stdio MCP process has its own HOME/config/cache and an explicit Blender
+executable. The interactive connector is deliberately unreachable in this test
+profile; only CLI operations on a newly authored `.blend` file are exposed.
+Supported `toolExposure` hides every other server tool, and a synthetic public-SDK
+fixture grants only the three exact CLI names/path/approved code bodies. The
+existing Blender/MCP processes and arguments remain unchanged. No owner scene,
+profile, credentials, GPU setting or application window is imported or changed.
+
+The real model performs the bounded authored task: one create/save call, a data-
+block summary and one reopen/verification call. The saved scene contains one cube,
+**eight vertices/six faces**, location **(1.25, -2, 0.5)** and the expected material.
+Its generated receipt is seeded in the file, excluded from the prompt, and returned
+exactly in the model's final answer. A separate real background Blender process
+independently reopens the file and verifies those facts; the saved-file hash differs
+from the empty seed. Four actual provider requests and three successful native MCP
+originals are retained. Creation runs once; the generic execute tool's create and
+read-only verification each cross operator approval, while only the explicitly
+owned summary is classified read-only. This proves bounded execution, not open-
+ended model-generated geometry quality, rendering or physical GUI acceptance.
+
+A second explicit turn holds real background Blender code after an owned marker.
+Stop ends generation as **aborted**, retains the effect as **unknown**, and causes
+no replay; its one additional request/fourth MCP original are retained. Releasing
+the test marker lets the owned external process settle. The scene's bytes remain
+unchanged: generation cancellation is not a claim that external execution was
+cancelled. All owned Blender, MCP and Host processes are terminal afterward.
+
+Cold original Trajectory/reload at **1440×1000** preserves equal display history,
+exact native bytes, five total model requests/four originals and no inference or
+tool replay, with zero browser errors/failed responses. The first selector could
+also match a quoted tool name in the user prompt; a further retained-only check
+against the qualified 737bdf9 ordinary tree explicitly selects the **TOOL** row and
+**Result** pane. Its actual receipt/name/8/6 JSON is visually inspected. That
+strengthened inspection repeats no model or Blender operation.
+
+The preflight catalog and read-only summary also pass with an unchanged seed.
+Private scripts, scene, profiles, paths, credentials, transcripts and screenshots
+stay outside GitHub. Owner installed setup, live interactive scenes, arbitrary
+modeling/rendering, concurrency, physical/platform behavior, Comfy/Unreal and all
+remaining P0/P1/privacy/migration/public-distribution gates remain open. The f98424b
+owner review, 97897cf selection/draft and model/speech placement remain preserved.
 
 ## Live Playwright workflow and retained inspection — October 14
 

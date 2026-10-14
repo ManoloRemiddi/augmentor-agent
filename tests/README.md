@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Actual Blender CLI evidence](../docs/HARNESS-PLUGIN-PARITY.md#live-blender-cli-workflow-and-retained-inspection--october-14)
+at public 1d6c30f/runtime 737bdf9 uses real Qwen, installed external server/Blender,
+a fresh scene, three CLI grants and exact authored code. Four requests/three MCP
+originals verify one saved cube/material/receipt; an independent Blender reopen
+agrees. One Stop request retains unknown effect without replay or scene changes.
+Cold original TOOL/Result/reload preserves native/history bytes and five requests/
+four originals. The stronger row selector avoids confusing a quoted tool name in
+the user prompt with the actual TOOL row. All owned processes settle; owner data
+and external GPL-marked source are not copied/published. Wider gates remain.
+
 [Runtime ownership fixtures](../docs/AUGMENTOR-HARNESS.md#runtime-listener-ownership--october-14)
 add a controlled real-main bind collision and actual held SDK shutdown/follower
 alongside the existing fresh-launch/journal/protocol case. Before the fix one of

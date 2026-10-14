@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[External live MCP compatibility](HARNESS-PLUGIN-PARITY.md#live-blender-cli-workflow-and-retained-inspection--october-14):
+installed Blender 5.2.1 LTS (9e2066aef7ef), Python blender-mcp distribution 1.0.3
+and its separately advertised MCP serverInfo 1.30.0 qualify the bounded CLI test.
+Inspected helper headers are GPL-3.0-or-later; metadata omits a licence expression.
+These observed external versions are not new managed dependency pins or source/
+binary redistribution approval. No server/Blender source is copied or bundled.
+The [earlier external Playwright](HARNESS-PLUGIN-PARITY.md#live-playwright-workflow-and-retained-inspection--october-14)
+proof uses installed @playwright/mcp 0.0.79/Apache-2.0. Pi core pins remain 1.1.0;
+changing an external service version requires fresh compatibility qualification.
+
 [MIT keyless library selection](HARNESS-PLUGIN-PARITY.md#mit-keyless-engine-and-public-fetch-library--october-14)
 at **68ab32100ac0fef63374d8cb17618d174d72095e** pins DDDMUC 0.8.9 / 6c3979202bcbda6dc52e0bd17cf34edad4bac5ed preferred engine
 functions, shinjiyu 0ceaa1985ad2e7774cd8f06890c4a9b1a7125955 Tavily helpers,
