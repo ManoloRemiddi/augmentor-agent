@@ -3,8 +3,8 @@
 import unittest
 from unittest.mock import patch
 import numpy as np
-from PySide6.QtCore import Qt, QPointF
-from PySide6.QtGui import QImage
+from PySide6.QtCore import Qt, QPointF, QPoint, QRect, QCoreApplication
+from PySide6.QtGui import QImage, QMoveEvent
 from PySide6.QtWidgets import QApplication
 from augmentor_linux.activity import FlowNoise, image_array, restore_emission_detail
 from augmentor_linux.window import Window
@@ -31,6 +31,58 @@ class ActivityTests(unittest.TestCase):
         window=Window(preview=True)
         try:
             self.assertTrue(window.activity.canvas.windowFlags() & Qt.WindowType.NoDropShadowWindowHint)
+        finally:
+            window.close()
+
+    def test_nonanimated_canvas_displacement_recovers_without_moving_owner_or_starting_animation(self):
+        window=Window(preview=True)
+        try:
+            window.setGeometry(300,300,424,484);window.show()
+            activity=window.activity;activity.configure(animated=False,busy=True)
+            QCoreApplication.processEvents()
+            owner=QRect(window.geometry());extra=activity.extent-activity.margin
+            expected=QRect(window.mapToGlobal(QPoint()),window.size()).adjusted(-extra,-extra,extra,extra)
+            self.assertFalse(activity.timer.isActive())
+            # A platform/transient notification can move only the canvas after
+            # the owner's own Move has finished. No user input or model work.
+            activity.canvas.move(expected.topLeft()+QPoint(0,80))
+            QCoreApplication.processEvents();QCoreApplication.processEvents()
+            self.assertEqual(activity.canvas.geometry(),expected)
+            self.assertEqual(window.geometry(),owner)
+            self.assertFalse(activity.timer.isActive())
+        finally:
+            window.close()
+
+    def test_refused_canvas_placement_is_bounded_and_an_owner_move_renews_it(self):
+        window=Window(preview=True)
+        try:
+            window.setGeometry(300,300,424,484);window.show()
+            activity=window.activity;activity.configure(animated=False,busy=True)
+            QCoreApplication.processEvents();canvas=activity.canvas
+            canvas.move(canvas.pos()+QPoint(0,80))
+            with patch.object(canvas,'setGeometry') as refused:
+                for _ in range(12):
+                    QCoreApplication.sendEvent(canvas,QMoveEvent(canvas.pos(),canvas.pos()))
+                    QCoreApplication.processEvents()
+                self.assertGreater(refused.call_count,0)
+                self.assertLessEqual(refused.call_count,2)
+                previous=refused.call_count
+                window.move(window.pos()+QPoint(10,10))
+                QCoreApplication.processEvents()
+                self.assertGreater(refused.call_count,previous)
+            self.assertFalse(activity.timer.isActive())
+        finally:
+            window.close()
+
+    def test_queued_canvas_correction_cannot_reshow_a_hidden_owner(self):
+        window=Window(preview=True)
+        try:
+            window.show();activity=window.activity;activity.configure(animated=False,busy=True)
+            QCoreApplication.processEvents()
+            activity.canvas.move(activity.canvas.pos()+QPoint(0,80));window.hide()
+            QCoreApplication.processEvents();QCoreApplication.processEvents()
+            self.assertFalse(activity.canvas.isVisible())
+            self.assertFalse(activity.timer.isActive())
         finally:
             window.close()
 

@@ -2,6 +2,53 @@
 
 # Augmentor 0.2.12 desktop flare correction
 
+## Current source: late canvas placement — October 15
+
+The original managed transient can receive a native Move after its owner's own
+geometry notification. Activity previously observed only owner events and the
+animation tick. A static effect therefore remained offset after a late external
+canvas move. The common Qt test and real isolated X11/KWin external-move proof
+both fail against the preceding code and pass with the correction. The native
+proof confirms an actual spontaneous canvas notification, fixed owner geometry
+and an inactive animation timer; it does not rely on an ignored move command.
+
+Activity now observes its canvas too and coalesces reconciliation through an
+owned zero-delay timer. The owner's existing target rectangle, exterior extent,
+window flags, appearance, input transparency, workspace/stacking and renderer
+are preserved. A correction changes only the canvas; it starts no animation.
+At most two corrections are attempted for an unresolved owner target, so a
+platform that refuses placement cannot drive an unbounded correction loop.
+Owner movement/normal synchronization renews the opportunity. Hidden, minimized,
+morphing or disabled effects are not revealed by queued work. Qt's
+[geometry/event contract](https://doc.qt.io/qt-6/qwidget.html#geometry-prop)
+and [move recursion warning](https://doc.qt.io/qt-6/qwidget.html#pos-prop)
+support deferred correction rather than recursive movement in the canvas event.
+
+Ten focused common cases pass, including static displacement, refused-placement
+bounds/renewal and hide-before-correction. The strengthened ten-phase two-process
+X11/KWin proof passes on CPU and Qt Quick/OpenGL via forced Mesa llvmpipe. The
+latter is software-backed OpenGL shader-path evidence, not physical RTX/Metal
+acceptance; owner GPU/model/speech placement is untouched. Existing Linux/macOS
+test recipes cover the common Activity suite; Windows Desktop now includes it.
+
+The initial full native run has 923 cases with one dictation fixture failure and
+45 identified skips. Its POSIX fake executable used the qualification Python
+path directly in a shebang, which splits a path containing spaces. The retained
+focused failure is corrected with a quoted shell launch of the same authored
+program/interpreter; all 22 dictation cases then pass with unchanged deadlines,
+saved-preference/child-recovery and no real microphone/service activity. An
+initial external-move probe's blocking sync/edge placement was invalid and is
+retained; the valid positive-coordinate proof uses the actual native event.
+
+The animated baseline and diagnostic trace pass locally; the trace observes
+late canvas moves repaired by the old animation tick. **2929c60 / Validate
+38646604138** retains its original post-move rectangle mismatch. The controlled
+static drift proves a related missed-notification gap, not the exact older hosted
+timing or its sole cause. Exact-ref full source/ordinary, hosted and physical/
+installed qualification remains pending at this implementation checkpoint.
+This current-source section does not relabel or redeploy the published 0.2.12
+artifact described below; no owner window or installed selection is changed.
+
 The exterior plasma/flare canvas now follows its owning Desktop window’s
 workspace and stacking order. Previously it bypassed the window manager and
 requested a global keep-above layer, so it could remain on another workspace

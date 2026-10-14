@@ -43,7 +43,12 @@ class ActivityHalo(QObject):
         self.timer.setInterval(40)
         self.timer.timeout.connect(self.tick)
         self.canvas = HaloCanvas(self)
+        self.geometry_timer=QTimer(self)
+        self.geometry_timer.setSingleShot(True)
+        self.geometry_timer.timeout.connect(self.reconcile_canvas)
+        self.canvas_retry_target=None;self.canvas_retries=0
         self.window.installEventFilter(self)
+        self.canvas.installEventFilter(self)
 
     def configure(self, busy=None, animated=None, enabled=None, effect=None, colours=None):
         if colours is not None:self.butterflies.set_colours(colours)
@@ -58,19 +63,37 @@ class ActivityHalo(QObject):
         if enabled is not None:self.enabled=bool(enabled)
         self.sync()
 
-    def position_canvas(self):
+    def canvas_target(self):
         extra=self.extent-self.margin
-        target=QRect(self.window.mapToGlobal(QPoint(0,0)),self.window.size()).adjusted(-extra,-extra,extra,extra)
+        return QRect(self.window.mapToGlobal(QPoint(0,0)),self.window.size()).adjusted(-extra,-extra,extra,extra)
+
+    def position_canvas(self, reset_retry=True):
+        target=self.canvas_target()
+        if reset_retry:self.canvas_retry_target=target;self.canvas_retries=0
         if self.canvas.geometry()!=target:
             self.canvas.setGeometry(target);self.butterflies.pointer=None
+
+    def reconcile_canvas(self):
+        if not self.window.isVisible() or self.window.isMinimized() or getattr(self.window,'morphing',False) or not self.enabled or self.effect=='none':return
+        target=self.canvas_target()
+        if target!=self.canvas_retry_target:self.canvas_retry_target=target;self.canvas_retries=0
+        if self.canvas.geometry()==target or self.canvas_retries>=2:return
+        self.canvas_retries+=1
+        self.position_canvas(reset_retry=False)
+        self.canvas.update()
 
     def eventFilter(self, watched, event):
         if watched is self.window:
             if event.type() in (QEvent.Type.Move,QEvent.Type.Resize):
                 self.position_canvas();self.canvas.update()
-                QTimer.singleShot(0,self.position_canvas)
+                self.geometry_timer.start(0)
             elif event.type()==QEvent.Type.Hide:
-                self.canvas.hide();self.timer.stop()
+                self.geometry_timer.stop();self.canvas.hide();self.timer.stop()
+        elif watched is self.canvas and event.type() in (QEvent.Type.Move,QEvent.Type.Resize):
+            # Native/transient placement can arrive after the owner's Move.
+            # Queue/coalesce rather than setting geometry recursively; a WM
+            # that refuses placement must not create an unbounded repair loop.
+            if self.canvas.geometry()!=self.canvas_target():self.geometry_timer.start(0)
         return False
 
     def sync(self):
