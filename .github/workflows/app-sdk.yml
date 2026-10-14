@@ -2,7 +2,7 @@
 name: Application SDK platform contracts
 on:
   pull_request:
-    paths: ['services/workspaces/**', 'apps/browser/**', 'packages/codex-runtime/**', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/test_app_sdk_platform.py', '.github/workflows/app-sdk.yml']
+    paths: ['services/workspaces/**', 'apps/browser/**', 'apps/harness/**', 'packages/codex-runtime/**', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/harness-session-create*', 'tests/test_app_sdk_platform.py', '.github/workflows/app-sdk.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -34,6 +34,8 @@ jobs:
       - name: Verify original GUI dependency resolution on this platform
         run: node --test tests/harness-build-resolution.test.mjs
       - run: npm run build
+      - name: Verify shared Harness session creation and draft scopes
+        run: node --test tests/harness-session-create.test.mjs
       - name: Verify OS private files and startup contracts
         run: node -e "const cp=require('child_process'); const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-m','unittest','discover','-s','tests','-p','test_app_sdk_platform.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"
       - name: Verify workspace capability contract

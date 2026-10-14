@@ -36,9 +36,9 @@ test('original Context Insights uses retained records, filters, refresh and exac
  await visible('document.querySelector("button[aria-label=\\"New session\\"]")');
  const histories=new Map();
  for(let i=0;i<2;i++){
-  await click('document.querySelector("button[aria-label=\\"New session\\"]")');await visible(composer+'&&!'+composer+'.hasAttribute("aria-disabled")');
+  const previous=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")');await click('document.querySelector("button[aria-label=\\"New session\\"]")');await visible('sessionStorage.getItem("augmentor-harness-session")!=='+JSON.stringify(previous)+'&&'+composer+'&&!'+composer+'.hasAttribute("aria-disabled")');
   await click(composer);await panel.call('Input.insertText',{text:'Read the authored fixture note '+i+'.'});await click('document.querySelector("button[aria-label=\\"Send message\\"]")');await visible('document.body.innerText.includes("The note says:")&&!document.querySelector("button[aria-label=\\"Stop generating\\"]")');
-  const row=(await rpc('session.list')).items.find(x=>!histories.has(x.sessionId));histories.set(row.sessionId,await rpc('session.history',{sessionId:row.sessionId}));
+  const selected=await panel.evaluate('sessionStorage.getItem("augmentor-harness-session")'),row=(await rpc('session.list')).items.find(x=>x.sessionId===selected);assert(row&&!histories.has(row.sessionId),'each prompt belongs to the newly selected owner');histories.set(row.sessionId,await rpc('session.history',{sessionId:row.sessionId}));
  }
  const wire=await readFile(link.requestLog,'utf8');assert.equal(wire.trim().split('\n').length,4);
  const openInsights=async()=>{await click('document.querySelector("button[aria-label=\\"Context Insights\\"]")');await visible('document.querySelector(".lc-ov-search")&&document.querySelector("[role=status]")?.innerText.includes("2 sessions")');};

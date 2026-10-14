@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[New Session ownership](../docs/DSH-GUI-ON-PI.md#new-session-input-ownership--october-14)
+adds actual original-GUI/CDP held creation with durable old/new draft and exact
+prompt-owner assertions. Four controller contracts and the qualified old-tree
+browser fail before the fix; a separate old-tree probe recreates disabled Send
+and wrongly saved old-owner text with zero inference. Final focused 7/7 covers
+stale success/failure, duplicate/wrong acknowledgments, refusal/draft restoration,
+read-only, unrelated-open behavior and original Insights. Initial quoting/captured-
+fetch preparation errors stay distinct; actual request interception, original
+assertions, two workers and deadlines remain unchanged.
+
 [Actual Blender CLI evidence](../docs/HARNESS-PLUGIN-PARITY.md#live-blender-cli-workflow-and-retained-inspection--october-14)
 at public 1d6c30f/runtime 737bdf9 uses real Qwen, installed external server/Blender,
 a fresh scene, three CLI grants and exact authored code. Four requests/three MCP

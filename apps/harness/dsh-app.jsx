@@ -125,7 +125,7 @@ const tr=dictionary=>(key,args={})=>String(dictionary[key]??commonEn[key]??key).
 const t={conversation:tr(conversationEn),sidebar:tr(sidebarEn),workspace:tr(workspaceEn),chat:tr(chatEn),trajectory:tr(trajectoryEn),model:tr(modelEn),goal:tr(goalEn),approval:tr(approvalEn),question:tr(questionEn),common:tr(commonEn),command:tr(commandEn),menu:tr(menuEn)};
 const settingsNotice=text=>controller.update({error:text});
 const harnessShortcuts=new DshShortcuts(controller,{previews:filePreviews,layout,workspaceControls:shortcuts,settingsShell,dictionaries:{workspace:workspaceEn,sidebarRight:sidebarRightEn,settings:settingsEn,layout:layoutShortcutEn}});filePreviews.useShortcuts=harnessShortcuts.useCatalog;
-const control={run:async action=>{try{return await action();}catch(error){if(!error.presentedByBranch)controller.update({error:error.message});return undefined;}}};
+const control={run:async action=>{try{return await action();}catch(error){if(!error.presentedByBranch&&!error.presentedByCreate)controller.update({error:error.message});return undefined;}}};
 let activeDraft=null;
 let draftRev=0,composerProjection={detectText:'',clipboardText:'',occurrences:[],selection:null,caret:null},commandMenu;const occurrenceIds=new Map();let nextOccurrenceId=0;
 const forkLast=sid=>{const revision=draftRev;return control.run(()=>controller.forkLast(sid,()=>draftRev===revision));};

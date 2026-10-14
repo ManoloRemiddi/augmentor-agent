@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[New Session input ownership](DSH-GUI-ON-PI.md#new-session-input-ownership--october-14)
+advances only the Harness view epoch/creation scope. The existing Host still creates
+one AgentSession per conversation and owns drafts/queues. Loading disables the old
+composer before RPC, while old drafts and stale-response fences retain their owners.
+No new data format, execution owner, OS adapter or supplier layout is introduced.
+
 [Runtime listener ownership](AUGMENTOR-HARNESS.md#runtime-listener-ownership--october-14)
 keeps the process admission fence through public SDK shutdown. Only a successful
 bind grants Unix socket cleanup identity; a failed process cannot remove another

@@ -1,5 +1,59 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## New Session input ownership — October 14
+
+A controlled actual original-GUI fixture reproduces a conversation-selection
+race: while `session.create` waits, the preceding composer remains editable.
+Text intended for the new conversation is saved on the old owner's draft. Once
+the new owner opens, its draft is empty and Send is disabled. This reproduces
+the 513×715 unavailable-Send failure class from 1d6c30f/Validate **38560545695**,
+without a model request; the exact hosted scheduling remains unobserved. That
+run has **1,157 pass, one assertion failure, zero cancelled and 23 existing skips**.
+Its runtime ownership cases pass; this is a separate frontend admission boundary.
+
+The controller now captures the selected model/workspace and advances its view
+epoch before the first creation await, entering the existing loading phase.
+Original InputBar controls disable outgoing editing/admission while its old
+private draft stays intact. A duplicate in the same creation scope dispatches
+nothing. The reply must confirm the requested new owner ID. Each refresh/open
+checks that the creation still owns the view; success or failure arriving after
+navigation cannot change another selection or paint its error there. A current
+refusal restores the preceding phase/durable draft, without resending creation.
+A new explicit creation can still supersede an unrelated open using the saved
+default, preserving that existing workflow. A failed new-owner load remains
+unavailable rather than claiming its incomplete context is ready.
+
+This uses the original loading/disabled presentation and scoped error dialog,
+not a new layout or control. No supplier/CSS, protocol, data format, SDK owner,
+queue identity, model choice, dependency or native adapter changes. The Insights
+driver additionally waits for a changed selected session ID before typing and
+checks each prompt's exact owner. Its two real read-tool rounds, usage/timing,
+filters, refresh, corpus scopes, navigation and unchanged parent histories remain.
+
+Four independent controller assertions fail against the old implementation;
+actual Chromium against the qualified 737bdf9 ordinary tree also fails because
+the old editor stays editable during a held real creation request. A second
+controlled old-tree probe types and saves the new intent on the old owner, then
+observes the empty new draft/disabled Send and zero provider requests. The new
+fixture verifies original disabled controls, no pre-ack inference, old-draft
+preservation, one prompt only in the new owner, two actual provider requests and
+cold navigation back to the retained old draft. Unit cases cover duplicate calls,
+stale success/failure, wrong acknowledgments, refusal/draft restoration, read-only
+and the preserved unrelated-open behavior. Their final focused **7/7** pass.
+
+Initial fixture attempts retain a selector quoting error and a fetch interception
+that cannot affect the controller's already captured fetch callback. The effective
+barrier uses the actual CDP HTTP request stage; it never replaces a server result,
+retries a click or relaxes a deadline. The qualified old-tree failure and final
+actual browser success are separate from those preparation errors.
+
+The change is shared Harness JavaScript with no OS-specific mechanism. MX Linux
+Chromium/Qt evidence does not establish physical macOS/Windows or installed-owner
+behavior. The existing SDK platform matrix now triggers for Harness changes and
+runs the five pure creation/draft-scope cases on Linux, macOS and Windows; its
+hosted results remain separate from local Linux execution. Owner reviews, installed 97897cf/draft, production services/settings and
+all wider P0/P1/plugin/privacy/migration/platform/public-release gates stay intact.
+
 ## Read-only release qualification output — October 14
 
 The indexed-history Chromium test keeps diagnostics in the test checkout's

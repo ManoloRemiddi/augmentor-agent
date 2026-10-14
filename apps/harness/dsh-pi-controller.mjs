@@ -5,7 +5,7 @@ import {appendDisplay,messageTargets} from './chat-projection.js';
 /** Browser transport to the existing Pi Host; never owns an agent or retries a mutation. */
 export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
-  branchFlight=null; branchIntents=new Map();
+  branchFlight=null; branchIntents=new Map();createFlight=null;
   state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
@@ -210,8 +210,24 @@ export class DshPiController {
   }
   async create(cwd=this.state.workspace){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
+    if(this.createFlight?.epoch===this.epoch&&this.createFlight.sessionId===this.state.sessionId)return null;
     const selection=this.state.selection||this.state.catalog.default;if(!selection)throw Error('Choose a model first.');
-    const sessionId=crypto.randomUUID();await this.rpc('session.create',{sessionId,selection,cwd});await this.refresh();await this.open(sessionId);
+    const sessionId=crypto.randomUUID(),flight={epoch:++this.epoch,sessionId:this.state.sessionId,previousPhase:this.state.phase,opening:false};this.createFlight=flight;
+    const current=()=>this.createFlight===flight&&this.epoch===flight.epoch&&this.state.sessionId===flight.sessionId&&!this.state.readOnly;
+    // Freeze the outgoing composer before the first async boundary. Its private
+    // draft remains owned by that conversation while the new owner is prepared.
+    this.update({phase:'loading',error:null});
+    try{
+      const created=await this.rpc('session.create',{sessionId,selection,cwd});
+      if(created?.sessionId!==sessionId)throw Error('The new conversation was not confirmed. Inspect the conversation list before trying again.');
+      if(!current())return created;
+      await this.refresh();if(!current())return created;
+      flight.epoch=this.epoch+1;flight.sessionId=sessionId;flight.opening=true;
+      await this.open(sessionId);return created;
+    }catch(error){
+      if(current())this.update({...(!flight.opening?{phase:flight.previousPhase}:{}),error:error.message});
+      error.presentedByCreate=true;throw error;
+    }finally{if(this.createFlight===flight)this.createFlight=null;}
   }
   pending=new Map();
   heldQuestions=new Map();
