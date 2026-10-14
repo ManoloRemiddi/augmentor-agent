@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Stored Pi account sign-out](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14): original MIT DSH confirmation, private OAuth metadata and supported Pi logout. Focused 22/22 fixture checks pass; source/ordinary and live/provider/installed acceptance remain open.
+
 [GUI qualification readiness](DSH-GUI-ON-PI.md#gui-qualification-readiness--october-14)
 at **be7bcb4634df94ac1587d80b9dcf70a9c93fd65c** fixes test drivers' inherited-fieldset
 readiness and final request-metadata barriers. Controlled main/hover/frame cases

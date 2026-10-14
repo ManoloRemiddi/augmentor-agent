@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Stored Pi account sign-out](../docs/HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds `model-accounts.test.mjs` and extends the actual Models Chromium test. Focused 22/22 across four files pass, including actual SDK deletion/synchronization failure, held settlement, no retry after lost reply, role revocation, original confirmation cancellation/sign-out and cold reload. Credentials/providers are authored fixtures; broader source/ordinary and real provider/installed acceptance remain open.
+
 [GUI readiness qualification](../docs/DSH-GUI-ON-PI.md#gui-qualification-readiness--october-14)
 at **be7bcb4634df94ac1587d80b9dcf70a9c93fd65c** adds three actual Chromium native-fieldset
 contracts for main/hover/frame preparation, explicit release and the first-legend

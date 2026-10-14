@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Stored Pi account sign-out](#stored-pi-account-sign-out--october-14) adds the original MIT DSH confirmation dialog and separate OAuth credential management. This source candidate is not installed in the owner review build; sign-in remains open.
+
 [Installed MX Models qualification](#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.
 
 Current discovery implementation: **340327d6a554094d9ce9d54dcdd0810c08e5b245**. Strict check/build and the exact 65-file MX cohort pass **334/334**, with five separate notice/workspace cases. Ordinary and installed qualification remain open.
@@ -505,3 +507,67 @@ snapshot. These are explicit unresolved build/licensing gates; no broad license
 allowlist, platform artifact adoption or further OS implementation is performed.
 The verified private MX selection and local 342-case source/ordinary evidence
 remain as recorded above. Further platform implementation awaits owner feedback.
+
+## Stored Pi account sign-out — October 14
+
+The original Models footer now lists stored OAuth provider routes and opens
+DSH's original sign-out confirmation. The two newly selected public files,
+`SignOutDialog.tsx` and `SignInDialog.module.css`, match the exact Git blobs at
+[the pinned MIT baseline](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/client/ui-settings-account).
+The public licence was rechecked against the retained licence. The source
+manifest grows from 580 to **582** entries; the previous records stay identical.
+Existing Models card CSS is reused. The browser graph allows only these two
+account presentation files; other DSH account controllers, sign-in transport,
+backend and analytics remain excluded. No new npm dependency is introduced.
+
+`models.settingsDescribe.accounts` contains only provider route IDs and a
+registered-provider boolean. “OAuth stored” reports local credential metadata,
+not account identity, token validity or a successful provider connection. Account
+identity, tokens, API keys and SDK error bodies are not returned. API-key
+credentials are not listed. An unregistered provider stays visible with an
+unavailable control; register it in Pi before managing its account.
+
+The separate operator-only `models.accountLogout` removes the OAuth credential
+currently stored for the selected provider through supported
+**ModelRuntime.logout**. Removing a provider profile still retains account
+credentials. Sign-out retains provider settings, profile API keys and environment
+credentials, so other configured authentication can remain available. It is a
+local operation and does not revoke access at the remote provider.
+
+Admission requires an applied model configuration, current profile revision,
+stored OAuth metadata and registered provider. Active work must settle and
+queued prompts/goals must be paused. The Host serial owner stays held through
+actual SDK settlement, with a ten-second abort signal; it never retries or
+releases ownership merely because cancellation was requested. After SDK success,
+loaded AgentSessions keep their owners and reconcile effective model definitions.
+The profile fingerprint and fresh credential metadata must agree before new work
+is enabled. A storage, synchronization or reconciliation failure is unconfirmed:
+new work stays blocked until explicit model refresh. A committed deletion is not
+silently rolled back. Raw SDK errors and credentials are not propagated.
+
+The browser scope checks operator epoch/capability and descriptor shape. A lost,
+invalid or revoked write reply retires its editor/account authority and clears the
+list. No automatic write replay occurs. An explicit fresh read is required before
+another attempt, and fresh stored metadata prevents a second deletion of an
+already removed OAuth credential. Cancel in the original confirmation submits no
+mutation. Provider route identity is the scope of this action; the GUI does not
+claim to identify an individual account or detect a same-type credential replaced
+by another Pi process between metadata checks and the SDK's serialized deletion.
+
+Focused strict check/build and **22/22 across four files** pass: the new public-
+SDK/account failure tests, existing model settings/configuration tests and original
+Models Chromium workflow. The authored provider/store qualifies actual deletion
+followed by SDK synchronization failure, stale/type/unregistered/busy/queue/goal
+refusals, held settlement, lost reply and late role revocation. The real isolated
+Host/browser uses synthetic valid-future Anthropic-shaped credentials, never a
+personal login: original pointer Cancel/confirm, unavailable orphan, inspector
+refusal, cold reload, unrelated credential retention, unchanged parent history/
+model selection and no new inference pass. This is fixture evidence, not a live
+provider or account-service acceptance claim. Wider source/ordinary qualification
+is pending at this implementation checkpoint.
+
+OAuth sign-in and interactive auth/callback cancellation, remote revocation,
+unregistered-account removal, proactive cross-client invalidation, common Native/
+Browser controls and broader model/provider/live/migration acceptance remain open.
+The owner review release/selected installation, drafts, production Qwen/speech
+settings and independent Office build are not replaced by this source change.

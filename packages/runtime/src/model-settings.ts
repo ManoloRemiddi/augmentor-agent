@@ -76,7 +76,16 @@ export class ModelSettings {
       rows.push({entry:{provider:id,displayName:stored?.name??id,settingsNs:NS,settingsPath:['providers',id],active:models.length>0,declared:!defaults.getProvider(id)},configured:!!stored||status.configured,removable:!!stored,apiKeyEnv:undefined,credential,derivedCredential:credential});
     }
     const value={providers:Object.fromEntries([...ids].map(id=>[id,{...base.providers[id],...user.providers[id]}]))};
-    return {writable:true,revision:this.revision,rows,namespaces:[{ns:NS,revision:this.revision,user,base,value,schema:{apis:MODEL_APIS}}]};
+    const accounts=[...oauth].sort().map(provider=>({provider,registered:!!runtime.getProvider(provider)}));
+    if(accounts.length>256)throw Error('The stored account list exceeds the editor limit.');
+    return {writable:true,revision:this.revision,rows,accounts,namespaces:[{ns:NS,revision:this.revision,user,base,value,schema:{apis:MODEL_APIS}}]};
+  }
+  async requireOAuthAccount(value:unknown,revision:unknown){
+    const provider=this.provider(value),oauth=await this.oauthAccounts();this.read();
+    if(revision!==this.revision)throw Error('Model settings changed. Refresh before signing out.');
+    if(!oauth.has(provider))throw Error('The stored OAuth account changed. Refresh before signing out.');
+    if(!this.runtime().getProvider(provider))throw Error('Register this provider in Pi before managing its stored account.');
+    return provider;
   }
   async credential(reference:unknown){
     const oauth=await this.oauthAccounts();

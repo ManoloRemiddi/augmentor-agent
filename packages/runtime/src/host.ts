@@ -181,13 +181,35 @@ export class Host {
     const fingerprint=this.modelSettings.fingerprint;
     const refreshed=await this.modelRuntime.refresh({allowNetwork:false,signal:AbortSignal.timeout(10000),...(providers?{providers}:{})});
     if(refreshed.aborted||refreshed.errors.size||this.modelRuntime.getError()||this.modelSettings.fingerprint!==fingerprint)throw Error('Pi could not apply the model configuration.');
+    await this.reconcileModelOwners();
+    this.modelSettings.markApplied(fingerprint);this.modelSettingsProblem=false;
+  }
+  private async reconcileModelOwners(){
     for(const r of this.loaded.values()){
       const current=this.modelRuntime.getModel(r.meta.selection.provider,r.meta.selection.model);
       if(!current)throw Error('A loaded model is unavailable.');
       requireThinking(current,r.session.thinkingLevel);
       if(JSON.stringify(current)!==JSON.stringify(r.session.model))await r.session.setModel(current);
     }
-    this.modelSettings.markApplied(fingerprint);this.modelSettingsProblem=false;
+  }
+  private async logoutModelAccount(provider:unknown,revision:unknown){
+    this.modelSettingsGuard();
+    if(this.modelSettingsProblem||this.modelSettingsBusy||!this.modelSettings.applied)throw Error('Refresh model settings before signing out.');
+    const account=await this.modelSettings.requireOAuthAccount(provider,revision);
+    this.modelSettingsGuard();
+    if([...this.metadata.values()].some(m=>!this.queue(m).paused&&!!this.queue(m).next)||[...this.loaded.values()].some(r=>r.goals.armed))throw Error('Pause queued prompts and goals before signing out.');
+    const fingerprint=this.modelSettings.fingerprint;
+    this.modelSettingsBusy=true;this.modelSettingsProblem=true;this.modelSettings.cancelDiscoveries();
+    try{
+      await this.modelRuntime.logout(account,{signal:AbortSignal.timeout(10000)});
+      if(this.modelRuntime.getError()||this.modelSettings.fingerprint!==fingerprint)throw Error('Model configuration changed during sign-out.');
+      await this.reconcileModelOwners();
+      const view=await this.modelSettings.describe();
+      if(view.accounts.some(row=>row.provider===account))throw Error('The account is still stored.');
+      this.modelSettings.markApplied(fingerprint);this.modelSettingsProblem=false;
+      return view;
+    }catch{throw Error('Account sign-out could not be confirmed. Refresh model settings before starting work or trying again. Nothing was retried.');}
+    finally{this.modelSettingsBusy=false;}
   }
   private async reloadModelSettings(){
     this.modelSettingsGuard();this.modelSettingsBusy=true;this.modelSettingsProblem=true;this.modelSettings.cancelDiscoveries();
@@ -747,6 +769,7 @@ export class Host {
     case 'models.settingsMutate':return this.modelSettings.mutate(p.ops,p.revision);
     case 'models.credentialDescribe':return this.modelSettings.credential(p.ref);
     case 'models.credentialSet':return this.modelSettings.setCredential(p.ref,p.value,p.revision);
+    case 'models.accountLogout':return this.logoutModelAccount(p.provider,p.revision);
     case 'models.settingsDiscover':return this.discoverModels(p.request??{});
     case 'models.settingsRefresh':await this.reloadModelSettings();return this.modelSettings.describe();
     case 'session.compaction':{const m=this.getMeta(p.sessionId);return this.compactions.describe(m.id);}
@@ -811,7 +834,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{searchSettings:process.platform==='linux',searchModes:process.platform==='linux',wikiSettings:process.platform==='linux',durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelDiscovery:true,shortcuts:true,appearancePreferences:true,metafolders:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{searchSettings:process.platform==='linux',searchModes:process.platform==='linux',wikiSettings:process.platform==='linux',durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelDiscovery:true,modelAccountLogout:true,shortcuts:true,appearancePreferences:true,metafolders:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.compactions.busy)throw Error('Stop and settle Pi compaction before shutting down the runtime.');
       if(this.uploads)throw Error('Finish file uploads before shutting down the runtime.');

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Stored Pi account sign-out](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds the original MIT DSH confirmation and OAuth metadata to Models. Supported SDK deletion preserves profile/environment keys; busy/stale/type refusals, uncertain outcomes and operator revocation are qualified by focused 22/22 across four files. The supplier selection is 582 files, with only two exact account presentation files admitted to the browser graph. Wider source/ordinary, sign-in, live provider, installed and migration acceptance remain open; owner builds/services and independent Office work are preserved.
+
 [GUI qualification readiness](DSH-GUI-ON-PI.md#gui-qualification-readiness--october-14)
 at **be7bcb4634df94ac1587d80b9dcf70a9c93fd65c** fixes test drivers' inherited-fieldset
 readiness and final request-metadata barriers. Controlled main/hover/frame cases

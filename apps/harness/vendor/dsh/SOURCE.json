@@ -3549,6 +3549,18 @@
       "sha256": "eb0dc0d72f9441b2ff029bd352976f1b30acc1184c2ee0512d5cc0803402a45a",
       "upstreamPath": "packages/client/ui-settings-models/src/client/store.ts",
       "upstreamSha256": "eb0dc0d72f9441b2ff029bd352976f1b30acc1184c2ee0512d5cc0803402a45a"
+    },
+    {
+      "path": "packages/client/ui-settings-account/src/client/SignOutDialog.tsx",
+      "sha256": "3ff29e9c2be9a29ac789c3617da2b9977f60f78623610f2bec0273be5f4f0873",
+      "upstreamPath": "packages/client/ui-settings-account/src/client/SignOutDialog.tsx",
+      "upstreamSha256": "3ff29e9c2be9a29ac789c3617da2b9977f60f78623610f2bec0273be5f4f0873"
+    },
+    {
+      "path": "packages/client/ui-settings-account/src/client/SignInDialog.module.css",
+      "sha256": "2cb6cc9d6b13d1c97def36f26a6dc539d8c4d6f2eade45c2a1c241de0d06f80a",
+      "upstreamPath": "packages/client/ui-settings-account/src/client/SignInDialog.module.css",
+      "upstreamSha256": "2cb6cc9d6b13d1c97def36f26a6dc539d8c4d6f2eade45c2a1c241de0d06f80a"
     }
   ]
 }

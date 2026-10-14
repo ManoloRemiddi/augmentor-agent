@@ -23,6 +23,7 @@ const providerApi=process.env.AUGMENTOR_HARNESS_PROOF_PROVIDER_API??'openai-comp
 let releaseArguments=null;
 if(!['openai-completions','anthropic-messages','openai-responses','google-generative-ai'].includes(providerApi))throw Error('Unsupported authored provider fixture.');
 mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(workspace);mkdirSync(home);
+if(process.env.AUGMENTOR_HARNESS_PROOF_MODEL_ACCOUNTS==='1')writeFileSync(join(config,'agent','auth.json'),JSON.stringify({anthropic:{type:'oauth',access:'AUTHORED_ACCESS_NOT_REAL',refresh:'AUTHORED_REFRESH_NOT_REAL',expires:4102444800000},'authored-unregistered':{type:'oauth',access:'AUTHORED_ORPHAN_ACCESS',refresh:'AUTHORED_ORPHAN_REFRESH',expires:4102444800000},'authored-key':{type:'api_key',key:'AUTHORED_UNRELATED_KEY'}}),{mode:0o600});
 writeFileSync(join(workspace,'note.txt'),'Harness fixture ready.\n');
 if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'){
  const extension=join(root,'question-ui.mjs');
