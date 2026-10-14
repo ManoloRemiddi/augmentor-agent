@@ -8,7 +8,7 @@ import {StepTiming} from './step-timing.js';
 /** Observe the supported SDK pipeline after all registered payload transforms. */
 export function observeSession(session: AgentSession, store: ObservationStore, sessionId: string,
   current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data;execution?:Data;reasoning?:Data;compactionId?:string}, notify: (event: unknown) => void,
-  warning: (message: string) => void, provenance?:ContextProvenance) {
+  warning: (message: string) => void, provenance?:ContextProvenance, finalPayload?:(payload:unknown,api:string)=>void) {
   let requestId: string | undefined;
   let started = 0, firstToken = false;
   let providerCount = 0, providerBytes = 0, providerDropped = 0, captureProvider = false;
@@ -72,6 +72,9 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     inspect(()=>provenance?.beforePayload(payload));
     const transformed = await previousPayload?.(payload, model);
     const effective = transformed === undefined ? payload : transformed;
+    // Core native request state uses the same final boundary, independently of
+    // optional diagnostics. Do not swallow a failed native persistence receipt.
+    finalPayload?.(effective,model.api);
     started = performance.now(); firstToken = false; requestId = undefined;
     resetProvider(); requestOpen = true;
     const event = record('model/request', {
