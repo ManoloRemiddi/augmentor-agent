@@ -2,6 +2,60 @@
 
 # Pi background jobs and delegation
 
+## Inspected evidence survives fresh refreshes — October 14
+
+Source **d88b1d441d58839b099d47bead423867d4e9bd02** fixes a separate refresh
+boundary in the shared original DSH and inspection Jobs view. The older-read
+fence below preserves explicit actions, but a legitimate new list refresh still
+replaced the entire panel and discarded opened native originals/provider pages
+and payload excerpts. A held actual desktop-child history read reproduces the
+loss before this fix, without a provider failure or artificial timeout.
+
+Refresh now collects the list, selected job and bounded delegated history before
+replacing its summary. Displayed controls remain usable during those reads;
+explicit actions still invalidate an older snapshot. The same conversation,
+connection generation, read-only mode, selected job and child retain their one
+displayed evidence section, opened disclosures and bounded excerpts. Its status
+seat is reused so retained callbacks keep the current work/disabled-state fence.
+This adds no disk cache or automatic native/provider payload reads. Changed owner,
+access mode or child, missing/unavailable jobs, a current refresh error and reset
+discard the old evidence. Subsequent excerpt requests keep existing Host ownership,
+native hashes and payload checks. Model/producer/Stop contracts are unchanged.
+
+Actual Chromium/Host/SDK qualification covers both the original DSH Jobs tab and
+the inspection page. Real original-tab pointer actions open native originals and
+a provider payload, hold the final history response during a fresh refresh and
+release it. The same open section and excerpts survive both stages; its retained
+payload control dispatches once and performs no inference. Parent history remains
+exact. The existing stale-last Start/Stop/native inspection and cold read-only
+cases remain, including explicit refusal of another owner's child reads.
+Controlled frontend receipts separately verify child/access/unavailable/error/
+reset clearing with exactly five explicit native reads and no background reads.
+They do not substitute for real producer or OS consent evidence.
+
+Strict check/build and final source/separate ordinary production **42/42 each**
+pass across nine files, two workers, unchanged deadlines, no skips. The cohort
+includes Jobs registry/delegated/desktop producers, original/inspection GUI,
+Goal/Search, workspace/session/Context/native compaction, pointer and navigation
+checks. All **902 compiled files** match the fresh ordinary tree; its **155**
+production npm instances and bundled Node 24.19.0 retain the dependency contract.
+The failing product case and initial original-tab/driver preparation failures
+are retained separately from the final tests. No supplier layout, CSS, control,
+dependency, product version or OS adapter is changed. This shared UI correction
+is tested on MX Linux; installed macOS/Windows acceptance remains separate.
+
+Preceding Validate **38521486184** at 4c58e2b failed both the hover-only workspace
+pointer and native-evidence retention assertion. The fresh-refresh mechanism is
+now reproduced, but its exact hosted interleaving was not captured and full
+new-head hosted acceptance is not inferred. The [hover preparation correction](DSH-GUI-ON-PI.md#hover-only-workspace-actions--october-14)
+retains its separate mechanism and complete original workflow assertions.
+
+The selected/running preview, its unsent draft, immutable Search candidate and
+manual-feedback profile remain unchanged. Fresh checks find Qwen, speech and
+memory healthy; no service/model configuration changes or restarts occur. Owner
+MX feedback/guarded adoption, broader live/plugin/migration/privacy workflows,
+other platforms and the Office preferred-source/rebuild/distribution gate remain.
+
 ## Displayed controls, cold receipts and current Qwen — October 14
 
 Source **8a441bb76e83eef509f6f0cd26e958736d5b6d7b** includes the shared Jobs

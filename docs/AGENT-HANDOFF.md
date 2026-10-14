@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Jobs evidence retention](PI-JOBS.md#inspected-evidence-survives-fresh-refreshes--october-14)
+at **d88b1d441d58839b099d47bead423867d4e9bd02** preserves opened native/provider
+evidence and excerpts through legitimate fresh summary refreshes. Snapshot reads
+finish before summary replacement; one bounded displayed section/status seat
+survives only the same owner/generation/access/job/child. Changed scope, unavailable
+jobs, current errors and reset clear it. Actual original DSH pointer and inspection
+tests preserve open evidence, retained callbacks, exact parent history and no
+inference. Separate controlled scope receipts qualify clearing/no automatic reads.
+Strict check/build and source/fresh ordinary **42/42 each** across nine files pass,
+two workers, unchanged deadlines/no skips; 902 compiled files match/155 production
+npm instances and bundled Node unchanged. Preceding 4c58e2b/38521486184 failures
+remain retained; exact hosted interleaving/full new-head CI remain unproven.
+App/draft/candidate/feedback preserved, Qwen/speech/memory healthy. Broader owner,
+plugin/live/privacy/migration/platform and Office public-release gates remain.
+
 [Original hover-only action preparation](DSH-GUI-ON-PI.md#hover-only-workspace-actions--october-14)
 at **36024aae780635daaa38f9920b5f6750611c08cc** uses row scroll/stability, actual
 hover and stable control hit-testing before one click. The original Rows CSS
@@ -9,8 +24,8 @@ and ordinary **10/10 each** pass, two workers, unchanged deadlines/no skips.
 Application/supplier/layout/dependency and installed/candidate/feedback/draft
 identities stay preserved. Latest preceding 4c58e2b/Validate 38521486184 retains
 workspace zero-target and Jobs native-evidence erasure assertions. Exact old
-motion and Jobs erasure causes/new-head CI are unproven; investigate state retention
-without weakening assertions or disabling normal product polling.
+motion/new-head CI are unproven; the linked Jobs follow-up reproduces and fixes
+fresh-refresh evidence retention without weakening assertions or stopping polling.
 
 [Accepted Search choice](HARNESS-PLUGIN-PARITY.md#accepted-search-source-choice--october-14):
 owner chooses the tested MIT alternatives. Historical 0.1.0 repository identity

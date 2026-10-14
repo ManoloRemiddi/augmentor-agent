@@ -33,9 +33,11 @@ Preceding Validate **38516251396** at 092e5a1 and **38521486184** at 4c58e2b bot
 report a zero-sized workspace-actions target. The authored case proves this hover
 preparation mechanism, but exact motion in those hosted runs was not captured.
 The latter also fails the Jobs assertion that an older list response cannot erase
-explicit native evidence. Preserve that separate failure; cause/new-head hosted
-acceptance are unproven. Investigate ordinary background refresh/state retention
-without weakening the evidence assertion or disabling product polling.
+explicit native evidence. The [subsequent Jobs correction](PI-JOBS.md#inspected-evidence-survives-fresh-refreshes--october-14)
+at d88b1d4 reproduces fresh-refresh erasure and preserves the inspected section;
+source/ordinary 42/42 each pass including actual original-tab pointer evidence.
+Exact earlier hosted interleaving/new-head acceptance remain unproven. Neither
+the evidence assertion nor ordinary product polling is weakened.
 
 The installed app/draft, immutable candidate, manual-feedback profile and all
 runtime/supplier/dependency identities remain unchanged. Full owner, plugin,

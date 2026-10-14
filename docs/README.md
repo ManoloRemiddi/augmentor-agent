@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Jobs evidence through fresh refreshes](PI-JOBS.md#inspected-evidence-survives-fresh-refreshes--october-14)
+records d88b1d4: opened bounded native/provider evidence survives summary updates
+in both the original DSH tab and inspector; owner/access/child/error/reset scope
+still clears it. Source/fresh ordinary 42/42 each and strict check/build pass with
+no dependency/layout/installed change. Original pointer/retained callback/history
+and no-inference checks are distinct from controlled frontend scope receipts.
+Preceding hosted failures remain recorded; new-head full CI, owner MX adoption,
+broader plugin/live/platform and Office distribution acceptance remain required.
+
 [Hover-only original actions](DSH-GUI-ON-PI.md#hover-only-workspace-actions--october-14)
 records source 36024aa and source/ordinary 10/10, preserving original CSS/layout
 and all workflow assertions. Row/control preparation now reacquires hover before

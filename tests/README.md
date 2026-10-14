@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+At **d88b1d441d58839b099d47bead423867d4e9bd02**, strict check/build and final
+source/fresh ordinary **42/42 each** pass at two workers, unchanged deadlines and
+no skips across `harness-jobs-chromium`, `jobs-registry`, `pi-jobs`,
+`pi-desktop-jobs`, `harness-goals-chromium`, `harness-search-chromium`,
+`harness-dsh-chromium`, `harness-pointer-chromium` and `harness-navigation-chromium`.
+Actual original DSH pointer and inspector cases retain native/provider excerpts
+and open state during/after a held fresh history response, exercise retained
+payload callbacks once, preserve parent history and perform no inference. Existing
+stale-last Start/Stop/cold read-only checks remain. Controlled frontend receipts
+separately clear evidence for child/access/unavailable/error/reset with five
+explicit native reads, no background reads. A before-fix actual fresh-refresh
+case fails deterministically; earlier original-tab/driver preparations are not
+qualification. All 902 compiled files match/155 npm instances remain unchanged.
+See [scope and prior hosted failures](../docs/PI-JOBS.md#inspected-evidence-survives-fresh-refreshes--october-14).
+These are source/ordinary MX checks; selected app/draft/candidate/feedback and
+broader owner/live/platform/distribution requirements remain separate.
+
 At **36024aae780635daaa38f9920b5f6750611c08cc**, pointer/composition/navigation
 source and ordinary **10/10 each** pass across `harness-pointer-chromium`,
 `harness-dsh-chromium` and `harness-navigation-chromium`, two workers, unchanged
