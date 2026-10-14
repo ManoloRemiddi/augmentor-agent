@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Stored Pi account sign-out](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14): original MIT DSH confirmation, private OAuth metadata and supported Pi logout. Focused 22/22 fixture checks pass; source/ordinary and live/provider/installed acceptance remain open.
+[Stored Pi account qualification](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) at **6c0d85c5c89993f1741618c1630a3f9ca5da72ed** adds the original MIT DSH sign-out confirmation and non-secret OAuth route metadata. Supported SDK logout retains provider/profile/environment keys; busy/stale/type/queue/goal refusals, uncertain commits, held settlement and operator revocation qualify. Source/fresh ordinary **217/217 each across 57 files**, all 43 Harness Chromium files, 908 matching compiled files and unchanged 20,847 dependency entries/155 npm instances/Node 24.19.0 pass. The supplier selection is 582 files with exactly two account presentation inputs. Initial build/stale-output and relative-path preparation failures stay retained. Owner review/selection/services and Office build are preserved. Sign-in, live/provider, installed/migration, new-head hosted and public-release gates remain open.
 
 [GUI qualification readiness](DSH-GUI-ON-PI.md#gui-qualification-readiness--october-14)
 at **be7bcb4634df94ac1587d80b9dcf70a9c93fd65c** fixes test drivers' inherited-fieldset

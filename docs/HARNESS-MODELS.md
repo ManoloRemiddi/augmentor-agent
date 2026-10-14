@@ -94,7 +94,9 @@ The current endpoint implementation and its source qualification are recorded in
 reads stay local. OpenAI Chat Completions/Responses and Anthropic endpoint listings
 now use the original bounded parser and the original candidate picker.
 
-OAuth sign-in/out dialogs, virtual/extension-provider editing, advanced hidden
+The initial forms left OAuth sign-in/out dialogs open. The current
+[stored-account sign-out](#stored-pi-account-sign-out--october-14) adds the separate
+logout control; sign-in, virtual/extension-provider editing, advanced hidden
 profile controls, proactive cross-client invalidation and common Native/Browser
 provider-management parity remain open. The complete-file `models.configure`,
 guided setup and manual reload now share the session reconciliation described in
@@ -564,10 +566,55 @@ personal login: original pointer Cancel/confirm, unavailable orphan, inspector
 refusal, cold reload, unrelated credential retention, unchanged parent history/
 model selection and no new inference pass. This is fixture evidence, not a live
 provider or account-service acceptance claim. Wider source/ordinary qualification
-is pending at this implementation checkpoint.
+was pending at that initial implementation checkpoint; the completed scope is
+recorded below.
 
 OAuth sign-in and interactive auth/callback cancellation, remote revocation,
 unregistered-account removal, proactive cross-client invalidation, common Native/
 Browser controls and broader model/provider/live/migration acceptance remain open.
 The owner review release/selected installation, drafts, production Qwen/speech
 settings and independent Office build are not replaced by this source change.
+
+### Source and ordinary account qualification
+
+Tested implementation **6c0d85c5c89993f1741618c1630a3f9ca5da72ed**, product
+**0.2.13**, Pi **1.1.0**. After the focused 22 cases and eleven existing discovery
+cases, source and a fresh separate ordinary tree each pass **217/217 across
+57 files**, including all **43 Harness Chromium files**, model/account/settings/
+discovery/configuration, Host/queue/session/native and build-resolution contracts.
+Each run uses two workers and unchanged deadlines, with no skipped/cancelled
+cases. Source duration is 140.14 seconds; bundled duration is 139.87 seconds.
+These are local fixture timings, not production performance guarantees.
+
+All **908 compiled files** match after both runs. The complete **20,847-entry**
+production dependency inventory, **155 npm instances** and bundled Node **24.19.0**
+retain their preceding verified bytes. Executable tests/fixtures match the tested
+source. The ordinary tree is unselected and mutable for qualification; it is not
+an installed release or a fresh package/export qualification.
+
+The initial browser build correctly refused the previously excluded account
+presentation files. An attempted focused run against the prior browser output
+retains one missing-control failure (21/22 pass); it is not an old-runtime
+regression reproduction. After the exact two-file admission and successful
+rebuild, focused 22/22 and the complete cohorts pass. A first ordinary launch used
+a relative executable path under a changed working directory and failed before
+any tests with ENOENT. The corrected absolute-path launch passes all 217; both
+preparation failures are retained in private evidence.
+
+All **24,288** immutable owner-review entries and artifact
+**f55e256e80c1c5345b17a65b24e3d01694fdbc99799e4325dd558173e3357e35** verify
+after testing, with its running process retained. The selected configuration is
+unchanged; canonical main's 38 pre-existing modifications remain preserved. The
+review and selected installation are not updated with this account feature.
+The review's local Qwen endpoint responds successfully; no model/speech/GPU
+configuration or personal credential changes occur.
+
+At preceding **75aba41**, [Validate 38579452229](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38579452229)
+passes SDK/core/original GUI and subsequent native/interaction/recovery/first-run,
+production inventory and extension notices, then refuses the existing Office
+exact-entry-source/full-engine-rebuild public distribution gate. Its SDK platform
+and Windows desktop workflows pass. Separate Windows command/delegation jobs
+retain ARM parent-Stop and x64 assertion/settlement failures; macOS packaging
+retains Office MPL/libvips LGPL review gates. Their causes and new-head hosted
+acceptance remain open. The isolated Office source build is still running in
+compile stage; no finished engine or public-release qualification follows.

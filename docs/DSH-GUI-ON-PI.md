@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original account confirmation on Pi](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds the exact MIT DSH sign-out dialog/CSS and reuses original Models cards for stored OAuth routes. No account backend/analytics enters the browser. Runtime 6c0d85c passes source/fresh ordinary 217/217 each across 57 files, all 43 Harness Chromium files, with 908 compiled matches and unchanged dependencies. Sign-in, live/provider/installed acceptance and wider migration remain open; current owner review is preserved.
+
 ## New Session input ownership — October 14
 
 A controlled actual original-GUI fixture reproduces a conversation-selection
