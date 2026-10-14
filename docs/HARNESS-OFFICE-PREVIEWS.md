@@ -32,7 +32,7 @@ The Linux broker arms `PR_SET_PDEATHSIG(SIGTERM)` and verifies its creator both
 before and after arming, before document/font work. The
 [Linux interface documentation](https://man7.org/linux/man-pages/man2/PR_SET_PDEATHSIG.2const.html)
 defines a creator-thread death notification and warns that it is not retroactive;
-the two checks close the observed startup race. A repeated graceful signal cannot
+the two checks guard creator loss while arming. A repeated graceful signal cannot
 interrupt the broker's final owned-root cleanup. Native descendants retain the
 separate PID/network/user namespace and Bubblewrap parent-death ownership.
 
@@ -43,7 +43,31 @@ the renderer; its responsive broker drains descendants/removes its known root
 and publishes no PDF or replay. The tests inspect only their own process tree,
 include children launched by worker threads, and use start-time identity tokens
 before cleanup signals. No unrelated process/environment or owner profile is read.
-Wider exact-source/ordinary qualification is pending below.
+At **97a2fac94c2366532085eb74b495418e7920b6de**, strict check/build and source/fresh
+ordinary **252/252 each across 62 files** pass, including all **44** Harness
+Chromium files, unchanged two workers/deadlines, zero skips/cancellations. Both
+trees also pass the explicit native-backend original Office viewer. All **921
+compiled files**, **2,047 executable source/test/fixture files** and unchanged
+**20,847 dependency entries / 155 npm instances / Node 24.19.0** match. The existing
+nine Office packaging and two private-source boundary cases pass (**11/11**);
+the public gate is unchanged. The failed old hard-stop comparison is retained.
+
+Read-only postflight verifies current/prior reviews' **24,305 / 24,288** inventory
+entries, all four review processes, unchanged selection and **38** canonical local
+changes. Qwen's read-only model endpoint returns **200**. No owner history/profile
+or credentials are read; no selection/review/draft/service/GPU/voice change occurs.
+This remains opt-in source qualification, with no installed update or binary.
+
+The preceding integration documentation head **c6c229a** passes the three-platform
+[SDK workflow 38631233193](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38631233193)
+and [Windows desktop 38631233109](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38631233109).
+[Validate 38631233240](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38631233240)
+records **1,229 tests: 1,200 pass, two fail, 27 identified skips**, before native/
+packaging acceptance. The nested-tool case reaches its final stderr assertion
+with a memory-processing lease warning; the Trajectory argument case times out
+waiting for its second held proposal. Their causes remain unproven. Those hosted
+failures do not become passes because the local cohort succeeds. Separate native
+Mac/Windows packaging/runtime and new-head hosted checks remain unqualified.
 
 This does not yet qualify simultaneous loss of owner and broker, an unresponsive
 broker after owner loss, allocation before helper startup, post-publication crash
