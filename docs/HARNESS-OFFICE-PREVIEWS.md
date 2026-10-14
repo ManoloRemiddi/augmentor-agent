@@ -47,16 +47,50 @@ capacity remains held through fallback cleanup. Existing native conversion
 limits, default pinned engine and GUI remain unchanged. No unknown action or
 conversion is replayed.
 
-The focused **19/19** common/real checks pass, including actual provider owner
-crash, owner loss after readiness/before copying, killed cleanup-owner recovery,
-replacement-root refusal, stopped-cleanup-owner release and held scratch
-admission/release with original cache behavior. Full exact-ref source/ordinary/GUI
-cohort qualification remains pending at this implementation checkpoint. Initial TypeScript
-path narrowing and the intentionally stale adapted-source receipt refused build;
-both preparation errors remain retained and are corrected against authored source.
-The seven MIT provider inputs retain their exact upstream identities; only the
-adapted provider index and its modification record change. New helpers are
-independently authored, with no dependency/version or private-source import.
+At **fc342300c57582de674bfcf3cc5a4b0c8477c493**, the exact-ref focused **19/19**
+common/real cases pass, including all six new scratch-ownership cases. The
+unchanged 64-file Harness cohort plus four existing original queue/default-Wasm
+cases totals **282 across 65 files**, all 44 Harness Chromium files and 15 shared
+DOM cases, two workers/unchanged deadlines/no skips or cancellations. **Source
+passes 281/282 with one failure; fresh ordinary passes 282/282.** Both original
+native-backed viewers separately pass font notices, PDF/zoom/reload/Retry and
+preserved request/native evidence. Eleven packaging/source-boundary cases pass
+with the public Office gate closed.
+
+The retained source failure is the existing killed-native-cleanup-guard case:
+at reported settlement it still observes `python3` and two `bwrap` actors. Their
+exact states/timing were not captured; this is not declared a harmless zombie or
+an assertion error. Twelve independent exact-ref guard-loss probes pass, and the
+ordinary cohort/focused source cases also pass. Those successes do not supersede
+the actual broader source failure. **Full qualification and promotion remain
+false.** The next implementation must establish process-completion evidence for
+the known sandbox actors before reporting settlement. Inspecting Bubblewrap's
+[monitoring/admission interfaces](https://manpages.debian.org/trixie/bubblewrap/bwrap.1.en.html)
+is preparation for that fix, not a tested replacement. Assertions and existing
+deadlines are retained.
+
+All **925 compiled / 2,051 executable source/test/fixture files** match the fresh
+ordinary tree; both Python helpers match source. Original GUI/CSS and normalized
+spreadsheet bodies/build metadata remain unchanged. Production 20,847 dependency
+entries/155 npm instances/Node 24.19.0 and 1,932 Browser test dependency entries
+remain matched. Initial TypeScript path narrowing and the stale adapted-source
+receipt refused build; both preparation errors are retained and corrected against
+authored source. Seven MIT provider inputs keep exact upstream identities; only
+the adapted provider index and its modification record change. New helpers are
+independently authored, with no dependency/version/private-source import.
+[Portable qualification record](../release/office-rebuild/provider-scratch-ownership.json)
+distinguishes passed scratch/viewer evidence from the unresolved completion case.
+Read-only postflight verifies both owner review inventories/all four processes,
+selection, 38 canonical changes and Qwen HTTP 200; no owner data/service is changed.
+
+Preceding **04613ad** [SDK 38653941416](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38653941416)
+passes all three platforms and [Windows Desktop 38653941396](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38653941396)
+passes. [Validate 38653941476](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38653941476)
+passes main Node 1,202/34 identified skips/zero failures, Browser 121/121,
+Python/Qt 878/45 identified skips and both strengthened ten-phase X11 proofs,
+then refuses the unchanged Office exact-source/rebuild packaging gate. This
+confirms the prior canvas hosted scope; it does not qualify this newer scratch
+source or the separate Windows command/macOS packaging failures.
 
 All-cleanup-owner loss, empty allocation before readiness, direct caller-PDF
 publication, durable owned-root indexing/power loss, adversarial concurrent
