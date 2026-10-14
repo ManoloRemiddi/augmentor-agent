@@ -4,6 +4,43 @@
 
 [Original account confirmation on Pi](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds the exact MIT DSH sign-out dialog/CSS and reuses original Models cards for stored OAuth routes. No account backend/analytics enters the browser. Runtime 6c0d85c passes source/fresh ordinary 217/217 each across 57 files, all 43 Harness Chromium files, with 908 compiled matches and unchanged dependencies. Sign-in, live/provider/installed acceptance and wider migration remain open; current owner review is preserved.
 
+## Trajectory companion readiness — October 14
+
+Preceding c6 Validate **38631233240** fails its nested-tool test only at the final
+empty-stderr assertion, with `Memory processing lease unavailable; capture
+continues.` The product's one-second memory activity bound includes on-demand
+companion startup. An authored **1,500 ms** interpreter barrier delays only the
+private memory service and reproduces that exact warning in both original
+Trajectory tests; all their argument/result/history/request assertions finish
+before the strict stderr failure. This establishes a companion-provisioning
+failure class, not the exact scheduler timing of the hosted run.
+
+These two fixture producers now explicitly own the real memory companion in
+their empty private state, before starting their Host. A bounded read-only
+`memory.dual.describe` exchange must confirm the actual child PID and absent
+engine configuration. The service stays alive across cold Host reopen and is
+stopped after the Host during fixture cleanup. No owner configuration, engine,
+provider key, transcript or private source is imported. Failed startup cleans
+only those owned fixture processes/directories. Disconnected, oversized, invalid
+or different-owner responses cannot grant readiness.
+
+The same 1,500 ms barrier with confirmed readiness passes **2/2**, as does the
+normal focused pair. Existing one-second product activity bounds, warnings,
+memory capture, request counts, Stop/no-replay behavior, zero browser errors,
+strict empty stderr, fixture deadlines and two workers are retained. Startup
+readiness is separate from a healthy active processing lease; unavailable real
+companions must continue to report their existing warning. This changes test
+provisioning only: product/runtime/GUI/CSS/dependency bytes and running previews
+remain unchanged.
+
+The argument test additionally verifies the exact visible and persisted authored
+draft before its single Send, then retains expanded body/editor/focus/session/
+history/request diagnostics on a second-proposal timeout. No text/prompt/click
+is replayed. The preceding hosted **second held proposal** timeout is still
+unresolved; successful local runs do not establish its cause or fix. No editor,
+Trajectory projection or runtime behavior is changed on that assumption.
+Wider exact-source/ordinary and new-head hosted qualification is pending.
+
 ## New Session input ownership — October 14
 
 A controlled actual original-GUI fixture reproduces a conversation-selection

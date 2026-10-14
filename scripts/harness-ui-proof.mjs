@@ -1,6 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Isolated real-Pi/browser fixture. No private source, models or histories are copied.
 import http from 'node:http';
+import {createConnection} from 'node:net';
 import {once} from 'node:events';
 import {spawn} from 'node:child_process';
 import {mkdtempSync,mkdirSync,writeFileSync,appendFileSync,readFileSync,existsSync,rmSync} from 'node:fs';
@@ -201,6 +202,12 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
 }
 const lazy=process.env.AUGMENTOR_HARNESS_PROOF_LAZY==='1';
 const fixtureEnv={...process.env,HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
+// Authored startup barrier: exercise slow companion provisioning without
+// changing the production one-second activity lease deadline or its warnings.
+if(process.env.AUGMENTOR_HARNESS_PROOF_MEMORY_START_DELAY){
+ const value=Number(process.env.AUGMENTOR_HARNESS_PROOF_MEMORY_START_DELAY);if(!Number.isInteger(value)||value<1||value>3000)throw Error('Invalid authored memory startup delay.');
+ const executable=join(root,'authored-python');writeFileSync(executable,'#!/usr/bin/python3\nimport os,sys,time\nif any(arg.endswith("/services/memory/service.py") for arg in sys.argv[1:]):time.sleep('+String(value/1000)+')\nreal='+JSON.stringify(process.env.AUGMENTOR_PYTHON??'/usr/bin/python3')+'\nos.execv(real,[real,*sys.argv[1:]])\n',{mode:0o700});fixtureEnv.AUGMENTOR_PYTHON=executable;
+}
 if(process.env.AUGMENTOR_HARNESS_PROOF_NATIVE_OFFICE==='1')fixtureEnv.AUGMENTOR_OFFICE_BACKEND='linux-native';
 if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'){
  const extension=join(root,'nested-tools.mjs'),resourcePath=join(config,'resources.json');
@@ -212,6 +219,20 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'){
 const prompts=process.env.AUGMENTOR_HARNESS_PROOF_PROMPTS==='1'?spawn(process.env.AUGMENTOR_PYTHON??'python3',['-Xutf8','-B',join(source,'services/prompt-library/service.py')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','ignore','pipe']}):null;
 prompts?.stderr.on('data',data=>process.stderr.write(data));
 prompts?.on('error',error=>process.stderr.write('Fixture prompt service: '+error.message+'\n'));
+const memory=process.env.AUGMENTOR_HARNESS_PROOF_MEMORY_READY==='1'?spawn(fixtureEnv.AUGMENTOR_PYTHON??'python3',['-Xutf8','-B',join(source,'services/memory/service.py')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','ignore','pipe']}):null;
+memory?.stderr.on('data',data=>process.stderr.write(data));
+let memoryError;memory?.on('error',error=>{memoryError=error;});
+if(memory){
+ const end=Date.now()+5000;let ready=false,failure;
+ while(!ready&&Date.now()<end){
+  if(memoryError||memory.exitCode!==null||memory.signalCode!==null){failure=Error('Authored memory companion stopped before readiness.');break;}
+  try{const id=randomUUID();const value=await new Promise((resolve,reject)=>{const socket=createConnection(join(sharedState,'dual-memory.sock'));let text='';socket.setTimeout(500,()=>socket.destroy(Error('Authored memory readiness timeout')));socket.on('error',reject);socket.on('end',()=>reject(Error('Authored memory readiness disconnected.')));socket.on('close',()=>reject(Error('Authored memory readiness closed.')));socket.on('connect',()=>socket.end(JSON.stringify({protocol:'augmentor-prompts/1',id,method:'memory.dual.describe',params:{}})+'\n'));socket.on('data',bytes=>{text+=bytes;if(text.length>65536){socket.destroy(Error('Authored memory readiness is too large.'));return;}if(text.includes('\n')){socket.destroy();try{const frame=JSON.parse(text);if(frame.id!==id||frame.error)throw Error('Authored memory readiness refused.');resolve(frame.result);}catch(error){reject(error);}}});});if(value.pid!==memory.pid||value.configured!==false){failure=Error('Authored memory owner or empty configuration differs.');break;}ready=true;}catch{await new Promise(resolve=>setTimeout(resolve,25));}
+ }
+ if(!ready){
+  for(const owned of [memory,prompts])if(owned?.pid&&owned.exitCode===null&&owned.signalCode===null){const exit=once(owned,'exit');owned.kill('SIGTERM');await exit;}
+  model.closeAllConnections();await new Promise(resolve=>model.close(resolve));rmSync(root,{recursive:true,force:true});throw failure??Error('Authored memory readiness was not confirmed.');
+ }
+}
 // Wait for our service before the runtime can try to auto-start a companion.
 if(prompts){
   const end=Date.now()+5000;
@@ -228,7 +249,7 @@ let child=startRuntime(),closing=false,reopenRequested=false,reopened=false;
 async function close(){
   if(closing)return;closing=true;
   if(fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_FINAL_RELEASE&&existsSync(root))writeFileSync(fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_FINAL_RELEASE,'fixture closing',{mode:0o600});
-  for(const owned of [child,prompts])if(owned?.pid&&owned.exitCode===null){const exit=once(owned,'exit');owned.kill('SIGTERM');await exit;}
+  for(const owned of [child,prompts,memory])if(owned?.pid&&owned.exitCode===null){const exit=once(owned,'exit');owned.kill('SIGTERM');await exit;}
   model.closeAllConnections();await new Promise(resolve=>model.close(resolve));
   rmSync(root,{recursive:true,force:true});
 }
@@ -247,7 +268,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),...(searchExtension?{searchExtension,searchInputStarted:join(workspace,'search-input-started'),searchInputControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-search-input'}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(memory?{memoryPid:memory.pid,memoryReady:true,memoryConfigured:false}:{}),...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),...(searchExtension?{searchExtension,searchInputStarted:join(workspace,'search-input-started'),searchInputControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-search-input'}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;
