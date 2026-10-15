@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import type {InputMode} from './input-mode.js';
 import {createHash,randomUUID} from 'node:crypto';
 import {existsSync,lstatSync,readFileSync,openSync,closeSync,writeFileSync,renameSync,fsyncSync,unlinkSync} from 'node:fs';
 import {dirname} from 'node:path';
@@ -6,11 +7,11 @@ import {promptAttachments,submittedParts,type PromptAttachment} from './attachme
 import {validateGoalSource,type GoalMessageSource} from './goals.js';
 
 type Status='waiting'|'dispatching'|'active'|'steering'|'completed'|'failed'|'cancelled'|'removed'|'unconfirmed';
-interface Item {id:string;input?:string;attachments?:PromptAttachment[];fingerprint:string;status:Status;queued:boolean;delivered:boolean;turnId?:string;steerTurnId?:string;goalSource?:GoalMessageSource}
+interface Item {inputMode?:InputMode;id:string;input?:string;attachments?:PromptAttachment[];fingerprint:string;status:Status;queued:boolean;delivered:boolean;turnId?:string;steerTurnId?:string;goalSource?:GoalMessageSource}
 interface Journal {schema:1;sessionId:string;revision:number;paused:boolean;items:Item[]}
 const statuses=new Set<Status>(['waiting','dispatching','active','steering','completed','failed','cancelled','removed','unconfirmed']);
 const visible=(item:Item)=>item.status==='waiting'||item.status==='unconfirmed'||item.status==='failed'&&item.input!==undefined||['dispatching','active','steering'].includes(item.status)&&item.queued&&!item.delivered;
-const fingerprint=(input:string,attachments:PromptAttachment[]=[])=>createHash('sha256').update(attachments.length?JSON.stringify([input,promptAttachments(attachments)]):input).digest('hex');
+const fingerprint=(input:string,attachments:PromptAttachment[]=[],mode:InputMode='text')=>createHash('sha256').update(mode==='voice'?JSON.stringify(['augmentor-spoken-input/1',input,promptAttachments(attachments)]):attachments.length?JSON.stringify([input,promptAttachments(attachments)]):input).digest('hex');
 export function promptIdentity(value:unknown):string {if(typeof value!=='string'||!/^[a-zA-Z0-9_.:-]{1,128}$/.test(value))throw Error('Invalid prompt identity.');return value;}
 
 /** Durable product admission. Pi owns execution; waiting inputs never enter its transient string queue. */
@@ -27,11 +28,11 @@ export class PiPromptQueue {
     promptIdentity(item.id);
     promptAttachments(item.attachments);
     if(item.goalSource!==undefined)validateGoalSource(item.goalSource);
-    if(ids.has(item.id)||!statuses.has(item.status)||typeof item.queued!=='boolean'||typeof item.delivered!=='boolean'||!/^[a-f0-9]{64}$/.test(item.fingerprint)||
+    if((item.inputMode!==undefined&&!['text','voice'].includes(item.inputMode))||(item.goalSource&&item.inputMode==='voice')||ids.has(item.id)||!statuses.has(item.status)||typeof item.queued!=='boolean'||typeof item.delivered!=='boolean'||!/^[a-f0-9]{64}$/.test(item.fingerprint)||
      (item.turnId!==undefined&&promptIdentity(item.turnId)!==item.turnId)||
      (item.steerTurnId!==undefined&&promptIdentity(item.steerTurnId)!==item.steerTurnId)||
      (item.status==='steering'&&(!item.steerTurnId||item.turnId!==item.steerTurnId))||
-     (item.input!==undefined&&(typeof item.input!=='string'||!item.input.trim()&&!item.attachments?.length||item.input.length>65536||fingerprint(item.input,item.attachments)!==item.fingerprint))||
+     (item.input!==undefined&&(typeof item.input!=='string'||!item.input.trim()&&!item.attachments?.length||item.input.length>65536||fingerprint(item.input,item.attachments,item.inputMode)!==item.fingerprint))||
      (['waiting','dispatching','active','steering','unconfirmed'].includes(item.status)&&item.input===undefined))throw Error('Corrupt prompt queue; automatic submission is disabled.');
     ids.add(item.id);
    }
@@ -52,14 +53,15 @@ export class PiPromptQueue {
   this.patch(id,{status:'steering',turnId,steerTurnId:turnId,queued:true});return true;
  }
  withdrawSteer(id:string){if(this.item(id).status!=='steering'||this.item(id).delivered)throw Error('Steering input has already crossed its delivery boundary.');this.patch(id,{status:'waiting',turnId:undefined,steerTurnId:undefined});}
- lookup(id:string,input:string,attachments:PromptAttachment[]=[]){
+ lookup(id:string,input:string,attachments:PromptAttachment[]=[],mode:InputMode='text'){
   const existing=this.data.items.find(item=>item.id===id);
-  if(existing&&existing.fingerprint!==fingerprint(input,attachments))throw Error('Prompt identity was reused for different input.');
+  if(existing&&((existing.inputMode??'text')!==mode||existing.fingerprint!==fingerprint(input,attachments,mode)))throw Error('Prompt identity was reused for different input.');
   return existing?structuredClone(existing):undefined;
  }
- enqueue(id:string,input:string,queued:boolean,goalSource?:GoalMessageSource,attachments:PromptAttachment[]=[]){
-  promptIdentity(id);if(typeof input!=='string'||!input.trim()&&!attachments.length||input.length>65536)throw Error('Invalid queued prompt.');attachments=promptAttachments(attachments);const duplicate=this.lookup(id,input,attachments);if(duplicate)return false;
-  const item:Item={id,input,...(attachments.length?{attachments}:{}),fingerprint:fingerprint(input,attachments),status:'waiting',queued,delivered:false,...(goalSource?{goalSource:validateGoalSource(goalSource)}:{})};
+ enqueue(id:string,input:string,queued:boolean,goalSource?:GoalMessageSource,attachments:PromptAttachment[]=[],mode:InputMode='text'){
+  if(!['text','voice'].includes(mode)||goalSource&&mode==='voice')throw Error('Invalid prompt input mode.');
+  promptIdentity(id);if(typeof input!=='string'||!input.trim()&&!attachments.length||input.length>65536)throw Error('Invalid queued prompt.');attachments=promptAttachments(attachments);const duplicate=this.lookup(id,input,attachments,mode);if(duplicate)return false;
+  const item:Item={id,input,...(mode==='voice'?{inputMode:mode}:{}),...(attachments.length?{attachments}:{}),fingerprint:fingerprint(input,attachments,mode),status:'waiting',queued,delivered:false,...(goalSource?{goalSource:validateGoalSource(goalSource)}:{})};
   const pending=[...this.data.items.filter(visible),item];
   if(pending.length>100||Buffer.byteLength(JSON.stringify(pending))>512*1024)throw Error('The prompt queue is full. Remove waiting or unsent prompts before adding more.');
   this.commit({...this.data,items:[...this.data.items,item]});return true;
@@ -101,7 +103,7 @@ export class PiPromptQueue {
   if(unsettled||this.next||this.data.items.some(item=>item.status==='steering'))this.commit({...this.data,paused:true,items:this.data.items.map(item=>['dispatching','active','steering'].includes(item.status)?{...item,status:'unconfirmed' as const}:item.status==='waiting'&&item.goalSource?{...item,status:'removed' as const,input:undefined}:item)});
  }
  snapshot(steeringAvailable=false){return {revision:this.data.revision,activeTurnId:!this.paused?this.active?.turnId??null:null,paused:this.paused,items:this.data.items.filter(visible).map(item=>({
-  id:item.id,rpcId:item.id,placement:item.status==='steering'?'steering':'queued',message:{content:submittedParts(item.input??'',item.attachments)},
+  id:item.id,rpcId:item.id,...(item.inputMode==='voice'?{inputMode:'voice'}:{}),placement:item.status==='steering'?'steering':'queued',message:{content:submittedParts(item.input??'',item.attachments)},
   stateLabel:item.status==='unconfirmed'?(item.delivered?'Interrupted — check the action outcome':'Not confirmed — check history'):item.status==='failed'?'Not sent':item.status==='steering'?'Steering — waiting for the safe boundary':item.status==='waiting'&&this.paused?'Paused':item.status==='waiting'?undefined:'Sending…',
   canSteer:steeringAvailable&&!this.paused&&!this.uncertain&&!this.pendingSteer&&!!this.active&&item.status==='waiting',canRemove:['waiting','failed'].includes(item.status),canResolve:item.status==='unconfirmed',
  }))};}

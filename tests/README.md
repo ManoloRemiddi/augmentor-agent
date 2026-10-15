@@ -1,5 +1,24 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi spoken/typed input](../docs/PI-VOICE.md#spoken-and-typed-input--october-15-2026)
+now carries explicit admitted mode through the durable queue, actual SDK delivery,
+request-only response style, transcript capture and native managed-memory briefs.
+Typed edits get fresh typed receipts; restart does not reopen speech or replay
+unknown input. Unadmitted extension follow-ups cannot inherit human speech mode.
+Memory recall origin remains distinct from a later typed correction's style.
+The original GUI, current MX review and installed/services remain unchanged.
+Pi surface controls, compatible real companion and physical speech remain pending.
+Focused and full source/ordinary qualification is recorded below when complete.
+
+`pi-input-mode.test.mjs` covers explicit mode validation, request-copy composition,
+legacy fingerprints, durable mode/recovery/editing, transcript source exclusions,
+branch memory and capture policy. `pi-voice-host.test.mjs` adds real Host/SDK
+spoken admission, duplicate checks after disconnect, queued cold resume, typed
+edits, same-owner steering and unowned follow-ups. The actual native memory
+branch fixture now restores a spoken brief across child/cold owners without
+new recall/tool execution. Use the documented Qt test interpreter for existing
+Codex native coverage; system Python may lack QtTest.
+
 [Current MX export/Context review](../docs/HARNESS-MX-REVIEW.md#export-and-live-context-review--october-15)
 **20261015-211446-7474ddb2** runs public **681a858/application 8c159cb7**, unselected.
 It includes the original DSH session-download menu/dialog and `/export`, late

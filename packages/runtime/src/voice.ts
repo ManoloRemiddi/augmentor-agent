@@ -13,6 +13,7 @@ interface Capture {id: string; parts: Set<number>}
 export class PiVoice extends ScopedVoice {
   private captures = new WeakMap<object, Capture>();
   constructor(connection: () => VoiceConnection = voiceConnection, warn: (session: string, message: string) => void = () => {}) {super('pi', connection, warn);}
+  acceptsSpokenInput(session: string): boolean {const lease = this.leases.get(session); return !!lease && !lease.closed;}
   admit(session: string, request: string, turn: string): void {
     const lease = this.accept(session, request, turn);
     if (lease) this.captures.delete(lease);

@@ -5,6 +5,7 @@ import {sessionEntryToContextMessages,type AgentSession,type ExtensionFactory} f
 import {getCurrentSystemPrompt,getSystemMessageText,normalizeContext,type SystemMessage} from '@earendil-works/pi-ai';
 import {payloadText} from '../../observation/src/store.js';
 import {systemTextPresence} from '../../observation/src/provider-system.js';
+import type {InputModeContribution} from './input-mode.js';
 import type {MemoryContribution} from '../../memory/src/pi.js';
 
 export const PROVENANCE_VERSION='augmentor-context-boundaries/1';
@@ -26,6 +27,7 @@ export class ContextProvenance {
   private runBytes=0;
   private requestBytes=0;
   private memoryStatus?:Omit<MemoryContribution,'context'>;
+  private inputModeStatus?:Omit<InputModeContribution,'text'>;
   constructor(private readonly capture:()=>boolean){}
   attach(session:AgentSession,skillEvents?:()=>readonly any[]){this.session=session;this.skillEvents=skillEvents;}
   readonly extension:ExtensionFactory=pi=>{
@@ -35,17 +37,18 @@ export class ContextProvenance {
       this.catalog();
     });
   };
-  beginTurn(){this.run.clear();this.request.clear();this.runBytes=0;this.requestBytes=0;this.memoryStatus=undefined;}
+  beginTurn(){this.run.clear();this.request.clear();this.runBytes=0;this.requestBytes=0;this.memoryStatus=undefined;this.inputModeStatus=undefined;}
   memory(contribution:MemoryContribution){
     const {context,...status}=contribution;this.memoryStatus=status;
     this.save(this.run,'memory',{...status,context});
   }
-  beginRequest(messages:unknown){this.request.clear();this.requestBytes=0;this.save(this.request,'beforeTransform',messages);this.nativeLineage();}
+  beginRequest(messages:unknown){this.request.clear();this.requestBytes=0;this.inputModeStatus=undefined;this.save(this.request,'beforeTransform',messages);this.nativeLineage();}
   transformed(messages:unknown){this.save(this.request,'afterTransform',messages);}
+  inputMode(contribution:InputModeContribution){const {text,...status}=contribution;this.inputModeStatus=status;this.save(this.request,'inputMode',contribution);}
   promptWrapping(record:unknown){this.save(this.request,'promptWrapping',record);}
   streaming(context:unknown){this.save(this.request,'sdkContext',context);}
   beforePayload(payload:unknown){this.save(this.request,'beforeProviderHooks',payload);}
-  endRequest(){this.request.clear();this.requestBytes=0;}
+  endRequest(){this.request.clear();this.requestBytes=0;this.inputModeStatus=undefined;}
   private nativeLineage(){
     if(!this.capture()){this.save(this.request,'nativeLineage',undefined);return;}
     const before=this.request.get('beforeTransform');if(before?.state!=='retained'||!Array.isArray(before.value)||!this.session)return;
@@ -152,7 +155,7 @@ export class ContextProvenance {
     this.managedSkills(api);
     if(!this.capture())this.dropBodies();
     const frames=new Map([...this.run,...this.request]);
-    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','promptWrapping','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks','instructionSources','managedSkills'];
+    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','promptWrapping','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks','instructionSources','managedSkills',...(this.inputModeStatus?['inputMode']:[])];
     const snapshots=Object.fromEntries(names.map(key=>[key,summary(frames.get(key)??missing())]));
     const before=frames.get('beforeTransform'),after=frames.get('afterTransform');
     const difference=messageDifference(before,after);
@@ -161,6 +164,7 @@ export class ContextProvenance {
     try{if(this.session)native={state:'observed',sessionId:this.session.sessionId,leafId:this.session.sessionManager.getLeafId(),boundary:'native leaf at request hook; per-message entry mapping not established'};}catch{}
     const data={version:PROVENANCE_VERSION,coverage:'public-boundaries-and-managed-memory; incomplete source attribution',maxCaptureBytes:PROVENANCE_LIMIT,snapshots,native,
       memory:{...(this.memoryStatus??{status:'not-observed'}),sdkSystemPresence:memoryPresence(memory,sdk,true),providerStringPresence:memoryPresence(memory,effective,false)},
+      ...(this.inputModeStatus?{inputMode:{...this.inputModeStatus,providerSystemPresence:inputModePresence(frames.get('inputMode'),effective,api)}}:{}),
       difference,providerHooks:{comparison:frames.get('beforeProviderHooks')?.state==='retained'&&effective?.state==='retained'?(frames.get('beforeProviderHooks')!.sha256===effective.sha256?'equal-redacted-json':'changed-redacted-json'):'not-observed'},
       limitations:['Loaded resources do not establish consumption.','Opaque transforms are captured in aggregate; individual handler attribution is not established.','Native lineage matches canonical projections at the before-transform boundary; identical candidates remain ambiguous.','Transport retries, headers and server-side context changes are not observed.']};
     const bodies=Object.fromEntries([...frames].filter(([,frame])=>frame.state==='retained').map(([name,frame])=>[name,frame.value]));
@@ -200,4 +204,9 @@ function memoryPresence(memory:Frame|undefined,frame:Frame|undefined,systemOnly:
     while(stack.length&&visited++<100000){const value=stack.pop();if(typeof value==='string'&&value.includes(text))return 'exact-text-present-in-a-string-field';if(value&&typeof value==='object')stack.push(...Object.values(value));}
     return stack.length?'not-observed':'exact-text-absent-from-string-fields';
   }catch{return 'not-observed';}
+}
+
+function inputModePresence(frame:Frame|undefined,provider:Frame|undefined,api?:string){
+ if(frame?.state!=='retained'||provider?.state!=='retained'||typeof frame.value?.text!=='string')return 'unavailable';
+ return systemTextPresence(provider.value,frame.value.text,api);
 }

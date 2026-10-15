@@ -2,6 +2,27 @@
 
 # Context selection and controlled memory processing
 
+## Pi interaction mode and native briefs — October 15
+
+[Pi input mode](PI-VOICE.md#spoken-and-typed-input--october-15-2026) now supplies
+`voice` or `text` from durable product admission to memory recall. New transcript
+events preserve delivered mode and original submitted human text; names alone do
+not label speech. Unadmitted extension input/replies are unattributed and excluded
+from new memory capture. Legacy events without the field remain text. A typed
+steering correction updates delivery/style mode inside the existing SDK turn;
+its existing recalled brief retains the original register, without a second
+recall or native/tool replay.
+
+Native `augmentor.memory-context.v1` briefs now accept mode `voice` as well as
+`text`, with the same strict fields, content hash, bound and last-record rule.
+A historical child/cold branch restores the retained brief and its **recall origin**
+mode even when its new question is typed. This does not grant speech authority.
+A damaged/unknown latest record never falls back to an older one. Previous
+text-only readers reject a latest voice brief; installed downgrade/migration
+compatibility therefore remains an explicit qualification gate. Existing text
+snapshot bytes remain unchanged. No production memory processing or deployment
+settings change. Source/ordinary and actual SDK branch qualification is pending.
+
 ## Memory-only llama.cpp request mode — October 14
 
 Source **5318959c1b4346bcaa293983206e767a45d4e1f2** adds the explicit installer

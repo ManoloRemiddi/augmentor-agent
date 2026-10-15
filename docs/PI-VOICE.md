@@ -2,6 +2,65 @@
 
 # Pi voice integration
 
+## Spoken and typed input — October 15, 2026
+
+`session.prompt.inputMode` defaults to `text`. A new `voice` admission requires a
+canonical `resonant-voice:<lowercase UUID>` identity, a connected operator and a
+live scoped Pi bridge. A name alone never supplies mode or speaker identity.
+Already admitted exact duplicates can be confirmed after disconnect; reuse with
+changed text or mode refuses. This is trusted local product attribution, not
+speaker authentication. Surface voice capability remains disabled.
+
+Queue schema 1 keeps existing text shapes/fingerprints. Spoken rows retain
+`inputMode: voice` and a mode-bound fingerprint through terminal receipts and
+cold recovery. Explicitly continued waiting speech retains that admission even
+without a live bridge; it does not reopen playback. Unknown outcomes still stop
+replay. Editing undispatched speech creates a fresh typed identity while retaining
+the removed original's spoken receipt. Goal/delegated input cannot be spoken.
+
+The public SDK's delivered user event selects current transcript/style mode.
+Spoken replies receive concise conversational guidance; a subsequent typed input
+explicitly restores ordinary formatting. Text-only conversations gain no style
+section. A public `Agent.streamFunction` request copy applies the section **after**
+Pi's final system projection; tools, executable policy, model/options and native
+messages remain intact. Manual compaction and standalone improvements bypass it.
+Context provenance reports the managed contribution and literal presence in the
+final provider system field, subject to existing capture/bounds; it does not claim
+that a model obeyed the style. Codex retains its existing public return shape and
+exact style wording through the shared authored prompt function.
+
+[Managed memory](CONTROLLED-MEMORY.md#pi-interaction-mode-and-native-briefs--october-15)
+recalls the admitted mode and records original submitted human text and assistant
+text with delivered mode. Goal/delegated user events and unadmitted extension
+follow-ups are not human memory receipts. New unattributed replies are excluded.
+Legacy events without mode retain their prior text interpretation. A typed
+correction changes style/capture mode immediately within the same SDK turn;
+recall remains the register consulted at that turn's start. Historical branches
+retain their brief's origin mode independently of the new question's style.
+
+Initial testing retained an incorrect test read of Codex's return envelope and
+reuse of closed provenance, then two queue fixtures that had not actually paused
+the idle queue. A real Host failure showed that Pi's memory-forced system
+projection erased a section added in `context_with_system`; stream-time composition
+corrects that boundary. Later original-content checks were corrected for Pi's
+provider text-part array. Existing Codex native coverage initially used system
+Python without QtTest; qualification uses the established isolated interpreter.
+No deadlines, guards or skips were relaxed. TypeScript/build and the focused
+83/83 set pass with the established Qt interpreter. Full source/ordinary
+qualification is pending.
+
+The preceding hosted run [38806598923](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38806598923)
+passes Linux and macOS overall at **d491e22b**. Windows advances through Host
+startup but refuses the fixture's raw token file ACL. The fixture now atomically
+creates that protected file through the existing private writer before replacing
+its raw bytes, preserving the speech protocol and ACL checks. Corrected hosted
+Windows behavior remains unqualified. Validation [38806598830](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38806598830)
+stopped on npm ECONNRESET; macOS packaging [38806598832](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38806598832)
+retains the Office MPL/libvips LGPL notice-review refusal. Neither is silently
+retried or presented as passing. The older Windows export-settlement failures
+remain separate. No private speech source or owner data is copied; the original
+GUI, current MX review, installed selection and services are unchanged.
+
 ## Platform fixture correction — October 15, 2026
 
 Fixture source **760dd242** preserves the runtime at **999c1f5f**. The completed

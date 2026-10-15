@@ -808,3 +808,14 @@ fixture and ES2023 check failures are retained. Pi surface voice capability,
 spoken memory mode, compatible companion and actual ASR/TTS remain pending;
 current MX review, GUI and installed/services are unchanged.
 [Portable evidence](../release/harness-pi-voice-host-qualification.json).
+
+## Pi spoken/typed attribution — October 15, 2026
+
+[The input-mode contract](PI-VOICE.md#spoken-and-typed-input--october-15-2026)
+is authored Augmentor code using the pinned public Pi 1.1.0 SDK and existing
+public shared voice transport. Synthetic provider/speech fixtures are independently
+authored; no private companion source is copied. GUI supplier inputs (615),
+Node/dependency pins and original notices are unchanged. A shared authored prompt
+function preserves Codex wording. A compatible real Pi companion is not yet a
+verified pin; controls/physical speech, installed migration and later platform
+artifacts remain pending.

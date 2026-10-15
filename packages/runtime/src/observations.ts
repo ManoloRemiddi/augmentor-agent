@@ -8,7 +8,8 @@ import {StepTiming} from './step-timing.js';
 /** Observe the supported SDK pipeline after all registered payload transforms. */
 export function observeSession(session: AgentSession, store: ObservationStore, sessionId: string,
   current: () => {turnId?: string; selected: Data; permissionPreset?: string; toolBudget?: Data;execution?:Data;reasoning?:Data;compactionId?:string}, notify: (event: unknown) => void,
-  warning: (message: string) => void, provenance?:ContextProvenance, finalPayload?:(payload:unknown,api:string)=>void) {
+  warning: (message: string) => void, provenance?:ContextProvenance, finalPayload?:(payload:unknown,api:string)=>void,
+  requestContext?:(context:Parameters<AgentSession['agent']['streamFunction']>[1])=>Parameters<AgentSession['agent']['streamFunction']>[1]) {
   let requestId: string | undefined;
   let started = 0, firstToken = false;
   let providerCount = 0, providerBytes = 0, providerDropped = 0, captureProvider = false;
@@ -65,7 +66,8 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
       }).catch(()=>summaryRecord('model/complete',{stopReason:'error',requestCoverage:id?'observed-after-summary-hooks':'not-observed'}));
       return stream;
     }
-    requestedThinking=options?.reasoning??'off';inspect(()=>provenance?.streaming(context));return previousStream(model,context,options);
+    const effective=requestContext?requestContext(context):context;
+    requestedThinking=options?.reasoning??'off';inspect(()=>provenance?.streaming(effective));return previousStream(model,effective,options);
   };
   if(typeof previousStream==='function')session.agent.streamFunction=streamHook;
   const payloadHook: typeof previousPayload = async (payload, model) => {

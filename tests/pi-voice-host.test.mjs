@@ -16,12 +16,16 @@ const artifact = resolve(process.env.AUGMENTOR_PI_TEST_ROOT ?? '.');
 const {privateDir, atomicJson} = await import(pathToFileURL(join(artifact, 'dist/runtime/src/storage.js')));
 const {PiConnection} = await import(pathToFileURL(join(artifact, 'dist/client/src/socket.js')));
 const {localConnect} = await import(pathToFileURL(join(artifact, 'dist/platform/src/transport.js')));
+const {piTranscriptEvent} = await import(pathToFileURL(join(artifact, 'dist/memory/src/pi.js')));
 async function fixture(t, {peerOptions, ...options} = {}) {
   const peer = createSyntheticVoicePeer({harnesses: ['pi'], ...peerOptions}), home = process.platform === 'win32' ? privateDir(join(tmpdir(), 'augmentor-speech-profile-' + crypto.randomUUID())) : privateDir(await mkdtemp(join(tmpdir(), 'augmentor-speech-profile-')));
   let f, ticketCalls = 0; const cleanup = [];
   t.after(async () => {for (const close of cleanup.reverse()) await close(); await f?.stop(); await peer.close(); await rm(home, {recursive: true, force: true, maxRetries: 5, retryDelay: 100});});
   await peer.listen(); peer.server.on('request', req => {if (req.url === '/internal/ticket') ticketCalls++;});
   atomicJson(join(home, 'config.json'), {port: Number(new URL(peer.connection.base).port)});
+  // The Windows private-record writer creates a protected file atomically;
+  // replacing its bytes preserves that ACL and the peer's raw-token protocol.
+  if (process.platform === 'win32') atomicJson(join(home, 'token'), null);
   await writeFile(join(home, 'token'), peer.connection.token + '\n', {mode: 0o600});
   f = await planFixture(t, {...options, voiceMode: {home}});
   const create = async (sid = 'voice-root', surface = 'linux') => {await f.call('session.create', {sessionId: sid, surface, selection: f.selection, cwd: f.workspace}); await f.call('events.subscribe', {sessionId: sid});};
@@ -37,6 +41,82 @@ async function fixture(t, {peerOptions, ...options} = {}) {
 }
 async function inactive(f) {await until(async () => (await f.call('host.describe')).activeVoiceBridges === 0, 'voice terminal');}
 const input = (sid, requestId, op = {kind: 'worker-reply', reply: 'Owned public reply.'}) => ({sessionId: sid, requestId, content: [{type: 'text', text: JSON.stringify(op)}]});
+const speechInput = (sid, op) => ({...input(sid, 'resonant-voice:' + crypto.randomUUID(), op), inputMode: 'voice'});
+const systemText = body => JSON.stringify(body.messages.filter(message => message.role === 'system'));
+const historyEvents = async (f, sid = 'voice-root') => (await f.call('session.history', {sessionId: sid})).events.map(row => row.event);
+
+test('explicit spoken admission binds style and memory mode without changing original native input or typed defaults', {timeout: 25000}, async t => {
+  const f = await fixture(t, {jobMode: {}}), sid = 'voice-root'; await f.create(); const spoken = speechInput(sid);
+  await assert.rejects(f.call('session.prompt', spoken), /scoped voice bridge/);
+  await assert.rejects(f.call('session.prompt', {...spoken, inputMode: 'other'}), /input mode/);
+  await assert.rejects(f.call('session.prompt', {...spoken, requestId: 'typed-id'}), /stable speech request identity/);
+  assert.equal(f.requests.length, 0);
+  // A speech-looking identity alone must remain ordinary typed input.
+  await f.call('session.prompt', {...speechInput(sid), inputMode: undefined}); await f.settled(sid);
+  assert(!systemText(f.requests[0]).includes('Augmentor input mode v1'));
+  await f.connect(); await f.call('session.prompt', spoken); await f.settled(sid);
+  assert(systemText(f.requests[1]).includes('The user spoke this request.'), JSON.stringify({system: systemText(f.requests[1]), users: (await historyEvents(f)).filter(row => row.type === 'user/message'), observations: (await f.call('observation.list', {sessionId: sid})).records.filter(row => row.kind === 'context/provenance').map(row => row.data.inputMode)}));
+  assert.deepEqual(f.requests[1].messages.findLast(row => row.role === 'user').content, spoken.content);
+  await f.call('voice.close', {sessionId: sid});
+  assert.equal((await f.call('session.prompt', spoken)).duplicate, true);
+  await assert.rejects(f.call('session.prompt', {...spoken, inputMode: 'text'}), /different input/);
+  await f.call('session.prompt', input(sid, 'typed-next')); await f.settled(sid);
+  assert(systemText(f.requests[2]).includes('Earlier spoken-response brevity instructions no longer apply'));
+  assert(!systemText(f.requests[2]).includes('The user spoke this request.'));
+  const events = await historyEvents(f), users = events.filter(row => row.type === 'user/message'), answers = events.filter(row => row.type === 'assistant/message');
+  assert.deepEqual(users.map(row => row.data.inputMode), ['text', 'voice', 'text']); assert.deepEqual(answers.map(row => row.data.inputMode), ['text', 'voice', 'text']);
+  assert.deepEqual(events.flatMap(row => piTranscriptEvent(row)).map(row => row.mode), ['text', 'text', 'voice', 'voice', 'text', 'text']);
+  const native = JSON.parse('[' + (await f.native(sid)).bytes.toString().trim().split('\n').join(',') + ']');
+  assert(!native.some(row => JSON.stringify(row.message ?? null).includes('Augmentor input mode v1')));
+  assert.deepEqual(native.filter(row => row.customType === 'augmentor.memory-context.v1').map(row => row.data.mode), ['text', 'voice', 'text']);
+  const observations = (await f.call('observation.list', {sessionId: sid})).records.filter(row => row.kind === 'context/provenance');
+  assert.equal(observations[0].data.inputMode, undefined); assert.equal(observations[1].data.inputMode.mode, 'voice'); assert.equal(observations[1].data.inputMode.providerSystemPresence, 'present');
+  assert.equal(observations[1].data.memory.mode, 'voice'); assert.equal(observations[2].data.memory.mode, 'text');
+  const before = f.requests.length; await f.stop(); await f.start(); await f.call('session.history', {sessionId: sid});
+  assert.equal(f.requests.length, before); assert.deepEqual((await historyEvents(f)).flatMap(row => piTranscriptEvent(row)).map(row => row.mode), ['text', 'text', 'voice', 'voice', 'text', 'text']);
+});
+
+test('admitted waiting speech keeps its mode through disconnect and cold resume without reopening speech or replaying history', {timeout: 25000}, async t => {
+  const f = await fixture(t, {jobMode: {}}), sid = 'voice-root'; await f.create(); await f.call('session.cancel', {sessionId: sid}); await f.connect(); const spoken = speechInput(sid);
+  await f.call('session.prompt', {...spoken, mode: 'queue', resumeQueue: false});
+  assert.equal(f.requests.length, 0); assert.equal((await f.call('session.queue', {sessionId: sid})).items[0].inputMode, 'voice');
+  await f.call('voice.close', {sessionId: sid}); await f.stop(); await f.start(); await f.call('events.subscribe', {sessionId: sid});
+  assert.equal(f.requests.length, 0); assert.equal((await f.call('session.queue', {sessionId: sid})).paused, true);
+  assert.equal((await f.call('session.prompt', spoken)).duplicate, true);
+  await f.call('session.continueQueue', {sessionId: sid}); await until(() => f.requests.length === 1, 'resumed voice request'); await f.settled(sid);
+  assert(systemText(f.requests[0]).includes('The user spoke this request.'));
+  assert.equal((await f.call('host.describe')).activeVoiceBridges, 0); assert.equal(f.ticketCalls(), 1); assert.deepEqual(f.peer.spoken, []);
+  assert.deepEqual((await historyEvents(f)).filter(row => ['user/message', 'assistant/message'].includes(row.type)).map(row => row.data.inputMode), ['voice', 'voice']);
+});
+
+test('editing waiting speech produces typed delivery with a fresh identity and no false spoken memory', {timeout: 25000}, async t => {
+  const f = await fixture(t, {jobMode: {}}), sid = 'voice-root'; await f.create(); await f.call('session.cancel', {sessionId: sid}); await f.connect(); const spoken = speechInput(sid);
+  await f.call('session.prompt', {...spoken, mode: 'queue', resumeQueue: false}); await f.call('voice.close', {sessionId: sid});
+  const snapshot = await f.call('session.queue', {sessionId: sid}), edited = input(sid, 'typed-edit');
+  await f.call('session.updateQueue', {sessionId: sid, itemId: spoken.requestId, newItemId: edited.requestId, expectedRevision: snapshot.revision, action: {kind: 'edit', content: edited.content}});
+  await f.call('session.continueQueue', {sessionId: sid}); await until(() => f.requests.length === 1, 'typed edited request'); await f.settled(sid);
+  assert(!systemText(f.requests[0]).includes('The user spoke this request.'));
+  const journal = JSON.parse(await readFile(join(f.state, 'sessions', sid + '.queue.json'), 'utf8'));
+  assert.equal(journal.items[0].status, 'removed'); assert.equal(journal.items[0].inputMode, 'voice'); assert.equal(journal.items[1].inputMode, undefined);
+  const events = await historyEvents(f); assert.equal(events.filter(row => row.type === 'user/message').length, 1);
+  assert(events.flatMap(row => piTranscriptEvent(row)).every(row => row.mode === 'text'));
+});
+
+test('a typed correction supersedes spoken style in the same actual SDK turn', {timeout: 25000}, async t => {
+  const f = await fixture(t, {jobMode: {}}), sid = 'voice-root'; await f.create(); await f.connect();
+  const started = await f.call('session.prompt', speechInput(sid, {kind: 'worker-hold'}));
+  await until(() => f.requests.length === 1, 'spoken provider active');
+  await f.call('session.prompt', {...input(sid, 'typed-steer'), mode: 'steer', expectedTurnId: started.turnId}); await f.settled(sid);
+  assert.equal(f.requests.length, 2); assert(systemText(f.requests[1]).includes('The user typed this request.')); assert(!systemText(f.requests[1]).includes('The user spoke this request.'));
+  const events = await historyEvents(f), users = events.filter(row => row.type === 'user/message');
+  assert.deepEqual(users.map(row => row.data.inputMode), ['voice', 'text']); assert(users.every(row => row.turnId === started.turnId));
+  assert.equal(events.filter(row => row.type === 'turn/start').length, 1); assert.equal(events.findLast(row => row.type === 'assistant/message').data.inputMode, 'text');
+  assert.equal(events.findLast(row => row.type === 'assistant/message').data.humanRequestId, 'typed-steer');
+  // Recall is run once at the spoken turn's start; that provenance is distinct
+  // from the later typed correction's response style and transcript mode.
+  const observations = (await f.call('observation.list', {sessionId: sid})).records.filter(row => row.kind === 'context/provenance');
+  assert.equal(observations[1].data.inputMode.mode, 'text'); assert.equal(observations[1].data.memory.mode, 'voice');
+});
 
 test('actual Pi Host speaks only live durably delivered human input through one SDK owner and never history or duplicate admission', {timeout: 25000}, async t => {
   const f = await fixture(t, {jobMode: {}}), sid = 'voice-root'; await f.create(sid);
@@ -172,11 +252,14 @@ test('an extension-injected follow-up cannot inherit a human speech request iden
   await writeFile(extension, `// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 export default pi => {let sent = false; pi.on('turn_end', () => {if (!sent) {sent = true; pi.sendUserMessage(JSON.stringify({kind:'worker-reply',reply:'AUTOMATIC_REPLY_MUST_NOT_SPEAK'}), {deliverAs:'followUp'});}});};\n`);
   atomicJson(join(f.config, 'resources.json'), {sources: [extension], skills: []});
-  await f.create(); await f.connect(); await f.call('session.prompt', input('voice-root', 'only-human')); await f.settled('voice-root');
+  await f.create(); await f.connect(); const human = speechInput('voice-root'); await f.call('session.prompt', human); await f.settled('voice-root');
   await until(() => f.peer.received.some(row => row.type === 'cancel'), 'unadmitted follow-up speech suppression');
   assert.equal(f.requests.length, 2); assert(!f.peer.spoken.some(text => text.includes('AUTOMATIC_REPLY_MUST_NOT_SPEAK')));
   assert(!JSON.stringify(f.peer.received).includes('AUTOMATIC_REPLY_MUST_NOT_SPEAK'));
   assert.equal(f.peer.received.filter(row => row.type === 'user-turn').length, 1);
   const history = await f.call('session.history', {sessionId: 'voice-root'}), users = history.events.map(row => row.event).filter(row => row.type === 'user/message');
-  assert.equal(users.length, 2); assert.equal(users[0].data.source.rpcId, 'only-human'); assert.equal(users[1].data.source.rpcId, undefined);
+  assert.equal(users.length, 2); assert.equal(users[0].data.source.rpcId, human.requestId); assert.equal(users[1].data.source.rpcId, undefined);
+  assert.equal(users[1].data.source.kind, 'unattributed'); assert.equal(users[1].data.inputMode, 'unattributed'); assert.deepEqual(piTranscriptEvent(users[1]), []);
+  assert(systemText(f.requests[0]).includes('The user spoke this request.')); assert(!systemText(f.requests[1]).includes('Augmentor input mode v1'));
+  const automatic = history.events.map(row => row.event).findLast(row => row.type === 'assistant/message'); assert.equal(automatic.data.inputMode, 'unattributed'); assert.deepEqual(piTranscriptEvent(automatic), []);
 });

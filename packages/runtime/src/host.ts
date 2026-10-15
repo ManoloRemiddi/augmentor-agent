@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {PiVoice} from './voice.js';
+import {piInputMode,promptInputMode,spokenRequestId,type InputMode} from './input-mode.js';
 import {WikiBinding} from './wiki.js';
 import {skillCatalog,prepareApprovedSkill,deliveredSkill,type PreparedSkill} from './session-skills.js';
 import {permissionSelection,permissionHistory,permissionChange,permissionAtBoundary,permissionCommand,permissionOptions,type PermissionRecord} from './session-permission-contracts.js';
@@ -85,7 +86,7 @@ import {PiJobs,jobSpec,jobsExtension,shellJob,boundChild,JOB_GUIDANCE,type JobRe
 import type {Usage} from '@earendil-works/pi-ai';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {permissionHistory?:PermissionRecord[];planModeBootstrap?:PlanModeRecord;delegation?:{parentId:string;jobId:string;allowedTools:string[];resources:Data};reasoning?:SavedReasoning;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {skillInputs:Map<string,PreparedSkill>;permissionSteer?:{id:string;text:string};planMode:PiPlanMode;resources:Data;searchEnabled?:boolean;searchMode?:'configured'|'keyless';wiki?:WikiBinding;wikiRevision?:string;memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];goals:PiGoals;mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean;reason?:string})=>Promise<void>;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
+interface Loaded {requestedMode?:InputMode;humanInput?:{requestId:string;mode:InputMode};inputMode?:InputMode|'unattributed';inputOrigin?:'user'|'goal'|'delegation'|'unattributed';voiceSeen?:boolean;skillInputs:Map<string,PreparedSkill>;permissionSteer?:{id:string;text:string};planMode:PiPlanMode;resources:Data;searchEnabled?:boolean;searchMode?:'configured'|'keyless';wiki?:WikiBinding;wikiRevision?:string;memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];goals:PiGoals;mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean;reason?:string})=>Promise<void>;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 /** Admission is serialized; extension preparation must not hold the host's
  * state lock while waiting for a UI answer, another RPC or an input handler.
  */
@@ -464,7 +465,7 @@ export class Host {
     const resources=m.delegation?.resources??readJson<Data>(join(this.dirs.config,'resources.json'),{sources:[],skills:[]});
     const goals=new PiGoals({getBranch:()=>manager.getBranch(),appendCustomEntry:(type,data)=>manager.appendCustomEntry(type,data),getSessionId:()=>manager.getSessionId()},()=>{this.publish(m.id,{method:'goal/updated',payload:{sessionId:m.id}});record?.observation?.record('goal/update',{activation:goals.armed?'armed':'disarmed'});});
     const provenance=new ContextProvenance(()=>this.observations.policy().capturePayloads);
-    const managedMemory=managedPiMemory(memory,!m.fork,contribution=>provenance.memory(contribution));
+    const managedMemory=managedPiMemory(memory,!m.fork,contribution=>{provenance.memory(contribution);if(contribution.mode==='voice'&&record)record.voiceSeen=true;},()=>record?.requestedMode??'text');
     if(!Array.isArray(resources.sources)||!Array.isArray(resources.skills))throw new Error('Invalid Pi resource configuration');
     const wikiNative=process.platform==='linux'&&m.surface!=='browser'&&!m.delegation;let wiki:WikiBinding|undefined,wikiRevision:string|undefined;
     const wikiFactory=(pi:ExtensionAPI)=>{const profile=this.wikiPreferences.describe();wiki=profile.value.enabled?new WikiBinding({...profile.value,enabled:true},this.dirs.state):undefined;wikiRevision=profile.revision;if(record)record.wiki=wiki;wiki?.factory(pi);};
@@ -504,6 +505,7 @@ export class Host {
     const nativeTitle=m.title.replace(/[\r\n]+/g,' ').trim();
     if(m.title&&(manager.getSessionName()??'')!==nativeTitle)created.session.setSessionName(m.title);m.reasoning=reasoning;m.file=created.session.sessionFile;this.save(m);
     record={skillInputs:new Map(),planMode,resources:structuredClone(resources),searchEnabled,searchMode,wiki,wikiRevision,memory,meta:m,session:created.session,manager,events:this.events(m),goals,mcp,cancelled:false};this.loaded.set(m.id,record);
+    record.voiceSeen=record.events.some(event=>event.data.inputMode==='voice');record.inputMode='unattributed';record.inputOrigin='unattributed';
     let history=record.events;
     if(m.fork){m.memoryStartSeq??=history.at(-1)?.seq??0;this.save(m);history=history.filter(e=>e.seq>m.memoryStartSeq!);}
     await memory.append(history.flatMap(event=>piTranscriptEvent(event)));
@@ -518,7 +520,7 @@ export class Host {
     record.observation=observeSession(created.session,this.observations,m.id,
       ()=>({turnId:record!.turnId,compactionId:this.compactions.activeId(m.id),selected:{...m.selection},permissionPreset:m.policy,toolBudget:{...TOOL_BUDGET,units:'unicode-code-points'},execution:record!.execution?.describe(),reasoning:record!.reasoning?.snapshot()}),
       observation=>this.publish(m.id,{method:'observation/event',payload:{sessionId:m.id,observation}}),
-      message=>this.append(m,'runtime/warning',{message}),provenance,managedMemory.finalPayload);
+      message=>this.append(m,'runtime/warning',{message}),provenance,managedMemory.finalPayload,piInputMode(()=>!m.delegation&&record?.humanInput?{...record.humanInput,voiceSeen:record.voiceSeen===true}:undefined,row=>provenance.inputMode(row)));
     return record!.observation;
     };
     const installed=installBindings();
@@ -562,10 +564,15 @@ export class Host {
         const admitted=requestId?this.queue(m).read(requestId):undefined,submittedContent=admitted?submittedParts(admitted.input??'',admitted.attachments):undefined;
         const goalSource=requestId&&!correction?this.queue(m).read(requestId).goalSource:undefined;
         if(goalSource){try{record!.goals.admit(goalSource,requestId!,e.message);}catch{record!.goals.disarm();record!.failed=true;record!.execution?.cancel();this.append(m,'runtime/error',{message:'Goal admission could not be saved or replayed. Inspect its original; no automatic continuation will be replayed.'});void record!.session.abort().catch(()=>{});}}
+        const origin=m.delegation?'delegation':goalSource?'goal':requestId?'user':'unattributed';
+        record!.inputOrigin=origin;record!.inputMode=origin==='user'?(admitted?.inputMode??'text'):origin==='unattributed'?'unattributed':'text';
+        record!.requestedMode=record!.inputMode==='voice'?'voice':'text';
+        record!.humanInput=origin==='user'&&requestId?{requestId,mode:admitted?.inputMode??'text'}:undefined;
+        if(record!.inputMode==='voice')record!.voiceSeen=true;
         if(requestId&&!goalSource&&!m.delegation&&!record!.cancelled&&record!.turnId&&this.connected(m.id))this.voice.admit(m.id,requestId,record!.turnId);
         else if(!m.delegation)void this.voice.stop(m.id);
         const skillInvocation=requestId?deliveredSkill(record!.skillInputs.get(requestId),content,e.message):undefined;if(requestId)record!.skillInputs.delete(requestId);
-        this.append(m,'user/message',{source:{...(goalSource??{kind:'user'}),sessionId:m.id,...(requestId?{rpcId:requestId}:{})},content,...(skillInvocation?{skillInvocation}:{}),...(submittedContent&&JSON.stringify(submittedContent)!==JSON.stringify(content)?{submittedContent}:{})});
+        this.append(m,'user/message',{inputMode:record!.inputMode,source:{...(goalSource??{kind:origin}),sessionId:m.id,...(requestId?{rpcId:requestId}:{})},content,...(skillInvocation?{skillInvocation}:{}),...(submittedContent&&JSON.stringify(submittedContent)!==JSON.stringify(content)?{submittedContent}:{})});
       }
       if(e.type==='message_update'){
         const a=e.assistantMessageEvent,requestId=record!.observation?.currentRequestId();
@@ -576,7 +583,7 @@ export class Host {
       if(e.type==='message_start'&&e.message.role==='assistant'){toolArguments.begin();messageCaptureId=toolArguments.identity();}
       if(e.type==='message_end'&&e.message.role==='assistant'){
         toolArguments.end();
-        this.append(m,'assistant/message',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,message:{content:e.message.content,stopReason:e.message.stopReason,timestamp:e.message.timestamp,usage:e.message.usage}});
+        this.append(m,'assistant/message',{inputMode:record!.inputMode??'unattributed',inputOrigin:record!.inputOrigin??'unattributed',...(record!.humanInput?{humanRequestId:record!.humanInput.requestId}:{}),requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,message:{content:e.message.content,stopReason:e.message.stopReason,timestamp:e.message.timestamp,usage:e.message.usage}});
         record!.failed=e.message.stopReason==='error';if(record!.failed&&!record!.steering?.waiting)this.append(m,'runtime/error',{message:e.message.errorMessage||'Model request failed'});
       }
       if(e.type==='tool_execution_start')this.append(m,'tool/call',{requestId:record!.observation?.currentRequestId(),captureId:messageCaptureId,name:e.toolName,toolCallId:e.toolCallId,...(e.parentToolCallId?{parentToolCallId:e.parentToolCallId,...toolArguments.captureExecutionArguments(e.args)}:{})});
@@ -711,6 +718,7 @@ export class Host {
     if(!queue.promote(id,turnId))return {accepted:true,duplicate:true,turnId};
     r.execution!.steerRequested();this.interactions.cancel(m.id);
     const permissionSteer={id,text:attachmentInput.text};r.permissionSteer=permissionSteer;
+    r.requestedMode=prior.inputMode??'text';
     const pending=r.steering!.enqueue(id,attachmentInput.text,result=>{
       if(result.action==='handled'){queue.handledSteer(id);r.execution!.steerHandled();this.append(m,'runtime/notice',{message:'The correction was handled by an input extension. No copy of that input was sent to the model.',submittedContent:submittedParts(prior.input??'',prior.attachments),source:{kind:'user',rpcId:id},incomplete:false});}
       r.observation?.record('execution/steer-input',{clientRequestId:id,action:result.action,handler:result.handler,skill:result.skill??r.skillInputs.get(id)?.receipt.name,template:result.template});
@@ -816,6 +824,7 @@ export class Host {
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
     const reasoningPolicy=reasoningConfig(this.settings.reasoning),savedThinking=this.reasoningSettings(m);
     r.turnId=randomUUID();const queue=this.queue(m),goalSource=queue.read(id).goalSource;queue.dispatch(id,r.turnId);
+    r.requestedMode=queue.read(id).inputMode??'text';r.humanInput=undefined;r.inputMode='unattributed';r.inputOrigin='unattributed';
     m.running=true;r.cancelled=false;r.failed=false;r.initialDelivered=false;r.preparingInput=false;r.interruptedInput=false;r.phase='preparing';r.activeRequestId=id;m.requests=[...m.requests.slice(-99),id];m.updatedAt=Date.now();this.save(m);this.append(m,'turn/start',{requestId:id});queue.accepted(id);
     r.observation?.beginTurn({clientRequestId:id});
     r.execution?.begin(r.manager);
@@ -849,7 +858,7 @@ export class Host {
       if(r.goals.armed&&(reason!=='completed'||goalSource&&handled)){try{r.goals.fail(handled?'goal-input-handled':reason==='aborted'?'turn-interrupted':'turn-failed',handled?'A goal input was handled without model admission. Explicit human review is required.':'Work stopped or failed. Inspect its outcome before explicitly resuming the goal.');}catch{r.goals.disarm();}}
       if(m.file&&existsSync(m.file))delete m.planModeBootstrap;
       if(r.turnId)this.voice.finish(m.id,r.turnId,reason==='completed');
-      m.running=false;m.updatedAt=Date.now();this.save(m);this.append(m,'turn/end',{reason:{kind:reason},requestId:id});r.observation?.record('turn/end',{reason,execution:r.execution?.describe()});r.turnId=undefined;r.activeRequestId=undefined;r.phase=undefined;
+      m.running=false;m.updatedAt=Date.now();this.save(m);this.append(m,'turn/end',{reason:{kind:reason},requestId:id});r.observation?.record('turn/end',{reason,execution:r.execution?.describe()});r.turnId=undefined;r.activeRequestId=undefined;r.phase=undefined;r.humanInput=undefined;r.requestedMode=undefined;r.inputMode='unattributed';r.inputOrigin='unattributed';
       void this.flushJobReceipts(m.id).catch(()=>{});if(!m.delegation&&!queue.paused)this.pump(m);
     }})();return {accepted:true,turnId:r.turnId};
   }
@@ -987,7 +996,7 @@ export class Host {
       try{const ticket=await this.voice.ticket(m.id,p.surface);this.voiceAuthority(m,p.surface);return ticket;}
       catch(error){await this.voice.release(m.id);throw error;}
     }
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeVoiceBridges:this.voice.active?1:0,activeUploads:this.uploads,activeSessionExports:this.sessionExports.active,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,activeModelAccountLogins:this.modelAccounts?.busy?1:0,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{voiceBridge:true,sessionExport:!this.sessionExports.problem,skillReferences:true,sessionPermissions:true,permissionDefaults:true,searchSettings:process.platform==='linux',searchModes:process.platform==='linux',wikiSettings:process.platform==='linux',durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelSettingsRevisions:true,modelDiscovery:true,modelAccountLogout:true,modelAccountLogin:true,shortcuts:true,appearancePreferences:true,metafolders:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,planMode:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue; product /plan and /permission use admitted SDK input',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeVoiceBridges:this.voice.active?1:0,activeUploads:this.uploads,activeSessionExports:this.sessionExports.active,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,activeModelAccountLogins:this.modelAccounts?.busy?1:0,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{voiceBridge:true,sessionExport:!this.sessionExports.problem,skillReferences:true,sessionPermissions:true,permissionDefaults:true,searchSettings:process.platform==='linux',searchModes:process.platform==='linux',wikiSettings:process.platform==='linux',durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelSettingsRevisions:true,modelDiscovery:true,modelAccountLogout:true,modelAccountLogin:true,shortcuts:true,appearancePreferences:true,metafolders:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,planMode:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',inputModes:{default:'text',voice:'explicit mode, canonical speech request id and live scoped lease at first admission; durable thereafter'},expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue; product /plan and /permission use admitted SDK input',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.voice.active)throw Error('Close voice before shutting down the runtime.');
       if(this.sessionExports.active)throw Error('Finish conversation downloads or wait for their one-minute links to expire before shutting down the runtime.');
@@ -1185,17 +1194,20 @@ export class Host {
     case 'session.prompt':{
       if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before sending a chat prompt.');
       const m=this.getMeta(p.sessionId),requestId=promptIdentity(p.requestId??id);
+      const inputMode=promptInputMode(p.inputMode);if(inputMode==='voice'&&!spokenRequestId(requestId))throw Error('Spoken input requires its stable speech request identity.');
       if(p.mode!==undefined&&!['queue','steer'].includes(p.mode))throw Error('Choose queue or steer mode.');
       const hasImages=Array.isArray(p.content)&&p.content.some((part:Data)=>part.type==='image');if(hasImages&&!(await this.selected(m.selection)).input.includes('image'))throw Error('The selected model does not support image input.');
       const {input,attachments}=await this.attachments.admit(m.id,p.content),queue=this.queue(m);
       if(permissionCommand(input)&&attachments.length)throw Error('Attachments cannot accompany /permission.');
       if(planCommand(input)?.active===false&&attachments.length)throw Error('Attachments cannot accompany /plan off.');
-      const existing=queue.lookup(requestId,input,attachments);if(existing||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
+      const existing=queue.lookup(requestId,input,attachments,inputMode);if(existing)return {accepted:true,duplicate:true,requestId};
+      if(m.requests.includes(requestId)){if(inputMode==='voice')throw Error('This legacy request has no verified spoken-input receipt. Inspect its history; nothing was replayed.');return {accepted:true,duplicate:true,requestId};}
+      if(inputMode==='voice'&&(!this.voice.acceptsSpokenInput(m.id)||!this.connected(m.id)))throw Error('Reconnect the scoped voice bridge before submitting spoken input.');
       if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
       this.loaded.get(m.id)?.mcp?.assertReady();
       if(p.mode==='steer'){
         const r=this.loaded.get(m.id);if(!m.running||!r||r.cancelled||r.phase==='settling'||r.turnId!==p.expectedTurnId||queue.paused||queue.uncertain||r.steering?.waiting)throw Error('The observed steering turn is no longer available.');
-        r.steering!.validate(input);queue.enqueue(requestId,input,true,undefined,attachments);return new SteeringReply(this.steer(m,requestId,p.expectedTurnId).then(result=>({...result,requestId})));
+        r.steering!.validate(input);queue.enqueue(requestId,input,true,undefined,attachments,inputMode);return new SteeringReply(this.steer(m,requestId,p.expectedTurnId).then(result=>({...result,requestId})));
       }
       if(p.mode===undefined&&m.running)throw Error('This conversation is already working; use queue mode to add a waiting prompt.');
       if(p.resumeQueue!==undefined&&typeof p.resumeQueue!=='boolean')throw Error('Choose whether to resume the queue.');
@@ -1204,7 +1216,7 @@ export class Host {
       // commands cannot bypass the persistent queue's admission/receipt rules.
       if(input.startsWith('/'))validateSteeringInput((await this.load(m)).session,input);
       if(this.mcpReloading||m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish MCP management or session reload before admitting another prompt.');
-      queue.enqueue(requestId,input,m.running||queue.paused||!!queue.next,undefined,attachments);
+      queue.enqueue(requestId,input,m.running||queue.paused||!!queue.next,undefined,attachments,inputMode);
       if(p.resumeQueue===true||(p.mode===undefined&&!m.running&&p.resumeQueue!==false))queue.resume();
       if(!m.running&&!queue.paused){
         let r:Loaded;try{r=await this.load(m);}catch(error){queue.notSent(requestId);throw error;}
