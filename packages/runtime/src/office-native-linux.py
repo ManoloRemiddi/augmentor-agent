@@ -2,7 +2,8 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Owned native Office broker. Called only with provider-owned scratch paths.
 
-No shell, personal profile, network, model, telemetry or persistent font cache.
+Fixed argv admission gate only; no personal profile, network, model, telemetry
+or persistent font cache. Admission/status descriptors close before the parser.
 Linux x64/Debian payload layout is explicit; other OS adapters remain separate.
 """
 from __future__ import annotations
@@ -190,9 +191,95 @@ def command(root: Path, source: Path) -> list[str]:
     for name in ('passwd', 'group', 'nsswitch.conf'):
         cmd += ['--ro-bind', str(root / 'etc' / name), '/etc/' + name]
     cmd += ['--symlink', 'usr/lib', '/lib', '--ro-bind', '/lib64/ld-linux-x86-64.so.2', '/lib64/ld-linux-x86-64.so.2', '--bind', str(root / 'work'), '/work', '--ro-bind', str(root / 'fonts'), '/fonts', '--ro-bind', str(source), '/input/source' + source.suffix, '--ro-bind', '/usr/bin/fc-list', '/usr/bin/fc-list', '--clearenv', '--chdir', '/work']
+    cmd += ['--ro-bind', '/usr/bin/dash', '/usr/bin/dash']
     for name, value in {'HOME': '/work/home', 'PATH': '/usr/bin:/bin', 'LANG': 'C.UTF-8', 'LC_ALL': 'C.UTF-8', 'TZ': 'UTC', 'TMPDIR': '/tmp', 'XDG_CONFIG_HOME': '/work/config', 'XDG_CACHE_HOME': '/work/cache', 'FONTCONFIG_FILE': '/work/fonts.conf', 'SAL_USE_VCLPLUGIN': 'svp', 'SAL_DISABLE_OPENCL': '1'}.items():
         cmd += ['--setenv', name, value]
     return cmd
+
+
+def actor_start(pid: int) -> str | None:
+    try:
+        value = Path('/proc/' + str(pid) + '/stat').read_text()
+        return value.rsplit(')', 1)[1].split()[19]
+    except (FileNotFoundError, ProcessLookupError):
+        return None
+
+
+def actor_record(root: Path, entry: dict) -> None:
+    data = (json.dumps(entry, separators=(',', ':')) + '\n').encode()
+    fd = os.open(root / 'actors.jsonl', os.O_WRONLY | os.O_CREAT | os.O_APPEND | os.O_NOFOLLOW, 0o600)
+    try:
+        info = os.fstat(fd)
+        if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or stat.S_IMODE(info.st_mode) != 0o600 or info.st_size + len(data) > 4096:
+            raise Failure('failed')
+        if os.write(fd, data) != len(data):
+            raise Failure('failed')
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+def record_actor(root: Path, pid: int, role: str) -> None:
+    start = actor_start(pid)
+    if start is None:
+        raise Failure('unavailable')
+    actor_record(root, {'pid': pid, 'start': start, 'role': role})
+
+
+def join_actors(root: Path) -> None:
+    """Join only trusted pre-admission identities; never discover or signal PIDs."""
+    try:
+        data = read_regular(root / 'actors.jsonl', 4096, 'failed')
+    except FileNotFoundError:
+        # No broker may copy data before its registration. An allocation-only
+        # failure can remove its own empty directory, without scanning elsewhere.
+        if any(root.iterdir()):
+            raise Failure('unavailable') from None
+        return
+    entries = [json.loads(line) for line in data.splitlines()]
+    if not entries or len(entries) > 10:
+        raise Failure('failed')
+    pending = set()
+    identities = set()
+    for entry in entries:
+        if set(entry) == {'phase', 'status'}:
+            phase, status = entry['phase'], entry['status']
+            if phase not in ('catalog', 'render') or status not in ('pending', 'ready'):
+                raise Failure('failed')
+            if status == 'pending':
+                if phase in pending:
+                    raise Failure('failed')
+                pending.add(phase)
+            elif phase not in pending:
+                raise Failure('failed')
+            else:
+                pending.remove(phase)
+        elif set(entry) == {'pid', 'start', 'role'}:
+            pid, start = entry['pid'], entry['start']
+            if type(pid) is not int or pid <= 1 or not isinstance(start, str) or not start.isdecimal() or entry['role'] not in ('broker', 'monitor', 'namespace-init'):
+                raise Failure('failed')
+            identities.add((pid, start))
+        else:
+            raise Failure('failed')
+    if pending:
+        raise Failure('unavailable')  # Interrupted registration is quarantined.
+    for pid, start in identities:
+        if actor_start(pid) != start:
+            continue
+        try:
+            descriptor = os.pidfd_open(pid)
+        except ProcessLookupError:
+            continue
+        try:
+            if actor_start(pid) != start:
+                continue
+            select.select([descriptor], [], [])
+            # The descriptor proves kernel exit. Wait for the confirmed identity
+            # to be reaped too; a reused PID is neither joined nor signalled.
+            while actor_start(pid) == start:
+                time.sleep(0.01)
+        finally:
+            os.close(descriptor)
 
 
 def run(cmd: list[str], root: Path, options: dict, *, catalog: bool = False) -> bytes:
@@ -206,12 +293,51 @@ def run(cmd: list[str], root: Path, options: dict, *, catalog: bool = False) -> 
         os.nice(10)
     blocked = signal.pthread_sigmask(signal.SIG_BLOCK, {signal.SIGTERM})
     child = None
+    descriptors = []
     try:
+        phase = 'catalog' if catalog else 'render'
+        actor_record(root, {'phase': phase, 'status': 'pending'})
+        info_read, info_write = os.pipe2(os.O_CLOEXEC)
+        admit_read, admit_write = os.pipe2(os.O_CLOEXEC)
+        descriptors.extend((info_read, info_write, admit_read, admit_write))
         with (root / ('catalog.log' if catalog else 'render.log')).open('wb') as log:
             def prepare():
+                os.dup2(admit_read, 3)
+                if admit_read != 3:
+                    os.close(admit_read)
                 signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
                 limits()
-            child = subprocess.Popen(cmd, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.DEVNULL, close_fds=True, preexec_fn=prepare)
+            split = cmd.index('--chdir') + 2
+            # command() ends in --setenv pairs; run() appends the actual program.
+            while split < len(cmd) and cmd[split].startswith('--'):
+                split += 3 if cmd[split] in ('--setenv', '--ro-bind') else 1
+            wrapper = 'IFS= read -r decision <&3 || exit 125; [ "$decision" = R ] || exit 125; exec 3<&-; exec "$@"'
+            launch = cmd[:split] + ['/usr/bin/dash', '-c', wrapper, 'augmentor-office-admit'] + cmd[split:]
+            launch[1:1] = ['--info-fd', str(info_write)]
+            child = subprocess.Popen(launch, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.DEVNULL, close_fds=True, pass_fds=tuple(set((3, admit_read, info_write))), preexec_fn=prepare)
+            os.close(info_write);descriptors.remove(info_write)
+            os.close(admit_read);descriptors.remove(admit_read)
+            record_actor(root, child.pid, 'monitor')
+            receipt = bytearray()
+            end = time.monotonic() + options['timeoutMs'] / 1000
+            while True:
+                remaining = end - time.monotonic()
+                if remaining <= 0 or not select.select([info_read], [], [], remaining)[0]:
+                    raise Failure('timeout')
+                chunk = os.read(info_read, 4097 - len(receipt))
+                if not chunk:
+                    break
+                receipt.extend(chunk)
+                if len(receipt) > 4096:
+                    raise Failure('failed')
+            frame = json.loads(receipt)
+            pid = frame.get('child-pid')
+            if type(pid) is not int or pid <= 1:
+                raise Failure('failed')
+            record_actor(root, pid, 'namespace-init')
+            actor_record(root, {'phase': phase, 'status': 'ready'})
+            os.write(admit_write, b'R\n')
+            os.close(admit_write);descriptors.remove(admit_write)
             signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
             try:
                 code = child.wait(timeout=options['timeoutMs'] / 1000)
@@ -221,7 +347,6 @@ def run(cmd: list[str], root: Path, options: dict, *, catalog: bool = False) -> 
                 pdf = root / 'work/out/source.pdf'
                 raise Failure('unavailable' if catalog else 'output-too-large' if pdf.exists() and pdf.stat().st_size >= options['maxOutputBytes'] else 'invalid-document')
     finally:
-        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
         if child is not None and child.poll() is None:
             child.terminate()
             try:
@@ -229,6 +354,9 @@ def run(cmd: list[str], root: Path, options: dict, *, catalog: bool = False) -> 
             except subprocess.TimeoutExpired:
                 child.kill()
                 child.wait()
+        for descriptor in descriptors:
+            os.close(descriptor)
+        signal.pthread_sigmask(signal.SIG_SETMASK, blocked)
     return read_regular(root / 'catalog.log', 256 * 1024, 'unavailable') if catalog else b''
 
 
@@ -336,6 +464,7 @@ def supervise(root: Path, identity: tuple[int, int], owner: int) -> tuple[bytes,
         sys.stdin.close()
         broker_fd = os.pidfd_open(pid)
         descriptors.append(broker_fd)
+        record_actor(root, pid, 'broker')
         cancelled = False
 
         def cancel(_signum, _frame):
@@ -382,6 +511,7 @@ def supervise(root: Path, identity: tuple[int, int], owner: int) -> tuple[bytes,
                     except ProcessLookupError:
                         pass
                     forced = True
+        join_actors(root)
         remove_owned_root(root, identity)
         return bytes(data), os.waitstatus_to_exitcode(status)
     except (AttributeError, OSError):
@@ -459,7 +589,18 @@ if __name__ == '__main__':
     identity = None
     parent_lease = None
     try:
-        root, identity = owned_root(sys.argv)
+        cleanup = sys.argv[1:2] == ['--cleanup']
+        arguments = [sys.argv[0], *sys.argv[2:]] if cleanup else sys.argv
+        root, identity = owned_root(arguments)
+        if cleanup:
+            if os.getppid() != int(arguments[1]):
+                raise Failure('failed')
+            process_name(b'aug-office-join')
+            join_actors(root)
+            remove_owned_root(root, identity)
+            root = None
+            print(json.dumps({'cleaned': True}), flush=True)
+            sys.exit(0)
         parent_lease = os.open(root.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
         fcntl.flock(parent_lease, fcntl.LOCK_SH)
         reply, code = supervise(root, identity, int(sys.argv[1]))
@@ -474,7 +615,9 @@ if __name__ == '__main__':
         sys.exit(1)
     finally:
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
-        if root is not None:
+        if root is not None and not (sys.argv[1:2] == ['--cleanup']):
+            if root.exists():
+                join_actors(root)
             remove_owned_root(root, identity)
         if parent_lease is not None:
             os.close(parent_lease)

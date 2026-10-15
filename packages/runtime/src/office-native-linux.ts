@@ -61,7 +61,13 @@ export async function createLinuxNativeOfficeConverter(options:ConverterOptions=
     });
     upstream.throwIfAborted();succeeded=true;return result;
     }finally{
-      try{const current=await lstat(scratch,{bigint:true});if(current.dev!==identity.dev||current.ino!==identity.ino||!current.isDirectory())throw new OfficeToPdfError('failed','Native Office scratch identity changed.');await rm(scratch,{recursive:true,force:true});}catch(cause){if((cause as NodeJS.ErrnoException).code!=='ENOENT')throw cause;}
+      try{const current=await lstat(scratch,{bigint:true});if(current.dev!==identity.dev||current.ino!==identity.ino||!current.isDirectory())throw new OfficeToPdfError('failed','Native Office scratch identity changed.');
+        await new Promise<void>((resolve,reject)=>{
+          const cleanup=spawn('/usr/bin/python3',['-I','-B',helper,'--cleanup',String(process.pid),scratch,String(identity.dev),String(identity.ino)],{detached:true,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8'},stdio:['ignore','pipe','ignore']});let result='',error:unknown,overflow=false;
+          cleanup.on('error',cause=>error=cause);cleanup.stdout.setEncoding('utf8');cleanup.stdout.on('data',bytes=>{if(overflow)return;result+=bytes;if(Buffer.byteLength(result)>8192){overflow=true;cleanup.kill('SIGKILL');}});
+          cleanup.once('close',code=>{try{if(code!==0||error||overflow||JSON.parse(result).cleaned!==true)throw new Error('Native actor completion was not confirmed.');resolve();}catch(cause){const failure=new OfficeToPdfError('unavailable','Native Office cleanup remains unconfirmed.',{cause});lifetime.abort(failure);reject(failure);}});
+        });
+      }catch(cause){if((cause as NodeJS.ErrnoException).code!=='ENOENT')throw cause;}
       if(!succeeded)await rm(request.outputPath,{force:true});
     }
   };

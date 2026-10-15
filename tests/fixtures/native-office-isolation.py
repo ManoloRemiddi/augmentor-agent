@@ -37,6 +37,12 @@ try:
     script = f'''import json,os,socket
 from pathlib import Path
 values={{'outsideFileAbsent':not Path({str(sentinel)!r}).exists(),'hostProcessEnvironmentAbsent':not Path('/proc/{os.getpid()}/environ').exists(),'hostEnvironmentAbsent':'AUTHORED_NATIVE_ENV_SENTINEL' not in os.environ,'ownerHomeAbsent':not Path({str(Path.home())!r}).exists()}}
+extra=[]
+for value in os.listdir('/proc/self/fd'):
+ try:
+  if int(value)>2:extra.append(os.readlink('/proc/self/fd/'+value))
+ except FileNotFoundError:pass
+values['admissionAndStatusDescriptorsClosedBeforeParser']=not extra
 try:socket.create_connection(('127.0.0.1',{listener.getsockname()[1]}),timeout=1).close();values['hostLoopbackDenied']=False
 except OSError:values['hostLoopbackDenied']=True
 for key,path in [('inputReadOnly','/input/source.docx'),('systemReadOnly','/usr/lib/libreoffice/program/bootstraprc')]:

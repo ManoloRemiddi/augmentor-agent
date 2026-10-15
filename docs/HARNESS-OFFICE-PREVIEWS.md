@@ -11,6 +11,52 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Admitted native actor completion — October 15
+
+The preceding source cohort at fc34230 reports settlement after a killed cleanup
+supervisor while its Python broker and two Bubblewrap actors remain observable.
+Their precise states/timing were not captured, so the old failure is retained
+without a claim about its sole cause. A pipe closing is insufficient completion
+evidence for a separate sandbox monitor's kernel exit/reaping.
+
+The trusted supervisor now registers its broker before admission. Each native
+catalog/render launch records a pending phase, the monitor identity and the
+namespace-init identity reported by Bubblewrap's supported
+[info interface](https://manpages.debian.org/trixie/bubblewrap/bwrap.1.en.html).
+The bounded private append log is fsynced before the phase is marked ready and
+parsing is admitted. A fixed positional-argument gate uses the system
+`/usr/bin/dash`, bound read-only; it rejects EOF/wrong admission and closes its
+one-way descriptor before executing the original parser command. Status pipes
+also close before parsing. User document text supplies no shell command.
+Dash is a system GPL component with separate distribution obligations; this
+adds no npm dependency and does not relabel the native system payload MIT.
+
+Normal supervision joins the registered actors before deleting private scratch.
+After helper loss, the live Node fallback invokes the same owned helper's
+cleanup mode, which verifies the existing root/device/inode/owner/mode and joins
+only recorded identities. Process descriptors prove kernel exit; the exact
+start token remains an additional reaping barrier. Reused PIDs are not joined or
+signalled. A partial registration is refused and scratch preserved; unconfirmed
+cleanup closes that converter to subsequent work. No general process discovery,
+temporary-directory scan, numeric-PID signalling or action replay is added.
+Existing document/font limits, graceful-to-forced interval and supplier
+queue/cache/GUI/default remain intact. This is a Linux x64 adapter; common
+provider behavior on other platforms is unchanged.
+
+Three controlled real-process completion contracts cover held actor/root,
+PID-token reuse and interrupted registration. Against the preceding helper,
+the two positive completion cases fail; the defensive refusal already passes.
+The initial/reviewed **22/22** common/real native cases pass, including actual
+monitor/broker registration before the held real parser, existing guard faults,
+outer scratch/caller cancellation and an extended actual sandbox check requiring
+no admission/status descriptor in the parser. Full exact-ref source/ordinary/GUI
+qualification remains pending at this implementation checkpoint. These contracts
+prove the new completion requirement, not the old hosted/local failure's exact
+schedule. All-owner loss, pre-ready registration windows, durable root indexing/
+power loss, direct caller-PDF publication, physical/font/security/source/licence/
+distribution/other-OS and broader migration gates remain open. No review or
+installed/default/binary promotion follows.
+
 ## Original provider scratch ownership — October 15
 
 A real original-provider crash fixture against **04613ad09786c0ed6eb764cc304d09e40bb9ccb6**

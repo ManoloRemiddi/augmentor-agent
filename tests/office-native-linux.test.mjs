@@ -6,7 +6,7 @@ import {PiOfficePreview} from '../dist/runtime/src/office-preview.js';import {Pi
 import {createLinuxNativeOfficeConverter} from '../dist/runtime/src/office-native-linux.js';
 import {createLinuxOfficeScratch} from '../dist/runtime/src/office-scratch-linux.js';
 import {previewDocx} from './fixtures/preview-office.mjs';import {previewPdf} from './fixtures/preview-pdf.mjs';import {zipSync,strToU8} from 'fflate';
-import {ownedProcesses,signalOwned,signalStoppedOwnedGroup,stillOwned} from './fixtures/native-office-processes.mjs';
+import {ownedProcesses,signalOwned,signalStoppedOwnedGroup,stillOwned,processIdentity} from './fixtures/native-office-processes.mjs';
 const exec=promisify(execFile),native=process.platform==='linux'&&process.arch==='x64'&&process.env.AUGMENTOR_NATIVE_OFFICE_TEST==='1';
 const requires='explicit AUGMENTOR_NATIVE_OFFICE_TEST=1 and real Linux x64 sandbox/Office dependencies';
 async function until(fn){const end=Date.now()+10000;while(Date.now()<end){if(await fn())return;await new Promise(resolve=>setTimeout(resolve,10));}throw Error('Owned native conversion phase was not observed.');}
@@ -63,7 +63,7 @@ test('native adapter refuses malformed/oversized archives, font budgets, existin
 });
 
 test('actual built native sandbox denies outside files, owner environment/process/network and input/system writes',{skip:native?false:requires,timeout:20000},async t=>{
- const root=await mkdtemp(join(tmpdir(),'augmentor-native-isolation-'));t.after(()=>rm(root,{recursive:true,force:true}));const {stdout}=await exec('/usr/bin/python3',['-B','tests/fixtures/native-office-isolation.py',root],{timeout:15000});const result=JSON.parse(stdout);assert.equal(Object.keys(result).length,7);assert(Object.values(result).every(value=>value===true));
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-isolation-'));t.after(()=>rm(root,{recursive:true,force:true}));const {stdout}=await exec('/usr/bin/python3',['-B','tests/fixtures/native-office-isolation.py',root],{timeout:15000});const result=JSON.parse(stdout);assert.equal(Object.keys(result).length,8);assert(Object.values(result).every(value=>value===true));
 });
 
 test('native cancellation, timeout and disposal settle owned processes and remove all transient scratch',{skip:native?false:requires,timeout:60000},async t=>{
@@ -123,8 +123,12 @@ for(const fault of ['stopped','killed'])test('live native owner settles when its
  const converter=await createLinuxNativeOfficeConverter(),abort=new AbortController(),work=converter.render({inputPath,outputPath},abort.signal);let owned=[],settled=false;const rejection=assert.rejects(work).then(()=>settled=true);
  t.after(async()=>{for(const identity of owned)await signalOwned(identity,'SIGCONT');for(const identity of owned)await signalOwned(identity,'SIGKILL');abort.abort();await rejection;await converter.dispose();await rm(root,{recursive:true,force:true});});
  await until(async()=>{owned=await ownedProcesses();return owned.some(row=>row.name==='soffice.bin');});const guard=owned.find(row=>row.name==='aug-office-gc');assert(guard);
+ const scratch=(await readdir(root)).find(name=>name.startsWith('augmentor-native-office-'));assert(scratch);
+ const registrations=(await readFile(join(root,scratch,'actors.jsonl'),'utf8')).trim().split('\n').map(line=>JSON.parse(line));
+ for(const identity of owned.filter(row=>row.name==='bwrap'||row.name==='python3'&&row.group===row.pid))assert(registrations.some(row=>row.pid===identity.pid&&row.start===identity.start),'every admitted trusted monitor/broker must have its exact identity registered');
+ assert(registrations.some(row=>row.phase==='render'&&row.status==='ready'),'the parser is admitted only after render actor registration');
  if(fault==='stopped'){for(const identity of owned)await signalOwned(identity,'SIGSTOP');abort.abort();}else{for(const identity of owned)if(identity.name==='soffice.bin')await signalOwned(identity,'SIGSTOP');await signalOwned(guard,'SIGKILL');}
- await until(()=>settled);const retained=[];for(const identity of owned)if(await stillOwned(identity))retained.push(identity.name);assert.deepEqual(retained,[],'lost/stopped guard must not retain conversion actors or admission');
+ await until(()=>settled);const retained=[];for(const identity of owned){const current=await processIdentity(identity.pid);if(current?.start===identity.start)retained.push({name:current.name,state:current.state});}assert.deepEqual(retained,[],'lost/stopped guard must not retain conversion actors or admission');
  assert.deepEqual(await readdir(root),['authored.docx']);assert.deepEqual(await readFile(inputPath),Buffer.from(original));assert.equal(guard.parent,process.pid,'the live owner must directly own the cleanup helper');await converter.dispose();await assert.rejects(converter.render({inputPath,outputPath}),/closed/);
 });
 
@@ -165,4 +169,26 @@ test('scratch guard and live provider fallback refuse a replaced outer directory
  const scratch=await createLinuxOfficeScratch(),moved=scratch.directory+'-moved';t.after(async()=>{await scratch.dispose().catch(()=>{});await rm(scratch.directory,{recursive:true,force:true});await rm(moved,{recursive:true,force:true});});
  await writeFile(join(scratch.directory,'original.txt'),'AUTHORED_ORIGINAL');await rename(scratch.directory,moved);await mkdir(scratch.directory,{mode:0o700});await writeFile(join(scratch.directory,'replacement.txt'),'AUTHORED_REPLACEMENT');
  await assert.rejects(scratch.dispose(),/identity changed/);assert.equal(await readFile(join(moved,'original.txt'),'utf8'),'AUTHORED_ORIGINAL');assert.equal(await readFile(join(scratch.directory,'replacement.txt'),'utf8'),'AUTHORED_REPLACEMENT');
+});
+
+async function completionFixture(t){
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-office-')),actor=spawn(process.execPath,['-e','process.stdin.resume();process.stdin.on("end",()=>process.exit(0));'],{stdio:['pipe','ignore','ignore']}),identity=await processIdentity(actor.pid);assert(identity);
+ let helper,exit;
+ t.after(async()=>{if(actor.exitCode===null&&actor.signalCode===null){const ended=once(actor,'exit');actor.kill('SIGKILL');await ended;}if(helper&&helper.exitCode===null&&helper.signalCode===null){const ended=once(helper,'exit');helper.kill('SIGKILL');await ended;}await rm(root,{recursive:true,force:true});});
+ const info=await stat(root,{bigint:true});await writeFile(join(root,'keep.txt'),'AUTHORED_COMPLETION_SENTINEL');
+ return {root,actor,identity,async start(entries){await writeFile(join(root,'actors.jsonl'),entries.map(row=>JSON.stringify(row)+'\n').join(''),{mode:0o600});helper=spawn('/usr/bin/python3',['-I','-B','dist/runtime/src/office-native-linux.py','--cleanup',String(process.pid),root,String(info.dev),String(info.ino)],{stdio:'ignore'});exit=once(helper,'exit');return helper;},async finish(){return (await exit)[0];}};
+}
+
+test('native completion barrier holds exact scratch and admission until its registered actor is reaped',{skip:native?false:requires,timeout:20000},async t=>{
+ const f=await completionFixture(t),helper=await f.start([{pid:f.identity.pid,start:f.identity.start,role:'monitor'}]);
+ await new Promise(resolve=>setTimeout(resolve,100));assert.equal(helper.exitCode,null,'helper-close alone cannot authorize scratch cleanup');assert.equal(await readFile(join(f.root,'keep.txt'),'utf8'),'AUTHORED_COMPLETION_SENTINEL');
+ const ended=once(f.actor,'exit');f.actor.stdin.end();await ended;assert.equal(await f.finish(),0);await assert.rejects(stat(f.root),e=>e.code==='ENOENT');
+});
+
+test('native completion barrier ignores a reused PID token without signalling the unrelated live process',{skip:native?false:requires,timeout:20000},async t=>{
+ const f=await completionFixture(t);await f.start([{pid:f.identity.pid,start:String(BigInt(f.identity.start)+1n),role:'monitor'}]);assert.equal(await f.finish(),0);assert.equal(f.actor.exitCode,null);assert.equal(await stillOwned(f.identity),true);await assert.rejects(stat(f.root),e=>e.code==='ENOENT');
+});
+
+test('incomplete native actor registration preserves scratch and fails closed without guessing processes',{skip:native?false:requires,timeout:20000},async t=>{
+ const f=await completionFixture(t);await f.start([{pid:f.identity.pid,start:f.identity.start,role:'monitor'},{phase:'render',status:'pending'}]);assert.equal(await f.finish(),1);assert.equal(await readFile(join(f.root,'keep.txt'),'utf8'),'AUTHORED_COMPLETION_SENTINEL');assert.equal(await stillOwned(f.identity),true);
 });
