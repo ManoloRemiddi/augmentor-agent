@@ -54,3 +54,21 @@ apply these reviewed broker/component changes, qualify it, then stage/activate
 through `augmentor-update`. Do not overwrite selected release files or restart
 active conversation windows to update the broker. The installed artifact and
 physical owner acceptance will be recorded after qualification.
+
+## Compatible installed adoption — 15 October
+
+The companion staged and activated a separate copy of compatible installed 0.2.11
+release `20261015-135014-37c92e76`, applying broker/component source `d1b7b1b`.
+Selected release `20261015-155352-7466460c` has artifact SHA-256
+`90bc1347822bb3af6e4e96d6b6d00708d4631f9a9fbd68351a11c494c9d9669f`.
+The old broker reported ready and accepted guarded shutdown; its replacement and
+native component run from the new artifact, advertising direct draft capture.
+Handy and broker preference bytes are unchanged. Other open Augmentor windows
+were not restarted and keep their loaded artifacts.
+
+The owner confirms physical dictation works in the EDGE panel, but reports pointer
+movement with its original widget touch route. The companion has selected a
+direct-touch correction and is awaiting a safe reopen without discarding an
+unsent draft. End-to-end independent-focus acceptance is therefore not complete.
+See the companion's current integration case; neither this product selection nor
+the isolated speech proof establishes physical acceptance on its own.
