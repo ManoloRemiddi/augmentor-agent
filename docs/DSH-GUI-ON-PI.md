@@ -50,8 +50,22 @@ Read Only plus Allow once; the guarded source blocks it. Earlier receipt-fixture
 booleans merely declined approvals and do not qualify this boundary; the corrected
 object receipts exercise real approvals. The retained first focused run also
 finds an old nine-entry command expectation, now exactly ten with Permission.
-No deadline or action assertion is weakened. Full source/fresh-copy regression,
-packaging, preservation and portable evidence are the next qualification step.
+No deadline or action assertion is weakened.
+
+At **454b555** (application **7115883**), the original current-chat Permission
+binding passes source/fresh ordinary **511/two existing optional skips/zero
+failures each**, **98 files/all 50 Harness Chromium files**, two workers and
+unchanged deadlines. All **1,022 compiled/3,300 tracked** inputs match; Node,
+20,702 production dependency entries/151 npm instances and 1,932 browser-test
+entries stay unchanged. Eleven packaging/boundary cases and the real public
+source boundary pass. Six sealed inventories/seven reviews, selection, canonical
+changes and service settings verify preserved. The retained first source failure
+was a `/proc` ESRCH in the native cancellation fixture; it now uses the existing
+process-identity helper without changing production code or assertions.
+Previous **8cb1c84** hosted SDK passes Linux/macOS and fails Windows companion
+cleanup with a different-executable identity error; current-head hosted results,
+fresh review/physical MX, installed adoption, speech and full migration remain
+open. [Portable evidence](../release/harness-session-permission-qualification.json).
 
 This is source-only. The existing 20261015-144829-1de182ad owner review and the
 installed selection remain unchanged and contain neither new permission binding.

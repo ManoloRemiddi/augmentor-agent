@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current-chat Permission](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
+is product policy in the existing conversation metadata, with revisioned history
+anchored to display boundaries. An atomic save precedes accepted live policy;
+historical branches seed that boundary's policy with fresh child revisions.
+Synchronous scoped controls do not create/reload an AgentSession or wait behind
+an approval-holding admission lane. The existing SDK tool policy rechecks Read
+Only after pending approvals; already dispatched work and accepted job grants
+retain their own outcome/authority. Original MIT DSH controls are clients of this
+shared policy, not a second owner or an OS sandbox. Native/Browser human text
+commands still enter through Pi's public admitted input pipeline.
+
 [Peer Models refresh qualification](HARNESS-MODELS.md#peer-refresh-qualification-ordering--october-15) reproduces the stale first-window Context field after real peer maintenance and uses one explicit original Refresh before editing. Driver **cba66bce67e2f16fb5b03050c38b74972c10f10d** passes source/ordinary **298/298 each** across 66 files/all 44 Chromium files with unchanged bounds; eight common scope cases retain fencing. Fixture follow-up **1d20c5c4789863423eb893add1745d025ed30e1c** passes the complete shared/native Office file **24/24 each** using exact admitted archive bytes. All 925 application bytes stay at c78c832; dependencies, original GUI/provider and owner reviews/selection/services verify. Hosted Windows still has a retained Office failure; new-head hosted, Office source/licence/distribution, live/installed/platform and full migration gates remain open. [Evidence](../release/harness-model-peer-refresh.json).
 
 [Native caller-output ownership](HARNESS-OFFICE-PREVIEWS.md#native-caller-output-ownership--october-15) reserves a descriptor-bound PDF and preserves changed regular/symlink targets through failure. At **c78c832c7fadc3367e93520aabf87f768ea4fb4b**, source/fresh ordinary **297/297 each** across 66 files/all 44 Harness Chromium files and both original native viewers pass with unchanged bounds. The final sandbox probe excludes output/parent descriptors from parsing; separate scratch/output cleanup preserves the existing root-refusal contract. Exact source/package bytes, original GUI/provider/dependencies and owner reviews/selection/services verify. Default Wasm remains; native is opt-in. Shared provider cases enter three-platform CI; hosted, source/licence/distribution, durable/all-owner and full migration gates remain open. [Portable evidence](../release/office-rebuild/caller-output-ownership.json).

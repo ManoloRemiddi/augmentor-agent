@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current-chat Permission](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
+is shared Pi Host/browser code: atomic metadata/CAS/history, admitted commands,
+future authorization and historical branch semantics are identical contracts on
+Linux/macOS/Windows. No OS adapter or sandbox is added. Common bindings, pure
+contracts and actual Host cases enter all three SDK jobs; Linux source/ordinary
+qualification is **511/two optional skips/zero failures each** at 454b555. The
+previous 8cb1c84 jobs pass Linux/macOS; Windows fails during companion cleanup
+with a different-executable identity error before a clean contract result.
+Current-head hosted and actual Mac/Windows artifacts/physical acceptance remain
+explicit gaps; installed Mac/Linux are unchanged. User feedback remains MX-first.
+
 [Native Office lifecycle correction](HARNESS-OFFICE-PREVIEWS.md#native-forced-cleanup-and-parent-ownership--october-14) implements Linux scratch identity/creator-death mechanics behind the shared provider contract. Source/ordinary 252/252 and the original viewer qualify at **97a2fac**; no GUI/default/installed change occurs. Native macOS/Windows and other Linux adapters must preserve the same cleanup/authority/format semantics; missing OS mechanisms remain gaps, not reduced feature definitions. Broader crash recovery/source-notice and installed acceptance remain open.
 
 [Opt-in Office sandbox adapter](HARNESS-OFFICE-PREVIEWS.md#opt-in-native-provider-integration--october-14) is Linux x64/Debian-layout source qualification, behind the same original MIT provider/queue/GUI. Source/ordinary 250/250 and original native-backend viewer pass at **15b1d8d**. The pinned default remains shared; macOS, Windows and other Linux architecture/layout sandbox adapters are explicit gaps, with the same six-format/font/limits/cancellation/privacy behavior required. No OS-specific feature reduction, UI change or installed rollout is implied.

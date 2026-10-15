@@ -8,9 +8,13 @@ their grants, and historical branches inherit the selected message's policy.
 Seven pure/eighteen actual Host/sixteen common GUI cases and five original-GUI
 cases pass **46/46**. Controlled old-API, absent-chip and removed-guard failures
 are retained. Supplier selection is **601** (two new verbatim files, prior 599
-unchanged); no dependency or second SDK owner is added. Broad source/copy checks,
-fresh review, hosted/physical acceptance and full migration remain open. Existing
-review/installed builds remain unchanged. The preceding Permission-default record
+unchanged); no dependency or second SDK owner is added. At **454b555**, source/fresh ordinary each pass **511/two existing optional
+skips/zero failures**, **98 files/all 50 Harness Chromium files**. All 1,022
+compiled/3,300 tracked inputs match; eleven packaging/boundary cases and real
+publication checks pass. Six sealed builds/seven reviews, selection and service
+settings verify preserved. [Portable evidence](../release/harness-session-permission-qualification.json).
+Fresh review, current-head hosted/physical acceptance, installed adoption and full
+migration remain open. Existing review/installed builds remain unchanged. The preceding Permission-default record
 below is historical where it lists current-chat controls as missing.
 
 [Original Permission default row](DSH-GUI-ON-PI.md#original-permission-default-row--october-15)
