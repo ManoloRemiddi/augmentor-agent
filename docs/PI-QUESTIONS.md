@@ -10,13 +10,53 @@ Focus temporarily freezes the pristine budget. Each client has a separate 15-sec
 
 Approval requests retain their existing hard timeout and cannot use these pause controls. They do not silently acquire indefinite approval waiting. Late answers and wait controls fail after settlement. Question expiry resolves the actual SDK dialog with no answer; no later-answer channel or fabricated “work continued and you can still answer” state is exposed. No answer, model request or external action is retried by these controls.
 
-The browser reads canonical phases and revisions, ticks only the displayed remaining count and never settles a question using its own timer. Older event/RPC snapshots cannot replace newer state. A stable original pending carrier avoids releasing focus during an ordinary timing update. Draft stores are scoped per conversation, so another conversation cannot prune or display an unfinished answer. Drafts survive component collapse/remount and switching within the current page; answer-draft persistence across a full page reload remains unimplemented. Pending Host questions do survive page reconnect within the running process; Host restart does not reconstruct or replay them.
+The browser reads canonical phases and revisions, ticks only the displayed remaining count and never settles a question using its own timer. Older event/RPC snapshots cannot replace newer state. A stable original pending carrier avoids releasing focus during an ordinary timing update. Draft stores are scoped per conversation, so another conversation cannot prune or display an unfinished answer. The original store now persists each conversation separately in browser local storage; collapse/remount, conversation switching and full page reload preserve its current unfinished answer and page. [The scoped binding](#conversation-scoped-saved-question-drafts--october-15) replaces the earlier shared-key behavior. Pending Host questions do survive page reconnect within the running process; Host restart does not reconstruct or replay them.
 
 [Persistent advisory plan mode](PI-PLAN-MODE.md) now binds the original chip and
 review to the same Pi owner. Generic plan-intent questions retain their existing
 hide/reopen behavior; `exit_plan_mode` dismissal concludes its active turn.
 
+## Conversation-scoped saved question drafts — October 15
+
+The copied MIT store already implemented browser `localStorage` persistence, but
+our binding created every conversation with its default shared key. The earlier
+memory-only description was inaccurate. An actual two-conversation original-GUI
+control reproduces the first conversation's lost unsent note after reload; the
+second conversation's draft still restores. Initial driver-only failures used a
+wrong pager label and then an incorrectly quoted selector; those remain distinct
+from the retained exact-content failure against the sealed bd03b15 control.
+
+The binding now passes the exact conversation ID to the original store's supported
+scope argument. Original components, styles, navigation, choices, custom text,
+explicit Skip and waiting controls are retained. The latest pending snapshot
+prunes only the selected operator conversation's settled drafts; loading, changed
+selection and read-only scopes cannot prune another conversation. Ordinary
+refreshes do not rewrite unchanged drafts. Returning to a resolved conversation
+clears its scoped draft; no answer or model/tool operation is sent by restoration.
+
+For compatibility, only an exact currently pending request ID in the old shared
+record may migrate. Question count, page, offered selections, wait vocabulary,
+text and byte bounds are checked; an existing scoped draft wins. The old record
+stays untouched because an older open client may still own its content. This is
+local browser state, not native tool history or a second answer channel. Browser
+storage unavailability retains the original non-fatal in-memory controls; it
+cannot guarantee reload restoration in that case. Host restart still settles
+pending dialogs rather than reconstructing/replaying them.
+
+Strict check/build and six focused files pass **46/46** on Linux. The original
+513×715 GUI checks independent notes/pages/selections in two real SDK conversations,
+exact unchanged native/display histories, two provider requests and no submissions,
+then Stop and selected-snapshot cleanup. Fourteen common binding cases cover
+migration/refusal/storage/selection and cleanup. Full source/ordinary results and
+publication revision are recorded by the subsequent qualification checkpoint.
+Installed owner reviews, prior sealed builds, selection and model/speech settings
+remain unchanged. Physical MX, live providers, other platform presentation,
+late-answer continuation and the complete migration gates remain separate.
+
 ## Structured batches and original plan review — October 15
+
+The following is the preceding structured-batch checkpoint; its draft limitations
+are superseded by the scoped-store qualification above.
 
 Native-profile `ask_user` now accepts either its existing `question`/string
 `options` call or `questions`: an ordered batch of stable IDs, text, optional

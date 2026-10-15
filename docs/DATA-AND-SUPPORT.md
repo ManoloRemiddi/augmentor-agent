@@ -248,8 +248,17 @@ cancellation and unavailable answers remain distinct from an offered choice.
 No second database, external export, analytics destination or permission grant
 is introduced. Invalid/partial replies leave the original question pending.
 
-Hidden-question identities and drafts are local UI memory scoped to the selected
-conversation/generation/access. Original plan sidebar navigation holds bounded
+Hidden-question identities remain local UI memory scoped to the selected
+conversation/generation/access. Generic answer drafts now use the original MIT
+store's browser-local persistence, scoped by origin and exact conversation ID.
+They contain pending request IDs, page, selected labels, custom text, explicit
+Skip and local wait choice. Only the selected operator's authoritative pending
+snapshot prunes settled drafts; restoration never submits an answer. An exact
+live matching legacy draft may copy from the old shared key after validation;
+that legacy record stays untouched for older clients. Browser/profile clearing
+and storage availability remain separate from native-history retention. These
+local drafts are not added to model input or diagnostics until explicit answer
+submission. [Behavior and limits](PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15). Original plan sidebar navigation holds bounded
 submitted Markdown in transient tab parameters; its retained tool record permits
 later reopening, without provider/filesystem operations. These are submitted
 plans, not evidence of executed work or approval of a different current plan.

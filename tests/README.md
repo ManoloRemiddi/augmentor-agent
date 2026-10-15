@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Scoped question drafts](../docs/PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15)
+use the original persisted store and a controlled two-conversation reload failure.
+Fourteen common migration/cleanup cases and the original actual-SDK Chromium flow
+join the source cohort; the common contracts also enter three-platform SDK CI.
+Initial focused 46/46 is distinct from the subsequent full/ordinary checkpoint.
+
 [Plan mode](../docs/PI-PLAN-MODE.md) adds common mode contracts, actual SDK/Host
 Native/Browser, queue/steering and original Chromium chip/review checks. The
 shared interaction tests cover a ten-minute simulated review wait, Stop and

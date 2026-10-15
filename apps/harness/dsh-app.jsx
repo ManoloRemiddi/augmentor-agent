@@ -36,6 +36,7 @@ import {AssistantNodeView} from '@dsh-gui/ui-chat/src/client/chat/AssistantNodeV
 import {ApprovalPanel} from '@dsh-gui/ui-approval/src/client/ApprovalPanel.tsx';
 import {QuestionComposer} from '@dsh-gui/ui-user-questions/src/client/QuestionComposer.tsx';
 import {createQuestionDraftStore} from '@dsh-gui/ui-user-questions/src/client/draft-store.ts';
+import {syncQuestionDrafts} from './dsh-question-drafts.mjs';
 import {en as approvalEn} from '@dsh-gui/ui-approval/src/client/locales.ts';
 import {en as questionEn} from '@dsh-gui/ui-user-questions/src/client/locales.ts';
 import {readDshPayload} from './dsh-payload.mjs';
@@ -116,6 +117,7 @@ const contextTab=bindContextSidebar(filePreviews,contextSettings,DshContextDashb
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
 const attachmentDrafts=new DshAttachments(controller);let openFiles=null;
 const questionDrafts=new Map();
+controller.subscribe(()=>syncQuestionDrafts(questionDrafts,createQuestionDraftStore,controller.state));
 const rowNotice=createSnapshotStore(null),archiveRequest=createSnapshotStore(null);let noticeSeq=0;
 const draft=createSnapshotStore(''),modelDirectory=createSnapshotStore({current:null,routable:null,groups:[],failures:[],status:'idle',pending:null,error:null});
 const noOp=()=>{},selectorFace=value=>(selector=x=>x)=>selector(value);
@@ -212,7 +214,7 @@ function PromptLibrary({close}){
 function InteractionTakeover({frame,state}){
   const [,tick]=useState(0);
   useEffect(()=>{if(frame.method!=='question/requested'||frame.payload.wait?.deadline===undefined)return;const timer=setInterval(()=>tick(x=>x+1),1000);return()=>clearInterval(timer);},[frame.rpcId,frame.payload.wait?.deadline]);
-  const draft=useMemo(()=>{if(!questionDrafts.has(state.sessionId))questionDrafts.set(state.sessionId,createQuestionDraftStore().create());return questionDrafts.get(state.sessionId);},[state.sessionId]);
+  const draft=useMemo(()=>questionDrafts.get(state.sessionId)??syncQuestionDrafts(questionDrafts,createQuestionDraftStore,state),[state.sessionId]);
   function useQuestionDraft(selector=x=>x){return selector(useSyncExternalStore(draft.subscribe,draft.getSnapshot));}
   const pending=useMemo(()=>{
     const epoch=controller.epoch,sessionId=state.sessionId;
