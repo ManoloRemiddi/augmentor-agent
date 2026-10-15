@@ -29,7 +29,9 @@ jobs:
         run: node -e "const fs=require('fs'),p=require('path'); const py=p.resolve('.sdk-test-python',process.platform==='win32'?'Scripts/python.exe':'bin/python');fs.appendFileSync(process.env.GITHUB_ENV,'AUGMENTOR_PYTHON='+py+'\nPYTHONDONTWRITEBYTECODE=1\n');"
       - name: Prepare locked Windows companion test dependencies
         if: runner.os == 'Windows'
-        run: uv pip install --python .sdk-test-python/Scripts/python.exe --require-hashes --no-deps --only-binary=:all: -r tests/fixtures/windows-plan-requirements.txt
+        run: >-
+          uv pip install --python .sdk-test-python/Scripts/python.exe --require-hashes --no-deps
+          --only-binary=:all: -r tests/fixtures/windows-plan-requirements.txt
       - run: npm ci --ignore-scripts
       - run: npm run check
       - name: Verify original GUI dependency resolution on this platform

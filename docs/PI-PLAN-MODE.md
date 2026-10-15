@@ -150,3 +150,9 @@ still need acceptance. General late answers and question-draft persistence acros
 page reload remain separate gaps. The approved GUI, model/speech/GPU settings,
 installed selection, prior owner reviews and the Office distribution boundary
 remain preserved.
+
+The first dependency-setup commit (32e6435) retained an invalid YAML plain scalar
+containing `:all:`; its workflow did not start any jobs. The corrected folded
+command parses locally and preserves every locked-install argument. This is
+retained separately from the earlier actual Windows companion startup failure;
+new hosted qualification remains required.
