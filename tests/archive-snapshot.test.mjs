@@ -13,6 +13,24 @@ async function fixture(t){const root=await mkdtemp(join(tmpdir(),'augmentor-expo
 async function consume(snapshot){const bytes=new Uint8Array(await new Response(snapshot.stream()).arrayBuffer());await snapshot.settled;return unzipSync(bytes);}
 async function until(fn,label){const end=Date.now()+5000;while(Date.now()<end){if(await fn())return;await delay(10);}throw Error('Archive fixture timeout: '+label);}
 
+test('generated metadata is labelled separately and final coverage sees immutable exact captured inventory',async t=>{
+ const f=await fixture(t),content='{"title":"café 🌊"}\n';await writeFile(join(f.source,'original'),'Exact original');let called=0;
+ const snapshot=await ArchiveSnapshot.capture([{path:'metadata.json',content},f.entry('original')],{preparing:true},undefined,f.spool,{informationAfterCapture(files){called++;assert.equal(files.length,2);assert.equal(files[0].origin,'serialized-runtime-metadata');files[0].path='forged';return {completed:true,bytes:files[1].bytes};}});
+ const zip=await consume(snapshot),manifest=JSON.parse(strFromU8(zip['manifest.json']));assert.equal(called,1);assert.equal(strFromU8(zip['metadata.json']),content);assert.deepEqual(manifest.information,{completed:true,bytes:14});assert.equal(manifest.files[0].path,'metadata.json');assert.equal(manifest.files[1].origin,undefined);assert.equal(manifest.files[0].sha256,sha(Buffer.from(content)));assert.deepEqual(manifest.unavailable,[]);
+});
+test('explicit missing optional sources are gaps while missing required sources refuse and clean up',async t=>{
+ const f=await fixture(t),snapshot=await f.capture([{...f.entry('absent','session/display.jsonl'),optional:true},{path:'metadata.json',content:'{}'}]),zip=await consume(snapshot),manifest=JSON.parse(strFromU8(zip['manifest.json']));assert.deepEqual(manifest.unavailable,[{path:'session/display.jsonl',reason:'source-missing-at-capture'}]);assert.equal(manifest.files.length,1);assert.equal(zip['session/display.jsonl'],undefined);await assert.rejects(f.capture([f.entry('absent')]));assert.deepEqual(await readdir(f.spool),[]);
+});
+test('optional never hides integrity, format, path or disappearing-open-source failures',async t=>{
+ const f=await fixture(t);await writeFile(join(f.source,'log'),'{}\n');
+ for(const entry of [{...f.entry('log'),expectedSha256:'a'.repeat(64)},{...f.entry('log'),expectedBytes:99},{...f.entry('log'),optional:'true'},{root:f.source,file:join(f.root,'outside'),path:'outside'}]){await assert.rejects(f.capture([{...entry,optional:entry.optional??true}]));assert.deepEqual(await readdir(f.spool),[]);}
+ await assert.rejects(f.capture([{...f.entry('log'),optional:true,onRecord(){renameSync(join(f.source,'log'),join(f.source,'moved'));}}]));assert.deepEqual(await readdir(f.spool),[]);
+});
+test('ambiguous metadata, oversized text and invalid final metadata refuse without scratch leaks',async t=>{
+ const f=await fixture(t);for(const source of [{path:'meta',content:'{}',file:'hidden'},{path:'meta',content:12},{path:'meta',content:'x'.repeat(64*1024*1024+1)}]){await assert.rejects(f.capture([source]));assert.deepEqual(await readdir(f.spool),[]);}
+ for(const finalize of [()=>undefined,()=>({large:'x'.repeat(1024*1024)}),()=>{throw Error('Final identity changed');}]){await assert.rejects(ArchiveSnapshot.capture([{path:'meta',content:'{}'}],{},undefined,f.spool,{informationAfterCapture:finalize}));assert.deepEqual(await readdir(f.spool),[]);}
+});
+
 test('archive preserves exact JSONL/UTF-8/binary bytes and publishes only portable immutable inventory',async t=>{
  const f=await fixture(t),log=Buffer.from('{"message":"café 🌊"}\n{"partial":'),binary=randomBytes(200000),observed=[];await writeFile(join(f.source,'pi.jsonl'),log);await writeFile(join(f.source,'file.bin'),binary);
  const snapshot=await f.capture([{...f.entry('pi.jsonl','session/pi.jsonl'),onRecord:value=>observed.push(value)},{...f.entry('file.bin','files/object.bin'),expectedBytes:binary.length,expectedSha256:sha(binary)}]);

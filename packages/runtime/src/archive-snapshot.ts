@@ -10,15 +10,21 @@ const CHUNK=64*1024,MAX_ENTRY=0xffffffff,MAX_FILES=65534,MAX_RECORD=64*1024*1024
 // ZIP32 leaves space for compression overhead, headers and the verified manifest.
 export const ARCHIVE_LIMITS={bytes:3*1024*1024*1024,pathBytes:8*1024*1024,informationBytes:1024*1024,manifestBytes:32*1024*1024,files:MAX_FILES};
 type Identity={dev:number;ino:number};
-export interface ArchiveSource {
+export interface ArchiveFileSource {
   /** Caller-owned explicit root and file. This module never walks a directory. */
   root:string;file:string;path:string;
   expectedBytes?:number;expectedSha256?:string;
+  optional?:boolean;
   /** Only complete JSONL records are observed; incomplete bytes remain in the archive. */
   onRecord?:(record:unknown)=>void;
 }
+export interface ArchiveTextSource {path:string;content:string}
+export type ArchiveSource=ArchiveFileSource|ArchiveTextSource;
+export interface ArchiveSnapshotOptions {informationAfterCapture?:(files:readonly ArchiveFile[])=>unknown}
+export class ArchiveScratchError extends Error {}
 export interface ArchiveFile {
   path:string;bytes:number;sha256:string;
+  origin?:'serialized-runtime-metadata';
   jsonl?:{completeRecords:number;incompleteTailBytes:number};
 }
 const same=(a:Identity,b:Identity)=>a.dev===b.dev&&a.ino===b.ino;
@@ -68,6 +74,7 @@ function jsonlObserver(callback:(value:unknown)=>void){
 export class ArchiveSnapshot {
   private readonly inventory:ArchiveFile[]=[];
   get files():readonly ArchiveFile[]{return structuredClone(this.inventory);}
+  private readonly unavailable:{path:string;reason:'source-missing-at-capture'}[]=[];
   private readonly stored:string[]=[];
   private totalBytes=0;
   private readonly abort=new AbortController();
@@ -75,21 +82,35 @@ export class ArchiveSnapshot {
   private finish!:()=>void;
   readonly settled=new Promise<void>(resolve=>{this.finish=resolve;});
   private constructor(readonly directory:string,private identity:Identity,private information:unknown){}
-  static async capture(sources:AsyncIterable<ArchiveSource>|Iterable<ArchiveSource>,information:unknown,signal=new AbortController().signal,parent=tmpdir()){
+  static async capture(sources:AsyncIterable<ArchiveSource>|Iterable<ArchiveSource>,information:unknown,signal=new AbortController().signal,parent=tmpdir(),options:ArchiveSnapshotOptions={}){
     signal.throwIfAborted();const info=structuredClone(information),encoded=JSON.stringify(info);if(encoded===undefined||Buffer.byteLength(encoded)>ARCHIVE_LIMITS.informationBytes)throw Error('Archive information must be bounded JSON.');const directory=await mkdtemp(join(parent,'augmentor-session-export-'));await chmod(directory,0o700);const result=new ArchiveSnapshot(directory,await lstat(directory),info);
     try{
       const names=new Set<string>();let pathBytes=0;
       for await(const source of sources){
         signal.throwIfAborted();const selected=Object.freeze({...source}),name=archivePath(selected.path);pathBytes+=Buffer.byteLength(name);if(names.has(name)||names.size>=MAX_FILES||pathBytes>ARCHIVE_LIMITS.pathBytes)throw Error('Archive entries must be unique and fit the ZIP directory limit.');names.add(name);
-        await result.captureFile(selected,signal);
+        if('content' in selected){
+          if(typeof selected.content!=='string'||['file','root','onRecord','expectedBytes','expectedSha256','optional'].some(key=>key in selected))throw Error('Archive metadata must be an unambiguous text source.');
+          await result.captureText(selected,signal);
+        }else await result.captureFile(selected,signal);
       }
+      if(options.informationAfterCapture){const next=structuredClone(options.informationAfterCapture(result.files)),encoded=JSON.stringify(next);if(encoded===undefined||Buffer.byteLength(encoded)>ARCHIVE_LIMITS.informationBytes)throw Error('Final archive information must be bounded JSON.');result.information=next;}
       if(Buffer.byteLength(result.manifest())>ARCHIVE_LIMITS.manifestBytes)throw Error('Archive manifest exceeds its ZIP metadata budget.');
       signal.throwIfAborted();return result;
     }catch(error){await result.cleanup();throw error;}
   }
-  private async captureFile(source:ArchiveSource,signal:AbortSignal){
+  private async captureText(source:ArchiveTextSource,signal:AbortSignal){
+    signal.throwIfAborted();const size=Buffer.byteLength(source.content);if(size>MAX_RECORD||size+this.totalBytes>ARCHIVE_LIMITS.bytes)throw Error('Serialized archive metadata exceeds its byte budget.');
+    const data=Buffer.from(source.content),stored=join(this.directory,String(this.stored.length)+'.data'),fd=await open(stored,'wx',0o600);
+    try{for(let offset=0;offset<data.length;offset+=CHUNK){signal.throwIfAborted();await writeAll(fd,data.subarray(offset,offset+CHUNK));}signal.throwIfAborted();}
+    finally{await fd.close();}
+    this.totalBytes+=size;this.stored.push(stored);this.inventory.push({path:source.path,bytes:size,sha256:createHash('sha256').update(data).digest('hex'),origin:'serialized-runtime-metadata'});
+  }
+  private async captureFile(source:ArchiveFileSource,signal:AbortSignal){
     if(source.expectedSha256!==undefined&&!/^[a-f0-9]{64}$/.test(source.expectedSha256))throw Error('Invalid expected archive source digest.');
-    const sourceFile=await openSource(source.root,source.file);let output:FileHandle|undefined;
+    if(source.optional!==undefined&&typeof source.optional!=='boolean')throw Error('Invalid optional archive source.');
+    let sourceFile:Awaited<ReturnType<typeof openSource>>;
+    try{sourceFile=await openSource(source.root,source.file);}catch(error){if(source.optional===true&&(error as NodeJS.ErrnoException).code==='ENOENT'){this.unavailable.push({path:source.path,reason:'source-missing-at-capture'});return;}throw error;}
+    let output:FileHandle|undefined;
     try{
       const {size}=sourceFile;if(!Number.isSafeInteger(size)||size<0||size>MAX_ENTRY||size+this.totalBytes>ARCHIVE_LIMITS.bytes||source.expectedBytes!==undefined&&source.expectedBytes!==size)throw Error('Archive source size is invalid, exceeds the ZIP byte budget or differs from its reference.');
       const stored=join(this.directory,String(this.stored.length)+'.data');output=await open(stored,'wx',0o600);const hash=createHash('sha256'),observer=source.onRecord?jsonlObserver(value=>{signal.throwIfAborted();source.onRecord!(value);}):undefined;
@@ -102,7 +123,7 @@ export class ArchiveSnapshot {
       this.totalBytes+=size;this.stored.push(stored);this.inventory.push({path:source.path,bytes:size,sha256,...(observer?{jsonl:observer.finish()}:{})});
     }finally{await output?.close();await sourceFile.fd.close();}
   }
-  private manifest(){return JSON.stringify({format:'augmentor-session-archive/1',information:this.information,files:this.inventory},null,2)+'\n';}
+  private manifest(){return JSON.stringify({format:'augmentor-session-archive/1',information:this.information,files:this.inventory,unavailable:this.unavailable},null,2)+'\n';}
   private async* entries(signal:AbortSignal):AsyncIterable<SessionLogZipEntry>{
     try{
       signal.throwIfAborted();yield {path:'manifest.json',content:this.manifest()};
@@ -123,7 +144,7 @@ export class ArchiveSnapshot {
   private async cleanup(){
     if(this.disposed)return;this.disposed=true;
     try{const stat=await lstat(this.directory);if(!stat.isDirectory()||stat.isSymbolicLink()||!same(stat,this.identity))throw Error('Archive scratch identity changed; its replacement was preserved.');await rm(this.directory,{recursive:true});}
-    catch(error){this.cleanupError=error;throw error;}finally{if(!this.used)this.finish();}
+    catch(error){this.cleanupError=error;throw new ArchiveScratchError(error instanceof Error?error.message:'Private archive cleanup failed.');}finally{if(!this.used)this.finish();}
   }
   async close(){
     this.abort.abort(Error('Session export closed.'));if(!this.used)await this.cleanup();await this.settled;if(this.cleanupError)throw this.cleanupError;

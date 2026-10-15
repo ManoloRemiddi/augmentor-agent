@@ -3720,6 +3720,48 @@
       "sha256": "409b30d2c34080552c415853408f0cd5b789ec1be6d5e7c916246fbcafff0480",
       "upstreamPath": "packages/client/ui-conversation/src/client/input/editor/reference-activation.ts",
       "upstreamSha256": "409b30d2c34080552c415853408f0cd5b789ec1be6d5e7c916246fbcafff0480"
+    },
+    {
+      "path": "packages/session-query/session-log-export/package.json",
+      "sha256": "e84bb5e244d1581dbd3c81239fa71c08c6fd1614ef48e03b1f2f3a47943d1965",
+      "upstreamPath": "packages/session-query/session-log-export/package.json",
+      "upstreamSha256": "e84bb5e244d1581dbd3c81239fa71c08c6fd1614ef48e03b1f2f3a47943d1965"
+    },
+    {
+      "path": "packages/session-query/session-log-export/src/client/Dialog.tsx",
+      "sha256": "42c42bd202da3dad67d44831f6eb077bf20866ac2ce2c13b9d85d490f754a00c",
+      "upstreamPath": "packages/session-query/session-log-export/src/client/Dialog.tsx",
+      "upstreamSha256": "42c42bd202da3dad67d44831f6eb077bf20866ac2ce2c13b9d85d490f754a00c"
+    },
+    {
+      "path": "packages/session-query/session-log-export/src/client/HeaderAction.module.css",
+      "sha256": "b8f965caceed742c978952d3adb1551b5d174a459b40755812c41725a78c9f7b",
+      "upstreamPath": "packages/session-query/session-log-export/src/client/HeaderAction.module.css",
+      "upstreamSha256": "b8f965caceed742c978952d3adb1551b5d174a459b40755812c41725a78c9f7b"
+    },
+    {
+      "path": "packages/session-query/session-log-export/src/client/HeaderAction.tsx",
+      "sha256": "1fcc65423287009b883100de5681dd1fd97d56a65501bea4c91a61cfde6fcbe6",
+      "upstreamPath": "packages/session-query/session-log-export/src/client/HeaderAction.tsx",
+      "upstreamSha256": "1fcc65423287009b883100de5681dd1fd97d56a65501bea4c91a61cfde6fcbe6"
+    },
+    {
+      "path": "packages/session-query/session-log-export/src/client/controller.ts",
+      "sha256": "db0953a82cb19970a228db0cd12f19f777f59c762d5775bb7a68c70c4af1bd31",
+      "upstreamPath": "packages/session-query/session-log-export/src/client/controller.ts",
+      "upstreamSha256": "db0953a82cb19970a228db0cd12f19f777f59c762d5775bb7a68c70c4af1bd31"
+    },
+    {
+      "path": "packages/session-query/session-log-export/src/client/locales.ts",
+      "sha256": "ee8a2922a8b3711af8292a683832ce1ee45cce17570fa9d1449f99c0393d6e42",
+      "upstreamPath": "packages/session-query/session-log-export/src/client/locales.ts",
+      "upstreamSha256": "ee8a2922a8b3711af8292a683832ce1ee45cce17570fa9d1449f99c0393d6e42"
+    },
+    {
+      "path": "packages/session-query/session-log-export/src/routes.ts",
+      "sha256": "88580bdc24194b8e637cfe5ba059f2ee258e016b127a5a4cfdefcd0e2ff54475",
+      "upstreamPath": "packages/session-query/session-log-export/src/routes.ts",
+      "upstreamSha256": "88580bdc24194b8e637cfe5ba059f2ee258e016b127a5a4cfdefcd0e2ff54475"
     }
   ]
 }

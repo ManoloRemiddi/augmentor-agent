@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Session download](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
+is an explicit local operator action. It downloads saved conversation, declared
+upload and retained diagnostic contents through an opaque one-use grant; no
+export upload/telemetry destination is added. Credentials/configuration stores,
+unsent drafts, memory databases and unrelated workspace/upload discovery are
+excluded. Original conversation/tool/attachment contents can themselves contain
+private information or user-supplied secrets; known diagnostic credential-field
+redactions do not certify an archive secret-free. Private scratch expires/cleans
+under verified Host ownership; unidentified or replaced scratch is preserved for
+inspection. Source qualification does not export owner data or alter installations.
+
+
 [Pi Home](HOME.md#pi-backend--october-15) is now a fourth managed SDK creation
 path, after the three paths qualified below on October 13. It uses the same
 process telemetry/cache/retry opt-outs, isolated Home state, no CLI discovery and

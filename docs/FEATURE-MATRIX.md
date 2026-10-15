@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original session download workflow](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
+now connects the original MIT DSH More menu/modal/controller and `/export` to Pi
+originals, verified delegated children, retained diagnostics and authorized declared
+uploads. Operator preflight produces a one-use, one-minute download grant; busy,
+timeout, cancellation and verified dead-owner cleanup preserve private boundaries.
+Seven verbatim public GUI inputs bring the selection to 615; no dependency or SDK
+owner is added. Focused actual Host/HTTP/ZIP/Chromium checks pass. Source/fresh
+ordinary qualification, a new sealed MX review, physical/installed/platform and
+full migration gates remain separate. Current owner review 20261015-192847-cfb956a7
+stays application 1b467d3 without this flow. The foundation-only checkpoint below
+is historical where it lists this source wiring as absent.
+
+
 [Installed MX Models qualification](HARNESS-MODELS.md#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.
 
 Qualified implementation **340327d6a554094d9ce9d54dcdd0810c08e5b245**: [Original endpoint discovery](HARNESS-MODELS.md#endpoint-discovery-source--october-13) now connects the copied candidate picker to bounded OpenAI/Anthropic listings, with local installed catalogs, public Pi credential resolution, scoped page coverage and cancellation. Strict source check/build and 65 MX files pass 334/334 plus five notice/workspace cases. Three new runtime MIT files retain two verbatim/one marked records; three existing GUI files are marked for coverage/default hints, with layout/CSS and other supplier records preserved. Ordinary/installed/live/OAuth/virtual/advanced/full P0/P1 gates remain open; selected MX stays 95e0fb2 / 20261012-222001-6b609cae. No installed restart or owner state change occurs.

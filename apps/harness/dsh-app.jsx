@@ -30,6 +30,10 @@ import {ReferenceChipNode,$createReferenceChipNode} from '@dsh-gui/ui-conversati
 import {TextRefNode,registerTextRefDecoration,rescanTextRefs} from '@dsh-gui/ui-conversation/src/client/input/editor/text-ref.ts';
 import {registerReferenceActivation} from '@dsh-gui/ui-conversation/src/client/input/editor/reference-activation.ts';
 import {DshCommandMenu} from './dsh-command-menu.mjs';
+import {SessionLogDownloadController,downloadUrl} from './vendor/dsh/packages/session-query/session-log-export/src/client/controller.ts';
+import {SessionLogDownloadHeaderAction} from './vendor/dsh/packages/session-query/session-log-export/src/client/HeaderAction.tsx';
+import {en as exportEn} from './vendor/dsh/packages/session-query/session-log-export/src/client/locales.ts';
+import {DshSessionExport} from './dsh-session-export.mjs';
 import {ModelSelect} from '@dsh-gui/ui-model-selection/src/client/ModelSelect.tsx';
 import {ChatView} from '@dsh-gui/ui-chat/src/client/chat/ChatView.tsx';
 import {ChatFlow} from '@dsh-gui/ui-chat/src/client/chat/ChatFlow.tsx';
@@ -128,6 +132,9 @@ const rowNotice=createSnapshotStore(null),archiveRequest=createSnapshotStore(nul
 const draft=createSnapshotStore(''),modelDirectory=createSnapshotStore({current:null,routable:null,groups:[],failures:[],status:'idle',pending:null,error:null});
 const noOp=()=>{},selectorFace=value=>(selector=x=>x)=>selector(value);
 const bind=source=>(selector=x=>x)=>selector(useSyncExternalStore(source.subscribe,source.getSnapshot));
+const sessionExports=new DshSessionExport({Controller:SessionLogDownloadController,controller,save:downloadUrl});
+const useSessionLogDownload=bind(sessionExports.store);
+window.addEventListener('pagehide',()=>void sessionExports.dispose(),{once:true});
 const useLayout=bind(layout),useWorkspaceView=bind(workspaceView),useWorkspaceShortcuts=bind(shortcuts.state),useDuration=bind(duration),useDraft=bind(draft);
 const useRowNotice=bind(rowNotice),useArchiveRequest=bind(archiveRequest);
 const notifyRow=(kind,extra={})=>rowNotice.set({kind,...extra,seq:++noticeSeq});
@@ -152,6 +159,7 @@ const commandRows=[
   {name:'goal',...builtinRowFace({definitionId:'@deepseek-ai/dsh-command-goal'},t.command)},
   {name:'plan',...builtinRowFace({definitionId:'@deepseek-ai/dsh-plan-mode'},t.command),description:'Enter plan mode; use /plan off to leave'},
   {name:'compact',...builtinRowFace({definitionId:'@deepseek-ai/dsh-command-compact'},t.command)},
+  {name:'export',...builtinRowFace({definitionId:'@deepseek-ai/dsh-session-log-export'},t.command)},
   {name:'permission',...builtinRowFace({definitionId:'@deepseek-ai/dsh-permission-presets'},t.command),description:'Choose this chat’s approval mode for new actions'},
   {name:'model',label:'Model',description:'Select a model for this conversation'},
   {name:'prompts',label:'Prompt library',description:'Use or edit a saved prompt'},
@@ -159,7 +167,7 @@ const commandRows=[
   {name:'context',label:'Context',description:'Inspect the recorded context dashboard'},
   {name:'inspect',label:'Full Pi record inspector',description:'Open the advanced conversation inspector'},
 ];
-commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,store:createSnapshotStore,sectionRows:rows=>sectionRows(rows,t.command),rows:()=>commandRows.filter(row=>row.name!=='permission'||controller.state.capabilities?.sessionPermissions===true).map(row=>row.name==='plan'&&!controller.state.capabilities?.planMode?{...row,description:'View this conversation’s plan and todos'}:row),actions:{},
+commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,store:createSnapshotStore,sectionRows:rows=>sectionRows(rows,t.command),rows:()=>commandRows.filter(row=>(row.name!=='permission'||controller.state.capabilities?.sessionPermissions===true)&&(row.name!=='export'||controller.state.capabilities?.sessionExport===true)).map(row=>row.name==='plan'&&!controller.state.capabilities?.planMode?{...row,description:'View this conversation’s plan and todos'}:row),actions:{},
   permission:{read:scope=>controller.refreshPermission(scope,{explicit:true}),current:()=>controller.state.permission,select:(preset,scope)=>controller.selectPermission(preset,scope),t:permissionT},
   current:()=>({...controller.state,epoch:controller.epoch,running:controller.state.sessions.find(x=>x.sessionId===controller.state.sessionId)?.running===true}),
   ready:()=>draftArchive.getSnapshot().ready,skillSource:scope=>controller.state.capabilities?.skillReferences?bindOriginalSkillSource({apply:applyOriginalSkills,controller,previews:filePreviews,valid:s=>commandMenu.valid(s),scope,dictionary:skillEn}):null,referenceSource:scope=>fileReferenceSource({controller,valid:s=>commandMenu.valid(s),fileCandidate,crumbsFor,parseCandidate,t:tr(referenceEn),openFile:path=>filePreviews.open(path)},scope),
@@ -306,7 +314,7 @@ function App(){
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
   useEffect(()=>{document.title=state.readOnly?'Conversation inspector · Augmentor Harness':'Augmentor Harness';},[state.readOnly]);
   React.useLayoutEffect(()=>{if(!hasContextTab&&view==='context'||!hasFleetTab&&view==='fleet')setView('chat');contextModal.sync();if(state.phase!=='ready'||state.readOnly||contextPrefs.value.insightsEntry==='hide')layout.actions.selectPanel(null);});
-  useEffect(()=>{commandMenu.deps.actions={compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:scope=>controller.state.capabilities?.planMode?controller.setPlanMode(true,scope):setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:(scope,segment,consume)=>contextModal.open(scope,segment,consume),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
+  useEffect(()=>{commandMenu.deps.actions={export:scope=>sessionExports.download(scope.sessionId),compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:scope=>controller.state.capabilities?.planMode?controller.setPlanMode(true,scope):setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:(scope,segment,consume)=>contextModal.open(scope,segment,consume),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
   const draftState=useSyncExternalStore(draftArchive.subscribe,draftArchive.getSnapshot);
@@ -358,6 +366,7 @@ function App(){
       case 'conversation.header':return <ConversationHeader {...p}/>;
       case 'conversation.header.leading':return state.readOnly?<span role="status" aria-label="Read-only conversation inspector" data-augmentor-access="read-only">Read-only</span>:options.fallback??null;
       case 'conversation.session.header':return <ConversationSessionHeader {...p} open={open} selectView={setView}/>;
+      case 'conversation.session.header.utilities':return state.readOnly||!state.capabilities?.sessionExport?null:<SessionLogDownloadHeaderAction {...p} t={tr(exportEn)} useSessionLogDownload={useSessionLogDownload} useFeedbackAvailable={selector=>selector(false)} request={sid=>control.run(()=>sessionExports.download(sid))} dismiss={sessionExports.dismiss} openFeedback={noOp}/>;
       case 'conversation.session.header.actions':return <Button variant="ghost" disabled={state.readOnly} aria-label="Rename conversation" onClick={()=>setDialog({kind:'rename',sid:state.sessionId,title:current?.title||''})}><IconEditOutlineRegular/></Button>;
       case 'conversation.hero.workspace':return <WorkspacePicker {...p} t={t.workspace} useDirectoryFlow={selectorFace(!state.readOnly)} createWorkspace={createWorkspace}/>;
       case 'conversation.workspace.directoryFlow':return DirectoryFlow(owner);

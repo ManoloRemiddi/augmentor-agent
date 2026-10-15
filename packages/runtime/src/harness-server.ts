@@ -4,6 +4,8 @@ import {randomBytes, timingSafeEqual} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {Readable} from 'node:stream';
+import {pipeline} from 'node:stream/promises';
 import {MAX_FRAME, identifier, request, type Data} from '../../protocol/src/index.js';
 import {FILE_LIMIT} from './attachments.js';
 import {PreviewReadError} from './file-preview.js';
@@ -130,9 +132,25 @@ export class HarnessServer {
       }
       const url = new URL(req.url ?? '/', this.base);
       if (url.origin !== this.base) {this.send(res, 403, {error: {message: 'Invalid request origin'}}); return;}
+      if(url.pathname.startsWith('/api/session.export/')){
+        if(req.method!=='GET'||url.search||!/^\/api\/session\.export\/[a-f0-9]{64}$/.test(url.pathname))throw Error('Use an exact one-use conversation download link.');
+        const abort=new AbortController(),cancel=()=>{if(!res.writableFinished)abort.abort(Error('Conversation download disconnected.'));};req.once('aborted',cancel);res.once('close',cancel);
+        try{await this.host.receiveHarnessRequest(()=>this.host.sessionExports.download(url.pathname.slice('/api/session.export/'.length),abort.signal,async(stream,filename,signal)=>{
+          res.writeHead(200,{'Content-Type':'application/zip','Content-Disposition':'attachment; filename="'+filename+'"'});
+          await pipeline(Readable.fromWeb(stream as import('node:stream/web').ReadableStream<Uint8Array>),res,{signal});
+        }));}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}return;
+      }
       if (url.pathname.startsWith('/api/')) {
         const access=this.access(req);
         if (!access) {this.send(res, 401, {error: {message: 'Open a fresh private Harness link to connect'}}); return;}
+        if(url.pathname==='/api/session.export'){
+          if(req.method!=='HEAD'||access.mode!=='operator')throw Error('Only an operator can prepare a conversation download.');
+          if(url.searchParams.get('includeDescendants')!=='true'||[...url.searchParams.keys()].some(key=>!['sessionId','includeDescendants'].includes(key))||url.searchParams.getAll('sessionId').length!==1||url.searchParams.getAll('includeDescendants').length!==1)throw Error('Choose an exact conversation export including verified descendants.');
+          const sid=identifier(url.searchParams.get('sessionId')),abort=new AbortController(),cancel=()=>{if(!res.writableFinished)abort.abort(Error('Conversation export preparation disconnected.'));};req.once('aborted',cancel);res.once('close',cancel);
+          try{const grant=await this.host.receiveHarnessRequest(()=>this.host.sessionExports.prepare(sid,abort.signal));
+            if(abort.signal.aborted||res.destroyed){await this.host.sessionExports.revoke(grant.url);return;}res.writeHead(200,{'X-Augmentor-Download':grant.url,'X-Augmentor-Download-Expires':String(grant.expiresAt)});res.end();
+          }finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}return;
+        }
         if(req.method==='GET'&&url.pathname==='/api/access'){this.send(res,200,{mode:access.mode,...(access.mode==='read-only'?{sessionId:access.sessionId,expiresAt:access.expiresAt}:{})});return;}
         if(req.method==='GET'&&url.pathname==='/api/appearance/revision'){
           if(access.mode!=='operator')throw Error('Appearance profile revisions require operator authority.');

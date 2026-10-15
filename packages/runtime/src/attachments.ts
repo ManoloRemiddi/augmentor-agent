@@ -3,9 +3,11 @@ import {randomUUID} from 'node:crypto';
 import {join} from 'node:path';
 import {readFileSync,lstatSync,openSync,closeSync,fsyncSync} from 'node:fs';
 import type {ImageContent} from '@earendil-works/pi-ai';
+import {identifier} from '../../protocol/src/index.js';
+import type {ArchiveFileSource} from './archive-snapshot.js';
 import {privateDir,atomicJson} from './storage.js';
-import {saveFileVerbatim,storedFilePath,readFileStreamVerbatim} from '../vendor/dsh-attachment/file-store.js';
-import {saveImageFile,readImageFile} from '../vendor/dsh-attachment/store.js';
+import {saveFileVerbatim,storedFilePath,readFileStreamVerbatim,fileLeafName} from '../vendor/dsh-attachment/file-store.js';
+import {saveImageFile,readImageFile,normalizedImagePath} from '../vendor/dsh-attachment/store.js';
 import type {FileAttachmentRef,ImageAttachmentRef,ImageMediaType} from '../vendor/dsh-attachment/types.js';
 
 export type PromptAttachment={type:'file';attachment:FileAttachmentRef}|{type:'image';attachment:ImageAttachmentRef & {originalAttachmentId?:string}};
@@ -78,4 +80,15 @@ export class PiAttachments {
   return {text:input+(files.length?'\n\nAttached files (read their exact contents using the file tools):\n'+files.join('\n'):''),images};
  }
  async image(sid:string,attachment:ImageAttachmentRef){this.authorize(sid,{type:'image',attachment});return readImageFile(this.root,attachment);}
+ /** Select only the immutable objects named by an already authorized part.
+  * Receipt tables and workspace aliases are never exported or scanned. */
+ archiveSources(sid:string,part:PromptAttachment):ArchiveFileSource[]{
+  identifier(sid);this.authorize(sid,part);const a=part.attachment,digest=a.attachmentId.slice(7),name=fileLeafName(a.name);
+  const object=(hash:string)=>join(this.root,'file-objects',hash.slice(0,2),hash);
+  if(part.type==='file')return [{root:this.root,file:object(digest),path:'files/'+digest+'/'+name,expectedBytes:a.bytes,expectedSha256:digest}];
+  const image=part.attachment,extension=({'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif'} as const)[image.mediaType];
+  const sources:ArchiveFileSource[]=[{root:this.root,file:normalizedImagePath(this.root,image),path:'media/'+digest+'.'+extension,expectedBytes:image.bytes,expectedSha256:digest}];
+  if(image.originalAttachmentId){const original=image.originalAttachmentId.slice(7);sources.push({root:this.root,file:object(original),path:'files/'+original+'/'+name,expectedSha256:original});}
+  return sources;
+ }
 }

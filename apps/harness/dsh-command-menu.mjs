@@ -2,7 +2,7 @@
 
 import {permissionCommand} from '../../packages/runtime/src/session-permission-contracts.ts';
 import {permissionMenuOptions} from './dsh-session-permissions.mjs';
-const unavailable=new Set(['export','feedback']);
+const unavailable=new Set(['feedback']);
 const sameModel=(a,b)=>a?.provider===b?.provider&&a?.model===b?.model;
 
 /** Pi bindings for the copied DSH trigger and popup controllers; no agent owner. */
@@ -42,6 +42,7 @@ export class DshCommandMenu {
     },matchEnter:(_,line)=>{
       const match=/^\/([^\s]+)(?:\s|$)/.exec(line);if(!match)return undefined;
       const name=match[1];if(name==='plan'&&this.current().capabilities?.planMode===true)return undefined; // Product /plan keeps its message and attachments in the admitted input chain.
+      if(name==='export'&&this.current().capabilities?.sessionExport!==true)throw Error('/export is not available on this Pi host. Your draft is preserved.');
       if(name==='permission'){if(this.current().capabilities?.sessionPermissions!==true)throw Error('/permission is not yet connected to this Pi host. Your draft is preserved.');const parsed=permissionCommand(line);this.dispatch(name,scope,{via:'enter',token:line,rev:this.deps.draft().rev},parsed.preset);return 'handled';}
       if(unavailable.has(name))throw Error('/'+name+' is not yet connected to Pi. Your draft is preserved.');
       if(!this.deps.rows().some(row=>row.name===name))return undefined;
@@ -88,7 +89,7 @@ export class DshCommandMenu {
       // captured revision/session/epoch still fence consumption at that time.
       return action(scope,segment,()=>this.consume(scope,segment))!==false;
     }
-    if(name==='compact'||name==='plan'&&this.current().capabilities?.planMode===true){
+    if(name==='compact'||name==='export'||name==='plan'&&this.current().capabilities?.planMode===true){
       if(name==='compact'&&this.current().running)throw Error('Stop active work before compacting. Your draft is preserved.');
       const action=this.deps.actions[name];if(!action)return false;
       // Only a confirmed admission may consume the owned slash span. Late

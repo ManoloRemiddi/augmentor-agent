@@ -1,6 +1,82 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Original session download workflow — October 15
+
+The original MIT DSH **More actions → Download session log** menu, progress/error
+modal and `/export` now bind the existing Pi Host. Seven additional verbatim
+public inputs at `d743267388641bc76f17c45ce8b4c231aed1d32c` retain their original
+MIT notice; the prior 608 selected GUI inputs stay unchanged (615 total). The
+original layout/CSS/controller and English/Chinese dictionaries are retained.
+The adapter changes the download filename to `augmentor-session-<id>.zip` and
+injects the authenticated carrier. No DSH Host serializer, feedback backend,
+analytics, dependency update or second AgentSession owner is introduced.
+
+The source selector captures the exact saved Pi file and display journal, retained
+observation journal/bodies, whitelisted runtime metadata, saved owned job records,
+and verified delegate/desktop descendants. Every parent/job/child edge is checked
+before capture and again at finalization; ordinary fork conversations and unrelated
+sessions are excluded. Only declared user-message attachment references with exact
+conversation authority are followed, using immutable content-addressed objects,
+including a normalized image and its declared original. Upload receipts, unsent
+drafts/queues, credential/configuration stores, memory databases, workspace files
+and unreferenced uploads are not discovered or exported. The native file includes
+its saved branches/entries; it is not a reconstruction of current effective context.
+
+Metadata entries are labelled `serialized-runtime-metadata`; file entries retain
+original bytes and SHA-256/size/complete-JSONL/incomplete-tail coverage. The final
+manifest reports the selected native headers, session links, journal counts and
+explicit missing optional sources. An initially absent observation body/journal
+can be a reported gap. Missing known native files or referenced uploads, corrupt
+complete JSONL, changed identities or object integrity failures refuse preparation.
+A newly created SDK session may reserve a native filename before creating the file;
+that case currently refuses export until saved native bytes exist. No model work
+or SDK session loading is used to make an archive possible.
+
+`HEAD /api/session.export?sessionId=<id>&includeDescendants=true` requires the
+operator Bearer and exact same-origin/Host checks. It prepares immutable private
+bytes and returns `X-Augmentor-Download` with a fresh, opaque **one-use 60-second**
+URL. The browser GET carries that narrow grant, never the long-lived Harness token;
+no filesystem path/session override or query is accepted on the grant route.
+Read-only inspectors cannot prepare exports or see these controls. Concurrent GETs
+consume one grant exactly once. Failed preparation stays in the original dialog;
+`/export` consumes only its still-owned draft after browser handoff, preserving
+later drafts and other conversations. The original success text means **download
+started**, not completed or independently verified by the UI.
+
+At most **two** captures/prepared/streaming downloads are admitted. Preparation is
+limited to **two minutes**, an unused grant to **one minute**, and an active stream
+to **ten minutes**. Existing snapshot ZIP32/record budgets below still apply.
+Prepared and streaming leases veto maintenance; disconnect, explicit shutdown,
+expiry and producer/sink failure join snapshot/compressor cleanup. Private scratch
+is under the exclusive Host profile's `session-exports/v1/owner-<nonce>` directory,
+with a private synced owner marker and root identity. Cold startup reclaims only
+verified dead-owner scratch. Unknown/live owners and cleanup identity failures
+preserve private evidence and disable export admission; a preservation marker also
+prevents a later restart from deleting an unverified replacement. Host shutdown
+continues closing its other owners if export scratch needs manual inspection.
+
+Strict check/build and focused actual filesystem/ZIP, public controller/store,
+Host/HTTP and Chromium tests pass locally. The browser proof downloads exact saved
+parent/child/upload bytes, checks manifest hashes, preserves an unsent draft,
+exercises `/export` in Light/Dark and retains the token after a missing-upload
+refusal. Cold reads add no provider work or native changes; crash recovery and
+one-use/inspector/origin boundaries are tested with independent authored profiles.
+Initial retention-field/binary-decoding test mistakes and a pre-native-file fixture
+assumption are retained. The first browser attempt retained an unchanged draft
+after settings: the fixture now uses the established keydown-before-insert input
+sequence; no product input behavior was changed to make that test pass.
+
+Full source/fresh ordinary qualification, a new sealed MX owner review, physical
+feedback, current-head hosted platform checks and later OS artifacts remain
+separate gates. Existing MX review **20261015-192847-cfb956a7** remains application
+**1b467d3** without this export flow or the preceding live Context arrival fix.
+No installed selection, owner conversation, credential, model or speech setting
+is changed. This completes the source workflow wiring in steps 1–4 of the historical
+foundation plan below; full migration and installed adoption remain open.
+
 ## Session-export archive foundation — October 15
+
+Historical checkpoint at 46ad4a9, superseded by the source workflow above where it lists unwired controls or missing lifecycle work.
 
 The pinned MIT DSH export package supplies the original Header More action,
 progress/error dialog, command controller and bounded fflate ZIP producer.
@@ -68,7 +144,7 @@ Current MX review **20261015-192847-cfb956a7** remains application **1b467d3**;
 neither this archive layer nor the preceding 47dc3de live Context fix is in that
 review. No export capability is advertised yet, and no owner data is exported.
 
-The complete export workflow remains the target, with these required next steps:
+Historical foundation acceptance plan (steps 1–4 are now implemented by the source workflow above; step 5 remains a release/acceptance gate):
 
 1. Select root native/display history, retained diagnostics, verified delegated
    descendants and only declared/authorized attachment objects, with honest gaps.

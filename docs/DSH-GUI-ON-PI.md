@@ -1,11 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Session export](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)
-has a tested snapshot/selected MIT ZIP foundation, but the original Header/dialog
-and `/export` are not wired yet. Source/attachment/family selection, authenticated
-one-use downloads, lifecycle/crash ownership and rendered end-to-end acceptance
-remain required; no placeholder export control or new layout is introduced.
-[Foundation-only source qualification](../release/harness-export-snapshot-qualification.json).
+[Original session download workflow](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
+now connects the original MIT DSH More menu/modal/controller and `/export` to Pi
+originals, verified delegated children, retained diagnostics and authorized declared
+uploads. Operator preflight produces a one-use, one-minute download grant; busy,
+timeout, cancellation and verified dead-owner cleanup preserve private boundaries.
+Seven verbatim public GUI inputs bring the selection to 615; no dependency or SDK
+owner is added. Focused actual Host/HTTP/ZIP/Chromium checks pass. Source/fresh
+ordinary qualification, a new sealed MX review, physical/installed/platform and
+full migration gates remain separate. Current owner review 20261015-192847-cfb956a7
+stays application 1b467d3 without this flow. The foundation-only checkpoint below
+is historical where it lists this source wiring as absent.
 
 ## Live Raw Context arrival — October 15
 

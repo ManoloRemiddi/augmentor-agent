@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original session download workflow](../docs/AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15):
+`archive-snapshot`, `pi-session-archive`, `pi-session-exports`, `harness-session-export`
+and `harness-session-export-chromium` cover exact bytes/manifest gaps, authorized
+attachment and child closure, actual cold Host/HTTP, one-use authority, expiry,
+joined cancellation, failed-preparation replacement preservation, crash recovery,
+original DSH controller/menu/dialog, browser downloads and scoped draft behavior.
+Shared contracts run in the three-OS SDK workflow; real Chromium is a Linux
+fixture, not physical MX or later OS release acceptance. The following foundation
+checkpoint is historical in its claim that no end-to-end export test exists.
+
+
 [Archive snapshot foundation](../docs/AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15):
 `archive-snapshot.test.mjs` has 20 authored real-filesystem/ZIP cases for immutable
 bytes/inventory, appending/changed/replaced sources, caller path mutation, path and
