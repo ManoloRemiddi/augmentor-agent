@@ -8,7 +8,7 @@ actors, and cleanup joins cold SDK loading, queued ticket retirement and workers
 Original Harness GUI/suppliers and existing reviews/installed/services remain
 unchanged. The separate Harness voice plugin, real compatible companion/pin,
 physical ASR/TTS, installed adoption and later OS gates remain required.
-Focused Node 76/76 and native/controller/maintenance 145/145 pass; full source/
+Focused Node 76/76 and native/controller/maintenance 146/146 pass; full source/
 ordinary qualification is pending.
 
 `pi-voice-surfaces.test.mjs` runs real Pi Host/SDK, Qt hold/release/Send and the
@@ -524,7 +524,7 @@ private-source fixtures, weakened deadlines or altered assertions. The broader
 runtime/native/MCP/context cohort remains required; hosted cancellation and
 wider platform/installed gates stay explicit.
 Qualification source **737bdf92f3a4c8166c3600e5a0c3cf25c4bab6f8** passes strict check/build
-and source/fresh ordinary **145/145 each across 23 files**, two workers, unchanged
+and source/fresh ordinary **146/146 each across 23 files**, two workers, unchanged
 deadlines/no skips. It includes managed MCP wire/shutdown/loader recovery, actual
 native Qt controls and original Context. All 908 compiled files match; 155
 production npm instances and bundled Node 24.19.0 retain the isolated base.

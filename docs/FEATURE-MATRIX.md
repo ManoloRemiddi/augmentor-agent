@@ -8,7 +8,7 @@ actors, and cleanup joins cold SDK loading, queued ticket retirement and workers
 Original Harness GUI/suppliers and existing reviews/installed/services remain
 unchanged. The separate Harness voice plugin, real compatible companion/pin,
 physical ASR/TTS, installed adoption and later OS gates remain required.
-Focused Node 76/76 and native/controller/maintenance 145/145 pass; full source/
+Focused Node 76/76 and native/controller/maintenance 146/146 pass; full source/
 ordinary qualification is pending.
 
 [Pi spoken/typed input](PI-VOICE.md#spoken-and-typed-input--october-15-2026)

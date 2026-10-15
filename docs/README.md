@@ -8,7 +8,7 @@ actors, and cleanup joins cold SDK loading, queued ticket retirement and workers
 Original Harness GUI/suppliers and existing reviews/installed/services remain
 unchanged. The separate Harness voice plugin, real compatible companion/pin,
 physical ASR/TTS, installed adoption and later OS gates remain required.
-Focused Node 76/76 and native/controller/maintenance 145/145 pass; full source/
+Focused Node 76/76 and native/controller/maintenance 146/146 pass; full source/
 ordinary qualification is pending.
 
 [Pi spoken/typed input](PI-VOICE.md#spoken-and-typed-input--october-15-2026)
@@ -474,7 +474,7 @@ preserves a winning socket after a failed bind and holds the listener until
 public SDK shutdown finishes. Real-main bind/drain fixtures reproduce both old
 violations, then pass with the existing launch/journal test and unchanged deadlines.
 The 60b7c54 CI owner-test cancellation remains recorded; its precise interleaving
-is unproven. Source/ordinary **145/145 each across 23 files** pass, 908 compiled
+is unproven. Source/ordinary **146/146 each across 23 files** pass, 908 compiled
 files match, and 155 production npm instances/Node stay unchanged. No owner
 artifact or model/speech configuration changes. New-head hosted and release gates
 remain open.

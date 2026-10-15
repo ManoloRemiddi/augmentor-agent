@@ -48,8 +48,15 @@ A later competing-Browser driver correctly hit the broker's one-executor guard.
 That guard remains: the corrected contention proof uses a separate real shared
 audio worker/private-IPC actor against the existing Browser lease. No executor
 or scope guard is weakened to make a test pass. Focus 76/76 and native/controller/
-maintenance 145/145 pass. Full source/fresh ordinary and isolated controls remain
-pending in this implementation checkpoint.
+maintenance 146/146 pass. Full source/fresh ordinary and isolated controls remain
+pending in this implementation checkpoint. The initial 46121ad1 source cohort
+passes 733/two existing optional skips/zero failures, but final review found that
+an initial spoken Send rejection had no submission receipt for VoiceSession.
+A retained failing real-VoiceSession/controller control proves it; the corrected
+Pi Controller now reports an unconfirmed result and hands-free shuts down without
+replay. Successful/failed initial spoken input uses the same receipt path as
+spoken follow-ups. The corrected native set passes 146/146. This supersedes the
+initial candidate; its ordinary copy was prepared but its cohort was not run.
 
 Preceding [SDK run 38810763428](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38810763428)
 at **6db75c8f** passes Linux and macOS overall. Windows's expanded step retains

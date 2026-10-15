@@ -550,6 +550,8 @@ class Controller(QObject):
     @admitted
     def send(self, text, selection, edit_from=None, request_id=None, *, input_mode='text'):
         if input_mode not in ('text','voice'):raise ContractError('Invalid input mode.')
+        spoken=self.harness=='pi' and input_mode=='voice'
+        if spoken and not isinstance(request_id,str):raise ContractError('Spoken input requires its request identity.')
         with self.lock:
             if self.running or self.navigating or self.repairing or self.recovery_lock.locked() or self.closed or self.read_only:
                 return False
@@ -600,6 +602,8 @@ class Controller(QObject):
                 self.set_idle(generation)
                 raise
             finally:
+                if spoken:
+                    self.queue_result.emit({'id':request_id,'accepted':accepted,**({} if accepted else {'error':'Submission was not confirmed. Check the conversation before retrying.'})})
                 if not accepted and not self.closed:
                     self.submission_failed.emit(text)
                 if self.generation is generation:

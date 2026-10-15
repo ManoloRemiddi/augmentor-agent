@@ -4,7 +4,8 @@ import threading
 import time
 from types import SimpleNamespace
 import unittest
-from PySide6.QtWidgets import QApplication
+from unittest.mock import patch
+from PySide6.QtWidgets import QApplication,QWidget
 from augmentor_linux.controller import Controller
 from augmentor_linux.pi_client import ContractError
 
@@ -89,5 +90,28 @@ class PiVoiceTests(unittest.TestCase):
         self.assertFalse(calls)
         Window.voice_transcript(window,{'sessionId':'same-chat','requestId':'current-utterance','text':'Current transcript'})
         self.assertEqual(calls,[('Current transcript',{'request_id':'resonant-voice:current-utterance','input_mode':'voice'})])
+
+    def test_first_spoken_rejection_reports_uncertainty_and_stops_hands_free_without_replay(self):
+        from augmentor_linux.voice import VoiceSession
+        c,_=self.controller();attempts=[];receipts=[]
+        def call(method,payload):
+            if method=='session.prompt':
+                attempts.append(payload);raise ContractError('Synthetic lost acknowledgment')
+            return {}
+        def run(fn,**_):
+            try:fn()
+            except ContractError:pass
+        c.client.call=call;c.task=run;c.queue_result.connect(receipts.append)
+        parent=QWidget()
+        with patch.object(VoiceSession,'connect_voice',lambda self:None):
+            voice=VoiceSession(parent,{'sessionId':'owned'},hands_free=True)
+        voice.submitted.add('current-utterance');c.queue_result.connect(voice.submission_result)
+        try:
+            self.assertTrue(c.send('Final recognized speech',{'provider':'fixture','model':'fixture'},request_id='resonant-voice:current-utterance',input_mode='voice'))
+            self.assertEqual(len(attempts),1);self.assertEqual(len(receipts),1)
+            self.assertFalse(receipts[0]['accepted']);self.assertIn('not confirmed',receipts[0]['error'])
+            self.assertTrue(voice.closed,'unconfirmed hands-free input must stop capture')
+            self.assertFalse(c.running)
+        finally:voice.close();parent.close()
 
 if __name__=='__main__':unittest.main()
