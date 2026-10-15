@@ -1,0 +1,103 @@
+{
+  "schema": "augmentor-browser-toolbar-qualification/1",
+  "date": "2026-10-15",
+  "applicationRef": "d8520d5fe6b7e8eaa232835be54ec0759b88c566",
+  "precedingFixtureRef": "b1b1986ea516c67239cad837e0bfdc2a3a2b62be",
+  "scope": "Test-only selection precondition on isolated authored Chromium/Codex fixtures; no product or installed change",
+  "fixturePath": "tests/codex-browser-chromium.test.mjs",
+  "fixtureSha256": "5954d4e450839fec49744e73bfd775e53bf40d4af9b054092f207d71149a73ed",
+  "chromiumVersion": "155.0.8059.39",
+  "codexNpmVersion": "0.159.2",
+  "rawPermissionReproduction": {
+    "logSha256": "e8c831d25f0817dc42817341e8655832e18e3a0bdbc0185cf93b3c72084881f8",
+    "tests": 2,
+    "pass": 1,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 3161.768095
+  },
+  "rawChromeError": "Either the '<all_urls>' or 'activeTab' permission is required.",
+  "pairedUninstrumentedReproduction": {
+    "logSha256": "144e15ca632224b65222c2a13df821fb2c611c9b65b8082bd3d5b86e57560bc5",
+    "tests": 2,
+    "pass": 0,
+    "fail": 2,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 2107.818907
+  },
+  "controlledBefore": {
+    "logSha256": "0f193be0c0b949ba89ace3fa2708a1c7a717faa8bc071c58bb0670ddd1262db7",
+    "tests": 1,
+    "pass": 0,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 1335.12683
+  },
+  "controlledAfter": {
+    "logSha256": "b65321f59810ebbe9bcd3896ed5ef1d5b973caff54f9b9c3376c5d957a861956",
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 3285.710693
+  },
+  "controlledCondition": "Panel tab is explicitly selected before the toolbar command; the negative restores the work tab only after the command; the corrected fixture selects it before the command.",
+  "pairedAfter": [
+    {
+      "logSha256": "fa1894b5ae4b64a98476fff1cd35d5ab9425b31a42f8df4dbb0e5849128e173e",
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 3104.232179
+    },
+    {
+      "logSha256": "63fef418c774bbf674584b10b72e77bcd7c5c7799a1726018eac002196fd5c2d",
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 3251.360607
+    },
+    {
+      "logSha256": "3d35a064be5ac6df8e6b873ff0c9f62f46f158b45d5517736390039fee4af93e",
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 3257.472778
+    },
+    {
+      "logSha256": "0b2b415bce228c5a7a1622e443c3e49db2c598e44072d227a099535fb6de612f",
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 3210.931489
+    }
+  ],
+  "productionCodeChanged": false,
+  "permissionsChanged": false,
+  "deadlinesChanged": false,
+  "assertionsRelaxed": false,
+  "workersPerCohort": 2,
+  "originalLoneFailureCauseProven": false,
+  "retainedDiagnosticPreparationFailure": "An ignored private raw-error diagnostic initially used await in a non-async callback and could not load the extension. Corrected privately; its failed logs are retained.",
+  "fullCohortsStatus": "running",
+  "fullQualificationPassed": false,
+  "promotionAllowed": false,
+  "remainingGates": [
+    "Full source and ordinary cohorts at corrected fixture",
+    "Hosted full GUI failures and new-head hosted checks",
+    "Physical MX feedback, installed/live browser/account qualification",
+    "Office engine/source/font/performance/distribution and full migration gates"
+  ]
+}

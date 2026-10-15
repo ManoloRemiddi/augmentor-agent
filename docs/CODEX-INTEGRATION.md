@@ -1,5 +1,33 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Verified fixture toolbar selection — October 15
+
+Paired isolated Chromium runs reproduce the missing image with an actual
+`activeTab` permission denial. A private diagnostic retains Chrome's original
+permission error; this is not an image serialization failure in those runs.
+The original full-cohort failure did not retain its tool body, so its exact cause
+remains unproven.
+
+The pinned [Chromium toolbar command](https://chromium.googlesource.com/chromium/src/+/155.0.8059.39/chrome/browser/devtools/protocol/extensions_handler.cc)
+finds the target's browser window; its
+[action implementation](https://chromium.googlesource.com/chromium/src/+/155.0.8059.39/chrome/browser/ui/extensions/extension_action_view_model.cc)
+then uses that window's active tab. The target ID does not select the tab.
+A controlled fixture first selects the extension panel tab, invokes the command
+with the work tab's target ID, then restores the work tab: the unchanged image
+assertion fails with the permission denial. Explicitly selecting the work tab
+before the same command makes the complete case pass, including actual JPEG
+input, DOM typing/one click, queue, Stop and memory checks.
+
+`codex-browser-chromium.test.mjs` now selects its exact authored work tab with
+`chrome.tabs.update` and verifies the returned URL and active state before the
+toolbar action. Four paired ordinary runs pass all eight cases. Capture still
+fails before that action. Production extension/runtime/GUI code, permissions,
+image assertions, two-worker bounds and deadlines are unchanged. Source and
+ordinary full cohorts are recorded separately in the
+[portable checkpoint](../release/harness-browser-toolbar-qualification.json).
+This synthetic fixture correction does not qualify live accounts or installed
+rollout; the earlier failure remains historical evidence.
+
 ## Retained ordinary screenshot failure — October 15
 
 The [question/plan follow-up](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)

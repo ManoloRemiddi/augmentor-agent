@@ -1583,3 +1583,13 @@ explain or supersede that full-cohort failure. The image assertion now reports
 actual authored tool-output metadata with image bytes omitted, preserving every
 image/pixel/no-replay assertion and existing bounds. Wider qualification remains
 incomplete; see [retained evidence](../docs/CODEX-INTEGRATION.md#retained-ordinary-screenshot-failure--october-15).
+
+The [toolbar selection follow-up](../docs/CODEX-INTEGRATION.md#verified-fixture-toolbar-selection--october-15)
+reproduces actual permission denial in paired runs, then proves the fixture's
+active-tab precondition with a selected-panel negative and selected-work-tab
+positive. Chromium's toolbar target ID identifies the window without selecting
+that tab. The fixture now explicitly selects and verifies its authored work tab
+before the action, preserving denied capture before consent, actual JPEG model
+input, one click, queue/Stop/memory assertions and existing deadlines. Four paired
+ordinary runs pass eight cases; full-cohort results remain separate in the
+[checkpoint](../release/harness-browser-toolbar-qualification.json).

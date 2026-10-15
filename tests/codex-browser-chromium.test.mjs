@@ -133,6 +133,16 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   assert.match(denied, /activeTab|all_urls|permission/i, 'No screenshot grant before a toolbar action');
   const browserTarget = await fetch(`http://127.0.0.1:${port}/json/version`).then(response => response.json());
   const browserControl = await cdp(browserTarget.webSocketDebuggerUrl); sockets.push(browserControl);
+  // triggerAction resolves the target's window, then invokes the action on that
+  // window's active tab. Its targetId does not select the intended work tab;
+  // Page.bringToFront alone did not establish that precondition reliably.
+  const selectedWorkTab = await panel.evaluate(`(async () => {
+    const tab = (await chrome.tabs.query({})).find(tab => tab.url === ${JSON.stringify(base + '/page')});
+    if (!tab) throw Error('Authored toolbar work tab is absent');
+    return chrome.tabs.update(tab.id, {active: true});
+  })()`);
+  assert.equal(selectedWorkTab.url, base + '/page');
+  assert.equal(selectedWorkTab.active, true, 'Select the actual work tab before the fixture toolbar action');
   const tabTargets = await browserControl.call('Target.getTargets', {filter: [{type: 'tab', exclude: false}]});
   const workTab = tabTargets.targetInfos.find(target => target.url === base + '/page'); assert.ok(workTab);
   await browserControl.call('Extensions.triggerAction', {id: extensionId, targetId: workTab.targetId});
