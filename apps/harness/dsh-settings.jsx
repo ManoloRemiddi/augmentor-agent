@@ -1,5 +1,9 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {SearchSettings} from './dsh-search-settings.jsx';
+import {DshPermissionDefaults} from './dsh-permission-defaults.mjs';
+import './dsh-permission-defaults.css';
+import {PermissionRow} from '@dsh-gui/ui-permission-presets/src/client/PermissionRow.tsx';
+import {en as permissionEn} from '@dsh-gui/ui-permission-presets/src/client/locales.ts';
 import React,{useEffect,useRef,useState,useSyncExternalStore} from 'react';
 import {DshAppearance} from './dsh-appearance.mjs';
 import {SettingsRoot} from '@dsh-gui/ui-settings-general/src/client/SettingsRoot.tsx';
@@ -84,6 +88,14 @@ function HtmlPreviewSetting({developerTools,state}){
  return <><DeveloperToolsRow t={copy} useDeveloperTools={useDeveloperTools} setEnabled={enabled=>developerTools.preference.setEnabled(enabled)} disabled={state.readOnly||accepted.busy||!accepted.writable}/>{accepted.error&&<div className="augmentor-extension"><p role="status">{accepted.error}</p><Button disabled={accepted.busy} onClick={()=>void developerTools.load()}>Refresh HTML preview setting</Button></div>}</>;
 }
 
+function PermissionDefaultSetting({controller}){
+ const [binding]=useState(()=>new DshPermissionDefaults(controller));
+ useEffect(()=>()=>binding.close(),[binding]);
+ const state=useSyncExternalStore(binding.subscribe,binding.getSnapshot),usePermission=selector=>selector(useSyncExternalStore(binding.subscribe,binding.getSnapshot));
+ const copy=translate(permissionEn);
+ return <div className="augmentor-permission-default"><PermissionRow usePermission={usePermission} load={binding.load} select={binding.select} t={copy}/>{state.error&&<div className="augmentor-extension"><Button onClick={()=>void binding.load()}>Refresh permission default</Button></div>}</div>;
+}
+
 /** Pure supplier shell; section contents call the existing Pi owner. */
 export function OriginalSettings({wide,state,controller,preferences,developerTools,appearanceProfile,metafolders,shortcutsUi,onPrompts,onContext,onTrajectory,notice}){
   const palette=useSyncExternalStore(appearanceProfile.subscribe,appearanceProfile.getSnapshot,appearanceProfile.getSnapshot);
@@ -100,7 +112,7 @@ export function OriginalSettings({wide,state,controller,preferences,developerToo
       if(options.only==='models')return <OriginalModels key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></OriginalModels>;
       if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><MetafolderSettings profile={metafolders}/><WikiSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller} onTrajectory={sid=>{settingsShell.actions.close();onTrajectory(sid);}}/><SearchSettings key={['search',controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
     }
-    if(name==='settings.general.item')return <><fieldset disabled={!palette.writable||palette.busy} style={{display:"contents",border:0,padding:0,margin:0}}><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/></fieldset>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div>{shortcutsUi?.render('settings.general.item')}<CurrentVersionRow t={t}/></>;
+    if(name==='settings.general.item')return <><PermissionDefaultSetting key={[controller.epoch,state.phase,state.readOnly,state.capabilities?.permissionDefaults===true].join(':')} controller={controller}/><fieldset disabled={!palette.writable||palette.busy} style={{display:"contents",border:0,padding:0,margin:0}}><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/></fieldset>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div>{shortcutsUi?.render('settings.general.item')}<CurrentVersionRow t={t}/></>;
     return options.fallback??null;
   };
   return <SettingsRoot wide={wide} t={t} useStore={useShell} actions={settingsShell.actions} renderSlot={renderSlot} useSections={face(sections)} useOnboardingSteps={face([])} useSessions={face({phase:state.phase,byId:{}})} useShortcuts={shortcutsUi?.useCatalog??face([])} useDesktopUpdate={face({failed:false,opening:false})} openDesktopUpdate={()=>{}} useConnectionState={face(state.phase==='ready'?'connected':state.phase==='connecting'?'connecting':'disconnected')} reconnect={()=>void controller.start(controller.state.sessionId).catch(e=>notice(e.message))}/>;

@@ -1,5 +1,56 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Original Permission default row — October 15
+
+Settings → General now uses the copied MIT DSH **Permission** row and its existing
+checkbox-gated Full access confirmation, ahead of Appearance at the supplier's
+slot order. Read Only, Ask before actions and Full access configure **new chats**;
+existing conversations retain their saved policy. Ask before actions names Pi's
+existing `workspace-write` policy accurately; it is not an OS sandbox. The separate
+current-conversation selector and `/permission` command remain unconnected, and
+DSH's experimental Auto preset is not advertised as a Pi capability.
+
+Six public files from DSH d743267's `ui-permission-presets` are copied verbatim,
+including the original row/CSS, labels, presentation and preferred type contracts.
+The supplier selection grows from 593 to **599**, with original hashes and MIT
+notice retained. No DSH host/plugin runtime, account service or dependency is added.
+An authored container wrapper fits the same row in a narrow Settings column;
+wide layout, supplier CSS and confirmation remain original. Light/Dark at 513×715
+and 1440×1000 exercise readable text and bounded controls without changing the
+shell, navigation, typography or themes.
+
+`host.describe.capabilities.permissionDefaults` identifies the binding. An
+operator's scoped `settings.describe {ns:"permission"}` returns only the default,
+its accepted global revision, the three supported options and writable field.
+It does not invoke the prompt-library or a model. Mutation retains the existing
+single `defaultPreset` set operation and expected revision. The saved settings
+file must commit before the in-memory value/revision changes; an actual refused
+write previously left future chats with an unsaved Full access policy. A controlled
+SDK/Host negative reproduces that bug; the fix retains exact settings bytes,
+accepted revision and Read Only for a subsequently created chat.
+
+The browser accepts a change only after acknowledgment and scoped readback of
+its value/newer revision. Failed, stale or unknown outcomes disable the row until
+an explicit read; no write is replayed. New reads and connection/inspector/close
+boundaries retire late results. A restricted conversation inspector neither reads
+nor exposes the global setting. Changing defaults does not edit current policies,
+start a turn, submit an action approval or replace the one Pi session owner.
+
+Strict check/build and five focused files pass **29/29** on Linux. Fifteen common
+binding cases, three actual Host cases and the original Chromium flow cover lost
+acknowledgment, stale/invalid writes, scope retirement, confirmation cancel/accept,
+new versus existing chats, restart, theme/viewport fit and no model request. The
+pre-change row-absence and failed-write controls fail as expected. Initial setup
+used the wrong fixture method; an initial responsive rule reserved supplier CSS
+names and was corrected with wrapper structure. The retained 401 px/zero-width
+row-fit failure precedes the final readable layout. No assertion or deadline was
+relaxed. Full source/fresh-copy qualification follows separately.
+
+This is source-only. The separate 20261015-144829-1de182ad review, earlier sealed
+artifacts, installed selection and owner profiles remain unchanged; this new row
+is not in those running builds. Shared hosted, installed/physical UI, current-chat
+permission switching, Windows lifecycle and complete migration gates remain open.
+
 ## Catalog refresh ordering — October 15
 
 A delayed background workspace read could replace a confirmed Unarchive or
@@ -1220,8 +1271,10 @@ Final assistant branching uses the original DSH branch control; current-message
 Edit remains in the advanced inspector. The original [question controls](PI-QUESTIONS.md)
 already bind Take time, editing and renewable focus leases to the Pi Host.
 Approvals retain their hard timeout; AbortSignal, Stop and last-operator loss
-still settle unanswered questions. Persistent answer drafts, structured batches
-and plan-review reopening remain separate gaps. Trajectory now includes [streamed and quiet partial arguments](#quiet-partial-argument-sampling--october-15)
+still settle unanswered questions. [Scoped saved answer drafts and structured batches](PI-QUESTIONS.md), together
+with [full plan review and saved reopening](PI-PLAN-MODE.md), are now connected.
+General late answers and reconstruction of a pending dialog after Host restart
+remain unavailable. Trajectory now includes [streamed and quiet partial arguments](#quiet-partial-argument-sampling--october-15)
 and [nested tool presentation](TRAJECTORY-NESTED-TOOLS.md), retaining
 explicit identities and unknown/missing coverage. Complete causal/resource/skill
 attribution and wider provider-format qualification remain open. DSH account and

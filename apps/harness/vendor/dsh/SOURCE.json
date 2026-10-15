@@ -3630,6 +3630,42 @@
       "sha256": "cb60b950a4e131876bfbfab54fd3995b5306ab590465050d3f19320c9cb29b1e",
       "upstreamPath": "packages/client/ui-plan/src/client/PlanModeControl.tsx",
       "upstreamSha256": "cb60b950a4e131876bfbfab54fd3995b5306ab590465050d3f19320c9cb29b1e"
+    },
+    {
+      "path": "packages/client/ui-permission-presets/src/client/PermissionRow.tsx",
+      "sha256": "7815bba5cc2f46dea1189e36c8f25fb9e512e66b554c16c16b5de34117f8badf",
+      "upstreamPath": "packages/client/ui-permission-presets/src/client/PermissionRow.tsx",
+      "upstreamSha256": "7815bba5cc2f46dea1189e36c8f25fb9e512e66b554c16c16b5de34117f8badf"
+    },
+    {
+      "path": "packages/client/ui-permission-presets/src/client/PermissionRow.module.css",
+      "sha256": "805011ab50eab2c2b3c0a87863cd29995161881c2b5d4f5630fdc41300b20456",
+      "upstreamPath": "packages/client/ui-permission-presets/src/client/PermissionRow.module.css",
+      "upstreamSha256": "805011ab50eab2c2b3c0a87863cd29995161881c2b5d4f5630fdc41300b20456"
+    },
+    {
+      "path": "packages/client/ui-permission-presets/src/client/presentation.ts",
+      "sha256": "9801807a906ed13af256542a410ae27d0edb2a0ecc646146c9b668f85616e955",
+      "upstreamPath": "packages/client/ui-permission-presets/src/client/presentation.ts",
+      "upstreamSha256": "9801807a906ed13af256542a410ae27d0edb2a0ecc646146c9b668f85616e955"
+    },
+    {
+      "path": "packages/client/ui-permission-presets/src/client/locales.ts",
+      "sha256": "682d7019794e583a4e16908dcf57e025cd4212a42331c38cfc6e5d2b3bd7d016",
+      "upstreamPath": "packages/client/ui-permission-presets/src/client/locales.ts",
+      "upstreamSha256": "682d7019794e583a4e16908dcf57e025cd4212a42331c38cfc6e5d2b3bd7d016"
+    },
+    {
+      "path": "packages/client/ui-permission-presets/src/client/settings-store.ts",
+      "sha256": "cb52e3048e471d62fc5b0f4e936911031e487d11e66b59085f1ceb1c0378d352",
+      "upstreamPath": "packages/client/ui-permission-presets/src/client/settings-store.ts",
+      "upstreamSha256": "cb52e3048e471d62fc5b0f4e936911031e487d11e66b59085f1ceb1c0378d352"
+    },
+    {
+      "path": "packages/client/ui-permission-presets/src/client/catalog.ts",
+      "sha256": "1e868fea79b5735979e82c96872f6f1ce39d2c3e3fa500b4f625b91759557971",
+      "upstreamPath": "packages/client/ui-permission-presets/src/client/catalog.ts",
+      "upstreamSha256": "1e868fea79b5735979e82c96872f6f1ce39d2c3e3fa500b4f625b91759557971"
     }
   ]
 }

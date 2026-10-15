@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 15 Permission-default selection adds six **verbatim MIT** files from
+public d743267 `packages/client/ui-permission-presets/src/client`: PermissionRow,
+its CSS, presentation, locale dictionaries and preferred settings/catalog type
+contracts. The 593 prior records stay unchanged; the selection is **599**. The
+Pi settings adapter and narrow-column wrapper are authored outside supplier
+source. The DSH host registration/current-session writer is not mounted; only the
+original future-session row and existing confirmation render through Pi settings.
+
 # Selected public DSH GUI
 
 Source: [DeepSeek Harness d743267](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c), public 0.2.1-alpha.2 baseline. The root MIT notice remains in LICENSE. CosmoKit/Schemastery carry their upstream notices where selected. SOURCE.json records every selected source hash, original public path and any adaptation. These supplier files retain their own licensing; Augmentor's resale restriction does not relabel them.

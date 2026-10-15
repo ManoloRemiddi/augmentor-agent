@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Permission default row](DSH-GUI-ON-PI.md#original-permission-default-row--october-15)
+restores the MIT DSH General setting and Full access confirmation for future chats.
+It preserves current conversation policies and commits settings before changing
+accepted memory/revision. The actual failed-write and missing-row controls fail
+before; focused 29/29 passes after, with narrow/wide Light/Dark rendering and no
+inference. Six verbatim MIT inputs bring the supplier selection to 599; no DSH
+backend is loaded. Current-session `/permission` remains a separate gap. Full/
+fresh-copy, shared hosted and installed/physical qualification remain separate;
+current owner reviews/selection are unchanged.
+
 [Fresh drafts / cold-history MX review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
 **20261015-144829-1de182ad** runs public 6ef121d/runtime 6bc2b0d, unselected,
 with scoped question drafts and exact cold-title loading in the original GUI.

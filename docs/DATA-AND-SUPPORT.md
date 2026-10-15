@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Permission defaults](DSH-GUI-ON-PI.md#original-permission-default-row--october-15)
+change only the current profile's existing settings file and revision, after an
+explicit operator choice. A scoped descriptor contains no prompts, provider keys,
+conversation history or external diagnostic export. Reads/writes perform no model
+request, and no owner profile is imported by the binding. Existing sessions retain
+their policy; a failed disk write retains accepted memory. Lost acknowledgments
+require an explicit read and do not cause write or action replay.
+
 [Advisory plan mode](PI-PLAN-MODE.md) stores private native mode/revision
 records and a pre-conversation metadata bootstrap until Pi creates its session
 file. Complete reviews and human decisions retain the existing private tool
