@@ -1257,3 +1257,13 @@ The preceding cfe5fab [Validate 38568478466](https://github.com/ManoloRemiddi/au
 passes SDK/core, native interaction/recovery/first-run, production inventory and
 extension notices before refusing the retained Office exact-source/engine-rebuild
 packaging gate. New-head hosted and all broader migration/release gates remain.
+
+## Passive Pi speech bridge foundation — October 15
+
+[Pi voice bridge foundation](PI-VOICE.md#passive-bridge-foundation--october-15-2026)
+at **ecab71a4** reuses the public scoped transport and passively observes live
+Pi SDK assistant text. The 19 focused cases pass, including actual Pi 1.1.0
+and existing Codex Native/Browser paths with synthetic speech. Pi Host/surface
+wiring, truthful voice memory mode, a separately qualified companion and actual
+ASR/TTS remain required. The GUI, current MX review and installed/services stay
+unchanged. [Portable evidence](../release/harness-pi-voice-foundation-qualification.json).

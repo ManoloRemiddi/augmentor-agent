@@ -31,7 +31,7 @@ p.add_argument('--vm-dir', type=Path, required=True)
 p.add_argument('--port', type=int, default=22487)
 a = p.parse_args(); vm = a.vm_dir.resolve(); work = Path(tempfile.mkdtemp(prefix='augmentor-codex-vm-proof-'))
 guest_root = '/home/beta/augmentor-codex-candidate'
-inputs = [*sorted((ROOT/'dist/codex-runtime/src').glob('*.js')), ROOT/'dist/desktop/src/index.js', *sorted((ROOT/'services/desktop').glob('*.py')), ROOT/'apps/native/augmentor_linux/adapters/codex.py', Path(__file__).resolve()]
+inputs = [*sorted((ROOT/'dist/codex-runtime/src').glob('*.js')), *sorted((ROOT/'dist/voice/src').glob('*.js')), ROOT/'dist/desktop/src/index.js', *sorted((ROOT/'services/desktop').glob('*.py')), ROOT/'apps/native/augmentor_linux/adapters/codex.py', Path(__file__).resolve()]
 identity = {'sourceRevision':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(), 'codexVersion':json.loads((ROOT/'node_modules/@openai/codex/package.json').read_text())['version'], 'sha256':{str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest() for path in inputs}}
 ssh = ['ssh', '-i', str(vm/'id_ed25519'), '-p', str(a.port), '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=3', '-o', 'UserKnownHostsFile='+str(vm/'known_hosts'), 'beta@127.0.0.1']
 def remote(command, data=None):

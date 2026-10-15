@@ -17,6 +17,14 @@ Hosted Linux/macOS SDK passes; Windows has two prompt-settlement timeouts before
 export is reached, with cause unproven. [Portable review evidence](../release/harness-export-context-review-20261015.json).
 
 
+[Pi voice bridge foundation](PI-VOICE.md#passive-bridge-foundation--october-15-2026)
+at **ecab71a4** reuses the public scoped transport and passively observes live
+Pi SDK assistant text. The 19 focused cases pass, including actual Pi 1.1.0
+and existing Codex Native/Browser paths with synthetic speech. Pi Host/surface
+wiring, truthful voice memory mode, a separately qualified companion and actual
+ASR/TTS remain required. The GUI, current MX review and installed/services stay
+unchanged. [Portable evidence](../release/harness-pi-voice-foundation-qualification.json).
+
 [Original session download workflow](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
 at **49e23de4/application 8c159cb7** restores the original MIT DSH More menu,
 download modal/controller and `/export` on Pi originals, verified children,

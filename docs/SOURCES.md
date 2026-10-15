@@ -776,3 +776,20 @@ and reduced-motion policy. Compiled/staged notices include the supplier text;
 DSH/dashboard records, dependency pins and model/runtime ownership are unchanged.
 Source/ordinary/installed qualification is recorded in the owning guide; full
 migration and distribution gates remain open.
+
+## Pi speech observer foundation — October 15
+
+[Pi voice bridge foundation](PI-VOICE.md#passive-bridge-foundation--october-15-2026)
+at **ecab71a4** reuses the public scoped transport and passively observes live
+Pi SDK assistant text. The 19 focused cases pass, including actual Pi 1.1.0
+and existing Codex Native/Browser paths with synthetic speech. Pi Host/surface
+wiring, truthful voice memory mode, a separately qualified companion and actual
+ASR/TTS remain required. The GUI, current MX review and installed/services stay
+unchanged. [Portable evidence](../release/harness-pi-voice-foundation-qualification.json).
+
+The shared transport is selected from Augmentor's public authored Codex adapter;
+its license remains `LicenseRef-Augmentor-MIT-Resale-1.0`. No dependency, selected
+DSH supplier file or private companion source is added. The additive Pi health
+capability is proposed and tested against an independently authored peer; it is
+not a verified Resonant Voice package pin. See the owning guide's compatibility
+and remaining-integration boundaries.

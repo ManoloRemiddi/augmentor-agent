@@ -17,6 +17,21 @@ Hosted Linux/macOS SDK passes; Windows has two prompt-settlement timeouts before
 export is reached, with cause unproven. [Portable review evidence](../release/harness-export-context-review-20261015.json).
 
 
+[Pi voice bridge foundation](../docs/PI-VOICE.md#passive-bridge-foundation--october-15-2026)
+at **ecab71a4** reuses the public scoped transport and passively observes live
+Pi SDK assistant text. The 19 focused cases pass, including actual Pi 1.1.0
+and existing Codex Native/Browser paths with synthetic speech. Pi Host/surface
+wiring, truthful voice memory mode, a separately qualified companion and actual
+ASR/TTS remain required. The GUI, current MX review and installed/services stay
+unchanged. [Portable evidence](../release/harness-pi-voice-foundation-qualification.json).
+
+`pi-voice.test.mjs` covers explicit Pi capability refusal, admitted turn/block
+identity, reasoning/tool exclusion, prefix/block divergence, abort/error, Stop
+against delayed HTTP, final-text bounds, unfinished completion and stream limits.
+It includes an actual public SDK lifecycle with one loopback provider request.
+`codex-voice.test.mjs` carries the seven existing shared-transport regressions.
+No private speech implementation or real ASR/TTS executes in these tests.
+
 [Original session download workflow](../docs/AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15):
 `archive-snapshot`, `pi-session-archive`, `pi-session-exports`, `harness-session-export`
 and `harness-session-export-chromium` cover exact bytes/manifest gaps, authorized
