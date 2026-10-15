@@ -3666,6 +3666,18 @@
       "sha256": "1e868fea79b5735979e82c96872f6f1ce39d2c3e3fa500b4f625b91759557971",
       "upstreamPath": "packages/client/ui-permission-presets/src/client/catalog.ts",
       "upstreamSha256": "1e868fea79b5735979e82c96872f6f1ce39d2c3e3fa500b4f625b91759557971"
+    },
+    {
+      "path": "packages/client/ui-permission-presets/src/client/PermissionSelect.tsx",
+      "sha256": "c4c1d3590d683bd07e869e14978615b5999472c2bf94ef752d4bd62f3bdebe82",
+      "upstreamPath": "packages/client/ui-permission-presets/src/client/PermissionSelect.tsx",
+      "upstreamSha256": "c4c1d3590d683bd07e869e14978615b5999472c2bf94ef752d4bd62f3bdebe82"
+    },
+    {
+      "path": "packages/client/ui-permission-presets/src/client/PermissionSelect.module.css",
+      "sha256": "479464c75eb3f4ed6e2fd1d8e41632fed6c9a0e7a48f0287094195ae0524d51d",
+      "upstreamPath": "packages/client/ui-permission-presets/src/client/PermissionSelect.module.css",
+      "upstreamSha256": "479464c75eb3f4ed6e2fd1d8e41632fed6c9a0e7a48f0287094195ae0524d51d"
     }
   ]
 }

@@ -1,14 +1,72 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Original current-chat Permission controls — October 15
+
+The original MIT DSH composer **PermissionSelect**, its CSS and `/permission`
+popup now control the selected Pi conversation. Read Only, Ask before actions
+(`workspace-write`) and Full access are the three supported modes. This does not
+provide an OS sandbox, add Native tools to Browser, or implement experimental
+Auto. The separate [General default](#original-permission-default-row--october-15)
+continues to affect only later chats. Two additional verbatim public d743267
+files bring the recorded supplier selection from 599 to **601**; the prior 599
+files/records, notices and dependencies are unchanged. No DSH host is loaded.
+
+The original chip sits in its original composer slot, remains available while a
+response generates and uses the original checkbox confirmation for Full access.
+Bare `/permission` opens the original three-choice popup with that confirmation;
+an explicit `/permission <machine-id>` is a direct human instruction. Only a
+successful, revision-matched receipt consumes the captured slash text. A changed
+draft, conversation or peer revision retires the old choice. UI state stays on
+the accepted mode while a choice is pending. A missing or invalid reply disables
+writing until an explicit read; nothing is automatically replayed. Notifications
+are read hints, and cannot replace a newer read or turn an acknowledged write
+into an unknown write. Inspectors can read only their selected conversation's
+mode and cannot change it; archived roots must be restored first.
+
+The canonical policy and versioned history commit together in the existing
+private conversation metadata, **before** the live policy changes. History
+retains revision, preset, the display-sequence boundary and change time; an old
+policy's initial time stays unknown. Reads create no AgentSession. Historical
+Reply/Edit branches seed the mode at the selected message, rather than taking a
+later parent mode; children own fresh revisions/sequence anchors and retain
+parent boundary provenance. The parent's native/display originals are preserved.
+The scoped API pages 20 policy records at a time. See [protocol](PROTOCOL.md).
+
+Changes govern **future authorization checks**. Already dispatched actions are
+not undone and accepted background jobs retain their own grants. Selecting Read
+Only during a pending tool/job approval blocks dispatch even if the human then
+answers Allow once. Selecting Full access does not silently answer an older
+approval. The synchronous metadata operation can settle while an approval holds
+the ordinary admission lane, without creating or reloading another SDK owner.
+Native/standalone Browser commands use Pi's public admitted RPC input chain;
+approved input transforms cannot synthesize a permission escalation.
+
+Strict check/build and five focused files pass **46/46** on Linux: seven pure
+contracts, eighteen actual Host cases, sixteen GUI-controller/command cases and
+five original-GUI cases (including the existing Context/Compact workflows).
+Controlled old-API/missing-chip failures prove the previous absence. A separate
+unsealed variant with only the post-approval guard removed actually writes after
+Read Only plus Allow once; the guarded source blocks it. Earlier receipt-fixture
+booleans merely declined approvals and do not qualify this boundary; the corrected
+object receipts exercise real approvals. The retained first focused run also
+finds an old nine-entry command expectation, now exactly ten with Permission.
+No deadline or action assertion is weakened. Full source/fresh-copy regression,
+packaging, preservation and portable evidence are the next qualification step.
+
+This is source-only. The existing 20261015-144829-1de182ad owner review and the
+installed selection remain unchanged and contain neither new permission binding.
+Fresh review, physical MX feedback, hosted/platform/speech/Office/privacy/live
+checks and complete migration remain open.
+
 ## Original Permission default row — October 15
 
 Settings → General now uses the copied MIT DSH **Permission** row and its existing
 checkbox-gated Full access confirmation, ahead of Appearance at the supplier's
 slot order. Read Only, Ask before actions and Full access configure **new chats**;
 existing conversations retain their saved policy. Ask before actions names Pi's
-existing `workspace-write` policy accurately; it is not an OS sandbox. The separate
-current-conversation selector and `/permission` command remain unconnected, and
-DSH's experimental Auto preset is not advertised as a Pi capability.
+existing `workspace-write` policy accurately; it is not an OS sandbox. The separate current-conversation controls were unconnected at this checkpoint;
+the [subsequent binding](#original-current-chat-permission-controls--october-15)
+adds them. DSH's experimental Auto preset is not advertised as a Pi capability.
 
 Six public files from DSH d743267's `ui-permission-presets` are copied verbatim,
 including the original row/CSS, labels, presentation and preferred type contracts.

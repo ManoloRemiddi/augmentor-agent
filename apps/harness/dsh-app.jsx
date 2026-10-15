@@ -77,6 +77,7 @@ import {en as modelEn} from '@dsh-gui/ui-model-selection/src/client/locales.ts';
 import {en as goalEn} from '@dsh-gui/ui-goal/src/client/locales.ts';
 import {DshAttachments} from './dsh-attachments.mjs';
 import {bindPlanReview,PlanModeControl} from './dsh-plan-review.jsx';
+import {CurrentPermissionControl,permissionT} from './dsh-permission-control.jsx';
 import {DshDrafts} from './dsh-drafts.mjs';
 import {ComposerAttachments} from '@dsh-gui/ui-attachment/src/client/ComposerAttachments.tsx';
 import {MessageImages} from '@dsh-gui/ui-attachment/src/client/MessageImages.tsx';
@@ -146,13 +147,15 @@ const commandRows=[
   {name:'goal',...builtinRowFace({definitionId:'@deepseek-ai/dsh-command-goal'},t.command)},
   {name:'plan',...builtinRowFace({definitionId:'@deepseek-ai/dsh-plan-mode'},t.command),description:'Enter plan mode; use /plan off to leave'},
   {name:'compact',...builtinRowFace({definitionId:'@deepseek-ai/dsh-command-compact'},t.command)},
+  {name:'permission',...builtinRowFace({definitionId:'@deepseek-ai/dsh-permission-presets'},t.command),description:'Choose this chat’s approval mode for new actions'},
   {name:'model',label:'Model',description:'Select a model for this conversation'},
   {name:'prompts',label:'Prompt library',description:'Use or edit a saved prompt'},
   {name:'jobs',label:'Jobs',description:'Inspect and manage this conversation’s jobs'},
   {name:'context',label:'Context',description:'Inspect the recorded context dashboard'},
   {name:'inspect',label:'Full Pi record inspector',description:'Open the advanced conversation inspector'},
 ];
-commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,store:createSnapshotStore,sectionRows:rows=>sectionRows(rows,t.command),rows:()=>commandRows.map(row=>row.name==='plan'&&!controller.state.capabilities?.planMode?{...row,description:'View this conversation’s plan and todos'}:row),actions:{},
+commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,store:createSnapshotStore,sectionRows:rows=>sectionRows(rows,t.command),rows:()=>commandRows.filter(row=>row.name!=='permission'||controller.state.capabilities?.sessionPermissions===true).map(row=>row.name==='plan'&&!controller.state.capabilities?.planMode?{...row,description:'View this conversation’s plan and todos'}:row),actions:{},
+  permission:{read:scope=>controller.refreshPermission(scope,{explicit:true}),current:()=>controller.state.permission,select:(preset,scope)=>controller.selectPermission(preset,scope),t:permissionT},
   current:()=>({...controller.state,epoch:controller.epoch,running:controller.state.sessions.find(x=>x.sessionId===controller.state.sessionId)?.running===true}),
   ready:()=>draftArchive.getSnapshot().ready,referenceSource:scope=>fileReferenceSource({controller,valid:s=>commandMenu.valid(s),fileCandidate,crumbsFor,parseCandidate,t:tr(referenceEn)},scope),
   draft:()=>({text:draft.getSnapshot(),detectText:composerProjection.detectText,rev:draftRev,sessionId:activeDraft,caret:composerProjection.caret}),catalog:()=>controller.state.catalog,choose:selection=>controller.choose(selection),notice:text=>controller.update({error:text}),focus:()=>editor.focus(),
@@ -353,6 +356,7 @@ function App(){
       case 'conversation.composer.bar':return <InputBar {...p} placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!draftState.ready||!!state.unconfirmed||state.compactionPending||state.compaction?.blocked||attachmentDrafts.busy||owner.disabled} keyboard={keyboard} addFiles={attachmentDrafts.add} removeAttachment={attachmentDrafts.remove} retryFileUpload={attachmentDrafts.retry} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace(attached.uploads)} useNotices={selectorFace(undefined)} useLexicon={useLexicon} useMenuLauncher={useMenuLauncher} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={ids=>attached.items.filter(x=>ids.includes(x.id))} toggleCommandMenu={span=>commandMenu.toggle(span)}/>;
       case 'conversation.input.attachments':return <ComposerAttachments {...owner} t={t.conversation}/>;
       case 'conversation.message.images':return <MessageImages {...owner} loadImage={loadImage} t={t.conversation}/>;
+      case 'conversation.input.permission':return <CurrentPermissionControl state={state} controller={controller} locked={owner.locked}/>;
       case 'conversation.input.plan':return <PlanModeControl state={state} controller={controller} locked={owner.locked}/>;
       case 'conversation.input.right':return <ImproveDraft state={{...state,draftReady:draftState.ready}}/>;
       case 'conversation.input.model':return <ModelSelect {...p} t={t.model} locked={owner.locked||state.readOnly||current?.running===true} available={!state.readOnly} directory={modelDirectory} load={async()=>modelDirectory.getSnapshot()} select={async selection=>{modelDirectory.update(s=>({...s,status:'selecting',pending:selection}));try{await controller.choose(selection);return modelDirectory.getSnapshot();}catch(e){modelDirectory.update(s=>({...s,status:'error',pending:null,error:e.message}));throw e;}}}/>;

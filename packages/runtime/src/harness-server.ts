@@ -13,7 +13,7 @@ const allowed = new Set([
   'session.fileReferences','workspaceFiles.stat','workspaceFiles.read','workspaceFiles.readBytes',
   'draft.describe','draft.text','draft.remove','draft.prepare','draft.settle','draft.acknowledge',
   'host.describe', 'session.organize', 'workspace.list', 'workspace.adopt', 'workspace.rename', 'workspace.remove', 'workspace.move', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
-  'session.jobInspection', 'session.family', 'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.setPlanMode', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.planMode', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
+  'session.jobInspection', 'session.family', 'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.setPlanMode', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.permission','session.selectPermission','session.planMode', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.prepareBranch', 'session.settleBranch', 'session.branchRecovery', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
@@ -25,7 +25,7 @@ const allowed = new Set([
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
 type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
-const inspectionReads=new Set(['session.jobInspection','session.family','session.jobs','session.job','session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.planMode', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','session.compaction','observation.describe','observation.list', 'observation.search','observation.payload']);
+const inspectionReads=new Set(['session.jobInspection','session.family','session.jobs','session.job','session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.permission','session.planMode', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','session.compaction','observation.describe','observation.list', 'observation.search','observation.payload']);
 interface LiveFrame {seq: number; sessionId: string; frame: Data}
 const LIVE_BYTES = 16 * 1024 * 1024;
 
@@ -96,7 +96,8 @@ export class HarnessServer {
     if(method==='session.jobInspection')return this.openInspection(this.host.jobInspectionTarget(params.sessionId,params.jobId),access.expiresAt);
     const result=await this.host.dispatch(method,params,id),meta=this.host.getMeta(access.sessionId);
     if(method==='session.list')return {items:meta.delegation?[this.host.inspectionSessionRow(access.sessionId)]:result.items.filter((row:Data)=>row.sessionId===access.sessionId)};
-    if(method==='host.describe')return {protocol:result.protocol,version:result.version,piVersion:result.piVersion,workspace:meta.cwd,capabilities:{inspection:true}};
+    if(method==='host.describe')return {protocol:result.protocol,version:result.version,piVersion:result.piVersion,workspace:meta.cwd,capabilities:{inspection:true,...(result.capabilities?.sessionPermissions?{sessionPermissions:true}:{})}};
+    if(method==='session.permission')return {...result,canSelect:false};
     if(method==='models.list')return {groups:result.groups.map((group:Data)=>({provider:group.provider,name:group.name,models:group.models.filter((model:Data)=>model.provider===meta.selection.provider&&model.model===meta.selection.model)})).filter((group:Data)=>group.models.length),default:meta.selection,pinned:[],hidden:[],failures:[]};
     return result;
   }

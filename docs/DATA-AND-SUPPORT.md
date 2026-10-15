@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current-chat permissions](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
+store only canonical policy and revision/preset/display-sequence/time history in
+the existing private conversation metadata. Unknown legacy initial times stay
+unknown. Existing display/optional observation receipts add policy metadata;
+normal retention/diagnostic clearing remains separate from ordinary metadata.
+Branch children seed the selected boundary's policy with fresh own revisions.
+The API reads 20 policy records per page; inspectors see only their selected
+conversation and cannot mutate it. Metadata controls create no SDK owner, model
+request, new network destination or telemetry integration. Typed human commands
+retain the existing private input/queue receipt rules without model inference.
+Accepted jobs retain their grants; no unknown permission or action is replayed.
+
 [Permission defaults](DSH-GUI-ON-PI.md#original-permission-default-row--october-15)
 change only the current profile's existing settings file and revision, after an
 explicit operator choice. A scoped descriptor contains no prompts, provider keys,

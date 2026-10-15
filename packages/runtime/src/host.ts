@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {WikiBinding} from './wiki.js';
+import {permissionSelection,permissionHistory,permissionChange,permissionAtBoundary,permissionCommand,permissionOptions,type PermissionRecord} from './session-permission-contracts.js';
 import {WikiPreferences} from './wiki-preferences.js';
 import {SearchPreferences} from './search-preferences.js';
 import {freeSearchExtension} from './free-search.js';
@@ -79,8 +80,8 @@ import {PiGoals,goalProjection,GOAL_GUIDANCE,GOAL_ROUND_TYPE} from './goals.js';
 import {PiJobs,jobSpec,jobsExtension,shellJob,boundChild,JOB_GUIDANCE,type JobRecord,type JobSpec,type JobControl,type JobOutcome} from './jobs.js';
 import type {Usage} from '@earendil-works/pi-ai';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
-interface Meta {planModeBootstrap?:PlanModeRecord;delegation?:{parentId:string;jobId:string;allowedTools:string[];resources:Data};reasoning?:SavedReasoning;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {planMode:PiPlanMode;resources:Data;searchEnabled?:boolean;searchMode?:'configured'|'keyless';wiki?:WikiBinding;wikiRevision?:string;memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];goals:PiGoals;mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean;reason?:string})=>Promise<void>;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
+interface Meta {permissionHistory?:PermissionRecord[];planModeBootstrap?:PlanModeRecord;delegation?:{parentId:string;jobId:string;allowedTools:string[];resources:Data};reasoning?:SavedReasoning;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
+interface Loaded {permissionSteer?:{id:string;text:string};planMode:PiPlanMode;resources:Data;searchEnabled?:boolean;searchMode?:'configured'|'keyless';wiki?:WikiBinding;wikiRevision?:string;memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];goals:PiGoals;mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean;reason?:string})=>Promise<void>;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 /** Admission is serialized; extension preparation must not hold the host's
  * state lock while waiting for a UI answer, another RPC or an input handler.
  */
@@ -312,6 +313,29 @@ export class Host {
   persistSettings(){this.settings.revision++;atomicJson(join(this.dirs.config,'settings.json'),this.settings);}
   private shortcutPreferences=new ShortcutPreferences(()=>{const raw=this.settings.shortcutBindings;if(raw===undefined)return null;if(typeof raw!=='string')throw Error('Shortcut preferences are unreadable.');return raw;},raw=>{if(!Number.isSafeInteger(this.settings.revision)||this.settings.revision<0)throw Error('The settings revision is unavailable.');const next={...this.settings,revision:this.settings.revision+1,shortcutBindings:raw};atomicJson(join(this.dirs.config,'settings.json'),next);this.settings=next;});
   get shortcutSettingsRevision(){return this.settings.revision;}
+  private permissionSnapshot(m:Meta,before?:unknown){
+    const all=permissionHistory(m);let end=all.length;
+    if(before!==undefined){end=all.findIndex(r=>r.revision===before);if(end<0)throw Error('The permission-history cursor is unavailable.');}
+    const entries=all.slice(Math.max(0,end-20),end);
+    return {available:true,...permissionSelection(m),origin:m.delegation?{kind:'accepted-job-grant',parentId:m.delegation.parentId,jobId:m.delegation.jobId}:m.fork?{kind:'branch-boundary',...m.fork}:{kind:'conversation-metadata'},canSelect:!m.delegation&&!this.organization.archived(m.id),options:permissionOptions(),history:{entries,hasMore:end>entries.length,cursor:entries[0]?.revision??null},boundary:'future authorization checks; running work and accepted job grants stay unchanged',persistence:'atomic host metadata; message-sequence policy history'};
+  }
+  private selectPermission(p:Data){
+    const m=this.getMeta(p.sessionId);if(m.delegation||this.organization.archived(m.id))throw Error('Restore a root operator conversation before changing permission mode.');
+    const previous=permissionSelection(m),change=permissionChange(m,p.preset,p.expectedRevision,this.history(m).lastSeq,Date.now(),randomUUID());
+    if(change.outcome==='noop')return {accepted:true,outcome:'noop',...this.permissionSnapshot(m)};
+    const next={...m,policy:change.policy,permissionHistory:change.permissionHistory};this.save(next);m.policy=next.policy;m.permissionHistory=next.permissionHistory;
+    const data={previous:previous.currentValue,currentValue:m.policy,revision:change.permissionHistory.at(-1)!.revision,boundary:'future authorization checks; running work and accepted job grants stay unchanged'};
+    try{this.append(m,'session/permission',data);this.loaded.get(m.id)?.observation?.record('execution/permission',data);}catch{console.warn('Permission mode was saved; its display/diagnostic receipt has a gap.');}
+    this.publish(m.id,{method:'permission/updated',payload:{sessionId:m.id,revision:data.revision}});return {accepted:true,outcome:'committed',...this.permissionSnapshot(m)};
+  }
+  private permissionInput(m:Meta){return (pi:ExtensionAPI)=>pi.on('input',event=>{
+    const command=permissionCommand(event.text);if(!command)return;
+    const r=this.loaded.get(m.id),steering=event.streamingBehavior==='steer',source=steering?r?.permissionSteer?.text:r?.activeRequestId?this.queue(m).read(r.activeRequestId).input:undefined;
+    if(!r||!m.running||r.cancelled||event.source!=='rpc'||(!steering&&!r.preparingInput)||source===undefined||source.trim()!==event.text.trim()||!permissionCommand(source))throw Error('A permission command requires the exact admitted human input.');
+    if(event.images?.length)throw Error('Attachments cannot accompany /permission.');
+    if(command.preset!==null)this.selectPermission({sessionId:m.id,preset:command.preset,expectedRevision:permissionSelection(m).revision});
+    return {action:'handled' as const};
+  });}
   private permissionDefaultSnapshot(){return {ns:'permission',revision:this.settings.revision,value:{defaultPreset:this.settings.defaultPreset},writableFields:['defaultPreset'],options:[{id:'read-only',label:'Read Only'},{id:'workspace-write',label:'Ask before actions'},{id:'danger-full-access',label:'Full access'}]};}
   private developerToolsSnapshot(){return {ns:'ui-settings',revision:this.settings.revision,value:developerTools(this.settings.developerTools),writableFields:['enabled']};}
   contextPreferenceSnapshot(){return {ns:'dsh-context',revision:this.settings.revision,value:contextPreferences(this.settings.contextPreferences),writableFields:CONTEXT_PREFERENCE_FIELDS};}
@@ -332,7 +356,7 @@ export class Host {
       groups.get(m.provider)!.models.push({provider:m.provider,model:m.id,name:m.name,location:local?'Local':'Network',available:available.has(m.provider+'/'+m.id),thinkingLevels:getSupportedThinkingLevels(m)});}
     return {groups:[...groups.values()],pinned:this.settings.pinned.map((p:any)=>typeof p==='string'?p:p.provider+'/'+p.model),hidden:this.settings.hidden,default:this.settings.defaultModel,failures:[]};
   }
-  getMeta(id:unknown){const m=this.metadata.get(identifier(id));if(!m)throw new Error('Conversation not found');return m;}
+  getMeta(id:unknown){const m=this.metadata.get(identifier(id));if(!m)throw new Error('Conversation not found');permissionSelection(m);return m;}
   jobInspectionTarget(parentId:unknown,jobId:unknown){
     const parent=this.getMeta(parentId);
     if(parent.delegation||this.jobs.problem)throw Error('The parent job catalogue is unavailable for child inspection.');
@@ -354,7 +378,7 @@ export class Host {
   policy(m:Meta){return (pi:ExtensionAPI)=>{
     // Resource startup/reload may call the SDK's sendUserMessage API. Only
     // an admitted Host turn may deliver input into this conversation's loop.
-    pi.on('input',()=>this.mcpReloading||!m.running?{action:'handled'}:undefined);
+    pi.on('input',()=>{permissionSelection(m);return this.mcpReloading||!m.running?{action:'handled'}:undefined;});
     pi.on('tool_call',async e=>{
     if(m.delegation&&!m.delegation.allowedTools.includes(e.toolName))return {block:true,reason:'This tool is outside the delegated job’s explicit grants.'};
     if((this.mcpReloading||!m.running)&&e.toolName!=='linux_desktop_stop')return {block:true,reason:'No admitted Host turn is available for this tool call.'};
@@ -370,8 +394,9 @@ export class Host {
     if(m.policy==='read-only')return {block:true,reason:'Read-only chat: actions that can change state are disabled.'};
     if(['home_request','home_set'].includes(e.toolName))return; // Persistent NAS pairing grants the scoped Home capability.
     if(m.policy!=='danger-full-access'&&!await this.interactions.approve(m.delegation?.parentId??m.id,e.toolName,e.input,m.id))return {block:true,reason:'Action not approved, cancelled or no user interface connected.'};
+    if(permissionSelection(m).currentValue==='read-only')return {block:true,reason:'Permission mode changed to Read Only while approval was pending; no action was dispatched.'};
   });};}
-  async load(m:Meta,branchManager?:SessionManager){this.wikiReady(m);this.searchReady(m);let record=this.loaded.get(m.id);if(record){record.mcp?.assertReady();return record;}
+  async load(m:Meta,branchManager?:SessionManager){permissionSelection(m);this.wikiReady(m);this.searchReady(m);let record=this.loaded.get(m.id);if(record){record.mcp?.assertReady();return record;}
     if(this.mcpReloading)throw Error('Finish MCP session reload before loading another conversation.');
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish MCP management before loading another Native conversation.');
     const model=await this.selected(m.selection);
@@ -400,7 +425,7 @@ export class Host {
     if(!Array.isArray(resources.sources)||!Array.isArray(resources.skills))throw new Error('Invalid Pi resource configuration');
     const wikiNative=process.platform==='linux'&&m.surface!=='browser'&&!m.delegation;let wiki:WikiBinding|undefined,wikiRevision:string|undefined;
     const wikiFactory=(pi:ExtensionAPI)=>{const profile=this.wikiPreferences.describe();wiki=profile.value.enabled?new WikiBinding({...profile.value,enabled:true},this.dirs.state):undefined;wikiRevision=profile.revision;if(record)record.wiki=wiki;wiki?.factory(pi);};
-    const checkPlanNames=()=>{if(m.delegation)return;const extensions=resourceLoader.getExtensions().extensions;if(extensions.flatMap(e=>[...e.tools.values()]).filter(t=>t.definition.name==='exit_plan_mode').length!==1||extensions.some(e=>e.commands.has('plan')))throw Error('The product plan command or exit_plan_mode tool collides with an approved resource. Inspect its configuration.');};
+    const checkPlanNames=()=>{if(m.delegation)return;const extensions=resourceLoader.getExtensions().extensions;if(extensions.flatMap(e=>[...e.tools.values()]).filter(t=>t.definition.name==='exit_plan_mode').length!==1||extensions.some(e=>e.commands.has('plan')||e.commands.has('permission')))throw Error('A product permission/plan command or exit_plan_mode tool collides with an approved resource. Inspect its configuration.');};
     const checkWikiNames=()=>{if(wiki){const names=resourceLoader.getExtensions().extensions.flatMap(extension=>[...extension.tools.values()].map(tool=>tool.definition.name));for(const name of ['wiki_query','wiki_write','wiki_rename','wiki_scaffold','wiki_archive','wiki_lint'])if(names.filter(value=>value===name).length!==1)throw Error('Wiki tool name collision; inspect approved resource configuration.');}};
     let searchEnabled:boolean|undefined,searchMode:'configured'|'keyless'|undefined;
     const searchFactory=(pi:ExtensionAPI)=>{const profile=this.searchPreferences.describe();searchEnabled=profile.enabled;searchMode=profile.mode;const confirmed=()=>{const p=this.searchPreferences.describe();if(!p.enabled||p.mode!==searchMode)throw Error('Search settings changed; refresh before continuing.');return p;};if(searchEnabled)(searchMode==='keyless'?keylessSearchExtension(()=>confirmed().keylessValue):freeSearchExtension(()=>confirmed().value))(pi);};
@@ -416,7 +441,7 @@ export class Host {
       }});
     const resourceLoader:DefaultResourceLoader=new DefaultResourceLoader({cwd:m.cwd,agentDir:this.dirs.agent,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,
       additionalExtensionPaths:m.surface==='browser'?[]:resources.sources,additionalSkillPaths:m.surface==='browser'?[]:resources.skills,additionalPromptTemplatePaths:[privateDir(join(this.dirs.agent,'prompts'))],
-      extensionFactories:[piScheduling,piLlamaCppSchemas,this.policy(m),...(wikiNative?[{name:'augmentor-free-search',factory:searchFactory}]:[]),...(wikiNative?[{name:'augmentor-wiki',factory:wikiFactory}]:[]),...(m.delegation?[]:[jobsExtension(m.id,this.jobs,(spec,signal)=>this.startJob(m,spec,signal))]),goals.extension,...(m.delegation?[]:[planMode.extension]),piPlans(revision=>{this.publish(m.id,{method:'plan/updated',payload:{sessionId:m.id,revision}});record?.observation?.record('planning/update',{revision});}),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),piReassessment(data=>record?.observation?.record('execution/checkpoint',data)),execution.extension,homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),managedMemory.extension,...(mcp?mcp.factories():[]),...(m.surface==='browser'?[this.browser.package(m.delegation?.parentId??m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[piQuestions(this.interactions,m.delegation?.parentId??m.id,m.id),linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)},(brief,toolCallId,signal)=>this.awaitDesktopJob(m,brief,toolCallId,signal))]),{name:'augmentor-prompt-wrapping',factory:piPromptWrapping(()=>({revision:this.settings.revision,value:this.settings.contextPreferences}),row=>provenance.promptWrapping(row))},{name:'augmentor-context-observer',factory:provenance.extension}],
+      extensionFactories:[piScheduling,piLlamaCppSchemas,this.policy(m),...(m.delegation?[]:[this.permissionInput(m)]),...(wikiNative?[{name:'augmentor-free-search',factory:searchFactory}]:[]),...(wikiNative?[{name:'augmentor-wiki',factory:wikiFactory}]:[]),...(m.delegation?[]:[jobsExtension(m.id,this.jobs,(spec,signal)=>this.startJob(m,spec,signal))]),goals.extension,...(m.delegation?[]:[planMode.extension]),piPlans(revision=>{this.publish(m.id,{method:'plan/updated',payload:{sessionId:m.id,revision}});record?.observation?.record('planning/update',{revision});}),piToolBudget(changes=>record?.observation?.record('context/budget',{changes,units:'unicode-code-points'})),piReassessment(data=>record?.observation?.record('execution/checkpoint',data)),execution.extension,homePackage('pi:'+m.id),pi=>memoryPackage(pi,m.fork?undefined:'pi:'+m.id),managedMemory.extension,...(mcp?mcp.factories():[]),...(m.surface==='browser'?[this.browser.package(m.delegation?.parentId??m.id)]:process.env.AUGMENTOR_PI_LINUX_TOOLS==='0'?[]:[piQuestions(this.interactions,m.delegation?.parentId??m.id,m.id),linuxPackage(this.backend),desktopPackage('pi:'+m.id),this.desktopSpecialist.package({owner:'pi:'+m.id,cwd:m.cwd,agentDir:this.dirs.agent,modelRuntime:this.modelRuntime,policy:m.policy,approve:(name,args)=>this.interactions.approve(m.id,name,args),cancelInteractions:()=>this.interactions.cancel(m.id),progress:info=>this.append(m,'desktop/progress',info)},(brief,toolCallId,signal)=>this.awaitDesktopJob(m,brief,toolCallId,signal))]),{name:'augmentor-prompt-wrapping',factory:piPromptWrapping(()=>({revision:this.settings.revision,value:this.settings.contextPreferences}),row=>provenance.promptWrapping(row))},{name:'augmentor-context-observer',factory:provenance.extension}],
       appendSystemPrompt:[browserRecovery,PLAN_GUIDANCE,GOAL_GUIDANCE,...(m.surface!=='browser'&&(!m.delegation||m.delegation.allowedTools.includes('read'))?[FILE_REFERENCE_PROMPT]:[]),...(m.delegation?['You are a bounded delegated worker. Follow the supplied task and all constraints. Do not start jobs, persistent goals or other workers. Your tools are explicitly granted by the parent conversation. Report failures and unknown outcomes; verify changes.']:[JOB_GUIDANCE]),m.surface==='browser'?'You are Augmentor Agent for Browser, powered by Pi. Use the browser tools to inspect and act in the connected visible browser. Read a fresh snapshot before actions. Stop on stale targets or denied actions. Report unknown outcomes honestly; do not replay actions.': `You are Augmentor Agent Desktop, powered by Pi. The operating system is ${process.platform}. Use tools to check actual facts. Keep the user informed. Use linux_browser_open for visible Chromium; never claim dispatch proves a page loaded. Use the platform accessibility observations for desktop structure. Stop on stale targets or denied actions. Use linux_desktop_connect and the user’s OS consent for desktop control. Use fresh screenshots before each action, then verify the result. A model must support image input. Stop on focus changes; never replay an unknown input outcome. Ask the user only when required information is missing.`,...(m.surface!=='browser'&&process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'?[DESKTOP_DELEGATION_GUIDANCE]:[])],
     });await resourceLoader.reload();
     checkPlanNames();checkWikiNames();
@@ -562,8 +587,9 @@ export class Host {
     }
     if(changes&&m.policy==='read-only')throw Error('Read-only chat cannot grant changing tools or a changing background command.');
     if(changes&&m.policy!=='danger-full-access'&&!await this.interactions.approve(m.id,'background_'+spec.kind,{task:spec.task,allowedTools:spec.allowedTools,limits:spec.limits}))throw Error('Background job was not approved.');
-    signal?.throwIfAborted();
-    const result=this.jobs.start(m.id,spec,(row,control)=>spec.kind==='shell'?shellJob(m.cwd,row,control):spec.kind==='desktop'?this.desktopJob(structuredClone(m),row,control):this.delegateJob(structuredClone(m),row,control));
+    if(changes&&permissionSelection(m).currentValue==='read-only')throw Error('Permission mode changed to Read Only while job approval was pending.');
+    signal?.throwIfAborted();const admitted=structuredClone(m);
+    const result=this.jobs.start(m.id,spec,(row,control)=>spec.kind==='shell'?shellJob(admitted.cwd,row,control):spec.kind==='desktop'?this.desktopJob(admitted,row,control):this.delegateJob(admitted,row,control));
     if(!result.duplicate){parent.manager.appendCustomEntry('augmentor/job-start-v1',{jobId:result.job.id,kind:spec.kind,requestId:spec.requestId,allowedTools:spec.allowedTools,limits:spec.limits,selection:{...m.selection},permissionPreset:m.policy});parent.observation?.record('job/start',{jobId:result.job.id,kind:spec.kind,allowedTools:spec.allowedTools,limits:spec.limits});}
     return result;
   }
@@ -636,13 +662,14 @@ export class Host {
     if(!m.running||r.cancelled||this.loaded.get(m.id)?.phase==='settling'||r.turnId!==turnId)throw Error('The observed steering turn is no longer active.');
     if(!queue.promote(id,turnId))return {accepted:true,duplicate:true,turnId};
     r.execution!.steerRequested();this.interactions.cancel(m.id);
+    const permissionSteer={id,text:attachmentInput.text};r.permissionSteer=permissionSteer;
     const pending=r.steering!.enqueue(id,attachmentInput.text,result=>{
       if(result.action==='handled'){queue.handledSteer(id);r.execution!.steerHandled();this.append(m,'runtime/notice',{message:'The correction was handled by an input extension. No copy of that input was sent to the model.',submittedContent:submittedParts(prior.input??'',prior.attachments),source:{kind:'user',rpcId:id},incomplete:false});}
       r.observation?.record('execution/steer-input',{clientRequestId:id,action:result.action,handler:result.handler,skill:result.skill,template:result.template});
     },error=>{r.failed=true;r.execution!.steerFailed();this.append(m,'runtime/error',{message:'Correction input preparation failed: '+String(error)});},attachmentInput.images);
     r.observation?.record('execution/steer-requested',{clientRequestId:id,boundary:'provider-supersession; dispatched-tools-settle',input:'sdk-public-input-and-approved-resources'});
     this.append(m,'runtime/notice',{message:'Steering accepted. Obsolete generation is stopping; any dispatched tools will settle before the correction.',incomplete:false});
-    const result=await pending;return {accepted:true,turnId,...(result.action==='handled'?{handled:true}:result.action==='cancelled'?{interruptedPreparation:true}:{})};
+    try{const result=await pending;return {accepted:true,turnId,...(result.action==='handled'?{handled:true}:result.action==='cancelled'?{interruptedPreparation:true}:{})};}finally{if(r.permissionSteer===permissionSteer)delete r.permissionSteer;}
   }
   prepareBranch(p:Data){
     const boundary=branchBoundary(p),source=this.getMeta(boundary.sessionId);
@@ -696,7 +723,7 @@ export class Host {
     else if(p.prepared!==undefined&&p.prepared!==false||reserved)throw Error('Use the exact prepared branch identity before creating its child.');
     if(p.prepared===true&&process.platform==='linux'){
       const context=branchPublicationContext(source.file,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
-      const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.name?join(this.dirs.sessions,sid,context.name):undefined,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
+      const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.name?join(this.dirs.sessions,sid,context.name):undefined,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,...permissionAtBoundary(source,p.messageSeq),updatedAt:Date.now(),requests:[],running:false,fork};
       const inherited=context.events.map(event=>event.type==='user/message'?{...event,data:{...event.data,source:{...event.data.source,sessionId:event.data.source?.sessionId??source.id}}}:event);
       let seq=inherited.at(-1)?.seq??0;if(p.mode==='reply')inherited.push({seq:++seq,type:'turn/end',data:{reason:{kind:'completed'}}});inherited.push({seq:++seq,type:'session/title',data:{title:m.title}});
       if(!Number.isSafeInteger(seq))throw Error('The branch display sequence is exhausted; originals preserved.');
@@ -705,7 +732,7 @@ export class Host {
     }
     const directory=privateDir(join(this.dirs.sessions,sid));
     const context=branchContext(source.file,directory,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
-    const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,policy:source.policy,updatedAt:Date.now(),requests:[],running:false,fork};
+    const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,...permissionAtBoundary(source,p.messageSeq),updatedAt:Date.now(),requests:[],running:false,fork};
     const inherited=context.events.map(event=>event.type==='user/message'?{...event,data:{...event.data,source:{...event.data.source,sessionId:event.data.source?.sessionId??source.id}}}:event);
     writeFileSync(join(this.dirs.sessions,sid+'.events.jsonl'),inherited.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600});
     this.save(m);this.metadata.set(sid,m);
@@ -735,7 +762,7 @@ export class Host {
     const finish=this.serial.then(()=>{if(this.quiescing)throw Error('Runtime is closing for maintenance.');return this.organizeSession(p);});this.serial=finish.catch(()=>{});return finish;
   }
   private mcpInfo(m:Meta){if(m.surface==='browser')return {available:false,reason:'MCP is unavailable in browser-only conversations.'};return {...(this.loaded.get(m.id)?.mcp?.describe()??{available:false,reason:'MCP bindings are not loaded for this saved conversation.'}),management:this.mcpManagement.describe(m.id)};}
-  submit(r:Loaded,input:string,id:string){r.mcp?.assertReady();const m=r.meta;if(this.organization.archived(m.id))throw Error('Restore the conversation before starting work.');if(m.running)throw new Error('This conversation is already working');
+  submit(r:Loaded,input:string,id:string){const permissionInput=permissionCommand(input);r.mcp?.assertReady();const m=r.meta;if(this.organization.archived(m.id))throw Error('Restore the conversation before starting work.');if(m.running)throw new Error('This conversation is already working');
     if(this.mcpReloading)throw Error('Finish MCP session reload before sending a chat prompt.');
     this.wikiReady(m);this.searchReady(m);
     if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');
@@ -746,7 +773,7 @@ export class Host {
     r.execution?.begin(r.manager);
     r.reasoning?.begin(reasoningPolicy,savedThinking,this.settings.revision);
     const modeInput=planCommand(input);
-    if(!m.title&&(!modeInput||modeInput.message||queue.read(id).attachments?.length)){m.title=((modeInput?modeInput.message:input)||queue.read(id).attachments?.map(p=>p.attachment.name||'Attachment').join(', ')||'Attachment').replace(/\s+/g,' ').slice(0,80);r.session.setSessionName(m.title);this.append(m,'session/title',{title:m.title});this.save(m);}
+    if(!m.title&&!permissionInput&&(!modeInput||modeInput.message||queue.read(id).attachments?.length)){m.title=((modeInput?modeInput.message:input)||queue.read(id).attachments?.map(p=>p.attachment.name||'Attachment').join(', ')||'Attachment').replace(/\s+/g,' ').slice(0,80);r.session.setSessionName(m.title);this.append(m,'session/title',{title:m.title});this.save(m);}
     r.task=(async()=>{let failed=false,attempted=false,handled=false;try{
       await r.memory.activity('foreground');if(r.cancelled)return;
       const attachmentInput=await this.attachments.resolve(m.id,input,queue.read(id).attachments);if(r.cancelled)return;validateSteeringInput(r.session,input);r.phase='running';attempted=true;r.preparingInput=true;
@@ -757,7 +784,7 @@ export class Host {
         if(disposition==='handled'){
           handled=true;r.execution?.inputHandled();
           const mode=r.planMode.view(),isPlanCommand=modeInput&&!modeInput.message&&(mode.pending?!mode.active:mode.active)===modeInput.active;
-          const message=isPlanCommand?(modeInput.active?(mode.pending?'Entering plan mode at the next step.':'Plan mode on. Use /plan off to leave.'):(mode.pending?'Leaving plan mode at the next step.':'Plan mode off.')):'The input was handled by an input extension. No copy of that input was sent to the model.';
+          const message=permissionInput?'Permission mode: '+permissionSelection(m).currentValue+'.'+(permissionInput.preset===null?' Available: '+permissionOptions().map(row=>row.value).join(', ')+'.':'')+' Existing running work and job grants stay unchanged.':isPlanCommand?(modeInput.active?(mode.pending?'Entering plan mode at the next step.':'Plan mode on. Use /plan off to leave.'):(mode.pending?'Leaving plan mode at the next step.':'Plan mode off.')):'The input was handled by an input extension. No copy of that input was sent to the model.';
           this.append(m,'runtime/notice',{message,disposition:'input-handled',submittedContent:submittedParts(input,queue.read(id).attachments),source:{kind:'user',sessionId:m.id,rpcId:id},incomplete:false});
         }
       }});
@@ -804,6 +831,9 @@ export class Host {
     if(method==='setup.test'){if(this.modelSettingsBusy)throw Error('Finish model account changes before testing another connection.');return this.setup.test(p);}
     if(method==='setup.cancel')return this.setup.cancel();
     if(method==='models.settingsDiscover')return this.discoverModels(p.request??{});
+    // These synchronous policy reads/writes create no SDK owner and must not wait behind an approval-holding preparation.
+    if(method==='session.permission')return this.permissionSnapshot(this.getMeta(p.sessionId),p.beforeRevision);
+    if(method==='session.selectPermission')return this.selectPermission(p);
     if(method==='session.cancel')return this.cancel(p.sessionId);
     if(method==='session.organize'&&p.action==='archive'&&p.stop===true)return this.stopAndArchive(p);
     if(method==='session.cancelJob')return this.jobs.cancel(this.getMeta(p.sessionId).id,identifier(p.jobId));
@@ -897,7 +927,7 @@ export class Host {
     case 'observation.list':{const m=this.getMeta(p.sessionId);return this.observations.page(m.id,{beforeSeq:p.beforeSeq,afterSeq:p.afterSeq,limit:p.limit,query:p.query});}
     case 'observation.payload':{const m=this.getMeta(p.sessionId);return this.observations.payload(m.id,identifier(p.eventId),p.offset,p.limit,p.sha256);}
     case 'observation.clear':{const m=this.getMeta(p.sessionId);this.observations.clear(m.id);return {cleared:true,scope:'diagnostic records only'};}
-    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,activeModelAccountLogins:this.modelAccounts?.busy?1:0,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{permissionDefaults:true,searchSettings:process.platform==='linux',searchModes:process.platform==='linux',wikiSettings:process.platform==='linux',durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelSettingsRevisions:true,modelDiscovery:true,modelAccountLogout:true,modelAccountLogin:true,shortcuts:true,appearancePreferences:true,metafolders:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,planMode:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue; product /plan uses admitted SDK input',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
+    case 'host.describe':return {protocol:PROTOCOL,pid:process.pid,activeUploads:this.uploads,activeFileReferences:this.referenceRequests,activeFilePreviews:this.previewReads,activeOfficePreviews:this.officePreview?.busy?1:0,activeHarnessRequests:this.harnessRequests,activeModelDiscoveries:this.modelSettings.activeDiscoveries,activeModelAccountLogins:this.modelAccounts?.busy?1:0,unsentHarnessDrafts:this.harnessDrafts.dirtyCount(),activeCompactions:this.compactions.busy?1:0,activeTurns:[...this.metadata.values()].filter(m=>m.running).length,version:RELEASE.version,piVersion:'1.1.0',workspace:process.env.AUGMENTOR_PI_WORKSPACE||process.cwd(),attachmentLimits:{...IMAGE_LIMITS,maxFileBytes:FILE_LIMIT},capabilities:{sessionPermissions:true,permissionDefaults:true,searchSettings:process.platform==='linux',searchModes:process.platform==='linux',wikiSettings:process.platform==='linux',durableBranches:true,recoverableBranchPublication:process.platform==='linux',modelSettings:true,modelSettingsRevisions:true,modelDiscovery:true,modelAccountLogout:true,modelAccountLogin:true,shortcuts:true,appearancePreferences:true,metafolders:true,htmlPreviewSettings:true,manualCompaction:'public-sdk; native-boundary-receipts; cancel-and-no-replay',attachments:true,jobs:'durable-exact-owner; bounded-sdk-children-and-shell; no-replay; one-time-attribution',goals:'persistent-branch-state; explicit-human-arming; same-owner-continuation',plans:true,planMode:true,queue:true,steering:true,reasoning:true,promptImprovement:true,inspection:true,indexedDisplayHistory:true,indexedNativeHistory:true,managedMcp:'native-managed-profile; browser-unavailable; explicit-sdk-management',mcpManagement:true,mcpConfiguration:true,toolOriginals:'native-current-branch; MCP-and-nested; before-result-hooks; 63-MiB-JSON-limit',originalHistorySearch:'Pi selected ancestry/all saved entries and raw display originals',linuxTools:process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0',desktopInput:desktopCapabilities().available,osCustomisation:false,localRouteEnforcement:false},promptInput:{source:'rpc',expandPromptTemplates:true,skills:'approved-session-resources',extensionCommands:'rejected-in-durable-queue; product /plan and /permission use admitted SDK input',disposition:'PromptOptions.preflightResult',stopDuringInput:'provider-blocked; await-handler-settlement; uncertain-receipt'},steering:{input:'sdk-public-input-and-approved-resources',sdkInputTransforms:true,inFlightTools:'settle',continuation:'same-AgentSession',identity:'owned-message-reference'},execution:{...EXECUTION_POLICY,providerRetries:0,sessionRetries:false,actionGuard:'automatic-recovery-and-steered-continuation',completion:'response-or-tool-handoff; task success requires verification'},toolBudget:{...TOOL_BUDGET,units:'unicode-code-points',originals:'native-current-branch',idleRepair:true},desktopSpecialist:{version:'augmentor-computer-use/1',available:desktopCapabilities().available,selectedModelOnly:true,requiresImageModel:true,maxConcurrent:1,evidence:'local-files',coreIntegration:false},desktopControl:desktopCapabilities(),configDir:this.dirs.config,stateDir:this.dirs.state};
     case 'host.prepareShutdown':
       if(this.modelAccounts?.busy)throw Error('Cancel and settle account sign-in before shutting down the runtime.');
       if(this.compactions.busy)throw Error('Stop and settle Pi compaction before shutting down the runtime.');
@@ -1096,6 +1126,7 @@ export class Host {
       if(p.mode!==undefined&&!['queue','steer'].includes(p.mode))throw Error('Choose queue or steer mode.');
       const hasImages=Array.isArray(p.content)&&p.content.some((part:Data)=>part.type==='image');if(hasImages&&!(await this.selected(m.selection)).input.includes('image'))throw Error('The selected model does not support image input.');
       const {input,attachments}=await this.attachments.admit(m.id,p.content),queue=this.queue(m);
+      if(permissionCommand(input)&&attachments.length)throw Error('Attachments cannot accompany /permission.');
       if(planCommand(input)?.active===false&&attachments.length)throw Error('Attachments cannot accompany /plan off.');
       const existing=queue.lookup(requestId,input,attachments);if(existing||m.requests.includes(requestId))return {accepted:true,duplicate:true,requestId};
       if(m.surface!=='browser'&&this.mcpManagement.busy)throw Error('Finish or cancel MCP management before sending a Native chat prompt.');

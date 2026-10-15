@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 15 **current-chat** selection adds two further **verbatim MIT** files:
+`ui-permission-presets/src/client/PermissionSelect.tsx` and its CSS. The source is
+the same public d743267 baseline below; Git blob and SHA-256 bodies were checked.
+The prior 599 records/bodies stay unchanged; the selection is now **601**. The
+original selector/confirmation and already selected slash popup render through
+an authored Pi revisioned-policy adapter in their original composer slot. The DSH
+host/plugin writer remains excluded. The preceding six-file default-row selection
+is retained below as historical provenance.
+
 The October 15 Permission-default selection adds six **verbatim MIT** files from
 public d743267 `packages/client/ui-permission-presets/src/client`: PermissionRow,
 its CSS, presentation, locale dictionaries and preferred settings/catalog type

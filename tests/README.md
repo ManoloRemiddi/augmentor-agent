@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original current-chat Permission controls](../docs/DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
+now bind the MIT DSH composer selector and slash popup to revisioned, atomic Pi
+conversation policy. Read Only, Ask before actions and Full access affect future
+authorization checks; pending approved changes are rechecked, accepted jobs keep
+their grants, and historical branches inherit the selected message's policy.
+Seven pure/eighteen actual Host/sixteen common GUI cases and five original-GUI
+cases pass **46/46**. Controlled old-API, absent-chip and removed-guard failures
+are retained. Supplier selection is **601** (two new verbatim files, prior 599
+unchanged); no dependency or second SDK owner is added. Broad source/copy checks,
+fresh review, hosted/physical acceptance and full migration remain open. Existing
+review/installed builds remain unchanged. The preceding Permission-default record
+below is historical where it lists current-chat controls as missing.
+
 [Original Permission default row](../docs/DSH-GUI-ON-PI.md#original-permission-default-row--october-15)
 restores the MIT DSH General setting and Full access confirmation for future chats.
 It preserves current conversation policies and commits settings before changing

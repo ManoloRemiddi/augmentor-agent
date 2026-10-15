@@ -1,6 +1,8 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 
-const unavailable=new Set(['permission','export','feedback']);
+import {permissionCommand} from '../../packages/runtime/src/session-permission-contracts.ts';
+import {permissionMenuOptions} from './dsh-session-permissions.mjs';
+const unavailable=new Set(['export','feedback']);
 const sameModel=(a,b)=>a?.provider===b?.provider&&a?.model===b?.model;
 
 /** Pi bindings for the copied DSH trigger and popup controllers; no agent owner. */
@@ -40,6 +42,7 @@ export class DshCommandMenu {
     },matchEnter:(_,line)=>{
       const match=/^\/([^\s]+)(?:\s|$)/.exec(line);if(!match)return undefined;
       const name=match[1];if(name==='plan'&&this.current().capabilities?.planMode===true)return undefined; // Product /plan keeps its message and attachments in the admitted input chain.
+      if(name==='permission'){if(this.current().capabilities?.sessionPermissions!==true)throw Error('/permission is not yet connected to this Pi host. Your draft is preserved.');const parsed=permissionCommand(line);this.dispatch(name,scope,{via:'enter',token:line,rev:this.deps.draft().rev},parsed.preset);return 'handled';}
       if(unavailable.has(name))throw Error('/'+name+' is not yet connected to Pi. Your draft is preserved.');
       if(!this.deps.rows().some(row=>row.name===name))return undefined;
       if(line!=='/'+name)throw Error('Use /'+name+' by itself to open this command. Your draft is preserved.');
@@ -71,8 +74,14 @@ export class DshCommandMenu {
     const draft=this.deps.draft(),span=segment.via==='enter'?{start:0,end:draft.text.length}:segment.span;
     return this.deps.replace(span,replacement,draft.rev,scope);
   }
-  dispatch(name,scope,segment){
+  dispatch(name,scope,segment,preset){
     if(!this.segmentValid(scope,segment))return false;
+    if(name==='permission'){
+      if(this.current().capabilities?.sessionPermissions!==true||!this.deps.permission)return false;
+      const context={...scope,segment};
+      if(preset!==undefined&&preset!==null){void Promise.resolve().then(async()=>{const view=await this.deps.permission.read(scope);if(!view||!this.segmentValid(scope,segment))return;const result=await this.deps.permission.select(preset,{...scope,revision:view.revision});if(result?.accepted)this.consume(scope,segment);}).catch(error=>this.deps.notice(error.message));return true;}
+      this.select.open('permission',{options:async(_,signal)=>{const view=await this.deps.permission.read(scope);if(signal.aborted||!this.valid(scope))return [];if(!view?.canSelect)throw Error('Refresh the current operator permission mode.');context.revision=view.revision;return permissionMenuOptions(view,this.deps.permission.t);},onSelect:async(option,captured)=>{if(!this.segmentValid(captured,captured.segment)||captured.revision!==this.deps.permission.current()?.revision)throw Error('The conversation, draft or permission mode changed. Reopen /permission; nothing was applied.');return this.deps.permission.select(option.value,captured);}},context,segment);return true;
+    }
     if(name==='context'){
       const action=this.deps.actions.context;if(!action)return false;
       // The original plugin leaves its token until the dialog closes. The

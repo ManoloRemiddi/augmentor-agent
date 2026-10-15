@@ -1,5 +1,35 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current-chat permissions](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15):
+`host.describe.capabilities.sessionPermissions` advertises `session.permission
+{sessionId,beforeRevision?}` and operator-only `session.selectPermission
+{sessionId,preset,expectedRevision}`. Read snapshots contain `available`,
+`currentValue`, `revision`, `canSelect`, three `{value,name,description}` options,
+`origin`, `history:{entries,hasMore,cursor}` (20 records/page) and boundary/storage
+labels. Older pages keep the current value/revision; unknown cursors fail. The
+initial revision is `initial`, with unknown change time; later UUID revisions are
+private to that conversation. `accepted:true` with `outcome:committed|noop`
+returns the canonical snapshot. Stale/invalid/failed writes cannot change accepted
+policy or metadata bytes. Current choices do not mutate global defaults, create
+an SDK owner or modify the native transcript. `permission/updated` is a scoped
+revision read hint; `session/permission` and optional `execution/permission` are
+local display/diagnostic receipts, not the canonical policy store.
+
+Only restored root operators can select. Scoped inspectors receive
+`canSelect:false` and cannot access another conversation or mutate a policy.
+Metadata reads/writes are synchronous outside the approval-holding admission
+lane. New authorization checks use the accepted policy, including a second Read
+Only check after a pending approval; existing dispatched work and job grants
+remain unchanged. A Full access choice does not answer pending approvals. Reply/
+Edit branches seed historical policy and own fresh revisions. The GUI accepts an
+exact setter receipt, reconciles dirty notifications through reads and fences
+unknown writes until explicit refresh. Bare GUI `/permission` uses the original
+popup; explicit supported arguments apply the exact human choice. Native/Browser
+text commands use the SDK admitted input chain without inference or a title;
+attachments, unsupported presets, extension commands with this name and transformed
+nonmatching input fail. The three machine IDs are `read-only`, `workspace-write`
+and `danger-full-access`; no sandbox or experimental Auto capability is implied.
+
 [New-chat permission defaults](DSH-GUI-ON-PI.md#original-permission-default-row--october-15):
 `host.describe.capabilities.permissionDefaults` advertises an operator-only
 `settings.describe {ns:"permission"}` snapshot with `value.defaultPreset`, the

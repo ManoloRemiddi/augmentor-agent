@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {readDshPayload} from './dsh-payload.mjs';
+import {checkedSessionPermission} from './dsh-session-permissions.mjs';
 import {appendDisplay,messageTargets} from './chat-projection.js';
 
 /** Browser transport to the existing Pi Host; never owns an agent or retries a mutation. */
@@ -7,7 +8,7 @@ export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
   branchFlight=null; branchIntents=new Map();createFlight=null;
   catalogRevision=0;catalogRead=0;
-  state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,planMode:null,goal:null,workspace:'',error:null,hasMore:false};
+  state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,permission:null,permissionBusy:false,permissionError:null,planMode:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
@@ -29,7 +30,7 @@ export class DshPiController {
   async open(sessionId){
     if(!this.state.readOnly&&this.state.workspaces?.archivedSessionIds?.includes(sessionId))throw Error('Restore the conversation before opening it.');
     const epoch=++this.epoch;
-    this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,compaction:null,compactionPending:false,phase:'loading',events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],selection:null,reasoning:null,planMode:null,goal:null,hasMore:false,error:null});
+    this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,compaction:null,compactionPending:false,phase:'loading',events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],selection:null,reasoning:null,permission:null,permissionBusy:false,permissionError:null,planMode:null,goal:null,hasMore:false,error:null});
     const sub=await this.rpc('events.subscribe',{sessionId,clientId:this.clientId});if(epoch!==this.epoch)return;
     this.cursor=sub.cursor;
     const [history,observations,model,queue,goal,compaction]=await Promise.all([
@@ -39,8 +40,32 @@ export class DshPiController {
     const reasoning=this.state.readOnly?null:await this.rpc('session.reasoning',{sessionId});if(epoch!==this.epoch)return;
     sessionStorage.setItem('augmentor-harness-session',sessionId);
     this.update({events:history.events.map(x=>x.event),hasMore:history.hasMore===true,observationHasMore:observations.hasMore===true,records:observations.records,selection:model.current,queue,goal,reasoning,compaction,interactions:sub.pending,phase:'ready'});
+    this.permissionUnconfirmed=false;
+    if(this.state.capabilities?.sessionPermissions)await this.refreshPermission({sessionId,epoch},{explicit:true});
     if(this.state.capabilities?.planMode)await this.refreshPlanMode({sessionId,epoch});
     void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
+  }
+  permissionRead=0;permissionMutation=null;permissionUnconfirmed=false;
+  async refreshPermission(scope={sessionId:this.state.sessionId,epoch:this.epoch},{explicit=false}={}){
+    if(!this.modeScope(scope)||!this.state.capabilities?.sessionPermissions||this.permissionUnconfirmed&&!explicit)return;
+    if(this.permissionMutation&&this.modeScope(this.permissionMutation)){this.permissionMutation.needsRefresh=true;return;}
+    const ticket=++this.permissionRead;this.update({permissionBusy:true});
+    try{const value=checkedSessionPermission(await this.rpc('session.permission',{sessionId:scope.sessionId}));if(this.modeScope(scope)&&ticket===this.permissionRead){this.permissionUnconfirmed=false;this.update({permission:value,permissionBusy:false,permissionError:null});return value;}}
+    catch(error){if(this.modeScope(scope)&&ticket===this.permissionRead){this.permissionUnconfirmed=true;this.update({permission:null,permissionBusy:false,permissionError:error.message});}}
+  }
+  async selectPermission(preset,scope={sessionId:this.state.sessionId,epoch:this.epoch,revision:this.state.permission?.revision}){
+    if(!this.modeScope(scope)||this.state.readOnly||!this.state.capabilities?.sessionPermissions||!this.state.permission?.canSelect||this.state.permissionBusy||this.permissionUnconfirmed||scope.revision!==this.state.permission.revision||!this.state.permission.options.some(x=>x.value===preset))throw Error('Refresh the current operator permission mode before choosing again.');
+    const operation={...scope};this.permissionMutation=operation;++this.permissionRead;this.update({permissionBusy:true,permissionError:null});
+    try{
+      const result=await this.rpc('session.selectPermission',{sessionId:scope.sessionId,preset,expectedRevision:scope.revision});if(!this.modeScope(scope))return {accepted:false,retired:true};if(result?.accepted!==true)throw Error('The permission change was not acknowledged.');const receipt=checkedSessionPermission(result);if(receipt.currentValue!==preset||(preset!==this.state.permission?.currentValue&&receipt.revision===scope.revision))throw Error('The permission receipt does not confirm the selected mode.');
+      if(this.permissionMutation===operation)this.permissionMutation=null;
+      this.permissionUnconfirmed=false;this.update({permission:receipt,permissionBusy:false,permissionError:null});
+      // A notification received while the write was pending may be newer than
+      // its accepted receipt. Reconcile by reading, never by repeating a choice.
+      if(operation.needsRefresh)await this.refreshPermission(scope,{explicit:true});
+      if(!this.modeScope(scope))return {accepted:false,retired:true};return {accepted:true,...receipt};
+    }catch(error){if(this.modeScope(scope)){this.permissionUnconfirmed=true;this.update({permission:null,permissionBusy:false,permissionError:error.message,error:error.message+' Nothing was retried. Refresh permission mode to inspect the saved choice.'});}throw error;}
+    finally{if(this.permissionMutation===operation)this.permissionMutation=null;}
   }
   planModeRead=0;
   modeScope(scope){return scope?.epoch===this.epoch&&scope.sessionId===this.state.sessionId&&this.state.phase==='ready';}
@@ -106,7 +131,7 @@ export class DshPiController {
     }catch(error){if(epoch===this.epoch)this.update({contextPage:{loading:false,error:error.message}});}})();
     try{await job.promise;}finally{if(this.contextPaging===job)this.contextPaging=null;}
   }
-  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,goal:null,planMode:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
+  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,goal:null,planMode:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,permission:null,permissionBusy:false,permissionError:null,hasMore:false,unconfirmed:null,phase:'ready'});}
   async refresh(){
     const epoch=this.epoch,sessionId=this.state.sessionId,readOnly=this.state.readOnly,revision=this.catalogRevision,read=++this.catalogRead;
     // A confirmed catalog update invalidates reads already in flight, including
@@ -229,6 +254,7 @@ export class DshPiController {
       if(changed)void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
       if(page.gap){await this.open(sessionId);return;}
       if(page.frames.length||!this.lastRefresh||Date.now()-this.lastRefresh>3000){this.lastRefresh=Date.now();await this.refresh();}
+      if(this.state.capabilities?.sessionPermissions&&page.frames.some(({frame})=>frame.method==='permission/updated'))await this.refreshPermission({sessionId,epoch});
       if(this.state.capabilities?.planMode&&page.frames.some(({frame})=>frame.method==='plan-mode/updated'))await this.refreshPlanMode({sessionId,epoch});
       if(page.frames.some(({frame})=>frame.method==='goal/updated')){const goal=await this.rpc('session.goal',{sessionId});if(epoch===this.epoch)this.update({goal});}
       for(const [key,held] of this.heldQuestions){
