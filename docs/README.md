@@ -4,6 +4,8 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [EDGE direct draft dictation](EDGE-DRAFT-DICTATION.md): token-bound Handy capture without global paste; separate companion native presentation.
+
 - [Handy repair downloads — October 5](HANDY-DOWNLOADS-2026-10-05.md): published preview 3, merged startup/rendering repair, all-platform qualification, full-byte verification and live website adoption.
 - [Historical published Handy downloads — October 3](HANDY-DOWNLOADS-2026-10-03.md): matched Linux/Mac/Windows preview 2, verified public bytes, qualification and physical acceptance boundaries.
 
