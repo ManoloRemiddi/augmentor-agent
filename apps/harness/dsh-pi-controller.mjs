@@ -10,7 +10,7 @@ export class DshPiController {
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
-  update(patch){this.state={...this.state,...patch};for(const fn of this.listeners)fn();}
+  update(patch){this.state={...this.state,...patch};for(const [id,scope] of this.hiddenQuestions)if(this.state.readOnly||this.state.phase!=='ready'||scope.epoch!==this.epoch||scope.sessionId!==this.state.sessionId||!this.state.interactions.some(f=>f.rpcId===id))this.hiddenQuestions.delete(id);for(const fn of this.listeners)fn();}
   async rpc(method,params={},signal){
     const response=await this.fetcher('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params}),...(signal?{signal}:{})});
     const body=await response.json();if(!response.ok||body.error){const error=Error(body.error?.message||'The local connection failed.');error.authoritative=!!body.error;throw error;}return body.result;
@@ -232,6 +232,21 @@ export class DshPiController {
   }
   pending=new Map();
   heldQuestions=new Map();
+  hiddenQuestions=new Map();
+  visibleInteraction(){return this.state.interactions.find(frame=>!this.hiddenQuestions.has(frame.rpcId));}
+  questionForTool(data){
+    if(data.name!=='ask_user'||this.state.readOnly||this.state.phase!=='ready')return;
+    const call=this.state.events.findLast(e=>e.type==='tool/call'&&e.data.name==='ask_user'&&e.data.toolCallId===data.toolCallId);
+    if(call?.seq!==data.seq)return;
+    return this.state.interactions.find(frame=>frame.method==='question/requested'&&frame.payload.sessionId===this.state.sessionId&&frame.payload.ownerId===this.state.sessionId&&frame.payload.toolCallId===data.toolCallId);
+  }
+  canHideQuestion(frame){
+    const call=this.state.events.findLast(e=>e.type==='tool/call'&&e.data.name==='ask_user'&&e.data.toolCallId===frame.payload?.toolCallId);
+    return !!call&&this.questionForTool({...call.data,seq:call.seq})?.rpcId===frame.rpcId;
+  }
+  hideQuestion(frame){const scope=this.interactionScope(frame);if(!this.canHideQuestion(frame))throw Error('This question has no current tool row.');this.hiddenQuestions.set(frame.rpcId,scope);this.heldQuestions.delete(frame.rpcId);this.update({});}
+  revealQuestion(frame){this.interactionScope(frame);if(!this.canHideQuestion(frame))throw Error('This question has no current tool row.');this.hiddenQuestions.delete(frame.rpcId);this.update({});}
+
   interactionScope(frame){
     const sessionId=this.state.sessionId,epoch=this.epoch;
     if(this.state.readOnly||this.state.phase!=='ready'||!sessionId||frame.payload?.sessionId&&frame.payload.sessionId!==sessionId||!this.state.interactions.some(x=>x.rpcId===frame.rpcId&&x.method===frame.method))throw Error('This interaction is no longer selected. Nothing was sent.');

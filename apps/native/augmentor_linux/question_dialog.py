@@ -42,5 +42,7 @@ class QuestionDialog(QDialog):
     def answer(self):
         result={'id':self.question['id'],'selected':[item.data(Qt.ItemDataRole.UserRole) for item in self.options.selectedItems()]}
         text=self.custom.toPlainText()
-        if text.strip():result['custom']=text
+        if text.strip():
+            result['custom']=text
+            if not self.question.get('multiSelect'):result['selected']=[]
         return result

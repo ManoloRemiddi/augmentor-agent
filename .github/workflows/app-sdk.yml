@@ -2,7 +2,7 @@
 name: Application SDK platform contracts
 on:
   pull_request:
-    paths: ['services/workspaces/**', 'apps/browser/**', 'apps/harness/**', 'packages/codex-runtime/**', 'packages/runtime/src/model-account*', 'packages/runtime/src/model-settings.ts', 'packages/runtime/src/tool-argument-snapshots.ts', 'packages/runtime/src/office-*', 'packages/runtime/src/host.ts', 'packages/runtime/src/harness-server.ts', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/model-account*', 'tests/tool-argument-snapshots.test.mjs', 'tests/office-native-linux.test.mjs', 'tests/harness-account-scope*', 'tests/harness-model-invalidation*', 'tests/harness-session-create*', 'tests/test_app_sdk_platform.py', 'apps/home/**', 'packages/home-client/**', 'packages/runtime/src/home.ts', 'adapters/dsh-home/**', 'tests/home-client.test.mjs', '.github/workflows/app-sdk.yml']
+    paths: ['services/workspaces/**', 'apps/browser/**', 'apps/harness/**', 'packages/codex-runtime/**', 'packages/runtime/src/model-account*', 'packages/runtime/src/model-settings.ts', 'packages/runtime/src/tool-argument-snapshots.ts', 'packages/runtime/src/office-*', 'packages/runtime/src/host.ts', 'packages/runtime/src/harness-server.ts', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/model-account*', 'tests/tool-argument-snapshots.test.mjs', 'tests/office-native-linux.test.mjs', 'tests/harness-account-scope*', 'tests/harness-model-invalidation*', 'tests/harness-session-create*', 'tests/test_app_sdk_platform.py', 'apps/home/**', 'packages/home-client/**', 'packages/runtime/src/home.ts', 'packages/runtime/src/questions.ts', 'packages/runtime/src/interactions.ts', 'packages/pi-linux/**', 'tests/pi-question*.mjs', 'tests/pi-interactions.test.mjs', 'adapters/dsh-home/**', 'tests/home-client.test.mjs', '.github/workflows/app-sdk.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -48,6 +48,8 @@ jobs:
         run: node --test --test-name-pattern="original provider admits|converter seat cancellation|original provider writes only" tests/office-native-linux.test.mjs
       - name: Verify real MCP timeout cancellation and retained sibling receipts
         run: node --test tests/pi-mcp-authorization.test.mjs
+      - name: Verify shared question batches, decisions and scoped timing controls
+        run: node --test tests/pi-question-contracts.test.mjs tests/pi-interactions.test.mjs
       - name: Verify shared Home client authority and durable request receipts
         run: node --test tests/home-client.test.mjs
       - name: Verify OS private files and startup contracts

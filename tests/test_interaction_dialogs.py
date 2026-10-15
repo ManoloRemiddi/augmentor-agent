@@ -44,6 +44,8 @@ class InteractionDialogsTest(unittest.TestCase):
         self.assertEqual(dialog.answer()['selected'],['B'])
         dialog.options.clearSelection();dialog.custom.setPlainText('A custom answer')
         self.assertEqual(dialog.answer(),{'id':'q','selected':[],'custom':'A custom answer'})
+        dialog.options.setCurrentRow(0)
+        self.assertEqual(dialog.answer(),{'id':'q','selected':[],'custom':'A custom answer'})
         dialog.close()
 
     def test_approval_defaults_to_no_and_cancellation_never_answers(self):

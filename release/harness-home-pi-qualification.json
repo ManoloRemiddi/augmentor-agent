@@ -179,5 +179,22 @@
     "apps/home/pi/prepare.mjs": "f9e6193c3854861364fd3363b2c5c4d12eac2f1cd33dab46c13aa8be019d83bd",
     "apps/home/pi/proof.mjs": "96708d259c33332df1c1eeb105f4c18313cb71bcbf3e27597954926ae1fb0344",
     "apps/home/test/pi-runtime.test.mjs": "4d8bf6b8e835d40e7602dd0c9ff20d176148adc5d5d0e39d50518a2a13b98f0b"
+  },
+  "hostedFollowUp": {
+    "ref": "476d7be89dd811ca785a873d3ea0abfb16a9fb19",
+    "sdkThreePlatforms": "passed",
+    "homeSourceTests": 48,
+    "homeSourcePasses": 48,
+    "piImageProofModes": [
+      "assist-preview",
+      "selected"
+    ],
+    "piImageProofPasses": 2,
+    "installedProductionNpmNotices": 133,
+    "homeJobUrl": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38692313466/job/116280861710",
+    "sdkRunUrl": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38692312973",
+    "homeJobLogSha256": "a25b77aacfab9eb632ff9e213ac17d1c07bc0ba666b129334349f72e38d60f98",
+    "widerLinuxFailure": "Context placement-menu Tab pointer target unavailable; exact cause unresolved; later package steps not reached",
+    "deploymentOrPublication": false
   }
 }

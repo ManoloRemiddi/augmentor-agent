@@ -232,3 +232,23 @@ European residency guarantee. Home adds no external support export, long-term
 memory, cross-host prompt sync or household erase/repair UI. Retention/backup and
 controlled state removal remain operator responsibilities. Do not share native
 history, original HTTP bodies or state mounts as a licence/provenance report.
+
+## Question batches and plan previews
+
+[Structured questions](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
+store asked fields and actual answers in the existing private native SDK tool
+history. Explicit submission sends those answers to the selected model; Skip,
+cancellation and unavailable answers remain distinct from an offered choice.
+No second database, external export, analytics destination or permission grant
+is introduced. Invalid/partial replies leave the original question pending.
+
+Hidden-question identities and drafts are local UI memory scoped to the selected
+conversation/generation/access. Original plan sidebar navigation holds bounded
+submitted Markdown in transient tab parameters; its retained tool record permits
+later reopening, without provider/filesystem operations. These are submitted
+plans, not evidence of executed work or approval of a different current plan.
+New plan/question detail renderers disable remote and local image resolution;
+image alternative text and manually followed links retain normal rendering.
+This is not a global audit of all Markdown paths or authorized external pages.
+Existing native-history retention and diagnostic clearing remain separate; no
+new household/session erase or support-export workflow is added.

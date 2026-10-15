@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Structured question batches and original plan review](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
+restore whole-batch/multi-choice/custom/Skip behavior and the copied full-plan
+sidebar/review/card components on the existing Pi owner. Exact local tool-row
+hide/reopen keeps Request changes pending without approval or inference. Eight
+additional pinned public MIT plan inputs bring the selection to 591; seven are
+verbatim and one has a marked image-policy adaptation, also applied to existing
+question details. Original CSS stays unchanged. Source/ordinary each pass
+388/two optional skips across 81 files/all 45 Harness Chromium files. This is
+isolated qualification; installed MX and owner reviews remain preserved. Complete
+plan mode, generic settled-question reopening, late answers, persistent answer
+drafts, hosted/live/platform/full migration and public-release gates remain open.
+
 [Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict check/build, focused 41/41 and source/fresh ordinary **236/236 each across 60 files** pass, including all 44 Harness Chromium files. Authored-provider evidence uses real FileAuthStorage/Host/Chromium, callback/manual-code races and cold interruption. All 911 compiled files match; 20,847 dependency entries/155 production npm instances/Node 24.19.0 stay unchanged. Real provider, installed and new-head hosted acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
 
 [Original account confirmation on Pi](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds the exact MIT DSH sign-out dialog/CSS and reuses original Models cards for stored OAuth routes. No account backend/analytics enters the browser. Runtime 6c0d85c passes source/fresh ordinary 217/217 each across 57 files, all 43 Harness Chromium files, with 908 compiled matches and unchanged dependencies. Sign-in, live/provider/installed acceptance and wider migration remain open; current owner review is preserved.

@@ -3,7 +3,7 @@ import {randomUUID} from 'node:crypto';
 import type {ExtensionUIContext, ExtensionUIDialogOptions} from '@earendil-works/pi-coding-agent';
 import type {Data} from '../../protocol/src/index.js';
 type QuestionWait={revision:number;state:'counting'|'focused'|'editing'|'waiting';remainingMs:number;deadline?:number};
-type PendingInteraction={sessionId:string;ownerId:string;frame:Data;finish:(value:any,reason?:string)=>void;timer?:ReturnType<typeof setTimeout>;wait?:QuestionWait;focus:Map<string,number>};
+type PendingInteraction={sessionId:string;ownerId:string;frame:Data;finish:(value:any,reason?:string)=>void;validate?:(value:any)=>any;timer?:ReturnType<typeof setTimeout>;wait?:QuestionWait;focus:Map<string,number>};
 export class Interactions {
   pending=new Map<string,PendingInteraction>();
   constructor(private publish:(sessionId:string,frame:Data)=>void,private connected:(sessionId:string)=>boolean,private timeout=120000,private focusLeaseMs=15000,private observeWait?:(ownerId:string,id:string,kind:string,active:boolean)=>void){
@@ -26,7 +26,7 @@ export class Interactions {
       this.schedule(item);
     },Math.max(0,Math.min(...deadlines)-Date.now()));
   }
-  ask(sessionId:string,method:string,payload:Data,options?:ExtensionUIDialogOptions,ownerId=sessionId):Promise<any> {
+  ask(sessionId:string,method:string,payload:Data,options?:ExtensionUIDialogOptions,ownerId=sessionId,validate?:(value:any)=>any):Promise<any> {
     if(!this.connected(sessionId)||options?.signal?.aborted)return Promise.resolve(undefined);
     return new Promise(resolve=>{
       const id=randomUUID();
@@ -35,7 +35,7 @@ export class Interactions {
       const frame={method,rpcId:id,payload:{...payload,sessionId,approvalId:id}};
       const finish=(value:any,reason='answered')=>{if(!this.pending.delete(id))return;clearTimeout(item.timer);options?.signal?.removeEventListener('abort',abort);this.observed(ownerId,id,method,false);this.publish(sessionId,{method:'interaction/resolved',rpcId:id,payload:{sessionId,rpcId:id,reason}});resolve(value);};
       const abort=()=>finish(undefined,'aborted');
-      const item:PendingInteraction={sessionId,ownerId,frame,finish,focus:new Map(),...(method==='question/requested'?{wait:{revision:0,state:'counting',remainingMs:duration,deadline:Date.now()+duration}}:{})};
+      const item:PendingInteraction={sessionId,ownerId,frame,finish,validate,focus:new Map(),...(method==='question/requested'?{wait:{revision:0,state:'counting',remainingMs:duration,deadline:Date.now()+duration}}:{})};
       this.pending.set(id,item);options?.signal?.addEventListener('abort',abort,{once:true});
       this.observed(ownerId,id,method,true);
       if(item.wait){this.updateFrame(item);this.schedule(item);}else item.timer=setTimeout(()=>finish(undefined,'timed-out'),duration);
@@ -64,7 +64,7 @@ export class Interactions {
     this.schedule(item);this.updateFrame(item);
     return {accepted:true,rpcId:id,wait:item.frame.payload.wait};
   }
-  answer(id:string,value:any,sessionId:string){const item=this.pending.get(id);if(!item||item.sessionId!==sessionId)throw new Error('This interaction has already resolved');if(item.wait?.deadline!==undefined&&item.wait.deadline<=Date.now()){item.finish(undefined,'timed-out');throw new Error('This interaction has already resolved');}item.finish(value);return {accepted:true};}
+  answer(id:string,value:any,sessionId:string){const item=this.pending.get(id);if(!item||item.sessionId!==sessionId)throw new Error('This interaction has already resolved');if(item.wait?.deadline!==undefined&&item.wait.deadline<=Date.now()){item.finish(undefined,'timed-out');throw new Error('This interaction has already resolved');}item.finish(item.validate?item.validate(value):value,value?.cancelled===true?'cancelled':'answered');return {accepted:true};}
   cancel(sessionId:string){for(const item of [...this.pending.values()])if(item.sessionId===sessionId||item.ownerId===sessionId)item.finish(undefined,'cancelled');}
   settleOwner(ownerId:string){for(const item of [...this.pending.values()])if(item.ownerId===ownerId)item.finish(undefined,'owner-settled');}
   frames(sessionId:string){return [...this.pending.values()].filter(p=>p.sessionId===sessionId).map(p=>{if(p.wait)this.updateFrame(p);return p.frame;});}

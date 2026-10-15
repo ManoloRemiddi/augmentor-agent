@@ -1557,3 +1557,21 @@ fixtures, not live HA/household migration, physical or limited-NAS qualification
 The Validate Home job now runs the image proof; common Home client contracts also
 run in the existing three-OS SDK matrix. Preceding CI is historical; new-head
 hosted checks remain pending until observed.
+
+## Structured question batches and original plan review — October 15
+
+`pi-question-contracts.test.mjs` checks bounded legacy/batch inputs, exact full
+answers, explicit Skip/cancel, independent plan/tool permission, signal/owner
+settlement and exact root-row hide/reopen/access retirement. These common cases
+run with existing interaction timing cases in the three-platform SDK workflow.
+`pi-question-batches.test.mjs` uses an actual private Pi Host/provider for rejected
+partial replies, one native result, cold retained context/legacy replies and Stop.
+`harness-dsh-question-batches-chromium.test.mjs` drives original real pointer
+controls at 513×715: three-answer/multi-select/custom batch, draft hide/reopen,
+complete plan sidebar Light/Dark, Request changes without answering, exact Approve,
+retained plan reopening and no provider/image replay. Native Qt dialog regression
+checks single-custom precedence as well as existing multi-choice/cancel/approval.
+The prior sealed artifact rejects the same batch at actual SDK validation.
+[Owning scope](../docs/PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
+and the portable qualification record separate synthetic, ordinary and installed
+claims. Existing managed timeouts, two workers and unchanged fixture bounds apply.

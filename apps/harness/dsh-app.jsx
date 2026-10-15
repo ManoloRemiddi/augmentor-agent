@@ -75,6 +75,7 @@ import {en as trajectoryEn} from '@dsh-gui/ui-trajectory/src/client/locales.ts';
 import {en as modelEn} from '@dsh-gui/ui-model-selection/src/client/locales.ts';
 import {en as goalEn} from '@dsh-gui/ui-goal/src/client/locales.ts';
 import {DshAttachments} from './dsh-attachments.mjs';
+import {bindPlanReview} from './dsh-plan-review.jsx';
 import {DshDrafts} from './dsh-drafts.mjs';
 import {ComposerAttachments} from '@dsh-gui/ui-attachment/src/client/ComposerAttachments.tsx';
 import {MessageImages} from '@dsh-gui/ui-attachment/src/client/MessageImages.tsx';
@@ -110,6 +111,7 @@ const contextPreferences=new DshContextPreferences(controller);contextSettings.a
 const contextModal=createDshContextModalBinding(controller);
 const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
 const filePreviews=new DshFilePreviews(controller,layout,developerTools);bindContextNavigation(filePreviews);
+const planReviews=bindPlanReview(filePreviews);
 const contextTab=bindContextSidebar(filePreviews,contextSettings,DshContextDashboard,DshContextFleet);
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
 const attachmentDrafts=new DshAttachments(controller);let openFiles=null;
@@ -171,7 +173,7 @@ function useGroupAction(){return useRef(null);}
 const presentation={mode:'detailed',foldCompletedTurns:false,collapseTiming:'immediate',settledReasoningPreview:true};
 const position={read:()=>null,save:noOp};
 function OwnedMessage(props){return <AssistantNodeView {...props} useDisclosure={useDisclosure} useTurnData={()=>undefined} useGroupAction={useGroupAction} usePresentation={selectorFace(presentation)} t={t.chat}/>;}
-function PiTool({node,onInspect}){const [expanded,set]=useState(false),data=node.data;return <DisclosureRow open={expanded} expandable onToggle={()=>set(x=>!x)} title={data.name} icon={<StateDot state={data.status==='pending'?'ongoing':data.status==='error'?'error':data.status==='finished'?'done':'warning'}/>} headerAccessory={<Button variant="ghost" onClick={onInspect}>Inspect</Button>} children={expanded?<><JsonBlock payload={data.call?.arguments??{}} label="Arguments"/><JsonBlock payload={data.result??{status:data.status}} label="Result"/></>:undefined}/>;}
+function PiTool({node,onInspect,state}){const [expanded,set]=useState(false),data=node.data,question=controller.questionForTool(data);return <DisclosureRow open={expanded} expandable onToggle={()=>set(x=>!x)} title={data.name} icon={<StateDot state={data.status==='pending'?'ongoing':data.status==='error'?'error':data.status==='finished'?'done':'warning'}/>} headerAccessory={<>{question&&!state.readOnly&&<Button variant="ghost" onClick={()=>void control.run(async()=>controller.revealQuestion(question))}>{t.question('reply.open')}</Button>}<Button variant="ghost" onClick={onInspect}>Inspect</Button></>} children={<><planReviews.Recorded data={data} state={state}/>{expanded&&<><JsonBlock payload={data.call?.arguments??{}} label="Arguments"/><JsonBlock payload={data.result??{status:data.status}} label="Result"/></>}</>}/>;}
 const directoryT=tr({'browser.title':'Select Workspace Directory','browser.home':'Home','browser.newFolder':'New folder','browser.folderName':'Folder name','browser.createIn':'New folder in "{name}"','browser.untitledFolder':'Untitled folder','browser.create':'Create','browser.cancel':'Cancel','browser.open':'Open','browser.editPath':'Edit path','browser.loading':'Loading…','browser.truncated':'Too many folders to list; only the beginning is shown.','browser.showHidden':'Show hidden files'});
 // Upstream restarts navigation when its listing callback changes. Keep these
 // bindings stable while Host polls refresh the surrounding conversation.
@@ -219,11 +221,11 @@ function InteractionTakeover({frame,state}){
     const keys=()=>controller.state.interactions.map(x=>x.rpcId);
     const wait=action=>{void controller.questionWait(frame,action).catch(error=>{if(epoch===controller.epoch&&controller.state.interactions.some(x=>x.rpcId===frame.rpcId))controller.update({error:error.message});});};
     return {key:frame.rpcId,kind:'question',sessionId:state.sessionId,toolName:frame.payload.toolName,reason:frame.payload.reason,answerable:true,
-      questions:(frame.payload.questions||[]).map((q,i)=>({...q,id:q.id||String(i)})),review:undefined,dismissal:'cancel',snapshot,liveKeys:keys,
+      questions:(frame.payload.questions||[]).map((q,i)=>({...q,id:q.id||String(i)})),review:undefined,get dismissal(){return controller.canHideQuestion(frame)?'hide':'cancel';},snapshot,liveKeys:keys,
       takeTime:()=>wait('take-time'),engage:()=>wait('engage'),holdFocus:()=>wait('hold-focus'),releaseFocus:()=>wait('release-focus'),
-      dismiss:()=>controller.answer(frame,{cancelled:true}),answer:value=>controller.answer(frame,frame.method==='approval/requested'?{outcome:value==='rejected'?'denied':value}:{answer:value})};
+      dismiss:async()=>{if(controller.canHideQuestion(frame))controller.hideQuestion(frame);else await controller.answer(frame,{cancelled:true});},answer:value=>controller.answer(frame,frame.method==='approval/requested'?{outcome:value==='rejected'?'denied':value}:{answer:value})};
   },[frame.rpcId,frame.method,state.sessionId,controller.epoch]);
-  return frame.method==='approval/requested'?<ApprovalPanel matched={pending} t={t.approval} resolveReason={x=>String(x)} renderSlot={()=>null}/>:<QuestionComposer matched={pending} t={t.question} useStore={useQuestionDraft} actions={draft.actions} useQuestionCard={(_,selector=x=>x)=>selector(pending.snapshot())} renderSlot={()=>null}/>;
+  return frame.method==='approval/requested'?<ApprovalPanel matched={pending} t={t.approval} resolveReason={x=>String(x)} renderSlot={()=>null}/>:<QuestionComposer matched={pending} t={t.question} useStore={useQuestionDraft} actions={draft.actions} useQuestionCard={(_,selector=x=>x)=>selector(pending.snapshot())} renderSlot={(name,owner)=>name==='conversation.plan-review.actions'?<planReviews.Actions {...owner} state={state}/>:null}/>;
 }
 function QueueStatus({state}){
   const queue=state.queue;if(!queue)return null;
@@ -278,7 +280,7 @@ function App(){
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
   const draftState=useSyncExternalStore(draftArchive.subscribe,draftArchive.getSnapshot);
-  useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!settingsState.open&&!commandMenu.menu.getSnapshot().open&&!commandMenu.popup.state.getSnapshot().open&&!state.interactions.length&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog,settingsState.open]);
+  useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!settingsState.open&&!commandMenu.menu.getSnapshot().open&&!commandMenu.popup.state.getSnapshot().open&&!controller.visibleInteraction()&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog,settingsState.open]);
   const current=state.sessions.find(x=>x.sessionId===state.sessionId);
   const workspaces=useMemo(()=>{
     if(state.workspaces)return {...state.workspaces,phase:'ready',state:'ready'};
@@ -308,7 +310,7 @@ function App(){
     try{const goal=controller.state.goal?.goal;await controller.rpc('session.updateGoal',{sessionId:state.sessionId,change:{operation,expectedRef:goal?{id:goal.id,revision:goal.revision}:null,...extra,...(operation==='resume'?{continueAutomatically:true}:{})}});const next=await controller.rpc('session.goal',{sessionId:state.sessionId});controller.update({goal:next});return {ok:true,value:next};}catch(e){return {ok:false,error:{message:e.message,code:'goal-update'}};}
   };
   const render=(name,owner={},options={})=>{
-    const p={...common,...owner,renderSlot:render,renderSlotChain:(name,owner,opts)=>name==='conversation.composer'&&!state.readOnly&&state.interactions.length?<InteractionTakeover frame={state.interactions[0]} state={state}/>:opts.fallback,renderFactorySlot:(name,owner,opts)=><ConversationContent {...common} {...owner} renderSlot={render} renderSlotChain={(name,owner,o)=>name==='conversation.composer'&&!state.readOnly&&state.interactions.length?<InteractionTakeover frame={state.interactions[0]} state={state}/>:o.fallback} useFactorySlot={(key,fallback)=>key==='views'?BoundSession:opts.slots?.[key]||fallback}/>};
+    const p={...common,...owner,renderSlot:render,renderSlotChain:(name,owner,opts)=>name==='conversation.composer'&&!state.readOnly&&controller.visibleInteraction()?<InteractionTakeover frame={controller.visibleInteraction()} state={state}/>:opts.fallback,renderFactorySlot:(name,owner,opts)=><ConversationContent {...common} {...owner} renderSlot={render} renderSlotChain={(name,owner,o)=>name==='conversation.composer'&&!state.readOnly&&controller.visibleInteraction()?<InteractionTakeover frame={controller.visibleInteraction()} state={state}/>:o.fallback} useFactorySlot={(key,fallback)=>key==='views'?BoundSession:opts.slots?.[key]||fallback}/>};
     switch(name){
       case 'sidebar':return <SidebarRoot {...p} t={t.sidebar} usePanels={selectorFace(state.readOnly||contextPrefs.value.insightsEntry==='hide'?[]:[{id:'dsh-context',label:'Context Insights'}])} useShortcuts={harnessShortcuts.useCatalog} usePanelInfo={selector=>useLayout(s=>selector(s.panelInfo))} startSession={()=>startSession()} toggleSidebar={layout.actions.toggleSidebar} selectPanel={layout.actions.selectPanel}/>;
       case 'sidebar.brand.mark':return <AugmentorBrand size={owner.size}/>;
@@ -342,7 +344,7 @@ function App(){
       case 'conversation.chat.node':
         if(owner.node.kind==='user')return <UserMessageNodeView {...p} t={t.chat}/>;
         if(owner.node.kind==='assistant-step')return <><OwnedMessage {...p}/>{Number.isSafeInteger(owner.node.data.finalNode?.seq)&&messageTargets(state.events).replies.has(owner.node.data.finalNode.seq)&&<MessageIconActions text={owner.node.data.blocks.filter(x=>x.kind==='text').map(x=>x.text).join('')} clock="end" t={t.chat} onBranch={state.readOnly?undefined:()=>branch(owner.node.data.finalNode.seq)} branchUnavailable={current?.running===true||!!state.branchPending}/>}</>;
-        if(owner.node.kind==='pi-tool')return <PiTool node={owner.node} onInspect={()=>setView('trajectory')}/>;
+        if(owner.node.kind==='pi-tool')return <PiTool node={owner.node} state={state} onInspect={()=>setView('trajectory')}/>;
         return <p role="status">{owner.node.data.text}</p>;
       case 'conversation.chat.reasoning.body':return <MarkdownText text={owner.text} streaming={owner.running}/>;
       case 'conversation.input.dock':return <><QueueStatus state={state}/><QueueDock {...p} useSession={selectorFace({...composed.session,subagent:state.readOnly?{address:{mode:'read-only'}}:null})} updateQueue={(itemId,action)=>controller.updateQueue(itemId,action)} notify={(_,text)=>controller.update({error:text})} loadImage={loadImage}/>{!state.readOnly&&<GoalBar goal={state.goal?.goal} activation={state.goal?.activation} t={t.goal} onPause={()=>goalAction('pause')} onResume={()=>goalAction('resume')} onClear={()=>goalAction('clear')} onEdit={objective=>goalAction('edit',{objective,maxGoalRounds:state.goal?.goal?.maxGoalRounds})}/>}</>;

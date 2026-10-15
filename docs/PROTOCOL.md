@@ -88,6 +88,16 @@ Pi `host.describe.capabilities.indexedNativeHistory` advertises private derived 
 
 Questions and approvals carry a unique `rpcId`. Subscription reattachment redelivers pending interactions; resolution emits `interaction/resolved`. Approvals retain a hard default two-minute timeout. Questions expose a revisioned foreground `wait` snapshot; explicit Take time/editing pause that budget, while client-specific focus leases pause it temporarily. `interaction/updated` carries changed canonical timing. AbortSignal, Stop, expiry and losing the last subscribed UI settle without an answer or permission. No connected UI means manual actions are denied. Completed interactions cannot be answered again. See [original question controls](PI-QUESTIONS.md) for exact leases, reconnect and persistence limits.
 
+The native-profile `ask_user` batch carries `toolName`, the SDK `toolCallId`,
+`ownerId` and ordered `questions` on its existing `question/requested` frame.
+For this product tool the Host validates an exact complete answer batch before
+settling; malformed replies leave the request pending. Its native result details
+use `augmentor-question-answer/1`, `status: answered|unanswered` and the actual
+answer when supplied. Legacy calls retain their text tool result. Plan-review
+intent changes presentation, not permission. Exact root tool rows can hide/reopen
+locally; pending Host ownership and timers remain authoritative. See
+[batch and review scope](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15).
+
 The Python client never automatically retries prompts or tool actions. New admissions retain stable ID/fingerprint receipts in `<Pi state>/sessions/<id>.queue.json`; terminal receipts discard historical prompt text. Reusing an identity with different input is rejected; repeating it with the same input returns its receipt without execution. Older sessions retain their historical last-100-ID compatibility list. This provides local admission deduplication, not a transaction guarantee for external actions. Reconnect reconciles history and live frames by `seq`. Restart records interrupted work, marks any dispatched nonterminal receipt unknown and pauses waiting inputs; it never replays them. A prior external action may have completed before a crash, so a user must inspect that outcome. **Keep interrupted** explicitly acknowledges the receipt and leaves waiting work paused. An explicit idle Send resumes older waiting inputs before the new prompt; Continue resumes only the existing queue.
 
 `session/queue` is a complete replacement with `payload.sessionId`, monotonically persisted `revision`, `paused`, `activeTurnId` and `items`. Each item carries `id`, `rpcId`, text message, placement, state label and `canRemove`, `canSteer`, `canResolve`. Subscription returns the current baseline without execution; the HTTP inspector receives it in the subscription result. Delivered `user/message.data.source.rpcId` identifies its admission receipt. Unknown action receipts remain visible even when user-message delivery was confirmed. Waiting/visible queue state is bounded to 100 rows and 512 KiB; dispatched and unresolved inputs cannot be removed or automatically retried. The current candidate advertises `queue: true`, `steering: true`. Pi's transient string queue does not own product input persistence.

@@ -1,3 +1,4 @@
+// Augmentor adaptation (MIT): question details never fetch remote or local image destinations.
 import {
   useEffect, useMemo, useRef, useState,
   type ChangeEvent, type FocusEvent, type KeyboardEvent,
@@ -493,7 +494,7 @@ function QuestionFlow({ pending, t, useStore, useQuestionCard, actions }: Questi
               onBlurCapture={blurAnswerSurface}
             >
               {question.detail !== undefined && (
-                <div className={css.detail}><MarkdownText text={question.detail} labels={markdownLabels} /></div>
+                <div className={css.detail}><MarkdownText text={question.detail} labels={markdownLabels} pathImages={{allowRemote:false}} /></div>
               )}
               <div className={css.options} role={question.multiSelect === true ? 'group' : 'radiogroup'}>
                 {(question.options ?? []).map((option, optionIndex) => {

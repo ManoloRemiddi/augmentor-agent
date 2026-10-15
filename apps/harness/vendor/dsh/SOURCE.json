@@ -2142,9 +2142,10 @@
     },
     {
       "path": "packages/client/ui-user-questions/src/client/QuestionComposer.tsx",
-      "sha256": "94ff9bce29bcb9feef4ca89c05cf35c279aee2bfe51a182e6c2e2c3f6cf56fdc",
+      "sha256": "c3e40a88bf3ff58fd607e7519a77596cb7c837a3052a1412307fd2ed2713e8d1",
       "upstreamPath": "packages/client/ui-user-questions/src/client/QuestionComposer.tsx",
-      "upstreamSha256": "94ff9bce29bcb9feef4ca89c05cf35c279aee2bfe51a182e6c2e2c3f6cf56fdc"
+      "upstreamSha256": "94ff9bce29bcb9feef4ca89c05cf35c279aee2bfe51a182e6c2e2c3f6cf56fdc",
+      "adaptation": "Modified by Augmentor (MIT): disable remote/local Markdown image resolution for untrusted submitted plan/question detail; original layout, text, controls and CSS retained."
     },
     {
       "path": "packages/client/ui-user-questions/src/client/contract/slots.ts",
@@ -3568,6 +3569,55 @@
       "upstreamPath": "packages/client/ui-settings-account/src/client/SignInDialog.tsx",
       "upstreamSha256": "3e28a98b67c0dfc16186de24ab15a6fffd7213d1a3e59ef5931f0217bf2161d3",
       "adaptation": "Modified by Augmentor (MIT): transient Pi prompt child, exact provider URLs without DSH theme parameters, non-browser waiting copy and an optional retry fence so unknown active attempts keep cancellation. Original dialog layout/CSS/actions retained."
+    },
+    {
+      "path": "packages/client/ui-plan/package.json",
+      "sha256": "5a02c1a1328b6fb365a422d776b1afc11adfa434c0f852e646864a036923c23d",
+      "upstreamPath": "packages/client/ui-plan/package.json",
+      "upstreamSha256": "5a02c1a1328b6fb365a422d776b1afc11adfa434c0f852e646864a036923c23d"
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/PlanCard.tsx",
+      "sha256": "8ff2881d16c904805f3e14aa1aa37c37453f83b8574ecf1c9f3340d502df971b",
+      "upstreamPath": "packages/client/ui-plan/src/client/PlanCard.tsx",
+      "upstreamSha256": "8ff2881d16c904805f3e14aa1aa37c37453f83b8574ecf1c9f3340d502df971b"
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/PlanPreview.tsx",
+      "sha256": "7ff168cb77e582b02792607658f3d57e0c0b759a2758382a9200c14afd317c7a",
+      "upstreamPath": "packages/client/ui-plan/src/client/PlanPreview.tsx",
+      "upstreamSha256": "b0c8e3f16a3c0ae907f298cab3431b14cbcae08cbc44db9bad1b9d6add535cc8",
+      "adaptation": "Modified by Augmentor (MIT): disable remote/local Markdown image resolution for untrusted submitted plan/question detail; original layout, text, controls and CSS retained."
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/PlanPreview.module.css",
+      "sha256": "25eb5ad8ab102015546086931079947e2f0706346e42491c57b7a92823ab8bf8",
+      "upstreamPath": "packages/client/ui-plan/src/client/PlanPreview.module.css",
+      "upstreamSha256": "25eb5ad8ab102015546086931079947e2f0706346e42491c57b7a92823ab8bf8"
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/review-store.ts",
+      "sha256": "cb0edde79572f70bee971453f897f57b27d0219dc2b13a1698a5eb1024c8c0a2",
+      "upstreamPath": "packages/client/ui-plan/src/client/review-store.ts",
+      "upstreamSha256": "cb0edde79572f70bee971453f897f57b27d0219dc2b13a1698a5eb1024c8c0a2"
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/review-preview.ts",
+      "sha256": "8c9f2f5d3998041d272ba1f82cac49f50cac96fc8d6b1233bfe993b4f8018c73",
+      "upstreamPath": "packages/client/ui-plan/src/client/review-preview.ts",
+      "upstreamSha256": "8c9f2f5d3998041d272ba1f82cac49f50cac96fc8d6b1233bfe993b4f8018c73"
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/failure-line.ts",
+      "sha256": "82288dcdc386615398ec0dd8105a19ccfb993a7d5e56a16f9cc94a299b17f6d4",
+      "upstreamPath": "packages/client/ui-plan/src/client/failure-line.ts",
+      "upstreamSha256": "82288dcdc386615398ec0dd8105a19ccfb993a7d5e56a16f9cc94a299b17f6d4"
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/locales.ts",
+      "sha256": "94be0e865cf0403b6c01beb51cf702d45ed26d27194d74643f1d3f7333f53160",
+      "upstreamPath": "packages/client/ui-plan/src/client/locales.ts",
+      "upstreamSha256": "94be0e865cf0403b6c01beb51cf702d45ed26d27194d74643f1d3f7333f53160"
     }
   ]
 }

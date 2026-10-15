@@ -120,6 +120,13 @@ const model=http.createServer(async(req,res)=>{
     const release=()=>{clearTimeout(timer);releaseArguments=null;chunk({tool_calls:[{index:0,function:{arguments:args.slice(middleSent?almost:middle)}}]},'tool_calls');res.end('data: [DONE]\n\n');};
     releaseArguments=release;res.once('close',()=>{clearTimeout(timer);if(releaseArguments===release)releaseArguments=null;});return;
   }
+  if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTION_BATCHES==='1'&&/BATCH_FIXTURE|PLAN_REVIEW_FIXTURE/.test(JSON.stringify(lastUser?.content))){
+    const plan=JSON.stringify(lastUser?.content).includes('PLAN_REVIEW_FIXTURE');
+    const questions=plan?[{id:'review',question:'Approve the authored plan?',detail:'# Authored review plan\n\nReview the complete submitted body before deciding.\n\n## Final verification\n\nAUTHORED_COMPLETE_PLAN_BODY\n\n![Unrequested external image](https://fixture.invalid/never-fetch-plan.png)',options:[{label:'Proceed'},{label:'Discuss'}],intent:{kind:'plan-review',approve:'Proceed'}}]:[{id:'colour',header:'Colour',question:'Which authored colour?',options:[{label:'Red'},{label:'Blue'}]},{id:'extras',header:'Extras',question:'Which authored extras?',multiSelect:true,detail:'Select more than one. ![Unrequested external image](https://fixture.invalid/never-fetch-question.png)',options:[{label:'Green'},{label:'Yellow'}]},{id:'note',question:'Add an authored note'}];
+    if(!afterTool)chunk({role:'assistant',tool_calls:[{index:0,id:'authored_batch_'+body.messages.length,type:'function',function:{name:'ask_user',arguments:JSON.stringify({questions})}}]},'tool_calls');
+    else chunk({role:'assistant',content:'Original batch answer received: '+JSON.stringify(body.messages.at(-1).content)},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});
+    res.end('data: [DONE]\n\n');return;
+  }
   if(process.env.AUGMENTOR_HARNESS_PROOF_QUESTIONS==='1'&&JSON.stringify(lastUser?.content).includes('QUESTION_FIXTURE')){
     if(!afterTool)chunk({role:'assistant',tool_calls:[{index:0,id:'authored_question',type:'function',function:{name:'ask_user',arguments:'{}'}}]},'tool_calls');
     else chunk({role:'assistant',content:'Original question answer received: '+JSON.stringify(body.messages.at(-1).content)},'stop',{prompt_tokens:100,completion_tokens:20,total_tokens:120});
@@ -205,7 +212,7 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
  writeFileSync(join(directory,'events.jsonl'),lines,{mode:0o600});writeFileSync(join(directory,'counter.json'),JSON.stringify({seq:1100}),{mode:0o600});
 }
 const lazy=process.env.AUGMENTOR_HARNESS_PROOF_LAZY==='1';
-const fixtureEnv={...process.env,...(modelRefreshRoot?{AUGMENTOR_HARNESS_PROOF_MODEL_REFRESH_ROOT:modelRefreshRoot}:{}),HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
+const fixtureEnv={...process.env,...(modelRefreshRoot?{AUGMENTOR_HARNESS_PROOF_MODEL_REFRESH_ROOT:modelRefreshRoot}:{}),HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:process.env.AUGMENTOR_HARNESS_PROOF_QUESTION_BATCHES==='1'?'1':'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
 // Authored startup barrier: exercise slow companion provisioning without
 // changing the production one-second activity lease deadline or its warnings.
 if(process.env.AUGMENTOR_HARNESS_PROOF_MEMORY_START_DELAY){

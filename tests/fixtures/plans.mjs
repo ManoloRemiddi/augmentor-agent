@@ -15,7 +15,7 @@ import {pythonExecutable} from '../../dist/platform/src/index.js';
 import {privateDir,atomicJson} from '../../dist/runtime/src/storage.js';
 import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
-export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode}={}){
+export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false}={}){
  const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
  const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])privateDir(path);
  const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
@@ -29,6 +29,11 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
   res.writeHead(200,{'content-type':'text/event-stream'});
   const send=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'plan-fixture',object:'chat.completion.chunk',model:'plan-fixture',choices:[{index:0,delta,finish_reason:finish}]})+'\n\n');
   const last=body.messages.at(-1),proposal=body.messages.findLast(m=>m.role==='assistant'&&m.tool_calls?.length),toolName=proposal?.tool_calls?.at(-1)?.function?.name;
+  if(questionMode){
+   if(last?.role!=='tool')send({role:'assistant',tool_calls:[{index:0,id:'question-'+requests.length,type:'function',function:{name:'ask_user',arguments:JSON.stringify(op.input)}}]},'tool_calls');
+   else send({role:'assistant',content:'Authored human answer received.'},'stop');
+   res.end('data: [DONE]\n\n');return;
+  }
   if(desktopMode){
    const tool=(name,args={})=>send({role:'assistant',tool_calls:[{index:0,id:'desktop-call-'+requests.length,type:'function',function:{name,arguments:JSON.stringify(args)}}]},'tool_calls');
    const worker=body.tools?.some(tool=>tool.function.name==='desktop_finish');
@@ -88,7 +93,7 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
  atomicJson(join(config,'agent','models.json'),{providers:{fixture:{api:'openai-completions',baseUrl:'http://127.0.0.1:'+model.address().port+'/v1',apiKey:'synthetic-plan-key',models:[{id:selection.model,name:'Synthetic planning provider',reasoning:false,input:desktopMode&&!desktopMode.textOnly?['text','image']:['text'],contextWindow:131072,maxTokens:2048}]}}});
  atomicJson(join(config,'settings.json'),{revision:0,defaultPreset:policy,pinned:[],hidden:[],defaultModel:selection,observation:{capturePayloads:true}});
  const env=Object.fromEntries(Object.entries(process.env).filter(([k])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(k)));
- Object.assign(env,{HOME:root,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),XDG_RUNTIME_DIR:runtime,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_LINUX_TOOLS:desktopMode?'1':'0',AUGMENTOR_DESKTOP_NO_AUTOSTART:'1',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'});
+ Object.assign(env,{HOME:root,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),XDG_RUNTIME_DIR:runtime,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_LINUX_TOOLS:desktopMode||questionMode?'1':'0',AUGMENTOR_DESKTOP_NO_AUTOSTART:'1',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'});
  // Keep only the explicitly resolved component interpreter in this private
  // profile; source Windows proofs use the hash-locked prepared interpreter.
  env.AUGMENTOR_PYTHON=pythonExecutable();
