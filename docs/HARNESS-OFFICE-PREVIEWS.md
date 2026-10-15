@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Cancellation fixture process-exit race — October 15
+
+The first current-permission source cohort fails in the optional native Office
+cancellation fixture while reading `/proc/<pid>/comm`: the observed short-lived
+child exits between enumeration and read, yielding Linux `ESRCH`. Its matched
+ordinary cohort finishes 513 cases (511 pass/two existing optional skips/zero failures).
+This failure occurs before cancellation, not in a renderer/cleanup assertion.
+The test now reuses the existing `ownedProcesses`/`stillOwned` identity helpers,
+which already handle ENOENT/ESRCH and distinguish a reused numeric PID. It still
+requires an actual native renderer, every observed identity to terminate, exact
+scratch removal/input preservation, timeout and disposal refusal under unchanged
+deadlines. No production/native code, sandbox or gate changes. The failing log is
+retained; a fresh full source/copy qualification follows, rather than treating a
+passing repeat as a cause explanation.
+
 [Original HTML previews](HARNESS-HTML-PREVIEWS.md) now supplies rendered HTML separately from Office conversion. Office/PDF engine and native supplier bytes/notices remain preserved; ordinary/installed qualification and full migration/public distribution gates stay distinct.
 
 [Linux packaging source review](#linux-packaging-source-review--october-13) now
