@@ -8,6 +8,11 @@ jobs. The symlink case explicitly skips Windows creation privileges; other
 regular-path, cancellation and byte contracts remain. Hosted/ACL/physical/artifact
 acceptance and the actual export workflow remain unqualified. The existing MX
 review/installed selection and user-directed rollout order stay unchanged.
+At **46ad4a9**, source/fresh ordinary each pass 615/two existing optional skips/zero
+failures, 111 files/all 52 Harness Chromium files, plus 20 focused archive cases.
+Preceding **8171524** hosted SDK passes Linux/macOS and fails the Windows
+permission-control step; current archive-source hosted/ACL/physical acceptance is
+not established. [Portable evidence](../release/harness-export-snapshot-qualification.json).
 
 [Live Raw Context arrival](DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15)
 is shared React/JSON glue with identical immutable-record/scope semantics on

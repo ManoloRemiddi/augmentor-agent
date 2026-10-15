@@ -5,6 +5,7 @@ has a tested snapshot/selected MIT ZIP foundation, but the original Header/dialo
 and `/export` are not wired yet. Source/attachment/family selection, authenticated
 one-use downloads, lifecycle/crash ownership and rendered end-to-end acceptance
 remain required; no placeholder export control or new layout is introduced.
+[Foundation-only source qualification](../release/harness-export-snapshot-qualification.json).
 
 ## Live Raw Context arrival — October 15
 

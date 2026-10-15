@@ -2,8 +2,13 @@
 
 [Session-export archive foundation](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)
 adds an immutable, verified snapshot API and a selected MIT DSH bounded ZIP
-producer, with private cleanup and joined compression/cancellation. Twenty
-focused source cases pass; full source/fresh-copy qualification is in progress.
+producer, with private cleanup and joined compression/cancellation. At **46ad4a9**,
+source/fresh ordinary each pass **615/two existing optional skips/zero failures**,
+111 files/all 52 Harness Chromium files, unchanged workers/bounds. All **1,039
+compiled/3,333 tracked** inputs match; 20 focused and 18 notice/packaging/boundary
+cases pass. Final guard-removal controls fail as intended. Existing GUI/agent code,
+608 GUI supplier inputs, dependencies, nine sealed inventories/ten reviews,
+selection and model/service settings verify preserved. [Portable evidence](../release/harness-export-snapshot-qualification.json).
 This is a foundation only: Host session/attachment selection, download authority,
 crash/busy ownership and original GUI/command wiring remain required. `/export`
 is still unavailable; no owner data/artifact or installed selection is changed.

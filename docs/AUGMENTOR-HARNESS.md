@@ -49,9 +49,24 @@ The initial 16-case prototype exposed premature cleanup completion and one inval
 information test used a helper default incorrectly; both failures are retained.
 A separate mutable-entry control fails before the shallow snapshot correction.
 No existing product failure is inferred from those unpublished prototypes.
-Strict check/build and focused checks pass; full source/fresh-copy qualification
-is in progress. Existing GUI/SDK/owner profiles and the installed selection stay
-unchanged; no export capability is advertised yet.
+At **46ad4a9**, strict check/build, **20/20** focused and **18** notice/packaging/
+source-boundary cases pass. Both final compiled guard-removal controls fail their
+original assertions: one removes immutable caller-entry capture, the other allows
+cleanup to report settlement before the producer. Their exact variant/input/log
+identities remain retained separately from the unchanged positive candidate.
+Source/fresh ordinary each pass **615/two existing optional skips/zero failures**,
+**111 files/all 52 Harness Chromium files**, two workers and unchanged bounds.
+All **1,039 compiled/3,333 tracked** inputs match. The eight new compiled inputs
+are the two modules/declarations/maps and the supplier LICENSE/SOURCE. Existing
+GUI, spreadsheet and generated build-manifest content normalize exactly against
+the prior source candidate's temporary overlay/chunk identities. Actual source/
+copy bytes match; no sealed artifact is normalized or patched. Existing 608 GUI
+supplier inputs and 151 production npm instances/Node remain unchanged. Nine
+sealed inventories/ten review processes, installed selection, canonical changes
+and model/speech/GPU settings verify preserved. [Portable qualification and roster](../release/harness-export-snapshot-qualification.json).
+Current MX review **20261015-192847-cfb956a7** remains application **1b467d3**;
+neither this archive layer nor the preceding 47dc3de live Context fix is in that
+review. No export capability is advertised yet, and no owner data is exported.
 
 The complete export workflow remains the target, with these required next steps:
 

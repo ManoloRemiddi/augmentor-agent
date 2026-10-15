@@ -7,8 +7,13 @@ symlink refusal, ZIP32 budgets, integrity/corrupt JSON, normal/cancel/error clea
 private-root replacement, surrogate boundaries and consumer backpressure. Initial
 prototype lifecycle and default-argument fixture failures remain retained, as does
 the pre-correction mutable-path control. This does not test a Host/HTTP/GUI export
-flow; that full workflow remains open. Full source/fresh-copy qualification is in
-progress. Notice assembly now checks the added MIT supplier notices explicitly.
+flow; that full workflow remains open. At **46ad4a9**, source/fresh ordinary each
+pass **615/two existing optional skips/zero failures**, 111 files/all 52 Harness
+Chromium files, two workers and unchanged bounds. All 1,039 compiled/3,333 tracked
+inputs match; 20 focused and 18 notice/packaging/boundary cases pass. Two isolated
+variants of the final compiled candidate reproduce the mutable-entry and early-
+settlement failures without changing source/dist. Notice assembly now checks the
+added MIT supplier notices explicitly. [Portable evidence/roster](../release/harness-export-snapshot-qualification.json).
 
 [Live Raw Context arrival](../docs/DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15):
 `harness-context-live-chromium.test.mjs` delays delivery of actual provenance frames

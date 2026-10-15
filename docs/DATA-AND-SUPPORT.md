@@ -9,6 +9,7 @@ not reconstruct effective context. A replaced scratch directory is preserved wit
 an error. Product source/family/attachment selection, browser download authority,
 expiry/shutdown and crash-orphan policy remain required before UI exposure. No
 owner data is exported by this checkpoint; current evidence uses authored files.
+[Foundation-only source qualification](../release/harness-export-snapshot-qualification.json).
 
 [Managed skill request links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
 add an optional full public SDK user-message JSON fingerprint to an ordinary skill
