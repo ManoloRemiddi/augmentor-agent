@@ -23,8 +23,14 @@ input, DOM typing/one click, queue, Stop and memory checks.
 toolbar action. Four paired ordinary runs pass all eight cases. Capture still
 fails before that action. Production extension/runtime/GUI code, permissions,
 image assertions, two-worker bounds and deadlines are unchanged. Source and
-ordinary full cohorts are recorded separately in the
-[portable checkpoint](../release/harness-browser-toolbar-qualification.json).
+ordinary full cohorts at fixture **14224cb3e165a6f1bfd5f5efd33709836bd89eeb**
+now each pass **388 checks/two existing optional skips/zero failures** across
+81 files/all 45 Harness Chromium files. They ran concurrently with two workers
+per cohort and unchanged deadlines. All 1,013 compiled application files match
+ordinary and remain at product d8520d5; the selected/review inventories, four
+processes and Qwen catalog verify unchanged. The
+[portable checkpoint](../release/harness-browser-toolbar-qualification.json)
+records hashes, failed controls, scope and remaining gates.
 This synthetic fixture correction does not qualify live accounts or installed
 rollout; the earlier failure remains historical evidence.
 

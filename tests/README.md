@@ -1591,5 +1591,9 @@ positive. Chromium's toolbar target ID identifies the window without selecting
 that tab. The fixture now explicitly selects and verifies its authored work tab
 before the action, preserving denied capture before consent, actual JPEG model
 input, one click, queue/Stop/memory assertions and existing deadlines. Four paired
-ordinary runs pass eight cases; full-cohort results remain separate in the
+ordinary runs pass eight cases. Full source and ordinary at fixture 14224cb each
+pass 388/two existing optional skips/zero failures across 81 files/all 45 Harness
+Chromium files. Both run concurrently, with two workers per cohort and unchanged
+deadlines. Product bytes and installed/review artifacts stay unchanged; original
+failure evidence and remaining hosted/live/release gates stay explicit in the
 [checkpoint](../release/harness-browser-toolbar-qualification.json).

@@ -100,8 +100,8 @@ The earlier separate ordinary assembly is retained as a controlled negative;
 final source/ordinary results and source identity are recorded in the portable
 checkpoint rather than relabelling the earlier 5eba45a counts.
 
-The current locale product is **d8520d5fe6b7e8eaa232835be54ec0759b88c566**.
-Its full source repeats **388 pass/two existing optional skips**; its fresh
+The locale product remains **d8520d5fe6b7e8eaa232835be54ec0759b88c566**.
+Its initial full source repeats **388 pass/two existing optional skips**; its fresh
 ordinary cohort retains **387 pass/one failure/two skips**. The one failure is
 `codex-browser-chromium`: after six actual synthetic provider requests and five
 function-call outputs, the final model input has no screenshot image. All new
@@ -111,7 +111,20 @@ diagnostic runs and one later source/ordinary case each pass, but do not
 supersede that failed full cohort. The unchanged assertion now includes authored
 tool outputs with image bytes omitted on failure; it adds no retry or timeout
 change. Final compiled/executable/dependency parity still verifies. Qualification
-and promotion remain **incomplete**, and that failure stays a release gate.
+and promotion remained **incomplete** at that checkpoint; the failed result is retained.
+
+The subsequent [toolbar fixture correction](CODEX-INTEGRATION.md#verified-fixture-toolbar-selection--october-15)
+**14224cb** establishes the actual work-tab selection before Chromium's toolbar
+command. A controlled wrong-tab negative fails with permission denial; the exact
+corrected positive and four paired ordinary runs pass. Full source and ordinary
+now each pass **388/two optional skips/zero failures**, across the same 81 files/
+45 Harness Chromium files, with two workers per cohort and unchanged deadlines.
+Application/GUI/permissions remain unchanged. This qualifies those local cohorts;
+it does not prove the original lone failure's sole cause or installed/live/full
+migration acceptance. [Portable follow-up](../release/harness-browser-toolbar-qualification.json).
+Preceding b1b1986 SDK Linux/macOS/Windows, Home and both Windows desktop jobs pass;
+its broader Linux run retains one post-Unarchive reopening GUI timeout (1,234
+pass/one failure/44 skips). New-head hosted and all remaining release gates stay open.
 
 Plan-review intent retains the same configured foreground question bound; it
 does not establish indefinite plan-mode waiting. Long-review behavior, alongside

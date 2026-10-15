@@ -232,13 +232,14 @@
     "newQuestionHead": "pending; local cohorts do not claim hosted qualification"
   },
   "officeBuildSnapshot": {
-    "observedAtUtc": "2026-10-15T07:27:30.656493+00:00",
+    "observedAtUtc": "2026-10-15T07:54:21.952147+00:00",
     "state": "running",
+    "stage": "final-link",
     "oomKilled": false,
     "outputQualified": false
   },
   "remainingGates": [
-    "Diagnose final ordinary Codex screenshot forwarding failure; six isolated passes do not supersede it or qualify promotion",
+    "Test-only verified toolbar selection qualifies subsequent local cohorts; original lone failure retained without a proven sole cause; hosted/live/installed browser qualification remains",
     "Physical owner MX feedback and guarded adoption preserving drafts/reviews",
     "Live providers, installed question/plan controls and wider configured extension/resource behavior",
     "Original full plan-mode/command bridge, generic settled-question composer reopening, late-answer continuation and persistent answer drafts",
@@ -339,5 +340,34 @@
       "logSha256": "280f2320cf4ce56fb43ab0420f8c1bb38663dbaa24a3f9a2488b2881e80a6b1f"
     }
   },
-  "fixtureEvidenceRef": "4c73f31ea42333c68168fde9c57c435fe456518d"
+  "fixtureEvidenceRef": "4c73f31ea42333c68168fde9c57c435fe456518d",
+  "subsequentFixtureQualification": {
+    "ref": "14224cb3e165a6f1bfd5f5efd33709836bd89eeb",
+    "record": "release/harness-browser-toolbar-qualification.json",
+    "sourceAndOrdinary": {
+      "source": {
+        "logSha256": "6ce3ea73d41d98810ac0dadb0a746ce3572d1fc8addd7a8c789dba8ba1de32f7",
+        "tests": 390,
+        "pass": 388,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 2,
+        "duration_ms": 188724.466088
+      },
+      "ordinary": {
+        "logSha256": "3c190d668f896bd7279ff27f877668fa03a29e0b74dda53586915a94a4af38a8",
+        "tests": 390,
+        "pass": 388,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 2,
+        "duration_ms": 189402.010209
+      }
+    },
+    "applicationBytesChanged": false,
+    "originalLoneFailureCauseProven": false,
+    "localCohortsPassed": true,
+    "fullMigrationQualified": false,
+    "promotionAllowed": false
+  }
 }

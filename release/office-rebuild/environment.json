@@ -236,12 +236,16 @@
     ],
     "finalAttempt": {
       "statusAtObservation": "running",
-      "observedAtUtc": "2026-10-15T07:27:30.656493+00:00",
+      "observedAtUtc": "2026-10-15T07:54:21.952147+00:00",
       "startedAt": "2026-10-15T04:20:28.788644779Z",
-      "observedStage": "compile",
+      "observedStage": "final-link",
       "configurePassed": true,
       "terminalResultVerified": false,
-      "outputQualification": false
+      "outputQualification": false,
+      "observedExecutable": "wasm-ld",
+      "observedLinkerRssBytes": 4950638592,
+      "observedLinkerElapsed": "26:48",
+      "oomKilledAtObservation": false
     },
     "publicRedistributionQualified": false
   }

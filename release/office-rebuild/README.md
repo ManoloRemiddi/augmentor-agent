@@ -16,7 +16,9 @@ own reverse check** before launch. All original 39 recipe/source files are retai
 the copied experimental recipe adds this one public patch. Its preferred source
 change is explicit. No warning check, module, format, runtime thread/memory policy
 or application dependency is removed. The final fresh attempt has passed configure
-and is compiling under the same 8 GiB cap, two CPUs, one job/nice 15 and no network.
+and has reached the actual final `wasm-ld` link under the same 8 GiB cap, two CPUs,
+one job/nice 15 and no network. The timestamped process observation confirms
+progress, not terminal success or an output package.
 Its output, layout/performance, notices and public redistribution remain unqualified.
 
 The separate [low link-optimization driver](run-low-lto.sh) retains full LTO and existing Wasm runtime/thread/memory flags, but explicitly sets `--lto-O0 --lto-CGO0` alongside the existing one-thread controls. A small authored Wasm function compiles, executes to 42 and shows both flags exactly once in the pinned real linker invocation. The full source attempt uses a separately copied failed cache, the same **8 GiB/zero-swap** cap, two CPUs/one job/nice 15 and no network. It is an experimental build profile requiring its own output, performance and source/licence qualification; it does not update any application dependency or public release gate. The first full attempt fails before link because ccache writes outside the writable mount. Its complete failed tree/logs are retained. The repaired driver uses explicit `CCACHE_DIR`/`CCACHE_TEMPDIR` beneath `/office`; a separate copied cache reaches the real final linker, where both optimization flags and unchanged runtime memory/thread/table/entry flags are verified. The [environment record](environment.json) records the point-in-time process state, not a presumed build success. The source-built entry and public engine gate remain unchanged.

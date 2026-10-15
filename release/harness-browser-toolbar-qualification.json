@@ -91,13 +91,73 @@
   "workersPerCohort": 2,
   "originalLoneFailureCauseProven": false,
   "retainedDiagnosticPreparationFailure": "An ignored private raw-error diagnostic initially used await in a non-async callback and could not load the extension. Corrected privately; its failed logs are retained.",
-  "fullCohortsStatus": "running",
+  "fullCohortsStatus": "passed",
   "fullQualificationPassed": false,
   "promotionAllowed": false,
   "remainingGates": [
-    "Full source and ordinary cohorts at corrected fixture",
     "Hosted full GUI failures and new-head hosted checks",
     "Physical MX feedback, installed/live browser/account qualification",
     "Office engine/source/font/performance/distribution and full migration gates"
+  ],
+  "fixtureRef": "14224cb3e165a6f1bfd5f5efd33709836bd89eeb",
+  "fullCohortsPassed": true,
+  "fullMigrationQualified": false,
+  "sourceAndOrdinary": {
+    "source": {
+      "logSha256": "6ce3ea73d41d98810ac0dadb0a746ce3572d1fc8addd7a8c789dba8ba1de32f7",
+      "tests": 390,
+      "pass": 388,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "duration_ms": 188724.466088
+    },
+    "ordinary": {
+      "logSha256": "3c190d668f896bd7279ff27f877668fa03a29e0b74dda53586915a94a4af38a8",
+      "tests": 390,
+      "pass": 388,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "duration_ms": 189402.010209
+    }
+  },
+  "testFileCount": 81,
+  "harnessChromiumFiles": 45,
+  "cohortsRanConcurrently": true,
+  "preservation": {
+    "observedAtUtc": "2026-10-15T07:54:21.952147+00:00",
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "fourReviewProcessesStillPresent": true,
+    "qwenCatalogHttpStatus": 200,
+    "canonicalPreexistingChanges": 38,
+    "matchingCompiledFiles": 1013,
+    "fixtureSourceAndOrdinaryMatch": true,
+    "productionDiffPaths": [],
+    "threeSealedInventoriesVerified": true,
+    "installedOrReviewActivation": false,
+    "modelSpeechGpuSettingsChanged": false
+  },
+  "officeSnapshot": {
+    "observedAtUtc": "2026-10-15T07:54:21.952147+00:00",
+    "state": "running",
+    "stage": "final-link",
+    "oomKilled": false,
+    "outputQualified": false
+  },
+  "precedingHosted": {
+    "ref": "b1b1986ea516c67239cad837e0bfdc2a3a2b62be",
+    "sdkThreePlatforms": "passed",
+    "homeActualPiImageModes": "passed",
+    "windowsDesktopX64AndArm64": "passed",
+    "widerLinux": "1234 pass, one original GUI post-unarchive reopening failure, 44 skips; exact cause unproven",
+    "sdkRun": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38699478077",
+    "homeJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38699478189/job/116303940947",
+    "linuxJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38699478189/job/116304409701",
+    "newFixtureHeadHosted": "pending"
+  },
+  "retainedPreparationFailures": [
+    "Ignored private raw-error diagnostic first used await in a non-async callback, preventing extension loading; privately corrected and retained",
+    "First ordinary driver invocation used a relative root and could not spawn its Node executable; no tests started; corrected absolute-root run is recorded separately"
   ]
 }

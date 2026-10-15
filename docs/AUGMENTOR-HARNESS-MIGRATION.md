@@ -6,12 +6,14 @@ Complete validated answers, exact tool-row hide/reopen, Request changes without
 approval, saved-plan reopening and disabled detail image fetching qualify through
 the actual SDK and original Chromium UI. Eight additional public MIT plan inputs
 are pinned; layout/CSS stay original and the supplier selection is 591 files.
-The preceding 5eba45a source/ordinary each pass 388/two optional skips. Final
-locale source passes **388/two skips**; final ordinary retains **387 pass/one Codex
-image failure/two skips**, across 81 files/all 45 Harness Chromium files. New
-question/plan cases pass, but wider qualification remains incomplete; isolated
-image reruns do not resolve it. All 1,013 compiled/2,149 executable files and
-dependencies match; shared Qt and eleven packaging/boundary checks pass.
+With fixture **14224cb**, source and ordinary each pass **388/two optional
+skips/zero failures**, across 81 files/all 45 Harness Chromium files. A controlled
+wrong-tab toolbar action proves a missing fixture precondition; explicit verified
+work-tab selection preserves production permissions and every image/action check.
+The earlier 387/one image failure/two skips remains historical, with its sole
+cause unproven. [Fixture evidence](../release/harness-browser-toolbar-qualification.json).
+All 1,013 compiled application files remain d8520d5; the preceding 2,149-input/
+dependency parity and shared Qt/eleven packaging-boundary checks remain distinct.
 [Portable checkpoint](../release/harness-question-batches-qualification.json). Owner installed/review builds, live providers,
 remaining plan-mode/late-answer/draft and full migration/release gates stay open.
 

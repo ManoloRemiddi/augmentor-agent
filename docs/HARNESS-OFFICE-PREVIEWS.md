@@ -101,7 +101,9 @@ exhausts the exact **8 GiB** cap, with zero swap and OOMKilled=true. Its failed
 cache and all earlier attempts remain retained. A separate fresh ThinLTO build
 now passes preparation, all 18 original patch reverse checks plus its additional
 build-rule check, verification and configuration. At the recorded observation it
-is **still compiling**, with no qualified engine output or package.
+has reached the actual **final WebAssembly link** (`wasm-ld`), still running
+with no qualified engine output or package. The process observation, not the
+driver stage label, establishes this progress; it does not confirm completion.
 
 The [published driver and build patch](../release/office-rebuild/README.md) use
 `-flto=thin` with the original `-Oz`, runtime thread/memory flags and feature set.
