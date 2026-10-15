@@ -24,8 +24,12 @@ by 80 ms and holds the fixture's post-snapshot continuation until the real close
 The original fixture fails the same native equality with exactly 303 actual closed
 metadata bytes; the corrected fixture passes with zero post-snapshot bytes. No
 SDK event, receipt or close is fabricated, and no sealed/selected/running artifact
-is patched. Full clean-candidate follow-up is recorded separately; physical,
-live, installed, other-platform and migration gates remain open.
+is patched. At fixture **cd46c36b2e1a9c0148a72d5b4c06daf22c221366**, the same clean
+sealed candidate passes **361/two existing optional skips across 78 files/all 44
+Harness Chromium files**, zero failures, then all 24,307 entries verify.
+[Candidate evidence](../release/harness-linux-candidate-qualification.json) retains
+the initial failure and preparation errors separately. Physical, live, installed,
+other-platform and full migration gates remain open.
 
 ## Timeout fixture uses observed cancellation — October 15
 

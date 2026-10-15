@@ -4,6 +4,54 @@
 
 [Original account confirmation on Pi](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds the exact MIT DSH sign-out dialog/CSS and reuses original Models cards for stored OAuth routes. No account backend/analytics enters the browser. Runtime 6c0d85c passes source/fresh ordinary 217/217 each across 57 files, all 43 Harness Chromium files, with 908 compiled matches and unchanged dependencies. Sign-in, live/provider/installed acceptance and wider migration remain open; current owner review is preserved.
 
+## Sealed Linux candidate — October 15
+
+Private candidate **20261015-064752-4cf0f74f**, product **0.2.13**, artifact
+**8ae847bddca7523f405a3a920202161c90880b263018dfe508c82b8e26e76422**
+is staged and **unselected**. It contains the original DSH GUI and current Pi
+bindings, including the accepted MIT Search alternatives and Jobs editor fix.
+All **1,007 compiled application files** match source/ordinary application
+**6fd0b52fe5199fe599a7e3796d09800797024b6c**. The staged source/fixture snapshot is
+140da43; the correction used for final qualification is **cd46c36b2e1a9c0148a72d5b4c06daf22c221366**.
+Test drivers remain outside the sealed artifact.
+
+The full candidate cohort passes **361 cases with two existing optional controlled
+Codex Browser skips**, zero failures/cancellations, across **78 files/all 44
+Harness Chromium files**, using its bundled Node **24.19.0**, two workers and
+unchanged deadlines. This includes original chat, references, attachments,
+Branch/Fork, Models/accounts, prompts, Context/Insights/Fleet, Trajectory,
+Search/Wiki, plans/goals/jobs and document-preview controls, plus managed MCP,
+privacy and external-prerequisite checks. It establishes synthetic contracts and
+rendered control behavior, not every live provider or physical interaction.
+The prior full root source/ordinary Node cohorts retain their distinct refs and
+[qualification](../release/harness-mcp-cancellation-barrier.json).
+
+The first diagnostic artifact includes **1,932 browser test dependency entries**
+and passes 361/two skips; it is retained. A separate input excludes those entries,
+then stages this clean artifact with **151 production npm instances/20,702 entries**,
+**871 notice/source-export entries** and all **82 source-built MPL-2.0 Office entry
+files/32 preferred-source files**. Codex stays an external prerequisite. The first
+clean run retains 360/one failure/two skips. Its 303-byte native diff decodes to a
+legitimate old connection **closed** record. The [fixture correction](MCP-TRANSPORT.md#cold-native-snapshot-follows-observed-close--october-15)
+waits for the exact retained close before taking the cold baseline; controlled
+old/new probes fail/pass respectively. Application/SDK/GUI/dependency bytes stay
+unchanged, and the same clean sealed artifact passes the complete follow-up.
+A separate initial comparison error treated an internal workspace link as external;
+whole-release verification resolves it without modifying the first artifact.
+
+After testing, **all 24,307 entries verify**. Both 24,305/24,288-entry owner review
+inventories, all four review processes, selected configuration and 38 pre-existing
+canonical changes verify. Qwen's read-only model endpoint returns 200; this is
+not new inference or physical speech evidence. Owner histories/credentials, review
+processes and installed selection stay unchanged; no public binary ships.
+The fixture host is **Debian GNU/Linux 13 (trixie), Linux x64**; physical **MX Linux
+owner acceptance remains separate**. Preceding 503908b hosted tests pass before
+Office public packaging refusal, while SDK Linux/macOS/Windows and Windows desktop
+pass. Mac notice/source packaging and Windows command jobs remain unqualified.
+The fresh ThinLTO engine is still compiling at observation. Engine output/fonts/
+redistribution, guarded activation, live services, physical MX/other platforms and
+complete P0/P1 migration remain open. [Portable evidence](../release/harness-linux-candidate-qualification.json).
+
 ## Quiet partial argument sampling — October 15
 
 The public SDK argument observer now owns one trailing timer for sampled tool
@@ -1019,7 +1067,7 @@ The directory browser enumerates actual folders and directory symlinks, with bou
 | Original DSH presentation | Pi binding |
 | --- | --- |
 | Sidebar and workspaces | Persistent workspace adoption/name/order/removal, conversation list/grouping/search, new conversation, original title rename, Pin/Unpin, Fork, Archive/Undo/restore, archived filters and actual directory picker |
-| Chat and composer | Retained/streaming Pi text, reasoning and tool output; identified Send, queue/steer and Stop |
+| Chat and composer | Retained/streaming Pi text, reasoning and tool output; identified Send, queue/steer and Stop; original attachments plus file/directory completion and durable reference chips |
 | Model chooser | Exact configured provider/model and supported reasoning effort; no silent substitution |
 | Trajectory | User/assistant/tool rows, timing, table/timeline and original tool detail pane with arguments, result and schema |
 | Context dashboard | Original Apache-2.0 dsh-context cards/charts/browser over recorded Pi payloads; estimates and unavailable seams are explicit, raw provenance remains available |
@@ -1066,9 +1114,27 @@ Final focused source and ordinary unselected bundled-Node cohorts each pass **84
 
 ## Remaining compatibility gaps
 
-This is an original-GUI integration preview, not complete DSH backend parity. File/image attachments are connected as described below. @-mention chips/autocomplete remain unconnected. The original slash menu now binds eight working Pi actions as qualified below; the full DSH command catalog remains incomplete. The complete original global settings/provider configuration is not connected. Unsupported operations report their missing binding.
+This is an original-GUI integration preview, with the current bindings recorded
+in their owning guides. File/image attachments remain connected.
+[Original file/directory completion and durable references](HARNESS-FILE-REFERENCES.md)
+include breadcrumbs and chips; older
+statements that all @-references are unconnected are superseded. Additional
+reference kinds and the full DSH command catalog remain incomplete. The original
+[Settings shell](#original-settings-shell--october-11-follow-up),
+[Models/provider forms](HARNESS-MODELS.md) and [Pi account dialogs](HARNESS-MODEL-ACCOUNTS.md)
+are connected. Virtual/extension-provider editing, advanced hidden controls,
+representative live providers and common Native/Browser management remain open.
+Unsupported operations retain an explicit missing-binding response.
 
-Final assistant branching uses the original DSH branch control; current-message Edit remains in the advanced inspector. The original question/approval components answer Host requests, but DSH's indefinite/take-time timing protocol is not implemented: the existing Host's finite timeout still applies. The original Trajectory now projects live text/reasoning and unresolved root SDK tool starts as qualified below. Tool-argument streaming, nested running-call presentation and unlinked request attribution remain gaps. Account/telemetry and backend-only DSH plugins are intentionally excluded.
+Final assistant branching uses the original DSH branch control; current-message
+Edit remains in the advanced inspector. The original question/approval components
+answer Host requests, with the Host's finite timeout rather than DSH's indefinite
+question timing. Trajectory now includes [streamed and quiet partial arguments](#quiet-partial-argument-sampling--october-15)
+and [nested tool presentation](TRAJECTORY-NESTED-TOOLS.md), retaining
+explicit identities and unknown/missing coverage. Complete causal/resource/skill
+attribution and wider provider-format qualification remain open. DSH account and
+telemetry services are excluded; supported Pi accounts use the separate original
+dialog binding above. Backend-only DSH plugins require their own Pi adapters.
 
 Live voice, embedded browser workflows, full memory/data migration, all live MCP services, desktop-specialist/Home acceptance and complete platform/installed migration remain separate requirements of the active Harness goal. The shared GUI adapter is platform-neutral, but this increment is qualified on MX Linux; further Windows/macOS/distro implementation remains deferred for owner feedback.
 
