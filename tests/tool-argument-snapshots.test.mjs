@@ -1,11 +1,32 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
 import {pathToFileURL} from 'node:url';import {resolve} from 'node:path';
+import {setTimeout as delay} from 'node:timers/promises';
 const {projectDsh}=await import(process.env.AUGMENTOR_DSH_PROJECTION_OVERRIDE?pathToFileURL(resolve(process.env.AUGMENTOR_DSH_PROJECTION_OVERRIDE)):new URL('../apps/harness/dsh-pi-projection.mjs',import.meta.url));
 const {ToolArgumentSnapshots}=await import(pathToFileURL(resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.','dist/runtime/src/tool-argument-snapshots.js')));
 const update=(type,args,{index=0,id='call',name='read'}={})=>({type,contentIndex:index,partial:{content:Array.from({length:index+1},(_,i)=>i===index?{type:'toolCall',id,name,arguments:args,privateExtra:'never copied'}:{type:'text',text:'unrelated private content'})},toolCall:{type:'toolCall',id,name,arguments:args,privateExtra:'never copied'},delta:'untrusted raw provider update'});
 const display=(seq,chunk,requestId='request',turnId='turn')=>({seq,type:'assistant/chunk',turnId,data:{requestId,chunk}});
 const state=events=>({sessionId:'s',sessions:[{sessionId:'s',running:true}],events,records:[{kind:'model/request',id:'request',turnId:'turn',time:1,data:{}}]});
+
+test('a quiet SDK burst emits its latest partial after the sample interval with the original request scope',async()=>{
+ let clock=0;const emitted=[],capture=new ToolArgumentSnapshots(()=>clock,(chunk,requestId)=>emitted.push({chunk,requestId}));capture.begin();
+ const first=capture.update(update('toolcall_start',{path:'first'}),'request-one');clock=10;assert.equal(capture.update(update('toolcall_delta',{path:'second'}),'request-one'),undefined);clock=20;assert.equal(capture.update(update('toolcall_delta',{path:'latest 😀'}),'request-one'),undefined);
+ clock=60;await delay(90);assert.equal(emitted.length,1);assert.equal(emitted[0].requestId,'request-one');assert.equal(emitted[0].chunk.complete,false);assert.equal(emitted[0].chunk.argsPatch.baseRevision,first.revision);
+ assert.equal(projectDsh(state([display(1,first),display(2,emitted[0].chunk)])).trajectory.partial.blocks[0].argsRaw,JSON.stringify({path:'latest 😀'}));capture.end();
+});
+
+test('quiet parallel partials retain their own request identities and bounded per-call sampling',async()=>{
+ let clock=0;const emitted=[],capture=new ToolArgumentSnapshots(()=>clock,(chunk,requestId)=>emitted.push({chunk,requestId}));capture.begin();
+ capture.update(update('toolcall_start',{path:'one'}),'request-one');capture.update(update('toolcall_start',{path:'two'},{index:1,id:'two'}),'request-two');clock=10;
+ capture.update(update('toolcall_delta',{path:'new one'}),'request-one');capture.update(update('toolcall_delta',{path:'new two'},{index:1,id:'two'}),'request-two');clock=60;await delay(90);
+ assert.deepEqual(emitted.map(row=>[row.chunk.index,row.requestId,row.chunk.revision]),[[0,'request-one',2],[1,'request-two',2]]);capture.end();
+});
+
+test('ending or replacing a SDK message and a final update retire queued partials without late display',async()=>{
+ let clock=0;const emitted=[],capture=new ToolArgumentSnapshots(()=>clock,chunk=>emitted.push(chunk));capture.begin();capture.update(update('toolcall_start',{}));clock=10;capture.update(update('toolcall_delta',{path:'stopped'}));capture.end();clock=60;await delay(90);assert.deepEqual(emitted,[]);
+ capture.begin();capture.update(update('toolcall_start',{}));clock=70;capture.update(update('toolcall_delta',{path:'replaced'}));capture.begin();clock=130;await delay(90);assert.deepEqual(emitted,[]);
+ capture.update(update('toolcall_start',{}));clock=140;capture.update(update('toolcall_delta',{path:'pending'}));const final=capture.update(update('toolcall_end',{path:'final'}));assert.equal(final.complete,true);clock=200;await delay(90);assert.deepEqual(emitted,[]);capture.end();
+});
 
 test('public SDK snapshots sample growing objects, flush final updates and encode exact Unicode changes without copying unrelated content',()=>{
  let clock=0;const capture=new ToolArgumentSnapshots(()=>clock);assert.equal(capture.update(update('toolcall_start',{})),undefined);capture.begin();
@@ -29,11 +50,12 @@ test('sampling preserves interleaved tool order and normal completion replaces a
  const completed=projectDsh(state([...events,final])).trajectory;assert.equal(completed.partial,null);assert.equal(completed.eventNodes.length,1);assert.equal(completed.eventNodes[0].blocks.length,2);assert.equal(completed.runningCalls.length,0);
  const stopped=projectDsh({...state([...events,{seq:4,type:'turn/end',turnId:'turn',data:{reason:{kind:'aborted'}}}]),sessions:[{sessionId:'s',running:false}]}).trajectory;assert.equal(stopped.partial,null);assert.equal(stopped.eventNodes[0].interrupted,true);assert.equal(stopped.eventNodes[0].time,null);assert.equal(stopped.runningCalls.length,0);
 });
-test('oversized, cyclic and excessive live captures expose a gap and reset safely for the next SDK message',()=>{
+test('oversized, cyclic and excessive live captures expose a gap and reset safely for the next SDK message',async()=>{
  let clock=0;const capture=new ToolArgumentSnapshots(()=>clock);capture.begin();assert.equal(capture.update(update('toolcall_start',{text:'x'.repeat(512*1024)})).argsRaw,null);
  const cycle={};cycle.self=cycle;clock=60;assert.equal(capture.update(update('toolcall_delta',cycle)).argsRaw,null);
  capture.begin();for(let i=0;i<128;i++){clock+=60;assert(capture.update(update('toolcall_start',{path:'small'},{index:i,id:'call'+i})));}const overflow=capture.update(update('toolcall_start',{path:'extra'},{index:128,id:'extra'}));assert.equal(overflow.argsRaw,null);clock+=60;assert.equal(capture.update(update('toolcall_delta',{path:'after cap'})),undefined);
  capture.begin();let bytes=0,gap;for(let i=0;i<12;i++){clock+=60;const row=capture.update(update(i?'toolcall_delta':'toolcall_start',{text:(i%2?'b':'a').repeat(450000)}));if(!row)break;if(row.argsRaw===null){gap=row;break;}bytes+=Buffer.byteLength(JSON.stringify(row));}assert(gap);assert(bytes<=2*1024*1024);assert.match(gap.reason,/budget/);capture.begin();assert.equal(capture.update(update('toolcall_start',{path:'recovered'})).argsRaw,'{"path":"recovered"}');
+ const emitted=[],bounded=new ToolArgumentSnapshots(()=>clock,chunk=>emitted.push(chunk));bounded.begin();for(let i=0;i<128;i++)bounded.update(update('toolcall_start',{path:'small'},{index:i,id:'bounded'+i}));clock+=10;bounded.update(update('toolcall_delta',{path:'pending'},{id:'bounded0'}));assert.equal(bounded.update(update('toolcall_start',{}, {index:128,id:'overflow'})).argsRaw,null);clock+=60;await delay(90);assert.deepEqual(emitted,[],'exhaustion retires queued partials');bounded.end();
 });
 test('a lost intermediate SDK snapshot cannot make a later patch fabricate valid but different arguments',()=>{
  let clock=0;const capture=new ToolArgumentSnapshots(()=>clock);capture.begin();const first=capture.update(update('toolcall_start',{path:'aaaa'}));clock=60;capture.update(update('toolcall_delta',{path:'bbbb'}));clock=120;const last=capture.update(update('toolcall_delta',{path:'bcbb'}));

@@ -462,7 +462,7 @@ export class Host {
       surface:m.surface??'linux',policy:m.policy,...(m.fork?{fork:m.fork}:{})});
     if(mcp){const info=mcp.describe();if(info.servers.length||info.configurationErrors)installed.record('integration/mcp',info);if(info.configurationErrors)this.append(m,'runtime/warning',{message:'Managed MCP configuration contains errors. Some servers are unavailable; ordinary chat remains available.'});}
     if(repaired.length)installed.record('context/budget',{changes:repaired,units:'unicode-code-points',boundary:'before-session-owner-load'});
-    const toolArguments=new ToolArgumentSnapshots();let messageCaptureId:string|undefined;
+    const toolArguments=new ToolArgumentSnapshots(undefined,(chunk,requestId)=>{if(this.loaded.get(m.id)===record&&m.running)this.append(m,'assistant/chunk',{requestId,chunk});});let messageCaptureId:string|undefined;
     created.session.subscribe(e=>{
       if(e.type==='agent_start')messageCaptureId=undefined;
       if(e.type==='message_start'&&e.message.role==='user'){
@@ -481,7 +481,7 @@ export class Host {
         const a=e.assistantMessageEvent,requestId=record!.observation?.currentRequestId();
         if(a.type==='text_delta')this.append(m,'assistant/chunk',{requestId,chunk:{type:'text-delta',text:a.delta}});
         if(a.type==='thinking_delta')this.append(m,'assistant/chunk',{requestId,chunk:{type:'reasoning-delta',text:a.delta}});
-        try{const chunk=toolArguments.update(a);if(chunk)this.append(m,'assistant/chunk',{requestId,chunk});}catch{/* Inspection cannot change tool dispatch. */}
+        try{const chunk=toolArguments.update(a,requestId);if(chunk)this.append(m,'assistant/chunk',{requestId,chunk});}catch{/* Inspection cannot change tool dispatch. */}
       }
       if(e.type==='message_start'&&e.message.role==='assistant'){toolArguments.begin();messageCaptureId=toolArguments.identity();}
       if(e.type==='message_end'&&e.message.role==='assistant'){

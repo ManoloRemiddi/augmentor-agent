@@ -112,7 +112,9 @@ const model=http.createServer(async(req,res)=>{
     const args=JSON.stringify({path:join(workspace,'note.txt')}),middle=Math.floor(args.length/2),almost=args.length-3;
     chunk({role:'assistant',tool_calls:[{index:0,id:'fixture_argument_read',type:'function',function:{name:'read',arguments:args.slice(0,middle)}}]});
     let middleSent=false;
-    const timer=setTimeout(()=>{middleSent=true;chunk({tool_calls:[{index:0,function:{arguments:args.slice(middle,almost)}}]});},100);
+    const middleChunk=()=>{middleSent=true;chunk({tool_calls:[{index:0,function:{arguments:args.slice(middle,almost)}}]});};
+    const burst=process.env.AUGMENTOR_HARNESS_PROOF_ARGUMENT_BURST==='1'&&JSON.stringify(lastUser.content).includes('ARGUMENT_STREAM_COMPLETE');
+    const timer=burst?null:setTimeout(middleChunk,100);if(burst)middleChunk();
     const release=()=>{clearTimeout(timer);releaseArguments=null;chunk({tool_calls:[{index:0,function:{arguments:args.slice(middleSent?almost:middle)}}]},'tool_calls');res.end('data: [DONE]\n\n');};
     releaseArguments=release;res.once('close',()=>{clearTimeout(timer);if(releaseArguments===release)releaseArguments=null;});return;
   }

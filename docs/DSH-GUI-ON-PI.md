@@ -1,5 +1,33 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Quiet partial argument sampling — October 15
+
+The public SDK argument observer now owns one trailing timer for sampled tool
+calls. A delta inside the existing 50 ms interval replaces that call's pending
+public object reference; when the SDK pauses, the latest partial is sampled with
+its original request identity. Message end/replacement, final updates and capture
+exhaustion retire pending work. Existing call, argument and total capture limits
+remain. The observer grants no dispatch authority and changes no Pi agent owner.
+
+The original Trajectory fixture now holds a second-turn provider burst. Its
+acceptance requires the exact current partial arguments through the original
+projection and GUI, whether Pi supplies an initial snapshot or a patch. Requiring
+a patch alone incorrectly rejects an already complete initial partial snapshot.
+Stop, zero early dispatch, distinct reused call identities, final evidence, cold
+reopen, provider counts, empty stderr and original deadlines are retained.
+
+Before this change, the two positive quiet-sampler unit contracts fail (**8/10**
+pass). The controlled second-turn burst also fails the old browser predicate.
+After adding the sampler, the browser still fails when the latest arguments arrive
+in its first snapshot; this retained intermediate failure establishes the separate
+fixture issue. The corrected focused pair passes **2/2** and the sampler **10/10**.
+These mechanisms do not prove the exact SDK delivery schedule or sole cause of
+the preceding hosted failure. Full source/ordinary qualification is pending at
+this implementation checkpoint; installed owner reviews remain on their prior
+build. The common sampler checks are added to Linux/macOS/Windows CI. No GUI
+layout, supplier source, model/speech settings or installed activation changes.
+
+
 [Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict check/build, focused 41/41 and source/fresh ordinary **236/236 each across 60 files** pass, including all 44 Harness Chromium files. Authored-provider evidence uses real FileAuthStorage/Host/Chromium, callback/manual-code races and cold interruption. All 911 compiled files match; 20,847 dependency entries/155 production npm instances/Node 24.19.0 stay unchanged. Real provider, installed and new-head hosted acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
 
 [Original account confirmation on Pi](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds the exact MIT DSH sign-out dialog/CSS and reuses original Models cards for stored OAuth routes. No account backend/analytics enters the browser. Runtime 6c0d85c passes source/fresh ordinary 217/217 each across 57 files, all 43 Harness Chromium files, with 908 compiled matches and unchanged dependencies. Sign-in, live/provider/installed acceptance and wider migration remain open; current owner review is preserved.
