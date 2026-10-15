@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {createHash} from 'node:crypto';
+import {managedSkillSources} from './managed-skill-provenance.js';
 import {sessionEntryToContextMessages,type AgentSession,type ExtensionFactory} from '@earendil-works/pi-coding-agent';
 import {getCurrentSystemPrompt,getSystemMessageText,normalizeContext,type SystemMessage} from '@earendil-works/pi-ai';
 import {payloadText} from '../../observation/src/store.js';
@@ -19,13 +20,14 @@ const summary=({value,...metadata}:Frame)=>metadata;
  */
 export class ContextProvenance {
   private session?:AgentSession;
+  private skillEvents?:(()=>readonly any[]);
   private run=new Map<string,Frame>();
   private request=new Map<string,Frame>();
   private runBytes=0;
   private requestBytes=0;
   private memoryStatus?:Omit<MemoryContribution,'context'>;
   constructor(private readonly capture:()=>boolean){}
-  attach(session:AgentSession){this.session=session;}
+  attach(session:AgentSession,skillEvents?:()=>readonly any[]){this.session=session;this.skillEvents=skillEvents;}
   readonly extension:ExtensionFactory=pi=>{
     pi.on('input',event=>{this.save(this.run,'input',{text:event.text,images:event.images,source:event.source,streamingBehavior:event.streamingBehavior});});
     pi.on('before_agent_start',event=>{
@@ -132,13 +134,25 @@ export class ContextProvenance {
       providerApi:api??'unavailable',limit,total,omitted:total-rows.length,maxAnnotationBytes:INSTRUCTION_SOURCES_LIMIT,rows,
       limitations:['Presence is literal text evidence, not source authority or causal attribution.','Absence may reflect formatting or transformations; loaded files and options need not be applied.','Identical-text source counts cover retained rows only.','Generated SDK defaults, invoked skill bodies and opaque handlers have no source link here.']},INSTRUCTION_SOURCES_LIMIT);
   }
+  private managedSkills(api?:string){
+    if(!this.capture()){this.save(this.request,'managedSkills',undefined);return;}
+    if(!this.skillEvents||!this.session)return;
+    if(this.request.get('beforeTransform')?.state!=='retained'){this.save(this.request,'managedSkills',{state:'unavailable',reason:'The primary before-transform context was not retained; no native message comparison was attempted.'},INSTRUCTION_SOURCES_LIMIT);return;}
+    try{
+      const events=this.skillEvents(),hasReceipts=events.some(event=>event?.type==='user/message'&&event.data?.skillInvocation);
+      const native=hasReceipts?this.session.sessionManager.buildSessionProjection().entries.flatMap(({sourceEntry,messages})=>messages.map((message,messageIndex)=>({entryId:sourceEntry.id,messageIndex,message}))):[];
+      const value=managedSkillSources(events,native,{before:this.request.get('beforeTransform'),after:this.request.get('afterTransform'),sdk:this.request.get('sdkContext'),provider:this.request.get('afterProviderHooks')},api);
+      this.save(this.request,'managedSkills',value,INSTRUCTION_SOURCES_LIMIT);
+    }catch{this.save(this.request,'managedSkills',()=>{});}
+  }
   finish(payload:unknown,api?:string){
     this.save(this.request,'afterProviderHooks',payload);
     // Primary snapshots have priority over this optional derived annotation.
     this.instructionSources(api);
+    this.managedSkills(api);
     if(!this.capture())this.dropBodies();
     const frames=new Map([...this.run,...this.request]);
-    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','promptWrapping','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks','instructionSources'];
+    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','promptWrapping','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks','instructionSources','managedSkills'];
     const snapshots=Object.fromEntries(names.map(key=>[key,summary(frames.get(key)??missing())]));
     const before=frames.get('beforeTransform'),after=frames.get('afterTransform');
     const difference=messageDifference(before,after);
@@ -154,7 +168,7 @@ export class ContextProvenance {
     this.endRequest();
     return result;
   }
-  dispose(){this.beginTurn();this.session=undefined;}
+  dispose(){this.beginTurn();this.session=undefined;this.skillEvents=undefined;}
 }
 
 function messageDifference(before?:Frame,after?:Frame){

@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed skill request links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
+add an optional full public SDK user-message JSON fingerprint to an ordinary skill
+receipt. It includes the SDK timestamp/content in the hash and follows ordinary
+private conversation retention/branch scope. It is not a guaranteed unique ID.
+Optional captured `managedSkills` diagnostics reference those receipts and native
+projection/message boundaries, without copying source bodies or rereading files.
+They are bounded by existing capture/retention limits and suppressed when capture
+is disabled. A missing primary context skips source/native reads. Diagnostic
+clearing does not erase ordinary receipts; no owner profile, credentials, model
+request, support export or new network destination is introduced. Literal provider
+user-field presence is not causal consumption or proof of provider acceptance.
+
 [Managed skill inputs](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
 add a selected-owner metadata read and ordinary conversation source fingerprints.
 Catalog discovery reads existing approved SDK headers only; an explicit managed

@@ -68,7 +68,7 @@ import {createWorkspaceShortcutControls} from '@dsh-gui/ui-workspace/src/client/
 import {createTrajectoryDurationStore} from '@dsh-gui/ui-trajectory/src/client/duration-store.ts';
 import {createTrajectoryStringWrappingStore} from '@dsh-gui/ui-trajectory/src/client/string-wrapping-store.ts';
 import {createSnapshotStore} from '@deepseek-ai/dsh-client-store';
-import {Button,Modal,Input,IconEditOutlineRegular,IconCopyOutlineRegular,IconGoalOutlineRegular,IconFolderCloseRegular,JsonBlock,MarkdownText,DisclosureRow,StateDot} from '@deepseek-ai/dsh-client-ui-primitives';
+import {Button,Modal,Input,IconEditOutlineRegular,IconCopyOutlineRegular,IconGoalOutlineRegular,IconFolderCloseRegular,JsonBlock as OriginalJsonBlock,MarkdownText,DisclosureRow,StateDot} from '@deepseek-ai/dsh-client-ui-primitives';
 import {en as commonEn} from '@dsh-gui/locale/src/locales/en.ts';
 import {en as conversationEn} from '@dsh-gui/ui-conversation/src/client/locales.ts';
 import {en as sidebarEn} from '@dsh-gui/ui-sidebar/src/client/locales.ts';
@@ -192,6 +192,9 @@ const listDshDirectory=path=>controller.rpc('workspace.listDirectory',{path});
 const createDshDirectory=async(path,name)=>(await controller.rpc('workspace.createDirectory',{path,name})).path;
 function DirectoryFlow(owner){return <DirectoryBrowser {...owner} t={directoryT} listDirectory={listDshDirectory} createDirectory={createDshDirectory} onOpen={owner.onPicked} onClose={owner.onCancel}/>;}
 
+// Bind the copied widget's required copy face; its display cap and layout stay upstream.
+const jsonTruncatedLabel=total=>`[Display truncated; ${total} JSON characters retained.]`;
+function JsonBlock(props){return <OriginalJsonBlock {...props} truncatedLabel={jsonTruncatedLabel}/>;}
 /** Existing Augmentor feature extensions occupy DSH's view slots. */
 function ExtensionView({kind,state}){
   const ref=useRef(null),refresh=useRef(noOp),session=useRef(state);session.current=state;

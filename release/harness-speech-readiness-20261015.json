@@ -1,0 +1,47 @@
+{
+  "schema": "augmentor-speech-readiness/1",
+  "date": "2026-10-15",
+  "observedAtUtc": "2026-10-15T16:48:58.559743+00:00",
+  "scope": "Local MX service readiness diagnosis; no service startup or configuration change this checkpoint",
+  "earlierFailedStartup": {
+    "phase": "Breeze GPU speech warmup after listener/model startup",
+    "gpu": "RTX 5090; Vulkan",
+    "firstStartupFreeMiB": 2572,
+    "allocationFailuresBytes": [
+      209879040,
+      220267440
+    ],
+    "error": "ErrorOutOfDeviceMemory; ggml buffer allocation assertion",
+    "bridgeStarted": false
+  },
+  "retryPreflight": {
+    "observedFreeMiB": 2502,
+    "declinedBeforeManagerStart": true,
+    "managerOperationStarted": false,
+    "serviceMutationAttempted": false,
+    "guardLogSha256": "dce387a5a618ce63879d9859811fb544ac1c398e8ef3752954b3c685809ef6fe",
+    "earlierTotalMinusUsedEstimateMiB": 2998,
+    "estimateDidNotAccountForReservedMemory": true,
+    "directReservedMemoryMiB": 498,
+    "explanation": "The initial higher headroom estimate subtracted used from total and omitted reserved VRAM. The direct free-memory guard read 2502 MiB and stopped before manager startup."
+  },
+  "preservation": {
+    "qwenProcessAndInvocationPreserved": true,
+    "qwenGpuPlacementPreserved": true,
+    "unitAndVoiceConfigurationFilesCompared": 6,
+    "configurationBytesPreserved": true,
+    "modelContextConcurrencyPrecisionAndOutputUnchanged": true,
+    "cpuAsrAndVadConfigurationPreserved": true,
+    "gpuOrModelTuningApplied": false,
+    "existingConfigurationReadForHashComparison": true
+  },
+  "serviceState": {
+    "qwen": "active",
+    "breeze": "failed",
+    "voice": "inactive",
+    "breezeAttemptTerminal": true
+  },
+  "conclusion": "Speech readiness remains unqualified under the observed memory headroom; do not infer that a listening endpoint is successful synthesis. The Harness migration continues independently.",
+  "physicalSpeechQualified": false,
+  "ownerOrInstalledArtifactsUpdated": false
+}

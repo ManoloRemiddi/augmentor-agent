@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed skill Context links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
+are shared SHA-256/JSON/native-projection and read-only provider-field code, with
+the same capture/legacy/ambiguity/retention semantics on Linux/macOS/Windows. No
+OS helper or dependency is introduced. The original JSON widget's missing copy
+face is bound in shared UI glue, without changing its cap/layout/CSS. Provider,
+projection, actual Host and existing context contracts enter all three SDK jobs.
+Local focus/runtime checks pass; current-head hosted and actual other-OS artifact/
+physical acceptance remain open. Linux GUI proof is distinct from other OS parity;
+user-directed further app rollout still waits for MX feedback.
+
 [Original skill controls](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
 use shared public Pi SDK/resource, file-descriptor and browser code. No OS helper
 is added. Metadata scope, alias priority, exact source/delivery fingerprints,

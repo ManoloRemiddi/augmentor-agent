@@ -500,7 +500,7 @@ export class Host {
     const installBindings=()=>{
     execution.install(created.session);record!.steering!.install();record!.reasoning!.install();
     if(!m.delegation)planMode.install(created.session);
-    provenance.attach(created.session);
+    provenance.attach(created.session,()=>record!.events);
     record.observation=observeSession(created.session,this.observations,m.id,
       ()=>({turnId:record!.turnId,compactionId:this.compactions.activeId(m.id),selected:{...m.selection},permissionPreset:m.policy,toolBudget:{...TOOL_BUDGET,units:'unicode-code-points'},execution:record!.execution?.describe(),reasoning:record!.reasoning?.snapshot()}),
       observation=>this.publish(m.id,{method:'observation/event',payload:{sessionId:m.id,observation}}),
@@ -547,7 +547,7 @@ export class Host {
         const admitted=requestId?this.queue(m).read(requestId):undefined,submittedContent=admitted?submittedParts(admitted.input??'',admitted.attachments):undefined;
         const goalSource=requestId&&!correction?this.queue(m).read(requestId).goalSource:undefined;
         if(goalSource){try{record!.goals.admit(goalSource,requestId!,e.message);}catch{record!.goals.disarm();record!.failed=true;record!.execution?.cancel();this.append(m,'runtime/error',{message:'Goal admission could not be saved or replayed. Inspect its original; no automatic continuation will be replayed.'});void record!.session.abort().catch(()=>{});}}
-        const skillInvocation=requestId?deliveredSkill(record!.skillInputs.get(requestId),content):undefined;if(requestId)record!.skillInputs.delete(requestId);
+        const skillInvocation=requestId?deliveredSkill(record!.skillInputs.get(requestId),content,e.message):undefined;if(requestId)record!.skillInputs.delete(requestId);
         this.append(m,'user/message',{source:{...(goalSource??{kind:'user'}),sessionId:m.id,...(requestId?{rpcId:requestId}:{})},content,...(skillInvocation?{skillInvocation}:{}),...(submittedContent&&JSON.stringify(submittedContent)!==JSON.stringify(content)?{submittedContent}:{})});
       }
       if(e.type==='message_update'){

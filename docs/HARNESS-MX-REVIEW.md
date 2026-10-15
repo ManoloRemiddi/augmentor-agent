@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[The Context-link/large-JSON correction](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
+is currently source-only. Review **20261015-180926-4e7b027e** below still runs
+9d9ac56; it does not include new delivered-message/native/provider links or the
+large raw JSON viewer fix. Its sealed bytes/profile and installed selection are
+preserved. The original skill menu/source preview remains qualified in that review.
+
 [Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
 **20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
 with the original DSH skill menu/editable links/current-source preview and both

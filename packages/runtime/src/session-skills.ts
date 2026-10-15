@@ -22,7 +22,7 @@ export function skillCatalog(skills:readonly ApprovedSkill[],occupied:(name:stri
  const encoded=JSON.stringify(rows);if(Buffer.byteLength(encoded)>SKILL_SOURCE_LIMIT)throw Error('The approved skill metadata exceeds the bounded discovery limit.');
  return {available:true,revision:sha(encoded),skills:rows,origin:'current public SDK resource catalog; no skill bodies read'};
 }
-export interface SkillReceipt {version:1;name:string;path:string;sourceSha256:string;instructionsSha256:string;expandedInputSha256:string;sourceBytes:number;instructionCharacters:number;instructionCharacterUnits:'unicode-code-points';boundary:'managed-input-read; delivered-sdk-user-message'}
+export interface SkillReceipt {sdkUserMessageSha256?:string;sdkUserMessageHashBoundary?:'public-sdk-user-message-json';version:1;name:string;path:string;sourceSha256:string;instructionsSha256:string;expandedInputSha256:string;sourceBytes:number;instructionCharacters:number;instructionCharacterUnits:'unicode-code-points';boundary:'managed-input-read; delivered-sdk-user-message'}
 export interface PreparedSkill {text:string;receipt:SkillReceipt}
 const identity=(s:any)=>[s.dev,s.ino,s.size,s.mtimeNs,s.ctimeNs].map(String).join(':');
 /** Read only the exact resource already approved by the SDK loader. The public
@@ -44,8 +44,13 @@ export async function prepareApprovedSkill(skills:readonly ApprovedSkill[],input
   return {text,receipt:{version:1,name:skill.name,path:skill.filePath,sourceSha256:sha(bytes),instructionsSha256:sha(body),expandedInputSha256:sha(text),sourceBytes:bytes.length,instructionCharacters,instructionCharacterUnits:'unicode-code-points',boundary:'managed-input-read; delivered-sdk-user-message'}};
  }finally{await handle.close();}
 }
-export function deliveredSkill(prepared:PreparedSkill|undefined,content:unknown){
+export function deliveredSkill(prepared:PreparedSkill|undefined,content:unknown,message?:unknown){
  if(!prepared||!Array.isArray(content))return;
  const text=content.filter(row=>row?.type==='text').map(row=>row.text).join('\n');
- return text===prepared.text?structuredClone(prepared.receipt):undefined;
+ if(text!==prepared.text)return;
+ const receipt=structuredClone(prepared.receipt);
+ // The public SDK message includes its timestamp. Cold native projection can
+ // match this identity without guessing from a repeated skill-name/body.
+ try{const value=message as any;if(value?.role==='user'&&(typeof value.content==='string'?value.content:Array.isArray(value.content)?value.content.filter((p:any)=>p?.type==='text').map((p:any)=>p.text).join('\n'):undefined)===text){receipt.sdkUserMessageSha256=sha(JSON.stringify(value));receipt.sdkUserMessageHashBoundary='public-sdk-user-message-json';}}catch{}
+ return receipt;
 }

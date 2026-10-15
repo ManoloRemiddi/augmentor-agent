@@ -1,5 +1,65 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Managed skill links in request Context — October 15
+
+New managed skill receipts may include `sdkUserMessageSha256` and
+`sdkUserMessageHashBoundary: public-sdk-user-message-json`. This fingerprints the
+complete public SDK user message, including its timestamp; it is not a guaranteed
+unique message ID. Source/body/expanded-input hashes and the original delivered
+text boundary remain unchanged. Existing version-1 receipts without this optional
+fingerprint are retained and explicitly unlinked; there is no backfill, file reread
+or model/tool replay.
+
+The existing optional Context provenance payload adds `snapshots.managedSkills`.
+It joins already loaded ordinary receipts to a **unique exact** public canonical
+native message projection. It then records exact whole-message matches/pointers
+before and after SDK context transforms and at the SDK stream boundary. At the
+post-hook provider payload it checks literal complete instruction/input text in
+recognized **user** fields only. Assistant/system quotations, tool-result content,
+function responses, arbitrary metadata and catalog entries do not establish that
+presence. Provider matches remain literal candidates, not source authority,
+provider acceptance, causal consumption or task success. Repeated identical text
+retains all provider candidates; duplicate native projections stay ambiguous.
+Changed/removed projections, source-hash mismatch, legacy receipts, redactions and
+unsupported API formats remain explicit gaps. Full `sourceProvenance` stays false;
+the original dashboard's global skill-consumption figures remain unavailable.
+
+Recognized provider user fields cover OpenAI Completions/Responses, Azure/Codex
+Responses, Anthropic Messages and Google Generative AI/Vertex. Other APIs remain
+unavailable for this derived comparison; their retained raw payloads stay separate.
+The annotation covers the latest 256 valid loaded managed receipts with total/
+omitted/invalid counts, caps pointer/candidate arrays at 256, and shares the
+existing **128 KiB annotation/8 MiB aggregate** budgets. Primary snapshots keep
+priority. If before-transform context is not retained, neither source-receipt nor
+native-projection reads are attempted. Disabled capture consults no ordinary
+receipts and retains no annotation. No approved source file is reopened. Snapshot
+message hashes are indexed once; equal provider text reuses its literal candidate
+result. A 64-source authored microbenchmark retains exactly equal JSON output
+while avoiding repeated full-context serialization; it is not a long-history or
+physical latency qualification.
+
+No new layout is introduced. **Context → Raw Pi context and saved entries →
+managedSkills** uses the existing copied JSON widget. Its required `truncatedLabel`
+copy face is now bound by owned glue: previously opening a body over the original
+20,000-character display cap crashed React with `truncatedLabel is not a function`.
+The retained failing original-GUI control reproduces that blank page. The supplier
+widget, display cap, CSS and full paged payload API remain unchanged. The final
+fixture opens a deliberately large request without a crash or another inference.
+It also previews V2 source while retaining V1 hashes/history and exposes the new
+managed source links through the original Context reader.
+
+Strict check/build, focused 49/49 and the existing runtime/inspection selection
+86/86 pass in the working source. Controlled prior-runtime missing fingerprints,
+large-JSON page failure and initial fixture corrections remain retained. All 608
+supplier records/bodies and locked dependencies are unchanged; no second SDK owner,
+new tool/file authority, network destination or diagnostic composer is introduced.
+Shared contracts enter Linux/macOS/Windows SDK jobs; real GUI evidence is Linux.
+Full source/fresh-copy qualification and publication are pending. The separate MX
+skill review **20261015-180926-4e7b027e** remains application 9d9ac56 and does not
+contain this Context/JSON increment. Installed selection is unchanged. Complete
+instruction/causal provenance, representative plugin and memory/speech workflows,
+physical MX feedback and full migration/platform gates remain open.
+
 [Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
 **20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
 with the original DSH skill menu/editable links/current-source preview and both

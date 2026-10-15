@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed skill Context links](../docs/DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15):
+`provider-user.test.mjs` has four recognized-role/pointer/unknown/bound tests;
+`managed-skill-provenance.test.mjs` has eight source/projection/ambiguity/edit/
+redaction/capture/budget cases; `pi-skill-provenance.test.mjs` has five actual Host
+flows including received requests, provider removal, cold history, branches,
+repeated instructions and disabled payload access. One existing skill-contract
+case verifies full delivered-message hashing without mutating preparation.
+The original skill GUI case now also opens Context's managed source links and a
+large request through the unchanged supplier JSON display, without inference.
+The old-runtime missing hash and pre-fix JSON page crash are retained controls.
+Initial fixture failures read only one 64 KiB payload page and edited already
+loaded settings; final fixtures use the existing hash-bound paged reader and
+revisioned settings API. Disabled metadata explicitly uses `{state:disabled}`.
+Focus 49/49 and runtime/inspection 86/86 pass; final full qualification is pending.
+The optional `node tests/fixtures/managed-skill-metadata-benchmark.mjs` reports
+three-iteration means for 64 authored receipts and an exact result digest. It
+reads no owner state and performs no provider request; timings are host-specific.
+
 [Current MX skill review](../docs/HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
 **20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
 with the original DSH skill menu/editable links/current-source preview and both

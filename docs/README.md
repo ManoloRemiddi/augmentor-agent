@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed skill Context links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
+are implemented in working source: exact delivered-message fingerprints link
+ordinary skill receipts to unique native projections and observed SDK/provider
+boundaries. Legacy/duplicate/removed/redacted/unsupported cases stay explicit;
+full causal provenance remains false. The original large-JSON viewer crash is
+reproduced and its required copy face bound without supplier/CSS changes. Strict
+check/build, focused 49/49 and runtime/inspection 86/86 pass; full source/fresh-copy
+qualification/publication remain pending. The current separate MX review below
+remains application 9d9ac56 and does not include this increment.
+
 [Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
 **20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
 with the original DSH skill menu/editable links/current-source preview and both

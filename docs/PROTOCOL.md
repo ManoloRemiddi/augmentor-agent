@@ -1,5 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed skill request links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15):
+version-1 `user/message.data.skillInvocation` may additionally carry
+`sdkUserMessageSha256` and `sdkUserMessageHashBoundary:"public-sdk-user-message-json"`.
+They attest a full delivered SDK user-message JSON fingerprint, including its
+SDK timestamp; identical objects need not have a unique native origin. Older
+receipts remain valid and unlinked; no native history is rewritten.
+
+Optional `context/provenance` adds `snapshots.managedSkills` under the existing
+capture/retention authority. It contains bounded ordinary source identities,
+hashes, unique native-entry references and before/after/SDK snapshot pointers,
+plus literal recognized provider user-field candidates. `nativeState`, each
+boundary's comparison state and provider state keep missing, ambiguous, changed,
+redacted, legacy and unsupported evidence distinct. Latest-receipt rows and
+pointer/candidate arrays cap at 256 with omitted counts; the optional annotation
+has the existing 128 KiB/aggregate 8 MiB limits. Primary-context omission skips
+native/source comparisons. Disabled capture does not consult ordinary receipts.
+This changes no RPC/inspection/file permissions or global full-source capability.
+The original JSON display cap remains 20,000 characters, with bound truncation
+copy; the full retained object remains available through hash-bound payload pages.
+
 [Skill controls](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15):
 `host.describe.capabilities.skillReferences` advertises operator-only
 `session.skills {sessionId}`. This reads only confirmed, already loaded public
