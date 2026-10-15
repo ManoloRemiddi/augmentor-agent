@@ -5,7 +5,12 @@ now avoids repeating a saved native title when reasoning inspection loads its
 existing SDK session. The public setter always appends; normalized equality skips
 only that duplicate. Changed metadata still synchronizes. Exact native originals,
 model/tool permissions and the single-owner lifecycle remain authoritative; source
-qualification and running/installed adoption are distinct.
+qualification and running/installed adoption are distinct. At 24b53b9/runtime
+6bc2b0d, source/fresh ordinary each pass 450/two optional skips/zero failures;
+the actual local-Qwen original-GUI flow preserves exact cold history and reopens
+the saved plan with no extra inference. Actual SDK manual compaction and pending
+planning state pass separately. The existing review remains bd03b15; Windows mode
+and speech readiness remain open. [Portable qualification](../release/harness-plan-native-title-qualification.json).
 
 [Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):
 runtime **97897cf**, private MX **20261013-142001-1f7f7f96**, product **0.2.13**,

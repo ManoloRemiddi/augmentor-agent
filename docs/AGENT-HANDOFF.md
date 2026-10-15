@@ -1,15 +1,24 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Cold native-title loading and actual plan compaction](PI-PLAN-MODE.md#cold-owner-titles-and-actual-manual-compaction--october-15)
-now compare the existing SDK name before an inspection load writes a duplicate.
-An actual SDK negative reproduces the extra native title; the fix preserves exact
-bytes for matching/normalized names while retaining one changed-title update.
-Actual manual compaction preserves active planning and a pending human target
-through Stop/restart until the next admitted chat; summary requests do not consume
-it. Strict check/build and focused 28/28 pass. Full/fresh-target and real-Qwen
-cold reopening remain subsequent qualification; installed and prior reviews stay
-unchanged. Qwen was restored through the existing manager with saved tuning
-preserved; Breeze startup failed and its failed attempt is terminal.
+[Cold title / local-Qwen qualification](PI-PLAN-MODE.md#cold-owner-titles-and-actual-manual-compaction--october-15)
+at **24b53b9** (runtime **6bc2b0d**) passes source/fresh ordinary **450/two
+optional skips/zero failures each**, 91 files/all 48 Harness Chromium files, two
+workers and unchanged bounds. Focused 28/28, actual SDK manual compaction and
+eleven packaging/boundary cases pass. The original GUI / actual local-Qwen proof
+reads once, presents a full plan, concludes Request changes without approval,
+turns mode off and reopens the saved plan with exact native/display history and
+no extra inference: three provider requests/two tools. A public optional Linux
+command repeats that isolated flow; its five help/refusal checks join shared CI.
+The initial 90-file Browser work-document failure and controlled before/after
+remain retained. All 1,019 compiled/3,277 tracked files match the fresh copy;
+593 supplier sources/CSS and dependencies remain unchanged. Generated spreadsheet
+paths/chunk identities differ from the prior build, with normalized content equal.
+Five sealed inventories, six review processes, selection and canonical changes
+verify. Qwen was restored through the existing manager with saved settings intact;
+Breeze startup failed and its failed attempt is terminal. The existing bd03b15
+review/installed selection stay unchanged. Prior 9b23644 hosted SDK passes Linux/
+macOS and fails Windows mode checks; new-head/platform/live speech/Office/full
+migration gates remain open. [Portable evidence](../release/harness-plan-native-title-qualification.json).
 
 [Conversation-scoped question drafts](PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15)
 at **df5aa20** use the original persisted store's conversation scope. The exact

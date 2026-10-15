@@ -119,8 +119,17 @@ messages replace it without changing limits or product admission.
 
 Strict check/build and four focused files pass **28/28** on Linux. The cold-title
 case covers initial/normalized names and an intentionally changed authored metadata
-title. Full source/ordinary and actual-Qwen cold-reopening qualification follow in
-the subsequent checkpoint; no installed/review artifact has been changed.
+title. At **24b53b9** (runtime **6bc2b0d**), source and a fresh unsealed ordinary
+copy each pass **450/two existing optional skips/zero failures**, 91 files/all
+48 Harness Chromium files, two workers and unchanged deadlines. Eleven packaging/
+source-boundary cases pass. The final actual-Qwen original-GUI flow below preserves
+exact cold native/display history and reopens the retained plan without inference.
+All 1,019 compiled/3,277 tracked inputs match that copy; dependencies, 593 supplier
+inputs and CSS remain unchanged. Five generated spreadsheet/GUI metadata assets
+differ from the preceding build only in temporary overlay paths and derived chunk
+identity; normalized content matches. Runtime changes are the Host title guard
+and its source map. [Portable evidence](../release/harness-plan-native-title-qualification.json).
+No installed/review artifact has been changed; the existing review retains bd03b15.
 
 ## Repeat the local model / original GUI proof
 
@@ -166,8 +175,19 @@ work-tab lookup before its first model prompt; all native-title/mode/compaction
 cases pass. A held initial-document control reproduces that exact absent lookup;
 an explicit committed-document/extension-tab barrier passes while retaining the
 same permission checks, model/image assertions and 45-second case bound. The
-older unretained scheduling cause remains unproven. The final fresh cohort and
-portable checkpoint follow this fixture correction.
+older unretained scheduling cause remains unproven. Both final 91-file cohorts
+above pass after this fixture correction. The first relative-path fresh-copy
+launcher failed before Node started; its corrected absolute launch and retained
+preparation log are separate from these test results.
+
+The existing manager restored the stopped Qwen service for the authorized live
+proof; saved unit/drop-in/voice-configuration hashes match before and after. Its
+Breeze startup failed, the failed attempt is terminal, and speech is unqualified.
+No GPU placement, context/concurrency/precision or output setting was changed.
+The diagnostic itself does not manage those services. This recovery necessarily
+reads existing manager configuration; it is separate from the fresh proof profile.
+The preceding **9b23644** hosted SDK run passes Linux/macOS and fails the Windows
+plan-mode step; the new source has not established Windows or installed parity.
 
 ## Qualification and remaining work
 

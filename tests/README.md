@@ -5,13 +5,19 @@ uses an explicit loopback declaration and private QA actors, never CI inference.
 Five help/refusal cases join the standard/shared SDK checks. The Codex Browser
 fixture's held initial-document before/after reproduces the absent toolbar lookup;
 its new read-only readiness barrier keeps permissions, images, queue assertions
-and the existing 45-second case bound. Final cohort evidence is separate.
+and the existing 45-second case bound. At 24b53b9 (runtime 6bc2b0d), source and
+fresh ordinary each pass **450/two optional skips/zero failures**, 91 files/all
+48 Harness Chromium files, two workers and unchanged bounds. Focused 28/28 and
+eleven packaging/boundary cases pass; the final actual-Qwen flow makes three
+requests/two tools and preserves exact cold native/display history. The retained
+first 90-file failure, controls, input parity and limits are in the
+[portable record](../release/harness-plan-native-title-qualification.json).
 
 [Plan compaction and cold native titles](../docs/PI-PLAN-MODE.md#cold-owner-titles-and-actual-manual-compaction--october-15)
 add actual public-SDK/Host cases to `pi-plan-mode`: bounded manual compaction,
 pending mode/restart and exact file identity after reasoning loads. A retained
 ordinary negative reproduces duplicate metadata; four focused source files pass
-28/28 after the fix. Full/fresh-target/live qualification is recorded separately.
+28/28 after the fix. The final full/fresh-copy and live results are recorded above.
 
 [Scoped question drafts](../docs/PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15)
 use the original persisted store and a controlled two-conversation reload failure.

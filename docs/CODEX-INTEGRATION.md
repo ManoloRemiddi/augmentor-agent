@@ -8,7 +8,9 @@ before the original selection/toolbar action. A held response reproduces the
 exact old absence before the barrier; releasing it through readiness passes the
 complete existing flow. Permission denial/grant, image/model/queue checks and the
 45-second case remain. No product permission or execution change follows; the
-old original interleaving/sole cause and final broad qualification stay separate.
+old original interleaving/sole cause remains unproven. At 24b53b9 the complete
+source/fresh ordinary cohorts each pass 450/two optional skips/zero failures,
+91 files and unchanged bounds. [Portable qualification](../release/harness-plan-native-title-qualification.json).
 
 ## Verified fixture toolbar selection — October 15
 
