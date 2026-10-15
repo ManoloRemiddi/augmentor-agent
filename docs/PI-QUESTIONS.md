@@ -92,6 +92,14 @@ public-gate and two source-boundary regressions pass without relaxing refusal.
 [Portable checkpoint](../release/harness-question-batches-qualification.json)
 records exact source, scope and retained failures.
 
+A final presentation follow-up supplies the original shared locale fallback to
+the copied plan components. Code-containing plans now expose readable code/copy/
+wrap labels instead of raw locale keys. The same actual full-plan test includes
+a fenced code block and checks its readable toolbar in both-theme qualification.
+The earlier separate ordinary assembly is retained as a controlled negative;
+final source/ordinary results and source identity are recorded in the portable
+checkpoint rather than relabelling the earlier 5eba45a counts.
+
 Retained driver failures are explicit: an unsupported `session.open` RPC,
 incorrect original Approve/text-row selectors, one newly quoted selector producing
 a syntax error, and assuming a legacy Light preference followed OS dark mode.

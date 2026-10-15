@@ -7,8 +7,9 @@ import {PlanPreview,PlanTitle} from '@dsh-gui/ui-plan/src/client/PlanPreview.tsx
 import {createPlanReviewStore} from '@dsh-gui/ui-plan/src/client/review-store.ts';
 import {reviewPreviewAddress} from '@dsh-gui/ui-plan/src/client/review-preview.ts';
 import {en} from '@dsh-gui/ui-plan/src/client/locales.ts';
+import {en as commonEn} from '@dsh-gui/locale/src/locales/en.ts';
 import {questionInput,questionAnswer} from '../../packages/runtime/src/questions.ts';
-const t=(key,args={})=>String(en[key]??key).replace(/\{(\w+)\}/g,(_,k)=>String(args[k]??''));
+const t=(key,args={})=>String(en[key]??commonEn[key]??key).replace(/\{(\w+)\}/g,(_,k)=>String(args[k]??''));
 const id='@deepseek-ai/dsh-client-ui-plan',none=()=>({status:'none'});
 export function bindPlanReview(previews){
  previews.registry.register({id,kind:'plan',patterns:['dsh-resource://plan-review/**'],priority:'builtin',title:()=>t('preview.title')});
