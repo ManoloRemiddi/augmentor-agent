@@ -42,18 +42,54 @@ Existing document/font limits, graceful-to-forced interval and supplier
 queue/cache/GUI/default remain intact. This is a Linux x64 adapter; common
 provider behavior on other platforms is unchanged.
 
+At final application **b3003bde58199288510698c21238a0d689f88c0f**, source and fresh ordinary
+cohorts each pass **285/285 across 65 files**: all 44 Harness Chromium files,
+15 common prompt DOM cases, 22 common/real native Office cases and four original
+queue/default-Wasm cases. Two workers, all existing deadlines, zero skips and
+cancellations are preserved. Both original native-backed viewers separately pass
+font notices/PDF/zoom/reload/Retry and preserved native/request evidence. Eleven
+packaging/source-boundary cases pass with the Office public gate unchanged.
+
 Three controlled real-process completion contracts cover held actor/root,
 PID-token reuse and interrupted registration. Against the preceding helper,
-the two positive completion cases fail; the defensive refusal already passes.
-The initial/reviewed **22/22** common/real native cases pass, including actual
-monitor/broker registration before the held real parser, existing guard faults,
-outer scratch/caller cancellation and an extended actual sandbox check requiring
-no admission/status descriptor in the parser. At provisional **6aa275763a2bac8327c14ff96ec70114ecefc62e**, full source and fresh ordinary cohorts each pass **285/285 across 65 files**. Review then adds a root-identity check before metadata reads and closes the converter for every ownership failure; final-ref source/ordinary/GUI qualification remains pending. These contracts
-prove the new completion requirement, not the old hosted/local failure's exact
-schedule. All-owner loss, pre-ready registration windows, durable root indexing/
-power loss, direct caller-PDF publication, physical/font/security/source/licence/
-distribution/other-OS and broader migration gates remain open. No review or
-installed/default/binary promotion follows.
+the two positive cases fail; the defensive refusal already passes. Initial/reviewed
+22-case runs and provisional **6aa2757** source/ordinary 285-case cohorts pass.
+Review then strengthens root revalidation before reading actor metadata, closes
+that converter for every ownership failure and records the full tested system
+Dash notice. The final cohorts above include those follow-ups. The existing
+killed-guard assertion now confirms no observed actor at settlement and captures
+states if it fails; it has no added post-settlement wait or relaxed predicate.
+The real parser starts only after its monitor/broker identities are observed in
+the registry, and the expanded sandbox probe requires no live admission/status
+descriptor in the parser. These contracts qualify admitted-actor completion;
+the older failure's exact states/schedule and sole cause remain unproven.
+
+All **925 compiled / 2,051 executable source/test/fixture files** match; both
+helpers match source. Original GUI/CSS and normalized spreadsheet bodies/metadata,
+seven supplier provider identities/inputs, production 20,847 dependency entries/
+155 npm instances/Node 24.19.0 and 1,932 Browser test entries remain preserved.
+The small ledger is transient lifecycle metadata, not a durable recovery index.
+[Portable qualification record](../release/office-rebuild/admitted-actor-completion.json)
+separates actor/GUI evidence, system Dash notices and open release scopes. Read-only
+postflight verifies both owner review inventories/all four processes, selection,
+38 canonical changes and Qwen HTTP 200; no owner profile/history/credentials or
+model/speech/GPU settings are changed.
+
+Preceding **c09782c** [SDK 38656747878](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38656747878)
+passes all three platforms and [Windows Desktop 38656747901](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38656747901)
+passes. [Validate 38656747993](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38656747993)
+retains main Node **1,202 pass/one failure/39 identified skips**: the original Free
+Search GUI case calls `indexOf` on an undefined immediate configured-order read.
+Its exact trigger/cause remains open; local 285-case passes do not supersede it.
+That run does not reach secondary/native/package stages. New-head hosted and
+separate Windows command/macOS packaging acceptance remain pending.
+
+All-owner loss, pre-ready registration windows, durable root indexing/power loss,
+direct caller-PDF publication, physical/font/security/source/licence/distribution/
+other-OS and broader migration gates remain open. **Full native release and
+promotion remain false.** No review/installed/default/binary promotion follows.
+The previous 281-case failure and its unqualified record below remain historical
+evidence, alongside this newer admitted-actor correction.
 
 ## Original provider scratch ownership — October 15
 
