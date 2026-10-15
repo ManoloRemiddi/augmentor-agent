@@ -110,6 +110,17 @@ a configured light's current state and offer that explicit review, without
 changing selection or replaying a command. An unrelated action must be reviewed
 in Home itself.
 
+NAS deployment (15 October): derivative image
+`sha256:7adb7277f5c5dfa478ccaa4c3a1a37c2108b88cbe56754d5c14500d90da09838`
+changes only `devices.mjs` from source `e4ff3d2c66caad7045c9d2a244d7686346435d26`
+plus provenance labels over the previous `425fd9eee39f…` image. Its six device
+cases pass in an isolated network-disabled NAS container. The selected service
+is healthy, with prior container/state backup retained; environment, limits and
+all four mount records are unchanged. The existing pending Main-light action
+was preserved for explicit owner review. The EDGE owner reports larger UI is
+better but lights still unresponsive before that review; a repeated physical
+On/Off cycle remains unresolved. No Desktop/Browser artifact was changed.
+
 Qualification: 31 Home cases pass on Node 24.19.0, including delayed readback,
 bounded mismatch, cancellation and one dispatch. Deployment identity and live
 physical acceptance are recorded separately; a source fix is not a running build.
