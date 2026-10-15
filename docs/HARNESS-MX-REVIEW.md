@@ -7,10 +7,74 @@ operator link is supplied privately in the chat/browser panel, never in this
 repository. The installed desktop preview, its draft and the earlier feedback
 profile keep their own settings and history.
 
+## Permission controls review — October 15
+
+Private **20261015-163114-00e4ca65** is the current separate MX feedback build.
+It runs public **c026963**, tested application **7115883** and source cohort
+**454b555**, product **0.2.13** / Pi **1.1.0**. It includes both original MIT DSH
+Permission controls: General's future-chat default and the selected conversation's
+composer selector and `/permission` popup. Read Only, Ask before actions and Full
+access share the existing Pi policy; Full access uses the original confirmation.
+The preceding drafts/cold-history review and every older profile remain available.
+This build does not activate or replace the installed desktop selection.
+
+Its **24,418** sealed entries have SHA-256
+**501614e41c0f03a87463059efba9c3f21d87cd7b9317692192e7029b679b6ff5**.
+All **1,022 compiled files** and Harness source match the tested source. Thirty-six
+selected public artifact files and the full compiled tree overlay the verified
+preceding review, with 151 production npm instances, Node and components
+unchanged. The 909 notice files include refreshed supplier provenance. MIT DSH
+selection is **601**; no DSH
+backend is loaded. Runnable staging intentionally excludes source packages;
+Office's preferred entry source stays in notices. No owner data or experimental
+ThinLTO engine is copied, and public Office distribution remains gated.
+
+Source, fresh ordinary and sealed target each finish **513 cases: 511 pass/two
+existing optional skips/zero failures**, **98 files/all 50 Harness Chromium
+files**, two workers and unchanged deadlines. Seven notice guards pass. The first
+source cohort's `/proc` ESRCH is retained; its cancellation fixture now reuses
+existing process identities, keeping actual cancellation/cleanup assertions and
+production code unchanged. Sealed drivers/static imports run from the QA checkout;
+the actual app targets use the matching sealed build. No output enters it.
+
+The exact sealed app also passes the original GUI / local-Qwen plan workflow:
+**three requests/two tools** (`read`, `exit_plan_mode`), Request changes without
+approval, bare mode off without inference, exact cold native/display history and
+saved-plan reopening. The input file, tool catalog and **262,144 context/8,192
+output** declaration stay unchanged. All five proof actors terminate. This is an
+isolated read-only proof, separate from later activity in the owner review.
+
+The fresh owner profile starts Read Only/keyless with local payload capture and
+no imported credentials, history, memory inference, voice or MCP configuration.
+Initial owner QA has **zero sessions, active turns, unsent drafts and SDK logins**.
+Both animated **2 px** Augmentor marks, black Light smoke, retained Dark flare,
+readable Settings, the original Permission row and cancelled Full access gate,
+and nine account choices/confirmation pass. First confirmation screenshots caught
+a fade frame; retained final frames wait for ancestor opacity and show readable
+original dialogs. No product or supplier code changed for these captures. Browser
+errors/failed responses are zero and the QA browser is terminal.
+
+Seven sealed inventories/eight review processes, the installed selection, canonical
+changes and model/speech/GPU setting hashes verify. Linux/macOS shared SDK checks
+at c026963 pass with both permission features; Windows is still in its permission
+step at the recorded snapshot, with earlier companion cleanup/lifecycle failures
+unresolved. Qwen is online; Breeze remains failed/terminal. Physical MX feedback,
+guarded adoption, other OS artifacts, speech/privacy/memory/MCP/OAuth/Office
+acceptance and complete migration/DSH retirement remain open.
+
+The private operator link is supplied only in chat/browser. Choose **New Session**
+to test the composer. Settings → General changes the next chat's default; the
+composer control or bare `/permission` changes this chat. Read Only affects future
+authorization checks; use Stop for running work. Existing accepted jobs retain
+their grants. [Behavior](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15),
+[portable review evidence](../release/harness-permission-review-20261015.json).
+
 ## Drafts and cold history review — October 15
 
-Private **20261015-144829-1de182ad** is the current separate review for owner
-feedback. It runs public **6ef121d**, tested application **6bc2b0d**, product
+**Historical checkpoint:** the permission-controls review above supersedes this
+for new feedback; its artifact, profile and owner remain preserved.
+
+Private **20261015-144829-1de182ad** was the separate review at this checkpoint. It runs public **6ef121d**, tested application **6bc2b0d**, product
 **0.2.13** / Pi **1.1.0**. It adds conversation-scoped saved question drafts and
 the cold-title fix to the original DSH GUI, alongside its plan-mode controls.
 Its sealed inventory has **24,400 entries**, SHA-256

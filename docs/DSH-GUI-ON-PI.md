@@ -67,10 +67,11 @@ cleanup with a different-executable identity error; current-head hosted results,
 fresh review/physical MX, installed adoption, speech and full migration remain
 open. [Portable evidence](../release/harness-session-permission-qualification.json).
 
-This is source-only. The existing 20261015-144829-1de182ad owner review and the
-installed selection remain unchanged and contain neither new permission binding.
-Fresh review, physical MX feedback, hosted/platform/speech/Office/privacy/live
-checks and complete migration remain open.
+The subsequent [MX review](HARNESS-MX-REVIEW.md#permission-controls-review--october-15)
+contains both Permission bindings and passes matching sealed-target/live/initial
+owner checks. The 20261015-144829-1de182ad review and installed selection remain
+preserved. Physical MX feedback, guarded adoption, other OS artifacts, Windows,
+speech/Office/privacy/live workflows and complete migration remain open.
 
 ## Original Permission default row — October 15
 

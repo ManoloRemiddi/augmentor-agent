@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX Permission review](HARNESS-MX-REVIEW.md#permission-controls-review--october-15)
+**20261015-163114-00e4ca65** runs public **c026963/application 7115883**, unselected,
+with both original Permission bindings. Source/ordinary/sealed target each pass
+**511/two optional skips/zero failures**, 98 files/all 50 Harness Chromium files.
+All 24,418 sealed entries/1,022 compiled files verify. Exact-sealed Qwen proof
+passes three requests/two tools and cold history; all five actors stop. Initial
+owner Light/Dark/logo/Permission/account QA has zero sessions/logins/drafts.
+Seven sealed builds/eight review owners, selection and service settings verify;
+Linux/macOS SDK pass, Windows remains unqualified. Physical MX feedback, guarded
+adoption, speech, other OS artifacts and full migration remain open.
+[Portable record](../release/harness-permission-review-20261015.json).
+
 [Original current-chat Permission controls](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
 now bind the MIT DSH composer selector and slash popup to revisioned, atomic Pi
 conversation policy. Read Only, Ask before actions and Full access affect future
