@@ -66,17 +66,35 @@ one failure**); fixture inputs are authored and no owner credentials/history are
 used. This proves a premature-observation gap, without declaring the older CI
 network schedule or sole trigger captured.
 
-The driver confirms one held mutation, releases it once, waits for an actual
-stored array, retains the original Tavily-before-TinyFish assertion, then waits
-for the original card's clean disabled Save control. The existing 15-second
-observer and 90-second case bound, real drag/pointer events, original modes/keys/
-drafts/themes/scope/restart/collision assertions are unchanged. The full Search
-case passes **1/1** with this controlled barrier. No effective defaults substitute
-for storage, no retry occurs and no failed test is removed. Product/provider/GUI/
-CSS/supplier/dependency bytes remain unchanged; this is qualification-driver
-correction only. Full source/ordinary/new-head hosted acceptance is pending at
-this implementation checkpoint; installed/live/platform/migration and other
-release gates remain separate.
+At driver **810153a88f1ee46121b547b69cdcd01f1c6b5f08**, the check confirms one held mutation,
+releases it once, waits for an actual stored array, retains the original
+Tavily-before-TinyFish assertion and observes the original card's clean disabled
+Save control. Existing 15-second observation/90-second case bounds, real drag/
+pointer events and all modes/keys/drafts/themes/scope/restart/collision assertions
+are preserved. Controlled before **0/1** and after **1/1** retain the failure and
+prove the observation gap; older hosted timing/sole trigger remains unproven.
+No effective defaults substitute for storage, no retry occurs and no failed case
+is dropped.
+
+Source and fresh ordinary cohorts each pass **285/285 across 65 files**, all
+44 Harness Chromium files/15 shared DOM cases/22 native-common cases and four
+original queue/default-Wasm cases. Both retain two workers, unchanged deadlines,
+zero skips/cancellations. **925 compiled files retain exact application b3003bd
+bytes**, including the original GUI/CSS/runtime and both native helpers; 2,051
+executable source/test/fixture files match. Production 20,847 dependency entries/
+155 npm instances/Node 24.19.0 and 1,932 Browser test entries remain unchanged.
+The prior two native original-viewer passes are at b3003bd and are not relabelled
+as new runs. The test-only change does not require rebuilding application code.
+
+[Portable qualification](../release/harness-search-save-observation.json)
+distinguishes application and driver refs, stored-commit evidence and remaining
+scopes. Read-only postflight verifies both owner review inventories/all four
+processes, selected configuration, 38 canonical changes and Qwen HTTP 200. Owner
+profiles/history/credentials, drafts and model/speech/GPU settings remain untouched.
+Preceding e9d65a4 [SDK 38660549909](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38660549909) passes all three platforms and [Windows Desktop 38660550031](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38660550031) passes. [Validate 38660549906](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38660549906) passes the old Search case but retains main Node 1,202 pass/one Trajectory proposed-argument failure/42 identified skips, with later native/package stages not reached. Its exact cause remains open; this correction does not qualify it. New-head hosted Search acceptance remains pending; local evidence does not supersede old CI. Installed/live/platform/migration, native durable/all-owner/
+caller-PDF/source/distribution and full release gates remain open. No review or
+installed/default/binary promotion follows. The owner's accepted MIT alternatives
+remain selected; historical 0.1.0 identity is not a source blocker.
 
 ## Live Blender CLI workflow and retained inspection — October 14
 
