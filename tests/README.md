@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Plan compaction and cold native titles](../docs/PI-PLAN-MODE.md#cold-owner-titles-and-actual-manual-compaction--october-15)
+add actual public-SDK/Host cases to `pi-plan-mode`: bounded manual compaction,
+pending mode/restart and exact file identity after reasoning loads. A retained
+ordinary negative reproduces duplicate metadata; four focused source files pass
+28/28 after the fix. Full/fresh-target/live qualification is recorded separately.
+
 [Scoped question drafts](../docs/PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15)
 use the original persisted store and a controlled two-conversation reload failure.
 Fourteen common migration/cleanup cases and the original actual-SDK Chromium flow

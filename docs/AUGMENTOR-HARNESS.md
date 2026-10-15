@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cold owner name synchronization](PI-PLAN-MODE.md#cold-owner-titles-and-actual-manual-compaction--october-15)
+now avoids repeating a saved native title when reasoning inspection loads its
+existing SDK session. The public setter always appends; normalized equality skips
+only that duplicate. Changed metadata still synchronizes. Exact native originals,
+model/tool permissions and the single-owner lifecycle remain authoritative; source
+qualification and running/installed adoption are distinct.
+
 [Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):
 runtime **97897cf**, private MX **20261013-142001-1f7f7f96**, product **0.2.13**,
 artifact **05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**,

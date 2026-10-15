@@ -96,6 +96,32 @@ compaction, model-account and resource-reload guards remain effective. The GUI
 retires stale reads across newer refreshes, selection and reconnect, and updates
 from peer mode notifications.
 
+## Cold owner titles and actual manual compaction — October 15
+
+Live Qwen testing reached the original full review, Request changes, explicit mode
+off and its next real reply, then exposed an extra native `session_info` title
+entry on cold reopening. The original file was preserved as an exact prefix;
+loading reasoning settings called the public SDK's unconditional title setter
+again. A separate authored actual-SDK control reproduces that duplicate without
+another model request. The loader now compares the saved name using the SDK's
+CR/LF/trim normalization before setting it. A changed metadata title still receives
+one native update; matching normalized names leave the complete file unchanged.
+Reasoning inspection still loads the one existing SDK owner, without inference.
+
+A new actual manual-compaction case supplies bounded authored history through the
+normal queue, selects mode off while work is active, stops that work, then compacts
+through the public SDK. The summary request omits request-only planning guidance
+and does not consume the pending human target. The native append preserves the
+original file, the same mode revision survives restart, duplicate compaction does
+not replay, and only the next admitted chat commits the selected mode off.
+The first fixture exceeded the existing prompt bound and was refused; four bounded
+messages replace it without changing limits or product admission.
+
+Strict check/build and four focused files pass **28/28** on Linux. The cold-title
+case covers initial/normalized names and an intentionally changed authored metadata
+title. Full source/ordinary and actual-Qwen cold-reopening qualification follow in
+the subsequent checkpoint; no installed/review artifact has been changed.
+
 ## Qualification and remaining work
 
 The [separate Linux owner review](HARNESS-MX-REVIEW.md#separate-plan-mode-review--october-15)
@@ -143,7 +169,7 @@ The retained failure remains evidence; a passing new Windows run is still needed
 before claiming that platform or the failure's complete cause qualified.
 
 This is Harness/source integration, not installed adoption or complete migration.
-Physical MX feedback, representative live providers, actual manual compaction with
+Physical MX feedback, representative live providers, live/alternate-provider compaction with
 active planning, hard-crash/write-fault coverage, complete attachment combinations,
 floating Native/browser-extension presentation and platform release artifacts
 still need acceptance. General late-answer continuation remains a separate gap. Generic Harness

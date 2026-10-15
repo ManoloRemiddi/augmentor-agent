@@ -430,7 +430,10 @@ export class Host {
     if(created.session.model?.id!==m.selection.model||created.session.model?.provider!==m.selection.provider){created.session.dispose();throw new Error('Pi selected a different model.');}
     if(m.surface!=='browser')created.session.agent.toolExecution='sequential';
     if(m.delegation){const callable=created.session.getCallableToolNames();if(m.delegation.allowedTools.some(name=>!callable.includes(name))){created.session.dispose();throw Error('A delegated tool grant is unavailable in the child resource registry.');}created.session.setActiveToolsByName(m.delegation.allowedTools);}
-    if(m.title)created.session.setSessionName(m.title);m.reasoning=reasoning;m.file=created.session.sessionFile;this.save(m);
+    // The public SDK setter always appends. Loading a saved owner for inspection
+    // must not repeat its already stored title; retain SDK name normalization.
+    const nativeTitle=m.title.replace(/[\r\n]+/g,' ').trim();
+    if(m.title&&(manager.getSessionName()??'')!==nativeTitle)created.session.setSessionName(m.title);m.reasoning=reasoning;m.file=created.session.sessionFile;this.save(m);
     record={planMode,resources:structuredClone(resources),searchEnabled,searchMode,wiki,wikiRevision,memory,meta:m,session:created.session,manager,events:this.events(m),goals,mcp,cancelled:false};this.loaded.set(m.id,record);
     let history=record.events;
     if(m.fork){m.memoryStartSeq??=history.at(-1)?.seq??0;this.save(m);history=history.filter(e=>e.seq>m.memoryStartSeq!);}

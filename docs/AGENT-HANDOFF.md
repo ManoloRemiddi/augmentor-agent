@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cold native-title loading and actual plan compaction](PI-PLAN-MODE.md#cold-owner-titles-and-actual-manual-compaction--october-15)
+now compare the existing SDK name before an inspection load writes a duplicate.
+An actual SDK negative reproduces the extra native title; the fix preserves exact
+bytes for matching/normalized names while retaining one changed-title update.
+Actual manual compaction preserves active planning and a pending human target
+through Stop/restart until the next admitted chat; summary requests do not consume
+it. Strict check/build and focused 28/28 pass. Full/fresh-target and real-Qwen
+cold reopening remain subsequent qualification; installed and prior reviews stay
+unchanged. Qwen was restored through the existing manager with saved tuning
+preserved; Breeze startup failed and its failed attempt is terminal.
+
 [Conversation-scoped question drafts](PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15)
 at **df5aa20** use the original persisted store's conversation scope. The exact
 lost-note control fails before; independent reload/pages/selections and settled
