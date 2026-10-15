@@ -55,8 +55,36 @@ Office formats through the original provider with unchanged inputs and owned
 cache copies, and **5/5** default queue/Wasm/original GUI cases. Nine real
 packaging cases pass, including preferred-source tampering and refusal of public
 Debian packaging. Fresh production staging collects **151** npm instance notices.
-Full source/ordinary and native-viewer qualification are recorded below when
-complete; these focused checks alone do not qualify a public or installed release.
+At **622300056a989dfc0d3456db223fa79d2675267b**, the complete selected source and fresh ordinary
+cohorts each pass **298/298** across 66 files/all 44 Harness Chromium files,
+including 15 shared prompt DOM, 24 common/native Office and four default queue/Wasm
+cases. Both separate native-backend GUI viewers pass. Two workers, original
+deadlines and zero skips/cancellations remain. All **1,007 compiled files** and
+**2,121 executable inputs** match between trees; original GUI/CSS normalize to
+the same bodies, all seven MIT provider upstream hashes remain and only its
+entry import adaptation changes. Fresh dependencies are **20,702 entries/151 npm
+instances**: 145 old entry/FFI/nested dependency files disappear, and the only
+remaining file difference is npm private lock metadata. Node and 1,932 browser
+test dependency entries remain identical. The first ordinary invocation failed
+before tests because its executable path was relative; the corrected absolute
+invocation is the recorded full pass. A first provenance comparison against the
+intentionally modified prototype also failed; verification now reads the original
+hash-verified archive directly. Neither failed probe is presented as a test pass.
+
+The observed qualification host reports **Debian 13.7 (trixie), Linux x64**.
+MX Linux physical owner acceptance and wider OS/distribution checks remain
+separate. Both owner review inventories (24,305/24,288 entries), all four review
+processes, selected configuration and 38 canonical pre-existing changes verify.
+Qwen's read-only model endpoint returns 200; this does not qualify new inference
+or speech. Model/speech/GPU settings and installed artifacts remain untouched.
+[Portable qualification](../release/office-rebuild/source-entry-qualification.json)
+records exact scope, retained failures and remaining gates.
+
+Predecessor **1cb5a799** now passes the [SDK Linux/macOS/Windows matrix](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38671302506)
+and Windows desktop. Its broader Validate run retains a Jobs pointer obstruction;
+Windows command-job tests and macOS/Windows Koffi notice packaging also fail.
+Removing that npm closure is not evidence that new-head hosted/platform tests
+pass. New-head CI, public and installed release qualification remain open.
 
 The separate full engine link retry on October 15 retains the verified compiler,
 recipe, one-thread resource controls and runtime/full-LTO flags in a copied cache.

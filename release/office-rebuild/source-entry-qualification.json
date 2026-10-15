@@ -1,0 +1,173 @@
+{
+  "schema": "augmentor-source-built-office-entry-qualification/1",
+  "date": "2026-10-15",
+  "testedApplicationRef": "622300056a989dfc0d3456db223fa79d2675267b",
+  "previousApplicationRef": "1cb5a799fc1812559c5873f816e6007787ba0ee0",
+  "scope": "Linux x64 source and fresh ordinary production-dependency qualification; no installed or public binary promotion",
+  "observedHost": "Debian GNU/Linux 13.7 (trixie); MX Linux remains the owner acceptance target",
+  "entry": {
+    "name": "@augmentor/office-entry",
+    "version": "0.1.3-augmentor.1",
+    "license": "MPL-2.0",
+    "publicRepository": "https://github.com/deepseek-ai/dsh-libreoffice-kit",
+    "sourceCommit": "b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+    "sourceArchiveSha256": "33839347e44b8df44c59115b566e9664e7db04a612a8f37ee2b220d7e501c036",
+    "preferredSourceFiles": 32,
+    "unchangedSourceFiles": 31,
+    "modifiedFile": "engine.ts: explicit source-fork identity and Wasm 0.1.5 mapping",
+    "declarations": 31,
+    "builtComponentFiles": 82,
+    "build": {
+      "node": "24.19.0",
+      "typescript": "5.9.3",
+      "esbuild": "0.28.2"
+    },
+    "runtimeDependencies": {
+      "fontkit": "2.0.4",
+      "saxes": "6.0.0",
+      "fflate": "0.8.3"
+    },
+    "opaqueNpmEntryRemoved": true,
+    "oldNpm015PreferredSourceRecovered": false,
+    "sourceBuiltImplementationGapClosed": true,
+    "originalMplNoticesMatch": true
+  },
+  "cohort": {
+    "testFiles": 66,
+    "harnessChromiumFiles": 44,
+    "workers": 2,
+    "existingDeadlineChanges": false,
+    "sharedPromptDomCases": 15,
+    "commonNativeOfficeCases": 24,
+    "defaultQueueWasmCases": 4,
+    "source": {
+      "cases": 298,
+      "passes": 298,
+      "failures": 0,
+      "skips": 0,
+      "cancellations": 0,
+      "durationMs": 154738.412108
+    },
+    "ordinary": {
+      "cases": 298,
+      "passes": 298,
+      "failures": 0,
+      "skips": 0,
+      "cancellations": 0,
+      "durationMs": 156714.823048
+    }
+  },
+  "officeProbes": {
+    "sourceSixFormatsPass": true,
+    "ordinarySixFormatsPass": true,
+    "formats": [
+      "doc",
+      "docx",
+      "xls",
+      "xlsx",
+      "ppt",
+      "pptx"
+    ],
+    "authoredContentVerifiedByActualPdfText": true,
+    "sourceBytesAndOwnedCacheCopiesVerified": true,
+    "separateNativeViewerPassesEach": 1,
+    "originalWarningsZoomReloadRetryAndNativeRequestEvidence": true
+  },
+  "packaging": {
+    "schema": 2,
+    "engineFilesUnchanged": 49,
+    "engineRecipeSourceFiles": 39,
+    "entryFilesExported": 82,
+    "cases": 9,
+    "privateSourceBoundaryCases": 2,
+    "forgedLabelsDoNotGrantApproval": true,
+    "changedSourceBinaryLockAndLinkedContentRefused": true,
+    "publicDebianPackagingRefused": true
+  },
+  "parity": {
+    "compiledFiles": 1007,
+    "executableInputs": 2121,
+    "productionDependencyEntries": 20702,
+    "productionNpmInstances": 151,
+    "removedDependencyFiles": 145,
+    "addedDependencyFiles": 0,
+    "changedDependencyFiles": 1,
+    "changedDependencyFilesAreNpmPrivateLockMetadataOnly": true,
+    "all49EngineFilesUnchanged": true,
+    "sourceArchiveHashVerified": true,
+    "all7OriginalMitProviderUpstreamHashesPreserved": true,
+    "normalizedOriginalGuiAndCssBodiesUnchanged": true,
+    "currentOwnerReviewEntriesVerified": 24305,
+    "priorOwnerReviewEntriesVerified": 24288,
+    "allFourReviewProcessesPreserved": true,
+    "canonicalPreexistingChangesPreserved": 38,
+    "ownerOrSelectedArtifactUpdated": false,
+    "modelSpeechGpuSettingsChanged": false,
+    "qwenReadOnlyModelsStatus": 200
+  },
+  "retainedFailures": [
+    {
+      "stage": "candidate upstream pnpm build",
+      "result": "refused copied dependency metadata; pinned direct TypeScript/tsdown build then passed; not relabelled as an upstream wrapper pass"
+    },
+    {
+      "stage": "first ordinary cohort launch",
+      "result": "relative child executable path raised ENOENT before tests; corrected absolute-path invocation passes 298/298"
+    },
+    {
+      "stage": "first provenance postflight",
+      "result": "compared against the intentionally modified prototype engine.ts; corrected verification reads original bytes from the hash-verified public archive; no source change required"
+    }
+  ],
+  "predecessorHosted": {
+    "head": "1cb5a799fc1812559c5873f816e6007787ba0ee0",
+    "sdkAllThreePlatforms": {
+      "run": 38671302506,
+      "conclusion": "success"
+    },
+    "windowsDesktop": {
+      "run": 38671302538,
+      "conclusion": "success"
+    },
+    "validate": {
+      "run": 38671302592,
+      "conclusion": "failure",
+      "observedFailure": "Jobs Start job pointer target covered by a context PRE; exact cause remains unproven"
+    },
+    "macos": {
+      "run": 38671302591,
+      "conclusion": "failure",
+      "observedFailure": "Koffi 3.1.1 platform package missing reviewed notice; removed closure is not yet hosted qualification"
+    },
+    "windowsQualification": {
+      "run": 38671302576,
+      "conclusion": "failure",
+      "observedFailure": "command-job assertions/timeouts and Koffi packaging notice gap"
+    },
+    "windowsCommandJobs": {
+      "run": 38671302644,
+      "conclusion": "failure"
+    },
+    "newHeadHostedQualified": false
+  },
+  "engineBuild": {
+    "recipePackage": "@deepseek-ai/libreoffice-kit-wasm@0.1.5",
+    "memoryLimitBytes": 8589934592,
+    "memoryPeakBytes": 8589934592,
+    "swapLimitBytes": 0,
+    "exitCode": 1,
+    "oomKilled": true,
+    "finalLinkComplete": false,
+    "originalRuntimeAndFullLtoFlagsPreserved": true,
+    "failedCacheRetained": true
+  },
+  "remainingGates": [
+    "Exact Wasm engine rebuild, output/package/render comparison and public distribution",
+    "MPL and remaining font/third-party notice sufficiency",
+    "Native engine packages and actual Windows/macOS adapters; wider Linux and MX physical acceptance",
+    "Native pre-ready/all-owner/power-loss/durable recovery and hostile document/font qualification",
+    "Live providers/OAuth/search/MCP/voice and complete migration/update/rollback/privacy acceptance"
+  ],
+  "installedArtifactsUpdated": false,
+  "publicRedistributionQualified": false
+}
