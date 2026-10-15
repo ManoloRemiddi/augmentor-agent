@@ -4,7 +4,9 @@
 use the original persisted store and a controlled two-conversation reload failure.
 Fourteen common migration/cleanup cases and the original actual-SDK Chromium flow
 join the source cohort; the common contracts also enter three-platform SDK CI.
-Initial focused 46/46 is distinct from the subsequent full/ordinary checkpoint.
+At df5aa20, focused 46/46 and source/fresh ordinary **439/two optional skips/zero
+failures** across 89 files/all 48 Harness Chromium files pass with unchanged bounds.
+[Exact cohort/evidence/limits](../release/harness-question-draft-qualification.json).
 
 [Plan mode](../docs/PI-PLAN-MODE.md) adds common mode contracts, actual SDK/Host
 Native/Browser, queue/steering and original Chromium chip/review checks. The

@@ -156,3 +156,11 @@ containing `:all:`; its workflow did not start any jobs. The corrected folded
 command parses locally and preserves every locked-install argument. This is
 retained separately from the earlier actual Windows companion startup failure;
 new hosted qualification remains required.
+
+[SDK run 38725408842](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38725408842)
+at 0b39dd6 passes Linux/macOS. Windows now confirms private companion preparation
+and reaches mode execution, but that 17-case step reports nine pass, six fail and
+two timeouts. Review probes reach actual provider tool calls; their exact stalled
+boundary and the lifecycle timeout causes remain unproven. The Qt correction
+qualifies setup, not Windows mode acceptance. No timeout, assertion or platform
+case was relaxed or skipped to change that outcome.

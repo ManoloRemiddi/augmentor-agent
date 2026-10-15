@@ -1,13 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Conversation-scoped question drafts](PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15)
-now use the original store's persisted scope instead of a shared default key.
-The exact lost first-conversation note reproduces before; two-conversation reload,
-selections/pages and settled cleanup pass after, without answer/inference replay.
-Strict check/build and focused 46/46 pass; full source/ordinary qualification
-follows. Existing sealed reviews/owner profiles and installation remain unchanged.
-The prior 0b39dd6 SDK run passes Linux/macOS; Windows now prepares its companion
-but retains six mode failures/two timeouts, with cause and qualification open.
+at **df5aa20** use the original persisted store's conversation scope. The exact
+lost-note control fails before; independent reload/pages/selections and settled
+cleanup pass after, with no answer/inference replay. Source/fresh ordinary each
+pass **439/two optional skips/zero failures**, 89 files/all 48 Harness Chromium
+files, unchanged bounds; focused 46/46 and eleven packaging/boundary cases pass.
+All 1,019 compiled/3,274 tracked files match; runtime bd03b15, dependencies,
+593 supplier inputs and CSS remain unchanged. Five sealed inventories, six review
+processes, selection/canonical changes and Qwen verify. This is source-only.
+Prior 0b39dd6 SDK passes Linux/macOS; Windows companion startup now works but six
+mode failures/two timeouts and broader installed/platform/migration gates remain.
+[Portable evidence](../release/harness-question-draft-qualification.json).
 
 [Separate plan-mode MX review](HARNESS-MX-REVIEW.md#separate-plan-mode-review--october-15)
 **20261015-130013-ae5dfe06** now runs public d7e6318/runtime bd03b15, unselected.

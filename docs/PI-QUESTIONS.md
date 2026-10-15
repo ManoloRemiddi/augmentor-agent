@@ -48,7 +48,16 @@ Strict check/build and six focused files pass **46/46** on Linux. The original
 exact unchanged native/display histories, two provider requests and no submissions,
 then Stop and selected-snapshot cleanup. Fourteen common binding cases cover
 migration/refusal/storage/selection and cleanup. Full source/ordinary results and
-publication revision are recorded by the subsequent qualification checkpoint.
+publication scope follow: at **df5aa20374a03f026d5cf174d32915edf69d83a2**, source
+and fresh ordinary each pass **439/two optional skips/zero failures**, across
+**89 files/all 48 Harness Chromium files**, two workers and unchanged bounds.
+All **1,019 compiled/3,274 tracked files** match after testing. The 20,702 production
+dependency entries/151 npm instances, Node 24.19.0, 1,932 browser-test entries,
+593 supplier inputs and original CSS remain unchanged; runtime bytes retain
+bd03b15. Eleven packaging/source-boundary cases pass. All five sealed inventories,
+six review processes, selection and 38 canonical changes verify; Qwen/current
+review respond HTTP 200. This fix is not in that running review.
+[Portable qualification and exact cohort](../release/harness-question-draft-qualification.json).
 Installed owner reviews, prior sealed builds, selection and model/speech settings
 remain unchanged. Physical MX, live providers, other platform presentation,
 late-answer continuation and the complete migration gates remain separate.
