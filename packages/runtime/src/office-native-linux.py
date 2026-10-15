@@ -226,8 +226,11 @@ def record_actor(root: Path, pid: int, role: str) -> None:
     actor_record(root, {'pid': pid, 'start': start, 'role': role})
 
 
-def join_actors(root: Path) -> None:
+def join_actors(root: Path, identity: tuple[int, int]) -> None:
     """Join only trusted pre-admission identities; never discover or signal PIDs."""
+    current = root.lstat()
+    if not stat.S_ISDIR(current.st_mode) or current.st_uid != os.getuid() or stat.S_IMODE(current.st_mode) != 0o700 or (current.st_dev, current.st_ino) != identity:
+        raise Failure('failed')
     try:
         data = read_regular(root / 'actors.jsonl', 4096, 'failed')
     except FileNotFoundError:
@@ -511,7 +514,7 @@ def supervise(root: Path, identity: tuple[int, int], owner: int) -> tuple[bytes,
                     except ProcessLookupError:
                         pass
                     forced = True
-        join_actors(root)
+        join_actors(root, identity)
         remove_owned_root(root, identity)
         return bytes(data), os.waitstatus_to_exitcode(status)
     except (AttributeError, OSError):
@@ -596,7 +599,7 @@ if __name__ == '__main__':
             if os.getppid() != int(arguments[1]):
                 raise Failure('failed')
             process_name(b'aug-office-join')
-            join_actors(root)
+            join_actors(root, identity)
             remove_owned_root(root, identity)
             root = None
             print(json.dumps({'cleaned': True}), flush=True)
@@ -617,7 +620,7 @@ if __name__ == '__main__':
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
         if root is not None and not (sys.argv[1:2] == ['--cleanup']):
             if root.exists():
-                join_actors(root)
+                join_actors(root, identity)
             remove_owned_root(root, identity)
         if parent_lease is not None:
             os.close(parent_lease)

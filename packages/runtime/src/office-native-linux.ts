@@ -67,7 +67,7 @@ export async function createLinuxNativeOfficeConverter(options:ConverterOptions=
           cleanup.on('error',cause=>error=cause);cleanup.stdout.setEncoding('utf8');cleanup.stdout.on('data',bytes=>{if(overflow)return;result+=bytes;if(Buffer.byteLength(result)>8192){overflow=true;cleanup.kill('SIGKILL');}});
           cleanup.once('close',code=>{try{if(code!==0||error||overflow||JSON.parse(result).cleaned!==true)throw new Error('Native actor completion was not confirmed.');resolve();}catch(cause){const failure=new OfficeToPdfError('unavailable','Native Office cleanup remains unconfirmed.',{cause});lifetime.abort(failure);reject(failure);}});
         });
-      }catch(cause){if((cause as NodeJS.ErrnoException).code!=='ENOENT')throw cause;}
+      }catch(cause){if((cause as NodeJS.ErrnoException).code!=='ENOENT'){lifetime.abort(cause);throw cause;}}
       if(!succeeded)await rm(request.outputPath,{force:true});
     }
   };

@@ -28,8 +28,7 @@ parsing is admitted. A fixed positional-argument gate uses the system
 `/usr/bin/dash`, bound read-only; it rejects EOF/wrong admission and closes its
 one-way descriptor before executing the original parser command. Status pipes
 also close before parsing. User document text supplies no shell command.
-Dash is a system GPL component with separate distribution obligations; this
-adds no npm dependency and does not relabel the native system payload MIT.
+The tested system Dash is **0.5.12-12**. Its [Debian notice](https://sources.debian.org/src/dash/0.5.12-12/debian/copyright/) records BSD-3-Clause/public-domain source and GPL-2+ generated-code obligations; those remain separate. This adds no npm dependency and does not relabel the native system payload MIT.
 
 Normal supervision joins the registered actors before deleting private scratch.
 After helper loss, the live Node fallback invokes the same owned helper's
@@ -49,8 +48,7 @@ the two positive completion cases fail; the defensive refusal already passes.
 The initial/reviewed **22/22** common/real native cases pass, including actual
 monitor/broker registration before the held real parser, existing guard faults,
 outer scratch/caller cancellation and an extended actual sandbox check requiring
-no admission/status descriptor in the parser. Full exact-ref source/ordinary/GUI
-qualification remains pending at this implementation checkpoint. These contracts
+no admission/status descriptor in the parser. At provisional **6aa275763a2bac8327c14ff96ec70114ecefc62e**, full source and fresh ordinary cohorts each pass **285/285 across 65 files**. Review then adds a root-identity check before metadata reads and closes the converter for every ownership failure; final-ref source/ordinary/GUI qualification remains pending. These contracts
 prove the new completion requirement, not the old hosted/local failure's exact
 schedule. All-owner loss, pre-ready registration windows, durable root indexing/
 power loss, direct caller-PDF publication, physical/font/security/source/licence/
