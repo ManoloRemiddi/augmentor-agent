@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original plan mode on Pi](PI-PLAN-MODE.md) adds the original MIT chip and
+`/plan`, persistent advisory state and full reviewed exit to the existing SDK
+owner. Approval keeps existing permissions; Request changes ends that turn and
+disarms automatic goal continuation without clearing its objective. Reviews wait
+while an operator is connected; action approval deadlines remain unchanged.
+Source/ordinary qualification and installed/platform adoption are distinct.
+
 [Source-built Office engine](HARNESS-OFFICE-PREVIEWS.md#fresh-thinlto-engine-build--october-15)
 now completes compile/package, **exit 0/no OOM**, below the unchanged **8 GiB**
 cap (**6,951,043,072-byte** peak). The tested private candidate builder and paired

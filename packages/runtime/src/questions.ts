@@ -40,7 +40,7 @@ export function piQuestions(interactions:Interactions,sessionId:string,ownerId=s
  pi.registerTool({name:'ask_user',label:'Ask user',description:'Ask for required missing information: supply question/options for one answer, or questions for a complete batch with stable IDs, optional detail and multiSelect. For one plan review use detail as the complete plan and intent {kind:"plan-review",approve:<exact offered label>}. A plan decision grants no permission to execute tools. Empty selections without custom text mean the human explicitly skipped that question. Never infer an answer after cancellation.',parameters:QUESTION_INPUT,
   async execute(toolCallId,input,signal){
    const {questions,legacy}=questionInput(input);
-   const result=await interactions.ask(sessionId,'question/requested',{questions,toolName:'ask_user',toolCallId,ownerId},{signal},ownerId,value=>questionAnswer(questions,value));
+   const result=await interactions.ask(sessionId,'question/requested',{questions,toolName:'ask_user',toolCallId,ownerId},{signal},ownerId,value=>questionAnswer(questions,value),questions[0]?.intent?.kind==='plan-review'?'waiting':'counting');
    const answer=result as Answer|undefined,first=answer?.answers[0];
    return {content:[{type:'text',text:legacy?(first?.custom??first?.selected[0]??'User did not answer.'):JSON.stringify(answer??{unanswered:true})}],details:{schema:'augmentor-question-answer/1',status:answer?'answered':'unanswered',...(answer?{answer}:{})}};
   },

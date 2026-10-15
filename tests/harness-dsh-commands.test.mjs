@@ -75,6 +75,13 @@ test('model popup captures provider identity and refuses stale draft/model/runni
 });
 
 // Async command admission must not erase a rejected or subsequently edited draft.
+test('Plan menu activation consumes only confirmed draft ownership; typed messages keep their admitted input path',async()=>{
+ const f=fixture();f.draft.text='/plan';f.deps.rows=()=>[{name:'plan'}];let finish;
+ f.deps.actions.plan=()=>new Promise(resolve=>finish=resolve);assert.equal(await f.menu.adjudicate('/plan inspect the project'),undefined);assert.equal(await f.menu.adjudicate('/plan off'),undefined);assert.deepEqual(f.writes,[]);
+ assert(f.menu.dispatch('plan',f.menu.scope,segment(1,0,5)));await Promise.resolve();assert.deepEqual(f.writes,[]);f.draft.rev++;finish({accepted:true});await new Promise(resolve=>setImmediate(resolve));assert.deepEqual(f.writes,[]);
+ f.draft.rev--;f.deps.actions.plan=async()=>{throw Error('Mode revision changed');};f.menu.dispatch('plan',f.menu.scope,segment(1,0,5));await new Promise(resolve=>setImmediate(resolve));assert.deepEqual(f.writes,[]);assert.deepEqual(f.notices,['Mode revision changed']);
+ f.deps.actions.plan=async()=>({accepted:true});f.menu.dispatch('plan',f.menu.scope,segment(1,0,5));await new Promise(resolve=>setImmediate(resolve));assert.equal(f.writes.length,1);
+});
 test('Compact consumes only a confirmed, unchanged command span and refuses active work',async()=>{
  const f=fixture();f.draft.text='/compact';f.deps.rows=()=>[{name:'compact'}];let settle;
  f.deps.actions.compact=()=>new Promise(resolve=>settle=resolve);

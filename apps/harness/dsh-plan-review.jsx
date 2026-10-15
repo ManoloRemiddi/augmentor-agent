@@ -3,14 +3,21 @@
 import React,{useMemo,useSyncExternalStore} from 'react';
 import {extractMarkdownPlainText} from '@deepseek-ai/dsh-client-ui-primitives';
 import {PlanCards,PlanReviewOpen} from '@dsh-gui/ui-plan/src/client/PlanCard.tsx';
+import {PlanChip} from '@dsh-gui/ui-plan/src/client/PlanModeControl.tsx';
 import {PlanPreview,PlanTitle} from '@dsh-gui/ui-plan/src/client/PlanPreview.tsx';
 import {createPlanReviewStore} from '@dsh-gui/ui-plan/src/client/review-store.ts';
 import {reviewPreviewAddress} from '@dsh-gui/ui-plan/src/client/review-preview.ts';
 import {en} from '@dsh-gui/ui-plan/src/client/locales.ts';
 import {en as commonEn} from '@dsh-gui/locale/src/locales/en.ts';
 import {questionInput,questionAnswer} from '../../packages/runtime/src/questions.ts';
+import {planReviewInput} from '../../packages/runtime/src/plan-mode-contracts.ts';
 const t=(key,args={})=>String(en[key]??commonEn[key]??key).replace(/\{(\w+)\}/g,(_,k)=>String(args[k]??''));
 const id='@deepseek-ai/dsh-client-ui-plan',none=()=>({status:'none'});
+export function PlanModeControl({state,controller,locked}){
+ const epoch=controller.epoch;
+ return <PlanChip key={state.sessionId+':'+epoch+':'+state.readOnly} useProjection={()=>state.planMode?.available?state.planMode:undefined} locked={locked||state.readOnly} t={t}
+  exitPlanMode={async()=>{await controller.setPlanMode(false,{sessionId:state.sessionId,epoch});return null;}}/>;
+}
 export function bindPlanReview(previews){
  previews.registry.register({id,kind:'plan',patterns:['dsh-resource://plan-review/**'],priority:'builtin',title:()=>t('preview.title')});
  previews.slots.set('sidebar.right.pane.tab::'+id,props=><PlanPreview {...props} useResource={none} t={t}/>);
@@ -30,8 +37,8 @@ export function bindPlanReview(previews){
  }
  function Recorded({data,state}){
   const plan=useMemo(()=>{
-   if(data.name!=='ask_user'||data.result?.details?.schema!=='augmentor-question-answer/1')return null;
-   try{const {questions}=questionInput(data.call?.arguments),q=questions[0];if(questions.length!==1||!q.intent)return null;
+   if(!['ask_user','exit_plan_mode'].includes(data.name)||data.result?.details?.schema!=='augmentor-question-answer/1')return null;
+   try{const {questions}=data.name==='exit_plan_mode'?planReviewInput(data.call?.arguments?.plan):questionInput(data.call?.arguments),q=questions[0];if(questions.length!==1||!q.intent)return null;
     if(data.result.details.status==='answered')questionAnswer(questions,{answer:data.result.details.answer});
     return {callId:String(data.seq),title:extractMarkdownPlainText(q.detail,{mode:'first-line'}),markdown:q.detail};
    }catch{return null;}

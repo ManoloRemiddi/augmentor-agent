@@ -102,6 +102,9 @@
     "tests/free-search.test.mjs",
     "tests/search-settings.test.mjs",
     "tests/harness-search-settings-chromium.test.mjs",
-    "tests/keyless-search.test.mjs"
+    "tests/keyless-search.test.mjs",
+    "tests/pi-plan-mode.test.mjs",
+    "tests/plan-mode-contracts.test.mjs",
+    "tests/harness-plan-mode-chromium.test.mjs"
   ]
 }

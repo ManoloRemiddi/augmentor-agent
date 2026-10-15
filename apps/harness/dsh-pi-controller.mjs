@@ -7,7 +7,7 @@ export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
   branchFlight=null; branchIntents=new Map();createFlight=null;
   catalogRevision=0;catalogRead=0;
-  state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,goal:null,workspace:'',error:null,hasMore:false};
+  state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,planMode:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
@@ -29,7 +29,7 @@ export class DshPiController {
   async open(sessionId){
     if(!this.state.readOnly&&this.state.workspaces?.archivedSessionIds?.includes(sessionId))throw Error('Restore the conversation before opening it.');
     const epoch=++this.epoch;
-    this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,compaction:null,compactionPending:false,phase:'loading',events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],selection:null,reasoning:null,goal:null,hasMore:false,error:null});
+    this.update({sessionId,unconfirmed:this.pending.get(sessionId)||null,compaction:null,compactionPending:false,phase:'loading',events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],selection:null,reasoning:null,planMode:null,goal:null,hasMore:false,error:null});
     const sub=await this.rpc('events.subscribe',{sessionId,clientId:this.clientId});if(epoch!==this.epoch)return;
     this.cursor=sub.cursor;
     const [history,observations,model,queue,goal,compaction]=await Promise.all([
@@ -39,7 +39,22 @@ export class DshPiController {
     const reasoning=this.state.readOnly?null:await this.rpc('session.reasoning',{sessionId});if(epoch!==this.epoch)return;
     sessionStorage.setItem('augmentor-harness-session',sessionId);
     this.update({events:history.events.map(x=>x.event),hasMore:history.hasMore===true,observationHasMore:observations.hasMore===true,records:observations.records,selection:model.current,queue,goal,reasoning,compaction,interactions:sub.pending,phase:'ready'});
+    if(this.state.capabilities?.planMode)await this.refreshPlanMode({sessionId,epoch});
     void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
+  }
+  planModeRead=0;
+  modeScope(scope){return scope?.epoch===this.epoch&&scope.sessionId===this.state.sessionId&&this.state.phase==='ready';}
+  async refreshPlanMode(scope={sessionId:this.state.sessionId,epoch:this.epoch}){
+    if(!this.modeScope(scope)||!this.state.capabilities?.planMode)return;
+    const ticket=++this.planModeRead;
+    try{const planMode=await this.rpc('session.planMode',{sessionId:scope.sessionId});if(this.modeScope(scope)&&ticket===this.planModeRead)this.update({planMode});}
+    catch(error){if(this.modeScope(scope)&&ticket===this.planModeRead)throw error;}
+  }
+  async setPlanMode(active,scope={sessionId:this.state.sessionId,epoch:this.epoch}){
+    if(!this.modeScope(scope)||this.state.readOnly||!this.state.capabilities?.planMode||!this.state.planMode?.available)throw Error('Refresh the current operator conversation before changing plan mode.');
+    ++this.planModeRead;
+    const result=await this.rpc('session.setPlanMode',{sessionId:scope.sessionId,active,expectedRevision:this.state.planMode.revision});
+    await this.refreshPlanMode(scope);return {accepted:true,...result};
   }
   hydrating=null;contextPayloadReads=new Map();contextPaging=null;
   eligibleContext(record){return record?.kind==='model/request'&&record.payload?.state==='retained'&&Number.isSafeInteger(record.payload.bytes)&&record.payload.bytes>=0&&record.payload.bytes<=1024*1024;}
@@ -91,7 +106,7 @@ export class DshPiController {
     }catch(error){if(epoch===this.epoch)this.update({contextPage:{loading:false,error:error.message}});}})();
     try{await job.promise;}finally{if(this.contextPaging===job)this.contextPaging=null;}
   }
-  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,goal:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
+  clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,goal:null,planMode:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
   async refresh(){
     const epoch=this.epoch,sessionId=this.state.sessionId,readOnly=this.state.readOnly,revision=this.catalogRevision,read=++this.catalogRead;
     // A confirmed catalog update invalidates reads already in flight, including
@@ -214,6 +229,7 @@ export class DshPiController {
       if(changed)void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
       if(page.gap){await this.open(sessionId);return;}
       if(page.frames.length||!this.lastRefresh||Date.now()-this.lastRefresh>3000){this.lastRefresh=Date.now();await this.refresh();}
+      if(this.state.capabilities?.planMode&&page.frames.some(({frame})=>frame.method==='plan-mode/updated'))await this.refreshPlanMode({sessionId,epoch});
       if(page.frames.some(({frame})=>frame.method==='goal/updated')){const goal=await this.rpc('session.goal',{sessionId});if(epoch===this.epoch)this.update({goal});}
       for(const [key,held] of this.heldQuestions){
         const frame=this.state.interactions.find(x=>x.rpcId===key);

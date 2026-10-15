@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Plan mode](../docs/PI-PLAN-MODE.md) adds common mode contracts, actual SDK/Host
+Native/Browser, queue/steering and original Chromium chip/review checks. The
+shared interaction tests cover a ten-minute simulated review wait, Stop and
+disconnect while preserving hard action-approval deadlines. Exact full-cohort
+results and installed/physical/platform limits remain separate.
+
 [ThinLTO Office source-build diagnostic](../release/office-rebuild/README.md#inspect-a-completed-thinlto-build-without-changing-the-app)
 is reproduced with `prepare-thin-candidate.mjs` and `compare-thin-candidate.mjs`.
 The actual public drivers pass six authored formats on both engines, exact

@@ -26,7 +26,8 @@ export class Interactions {
       this.schedule(item);
     },Math.max(0,Math.min(...deadlines)-Date.now()));
   }
-  ask(sessionId:string,method:string,payload:Data,options?:ExtensionUIDialogOptions,ownerId=sessionId,validate?:(value:any)=>any):Promise<any> {
+  ask(sessionId:string,method:string,payload:Data,options?:ExtensionUIDialogOptions,ownerId=sessionId,validate?:(value:any)=>any,questionWait:'counting'|'waiting'='counting'):Promise<any> {
+    if(questionWait==='waiting'&&method!=='question/requested')throw Error('Only questions may start with a paused foreground deadline; action approvals retain their hard timeout.');
     if(!this.connected(sessionId)||options?.signal?.aborted)return Promise.resolve(undefined);
     return new Promise(resolve=>{
       const id=randomUUID();
@@ -35,7 +36,7 @@ export class Interactions {
       const frame={method,rpcId:id,payload:{...payload,sessionId,approvalId:id}};
       const finish=(value:any,reason='answered')=>{if(!this.pending.delete(id))return;clearTimeout(item.timer);options?.signal?.removeEventListener('abort',abort);this.observed(ownerId,id,method,false);this.publish(sessionId,{method:'interaction/resolved',rpcId:id,payload:{sessionId,rpcId:id,reason}});resolve(value);};
       const abort=()=>finish(undefined,'aborted');
-      const item:PendingInteraction={sessionId,ownerId,frame,finish,validate,focus:new Map(),...(method==='question/requested'?{wait:{revision:0,state:'counting',remainingMs:duration,deadline:Date.now()+duration}}:{})};
+      const item:PendingInteraction={sessionId,ownerId,frame,finish,validate,focus:new Map(),...(method==='question/requested'?{wait:{revision:0,state:questionWait,remainingMs:duration,...(questionWait==='counting'?{deadline:Date.now()+duration}:{})}}:{})};
       this.pending.set(id,item);options?.signal?.addEventListener('abort',abort,{once:true});
       this.observed(ownerId,id,method,true);
       if(item.wait){this.updateFrame(item);this.schedule(item);}else item.timer=setTimeout(()=>finish(undefined,'timed-out'),duration);

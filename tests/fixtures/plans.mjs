@@ -15,10 +15,11 @@ import {pythonExecutable} from '../../dist/platform/src/index.js';
 import {privateDir,atomicJson} from '../../dist/runtime/src/storage.js';
 import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
-export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false}={}){
+export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,forcePrompt=false}={}){
  const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
  const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])privateDir(path);
  const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
+ if(forcePrompt){const extension=join(root,'authored-force-prompt.mjs');await writeFile(extension,"export default pi=>pi.on('before_agent_start',event=>({systemPrompt:event.systemPrompt+'\\n\\nAUTHORED_FORCED_PROMPT'}));\n");atomicJson(join(config,'resources.json'),{sources:[extension],skills:[]});}
  const requests=[],children=[],connections=[],frames=[];let child,owner,errors='';
  const model=http.createServer(async(req,res)=>{
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
@@ -29,6 +30,15 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
   res.writeHead(200,{'content-type':'text/event-stream'});
   const send=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'plan-fixture',object:'chat.completion.chunk',model:'plan-fixture',choices:[{index:0,delta,finish_reason:finish}]})+'\n\n');
   const last=body.messages.at(-1),proposal=body.messages.findLast(m=>m.role==='assistant'&&m.tool_calls?.length),toolName=proposal?.tool_calls?.at(-1)?.function?.name;
+  if(planMode){
+   if(planMode.goalReview&&text?.startsWith('Continue the explicitly started goal'))op={kind:'mode-review',plan:'# Authored goal plan\n\nWait for the human review.'};
+   const tool=(name,args)=>send({role:'assistant',tool_calls:[{index:0,id:'mode-'+requests.length,type:'function',function:{name,arguments:JSON.stringify(args)}}]},'tool_calls');
+   if(op.kind==='mode-hold'){send({role:'assistant',content:'Authored provider holding for a mode selection. '});const timer=setInterval(()=>send({content:' '}),100);if(typeof planMode==='object')planMode.release=()=>{clearInterval(timer);if(!res.writableEnded){send({content:'Authored held response released.'},'stop');res.end('data: [DONE]\n\n');}};res.once('close',()=>clearInterval(timer));return;}
+   if(op.kind==='mode-review'&&last?.role!=='tool')tool('exit_plan_mode',{plan:op.plan});
+   else if(op.kind==='mode-review'&&toolName==='exit_plan_mode'&&op.write)tool('write',{path:op.write,content:'This write still needs existing tool permission.'});
+   else send({role:'assistant',content:'Authored plan-mode result received.'},'stop');
+   res.end('data: [DONE]\n\n');return;
+  }
   if(questionMode){
    if(last?.role!=='tool')send({role:'assistant',tool_calls:[{index:0,id:'question-'+requests.length,type:'function',function:{name:'ask_user',arguments:JSON.stringify(op.input)}}]},'tool_calls');
    else send({role:'assistant',content:'Authored human answer received.'},'stop');

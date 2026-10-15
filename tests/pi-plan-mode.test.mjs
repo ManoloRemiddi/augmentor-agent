@@ -1,0 +1,78 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Actual public SDK/Host/provider boundaries with independent authored inputs.
+import test from 'node:test';import assert from 'node:assert/strict';
+import {readFile,access} from 'node:fs/promises';import {join} from 'node:path';
+import {planFixture,until} from './fixtures/plans.mjs';
+const plan='# Authored mode plan\n\nInspect the requested work, preserve permissions, then verify the result.';
+const mode=(f,sid)=>f.call('session.planMode',{sessionId:sid});
+const choose=async(f,sid,active)=>f.call('session.setPlanMode',{sessionId:sid,active,expectedRevision:(await mode(f,sid)).revision});
+const request=(f,sid,text)=>f.call('session.prompt',{sessionId:sid,requestId:crypto.randomUUID(),content:[{type:'text',text}]});
+const policy=body=>JSON.stringify(body.messages).includes('<plan_mode>');
+const catalog=body=>body.tools.map(t=>t.function.name).sort();
+async function review(f,sid,op={}){
+ const old=new Set(f.frames.map(x=>x.rpcId));await f.call('events.subscribe',{sessionId:sid});await f.prompt(sid,{kind:'mode-review',plan,...op},{wait:false});let frame;
+ await until(()=>{frame=f.frames.find(x=>x.method==='question/requested'&&!old.has(x.rpcId));return !!frame;},'original plan review').catch(async error=>{error.message+=' '+JSON.stringify({requests:f.requests.length,history:await f.call('session.history',{sessionId:sid,maxMessages:25}),stderr:f.errors()});throw error;});assert.equal(frame.payload.wait.state,'waiting');assert.equal(frame.payload.wait.deadline,undefined);return frame;
+}
+test('plan mode persists before first chat, native handover, pending selection, restart and exact branch ancestry',{timeout:90000},async t=>{
+ const f=await planFixture(t,{planMode:true,forcePrompt:true}),sid='mode-parent';await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});
+ assert.deepEqual({active:(await mode(f,sid)).active,pending:(await mode(f,sid)).pending},{active:false,pending:false});
+ await choose(f,sid,true);const initial=await mode(f,sid);assert.equal(initial.active,true);assert.equal(f.requests.length,0);
+ await f.stop();await f.start();assert.equal((await mode(f,sid)).revision,initial.revision);assert.equal(f.requests.length,0,'restoring an empty session performs no inference');
+ await f.prompt(sid,{kind:'reply'});assert(policy(f.requests[0]));assert(JSON.stringify(f.requests[0].messages).includes('AUTHORED_FORCED_PROMPT'));const history=await f.call('session.history',{sessionId:sid,maxMessages:100}),reply=history.events.findLast(x=>x.event.type==='assistant/message');assert(reply);
+ const metadata=JSON.parse(await readFile(join(f.state,'sessions',sid+'.meta.json'),'utf8'));assert.equal(metadata.planModeBootstrap,undefined);assert((await f.native(sid)).bytes.includes(Buffer.from('augmentor/plan-mode-v1')));
+ await choose(f,sid,false);assert.equal((await mode(f,sid)).active,false);const count=f.requests.length;
+ await f.call('session.branch',{sessionId:sid,newSessionId:'mode-child',messageSeq:reply.event.seq,mode:'reply'});assert.equal((await mode(f,'mode-child')).active,true);assert.equal((await mode(f,sid)).active,false);assert.equal(f.requests.length,count);
+ await f.prompt(sid,{kind:'mode-hold'},{wait:false});await until(()=>f.requests.length===count+1,'held provider');await choose(f,sid,true);
+ const pending=await mode(f,sid);assert.equal(pending.active,false);assert.equal(pending.pending,true);assert.equal(policy(f.requests.at(-1)),false);
+ await f.call('session.cancel',{sessionId:sid});await f.settled(sid);const native=await f.native(sid),before=f.requests.length;await f.stop();await f.start();const cold=await mode(f,sid);assert.equal(cold.active,false);assert.equal(cold.pending,true);assert.equal(cold.revision,pending.revision);assert.deepEqual(await readFile(native.file),native.bytes);assert.equal(f.requests.length,before);
+ await f.prompt(sid,{kind:'reply'});assert.equal((await mode(f,sid)).active,true);assert.equal((await mode(f,sid)).pending,false);assert(policy(f.requests.at(-1)),JSON.stringify({view:await mode(f,sid),requests:f.requests.length,before,last:f.requests.at(-1).messages.map(m=>({role:m.role,content:JSON.stringify(m.content).slice(0,900)}))}));assert.equal((await mode(f,'mode-child')).active,true);assert.equal(f.errors(),'');
+});
+test('product slash commands preserve durable admission and reject attached /plan off before mode changes',{timeout:60000},async t=>{
+ const f=await planFixture(t,{planMode:true}),sid='mode-input';await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});
+ await request(f,sid,'/plan');await f.settled(sid);assert.equal(f.requests.length,0);assert.equal((await mode(f,sid)).active,true);assert.equal((await f.call('session.list')).items.find(x=>x.sessionId===sid).title,'');assert((await f.call('session.history',{sessionId:sid})).events.some(x=>x.event.type==='runtime/notice'&&x.event.data.message==='Plan mode on. Use /plan off to leave.'));
+ const link=new URL((await f.link()).url),token=new URLSearchParams(link.hash.slice(1)).get('token'),uploaded=await fetch(link.origin+'/api/attachments/upload?'+new URLSearchParams({sessionId:sid,name:'authored.txt'}),{method:'POST',headers:{Authorization:'Bearer '+token},body:Buffer.from('AUTHORED_PLAN_ATTACHMENT')});assert.equal(uploaded.status,200);const upload=await uploaded.json();
+ const before=await mode(f,sid);await assert.rejects(f.call('session.prompt',{sessionId:sid,requestId:crypto.randomUUID(),content:[{type:'text',text:'/plan off'},{type:'file',...upload,attachment:upload.file}]}),/Attachments cannot accompany/);assert.equal((await mode(f,sid)).revision,before.revision);
+ await request(f,sid,'/plan '+JSON.stringify({kind:'reply'}));await f.settled(sid);assert.equal(f.requests.length,1);assert(policy(f.requests[0]));assert.deepEqual(f.requests[0].messages.findLast(m=>m.role==='user').content,[{type:'text',text:JSON.stringify({kind:'reply'})}]);assert.equal((await f.call('session.list')).items.find(x=>x.sessionId===sid).title,JSON.stringify({kind:'reply'}));
+ await request(f,sid,'/plan off');await f.settled(sid);assert.equal((await mode(f,sid)).active,false);assert.equal(f.requests.length,1);await f.prompt(sid,{kind:'reply'});assert.equal(policy(f.requests[1]),false);assert.deepEqual(catalog(f.requests[0]),catalog(f.requests[1]));
+ await assert.rejects(f.call('session.setPlanMode',{sessionId:sid,active:true,expectedRevision:before.revision}),/changed/);assert.equal((await mode(f,sid)).active,false);assert.equal(f.errors(),'');
+});
+test('review approval changes guidance at the next request and never expands read-only tool authority',{timeout:60000},async t=>{
+ const f=await planFixture(t,{planMode:true,policy:'read-only'}),sid='mode-review-approve',target=join(f.workspace,'must-not-exist.txt');await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});await choose(f,sid,true);
+ const frame=await review(f,sid,{write:target});assert.equal(frame.payload.toolName,'exit_plan_mode');assert.equal(frame.payload.questions[0].detail,plan);assert(policy(f.requests[0]));
+ await f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{answer:{answers:[{id:'plan-review',selected:['Approve']}]}}});await f.settled(sid);
+ assert.equal(f.requests.length,3);assert.equal(policy(f.requests[1]),false);assert.equal(policy(f.requests[2]),false);assert.deepEqual(catalog(f.requests[0]),catalog(f.requests[1]));assert(JSON.stringify(f.requests[2].messages).includes('Read-only chat'));await assert.rejects(access(target));assert.equal((await mode(f,sid)).active,false);
+ const native=(await f.native(sid)).bytes.toString().trim().split('\n').map(JSON.parse);assert.equal(native.find(x=>x.type==='message'&&x.message.role==='toolResult'&&x.message.toolName==='exit_plan_mode').message.details.approved,true);
+ await assert.rejects(f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{answer:{answers:[{id:'plan-review',selected:['Approve']}]}}}),/resolved/);assert.equal(f.errors(),'');
+ const inspector=new URL((await f.call('inspection.open',{sessionId:sid})).url),token=new URLSearchParams(inspector.hash.slice(1)).get('token');
+ const inspect=method=>fetch(inspector.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params:{sessionId:sid,active:true,expectedRevision:'empty'}})});
+ assert.equal((await inspect('session.planMode')).status,200);assert.equal((await inspect('session.setPlanMode')).status,400);assert.equal(f.requests.length,3);
+});
+test('feedback, dismissal, Stop and inactive calls cannot fabricate plan approval or replay the next request',{timeout:90000},async t=>{
+ const f=await planFixture(t,{planMode:true}),sid='mode-review-revise';await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});await choose(f,sid,true);
+ let frame=await review(f,sid);await f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{answer:{answers:[{id:'plan-review',selected:[],custom:'AUTHORED_REVIEW_FEEDBACK'}]}}});await f.settled(sid);assert.equal(f.requests.length,2);assert(policy(f.requests[1]));assert(JSON.stringify(f.requests[1].messages).includes('AUTHORED_REVIEW_FEEDBACK'));assert.equal((await mode(f,sid)).active,true);
+ frame=await review(f,sid);await f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{answer:{answers:[{id:'plan-review',selected:['Keep planning']}]}}});await f.settled(sid);assert(policy(f.requests.at(-1)));assert.equal((await mode(f,sid)).active,true);
+ frame=await review(f,sid);const before=f.requests.length;await f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{cancelled:true}});await f.settled(sid);assert.equal(f.requests.length,before,'dismissal concludes rather than asking the model to wait');assert.equal((await mode(f,sid)).active,true);
+ frame=await review(f,sid);const stopped=f.requests.length;await f.call('session.cancel',{sessionId:sid});await f.settled(sid);assert.equal(f.requests.length,stopped);assert.equal((await mode(f,sid)).active,true);await f.stop();await f.start();assert.equal((await mode(f,sid)).active,true);assert.equal(f.requests.length,stopped);
+ await choose(f,sid,false);await f.prompt(sid,{kind:'mode-review',plan});assert.equal(f.requests.length,stopped+2);assert.equal((await mode(f,sid)).active,false);assert(JSON.stringify(f.requests.at(-1).messages).includes('requires an active plan-mode'));assert.equal(f.errors(),'');
+});
+test('closing an automatically continued goal review disarms continuation while preserving the active objective',{timeout:60000},async t=>{
+ const f=await planFixture(t,{planMode:{goalReview:true}}),sid='mode-goal-review';await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});await choose(f,sid,true);await f.call('events.subscribe',{sessionId:sid});
+ await f.call('session.updateGoal',{sessionId:sid,change:{operation:'create',expectedRef:null,objective:'Complete the explicitly authored goal after human plan review.',maxGoalRounds:3,continueAutomatically:true}});let frame;
+ await until(()=>{frame=f.frames.find(x=>x.method==='question/requested');return !!frame;},'goal plan review');assert.equal(f.requests.length,1);await f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{cancelled:true}});await f.settled(sid);
+ const goal=await f.call('session.goal',{sessionId:sid});assert.equal(goal.activation,'disarmed');assert.equal(goal.goal.phase,'active');assert.equal(goal.goal.roundsStarted,1);assert.equal((await mode(f,sid)).active,true);assert.equal((await f.call('session.queue',{sessionId:sid})).items.length,0);assert.equal(f.requests.length,1);assert.equal(f.errors(),'');
+});
+test('Browser surface plan review uses the same SDK owner without native-tool grants',{timeout:60000},async t=>{
+ const f=await planFixture(t,{planMode:true,policy:'read-only'}),sid='mode-browser';await f.call('session.create',{sessionId:sid,surface:'browser',cwd:f.workspace,selection:f.selection});await choose(f,sid,true);
+ const frame=await review(f,sid);assert.equal(frame.payload.ownerId,sid);assert(policy(f.requests[0]));assert(!catalog(f.requests[0]).includes('write'));assert(!catalog(f.requests[0]).includes('linux_desktop_connect'));
+ await f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{answer:{answers:[{id:'plan-review',selected:['Approve']}]}}});await f.settled(sid);assert.equal(f.requests.length,2);assert.equal(policy(f.requests[1]),false);assert.deepEqual(catalog(f.requests[0]),catalog(f.requests[1]));assert.equal((await mode(f,sid)).active,false);assert.equal(f.errors(),'');
+});
+test('queued plan input changes mode only when its identified SDK request is admitted',{timeout:60000},async t=>{
+ const control={},f=await planFixture(t,{planMode:control}),sid='mode-queued';await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});await f.prompt(sid,{kind:'mode-hold'},{wait:false});await until(()=>!!control.release,'held pre-plan generation');
+ const text='/plan '+JSON.stringify({kind:'reply'}),id=crypto.randomUUID();await f.call('session.prompt',{sessionId:sid,requestId:id,mode:'queue',content:[{type:'text',text}]});assert.equal((await mode(f,sid)).active,false);assert.equal(f.requests.length,1);control.release();await until(()=>f.requests.length===2,'queued plan dispatch');await f.settled(sid);
+ assert.equal((await mode(f,sid)).active,true);assert.equal(policy(f.requests[0]),false);assert(policy(f.requests[1]));assert.deepEqual(f.requests[1].messages.findLast(m=>m.role==='user').content,[{type:'text',text:JSON.stringify({kind:'reply'})}]);assert.equal(JSON.parse(await readFile(join(f.state,'sessions',sid+'.queue.json'),'utf8')).items.find(x=>x.id===id).status,'completed');assert.equal(f.errors(),'');
+});
+test('steered plan input preserves the one active turn and applies guidance to its identified correction',{timeout:60000},async t=>{
+ const f=await planFixture(t,{planMode:true}),sid='mode-steered';await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});await f.prompt(sid,{kind:'mode-hold'},{wait:false});await until(()=>f.requests.length===1,'active generation before steering');const queue=await f.call('session.queue',{sessionId:sid}),id=crypto.randomUUID();
+ await f.call('session.prompt',{sessionId:sid,requestId:id,mode:'steer',expectedTurnId:queue.activeTurnId,content:[{type:'text',text:'/plan '+JSON.stringify({kind:'reply'})}]});await until(()=>f.requests.length===2,'identified plan correction');await f.settled(sid);assert.equal((await mode(f,sid)).active,true);assert.equal(policy(f.requests[0]),false);assert(policy(f.requests[1]));assert.deepEqual(f.requests[1].messages.findLast(m=>m.role==='user').content,[{type:'text',text:JSON.stringify({kind:'reply'})}]);
+ const history=await f.call('session.history',{sessionId:sid,maxMessages:100});assert.equal(history.events.filter(x=>x.event.type==='turn/start').length,1);assert(history.events.some(x=>x.event.type==='user/message'&&x.event.data.source?.rpcId===id));assert.equal(f.errors(),'');
+});

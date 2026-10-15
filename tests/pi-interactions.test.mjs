@@ -4,6 +4,17 @@ import assert from 'node:assert/strict';
 import {Interactions} from '../dist/runtime/src/interactions.js';
 import {DshPiController} from '../apps/harness/dsh-pi-controller.mjs';
 
+test('plan reviews start waiting, outlive the foreground budget and retain Stop/disconnect ownership without pausing approvals',async t=>{
+ t.mock.timers.enable({apis:['Date','setTimeout'],now:1000});let connected=true;
+ const frames=[],interactions=new Interactions((_sid,frame)=>frames.push(frame),()=>connected,100,50);
+ assert.throws(()=>interactions.ask('s','approval/requested',{},undefined,'s',undefined,'waiting'),/hard timeout/);assert.equal(interactions.pending.size,0);
+ const abort=new AbortController();let pending=interactions.ask('s','question/requested',{questions:[]},{signal:abort.signal},'s',undefined,'waiting');let id=interactions.frames('s')[0].rpcId;
+ assert.equal(interactions.frames('s')[0].payload.wait.state,'waiting');assert.equal(interactions.frames('s')[0].payload.wait.deadline,undefined);
+ t.mock.timers.tick(600000);assert.equal(interactions.frames('s').length,1);interactions.wait(id,'s','viewer','hold-focus');interactions.wait(id,'s','viewer','release-focus');assert.equal(interactions.frames('s')[0].payload.wait.state,'waiting');abort.abort();assert.equal(await pending,undefined);assert.equal(frames.at(-1).payload.reason,'aborted');
+ pending=interactions.ask('s','question/requested',{},undefined,'child',undefined,'waiting');interactions.cancel('child');assert.equal(await pending,undefined);
+ pending=interactions.ask('s','question/requested',{},undefined,'s',undefined,'waiting');connected=false;t.mock.timers.tick(1000);assert.equal(await pending,undefined);assert.equal(frames.at(-1).payload.reason,'disconnected');assert.equal(interactions.pending.size,0);
+});
+
 test('question countdown pauses for each client focus lease and expires after the last release or lost lease',async t=>{
  t.mock.timers.enable({apis:['Date','setTimeout'],now:1000});
  const events=[],interactions=new Interactions((sid,frame)=>events.push(frame),()=>true,100,50);

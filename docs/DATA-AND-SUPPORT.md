@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Advisory plan mode](PI-PLAN-MODE.md) stores private native mode/revision
+records and a pre-conversation metadata bootstrap until Pi creates its session
+file. Complete reviews and human decisions retain the existing private tool
+history/payload policy; local mode observations contain metadata. The mode binding adds no telemetry integration; bare changes issue no chat-model
+request. Configured services and extensions retain their separate audit scope.
+
 [Live-owner native cleanup](HARNESS-OFFICE-PREVIEWS.md#native-guard-loss-and-bounded-live-owner-drain--october-15) makes Node directly own its supervisor, so the existing forced-stop/root fallback also works when that supervisor stops or dies. Kernel death ownership drains the separate broker; a bounded private result pipe relays the existing reply after broker/root settlement. It adds no request/document input to the supervisor, document store, telemetry, unknown-directory scan or replay. At **edf50db**, source/fresh ordinary **272/272 each across 64 files** and both original native-backend viewers pass, preserving dependencies, GUI/CSS, reviews/selection/services and original input. Focused 13-case proof includes guard faults and previous owner/group/replacement-root cases. All-cleanup-owner loss, pre-admission, caller-PDF/outer-provider and durable/power-loss recovery remain open. Running/selected previews keep the pinned default and preceding artifacts.
 
 [Independent native Office cleanup](HARNESS-OFFICE-PREVIEWS.md#independent-native-scratch-cleanup--october-15) is the preceding 8ce4334 checkpoint: source/ordinary 270/270 across 64 files and both original viewers qualify owner/broker-group and stopped-tree loss while its guard survives. That checkpoint's guard loss/stall gap is addressed by the live-owner work above; its broader crash/durable/source/distribution limits remain.

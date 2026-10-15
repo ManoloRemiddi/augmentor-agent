@@ -39,7 +39,8 @@ export class DshCommandMenu {
       return 'handled';
     },matchEnter:(_,line)=>{
       const match=/^\/([^\s]+)(?:\s|$)/.exec(line);if(!match)return undefined;
-      const name=match[1];if(unavailable.has(name))throw Error('/'+name+' is not yet connected to Pi. Your draft is preserved.');
+      const name=match[1];if(name==='plan')return undefined; // Product /plan keeps its message and attachments in the admitted input chain.
+      if(unavailable.has(name))throw Error('/'+name+' is not yet connected to Pi. Your draft is preserved.');
       if(!this.deps.rows().some(row=>row.name===name))return undefined;
       if(line!=='/'+name)throw Error('Use /'+name+' by itself to open this command. Your draft is preserved.');
       this.dispatch(name,scope,{via:'enter',token:line,rev:this.deps.draft().rev});return 'handled';
@@ -78,9 +79,9 @@ export class DshCommandMenu {
       // captured revision/session/epoch still fence consumption at that time.
       return action(scope,segment,()=>this.consume(scope,segment))!==false;
     }
-    if(name==='compact'){
-      if(this.current().running)throw Error('Stop active work before compacting. Your draft is preserved.');
-      const action=this.deps.actions.compact;if(!action)return false;
+    if(name==='compact'||name==='plan'){
+      if(name==='compact'&&this.current().running)throw Error('Stop active work before compacting. Your draft is preserved.');
+      const action=this.deps.actions[name];if(!action)return false;
       // Only a confirmed admission may consume the owned slash span. Late
       // replies cannot erase a changed draft or another conversation's text.
       void Promise.resolve().then(()=>{if(!this.segmentValid(scope,segment))return;return action(scope);}).then(result=>{if(result?.accepted)this.consume(scope,segment);}).catch(error=>this.deps.notice(error.message));return true;

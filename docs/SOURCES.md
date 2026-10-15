@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Plan mode](PI-PLAN-MODE.md) selects the pinned original MIT PlanModeControl
+and CSS verbatim, bringing the DSH supplier selection to 593 files. Its Pi state,
+public Agent hook and tool/input binding are Augmentor-authored. No DSH plan
+backend or new dependency is mounted; product and supplier licences stay distinct.
+
 ## Original plan review selection — 15 October 2026
 
 The existing pinned public MIT DSH **d743267388641bc76f17c45ce8b4c231aed1d32c**

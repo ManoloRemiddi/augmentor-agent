@@ -3618,6 +3618,18 @@
       "sha256": "94be0e865cf0403b6c01beb51cf702d45ed26d27194d74643f1d3f7333f53160",
       "upstreamPath": "packages/client/ui-plan/src/client/locales.ts",
       "upstreamSha256": "94be0e865cf0403b6c01beb51cf702d45ed26d27194d74643f1d3f7333f53160"
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/PlanModeControl.module.css",
+      "sha256": "86afe26e6ef51e6368b49dd1e299b770999c9ed3f806b1d1c12b0bbbd7a80187",
+      "upstreamPath": "packages/client/ui-plan/src/client/PlanModeControl.module.css",
+      "upstreamSha256": "86afe26e6ef51e6368b49dd1e299b770999c9ed3f806b1d1c12b0bbbd7a80187"
+    },
+    {
+      "path": "packages/client/ui-plan/src/client/PlanModeControl.tsx",
+      "sha256": "cb60b950a4e131876bfbfab54fd3995b5306ab590465050d3f19320c9cb29b1e",
+      "upstreamPath": "packages/client/ui-plan/src/client/PlanModeControl.tsx",
+      "upstreamSha256": "cb60b950a4e131876bfbfab54fd3995b5306ab590465050d3f19320c9cb29b1e"
     }
   ]
 }
