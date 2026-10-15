@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Source-built Office engine](HARNESS-OFFICE-PREVIEWS.md#fresh-thinlto-engine-build--october-15)
+now completes compile/package, **exit 0/no OOM**, below the unchanged **8 GiB**
+cap (**6,951,043,072-byte** peak). The tested private candidate builder and paired
+original-provider probe preserve six authored Office formats, input/cache/font
+contracts and identical text/pages/**ten pages of pixels at 96 DPI**. Both entry
+and engine have explicit experimental identities; 32 MPL entry sources and the
+resource profile remain supplied. Six direct refusal checks plus nine packaging/
+two source-boundary cases pass. The default engine/public gate, installed and
+owner-review artifacts remain unchanged. Representative documents/fonts,
+performance/security, source/notice distribution, GUI candidate integration,
+physical/platform and full migration acceptance remain open.
+[Portable evidence](../release/office-rebuild/thin-engine-qualification.json).
+
 [Fresh MX review](HARNESS-MX-REVIEW.md#current-separate-review--october-15)
 **20261015-103820-b0d02caa** is an unselected browser owner on public f0d241a /
 tested runtime ea3775b. Source/ordinary/sealed-target each pass **401/two optional

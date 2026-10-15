@@ -15,16 +15,57 @@ retained. The final appended rule passes **all 18 original reverse checks and it
 own reverse check** before launch. All original 39 recipe/source files are retained;
 the copied experimental recipe adds this one public patch. Its preferred source
 change is explicit. No warning check, module, format, runtime thread/memory policy
-or application dependency is removed. The final fresh attempt has passed configure
-and has completed the final `wasm-ld` link. Actual `wasm-opt -Oz` post-link
-optimization is now running under the same 8 GiB cap, two CPUs, one job/nice 15
-and no network. The timestamped process observation confirms this transition,
-not terminal success or an output package.
-Its output, layout/performance, notices and public redistribution remain unqualified.
+or application dependency is removed. The final fresh attempt now completes
+**compile and package**, exit **0 / OOMKilled=false** at **09:01:32 UTC**, with
+**6,951,043,072-byte** cgroup peak under the unchanged 8 GiB/zero-swap cap,
+two CPUs, one job/nice 15 and no network. Six actual authored formats through
+the original provider match the pinned engine's text, pages, missing-font sets
+and all ten pages' raw pixels at 96 DPI. This is basic diagnostic output parity;
+representative documents, fonts/performance/security, source/notice distribution,
+GUI candidate integration, platforms and public redistribution remain unqualified.
+[Exact evidence](thin-engine-qualification.json),
+[owning guide](../../docs/HARNESS-OFFICE-PREVIEWS.md#fresh-thinlto-engine-build--october-15).
+
+## Inspect a completed ThinLTO build without changing the app
+
+Use the exact Node **24.19.0**, locked source dependencies and a fresh direct
+child of this checkout's ignored `outputs/`. `UNSELECTED_APP` must be an ordinary
+private app under `outputs/`, with the current default engine/entry identities.
+`BUILT_CACHE` is the retained successful driver's `/office` mount source;
+`TERMINAL_CONTAINER` identifies that exited successful builder. These commands
+do not restart the builder or use an owner profile:
+
+```sh
+node release/office-rebuild/prepare-thin-candidate.mjs \
+  "$UNSELECTED_APP" "$BUILT_CACHE" "$TERMINAL_CONTAINER" \
+  "$PWD/outputs/office-thin-new-candidate"
+node release/office-rebuild/compare-thin-candidate.mjs \
+  "$PWD/outputs/office-thin-new-candidate/app" "$UNSELECTED_APP" \
+  "$PWD/outputs/office-thin-new-comparison"
+```
+
+The builder requires terminal exit 0/no OOM, complete package receipt, pinned
+builder/resource/driver/patch/source identities and exact output hashes. It
+clones only `dist`, `node_modules`, Node and package manifests, retains MPL and
+supplier notices, and gives both experimental engine and entry explicit own
+versions. Their preferred source and resource profile are included; the source
+closure for public distribution is still a separate gate. Existing outputs and
+sealed bases are refused before writes. Failed diagnostic trees are retained.
+
+The comparison runs each original provider in a separate process and uses the
+same authored inputs for both. It needs Python/LibreOffice fixture generation,
+Poppler (`pdftotext`, `pdfinfo`, `pdftoppm`) and the root's locked Sharp. It
+checks exact input bytes/cache ownership/font notices and 96 DPI pixel parity;
+`comparison.json`, PDFs and PNGs remain private for inspection. The lower-level
+`source-entry-probe.mjs` keeps its default entry mode; `--thin` is explicit and
+`--fixtures` copies only the six named authored inputs for paired tests. No
+claim of a speed improvement follows from one short diagnostic run.
+
+## Earlier experiments and default entry
 
 The separate [low link-optimization driver](run-low-lto.sh) retains full LTO and existing Wasm runtime/thread/memory flags, but explicitly sets `--lto-O0 --lto-CGO0` alongside the existing one-thread controls. A small authored Wasm function compiles, executes to 42 and shows both flags exactly once in the pinned real linker invocation. The full source attempt uses a separately copied failed cache, the same **8 GiB/zero-swap** cap, two CPUs/one job/nice 15 and no network. It is an experimental build profile requiring its own output, performance and source/licence qualification; it does not update any application dependency or public release gate. The first full attempt fails before link because ccache writes outside the writable mount. Its complete failed tree/logs are retained. The repaired driver uses explicit `CCACHE_DIR`/`CCACHE_TEMPDIR` beneath `/office`; a separate copied cache reaches the real final linker, where both optimization flags and unchanged runtime memory/thread/table/entry flags are verified. The [environment record](environment.json) records the point-in-time process state, not a presumed build success. The source-built entry and public engine gate remain unchanged.
 
-The October 15 default entry is now [built from complete public source](../../packages/runtime/vendor/office-entry/BUILDING.md) as `@augmentor/office-entry@0.1.3-augmentor.1`. This replaces the opaque npm JavaScript entry; it does not rebuild the Wasm engine. The separate one-thread **8 GiB** final-link retry also OOMs (exit 1, exact cap, zero swap), so the engine/public binary gate remains open. The environment record retains all failed attempts. No additional unchanged retry or memory-cap increase follows automatically.
+The October 15 default entry is [built from complete public source](../../packages/runtime/vendor/office-entry/BUILDING.md) as `@augmentor/office-entry@0.1.3-augmentor.1`. This replaces the opaque npm JavaScript entry; its default Wasm dependency remains unchanged. The earlier one-thread full-LTO **8 GiB** final-link retry OOMs (exit 1, exact cap, zero swap). The environment record retains all failed attempts separately from the successful ThinLTO diagnostic. Public binary approval remains open; no unchanged retry or memory-cap increase follows automatically.
 
 [Admitted native actor completion](admitted-actor-completion.json) registers monitor/namespace identities before parsing, then verifies kernel exit/reaping before known-root cleanup. Final b3003bd source/ordinary 285-case and both original-viewer proofs pass; supplier/dependency/GUI and owner state are preserved. System Dash carries separate BSD/public-domain/GPL notice records. All-owner/durable/pre-ready/caller-PDF/full-native/distribution/OS and the preceding hosted Search GUI failure remain open; no promotion follows. [Owning scope](../../docs/HARNESS-OFFICE-PREVIEWS.md#admitted-native-actor-completion--october-15).
 

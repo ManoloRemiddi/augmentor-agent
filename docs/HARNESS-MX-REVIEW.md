@@ -62,6 +62,12 @@ command and question-draft behavior, Office source/output/distribution and the
 remaining migration/platform gates stay open.
 [Portable qualification](../release/harness-mx-review-refresh-20261015.json).
 
+The later [source-built ThinLTO engine diagnostic](HARNESS-OFFICE-PREVIEWS.md#fresh-thinlto-engine-build--october-15)
+completes compile/package and six basic authored-format comparisons in a separate
+ordinary clone. It is **not included in this review**: this sealed artifact keeps
+its pinned engine and full inventory. Representative output, GUI integration,
+source/notice distribution and public engine approval remain open.
+
 <a id="current-separate-review--account-controls-october-14"></a>
 
 ## Earlier separate review — account controls, October 14

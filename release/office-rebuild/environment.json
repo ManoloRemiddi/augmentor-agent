@@ -1,7 +1,7 @@
 {
   "schema": "augmentor-office-engine-rebuild-environment/1",
   "date": "2026-10-14",
-  "scope": "Linux x64 isolated source-build attempt; final link OOM; no public binary qualification",
+  "scope": "Linux x64 isolated source-build experiments; ThinLTO compile/package complete with basic authored parity; no public binary qualification",
   "applicationSourceRef": "81094b3ea6f104428e6c3d7e110b5121aead8d75",
   "recipePackage": "@deepseek-ai/libreoffice-kit-wasm@0.1.5",
   "verifiedRecipeFileCount": 39,
@@ -235,18 +235,23 @@
       }
     ],
     "finalAttempt": {
-      "statusAtObservation": "running",
-      "observedAtUtc": "2026-10-15T08:56:33.046482+00:00",
+      "statusAtObservation": "exited",
+      "observedAtUtc": "2026-10-15T09:09:31.747070+00:00",
       "startedAt": "2026-10-15T04:20:28.788644779Z",
-      "observedStage": "post-link-optimization",
+      "finishedAt": "2026-10-15T09:01:32.368319796Z",
+      "observedStage": "complete",
       "configurePassed": true,
-      "terminalResultVerified": false,
+      "compileComplete": true,
+      "packageComplete": true,
+      "terminalResultVerified": true,
+      "exitCode": 0,
+      "oomKilled": false,
+      "memoryPeakBytes": 6951043072,
+      "memoryLimitBytes": 8589934592,
+      "swapMaxBytes": 0,
       "outputQualification": false,
-      "observedExecutable": "wasm-opt",
-      "oomKilledAtObservation": false,
-      "finalLinkCompletedAtObservation": true,
-      "observedProcessRssBytes": 5160939520,
-      "observedProcessElapsed": "06:01"
+      "basicAuthoredOutputParity": true,
+      "qualificationRecord": "thin-engine-qualification.json"
     },
     "publicRedistributionQualified": false,
     "precedingFinalLinkObservation": {
@@ -261,6 +266,21 @@
       "observedLinkerRssBytes": 4950638592,
       "observedLinkerElapsed": "26:48",
       "oomKilledAtObservation": false
+    },
+    "precedingPostLinkOptimizationObservation": {
+      "statusAtObservation": "running",
+      "observedAtUtc": "2026-10-15T08:56:33.046482+00:00",
+      "startedAt": "2026-10-15T04:20:28.788644779Z",
+      "observedStage": "post-link-optimization",
+      "configurePassed": true,
+      "terminalResultVerified": false,
+      "outputQualification": false,
+      "observedExecutable": "wasm-opt",
+      "oomKilledAtObservation": false,
+      "finalLinkCompletedAtObservation": true,
+      "observedProcessRssBytes": 5160939520,
+      "observedProcessElapsed": "06:01"
     }
-  }
+  },
+  "updated": "2026-10-15"
 }

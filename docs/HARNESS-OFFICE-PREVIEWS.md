@@ -98,14 +98,14 @@ packaging/render comparison and public binary approval remain false.
 
 The later low-optimization full-LTO attempt also reaches the final linker and
 exhausts the exact **8 GiB** cap, with zero swap and OOMKilled=true. Its failed
-cache and all earlier attempts remain retained. A separate fresh ThinLTO build
-now passes preparation, all 18 original patch reverse checks plus its additional
-build-rule check, verification and configuration. At the recorded observation it
-has completed the final WebAssembly link and reached **post-link optimization**
-(`wasm-opt -Oz`). The actual optimizer process is live under the same resource
-profile. No engine output/package is qualified yet. The process observation,
-not the driver's generic compile-stage label, establishes this progress; it does
-not confirm full build completion.
+cache and all earlier attempts remain retained. The separate fresh ThinLTO build
+now completes **compile and package**, exiting **0 / OOMKilled=false** at
+**2026-10-15 09:01:32 UTC**. Its cgroup peak is **6,951,043,072 bytes**, below
+the unchanged **8 GiB** cap, with zero swap. Preparation, all 18 original patch
+reverse checks plus its additional build-rule check, verification, configuration,
+final linking and `wasm-opt -Oz` finish. The earlier live-link/optimizer
+observations are historical; terminal container state and the driver's completed
+package receipt now establish success.
 
 The [published driver and build patch](../release/office-rebuild/README.md) use
 `-flto=thin` with the original `-Oz`, runtime thread/memory flags and feature set.
@@ -117,11 +117,45 @@ the toolchain mode, not the complete Office engine. No old Core objects are reus
 
 The same pinned builder, **8 GiB/zero-swap**, two-CPU, one-job/nice-15 and no-network
 profile remains. [Environment evidence](../release/office-rebuild/environment.json)
-records its exact source/driver/patch hashes and point-in-time state, with both
-failed ThinLTO preparations retained. Full compilation, export/notice inventory,
-six-format rendering/layout/performance comparison, fonts, physical/platform and
-redistribution qualification remain. The application's default engine, installed
-reviews and model/speech/GPU settings are unchanged.
+retains the exact source/driver/patch hashes, preceding observations and both
+failed ThinLTO preparations. LibreOffice **26.8.0.3**, Core
+**bce0998afefdbc355585ca324285661a2170ba77**, produces a **131,888,969-byte**
+Wasm module. Its four runtime assets and supplier manifest are hash-bound in the
+[portable qualification](../release/office-rebuild/thin-engine-qualification.json).
+
+The [private candidate builder](../release/office-rebuild/prepare-thin-candidate.mjs)
+verifies that terminal build, original supplier sources/notices, Core diff and
+resource profile before cloning only an unselected ordinary app's `dist`,
+`node_modules`, Node and package manifests. It refuses sealed bases and existing
+outputs; no owner profile is copied. It builds all **32 MPL preferred entry
+sources**, **31 declarations** and four ESM entry points, changing only the entry
+identity and engine mapping. The private names are **@augmentor/office-entry
+0.1.3-augmentor.thin.1** and **@augmentor/office-engine-wasm
+0.1.5-augmentor.thin.1**. They are diagnostics, not registered npm releases or
+replacements for the default dependency. The supplier build identity omits the
+compiler override, so the separate resource-profile hash is required. Both the
+raw Core patch hash and the supplier's trimmed-stdout hash are recorded; they
+must not be compared as though their inputs were identical.
+
+The [paired original-provider probe](../release/office-rebuild/compare-thin-candidate.mjs)
+passes **DOC, DOCX, XLS, XLSX, PPT and PPTX** against the pinned engine using
+the exact same independently authored fixture bytes. Actual text, page counts,
+missing-font sets and **all ten pages' raw pixels at 96 DPI** match; rendered
+pages were also visually inspected. Each engine preserves input bytes, returns
+separately owned cache buffers and closes without remaining busy. The authored
+DOCX's missing-font notice remains visible. The tested public builder/probe,
+six direct refusal checks and unchanged public packaging gate have separate
+evidence in the portable record. Initial private preparation failures (raw versus
+trimmed diff comparison; unavailable timing executable before conversion) remain
+retained, rather than being presented as failed conversions or erased.
+
+This establishes a successful source compile/package and basic authored output
+parity. Representative complex documents, fonts, resource/performance/security
+acceptance, complete corresponding-source/third-party notice distribution,
+original-GUI candidate integration, physical/platform and public redistribution
+qualification remain. The default engine, installed and owner-review artifacts,
+and model/speech/GPU settings are unchanged. No public binary or installed
+promotion follows this diagnostic.
 
 ## Immutable authored scratch input — October 15
 

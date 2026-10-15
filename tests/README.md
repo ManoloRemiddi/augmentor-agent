@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[ThinLTO Office source-build diagnostic](../release/office-rebuild/README.md#inspect-a-completed-thinlto-build-without-changing-the-app)
+is reproduced with `prepare-thin-candidate.mjs` and `compare-thin-candidate.mjs`.
+The actual public drivers pass six authored formats on both engines, exact
+input/cache/font contracts and all ten pages' 96 DPI pixel parity. Six direct
+refusal checks and nine unchanged packaging/two source-boundary cases pass;
+representative documents, GUI candidate integration, source/notice distribution,
+performance/security, installed and platform acceptance remain separate.
+[Portable evidence](../release/office-rebuild/thin-engine-qualification.json).
+
 The [October 15 MX review](../docs/HARNESS-MX-REVIEW.md#current-separate-review--october-15)
 uses source f0d241a/runtime ea3775b. Source, ordinary and sealed-target each pass
 401/two optional skips/zero failures across 83 files/all 46 Harness Chromium files,
