@@ -12,10 +12,12 @@ const artifact=resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.'),sdk=join(artifac
 const {createAgentSession,DefaultResourceLoader,ModelRuntime,SessionManager,SettingsManager}=await import(pathToFileURL(join(sdk,typeof entry==='string'?entry:entry.import)));
 const {ManagedMcp}=await import(pathToFileURL(join(artifact,'dist/runtime/src/mcp.js')));
 const {MCP_CONNECTION_TYPE,savedMcpConnection}=await import(pathToFileURL(join(artifact,'dist/runtime/src/mcp-connection.js')));
-for(const mode of ['metadata','healthy-resource','get','timeout','timeout-save-failure'])test('actual SDK retains MCP '+mode+' authorization evidence and active receipts',{timeout:15000},async t=>{
+for(const mode of ['metadata','healthy-resource','get','timeout','timeout-delayed-read','timeout-save-failure'])test('actual SDK retains MCP '+mode+' authorization evidence and active receipts',{timeout:15000},async t=>{
  const root=await mkdtemp(join(tmpdir(),'augmentor-mcp-auth-boundary-')),agentDir=join(root,'agent'),cwd=join(root,'workspace'),sessions=join(root,'sessions'),timeoutCase=mode.startsWith('timeout'),notices=[];for(const path of [agentDir,cwd,sessions])await mkdir(path,{mode:0o700});
  const priorAgentDir=process.env.PI_CODING_AGENT_DIR;process.env.PI_CODING_AGENT_DIR=agentDir;t.after(()=>{if(priorAgentDir===undefined)delete process.env.PI_CODING_AGENT_DIR;else process.env.PI_CODING_AGENT_DIR=priorAgentDir;});
- let session,mutations=0,reads=0,resources=0,releaseRead,metadataRejected=false,getRejected=false,reopened=false;const ready=new Promise(done=>releaseRead=done),timers=new Set(),requests=[];
+ let session,mutations=0,reads=0,resources=0,releaseRead,metadataRejected=false,getRejected=false,reopened=false;
+ let writeId,readId,finishReceipt,writeCancellations=0;const trace=[];
+ const ready=new Promise(done=>releaseRead=done),timers=new Set(),requests=[];
  const later=(fn,ms)=>{const timer=setTimeout(()=>{timers.delete(timer);fn();},ms);timers.add(timer);};
  const challenge=res=>res.writeHead(403,{'www-authenticate':'Bearer error="insufficient_scope", scope="write"'}).end('AUTHORED_PRIVATE_AUTH_BODY');
  const wire=http.createServer(async(req,res)=>{
@@ -32,11 +34,20 @@ for(const mode of ['metadata','healthy-resource','get','timeout','timeout-save-f
    else answer({resources:[]});return;
   }
   if(frame.method==='resources/templates/list'){answer({resourceTemplates:[]});return;}
-  if(frame.method==='tools/call'&&frame.params.name==='write_record'){mutations++;if(mode==='healthy-resource'){await ready;challenge(res);}else later(()=>challenge(res),600);return;}
+  if(frame.method==='tools/call'&&frame.params.name==='write_record'){
+   mutations++;writeId=frame.id;
+   if(timeoutCase){await ready;trace.push('write-challenge');challenge(res);}
+   else if(mode==='healthy-resource'){await ready;challenge(res);}else later(()=>challenge(res),600);return;
+  }
   if(frame.method==='tools/call'&&frame.params.name==='prepare_read'){later(()=>answer({content:[{type:'text',text:'AUTHORED_READ_PREPARED'}]}),400);return;}
   if(frame.method==='tools/call'&&frame.params.name==='read_record'){
-   reads++;res.writeHead(200,{'content-type':'text/event-stream'});res.write('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:'authored',progress:1}})+'\n\n');releaseRead();
-   later(()=>res.end('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',id:frame.id,result:{content:[{type:'text',text:'AUTHORED_BOUNDARY_RECEIPT'}]}})+'\n\n'),timeoutCase?800:120);return;
+   // Exercise real admission latency without spending a second fixed delay
+   // inside the healthy request's unchanged one-second SDK deadline.
+   if(mode==='timeout-delayed-read')await new Promise(done=>later(done,300));
+   reads++;readId=frame.id;res.writeHead(200,{'content-type':'text/event-stream'});res.write('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',method:'notifications/progress',params:{progressToken:'authored',progress:1}})+'\n\n');
+   const reply=()=>res.end('event: message\ndata: '+JSON.stringify({jsonrpc:'2.0',id:frame.id,result:{content:[{type:'text',text:'AUTHORED_BOUNDARY_RECEIPT'}]}})+'\n\n');
+   if(timeoutCase){trace.push('read-admitted');finishReceipt=()=>{trace.push('read-released');reply();};releaseRead();}
+   else {releaseRead();later(reply,120);}return;
   }
   assert.fail('Unexpected authored method '+frame.method);
  });wire.listen(0,'127.0.0.1');await once(wire,'listening');
@@ -51,17 +62,24 @@ for(const mode of ['metadata','healthy-resource','get','timeout','timeout-save-f
  await writeFile(join(agentDir,'models.json'),JSON.stringify({providers:{fixture:{baseUrl:'http://127.0.0.1:'+provider.address().port+'/v1',api:'openai-completions',apiKey:'synthetic-only',models:[{id:'boundary',name:'Authored boundary',reasoning:false,input:['text'],contextWindow:32768,maxTokens:1024}]}}}));
  await writeFile(join(agentDir,'mcp.json'),JSON.stringify({mcpServers:{web:{url:'http://127.0.0.1:'+wire.address().port+'/mcp',exposure:mode==='metadata'||mode==='healthy-resource'?'direct':'codemode',timeout:1}}}),{mode:0o600});
  const modelRuntime=await ModelRuntime.create({authPath:join(agentDir,'auth.json'),modelsPath:join(agentDir,'models.json'),modelsStorePath:join(agentDir,'store.json'),allowModelNetwork:false}),settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:false},defaultProjectTrust:'never'});
- const open=async manager=>{const managed=new ManagedMcp(agentDir,join(root,'state'),'authored-boundary',(event,retained)=>notices.push({event,retained})),loader=new DefaultResourceLoader({cwd,agentDir,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,extensionFactories:managed.factories()});await loader.reload();assert.deepEqual(loader.getExtensions().errors,[]);({session}=await createAgentSession({cwd,agentDir,modelRuntime,model:modelRuntime.getModel('fixture','boundary'),settingsManager,resourceLoader:loader,sessionManager:manager,noTools:'builtin',tools:['+codemode','+list_mcp_resources']}));session.agent.toolExecution='parallel';await session.bindExtensions({mode:'rpc'});return managed;};
+ const connectionChanged=event=>{
+  if(!timeoutCase)return;
+  // This is the observer of the real SDK cancellation, including when its
+  // HTTP notification is refused by authorization. Never synthesize a cancel.
+  if(event.event==='request-cancelled'&&event.requestId===writeId){writeCancellations++;trace.push('write-cancelled');finishReceipt?.();}
+  if(event.event==='tool-response'&&event.requestId===readId)trace.push('read-received');
+ };
+ const open=async manager=>{const managed=new ManagedMcp(agentDir,join(root,'state'),'authored-boundary',(event,retained)=>notices.push({event,retained}),undefined,connectionChanged),loader=new DefaultResourceLoader({cwd,agentDir,settingsManager,noExtensions:true,noSkills:true,noContextFiles:true,noThemes:true,extensionFactories:managed.factories()});await loader.reload();assert.deepEqual(loader.getExtensions().errors,[]);({session}=await createAgentSession({cwd,agentDir,modelRuntime,model:modelRuntime.getModel('fixture','boundary'),settingsManager,resourceLoader:loader,sessionManager:manager,noTools:'builtin',tools:['+codemode','+list_mcp_resources']}));session.agent.toolExecution='parallel';await session.bindExtensions({mode:'rpc'});return managed;};
  const managed=await open(SessionManager.create(cwd,sessions));
  // Fault injection at a public SDK method, limited to authorization custom entries.
  if(mode==='timeout-save-failure'){const append=session.sessionManager.appendCustomEntry.bind(session.sessionManager);session.sessionManager.appendCustomEntry=(type,data)=>{if(type==='augmentor-mcp-authorization/1')throw Error('AUTHORED_PRIVATE_SAVE_ERROR');return append(type,data);};}
  await session.prompt('Authored authorization boundary');
- assert.equal(requests.length,2);assert.equal(reads,mode==='healthy-resource'?0:1);const results=JSON.stringify(requests[1].messages.filter(row=>row.role==='tool'));assert(results.includes(mode==='healthy-resource'?'AUTHORED_RESOURCE_RECEIPT':'AUTHORED_BOUNDARY_RECEIPT'),'an auth boundary cannot discard the already-admitted receipt');assert(!JSON.stringify(requests).includes('AUTHORED_PRIVATE_AUTH_BODY'));
+ assert.equal(requests.length,2);assert.equal(reads,mode==='healthy-resource'?0:1);const results=JSON.stringify(requests[1].messages.filter(row=>row.role==='tool'));assert(results.includes(mode==='healthy-resource'?'AUTHORED_RESOURCE_RECEIPT':'AUTHORED_BOUNDARY_RECEIPT'),'an auth boundary cannot discard the already-admitted receipt '+JSON.stringify({mode,trace,timeoutResult:results.includes('timed out'),closedResult:results.includes('closed')}));assert(!JSON.stringify(requests).includes('AUTHORED_PRIVATE_AUTH_BODY'));
  assert(!JSON.stringify(requests).includes('augmentor-mcp-authorization/1'));assert(!JSON.stringify(requests).includes('challenge-observed'),'native auth entries do not enter provider context');
  assert.deepEqual(JSON.parse(await readFile(join(agentDir,'mcp-auth.json'),'utf8')),{},'synthetic credentials stay in the explicitly private SDK agent directory');
  if(mode==='healthy-resource'){assert.equal(mutations,1);assert.match(results,/requires sign-in/i);}
  if(mode==='metadata'){assert(metadataRejected,JSON.stringify({resources,results}));assert.match(results,/requires sign-in/i);assert(resources>=2);}if(mode==='get')assert(getRejected);
- if(timeoutCase){assert.equal(mutations,1);assert.match(results,/timed out/i);assert(!/requires sign-in/i.test(results),'the SDK timeout must remain the caller result');}
+ if(timeoutCase){assert.equal(mutations,1);assert.match(results,/timed out/i);assert(!/requires sign-in/i.test(results),'the SDK timeout must remain the caller result');assert.equal(writeCancellations,1);assert.deepEqual(trace,['read-admitted','write-challenge','write-cancelled','read-released','read-received']);assert.notEqual(writeId,readId);}
  const info=managed.describe().servers.find(row=>row.name==='web').authorization,observed=mode==='timeout-save-failure'?info.unsaved:info.lastObserved;assert.equal(observed?.state,'sign-in-required');assert.equal(observed?.boundary,mode==='metadata'?'http-request-response':mode==='get'?'http-get-response':'http-tool-response');assert.equal(observed.status,403);
  assert.equal(notices.at(-1).retained,mode!=='timeout-save-failure');assert(!JSON.stringify(requests).includes('AUTHORED_PRIVATE_SAVE_ERROR'));if(mode==='timeout-save-failure'){assert.equal(info.lastObserved,null);assert.equal(info.retention,'native-append-failed');}
  const file=session.sessionManager.getSessionFile(),original=await readFile(file);assert.equal(session.sessionManager.getBranch().filter(row=>row.type==='custom'&&row.customType==='augmentor-mcp-authorization/1').length,mode==='timeout-save-failure'?0:2);session.dispose();session=undefined;

@@ -1,5 +1,36 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Timeout fixture uses observed cancellation — October 15
+
+The former timeout fixture independently delayed preparation by 400 ms,
+authorization by 600 ms and its healthy SSE reply by 800 ms. A controlled 300 ms
+server-admission delay reproduces the missing-receipt assertion with **both SDK
+calls timing out** at their unchanged one-second deadline. That does not prove
+the exact older hosted schedule; its failed output lacked these inner results.
+The production transport is unchanged by this qualification correction.
+
+The timeout fixture now admits the real sibling HTTP read before issuing its
+authorization challenge. It releases the original SSE receipt only when the
+existing public connection observer reports the real failed request's SDK
+cancellation. This works even when authorization prevents a cancellation POST
+from reaching the server. It asserts exact request identities and the complete
+read-admitted/challenge/write-cancelled/read-released/read-received order. The
+one-second SDK timeout, 15-second outer bound, 400 ms preparation stage, unknown
+mutation outcome/no retry, two provider requests, credential/body exclusion,
+failed native append and cold original-byte/connection restoration checks remain.
+No SDK event, cancellation, provider result or product hint is synthesized.
+
+A sixth case retains the controlled admission delay. All six actual SDK modes
+and **45/45** focused cases across seven real transport/observer/token/connection
+files pass. An isolated unselected negative control that removes the sibling
+drain fails the revised receipt assertion with a closed connection, so the new
+ordering still detects loss of admitted work. A first focus command named a
+nonexistent extra path, which Node ignored: its 39 cases cover four actual files;
+only the corrected seven-file 45-case run is claimed here. New shared SDK CI runs
+all six modes on Linux/macOS/Windows. Full source/ordinary and new-head hosted
+qualification remain to be recorded; this is synthetic account/service evidence,
+not live or installed acceptance.
+
 # Managed MCP dispatch and failed acknowledgments
 
 The accepted Harness migration requires unknown action outcomes to survive reconnect without replay. Pi 1.1.0's SDK retries any MCP request once after `McpSessionExpiredError`, assuming an HTTP 404 means the server did not execute it. An independently authored actual HTTP/SDK-owner fixture disproved that assumption for a server that applied a mutation before returning 404: one logical tool call changed the fixture twice. This is a reproduced integration failure, not a claim that compliant MCP servers normally behave this way.
