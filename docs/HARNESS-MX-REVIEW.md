@@ -7,7 +7,61 @@ operator link is supplied privately in the chat/browser panel, never in this
 repository. The installed desktop preview, its draft and the earlier feedback
 profile keep their own settings and history.
 
+## Drafts and cold history review — October 15
+
+Private **20261015-144829-1de182ad** is the current separate review for owner
+feedback. It runs public **6ef121d**, tested application **6bc2b0d**, product
+**0.2.13** / Pi **1.1.0**. It adds conversation-scoped saved question drafts and
+the cold-title fix to the original DSH GUI, alongside its plan-mode controls.
+Its sealed inventory has **24,400 entries**, SHA-256
+**6919ef351a8df192c3ca8892c42fd0c4420da5cb558176168939a72f72a8f392**.
+All **1,019 compiled files** match the tested source after qualification/startup;
+151 production npm instances, Node, components, 593 supplier inputs/CSS and 909
+notices retain their reviewed bytes. Fifteen public artifact files and the full
+compiled tree overlay the verified preceding plan-mode review; no owner data or
+experimental Office engine is copied. This is a private review assembly.
+
+Source, fresh ordinary and sealed-target each pass **450/two existing optional
+skips/zero failures**, **91 files/all 48 Harness Chromium files**, two workers
+and unchanged bounds. Seven notice guards pass. Drivers and static fixture
+imports run from the qualification checkout; the actual app targets use the
+sealed build, with identical compiled inputs. No test output enters that build.
+
+The exact sealed application also passes a separate original-GUI / actual-Qwen
+proof: one read, full plan review, Request changes without approval, explicit
+mode off, next real response and cold saved-plan reopening preserve exact
+native/display history. It makes **three provider requests/two tools**, keeps
+8,192 output tokens and the same tool catalog, and leaves the authored file
+unchanged. All five owned proof actors terminate. This uses a separate private
+fixture profile; it does not populate or qualify later activity in the owner
+review profile. [Repeatable proof and limits](PI-PLAN-MODE.md#repeat-the-local-model--original-gui-proof).
+
+The fresh owner review is read-only/keyless with the preserved Qwen declaration
+(262,144 context/8,192 output), local payload capture and no imported credentials,
+history, memory inference, voice or MCP configuration. Initial actual-owner QA
+has **zero sessions, requests, tools, logins and drafts**. Both 2 px animated
+Augmentor marks, black Light smoke, Dark flare, readable Settings and all nine
+account choices/confirmation are checked and screenshots inspected. No sign-in
+is admitted; browser errors and failed responses are zero. The QA browser stops.
+
+The installed selection and five earlier sealed inventories/six review owners
+remain preserved; this adds a seventh separate owner without activation. Review
+and Qwen catalog respond HTTP 200. Model/speech/GPU configuration hashes match;
+Breeze remains unavailable with its earlier failed attempt terminal. The private
+operator link is supplied only in chat/browser. Choose **New Session** to test;
+`/plan` enables advisory planning and bare `/plan off` leaves without inference.
+
+Linux/macOS hosted SDK status and the continuing Windows lifecycle gate are
+recorded in the portable checkpoint. Physical MX feedback, guarded installed
+adoption, other platform artifacts, normal/live privacy/memory/speech workflows,
+crash/write faults, general late-answer/restart reconstruction, Office distribution
+and complete migration acceptance remain open.
+[Portable review qualification](../release/harness-draft-title-review-20261015.json).
+
 ## Separate plan-mode review — October 15
+
+**Historical checkpoint:** the newer drafts/cold-history review above supersedes
+this for new feedback. This artifact, profile and owner remain preserved.
 
 Private **20261015-130013-ae5dfe06** now provides the original plan chip and
 `/plan` controls on the existing Pi owner. It runs public **d7e6318** / tested

@@ -1,0 +1,270 @@
+{
+  "schema": "augmentor-draft-title-review-qualification/1",
+  "date": "2026-10-15",
+  "scope": "Separate private unselected Linux browser review; no installed selection or public binary",
+  "releaseId": "20261015-144829-1de182ad",
+  "publicSourceRef": "6ef121d0108a54fcc38c3ddd1c4ca920260648e2",
+  "testedApplicationRef": "6bc2b0de0ce61b5e8b550c6b1c8d83069f66fa55",
+  "testedCohortSourceRef": "24b53b98d5dde1038cf13a0f06483ff407cce26f",
+  "artifactSha256": "6919ef351a8df192c3ca8892c42fd0c4420da5cb558176168939a72f72a8f392",
+  "inventoryEntries": 24400,
+  "productVersion": "0.2.13",
+  "piSdk": "1.1.0",
+  "precedingSealedReview": "20261015-130013-ae5dfe06",
+  "sourceAndOrdinaryCheckpoint": "harness-plan-native-title-qualification.json",
+  "sealedTargetCohort": {
+    "tests": 452,
+    "pass": 450,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 2,
+    "durationMs": 190150.602782,
+    "logSha256": "5e21d9b4fa0c16414c9d15fc6069eac0a7d73e7938145b46f6c9b800757a51f4"
+  },
+  "testFiles": 91,
+  "harnessChromiumFiles": 48,
+  "workers": 2,
+  "existingDeadlinesChanged": false,
+  "assertionsRelaxed": false,
+  "noticeGuards": 7,
+  "assembly": {
+    "baseSourceRef": "d7e6318f0ca61f9ddab67152a2fb34138a4f25e6",
+    "baseArtifactSha256": "9f764f9b9e8f2f43d8d2d4f4a5225792cef9e2c74d9e9c2702b6d7d3cefacd39",
+    "baseInventoryEntries": 24395,
+    "changedPublicArtifactFiles": [
+      {
+        "status": "M",
+        "path": "apps/harness/dsh-app.jsx"
+      },
+      {
+        "status": "A",
+        "path": "apps/harness/dsh-question-drafts.mjs"
+      },
+      {
+        "status": "M",
+        "path": "docs/AGENT-HANDOFF.md"
+      },
+      {
+        "status": "M",
+        "path": "docs/AUGMENTOR-HARNESS-MIGRATION.md"
+      },
+      {
+        "status": "M",
+        "path": "docs/AUGMENTOR-HARNESS.md"
+      },
+      {
+        "status": "M",
+        "path": "docs/CODEX-INTEGRATION.md"
+      },
+      {
+        "status": "M",
+        "path": "docs/DATA-AND-SUPPORT.md"
+      },
+      {
+        "status": "M",
+        "path": "docs/HARNESS-MX-REVIEW.md"
+      },
+      {
+        "status": "M",
+        "path": "docs/PI-PLAN-MODE.md"
+      },
+      {
+        "status": "M",
+        "path": "docs/PI-QUESTIONS.md"
+      },
+      {
+        "status": "M",
+        "path": "docs/README.md"
+      },
+      {
+        "status": "A",
+        "path": "release/harness-plan-mode-review-20261015.json"
+      },
+      {
+        "status": "A",
+        "path": "release/harness-plan-native-title-qualification.json"
+      },
+      {
+        "status": "A",
+        "path": "release/harness-question-draft-qualification.json"
+      },
+      {
+        "status": "A",
+        "path": "scripts/harness-local-plan-proof.mjs"
+      }
+    ],
+    "compiledFiles": 1019,
+    "productionNpmInstances": 151,
+    "dependencyAndNodeBytesUnchanged": true,
+    "componentBytesUnchanged": true,
+    "noticeFiles": 909,
+    "supplierDshFiles": 593,
+    "ownerDataCopied": false,
+    "qualificationOutputOutsideArtifact": true
+  },
+  "profile": {
+    "defaultPreset": "read-only",
+    "keylessSearchEnabled": true,
+    "localPayloadCapture": true,
+    "modelDeclarationPreserved": true,
+    "contextWindow": 262144,
+    "maxTokens": 8192,
+    "credentialsImported": false,
+    "conversationsImported": false,
+    "memoryVoiceMcpConfigurationImported": false,
+    "providerDeclaration": "Previously sanitized loopback-only api/baseUrl/models input; no original owner profile read"
+  },
+  "initialOwnerQa": {
+    "exactRuntimeAndProfile": true,
+    "product": "0.2.13",
+    "piSdk": "1.1.0",
+    "sessions": 0,
+    "activeTurns": 0,
+    "unsentDrafts": 0,
+    "readOnly": true,
+    "keylessSearch": true,
+    "localCapture": true,
+    "originalStartPage": true,
+    "planModeCapability": true,
+    "twoAugmentorMarks": true,
+    "composerDisabledUntilNewSession": true,
+    "settingsAvailable": true,
+    "browserErrors": 0,
+    "failedResponses": 0,
+    "noModelOrToolWorkSubmitted": true,
+    "accountControls": {
+      "registeredProviders": 9,
+      "storedCredentials": 0,
+      "originalConfirmationOpenedAndClosed": true,
+      "sdkLoginAdmitted": false
+    },
+    "lightAndDarkVisuallyInspected": true,
+    "marks": "2 px animated transparent outline; black Light smoke and retained Dark flare",
+    "ownedQaBrowserTerminal": true,
+    "laterOwnerActivityInferred": false
+  },
+  "separateSealedLiveProof": {
+    "passed": true,
+    "phase": "qualified",
+    "contextWindow": 262144,
+    "maxTokens": 8192,
+    "modelSpeechGpuSettingsChanged": false,
+    "appHostSha256": "05c914bd1811a9aeb24dc82cc8a4e2a1fc7968a0ae38f468f667bde898c28ebe",
+    "appGuiSha256": "264e8117bcb47f08033785338135b3993d5c731e85ef2db65d39e4c56255adc4",
+    "driverSha256": "086e8e9b7cb46e39ee5446c2d5bce4739fb7e2b3c47a5b55a4eeee79298ebdaf",
+    "environmentCredentialsInherited": false,
+    "memoryInferenceConfigurationImported": false,
+    "livePlanContainsReadMarker": true,
+    "monitoredPageDestinationsLocalOnly": true,
+    "actualOutputLimit": 8192,
+    "providerRequests": 3,
+    "toolCalls": 2,
+    "toolNames": [
+      "read",
+      "exit_plan_mode"
+    ],
+    "planWaitingWithoutForegroundDeadline": true,
+    "requestChangesConcludesWithoutApproval": true,
+    "bareModeOffInference": false,
+    "toolCatalogUnchanged": true,
+    "readOnly": true,
+    "workspaceNoteUnchanged": true,
+    "coldNativeAndDisplayExact": true,
+    "coldSavedPlanReopensWithoutInference": true,
+    "browserErrors": 0,
+    "failedResponses": 0,
+    "providerHealthOnly": false,
+    "allOwnedActorsTerminal": true,
+    "wireSummaries": [
+      {
+        "request": 1,
+        "status": 200,
+        "completed": true,
+        "bytes": 23039,
+        "sha256": "1fefa6345d80dd51ba0b6deadc9d98ff2f90d8128d716b9be283162999bf8316",
+        "finishReasons": [
+          "tool_calls"
+        ]
+      },
+      {
+        "request": 2,
+        "status": 200,
+        "completed": true,
+        "bytes": 58552,
+        "sha256": "ceebad8a9f9e5efa54d1257d99787d7c61a77dca6e12eee587ed1810f7144736",
+        "finishReasons": [
+          "tool_calls"
+        ]
+      },
+      {
+        "request": 3,
+        "status": 200,
+        "completed": true,
+        "bytes": 23787,
+        "sha256": "9cf687a96c9ed811bdd4d21ad8f6d40fd1e0a92d2fedec3b11a06b19f50024b1",
+        "finishReasons": [
+          "stop"
+        ]
+      }
+    ],
+    "scope": "Separate authored private read-only profile against the exact sealed application; not the empty review profile or owner conversations",
+    "actorsOwnedAndTerminal": 5,
+    "originalGuiScreenshotsVisuallyInspected": [
+      "live-review",
+      "cold-saved-plan"
+    ]
+  },
+  "preservation": {
+    "observedAtUtc": "2026-10-15T12:54:11.727836+00:00",
+    "priorFiveSealedInventoriesVerified": true,
+    "sixPreviousAndOneNewOwnerProcessesPresent": true,
+    "selectedConfigurationSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "reviewHttpStatus": 200,
+    "qwenCatalogHttpStatus": 200,
+    "modelSpeechGpuConfigurationBytesPreserved": true,
+    "breezeReady": false,
+    "breezeAttemptTerminal": true,
+    "modelSpeechGpuSettingsChangedThisCheckpoint": false,
+    "selectedActivation": false,
+    "publicBinaryPublished": false
+  },
+  "hosted": {
+    "sourceRef": "6ef121d0108a54fcc38c3ddd1c4ca920260648e2",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38737246078",
+    "status": "in_progress",
+    "conclusion": "",
+    "jobs": [
+      {
+        "name": "contracts (ubuntu-24.04)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "contracts (macos-14)",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "name": "contracts (windows-2025)",
+        "status": "in_progress",
+        "conclusion": ""
+      }
+    ],
+    "scope": "Observed hosted status, not evidence for other OS artifacts or a closed Windows lifecycle gate"
+  },
+  "office": {
+    "defaultPinnedEngineUnchanged": true,
+    "experimentalThinLtoEngineIncluded": false,
+    "publicDistributionQualified": false
+  },
+  "remainingGates": [
+    "Physical MX owner feedback, representative normal/live workflows and guarded installed adoption",
+    "Unresolved Windows mode lifecycle/review issues and other platform artifacts",
+    "Hard crash/write fault, large-history/compaction/attachment combinations and general late-answer/restart reconstruction",
+    "Floating Native/browser-extension UI, privacy/memory/speech and complete MCP/OAuth/live-provider acceptance",
+    "Representative Office source/notice/output/security/distribution and full P0/P1 migration/DSH retirement"
+  ],
+  "fullMigrationQualified": false,
+  "promotionAllowed": false
+}

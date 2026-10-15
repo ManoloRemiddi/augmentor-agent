@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Fresh drafts / cold-history MX review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
+**20261015-144829-1de182ad** runs public 6ef121d/runtime 6bc2b0d, unselected,
+with scoped question drafts and exact cold-title loading in the original GUI.
+Source/ordinary/sealed-target each pass **450/two optional skips/zero failures**,
+91 files/all 48 Harness Chromium files, unchanged workers/bounds. All **24,400
+entries/1,019 compiled files** verify after original Light/Dark/account QA with
+zero owner-profile sessions/inference/tools/logins/drafts. A separate actual-Qwen
+sealed-target flow passes full plan/read/mode-off/cold reopening: three requests/
+two tools, exact history, unchanged read-only file/catalog/output and all five
+proof actors terminal. Prior five artifacts/six owners, selection and settings
+verify preserved. Physical MX/installed/Windows/speech/Office/full migration gates
+remain open. [Portable record](../release/harness-draft-title-review-20261015.json).
+
 [Cold owner name synchronization](PI-PLAN-MODE.md#cold-owner-titles-and-actual-manual-compaction--october-15)
 now avoids repeating a saved native title when reasoning inspection loads its
 existing SDK session. The public setter always appends; normalized equality skips
@@ -9,7 +22,7 @@ qualification and running/installed adoption are distinct. At 24b53b9/runtime
 6bc2b0d, source/fresh ordinary each pass 450/two optional skips/zero failures;
 the actual local-Qwen original-GUI flow preserves exact cold history and reopens
 the saved plan with no extra inference. Actual SDK manual compaction and pending
-planning state pass separately. The existing review remains bd03b15; Windows mode
+planning state pass separately. The preceding review remains bd03b15; Windows mode
 and speech readiness remain open. [Portable qualification](../release/harness-plan-native-title-qualification.json).
 
 [Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):

@@ -56,7 +56,9 @@ dependency entries/151 npm instances, Node 24.19.0, 1,932 browser-test entries,
 593 supplier inputs and original CSS remain unchanged; runtime bytes retain
 bd03b15. Eleven packaging/source-boundary cases pass. All five sealed inventories,
 six review processes, selection and 38 canonical changes verify; Qwen/current
-review respond HTTP 200. This fix is not in that running review.
+review respond HTTP 200. That preceding bd03b15 review lacks this fix; the newer
+[drafts/cold-history review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
+now includes it on 6bc2b0d and passes the 91-file sealed-target cohort.
 [Portable qualification and exact cohort](../release/harness-question-draft-qualification.json).
 Installed owner reviews, prior sealed builds, selection and model/speech settings
 remain unchanged. Physical MX, live providers, other platform presentation,

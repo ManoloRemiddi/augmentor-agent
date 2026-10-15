@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Fresh drafts / cold-history MX review](../docs/HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
+**20261015-144829-1de182ad** runs public 6ef121d/runtime 6bc2b0d, unselected,
+with scoped question drafts and exact cold-title loading in the original GUI.
+Source/ordinary/sealed-target each pass **450/two optional skips/zero failures**,
+91 files/all 48 Harness Chromium files, unchanged workers/bounds. All **24,400
+entries/1,019 compiled files** verify after original Light/Dark/account QA with
+zero owner-profile sessions/inference/tools/logins/drafts. A separate actual-Qwen
+sealed-target flow passes full plan/read/mode-off/cold reopening: three requests/
+two tools, exact history, unchanged read-only file/catalog/output and all five
+proof actors terminal. Prior five artifacts/six owners, selection and settings
+verify preserved. Physical MX/installed/Windows/speech/Office/full migration gates
+remain open. [Portable record](../release/harness-draft-title-review-20261015.json).
+
 [Optional local plan proof](../docs/PI-PLAN-MODE.md#repeat-the-local-model--original-gui-proof)
 uses an explicit loopback declaration and private QA actors, never CI inference.
 Five help/refusal cases join the standard/shared SDK checks. The Codex Browser

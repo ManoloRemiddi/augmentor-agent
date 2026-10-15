@@ -129,7 +129,9 @@ inputs and CSS remain unchanged. Five generated spreadsheet/GUI metadata assets
 differ from the preceding build only in temporary overlay paths and derived chunk
 identity; normalized content matches. Runtime changes are the Host title guard
 and its source map. [Portable evidence](../release/harness-plan-native-title-qualification.json).
-No installed/review artifact has been changed; the existing review retains bd03b15.
+At that source checkpoint no artifact changed; the preceding review retains bd03b15.
+The newer [drafts/cold-history review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
+now includes this fix and repeats the full sealed-target and actual-Qwen proof.
 
 ## Repeat the local model / original GUI proof
 
@@ -190,6 +192,11 @@ The preceding **9b23644** hosted SDK run passes Linux/macOS and fails the Window
 plan-mode step; the new source has not established Windows or installed parity.
 
 ## Qualification and remaining work
+
+The [new separate Linux owner review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
+includes scoped question drafts and this cold-title fix on sealed runtime 6bc2b0d.
+Its sealed-target cohort passes 450/two optional skips; separate real-Qwen planning
+and exact cold reopening pass. The installed selection stays unchanged.
 
 The [separate Linux owner review](HARNESS-MX-REVIEW.md#separate-plan-mode-review--october-15)
 now includes this mode on sealed runtime bd03b15. Its full sealed-target cohort
