@@ -95,7 +95,9 @@
     "windowsDesktopRun": 38817253390,
     "windowsDesktop": "success",
     "macosBundleRun": 38817253417,
-    "macosBundle": "failed at unchanged MPL Office/LGPL libvips notice gates; not SDK voice failure"
+    "macosBundle": "failed at unchanged MPL Office/LGPL libvips notice gates; not SDK voice failure",
+    "validateRun": 38817253540,
+    "validate": "failed at existing Office public source/rebuild qualification guard during Debian packaging; no redistribution approval inferred"
   },
   "preservation": {
     "sealedInventoriesVerified": 10,
@@ -129,11 +131,29 @@
     "newInstalledOrSealedArtifactOrServiceMutation": false
   },
   "remaining": [
-    "hosted private component checks",
+    "diagnose hosted private audio-suite stall and qualify component jobs",
     "private distribution and deliberate shared dependency pin/adoption",
     "physical CPU ASR/VAD and RTX 5090 Breeze/Qwen listening acceptance",
     "separate Harness web entry point",
     "voice-brief upgrade/downgrade",
     "full migration, owner MX feedback and later OS/public release gates"
-  ]
+  ],
+  "hostedComponentSnapshot": {
+    "run": 38819354223,
+    "headRef": "f3547dddfbfbcec7f2f93574f2b8309746e4412d",
+    "result": "all four OS/CPU jobs cancelled at their existing ten-minute limit",
+    "observedBoundary": "reported output stops after two preference cases before the tempo/pitch result; no complete hosted Pi qualification",
+    "cause": "unproven",
+    "localCiEnvironmentRepetition": {
+      "passed": 61,
+      "existingWindowsOnlySkips": 3,
+      "failed": 0
+    },
+    "diagnosticFollowup": {
+      "sourceRef": "f0b61c15f137025ef7b6bd6abf4466b128ef3f67",
+      "run": 38820874680,
+      "statusAtRecord": "in_progress",
+      "change": "bounded FFmpeg availability/version check before unchanged full suite; no install, skip or bound relaxation"
+    }
+  }
 }

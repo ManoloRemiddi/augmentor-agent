@@ -98,6 +98,16 @@ desktop build passes. macOS bundle checks still stop at the existing MPL Office/
 LGPL libvips notice gates. These component checks do not clear those application
 or physical-platform gates.
 
+The private component's first [hosted run 38819354223](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/38819354223)
+at **f3547ddd** reaches the existing ten-minute limit on all four OS/CPU jobs.
+Reported progress stops after two preference checks, before the tempo/pitch
+result. The cause is unproven; local CI-environment repetition still passes 61
+plus three existing Windows-only skips. The separate diagnostic follow-up
+**f0b61c15/run 38820874680** checks FFmpeg availability/version before the unchanged
+full suite, without installs, skips or bound relaxation. No complete hosted Pi
+qualification follows from the cancelled run. Application Validate **38817253540**
+also refuses Debian packaging at its existing Office public source/rebuild gate.
+
 Read-only postflight re-verifies ten sealed reviews/eleven owners, selection,
 38 canonical changes and six model/service configurations. Current review
 **20261015-211446-7474ddb2/application 8c159cb7** stays unchanged and available,
