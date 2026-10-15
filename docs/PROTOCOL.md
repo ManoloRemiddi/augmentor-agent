@@ -1,5 +1,30 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Skill controls](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15):
+`host.describe.capabilities.skillReferences` advertises operator-only
+`session.skills {sessionId}`. This reads only confirmed, already loaded public
+SDK metadata, without creating an owner, scanning files, reading bodies or
+invoking a provider. A successful reply contains `sessionId`, `available:true`,
+SHA-256 `revision`, `origin`, and at most 2,048 `skills` rows with canonical
+`name`, approved `path`, `description`, insertion `command` and `modelInvocable`.
+Serialized rows are limited to one MiB. Cold/reloading/failed-resource owners
+return `available:false,reason`; Browser/delegation return an empty `excluded`
+catalog. Scoped inspectors cannot call this method. `skills/updated {sessionId}`
+is a successful same-owner reload hint, not the catalog itself.
+
+An ordinary delivered `user/message.data.skillInvocation` may contain version 1,
+`name`, `path`, `sourceSha256`, `instructionsSha256`, `expandedInputSha256`,
+`sourceBytes`, `instructionCharacters`, `instructionCharacterUnits:
+"unicode-code-points"`, and `boundary:"managed-input-read; delivered-sdk-user-message"`.
+It is emitted only after exact delivered SDK user-text equality with the managed
+expansion; there is no receipt for guessed/forged wrappers or failed reads. It is
+ordinary scoped conversation data, retained on branches/cold reopen independently
+of optional diagnostics. It does not attest final provider consumption or change
+full `sourceProvenance` availability. Reserved/occupied bare aliases retain their
+control/template semantics; `/skill:name` is the explicit alternative. Failed
+managed source/control preparation uses public SDK `handled` to stop inference,
+because thrown handler errors alone do not stop Pi 1.1.0 input processing.
+
 [Current-chat permissions](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15):
 `host.describe.capabilities.sessionPermissions` advertises `session.permission
 {sessionId,beforeRevision?}` and operator-only `session.selectPermission

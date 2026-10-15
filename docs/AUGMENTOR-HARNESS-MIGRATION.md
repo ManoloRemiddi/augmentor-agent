@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original skill controls and source fingerprints](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
+are implemented in source on the existing Pi owner, using the original MIT DSH
+menu/editable references/current-source preview. Seven verbatim inputs bring the
+supplier selection to 608, with prior 601/dependencies unchanged. Focused 66/66
+and independent old-SDK/new-managed format comparison pass; missing-source and
+rejected Permission inputs now stop before inference. Full source/fresh-copy
+qualification/publication are pending. This does not change the separate MX
+Permission review below or installed selection. Complete skill/resource causal
+provenance, representative plugin workflows, live speech, physical MX feedback
+and full migration/platform gates remain open.
+
 [Current MX Permission review](HARNESS-MX-REVIEW.md#permission-controls-review--october-15)
 **20261015-163114-00e4ca65** runs public **c026963/application 7115883**, unselected,
 with both original Permission bindings. Source/ordinary/sealed target each pass

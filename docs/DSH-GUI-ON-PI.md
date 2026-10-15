@@ -1,5 +1,62 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Original skill controls and source fingerprints — October 15
+
+The MIT DSH skill slash source now uses the selected Pi owner's approved public
+SDK resource catalog. Its original ranking, cached per-session lookup, user-only
+marker, literal insertion, editable text decoration and right-sidebar source
+preview run unchanged. Sent managed skill links reopen the **current** approved
+source; historical native/display entries retain the instructions used then.
+Picking or previewing a skill neither runs it nor invokes a model. Existing file
+chips use the supplier's reference activation alongside these editable tokens.
+
+The original `/name` gesture maps through one supported Pi `input` extension on
+the existing root Native AgentSession. Explicit `/skill:name` remains supported.
+Product commands, registered extension commands and prompt-template aliases keep
+their priority; collisions use the explicit SDK spelling. The original editable
+scanner recognizes word-like `/name` tokens, so colon-form fallback commands do
+not gain that draft decoration. Browser sessions, delegated workers and scoped
+inspectors do not gain the Native resource catalog/current-file authority.
+There is no DSH Host, second agent, synthetic `skill` tool call or new dependency.
+
+A managed invocation reads only the exact currently loaded SDK skill path, at
+most one MiB, as a regular UTF-8 file. Descriptor/path identity, size and change
+times are checked around the bounded read. The raw source, normalized instruction
+body and complete expanded input receive separate SHA-256 fingerprints. The
+receipt is saved on the ordinary `user/message` only when the delivered SDK user
+text equals that expansion. Its boundary is **managed-input-read;
+delivered-sdk-user-message**: it does not prove later provider consumption,
+causal influence, complete instruction composition or the Context dashboard's
+full skill attribution. Global `sourceProvenance` remains false. Unicode counts
+use code points; raw hashes preserve BOM/CRLF bytes. New explicit invocations read
+new source bytes; cold reopen and historical branches preserve older receipts.
+
+A retained negative test found that Pi 1.1.0 catches thrown input-handler errors
+and can continue to inference. Missing/unreadable managed sources and rejected
+managed Permission commands now return public `handled` and mark their owned
+turn failed, with a best-effort local error. They make zero provider requests.
+Retired asynchronous reads cannot attach a receipt or fail a newer turn. Unknown
+skill names retain SDK behavior; they do not receive invented source receipts.
+
+Seven new **verbatim MIT** files from public d743267 bring the supplier selection
+to **608**; the preceding 601 records/bodies, existing CSS, licences and locked
+dependencies are unchanged. These are the skill source/row/CSS/dictionaries and
+original editor decoration/text-reference/activation modules. The copied row is
+not mounted as a fabricated Pi tool card. See [source provenance](../apps/harness/vendor/dsh/SOURCE.md).
+
+Strict check/build and focused **66/66** pass: eight pure contracts, twelve
+actual Host skill flows, nine common service-face bindings, existing Permission
+contracts, and real original skill/file GUI checks. Independent old official SDK
+and new managed expansion produce equal native/display/provider text for LF,
+BOM/CRLF/Unicode and empty-body authored sources. The old catalog/menu absence,
+first missing editor-transform assertion and real missing-source inference
+failure remain retained. Light/Dark source previews are visually checked. Full
+source/fresh-copy qualification and publication are pending at this checkpoint.
+The separate MX Permission review **20261015-163114-00e4ca65** does not contain
+this skill increment; its sealed bytes and installed selection remain unchanged.
+Owner feedback, representative Wiki skill workflows, full resource/provenance/
+P0/P1 migration, speech and other OS artifacts remain open.
+
 ## Original current-chat Permission controls — October 15
 
 The original MIT DSH composer **PermissionSelect**, its CSS and `/permission`

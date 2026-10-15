@@ -3678,6 +3678,48 @@
       "sha256": "479464c75eb3f4ed6e2fd1d8e41632fed6c9a0e7a48f0287094195ae0524d51d",
       "upstreamPath": "packages/client/ui-permission-presets/src/client/PermissionSelect.module.css",
       "upstreamSha256": "479464c75eb3f4ed6e2fd1d8e41632fed6c9a0e7a48f0287094195ae0524d51d"
+    },
+    {
+      "path": "packages/client/ui-skill/src/client/index.ts",
+      "sha256": "04806935357b07313e9f23523e2c8c061acf7033187d1657f1261a7052d23dce",
+      "upstreamPath": "packages/client/ui-skill/src/client/index.ts",
+      "upstreamSha256": "04806935357b07313e9f23523e2c8c061acf7033187d1657f1261a7052d23dce"
+    },
+    {
+      "path": "packages/client/ui-skill/src/client/SkillRow.tsx",
+      "sha256": "91d5dc60aa361d6b3cdcaaebf9af783263cddb366aa1a28ee63367f194dcf848",
+      "upstreamPath": "packages/client/ui-skill/src/client/SkillRow.tsx",
+      "upstreamSha256": "91d5dc60aa361d6b3cdcaaebf9af783263cddb366aa1a28ee63367f194dcf848"
+    },
+    {
+      "path": "packages/client/ui-skill/src/client/SkillRow.module.css",
+      "sha256": "8d13dc8c4ce39a7f44421b9b60511e06eb9e453679d75b3f3c2ed2131270f786",
+      "upstreamPath": "packages/client/ui-skill/src/client/SkillRow.module.css",
+      "upstreamSha256": "8d13dc8c4ce39a7f44421b9b60511e06eb9e453679d75b3f3c2ed2131270f786"
+    },
+    {
+      "path": "packages/client/ui-skill/src/client/locales.ts",
+      "sha256": "97e16d7eb91d3b581a4d8a06b65d33877014e712570eb3d1648cfddd2d484cef",
+      "upstreamPath": "packages/client/ui-skill/src/client/locales.ts",
+      "upstreamSha256": "97e16d7eb91d3b581a4d8a06b65d33877014e712570eb3d1648cfddd2d484cef"
+    },
+    {
+      "path": "packages/client/ui-conversation/src/client/input/decorations.ts",
+      "sha256": "b1cf3d70edb51f0e726ff8a2b61c4eb82724513eb3bfbdab4ee01e8d9d24d835",
+      "upstreamPath": "packages/client/ui-conversation/src/client/input/decorations.ts",
+      "upstreamSha256": "b1cf3d70edb51f0e726ff8a2b61c4eb82724513eb3bfbdab4ee01e8d9d24d835"
+    },
+    {
+      "path": "packages/client/ui-conversation/src/client/input/editor/text-ref.ts",
+      "sha256": "d00ed3c6b72c0649c78b0bc85a8ab9a7e6ba5c2184597be2286f8f7e7151354f",
+      "upstreamPath": "packages/client/ui-conversation/src/client/input/editor/text-ref.ts",
+      "upstreamSha256": "d00ed3c6b72c0649c78b0bc85a8ab9a7e6ba5c2184597be2286f8f7e7151354f"
+    },
+    {
+      "path": "packages/client/ui-conversation/src/client/input/editor/reference-activation.ts",
+      "sha256": "409b30d2c34080552c415853408f0cd5b789ec1be6d5e7c916246fbcafff0480",
+      "upstreamPath": "packages/client/ui-conversation/src/client/input/editor/reference-activation.ts",
+      "upstreamSha256": "409b30d2c34080552c415853408f0cd5b789ec1be6d5e7c916246fbcafff0480"
     }
   ]
 }

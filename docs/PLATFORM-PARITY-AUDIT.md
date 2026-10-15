@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original skill controls](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
+use shared public Pi SDK/resource, file-descriptor and browser code. No OS helper
+is added. Metadata scope, alias priority, exact source/delivery fingerprints,
+input rejection and original UI remain one contract across Linux/macOS/Windows.
+Eight pure, twelve actual Host and nine common binding cases enter all three SDK
+jobs; source checks/build and the focused Linux 66-case selection pass. The
+symlink fixture explicitly skips Windows without creation privileges, retaining
+regular-file/error tests. Real Chromium and visual evidence is Linux-only;
+current-head hosted results and other OS artifacts/physical acceptance are open.
+User-directed further app rollout remains MX-first.
+
 [Current-chat Permission](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
 is shared Pi Host/browser code: atomic metadata/CAS/history, admitted commands,
 future authorization and historical branch semantics are identical contracts on

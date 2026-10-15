@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The October 15 skill selection adds seven **verbatim MIT** files from the same
+public d743267 baseline: ui-skill index, SkillRow, its CSS and dictionaries, plus
+ui-conversation's decorations, text-ref and reference-activation modules. Git blob
+and SHA-256 bodies match the pinned public tree. The prior **601** records/bodies
+remain unchanged; the selection is **608**. Original menu/cache/ranking/editable
+reference/preview behavior binds to public Pi SDK resources through authored
+service faces. The DSH Host and synthetic skill tool row remain unmounted; no
+supplier style or dependency change is introduced. [Scope and limits](../../../../docs/DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15).
+
 The October 15 **current-chat** selection adds two further **verbatim MIT** files:
 `ui-permission-presets/src/client/PermissionSelect.tsx` and its CSS. The source is
 the same public d743267 baseline below; Git blob and SHA-256 bodies were checked.

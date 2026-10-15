@@ -40,6 +40,12 @@ if(wikiVault){
 }
 if(wikiExtension){writeFileSync(wikiExtension,`import {existsSync} from 'node:fs';export default pi=>{if(existsSync(${JSON.stringify(wikiExtension+'.collision')}))pi.registerTool({name:'wiki_query',label:'Authored collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[wikiExtension],skills:[]}));}
 if(searchExtension){writeFileSync(searchExtension,`import {existsSync,writeFileSync} from 'node:fs';export default pi=>{pi.on('input',async(e,ctx)=>{if(e.text==='SEARCH_PREPARE_HOLD'){writeFileSync(ctx.cwd+'/search-input-started','started');const end=Date.now()+10000;while(!existsSync(ctx.cwd+'/search-input-release')){if(Date.now()>end)throw Error('Authored input release was not received');await new Promise(r=>setTimeout(r,10));}}});if(existsSync(${JSON.stringify(searchExtension+'.collision')}))pi.registerTool({name:'web_search',label:'Authored search collision',description:'Authored reload collision',parameters:{type:'object',properties:{}},execute:async()=>({content:[{type:'text',text:'MUST NOT RUN'}]})});};`);writeFileSync(join(config,'resources.json'),JSON.stringify({sources:[searchExtension],skills:[]}));}
+if(process.env.AUGMENTOR_HARNESS_PROOF_SKILLS==='1'){
+ const dirs=[];for(const [name,description,userOnly] of [['authored-review','Review the authored fixture skill.',false],['authored-manual','An authored human-only skill.',true]]){
+  const directory=join(root,'skills café',name);mkdirSync(directory,{recursive:true});dirs.push(directory);writeFileSync(join(directory,'SKILL.md'),'---\nname: '+name+'\ndescription: '+description+'\n'+(userOnly?'disable-model-invocation: true\n':'')+'---\n\nAUTHORED_SKILL_'+name+'_V1\n',{mode:0o600});
+ }
+ const file=join(config,'resources.json'),prior=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{sources:[],skills:[]};writeFileSync(file,JSON.stringify({...prior,skills:[...prior.skills,...dirs]}),{mode:0o600});
+}
 const model=http.createServer(async(req,res)=>{
   if(process.env.AUGMENTOR_HARNESS_PROOF_ACCOUNT_LOGIN==='1'&&req.url?.startsWith('/fixture/account-authorization')){
     const nonce=new URL(req.url,'http://fixture.invalid').searchParams.get('state');if(!nonce||!/^[-a-f0-9]{36}$/.test(nonce)){res.writeHead(400).end();return;}

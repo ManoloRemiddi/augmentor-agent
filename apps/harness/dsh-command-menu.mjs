@@ -22,7 +22,7 @@ export class DshCommandMenu {
   sync(){
     const now=this.current();
     if(this.scope&&this.valid(this.scope))return;
-    this.engine?.dispose();this.select?.dispose();for(const off of this.offs)off();this.offs=[];
+    this.engine?.dispose();this.select?.dispose();this.skillBinding?.dispose();this.skillBinding=null;for(const off of this.offs)off();this.offs=[];
     this.scope=null;this.engine=null;this.select=null;this.launchSegment=null;
     this.menu.set({open:false,groups:[],highlight:null,hit:null});this.headers.set(new Map());this.launcher.set(null);this.lexicon.set(new Map());this.popup.state.set(this.closedPopup);
     if(!this.enabled(now))return;
@@ -48,7 +48,7 @@ export class DshCommandMenu {
       if(line!=='/'+name)throw Error('Use /'+name+' by itself to open this command. Your draft is preserved.');
       this.dispatch(name,scope,{via:'enter',token:line,rev:this.deps.draft().rev});return 'handled';
     }};
-    const reference=this.deps.referenceSource?.(scope),sources=[source,...(reference?[reference]:[])];
+    const reference=this.deps.referenceSource?.(scope),skills=this.deps.skillSource?.(scope);this.skillBinding=skills;const sources=[source,...(skills?[skills.source]:[]),...(reference?[reference]:[])];
     this.engine=new this.deps.InputTriggerController({sessionId:scope.sessionId,actx:{bail:(_,event,p)=>{
       if(event==='slash/input-insert-text')return this.consume(scope,{via:'menu',span:p.span},p.text);
       if(event==='slash/input-insert-reference'&&this.segmentValid(scope,{via:'menu',span:p.span}))return this.deps.insertReference?.(p.span,p.reference,this.deps.draft().rev,scope)===true;
@@ -112,5 +112,6 @@ export class DshCommandMenu {
       },
     },context,segment);return true;
   }
-  dispose(){this.engine?.dispose();this.select?.dispose();for(const off of this.offs)off();this.offs=[];}
+  openReference(source,reference){this.sync();return this.engine?.openReference(source,reference)===true;}
+  dispose(){this.engine?.dispose();this.skillBinding?.dispose();this.skillBinding=null;this.select?.dispose();for(const off of this.offs)off();this.offs=[];}
 }

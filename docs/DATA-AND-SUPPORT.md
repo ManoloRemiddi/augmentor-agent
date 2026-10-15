@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed skill inputs](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
+add a selected-owner metadata read and ordinary conversation source fingerprints.
+Catalog discovery reads existing approved SDK headers only; an explicit managed
+invocation reads the exact approved regular UTF-8 file, bounded to one MiB, and
+records its path/byte count and raw-source/body/expanded-input SHA-256 values when
+SDK delivery matches. These receipts and expanded instructions have the same
+private retention/branch/read scope as ordinary prompts; clearing diagnostics
+does not erase them. Current-source preview uses the existing explicit Native
+file reader, with no new file endpoint or scope granted to inspectors/Browser.
+Preview/catalog reads add no inference or network destination. Submission reaches
+the already selected model as an ordinary prompt. No owner profile, credentials
+or private plugin source was imported. The fingerprints attest the input boundary,
+not complete provider consumption, skill effectiveness or causal attribution.
+
 [Current-chat permissions](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
 store only canonical policy and revision/preset/display-sequence/time history in
 the existing private conversation metadata. Unknown legacy initial times stay

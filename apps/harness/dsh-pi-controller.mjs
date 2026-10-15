@@ -8,7 +8,7 @@ export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
   branchFlight=null; branchIntents=new Map();createFlight=null;
   catalogRevision=0;catalogRead=0;
-  state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,permission:null,permissionBusy:false,permissionError:null,planMode:null,goal:null,workspace:'',error:null,hasMore:false};
+  state={skillsRevision:0,familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,permission:null,permissionBusy:false,permissionError:null,planMode:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
@@ -254,6 +254,7 @@ export class DshPiController {
       if(changed)void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
       if(page.gap){await this.open(sessionId);return;}
       if(page.frames.length||!this.lastRefresh||Date.now()-this.lastRefresh>3000){this.lastRefresh=Date.now();await this.refresh();}
+      if(page.frames.some(({frame})=>frame.method==='skills/updated'))this.update({skillsRevision:this.state.skillsRevision+1});
       if(this.state.capabilities?.sessionPermissions&&page.frames.some(({frame})=>frame.method==='permission/updated'))await this.refreshPermission({sessionId,epoch});
       if(this.state.capabilities?.planMode&&page.frames.some(({frame})=>frame.method==='plan-mode/updated'))await this.refreshPlanMode({sessionId,epoch});
       if(page.frames.some(({frame})=>frame.method==='goal/updated')){const goal=await this.rpc('session.goal',{sessionId});if(epoch===this.epoch)this.update({goal});}

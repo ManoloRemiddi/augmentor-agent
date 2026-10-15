@@ -26,7 +26,9 @@ import {$replaceDetectSpanWithNodes,$replaceDetectSpanWithText} from '@dsh-gui/u
 import {fileReferenceSource} from './dsh-file-references.mjs';
 import {fileCandidate,crumbsFor,parseCandidate} from '@dsh-gui/ui-reference/src/client/index.ts';
 import {en as referenceEn} from '@dsh-gui/ui-reference/src/client/locales.ts';
-import {ReferenceChipNode,$createReferenceChipNode,$isReferenceChipNode} from '@dsh-gui/ui-conversation/src/client/input/editor/chip-node.tsx';
+import {ReferenceChipNode,$createReferenceChipNode} from '@dsh-gui/ui-conversation/src/client/input/editor/chip-node.tsx';
+import {TextRefNode,registerTextRefDecoration,rescanTextRefs} from '@dsh-gui/ui-conversation/src/client/input/editor/text-ref.ts';
+import {registerReferenceActivation} from '@dsh-gui/ui-conversation/src/client/input/editor/reference-activation.ts';
 import {DshCommandMenu} from './dsh-command-menu.mjs';
 import {ModelSelect} from '@dsh-gui/ui-model-selection/src/client/ModelSelect.tsx';
 import {ChatView} from '@dsh-gui/ui-chat/src/client/chat/ChatView.tsx';
@@ -78,6 +80,9 @@ import {en as goalEn} from '@dsh-gui/ui-goal/src/client/locales.ts';
 import {DshAttachments} from './dsh-attachments.mjs';
 import {bindPlanReview,PlanModeControl} from './dsh-plan-review.jsx';
 import {CurrentPermissionControl,permissionT} from './dsh-permission-control.jsx';
+import {bindOriginalSkillSource,openCurrentSkill} from './dsh-skills.mjs';
+import {apply as applyOriginalSkills} from '@dsh-gui/ui-skill/src/client/index.ts';
+import {en as skillEn} from '@dsh-gui/ui-skill/src/client/locales.ts';
 import {DshDrafts} from './dsh-drafts.mjs';
 import {ComposerAttachments} from '@dsh-gui/ui-attachment/src/client/ComposerAttachments.tsx';
 import {MessageImages} from '@dsh-gui/ui-attachment/src/client/MessageImages.tsx';
@@ -135,10 +140,10 @@ let activeDraft=null;
 let draftRev=0,composerProjection={detectText:'',clipboardText:'',occurrences:[],selection:null,caret:null},commandMenu;const occurrenceIds=new Map();let nextOccurrenceId=0;
 const forkLast=sid=>{const revision=draftRev;return control.run(()=>controller.forkLast(sid,()=>draftRev===revision));};
 const references=()=>composerProjection.occurrences.map(({occurrenceId,...ref})=>ref);
-const editor=createEditor({namespace:'augmentor-dsh-composer',nodes:[ReferenceChipNode],onError:error=>controller.update({error:error.message}),theme:{}});
+const editor=createEditor({namespace:'augmentor-dsh-composer',nodes:[ReferenceChipNode,TextRefNode],onError:error=>controller.update({error:error.message}),theme:{}});
 registerPlainText(editor);registerHistory(editor,createEmptyHistoryState(),300);
-const openChip=event=>{if(!(event.target instanceof Node))return;let opened=false;editor.read(()=>{const node=$getNearestNodeFromDOMNode(event.target);if($isReferenceChipNode(node)&&!node.isInvalid()&&node.getSource()==='reference'&&node.getAppearance()==='file'){const ref=node.getReference(),path=ref.startsWith('@\"')?ref.slice(2,-1):ref.slice(1);opened=filePreviews.open(path);}});if(opened){event.preventDefault();commandMenu?.dismiss();}};
-editor.registerRootListener((root,previous)=>{previous?.removeEventListener('click',openChip);root?.addEventListener('click',openChip);});
+registerTextRefDecoration(editor,()=>commandMenu?.lexicon.getSnapshot()??new Map(),()=>null);
+registerReferenceActivation(editor,(source,reference)=>commandMenu?.openReference(source,reference)===true);
 editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const previous=composerProjection;composerProjection=$projectComposer(key=>{if(!occurrenceIds.has(key))occurrenceIds.set(key,++nextOccurrenceId);return occurrenceIds.get(key);});const value=composerProjection.clipboardText;if(value!==draft.getSnapshot()||previous.detectText!==composerProjection.detectText||JSON.stringify(previous.occurrences)!==JSON.stringify(composerProjection.occurrences))draftRev++;draft.set(value);if(activeDraft)draftArchive.edit(value,references());commandMenu?.track();}));
 function setDraft(value){const text=typeof value==='string'?value:value.text,refs=typeof value==='string'?[]:value.references??[];editor.update(()=>{const paragraph=$createParagraphNode();let offset=0;for(const ref of refs){if(ref.offset>offset)paragraph.append($createTextNode(text.slice(offset,ref.offset)));const chip=$createReferenceChipNode(ref);if(ref.invalid)chip.setInvalid(true);paragraph.append(chip);offset=ref.offset+ref.length;}if(offset<text.length)paragraph.append($createTextNode(text.slice(offset)));$getRoot().clear().append(paragraph);},{discrete:true});}
 const draftArchive=new DshDrafts(controller,{restore:(sid,text,references)=>{activeDraft=sid;setDraft({text,references});},attachments:attachmentDrafts});
@@ -157,13 +162,14 @@ const commandRows=[
 commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,store:createSnapshotStore,sectionRows:rows=>sectionRows(rows,t.command),rows:()=>commandRows.filter(row=>row.name!=='permission'||controller.state.capabilities?.sessionPermissions===true).map(row=>row.name==='plan'&&!controller.state.capabilities?.planMode?{...row,description:'View this conversation’s plan and todos'}:row),actions:{},
   permission:{read:scope=>controller.refreshPermission(scope,{explicit:true}),current:()=>controller.state.permission,select:(preset,scope)=>controller.selectPermission(preset,scope),t:permissionT},
   current:()=>({...controller.state,epoch:controller.epoch,running:controller.state.sessions.find(x=>x.sessionId===controller.state.sessionId)?.running===true}),
-  ready:()=>draftArchive.getSnapshot().ready,referenceSource:scope=>fileReferenceSource({controller,valid:s=>commandMenu.valid(s),fileCandidate,crumbsFor,parseCandidate,t:tr(referenceEn)},scope),
+  ready:()=>draftArchive.getSnapshot().ready,skillSource:scope=>controller.state.capabilities?.skillReferences?bindOriginalSkillSource({apply:applyOriginalSkills,controller,previews:filePreviews,valid:s=>commandMenu.valid(s),scope,dictionary:skillEn}):null,referenceSource:scope=>fileReferenceSource({controller,valid:s=>commandMenu.valid(s),fileCandidate,crumbsFor,parseCandidate,t:tr(referenceEn),openFile:path=>filePreviews.open(path)},scope),
   draft:()=>({text:draft.getSnapshot(),detectText:composerProjection.detectText,rev:draftRev,sessionId:activeDraft,caret:composerProjection.caret}),catalog:()=>controller.state.catalog,choose:selection=>controller.choose(selection),notice:text=>controller.update({error:text}),focus:()=>editor.focus(),
   insertReference:(span,ref,rev,scope)=>{let applied=false;editor.update(()=>{if(draftRev===rev&&activeDraft===scope.sessionId&&controller.epoch===scope.epoch){const tail=composerProjection.detectText.slice(span.end);applied=$replaceDetectSpanWithNodes(span,[$createReferenceChipNode(ref),...(tail.startsWith(' ')?[]:[$createTextNode(' ')])]);}},{discrete:true});return applied;},
   replace:(span,text,rev,scope)=>{let applied=false;editor.update(()=>{if(draftRev===rev&&activeDraft===scope.sessionId&&controller.epoch===scope.epoch)applied=$replaceDetectSpanWithText(span,text);},{discrete:true});return applied;},
 });
 controller.subscribe(()=>commandMenu.sync());draftArchive.subscribe(()=>commandMenu.sync());
 const useLexicon=bind(commandMenu.lexicon),useMenuLauncher=bind(commandMenu.launcher);
+commandMenu.lexicon.subscribe(()=>rescanTextRefs(editor));
 const keyboard={editor,arbitrate:(key,composing)=>commandMenu.arbitrate(key,composing),space:()=>commandMenu.engine?.onSpace()??false,dismissPopup:()=>commandMenu.popup.dismiss(),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
   const text=draft.getSnapshot(),sid=controller.state.sessionId,items=[...attachmentDrafts.draft(sid).items],epoch=controller.epoch;if(attachmentDrafts.busy||!text.trim()&&!items.length)return;
   if(await commandMenu.adjudicate(text)!==undefined)return;
@@ -339,7 +345,7 @@ function App(){
       case 'conversation.session':return <ConversationSession {...p}/>;
       case 'conversation.view':{
         const id=options.only||view;
-        if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={async(path,options)=>{if(!filePreviews.open(path,{params:options?.line===undefined?undefined:{line:options.line}}))throw Error('File preview is unavailable in this conversation.');}} openSkill={unsupported} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={loadImage} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={branch} fileMentions={()=>undefined}/>;
+        if(id==='chat')return <ChatView {...p} t={t.chat} useChat={useChat} usePresentation={selectorFace(presentation)} openFile={async(path,options)=>{if(!filePreviews.open(path,{params:options?.line===undefined?undefined:{line:options.line}}))throw Error('File preview is unavailable in this conversation.');}} openSkill={name=>void control.run(()=>openCurrentSkill(controller,filePreviews,name))} openExternalLink={url=>{window.open(url,'_blank','noopener,noreferrer');}} loadOlder={()=>controller.older()} loadThrough={()=>controller.older()} loadImage={loadImage} inspectCall={()=>setView('trajectory')} chatScroll={position} forkAt={branch} fileMentions={()=>undefined}/>;
         if(id==='trajectory')return <TrajectoryView {...p} t={t.trajectory} recordedRequestsOnly useTrajectory={selectorFace(composed.trajectory)} useDuration={useDuration} setActualDuration={value=>duration.set(value)} jsonStringWrapping={{getDefault:()=>wrapping.getSnapshot(),setDefault:value=>wrapping.set(value)}} loadOlder={()=>controller.older()} loadImage={loadImage} viewRequest={null}/>;
         if(id==='fleet'&&hasFleetTab)return <DshContextFleet key={state.sessionId} state={state} controller={controller}/>;
         if(id==='context'&&hasContextTab)return <DshContextDashboard key={state.sessionId} state={state} controller={controller}><ContextView state={state}/></DshContextDashboard>;

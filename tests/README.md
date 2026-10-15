@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original skill controls](../docs/DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15):
+`session-skills.test.mjs` has eight pure selector/catalog/source contracts;
+`pi-skill-workflows.test.mjs` has twelve actual Host/SDK flows, including cold
+history, historical branches, steering, missing-source zero inference, user-only
+resources and template collisions. `harness-skills.test.mjs` has nine authored
+service-face scope/lifetime/preview cases; this is not the original plugin proof.
+`harness-skills-chromium.test.mjs` runs the real copied plugin/cache/ranker/editor,
+menu, source sidebar and SDK with authored skills in Light/Dark. The focused
+66-case skill/Permission/file selection passes. Controlled old catalog/menu
+absence, first missing-transform assertion and actual missing-source inference
+failure are retained. Independent prior official SDK/new managed expansion text
+matches across native/display/provider boundaries for three authored source forms.
+The new cases enter shared CI where applicable; real GUI proof remains Linux.
+Full source/fresh-copy qualification is pending; sealed owner reviews are unchanged.
+
 [Current MX Permission review](../docs/HARNESS-MX-REVIEW.md#permission-controls-review--october-15)
 **20261015-163114-00e4ca65** runs public **c026963/application 7115883**, unselected,
 with both original Permission bindings. Source/ordinary/sealed target each pass
