@@ -35,6 +35,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Automatic relationship and project memory](DUAL-MEMORY.md)
 - [Memory processing and energy review — 21 September 2026](MEMORY-ENERGY-DESIGN-REVIEW.md) (investigated; replacement lifecycle proposed)
 - [Automatic memory: operations and developer contract](MEMORY-OPERATIONS.md)
+- [Conversational checks and historical-memory relevance](MEMORY-CHECKIN-RELEVANCE.md)
 - [Optional manual memory library](MEMORY.md)
 - [Improve a draft](PROMPT-IMPROVEMENT.md)
 - [Saved prompts and DSH commands](SLASH-COMMANDS.md)
