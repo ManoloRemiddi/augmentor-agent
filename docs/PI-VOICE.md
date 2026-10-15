@@ -34,7 +34,7 @@ integration and retirement/late-result proofs are still implementation work.
 This is read-only source/license analysis, not a shipped microphone control. The
 full snapshot has **14,987 files**; all **615 existing supplier entries** verify
 against their recorded upstream source paths/hashes and selected-body hashes,
-including five already recorded adaptations. New candidate file hashes and the
+including 20 already recorded body adaptations. New candidate file hashes and the
 MIT license digest are in the [portable audit](../release/harness-original-web-voice-audit-20261016.json).
 No new supplier code, UI layout, dependency, ASR model, installed/review artifact
 or service configuration changes in this audit.

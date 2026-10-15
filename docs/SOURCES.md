@@ -6,7 +6,7 @@ plugin supplies the original microphone/toolbar/waveform/device picker and inser
 editable drafts, with no automatic Send or speech playback. Reuse that original
 UI for the remaining web entry point while retaining the existing CPU ASR service;
 SenseVoice installation is not part of UI reuse. This is a read-only audit, with
-615 existing supplier records/five recorded adaptations reverified and no new
+615 existing supplier records/20 recorded body adaptations reverified and no new
 source selected. [Portable audit](../release/harness-original-web-voice-audit-20261016.json).
 
 [Private Pi speech candidate](PI-VOICE.md#companion-package-acceptance--october-16-2026)
