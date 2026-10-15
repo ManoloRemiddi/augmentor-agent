@@ -20,6 +20,8 @@ const wikiExtension=process.env.AUGMENTOR_HARNESS_PROOF_WIKI_SETTINGS==='1'?join
 const searchExtension=process.env.AUGMENTOR_HARNESS_PROOF_SEARCH_SETTINGS==='1'?join(root,'search-settings-resource.mjs'):null;
 const requestLog=process.env.AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS==='1'?join(root,'requests.jsonl'):null;
 const discoveryLog=process.env.AUGMENTOR_HARNESS_PROOF_MODEL_DISCOVERY==='1'?join(root,'model-listings.jsonl'):null;
+const modelRefreshRoot=process.env.AUGMENTOR_HARNESS_PROOF_MODEL_REFRESH_BARRIER==='1'?join(root,'model-refresh'):null;
+if(modelRefreshRoot)mkdirSync(modelRefreshRoot,{mode:0o700});
 const providerApi=process.env.AUGMENTOR_HARNESS_PROOF_PROVIDER_API??'openai-completions';
 let releaseArguments=null;
 if(!['openai-completions','anthropic-messages','openai-responses','google-generative-ai'].includes(providerApi))throw Error('Unsupported authored provider fixture.');
@@ -203,7 +205,7 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_INDEXED==='1'){
  writeFileSync(join(directory,'events.jsonl'),lines,{mode:0o600});writeFileSync(join(directory,'counter.json'),JSON.stringify({seq:1100}),{mode:0o600});
 }
 const lazy=process.env.AUGMENTOR_HARNESS_PROOF_LAZY==='1';
-const fixtureEnv={...process.env,HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
+const fixtureEnv={...process.env,...(modelRefreshRoot?{AUGMENTOR_HARNESS_PROOF_MODEL_REFRESH_ROOT:modelRefreshRoot}:{}),HOME:home,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:sharedState,AUGMENTOR_SHARED_DATA:sharedData,AUGMENTOR_PI_LINUX_TOOLS:'0',AUGMENTOR_HARNESS:lazy?'0':'1',PI_OFFLINE:'1'};
 // Authored startup barrier: exercise slow companion provisioning without
 // changing the production one-second activity lease deadline or its warnings.
 if(process.env.AUGMENTOR_HARNESS_PROOF_MEMORY_START_DELAY){
@@ -244,12 +246,13 @@ if(prompts){
   }
 }
 const startRuntime=()=>{
-  const runtime=spawn(process.execPath,[join(source,'dist/runtime/src/main.js')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','pipe','pipe']});
+  const runtime=spawn(process.execPath,[...(modelRefreshRoot?['--import',join(source,'scripts/fixtures/model-refresh-barrier.mjs')]:[]),join(source,'dist/runtime/src/main.js')],{cwd:workspace,env:fixtureEnv,stdio:['ignore','pipe','pipe']});
   runtime.stderr.on('data',data=>process.stderr.write(data));return runtime;
 };
 let child=startRuntime(),closing=false,reopenRequested=false,reopened=false;
 async function close(){
   if(closing)return;closing=true;
+  if(modelRefreshRoot&&existsSync(modelRefreshRoot))writeFileSync(join(modelRefreshRoot,'release'),'fixture closing',{mode:0o600});
   if(fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_FINAL_RELEASE&&existsSync(root))writeFileSync(fixtureEnv.AUGMENTOR_HARNESS_PROOF_NESTED_FINAL_RELEASE,'fixture closing',{mode:0o600});
   for(const owned of [child,prompts,memory])if(owned?.pid&&owned.exitCode===null){const exit=once(owned,'exit');owned.kill('SIGTERM');await exit;}
   model.closeAllConnections();await new Promise(resolve=>model.close(resolve));
@@ -270,7 +273,7 @@ while(!closing){
     await new Promise(resolve=>setTimeout(resolve,25));
   }
   const link=lazy?{url:null}:JSON.parse(readFileSync(join(state,'harness.json'),'utf8'));
-  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(memory?{memoryPid:memory.pid,memoryReady:true,memoryConfigured:false}:{}),...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),...(searchExtension?{searchExtension,searchInputStarted:join(workspace,'search-input-started'),searchInputControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-search-input'}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
+  console.log(JSON.stringify({fixture:true,...(reopened?{reopened:true}:{}),url:link.url,workspace,config,state,home,...(memory?{memoryPid:memory.pid,memoryReady:true,memoryConfigured:false}:{}),...(wikiVault?{wikiVault}:{}),...(wikiExtension?{wikiExtension}:{}),...(searchExtension?{searchExtension,searchInputStarted:join(workspace,'search-input-started'),searchInputControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-search-input'}:{}),sharedState,sharedData,pid:child.pid,requestLog,...(discoveryLog?{discoveryLog}:{}),...(modelRefreshRoot?{modelRefreshRoot}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_TOOL_ARGUMENTS==='1'?{argumentControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-arguments'}:{}),...(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'?{nestedControlUrl:'http://127.0.0.1:'+model.address().port+'/fixture/release-nested'}:{})}));
   await once(child,'exit');
   if(!reopenRequested||closing){await close();break;}
   reopenRequested=false;reopened=true;

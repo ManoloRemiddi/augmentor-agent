@@ -1,5 +1,41 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Peer refresh qualification ordering — October 15
+
+A peer's explicit Models refresh can advance the operator revision hint while
+runtime reconciliation is busy, even when the stored profile bytes and its
+settings revision do not change. An older window correctly retains its view but
+loses edit/discovery authority. Finishing the peer refresh does not authorize the
+old view; the original Refresh model settings control must obtain a fresh view.
+
+The original Models browser case previously refreshed its second window and
+immediately continued editing the first. An authored preload now holds one
+public SDK `ModelRuntime.refresh` in the fixture's isolated process, allowing
+normal browser polling to observe the actual busy hint. It changes no hint,
+descriptor, provider, deadline or product source. Before the ordering correction,
+this recreates the same unavailable Context window 1 pointer failure and read-only
+form seen in hosted Validate 38665728402. The older hosted SDK schedule itself
+was not captured. Two earlier probes fail at the peer refresh stage and remain
+separate from this successful reproduction.
+
+The driver now requires one completed peer refresh, unchanged profile bytes and
+settings revision, and continued read-only state in the first window. One explicit
+click on its original Refresh model settings control must settle and obtain an
+editable view before the unchanged provider/model/account workflow continues.
+Stale-peer draft retention/refusal, actual controls, private-field preservation,
+discovery selection, account confirmation, native ancestry, request counts,
+empty stderr and original 12-second/60-second bounds remain. No mutation is
+retried and no stale view is made writable by a notification alone.
+
+Focused evidence is **9/9**: the full real Models browser case and eight shared
+scope cases. The controlled SDK hold is **294 ms**, one peer refresh and one
+explicit own refresh; no profile rewrite occurs. A new common scope case confirms
+that the same profile revision cannot regain authority after peer maintenance
+without an explicit fresh read. It is already included in the three-platform SDK
+workflow. Full source/ordinary qualification follows this driver checkpoint.
+GUI/runtime/supplier/dependency bytes and installed owner reviews are unchanged.
+
+
 [Cross-window Models invalidation](#cross-window-models-invalidation--october-14) adds non-secret operator revision hints to the existing poll transport. A changed view loses edit/discovery authority while preserving original open forms and unsaved text. Fresh reads are explicit; confirmed own saves carry settled stamps, and late reads/replies cannot restore stale authority. The original GUI/CSS and 583 supplier records remain unchanged. At **8ed59df73540f85134ea9bd08348e60be063b99c**, strict check/build, initial focused 49/49 and source/fresh ordinary **244/244 each across 61 files** pass, all 44 Harness Chromium files, two workers, unchanged deadlines/no skips. All 911 compiled files and 2,034 executable source/test/fixture files match; 20,847 dependency entries/155 npm instances/Node 24.19.0 stay unchanged. [SDK workflow 38607443364](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38607443364) passes all three platforms, including 31 account/model cases on each. The current owner review and installed selection remain preserved.
 
 [Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict check/build, focused 41/41 and source/fresh ordinary **236/236 each across 60 files** pass, including all 44 Harness Chromium files. Authored-provider evidence uses real FileAuthStorage/Host/Chromium, callback/manual-code races and cold interruption. All 911 compiled files match; 20,847 dependency entries/155 production npm instances/Node 24.19.0 stay unchanged. Real provider, installed and new-head hosted acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.

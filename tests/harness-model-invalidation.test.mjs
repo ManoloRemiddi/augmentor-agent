@@ -11,6 +11,12 @@ function fixture(t,rpc=async()=>descriptor()){
 test('a newer operator hint retires edit authority and discovery while preserving the accepted provider view',async t=>{
  const {controller,scope}=fixture(t);await scope.load();const before=scope.snapshot,discovery=new AbortController();scope.pendingDiscoveries.add(discovery);controller.update({modelsRevision:2});assert.equal(scope.accepted,false);assert.equal(scope.snapshot.status,'ready');assert.equal(scope.snapshot.writable,false);assert.equal(scope.snapshot.rows,before.rows);assert.equal(scope.snapshot.namespaces,before.namespaces);assert.equal(discovery.signal.aborted,true);await assert.rejects(scope.call('models.settingsMutate',{},true),/Refresh/);
 });
+test('settled peer maintenance cannot reauthorize the same profile revision without an explicit fresh read',async t=>{
+ let hint=1;const calls=[],{controller,scope}=fixture(t,async method=>{calls.push(method);return descriptor(hint,100);});await scope.load();const accepted=scope.snapshot;
+ controller.update({modelsRevision:2});assert.equal(scope.accepted,false);assert.equal(scope.snapshot.rows,accepted.rows);assert.equal(scope.revision,100);
+ hint=3;controller.update({modelsRevision:3});assert.equal(scope.accepted,false);assert.equal(scope.snapshot.writable,false);assert.equal((await scope.operations.writeSettings('llm-pi-ai',[],100)).kind,'refused');assert.deepEqual(calls,['models.settingsDescribe']);
+ await scope.load();assert.equal(scope.accepted,true);assert.equal(scope.snapshot.writable,true);assert.equal(scope.revision,100);assert.equal(scope.acceptedHint,3);assert.deepEqual(calls,['models.settingsDescribe','models.settingsDescribe']);
+});
 test('older notifications cannot invalidate a newer accepted descriptor or invent a fresh write',async t=>{
  let reads=0;const {controller,scope}=fixture(t,async()=>{reads++;return descriptor(4);});await scope.load();controller.update({modelsRevision:2});controller.update({modelsRevision:4});assert.equal(scope.accepted,true);assert.equal(scope.snapshot.writable,true);assert.equal(reads,1);
 });
