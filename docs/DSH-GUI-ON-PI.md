@@ -21,17 +21,37 @@ A new actual-Pi/original-GUI test splits delivery of the two real provenance
 frames, preserving their bytes/IDs and all other transport data. Its pre-fix
 control fails with both frames delivered, no browser error and no coverage. The
 fixed flow keeps the selected request and provider-body read count, then retires
-an old delayed error and another conversation's delayed paged success. Native and
+an old delayed error and another conversation's delayed body-read success. Native and
 display files and all four provider requests (two ordinary authored turns) stay
 identical. An initial fixture attempt opened tabs while the original blank-chat
 header was hidden; the corrected fixture first completes its ordinary warmup.
 Both failures remain retained, with the latter identified as the product control.
 
-Source qualification is in progress. The current separate MX review
+At **47dc3de**, strict check/build, focused **9/9**, final rendered capture and
+**18** notice/packaging/source-boundary cases pass. Source/fresh ordinary each pass
+**595/two existing optional skips/zero failures**, **110 files/all 52 Harness
+Chromium files**, unchanged workers/bounds/assertions. All **1,031 compiled/3,327
+tracked** inputs match. The only authored application-source change is this
+`dsh-app.jsx` glue; all 608 supplier records/bodies/CSS/licences and dependencies
+are unchanged. Spreadsheet chunk/comment paths and generated manifests differ
+from the prior build; all four comment lines and six worker-manifest paths
+normalize exactly, with identical spreadsheet code. Asset membership differs only
+by its corresponding chunk filename. Current source and fresh copy match every
+actual compiled byte; the old artifacts are not normalized or modified.
+
+The first fresh-copy launcher used a relative Node path and failed before child
+startup; its log is retained and the absolute existing path runs the same cohort.
+Initial parity assertions assumed identical generated filenames/asset order;
+their failures remain retained, with actual path/comment/membership differences
+verified separately. No product assertion/deadline or existing case is removed.
+Nine sealed inventories/ten review owners, selected configuration, canonical
+changes and model/service settings verify preserved. Prior live evidence is
+checked against its own sealed root. The current separate MX review
 **20261015-192847-cfb956a7** still runs application **1b467d3** without this live
-arrival correction; its sealed bytes and the installed selection stay unchanged.
-Long-history/live-provider/physical feedback and full provenance/migration remain
-open.
+arrival correction. [Portable qualification and exact roster](../release/harness-context-live-arrival-qualification.json).
+Long-history/live-provider/physical feedback, a consolidated fresh review and full
+provenance/migration/platform acceptance remain open; installed selection stays
+unchanged.
 
 [Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.

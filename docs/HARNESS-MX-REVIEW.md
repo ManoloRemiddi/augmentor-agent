@@ -5,6 +5,9 @@ is currently source-only. The current review **20261015-192847-cfb956a7** below
 remains application **1b467d3**: it includes managed Context links/large JSON
 inspection, but not the later-provenance arrival correction. Its sealed app,
 profile and the installed selection remain unchanged.
+[Source qualification](../release/harness-context-live-arrival-qualification.json)
+records 595 pass/two existing optional skips/zero failures on source and fresh copy;
+this does not update the review artifact.
 
 [Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.

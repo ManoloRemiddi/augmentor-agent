@@ -9,7 +9,16 @@ It uses two authored normal turns, no owner data or live external provider. The
 old build fails after both frames are delivered; the initial missing blank-chat
 header fixture failure is distinct and retained. Optional
 `AUGMENTOR_CONTEXT_LIVE_PROOF_OUTPUT` writes a screenshot outside the target build.
-Source qualification is in progress; no owner artifact is patched.
+At **47dc3de**, focus 9/9 and the inspected final capture pass. Source/fresh
+ordinary each pass **595/two existing optional skips/zero failures**, 110 files/
+all 52 Harness Chromium files, two workers and unchanged bounds/assertions. All
+1,031 compiled/3,327 tracked inputs match; 18 notice/packaging/boundary cases pass.
+The initial relative-path driver failed before test startup and is retained;
+the exact same cohort runs through the absolute existing Node path. Initial
+prior-build filename/order assumptions are retained separately from strict
+observed generated-comment/chunk/asset equivalence checks. The only application
+source change is owned UI glue; suppliers and existing review/selection remain
+unchanged. [Portable evidence/roster](../release/harness-context-live-arrival-qualification.json).
 
 [Current MX Context review](../docs/HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.

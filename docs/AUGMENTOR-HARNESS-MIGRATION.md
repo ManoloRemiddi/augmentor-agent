@@ -6,10 +6,16 @@ A retained actual-Pi/original-GUI control delivers both real provenance frames
 later and reproduces missing coverage. Separate read lifetimes accept arrival
 without rereading the unchanged request; older success/errors remain retired
 across selection/conversation changes. There is no new layout, supplier change,
-SDK owner, model work or stored format. Source qualification is in progress;
-current MX review 20261015-192847-cfb956a7 remains application 1b467d3 and does
-not include this source correction. Installed/physical and full migration gates
-remain open.
+SDK owner, model work or stored format. At **47dc3de**, source/fresh ordinary each
+pass **595/two existing optional skips/zero failures**, 110 files/all 52 Harness
+Chromium files, unchanged workers/bounds. All 1,031 compiled/3,327 tracked inputs
+match; focus 9/9, final original-GUI capture and 18 notice/packaging/boundary cases
+pass. Supplier/dependencies, nine sealed inventories/ten review owners, selection
+and model/service settings verify preserved. Generated spreadsheet comment paths/
+chunk identities differ from the prior build, with normalized code equal. Current
+MX review 20261015-192847-cfb956a7 remains application 1b467d3 without this source
+correction. Installed/physical/full migration gates remain open.
+[Portable qualification](../release/harness-context-live-arrival-qualification.json).
 
 [Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.

@@ -5,7 +5,12 @@ is shared React/JSON glue with identical immutable-record/scope semantics on
 Linux/macOS/Windows. No OS adapter, package or protocol changes. Existing shared
 GUI builds enter all three SDK jobs; the new actual Chromium/Pi ordering proof
 is Linux-only, and does not qualify other-OS artifacts or physical acceptance.
-Source qualification is in progress; the existing MX review/selection are unchanged.
+At **47dc3de**, Linux source/fresh ordinary each pass 595/two existing optional
+skips/zero failures, 110 files/all 52 Harness Chromium files; focus 9/9 and the
+rendered capture pass. Preceding **6402108c** hosted SDK passes Linux/macOS and
+fails the Windows permission-control step; this does not establish the failure's
+cause. Current-source hosted and other-OS artifact/physical gates remain open.
+The existing MX review/selection are unchanged. [Evidence](../release/harness-context-live-arrival-qualification.json).
 
 [The separate MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 now includes application **1b467d3**, with exact-sealed Linux GUI/runtime checks:
