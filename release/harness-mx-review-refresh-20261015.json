@@ -98,11 +98,12 @@
     "newNoticeHelperHeadHosted": "pending"
   },
   "officeSnapshot": {
-    "observedAtUtc": "2026-10-15T08:48:38.746830+00:00",
+    "observedAtUtc": "2026-10-15T08:56:33.046482+00:00",
     "state": "running",
-    "stage": "final-link",
+    "stage": "post-link-optimization",
     "oomKilled": false,
-    "outputQualified": false
+    "outputQualified": false,
+    "finalLinkCompletedAtObservation": true
   },
   "retainedPreparationFailure": "The verified production-dependency baseline lacks the standalone licenses/node.txt expected by the private notice helper. Initial notice assembly refuses before staging. An explicit second sealed artifact supplies the original notice only after both inventories and identical Node binary verification; all other runtime/native authority stays with the primary baseline.",
   "remainingGates": [

@@ -236,6 +236,21 @@
     ],
     "finalAttempt": {
       "statusAtObservation": "running",
+      "observedAtUtc": "2026-10-15T08:56:33.046482+00:00",
+      "startedAt": "2026-10-15T04:20:28.788644779Z",
+      "observedStage": "post-link-optimization",
+      "configurePassed": true,
+      "terminalResultVerified": false,
+      "outputQualification": false,
+      "observedExecutable": "wasm-opt",
+      "oomKilledAtObservation": false,
+      "finalLinkCompletedAtObservation": true,
+      "observedProcessRssBytes": 5160939520,
+      "observedProcessElapsed": "06:01"
+    },
+    "publicRedistributionQualified": false,
+    "precedingFinalLinkObservation": {
+      "statusAtObservation": "running",
       "observedAtUtc": "2026-10-15T07:54:21.952147+00:00",
       "startedAt": "2026-10-15T04:20:28.788644779Z",
       "observedStage": "final-link",
@@ -246,7 +261,6 @@
       "observedLinkerRssBytes": 4950638592,
       "observedLinkerElapsed": "26:48",
       "oomKilledAtObservation": false
-    },
-    "publicRedistributionQualified": false
+    }
   }
 }
