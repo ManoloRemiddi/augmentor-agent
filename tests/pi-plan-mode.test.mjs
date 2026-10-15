@@ -44,8 +44,8 @@ test('review approval changes guidance at the next request and never expands rea
  const native=(await f.native(sid)).bytes.toString().trim().split('\n').map(JSON.parse);assert.equal(native.find(x=>x.type==='message'&&x.message.role==='toolResult'&&x.message.toolName==='exit_plan_mode').message.details.approved,true);
  await assert.rejects(f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{answer:{answers:[{id:'plan-review',selected:['Approve']}]}}}),/resolved/);assert.equal(f.errors(),'');
  const inspector=new URL((await f.call('inspection.open',{sessionId:sid})).url),token=new URLSearchParams(inspector.hash.slice(1)).get('token');
- const inspect=method=>fetch(inspector.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params:{sessionId:sid,active:true,expectedRevision:'empty'}})});
- assert.equal((await inspect('session.planMode')).status,200);assert.equal((await inspect('session.setPlanMode')).status,400);assert.equal(f.requests.length,3);
+ const revision=(await mode(f,sid)).revision,inspect=method=>fetch(inspector.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+token,'content-type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params:{sessionId:sid,active:true,expectedRevision:revision}})});
+ assert.equal((await inspect('session.planMode')).status,200);const blocked=await inspect('session.setPlanMode');assert.equal(blocked.status,400);assert.match((await blocked.json()).error.message,/read-only/);assert.equal((await mode(f,sid)).active,false);assert.equal(f.requests.length,3);
 });
 test('feedback, dismissal, Stop and inactive calls cannot fabricate plan approval or replay the next request',{timeout:90000},async t=>{
  const f=await planFixture(t,{planMode:true}),sid='mode-review-revise';await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});await choose(f,sid,true);
