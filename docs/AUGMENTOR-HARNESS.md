@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX export/Context review](HARNESS-MX-REVIEW.md#export-and-live-context-review--october-15)
+**20261015-211446-7474ddb2** runs public **681a858/application 8c159cb7**, unselected.
+It includes the original DSH session-download menu/dialog and `/export`, late
+Context arrival correction, original skill/Permission/Trajectory controls,
+large-JSON inspection and themed Augmentor marks. Source/fresh ordinary/sealed
+target each pass **654/two existing optional skips/zero failures**, **116 files/all
+53 Harness Chromium files**, unchanged workers/bounds. All **24,468 sealed entries,
+1,045 compiled/820 Harness source files** verify; dependencies/Node/components stay
+unchanged and 911 notice files retain the 615 GUI supplier inputs. Three exact-sealed
+GUI cases and isolated actual-Qwen plan/read/mode-off/cold-history proof pass.
+Initial owner QA has zero sessions/turns/drafts/logins; ten sealed inventories/eleven
+review owners, selection and model/service settings verify preserved. Physical MX
+feedback/adoption, live voice, full migration and later OS artifacts remain open.
+Hosted Linux/macOS SDK passes; Windows has two prompt-settlement timeouts before
+export is reached, with cause unproven. [Portable review evidence](../release/harness-export-context-review-20261015.json).
+
+
 ## Original session download workflow — October 15
 
 The original MIT DSH **More actions → Download session log** menu, progress/error
@@ -81,9 +98,10 @@ presentation inputs are added. Nine sealed inventories/ten review processes,
 selection, canonical changes and model/speech/GPU configuration bytes verify
 preserved. [Portable source qualification and complete roster](../release/harness-session-export-qualification.json).
 
-A new sealed MX owner review, physical feedback, current-head hosted platform
-checks and later OS artifacts remain separate gates. Existing MX review **20261015-192847-cfb956a7** remains application
-**1b467d3** without this export flow or the preceding live Context arrival fix.
+The source checkpoint now has the [separate sealed MX review](HARNESS-MX-REVIEW.md#export-and-live-context-review--october-15)
+above with this export flow and live Context correction. Physical feedback,
+guarded installed adoption and later OS artifact qualification remain separate.
+The preceding **20261015-192847-cfb956a7 / 1b467d3** review stays unchanged.
 No installed selection, owner conversation, credential, model or speech setting
 is changed. This completes the source workflow wiring in steps 1–4 of the historical
 foundation plan below; full migration and installed adoption remain open.

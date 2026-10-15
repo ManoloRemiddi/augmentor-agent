@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX export/Context review](HARNESS-MX-REVIEW.md#export-and-live-context-review--october-15)
+**20261015-211446-7474ddb2** runs public **681a858/application 8c159cb7**, unselected.
+It includes the original DSH session-download menu/dialog and `/export`, late
+Context arrival correction, original skill/Permission/Trajectory controls,
+large-JSON inspection and themed Augmentor marks. Source/fresh ordinary/sealed
+target each pass **654/two existing optional skips/zero failures**, **116 files/all
+53 Harness Chromium files**, unchanged workers/bounds. All **24,468 sealed entries,
+1,045 compiled/820 Harness source files** verify; dependencies/Node/components stay
+unchanged and 911 notice files retain the 615 GUI supplier inputs. Three exact-sealed
+GUI cases and isolated actual-Qwen plan/read/mode-off/cold-history proof pass.
+Initial owner QA has zero sessions/turns/drafts/logins; ten sealed inventories/eleven
+review owners, selection and model/service settings verify preserved. Physical MX
+feedback/adoption, live voice, full migration and later OS artifacts remain open.
+Hosted Linux/macOS SDK passes; Windows has two prompt-settlement timeouts before
+export is reached, with cause unproven. [Portable review evidence](../release/harness-export-context-review-20261015.json).
+
+
 [Original session download workflow](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
 at **49e23de4/application 8c159cb7** restores the original MIT DSH More menu,
 download modal/controller and `/export` on Pi originals, verified children,
@@ -12,9 +29,9 @@ proof, two failing isolated guard-removal controls and 18 notice/packaging/bound
 cases pass. The 615 GUI inputs include seven new verbatim MIT files; prior 608,
 dependencies, nine sealed inventories/ten owners, selection and settings verify
 preserved. [Portable evidence/roster](../release/harness-session-export-qualification.json).
-Current owner review 20261015-192847-cfb956a7 remains application 1b467d3 without
-export or the live Context arrival fix. A new sealed MX review, physical/installed/
-platform and full migration gates remain open. Foundation-only notes below are
+That source checkpoint now has the separate sealed MX review above. The preceding
+20261015-192847-cfb956a7 review remains application 1b467d3 unchanged; physical/
+installed/platform and full migration gates remain open. Foundation-only notes below are
 historical where they list this source workflow as absent.
 
 ## Live Raw Context arrival — October 15

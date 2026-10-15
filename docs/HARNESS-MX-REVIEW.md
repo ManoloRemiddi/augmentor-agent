@@ -1,29 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Live-arrival Context correction](DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15)
-is currently source-only. The current review **20261015-192847-cfb956a7** below
-remains application **1b467d3**: it includes managed Context links/large JSON
-inspection, but not the later-provenance arrival correction. Its sealed app,
-profile and the installed selection remain unchanged.
-[Source qualification](../release/harness-context-live-arrival-qualification.json)
-records 595 pass/two existing optional skips/zero failures on source and fresh copy;
-this does not update the review artifact.
-
-[Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
-**20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
-It includes managed skill links in original Raw Pi Context and the large-JSON
-viewer correction, alongside the original DSH skill/Permission/Trajectory UI and
-themed Augmentor marks. Source/fresh ordinary/sealed target each pass **594/two
-existing optional skips/zero failures**, 109 files/all 51 Harness Chromium files.
-All **24,440 sealed entries/1,031 compiled/812 Harness source files** verify;
-151 production npm instances, Node, components and 608 supplier inputs stay unchanged.
-Exact-sealed Light/Dark skill/Context/large-request checks and isolated actual-Qwen
-plan/cold-history proof pass. Initial owner QA has zero sessions/turns/drafts/logins;
-nine sealed inventories/ten review owners, selection, canonical changes and model/
-service settings verify preserved. Physical MX feedback, installed adoption, live
-arrival/long-history Context inspection, complete causal provenance, remaining
-plugin/memory/speech workflows and full migration/platform gates remain open.
-[Portable review evidence](../release/harness-managed-context-review-20261015.json).
+[Current MX export/Context review](HARNESS-MX-REVIEW.md#export-and-live-context-review--october-15)
+**20261015-211446-7474ddb2** runs public **681a858/application 8c159cb7**, unselected.
+It includes the original DSH session-download menu/dialog and `/export`, late
+Context arrival correction, original skill/Permission/Trajectory controls,
+large-JSON inspection and themed Augmentor marks. Source/fresh ordinary/sealed
+target each pass **654/two existing optional skips/zero failures**, **116 files/all
+53 Harness Chromium files**, unchanged workers/bounds. All **24,468 sealed entries,
+1,045 compiled/820 Harness source files** verify; dependencies/Node/components stay
+unchanged and 911 notice files retain the 615 GUI supplier inputs. Three exact-sealed
+GUI cases and isolated actual-Qwen plan/read/mode-off/cold-history proof pass.
+Initial owner QA has zero sessions/turns/drafts/logins; ten sealed inventories/eleven
+review owners, selection and model/service settings verify preserved. Physical MX
+feedback/adoption, live voice, full migration and later OS artifacts remain open.
+Hosted Linux/macOS SDK passes; Windows has two prompt-settlement timeouts before
+export is reached, with cause unproven. [Portable review evidence](../release/harness-export-context-review-20261015.json).
 
 # MX Harness review build
 
@@ -32,9 +23,86 @@ operator link is supplied privately in the chat/browser panel, never in this
 repository. The installed desktop preview, its draft and the earlier feedback
 profile keep their own settings and history.
 
+## Export and live Context review — October 15
+
+Private **20261015-211446-7474ddb2** is the current separate MX feedback build. It runs
+public **681a85819bd83329c01cdd9761d048f96cc65093**, tested application
+**8c159cb719f56a8a76aabd2e694db72717822464**, cohort
+**49e23de492609bad9f22ef54e023584ff54b53bf**, product **0.2.13** / Pi **1.1.0**.
+Its **24,468-entry** sealed inventory has SHA-256 **fba675c05c8e40dd1b8b01dd96ac517930fa79a0f205fdf9592230374810c31d**.
+The private operator link is supplied in the chat, never in this repository.
+This review is not the selected installed build; preceding reviews and drafts remain
+available without restarts or profile replacement.
+
+This batch adds the original MIT DSH Header **More actions → Download session log**,
+shared progress/error dialog and `/export` to the Pi adapter, plus the correction
+that accepts later Context provenance without rereading an unchanged request.
+It retains the original skill source/editable references/current-source preview,
+managed skill Context links, large-JSON viewer, current/new-chat Permission controls,
+Trajectory, Context/Insights, themed two-pixel Augmentor marks and existing previews.
+The source [export contract](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
+explains exact Pi/display/diagnostic/child/upload scope, manifest gaps, one-use
+links, private cleanup and limits. Native files include their saved branches;
+archives are neither an effective-context reconstruction nor import/replay files.
+A new SDK session can reserve a native filename before creating it; export currently
+refuses until saved native bytes exist. User conversation/attachment contents can
+contain private information even though configuration/credential stores are excluded.
+
+Source, fresh ordinary copy and exact sealed target each pass **654/two existing
+optional skips/zero failures**, **116 files/all 53 Harness Chromium files**, with
+two workers and unchanged bounds. All **1,045 compiled and 820 Harness source files**
+match the reviewed source. Compared with preceding 20261015-192847-cfb956a7, the
+assembly selects **30 public artifact files**, keeps the same Node/151 production
+npm instances/components and retains **911 notice files/615 GUI supplier inputs**.
+The selected MIT ZIP body, prior supplier CSS and original licences remain supplied.
+Preferred Office sources stay in notices; no public binary/Office promotion follows.
+
+Separate exact-sealed original-GUI fixtures pass **3/3**: real browser ZIP downloads
+match parent/child/upload originals and manifest hashes, failed export and changed
+drafts are preserved, Light/Dark dialogs remain readable, later actual provenance
+frames arrive without duplicate request reads, and original skill/large JSON views
+survive cold/history inspection. Six fixture screenshots were inspected. These
+fixtures use independently authored providers/resources in isolated profiles.
+
+An isolated actual-Qwen sealed-target proof passes plan/read/mode-off and cold
+reopening with **three provider requests/two tools**. Native/display originals,
+read-only file, selected catalog and output/context limits remain preserved;
+all five owned proof actors terminate. This is separate from the feedback profile.
+Its initial QA has **zero conversations/turns/drafts/logins**, with Read Only,
+keyless Search and local payload capture enabled. The existing loopback Qwen
+provider declaration preserves **262,144 context/8,192 output**; credentials,
+history, custom skills, memory, voice and MCP configuration are not imported.
+Five owner screenshot states were inspected for both marks, Light black flare,
+Dark retained flare, theme text, Permission confirmation/cancel and account dialog
+without starting OAuth. Browser QA closes its own temporary Chromium and submits
+no model/tool work in the feedback profile.
+
+Create a **New Session** to begin testing. Check the logo/Light–Dark transition,
+Models, Trajectory and Context/Insights during a normal conversation, then try
+**More actions → Download session log** or `/export`. The original success dialog
+means the browser download started. Keep a downloaded archive private when its
+conversation or uploads contain sensitive material. No installed adoption is
+required to try this separate review.
+
+Ten sealed inventories/eleven review processes, the selected configuration,
+canonical uncommitted work and model/speech/GPU configuration hashes verify preserved.
+Qwen is online; Breeze remains failed/terminal and voice inactive at the snapshot.
+The preceding [speech diagnosis](../release/harness-speech-readiness-20261015.json)
+is unchanged. Hosted [SDK run 38792023760](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38792023760)
+passes Linux/macOS; Windows reports **47 pass/two fail/one POSIX-symlink skip** in
+the 50-case export step. Both actual Host fixtures time out settling a prompt
+before reaching export preparation, so the root cause and Windows runtime path
+remain unqualified. No timeout/worker bound is increased and failures are retained.
+Physical MX feedback/refinement and guarded installed adoption remain required,
+alongside full provenance, remaining plugin/memory/speech/OAuth/MCP/Office/Home,
+later OS/public distribution and full P0/P1 migration/DSH retirement gates.
+[Portable review record](../release/harness-export-context-review-20261015.json).
+
 ## Managed Context review — October 15
 
-Private **20261015-192847-cfb956a7** is the current separate MX feedback build,
+Historical: superseded for new feedback by the export/Context review above. Its sealed artifact, profile and owner remain preserved.
+
+Private **20261015-192847-cfb956a7** is the preceding separate MX feedback build,
 public **a0db6ea**, tested application/cohort **1b467d3**, product **0.2.13** /
 Pi **1.1.0**. It retains the original DSH GUI, skill controls, Permission selectors,
 Trajectory and animated Augmentor marks. **Context → Raw Pi context and saved
