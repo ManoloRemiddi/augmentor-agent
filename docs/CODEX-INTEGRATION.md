@@ -12,8 +12,8 @@ was not retained, so target/permission/transport cause remains unproven. Six
 private isolated diagnostic passes plus subsequent unchanged source/ordinary
 image cases do not resolve it or qualify promotion.
 
-The actual image and pixel assertions now include authored tool outputs in their
-failure message, omitting image data. No production code, action, permission,
+The image-forwarding assertion now includes authored tool outputs in its failure
+message, omitting image data. No production code, action, permission,
 provider selection, worker bound, timeout or retry policy changes. The fixture
 uses only its independently authored page/provider and exact external pinned CLI;
 no owner browser or account is involved. [Portable scope and remaining gates](../release/harness-question-batches-qualification.json).

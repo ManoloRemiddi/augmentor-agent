@@ -338,5 +338,6 @@
       "duration_ms": 2932.909789,
       "logSha256": "280f2320cf4ce56fb43ab0420f8c1bb38663dbaa24a3f9a2488b2881e80a6b1f"
     }
-  }
+  },
+  "fixtureEvidenceRef": "4c73f31ea42333c68168fde9c57c435fe456518d"
 }
