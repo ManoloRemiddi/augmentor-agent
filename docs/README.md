@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Private Pi speech candidate](PI-VOICE.md#companion-package-acceptance--october-16-2026)
+**0.1.21/component add6fffb** now passes actual application acceptance in the
+speech repository's [draft PR #5](https://github.com/ManoloRemiddi/resonant-voice/pull/5).
+Source/fresh ordinary each pass 61 Node cases plus three existing Windows-only
+skips, 15 Python cases and four packed-companion Pi Host/Native/Browser cases.
+Pinned legacy DSH lifecycle and disposable archive install/remove pass; a
+revocation-removal control fails as intended. Final external application inputs
+stay unchanged. Private code/fixtures/archive stay outside public app/tests/CI;
+provider/ASR/PCM/devices are synthetic. Shared 0.1.19 pins, original GUI, MX review,
+installed/services and GPU/model settings are unchanged. Hosted component results,
+distribution/pin/adoption, physical speech and full migration remain open.
+[Portable acceptance record](../release/harness-pi-voice-companion-qualification.json).
+
 [Native and Browser Pi voice controls](PI-VOICE.md#native-and-browser-controls--october-16-2026)
 now reuse the existing orb, gesture/audio engine and private Pi owner. Final ASR
 submissions carry explicit spoken mode; native Send remains typed and Browser

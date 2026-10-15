@@ -1,0 +1,139 @@
+{
+  "schema": "augmentor-pi-voice-companion-acceptance/1",
+  "date": "2026-10-16",
+  "scope": "private component candidate exercised against the frozen public application; public application behavior/pins unchanged",
+  "application": {
+    "sourceRef": "4cb16513163d4f4b9ee068f9df103f3f5f600427",
+    "productVersion": "0.2.13",
+    "piSdk": "1.1.0",
+    "trackedGitBlobsVerified": 3366,
+    "compiledFilesVerified": 1057,
+    "freshPrivateArtifactEntries": 27067,
+    "artifactInventorySha256BeforeAndAfter": "3ad5bf728d62f7664849814bdde78100b240599effddbd9dd0c3ba11e1c67f72",
+    "finalBytecodeWritesDisabledAndAbsent": true
+  },
+  "companionCandidate": {
+    "repository": "https://github.com/ManoloRemiddi/resonant-voice",
+    "private": true,
+    "draftPullRequest": "https://github.com/ManoloRemiddi/resonant-voice/pull/5",
+    "version": "0.1.21",
+    "testedComponentSourceRef": "add6fffbec1ddf16c8369333652c0f9e5eade6ec",
+    "sourceLicense": "MIT",
+    "localArchiveSha256": "14ea3b49a93f7841652cce9d0bb9ec253127b9aee9494dbc74f26378e84a5cb1",
+    "archiveFilesVerifiedAgainstComponentSource": 64,
+    "componentTrackedInputsVerifiedInOrdinaryCopy": 85,
+    "publicArchivePublished": false,
+    "selectedAsApplicationDependency": false,
+    "currentSharedApplicationArchiveVersion": "0.1.19",
+    "DSHCompatibility": "actual 0.1.5-rc.1; separate 0.2 branch is not qualified here"
+  },
+  "componentChecksSourceAndOrdinaryEach": {
+    "node": {
+      "tests": 64,
+      "passed": 61,
+      "existingWindowsOnlySkips": 3,
+      "failed": 0,
+      "cancelled": 0
+    },
+    "python": {
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    "applicationAgainstInstalledCandidateTarball": {
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "workers": 2,
+      "timeoutsUnchanged": true,
+      "covers": [
+        "actual Host/public Pi SDK spoken and typed input, Stop and cold no-replay",
+        "Host Close before ticket redemption refuses later microphone auth",
+        "actual existing Native orb/hold/release/PCM/Send controls",
+        "framed Browser/shared audio worker and same-turn spoken steering"
+      ]
+    },
+    "legacyDshLifecycle": "passed; synthetic provider/TTS",
+    "disposableDshTarballInstallComposeRemove": "passed"
+  },
+  "safeguardRemovalControl": {
+    "removed": "pending-ticket retirement on disconnect in a separate private copy",
+    "cases": 1,
+    "expectedFailed": 1,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "evidenceBoundary": {
+    "realComponentCodeAndVersionedProtocol": true,
+    "realApplicationHostSdkAndSurfaceWorkers": true,
+    "syntheticProviderAsrPcmAndDevices": true,
+    "physicalAsrTtsOrListeningQualified": false,
+    "privateSourceFixturesOrArchiveAddedToPublicRepoOrCi": false,
+    "publicCloneReproductionRequiresPrivateCandidateAccess": true,
+    "retainedEarlyFailures": [
+      "eight pre-fix pending/Pi controls",
+      "closed-heartbeat compatibility response corrected",
+      "two silent-PCM fixture observation failures, corrected without production audio change",
+      "global wrong-DSH-version refusal, replaced by isolated pinned DSH qualification",
+      "generated Python caches in earlier retained ordinary test copy; original tracked/compiled inputs reverified and caches retained; final proofs use a fresh private artifact",
+      "provisional local 0.1.20 archives retained; final 0.1.21 avoids the separate DSH 0.2 branch version"
+    ]
+  },
+  "hostedApplicationSnapshot": {
+    "sourceRef": "544bf0359f0d90e14370152eaabad574f98b318f",
+    "sdkRun": 38817253387,
+    "linux": "success",
+    "macos": "success",
+    "windowsExpandedVoiceMemoryStep": {
+      "cases": 75,
+      "passed": 55,
+      "failed": 5,
+      "cancelled": 14,
+      "existingPosixOnlySkip": 1,
+      "remaining": "strict companion cleanup executable-identity refusal and memory/Host timeouts; timeout cause unproven"
+    },
+    "windowsDesktopRun": 38817253390,
+    "windowsDesktop": "success",
+    "macosBundleRun": 38817253417,
+    "macosBundle": "failed at unchanged MPL Office/LGPL libvips notice gates; not SDK voice failure"
+  },
+  "preservation": {
+    "sealedInventoriesVerified": 10,
+    "reviewOwnersVerified": 11,
+    "selectedConfigurationSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "originalCompanionPreexistingDirtyFiles": 4,
+    "modelServiceConfigurationFilesVerified": 6,
+    "currentMxReview": "20261015-211446-7474ddb2",
+    "reviewApplicationRef": "8c159cb719f56a8a76aabd2e694db72717822464",
+    "currentReviewHttpStatus": 200,
+    "qwenCatalogHttpStatus": 200,
+    "speechUnits": {
+      "resonant-breeze.service": {
+        "MainPID": "0",
+        "ControlPID": "0",
+        "ActiveState": "failed",
+        "SubState": "failed",
+        "Job": ""
+      },
+      "resonant-voice.service": {
+        "MainPID": "0",
+        "ControlPID": "0",
+        "ActiveState": "inactive",
+        "SubState": "dead",
+        "Job": ""
+      }
+    },
+    "rtx5090FreeMiB": 2012,
+    "existingBreezeStartThresholdMiB": 2828,
+    "newInstalledOrSealedArtifactOrServiceMutation": false
+  },
+  "remaining": [
+    "hosted private component checks",
+    "private distribution and deliberate shared dependency pin/adoption",
+    "physical CPU ASR/VAD and RTX 5090 Breeze/Qwen listening acceptance",
+    "separate Harness web entry point",
+    "voice-brief upgrade/downgrade",
+    "full migration, owner MX feedback and later OS/public release gates"
+  ]
+}

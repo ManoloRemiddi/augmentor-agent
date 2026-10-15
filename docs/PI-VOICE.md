@@ -2,6 +2,74 @@
 
 # Pi voice integration
 
+## Companion package acceptance — October 16, 2026
+
+A separately built **Resonant Voice 0.1.21** candidate now explicitly supports
+Pi's scoped bridge. Its [private draft PR #5](https://github.com/ManoloRemiddi/resonant-voice/pull/5)
+and component source **add6fffbec1ddf16c8369333652c0f9e5eade6ec** retain 0.1.19's
+private configuration and joined maintenance while porting the scoped Codex
+contract. A pending opening can now be closed before microphone redemption;
+its exact ticket is revoked even if another same-ID harness owns audio. Pending
+heartbeats and sequences carry through redemption, abandoned tickets expire on
+the host lease, and a surface cannot renew a missing host. Task Stop keeps voice
+connected; Close retires it and normally disposes the worker. Existing DSH ticket
+shape and speech settings remain compatible. The distinct version avoids the
+separate DSH 0.2 branch's 0.1.20; this candidate qualifies legacy DSH 0.1.5-rc.1
+and Pi 1.1.0, not that DSH 0.2 adapter.
+
+This is **private component acceptance**, not a public speech-source import or
+installed voice update. Application source remains **4cb16513**. In the private
+component repository, source and a fresh ordinary copy each pass **61 Node cases
+with three existing Windows-only skips**, **15 Python cases** and **four actual
+Host/SDK/Native/Browser cases** against an installed candidate tarball. Existing
+Native orb/hold/release/original Send and Browser audio worker/spoken steering
+are exercised without layout changes. Actual pinned DSH lifecycle and disposable
+tarball install/compose/remove pass. All 85 tracked component/64 archive files
+match; a separate pending-revocation removal fails its one test as intended.
+The archive SHA-256 is
+`14ea3b49a93f7841652cce9d0bb9ec253127b9aee9494dbc74f26378e84a5cb1`.
+[Portable record](../release/harness-pi-voice-companion-qualification.json).
+
+The provider, ASR, PCM and audio devices are synthetic. These tests do not certify
+recognition quality, Breeze generation, real microphone/playback or listening.
+No private source, test fixture or candidate archive is added to the public
+application/tests/CI. Reproducing component acceptance requires access to that
+private candidate; public app tests continue to use independent protocol peers.
+The original dirty companion checkout and its four changes remain preserved.
+The shared application archive stays 0.1.19 until deliberate distribution/pin
+qualification and adoption; package version alone cannot enable installed Pi voice.
+The Harness web entry point, voice-brief upgrades/downgrades and full migration
+remain open.
+
+Retained early failures include the pre-fix pending-ticket controls, a corrected
+closed-heartbeat response regression, silent-PCM test-fixture observation failures
+and refusal of a global DSH version different from the pinned test contract.
+Early component tests generated untracked Python cache files in the retained
+ordinary app test copy; tracked/compiled inputs verify unchanged and the caches
+are retained. Final proofs use a new private copy of public application 4cb16513:
+all **3,366 tracked Git blobs/1,057 compiled files** verify, and the complete
+**27,067-entry** inventory is identical before/after, with bytecode writes disabled.
+Deadlines and two application-test workers remain unchanged.
+
+[Application SDK run 38817253387](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38817253387)
+at **544bf035** passes Linux/macOS overall. Windows's expanded voice/memory step
+retains **75 cases: 55 pass/five failures/14 cancellations/one existing POSIX-only
+skip**. Protected fixture creation no longer produces the earlier provenance
+setup failures, but strict companion executable-identity cleanup and memory/Host
+timeouts remain unresolved; the timeout cause is unproven. The separate Windows
+desktop build passes. macOS bundle checks still stop at the existing MPL Office/
+LGPL libvips notice gates. These component checks do not clear those application
+or physical-platform gates.
+
+Read-only postflight re-verifies ten sealed reviews/eleven owners, selection,
+38 canonical changes and six model/service configurations. Current review
+**20261015-211446-7474ddb2/application 8c159cb7** stays unchanged and available,
+without the newer source speech controls. Qwen models return HTTP 200; Breeze is
+failed and voice inactive, with **2,012 MiB** free on RTX 5090 against its existing
+**2,828 MiB** start requirement. No new retry, placement/tuning, installed
+activation, public binary or merge occurs. Physical speech remains blocked on
+that existing resource gate; other authorized migration work can continue.
+
 ## Native and Browser controls — October 16, 2026
 
 Pi Host now advertises the source `voice` capability. The Native client and
@@ -95,10 +163,12 @@ failed and voice inactive, with 2,012 MiB free on RTX 5090 against the existing
 MX review **20261015-211446-7474ddb2** remains application **8c159cb7**, without this
 Native/Browser source binding. No new artifact is staged or activated.
 
-A compatible separately qualified Pi companion is still required: old Codex-only
-health advertisements refuse before tickets. The private speech checkout and its
-four changes remain untouched/unpublished; tests use independently authored
-protocol peers and fixed PCM, not real ASR/TTS or private service source. Qwen/
+At this Native/Browser checkpoint a separately qualified Pi companion was still
+required; the candidate above now supplies component acceptance while distribution/
+adoption remain open. Old Codex-only health advertisements still refuse before
+tickets. This public test cohort uses independently authored protocol peers and
+fixed PCM, not real ASR/TTS or private service source. The original private
+checkout and its four local changes remain preserved. Qwen/
 Breeze stay on RTX 5090 with existing context/concurrency/precision and CPU ASR/
 VAD. No running/review artifact, installed selection or service is changed.
 
