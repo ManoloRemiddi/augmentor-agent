@@ -1575,3 +1575,11 @@ The prior sealed artifact rejects the same batch at actual SDK validation.
 [Owning scope](../docs/PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
 and the portable qualification record separate synthetic, ordinary and installed
 claims. Existing managed timeouts, two workers and unchanged fixture bounds apply.
+
+The code-plan locale follow-up at d8520d5 repeats all 81 files/45 Harness Chromium
+files: source 388 pass/two optional skips; fresh ordinary 387 pass/one retained
+Codex screenshot-image failure/two skips. Isolated image cases pass but do not
+explain or supersede that full-cohort failure. The image assertion now reports
+actual authored tool-output metadata with image bytes omitted, preserving every
+image/pixel/no-replay assertion and existing bounds. Wider qualification remains
+incomplete; see [retained evidence](../docs/CODEX-INTEGRATION.md#retained-ordinary-screenshot-failure--october-15).
