@@ -17,8 +17,8 @@ import {localConnect} from '../dist/platform/src/transport.js';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label){const end=Date.now()+12000;let last;while(Date.now()<end){try{if(await fn())return;}catch(error){last=error;}await delay(30);}throw Error('Harness composition timeout: '+label+(last?' ('+last.message+')':''));}
 test('original current Permission chip and slash popup preserve drafts, confirmations, peer updates and inspector scope without inference',{skip:process.platform!=='linux',timeout:60000},async t=>{
- const profile=await mkdtemp(join(tmpdir(),'augmentor-context-chrome-'));let fixture,chrome,panel,owner,link,output='',stderr='';
- t.after(async()=>{owner?.close();panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-context-chrome-'));let fixture,chrome,panel,owner,link,output='',stderr='',stopIntercept=async()=>{};
+ t.after(async()=>{await stopIntercept();owner?.close();panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
  fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_PROMPTS:'1'},stdio:['ignore','pipe','pipe']});fixture.stdout.on('data',data=>output+=data);fixture.stderr.on('data',data=>stderr+=data);
  await until(()=>{assert.equal(fixture.exitCode,null,stderr);try{link=JSON.parse(output.trim().split('\n').find(line=>line.startsWith('{"fixture"')));return !!link;}catch{return false;}},'owner ready');
@@ -42,8 +42,27 @@ test('original current Permission chip and slash popup preserve drafts, confirma
  assert.equal(await readFile(link.requestLog,'utf8').catch(e=>{if(e.code==='ENOENT')return '';throw e;}),'');await visible(mode);
  const isMode=name=>mode+'?.getAttribute("aria-label")==='+JSON.stringify('Access mode, current: '+name)+'&&!'+mode+'.disabled',read=()=>rpc('session.permission',{sessionId:sid}),defaults=await rpc('settings.describe',{ns:'permission'});
  await visible(isMode('Ask before actions'));const choose=async name=>{await click(mode);const option='Array.from(document.querySelectorAll("[role=menuitem]")).find(x=>x.textContent.trim()==='+JSON.stringify(name)+')';await visible(option);await click(option);};
+ // Hold the real own-write echo until its accepted receipt has opened a
+ // subsequent Full access dialog. No response body or revision is fabricated.
+ const echo={held:null,released:false,following:false,error:null};let intercepting=true;
+ await panel.call('Fetch.enable',{patterns:[{urlPattern:url.origin+'/api/events*',requestStage:'Response'}]});
+ const drain=(async()=>{while(intercepting){for(const request of panel.pausedRequests.splice(0)){
+  try{const response=await panel.call('Fetch.getResponseBody',{requestId:request.id}),page=JSON.parse(response.base64Encoded?Buffer.from(response.body,'base64').toString():response.body);
+   const notification=page.frames?.find(({frame})=>frame.method==='permission/updated'&&frame.payload?.sessionId===sid);
+   if(!echo.held&&notification){echo.held={...request,revision:notification.frame.payload.revision};continue;}
+   if(echo.released)echo.following=true;
+   await panel.call('Fetch.continueRequest',{requestId:request.id});
+  }catch(error){echo.error=error;intercepting=false;break;}
+ }if(intercepting)await delay(5);}})();
+ stopIntercept=async()=>{if(!intercepting){await drain;return;}intercepting=false;await drain;await panel.call('Fetch.disable');stopIntercept=async()=>{};};
  await choose('Read Only');await visible(isMode('Read Only'));assert.equal((await read()).currentValue,'read-only');await replaceDraft('Keep this human note.');
- await choose('Full access');await visible(confirmation);assert(await panel.evaluate(button('Enable Full access',confirmation)+'.disabled'));await click(button('Cancel',confirmation));await visible('!'+confirmation);assert.equal((await read()).currentValue,'read-only');assert.equal(await panel.evaluate(editor+'.textContent'),'Keep this human note.');
+ await choose('Full access');await visible(confirmation);assert(await panel.evaluate(button('Enable Full access',confirmation)+'.disabled'));
+ await until(()=>{if(echo.error)throw echo.error;return !!echo.held;},'real own permission echo held');const ownReceipt=await read();assert.equal(echo.held.revision,ownReceipt.revision);
+ await panel.evaluate('globalThis.__permissionReceiptDialog='+confirmation+';true');echo.released=true;await panel.call('Fetch.continueRequest',{requestId:echo.held.id});
+ await until(()=>{if(echo.error)throw echo.error;return echo.following;},'own permission echo processed before subsequent poll');
+ assert.equal(await panel.evaluate('globalThis.__permissionReceiptDialog==='+confirmation+'&&globalThis.__permissionReceiptDialog.isConnected'),true,'a delivered own receipt must preserve the exact open confirmation');
+ assert.equal((await read()).revision,ownReceipt.revision);await stopIntercept();
+ await click(button('Cancel',confirmation));await visible('!'+confirmation);assert.equal((await read()).currentValue,'read-only');assert.equal(await panel.evaluate(editor+'.textContent'),'Keep this human note.');
  await choose('Full access');await visible(confirmation);await click(confirmation+'.querySelector("input[type=checkbox]")');await visible('!'+button('Enable Full access',confirmation)+'.disabled');await click(button('Enable Full access',confirmation));await visible(isMode('Full access'));assert.equal((await read()).currentValue,'danger-full-access');assert.equal(await panel.evaluate(editor+'.textContent'),'Keep this human note.');
  await choose('Read Only');await visible(isMode('Read Only'));await choose('Full access');await visible(confirmation);const beforePeer=await read();await rpc('session.selectPermission',{sessionId:sid,preset:'workspace-write',expectedRevision:beforePeer.revision});await visible('!'+confirmation+'&&'+isMode('Ask before actions'));assert.equal(await panel.evaluate(editor+'.textContent'),'Keep this human note.');
  await replaceDraft('/permission');await click(query('button[aria-label="Send message"]'));const popup=query('[role=listbox][aria-label="/permission matches"]');await visible(popup);const option=name=>'Array.from('+popup+'.querySelectorAll("[role=option]")).find(x=>x.textContent.includes('+JSON.stringify(name)+'))';assert.equal(await panel.evaluate(popup+'.querySelectorAll("[role=option]").length'),3);await click(option('Read Only'));await visible('!'+popup+'&&'+isMode('Read Only')+'&&'+editor+'.textContent===""');

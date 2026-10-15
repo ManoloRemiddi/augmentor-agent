@@ -7,7 +7,7 @@ import {appendDisplay,messageTargets} from './chat-projection.js';
 export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
   branchFlight=null; branchIntents=new Map();createFlight=null;
-  catalogRevision=0;catalogRead=0;
+  catalogRevision=0;catalogRead=0;permissionReceipts=null;
   state={skillsRevision:0,familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,permission:null,permissionBusy:false,permissionError:null,planMode:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
@@ -46,11 +46,21 @@ export class DshPiController {
     void this.hydrate().catch(error=>{if(epoch===this.epoch)this.update({error:error.message});});
   }
   permissionRead=0;permissionMutation=null;permissionUnconfirmed=false;
+  rememberPermission(scope,revision){
+    if(!this.modeScope(scope))return;
+    if(this.permissionReceipts?.sessionId!==scope.sessionId||this.permissionReceipts?.epoch!==scope.epoch)this.permissionReceipts={sessionId:scope.sessionId,epoch:scope.epoch,revisions:new Set()};
+    const revisions=this.permissionReceipts.revisions;revisions.add(revision);if(revisions.size>128)revisions.delete(revisions.values().next().value);
+  }
+  permissionNeedsRefresh(frames,scope){
+    if(!this.modeScope(scope))return false;
+    const known=this.permissionReceipts?.sessionId===scope.sessionId&&this.permissionReceipts?.epoch===scope.epoch?this.permissionReceipts.revisions:null;
+    return frames.some(({frame})=>frame.method==='permission/updated'&&(!frame.payload?.sessionId||frame.payload.sessionId===scope.sessionId)&&(!known?.has(frame.payload?.revision)||this.permissionUnconfirmed));
+  }
   async refreshPermission(scope={sessionId:this.state.sessionId,epoch:this.epoch},{explicit=false}={}){
     if(!this.modeScope(scope)||!this.state.capabilities?.sessionPermissions||this.permissionUnconfirmed&&!explicit)return;
     if(this.permissionMutation&&this.modeScope(this.permissionMutation)){this.permissionMutation.needsRefresh=true;return;}
     const ticket=++this.permissionRead;this.update({permissionBusy:true});
-    try{const value=checkedSessionPermission(await this.rpc('session.permission',{sessionId:scope.sessionId}));if(this.modeScope(scope)&&ticket===this.permissionRead){this.permissionUnconfirmed=false;this.update({permission:value,permissionBusy:false,permissionError:null});return value;}}
+    try{const value=checkedSessionPermission(await this.rpc('session.permission',{sessionId:scope.sessionId}));if(this.modeScope(scope)&&ticket===this.permissionRead){this.permissionUnconfirmed=false;this.rememberPermission(scope,value.revision);this.update({permission:value,permissionBusy:false,permissionError:null});return value;}}
     catch(error){if(this.modeScope(scope)&&ticket===this.permissionRead){this.permissionUnconfirmed=true;this.update({permission:null,permissionBusy:false,permissionError:error.message});}}
   }
   async selectPermission(preset,scope={sessionId:this.state.sessionId,epoch:this.epoch,revision:this.state.permission?.revision}){
@@ -59,7 +69,7 @@ export class DshPiController {
     try{
       const result=await this.rpc('session.selectPermission',{sessionId:scope.sessionId,preset,expectedRevision:scope.revision});if(!this.modeScope(scope))return {accepted:false,retired:true};if(result?.accepted!==true)throw Error('The permission change was not acknowledged.');const receipt=checkedSessionPermission(result);if(receipt.currentValue!==preset||(preset!==this.state.permission?.currentValue&&receipt.revision===scope.revision))throw Error('The permission receipt does not confirm the selected mode.');
       if(this.permissionMutation===operation)this.permissionMutation=null;
-      this.permissionUnconfirmed=false;this.update({permission:receipt,permissionBusy:false,permissionError:null});
+      this.permissionUnconfirmed=false;this.rememberPermission(scope,receipt.revision);this.update({permission:receipt,permissionBusy:false,permissionError:null});
       // A notification received while the write was pending may be newer than
       // its accepted receipt. Reconcile by reading, never by repeating a choice.
       if(operation.needsRefresh)await this.refreshPermission(scope,{explicit:true});
@@ -255,7 +265,7 @@ export class DshPiController {
       if(page.gap){await this.open(sessionId);return;}
       if(page.frames.length||!this.lastRefresh||Date.now()-this.lastRefresh>3000){this.lastRefresh=Date.now();await this.refresh();}
       if(page.frames.some(({frame})=>frame.method==='skills/updated'))this.update({skillsRevision:this.state.skillsRevision+1});
-      if(this.state.capabilities?.sessionPermissions&&page.frames.some(({frame})=>frame.method==='permission/updated'))await this.refreshPermission({sessionId,epoch});
+      if(this.state.capabilities?.sessionPermissions&&this.permissionNeedsRefresh(page.frames,{sessionId,epoch}))await this.refreshPermission({sessionId,epoch});
       if(this.state.capabilities?.planMode&&page.frames.some(({frame})=>frame.method==='plan-mode/updated'))await this.refreshPlanMode({sessionId,epoch});
       if(page.frames.some(({frame})=>frame.method==='goal/updated')){const goal=await this.rpc('session.goal',{sessionId});if(epoch===this.epoch)this.update({goal});}
       for(const [key,held] of this.heldQuestions){
