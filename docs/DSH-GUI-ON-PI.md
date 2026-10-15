@@ -1,5 +1,28 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Restore-row observation — October 15
+
+The original Archive/Undo/Unarchive fixture now waits for the restored row's
+original **Archive session** button before its next explicit open. A direct
+`workspace.list` read can see the Host commit before the browser receives the
+mutation reply. The original GUI correctly keeps that row guarded until then;
+the old fixture's early click can leave the sessionless hero visible.
+
+A controlled actual-Chromium case holds the restore HTTP response at CDP's
+response stage after the Host commits. The old sequence fails waiting for the
+retained output, matching the hosted failure's symptom. Releasing the reply and
+waiting for the original row action before opening passes the complete workflow.
+No original supplier UI/CSS, controller, Host, action replay, model request,
+timeout or assertion changes. Both Undo and Unarchive use the observed barrier.
+All four cases in the owning Chromium file pass on source and ordinary; full
+cohorts and exact hashes are recorded in the
+[portable checkpoint](../release/harness-restore-row-qualification.json).
+
+The b1b1986 hosted failure did not retain its inner reply timing, so this proves
+the fixture defect without establishing that failure's sole cause. Product bytes
+remain d8520d5. Installed/review activation, live/physical MX, new-head hosted,
+Office and full migration acceptance remain separate.
+
 [Structured question batches and original plan review](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
 restore whole-batch/multi-choice/custom/Skip behavior and the copied full-plan
 sidebar/review/card components on the existing Pi owner. Exact local tool-row

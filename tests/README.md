@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Restore-row observation](../docs/DSH-GUI-ON-PI.md#restore-row-observation--october-15)
+qualifies the original archive/Undo/restore workflow's next explicit open against
+its rendered row action, rather than only a direct Host read. The controlled
+negative holds the actual restore response after commit and reproduces the
+retained-output timeout; the released response plus original Archive-button
+barrier passes. The full owning Chromium file passes four cases each on source
+and ordinary, with unchanged deadlines/assertions/product/supplier code.
+[Checkpoint](../release/harness-restore-row-qualification.json) separates controls,
+full cohorts, the original hosted failure and installed/live/migration gates.
+
 [Sealed Linux candidate](../docs/DSH-GUI-ON-PI.md#sealed-linux-candidate--october-15) **20261015-064752-4cf0f74f** is qualified and unselected: **361 pass/two existing optional skips**, 78 files/all 44 Harness Chromium files, two workers and unchanged deadlines. All **24,307 inventory entries** verify; the 1,007 application files remain **6fd0b52**, with fixture follow-up **cd46c36**. It preserves 151 production npm instances and excludes browser test dependencies. The retained first clean failure is a proven late native closed observation; the corrected fixture waits for actual retained closure. Owner reviews, selection and services verify. Preceding hosted tests pass before Office public packaging refusal; engine, physical MX/activation, live/privacy/platform and full migration gates remain open. [Portable record](../release/harness-linux-candidate-qualification.json).
 
 [Jobs editor concurrent refresh](../docs/PI-JOBS.md#job-editor-survives-a-concurrent-refresh--october-15) at **6fd0b52fe5199fe599a7e3796d09800797024b6c** passes source/fresh ordinary **304/304 each** across 67 files/all 44 Harness Chromium files. Six common DOM cases verify open/closed intent during a held read, owner/epoch/role retirement and confirmed/refused admission; both the common open case and actual original DSH GUI fail against the preceding product. All three actual Jobs GUI workflows pass after. Existing two workers/deadlines/no skips and 1,007 compiled/2,122 product/test input parity remain. Eleven packaging/source-boundary cases pass with the engine gate closed. Wider Linux MCP receipt, native packaging/Windows job, new-head hosted and installed/physical acceptance remain open. [Portable record](../release/harness-jobs-editor-refresh.json).
