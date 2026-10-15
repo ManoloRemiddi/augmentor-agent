@@ -71,6 +71,12 @@ replay. Successful/failed initial spoken input uses the same receipt path as
 spoken follow-ups. The corrected native set passes 146/146. This supersedes the
 initial candidate; its ordinary copy was prepared but its cohort was not run.
 
+The 76-case development focus is supplemental evidence, not a separate frozen
+commit claim. Both final main cohorts reverify 74 of its case names; the two
+native-memory snapshot/branch cases pass separately against both frozen source
+and ordinary trees (**2/2 each**, zero skips/failures). The portable record lists
+that supplement separately from the 126-file main roster.
+
 Preceding [SDK run 38810763428](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38810763428)
 at **6db75c8f** passes Linux and macOS overall. Windows's expanded step retains
 **73 cases: 46 pass/13 fail/13 cancelled/one existing POSIX-only skip**. Newly

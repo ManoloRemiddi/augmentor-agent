@@ -28,8 +28,6 @@
       "cancelled": 0,
       "skipped": 0
     },
-    "focusedPhaseRef": "46121ad1beee6e63d2fb12d11aac80e9dcfd89a7",
-    "finalCohortsSupersedeFocusedPhase": true,
     "source": {
       "tests": 735,
       "pass": 733,
@@ -101,7 +99,26 @@
       }
     ],
     "noticePackagingPrivateBoundaryCases": 22,
-    "trackedAndHistoryPrivateSourceGate": "passed"
+    "trackedAndHistoryPrivateSourceGate": "passed",
+    "focusedDevelopmentPhaseFrozenCommitClaim": false,
+    "focusedCaseNamesReverifiedInFinalMainCohorts": 74,
+    "focusedCaseNamesReverifiedInPairedMemorySupplement": 2,
+    "allFocusedCaseNamesReverifiedInFinalFrozenChecks": true,
+    "supplementalMemorySource": {
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0
+    },
+    "supplementalMemoryOrdinary": {
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0
+    },
+    "supplementalTests": [
+      "tests/pi-memory-snapshot.test.mjs"
+    ]
   },
   "retainedFailures": [
     {
