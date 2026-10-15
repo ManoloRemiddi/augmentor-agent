@@ -1,0 +1,183 @@
+{
+  "schema": "augmentor-home-pi-qualification/1",
+  "date": "2026-10-15",
+  "scope": "Source and isolated unselected local Linux image; authored HA/provider fixtures only; no NAS or installed deployment",
+  "implementationRef": "640e871aeedad697fb87b7e47b754d1574fa0884",
+  "protocol": "augmentor-home/1",
+  "legacyDefault": "dsh",
+  "piOptIn": "HOME_HARNESS=pi",
+  "nativeHistoryConversionImplemented": false,
+  "sdkFamily": {
+    "@earendil-works/pi-coding-agent": "1.1.0",
+    "@earendil-works/chord": "1.1.0",
+    "@earendil-works/pi-agent-core": "1.1.0",
+    "@earendil-works/pi-ai": "1.1.0",
+    "@earendil-works/pi-codemode": "1.1.0",
+    "@earendil-works/pi-telemetry": "1.1.0",
+    "@earendil-works/pi-tui": "1.1.0",
+    "@earendil-works/pi-mcp": "1.1.0"
+  },
+  "nodeVersion": "24.19.0",
+  "image": {
+    "id": "sha256:3c2b4fd995f649bc05ce5fa1d7515871654b86103a6f6e8015f645b17903b758",
+    "uncompressedSizeBytes": 666758013,
+    "buildRecipe": "apps/home/Dockerfile.pi",
+    "lock": "apps/home/pi/package-lock.json",
+    "lockPackageInstances": 158,
+    "installedProductionPackageInstancesWithNotices": 133,
+    "compiledFilesMatchingSource": 633,
+    "dshNpmPackages": 0,
+    "published": false,
+    "resourceLimitsInProof": {
+      "cpu": 1,
+      "memoryBytes": 1073741824,
+      "additionalSwapBytes": 0,
+      "readOnlyRoot": true,
+      "nonroot": true
+    }
+  },
+  "applicationParity": {
+    "priorCompiledFilesUnchanged": 1007,
+    "priorApplicationRef": "6fd0b52fe5199fe599a7e3796d09800797024b6c",
+    "newCompiledFiles": [
+      "runtime/src/home.d.ts",
+      "runtime/src/home.js.map",
+      "runtime/src/home.js"
+    ],
+    "totalSourceCompiledFiles": 1010,
+    "originalDshGuiChanged": false
+  },
+  "checks": {
+    "strictCheck": true,
+    "typescriptCompile": true,
+    "publicSourceBoundary": true,
+    "nodeSyntax": true,
+    "homeAndClient": {
+      "tests": 54,
+      "pass": 54,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 2047.223207,
+      "logSha256": "cb6fe9f720b544f673024c5e45cc36bb89695d21c19f0c0e050f22a5433e4f47"
+    },
+    "sharedSdkPrivacyAndMcp": {
+      "tests": 9,
+      "pass": 9,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 6605.4543,
+      "logSha256": "d0a3d91be58d8720d8fbcc3a0f20166ee8ead388f4d2b81adb940915d4c58680"
+    },
+    "actualImageCmd": {
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "duration_ms": 1924.389441,
+      "logSha256": "fa54901e39166b638449e7af0896843896dea45209db9c105619b8613abdc517"
+    },
+    "imageProofModes": [
+      {
+        "mode": "assist-preview",
+        "node": "v24.19.0",
+        "lockedNpmPackages": 158,
+        "modelRequests": 2,
+        "deviceMutations": 1,
+        "cachedResponseNoReplay": true,
+        "unexpectedTcpDestinations": 0,
+        "sharedPrompts": true,
+        "actualCmd": true
+      },
+      {
+        "mode": "selected",
+        "node": "v24.19.0",
+        "lockedNpmPackages": 158,
+        "modelRequests": 2,
+        "deviceMutations": 1,
+        "cachedResponseNoReplay": true,
+        "unexpectedTcpDestinations": 0,
+        "sharedPrompts": true,
+        "actualCmd": true
+      }
+    ],
+    "legacyImageBuild": true,
+    "legacyPackagedSharedPromptsRead": true,
+    "dependencyNoticeCollectorPassedWithoutWaiver": true
+  },
+  "contracts": [
+    "Explicit supported SDK lifecycle, no second agent loop or implicit backend/model fallback",
+    "Existing Home API, pairing/roles, selected-device identity, exact REST targets and shared prompts",
+    "Durable request cache; same ID/input returns stored response without inference or action replay",
+    "Ten provider requests, twelve tools, sequential calls, ninety-second default deadline, 4096 output tokens",
+    "Before-dispatch reservation and unknown-outcome fencing on failed/partial/mismatching/lost acknowledgement",
+    "Cold native household scope verification; symmetric refusal of unconverted DSH/Pi history",
+    "Dedicated Home SDK state, inherited telemetry opt-out, no CLI resources, no built-in coding tools",
+    "Public forced-prompt projection removes automatic cwd metadata while preserving Home persona/current tool declarations",
+    "Retained bounded original failed MCP HTTP body is excluded from model input"
+  ],
+  "retainedPreparations": [
+    "Initial SDK intent-result envelope handling failed the authored acknowledgement expectation; corrected against actual public SDK tool-result shape.",
+    "Fresh minimal lock mixed 1.1.0 coding-agent and 1.2.0 family siblings; actual image startup failed before provider/device work. Entire eight-package family is now pinned/verified against root.",
+    "Notice-aware build refused three newer AWS package versions without reviewed licence text. Versions are aligned to the existing tested root lock; the unchanged collector passes.",
+    "Actual provider probe observed SDK-added cwd metadata despite disabled context files. Public before_agent_start forced prompt removes it; fresh/cold source and exact image requests verify the projection."
+  ],
+  "preservation": {
+    "liveNasDeploymentChanged": false,
+    "installedSelectionChanged": false,
+    "reviewWindowsActivatedOrRestarted": false,
+    "ownerConversationsOrCredentialsCopied": false,
+    "ownerQwenCatalogHttpStatus": 200,
+    "ownerQwenOrSpeechSettingsChanged": false,
+    "threeSealedInventoriesVerified": true,
+    "fourOwnerProcessesStillPresent": true
+  },
+  "precedingHosted": {
+    "ref": "30b0f62a142827b356cff7393576dd6ed9df5fb5",
+    "sdkThreeOs": "passed",
+    "windowsDesktopTwoArchitectures": "passed",
+    "legacyHomeJob": "passed",
+    "linuxPackaging": "refused Office public source/rebuild gate",
+    "macPackaging": "dependency notice failure retained",
+    "windowsCommandJobs": "failures retained",
+    "newHomeHeadHosted": "pending; local proof does not assert hosted completion"
+  },
+  "officeBuildSnapshot": {
+    "observedAtUtc": "2026-10-15T06:25:02.576386+00:00",
+    "state": "running",
+    "oomKilled": false,
+    "activatedOrPatched": false,
+    "outputQualified": false
+  },
+  "remainingGates": [
+    "Live HA/provider behavior, physical effects and human Home acceptance",
+    "Household history migration and controlled NAS adoption/rollback; no automatic native conversion",
+    "Crash/power-loss and missing initial-native-file repair/recovery; fail closed in current source",
+    "Limited-NAS hardware/performance and comprehensive live destination/extension/OS privacy qualification",
+    "Owner MX feedback and guarded installed desktop adoption with drafts preserved",
+    "ThinLTO Office engine completion, rendering/performance/fonts/source/licence/public redistribution",
+    "Windows command-job and native packaging failures, new-head hosted qualification and full accepted P0/P1 parity",
+    "Public release, update/rollback and DSH retirement remain unqualified"
+  ],
+  "inputSha256": {
+    "packages/runtime/src/home.ts": "74b6ae862a63a7943a3f07e6d7f48ac4a1e1d0a6f5125fb07ce1ba2dff6789fa",
+    "apps/home/runtime.mjs": "d8e814be4c3600ec9ce36c20cb30d007b56330192d1307e0020a26b556ac363d",
+    "apps/home/runtime-dsh.mjs": "1c65af1a48cbdb325303e0d34f0b00583b2fb9eb84c856be7997b2bf79d478f6",
+    "apps/home/runtime-pi.mjs": "b3b3d60a29c7b768388c524b49aa8980f658578a769a19d71572a24153cf3134",
+    "apps/home/persona.mjs": "2060f91614736c4f7edc1be81e574b97a43175307ddef71362140ee975729510",
+    "apps/home/server.mjs": "2c291a1d013978ad7702ad0045456696181532ff936f40906484c9239e10289f",
+    "adapters/dsh-home/index.mjs": "2bece7b4e28f20ccc13b2ed77dce3815d59bad79e3d7f788ae6e705534a069c9",
+    "apps/home/Dockerfile.pi": "96885b804a697157d069818dcf4fab7a3ec4616a910b8df1bab82b64a578e570",
+    "apps/home/Dockerfile.pi.dockerignore": "3335b79be1c50de4ba511bc1b0f793ce4730704bae3fe562c7a77c50049016a6",
+    "apps/home/pi/package.json": "0474c83052bc31cc35dba9c71368f45a3717281b51ed594886e3ad14a3a884c6",
+    "apps/home/pi/package-lock.json": "6ba839ddc175648806c8d0fa9917099075f94a22f82d6f8ccda3e501dda4f9c1",
+    "apps/home/pi/prepare.mjs": "f9e6193c3854861364fd3363b2c5c4d12eac2f1cd33dab46c13aa8be019d83bd",
+    "apps/home/pi/proof.mjs": "96708d259c33332df1c1eeb105f4c18313cb71bcbf3e27597954926ae1fb0344",
+    "apps/home/test/pi-runtime.test.mjs": "4d8bf6b8e835d40e7602dd0c9ff20d176148adc5d5d0e39d50518a2a13b98f0b"
+  }
+}

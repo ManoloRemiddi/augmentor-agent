@@ -248,7 +248,7 @@ benchmark. Debian repositories can change; preserve the actual immutable image
 identity in the [portable qualification](../release/harness-home-pi-qualification.json).
 The legacy Dockerfile remains separately supported and DSH by default.
 
-Final local evidence: strict check/TypeScript compilation; **54/54** combined Home
+Final local evidence at **640e871aeedad697fb87b7e47b754d1574fa0884**: strict check/TypeScript compilation; **54/54** combined Home
 and shared-client tests; **9/9** shared SDK privacy/MCP regressions; **2/2** actual
 image-CMD proofs, one per device mode. Each image proof uses authored loopback
 provider/HA endpoints, normal config/secret-file loading, nonroot read-only root,
