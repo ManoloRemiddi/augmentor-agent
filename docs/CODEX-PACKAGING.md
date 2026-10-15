@@ -41,8 +41,13 @@ The three whole affected files pass **10/10 with two existing optional controlle
 Browser skips** on both source and the ordinary production tree. Earlier probes
 that supplied only part of the prerequisite still retain the Browser failure.
 The original bad-interpreter probe expected ENOENT but observed EACCES; the final
-negative/positive probe records that actual result. These probes do not replace
-full ordinary qualification, live accounts, physical use or release gates.
+negative/positive probe records that actual result. At fixture **140da43fdd861b99f19c856be86862c65ac6e70f**, a complete corrected ordinary run
+passes **1,255 cases with six identified skips**, zero failures/cancellations,
+two workers and unchanged deadlines. This follows the exact failed three-case
+full run; it is not reported as an unchanged-dependency fix to product code.
+Source's preceding full run is 8ac2c40, with the affected-file follow-up above.
+[Combined qualification](../release/harness-mcp-cancellation-barrier.json) keeps
+those refs distinct. Live accounts, physical use and release gates remain open.
 
 ## Separately installed runtime — October 1
 

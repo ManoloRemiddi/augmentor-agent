@@ -94,6 +94,31 @@ unchanged retry or further RAM increase is inferred. [Environment record](../rel
 retains this separately from the preceding 6 GiB attempts. Engine compile,
 packaging/render comparison and public binary approval remain false.
 
+## Fresh ThinLTO engine build — October 15
+
+The later low-optimization full-LTO attempt also reaches the final linker and
+exhausts the exact **8 GiB** cap, with zero swap and OOMKilled=true. Its failed
+cache and all earlier attempts remain retained. A separate fresh ThinLTO build
+now passes preparation, all 18 original patch reverse checks plus its additional
+build-rule check, verification and configuration. At the recorded observation it
+is **still compiling**, with no qualified engine output or package.
+
+The [published driver and build patch](../release/office-rebuild/README.md) use
+`-flto=thin` with the original `-Oz`, runtime thread/memory flags and feature set.
+Link-only thread/cache controls stay in the Emscripten make rule; they do not
+enter strict compile-only checks. The additional patch is **MPL-2.0**, and the
+preferred-source change is explicit. The tiny actual ThinLTO probe contains LLVM
+summaries, links against the pinned ThinLTO sysroot and returns 42. This proves
+the toolchain mode, not the complete Office engine. No old Core objects are reused.
+
+The same pinned builder, **8 GiB/zero-swap**, two-CPU, one-job/nice-15 and no-network
+profile remains. [Environment evidence](../release/office-rebuild/environment.json)
+records its exact source/driver/patch hashes and point-in-time state, with both
+failed ThinLTO preparations retained. Full compilation, export/notice inventory,
+six-format rendering/layout/performance comparison, fonts, physical/platform and
+redistribution qualification remain. The application's default engine, installed
+reviews and model/speech/GPU settings are unchanged.
+
 ## Immutable authored scratch input — October 15
 
 The shared scratch-seat test generated a DOCX when writing its source, then

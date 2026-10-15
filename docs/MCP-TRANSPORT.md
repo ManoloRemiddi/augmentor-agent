@@ -35,12 +35,37 @@ ordinary run retains **1,252 passes/three failures/six skips**: two absent exter
 Codex prerequisites and a test native-host shebang that cannot represent its
 bundled Node path containing spaces. The [separate prerequisite fixture correction](CODEX-PACKAGING.md#production-qualification-uses-an-explicit-prerequisite--october-15)
 qualifies those affected files without changing production or bundling a CLI.
-A complete corrected ordinary run remains required and is recorded separately.
+At prerequisite-fixture **140da43fdd861b99f19c856be86862c65ac6e70f**, its complete three affected source
+files pass **10 cases with two existing optional skips**. The corrected complete
+ordinary root Node suite plus 21 common DOM cases then passes **1,255 cases/six
+identified skips**, zero failures/cancellations, with the same two test workers
+and unchanged deadlines. The source full-run ref remains **8ac2c40**; it is not
+relabeled as the later prerequisite follow-up. All **1,007 application files**
+remain byte-for-byte at 6fd0b52; source/ordinary match **2,123 product/test inputs**.
+The 20,702 production dependency entries/151 npm instances, bundled Node and
+1,932 browser-test dependency entries remain unchanged. No external CLI package
+or binary is added to the ordinary application. Eleven source-boundary/Office
+packaging cases pass with the public engine gate closed.
+
+Both 24,305/24,288-entry owner review inventories, four review processes, selected
+configuration and 38 canonical pre-existing status entries verify. Qwen's model
+endpoint returns 200; no live inference/physical speech claim follows. Installed
+selections, reviews and model/speech/GPU settings remain untouched.
+[Portable qualification](../release/harness-mcp-cancellation-barrier.json) records
+all cohort refs, preparation failures, negative controls and remaining gates.
 
 The [SDK workflow at 8ac2c40](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38680199098)
 passes Linux/macOS/Windows, including all six cancellation/authorization modes.
+[Validate 38680199462](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38680199462)
+passes its preceding Node/SDK, DSH setup and Native test stages, then refuses
+public Debian Office packaging at the unchanged engine source/rebuild gate.
 These are synthetic account/service and shared API checks, not live, physical,
-installed or complete migration acceptance.
+installed or complete migration acceptance. The [140da43 SDK matrix](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38681751869)
+also passes all six modes on all three platforms, and Windows desktop passes.
+Its wider Linux run remains in progress at observation; Mac packaging fails on
+unreviewed native Office MPL-2.0/libvips LGPL-3.0-or-later notice/source handling,
+and Windows command-job tests fail. Those adapters and full hosted acceptance
+remain unqualified.
 
 # Managed MCP dispatch and failed acknowledgments
 
