@@ -2,6 +2,12 @@
 
 # Start here: agent handoff
 
+15 October: [conversational memory relevance](MEMORY-CHECKIN-RELEVANCE.md) records
+the EDGE prompt investigation, generic-word recall correction, exact Linux-only
+backend artifact/HMR binding, failed legacy-file attempt and real-model pass.
+Desktop/model/speech selection and memory data are preserved; Browser adoption
+is separate. Runtime inventory is authoritative for DSH 0.2 preset bindings.
+
 ## September 26 public Apple-independent macOS preview
 
 The owner approved publishing a clearly labelled macOS preview without Developer
