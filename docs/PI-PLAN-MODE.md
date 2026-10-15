@@ -146,8 +146,9 @@ This is Harness/source integration, not installed adoption or complete migration
 Physical MX feedback, representative live providers, actual manual compaction with
 active planning, hard-crash/write-fault coverage, complete attachment combinations,
 floating Native/browser-extension presentation and platform release artifacts
-still need acceptance. General late answers and question-draft persistence across
-page reload remain separate gaps. The approved GUI, model/speech/GPU settings,
+still need acceptance. General late-answer continuation remains a separate gap. Generic Harness
+question drafts now [restore by conversation after reload](PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15);
+that later source fix is qualified separately from this mode/review checkpoint. The approved GUI, model/speech/GPU settings,
 installed selection, prior owner reviews and the Office distribution boundary
 remain preserved.
 
