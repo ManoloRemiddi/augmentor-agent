@@ -45,8 +45,8 @@ provider capacity, cancellation and hard owner/guard-loss cases remain.
 
 The final focused four-case run also passes after checking cancellation through
 its final output-identity barrier. Shared provider admission/cancellation/capacity
-contracts are added to Linux/macOS/Windows CI. Full source/ordinary qualification
-follows this implementation checkpoint.
+contracts are added to Linux/macOS/Windows CI. The initial checkpoint predates
+the full source/ordinary qualification below.
 Linux x64 native remains opt-in; the original GUI, common supplier provider,
 default Wasm backend and other-OS behavior are unchanged. This qualifies the
 controlled replacement boundary and descriptor ownership, not all concurrent
@@ -54,6 +54,10 @@ same-user mutations between an identity check and unlink. Pre-ready allocation,
 all cleanup owners lost/power loss, durable root recovery, completed-output
 handoff uncertainty, physical/font/security/source/licence/distribution and other
 OS gates remain open. No installed/default/public binary promotion follows.
+
+At **c78c832c7fadc3367e93520aabf87f768ea4fb4b**, source and fresh ordinary Node 24.19.0 each pass **297/297** across 66 files/all 44 Harness Chromium files, 15 shared prompt DOM cases, 24 native-common cases and four default queue/Wasm cases. Two workers, original deadlines and zero skips/cancellations remain. Both original native Office viewers separately pass font notices/PDF/zoom/reload/Retry and unchanged request/native evidence. All 925 compiled files and 2,051 executable inputs match between trees. Three native runtime outputs change; regenerated GUI hash names/receipts normalize to unchanged original GUI/CSS bodies. The 20,847 production dependency entries, 155 npm instances, Node and 1,932 browser-test entries remain unchanged. All seven MIT provider inputs/upstream hashes remain unchanged. Eleven packaging/source-boundary cases pass with the public Office gate closed. Read-only postflight verifies both owner review inventories/all four processes, selected artifact, 38 canonical changes and Qwen HTTP 200; owner history/credentials and model/speech/GPU settings are untouched. [Portable evidence](../release/office-rebuild/caller-output-ownership.json). New-head hosted, installed/live/physical and the wider gates above remain open.
+
+Preceding **76b83fa** [Validate 38665728402](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38665728402) records main Node **1,205 pass/one failure/42 identified skips**. The original Models test cannot edit Context window 1; captured text says the model view is read-only and requires an explicit refresh. Its trigger/sole cause is unproven; local passes do not erase it. Secondary/native/package stages are not reached. Three-platform SDK **38665728306** and Windows desktop **38665728364** pass. This remains the next investigation.
 
 ## Admitted native actor completion — October 15
 
