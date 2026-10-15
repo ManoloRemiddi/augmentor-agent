@@ -27,7 +27,11 @@ no-copy-before-admission, capacity-through-cleanup, single-render/cache and
 original byte-equality assertions remain. No runtime/provider/GUI/helper or
 library implementation changes. The complete shared/native file is qualified
 as a focused follow-up to the Models source/ordinary cohort; hosted Windows
-acceptance remains required.
+acceptance remains required. At **1d20c5c4789863423eb893add1745d025ed30e1c**, the complete shared/native
+file passes **24/24 each** on source and a fresh ordinary tree. The 298/298 source
+and ordinary baseline belongs to Models driver **cba66bce67e2f16fb5b03050c38b74972c10f10d**; it was not
+relabelled as a follow-up run. Application bytes remain exactly c78c832.
+[Combined portable evidence](../release/harness-model-peer-refresh.json).
 
 ## Native caller-output ownership — October 15
 
