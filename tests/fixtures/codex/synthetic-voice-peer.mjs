@@ -6,8 +6,8 @@ import {randomBytes, randomUUID} from 'node:crypto';
 import {WebSocketServer, WebSocket} from 'ws';
 
 const opaque = () => randomBytes(32).toString('hex');
-export function createSyntheticVoicePeer({render} = {}) {
-  const token = opaque(), tickets = new Map(), bridges = new Map(), connections = [], spoken = [];
+export function createSyntheticVoicePeer({render, harnesses = ['codex']} = {}) {
+  const token = opaque(), tickets = new Map(), bridges = new Map(), connections = [], spoken = [], received = [];
   let port;
   const send = (peer, event) => {if (peer?.socket.readyState === WebSocket.OPEN) peer.socket.send(JSON.stringify(event));};
   const clear = peer => {
@@ -31,7 +31,7 @@ export function createSyntheticVoicePeer({render} = {}) {
   const server = createServer(async (request, response) => {
     const reply = (status, body) => {response.writeHead(status, {'content-type': 'application/json'}); response.end(JSON.stringify(body));};
     if (request.method === 'GET' && request.url === '/health') {
-      reply(200, {protocol: 'resonant-voice/1', capabilities: {scopedHarnessBridge: 1}}); return;
+      reply(200, {protocol: 'resonant-voice/1', capabilities: {scopedHarnessBridge: 1, scopedHarnesses: harnesses}}); return;
     }
     if (request.method !== 'POST' || request.headers['x-resonant-token'] !== token) {reply(403, {error: 'Synthetic peer requires its test token.'}); return;}
     let body;
@@ -41,6 +41,7 @@ export function createSyntheticVoicePeer({render} = {}) {
       body = JSON.parse(Buffer.concat(chunks));
     } catch {reply(400, {error: 'Invalid test request.'}); return;}
     if (request.url === '/internal/ticket') {
+      if (!harnesses.includes(body.harness)) {reply(400, {error: 'Unsupported synthetic harness.'}); return;}
       const ticket = opaque(), bridgeId = opaque();
       const bridge = {sessionId: body.sessionId, harness: body.harness, bridgeId, seq: 0};
       tickets.set(ticket, bridge); bridges.set(bridgeId, bridge);
@@ -53,6 +54,7 @@ export function createSyntheticVoicePeer({render} = {}) {
     }
     if (!Number.isInteger(body.seq) || body.seq <= bridge.seq) {reply(200, {ok: true, ignored: true}); return;}
     bridge.seq = body.seq;
+    received.push(structuredClone(body));
     const peer = bridge.peer;
     if (body.type === 'disconnect') {
       closePeer(peer); bridges.delete(bridge.bridgeId); reply(200, {ok: true, active: false}); return;
@@ -95,7 +97,7 @@ export function createSyntheticVoicePeer({render} = {}) {
     socket.on('close', () => {if (peer) {peer.closed = true; peer.rendering?.abort();}});
     socket.on('error', () => {if (peer) closePeer(peer);});
   });
-  return {server, connections, spoken,
+  return {server, connections, spoken, received,
     get connection() {return {base: `http://127.0.0.1:${port}`, token};},
     async listen() {await new Promise(resolve => server.listen(0, '127.0.0.1', resolve)); port = server.address().port;},
     async close() {
