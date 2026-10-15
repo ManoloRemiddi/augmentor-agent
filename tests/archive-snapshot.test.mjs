@@ -56,7 +56,10 @@ test('a source replacement after capture cannot change the completed immutable s
  const snapshot=await f.capture(sources());await rename(join(f.source,'replacement'),path);assert.equal(strFromU8((await consume(snapshot))['log.jsonl']),'{"value":1}\n');assert.equal(await readFile(path,'utf8'),'AUTHORED REPLACEMENT');
 });
 test('an atomically replaced source during capture refuses without touching its replacement',async t=>{
- const f=await fixture(t),path=join(f.source,'log.jsonl'),replacement=join(f.source,'replacement');await writeFile(path,'{"value":1}\n');await writeFile(replacement,'AUTHORED REPLACEMENT');await assert.rejects(f.capture([{...f.entry('log.jsonl'),onRecord:()=>renameSync(replacement,path)}]),/identity changed|source changed/);assert.equal(await readFile(path,'utf8'),'AUTHORED REPLACEMENT');assert.deepEqual(await readdir(f.spool),[]);
+ const f=await fixture(t),path=join(f.source,'log.jsonl'),replacement=join(f.source,'replacement'),original='{"value":1}\n';await writeFile(path,original);await writeFile(replacement,'AUTHORED REPLACEMENT');let replaced=false,blocked;
+ await assert.rejects(f.capture([{...f.entry('log.jsonl'),onRecord(){try{renameSync(replacement,path);replaced=true;}catch(error){if(process.platform==='win32'&&error.code==='EPERM')blocked=error;throw error;}}}]),error=>blocked?error===blocked:replaced&&/identity changed|source changed/.test(error.message));
+ if(blocked){assert.equal(await readFile(path,'utf8'),original);assert.equal(await readFile(replacement,'utf8'),'AUTHORED REPLACEMENT');t.diagnostic('Windows refused replacing the open source descriptor; both originals and the capture refusal are verified. The post-swap identity branch is exercised only where the OS admits that swap.');}
+ else{assert(replaced);assert.equal(await readFile(path,'utf8'),'AUTHORED REPLACEMENT');}assert.deepEqual(await readdir(f.spool),[]);
 });
 test('outside sources, non-files and unsafe or duplicate archive paths never leave a snapshot',async t=>{
  const f=await fixture(t);await writeFile(join(f.source,'file'),'AUTHORED');await writeFile(join(f.root,'outside'),'OUTSIDE');

@@ -74,6 +74,29 @@ No installed selection, owner conversation, credential, model or speech setting
 is changed. This completes the source workflow wiring in steps 1–4 of the historical
 foundation plan below; full migration and installed adoption remain open.
 
+### Preceding hosted failures and fixture corrections
+
+The completed **7ed52400** SDK run
+[38785633828](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38785633828)
+passes Linux/macOS and fails one Windows archive test: Windows returns **EPERM**
+when the fixture attempts to rename over its open source descriptor. The test now
+requires either the admitted swap plus archive identity refusal, or that exact
+Windows OS refusal plus preservation of both original files and cleanup. It does
+not skip the test or treat unrelated errors as success; the post-swap branch is
+explicitly unexercised when the OS refuses the swap. This corrects a fixture
+assumption, with no runtime change. Hosted verification of the new branch remains
+pending; a passing Linux run does not qualify Windows behavior.
+
+The same head's [Debian run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38785634266)
+fails an older command fixture's exact error substring after `/permission` gained
+its capability check. That local failure is retained. Per-command unavailable
+messages now match the supported permission/export/feedback boundaries, with
+unchanged draft/action/write assertions. The two corrected files pass **32/32**
+on Linux. These are separate from the frozen 8c159cb7 application cohort.
+The preceding [Mac packaging run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38785633923)
+refuses unreviewed bundled MPL-2.0/LGPL-3.0-or-later suppliers; no allowlist or
+binary-promotion gate was relaxed. Public/OS artifact qualification stays open.
+
 ## Session-export archive foundation — October 15
 
 Historical checkpoint at 46ad4a9, superseded by the source workflow above where it lists unwired controls or missing lifecycle work.

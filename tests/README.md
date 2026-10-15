@@ -11,6 +11,14 @@ fixture, not physical MX or later OS release acceptance. The following foundatio
 checkpoint is historical in its claim that no end-to-end export test exists.
 
 
+The preceding Windows archive failure was an open-target rename returning EPERM.
+The replacement fixture now distinguishes that exact OS refusal from an admitted
+swap and verifies both original files/cleanup; Linux still must exercise the
+post-swap identity refusal. The older command fixture now checks separate
+permission/export/feedback unavailable messages and retains all draft/action guards.
+The original local/hosted failures remain evidence; Linux targeted 32/32 passes
+without a runtime change, and corrected Windows hosted behavior remains pending.
+
 [Archive snapshot foundation](../docs/AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15):
 `archive-snapshot.test.mjs` has 20 authored real-filesystem/ZIP cases for immutable
 bytes/inventory, appending/changed/replaced sources, caller path mutation, path and

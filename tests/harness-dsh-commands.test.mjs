@@ -56,7 +56,7 @@ test('draft revision and inline slash picks prevent unintended UI actions; launc
 test('owned commands are adjudicated before inference; arguments and unbound DSH commands preserve the draft',async()=>{
   const f=fixture();assert.equal(await f.menu.adjudicate('/goal'),'handled');assert.deepEqual(f.actions,['goal']);assert.equal(f.writes.length,1);
   f.writes.length=0;f.actions.length=0;
-  for(const command of ['permission','export','feedback'])await assert.rejects(f.menu.adjudicate('/'+command),/not yet connected to Pi/);
+  for(const [command,message] of [['permission',/not yet connected to this Pi host/],['export',/not available on this Pi host/],['feedback',/not yet connected to Pi/]]){f.draft.text='/'+command;await assert.rejects(f.menu.adjudicate(f.draft.text),message);assert.equal(f.draft.text,'/'+command);assert.deepEqual(f.actions,[]);assert.deepEqual(f.writes,[]);}
   await assert.rejects(f.menu.adjudicate('/goal draft arguments'),/by itself/);
   assert.equal(await f.menu.adjudicate('/unrelated-saved-template'),undefined);
   assert.deepEqual(f.actions,[]);assert.deepEqual(f.writes,[]);assert.deepEqual(f.choices,[]);
