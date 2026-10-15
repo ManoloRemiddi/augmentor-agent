@@ -13,7 +13,16 @@ absence, first missing-transform assertion and actual missing-source inference
 failure are retained. Independent prior official SDK/new managed expansion text
 matches across native/display/provider boundaries for three authored source forms.
 The new cases enter shared CI where applicable; real GUI proof remains Linux.
-Full source/fresh-copy qualification is pending; sealed owner reviews are unchanged.
+At **9d9ac56**, source/fresh ordinary each pass **541/two existing optional
+skips/zero failures**, 102 files/all 51 Harness Chromium files, two workers and
+unchanged bounds. All 1,025 compiled/3,315 tracked inputs match; the final 66-case
+selection, all 56 existing runtime cases and separate final original-GUI capture
+pass. Both initial full-cohort diagnostic failures and the intermediate invalid-
+transform rejection failure remain retained, with assertions unchanged. Seven
+notice/eleven packaging and source-boundary cases plus the real publication
+boundary pass. [Portable evidence and exact test-file roster](../release/harness-skill-qualification.json).
+Seven sealed owner inventories/eight review processes and installed selection
+remain unchanged; current-head hosted/physical acceptance remains open.
 
 [Current MX Permission review](../docs/HARNESS-MX-REVIEW.md#permission-controls-review--october-15)
 **20261015-163114-00e4ca65** runs public **c026963/application 7115883**, unselected,

@@ -9,6 +9,9 @@ GUI/live source-fingerprint checks use authored fixtures, not nine representativ
 Wiki workflows. The global source-provenance/causal attribution, owner migration,
 companion CLIs/services and installed/physical gates remain open. The current
 separate MX Permission review does not yet include this source increment.
+At **9d9ac56**, source/fresh ordinary each pass **541/two optional skips/zero
+failures**, 102 files/all 51 Harness Chromium files, with 66 focused and 56 existing
+lifecycle cases; representative Wiki workflows remain separate. [Portable evidence](../release/harness-skill-qualification.json).
 
 [Current Pi accounts](HARNESS-MODEL-ACCOUNTS.md) qualifies supported sign-in and
 local sign-out in the original DSH dialogs with authored providers, real SDK/

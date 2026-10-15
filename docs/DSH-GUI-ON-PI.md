@@ -56,8 +56,18 @@ Host now carries that field from the owned prepared receipt, with the original
 assertion retained. Its next focused runtime check also retained a malformed
 non-string upstream-transform rejection regression. The managed readers now
 leave such invalid inputs to existing SDK/steering validation, preserving its
-rejected/uncertain outcome rather than converting it to handled. Fresh final
-qualification/publication are pending.
+rejected/uncertain outcome rather than converting it to handled. At **9d9ac56**, final source/fresh ordinary each pass **541/two existing
+optional skips/zero failures**, 102 files/all 51 Harness Chromium files, two
+workers per cohort and unchanged bounds. All **1,025 compiled/3,315 tracked**
+inputs match. Final focused 66/66, existing lifecycle 56/56 and a separate final
+original-GUI Light/Dark capture pass. Seven notice and eleven packaging/boundary
+cases plus the actual tracked/history source boundary pass. All seven sealed
+inventories/eight review processes, selection, service settings and the canonical
+38 pre-existing changes verify preserved. [Portable evidence](../release/harness-skill-qualification.json)
+retains both failed first full cohorts and the intermediate malformed-transform
+failure, alongside their passing unchanged assertions. The final shared hosted
+SDK/artifact checks remain pending; preceding 29d144f passes Linux/macOS and fails
+Windows companion executable-identity cleanup during permission checks.
 The separate MX Permission review **20261015-163114-00e4ca65** does not contain
 this skill increment; its sealed bytes and installed selection remain unchanged.
 Owner feedback, representative Wiki skill workflows, full resource/provenance/

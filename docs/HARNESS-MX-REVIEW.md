@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [original skill controls/source-fingerprint increment](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
+is qualified in source/fresh ordinary at **9d9ac56** (541 pass/two optional skips
+per cohort). It is **not** in the separate Permission review below. That sealed
+review, its owner profile and installed selection remain unchanged. Consolidated
+review staging/physical acceptance remain open.
+
 # MX Harness review build
 
 A separate private Linux review instance is available for owner feedback. Its

@@ -8,7 +8,13 @@ Eight pure, twelve actual Host and nine common binding cases enter all three SDK
 jobs; source checks/build and the focused Linux 66-case selection pass. The
 symlink fixture explicitly skips Windows without creation privileges, retaining
 regular-file/error tests. Real Chromium and visual evidence is Linux-only;
-current-head hosted results and other OS artifacts/physical acceptance are open.
+at **9d9ac56**, Linux source/fresh ordinary each pass **541/two optional
+skips/zero failures**, 102 files/all 51 Harness Chromium files. Both first full
+cohort diagnostic failures and the malformed-transform rejection failure remain
+retained and corrected without changing existing assertions. Preceding 29d144f
+passes Linux/macOS hosted SDK jobs; Windows fails companion executable-identity
+cleanup during permission checks. Current-head hosted results and other OS
+artifacts/physical acceptance remain open. [Portable evidence](../release/harness-skill-qualification.json).
 User-directed further app rollout remains MX-first.
 
 [Current-chat Permission](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
