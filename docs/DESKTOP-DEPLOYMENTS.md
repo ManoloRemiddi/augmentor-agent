@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
+**20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
+It includes managed skill links in original Raw Pi Context and the large-JSON
+viewer correction, alongside the original DSH skill/Permission/Trajectory UI and
+themed Augmentor marks. Source/fresh ordinary/sealed target each pass **594/two
+existing optional skips/zero failures**, 109 files/all 51 Harness Chromium files.
+All **24,440 sealed entries/1,031 compiled/812 Harness source files** verify;
+151 production npm instances, Node, components and 608 supplier inputs stay unchanged.
+Exact-sealed Light/Dark skill/Context/large-request checks and isolated actual-Qwen
+plan/cold-history proof pass. Initial owner QA has zero sessions/turns/drafts/logins;
+nine sealed inventories/ten review owners, selection, canonical changes and model/
+service settings verify preserved. Physical MX feedback, installed adoption, live
+arrival/long-history Context inspection, complete causal provenance, remaining
+plugin/memory/speech workflows and full migration/platform gates remain open.
+[Portable review evidence](../release/harness-managed-context-review-20261015.json).
+
 [Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
 **20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
 with the original DSH skill menu/editable links/current-source preview and both

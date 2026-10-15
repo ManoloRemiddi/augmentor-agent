@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[The separate MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
+now includes application **1b467d3**, with exact-sealed Linux GUI/runtime checks:
+594 pass/two existing optional skips/zero failures, 109 files. Hosted public
+**a0db6ea** shared SDK checks pass Linux/macOS; Windows remains unqualified at the
+recorded in-progress snapshot. These are separate from other-OS application
+artifacts/physical acceptance; further rollout remains MX-first. No installed
+selection or OS adapter is changed. [Portable snapshot](../release/harness-managed-context-review-20261015.json).
+
 [Managed skill Context links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
 are shared SHA-256/JSON/native-projection and read-only provider-field code, with
 the same capture/legacy/ambiguity/retention semantics on Linux/macOS/Windows. No

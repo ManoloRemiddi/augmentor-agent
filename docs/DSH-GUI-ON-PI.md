@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
+**20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
+It includes managed skill links in original Raw Pi Context and the large-JSON
+viewer correction, alongside the original DSH skill/Permission/Trajectory UI and
+themed Augmentor marks. Source/fresh ordinary/sealed target each pass **594/two
+existing optional skips/zero failures**, 109 files/all 51 Harness Chromium files.
+All **24,440 sealed entries/1,031 compiled/812 Harness source files** verify;
+151 production npm instances, Node, components and 608 supplier inputs stay unchanged.
+Exact-sealed Light/Dark skill/Context/large-request checks and isolated actual-Qwen
+plan/cold-history proof pass. Initial owner QA has zero sessions/turns/drafts/logins;
+nine sealed inventories/ten review owners, selection, canonical changes and model/
+service settings verify preserved. Physical MX feedback, installed adoption, live
+arrival/long-history Context inspection, complete causal provenance, remaining
+plugin/memory/speech workflows and full migration/platform gates remain open.
+[Portable review evidence](../release/harness-managed-context-review-20261015.json).
+
 ## Managed skill links in request Context — October 15
 
 New managed skill receipts may include `sdkUserMessageSha256` and
@@ -62,9 +78,9 @@ publication checks pass. Eight sealed inventories/nine review processes, selecte
 configuration, six unit/voice settings files and 38 canonical changes verify
 preserved. The 64-source metadata benchmark drops from about 57 ms to 2 ms
 (three-iteration means) with exactly identical 74,664-byte annotations; this is
-only the authored host-local case. [Portable evidence](../release/harness-managed-skill-context-qualification.json). The separate MX
-skill review **20261015-180926-4e7b027e** remains application 9d9ac56 and does not
-contain this Context/JSON increment. Installed selection is unchanged. Complete
+only the authored host-local case. [Portable evidence](../release/harness-managed-skill-context-qualification.json). The new separate MX
+Context review above contains this increment; the earlier skill review
+**20261015-180926-4e7b027e** remains application 9d9ac56 and is preserved. Installed selection is unchanged. Complete
 instruction/causal provenance, representative plugin and memory/speech workflows,
 physical MX feedback and full migration/platform gates remain open.
 

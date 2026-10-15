@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
+**20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
+It includes managed skill links in original Raw Pi Context and the large-JSON
+viewer correction, alongside the original DSH skill/Permission/Trajectory UI and
+themed Augmentor marks. Source/fresh ordinary/sealed target each pass **594/two
+existing optional skips/zero failures**, 109 files/all 51 Harness Chromium files.
+All **24,440 sealed entries/1,031 compiled/812 Harness source files** verify;
+151 production npm instances, Node, components and 608 supplier inputs stay unchanged.
+Exact-sealed Light/Dark skill/Context/large-request checks and isolated actual-Qwen
+plan/cold-history proof pass. Initial owner QA has zero sessions/turns/drafts/logins;
+nine sealed inventories/ten review owners, selection, canonical changes and model/
+service settings verify preserved. Physical MX feedback, installed adoption, live
+arrival/long-history Context inspection, complete causal provenance, remaining
+plugin/memory/speech workflows and full migration/platform gates remain open.
+[Portable review evidence](../release/harness-managed-context-review-20261015.json).
+
 [Managed skill Context links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
 at **1b467d3** qualify optional delivered-message fingerprints, unique native
 projection references and exact SDK/literal provider user-field comparisons.
@@ -10,7 +26,8 @@ files**, unchanged workers/bounds. All **1,031 compiled/3,324 tracked** inputs
 match; focused 49/49, runtime/inspection 86/86 and separate final Light/Dark raw
 Context checks pass. All 608 supplier records/bodies, dependencies, eight sealed
 inventories/nine review processes, selection/settings and canonical changes verify
-preserved. This is source-only; the current MX review below remains 9d9ac56.
+preserved. That source-only checkpoint now has the separately sealed Context
+review above; the older 9d9ac56 review remains available unchanged.
 Full causal provenance, skill analytics, plugin/memory/speech workflows, physical
 MX feedback and complete migration/platform gates remain open. [Portable evidence](../release/harness-managed-skill-context-qualification.json).
 

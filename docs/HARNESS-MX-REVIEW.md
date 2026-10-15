@@ -1,23 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[The Context-link/large-JSON correction](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
-is currently source-only. Review **20261015-180926-4e7b027e** below still runs
-9d9ac56; it does not include new delivered-message/native/provider links or the
-large raw JSON viewer fix. Its sealed bytes/profile and installed selection are
-preserved. The original skill menu/source preview remains qualified in that review.
-
-[Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
-**20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
-with the original DSH skill menu/editable links/current-source preview and both
-Permission controls. Source/ordinary/sealed target each pass **541/two optional
-skips/zero failures**, 102 files/all 51 Harness Chromium files. All **24,431 sealed
-entries/1,025 compiled/812 Harness source files** verify; supplier selection is 608.
-Exact-sealed authored skill GUI and actual-Qwen plan/cold-history proof pass;
-initial owner Light/Dark/logo/Permission/account QA has zero sessions/logins/drafts.
-Eight sealed inventories/nine review owners, selection and model/service settings
-verify preserved. Linux/macOS SDK pass at 4eede33; Windows is unqualified at the
-recorded snapshot. Physical MX feedback, guarded adoption, full provenance/plugin/
-migration, speech and other OS artifacts remain open. [Portable record](../release/harness-skill-review-20261015.json).
+[Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
+**20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
+It includes managed skill links in original Raw Pi Context and the large-JSON
+viewer correction, alongside the original DSH skill/Permission/Trajectory UI and
+themed Augmentor marks. Source/fresh ordinary/sealed target each pass **594/two
+existing optional skips/zero failures**, 109 files/all 51 Harness Chromium files.
+All **24,440 sealed entries/1,031 compiled/812 Harness source files** verify;
+151 production npm instances, Node, components and 608 supplier inputs stay unchanged.
+Exact-sealed Light/Dark skill/Context/large-request checks and isolated actual-Qwen
+plan/cold-history proof pass. Initial owner QA has zero sessions/turns/drafts/logins;
+nine sealed inventories/ten review owners, selection, canonical changes and model/
+service settings verify preserved. Physical MX feedback, installed adoption, live
+arrival/long-history Context inspection, complete causal provenance, remaining
+plugin/memory/speech workflows and full migration/platform gates remain open.
+[Portable review evidence](../release/harness-managed-context-review-20261015.json).
 
 # MX Harness review build
 
@@ -26,9 +23,77 @@ operator link is supplied privately in the chat/browser panel, never in this
 repository. The installed desktop preview, its draft and the earlier feedback
 profile keep their own settings and history.
 
+## Managed Context review — October 15
+
+Private **20261015-192847-cfb956a7** is the current separate MX feedback build,
+public **a0db6ea**, tested application/cohort **1b467d3**, product **0.2.13** /
+Pi **1.1.0**. It retains the original DSH GUI, skill controls, Permission selectors,
+Trajectory and animated Augmentor marks. **Context → Raw Pi context and saved
+entries → managedSkills** now exposes delivered-message fingerprints, unique
+canonical native links, SDK snapshot matches and literal full-text provider user
+candidates. Legacy, changed, ambiguous, redacted and unsupported evidence stays
+explicitly unlinked or uncompared. These comparisons do not establish causal
+consumption, provider acceptance or global skill analytics. No source file is
+reread for this diagnostic. The original JSON widget's required truncation copy
+is supplied; opening a large raw request no longer crashes the page. Its supplier
+layout/CSS, 20,000-character display cap and full paged API remain unchanged.
+
+The **24,440** sealed entries have SHA-256 **17c82a5e372fe1ad72e8c26b795da09cdf6bc6f9feab422d76199d7db2d7d851**.
+All **1,031 compiled/812 Harness source files** match the tested source.
+16 selected public artifact files and the compiled tree overlay the verified
+preceding skill review. Node, 151 production npm instances, components, 909 notice
+files and the 608-file MIT supplier selection retain their bytes. The separate
+Apache dsh-context/MPL Office notices and all 32 preferred Office entry sources
+remain supplied. No experimental ThinLTO engine, new dependency or owner data is
+included; public Office distribution remains gated. This is an unselected review.
+
+Source, fresh ordinary and sealed target each finish **596 cases: 594 pass, two
+existing optional skips, zero failures**, 109 files/all 51 Harness Chromium files,
+two workers and unchanged bounds/assertions. Drivers/static imports run from the
+qualification checkout; actual app targets use the sealed build with identical
+compiled bytes. Separate exact-sealed authored skill/Context checks show V2 source
+with retained V1 receipt/history and readable metadata in Light/Dark. A deliberately
+large provider request opens without a page crash or new inference. All four
+screenshots are inspected; these fixtures stay outside the owner profile.
+
+The exact sealed app passes an isolated live-Qwen plan/read/mode-off/cold reopening
+flow: **three requests/two tools** (`read`, `exit_plan_mode`), Request changes
+without approval, no inference for bare mode off, unchanged note/catalog and exact
+cold native/display history and saved plan. Context **262,144** / output **8,192**
+and all model/service settings are preserved; all five proof actors terminate.
+This live plan proof does not independently qualify managed skill consumption.
+
+The fresh feedback profile starts Read Only, keyless Search and local payload
+capture, with no imported credentials/history/memory/voice/MCP or synthetic skills.
+Initial owner QA has zero sessions, turns, drafts and SDK logins; both 2 px animated
+marks, black Light smoke/Dark flare, Settings readability, original Permission
+confirmation/cancel and nine account choices/cancel pass. All five screenshot
+states are inspected; browser errors/failed responses are zero and QA Chrome
+terminates. Later owner activity is not inferred from this initial check.
+
+Nine sealed inventories/ten review owners, installed selection, 38 canonical
+changes and model/speech/GPU settings verify preserved. Qwen is online; Breeze
+remains failed/terminal and voice inactive at the snapshot. [Speech readiness](../release/harness-speech-readiness-20261015.json)
+records the earlier warmup OOM and refused retry preflight. Current hosted results
+are recorded separately in the portable evidence, without inferring OS artifact
+or physical acceptance. Live-arrival/long-history Context, physical MX feedback,
+guarded installed adoption, complete provenance, remaining plugins/companions,
+memory/speech/OAuth/MCP/Office, full P0/P1 migration and DSH retirement remain open.
+Further application rollout stays MX-first.
+
+Use the private operator link supplied in chat/browser and choose **New Session**.
+This clean profile contains no imported custom skills. The Wiki suite can be set
+up under **Settings → Plugins** with a test vault for its bundled skills; previewing
+does not invoke a skill. Earlier profiles/drafts/history remain available.
+[Context boundary](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15) ·
+[portable review evidence](../release/harness-managed-context-review-20261015.json).
+
 ## Skill controls review — October 15
 
-Private **20261015-180926-4e7b027e** is the current separate MX feedback build.
+**Historical checkpoint:** the managed Context review above supersedes this for
+new feedback; this sealed artifact/profile and owner remain preserved.
+
+Private **20261015-180926-4e7b027e** was the separate MX feedback build at this checkpoint.
 It runs public **4eede33**, tested application/cohort **9d9ac56**, product
 **0.2.13** / Pi **1.1.0**. It includes the original MIT DSH skill menu, cached
 ranking, user-only markers, editable `/name` tokens and current-source sidebar
