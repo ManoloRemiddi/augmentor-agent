@@ -82,7 +82,7 @@ reopens the saved plan without replay. Actual provider inputs and two native too
 results are checked; new detail/preview renderers attempt no external image URL.
 The separate SDK case rejects a partial reply, cold-resumes real prior tool
 context, keeps legacy text replies and cancels a waiting batch through Stop.
-Source and fresh ordinary each pass **388 checks / two existing optional Codex
+Implementation **5eba45a0453808be5bd9b6d32317cb199d1a0e9a**: source and fresh ordinary each pass **388 checks / two existing optional Codex
 skips**, zero failures/cancellations, across **81 files / all 45 Harness Chromium
 files**. Both retain two workers and unchanged deadlines. All **1,013 compiled
 files / 2,149 executable inputs** match; the 20,702 production dependency entries /

@@ -236,7 +236,7 @@
     ],
     "finalAttempt": {
       "statusAtObservation": "running",
-      "observedAtUtc": "2026-10-15T06:25:02.576386+00:00",
+      "observedAtUtc": "2026-10-15T07:05:29.679290+00:00",
       "startedAt": "2026-10-15T04:20:28.788644779Z",
       "observedStage": "compile",
       "configurePassed": true,
