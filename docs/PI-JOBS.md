@@ -2,6 +2,34 @@
 
 # Pi background jobs and delegation
 
+## Job editor survives a concurrent refresh — October 15
+
+A fresh list/history read could replace the job editor with a closed disclosure,
+even if the user opened it and typed a task while that read was pending. Shared
+DOM coverage reproduces the lost open state, and the actual original DSH Jobs
+tab reproduces it with a held real `session.jobHistory` response. Both fail
+against the preceding product. This is a real usability defect that can explain
+a hidden Start target; it does not establish the sole cause of the older hosted
+pointer obstruction, whose exact event ordering was not captured.
+
+The shared original/inspection Jobs controller now samples the current editor's
+open state when it commits the complete fresh view. Current unsaved fields and
+request ID retain their existing draft ownership. A user closing the editor while
+that read is pending stays closed. Confirmed admission explicitly closes and
+clears the accepted draft; a refusal preserves its open fields and request ID.
+Changed conversation, connection generation or read-only access continues to
+reset the view and reject retired replies. Existing exact-child evidence,
+controls/disabled states, grants, limits, Start/Stop/no-replay and producer/model
+semantics remain. There is no layout, CSS, control placement or supplier edit.
+
+Six shared DOM cases pass, covering open/close during a held read, three owner/
+access replacements, and rejected/confirmed admission. All three existing real
+Jobs Chromium cases pass, including original-tab history/native/provider evidence,
+inspection Start/Stop and cold read-only scope, and desktop specialist workflows.
+Strict check/build pass. The six common cases enter the Linux/macOS/Windows SDK
+workflow; new-head hosted, fresh ordinary/full-cohort and installed/physical
+qualification remain separate until their exact evidence is recorded.
+
 ## Inspected evidence survives fresh refreshes — October 14
 
 Source **d88b1d441d58839b099d47bead423867d4e9bd02** fixes a separate refresh

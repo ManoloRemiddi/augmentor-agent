@@ -30,7 +30,13 @@ test('original DSH Jobs view retains explicit child evidence through a fresh ref
  await panel.evaluate('globalThis.originalJobsHeader=document.querySelector(".augmentor-extension h3");globalThis.originalJobsEvidence='+section);
  panel.pauseRpcMethods=new Set(['session.jobHistory']);await panel.call('Fetch.enable',{patterns:[{urlPattern:'*/api/rpc',requestStage:'Response'}]});await click('Refresh jobs');await until(()=>panel.pausedRequests.length===1,'original fresh history held');
  const retained=()=>panel.evaluate('originalJobsEvidence.isConnected&&originalJobsEvidence.open&&originalJobsEvidence.textContent.includes("indexed original selected ancestry")&&originalJobsEvidence.textContent.includes("desktop_finish")&&originalJobsEvidence.textContent.includes("bounded desktop specialist")');assert.equal(await retained(),true,'original pending refresh preserves open evidence');
+ const editor='Array.from(document.querySelectorAll(".augmentor-extension details")).find(el=>el.querySelector("summary")?.textContent==="Start a bounded job")';
+ await harnessPointerClick(panel,editor+'.querySelector("summary")',until);
+ await panel.evaluate('(()=>{const field=document.querySelector("[aria-label=\\"Background job task\\"]");field.value="Authored draft opened during retained history refresh";field.dispatchEvent(new Event("input"));})()');
  panel.pauseRpcMethods.clear();const held=panel.pausedRequests[0];await panel.call('Fetch.continueRequest',{requestId:held.id});await until(()=>panel.finishedRequests.has(held.networkId),'original history delivered');await visible('document.querySelector(".augmentor-extension h3")!==originalJobsHeader');assert.equal(await retained(),true,'original completed refresh preserves open evidence');
+ assert.equal(await panel.evaluate(editor+'.open'),true,'fresh history cannot close a job draft opened during its read');
+ assert.equal(await panel.evaluate('document.querySelector("[aria-label=\\"Background job task\\"]").value'),'Authored draft opened during retained history refresh');
+ await harnessPointerClick(panel,editor+'.querySelector("summary")',until);
  const reads=[...panel.requests.values()].filter(row=>row.method==='session.jobPayload').length;await harnessPointerClick(panel,request+'.querySelector("button")',until);await until(async()=>[...panel.requests.values()].filter(row=>row.method==='session.jobPayload').length===reads+1&&await panel.evaluate('Array.from(originalJobsEvidence.querySelectorAll("button")).every(el=>!el.disabled)'),'original retained payload callback completes once');
  assert.equal(f.requests.length,modelCount);assert.deepEqual(await f.call('session.history',{sessionId:sid}),history);assert.deepEqual(panel.errors,[]);assert.equal(f.errors(),'');
 });

@@ -38,8 +38,8 @@ jobs:
         run: node --test tests/harness-session-create.test.mjs
       - name: Prepare locked browser-only test dependencies
         run: npm ci --prefix apps/browser/test --ignore-scripts
-      - name: Verify shared prompt catalog ordering and preserved editor behavior
-        run: node --test apps/browser/test/prompt-editor-ordering.test.mjs apps/browser/test/prompts.test.mjs
+      - name: Verify shared prompt ordering and job editor refresh state
+        run: node --test apps/browser/test/prompt-editor-ordering.test.mjs apps/browser/test/prompts.test.mjs apps/browser/test/jobs-refresh.test.mjs
       - name: Verify shared Pi accounts, model invalidation and transient operator scopes
         run: node --test tests/model-account-login.test.mjs tests/model-accounts.test.mjs tests/harness-account-scope.test.mjs tests/harness-model-invalidation.test.mjs
       - name: Verify shared SDK argument snapshots, quiet bursts and retirement
