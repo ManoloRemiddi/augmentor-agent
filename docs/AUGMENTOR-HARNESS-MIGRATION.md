@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi Home backend](HOME.md#pi-backend--october-15) removes the Home conversation
+engine's DSH dependency through an explicit public SDK **1.1.0** opt-in. Both
+selected-device and Assist modes pass actual isolated image-CMD/API proofs;
+**54/54** Home/client and **9/9** shared SDK regressions pass. Native household
+history, roles, durable action receipts, unknown-outcome fencing and explicit
+model selection remain owned by the existing service. SDK-family/notice guards
+and Home-only prompt projection qualify in the exact image. This is source plus
+an unselected Linux image: DSH stays the legacy default, histories do not convert,
+and NAS/live/physical/crash/installed/full migration gates remain open. All prior
+1,007 compiled application files and owner review/selected artifacts are preserved.
+[Portable evidence](../release/harness-home-pi-qualification.json).
+
 [Current Pi accounts](HARNESS-MODEL-ACCOUNTS.md) qualifies supported sign-in and
 local sign-out in the original DSH dialogs with authored providers, real SDK/
 FileAuthStorage/Chromium and source/ordinary 236-case runs at 039308e. Real provider,

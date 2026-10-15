@@ -31,10 +31,17 @@ jobs:
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: '24.19.0'
+      - run: npm ci --ignore-scripts
+      - name: Compile the shared SDK Home adapter
+        run: ./node_modules/.bin/tsc -p tsconfig.json
       - run: npm ci --prefix apps/home --ignore-scripts
       - run: npm --prefix apps/home test
       - name: Build isolated Home image with the shared prompt service
         run: docker build -f apps/home/Dockerfile -t augmentor-home:ci .
+      - name: Build the isolated Pi Home image with matching SDK family pins
+        run: docker build -f apps/home/Dockerfile.pi -t augmentor-home-pi:ci .
+      - name: Exercise actual Pi Home CMD, scoped requests, receipts and shared prompts
+        run: node apps/home/pi/proof.mjs augmentor-home-pi:ci
       - name: Exercise the packaged shared prompt library
         run: >-
           docker run --rm --tmpfs /tmp -e AUGMENTOR_SHARED_STATE=/tmp/run

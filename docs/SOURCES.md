@@ -238,6 +238,23 @@ package and lock agree on the MIT license; its original `LICENSE.md` SHA-256 is
 Real cryptographic identity checks and synthetic OpenAI transport pass on Linux.
 This does not qualify live sign-in, subscription eligibility or installed login.
 
+## Pi Home — 15 October 2026
+
+The optional Home image uses the family's public Pi coding-agent/MCP SDK, with
+all eight `@earendil-works` packages pinned to **1.1.0**, TypeBox **1.3.7**, ws
+**8.21.3** and the pinned Node **24.19.0** image. Its separate minimal package lock
+aligns uniquely versioned dependencies to the existing root lock; preparation
+checks the entire SDK family against that root and verifies the recorded Photon
+source build. The unchanged collector exports notices for **133 installed
+production instances** (158 lock entries). The source-based Photon payload and
+all package/Debian terms remain distinct from product/MIT GUI licensing. No DSH
+npm package is installed in this image. Legacy Home retains its own DSH lock.
+[Home](HOME.md#pi-backend--october-15) and its
+[portable evidence](../release/harness-home-pi-qualification.json) record exact
+image identity, synthetic proof scope, retained mixed-family/licence preparation
+failures and remaining live NAS/distribution gates. No image is published or
+activated by this checkpoint.
+
 ## Home preview — 24 September 2026
 
 `apps/home/package-lock.json` pins the exercised DSH 0.1.5-rc.1 packages,

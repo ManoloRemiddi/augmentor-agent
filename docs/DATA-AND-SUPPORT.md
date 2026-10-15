@@ -200,3 +200,35 @@ This repository's checks cover the implemented boundaries and recorded fixtures.
 They are not an independent penetration test. Provider policies apply to the
 model and memory services you configure. Store publication needs a publisher-owned
 privacy policy and accurate permissions/data disclosures for the final build.
+
+## Home Pi data
+
+The [optional Home Pi seat](HOME.md#pi-backend--october-15) stores household-hashed
+indices and native SDK histories under the existing private Home state directory,
+in `pi/index` and `pi/sessions`; `pi/agent` owns SDK metadata/cache state. Native
+records contain prompts, assistant/tool messages, request identity/role/mode,
+local paths and MCP connection/authorization observations. These are ordinary
+household data, separate from desktop diagnostics. Existing Home SQLite still
+owns paired-client identities, request replies and action arguments/outcomes;
+owner-saved model credentials retain existing private `model.json` storage.
+
+Configured HA/model credentials are not copied into a second MCP/SDK credential
+file. Managed MCP failure evidence can retain up to **1 MiB** of original response
+body with status/content-type and server/request metadata in native history,
+under the shared bounded transport policy. The original-body record does not copy
+Authorization headers. Response bodies/tool outputs may
+contain private data or echoed secrets. The original body is excluded from model
+input; ordinary selected tools/results still enter the configured provider's
+conversation. Home's forced prompt removes SDK-added cwd metadata from provider
+requests, without deleting local native history. It does not redact paths a user
+explicitly submits or a selected tool returns.
+
+Only explicit provider requests, configured HA operations/readiness and the local
+shared prompt service are intended. No CLI packages/project files/skills or
+built-in shell/file tools are loaded. Managed telemetry, analytics, cache warming
+and retries are disabled. Two authored image fixtures reject unconfigured TCP
+attempts; this is pinned-core evidence, not a live HA/provider/OS audit or a
+European residency guarantee. Home adds no external support export, long-term
+memory, cross-host prompt sync or household erase/repair UI. Retention/backup and
+controlled state removal remain operator responsibilities. Do not share native
+history, original HTTP bodies or state mounts as a licence/provenance report.

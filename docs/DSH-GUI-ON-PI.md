@@ -1127,9 +1127,11 @@ representative live providers and common Native/Browser management remain open.
 Unsupported operations retain an explicit missing-binding response.
 
 Final assistant branching uses the original DSH branch control; current-message
-Edit remains in the advanced inspector. The original question/approval components
-answer Host requests, with the Host's finite timeout rather than DSH's indefinite
-question timing. Trajectory now includes [streamed and quiet partial arguments](#quiet-partial-argument-sampling--october-15)
+Edit remains in the advanced inspector. The original [question controls](PI-QUESTIONS.md)
+already bind Take time, editing and renewable focus leases to the Pi Host.
+Approvals retain their hard timeout; AbortSignal, Stop and last-operator loss
+still settle unanswered questions. Persistent answer drafts, structured batches
+and plan-review reopening remain separate gaps. Trajectory now includes [streamed and quiet partial arguments](#quiet-partial-argument-sampling--october-15)
 and [nested tool presentation](TRAJECTORY-NESTED-TOOLS.md), retaining
 explicit identities and unknown/missing coverage. Complete causal/resource/skill
 attribution and wider provider-format qualification remain open. DSH account and

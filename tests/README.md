@@ -1530,3 +1530,30 @@ assertions. Cold unconfirmed-operation recovery and broader migration remain ope
 
 
 The October 14 [account private-storage fixture correction](../docs/HARNESS-MODEL-ACCOUNTS.md#hosted-private-storage-fixture-correction) uses an uncreated private child through the shared OS adapter. ce22's real Windows inherited-ACL temporary-root refusals are retained; Linux/macOS hosted contracts pass. The corrected Linux common account/runtime/scope 24/24 pass. At **9a27612c60618741811a2dd49ba07456904f1f14**, [SDK workflow 38603587310](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38603587310) passes on Linux/macOS/Windows, including 24/24 common account cases on each and the Windows ordinary-parent refusal/native receipt verification. Remaining platform/workspace steps pass; broader installed/package gates stay distinct. Production runtime/compiled/GUI and sealed review bytes remain unchanged.
+
+## Optional Pi Home backend — October 15
+
+Compile shared TypeScript after root `npm ci --ignore-scripts`, install the legacy
+Home test dependencies (`npm ci --prefix apps/home --ignore-scripts`), then run
+`node --test apps/home/test/*.test.mjs tests/home-client.test.mjs`. Final **54/54**
+pass on Node 24.19.0. Home fixtures use real SDK/native sessions, MCP HTTP and
+selected-device REST/WebSocket endpoints; they reject DSH package imports in the
+Pi test process. Cold exact household scope/model context, forward/reverse history
+refusal, roles, registry replacement, acknowledged-but-mismatching state, request
+cache/conflicts, creation/after-dispatch cancellation, bounds, literal slash text,
+failed/partial acknowledgements and mutation-plus-lost-HTTP-original/no-replay are
+covered. The provider sees Home persona/current tools but no automatic cwd path.
+
+Build `apps/home/Dockerfile.pi` and run `node apps/home/pi/proof.mjs <image>`.
+Both modes pass (**2/2**) through the actual CMD/flock/config/API/SDK; nonroot,
+read-only root, 1 CPU/1 GiB/no extra swap, synthetic-only endpoints, DSH-load and
+TCP guards, real healthcheck/shared prompts and graceful exit are enforced.
+The notice collector passes for 133 installed instances; all 633 compiled files
+match source outputs. The legacy Dockerfile also builds and its packaged shared
+prompt read passes. Nine shared privacy/MCP regression cases pass separately.
+[Qualification](../release/harness-home-pi-qualification.json) records immutable
+image/source identities and retained failed preparations. These are authored
+fixtures, not live HA/household migration, physical or limited-NAS qualification.
+The Validate Home job now runs the image proof; common Home client contracts also
+run in the existing three-OS SDK matrix. Preceding CI is historical; new-head
+hosted checks remain pending until observed.

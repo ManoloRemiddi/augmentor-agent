@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi Home](HOME.md#pi-backend--october-15) is now a fourth managed SDK creation
+path, after the three paths qualified below on October 13. It uses the same
+process telemetry/cache/retry opt-outs, isolated Home state, no CLI discovery and
+public forced-prompt projection to exclude automatic cwd metadata. Its final
+Home/client cohort passes 54/54; two actual image-CMD fixtures enforce only the
+authored provider/HA destinations, with inherited `PI_TELEMETRY=true`, preserved
+Home tools and cached request receipts. A standalone probe first observed cwd
+leakage; actual fresh/cold provider requests now exclude it. No live NAS/provider
+or owner state is used. All eight SDK/Chord dependencies are pinned to the tested
+1.1.0 family and verified during image preparation; package updates must repeat
+these checks. See [Home data](DATA-AND-SUPPORT.md#home-pi-data) and the
+[portable record](../release/harness-home-pi-qualification.json).
+
 The [latest qualified combined candidate](HARNESS-BRANCH-PUBLICATION.md#qualified-ordinary-and-immutable-candidate)
 retains this guard and adds Linux branch publication recovery. The privacy-only
 artifact below is its preceding unselected checkpoint; installed MX remains the

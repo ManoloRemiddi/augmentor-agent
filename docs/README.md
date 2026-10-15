@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi Home backend](HOME.md#pi-backend--october-15) removes the Home conversation
+engine's DSH dependency through an explicit public SDK **1.1.0** opt-in. Both
+selected-device and Assist modes pass actual isolated image-CMD/API proofs;
+**54/54** Home/client and **9/9** shared SDK regressions pass. Native household
+history, roles, durable action receipts, unknown-outcome fencing and explicit
+model selection remain owned by the existing service. SDK-family/notice guards
+and Home-only prompt projection qualify in the exact image. This is source plus
+an unselected Linux image: DSH stays the legacy default, histories do not convert,
+and NAS/live/physical/crash/installed/full migration gates remain open. All prior
+1,007 compiled application files and owner review/selected artifacts are preserved.
+[Portable evidence](../release/harness-home-pi-qualification.json).
+
 [Sealed Linux candidate](DSH-GUI-ON-PI.md#sealed-linux-candidate--october-15) **20261015-064752-4cf0f74f** is qualified and unselected: **361 pass/two existing optional skips**, 78 files/all 44 Harness Chromium files, two workers and unchanged deadlines. All **24,307 inventory entries** verify; the 1,007 application files remain **6fd0b52**, with fixture follow-up **cd46c36**. It preserves 151 production npm instances and excludes browser test dependencies. The retained first clean failure is a proven late native closed observation; the corrected fixture waits for actual retained closure. Owner reviews, selection and services verify. Preceding hosted tests pass before Office public packaging refusal; engine, physical MX/activation, live/privacy/platform and full migration gates remain open. [Portable record](../release/harness-linux-candidate-qualification.json).
 
 [Concurrent Jobs editor refresh](PI-JOBS.md#job-editor-survives-a-concurrent-refresh--october-15) at **6fd0b52fe5199fe599a7e3796d09800797024b6c** retains the user’s latest open/closed editor and unsaved task when a fresh history read commits. Controlled shared/original-GUI failures reproduce the defect; source/fresh ordinary **304/304 each** pass across 67 files/all 44 Harness Chromium files, six new common cases, unchanged two workers/deadlines/no skips. All 1,007 compiled/2,122 product/test inputs match; 20,702 dependency entries/151 npm instances, supplier GUI/CSS, original Office provider and source-built entry stay unchanged. Eleven packaging/source-boundary cases pass with the public gate closed. Owner reviews/selection/services verify. Preceding SDK Linux/macOS/Windows and Windows desktop pass; wider MCP receipt, native packaging/Windows job, new-head/installed/live/full migration gates remain open. [Portable evidence](../release/harness-jobs-editor-refresh.json).

@@ -32,3 +32,6 @@
 **/node_modules
 **/__pycache__
 **/*.pyc
+
+!apps/harness/
+!apps/harness/package.json

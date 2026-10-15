@@ -2,8 +2,10 @@
 
 # Home runtime — development preview
 
-Home reuses the family's DSH sessions, model provider, tool lifecycle, prompt
-service and action-outcome helpers. Application code lives here in `apps/home`
+Home reuses the family's harness SDK, model provider, tool lifecycle, prompt
+service and action-outcome helpers. Existing deployments default to DSH; the
+[explicit Pi backend](#pi-backend--october-15) is qualified with authored fixtures
+and an isolated Linux image, without changing the live NAS. Application code lives here in `apps/home`
 and `adapters/dsh-home`. The private `local-ai-smart-home` companion owns hub
 packaging, operational evidence and household-specific configuration. It does
 not own a second conversation engine. Existing Desktop and Browser clients now
@@ -87,10 +89,10 @@ mutation replay or provider fallback occurs. This is not distributed exactly-onc
 execution: HA can act before a connection breaks. Tool completion is an execution
 acknowledgement; the agent must read state afterwards to report observed effects.
 
-One active request, 90-second cancellation deadline, 10 DSH steps and 12 tool
+One active request, 90-second cancellation deadline, 10 model requests and 12 tool
 calls bound each turn. MCP calls time out after 15 seconds. Cancellation after
 dispatch leaves an unknown outcome. Client disconnection does not cancel an
-admitted turn; retrieve its result with the original request ID. At most 16 DSH
+admitted turn; retrieve its result with the original request ID. At most 16 harness
 session handles are retained in memory; durable sessions resume on demand.
 
 The deadline regression test uses actual DSH and a local MCP fixture, waits until
@@ -107,6 +109,8 @@ fixture evidence, not a live household/device test.
 ## Build and configuration
 
 ```sh
+npm ci --ignore-scripts
+./node_modules/.bin/tsc -p tsconfig.json
 npm ci --prefix apps/home --ignore-scripts
 npm --prefix apps/home test
 docker build -f apps/home/Dockerfile -t augmentor-home:preview .
@@ -172,7 +176,107 @@ Personal/relationship/project memory inference is disabled. The shared prompt
 service implementation and schema are reused, but there is no cross-host prompt
 sync yet. The Home page configures one OpenAI-compatible provider; full family
 provider-picker/subscription integration remains pending. The selected provider
-runs through DSH; subscription access is not assumed to be a transferable API key.
+runs through the explicitly configured harness; subscription access is not assumed
+to be a transferable API key.
+
+## Pi backend — October 15
+
+`HOME_HARNESS=pi` selects the family's public Pi coding-agent **1.1.0** session
+lifecycle. Unset or `dsh` preserves the existing DSH backend. There is one session
+owner per household, no second agent loop and no automatic engine fallback. The
+existing `augmentor-home/1` HTTP contract, pairing/roles, request receipts,
+SQLite action ledger, shared prompts, model settings and Home web page are reused.
+`GET /health` identifies the actual harness; it does not prove provider readiness.
+
+Both device modes work: default `selected` exposes only `home_devices` and
+`home_set` through the existing exact registry/REST boundary; `assist-preview`
+uses the public Pi MCP extension with HA live context and the same three allowed
+intent tools. Reads and mutation acknowledgements remain separate from physical
+verification. A failed/partial acknowledgement, mismatching observed selected
+state, cancellation after dispatch or lost HTTP response leaves an unknown action;
+the ledger fences further changes until review. No mutation is automatically
+replayed. The Pi seat enforces ten provider requests, twelve tool calls,
+sequential execution, 90 seconds by default, 4,096 output tokens and the same
+configured context size (131,072 default). These are service bounds, not changes
+to the owner's live Qwen/speech configuration.
+
+Pi uses private `pi/agent`, `pi/index` and `pi/sessions` beneath the existing
+`HOME_STATE_DIR`. An fsynced household-hash index names one native SDK JSONL; its
+retained scope entry must match on cold resume. Missing, foreign, unsafe or
+corrupt history fails closed. Index reservation can precede the first native
+flush: a crash/cancel at that boundary can leave an index whose missing file needs
+operator review. There is no automatic repair or silent fresh conversation.
+Each backend refuses the other's same-household marker, including on rollback.
+History conversion/import is **not implemented**. For a trial use a separate
+private state mount and newly scoped conversations; retain the old state/image
+for rollback, with one service owner holding its normal `flock` lock. Existing
+live history is not a migration fixture.
+
+The dedicated Home process sets `PI_CODING_AGENT_DIR` to its own private agent
+directory, disables telemetry/analytics/cache warming/retries and loads no CLI
+packages, project context, skills, themes, prompt templates or built-in coding
+tools. The public `before_agent_start` forced-prompt projection sends only the
+Home persona plus current tool declarations, excluding SDK-added cwd metadata.
+Literal `/mcp ...` chat remains user text. Explicit model selection cannot silently
+fall back. HA/model tokens remain in configured secret files/process memory;
+owner-saved model settings retain the existing private `model.json` behavior.
+See [data scope](DATA-AND-SUPPORT.md#home-pi-data) for native histories and retained
+failed HTTP bodies.
+
+Build and test from the repository root with Node **24.19.0**:
+
+```sh
+npm ci --ignore-scripts
+./node_modules/.bin/tsc -p tsconfig.json
+npm ci --prefix apps/home --ignore-scripts
+node --test apps/home/test/*.test.mjs tests/home-client.test.mjs
+docker build -f apps/home/Dockerfile.pi -t augmentor-home-pi:preview .
+node apps/home/pi/proof.mjs augmentor-home-pi:preview
+```
+
+This separate image sets `HOME_HARNESS=pi` and installs its minimal lock from
+`apps/home/pi`. All eight Pi/Chord packages match the tested root **1.1.0** family;
+other uniquely versioned root dependencies are aligned to the reviewed root
+lock. The preparation step rejects a different SDK family and verifies/replaces
+Photon with the family's recorded source build. The normal dependency-notice
+collector must pass; notices/source terms are preserved, not relicensed as MIT.
+There are **158 lock entries / 133 installed production package instances** and
+no DSH npm package. The image includes Python/shared prompt service, with no Qt,
+server-side browser or GPU service requirement. Its measured local uncompressed
+image size is **666,758,013 bytes**; this is not a hardware minimum or performance
+benchmark. Debian repositories can change; preserve the actual immutable image
+identity in the [portable qualification](../release/harness-home-pi-qualification.json).
+The legacy Dockerfile remains separately supported and DSH by default.
+
+Final local evidence: strict check/TypeScript compilation; **54/54** combined Home
+and shared-client tests; **9/9** shared SDK privacy/MCP regressions; **2/2** actual
+image-CMD proofs, one per device mode. Each image proof uses authored loopback
+provider/HA endpoints, normal config/secret-file loading, nonroot read-only root,
+1 CPU/1 GiB with no extra swap, actual HTTP authentication, one mutation, cached
+same-ID reply, real healthcheck, shared prompts and graceful exit. A preload
+rejects DSH package loads and unexpected TCP destinations. Model requests contain
+Home instructions/tools but no automatic cwd section. All **633** image-compiled
+files match source outputs; all prior **1,007** application files match the sealed
+Linux checkpoint, with only three new Home compiled files in the full source tree.
+The legacy image also builds and its actual packaged prompt-service read passes.
+CI now carries these Home image proofs and common client contracts on three OSes;
+new-head hosted results remain separate from local evidence.
+
+Retained preparation failures: a fresh minimal lock mixed SDK **1.1.0/1.2.0**
+and failed actual startup before a request; full-family pins corrected it. The
+notice-aware build then rejected three freshly resolved AWS versions with absent
+reviewed licence text; aligning to the existing tested root versions makes the
+unchanged collector pass. Initial Home intent-result envelope handling and a
+probe showing SDK cwd leakage were corrected against actual SDK/provider traffic.
+No notice requirement or production timeout was relaxed.
+
+This is source plus an unselected local Linux image, not a NAS deployment, public
+container, installed MX update or complete DSH retirement. Live HA/model, physical
+device outcomes, household migration, controlled NAS upgrade/rollback, owner-crash/
+power-loss durability, limited-hardware performance and broader network/privacy
+qualification remain open. Desktop GUI bytes and all owner review/selected
+artifacts stay unchanged. The independent Office engine build and full migration
+release gates remain binding.
 
 ## Qualification and remaining work
 
