@@ -11,6 +11,24 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Immutable authored scratch input — October 15
+
+The shared scratch-seat test generated a DOCX when writing its source, then
+regenerated another inside the asynchronous converter callback for its byte
+assertion. ZIP timestamps can change between those calls. An independently
+authored past-dated ZIP reproduces the same `document-render/failed` wrapper and
+source call site as the Windows SDK failure without any Windows mechanism.
+The hosted inner error was not captured, so its exact cause remains unproven.
+
+The test now captures one source buffer and uses it for both admission and the
+exact copied-byte assertion. Its explicit year-2000 archive timestamp makes a
+future accidental regeneration differ reliably from the source. The original
+no-copy-before-admission, capacity-through-cleanup, single-render/cache and
+original byte-equality assertions remain. No runtime/provider/GUI/helper or
+library implementation changes. The complete shared/native file is qualified
+as a focused follow-up to the Models source/ordinary cohort; hosted Windows
+acceptance remains required.
+
 ## Native caller-output ownership — October 15
 
 The former adapter checked that the requested PDF path was absent, then on a

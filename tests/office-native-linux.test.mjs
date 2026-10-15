@@ -5,7 +5,7 @@ import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFile,s
 import {PiOfficePreview} from '../dist/runtime/src/office-preview.js';import {PiFilePreview} from '../dist/runtime/src/file-preview.js';
 import {createLinuxNativeOfficeConverter} from '../dist/runtime/src/office-native-linux.js';
 import {createLinuxOfficeScratch} from '../dist/runtime/src/office-scratch-linux.js';
-import {previewDocx} from './fixtures/preview-office.mjs';import {previewPdf} from './fixtures/preview-pdf.mjs';import {zipSync,strToU8} from 'fflate';
+import {previewDocx} from './fixtures/preview-office.mjs';import {previewPdf} from './fixtures/preview-pdf.mjs';import {zipSync,strToU8,unzipSync} from 'fflate';
 import {ownedProcesses,signalOwned,signalStoppedOwnedGroup,stillOwned,processIdentity} from './fixtures/native-office-processes.mjs';
 const exec=promisify(execFile),native=process.platform==='linux'&&process.arch==='x64'&&process.env.AUGMENTOR_NATIVE_OFFICE_TEST==='1';
 const requires='explicit AUGMENTOR_NATIVE_OFFICE_TEST=1 and real Linux x64 sandbox/Office dependencies';
@@ -31,12 +31,14 @@ test('converter seat cancellation retains the original provider capacity until b
 
 test('original provider writes only after scratch admission and keeps capacity until scratch release settles',async t=>{
  const root=await mkdtemp(join(tmpdir(),'augmentor-office-scratch-seat-')),reader=new PiFilePreview();let allocate,release,admitted=false,releasing=false,renders=0;
+ // A fixed past ZIP date makes regeneration visibly different from the admitted bytes.
+ const body=Buffer.from(zipSync(unzipSync(previewDocx()),{level:6,mtime:new Date('2000-01-01T00:00:00Z')}));
  const allocation=new Promise(resolve=>allocate=resolve),cleanup=new Promise(resolve=>release=resolve);
  const directory=join(root,'private-scratch'),provider=new PiOfficePreview((scope,kind,p,signal)=>reader.read(scope.workspaceRoot,kind,p,signal),async()=>({
   createScratch:async()=>{admitted=true;await allocation;await mkdir(directory,{mode:0o700});return {directory,dispose:async()=>{releasing=true;await cleanup;await rm(directory,{recursive:true});}};},
-  render:async({inputPath,outputPath})=>{renders++;assert.deepEqual(await readFile(inputPath),Buffer.from(previewDocx()));await writeFile(outputPath,previewPdf());return {missingFonts:[]};},dispose:async()=>{},
+  render:async({inputPath,outputPath})=>{renders++;assert.deepEqual(await readFile(inputPath),body);await writeFile(outputPath,previewPdf());return {missingFonts:[]};},dispose:async()=>{},
  }));t.after(async()=>{allocate?.();release?.();await provider.close();await rm(root,{recursive:true,force:true});});
- const path=join(root,'authored.docx');await writeFile(path,previewDocx());let settled=false;const work=provider.render({sessionId:'scratch-seat',workspaceRoot:root},{path},new AbortController().signal).then(result=>{settled=true;return result;});
+ const path=join(root,'authored.docx');await writeFile(path,body);let settled=false;const work=provider.render({sessionId:'scratch-seat',workspaceRoot:root},{path},new AbortController().signal).then(result=>{settled=true;return result;});
  await until(()=>admitted);await assert.rejects(stat(directory),e=>e.code==='ENOENT');assert.equal(renders,0);allocate();await until(()=>releasing);assert.equal(settled,false);assert.equal(provider.busy,true);assert.equal(renders,1);
  release();assert((await work).data.byteLength>0);assert.equal(provider.busy,false);assert.deepEqual(await readdir(root),['authored.docx']);
  await provider.render({sessionId:'scratch-seat',workspaceRoot:root},{path},new AbortController().signal);assert.equal(renders,1,'original content cache remains intact');
