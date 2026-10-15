@@ -48,8 +48,21 @@ A later competing-Browser driver correctly hit the broker's one-executor guard.
 That guard remains: the corrected contention proof uses a separate real shared
 audio worker/private-IPC actor against the existing Browser lease. No executor
 or scope guard is weakened to make a test pass. Focus 76/76 and native/controller/
-maintenance 146/146 pass. Full source/fresh ordinary and isolated controls remain
-pending in this implementation checkpoint. The initial 46121ad1 source cohort
+maintenance 146/146 pass. At final source **4cb16513**, source/fresh ordinary each pass **735 cases:
+733 pass/two existing optional skips/zero failures**, **126 files/all 53 Harness
+Chromium files**, two workers and unchanged deadlines. Both native/controller/
+maintenance runs pass **146/146**. All **1,057 compiled/3,366 tracked inputs** match
+at freeze, and every ordinary tracked Git blob verifies against the exact commit.
+Two separate copies that move cold preparation outside ownership or omit the
+client opening ID each fail their intended actual Host/shared-worker case. The
+22 notice/packaging/private-source cases and tracked/branch-history gate pass.
+Supplier/Harness controller/layout/CSS/assets and Node/151 npm instances remain
+unchanged. The generated Harness GUI normalizes equal after one spreadsheet
+chunk reference/four source-comment paths. [Portable qualification and full
+roster](../release/harness-pi-voice-surfaces-qualification.json).
+Qualification setup also retained a self-referential manifest read and a Native
+invocation from the wrong directory; neither ran its advertised cohort. Separate
+corrected copies/launches supply the recorded results. The initial 46121ad1 source cohort
 passes 733/two existing optional skips/zero failures, but final review found that
 an initial spoken Send rejection had no submission receipt for VoiceSession.
 A retained failing real-VoiceSession/controller control proves it; the corrected
@@ -67,6 +80,14 @@ out. Fresh Windows provenance/native-memory roots now use the existing atomic
 private creator; no guard, deadline, concurrency or skip is relaxed. Remaining
 cleanup/timeout causes and new-head Windows qualification remain open. Earlier
 export settlement and Office/libvips packaging notice gates are not resolved.
+
+Read-only postflight verifies ten sealed inventories/eleven review owners, the
+selected configuration, 38 canonical changes, the private companion's four changes
+and six model/service configurations. Qwen catalog is HTTP 200. Breeze remains
+failed and voice inactive, with 2,012 MiB free on RTX 5090 against the existing
+2,828 MiB startup requirement; it is not retried, moved or silently tuned. Current
+MX review **20261015-211446-7474ddb2** remains application **8c159cb7**, without this
+Native/Browser source binding. No new artifact is staged or activated.
 
 A compatible separately qualified Pi companion is still required: old Codex-only
 health advertisements refuse before tickets. The private speech checkout and its

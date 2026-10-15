@@ -8,8 +8,14 @@ actors, and cleanup joins cold SDK loading, queued ticket retirement and workers
 Original Harness GUI/suppliers and existing reviews/installed/services remain
 unchanged. The separate Harness voice plugin, real compatible companion/pin,
 physical ASR/TTS, installed adoption and later OS gates remain required.
-Focused Node 76/76 and native/controller/maintenance 146/146 pass; full source/
-ordinary qualification is pending.
+At **4cb16513**, source/fresh ordinary each pass **733/two existing optional
+skips/zero failures**, **126 files/all 53 Harness Chromium files**, unchanged
+workers/bounds. Both native/controller/maintenance sets pass **146/146**. All
+**1,057 compiled/3,366 tracked inputs** match at freeze; the two isolated
+safeguard-removal controls fail as intended and 22 packaging/private-source cases
+pass. Supplier/GUI source and dependency pins remain unchanged. The initial
+candidate, failed feedback control and hosted/fixture failures are retained.
+[Portable qualification](../release/harness-pi-voice-surfaces-qualification.json).
 
 [Pi spoken/typed input](PI-VOICE.md#spoken-and-typed-input--october-15-2026)
 now carries explicit admitted mode through the durable queue, actual SDK delivery,

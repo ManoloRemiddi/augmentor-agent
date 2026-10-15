@@ -836,3 +836,11 @@ separate component; no new version/pin is inferred from fake protocol success.
 No original DSH GUI supplier, layout/CSS, Node/npm dependency or component is
 changed. Actual fixture transport/device-callback evidence is distinct from
 physical microphone/ASR/Breeze/playback and installed/platform acceptance.
+
+Implementation **46121ad1**, followed by Native first-submission feedback
+**4cb16513163d4f4b9ee068f9df103f3f5f600427**, qualifies source/fresh ordinary 733/two
+optional skips/zero failures, 126 files/all 53 Harness Chromium files, and Native/
+controller/maintenance 146/146 each. All 1,057 compiled/3,366 tracked inputs match
+at freeze; compiled bits retain the initial implementation's bytes. The exact
+ordinary tracked Git blobs and private-source history gate verify. [Evidence,
+retained failures and remaining gates](../release/harness-pi-voice-surfaces-qualification.json).
