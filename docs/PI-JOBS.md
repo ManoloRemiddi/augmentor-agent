@@ -27,8 +27,32 @@ access replacements, and rejected/confirmed admission. All three existing real
 Jobs Chromium cases pass, including original-tab history/native/provider evidence,
 inspection Start/Stop and cold read-only scope, and desktop specialist workflows.
 Strict check/build pass. The six common cases enter the Linux/macOS/Windows SDK
-workflow; new-head hosted, fresh ordinary/full-cohort and installed/physical
-qualification remain separate until their exact evidence is recorded.
+workflow. At **6fd0b52fe5199fe599a7e3796d09800797024b6c**, the selected source and fresh ordinary
+cohorts each pass **304/304** across 67 files/all 44 Harness Chromium files,
+with the original two workers, unchanged deadlines and zero skips/cancellations.
+The cohort includes the existing 15 shared prompt DOM, all six new job-editor,
+all three actual Jobs GUI, 24 common/native Office and four default queue/Wasm
+cases. All **1,007 compiled files** and **2,122 product/test inputs** match between
+trees. The copied production dependency inventory remains **20,702 entries/151
+npm instances**; bundled Node and 1,932 browser-test dependency entries match.
+Supplier GUI selections/CSS, original MIT Office provider and all 82 source-built
+MPL entry files remain unchanged; the authored Jobs controller and its GUI bundle
+change as expected. Eleven packaging/source-boundary cases pass with the public
+engine gate still closed.
+
+Read-only postflight verifies both 24,305/24,288-entry owner review inventories,
+all four review processes, selected configuration and 38 canonical pre-existing
+status entries. Qwen's read-only model endpoint returns 200; no inference or
+physical voice claim follows. Reviews, drafts, installed selections and model/
+speech/GPU settings stay untouched. [Portable evidence](../release/harness-jobs-editor-refresh.json)
+records exact scope and the retained failures.
+
+Predecessor **c393c94** passes the [SDK Linux/macOS/Windows matrix](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38676599783)
+and Windows desktop. Its wider Linux suite fails a separate MCP authorization
+active-receipt assertion. Native Office/libvips notice gates on macOS and Windows
+command-job failures remain. These are not superseded by the selected Jobs cohort.
+New-head hosted, actual MX physical/installed, live integrations and complete
+migration/distribution acceptance remain separate.
 
 ## Inspected evidence survives fresh refreshes — October 14
 

@@ -5,6 +5,8 @@
 set -euo pipefail
 umask 077
 export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+export CCACHE_DIR=/office/low-lto-compiler-cache CCACHE_TEMPDIR=/office/low-lto-compiler-cache/tmp
+mkdir -p "$CCACHE_TEMPDIR"
 export EMCC_CORES=1 BINARYEN_CORES=1
 export EMCC_CFLAGS='-Wl,--threads=1,--thinlto-jobs=1,--lto-O0,--lto-CGO0'
 export EMCC_DEBUG=1 EMCC_TEMP_DIR=/office/linker-low-lto-tmp
@@ -25,7 +27,7 @@ from pathlib import Path
 import hashlib,json,os
 root=Path('/office');identity=root/'build-debian13/dsh-build-identity.json'
 if not identity.is_file():raise RuntimeError('Use a separately copied, previously configured pinned build.')
-value={'schema':'augmentor-office-low-lto-profile/1','compilerResourceFlags':{name:os.environ[name] for name in ('EMCC_CORES','BINARYEN_CORES','EMCC_CFLAGS')},'debugOutputOnDisk':os.environ['EMCC_TEMP_DIR'],'originalBuildIdentitySha256':hashlib.sha256(identity.read_bytes()).hexdigest(),'supplierIdentityCapturesExtraResourceFlags':False,'runtimeWasmThreadOrMemoryFlagsChanged':False,'fullLtoRetained':True,'linkOptimizerLevel':0,'linkCodegenLevel':0,'linkOptimizationProfileChanged':True,'outputComparisonQualified':False,'publicRedistributionQualified':False}
+value={'schema':'augmentor-office-low-lto-profile/1','compilerResourceFlags':{name:os.environ[name] for name in ('EMCC_CORES','BINARYEN_CORES','EMCC_CFLAGS')},'debugOutputOnDisk':os.environ['EMCC_TEMP_DIR'],'originalBuildIdentitySha256':hashlib.sha256(identity.read_bytes()).hexdigest(),'supplierIdentityCapturesExtraResourceFlags':False,'runtimeWasmThreadOrMemoryFlagsChanged':False,'fullLtoRetained':True,'linkOptimizerLevel':0,'linkCodegenLevel':0,'linkOptimizationProfileChanged':True,'compilerCacheDirectory':os.environ['CCACHE_DIR'],'outputComparisonQualified':False,'publicRedistributionQualified':False}
 (root/'low-lto-resource-profile.json').write_text(json.dumps(value,indent=2)+'\n')
 PY
 for stage in verify compile package; do
