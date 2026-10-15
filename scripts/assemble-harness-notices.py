@@ -30,15 +30,24 @@ def native_files(root):
     return result
 
 
-def assemble(app, baseline):
+def assemble(app, baseline, node_notice_baseline=None):
     app, baseline = Path(app).resolve(), Path(baseline).resolve()
     if (app / 'desktop-release.json').exists():
         raise ValueError('Never change a staged release; use an unselected assembly.')
     if app == baseline or app.is_relative_to(baseline) or baseline.is_relative_to(app):
         raise ValueError('Keep the assembly separate from its baseline.')
     previous = inventory.verify(baseline)
-    if native_files(app) != native_files(baseline):
+    current_native = native_files(app)
+    if current_native != native_files(baseline):
         raise ValueError('Dependency/Node native bytes differ; review their source and notices before assembly.')
+    # An explicit second sealed artifact may supply the Node notice when the
+    # main private baseline lacks it. Its exact Node binary must still match;
+    # it supplies no dependency, source or other native notice authority.
+    node_baseline = Path(node_notice_baseline).resolve() if node_notice_baseline is not None else baseline
+    node_release = previous if node_baseline == baseline else inventory.verify(node_baseline)
+    node_sha256 = current_native.get('node/bin/node')
+    if not node_sha256 or node_release['files'].get('node/bin/node') != node_sha256:
+        raise ValueError('Node notice baseline does not contain the exact bundled Node binary.')
     web = app / 'dist/harness-web'
     provenance = json.loads((web / 'SOURCE.json').read_text())
     closure = {}
@@ -50,7 +59,7 @@ def assemble(app, baseline):
     for relative in previous['files']:
         if relative.startswith('licenses/') and not (app / relative).exists():
             require(relative, baseline / relative)
-    require('licenses/node.txt', baseline / 'licenses/node.txt')
+    require('licenses/node.txt', node_baseline / 'licenses/node.txt')
     require('licenses/dsh-gui/THIRD-PARTY-NOTICES.txt', web / 'THIRD-PARTY-NOTICES.txt')
     require('licenses/dsh-gui/SOURCE.json', web / 'SOURCE.json')
     for name, key in (('dsh', None), ('dsh-context', 'dshContext'), ('dsh-metafolder', 'dshMetafolder'), ('augmentor-brand', 'augmentorBrand')):
@@ -120,7 +129,8 @@ def assemble(app, baseline):
         target = app / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(content)
-    return {'baselineArtifactSha256': previous['artifactSha256'], 'dependencyNativeFiles': len(native_files(app)),
+    return {'baselineArtifactSha256': previous['artifactSha256'], 'dependencyNativeFiles': len(current_native),
+            'nodeNoticeBaselineArtifactSha256': node_release['artifactSha256'], 'nodeNoticeBinarySha256': node_sha256,
             'writtenNoticeFiles': len(closure), 'verifiedSearchSourceRecords': search_records,
             'publicBinaryRedistributionQualified': False}
 
@@ -129,5 +139,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--app', type=Path, required=True)
     parser.add_argument('--baseline', type=Path, required=True)
+    parser.add_argument('--node-notice-baseline', type=Path, help='Optional verified sealed artifact with the identical Node binary and its original notice.')
     args = parser.parse_args()
-    print(json.dumps(assemble(args.app, args.baseline), indent=2))
+    print(json.dumps(assemble(args.app, args.baseline, args.node_notice_baseline), indent=2))

@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`test_harness_notice_assembly.py` also covers an explicit supplementary sealed
+Node-notice source. Identical Node bytes and a verified original notice are
+required; missing/unsealed/tampered/wrong-binary sources refuse before any write.
+The positive copies no unrelated supplementary notice and leaves both baseline
+inventories unchanged. This supports private review assembly without changing
+public engine qualification or installed selection.
+
 [Catalog refresh ordering](../docs/DSH-GUI-ON-PI.md#catalog-refresh-ordering--october-15)
 adds twelve shared controller cases and one actual original-GUI/Host case.
 `harness-workspace-ordering.test.mjs` covers confirmed restore/rename, reverse

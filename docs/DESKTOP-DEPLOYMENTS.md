@@ -36,6 +36,12 @@ guarded adoption and installed acceptance remain required.
 
 For a private assembly retaining the same reviewed native dependencies, run
 `python3 scripts/assemble-harness-notices.py --app /path/to/unselected-assembly --baseline /path/to/verified-release`
+If that verified private baseline lacks `licenses/node.txt`, pass
+`--node-notice-baseline /path/to/verified-node-notice-release` explicitly. The
+supplementary artifact must verify and contain the identical bundled Node binary
+and its regular original notice. It supplies only that notice; dependency/native
+identity checks and public redistribution gates remain unchanged. A missing,
+tampered, unsealed or wrong-binary supplementary source refuses before writing.
 before normal staging. The assembly must include built GUI/runtime, public
 preferred supplier source, locked production dependencies and bundled Node.
 This completes generated supplier/Node/PDF/Wiki and API/keyless search notice

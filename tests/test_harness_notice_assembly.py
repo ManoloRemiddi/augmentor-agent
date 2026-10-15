@@ -17,6 +17,11 @@ if assembly:
 
 @unittest.skipUnless(sys.platform == 'linux', 'Linux private preview assembly')
 class HarnessNoticeAssemblyTest(unittest.TestCase):
+    def seal(self, root):
+        files = assembly.inventory.inventory(root)
+        digest = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()
+        (root / 'desktop-release.json').write_text(json.dumps({'files': files, 'artifactSha256': digest}))
+
     def fixture(self):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
@@ -137,3 +142,47 @@ class HarnessNoticeAssemblyTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'escapes'):
             assembly.assemble(app, baseline)
         self.assertEqual((outside / 'node.txt').read_text(), 'AUTHORED OUTSIDE ORIGINAL')
+
+    def test_explicit_verified_node_notice_baseline_supplies_only_the_matching_node_notice(self):
+        root, app, baseline = self.fixture()
+        supplemental = root / 'node-notice-baseline'
+        (supplemental / 'node/bin').mkdir(parents=True)
+        (supplemental / 'licenses').mkdir()
+        (supplemental / 'node/bin/node').write_bytes((baseline / 'node/bin/node').read_bytes())
+        (supplemental / 'licenses/node.txt').write_bytes((baseline / 'licenses/node.txt').read_bytes())
+        (supplemental / 'licenses/unrelated.txt').write_text('NOT A DEPENDENCY NOTICE SOURCE')
+        self.seal(supplemental)
+        (baseline / 'licenses/node.txt').unlink()
+        self.seal(baseline)
+        before = {p: assembly.inventory.verify(p) for p in (baseline, supplemental)}
+        with self.assertRaises(ValueError):
+            assembly.assemble(app, baseline)
+        self.assertFalse((app / 'licenses').exists())
+        result = assembly.assemble(app, baseline, supplemental)
+        self.assertEqual((app / 'licenses/node.txt').read_bytes(), (supplemental / 'licenses/node.txt').read_bytes())
+        self.assertEqual(result['nodeNoticeBaselineArtifactSha256'], before[supplemental]['artifactSha256'])
+        self.assertFalse((app / 'licenses/unrelated.txt').exists())
+        self.assertFalse(result['publicBinaryRedistributionQualified'])
+        for path in (baseline, supplemental):
+            self.assertEqual(assembly.inventory.verify(path), before[path])
+
+    def test_node_notice_wrong_binary_unsealed_tampered_or_missing_sources_refuse_before_writes(self):
+        for fault in ('binary', 'unsealed', 'tampered', 'missing'):
+            with self.subTest(fault=fault):
+                root, app, baseline = self.fixture()
+                supplemental = root / 'node-notice-baseline'
+                (supplemental / 'node/bin').mkdir(parents=True)
+                (supplemental / 'licenses').mkdir()
+                (supplemental / 'node/bin/node').write_bytes((baseline / 'node/bin/node').read_bytes())
+                (supplemental / 'licenses/node.txt').write_text('AUTHORED ORIGINAL NODE NOTICE')
+                if fault == 'binary':
+                    (supplemental / 'node/bin/node').write_bytes(b'\x7fELF DIFFERENT NODE')
+                if fault == 'missing':
+                    (supplemental / 'licenses/node.txt').unlink()
+                if fault != 'unsealed':
+                    self.seal(supplemental)
+                if fault == 'tampered':
+                    (supplemental / 'licenses/node.txt').write_text('UNATTESTED REPLACEMENT')
+                with self.assertRaises((ValueError, FileNotFoundError)):
+                    assembly.assemble(app, baseline, supplemental)
+                self.assertFalse((app / 'licenses').exists())
