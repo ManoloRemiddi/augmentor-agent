@@ -17,7 +17,7 @@ const {privateDir, atomicJson} = await import(pathToFileURL(join(artifact, 'dist
 const {PiConnection} = await import(pathToFileURL(join(artifact, 'dist/client/src/socket.js')));
 const {localConnect} = await import(pathToFileURL(join(artifact, 'dist/platform/src/transport.js')));
 async function fixture(t, {peerOptions, ...options} = {}) {
-  const peer = createSyntheticVoicePeer({harnesses: ['pi'], ...peerOptions}), home = privateDir(await mkdtemp(join(tmpdir(), 'augmentor-speech-profile-')));
+  const peer = createSyntheticVoicePeer({harnesses: ['pi'], ...peerOptions}), home = process.platform === 'win32' ? privateDir(join(tmpdir(), 'augmentor-speech-profile-' + crypto.randomUUID())) : privateDir(await mkdtemp(join(tmpdir(), 'augmentor-speech-profile-')));
   let f, ticketCalls = 0; const cleanup = [];
   t.after(async () => {for (const close of cleanup.reverse()) await close(); await f?.stop(); await peer.close(); await rm(home, {recursive: true, force: true, maxRetries: 5, retryDelay: 100});});
   await peer.listen(); peer.server.on('request', req => {if (req.url === '/internal/ticket') ticketCalls++;});
