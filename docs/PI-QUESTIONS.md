@@ -82,7 +82,7 @@ reopens the saved plan without replay. Actual provider inputs and two native too
 results are checked; new detail/preview renderers attempt no external image URL.
 The separate SDK case rejects a partial reply, cold-resumes real prior tool
 context, keeps legacy text replies and cancels a waiting batch through Stop.
-Implementation **5eba45a0453808be5bd9b6d32317cb199d1a0e9a**: source and fresh ordinary each pass **388 checks / two existing optional Codex
+Preceding implementation **5eba45a0453808be5bd9b6d32317cb199d1a0e9a**: source and fresh ordinary each pass **388 checks / two existing optional Codex
 skips**, zero failures/cancellations, across **81 files / all 45 Harness Chromium
 files**. Both retain two workers and unchanged deadlines. All **1,013 compiled
 files / 2,149 executable inputs** match; the 20,702 production dependency entries /
@@ -99,6 +99,23 @@ a fenced code block and checks its readable toolbar in both-theme qualification.
 The earlier separate ordinary assembly is retained as a controlled negative;
 final source/ordinary results and source identity are recorded in the portable
 checkpoint rather than relabelling the earlier 5eba45a counts.
+
+The current locale product is **d8520d5fe6b7e8eaa232835be54ec0759b88c566**.
+Its full source repeats **388 pass/two existing optional skips**; its fresh
+ordinary cohort retains **387 pass/one failure/two skips**. The one failure is
+`codex-browser-chromium`: after six actual synthetic provider requests and five
+function-call outputs, the final model input has no screenshot image. All new
+question/plan cases pass. The first failure did not retain the tool-output body,
+so its exact transport/target/permission cause is unproven. Six isolated private
+diagnostic runs and one later source/ordinary case each pass, but do not
+supersede that failed full cohort. The unchanged assertion now includes authored
+tool outputs with image bytes omitted on failure; it adds no retry or timeout
+change. Final compiled/executable/dependency parity still verifies. Qualification
+and promotion remain **incomplete**, and that failure stays a release gate.
+
+Plan-review intent retains the same configured foreground question bound; it
+does not establish indefinite plan-mode waiting. Long-review behavior, alongside
+the original full plan-mode bridge, remains to qualify.
 
 Retained driver failures are explicit: an unsupported `session.open` RPC,
 incorrect original Approve/text-row selectors, one newly quoted selector producing

@@ -147,7 +147,7 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   const toolOutputs = modelInputs.at(-1).input.filter(item => item.type === 'function_call_output');
   assert.equal(toolOutputs.length, 5);
   const image = toolOutputs.flatMap(item => Array.isArray(item.output) ? item.output : []).find(item => item.type === 'input_image');
-  assert.ok(image?.image_url?.startsWith('data:image/jpeg;base64,'), 'Pinned Codex forwards the actual screenshot as image input');
+  assert.ok(image?.image_url?.startsWith('data:image/jpeg;base64,'), 'Pinned Codex forwards the actual screenshot as image input; observed tool outputs: '+JSON.stringify(toolOutputs,(_key,value)=>value?.type==='input_image'?{type:'input_image',urlPresent:typeof value.image_url==='string'}:value));
   assert.ok(Buffer.from(image.image_url.split(',')[1], 'base64').length > 100, 'Actual Chromium JPEG pixels, not an image placeholder');
   assert.ok(toolOutputs.every(item => !JSON.stringify(item.output).includes('unknown outcome')));
   // Exercise actual loaded composer and row controls, rather than bypassing the panel.

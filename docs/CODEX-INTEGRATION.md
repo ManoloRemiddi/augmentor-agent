@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Retained ordinary screenshot failure — October 15
+
+The [question/plan follow-up](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
+qualifies its new controls, but the final ordinary 81-file cohort at product
+**d8520d5** retains one existing loaded-Chromium/Codex case failure: after six
+provider requests and five function-call outputs, no `input_image` is present in
+the last provider input. The broader source cohort passes; the ordinary result
+is 387 pass/one failure/two existing optional skips. The first failure's tool body
+was not retained, so target/permission/transport cause remains unproven. Six
+private isolated diagnostic passes plus subsequent unchanged source/ordinary
+image cases do not resolve it or qualify promotion.
+
+The actual image and pixel assertions now include authored tool outputs in their
+failure message, omitting image data. No production code, action, permission,
+provider selection, worker bound, timeout or retry policy changes. The fixture
+uses only its independently authored page/provider and exact external pinned CLI;
+no owner browser or account is involved. [Portable scope and remaining gates](../release/harness-question-batches-qualification.json).
+
 # Codex integration: implementation and evidence
 
 Status: in development on `feat/codex-integration`, based on canonical main

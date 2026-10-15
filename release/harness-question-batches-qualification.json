@@ -1,8 +1,8 @@
 {
   "schema": "augmentor-question-batches-qualification/1",
   "date": "2026-10-15",
-  "implementationRef": "5eba45a0453808be5bd9b6d32317cb199d1a0e9a",
-  "scope": "Shared source and separate ordinary Linux production assembly with authored provider/UI fixtures; no installed or public binary rollout",
+  "implementationRef": "d8520d5fe6b7e8eaa232835be54ec0759b88c566",
+  "scope": "Shared source and unselected ordinary Linux qualification; final broader ordinary cohort retains one unexplained Codex screenshot failure; not an installed/public rollout",
   "nodeVersion": "24.19.0",
   "sdkVersion": "1.1.0",
   "sourceAndOrdinary": {
@@ -12,17 +12,17 @@
       "fail": 0,
       "cancelled": 0,
       "skipped": 2,
-      "duration_ms": 182135.229374,
-      "logSha256": "0834a2258ea51f7342556a52e352f68882bdc0a1ae5dbf6415d1b1506e2a3808"
+      "duration_ms": 186723.08463,
+      "logSha256": "668a1e9b90ee101e4e485a7ff9041384ce83ab7f4db886fcd217775b744da5a0"
     },
     "ordinary": {
       "tests": 390,
-      "pass": 388,
-      "fail": 0,
+      "pass": 387,
+      "fail": 1,
       "cancelled": 0,
       "skipped": 2,
-      "duration_ms": 184391.734462,
-      "logSha256": "32956e4d591e721fa127009726e1ddc1e0529787ac7366f803464665aeae8106"
+      "duration_ms": 185276.987123,
+      "logSha256": "3995d9a55ac39cc539ceac17d736791ace5b204754c4863aa7583457d52b22b3"
     }
   },
   "testFiles": [
@@ -173,7 +173,9 @@
     "newVerbatimSupplierInputs": 7,
     "existingSupplierCssUnchanged": true,
     "productionNpmInstances": 151,
-    "matchingExecutableInputs": 2149
+    "matchingExecutableInputs": 2149,
+    "scope": "Final runtime/GUI inputs match; later diagnostic-only test assertion copied after failed cohort; old ordinary assembly retained as locale control",
+    "privateDiagnosticDriverOutsidePublication": true
   },
   "contracts": [
     "Native-profile ask_user supports legacy text and complete bounded batches on public Pi tool lifecycle",
@@ -230,12 +232,13 @@
     "newQuestionHead": "pending; local cohorts do not claim hosted qualification"
   },
   "officeBuildSnapshot": {
-    "observedAtUtc": "2026-10-15T07:01:08.225752+00:00",
+    "observedAtUtc": "2026-10-15T07:27:30.656493+00:00",
     "state": "running",
     "oomKilled": false,
     "outputQualified": false
   },
   "remainingGates": [
+    "Diagnose final ordinary Codex screenshot forwarding failure; six isolated passes do not supersede it or qualify promotion",
     "Physical owner MX feedback and guarded adoption preserving drafts/reviews",
     "Live providers, installed question/plan controls and wider configured extension/resource behavior",
     "Original full plan-mode/command bridge, generic settled-question composer reopening, late-answer continuation and persistent answer drafts",
@@ -243,21 +246,97 @@
     "Read-only inspector/sidebar and delegated hidden-tool-row diversity, shared Native/Browser UI completeness",
     "Prior hosted Context pointer failure, new-head CI, Mac/Windows packaging/job adapters and physical platform qualification",
     "Office ThinLTO completion, output/performance/fonts/source/licence/public redistribution",
-    "Full accepted P0/P1 parity, live privacy/update/rollback and DSH execution retirement"
+    "Full accepted P0/P1 parity, live privacy/update/rollback and DSH execution retirement",
+    "Plan review retains the configured foreground question bound; indefinite/long plan-mode waiting remains unqualified"
   ],
   "inputSha256": {
     "packages/runtime/src/questions.ts": "8586be175a350bda30e5f666fa685a2f338cc1f928be89698898ad43b26ee7ed",
     "packages/runtime/src/interactions.ts": "776e4a2433459fba1bcc5617922b1f7fa590954a418238896653f2c4e16a49d2",
     "packages/runtime/src/host.ts": "b9a46ca1b8d306088692f5ffe57f02eb8c7568aff5deeb8464f64055758b9d95",
     "packages/pi-linux/src/index.ts": "b69fa58505cefe8345fc0ddae4fbba5a35288f30888df4cc7d77c5648fdd42fa",
-    "apps/harness/dsh-plan-review.jsx": "66c6c7c9d49c0dbf8e09f8a2f270e6106c6110db1a0b3649f51ab1781303ea65",
+    "apps/harness/dsh-plan-review.jsx": "47ffd65f75512a9fc6360bc5e0a873cea11a448d6d9e538f1b40bc188472560b",
     "apps/harness/dsh-app.jsx": "fcda6c6c5bf7304da885097ef2b439234abc83e5bf392bd0586f8a74d625467b",
     "apps/harness/dsh-pi-controller.mjs": "27c48a5e7716ae129c626b0ff32b9de847ea9b166b012aea20e64fdbff72252c",
     "apps/harness/vendor/dsh/SOURCE.json": "9b50743826d9d18aed19c81bf24cbaf6bb8c8f2c5823eb1128eaf2749038793d",
     "apps/native/augmentor_linux/question_dialog.py": "436b974d2fc0ad090a6cedee5dea8e8527b611aea9e84bd14d2a0e093ab2d95b",
     "tests/pi-question-contracts.test.mjs": "5dbef05e9ba2069d327c622314cb4e3aae03477582d42231732872e18feeb7b2",
     "tests/pi-question-batches.test.mjs": "15fb24c0d42fcc3a53a54a6e8c1082c8e3316c34c194d7832702063043dfc3e8",
-    "tests/harness-dsh-question-batches-chromium.test.mjs": "be75d461b4e8debc6f38b19d5354dc18c5be17204a2d294d07052913e4e82f31",
-    "scripts/harness-ui-proof.mjs": "dd0e5bbdd2dcba93e9185ce6cd9fd2796e66fe317613f3195c7ddc332200e678"
+    "tests/harness-dsh-question-batches-chromium.test.mjs": "40bfaaf488892997f3ee1e75694914fc552fed3951e3a84bdf6fc89757cd50ba",
+    "scripts/harness-ui-proof.mjs": "3eeca13115ff7dc82e9f43be0f6a8821e96714581b6b8c50058926e10f318e41",
+    "tests/codex-browser-chromium.test.mjs": "cd27a6c1a229834b91cd2e3877cab4729c8b9ba706d44b296d4db74f0c191622"
+  },
+  "precedingQualification": {
+    "implementationRef": "5eba45a0453808be5bd9b6d32317cb199d1a0e9a",
+    "sourceAndOrdinary": {
+      "source": {
+        "tests": 390,
+        "pass": 388,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 2,
+        "duration_ms": 182135.229374,
+        "logSha256": "0834a2258ea51f7342556a52e352f68882bdc0a1ae5dbf6415d1b1506e2a3808"
+      },
+      "ordinary": {
+        "tests": 390,
+        "pass": 388,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 2,
+        "duration_ms": 184391.734462,
+        "logSha256": "32956e4d591e721fa127009726e1ddc1e0529787ac7366f803464665aeae8106"
+      }
+    },
+    "currentQualificationSupersededByLocaleFollowUp": true
+  },
+  "fullQualificationPassed": false,
+  "promotionAllowed": false,
+  "presentationFollowUp": {
+    "implementationRef": "d8520d5fe6b7e8eaa232835be54ec0759b88c566",
+    "commonLocaleFallback": true,
+    "fencedCodePlanFixture": true,
+    "controlledBefore": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 15722.25126,
+      "logSha256": "737e8abc52017d74b7dc9ba159b7d4d1eb2f6be36c2016d48dbe7d74e329c425"
+    },
+    "controlledBeforeRef": "5eba45a0453808be5bd9b6d32317cb199d1a0e9a",
+    "controlledAfter": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 4740.616847,
+      "logSha256": "cadee674e9574375cd7b6507b001c40b28c14b80090bc4c05feb47c84fb947ac"
+    },
+    "beforeFailure": "Original full plan displays raw codeBlock.title instead of readable shared label; same question/plan flow otherwise progresses.",
+    "broaderOrdinaryPassed": false,
+    "retainedFailure": "loaded Chromium extension executes Codex-observed typing, clicking and screenshots on an isolated page: model input has no input_image after five tool outputs; exact cause unproven",
+    "sixPrivateIsolatedDiagnosticRunsPassed": true,
+    "isolatedRerunsDoNotResolveBroaderFailure": true,
+    "fixtureEvidenceFollowUp": "Unchanged image assertions now include bounded authored tool outputs with image bytes omitted; no action/deadline/permission change",
+    "sourceEvidenceDriver": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 3034.227835,
+      "logSha256": "2b6460234509746169cfba66b0e1fc62fc0a869c2b86f90e329a7a9139e78dfa"
+    },
+    "ordinaryEvidenceDriver": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "duration_ms": 2932.909789,
+      "logSha256": "280f2320cf4ce56fb43ab0420f8c1bb38663dbaa24a3f9a2488b2881e80a6b1f"
+    }
   }
 }

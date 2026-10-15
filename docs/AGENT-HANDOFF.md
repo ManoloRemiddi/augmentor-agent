@@ -6,10 +6,13 @@ Complete validated answers, exact tool-row hide/reopen, Request changes without
 approval, saved-plan reopening and disabled detail image fetching qualify through
 the actual SDK and original Chromium UI. Eight additional public MIT plan inputs
 are pinned; layout/CSS stay original and the supplier selection is 591 files.
-Source and fresh ordinary each pass **388 checks/two existing optional Codex
-skips**, 81 files/all 45 Harness Chromium files, two workers/unchanged bounds;
-1,013 compiled/2,149 executable files and dependencies match. Shared Qt and eleven
-packaging/boundary checks pass. [Portable checkpoint](../release/harness-question-batches-qualification.json). Owner installed/review builds, live providers,
+The preceding 5eba45a source/ordinary each pass 388/two optional skips. Final
+locale source passes **388/two skips**; final ordinary retains **387 pass/one Codex
+image failure/two skips**, across 81 files/all 45 Harness Chromium files. New
+question/plan cases pass, but wider qualification remains incomplete; isolated
+image reruns do not resolve it. All 1,013 compiled/2,149 executable files and
+dependencies match; shared Qt and eleven packaging/boundary checks pass.
+[Portable checkpoint](../release/harness-question-batches-qualification.json). Owner installed/review builds, live providers,
 remaining plan-mode/late-answer/draft and full migration/release gates stay open.
 
 [Pi Home backend](HOME.md#pi-backend--october-15) removes the Home conversation

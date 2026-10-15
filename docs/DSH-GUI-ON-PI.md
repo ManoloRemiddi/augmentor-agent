@@ -6,8 +6,11 @@ sidebar/review/card components on the existing Pi owner. Exact local tool-row
 hide/reopen keeps Request changes pending without approval or inference. Eight
 additional pinned public MIT plan inputs bring the selection to 591; seven are
 verbatim and one has a marked image-policy adaptation, also applied to existing
-question details. Original CSS stays unchanged. Source/ordinary each pass
-388/two optional skips across 81 files/all 45 Harness Chromium files. This is
+question details. Original CSS stays unchanged. Preceding 5eba45a source/ordinary
+each pass 388/two optional skips. Final locale source passes 388/two skips; final
+ordinary retains 387/one Codex screenshot failure/two skips across 81 files/all 45
+Harness Chromium files. New question/plan cases pass; wider qualification remains
+incomplete and isolated image passes do not resolve that failure. This is
 isolated qualification; installed MX and owner reviews remain preserved. Complete
 plan mode, generic settled-question reopening, late answers, persistent answer
 drafts, hosted/live/platform/full migration and public-release gates remain open.
