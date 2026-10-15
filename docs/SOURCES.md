@@ -1,16 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Original session download workflow](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
-now connects the original MIT DSH More menu/modal/controller and `/export` to Pi
-originals, verified delegated children, retained diagnostics and authorized declared
-uploads. Operator preflight produces a one-use, one-minute download grant; busy,
-timeout, cancellation and verified dead-owner cleanup preserve private boundaries.
-Seven verbatim public GUI inputs bring the selection to 615; no dependency or SDK
-owner is added. Focused actual Host/HTTP/ZIP/Chromium checks pass. Source/fresh
-ordinary qualification, a new sealed MX review, physical/installed/platform and
-full migration gates remain separate. Current owner review 20261015-192847-cfb956a7
-stays application 1b467d3 without this flow. The foundation-only checkpoint below
-is historical where it lists this source wiring as absent.
+at **49e23de4/application 8c159cb7** restores the original MIT DSH More menu,
+download modal/controller and `/export` on Pi originals, verified children,
+retained diagnostics and authorized declared uploads. One-use grants, bounded
+leases, joined cleanup and preserved unknown scratch retain private boundaries.
+Source/fresh ordinary each pass **654/two existing optional skips/zero failures**,
+**116 files/all 53 Harness Chromium files**, unchanged workers/bounds; all **1,045
+compiled/3,348 tracked** inputs match. Focus 51/51, original Light/Dark browser ZIP
+proof, two failing isolated guard-removal controls and 18 notice/packaging/boundary
+cases pass. The 615 GUI inputs include seven new verbatim MIT files; prior 608,
+dependencies, nine sealed inventories/ten owners, selection and settings verify
+preserved. [Portable evidence/roster](../release/harness-session-export-qualification.json).
+Current owner review 20261015-192847-cfb956a7 remains application 1b467d3 without
+export or the live Context arrival fix. A new sealed MX review, physical/installed/
+platform and full migration gates remain open. Foundation-only notes below are
+historical where they list this source workflow as absent.
 
 
 [Session-export archive foundation](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)

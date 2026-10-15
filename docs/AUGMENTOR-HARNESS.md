@@ -66,9 +66,23 @@ assumption are retained. The first browser attempt retained an unchanged draft
 after settings: the fixture now uses the established keydown-before-insert input
 sequence; no product input behavior was changed to make that test pass.
 
-Full source/fresh ordinary qualification, a new sealed MX owner review, physical
-feedback, current-head hosted platform checks and later OS artifacts remain
-separate gates. Existing MX review **20261015-192847-cfb956a7** remains application
+At **49e23de492609bad9f22ef54e023584ff54b53bf** (application
+**8c159cb719f56a8a76aabd2e694db72717822464**), the corrected frozen source/fresh
+ordinary cohort each passes **654/two existing optional skips/zero failures**,
+**116 files/all 53 Harness Chromium files**, two workers and unchanged deadlines.
+All **1,045 compiled/3,348 tracked** inputs match. Application bytes remain exact
+through the test/documentation corrections; the two original failed cohorts stay
+retained. Focused 51/51, settled original Light/Dark browser download/text-color
+checks, two intentionally failing isolated compiled guard-removal controls and
+18 notice/packaging/private-boundary cases pass. The corrected archive/command
+cases pass 32/32; original GUI/Office cases pass 8/8. Prior 608 GUI source/CSS,
+Node and 151 production npm instances remain unchanged; seven verbatim MIT
+presentation inputs are added. Nine sealed inventories/ten review processes,
+selection, canonical changes and model/speech/GPU configuration bytes verify
+preserved. [Portable source qualification and complete roster](../release/harness-session-export-qualification.json).
+
+A new sealed MX owner review, physical feedback, current-head hosted platform
+checks and later OS artifacts remain separate gates. Existing MX review **20261015-192847-cfb956a7** remains application
 **1b467d3** without this export flow or the preceding live Context arrival fix.
 No installed selection, owner conversation, credential, model or speech setting
 is changed. This completes the source workflow wiring in steps 1–4 of the historical

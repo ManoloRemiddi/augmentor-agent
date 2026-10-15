@@ -29,6 +29,13 @@ owner. Runtime/GUI code and test deadlines/workers are unchanged. These failures
 are preserved and followed by a new frozen source/copy qualification, rather than
 being relabelled as passed or skipped.
 
+Final source **49e23de4/application 8c159cb7** and fresh ordinary each pass
+**654/two existing optional skips/zero failures**, 116 files/all 53 Harness Chromium
+files, unchanged workers/deadlines. All 1,045 compiled/3,348 tracked inputs match;
+51 focused, separate settled Light/Dark download/text checks, both isolated
+negative controls, 32 corrected archive/command and eight GUI/Office cases plus
+18 notice/packaging/boundary checks qualify. [Portable evidence and roster](../release/harness-session-export-qualification.json).
+
 [Archive snapshot foundation](../docs/AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15):
 `archive-snapshot.test.mjs` has 20 authored real-filesystem/ZIP cases for immutable
 bytes/inventory, appending/changed/replaced sources, caller path mutation, path and
