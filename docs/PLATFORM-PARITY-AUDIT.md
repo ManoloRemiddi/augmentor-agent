@@ -6,8 +6,10 @@ the same capture/legacy/ambiguity/retention semantics on Linux/macOS/Windows. No
 OS helper or dependency is introduced. The original JSON widget's missing copy
 face is bound in shared UI glue, without changing its cap/layout/CSS. Provider,
 projection, actual Host and existing context contracts enter all three SDK jobs.
-Local focus/runtime checks pass; current-head hosted and actual other-OS artifact/
-physical acceptance remain open. Linux GUI proof is distinct from other OS parity;
+Local focus 49/49 and runtime/inspection 86/86 pass; at **1b467d3**, Linux
+source/fresh ordinary each pass **594/two optional skips/zero failures**, 109 files/
+all 51 Harness Chromium files. Current-head hosted and actual other-OS artifact/
+physical acceptance remain open. [Portable evidence](../release/harness-managed-skill-context-qualification.json). Linux GUI proof is distinct from other OS parity;
 user-directed further app rollout still waits for MX feedback.
 
 [Original skill controls](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)

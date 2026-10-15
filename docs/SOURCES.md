@@ -1,14 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Managed skill Context links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
-are implemented in working source: exact delivered-message fingerprints link
-ordinary skill receipts to unique native projections and observed SDK/provider
-boundaries. Legacy/duplicate/removed/redacted/unsupported cases stay explicit;
-full causal provenance remains false. The original large-JSON viewer crash is
-reproduced and its required copy face bound without supplier/CSS changes. Strict
-check/build, focused 49/49 and runtime/inspection 86/86 pass; full source/fresh-copy
-qualification/publication remain pending. The current separate MX review below
-remains application 9d9ac56 and does not include this increment.
+at **1b467d3** qualify optional delivered-message fingerprints, unique native
+projection references and exact SDK/literal provider user-field comparisons.
+The original large-JSON viewer crash is reproduced and its required copy face
+bound without supplier/CSS changes. Source/fresh ordinary each pass **594/two
+existing optional skips/zero failures**, **109 files/all 51 Harness Chromium
+files**, unchanged workers/bounds. All **1,031 compiled/3,324 tracked** inputs
+match; focused 49/49, runtime/inspection 86/86 and separate final Light/Dark raw
+Context checks pass. All 608 supplier records/bodies, dependencies, eight sealed
+inventories/nine review processes, selection/settings and canonical changes verify
+preserved. This is source-only; the current MX review below remains 9d9ac56.
+Full causal provenance, skill analytics, plugin/memory/speech workflows, physical
+MX feedback and complete migration/platform gates remain open. [Portable evidence](../release/harness-managed-skill-context-qualification.json).
+
 
 [Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
 **20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,

@@ -13,7 +13,14 @@ The old-runtime missing hash and pre-fix JSON page crash are retained controls.
 Initial fixture failures read only one 64 KiB payload page and edited already
 loaded settings; final fixtures use the existing hash-bound paged reader and
 revisioned settings API. Disabled metadata explicitly uses `{state:disabled}`.
-Focus 49/49 and runtime/inspection 86/86 pass; final full qualification is pending.
+At **1b467d3**, focus 49/49, runtime/inspection 86/86 and separate final
+Light/Dark Context/large-JSON capture pass. Source/fresh ordinary each pass
+**594/two existing optional skips/zero failures**, 109 files/all 51 Harness
+Chromium files, two workers and unchanged bounds. All 1,031 compiled/3,324 tracked
+inputs match. Seven notice/eleven packaging and source-boundary cases plus actual
+publication checks pass. [Portable evidence and exact test roster](../release/harness-managed-skill-context-qualification.json).
+This is source-only; earlier sealed owner reviews and installed selection remain
+unchanged. Full causal provenance and actual other-OS/physical acceptance stay open.
 The optional `node tests/fixtures/managed-skill-metadata-benchmark.mjs` reports
 three-iteration means for 64 authored receipts and an exact result digest. It
 reads no owner state and performs no provider request; timings are host-specific.

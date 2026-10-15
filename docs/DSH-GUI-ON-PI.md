@@ -54,7 +54,15 @@ large-JSON page failure and initial fixture corrections remain retained. All 608
 supplier records/bodies and locked dependencies are unchanged; no second SDK owner,
 new tool/file authority, network destination or diagnostic composer is introduced.
 Shared contracts enter Linux/macOS/Windows SDK jobs; real GUI evidence is Linux.
-Full source/fresh-copy qualification and publication are pending. The separate MX
+At **1b467d3**, source/fresh ordinary each pass **594/two existing optional
+skips/zero failures**, 109 files/all 51 Harness Chromium files, two workers and
+unchanged assertions/deadlines. All 1,031 compiled/3,324 tracked inputs match;
+seven notice/eleven packaging and source-boundary cases plus actual tracked/history
+publication checks pass. Eight sealed inventories/nine review processes, selected
+configuration, six unit/voice settings files and 38 canonical changes verify
+preserved. The 64-source metadata benchmark drops from about 57 ms to 2 ms
+(three-iteration means) with exactly identical 74,664-byte annotations; this is
+only the authored host-local case. [Portable evidence](../release/harness-managed-skill-context-qualification.json). The separate MX
 skill review **20261015-180926-4e7b027e** remains application 9d9ac56 and does not
 contain this Context/JSON increment. Installed selection is unchanged. Complete
 instruction/causal provenance, representative plugin and memory/speech workflows,
