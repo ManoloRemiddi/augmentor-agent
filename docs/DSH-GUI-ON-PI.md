@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict check/build, focused 41/41 and source/fresh ordinary **236/236 each across 60 files** pass, including all 44 Harness Chromium files. Authored-provider evidence uses real FileAuthStorage/Host/Chromium, callback/manual-code races and cold interruption. All 911 compiled files match; 20,847 dependency entries/155 production npm instances/Node 24.19.0 stay unchanged. Real provider, installed and new-head hosted acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
+
+[Original account confirmation on Pi](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds the exact MIT DSH sign-out dialog/CSS and reuses original Models cards for stored OAuth routes. No account backend/analytics enters the browser. Runtime 6c0d85c passes source/fresh ordinary 217/217 each across 57 files, all 43 Harness Chromium files, with 908 compiled matches and unchanged dependencies. Sign-in, live/provider/installed acceptance and wider migration remain open; current owner review is preserved.
+
 ## Quiet partial argument sampling — October 15
 
 The public SDK argument observer now owns one trailing timer for sampled tool
@@ -22,15 +26,14 @@ After adding the sampler, the browser still fails when the latest arguments arri
 in its first snapshot; this retained intermediate failure establishes the separate
 fixture issue. The corrected focused pair passes **2/2** and the sampler **10/10**.
 These mechanisms do not prove the exact SDK delivery schedule or sole cause of
-the preceding hosted failure. Full source/ordinary qualification is pending at
-this implementation checkpoint; installed owner reviews remain on their prior
-build. The common sampler checks are added to Linux/macOS/Windows CI. No GUI
+the preceding hosted failure. The initial implementation checkpoint predates the
+qualification below; installed owner reviews remain on their prior build.
+The common sampler checks are added to Linux/macOS/Windows CI. No GUI
 layout, supplier source, model/speech settings or installed activation changes.
 
+At **4cfb98df91caf66402a266abfa802cc47ec505bd**, source and fresh ordinary Node 24.19.0 each pass **295/295**, across 66 files/all 44 Harness Chromium files, 15 shared prompt DOM cases, 22 native-common cases and four default queue/Wasm cases. Two workers and existing deadlines are retained; no skips or cancellations occur. Both separate original native-backend viewers pass. All 925 compiled files and 2,051 executable inputs match between trees. Five runtime outputs change; GUI build hash names/receipts regenerate, with normalized original GUI/CSS bodies unchanged. The 20,847 production dependency entries, 155 npm instances, bundled Node and 1,932 browser-test entries remain unchanged. Eleven packaging/source-boundary cases pass with the public Office gate closed. Full owner review inventories, four review processes, selected artifact and 38 canonical changes verify; Qwen's read-only model endpoint returns 200. No owner profile/history/credential access or installed activation follows. [Portable evidence](../release/harness-trajectory-quiet-partials.json).
 
-[Original Pi account sign-in](HARNESS-MODEL-ACCOUNTS.md) adds the original MIT DSH dialog with supported SDK prompts, callback/manual-code races, metadata-only durable receipts, cancellation and no replay. At **039308ef0c7dee6e9089789f3652ef7590e31d10**, strict check/build, focused 41/41 and source/fresh ordinary **236/236 each across 60 files** pass, including all 44 Harness Chromium files. Authored-provider evidence uses real FileAuthStorage/Host/Chromium, callback/manual-code races and cold interruption. All 911 compiled files match; 20,847 dependency entries/155 production npm instances/Node 24.19.0 stay unchanged. Real provider, installed and new-head hosted acceptance remain open. The MIT selection is 583 files, with exactly three account presentation inputs and no DSH backend/analytics. Owner review/selection/services and the independent Office build remain preserved.
-
-[Original account confirmation on Pi](HARNESS-MODELS.md#stored-pi-account-sign-out--october-14) adds the exact MIT DSH sign-out dialog/CSS and reuses original Models cards for stored OAuth routes. No account backend/analytics enters the browser. Runtime 6c0d85c passes source/fresh ordinary 217/217 each across 57 files, all 43 Harness Chromium files, with 908 compiled matches and unchanged dependencies. Sign-in, live/provider/installed acceptance and wider migration remain open; current owner review is preserved.
+The preceding **2234f8f** [Validate run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38661983045) passes main Node 1,203 with 42 identified skips, Browser 121/121, Python 878 with 45 identified skips and dependency inventory 4/4, then refuses public Office packaging. Search and Trajectory both pass in that run. Its three-platform SDK and Windows desktop runs pass. Passing old Trajectory evidence does not erase the retained intermittent failure or establish its exact schedule. New-head hosted, installed/live/physical, remaining Office lifecycle/source/licence and full migration gates remain open.
 
 ## Trajectory companion readiness — October 14
 
