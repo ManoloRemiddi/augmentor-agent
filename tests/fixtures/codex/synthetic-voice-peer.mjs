@@ -6,7 +6,7 @@ import {randomBytes, randomUUID} from 'node:crypto';
 import {WebSocketServer, WebSocket} from 'ws';
 
 const opaque = () => randomBytes(32).toString('hex');
-export function createSyntheticVoicePeer({render, harnesses = ['codex']} = {}) {
+export function createSyntheticVoicePeer({render, harnesses = ['codex'], beforeRequest} = {}) {
   const token = opaque(), tickets = new Map(), bridges = new Map(), connections = [], spoken = [], received = [];
   let port;
   const send = (peer, event) => {if (peer?.socket.readyState === WebSocket.OPEN) peer.socket.send(JSON.stringify(event));};
@@ -31,6 +31,7 @@ export function createSyntheticVoicePeer({render, harnesses = ['codex']} = {}) {
   const server = createServer(async (request, response) => {
     const reply = (status, body) => {response.writeHead(status, {'content-type': 'application/json'}); response.end(JSON.stringify(body));};
     if (request.method === 'GET' && request.url === '/health') {
+      await beforeRequest?.({path: request.url});
       reply(200, {protocol: 'resonant-voice/1', capabilities: {scopedHarnessBridge: 1, scopedHarnesses: harnesses}}); return;
     }
     if (request.method !== 'POST' || request.headers['x-resonant-token'] !== token) {reply(403, {error: 'Synthetic peer requires its test token.'}); return;}
@@ -40,6 +41,7 @@ export function createSyntheticVoicePeer({render, harnesses = ['codex']} = {}) {
       for await (const chunk of request) {size += chunk.length; if (size > 65536) throw Error(); chunks.push(chunk);}
       body = JSON.parse(Buffer.concat(chunks));
     } catch {reply(400, {error: 'Invalid test request.'}); return;}
+    await beforeRequest?.({path: request.url, body});
     if (request.url === '/internal/ticket') {
       if (!harnesses.includes(body.harness)) {reply(400, {error: 'Unsupported synthetic harness.'}); return;}
       const ticket = opaque(), bridgeId = opaque();

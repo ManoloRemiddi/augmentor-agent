@@ -15,7 +15,7 @@ import {pythonExecutable} from '../../dist/platform/src/index.js';
 import {privateDir,atomicJson} from '../../dist/runtime/src/storage.js';
 import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
-export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,permissionMode=false,forcePrompt=false}={}){
+export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,permissionMode=false,forcePrompt=false,voiceMode}={}){
  const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
  const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])privateDir(path);
  const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
@@ -108,6 +108,7 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
  atomicJson(join(config,'settings.json'),{revision:0,defaultPreset:policy,pinned:[],hidden:[],defaultModel:selection,observation:{capturePayloads:true}});
  const env=Object.fromEntries(Object.entries(process.env).filter(([k])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(k)));
  Object.assign(env,{HOME:root,XDG_CONFIG_HOME:join(root,'xdg-config'),XDG_STATE_HOME:join(root,'xdg-state'),XDG_DATA_HOME:join(root,'xdg-data'),XDG_CACHE_HOME:join(root,'xdg-cache'),XDG_RUNTIME_DIR:runtime,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_LINUX_TOOLS:desktopMode||questionMode?'1':'0',AUGMENTOR_DESKTOP_NO_AUTOSTART:'1',AUGMENTOR_HARNESS:'1',PI_OFFLINE:'1'});
+ if(voiceMode)env.RESONANT_VOICE_HOME=voiceMode.home;
  // Keep only the explicitly resolved component interpreter in this private
  // profile; source Windows proofs use the hash-locked prepared interpreter.
  env.AUGMENTOR_PYTHON=pythonExecutable();

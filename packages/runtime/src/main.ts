@@ -50,7 +50,7 @@ if(process.platform!=='win32'&&existsSync(path)){
 const server=localServer(socket=>{
   clients.set(socket,null);let buffer=Buffer.alloc(0);let ready=false;
   socket.on('error',()=>{});
-  socket.on('close',()=>{if(host)host.browser.detach(socket);const sid=clients.get(socket);clients.delete(socket);if(host&&sid&&!connected(sid))host.interactions.cancel(sid);});
+  socket.on('close',()=>{if(host)host.browser.detach(socket);const sid=clients.get(socket);clients.delete(socket);if(host&&sid)void host.operatorDisconnected(sid);});
   socket.on('data',chunk=>{buffer=Buffer.concat([buffer,chunk]);if(buffer.length>MAX_FRAME){socket.destroy();return;}let newline:number;
     while((newline=buffer.indexOf(10))>=0){const line=buffer.subarray(0,newline).toString('utf8');buffer=buffer.subarray(newline+1);void (async()=>{
       let id:string|undefined;
@@ -59,7 +59,7 @@ const server=localServer(socket=>{
         if(req.method==='host.hello'){if(p.protocol!==PROTOCOL)throw new Error('Incompatible Augmentor protocol');ready=true;write(socket,{id,result:{protocol:PROTOCOL}});return;}
         if(!ready)throw new Error('A protocol handshake is required');
         if(closing)throw new Error('Runtime is closing for maintenance.');
-        if(req.method==='events.subscribe'){if(p.sessionId!==null&&p.sessionId!==undefined)host.getMeta(p.sessionId);clients.set(socket,p.sessionId??null);write(socket,{id,result:{subscribed:true}});if(p.sessionId){write(socket,{event:{method:'session/queue',payload:{sessionId:p.sessionId,...host.queueSnapshot(p.sessionId)}}});for(const frame of host.interactions.frames(p.sessionId))write(socket,{event:frame});}return;}
+        if(req.method==='events.subscribe'){if(p.sessionId!==null&&p.sessionId!==undefined)host.getMeta(p.sessionId);const previous=clients.get(socket);clients.set(socket,p.sessionId??null);if(previous&&previous!==p.sessionId)void host.operatorDisconnected(previous);write(socket,{id,result:{subscribed:true}});if(p.sessionId){write(socket,{event:{method:'session/queue',payload:{sessionId:p.sessionId,...host.queueSnapshot(p.sessionId)}}});for(const frame of host.interactions.frames(p.sessionId))write(socket,{event:frame});}return;}
         if(req.method==='browser.attach'){if(host.getMeta(p.sessionId).surface!=='browser')throw new Error('Browser tools require a browser session');host.browser.attach(p.sessionId,socket,frame=>write(socket,{event:{method:'browser/execute',payload:frame}}));write(socket,{id,result:{attached:true}});return;}
         if(req.method==='browser.respond'){host.browser.respond(socket,p.rpcId,p.result,p.error);write(socket,{id,result:{accepted:true}});return;}
         if(req.method==='host.shutdown'){await host.dispatch('host.prepareShutdown',{},req.id);write(socket,{id,result:{accepted:true}});void shutdown();return;}
