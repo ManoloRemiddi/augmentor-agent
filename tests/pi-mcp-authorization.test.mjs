@@ -17,6 +17,7 @@ for(const mode of ['metadata','healthy-resource','get','timeout','timeout-delaye
  const priorAgentDir=process.env.PI_CODING_AGENT_DIR;process.env.PI_CODING_AGENT_DIR=agentDir;t.after(()=>{if(priorAgentDir===undefined)delete process.env.PI_CODING_AGENT_DIR;else process.env.PI_CODING_AGENT_DIR=priorAgentDir;});
  let session,mutations=0,reads=0,resources=0,releaseRead,metadataRejected=false,getRejected=false,reopened=false;
  let writeId,readId,finishReceipt,writeCancellations=0;const trace=[];
+ const closedConnections=new Map(),closeWaiters=new Map();
  const ready=new Promise(done=>releaseRead=done),timers=new Set(),requests=[];
  const later=(fn,ms)=>{const timer=setTimeout(()=>{timers.delete(timer);fn();},ms);timers.add(timer);};
  const challenge=res=>res.writeHead(403,{'www-authenticate':'Bearer error="insufficient_scope", scope="write"'}).end('AUTHORED_PRIVATE_AUTH_BODY');
@@ -62,7 +63,11 @@ for(const mode of ['metadata','healthy-resource','get','timeout','timeout-delaye
  await writeFile(join(agentDir,'models.json'),JSON.stringify({providers:{fixture:{baseUrl:'http://127.0.0.1:'+provider.address().port+'/v1',api:'openai-completions',apiKey:'synthetic-only',models:[{id:'boundary',name:'Authored boundary',reasoning:false,input:['text'],contextWindow:32768,maxTokens:1024}]}}}));
  await writeFile(join(agentDir,'mcp.json'),JSON.stringify({mcpServers:{web:{url:'http://127.0.0.1:'+wire.address().port+'/mcp',exposure:mode==='metadata'||mode==='healthy-resource'?'direct':'codemode',timeout:1}}}),{mode:0o600});
  const modelRuntime=await ModelRuntime.create({authPath:join(agentDir,'auth.json'),modelsPath:join(agentDir,'models.json'),modelsStorePath:join(agentDir,'store.json'),allowModelNetwork:false}),settingsManager=SettingsManager.inMemory({enableInstallTelemetry:false,enableAnalytics:false,cacheWarming:'off',retry:{enabled:false,provider:{maxRetries:0}},compaction:{enabled:false},defaultProjectTrust:'never'});
- const connectionChanged=event=>{
+ const connectionChanged=(event,retained)=>{
+  if(event.event==='closed'){
+   const terminal={event,retained};closedConnections.set(event.instanceId,terminal);
+   closeWaiters.get(event.instanceId)?.(terminal);closeWaiters.delete(event.instanceId);
+  }
   if(!timeoutCase)return;
   // This is the observer of the real SDK cancellation, including when its
   // HTTP notification is refused by authorization. Never synthesize a cancel.
@@ -82,6 +87,12 @@ for(const mode of ['metadata','healthy-resource','get','timeout','timeout-delaye
  if(timeoutCase){assert.equal(mutations,1);assert.match(results,/timed out/i);assert(!/requires sign-in/i.test(results),'the SDK timeout must remain the caller result');assert.equal(writeCancellations,1);assert.deepEqual(trace,['read-admitted','write-challenge','write-cancelled','read-released','read-received']);assert.notEqual(writeId,readId);}
  const info=managed.describe().servers.find(row=>row.name==='web').authorization,observed=mode==='timeout-save-failure'?info.unsaved:info.lastObserved;assert.equal(observed?.state,'sign-in-required');assert.equal(observed?.boundary,mode==='metadata'?'http-request-response':mode==='get'?'http-get-response':'http-tool-response');assert.equal(observed.status,403);
  assert.equal(notices.at(-1).retained,mode!=='timeout-save-failure');assert(!JSON.stringify(requests).includes('AUTHORED_PRIVATE_SAVE_ERROR'));if(mode==='timeout-save-failure'){assert.equal(info.lastObserved,null);assert.equal(info.retention,'native-append-failed');}
+ // Prompt settlement does not join the transport's deferred close. Its actual
+ // terminal observation must be retained before the cold-original baseline.
+ const instanceId=managed.describe().servers.find(row=>row.name==='web').connection.current?.instanceId;
+ assert.equal(typeof instanceId,'string');
+ const terminal=closedConnections.get(instanceId)??await new Promise(done=>closeWaiters.set(instanceId,done));
+ assert.equal(terminal.event.instanceId,instanceId);assert.equal(terminal.event.event,'closed');assert.equal(terminal.retained,true);
  const file=session.sessionManager.getSessionFile(),original=await readFile(file);assert.equal(session.sessionManager.getBranch().filter(row=>row.type==='custom'&&row.customType==='augmentor-mcp-authorization/1').length,mode==='timeout-save-failure'?0:2);session.dispose();session=undefined;
  reopened=true;const manager=SessionManager.open(file);assert.deepEqual(await readFile(file),original,'cold native restoration alone does not change originals');
  const restored=await open(manager),restoredInfo=restored.describe().servers.find(row=>row.name==='web').authorization;assert.deepEqual(restoredInfo.lastObserved,mode==='timeout-save-failure'?null:observed);assert.equal(restoredInfo.unsaved,null,'cold restoration cannot invent missing native evidence');assert.equal(requests.length,2,'restoring the SDK binding cannot infer or replay');assert.equal(reads,mode==='healthy-resource'?0:1);assert.equal(mutations,mode==='healthy-resource'||timeoutCase?1:0);

@@ -1,5 +1,32 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Cold native snapshot follows observed close — October 15
+
+A new clean sealed-candidate run retains **360 passes/one failure/two optional
+skips** across 78 files. The failed cold-original assertion contains exactly
+**303 appended bytes**. Decoding the full assertion's byte diff proves that the
+additional record is a valid `augmentor-mcp-connection/1` **closed** observation
+from the preceding owner. The fixture read its baseline before the transport's
+deferred close; prompt settlement alone does not join that lifecycle boundary.
+The previous 361-pass artifact run and earlier full source/ordinary cohorts stay
+distinct; their passes do not erase this failure.
+
+The fixture now observes the real public connection callback for the **exact
+instance**, requires successful native retention, then reads its original bytes
+before disposal and cold SDK reopening. It preserves the existing native equality,
+prefix, authorization count, connection-only append, no-inference/no-replay and
+credential exclusion assertions. All six actual SDK modes pass, with the same
+one-second request and 15-second outer deadlines. Production transport, SDK,
+dependencies and sealed application bytes are unchanged.
+
+A separate unselected diagnostic clone delays only the existing deferred close
+by 80 ms and holds the fixture's post-snapshot continuation until the real close.
+The original fixture fails the same native equality with exactly 303 actual closed
+metadata bytes; the corrected fixture passes with zero post-snapshot bytes. No
+SDK event, receipt or close is fabricated, and no sealed/selected/running artifact
+is patched. Full clean-candidate follow-up is recorded separately; physical,
+live, installed, other-platform and migration gates remain open.
+
 ## Timeout fixture uses observed cancellation — October 15
 
 The former timeout fixture independently delayed preparation by 400 ms,
