@@ -25,6 +25,11 @@ if not Path(fonts).is_dir():
 options = {'fontDirectories': [fonts], 'fontFallbacks': [], 'maxFontFiles': 100, 'maxFontFileBytes': 256 * 1024**2, 'maxLoadedFontBytes': 512 * 1024**2, 'maxOutputBytes': 20 * 1024**2, 'timeoutMs': 10_000}
 adapter.snapshot_fonts(box, options)
 adapter.profile(box, options)
+output = root / 'descriptor-output.pdf'
+output_fd = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+parent_fd = os.open(root, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+assert (output_fd, parent_fd) == (3, 4)
+os.write(output_fd, b'AUTHORED_OUTPUT_DESCRIPTOR')
 listener = socket.socket()
 listener.bind(('127.0.0.1', 0))
 listener.listen(1)
@@ -43,6 +48,7 @@ for value in os.listdir('/proc/self/fd'):
   if int(value)>2:extra.append(os.readlink('/proc/self/fd/'+value))
  except FileNotFoundError:pass
 values['admissionAndStatusDescriptorsClosedBeforeParser']=not extra
+values['outputAndParentDescriptorsClosedBeforeParser']=not extra
 try:socket.create_connection(('127.0.0.1',{listener.getsockname()[1]}),timeout=1).close();values['hostLoopbackDenied']=False
 except OSError:values['hostLoopbackDenied']=True
 for key,path in [('inputReadOnly','/input/source.docx'),('systemReadOnly','/usr/lib/libreoffice/program/bootstraprc')]:
@@ -53,8 +59,11 @@ print(json.dumps(values));assert all(values.values())
     os.environ['AUTHORED_NATIVE_ENV_SENTINEL'] = 'AUTHORED_NOT_REAL'
     result = json.loads(adapter.run(cmd + ['/usr/bin/python3.13', '-I', '-c', script], box, options, catalog=True))
     assert sentinel.read_text() == 'AUTHORED_OUTSIDE_FILE' and input_path.read_text() == 'AUTHORED_READONLY_INPUT'
+    assert output.read_text() == 'AUTHORED_OUTPUT_DESCRIPTOR'
     profile = (box / 'work/profile/user/registrymodifications.xcu').read_text()
     assert 'DisableMacrosExecution' in profile and 'DisableActiveContent' in profile
     print(json.dumps(result))
 finally:
     listener.close()
+    os.close(output_fd)
+    os.close(parent_fd)

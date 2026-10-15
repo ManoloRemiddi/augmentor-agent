@@ -11,6 +11,50 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Native caller-output ownership — October 15
+
+The former adapter checked that the requested PDF path was absent, then on a
+conversion failure removed whatever occupied that path. Two controlled real
+helper cases hold the original parent-directory lease before broker admission,
+create a regular file or symlink at the target and release the helper once.
+Both fail against the preceding runtime because cleanup deletes the replacement.
+The unrelated symlink target itself remains intact; the link deletion is also a
+failure. No model, owner profile or private source participates.
+
+The Node owner now reserves a new 0600 regular output with exclusive/no-follow
+creation through an open parent-directory descriptor. The helper receives the
+output and original parent descriptors, checks their owner/mode and link identity,
+and writes the validated PDF through the inherited output descriptor. Writes
+are flushed/fsynced; the caller path and parent are revalidated before success.
+Normal failures, cancellation and observed owner loss remove only a matching
+reserved output. The live Node fallback uses the same retained parent/file
+identity after helper loss. A replaced regular file or symlink is preserved and
+that converter closes to further work. No filename-only failed-output removal
+remains. The original provider consumes the PDF after conversion; a reserved
+empty file during native work is internal, not a GUI ready preview.
+
+An initial 24-case run passes 23 and retains one existing replaced-scratch
+failure: scratch refusal skipped reserved-output cleanup. Independent nested
+cleanup now preserves the unknown root while still cleaning the known output;
+the full reviewed set passes **24/24**. The final three focused contracts also
+pass after adding no-admission/closed-converter assertions and opening actual
+output/parent descriptors in the existing sandbox probe. Its nine negative
+boundaries include no extra descriptors in the parser and unchanged authored
+output bytes. All six authored document formats, font notices, bounds, default
+provider capacity, cancellation and hard owner/guard-loss cases remain.
+
+The final focused four-case run also passes after checking cancellation through
+its final output-identity barrier. Shared provider admission/cancellation/capacity
+contracts are added to Linux/macOS/Windows CI. Full source/ordinary qualification
+follows this implementation checkpoint.
+Linux x64 native remains opt-in; the original GUI, common supplier provider,
+default Wasm backend and other-OS behavior are unchanged. This qualifies the
+controlled replacement boundary and descriptor ownership, not all concurrent
+same-user mutations between an identity check and unlink. Pre-ready allocation,
+all cleanup owners lost/power loss, durable root recovery, completed-output
+handoff uncertainty, physical/font/security/source/licence/distribution and other
+OS gates remain open. No installed/default/public binary promotion follows.
+
 ## Admitted native actor completion — October 15
 
 The preceding source cohort at fc34230 reports settlement after a killed cleanup

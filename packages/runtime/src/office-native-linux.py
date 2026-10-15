@@ -404,6 +404,35 @@ def process_name(name: bytes) -> None:
         raise Failure('unavailable')
 
 
+def output_identity() -> tuple[int, int, str]:
+    """Only the Node-created exclusive file and original parent descriptors."""
+    if len(sys.argv) != 6:
+        raise Failure('failed')
+    name = sys.argv[5]
+    if not name or name in ('.', '..') or '/' in name or '\x00' in name:
+        raise Failure('invalid-output')
+    target, parent = os.fstat(3), os.fstat(4)
+    if not stat.S_ISREG(target.st_mode) or target.st_uid != os.getuid() or stat.S_IMODE(target.st_mode) != 0o600 or not stat.S_ISDIR(parent.st_mode):
+        raise Failure('invalid-output')
+    return target.st_dev, target.st_ino, name
+
+
+def output_matches() -> bool:
+    dev, ino, name = output_identity()
+    try:
+        current = os.stat(name, dir_fd=4, follow_symlinks=False)
+    except FileNotFoundError:
+        return False
+    return stat.S_ISREG(current.st_mode) and current.st_uid == os.getuid() and stat.S_IMODE(current.st_mode) == 0o600 and (current.st_dev, current.st_ino) == (dev, ino)
+
+
+def remove_owned_output() -> None:
+    # A changed/missing link is not authority to delete another caller's file.
+    _, _, name = output_identity()
+    if output_matches():
+        os.unlink(name, dir_fd=4)
+
+
 def broker(root: Path, guardian: int, owner_fd: int, admit: int, write: int, blocked: set) -> None:
     # Keep the Node pipe open through broker death, without exposing its handle
     # to native children. Only the guardian relays this private result pipe.
@@ -515,8 +544,11 @@ def supervise(root: Path, identity: tuple[int, int], owner: int) -> tuple[bytes,
                         pass
                     forced = True
         join_actors(root, identity)
+        code = os.waitstatus_to_exitcode(status)
+        if cancelled or select.select([owner_fd], [], [], 0)[0] or code != 0:
+            remove_owned_output()
         remove_owned_root(root, identity)
-        return bytes(data), os.waitstatus_to_exitcode(status)
+        return bytes(data), code
     except (AttributeError, OSError):
         raise Failure('unavailable') from None
     finally:
@@ -542,14 +574,18 @@ def main(root: Path) -> dict:
     source, output = Path(request['inputPath']), Path(request['outputPath'])
     if not source.is_absolute() or not output.is_absolute() or not source.suffix[1:].lower() in FORMATS:
         raise Failure('unsupported-format')
-    if os.path.lexists(output):
+    _, _, output_name = output_identity()
+    if output.name != output_name or not output_matches():
+        raise Failure('invalid-output')
+    parent = os.fstat(4)
+    current_parent = output.parent.lstat()
+    if not stat.S_ISDIR(current_parent.st_mode) or (current_parent.st_dev, current_parent.st_ino) != (parent.st_dev, parent.st_ino):
         raise Failure('invalid-output')
     extension = source.suffix[1:].lower()
     data = read_regular(source, options['maxInputBytes'], 'input-too-large')
     families = declared_fonts(data, extension, options)
     if root.parent != output.parent:
         raise Failure('failed')
-    published = False
     try:
         snapshot_fonts(root, options)
         profile(root, options)
@@ -572,16 +608,18 @@ def main(root: Path) -> dict:
             raise Failure('invalid-document') from None
         if not pdf.startswith(b'%PDF-') or not pdf:
             raise Failure('invalid-output')
-        fd = os.open(output, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
-        published = True
-        with os.fdopen(fd, 'wb') as target:
+        if not output_matches():
+            raise Failure('invalid-output')
+        with os.fdopen(os.dup(3), 'wb') as target:
             target.write(pdf)
-        result = {'backend': 'linux-native', 'missingFonts': missing}
-        published = False  # Successful caller-owned output must survive cleanup.
-        return result
-    finally:
-        if published:
-            output.unlink(missing_ok=True)
+            target.flush()
+            os.fsync(target.fileno())
+        if not output_matches():
+            raise Failure('invalid-output')
+        return {'backend': 'linux-native', 'missingFonts': missing}
+    except BaseException:
+        remove_owned_output()
+        raise
 
 
 if __name__ == '__main__':
@@ -591,10 +629,14 @@ if __name__ == '__main__':
     root = None
     identity = None
     parent_lease = None
+    completed = False
+    output_owned = False
     try:
         cleanup = sys.argv[1:2] == ['--cleanup']
         arguments = [sys.argv[0], *sys.argv[2:]] if cleanup else sys.argv
-        root, identity = owned_root(arguments)
+        if len(arguments) != (5 if cleanup else 6):
+            raise Failure('failed')
+        root, identity = owned_root(arguments[:5])
         if cleanup:
             if os.getppid() != int(arguments[1]):
                 raise Failure('failed')
@@ -604,11 +646,16 @@ if __name__ == '__main__':
             root = None
             print(json.dumps({'cleaned': True}), flush=True)
             sys.exit(0)
+        output_identity()
+        output_owned = True
+        if not output_matches():
+            raise Failure('invalid-output')
         parent_lease = os.open(root.parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
         fcntl.flock(parent_lease, fcntl.LOCK_SH)
         reply, code = supervise(root, identity, int(sys.argv[1]))
         sys.stdout.buffer.write(reply)
         sys.stdout.buffer.flush()
+        completed = code == 0
         sys.exit(code)
     except Failure as error:
         print(json.dumps({'error': {'code': error.code}}), flush=True)
@@ -618,9 +665,15 @@ if __name__ == '__main__':
         sys.exit(1)
     finally:
         signal.signal(signal.SIGTERM, signal.SIG_IGN)
-        if root is not None and not (sys.argv[1:2] == ['--cleanup']):
-            if root.exists():
-                join_actors(root, identity)
-            remove_owned_root(root, identity)
-        if parent_lease is not None:
-            os.close(parent_lease)
+        try:
+            if root is not None and not (sys.argv[1:2] == ['--cleanup']):
+                if root.exists():
+                    join_actors(root, identity)
+                remove_owned_root(root, identity)
+        finally:
+            try:
+                if output_owned and not completed:
+                    remove_owned_output()
+            finally:
+                if parent_lease is not None:
+                    os.close(parent_lease)

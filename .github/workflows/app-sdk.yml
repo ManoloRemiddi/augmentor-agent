@@ -2,7 +2,7 @@
 name: Application SDK platform contracts
 on:
   pull_request:
-    paths: ['services/workspaces/**', 'apps/browser/**', 'apps/harness/**', 'packages/codex-runtime/**', 'packages/runtime/src/model-account*', 'packages/runtime/src/model-settings.ts', 'packages/runtime/src/tool-argument-snapshots.ts', 'packages/runtime/src/host.ts', 'packages/runtime/src/harness-server.ts', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/model-account*', 'tests/tool-argument-snapshots.test.mjs', 'tests/harness-account-scope*', 'tests/harness-model-invalidation*', 'tests/harness-session-create*', 'tests/test_app_sdk_platform.py', '.github/workflows/app-sdk.yml']
+    paths: ['services/workspaces/**', 'apps/browser/**', 'apps/harness/**', 'packages/codex-runtime/**', 'packages/runtime/src/model-account*', 'packages/runtime/src/model-settings.ts', 'packages/runtime/src/tool-argument-snapshots.ts', 'packages/runtime/src/office-*', 'packages/runtime/src/host.ts', 'packages/runtime/src/harness-server.ts', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/model-account*', 'tests/tool-argument-snapshots.test.mjs', 'tests/office-native-linux.test.mjs', 'tests/harness-account-scope*', 'tests/harness-model-invalidation*', 'tests/harness-session-create*', 'tests/test_app_sdk_platform.py', '.github/workflows/app-sdk.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -44,6 +44,8 @@ jobs:
         run: node --test tests/model-account-login.test.mjs tests/model-accounts.test.mjs tests/harness-account-scope.test.mjs tests/harness-model-invalidation.test.mjs
       - name: Verify shared SDK argument snapshots, quiet bursts and retirement
         run: node --test tests/tool-argument-snapshots.test.mjs
+      - name: Verify shared Office provider admission, cancellation and capacity
+        run: node --test --test-name-pattern="original provider admits|converter seat cancellation|original provider writes only" tests/office-native-linux.test.mjs
       - name: Verify OS private files and startup contracts
         run: node -e "const cp=require('child_process'); const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-m','unittest','discover','-s','tests','-p','test_app_sdk_platform.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"
       - name: Verify workspace capability contract

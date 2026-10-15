@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mkdtemp,writeFile,readFile,rm,readdir,stat,mkdir,rename} from 'node:fs/promises';
+import {mkdtemp,writeFile,readFile,rm,readdir,stat,mkdir,rename,symlink,lstat} from 'node:fs/promises';
 import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFile,spawn} from 'node:child_process';import {promisify} from 'node:util';import {once} from 'node:events';
 import {PiOfficePreview} from '../dist/runtime/src/office-preview.js';import {PiFilePreview} from '../dist/runtime/src/file-preview.js';
 import {createLinuxNativeOfficeConverter} from '../dist/runtime/src/office-native-linux.js';
@@ -62,8 +62,23 @@ test('native adapter refuses malformed/oversized archives, font budgets, existin
  await assert.rejects(createLinuxNativeOfficeConverter({fontMetadataCacheDirectory:'/tmp/ignored-cache'}),/transient/);await assert.rejects(createLinuxNativeOfficeConverter({misspelledOption:1}),/Unknown/);
 });
 
+for(const kind of ['regular','symlink'])test('native failure preserves a concurrently replaced '+kind+' caller output',{skip:native?false:requires,timeout:30000},async t=>{
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-output-owner-')),inputPath=join(root,'authored.docx'),outputPath=join(root,'converted.pdf'),marker=join(root,'other.txt');await writeFile(inputPath,previewDocx());await writeFile(marker,'AUTHORED_UNRELATED_TARGET');
+ // The real helper cannot admit the broker while this proven directory lease is held.
+ const lock=spawn('/usr/bin/python3',['-I','-B','-c',"import os,sys,fcntl;fd=os.open(sys.argv[1],os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fcntl.flock(fd,fcntl.LOCK_EX);print('ready',flush=True);sys.stdin.buffer.read();os.close(fd)",root],{stdio:['pipe','pipe','pipe']});let ready='',errors='';lock.stdout.on('data',v=>ready+=v);lock.stderr.on('data',v=>errors+=v);await until(()=>ready==='ready\n');
+ const converter=await createLinuxNativeOfficeConverter();let work;
+ t.after(async()=>{lock.stdin.end();if(lock.exitCode===null)await once(lock,'close');if(work)await work.catch(()=>{});await converter.dispose();await rm(root,{recursive:true,force:true});});
+ work=converter.render({inputPath,outputPath});const rejection=assert.rejects(work,e=>['invalid-output','failed','unavailable'].includes(e.code));
+ let scratchName;await until(async()=>{scratchName=(await readdir(root)).find(name=>name.startsWith('augmentor-native-office-'));return !!scratchName;});assert.deepEqual(await readdir(join(root,scratchName)),[],'held parent lease prevents broker admission or source copying');
+ await rm(outputPath,{force:true});if(kind==='regular')await writeFile(outputPath,'AUTHORED_OTHER_OUTPUT');else await symlink(marker,outputPath);
+ const before=await lstat(outputPath,{bigint:true});lock.stdin.end();await once(lock,'close');assert.equal(errors,'');await rejection;
+ const after=await lstat(outputPath,{bigint:true});assert.equal(after.dev,before.dev);assert.equal(after.ino,before.ino);assert.equal(after.isSymbolicLink(),kind==='symlink');assert.equal(await readFile(outputPath,'utf8'),kind==='regular'?'AUTHORED_OTHER_OUTPUT':'AUTHORED_UNRELATED_TARGET');assert.equal(await readFile(marker,'utf8'),'AUTHORED_UNRELATED_TARGET');
+ await assert.rejects(converter.render({inputPath,outputPath:join(root,'next.pdf')}),e=>e.code==='invalid-output');await assert.rejects(lstat(join(root,'next.pdf')),e=>e.code==='ENOENT');
+ assert(!(await readdir(root)).some(name=>name.startsWith('augmentor-native-office-')));
+});
+
 test('actual built native sandbox denies outside files, owner environment/process/network and input/system writes',{skip:native?false:requires,timeout:20000},async t=>{
- const root=await mkdtemp(join(tmpdir(),'augmentor-native-isolation-'));t.after(()=>rm(root,{recursive:true,force:true}));const {stdout}=await exec('/usr/bin/python3',['-B','tests/fixtures/native-office-isolation.py',root],{timeout:15000});const result=JSON.parse(stdout);assert.equal(Object.keys(result).length,8);assert(Object.values(result).every(value=>value===true));
+ const root=await mkdtemp(join(tmpdir(),'augmentor-native-isolation-'));t.after(()=>rm(root,{recursive:true,force:true}));const {stdout}=await exec('/usr/bin/python3',['-B','tests/fixtures/native-office-isolation.py',root],{timeout:15000});const result=JSON.parse(stdout);assert.equal(Object.keys(result).length,9);assert(Object.values(result).every(value=>value===true));
 });
 
 test('native cancellation, timeout and disposal settle owned processes and remove all transient scratch',{skip:native?false:requires,timeout:60000},async t=>{
