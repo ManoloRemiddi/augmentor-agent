@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
+**20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
+with the original DSH skill menu/editable links/current-source preview and both
+Permission controls. Source/ordinary/sealed target each pass **541/two optional
+skips/zero failures**, 102 files/all 51 Harness Chromium files. All **24,431 sealed
+entries/1,025 compiled/812 Harness source files** verify; supplier selection is 608.
+Exact-sealed authored skill GUI and actual-Qwen plan/cold-history proof pass;
+initial owner Light/Dark/logo/Permission/account QA has zero sessions/logins/drafts.
+Eight sealed inventories/nine review owners, selection and model/service settings
+verify preserved. Linux/macOS SDK pass at 4eede33; Windows is unqualified at the
+recorded snapshot. Physical MX feedback, guarded adoption, full provenance/plugin/
+migration, speech and other OS artifacts remain open. [Portable record](../release/harness-skill-review-20261015.json).
+
 [Original skill controls and source fingerprints](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
 at **9d9ac56** qualify the unchanged MIT DSH menu/editable references/current-file
 preview on the existing Pi owner. Source/fresh ordinary each pass **541/two
@@ -9,8 +22,9 @@ compiled/3,315 tracked inputs match; 608 supplier hashes, prior 601/CSS/notices 
 dependencies verify. Initial source/copy steering diagnostic and malformed-input
 failures remain retained; their original assertions pass after the correction.
 Seven sealed inventories/eight review processes, selection/settings and canonical
-changes verify preserved. This is source-only: the separate MX Permission review
-below does not include it. Full causal/resource/plugin/migration, live speech,
+changes verify preserved. That source checkpoint did not update the prior MX
+Permission review; the new skill review above now includes it. Full causal/
+resource/plugin/migration, live speech,
 physical MX and platform/installed gates remain open. [Portable evidence](../release/harness-skill-qualification.json).
 
 

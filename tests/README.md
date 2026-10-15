@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX skill review](../docs/HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
+**20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
+with the original DSH skill menu/editable links/current-source preview and both
+Permission controls. Source/ordinary/sealed target each pass **541/two optional
+skips/zero failures**, 102 files/all 51 Harness Chromium files. All **24,431 sealed
+entries/1,025 compiled/812 Harness source files** verify; supplier selection is 608.
+Exact-sealed authored skill GUI and actual-Qwen plan/cold-history proof pass;
+initial owner Light/Dark/logo/Permission/account QA has zero sessions/logins/drafts.
+Eight sealed inventories/nine review owners, selection and model/service settings
+verify preserved. Linux/macOS SDK pass at 4eede33; Windows is unqualified at the
+recorded snapshot. Physical MX feedback, guarded adoption, full provenance/plugin/
+migration, speech and other OS artifacts remain open. [Portable record](../release/harness-skill-review-20261015.json).
+
+Sealed drivers/static imports run from the QA checkout; actual targets use the
+sealed build with all compiled bytes equal. Authored skill files and live-Qwen
+plan fixtures stay separate from the owner review profile. The latter starts
+empty; later owner activity is not inferred. No test output enters the artifact.
+
 [Original skill controls](../docs/DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15):
 `session-skills.test.mjs` has eight pure selector/catalog/source contracts;
 `pi-skill-workflows.test.mjs` has twelve actual Host/SDK flows, including cold

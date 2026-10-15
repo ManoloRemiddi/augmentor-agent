@@ -7,8 +7,9 @@ managed delivery saves exact source/body/input fingerprints in ordinary history.
 All nine previously copied Wiki skill resources remain selected, but the new
 GUI/live source-fingerprint checks use authored fixtures, not nine representative
 Wiki workflows. The global source-provenance/causal attribution, owner migration,
-companion CLIs/services and installed/physical gates remain open. The current
-separate MX Permission review does not yet include this source increment.
+companion CLIs/services and installed/physical gates remain open. The [new separate MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
+now includes this increment, with exact-sealed authored GUI and preserved owner
+profiles. The earlier Permission review remains available without this change.
 At **9d9ac56**, source/fresh ordinary each pass **541/two optional skips/zero
 failures**, 102 files/all 51 Harness Chromium files, with 66 focused and 56 existing
 lifecycle cases; representative Wiki workflows remain separate. [Portable evidence](../release/harness-skill-qualification.json).

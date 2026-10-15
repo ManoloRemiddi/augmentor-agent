@@ -1,10 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-The [original skill controls/source-fingerprint increment](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
-is qualified in source/fresh ordinary at **9d9ac56** (541 pass/two optional skips
-per cohort). It is **not** in the separate Permission review below. That sealed
-review, its owner profile and installed selection remain unchanged. Consolidated
-review staging/physical acceptance remain open.
+[Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
+**20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
+with the original DSH skill menu/editable links/current-source preview and both
+Permission controls. Source/ordinary/sealed target each pass **541/two optional
+skips/zero failures**, 102 files/all 51 Harness Chromium files. All **24,431 sealed
+entries/1,025 compiled/812 Harness source files** verify; supplier selection is 608.
+Exact-sealed authored skill GUI and actual-Qwen plan/cold-history proof pass;
+initial owner Light/Dark/logo/Permission/account QA has zero sessions/logins/drafts.
+Eight sealed inventories/nine review owners, selection and model/service settings
+verify preserved. Linux/macOS SDK pass at 4eede33; Windows is unqualified at the
+recorded snapshot. Physical MX feedback, guarded adoption, full provenance/plugin/
+migration, speech and other OS artifacts remain open. [Portable record](../release/harness-skill-review-20261015.json).
 
 # MX Harness review build
 
@@ -13,9 +20,80 @@ operator link is supplied privately in the chat/browser panel, never in this
 repository. The installed desktop preview, its draft and the earlier feedback
 profile keep their own settings and history.
 
+## Skill controls review — October 15
+
+Private **20261015-180926-4e7b027e** is the current separate MX feedback build.
+It runs public **4eede33**, tested application/cohort **9d9ac56**, product
+**0.2.13** / Pi **1.1.0**. It includes the original MIT DSH skill menu, cached
+ranking, user-only markers, editable `/name` tokens and current-source sidebar
+links, alongside the existing original GUI, Context/Trajectory, themed Augmentor
+marks and both Permission controls. Pi remains the sole AgentSession owner.
+Managed invocation stores exact source/body/expanded-input fingerprints only on
+matched SDK user-text delivery; full causal/provider consumption attribution is
+still unqualified. A source preview shows the current approved file; old saved
+instructions and receipts remain unchanged. Colon-form `/skill:name` is supported
+for aliases that collide with commands/templates, without upstream draft styling.
+
+Its **24,431** sealed entries have SHA-256
+**5cea05cbeb8f288e8220a2b6b7e770ccc23b90bba71eb29f4e6c193fa47e5982**.
+All **1,025 compiled/812 Harness source files** match the tested source. Twenty-eight
+selected public artifact files and the full compiled tree overlay the verified
+previous review; 151 production npm instances, Node and components stay unchanged.
+The **909** notice files preserve the 608-file MIT DSH selection and separate
+Apache dsh-context/MPL Office suppliers. Runnable staging excludes source packages;
+all 32 preferred Office entry sources remain unchanged in notices. No DSH backend,
+new dependency, private owner data or experimental ThinLTO engine is included.
+Public Office distribution remains gated. This review is not an installed update.
+
+Source, fresh ordinary and exact sealed target each finish **543 cases: 541 pass,
+two existing optional skips, zero failures**, **102 files/all 51 Harness Chromium
+files**, two workers and unchanged assertions/deadlines. QA drivers/static imports
+run from the qualification checkout; actual app targets use the sealed build with
+identical compiled inputs. Seven notice guards pass. A separate exact-sealed
+original skill-menu/source-sidebar proof passes with authored files/provider in
+Light/Dark, showing current V2 source while the recorded V1 receipt/history stays
+unchanged. Synthetic skill sources are not installed in the owner profile.
+
+The exact sealed app also passes the actual local-Qwen read/plan/mode-off/cold
+reopen flow: **three provider requests/two tools** (`read`, `exit_plan_mode`),
+Request changes without approval, mode off without inference, unchanged note and
+tool catalog, exact cold native/display history and saved-plan reopening. The
+**262,144 context/8,192 output** declaration is preserved; all five proof actors
+terminate. This is an isolated live proof, not activity in the feedback profile.
+
+The fresh owner profile starts Read Only/keyless with local payload capture and
+no imported credentials, conversations, memory inference, voice or MCP setup.
+Initial QA has **zero sessions, active turns, unsent drafts and SDK logins**.
+Both animated **2 px** Augmentor marks, black Light smoke, retained Dark flare,
+readable Settings, original Permission confirmation cancelled without changing
+mode, and nine account-provider choices/confirmation pass. All five screenshot
+states are visually inspected; dialogs wait for full ancestor opacity. Browser
+errors/failed responses are zero and the QA browser terminates. Later owner
+activity is not inferred from this initial check.
+
+Eight sealed inventories/nine review processes, installed selection, 38 canonical
+changes and model/speech/GPU settings verify preserved. Linux/macOS shared SDK
+checks pass at public 4eede33, including the new skill contracts; Windows remains
+unqualified at the recorded snapshot. Qwen is online; Breeze remains failed and
+terminal, voice inactive. Physical MX feedback/refinement, guarded installed
+adoption, representative remaining plugin/companion workflows, full instruction/
+causal provenance, speech/privacy/memory/MCP/OAuth/Office distribution and complete
+P0/P1 migration/DSH retirement remain open. Further app rollout remains MX-first.
+
+The private operator link is supplied in chat/browser only. Choose **New Session**
+to test the composer. Skills appear only from the conversation's approved resource
+catalog; this fresh profile has no imported custom skills. You can configure the
+Wiki suite under **Settings → Plugins** with a test vault to expose its bundled
+skills. Previewing a skill does not invoke it; sending its leading command does.
+Earlier review profiles and their drafts/history remain available. [Skill boundary](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15),
+[portable review evidence](../release/harness-skill-review-20261015.json).
+
 ## Permission controls review — October 15
 
-Private **20261015-163114-00e4ca65** is the current separate MX feedback build.
+**Historical checkpoint:** the skill-controls review above supersedes this for
+new feedback; its artifact, profile and owner remain preserved.
+
+Private **20261015-163114-00e4ca65** was the separate MX feedback build at this checkpoint.
 It runs public **c026963**, tested application **7115883** and source cohort
 **454b555**, product **0.2.13** / Pi **1.1.0**. It includes both original MIT DSH
 Permission controls: General's future-chat default and the selected conversation's
