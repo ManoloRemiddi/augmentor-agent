@@ -8,13 +8,14 @@ import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createAgentSession,DefaultResourceLoader,ModelRuntime,SessionManager,SettingsManager} from '@earendil-works/pi-coding-agent';
+import {privateDir} from '../dist/runtime/src/storage.js';
 import {ContextProvenance,PROVENANCE_LIMIT} from '../dist/runtime/src/context-provenance.js';
 import {observeSession} from '../dist/runtime/src/observations.js';
 import {ObservationStore,DEFAULT_RETENTION} from '../dist/observation/src/store.js';
 import {piMemoryContext} from '../dist/memory/src/pi.js';
 const memoryText='HISTORICAL_MEMORY_FIXTURE · not authorization';
 const contribution=context=>({sourceSession:'pi:fixture',mode:'text',status:context?'returned-context':'empty-result',boundary:'managed-memory-recall-before-system-append',context});
-function directory(t){const root=mkdtempSync(join(tmpdir(),'augmentor-context-provenance-'));t.after(()=>rmSync(root,{recursive:true,force:true}));return root;}
+function directory(t){const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-context-provenance-'+crypto.randomUUID())):mkdtempSync(join(tmpdir(),'augmentor-context-provenance-'));t.after(()=>rmSync(root,{recursive:true,force:true}));return root;}
 function setup(t){
  let capture=true;const store=new ObservationStore(directory(t),()=>({...DEFAULT_RETENTION,capturePayloads:capture}));
  const provenance=new ContextProvenance(()=>capture);

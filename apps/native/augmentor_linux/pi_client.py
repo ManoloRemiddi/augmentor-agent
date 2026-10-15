@@ -63,7 +63,7 @@ class Connection:
 class PiClient:
     def __init__(self, base=None):
         self.base = base or socket_path()
-        self.capabilities = {'branch': True, 'edit': True, 'queue': False, 'steering': False, 'reasoning': False,'promptImprovement': False,'inspection':False,'mcpManagement':False,'mcpConfiguration':False}
+        self.capabilities = {'branch': True, 'edit': True, 'voice':False,'queue': False, 'steering': False, 'reasoning': False,'promptImprovement': False,'inspection':False,'mcpManagement':False,'mcpConfiguration':False}
         self.supports_queue = False
 
     def call(self, method, payload=None):
@@ -78,6 +78,7 @@ class PiClient:
             result=connection.call(method,payload)
             if method == 'host.describe':
                 self.supports_queue = result.get('capabilities', {}).get('queue') is True
+                self.capabilities['voice'] = result.get('capabilities', {}).get('voice') is True
                 self.capabilities['queue'] = self.supports_queue
                 self.capabilities['steering'] = result.get('capabilities', {}).get('steering') is True
                 self.capabilities['reasoning'] = result.get('capabilities', {}).get('reasoning') is True
@@ -95,6 +96,9 @@ class PiClient:
         return self.call('interaction.respond',{'rpcId':rpc_id,'sessionId':value['sessionId'],'value':value})
 
     def validate_model(self, selection):return self.call('models.validate',selection)
+    def workspace(self):return Path(os.environ.get('AUGMENTOR_PI_WORKSPACE',Path.home()/'Augmentor Linux Pi'))
+    def voice_ticket(self,session,open_id):return self.call('voice.ticket',{'sessionId':session,'surface':'linux','openId':open_id})
+    def voice_close(self,session,open_id):return self.call('voice.close',{'sessionId':session,'openId':open_id})
     def improve_prompt(self,text,instructions,selection,*,request_id,expected_revision,session_id=None):
         return self.call('prompt.improve',{'text':text,'selection':selection,'requestId':request_id,'scopeId':request_id,
             'expectedInstructionsRevision':expected_revision,**({'sessionId':session_id} if session_id else {})})

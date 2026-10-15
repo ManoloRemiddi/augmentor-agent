@@ -4,46 +4,54 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {once} from 'node:events';
-import {mkdtemp, writeFile, rm, readFile} from 'node:fs/promises';
+import {writeFile, readFile} from 'node:fs/promises';
 import {join, resolve} from 'node:path';
-import {tmpdir} from 'node:os';
 import {pathToFileURL} from 'node:url';
-import {WebSocket} from 'ws';
 import {setTimeout as delay} from 'node:timers/promises';
-import {planFixture, until} from './fixtures/plans.mjs';
-import {createSyntheticVoicePeer} from './fixtures/codex/synthetic-voice-peer.mjs';
+import {until} from './fixtures/plans.mjs';
+import {piVoiceFixture as fixture} from './fixtures/pi-voice.mjs';
 const artifact = resolve(process.env.AUGMENTOR_PI_TEST_ROOT ?? '.');
-const {privateDir, atomicJson} = await import(pathToFileURL(join(artifact, 'dist/runtime/src/storage.js')));
+const {atomicJson} = await import(pathToFileURL(join(artifact, 'dist/runtime/src/storage.js')));
 const {PiConnection} = await import(pathToFileURL(join(artifact, 'dist/client/src/socket.js')));
 const {localConnect} = await import(pathToFileURL(join(artifact, 'dist/platform/src/transport.js')));
 const {piTranscriptEvent} = await import(pathToFileURL(join(artifact, 'dist/memory/src/pi.js')));
-async function fixture(t, {peerOptions, ...options} = {}) {
-  const peer = createSyntheticVoicePeer({harnesses: ['pi'], ...peerOptions}), home = process.platform === 'win32' ? privateDir(join(tmpdir(), 'augmentor-speech-profile-' + crypto.randomUUID())) : privateDir(await mkdtemp(join(tmpdir(), 'augmentor-speech-profile-')));
-  let f, ticketCalls = 0; const cleanup = [];
-  t.after(async () => {for (const close of cleanup.reverse()) await close(); await f?.stop(); await peer.close(); await rm(home, {recursive: true, force: true, maxRetries: 5, retryDelay: 100});});
-  await peer.listen(); peer.server.on('request', req => {if (req.url === '/internal/ticket') ticketCalls++;});
-  atomicJson(join(home, 'config.json'), {port: Number(new URL(peer.connection.base).port)});
-  // The Windows private-record writer creates a protected file atomically;
-  // replacing its bytes preserves that ACL and the peer's raw-token protocol.
-  if (process.platform === 'win32') atomicJson(join(home, 'token'), null);
-  await writeFile(join(home, 'token'), peer.connection.token + '\n', {mode: 0o600});
-  f = await planFixture(t, {...options, voiceMode: {home}});
-  const create = async (sid = 'voice-root', surface = 'linux') => {await f.call('session.create', {sessionId: sid, surface, selection: f.selection, cwd: f.workspace}); await f.call('events.subscribe', {sessionId: sid});};
-  const connect = async (sid = 'voice-root', surface = 'linux') => {
-    const ticket = await f.call('voice.ticket', {sessionId: sid, surface});
-    assert.deepEqual(Object.keys(ticket).sort(), ['protocol', 'sessionId', 'ticket', 'url']);
-    const socket = new WebSocket(ticket.url), messages = [];
-    socket.on('message', (data, binary) => {if (!binary) messages.push(JSON.parse(data));});
-    await once(socket, 'open'); socket.send(JSON.stringify({type: 'auth', ticket: ticket.ticket, textSource: 'plugin'}));
-    await until(() => messages.some(row => row.type === 'ready'), 'speech authentication'); return {socket, messages};
-  };
-  return {...f, peer, create, connect, ticketCalls: () => ticketCalls, beforeClose: close => cleanup.push(close)};
-}
+
 async function inactive(f) {await until(async () => (await f.call('host.describe')).activeVoiceBridges === 0, 'voice terminal');}
 const input = (sid, requestId, op = {kind: 'worker-reply', reply: 'Owned public reply.'}) => ({sessionId: sid, requestId, content: [{type: 'text', text: JSON.stringify(op)}]});
 const speechInput = (sid, op) => ({...input(sid, 'resonant-voice:' + crypto.randomUUID(), op), inputMode: 'voice'});
 const systemText = body => JSON.stringify(body.messages.filter(message => message.role === 'system'));
 const historyEvents = async (f, sid = 'voice-root') => (await f.call('session.history', {sessionId: sid})).events.map(row => row.event);
+
+test('scoped close cannot retire another opening of the same root conversation', {timeout:25000},async t=>{
+  const f=await fixture(t);await f.create();await f.connect('voice-root','linux','first-opening');
+  await assert.rejects(f.call('voice.ticket',{sessionId:'voice-root',surface:'linux',openId:'second-opening'}),/existing voice/);
+  await f.call('voice.close',{sessionId:'voice-root',openId:'second-opening'});
+  assert.equal((await f.call('host.describe')).activeVoiceBridges,1);assert.equal(f.peer.connections[0].closed,false);
+  await f.call('voice.close',{sessionId:'voice-root',openId:'first-opening'});await inactive(f);
+  assert.equal(f.ticketCalls(),1);assert(f.peer.connections[0].closed);
+});
+
+test('closing during public SDK session loading joins preparation and prevents a late speech ticket', {timeout: 25000}, async t => {
+  const f = await fixture(t), entered = join(f.root, 'voice-load-entered'), release = join(f.root, 'voice-load-release');
+  await f.create(); await f.stop();
+  const extension = join(f.config, 'agent', 'authored-load-gate.mjs');
+  await writeFile(extension, `// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {writeFileSync,existsSync} from 'node:fs';
+export default pi => pi.on('session_start', async () => {writeFileSync(${JSON.stringify(entered)}, 'entered'); while (!existsSync(${JSON.stringify(release)})) await new Promise(resolve => setTimeout(resolve, 10));});\n`);
+  atomicJson(join(f.config, 'resources.json'), {sources: [extension], skills: []});
+  await f.start(); await f.call('events.subscribe', {sessionId: 'voice-root'});
+  const ticket = f.call('voice.ticket', {sessionId: 'voice-root', surface: 'linux'}).then(value => ({value}), error => ({error: error.message}));
+  let closing, closeSettled = false, remainedPending;
+  try {
+    await until(async () => readFile(entered).then(() => true, () => false), 'public SDK session load held');
+    closing = f.call('voice.close', {sessionId: 'voice-root'}).then(value => {closeSettled = true; return value;});
+    await delay(40); remainedPending = !closeSettled;
+  } finally {await writeFile(release, 'release');}
+  const result = await ticket; await closing;
+  assert(remainedPending, 'close must join a setup already loading its SDK owner');
+  assert.match(result.error ?? '', /closing/); assert.equal(f.ticketCalls(), 0);
+  assert.equal((await f.call('host.describe')).activeVoiceBridges, 0); assert.equal(f.requests.length, 0);
+});
 
 test('explicit spoken admission binds style and memory mode without changing original native input or typed defaults', {timeout: 25000}, async t => {
   const f = await fixture(t, {jobMode: {}}), sid = 'voice-root'; await f.create(); const spoken = speechInput(sid);
@@ -120,7 +128,7 @@ test('a typed correction supersedes spoken style in the same actual SDK turn', {
 
 test('actual Pi Host speaks only live durably delivered human input through one SDK owner and never history or duplicate admission', {timeout: 25000}, async t => {
   const f = await fixture(t, {jobMode: {}}), sid = 'voice-root'; await f.create(sid);
-  const description = await f.call('host.describe'); assert.equal(description.capabilities.voiceBridge, true); assert.notEqual(description.capabilities.voice, true);
+  const description = await f.call('host.describe'); assert.equal(description.capabilities.voiceBridge, true); assert.equal(description.capabilities.voice, true);
   const socket = await f.connect(sid), p = input(sid, 'typed-human');
   const result = await f.call('session.prompt', p); await f.settled(sid);
   await until(() => socket.messages.some(row => row.type === 'turn-complete'), 'speech terminal receipt');

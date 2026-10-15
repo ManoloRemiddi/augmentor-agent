@@ -390,6 +390,8 @@ class Window(QWidget):
             QTimer.singleShot(0,self.begin_voice)
 
     def close_voice_panel(self):
+        cancellation=getattr(self,'voice_preparation_cancel',None)
+        if cancellation:cancellation.set()
         self.voice_epoch+=1;self.voice_opening=False;self.voice_gesture_mode=None
         voice=self.voice_dialog;self.voice_dialog=None
         early=self.voice_input;self.voice_input=None
@@ -402,6 +404,7 @@ class Window(QWidget):
                 try:self.controller.queue_result.disconnect(voice.submission_result)
                 except (RuntimeError,TypeError):pass
             voice.close()
+        if self.controller and hasattr(self.controller,'close_voice'):self.controller.close_voice()
         self.voice_button.recording_available=False
         self.voice_button.set_state('off')
         self.update_controls()
@@ -416,10 +419,11 @@ class Window(QWidget):
         if self.voice_is_hands_free():self.prepare_voice_input()
         if self.voice_opening:return
         controller=self.controller;selection=self.model_picker.currentData()
+        cancellation=threading.Event();self.voice_preparation_cancel=cancellation
         self.voice_opening=True;self.voice_epoch+=1;epoch=self.voice_epoch
         self.voice_button.set_state('connecting')
         def work():
-            try:return controller.prepare_voice(selection),None
+            try:return (controller.prepare_voice(selection,cancelled=cancellation) if getattr(controller,'harness',None)=='pi' else controller.prepare_voice(selection)),None
             except Exception as error:return None,str(error)
         def ready(result):
             # prepare_voice has released its navigation lock. Refresh every control,
@@ -446,10 +450,11 @@ class Window(QWidget):
     def voice_transcript(self,event):
         controller=self.controller
         if not self.voice_dialog or self.voice_dialog.closed or not controller or controller.session!=event['sessionId'] or controller.read_only:return
+        if getattr(controller,'harness',None)=='pi' and event.get('requestId') not in self.voice_dialog.submitted:return
         if controller.running:
-            accepted=controller.queue_prompt(event['text'],'resonant-voice:'+event['requestId'],mode='steer')
+            accepted=controller.queue_prompt(event['text'],'resonant-voice:'+event['requestId'],mode='steer',**({'input_mode':'voice'} if getattr(controller,'harness',None)=='pi' else {}))
         else:
-            accepted=controller.send(event['text'],self.model_picker.currentData(),request_id='resonant-voice:'+event['requestId'])
+            accepted=controller.send(event['text'],self.model_picker.currentData(),request_id='resonant-voice:'+event['requestId'],**({'input_mode':'voice'} if getattr(controller,'harness',None)=='pi' else {}))
         if not accepted and self.voice_dialog:
             self.voice_dialog.set_status('Message was not submitted. '+event['text'])
             if getattr(self.voice_dialog,'hands_free',False):self.voice_dialog.shutdown()
@@ -478,7 +483,7 @@ class Window(QWidget):
         self.voice_button.hands_free=self.voice_is_hands_free()
         self.voice_button.refresh_tip()
         self.voice_button.setVisible(self.preferences.values.get('resonant_voice',True))
-        self.voice_button.setEnabled(bool(self.controller and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
+        self.voice_button.setEnabled(bool(self.controller and (getattr(self.controller,'harness',None)=='dsh' or getattr(self.controller,'capabilities',{}).get('voice')) and getattr(self.controller,'online',False) and not getattr(self.controller,'read_only',False) and not getattr(self.controller,'voice_closing',0) and (not getattr(self.controller,'navigating',False) or self.voice_opening)))
         running=bool(self.controller and (self.controller.running or getattr(self.controller,'navigating',False)))
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))

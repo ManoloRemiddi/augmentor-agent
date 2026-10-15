@@ -825,3 +825,14 @@ ordinary 712/two optional skips/zero failures, 123 files/all 53 Harness Chromium
 files, with 1,057 compiled/3,361 tracked inputs matching at freeze. Public/private
 source checks pass; no private component is published or pinned by these fixtures.
 [Portable scope, preserved failures and remaining gates](../release/harness-pi-input-mode-qualification.json).
+
+## Pi Native and Browser voice source — October 16, 2026
+
+[Shared control integration](PI-VOICE.md#native-and-browser-controls--october-16-2026)
+reuses only this public repository's Native/Browser/audio and scoped transport
+source with the pinned public Pi 1.1.0 SDK. It does not copy or publish the private
+Resonant Voice implementation. A compatible Pi companion is still an unqualified
+separate component; no new version/pin is inferred from fake protocol success.
+No original DSH GUI supplier, layout/CSS, Node/npm dependency or component is
+changed. Actual fixture transport/device-callback evidence is distinct from
+physical microphone/ASR/Breeze/playback and installed/platform acceptance.

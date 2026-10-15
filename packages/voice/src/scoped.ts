@@ -21,18 +21,22 @@ export function voiceConnection(): VoiceConnection {
 }
 interface Item {stream: string; text: string; pending: string; done: boolean; timer?: ReturnType<typeof setTimeout>}
 interface Lease {
+  openId?: string;
   session: string; connection: VoiceConnection; bridgeId: string; seq: number; epoch: number; pending: number; bytes: number;
   chain: Promise<void>; timer?: ReturnType<typeof setInterval>; request?: string; turn?: string; items: Map<string, Item>; closed: boolean;
 }
 /** Only a live, explicitly opened speech lease receives public native events. */
 export class ScopedVoice {
   protected leases = new Map<string, Lease>();
-  private opening = new Map<string, {cancelled: boolean; done: Promise<void>; settle: () => void}>();
-  private releasing = new Map<string, Promise<void>>();
+  private opening = new Map<string, {openId?: string; cancelled: boolean; done: Promise<void>; settle: () => void}>();
+  private releasing = new Map<string, {openId?: string; done: Promise<void>}>();
   private closed = false;
   constructor(private harness: 'codex' | 'pi', private connection: () => VoiceConnection = voiceConnection, private warn: (session: string, message: string) => void = () => {}) {}
   get active(): boolean {return this.leases.size > 0 || this.opening.size > 0 || this.releasing.size > 0;}
-  owns(session: string): boolean {return this.leases.has(session) || this.opening.has(session) || this.releasing.has(session);}
+  owns(session: string, openId?: string): boolean {
+    if (openId !== undefined) return [this.leases.get(session), this.opening.get(session), this.releasing.get(session)].some(row => row?.openId === openId);
+    return this.leases.has(session) || this.opening.has(session) || this.releasing.has(session);
+  }
   private async http(connection: VoiceConnection, path: string, body?: Data): Promise<Data> {
     // Validate even injected/test configuration before attaching a local service credential.
     const url = new URL(connection.base);
@@ -45,13 +49,17 @@ export class ScopedVoice {
       return JSON.parse(content);
     } catch {throw new Error('Resonant Voice did not confirm the operation. Reconnect voice; speech was not replayed.');}
   }
-  async ticket(session: string, surface: 'linux' | 'browser'): Promise<Data> {
+  async ticket(session: string, surface: 'linux' | 'browser', prepare?: () => Promise<void>, openId?: string): Promise<Data> {
     if (this.closed || this.owns(session)) throw new Error('Voice is already opening or connected. Close it before reconnecting.');
     let settle!: () => void;
     const done = new Promise<void>(resolve => {settle = resolve;});
-    const opening = {cancelled: false, done, settle};
+    const opening = {openId, cancelled: false, done, settle};
     this.opening.set(session, opening);
     try {
+      // Own the entire accepted setup, including a cold SDK owner load. Close,
+      // Stop and maintenance must join it before a late ticket can escape.
+      if (prepare) await prepare();
+      if (this.closed || opening.cancelled) throw new Error('Voice is closing.');
       const connection = this.connection();
       const health = await this.http(connection, '/health');
       if (health.protocol !== 'resonant-voice/1' || health.capabilities?.scopedHarnessBridge !== 1) throw new Error('Voice requires Resonant Voice with its scoped harness bridge (Codex: 0.1.17).');
@@ -60,7 +68,7 @@ export class ScopedVoice {
       const result = await this.http(connection, '/internal/ticket', {sessionId: session, surface, harness: this.harness});
       if (result.protocol !== 'resonant-voice/1' || result.sessionId !== session || result.url !== connection.base.replace('http:', 'ws:') + '/voice' ||
           !/^[a-f0-9]{64}$/.test(result.ticket) || !/^[a-f0-9]{64}$/.test(result.bridgeId) || result.bridgeLeaseMs !== 8000) throw new Error('Incompatible scoped voice ticket.');
-      const lease: Lease = {session, connection, bridgeId: result.bridgeId, seq: 0, epoch: 0, pending: 0, bytes: 0, chain: Promise.resolve(), items: new Map(), closed: false};
+      const lease: Lease = {openId, session, connection, bridgeId: result.bridgeId, seq: 0, epoch: 0, pending: 0, bytes: 0, chain: Promise.resolve(), items: new Map(), closed: false};
       if (this.closed || opening.cancelled) {
         await this.send(lease, {type: 'disconnect'}).catch(() => {});
         throw new Error('Voice is closing.');
@@ -149,8 +157,9 @@ export class ScopedVoice {
     lease.epoch++;
     await this.send(lease, {type: 'cancel'}).catch(() => this.fail(lease));
   }
-  async release(session: string): Promise<void> {
-    const existing = this.releasing.get(session); if (existing) return existing;
+  async release(session: string, openId?: string): Promise<void> {
+    if (openId !== undefined && !this.owns(session, openId)) return;
+    const existing = this.releasing.get(session); if (existing) return existing.done;
     const opening = this.opening.get(session); if (opening) opening.cancelled = true;
     const lease = this.leases.get(session);
     if (!lease && !opening) return;
@@ -158,9 +167,9 @@ export class ScopedVoice {
       if (lease) {this.forget(lease); await Promise.all([this.send(lease, {type: 'disconnect'}).catch(() => {}), lease.chain]);}
       await opening?.done;
     })();
-    this.releasing.set(session, release);
+    this.releasing.set(session, {done: release, openId: lease?.openId ?? opening?.openId});
     try {await release;} finally {this.releasing.delete(session);}
   }
   async close(): Promise<void> {this.closed = true; await Promise.all([...new Set([...this.leases.keys(), ...this.opening.keys(), ...this.releasing.keys()])].map(id => this.release(id)));}
-  async flush(): Promise<void> {await Promise.all([...this.leases.values()].map(lease => lease.chain).concat([...this.releasing.values()]));}
+  async flush(): Promise<void> {await Promise.all([...this.leases.values()].map(lease => lease.chain).concat([...this.releasing.values()].map(row => row.done)));}
 }

@@ -1,5 +1,26 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native and Browser Pi voice controls](../docs/PI-VOICE.md#native-and-browser-controls--october-16-2026)
+now reuse the existing orb, gesture/audio engine and private Pi owner. Final ASR
+submissions carry explicit spoken mode; native Send remains typed and Browser
+corrections steer the same SDK turn. Opening IDs fence automatic close across
+actors, and cleanup joins cold SDK loading, queued ticket retirement and workers.
+Original Harness GUI/suppliers and existing reviews/installed/services remain
+unchanged. The separate Harness voice plugin, real compatible companion/pin,
+physical ASR/TTS, installed adoption and later OS gates remain required.
+Focused Node 76/76 and native/controller/maintenance 145/145 pass; full source/
+ordinary qualification is pending.
+
+`pi-voice-surfaces.test.mjs` runs real Pi Host/SDK, Qt hold/release/Send and the
+framed Browser bridge/shared Python audio worker with independent speech/provider
+peers and synthetic device callbacks. It proves PCM routing, explicit mode,
+spoken same-turn correction, out-of-lane close/EOF and a refused competing actor.
+It does not execute private speech code, real recognition/synthesis or devices.
+`test_pi_voice.py` covers native preparation/close reservations, cancellation,
+scoped opening IDs, explicit send/steering and retired same-chat transcripts.
+Existing Browser DOM gestures now cover Pi and Codex capability gating. The Host
+speech fixture is factored into `fixtures/pi-voice.mjs`; all prior checks remain.
+
 [Pi spoken/typed input](../docs/PI-VOICE.md#spoken-and-typed-input--october-15-2026)
 now carries explicit admitted mode through the durable queue, actual SDK delivery,
 request-only response style, transcript capture and native managed-memory briefs.

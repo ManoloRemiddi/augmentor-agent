@@ -10,6 +10,7 @@ import {join,resolve} from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {Type} from 'typebox';
 import {createAgentSession,DefaultResourceLoader,ModelRuntime,SessionManager,SettingsManager} from '@earendil-works/pi-coding-agent';
+import {privateDir} from '../dist/runtime/src/storage.js';
 import {branchPublicationContext} from '../dist/runtime/src/branches.js';
 import {observeSession} from '../dist/runtime/src/observations.js';
 import {ObservationStore,DEFAULT_RETENTION} from '../dist/observation/src/store.js';
@@ -17,7 +18,7 @@ const artifact=resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.');
 const {piMemoryContext,managedPiMemory}=await import(pathToFileURL(join(artifact,'dist/memory/src/pi.js')));
 const snapshotType='augmentor.memory-context.v1';
 test('actual Pi native branches restore their bounded managed memory with tool context, no recall or replay',{timeout:30000},async t=>{
- const root=mkdtempSync(join(tmpdir(),'augmentor-pi-memory-snapshot-')),cwd=join(root,'workspace'),agentDir=join(root,'agent'),native=join(root,'native');for(const dir of [cwd,agentDir,native])mkdirSync(dir);
+ const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-pi-memory-snapshot-'+crypto.randomUUID())):mkdtempSync(join(tmpdir(),'augmentor-pi-memory-snapshot-')),cwd=join(root,'workspace'),agentDir=join(root,'agent'),native=join(root,'native');for(const dir of [cwd,agentDir,native])mkdirSync(dir);
  t.after(()=>rmSync(root,{recursive:true,force:true}));
  const old='HISTORICAL_SQLITE_MEMORY · café 日本語 🙂',newer='NEWER_POSTGRESQL_MEMORY',hidden='ORIGINAL_HIDDEN_TOOL_RECEIPT',received=[],recalls=[],contributions=[];let memoryValue=old,inputMode='voice',toolCalls=0,override=false;
  const server=http.createServer(async(req,res)=>{

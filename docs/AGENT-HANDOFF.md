@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native and Browser Pi voice controls](PI-VOICE.md#native-and-browser-controls--october-16-2026)
+now reuse the existing orb, gesture/audio engine and private Pi owner. Final ASR
+submissions carry explicit spoken mode; native Send remains typed and Browser
+corrections steer the same SDK turn. Opening IDs fence automatic close across
+actors, and cleanup joins cold SDK loading, queued ticket retirement and workers.
+Original Harness GUI/suppliers and existing reviews/installed/services remain
+unchanged. The separate Harness voice plugin, real compatible companion/pin,
+physical ASR/TTS, installed adoption and later OS gates remain required.
+Focused Node 76/76 and native/controller/maintenance 145/145 pass; full source/
+ordinary qualification is pending.
+
 [Pi spoken/typed input](PI-VOICE.md#spoken-and-typed-input--october-15-2026)
 now carries explicit admitted mode through the durable queue, actual SDK delivery,
 request-only response style, transcript capture and native managed-memory briefs.

@@ -2,7 +2,76 @@
 
 # Pi voice integration
 
+## Native and Browser controls — October 16, 2026
+
+Pi Host now advertises the source `voice` capability. The Native client and
+Browser initialize response expose it only when that Host advertises it; older
+Hosts leave the control unavailable. Existing orb placement/gestures, hold/lock/
+hands-free state machine and common device/playback engine remain unchanged.
+This is source integration, not an installed or live-speech qualification. The
+original Harness web GUI still needs its separate voice-plugin entry point;
+its HTTP gateway continues to deny private `voice.ticket` and `voice.close`.
+
+Native prepares the ordinary Pi workspace/model/session and subscribes before
+requesting a scoped ticket. It sends **only final** ASR text through the existing
+Controller with explicit voice mode, including in-turn steering. Normal Send/
+queued edits stay typed. A retired voice object's request cannot enter a newer
+same-chat connection. Browser uses the same Python VoiceSession, forwards native
+events for completion, validates current chat and unknown receipts, and sends
+spoken corrections through the public Pi steering path. Browser controls can
+cancel pending setup without first making a serialized catalog read. Navigation,
+settings saves and EOF close speech; accepted operations/workers settle before
+connection/process shutdown. No second agent loop or copied UI is introduced.
+
+Each Pi client generates an `openId` for setup/close. It is an ephemeral local
+opening identity, separate from the ASR request ID and private companion bridge
+secret. Matching opening IDs protect pending, active and closing ownership;
+a refused contender's automatic cleanup cannot close an existing actor. Ticket
+responses keep the original four fields. Trusted internal Stop/orphan/shutdown
+and deliberate legacy unscoped close retain root-wide cleanup. No opening is
+restored after restart. Clients cancel immediately, then retire any late queued
+ticket after preparation settles; a new local lease stays blocked until joined
+close finishes. Native reservations also keep maintenance busy during cleanup.
+
+A retained actual cold-Host control shows that close previously returned while
+`load()` was still running, allowing a later ticket. The scoped transport now
+owns an optional preparation callback before that public SDK load begins, and
+Close/Stop/shutdown join it. The first driver mistakenly held initial session
+creation before entering its cleanup-protected test region; that 25-second
+cancellation is retained and its owned gate was released. The corrected cold
+setup control fails before the fix and passes after it, without changing bounds.
+
+Initial surface tests exposed a missing Pi workspace adapter method and a
+fixture using numeric frame IDs with Pi's string correlation contract. The
+Native adapter and fixture are corrected; Browser timeouts were not increased.
+A later competing-Browser driver correctly hit the broker's one-executor guard.
+That guard remains: the corrected contention proof uses a separate real shared
+audio worker/private-IPC actor against the existing Browser lease. No executor
+or scope guard is weakened to make a test pass. Focus 76/76 and native/controller/
+maintenance 145/145 pass. Full source/fresh ordinary and isolated controls remain
+pending in this implementation checkpoint.
+
+Preceding [SDK run 38810763428](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38810763428)
+at **6db75c8f** passes Linux and macOS overall. Windows's expanded step retains
+**73 cases: 46 pass/13 fail/13 cancelled/one existing POSIX-only skip**. Newly
+included provenance fixtures pre-created ordinary Windows roots before the strict
+ACL helper, cleanup refused an executable identity, and memory/Host cases timed
+out. Fresh Windows provenance/native-memory roots now use the existing atomic
+private creator; no guard, deadline, concurrency or skip is relaxed. Remaining
+cleanup/timeout causes and new-head Windows qualification remain open. Earlier
+export settlement and Office/libvips packaging notice gates are not resolved.
+
+A compatible separately qualified Pi companion is still required: old Codex-only
+health advertisements refuse before tickets. The private speech checkout and its
+four changes remain untouched/unpublished; tests use independently authored
+protocol peers and fixed PCM, not real ASR/TTS or private service source. Qwen/
+Breeze stay on RTX 5090 with existing context/concurrency/precision and CPU ASR/
+VAD. No running/review artifact, installed selection or service is changed.
+
 ## Spoken and typed input — October 15, 2026
+
+This dated **cc6bbac5** checkpoint predates the Native/Browser binding above;
+its disabled surface-capability status is historical.
 
 `session.prompt.inputMode` defaults to `text`. A new `voice` admission requires a
 canonical `resonant-voice:<lowercase UUID>` identity, a connected operator and a

@@ -82,6 +82,9 @@ class Controller(QObject):
         self.has_more = False
         self.loading_page = False
         self.navigating = False
+        self.voice_lock = threading.Lock()
+        self.voice_pending = self.voice_session = None
+        self.voice_closing = 0
         self.state_file = None if client is not None else Path(os.environ.get('AUGMENTOR_PI_STATE', Path(os.environ.get('XDG_STATE_HOME', Path.home() / '.local/state')) / 'augmentor-pi')) / 'session.json'
         if client is None and hasattr(self.client,'state_path'):self.state_file=self.client.state_path()
         if self.state_file:
@@ -475,13 +478,23 @@ class Controller(QObject):
             self.recovery_lock.release()
 
     @admitted
-    def prepare_voice(self, selection):
+    def prepare_voice(self, selection, *, cancelled=None):
+        def check_cancelled():
+            if self.closed or cancelled and cancelled.is_set() or pending and pending.get('cancelled'):
+                raise ContractError('Voice is closing.')
+        pending=None
         with self.lock:
             if self.running or self.navigating or self.repairing or self.closed or self.read_only or not self.online:
                 raise ContractError('Open an idle, connected conversation first.')
             if not hasattr(self.client,'voice_ticket'):raise ContractError('Voice is unavailable with this harness.')
+            if self.harness=='pi':
+                with self.voice_lock:
+                    if self.voice_pending or self.voice_session or self.voice_closing:raise ContractError('Voice is open or still closing.')
+                    pending={'done':threading.Event(),'session':self.session,'openId':uuid.uuid4().hex,'cancelled':False}
+                    self.voice_pending=pending
             self.navigating=True
         try:
+            check_cancelled()
             self.client.validate_model(selection)
             if not self.session:
                 session=self.preset+'-'+uuid.uuid4().hex
@@ -490,14 +503,53 @@ class Controller(QObject):
                 self.session=session
                 self.save_session()
                 self.session_info.emit({'sessionId':session,'saved':False,'readOnly':False})
+            if pending:pending['session']=self.session
+            check_cancelled()
             self.client.call('session.selectModel',{'sessionId':self.session,**selection})
             self.selection=selection;self.save_session()
             if not self.connected or not self.stream or self.stream.session!=self.session:self.subscribe(self.session)
-            return self.client.voice_ticket(self.session)
-        finally:self.navigating=False
+            ticket=self.client.voice_ticket(self.session,pending['openId']) if pending else self.client.voice_ticket(self.session)
+            try:
+                if pending:
+                    with self.voice_lock:
+                        check_cancelled();self.voice_session={'session':ticket['sessionId'],'openId':pending['openId']}
+                else:check_cancelled()
+            except Exception:
+                if self.harness=='pi':self.client.voice_close(ticket['sessionId'],pending['openId'])
+                raise
+            return ticket
+        finally:
+            if pending:
+                with self.voice_lock:
+                    if self.voice_pending is pending:self.voice_pending=None
+                    pending['done'].set()
+            self.navigating=False
+
+    def close_voice(self):
+        if self.harness!='pi' or not hasattr(self.client,'voice_close'):return
+        with self.voice_lock:
+            pending=self.voice_pending;owner=self.voice_session or pending
+            if not owner:return
+            sid=owner['session'];open_id=owner['openId']
+            if pending:pending['cancelled']=True
+            self.voice_session=None;self.voice_closing+=1
+        def work():
+            try:
+                try:
+                    if sid:self.client.voice_close(sid,open_id)
+                finally:
+                    if pending:
+                        pending['done'].wait()
+                        if pending['session']:self.client.voice_close(pending['session'],pending['openId'])
+            finally:
+                with self.voice_lock:
+                    self.voice_session=None;self.voice_closing-=1
+                if not self.closed:self.busy.emit(self.running)
+        self.task(work)
 
     @admitted
-    def send(self, text, selection, edit_from=None, request_id=None):
+    def send(self, text, selection, edit_from=None, request_id=None, *, input_mode='text'):
+        if input_mode not in ('text','voice'):raise ContractError('Invalid input mode.')
         with self.lock:
             if self.running or self.navigating or self.repairing or self.recovery_lock.locked() or self.closed or self.read_only:
                 return False
@@ -534,7 +586,7 @@ class Controller(QObject):
                 if not self.connected or not self.stream or self.stream.session!=self.session:self.subscribe(self.session)
                 if cancelled.is_set():
                     return
-                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', **({'resumeQueue':True} if self.harness in ('pi','codex') else {}), 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
+                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', **({'resumeQueue':True} if self.harness in ('pi','codex') else {}), **({'inputMode':'voice'} if self.harness=='pi' and input_mode=='voice' else {}), 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
                 accepted = True
@@ -558,7 +610,8 @@ class Controller(QObject):
         return True
 
     @admitted
-    def queue_prompt(self, text, request_id, mode='queue'):
+    def queue_prompt(self, text, request_id, mode='queue', *, input_mode='text'):
+        if input_mode not in ('text','voice'):raise ContractError('Invalid input mode.')
         if not getattr(self.client,'supports_queue',False) or not self.running or self.navigating or self.read_only or not self.online:return False
         generation=self.generation;sid=self.session;turn_id=getattr(self,'queue_turn_id',None)
         def work():
@@ -569,7 +622,7 @@ class Controller(QObject):
                     time.sleep(.03)
                 target=sid or self.session
                 if self.closed or self.generation is not generation or target!=self.session or not target or self.cancel_requested.is_set():raise ContractError('Prompt was not queued; the active response stopped or changed.')
-                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'expectedTurnId':turn_id} if self.harness in ('pi','codex') and mode=='steer' else {})})
+                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'inputMode':'voice'} if self.harness=='pi' and input_mode=='voice' else {}),**({'expectedTurnId':turn_id} if self.harness in ('pi','codex') and mode=='steer' else {})})
                 self.queue_result.emit({'id':request_id,'accepted':result.get('accepted') is True,'command':bool(result.get('command'))})
             except Exception as exc:
                 self.queue_result.emit({'id':request_id,'accepted':False,'error':str(exc)})
@@ -679,6 +732,7 @@ class Controller(QObject):
         self.task(lambda: self.client.respond(frame['rpcId'], value))
 
     def close(self):
+        self.close_voice()
         if self.running:self.stop()
         self.closed = True
         self.queue_executor.shutdown(wait=False,cancel_futures=True)

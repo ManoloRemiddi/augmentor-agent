@@ -2,6 +2,12 @@
 
 # Context selection and controlled memory processing
 
+[Pi Native/Browser controls](PI-VOICE.md#native-and-browser-controls--october-16-2026)
+now supply the admitted mode through actual Controller/Browser worker paths.
+Synthetic end-to-end tests exercise spoken input, typed Send and spoken same-turn
+correction without changing this memory schema or inference settings. Real ASR/
+TTS/owner continuity and installed upgrade/downgrade remain separate gates.
+
 ## Pi interaction mode and native briefs — October 15
 
 [Pi input mode](PI-VOICE.md#spoken-and-typed-input--october-15-2026) now supplies
