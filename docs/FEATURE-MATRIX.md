@@ -178,3 +178,7 @@ See [contract and qualification](BOUNDED-EXECUTION-RECOVERY.md).
 ## 0.2.10 recovery scope
 
 Both DSH Augmentor presets include [action-aware recovery](BOUNDED-EXECUTION-RECOVERY.md#action-aware-recovery--0210-preview). Exact duplicate changes and uncertain/background outcomes are guarded during automatic recovery; normal explicit tasks retain their behavior. Pi and delegated agents are outside this adapter. This is execution protection, not semantic task verification.
+
+## Home readback follow-up — 15 October 2026
+
+Selected-device execution waits for matching integration state for up to eight seconds after one service dispatch. Delay/mismatch/cancellation fixture cases pass; unknown actions still require explicit review and are never replayed. See [Home](HOME.md#delayed-device-readback--15-october-2026). This NAS-only candidate is independent of installed Desktop and Browser releases.
