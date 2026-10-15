@@ -47,3 +47,20 @@ test('inventory never offers controls for a replaced selected entity',async t=>{
  h.replace();const device=(await h.devices.inventory())[0];
  assert.equal(device.selected,true);assert.equal(device.identity_changed,true);assert.equal(device.control,false);
 });
+
+
+test('delayed integration state settles without replaying the service call',async()=>{
+ let clock=0,reads=0,writes=0;
+ const d=new Devices({mcpUrl:'http://127.0.0.1',haToken:'fixture'},{exec(){}},{timeoutMs:100,intervalMs:10,now:()=>clock,wait:async ms=>{clock+=ms;}});
+ d.rest=async()=>{writes++;};d.read=async()=>({state:++reads<3?'off':'on'});
+ const result=await d.execute({entity_id:'light.fixture',action:'on'});
+ assert.equal(result.status,'completed');assert.equal(reads,3);assert.equal(writes,1);assert.equal(result.physical_verification,false);
+});
+test('nonmatching state remains unknown after bounded reads; cancellation never redispatches',async()=>{
+ let clock=0,writes=0;
+ const d=new Devices({mcpUrl:'http://127.0.0.1',haToken:'fixture'},{exec(){}},{timeoutMs:20,intervalMs:10,now:()=>clock,wait:async ms=>{clock+=ms;}});
+ d.rest=async()=>{writes++;};d.read=async()=>({state:'off'});
+ assert.equal((await d.execute({entity_id:'light.fixture',action:'on'})).status,'unknown');assert.equal(clock,20);assert.equal(writes,1);
+ const abort=new AbortController();d.settle.wait=async()=>abort.abort();
+ await assert.rejects(d.execute({entity_id:'light.fixture',action:'on'},abort.signal),/cancelled/);assert.equal(writes,2);
+});

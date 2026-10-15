@@ -25,7 +25,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 - [Current architecture](ARCHITECTURE.md)
 - [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)
 
-- [Home runtime, existing-device integration and qualification](HOME.md)
+- [Home runtime, existing-device integration, delayed readback and qualification](HOME.md)
 - [Feature ownership and compatibility · Augmentor 0.2.9 development](FEATURE-MATRIX.md)
 - [Desktop development snapshot · 19 September 2026](DESKTOP-UPDATE-2026-09-19.md)
 - [Source baselines and migration inventory](SOURCES.md)

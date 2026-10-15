@@ -88,3 +88,5 @@ checks its rendered reply. Normal app launches reject the test operations.
 `test_ui_testing.py` verifies default denial, draft/dialog protection and
 non-overwriting screenshot output. See the
 [installed native acceptance](../docs/MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).
+
+Home selected-device delayed-readback cases (15 October): `node --test apps/home/test/*.test.mjs` covers one dispatch with eventual state, bounded mismatch and cancellation. Fixture results do not establish physical light acceptance.

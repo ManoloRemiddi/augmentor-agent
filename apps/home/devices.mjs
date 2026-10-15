@@ -1,11 +1,12 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Restricted adapter over HA's existing REST services and entity registry.
 import WebSocket from 'ws';
+import {setTimeout as delay} from 'node:timers/promises';
 const valid=id=>typeof id==='string'&&/^(light|switch|input_boolean|sensor|binary_sensor)\.[a-z0-9_]+$/.test(id);
 const fingerprint=e=>JSON.stringify([e.id,e.platform,e.config_entry_id,e.unique_id]);
 function summary(state){return {entity_id:state.entity_id,name:String(state.attributes?.friendly_name??state.entity_id).slice(0,200),state:String(state.state).slice(0,200),brightness:state.attributes?.brightness??null,unit:state.attributes?.unit_of_measurement??null,last_updated:state.last_updated??null};}
 export class Devices {
- constructor(config,db){this.url=new URL(config.mcpUrl).origin;this.token=config.haToken;this.db=db;db.exec('CREATE TABLE IF NOT EXISTS home_devices(entity TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, control INTEGER NOT NULL)');}
+ constructor(config,db,settle={}){this.settle={timeoutMs:8000,intervalMs:250,now:()=>performance.now(),wait:(ms,signal)=>delay(ms,undefined,{signal}),...settle};this.url=new URL(config.mcpUrl).origin;this.token=config.haToken;this.db=db;db.exec('CREATE TABLE IF NOT EXISTS home_devices(entity TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, control INTEGER NOT NULL)');}
  async rest(path,body,signal){
   const response=await fetch(this.url+path,{method:body===undefined?'GET':'POST',redirect:'error',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},...(body===undefined?{}:{body:JSON.stringify(body)}),signal:signal?AbortSignal.any([signal,AbortSignal.timeout(10000)]):AbortSignal.timeout(10000)});
   if(!response.ok){await response.body?.cancel();throw Error('Home Assistant request failed ('+response.status+')');}
@@ -57,8 +58,17 @@ export class Devices {
  async execute(args,signal){
   const domain=args.entity_id.split('.')[0];
   await this.rest('/api/services/'+domain+'/'+(args.action==='off'?'turn_off':'turn_on'),{entity_id:args.entity_id,...args.action==='brightness'?{brightness_pct:args.brightness_pct}:{}},signal);
-  const observed=await this.read(args.entity_id,signal),expected=args.action==='off'?'off':'on';
-  const matches=observed.state===expected&&(args.action!=='brightness'||Math.abs((observed.brightness??-1000)-args.brightness_pct*255/100)<=3);
+  // HA's service acknowledgement may precede the integration's state event.
+  // Dispatch exactly once; wait only for readback, still validating identity.
+  const expected=args.action==='off'?'off':'on',deadline=this.settle.now()+this.settle.timeoutMs;
+  let observed,matches=false;
+  do {
+   if(signal?.aborted)throw Error('Home request cancelled');
+   observed=await this.read(args.entity_id,signal);
+   matches=observed.state===expected&&(args.action!=='brightness'||Math.abs((observed.brightness??-1000)-args.brightness_pct*255/100)<=3);
+   if(matches||this.settle.now()>=deadline)break;
+   await this.settle.wait(Math.min(this.settle.intervalMs,Math.max(0,deadline-this.settle.now())),signal);
+  } while(this.settle.now()<=deadline);
   return {status:matches?'completed':'unknown',evidence:matches?'integration-state-observed':'acknowledged-without-matching-state',observed,physical_verification:false};
  }
 }

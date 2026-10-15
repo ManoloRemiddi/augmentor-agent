@@ -93,6 +93,27 @@ dispatch leaves an unknown outcome. Client disconnection does not cancel an
 admitted turn; retrieve its result with the original request ID. At most 16 DSH
 session handles are retained in memory; durable sessions resume on demand.
 
+## Delayed device readback — 15 October 2026
+
+A successful HA service response can arrive before the device's new state.
+Selected-device execution now sends the service call once, then polls the
+identity-validated state at 250 ms intervals for up to eight seconds. Matching
+on/off (and brightness tolerance when requested) completes the action. A timeout,
+read failure or cancellation still leaves an uncertain outcome; it never retries
+the mutation or clears the ledger automatically. This is integration readback,
+not visual proof of the physical light.
+
+The previous single immediate read produced an unknown Main-light On outcome
+on the owner's EDGE test; a later read reported On. That existing ledger entry
+still requires explicit owner review and acknowledgement. The EDGE can display
+a configured light's current state and offer that explicit review, without
+changing selection or replaying a command. An unrelated action must be reviewed
+in Home itself.
+
+Qualification: 31 Home cases pass on Node 24.19.0, including delayed readback,
+bounded mismatch, cancellation and one dispatch. Deployment identity and live
+physical acceptance are recorded separately; a source fix is not a running build.
+
 ## Build and configuration
 
 ```sh
