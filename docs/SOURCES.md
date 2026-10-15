@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live Raw Context arrival](DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15)
+now watches the selected request's independently delivered provenance identity.
+A retained actual-Pi/original-GUI control delivers both real provenance frames
+later and reproduces missing coverage. Separate read lifetimes accept arrival
+without rereading the unchanged request; older success/errors remain retired
+across selection/conversation changes. There is no new layout, supplier change,
+SDK owner, model work or stored format. Source qualification is in progress;
+current MX review 20261015-192847-cfb956a7 remains application 1b467d3 and does
+not include this source correction. Installed/physical and full migration gates
+remain open.
+
 [Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
 It includes managed skill links in original Raw Pi Context and the large-JSON

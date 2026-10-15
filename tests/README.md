@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live Raw Context arrival](../docs/DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15):
+`harness-context-live-chromium.test.mjs` delays delivery of actual provenance frames
+in a real private Pi/original-GUI flow. It checks automatic later coverage without
+request reselection/body rereads, no polling rereads, retired error/success across
+selection/session changes and unchanged native/display history/provider requests.
+It uses two authored normal turns, no owner data or live external provider. The
+old build fails after both frames are delivered; the initial missing blank-chat
+header fixture failure is distinct and retained. Optional
+`AUGMENTOR_CONTEXT_LIVE_PROOF_OUTPUT` writes a screenshot outside the target build.
+Source qualification is in progress; no owner artifact is patched.
+
 [Current MX Context review](../docs/HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
 It includes managed skill links in original Raw Pi Context and the large-JSON

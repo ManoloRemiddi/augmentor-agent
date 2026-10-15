@@ -209,9 +209,25 @@ function ExtensionView({kind,state}){
   return <div className="augmentor-extension"><Button onClick={()=>void refresh.current()}>Refresh {kind}</Button><div ref={ref}/></div>;
 }
 function ContextView({state}){
-  const requests=state.records.filter(r=>r.kind==='model/request').reverse();const [selected,set]=useState(null),[payload,setPayload]=useState(null),[lineage,setLineage]=useState(null),[error,setError]=useState(null);
+  const requests=state.records.filter(r=>r.kind==='model/request').reverse();const [selected,set]=useState(null),[payload,setPayload]=useState(null),[lineage,setLineage]=useState(null),[payloadError,setPayloadError]=useState(null),[lineageError,setLineageError]=useState(null);
   const request=requests.find(r=>r.id===selected)||requests[0];
-  useEffect(()=>{let live=true;setPayload(null);setLineage(null);setError(null);const provenance=state.records.find(r=>r.kind==='context/provenance'&&r.requestId===request?.id);if(provenance)readDshPayload((m,p)=>controller.rpc(m,p),state.sessionId,provenance).then(value=>{if(live)setLineage({...value,metadata:provenance.data});},e=>{if(live)setError(e.message);});if(request)readDshPayload((method,params)=>controller.rpc(method,params),state.sessionId,request).then(value=>{if(live){if(value.available)setPayload(value.value);else setError(value.reason);}},e=>{if(live)setError(e.message);});return()=>{live=false;};},[request?.id,state.sessionId]);
+  const provenance=state.records.find(r=>r.kind==='context/provenance'&&r.requestId===request?.id),error=payloadError||lineageError;
+  // Observation records are immutable, but the matching provenance can arrive
+  // on a later event page. Its arrival must not restart the provider-body read.
+  useEffect(()=>{
+    let live=true;setPayload(null);setPayloadError(null);
+    if(request)readDshPayload((m,p)=>controller.rpc(m,p),state.sessionId,request).then(value=>{
+      if(live){if(value.available)setPayload(value.value);else setPayloadError(value.reason);}
+    },e=>{if(live)setPayloadError(e.message);});
+    return()=>{live=false;};
+  },[request?.id,state.sessionId]);
+  useEffect(()=>{
+    let live=true;setLineage(null);setLineageError(null);
+    if(provenance)readDshPayload((m,p)=>controller.rpc(m,p),state.sessionId,provenance).then(value=>{
+      if(live)setLineage({...value,metadata:provenance.data});
+    },e=>{if(live)setLineageError(e.message);});
+    return()=>{live=false;};
+  },[provenance?.id,request?.id,state.sessionId]);
   return <div className="augmentor-extension"><h2>Context</h2><label>Recorded request <select value={request?.id||''} onChange={e=>set(e.target.value)}>{requests.map(r=><option key={r.id} value={r.id}>{r.data.provider}/{r.data.model} · #{r.seq}</option>)}</select></label>{!request?<p>No provider request has been recorded for this conversation.</p>:<><JsonBlock payload={request.data} label="Request settings"/><JsonBlock payload={request.payload||{available:false}} label="Retained payload identity"/>{error&&<p role="status">{error}</p>}{payload&&<><JsonBlock label="Effective provider request" payload={payload}/><JsonBlock label="Tool declarations" payload={payload.tools||[]}/>{lineage&&<><JsonBlock label="Composition coverage" payload={lineage.metadata}/>{lineage.available?Object.entries(lineage.value.snapshots||{}).map(([name,value])=><JsonBlock key={name} label={name} payload={value}/>):<p role="status">{lineage.reason}</p>}</>}</>}</>}<NativeRecords state={state}/></div>;
 }
 function NativeRecords({state}){const ref=useRef(null);useEffect(()=>{let live=true;attachNativeHistory(ref.current,{rpc:(m,p)=>controller.rpc(m,p),sessionId:state.sessionId,alive:()=>live});return()=>{live=false;ref.current?.replaceChildren();};},[state.sessionId]);return <div ref={ref}/>;}

@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live-arrival Context correction](DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15)
+is currently source-only. The current review **20261015-192847-cfb956a7** below
+remains application **1b467d3**: it includes managed Context links/large JSON
+inspection, but not the later-provenance arrival correction. Its sealed app,
+profile and the installed selection remain unchanged.
+
 [Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
 It includes managed skill links in original Raw Pi Context and the large-JSON

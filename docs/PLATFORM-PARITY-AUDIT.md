@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live Raw Context arrival](DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15)
+is shared React/JSON glue with identical immutable-record/scope semantics on
+Linux/macOS/Windows. No OS adapter, package or protocol changes. Existing shared
+GUI builds enter all three SDK jobs; the new actual Chromium/Pi ordering proof
+is Linux-only, and does not qualify other-OS artifacts or physical acceptance.
+Source qualification is in progress; the existing MX review/selection are unchanged.
+
 [The separate MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 now includes application **1b467d3**, with exact-sealed Linux GUI/runtime checks:
 594 pass/two existing optional skips/zero failures, 109 files. Hosted public

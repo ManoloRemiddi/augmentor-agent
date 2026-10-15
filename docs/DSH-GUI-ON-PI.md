@@ -1,5 +1,38 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Live Raw Context arrival — October 15
+
+The raw reader can mount with a retained `model/request` before its matching
+`context/provenance` event reaches the next browser poll. Previously its single
+effect depended only on request/session identity. Later provenance updated the
+controller's real records but did not run that read, leaving Composition coverage
+and snapshots missing until a remount or another request selection.
+
+Owned glue now gives request-body and provenance reads separate lifetimes. The
+latter watches the matching immutable provenance ID as well as request/session
+identity. Arrival reads that payload without clearing or rereading the unchanged
+provider body. Unrelated polls do not read either body again. Each lifetime
+retires its own success/error on replacement or unmount; errors retain the same
+existing status presentation. Full paged/hash-bound reads and capture policy stay
+unchanged; no transport replay, model work, SDK owner, file authority, stored
+format, supplier/CSS or control placement is added.
+
+A new actual-Pi/original-GUI test splits delivery of the two real provenance
+frames, preserving their bytes/IDs and all other transport data. Its pre-fix
+control fails with both frames delivered, no browser error and no coverage. The
+fixed flow keeps the selected request and provider-body read count, then retires
+an old delayed error and another conversation's delayed paged success. Native and
+display files and all four provider requests (two ordinary authored turns) stay
+identical. An initial fixture attempt opened tabs while the original blank-chat
+header was hidden; the corrected fixture first completes its ordinary warmup.
+Both failures remain retained, with the latter identified as the product control.
+
+Source qualification is in progress. The current separate MX review
+**20261015-192847-cfb956a7** still runs application **1b467d3** without this live
+arrival correction; its sealed bytes and the installed selection stay unchanged.
+Long-history/live-provider/physical feedback and full provenance/migration remain
+open.
+
 [Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
 It includes managed skill links in original Raw Pi Context and the large-JSON
