@@ -104,8 +104,11 @@ Reported progress stops after two preference checks, before the tempo/pitch
 result. The cause is unproven; local CI-environment repetition still passes 61
 plus three existing Windows-only skips. The separate diagnostic follow-up
 **f0b61c15/run 38820874680** checks FFmpeg availability/version before the unchanged
-full suite, without installs, skips or bound relaxation. No complete hosted Pi
-qualification follows from the cancelled run. Application Validate **38817253540**
+full suite, without installs, skips or bound relaxation. The follow-up now fails the explicit working-FFmpeg-on-PATH prerequisite on all
+four jobs, before full npm test. That identifies a hosted tooling blocker without
+proving the only cause of the earlier stall. Provision and record the test
+processor, Linux first, then requalify the unchanged audio assertions. No complete
+hosted Pi qualification follows from either failed attempt. Application Validate **38817253540**
 also refuses Debian packaging at its existing Office public source/rebuild gate.
 
 Read-only postflight re-verifies ten sealed reviews/eleven owners, selection,

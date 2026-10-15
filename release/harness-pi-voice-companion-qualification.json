@@ -131,7 +131,7 @@
     "newInstalledOrSealedArtifactOrServiceMutation": false
   },
   "remaining": [
-    "diagnose hosted private audio-suite stall and qualify component jobs",
+    "provision/record a qualified hosted FFmpeg dependency, Linux first, and requalify without skipped audio cases",
     "private distribution and deliberate shared dependency pin/adoption",
     "physical CPU ASR/VAD and RTX 5090 Breeze/Qwen listening acceptance",
     "separate Harness web entry point",
@@ -152,8 +152,9 @@
     "diagnosticFollowup": {
       "sourceRef": "f0b61c15f137025ef7b6bd6abf4466b128ef3f67",
       "run": 38820874680,
-      "statusAtRecord": "in_progress",
-      "change": "bounded FFmpeg availability/version check before unchanged full suite; no install, skip or bound relaxation"
+      "statusAtRecord": "completed: all four jobs fail the explicit working-FFmpeg-on-PATH gate before full npm test",
+      "change": "bounded FFmpeg availability/version check before unchanged full suite; no install, skip or bound relaxation",
+      "scope": "identifies an existing hosted tooling blocker; not proof of the sole cause of preceding timeout"
     }
   }
 }

@@ -3,8 +3,9 @@
 [Hosted component diagnosis](PI-VOICE.md#companion-package-acceptance--october-16-2026)
 retains private run 38819354223's four job-limit cancellations before tempo/pitch
 completion. Local CI-environment checks pass; the hosted cause is unproven.
-Follow-up f0b61c15/run 38820874680 diagnoses FFmpeg availability/version before
-the unchanged full suite. No hosted Pi/platform pass is claimed. App Validate
+Follow-up f0b61c15/run 38820874680 fails the explicit working-FFmpeg-on-PATH
+gate on all four jobs. Provision/record that test dependency, Linux first, then
+requalify the unchanged full suite. No hosted Pi/platform pass is claimed. App Validate
 38817253540 also stops at the existing Office public source/rebuild packaging gate.
 Local candidate evidence, current review/pins/services and GUI remain unchanged.
 
