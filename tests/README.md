@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [October 15 MX review](../docs/HARNESS-MX-REVIEW.md#current-separate-review--october-15)
+uses source f0d241a/runtime ea3775b. Source, ordinary and sealed-target each pass
+401/two optional skips/zero failures across 83 files/all 46 Harness Chromium files,
+with two workers and unchanged bounds. Sealed-target drivers remain outside the
+release; actual Host/static/native targets and all matching compiled inputs are
+identified in the [checkpoint](../release/harness-mx-review-refresh-20261015.json).
+Fresh owner QA checks exact runtime, original empty page, two Augmentor marks,
+Light/Dark Settings and account confirmation without login/inference. Seven notice
+assembly, nine Office packaging and two source-boundary cases pass separately.
+All sealed inventories and old owners/selection are preserved; physical owner and
+live/full migration acceptance are not inferred from the queued browser-open request.
+
 `test_harness_notice_assembly.py` also covers an explicit supplementary sealed
 Node-notice source. Identical Node bytes and a verified original notice are
 required; missing/unsealed/tampered/wrong-binary sources refuse before any write.

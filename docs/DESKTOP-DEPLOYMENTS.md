@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[The October 15 MX review](HARNESS-MX-REVIEW.md#current-separate-review--october-15)
+is a new unselected browser owner, release **20261015-103820-b0d02caa** / product
+0.2.13, public source f0d241a and tested runtime ea3775b. Source/ordinary/sealed-target
+each pass 401/two optional skips; all 24,381 entries verify after startup/browser
+QA. Its profile is fresh/read-only/keyless with the earlier Qwen declaration;
+no credential/history import or initial inference/login occurs. Current selected
+preview and four earlier reviews/drafts stay preserved. This does not activate an
+installed desktop or qualify public Office redistribution.
+
 [The refreshed MX review instance](HARNESS-MX-REVIEW.md) runs source **9f5bc70**
 in managed, unselected release **20261014-145102-22cbe428**, artifact
 **f55e256e80c1c5345b17a65b24e3d01694fdbc99799e4325dd558173e3357e35**.

@@ -7,7 +7,64 @@ operator link is supplied privately in the chat/browser panel, never in this
 repository. The installed desktop preview, its draft and the earlier feedback
 profile keep their own settings and history.
 
-## Current separate review — account controls, October 14
+## Current separate review — October 15
+
+Private release **20261015-103820-b0d02caa** runs product **0.2.13** / Pi
+**1.1.0**, public source **f0d241aaa787ff153dd0283a3557316c5d76a3f7** and tested
+application **ea3775bff3d520cfd4d6cba70ef946120beaeb32**. Its complete inventory is
+**24,381 entries**, SHA-256
+**deed88f71858ed773b5c8dbc026f4268e9c6204edfc32de312f1f769a58079fd**.
+It includes structured questions/full-plan review, readable plan-code controls,
+the source-built Office entry and catalog ordering correction since the earlier
+review. The original GUI and both Augmentor marks are retained.
+
+The verified immediate base is the unselected **20261015-064752-4cf0f74f**
+artifact, runtime 6fd0b52. Selected public source changes and the complete
+**1,013-file compiled tree** overlay that base. Its **151 production npm
+instances**, Node 24.19.0 and native/component bytes stay unchanged. The current
+**909 notice files** include refreshed supplier provenance and the standalone
+Node notice. The main baseline lacked that standalone notice, so initial notice
+assembly refused. An explicit second verified sealed review supplies only its
+original Node notice after exact binary equality; both old inventories stay
+unchanged. The helper's seven cases cover wrong-binary/unsealed/tampered/missing
+sources and refusal before writes. This does not qualify public Office distribution.
+
+Source and ordinary each pass **401/two optional skips/zero failures**. The new
+sealed-target cohort repeats those results across **83 files/all 46 Harness
+Chromium files**, with two workers and unchanged deadlines. Drivers/static imports
+run from the qualification checkout, while actual Host/Harness/native targets use
+the sealed release; compiled and relevant source bytes match. The entire inventory
+verifies after those checks, runtime startup and actual browser QA. Qualification
+output never goes inside a sealed release.
+
+The new profile preserves the earlier local Qwen model declaration, context and
+output limit. It starts read-only with keyless Search and local provider-payload
+capture. It imports no personal credentials, conversations, MCP, voice or
+memory-engine configuration. Actual owner QA creates **zero sessions, model
+requests, tool actions, account logins or unsent drafts**. The original account
+confirmation opens and closes without admitting login; nine providers are listed.
+Light/Dark checks and inspected screenshots confirm the 2 px animated outline,
+black Light-mode smoke, preserved Dark flare and readable Settings text. Browser
+errors/failed responses are zero. These are initial QA observations, not a claim
+about later owner activity or live inference acceptance.
+
+The [three-OS SDK run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38705753106)
+at c0c783a passes Linux, macOS and Windows, including the new catalog contracts.
+The browser-open request is queued for this chat; no owner interaction is inferred.
+The private link is supplied in chat only. Choose **New Session** to begin testing;
+Models, Plugins, Trajectory, Context and Insights use the original interface.
+
+The selected installed preview and all four previous review processes/profiles
+remain preserved. This adds a separate browser owner and does not activate the
+desktop selection, alter model/speech/GPU settings or publish a binary. Physical
+MX feedback, live provider/OAuth/MCP/voice/memory workflows, complete plan-mode/
+command and question-draft behavior, Office source/output/distribution and the
+remaining migration/platform gates stay open.
+[Portable qualification](../release/harness-mx-review-refresh-20261015.json).
+
+<a id="current-separate-review--account-controls-october-14"></a>
+
+## Earlier separate review — account controls, October 14
 
 The newer private review is **20261014-185647-8f0be3ed**, product **0.2.13** /
 Pi **1.1.0**, public source **ce22aada5865fb72cb2ecedf895a0cc6496bcaf8** and

@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Fresh MX review](HARNESS-MX-REVIEW.md#current-separate-review--october-15)
+**20261015-103820-b0d02caa** is an unselected browser owner on public f0d241a /
+tested runtime ea3775b. Source/ordinary/sealed-target each pass **401/two optional
+skips/zero failures**, 83 files/all 46 Harness Chromium files and unchanged bounds.
+All **24,381 entries** verify after owner startup and real Light/Dark/account QA;
+1,013 compiled files and 151 production npm instances match. Refreshed supplier
+notices plus an explicit matching sealed Node-notice source give 909 notice files;
+seven notice guards and eleven packaging/boundary cases pass. Initial owner QA
+has no sessions, inference, tools, logins or drafts; its fresh read-only/keyless
+profile retains the earlier Qwen declaration. c0c783a SDK passes all three OSs.
+The browser opening is queued, not proof of owner interaction. Selection, four
+previous reviews/drafts and model/speech/GPU settings remain preserved. Physical/
+live/Office/distribution/full migration gates remain open.
+[Portable record](../release/harness-mx-review-refresh-20261015.json).
+
 [Catalog refresh ordering](DSH-GUI-ON-PI.md#catalog-refresh-ordering--october-15)
 at **ea3775bff3d520cfd4d6cba70ef946120beaeb32** prevents older background reads
 from undoing confirmed restore/rename state or clearing selection. Source and
