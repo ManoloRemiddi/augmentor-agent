@@ -793,3 +793,18 @@ DSH supplier file or private companion source is added. The additive Pi health
 capability is proposed and tested against an independently authored peer; it is
 not a verified Resonant Voice package pin. See the owning guide's compatibility
 and remaining-integration boundaries.
+
+## Pi Host speech ownership — October 15
+
+[Pi Host speech ownership](PI-VOICE.md#host-ownership-and-joined-close--october-15-2026)
+at **83d32ea7** binds the existing durable human queue/public SDK owner to scoped
+speech, Stop, orphan disconnect and joined setup/delivery shutdown. The 68-case
+focused set passes with synthetic speech, including 12 actual Host cases. Final
+**999c1f5f** source/fresh ordinary each pass **700/two optional skips/zero failures**,
+122 files/all 53 Harness Chromium files; 1,051 compiled/3,356 tracked inputs match.
+A real delayed-own-notification control proves the original Permission dialog
+correction; new peer revisions still invalidate stale choices. Older
+fixture and ES2023 check failures are retained. Pi surface voice capability,
+spoken memory mode, compatible companion and actual ASR/TTS remain pending;
+current MX review, GUI and installed/services are unchanged.
+[Portable evidence](../release/harness-pi-voice-host-qualification.json).

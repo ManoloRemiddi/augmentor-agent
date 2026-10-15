@@ -2,7 +2,93 @@
 
 # Pi voice integration
 
+## Host ownership and joined close — October 15, 2026
+
+Host implementation **83d32ea7**, qualified with the **999c1f5f** Permission
+notification correction, connects the passive observer to the existing Pi
+Host and its durable queue. This is an internal private-IPC bridge:
+`host.describe` reports `voiceBridge: true`, **not** the surface `voice` capability.
+Native, Browser and Harness voice controls remain disabled/unconnected for Pi.
+Spoken-input memory mode and a separately qualified companion are still required
+before enabling them. The current MX review, installed selection and services
+remain unchanged. [Portable qualification](../release/harness-pi-voice-host-qualification.json).
+
+`voice.ticket` requires the owning Linux/Browser surface, a connected operator,
+a human root, idle confirmed work and no archived, delegated or unknown-outcome
+state. The same public SDK owner is loaded; it is not replaced or duplicated.
+Authority is checked again after loading and after ticket I/O. Incompatible
+companions fail before ticket issuance. `voice.close` bypasses the preparation
+lane so it can cancel a setup in flight; the private Harness HTTP gateway does
+not expose either voice RPC.
+
+A live SDK human event can open speech forwarding only after `queue.delivered`
+has saved its receipt. The Host passes the product request/turn identity, never
+a diagnostic provider request ID. Identified human steering retains the same
+SDK owner; child, goal and unadmitted extension user events cannot inherit the
+lease's human identity. An unowned user event suppresses forwarding until another
+known human input is delivered. History reads, duplicate prompt admission and
+cold inspection do not speak or reopen voice.
+
+Stop starts its speech cancellation before waiting for model/tool settlement.
+An active connection remains usable for the next human turn. During setup, Stop
+uses the same cancellation path as explicit close. Last-operator IPC disconnect
+or subscription transfer closes the lease; another connected operator preserves
+it. Archive, compaction/repair, resource reload and maintenance protect pending,
+active and closing speech ownership. Shared model/MCP/reasoning changes require
+closing voice. An unconditional runtime shutdown joins voice cleanup before
+remaining owners settle; a cold process never reconstructs the connection.
+
+Shared close now joins both setup and earlier HTTP delivery. A cancelled setup
+never exposes its ticket; if issuance already completed, the client sends a
+scoped disconnect. Close remains busy until the older delivery chain settles,
+even after its socket closes. Monotonic sequences retire delayed text. Unknown
+remote failure is not replayed; the separately implemented companion lease is
+still part of its unqualified production contract. Windows connection-file
+verification now uses the existing owner-ACL/reparse helper, while POSIX keeps
+its private-file mode and owner checks. The Host tests use this real private
+configuration reader, not a production test hook or sibling source import.
+
+The focused Host/observer/Codex and affected guard set passes **68/68**, including
+12 actual-Host cases with independent speech/provider peers. The initial broader
+focused set had **64 pass/three failures**: old preview/reference/upload prototype
+fixtures omitted `sessionExports.active`. All three reproduce against the frozen
+`ecab71a4` baseline in a separate control copy. Their setup now includes an idle
+export owner and the new voice owner; original assertions/deadlines remain.
+The earlier TypeScript check also rejected `Promise.withResolvers` under the
+existing ES2023 library. Explicit promise resolution corrects that use without
+raising the compiler target or runtime pin. Both failures remain recorded.
+
+Final source **999c1f5f** and fresh ordinary each pass **700 cases/two existing
+optional skips/zero failures**, **122 files/all 53 Harness Chromium files**, two
+workers and unchanged deadlines. All **1,051 compiled/3,356 tracked inputs** match
+at freeze; 615 supplier inputs and dependency pins stay unchanged. Two isolated
+guard-removal controls each fail their intended Host case, 22 notice/packaging/
+source-boundary cases pass, and tracked-file/branch-history privacy checks pass. The initial 700-case source run retained a Permission dialog
+failure (697 pass/one fail/two optional skips). A separate real-notification
+control confirms its cause; the authored controller correction preserves the
+exact original confirmation across confirmed echoes while new peer revisions
+still invalidate it. See [the GUI correction and retained control](DSH-GUI-ON-PI.md#confirmed-permission-notifications--october-15).
+
+
+The preceding Application SDK run
+[38798072784](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38798072784)
+at **aeb73888** completed: all three OS jobs passed the **12 foundation observer
+cases**; Linux/macOS passed overall. Windows again failed two prompt settlements
+before export preparation (47 pass/two fail/one existing POSIX-symlink skip in
+that step). This confirms neither the cause of that failure nor the new Host
+integration on Windows. The expanded three-OS voice step now includes the Host
+and legacy guard cases; its qualification is pending at publication.
+
+Remaining work is truthful spoken/typed input and memory/provenance attribution,
+existing Native/Browser and approved Harness entry points, an exactly pinned
+companion artifact, actual CPU ASR/VAD and Breeze on RTX 5090, physical audio and
+hands-free acceptance, packaged/installed qualification, Windows investigation
+and full migration. No model, service, GPU placement or GUI layout is changed.
+
 ## Passive bridge foundation — October 15, 2026
+
+Historical foundation-only checkpoint; the Host wiring statements below are
+superseded by [the current integration](#host-ownership-and-joined-close--october-15-2026).
 
 Application source `ecab71a4` extracts Augmentor's existing public Codex speech
 transport into [the shared bridge](../packages/voice/src/scoped.ts) and adds a

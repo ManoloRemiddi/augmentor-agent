@@ -17,6 +17,27 @@ Hosted Linux/macOS SDK passes; Windows has two prompt-settlement timeouts before
 export is reached, with cause unproven. [Portable review evidence](../release/harness-export-context-review-20261015.json).
 
 
+[Pi Host speech ownership](../docs/PI-VOICE.md#host-ownership-and-joined-close--october-15-2026)
+at **83d32ea7** binds the existing durable human queue/public SDK owner to scoped
+speech, Stop, orphan disconnect and joined setup/delivery shutdown. The 68-case
+focused set passes with synthetic speech, including 12 actual Host cases. Final
+**999c1f5f** source/fresh ordinary each pass **700/two optional skips/zero failures**,
+122 files/all 53 Harness Chromium files; 1,051 compiled/3,356 tracked inputs match.
+A real delayed-own-notification control proves the original Permission dialog
+correction; new peer revisions still invalidate stale choices. Older
+fixture and ES2023 check failures are retained. Pi surface voice capability,
+spoken memory mode, compatible companion and actual ASR/TTS remain pending;
+current MX review, GUI and installed/services are unchanged.
+[Portable evidence](../release/harness-pi-voice-host-qualification.json).
+
+`pi-voice-host.test.mjs` uses actual private IPC/config, public SDK and durable
+receipts for admission, duplicate/history refusal, Stop, last-operator transfer,
+joined health/ticket setup and delayed-body close, shutdown/cold restart,
+unknown outcome, goal/delegate exclusion and extension-injected follow-ups.
+The synthetic peer is independently authored; it does not qualify private
+companion behavior, ASR/TTS or devices. Existing prototype guard fixtures have
+explicit idle voice/export owners, without weakened assertions or larger bounds.
+
 [Pi voice bridge foundation](../docs/PI-VOICE.md#passive-bridge-foundation--october-15-2026)
 at **ecab71a4** reuses the public scoped transport and passively observes live
 Pi SDK assistant text. The 19 focused cases pass, including actual Pi 1.1.0

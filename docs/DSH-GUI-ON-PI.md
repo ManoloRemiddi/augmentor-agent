@@ -1857,3 +1857,34 @@ engine build and broader migration qualification remain open. Changes are
 to Linux Chromium qualification; no macOS/Windows/physical or installed acceptance
 is inferred. Owner review builds, drafts and model/speech settings stay preserved;
 all full migration, live and source/rebuild/public-distribution gates remain open.
+
+## Confirmed Permission notifications — October 15
+
+Source **999c1f5f** preserves an open original Full access confirmation when a
+late notification repeats a permission revision already confirmed by this
+conversation's read or write receipt. The authored Pi controller remembers at
+most 128 confirmed identities in one session/epoch; notifications never set its
+accepted mode. New/unknown revisions still require a read, peer changes still
+invalidate stale confirmations, and conversation/epoch changes retire the cache.
+Supplier components, layout, CSS, licences and the 615 selected inputs stay intact.
+
+The initial Host source cohort at **83d32ea7** had 700 cases: 697 passed, one
+Permission Chromium case failed and two existing optional cases skipped. A real
+own-write notification could arrive after a subsequent Full access dialog opened;
+the redundant permission read toggled busy state and unmounted that dialog.
+A separate Chromium control holds the **actual** response at delivery, opens the
+new confirmation and then releases the unchanged response. Before the fix, that
+control fails because the exact dialog node disappears; after the fix it passes.
+An initial control setup returned a DOM object by value and failed CDP
+serialization; returning a boolean corrected that fixture before the causal
+control was recorded. No deadline, animation guard or pointer assertion is removed.
+
+All 18 permission controller/command cases and the original full Chromium flow
+pass, including disabled confirmation before acknowledgement, cancellation,
+checkbox enabling, real peer updates, slash commands, Light/Dark and scoped
+read-only inspection with no model requests. Both theme screenshots were inspected.
+The old failed run/control remain evidence. Full source/copy qualification is
+recorded with [Pi Host ownership](PI-VOICE.md#host-ownership-and-joined-close--october-15-2026)
+and [portable evidence](../release/harness-pi-voice-host-qualification.json).
+This is a source correction; the current MX review and selected artifact remain
+unchanged and do not contain it yet.
