@@ -6,11 +6,12 @@ import {appendDisplay,messageTargets} from './chat-projection.js';
 export class DshPiController {
   listeners=new Set(); epoch=0; polling=false; cursor=0; clientId=crypto.randomUUID();
   branchFlight=null; branchIntents=new Map();createFlight=null;
+  catalogRevision=0;catalogRead=0;
   state={familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,goal:null,workspace:'',error:null,hasMore:false};
   constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
-  update(patch){this.state={...this.state,...patch};for(const [id,scope] of this.hiddenQuestions)if(this.state.readOnly||this.state.phase!=='ready'||scope.epoch!==this.epoch||scope.sessionId!==this.state.sessionId||!this.state.interactions.some(f=>f.rpcId===id))this.hiddenQuestions.delete(id);for(const fn of this.listeners)fn();}
+  update(patch){if(Object.hasOwn(patch,'workspaces'))this.catalogRevision++;this.state={...this.state,...patch};for(const [id,scope] of this.hiddenQuestions)if(this.state.readOnly||this.state.phase!=='ready'||scope.epoch!==this.epoch||scope.sessionId!==this.state.sessionId||!this.state.interactions.some(f=>f.rpcId===id))this.hiddenQuestions.delete(id);for(const fn of this.listeners)fn();}
   async rpc(method,params={},signal){
     const response=await this.fetcher('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params}),...(signal?{signal}:{})});
     const body=await response.json();if(!response.ok||body.error){const error=Error(body.error?.message||'The local connection failed.');error.authoritative=!!body.error;throw error;}return body.result;
@@ -91,7 +92,19 @@ export class DshPiController {
     try{await job.promise;}finally{if(this.contextPaging===job)this.contextPaging=null;}
   }
   clearSelection(){this.epoch++;globalThis.sessionStorage?.removeItem('augmentor-harness-session');this.update({sessionId:null,events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,goal:null,compaction:null,compactionPending:false,interactions:[],selection:null,reasoning:null,hasMore:false,unconfirmed:null,phase:'ready'});}
-  async refresh(){const epoch=this.epoch,sessionId=this.state.sessionId;const [list,workspaces]=await Promise.all([this.rpc('session.list'),this.state.readOnly?null:this.rpc('workspace.list')]);if(epoch!==this.epoch||sessionId!==this.state.sessionId)return;this.update({sessions:list.items,workspaces});if(!this.state.readOnly&&workspaces?.archivedSessionIds?.includes(this.state.sessionId))this.clearSelection();}
+  async refresh(){
+    const epoch=this.epoch,sessionId=this.state.sessionId,readOnly=this.state.readOnly,revision=this.catalogRevision,read=++this.catalogRead;
+    // A confirmed catalog update invalidates reads already in flight, including
+    // reads started during its mutation. Only the latest read may commit.
+    const current=()=>epoch===this.epoch&&sessionId===this.state.sessionId&&readOnly===this.state.readOnly&&revision===this.catalogRevision&&read===this.catalogRead;
+    let list,workspaces;
+    try{
+      [list,workspaces]=await Promise.all([this.rpc('session.list'),readOnly?null:this.rpc('workspace.list')]);
+    }catch(error){if(current())throw error;return;}
+    if(!current())return;
+    this.update({sessions:list.items,workspaces});
+    if(!readOnly&&workspaces?.archivedSessionIds?.includes(this.state.sessionId))this.clearSelection();
+  }
   async organize(action,sessionId,stop=false){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
     try{const result=await this.rpc('session.organize',{sessionId,action,stop,expectedRevision:this.state.workspaces?.organizationRevision});this.update({workspaces:result.workspaces});if(result.workspaces.archivedSessionIds.includes(this.state.sessionId))this.clearSelection();return result;}

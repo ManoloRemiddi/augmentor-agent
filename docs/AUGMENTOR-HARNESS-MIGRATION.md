@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Catalog refresh ordering](DSH-GUI-ON-PI.md#catalog-refresh-ordering--october-15)
+prevents older background reads from undoing confirmed restore/rename state or
+clearing selection. Twelve common contracts and a controlled original 513×715
+GUI/actual Host case reproduce the defect and pass after the fix; the seed is
+synthetic and controls add no inference or history changes. Original GUI/CSS,
+Host conflict/mutation policy and dependency pins stay unchanged. Full cohorts,
+source/ordinary identities and remaining hosted/installed/live/migration gates
+are separate in the [checkpoint](../release/harness-workspace-ordering.json).
+
 [Restore-row qualification](DSH-GUI-ON-PI.md#restore-row-observation--october-15)
 at fixture **42573b6** passes source/ordinary **388/two optional skips/zero failures
 each**, 81 files/all 45 Harness Chromium files, two workers per cohort/unchanged
@@ -7,7 +16,7 @@ bounds. Held actual restore replies reproduce premature opening; the original
 Archive-button barrier qualifies Undo/Unarchive without product changes. All
 1,013 compiled files, three sealed inventories, selection/four review processes
 and Qwen catalog verify preserved. A separate stale controller catalog-refresh
-race is reproduced and remains to fix; hosted/live/installed/Office/full migration
+race was reproduced; the catalog-ordering fix above supersedes it. Hosted/live/installed/Office/full migration
 gates remain open. [Portable evidence](../release/harness-restore-row-qualification.json).
 
 [Structured question batches and original plan review](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)

@@ -36,6 +36,8 @@ jobs:
       - run: npm run build
       - name: Verify shared Harness session creation and draft scopes
         run: node --test tests/harness-session-create.test.mjs
+      - name: Verify shared Harness catalog read and mutation ordering
+        run: node --test tests/harness-workspace-ordering.test.mjs
       - name: Prepare locked browser-only test dependencies
         run: npm ci --prefix apps/browser/test --ignore-scripts
       - name: Verify shared prompt ordering and job editor refresh state

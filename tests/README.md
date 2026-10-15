@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Catalog refresh ordering](../docs/DSH-GUI-ON-PI.md#catalog-refresh-ordering--october-15)
+adds twelve shared controller cases and one actual original-GUI/Host case.
+`harness-workspace-ordering.test.mjs` covers confirmed restore/rename, reverse
+read completion, old/current errors, reads during mutation, selection/access
+changes and unrelated streaming. It runs in the existing three-OS SDK matrix.
+`harness-workspace-ordering-chromium.test.mjs` holds a real older catalog HTTP
+reply while an original Unarchive action confirms, then verifies unchanged row
+state, explicit reopening, exact retained SDK history and no further model input.
+The initial seed is synthetic; no owner source/history is used. Old controller/
+bundle negatives and corrected positives are recorded separately in the
+[checkpoint](../release/harness-workspace-ordering.json).
+
 [Restore-row observation](../docs/DSH-GUI-ON-PI.md#restore-row-observation--october-15)
 qualifies the original archive/Undo/restore workflow's next explicit open against
 its rendered row action, rather than only a direct Host read. The controlled

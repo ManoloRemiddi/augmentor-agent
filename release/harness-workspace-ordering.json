@@ -1,0 +1,101 @@
+{
+  "schema": "augmentor-workspace-ordering-qualification/1",
+  "date": "2026-10-15",
+  "precedingSourceRef": "5a588b1dfa98293f901cb73f512316be2889ca6d",
+  "scope": "Shared Harness controller and original Linux GUI; no installed/review activation",
+  "controlledCommonBefore": {
+    "logSha256": "37f7f02d58f65819e9808ca4dbcc7faad1d540fc8fbcfd063109592dd2f3fdc9",
+    "tests": 12,
+    "pass": 5,
+    "fail": 7,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 45.311175
+  },
+  "focusedAfter": {
+    "logSha256": "ac5908cdd6b7e58be2f70241a064f8be5d3650f5b394215100f78f253f28ff54",
+    "tests": 43,
+    "pass": 43,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 94.661179
+  },
+  "controlledGuiBefore": {
+    "logSha256": "c5cf9a7e711b5240244c25c1d0d2599d3501b091fc6832f11255812ab59e282f",
+    "tests": 1,
+    "pass": 0,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 5344.622266
+  },
+  "controlledGuiAfter": {
+    "logSha256": "fa508c8bc7085781fcea840ba7e4e51f21342a6f7b65e65361a79485edfe27c7",
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 5434.948689
+  },
+  "controlApplicationRef": "d8520d5fe6b7e8eaa232835be54ec0759b88c566",
+  "controlControllerSha256": "27c48a5e7716ae129c626b0ff32b9de847ea9b166b012aea20e64fdbff72252c",
+  "controlGuiSha256": "57d36325f020ad21c5ab6de11b361b83bea1b7ad91e869b96b4e48b67c27e9e2",
+  "viewport": {
+    "width": 513,
+    "height": 715
+  },
+  "controlledCondition": "Actual older workspace.list HTTP response is held; original restore confirms; released old response must not resurrect archived membership. One explicit open then retains exact history and the synthetic provider input log.",
+  "contracts": [
+    "A committed workspace snapshot invalidates prior in-flight reads, including reads begun during a mutation",
+    "Only the latest refresh in the same epoch/session/access scope can commit or surface an RPC failure",
+    "Unrelated stream/queue updates do not invalidate catalog reads",
+    "Fresh archives still clear the exact selected conversation; fresh read failures surface without retry",
+    "No persisted Host revision/CAS/mutation/action policy or original GUI/CSS/dependency changes"
+  ],
+  "sharedPlatformContractsAdded": [
+    "Linux",
+    "macOS",
+    "Windows"
+  ],
+  "strictCheckBuildPassed": true,
+  "deadlinesChanged": false,
+  "assertionsRelaxed": false,
+  "compiledFileCount": 1013,
+  "compiledChangedFromControl": [
+    "dist/harness-web/assets.json",
+    "dist/harness-web/build-inputs.json",
+    "dist/harness-web/dsh-gui.js",
+    "dist/harness-web/excel-worker-inputs.json"
+  ],
+  "compiledAddedFromControl": [
+    "dist/harness-web/excel-WR7CX3DO.js"
+  ],
+  "compiledRemovedFromControl": [
+    "dist/harness-web/excel-7UUX62KX.js"
+  ],
+  "supplierCssAndNoticesUnchanged": true,
+  "fullCohortsStatus": "not-started",
+  "fullMigrationQualified": false,
+  "promotionAllowed": false,
+  "priorHostedFailureSoleCauseProven": false,
+  "retainedPreparationFailures": [
+    "Initial GUI setup did not open the responsive sidebar, so View options was unavailable",
+    "Fixture setup initially omitted explicit workspace registration and used an absent row attribute; corrected to the original data-row-key",
+    "Nonselected blank sessions are intentionally omitted by the supplier sidebar; an actual authored SDK seed now establishes a retained conversation before control assertions",
+    "The first compiled comparison assumed the old graph contained every current chunk filename; corrected comparison records added/removed graph assets separately"
+  ],
+  "inputSha256": {
+    "apps/harness/dsh-pi-controller.mjs": "e3ca005dc1cda15772ae03be5fe913c72132fa0373cea2753ca1b600a7479239",
+    "tests/harness-workspace-ordering.test.mjs": "3810d0c9274f183daeb75fde054f37ab1e2ad4b432e299ab2c00684b5e232805",
+    "tests/harness-workspace-ordering-chromium.test.mjs": "ba167841028115afbfeef2b19b30c9eb76f5c3b3ac90a1e5d08b7095f339bb6c",
+    ".github/workflows/app-sdk.yml": "90e20b995436e89298a494fddf1067388d1246e1bb2d83389ca9a5324507cd1f"
+  },
+  "remainingGates": [
+    "Full source and fresh ordinary cohorts at this implementation",
+    "New-head three-OS and full hosted acceptance",
+    "Physical MX feedback/guarded review adoption, live providers and installed workflows",
+    "Office full engine/output/font/performance/source/licence/distribution and complete migration/platform gates"
+  ]
+}

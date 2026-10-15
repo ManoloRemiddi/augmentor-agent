@@ -1,5 +1,37 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Catalog refresh ordering — October 15
+
+A delayed background workspace read could replace a confirmed Unarchive or
+workspace rename with its older snapshot. It could also clear a selected
+conversation using that old archive membership. Two overlapping refreshes could
+commit in reverse order, and an obsolete read error could surface after a newer
+successful update.
+
+The shared `DshPiController` now tracks local catalog updates and refresh reads.
+Any committed workspace snapshot invalidates reads already in flight, including
+reads begun while a mutation was pending. Only the newest refresh in the same
+conversation/access scope may commit or surface a read failure. Unrelated
+streaming updates do not invalidate catalog reads. A genuinely fresh archive
+still clears its selected conversation, and current failures still surface.
+No mutation, model request or unknown action is retried. Persisted Host revision
+and conflict policy, original GUI/CSS and dependency pins stay unchanged.
+
+Twelve shared cases cover restore/rename, overlapping reads, obsolete/current
+failures, during-mutation reads, selection/access changes and streaming updates.
+The actual original GUI at 513×715 opens its normal sidebar, restores an authored
+conversation, then receives a held real older `workspace.list` response. The old
+bundle re-archives its row; the corrected bundle keeps its original Archive
+action and opens retained history with no additional model request or history
+change. The seed is an actual isolated SDK/provider turn, not owner data.
+
+Shared Linux/macOS/Windows SDK CI now includes these controller contracts. Local
+source/ordinary cohort identities, exact controls and remaining hosted/installed/
+live/Office/migration gates are recorded in the
+[portable checkpoint](../release/harness-workspace-ordering.json). This supersedes
+the open controller finding below; it does not establish the earlier hosted
+post-Unarchive failure's sole cause or activate an installed build.
+
 ## Restore-row observation — October 15
 
 The original Archive/Undo/Unarchive fixture now waits for the restored row's
