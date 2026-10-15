@@ -336,6 +336,7 @@ export class Host {
     return {action:'handled' as const};
   }
   private permissionInput(m:Meta){return (pi:ExtensionAPI)=>pi.on('input',event=>{
+    if(typeof event.text!=='string')return;
     const r=this.loaded.get(m.id);
     try{
       const command=permissionCommand(event.text);if(!command)return;
@@ -347,6 +348,7 @@ export class Host {
     }catch(error){return this.rejectManagedInput(m,r,error);}
   });}
   private skillsInput(m:Meta){return (pi:ExtensionAPI)=>pi.on('input',async event=>{
+    if(typeof event.text!=='string')return;
     const r=this.loaded.get(m.id),steer=event.streamingBehavior==='steer',requestId=steer?r?.permissionSteer?.id:r?.activeRequestId;
     if(!r||event.source!=='rpc'||!m.running||r.cancelled||!requestId||!steer&&!r.preparingInput)return;
     const turnId=r.turnId,current=()=>this.loaded.get(m.id)===r&&m.running&&r.turnId===turnId&&(steer?r.permissionSteer?.id===requestId:r.activeRequestId===requestId&&r.preparingInput);
@@ -693,7 +695,7 @@ export class Host {
     const permissionSteer={id,text:attachmentInput.text};r.permissionSteer=permissionSteer;
     const pending=r.steering!.enqueue(id,attachmentInput.text,result=>{
       if(result.action==='handled'){queue.handledSteer(id);r.execution!.steerHandled();this.append(m,'runtime/notice',{message:'The correction was handled by an input extension. No copy of that input was sent to the model.',submittedContent:submittedParts(prior.input??'',prior.attachments),source:{kind:'user',rpcId:id},incomplete:false});}
-      r.observation?.record('execution/steer-input',{clientRequestId:id,action:result.action,handler:result.handler,skill:result.skill,template:result.template});
+      r.observation?.record('execution/steer-input',{clientRequestId:id,action:result.action,handler:result.handler,skill:result.skill??r.skillInputs.get(id)?.receipt.name,template:result.template});
     },error=>{r.failed=true;r.execution!.steerFailed();this.append(m,'runtime/error',{message:'Correction input preparation failed: '+String(error)});},attachmentInput.images);
     r.observation?.record('execution/steer-requested',{clientRequestId:id,boundary:'provider-supersession; dispatched-tools-settle',input:'sdk-public-input-and-approved-resources'});
     this.append(m,'runtime/notice',{message:'Steering accepted. Obsolete generation is stopping; any dispatched tools will settle before the correction.',incomplete:false});

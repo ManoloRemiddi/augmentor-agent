@@ -50,8 +50,14 @@ contracts, and real original skill/file GUI checks. Independent old official SDK
 and new managed expansion produce equal native/display/provider text for LF,
 BOM/CRLF/Unicode and empty-body authored sources. The old catalog/menu absence,
 first missing editor-transform assertion and real missing-source inference
-failure remain retained. Light/Dark source previews are visually checked. Full
-source/fresh-copy qualification and publication are pending at this checkpoint.
+failure remain retained. Light/Dark source previews are visually checked. The first full source/fresh-copy cohorts retain an existing steering-diagnostic
+regression: managed expansion had removed its approved skill-name field. The
+Host now carries that field from the owned prepared receipt, with the original
+assertion retained. Its next focused runtime check also retained a malformed
+non-string upstream-transform rejection regression. The managed readers now
+leave such invalid inputs to existing SDK/steering validation, preserving its
+rejected/uncertain outcome rather than converting it to handled. Fresh final
+qualification/publication are pending.
 The separate MX Permission review **20261015-163114-00e4ca65** does not contain
 this skill increment; its sealed bytes and installed selection remain unchanged.
 Owner feedback, representative Wiki skill workflows, full resource/provenance/
