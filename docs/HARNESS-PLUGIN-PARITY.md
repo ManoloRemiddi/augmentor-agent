@@ -50,6 +50,34 @@ It must retain Qwen/Breeze on RTX 5090, existing context/concurrency/precision a
 CPU ASR/VAD. Home, Handy, embedded profiles and other product adapters remain
 separate required workflows under the accepted migration specification.
 
+## Search order Save observation — October 15
+
+The preceding c09782c hosted original Search GUI check reads
+`user.providerOrder` immediately after the Save pointer event and calls
+`indexOf` while that stored field is undefined. The original card deliberately
+saves asynchronously through the supported private scope; a pointer release is
+not its storage commit. Keys/fetch/keyless fields already have commit barriers
+in the same driver, but drag order lacked one.
+
+A controlled Chromium fixture now holds the actual `search.set` request after
+one original drag/Save action. An independent Host read still has no stored order.
+The old immediate-read assertion reproduces the exact TypeError (**one case,
+one failure**); fixture inputs are authored and no owner credentials/history are
+used. This proves a premature-observation gap, without declaring the older CI
+network schedule or sole trigger captured.
+
+The driver confirms one held mutation, releases it once, waits for an actual
+stored array, retains the original Tavily-before-TinyFish assertion, then waits
+for the original card's clean disabled Save control. The existing 15-second
+observer and 90-second case bound, real drag/pointer events, original modes/keys/
+drafts/themes/scope/restart/collision assertions are unchanged. The full Search
+case passes **1/1** with this controlled barrier. No effective defaults substitute
+for storage, no retry occurs and no failed test is removed. Product/provider/GUI/
+CSS/supplier/dependency bytes remain unchanged; this is qualification-driver
+correction only. Full source/ordinary/new-head hosted acceptance is pending at
+this implementation checkpoint; installed/live/platform/migration and other
+release gates remain separate.
+
 ## Live Blender CLI workflow and retained inspection — October 14
 
 Public source **1d6c30faaed5c8fc392ed34cedc77eeed4d05677**, runtime unchanged
