@@ -59,7 +59,7 @@
   },
   "retainedPreparationFailure": "A private global fetch wrapper did not intercept the controller, which had already captured its fetch reference. Both initial controls timed out on the missing hold; corrected CDP response-stage controls are separate.",
   "remainingGates": [
-    "Fix separately reproduced stale controller workspace refresh after a confirmed mutation; fixture observation changes do not correct it",
+    "Subsequent catalog-ordering product fix passes local cohorts; hosted/installed/live adoption remains",
     "New-head hosted acceptance; earlier unrelated Context pointer failure remains historical",
     "Physical MX, live/installed/provider/browser and complete P0/P1 migration",
     "Office complete engine/output/font/performance/licence/distribution and other platforms"
@@ -138,5 +138,11 @@
     "widerLinuxAtObservation": "running",
     "linuxJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38702318726/job/116313720276",
     "newFixtureHeadHosted": "pending"
+  },
+  "subsequentProductCorrection": {
+    "ref": "ea3775bff3d520cfd4d6cba70ef946120beaeb32",
+    "record": "release/harness-workspace-ordering.json",
+    "localCohortsPassed": true,
+    "installedActivation": false
   }
 }

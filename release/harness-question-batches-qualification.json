@@ -239,7 +239,7 @@
     "outputQualified": false
   },
   "remainingGates": [
-    "Fix separately reproduced stale controller workspace refresh after a confirmed mutation; fixture observation changes do not correct it",
+    "Subsequent catalog-ordering product fix passes local cohorts; hosted/installed/live adoption remains",
     "Test-only verified toolbar selection qualifies subsequent local cohorts; original lone failure retained without a proven sole cause; hosted/live/installed browser qualification remains",
     "Physical owner MX feedback and guarded adoption preserving drafts/reviews",
     "Live providers, installed question/plan controls and wider configured extension/resource behavior",
@@ -378,5 +378,11 @@
     "localCohortsPassed": true,
     "fullMigrationQualified": false,
     "promotionAllowed": false
+  },
+  "subsequentCatalogOrderingCorrection": {
+    "ref": "ea3775bff3d520cfd4d6cba70ef946120beaeb32",
+    "record": "release/harness-workspace-ordering.json",
+    "localCohortsPassed": true,
+    "installedActivation": false
   }
 }

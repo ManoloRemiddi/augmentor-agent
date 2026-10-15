@@ -25,6 +25,16 @@ bundle re-archives its row; the corrected bundle keeps its original Archive
 action and opens retained history with no additional model request or history
 change. The seed is an actual isolated SDK/provider turn, not owner data.
 
+At **ea3775bff3d520cfd4d6cba70ef946120beaeb32**, full source and fresh ordinary
+each pass **401/two existing optional skips/zero failures** across 83 files/all
+46 Harness Chromium files. Both run concurrently with two workers per cohort and
+unchanged deadlines. All 1,013 compiled files and tracked input bytes match;
+20,702 production dependency files/symlinks, 151 npm instances, bundled Node and
+1,932 browser-test entries remain unchanged. The GUI graph changes are recorded,
+including one renamed Excel chunk; source supplier/CSS/notices stay unchanged.
+Nine packaging and two source-boundary guards pass. Three sealed inventories,
+selected configuration, four review processes and Qwen catalog verify preserved.
+
 Shared Linux/macOS/Windows SDK CI now includes these controller contracts. Local
 source/ordinary cohort identities, exact controls and remaining hosted/installed/
 live/Office/migration gates are recorded in the
@@ -63,7 +73,7 @@ A separate product probe confirms that an older background `workspace.list`
 reply can overwrite a confirmed restore with older archived membership in
 `DshPiController.refresh`. This fixture change does not fix that ordering defect.
 The checkpoint retains the exact authored condition and observed revisions;
-controller refresh/mutation ordering remains an explicit next product fix.
+the subsequent catalog refresh ordering correction above supersedes that source gap.
 
 [Structured question batches and original plan review](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
 restore whole-batch/multi-choice/custom/Skip behavior and the copied full-plan

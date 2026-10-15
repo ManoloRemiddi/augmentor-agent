@@ -11,6 +11,11 @@ state, explicit reopening, exact retained SDK history and no further model input
 The initial seed is synthetic; no owner source/history is used. Old controller/
 bundle negatives and corrected positives are recorded separately in the
 [checkpoint](../release/harness-workspace-ordering.json).
+At implementation ea3775b, source and fresh ordinary each pass 401/two optional
+skips/zero failures across 83 files/all 46 Harness Chromium files. Two workers per
+cohort and existing deadlines remain. All compiled/tracked inputs match; supplier
+CSS/dependencies and installed/review preservation verify. Eleven packaging/
+source-boundary cases pass without opening public Office distribution.
 
 [Restore-row observation](../docs/DSH-GUI-ON-PI.md#restore-row-observation--october-15)
 qualifies the original archive/Undo/restore workflow's next explicit open against

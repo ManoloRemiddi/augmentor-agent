@@ -1,13 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Catalog refresh ordering](DSH-GUI-ON-PI.md#catalog-refresh-ordering--october-15)
-prevents older background reads from undoing confirmed restore/rename state or
-clearing selection. Twelve common contracts and a controlled original 513×715
-GUI/actual Host case reproduce the defect and pass after the fix; the seed is
-synthetic and controls add no inference or history changes. Original GUI/CSS,
-Host conflict/mutation policy and dependency pins stay unchanged. Full cohorts,
-source/ordinary identities and remaining hosted/installed/live/migration gates
-are separate in the [checkpoint](../release/harness-workspace-ordering.json).
+at **ea3775bff3d520cfd4d6cba70ef946120beaeb32** prevents older background reads
+from undoing confirmed restore/rename state or clearing selection. Source and
+fresh ordinary each pass **401/two optional skips/zero failures**, 83 files/all
+46 Harness Chromium files, two workers per cohort/unchanged bounds. Twelve common
+cases and an original 513×715 GUI/actual Host case prove the defect and correction;
+controls preserve seeded history and add no inference. All 1,013 compiled files
+match ordinary; Node/dependencies, supplier GUI/CSS, three sealed inventories,
+selection/four review processes and Qwen catalog verify. Eleven packaging/boundary
+checks pass with the public engine gate closed. New-head hosted, installed/live/
+physical/Office and complete migration/platform gates remain open.
+[Portable checkpoint](../release/harness-workspace-ordering.json).
 
 [Restore-row qualification](DSH-GUI-ON-PI.md#restore-row-observation--october-15)
 at fixture **42573b6** passes source/ordinary **388/two optional skips/zero failures
