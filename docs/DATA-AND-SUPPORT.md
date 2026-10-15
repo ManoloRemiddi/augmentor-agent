@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Session-export snapshot source](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)
+creates private temporary copies only when an internal caller explicitly invokes
+the API. Normal completion/cancel/close joins its producer and removes its own
+scratch. It never changes originals, diagnostic capture policy or configuration.
+An incomplete JSONL tail remains raw with an explicit coverage count; this does
+not reconstruct effective context. A replaced scratch directory is preserved with
+an error. Product source/family/attachment selection, browser download authority,
+expiry/shutdown and crash-orphan policy remain required before UI exposure. No
+owner data is exported by this checkpoint; current evidence uses authored files.
+
 [Managed skill request links](DSH-GUI-ON-PI.md#managed-skill-links-in-request-context--october-15)
 add an optional full public SDK user-message JSON fingerprint to an ordinary skill
 receipt. It includes the SDK timestamp/content in the hash and follows ordinary

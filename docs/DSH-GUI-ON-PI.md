@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Session export](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)
+has a tested snapshot/selected MIT ZIP foundation, but the original Header/dialog
+and `/export` are not wired yet. Source/attachment/family selection, authenticated
+one-use downloads, lifecycle/crash ownership and rendered end-to-end acceptance
+remain required; no placeholder export control or new layout is introduced.
+
 ## Live Raw Context arrival — October 15
 
 The raw reader can mount with a retained `model/request` before its matching

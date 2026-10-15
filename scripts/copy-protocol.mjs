@@ -49,3 +49,8 @@ for(const name of ['keyless-search','dsh-keyless-fetch']){
  for(const row of selection.files)if(createHash('sha256').update(readFileSync(source+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Public keyless source changed: '+name+'/'+row.path);
  cpSync(source,'dist/runtime/vendor/'+name,{recursive:true});
 }
+
+const exportSource='packages/runtime/vendor/dsh-session-log-export';
+const exportSelection=JSON.parse(readFileSync(exportSource+'/SOURCE.json','utf8'));
+for(const row of exportSelection.files)if(createHash('sha256').update(readFileSync(exportSource+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Public DSH session-export source changed: '+row.path);
+for(const name of ['LICENSE','SOURCE.json'])copyFileSync(exportSource+'/'+name,'dist/runtime/vendor/dsh-session-log-export/'+name);

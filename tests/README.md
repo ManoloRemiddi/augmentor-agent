@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Archive snapshot foundation](../docs/AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15):
+`archive-snapshot.test.mjs` has 20 authored real-filesystem/ZIP cases for immutable
+bytes/inventory, appending/changed/replaced sources, caller path mutation, path and
+symlink refusal, ZIP32 budgets, integrity/corrupt JSON, normal/cancel/error cleanup,
+private-root replacement, surrogate boundaries and consumer backpressure. Initial
+prototype lifecycle and default-argument fixture failures remain retained, as does
+the pre-correction mutable-path control. This does not test a Host/HTTP/GUI export
+flow; that full workflow remains open. Full source/fresh-copy qualification is in
+progress. Notice assembly now checks the added MIT supplier notices explicitly.
+
 [Live Raw Context arrival](../docs/DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15):
 `harness-context-live-chromium.test.mjs` delays delivery of actual provenance frames
 in a real private Pi/original-GUI flow. It checks automatic later coverage without

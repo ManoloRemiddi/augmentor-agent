@@ -71,7 +71,7 @@ def assemble(app, baseline, node_notice_baseline=None):
             if selected != provenance[key]:
                 raise ValueError('Compiled supplier provenance differs from its selected source: ' + name)
             require('licenses/' + seat + '/SOURCE.json', vendor / 'SOURCE.json')
-    for name in ('dsh-attachment', 'dsh-file-reference', 'dsh-preview', 'dsh-model-discovery', 'dsh-office', 'dsh-plugin-wiki-tools', 'dsh-plugin-wiki-skills'):
+    for name in ('dsh-attachment', 'dsh-file-reference', 'dsh-preview', 'dsh-model-discovery', 'dsh-office', 'dsh-plugin-wiki-tools', 'dsh-plugin-wiki-skills', 'dsh-session-log-export'):
         # Office's TypeScript is compiled by tsc; its notice inputs stay in
         # preferred source, unlike the copied JavaScript vendor directories.
         vendor = app / ('packages/runtime/vendor' if name == 'dsh-office' else 'dist/runtime/vendor') / name

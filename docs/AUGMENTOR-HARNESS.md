@@ -1,5 +1,71 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Session-export archive foundation — October 15
+
+The pinned MIT DSH export package supplies the original Header More action,
+progress/error dialog, command controller and bounded fflate ZIP producer.
+[Upstream package contract](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/session-query/session-log-export/README.md)
+expects a browser download containing the root, sub-sessions and attachments.
+Its DSH persistence serializer cannot represent raw Pi history faithfully.
+The Pi adapter must therefore select original Pi/display files and verified
+attachment/delegation sources while reusing the original download presentation.
+
+This source increment selects only the pure compression section/types in
+`packages/runtime/vendor/dsh-session-log-export/zip.ts`, with the original MIT
+LICENSE and exact upstream/adapted hashes. DSH Host service arguments become an
+entry iterator; a completion callback lets the owned adapter join producer
+settlement. Compression/chunking/backpressure/abort bodies otherwise stay upstream.
+No DSH Host or new package is loaded; fflate remains the existing pinned **0.8.3**.
+Build validation copies/checks the selected source notices, and private notice
+assembly retains the new supplier alongside prior licences.
+
+Owned `ArchiveSnapshot` accepts only caller-authorized explicit root/file/ZIP-path
+triples. It performs no directory discovery, model input, network call, SDK owner
+creation or browser path resolution. Regular owned descriptors and root/path
+identities refuse outside paths, redirected parents and file swaps. Raw bytes
+are copied to private **0700/0600** scratch, hashed and read again at the same
+captured prefix. Appends can continue beyond that boundary; a changed prefix or
+object digest/size mismatch refuses. Optional JSONL observation parses complete
+records only and records an incomplete tail without changing its original bytes.
+The metadata inventory is a defensive copy, with portable ZIP paths and hashes.
+Caller entries are frozen copies captured before observation, so a callback cannot replace an
+already validated ZIP path. Streaming rechecks its private stored bytes.
+
+`manifest.json` identifies **augmentor-session-archive/1**, source sizes/hashes and
+JSONL coverage. It is an archive description, not a DSH or Pi import format.
+The current ZIP32 safety budgets are **3 GiB input, 8 MiB aggregate path text,
+1 MiB information, 32 MiB manifest, 65,534 source files** and **64 MiB per observed
+JSONL record**. Oversized archives refuse; no partial success or byte trimming is
+reported. Compression uses a 64 KiB queue/push boundary. Request/consumer/explicit
+close cancellation joins the producer and source descriptors before `settled`.
+Normal close removes only its owned scratch identity; a replaced scratch root is
+preserved with an error. Automatic crash-orphan reclamation is not implemented.
+
+Twenty authored filesystem/actual ZIP tests qualify source prefixes, exact
+Unicode/binary data, incomplete tails, mutable caller entries, path/symlink and
+atomic-replacement refusals, sparse oversized files, size/hash/JSON failures,
+producer failure, consumer backpressure/cancellation and private scratch lifetime.
+The initial 16-case prototype exposed premature cleanup completion and one invalid
+information test used a helper default incorrectly; both failures are retained.
+A separate mutable-entry control fails before the shallow snapshot correction.
+No existing product failure is inferred from those unpublished prototypes.
+Strict check/build and focused checks pass; full source/fresh-copy qualification
+is in progress. Existing GUI/SDK/owner profiles and the installed selection stay
+unchanged; no export capability is advertised yet.
+
+The complete export workflow remains the target, with these required next steps:
+
+1. Select root native/display history, retained diagnostics, verified delegated
+   descendants and only declared/authorized attachment objects, with honest gaps.
+2. Add operator-authenticated preflight and short-lived single-use browser download
+   authority without placing the long-lived Harness capability in a URL.
+3. Join prepared/streaming leases with maintenance/shutdown, timeouts, response
+   disconnect and safe crash-orphan cleanup; validate source and child identities.
+4. Reuse the original MIT Header/dialog/controller and `/export`, preserve drafts
+   and read-only scopes, and verify an actual browser ZIP against cold originals.
+5. Qualify the complete source/fresh artifact, physical MX workflow and later OS
+   artifacts before installed adoption or any claim of DSH retirement.
+
 [Fresh drafts / cold-history MX review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
 **20261015-144829-1de182ad** runs public 6ef121d/runtime 6bc2b0d, unselected,
 with scoped question drafts and exact cold-title loading in the original GUI.

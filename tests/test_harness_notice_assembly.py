@@ -58,7 +58,7 @@ class HarnessNoticeAssemblyTest(unittest.TestCase):
         provenance['dshFreeSearch'] = client
         write(app / 'dist/harness-web/SOURCE.json', json.dumps(provenance))
         write(app / 'dist/harness-web/THIRD-PARTY-NOTICES.txt', 'AUTHORED CURRENT GUI NOTICES')
-        for name in ('dsh-attachment', 'dsh-file-reference', 'dsh-preview', 'dsh-model-discovery', 'dsh-office', 'dsh-plugin-wiki-tools', 'dsh-plugin-wiki-skills'):
+        for name in ('dsh-attachment', 'dsh-file-reference', 'dsh-preview', 'dsh-model-discovery', 'dsh-office', 'dsh-plugin-wiki-tools', 'dsh-plugin-wiki-skills', 'dsh-session-log-export'):
             vendor = app / ('packages/runtime/vendor' if name == 'dsh-office' else 'dist/runtime/vendor') / name
             write(vendor / 'LICENSE', 'AUTHORED NOTICE ' + name)
             write(vendor / 'SOURCE.json', json.dumps({'fixture': name}))
@@ -72,6 +72,8 @@ class HarnessNoticeAssemblyTest(unittest.TestCase):
         self.assertEqual((app / 'licenses/node.txt').read_bytes(), (baseline / 'licenses/node.txt').read_bytes())
         self.assertEqual((app / 'licenses/dsh-gui/SOURCE.json').read_bytes(), (app / 'dist/harness-web/SOURCE.json').read_bytes())
         self.assertEqual((app / 'licenses/dsh-plugin-wiki-skills/ORIGINAL_LICENSE').read_text(), 'AUTHORED PRIOR SKILL NOTICE')
+        self.assertEqual((app / 'licenses/dsh-session-log-export/LICENSE').read_text(), 'AUTHORED NOTICE dsh-session-log-export')
+        self.assertEqual(json.loads((app / 'licenses/dsh-session-log-export/SOURCE.json').read_text())['fixture'], 'dsh-session-log-export')
         self.assertEqual(result['verifiedSearchSourceRecords'], 8)
         self.assertEqual((app / 'licenses/dsh-web-search-free/client/SOURCE.json').read_bytes(), (app / 'apps/harness/vendor/dsh-web-search-free/SOURCE.json').read_bytes())
         self.assertEqual((app / 'licenses/keyless-search/runtime/LICENSE-shinjiyu').read_text(), 'AUTHORED SUPPLIER NOTICE LICENSE-shinjiyu')

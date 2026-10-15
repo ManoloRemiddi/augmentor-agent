@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Archive snapshots](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)
+use shared Node descriptors, crypto, WHATWG streams and the existing fflate pin;
+there is no OS adapter or native package. The 20-case source fixture passes on
+Linux, and is added before the existing shared permission step in all three SDK
+jobs. The symlink case explicitly skips Windows creation privileges; other
+regular-path, cancellation and byte contracts remain. Hosted/ACL/physical/artifact
+acceptance and the actual export workflow remain unqualified. The existing MX
+review/installed selection and user-directed rollout order stay unchanged.
+
 [Live Raw Context arrival](DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15)
 is shared React/JSON glue with identical immutable-record/scope semantics on
 Linux/macOS/Windows. No OS adapter, package or protocol changes. Existing shared

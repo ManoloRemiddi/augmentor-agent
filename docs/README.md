@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Session-export archive foundation](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)
+adds an immutable, verified snapshot API and a selected MIT DSH bounded ZIP
+producer, with private cleanup and joined compression/cancellation. Twenty
+focused source cases pass; full source/fresh-copy qualification is in progress.
+This is a foundation only: Host session/attachment selection, download authority,
+crash/busy ownership and original GUI/command wiring remain required. `/export`
+is still unavailable; no owner data/artifact or installed selection is changed.
+
 [Live Raw Context arrival](DSH-GUI-ON-PI.md#live-raw-context-arrival--october-15)
 now watches the selected request's independently delivered provenance identity.
 A retained actual-Pi/original-GUI control delivers both real provenance frames
