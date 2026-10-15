@@ -48,7 +48,7 @@
   "productionCodeChanged": false,
   "supplierGuiOrCssChanged": false,
   "workersPerCohort": 2,
-  "fullCohortsStatus": "running",
+  "fullCohortsStatus": "passed",
   "fullMigrationQualified": false,
   "promotionAllowed": false,
   "hostedOriginalCauseProven": false,
@@ -59,9 +59,84 @@
   },
   "retainedPreparationFailure": "A private global fetch wrapper did not intercept the controller, which had already captured its fetch reference. Both initial controls timed out on the missing hold; corrected CDP response-stage controls are separate.",
   "remainingGates": [
-    "Full source/ordinary cohorts at corrected fixture",
+    "Fix separately reproduced stale controller workspace refresh after a confirmed mutation; fixture observation changes do not correct it",
     "New-head hosted acceptance; earlier unrelated Context pointer failure remains historical",
     "Physical MX, live/installed/provider/browser and complete P0/P1 migration",
     "Office complete engine/output/font/performance/licence/distribution and other platforms"
-  ]
+  ],
+  "fixtureRef": "42573b67425e17fde2d87e94b5cfeff2df4c53fc",
+  "fullCohortsPassed": true,
+  "sourceAndOrdinary": {
+    "source": {
+      "logSha256": "93bab1f3a9aa279ddd1c8a495381a33756910d7b61bd7b23625949da4d0a62c8",
+      "tests": 390,
+      "pass": 388,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "duration_ms": 194154.930327
+    },
+    "ordinary": {
+      "logSha256": "0dc2b727d72ea194a4e87244cbc9e926c566bb0eba8a66728ee63a54d003def4",
+      "tests": 390,
+      "pass": 388,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "duration_ms": 193068.913028
+    }
+  },
+  "testFileCount": 81,
+  "harnessChromiumFiles": 45,
+  "cohortsRanConcurrently": true,
+  "preservation": {
+    "observedAtUtc": "2026-10-15T08:07:11.049879+00:00",
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "fourReviewProcessesStillPresent": true,
+    "qwenCatalogHttpStatus": 200,
+    "canonicalPreexistingChanges": 38,
+    "matchingCompiledFiles": 1013,
+    "fixtureSourceAndOrdinaryMatch": true,
+    "productionDiffPaths": [],
+    "threeSealedInventoriesVerified": true,
+    "installedOrReviewActivation": false,
+    "modelSpeechGpuSettingsChanged": false
+  },
+  "officeSnapshot": {
+    "observedAtUtc": "2026-10-15T08:07:11.049879+00:00",
+    "state": "running",
+    "stage": "final-link",
+    "oomKilled": false,
+    "outputQualified": false
+  },
+  "separateOpenProductFinding": {
+    "condition": "A workspace refresh captures organization revision 1 before restore; restore confirms revision 2; the delayed old refresh then replaces revision 2 with archived membership from revision 1.",
+    "observed": {
+      "observedAfterConfirmedRestoreAndLateOlderRefresh": {
+        "revision": 1,
+        "organizationRevision": 1,
+        "items": [],
+        "pinnedSessionIds": [],
+        "archivedSessionIds": [
+          "restored"
+        ]
+      },
+      "expectedOrganizationRevision": 2,
+      "staleRestoreProjection": true
+    },
+    "logSha256": "8f63fb4982634953b59cf96737fed741979b6ed71eec0a858781d1b40c4681e9",
+    "fixedByThisFixtureChange": false,
+    "liveOrHostedCauseProven": false
+  },
+  "precedingHosted": {
+    "ref": "e43d3d3cba9c1cf7e5204446b2a933c3abee53a5",
+    "sdkThreePlatforms": "passed",
+    "homeActualPiImageModes": "passed",
+    "windowsDesktopX64AndArm64": "passed",
+    "sdkRun": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38702318581",
+    "homeJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38702318726/job/116313267683",
+    "widerLinuxAtObservation": "running",
+    "linuxJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38702318726/job/116313720276",
+    "newFixtureHeadHosted": "pending"
+  }
 }

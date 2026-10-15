@@ -6,7 +6,10 @@ its rendered row action, rather than only a direct Host read. The controlled
 negative holds the actual restore response after commit and reproduces the
 retained-output timeout; the released response plus original Archive-button
 barrier passes. The full owning Chromium file passes four cases each on source
-and ordinary, with unchanged deadlines/assertions/product/supplier code.
+and ordinary, with unchanged deadlines/assertions/product/supplier code. Full
+source and ordinary at fixture 42573b6 each pass 388/two existing optional skips/
+zero failures across 81 files/all 45 Harness Chromium files. A separate controller
+catalog-refresh race is reproduced and remains to fix; this is fixture qualification.
 [Checkpoint](../release/harness-restore-row-qualification.json) separates controls,
 full cohorts, the original hosted failure and installed/live/migration gates.
 

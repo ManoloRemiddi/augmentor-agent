@@ -239,6 +239,7 @@
     "outputQualified": false
   },
   "remainingGates": [
+    "Fix separately reproduced stale controller workspace refresh after a confirmed mutation; fixture observation changes do not correct it",
     "Test-only verified toolbar selection qualifies subsequent local cohorts; original lone failure retained without a proven sole cause; hosted/live/installed browser qualification remains",
     "Physical owner MX feedback and guarded adoption preserving drafts/reviews",
     "Live providers, installed question/plan controls and wider configured extension/resource behavior",
@@ -366,6 +367,14 @@
     },
     "applicationBytesChanged": false,
     "originalLoneFailureCauseProven": false,
+    "localCohortsPassed": true,
+    "fullMigrationQualified": false,
+    "promotionAllowed": false
+  },
+  "subsequentRestoreFixtureQualification": {
+    "ref": "42573b67425e17fde2d87e94b5cfeff2df4c53fc",
+    "record": "release/harness-restore-row-qualification.json",
+    "applicationBytesChanged": false,
     "localCohortsPassed": true,
     "fullMigrationQualified": false,
     "promotionAllowed": false

@@ -14,14 +14,24 @@ retained output, matching the hosted failure's symptom. Releasing the reply and
 waiting for the original row action before opening passes the complete workflow.
 No original supplier UI/CSS, controller, Host, action replay, model request,
 timeout or assertion changes. Both Undo and Unarchive use the observed barrier.
-All four cases in the owning Chromium file pass on source and ordinary; full
-cohorts and exact hashes are recorded in the
+All four cases in the owning Chromium file pass on source and ordinary. Full
+cohorts at fixture **42573b67425e17fde2d87e94b5cfeff2df4c53fc** each pass
+**388/two optional skips/zero failures**, across 81 files/all 45 Harness Chromium
+files. They run concurrently with two workers per cohort and unchanged bounds.
+All 1,013 compiled files and installed/review preservation verify; exact hashes
+are recorded in the
 [portable checkpoint](../release/harness-restore-row-qualification.json).
 
 The b1b1986 hosted failure did not retain its inner reply timing, so this proves
 the fixture defect without establishing that failure's sole cause. Product bytes
 remain d8520d5. Installed/review activation, live/physical MX, new-head hosted,
 Office and full migration acceptance remain separate.
+
+A separate product probe confirms that an older background `workspace.list`
+reply can overwrite a confirmed restore with older archived membership in
+`DshPiController.refresh`. This fixture change does not fix that ordering defect.
+The checkpoint retains the exact authored condition and observed revisions;
+controller refresh/mutation ordering remains an explicit next product fix.
 
 [Structured question batches and original plan review](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
 restore whole-batch/multi-choice/custom/Skip behavior and the copied full-plan

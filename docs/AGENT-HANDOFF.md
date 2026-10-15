@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Restore-row qualification](DSH-GUI-ON-PI.md#restore-row-observation--october-15)
+at fixture **42573b6** passes source/ordinary **388/two optional skips/zero failures
+each**, 81 files/all 45 Harness Chromium files, two workers per cohort/unchanged
+bounds. Held actual restore replies reproduce premature opening; the original
+Archive-button barrier qualifies Undo/Unarchive without product changes. All
+1,013 compiled files, three sealed inventories, selection/four review processes
+and Qwen catalog verify preserved. A separate stale controller catalog-refresh
+race is reproduced and remains to fix; hosted/live/installed/Office/full migration
+gates remain open. [Portable evidence](../release/harness-restore-row-qualification.json).
+
 [Structured question batches and original plan review](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
 now bind the original DSH question and full-plan controls to the existing Pi owner.
 Complete validated answers, exact tool-row hide/reopen, Request changes without
