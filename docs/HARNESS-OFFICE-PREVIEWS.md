@@ -11,6 +11,61 @@ open. Existing installed and unselected runtime artifacts are unchanged.
 
 # Original Harness Office previews
 
+## Public-source Office entry — October 15
+
+The default converter now uses **@augmentor/office-entry 0.1.3-augmentor.1**,
+built from the complete public preferred TypeScript source at
+[DSH LibreOffice Kit b19bb73](https://github.com/deepseek-ai/dsh-libreoffice-kit/tree/b19bb73c74ed893b8a5d1716d32df32a113ed31b/packages/entry/src).
+The verified source archive SHA-256 is
+`33839347e44b8df44c59115b566e9664e7db04a612a8f37ee2b220d7e501c036`.
+All 32 preferred-source files, original MPL-2.0 LICENSE/NOTICE, upstream/local
+hashes and explicit modifications are retained under
+`packages/runtime/vendor/office-entry`. This closes the entry's missing-source
+implementation gap by replacing the opaque npm entry. It does **not** establish
+that the npm 0.1.5 entry's preferred source was recovered.
+
+Only the source-fork identity and Wasm compatibility mapping change in the
+public entry implementation. The supported original MIT Office provider imports
+this component through its existing converter seat; queue, limits, scratch,
+cancellation, cache and original GUI behaviour remain. Native adapter type imports
+use the same component. Default Linux remains Wasm; `linux-native` remains opt-in.
+Public 0.1.3 native package mappings are pinned for other OSes, with **native and
+installed platform qualification still required**. No running or selected artifact
+is updated by this source change.
+
+The normal check verifies all source hashes and 31 generated declarations using
+TypeScript **5.9.3**. Build uses pinned esbuild **0.28.2** and emits four ESM entry
+points, source maps, complete preferred source/notices/build inputs and exact
+`SOURCE.json` hashes. Runtime dependencies are fontkit **2.0.4**, saxes **6.0.0**
+and the existing root fflate **0.8.3**; the opaque entry and its nested fflate
+0.8.2/Koffi dependency closure are removed. These are actual lock changes, not
+unchanged-dependency evidence. [Build and reconstruction instructions](../packages/runtime/vendor/office-entry/BUILDING.md)
+identify the source layout and pinned tools.
+
+The Linux packaging record is schema 2: all **82 source-built entry files** and
+all unchanged **49 engine files** are hash-bound. Production staging exports the
+entry's complete build/source/notice inventory as well as the existing 39 engine
+recipe/source files. Changed source, compiled entry, lock, links, extra files,
+forged exports and approval labels remain refused. **Public packaging continues
+to fail deliberately** because the exact engine rebuild is unqualified. MPL,
+font and third-party notice sufficiency are separate from private preview tests.
+
+Initial source integration passes strict check/build, all six actual authored
+Office formats through the original provider with unchanged inputs and owned
+cache copies, and **5/5** default queue/Wasm/original GUI cases. Nine real
+packaging cases pass, including preferred-source tampering and refusal of public
+Debian packaging. Fresh production staging collects **151** npm instance notices.
+Full source/ordinary and native-viewer qualification are recorded below when
+complete; these focused checks alone do not qualify a public or installed release.
+
+The separate full engine link retry on October 15 retains the verified compiler,
+recipe, one-thread resource controls and runtime/full-LTO flags in a copied cache.
+At an **8 GiB** memory cap it again terminates with OOMKilled=true, exit 1, exact
+8,589,934,592-byte peak and zero swap. The failed result is preserved; no repeated
+unchanged retry or further RAM increase is inferred. [Environment record](../release/office-rebuild/environment.json)
+retains this separately from the preceding 6 GiB attempts. Engine compile,
+packaging/render comparison and public binary approval remain false.
+
 ## Immutable authored scratch input — October 15
 
 The shared scratch-seat test generated a DOCX when writing its source, then
@@ -885,8 +940,9 @@ history, drafts or model context.
 
 ## Engine and licence scope
 
-Pinned **@deepseek-ai/libreoffice-kit 0.1.5** matches the public DSH lock. Its
-Linux **0.1.5 Wasm** package uses LibreOffice **26.8.0.3**, source
+The current [source-backed entry](#public-source-office-entry--october-15)
+replaces the historical **@deepseek-ai/libreoffice-kit 0.1.5** npm entry.
+The unchanged Linux **0.1.5 Wasm** package uses LibreOffice **26.8.0.3**, source
 **bce0998afefdbc355585ca324285661a2170ba77**, build identity
 **81c24980c5de51d11e2e50d48ea2bd98f9830a97d35df551f4aed8b6ff5bfe2c**.
 The package manifest, engine payload hashes, source/rebuild recipe and licence
@@ -917,6 +973,8 @@ the existing Sharp/libvips and Liberation-font gates. No public binary release
 or all-MIT product licence claim follows from this source change.
 
 ## Linux packaging source review — October 13
+
+Historical checkpoint. The [October 15 source-backed entry](#public-source-office-entry--october-15) supersedes the entry identity/inventory and its missing-source gap below; the engine/public distribution gate remains open.
 
 Implementation **647dd1a9d60ea53c716929481a3c28e19aa80615** adds
 `scripts/office_engine.py` to production staging and the Debian native inventory.

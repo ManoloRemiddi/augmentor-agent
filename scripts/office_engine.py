@@ -2,7 +2,7 @@
 """Bind the exact Linux Office payload to its shipped source and licence records.
 
 Private preview identity is distinct from permission to distribute this engine.
-The current source/rebuild and entry preferred-source gates remain open.
+The entry has public preferred source; the engine rebuild gate remains open.
 """
 import hashlib
 import json
@@ -12,7 +12,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 ENGINE = 'node_modules/@deepseek-ai/libreoffice-kit-wasm'
-ENTRY = 'node_modules/@deepseek-ai/libreoffice-kit'
+ENTRY = 'dist/runtime/vendor/office-entry'
 NOTICES = {
     'kit-LICENSE': (ENTRY, 'LICENSE'),
     'kit-NOTICE': (ENTRY, 'NOTICE'),
@@ -45,18 +45,22 @@ def file_at(directory, name, expected=None):
 def record(root=ROOT):
     path = file_at(root, 'release/office-engine-linux-wasm.json')
     item = json.loads(path.read_text())
-    if (item.get('schema') != 'augmentor-office-engine/1' or
+    if (item.get('schema') != 'augmentor-office-engine/2' or
             item.get('package', {}).get('name') != '@deepseek-ai/libreoffice-kit-wasm' or
-            item.get('entryPackage', {}).get('name') != '@deepseek-ai/libreoffice-kit' or
-            any(item[key].get('version') != '0.1.5' or item[key].get('license') != 'MPL-2.0'
-                for key in ('package', 'entryPackage'))):
+            item.get('package', {}).get('version') != '0.1.5' or
+            item.get('entryPackage', {}).get('name') != '@augmentor/office-entry' or
+            item.get('entryPackage', {}).get('version') != '0.1.3-augmentor.1' or
+            any(item[key].get('license') != 'MPL-2.0' for key in ('package', 'entryPackage'))):
         raise ValueError('Unreviewed Office package identity')
     for files in (item.get('files', {}), item['entryPackage'].get('files', {})):
         if not files or any(not re.fullmatch(r'[a-f0-9]{64}', value) for value in files.values()):
             raise ValueError('Office file inventory is missing or invalid')
     if (not {'assets/manifest.json', 'assets/soffice.wasm', 'licenses/LICENSE', 'licenses/NOTICE',
             'sources/engine/wasm-source/lok.cxx', 'sources/source-changes.patch'}.issubset(item['files']) or
-            not {'package.json', 'LICENSE', 'NOTICE', 'lib/index.js'}.issubset(item['entryPackage']['files'])):
+            not {'package.json', 'LICENSE', 'NOTICE', 'index.js', 'worker.js', 'UPSTREAM.json',
+                 'SOURCE.json', 'preferred-source/index.ts', 'preferred-source/engine.ts',
+                 'build-support/package-lock.json', 'build-support/build-office-entry.mjs'
+                 }.issubset(item['entryPackage']['files'])):
         raise ValueError('Office source/notice inventory is incomplete')
     return item
 
@@ -71,13 +75,12 @@ def validate_inputs(app, root=ROOT):
         meta = json.loads((package / 'package.json').read_text())
         locked = lock.get(directory, {})
         if (any(meta.get(key) != pin[key] for key in ('name', 'version', 'license')) or
-                any(locked.get(key) != pin[key] for key in ('version', 'license', 'integrity'))):
+                directory == ENGINE and any(locked.get(key) != pin[key]
+                                             for key in ('version', 'license', 'integrity'))):
             raise ValueError('Office installed package differs from the reviewed lock: ' + directory)
         actual = set()
         for path in package.rglob('*'):
             relative = path.relative_to(package)
-            if directory == ENTRY and 'node_modules' in relative.parts:
-                continue
             if path.is_symlink():
                 raise ValueError('Linked Office package content: ' + relative.as_posix())
             if path.is_file():
@@ -86,6 +89,19 @@ def validate_inputs(app, root=ROOT):
             raise ValueError('Office package file inventory changed: ' + directory)
         for name, expected in files.items():
             file_at(app, directory + '/' + name, expected)
+    if sha(app / 'package-lock.json') != sha(app / ENTRY / 'build-support/package-lock.json'):
+        raise ValueError('Office source build and installed dependency locks differ')
+    entry_source = json.loads((app / ENTRY / 'SOURCE.json').read_text())
+    preferred = json.loads((app / ENTRY / 'UPSTREAM.json').read_text())
+    if (entry_source.get('schema') != 'augmentor-built-office-entry/1' or
+            entry_source.get('files') != {name: digest
+                for name, digest in item['entryPackage']['files'].items() if name != 'SOURCE.json'} or
+            preferred.get('commit') != item['entryPackage']['sourceCommit'] or
+            preferred.get('archiveSha256') != item['entryPackage']['sourceArchiveSha256'] or
+            len(preferred.get('files', [])) != 32):
+        raise ValueError('Office entry preferred source/build identity changed')
+    for row in preferred['files']:
+        file_at(app, ENTRY + '/' + row['path'], row['sha256'])
     manifest = json.loads((app / ENGINE / 'assets/manifest.json').read_text())
     if (any(manifest.get(key) != value for key, value in item['engine'].items()) or
             manifest.get('inputs', {}).get('source') != item['source'] or
@@ -97,7 +113,8 @@ def validate_inputs(app, root=ROOT):
 
 
 def exports(item):
-    return {**NOTICES, **{name: (ENGINE, name) for name in item['files'] if name.startswith('sources/')}}
+    return {**NOTICES, **{name: (ENGINE, name) for name in item['files'] if name.startswith('sources/')},
+            **{'entry/' + name: (ENTRY, name) for name in item['entryPackage']['files']}}
 
 
 def component(item):
@@ -106,7 +123,20 @@ def component(item):
             'sha256': item['files']['assets/soffice.wasm'],
             'notices': ['office-engine/BUILD.json', *('office-engine/' + name for name in sorted(exports(item)))],
             'publicRedistributionQualified': False,
-            'scope': 'Exact private-preview payload, engine source and notice identities only.'}
+            'entryComponent': {'name': item['entryPackage']['name'],
+                'version': item['entryPackage']['version'], 'license': 'MPL-2.0',
+                'preferredSourceFiles': 32, 'sourceBuilt': True},
+            'scope': 'Source-built entry plus exact private-preview engine and source/notice identities.'}
+
+
+def stage_entry(app, root=ROOT):
+    """Copy the reviewed compiled/source component before production notice staging."""
+    item = record(root)
+    for name, expected in item['entryPackage']['files'].items():
+        file_at(root, ENTRY + '/' + name, expected)
+    target = app / ENTRY
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copytree(root / ENTRY, target)
 
 
 def stage_engine(app, root=ROOT):
@@ -144,6 +174,6 @@ def validate_bundle(app, root=ROOT, *, require_public=True):
         raise ValueError('Office native component inventory differs from reviewed inputs')
     if require_public:
         raise ValueError('Office public source/rebuild qualification remains open: '
-                         'the exact entry preferred source and engine rebuild are not qualified. '
+                         'the exact engine rebuild is not qualified. '
                          'Private-preview identity is not public redistribution approval.')
     return result

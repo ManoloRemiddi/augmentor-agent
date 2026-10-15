@@ -7,7 +7,7 @@ import type {BigIntStats} from 'node:fs';
 import type {FileHandle} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {readFile,lstat,open,unlink,mkdtemp} from 'node:fs/promises';
-import type {ConverterOptions} from '@deepseek-ai/libreoffice-kit';
+import type {ConverterOptions} from '../vendor/office-entry/index.js';
 import type {OfficeConverter} from '../vendor/dsh-office/index.js';
 import {OfficeToPdfError} from '../vendor/dsh-office/errors.js';
 import {createLinuxOfficeScratch} from './office-scratch-linux.js';

@@ -103,5 +103,42 @@
     "outputQualification": false,
     "retainedBuildAndContainer": true,
     "scope": "Thread controls were delivered to the full native linker but did not qualify the 6 GiB build; original failed tree retained."
+  },
+  "memory8ThreadLimitedAttempt": {
+    "date": "2026-10-15",
+    "applicationSourceRef": "1cb5a799fc1812559c5873f816e6007787ba0ee0",
+    "separateCopiedConfiguredTree": true,
+    "previousFailedTreePreserved": true,
+    "builderImageId": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924",
+    "driverSha256": "bd09f40d9f830ea3b862976910acbc0e74e2385bb19a87624b2721ce80356093",
+    "network": "none",
+    "limits": {
+      "cpus": 2,
+      "memoryBytes": 8589934592,
+      "memoryAndSwapBytes": 8589934592,
+      "pids": 1024,
+      "jobs": 1,
+      "nice": 15
+    },
+    "threadControls": {
+      "EMCC_CORES": "1",
+      "BINARYEN_CORES": "1",
+      "EMCC_CFLAGS": "-Wl,--threads=1,--thinlto-jobs=1"
+    },
+    "runtimeMemoryOrThreadFlagsChanged": false,
+    "fullLtoRetained": true,
+    "supplierBuildIdentityCapturesExtraResourceFlags": false,
+    "startedAt": "2026-10-15T03:08:22.681939143Z",
+    "finishedAt": "2026-10-15T03:09:29.855709952Z",
+    "exitCode": 1,
+    "oomKilled": true,
+    "memoryPeakBytes": 8589934592,
+    "swapMaxBytes": 0,
+    "lastStage": "compile-final-link",
+    "compileComplete": false,
+    "outputQualification": false,
+    "retainedBuildAndContainer": true,
+    "higherMemoryRetryStarted": false,
+    "scope": "8 GiB still exhausts memory at the final link; no model/speech/GPU service changes or public binary qualification."
   }
 }

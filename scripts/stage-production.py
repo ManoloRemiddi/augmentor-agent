@@ -200,6 +200,7 @@ def main():
     (target / 'distribution-overrides.json').write_text(json.dumps(overrides, indent=2) + '\n')
     (target / 'distribution-exclusions.json').write_text(json.dumps(excluded, indent=2) + '\n')
     if node_target['os'] == 'linux':
+        office_engine.stage_entry(target)
         office_engine.stage_engine(target)
     subprocess.run([sys.executable, str(ROOT / 'scripts/third-party-notices.py'), '--tree', str(target),
                     '--out', str(target / 'licenses/npm')], check=True)

@@ -9,8 +9,8 @@
       "path": "index.ts",
       "upstreamPath": "packages/document/office-to-pdf/src/index.ts",
       "upstreamSha256": "5e7030469a5ec1f432c6a2e8a2de10b5fb3b02d76bf27d3c8c59da00e913fbfb",
-      "sha256": "3f58e6a1c37820f4043770f847754696201b63e3d25e85aa929d7591f43edfa8",
-      "adaptation": "Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original converter/queue/scratch/error logic retained. Active teardown is exposed for maintenance; engine font disk cache is disabled. An explicit converter factory seat retains the original queue and lazy pinned default while allowing an independently authored native adapter. An optional backend-owned scratch seat acquires cleanup authority before writing source bytes and waits for its release before slot reuse; backends without it retain the original temporary-directory behavior."
+      "sha256": "5bb7e4a65df0fee46e0549276dbc2dc9ad53cc0170f5af39d449b0ceca425168",
+      "adaptation": "Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original converter/queue/scratch/error logic retained. Active teardown is exposed for maintenance; engine font disk cache is disabled. An explicit converter factory seat retains the original queue and lazy pinned default while allowing an independently authored native adapter. An optional backend-owned scratch seat acquires cleanup authority before writing source bytes and waits for its release before slot reuse; backends without it retain the original temporary-directory behavior. The default factory and option types use the separately licensed, public-source Augmentor Office entry component; queue, cache and scratch behavior are unchanged."
     },
     {
       "path": "errors.ts",

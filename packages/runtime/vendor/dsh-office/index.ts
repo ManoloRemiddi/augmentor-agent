@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { extname, isAbsolute, join } from 'node:path'
-import type { ConverterOptions } from '@deepseek-ai/libreoffice-kit'
+import type { ConverterOptions } from '../office-entry/index.js'
 import type { OfficePreviewSeat as Context, WorkspaceFileScope, WorkspaceFileStat } from '../../src/office-preview.js'
 import { brandString } from './brand.js'
 import { PreviewReadError as RemoteError } from '../../src/file-preview.js'
@@ -27,7 +27,7 @@ export interface OfficeConverter {
 }
 export interface OfficeScratch { directory: string; signal?: AbortSignal; dispose(): Promise<void> }
 export type OfficeConverterFactory = (options: ConverterOptions) => Promise<OfficeConverter>
-const pinnedConverter: OfficeConverterFactory = async options => (await import('@deepseek-ai/libreoffice-kit')).createConverter(options)
+const sourceConverter: OfficeConverterFactory = async options => (await import('../office-entry/index.js')).createConverter(options)
 
 /** Provider concurrency and kit rendering/font configuration. */
 export interface Config {
@@ -208,7 +208,7 @@ export class OfficeToPdf {
     let scratch: OfficeScratch | undefined
     try {
       if (slot.converter === undefined) {
-        slot.converter = (this.config.converterFactory ?? pinnedConverter)(this.options).catch((error: unknown) => {
+        slot.converter = (this.config.converterFactory ?? sourceConverter)(this.options).catch((error: unknown) => {
           delete slot.converter
           throw error
         })

@@ -44,6 +44,10 @@ class OfficeEnginePackagingTests(unittest.TestCase):
         self.assertFalse(result['publicRedistributionQualified'])
         sources = list((self.app / 'licenses/office-engine/sources').rglob('*'))
         self.assertEqual(sum(path.is_file() for path in sources), 39)
+        preferred = list((self.app / 'licenses/office-engine/entry/preferred-source').rglob('*.ts'))
+        self.assertEqual(len(preferred), 32)
+        self.assertEqual(result['entryComponent']['version'], '0.1.3-augmentor.1')
+        self.assertTrue(result['entryComponent']['sourceBuilt'])
         for notice in result['notices']:
             self.assertTrue((self.app / 'licenses' / notice).is_file(), notice)
         self.assertEqual(result, office.validate_bundle(self.app, require_public=False))
@@ -91,7 +95,8 @@ class OfficeEnginePackagingTests(unittest.TestCase):
             self.stage()
 
     def test_changed_engine_source_and_compiled_entry_are_not_accepted(self):
-        for name in (office.ENGINE + '/sources/source-changes.patch', office.ENTRY + '/lib/index.js'):
+        for name in (office.ENGINE + '/sources/source-changes.patch', office.ENTRY + '/index.js',
+                     office.ENTRY + '/preferred-source/engine.ts'):
             path = self.app / name
             original = path.read_bytes()
             path.write_bytes(original + b'changed')
