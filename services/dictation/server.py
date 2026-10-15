@@ -41,7 +41,7 @@ def process_alive(pid):
 class Backend:
     def __init__(self, base, session="default"):
         self.base=base; self.lock=threading.RLock(); self.child=None; self.pending={}; self.sequence=0; self.generation=0; self.owner=None;self.input_daemon=None;self.portal=None
-        self.key_events=queue.Queue();self.restore_at=0
+        self.key_events=queue.Queue();self.restore_at=0;self.draft_owner=None
         threading.Thread(target=self.key_worker,daemon=True).start()
         self.inputdir=base/session;self.inputdir.mkdir(exist_ok=True,mode=0o700)
         self.statefile=base/'preferences.json'
@@ -167,6 +167,7 @@ class Backend:
         finally:self.pending.pop(ident,None)
 
     def stop(self):
+        self.draft_owner=None
         instance,self.portal=self.portal,None
         if instance:instance.close()
         self.stop_input()
@@ -183,9 +184,44 @@ class Backend:
             for descriptor in module._leases:os.close(descriptor)
             module._leases.clear()
 
+    def reap_draft(self):
+        """Cancel only the dead/expired client's token; never replay a start."""
+        with self.lock:
+            owner=self.draft_owner
+            if not owner:return
+            if process_alive(owner['pid']) and time.monotonic()<owner['deadline']:return
+            if self.child and self.child.poll() is None:
+                try:
+                    self.call('draft.cancel',{'token':owner['token']})
+                    state=self.call('draft.poll',{'token':owner['token']})
+                    if state.get('worker'):return
+                    self.call('draft.release',{'token':owner['token']})
+                except (OSError,RuntimeError,TimeoutError):return
+            self.draft_owner=None
+
+    def draft_request(self,method,params):
+        token=params.get('token')
+        import re
+        if not isinstance(token,str) or not re.fullmatch('[0-9a-f]{32}',token):raise ValueError('Invalid draft token.')
+        if method=='draft.start':
+            if self.draft_owner or self.owner:raise RuntimeError('Microphone is busy in another Augmentor capture.')
+            if type(params.get('pid')) is not int or params['pid']<=0 or not process_alive(params['pid']):raise ValueError('Invalid draft owner.')
+            self.start()
+            if self.call('status',{}).get('direct_draft_capture') is not True:raise RuntimeError('This Handy component needs the direct-draft update.')
+            self.draft_owner={'token':token,'pid':params['pid'],'deadline':time.monotonic()+180}
+            try:return self.call(method,{'token':token})
+            except Exception:
+                self.draft_owner['deadline']=0
+                self.reap_draft()
+                raise
+        if not self.draft_owner or self.draft_owner['token']!=token:raise RuntimeError('Draft capture ownership changed; no text was inserted.')
+        result=self.call(method,{'token':token})
+        if method=='draft.release':self.draft_owner=None
+        return result
+
     def idle_ready(self):
         with self.lock:
-            if self.preferences.get('enabled') or self.owner:return False
+            if self.preferences.get('enabled') or self.owner or self.draft_owner:return False
             if not self.child or self.child.poll() is not None:return True
             # A disabled settings read can have started Handy. Keep asynchronous
             # downloads/capture alive; retire only after explicit native evidence.
@@ -198,10 +234,13 @@ class Backend:
 
     def request(self, method, params):
         with self.lock:
+            self.reap_draft()
             if self.owner:
                 if not process_alive(self.owner['pid']):
                     if self.child and self.child.poll() is None:self.call('conversation.release',{'token':self.owner['token']})
                     self.owner=None
+            if method in {'draft.start','draft.stop','draft.poll','draft.cancel','draft.release'}:
+                return self.draft_request(method,params)
             if method=='initialize':
                 if 'theme' not in self.preferences:self.request('theme',params['theme'])
                 return self.request('status',{})
@@ -226,6 +265,7 @@ class Backend:
                     self.stop()
                 self.preferences['enabled']=params['enabled'];self.save();return {}
             if method=='conversation.acquire':
+                if self.draft_owner:raise RuntimeError('Microphone is busy in EDGE dictation.')
                 expires=params.get('expires_at')
                 if expires is not None and (type(expires) is not int or expires<=time.time_ns()):raise RuntimeError('Voice input request expired; start voice again.')
                 if self.owner and self.owner['token']!=params.get('token'):raise RuntimeError('Microphone is busy in another Augmentor conversation.')
@@ -241,7 +281,7 @@ class Backend:
                     self.owner=None
                 return {}
             if method=='shutdown':
-                if self.owner:raise RuntimeError('Close Augmentor voice before maintenance. Nothing was cancelled.')
+                if self.owner or self.draft_owner:raise RuntimeError('Finish Augmentor voice/draft capture before maintenance. Nothing was cancelled.')
                 if self.child and self.child.poll() is None and self.call('status',{}).get('phase') in ('recording','transcribing'):raise RuntimeError('Finish or cancel dictation before maintenance.')
                 self.stop();self.shutting_down=True;return {}
             if method=='status' and not self.preferences.get('enabled') and not self.child:
@@ -342,6 +382,7 @@ def main():
         try:
             while not stopped.wait(1):
                 backend.restore_enabled()
+                backend.reap_draft()
                 with backend.lock:
                     if backend.owner and not process_alive(backend.owner['pid']):
                         try:

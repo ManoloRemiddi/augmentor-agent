@@ -2,6 +2,16 @@
 
 # Start here: agent handoff
 
+## October 15 EDGE direct draft capture — development
+
+[Direct capture contract](EDGE-DRAFT-DICTATION.md) adds token/PID-owned capture to
+the shared Handy component/broker for the companion EDGE surface. Six admission
+and cleanup cases plus 22 existing broker cases pass. Actual virtual-mic CPU ASR
+and compatible installed broker adoption passed; source `d1b7b1b` is in draft
+PR #47. Physical dictation works per the owner, but the companion touch/focus
+acceptance is still failing and under correction. No artifact was patched in
+place; preserve existing conversations and the unsent EDGE draft.
+
 ## October 5 dictation repair downloads — live
 
 The owner confirmed the recording overlay and authorized publication. PR #39
