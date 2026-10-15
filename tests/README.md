@@ -19,6 +19,16 @@ permission/export/feedback unavailable messages and retains all draft/action gua
 The original local/hosted failures remain evidence; Linux targeted 32/32 passes
 without a runtime change, and corrected Windows hosted behavior remains pending.
 
+The initial frozen 8c159cb7 source/fresh ordinary cohort retained **648 cases,
+643 pass/three failures/two existing optional skips** in each copy. Two original
+Chromium assertions still expected the pre-Export menu list/count; an Office
+maintenance fixture built with `Object.create(Host.prototype)` omitted the newly
+constructed `sessionExports.active` counter. The fixtures now require the original
+Export row at its supplier grouping position and supply an explicitly idle export
+owner. Runtime/GUI code and test deadlines/workers are unchanged. These failures
+are preserved and followed by a new frozen source/copy qualification, rather than
+being relabelled as passed or skipped.
+
 [Archive snapshot foundation](../docs/AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15):
 `archive-snapshot.test.mjs` has 20 authored real-filesystem/ZIP cases for immutable
 bytes/inventory, appending/changed/replaced sources, caller path mutation, path and

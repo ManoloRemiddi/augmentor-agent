@@ -97,6 +97,16 @@ The preceding [Mac packaging run](https://github.com/ManoloRemiddi/augmentor-age
 refuses unreviewed bundled MPL-2.0/LGPL-3.0-or-later suppliers; no allowlist or
 binary-promotion gate was relaxed. Public/OS artifact qualification stays open.
 
+The initial frozen 8c159cb7 source/fresh ordinary cohort retained **648 cases,
+643 pass/three failures/two existing optional skips** in each copy. Two original
+Chromium assertions still expected the pre-Export menu list/count; an Office
+maintenance fixture built with `Object.create(Host.prototype)` omitted the newly
+constructed `sessionExports.active` counter. The fixtures now require the original
+Export row at its supplier grouping position and supply an explicitly idle export
+owner. Runtime/GUI code and test deadlines/workers are unchanged. These failures
+are preserved and followed by a new frozen source/copy qualification, rather than
+being relabelled as passed or skipped.
+
 ## Session-export archive foundation — October 15
 
 Historical checkpoint at 46ad4a9, superseded by the source workflow above where it lists unwired controls or missing lifecycle work.

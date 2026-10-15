@@ -121,7 +121,7 @@ test('copied DSH GUI drives the real Pi owner, opens record details, inspects co
  assert.equal(await panel.evaluate('getSelection().toString()'),'Preserved draft text.');
  await click('document.querySelector("button[aria-label=\\"Add files or run commands\\"]")');
  await visible('document.querySelector("[data-trigger-menu] [role=listbox][aria-label=\\"Trigger suggestions\\"]")');
- assert.deepEqual(await panel.evaluate('Array.from(document.querySelectorAll("[data-trigger-menu] [role=option]")).map(x=>x.querySelector("[class*=itemName]")?.textContent)'),['File','Goal','Plan','Compact','Permission','Model','Prompt library','Jobs','Context','Full Pi record inspector']);
+ assert.deepEqual(await panel.evaluate('Array.from(document.querySelectorAll("[data-trigger-menu] [role=option]")).map(x=>x.querySelector("[class*=itemName]")?.textContent)'),['File','Goal','Plan','Compact','Permission','Model','Export','Prompt library','Jobs','Context','Full Pi record inspector']);
  assert(await panel.evaluate('document.querySelector("[data-trigger-menu]").innerText.includes("Add")&&document.querySelector("[data-trigger-menu]").innerText.includes("Commands")'));
  assert(await panel.evaluate('document.activeElement==='+editor),'the original slash menu keeps composer focus');
  await click('Array.from(document.querySelectorAll("[data-trigger-menu] [role=option]")).find(x=>x.textContent.includes("Set or view the goal"))');
@@ -218,7 +218,7 @@ test('original DSH Compact row saves a real Pi summary and reports its native bo
  let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'compact Chrome ready');const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);await panel.call('Emulation.setDeviceMetricsOverride',{width:513,height:715,deviceScaleFactor:1,mobile:false});await panel.reload();for(const domain of ['Runtime','Log','Network','Page'])await panel.call(domain+'.enable');
  const visible=expression=>until(()=>panel.evaluate('Boolean('+expression+')'),expression).catch(async error=>{error.message+=' '+JSON.stringify({body:await panel.evaluate('document.body.innerText'),errors:panel.errors,fixture:stderr});throw error;}),click=expression=>harnessPointerClick(panel,expression,until);
  await visible('document.querySelector("[contenteditable=true]")&&!document.querySelector("[contenteditable=true]").hasAttribute("aria-disabled")');
- await click('document.querySelector("button[aria-label=\\"Add files or run commands\\"]")');await visible('document.querySelectorAll("[data-trigger-menu] [role=option]").length===10');
+ await click('document.querySelector("button[aria-label=\\"Add files or run commands\\"]")');await visible('document.querySelectorAll("[data-trigger-menu] [role=option]").length===11');
  await click('Array.from(document.querySelectorAll("[data-trigger-menu] [role=option]")).find(x=>x.textContent.includes("Compact"))');
  let info;await until(async()=>{info=await rpc('session.compaction');return info.lastReceipt?.state==='completed';},'original Compact saves native entry');assert(info.lastReceipt.estimatedTokensAfter<info.lastReceipt.tokensBefore);assert.equal((await rpc('session.history')).events.filter(x=>x.event.type==='user/message').length,0);
  await click('Array.from(document.querySelectorAll("[role=tab]")).find(x=>x.textContent==="Context")');await visible('document.querySelector(".lc-root")&&document.body.innerText.includes("Context Stats")');
