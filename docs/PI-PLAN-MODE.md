@@ -122,6 +122,53 @@ case covers initial/normalized names and an intentionally changed authored metad
 title. Full source/ordinary and actual-Qwen cold-reopening qualification follow in
 the subsequent checkpoint; no installed/review artifact has been changed.
 
+## Repeat the local model / original GUI proof
+
+Run [`harness-local-plan-proof.mjs`](../scripts/harness-local-plan-proof.mjs) from
+a full source checkout, with Node 24.19.0, a separate QA application assembly,
+its qualified Python interpreter and installed Chromium. Supply a sanitized JSON
+declaration containing only `api`, loopback `baseUrl` and the single existing
+Qwen `models` entry; omit credential fields and preserve that model entry. The
+current proof is for its 262,144-token context declaration and 8,192-token output
+limit. It does not rewrite the served model, tuning, unit files or user profiles.
+
+```sh
+node scripts/harness-local-plan-proof.mjs \
+  --app "$AUGMENTOR_QA_APP" \
+  --python "$AUGMENTOR_PROOF_PYTHON" \
+  --provider-json "$AUGMENTOR_LOCAL_MODEL_JSON" \
+  --output-parent "$AUGMENTOR_PROOF_OUTPUT"
+```
+
+Every invocation creates a private output/profile and short owned runtime socket
+namespace. It starts only its own prompt/memory companions and Harness owner;
+no system service is started, stopped or restored by this optional command. The
+fresh read-only profile has no imported history, credentials, resources, memory
+inference gateway or voice/MCP configuration; child environment credentials are
+excluded. The actual provider must read the authored marker once and present its
+complete plan. Original Request changes concludes without approval; bare `/plan
+off` performs no inference, its next real response has no planning section, and
+cold original plan reopening preserves exact native/display history. All owned
+actors must terminate. The output captures native history, requests, provider SSE,
+logs and screenshots privately; it is not a support export or public artifact.
+
+The final public driver has passed one complete actual Qwen flow with three
+provider requests/two tools and verified output limit, local Page destinations,
+unchanged source file and cold history. Its five refusal/help cases pass without
+starting any actor. An earlier incomplete stream and subsequent service loss,
+setup-only Unix-path/navigation failures, premature reply observation and the
+actual duplicate-title failure remain retained. Passing this bounded flow does
+not establish their complete causes or broader reliability/provider/voice parity.
+
+The initial 90-file source/ordinary cohorts at 6bc2b0d each report **444 pass/one
+failure/two optional skips**. The only failure occurs in Codex Browser's initial
+work-tab lookup before its first model prompt; all native-title/mode/compaction
+cases pass. A held initial-document control reproduces that exact absent lookup;
+an explicit committed-document/extension-tab barrier passes while retaining the
+same permission checks, model/image assertions and 45-second case bound. The
+older unretained scheduling cause remains unproven. The final fresh cohort and
+portable checkpoint follow this fixture correction.
+
 ## Qualification and remaining work
 
 The [separate Linux owner review](HARNESS-MX-REVIEW.md#separate-plan-mode-review--october-15)

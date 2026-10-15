@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Initial toolbar work-document qualification](PI-PLAN-MODE.md#repeat-the-local-model--original-gui-proof)
+retains source/ordinary 6bc2b0d failures where the work-tab URL is absent before
+model submission. The fixture now starts its blank target explicitly, dispatches
+one navigation, then reads committed URL/document/input and extension tab identity
+before the original selection/toolbar action. A held response reproduces the
+exact old absence before the barrier; releasing it through readiness passes the
+complete existing flow. Permission denial/grant, image/model/queue checks and the
+45-second case remain. No product permission or execution change follows; the
+old original interleaving/sole cause and final broad qualification stay separate.
+
 ## Verified fixture toolbar selection — October 15
 
 Paired isolated Chromium runs reproduce the missing image with an actual

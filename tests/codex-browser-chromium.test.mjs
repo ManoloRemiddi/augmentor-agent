@@ -36,10 +36,12 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   const root = await mkdtemp(join(tmpdir(), 'codex-chromium-')); const sockets = [];
   let chrome, ipc, memory, interpreterRoot; let rounds = 0; const modelInputs = [];
   let queueMode = false, queueRounds = 0, releaseQueue; const queueInputs = [];
+  const holdWorkDocument=process.env.AUGMENTOR_CODEX_WORK_DOCUMENT_HOLD==='1';let releaseWorkDocument;
   const server = createServer(async (req, res) => {
     if (req.url === '/page') {
       res.setHeader('content-type', 'text/html');
-      res.end('<!doctype html><title>Codex browser fixture</title><input id="fixture-input"><button id="fixture-button" onclick="document.body.dataset.clicks=String(Number(document.body.dataset.clicks||0)+1)">Fixture action</button>'); return;
+      const body='<!doctype html><title>Codex browser fixture</title><input id="fixture-input"><button id="fixture-button" onclick="document.body.dataset.clicks=String(Number(document.body.dataset.clicks||0)+1)">Fixture action</button>';
+      if(holdWorkDocument)releaseWorkDocument=()=>res.end(body);else res.end(body);return;
     }
     if (req.url !== '/v1/responses') {res.writeHead(404); res.end(); return;}
     let body = ''; for await (const part of req) body += part; modelInputs.push(JSON.parse(body));
@@ -100,12 +102,12 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   await writeFile(join(profile, 'NativeMessagingHosts/com.augmentor.agent.json'), JSON.stringify({name: 'com.augmentor.agent', description: 'Isolated Codex proof', path: launcher, type: 'stdio', allowed_origins: [`chrome-extension://${extensionId}/`]}));
   const isolatedEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(AUGMENTOR_|DSH_|PI_)/.test(key)));
   await mkdir(join(root, 'runtime'), {mode: 0o700});
-  chrome = spawn(process.env.CHROMIUM_BIN ?? 'chromium', ['--headless=new', '--enable-unsafe-extension-debugging', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--load-extension=' + extension, '--disable-extensions-except=' + extension, base + '/page'], {env: {...isolatedEnv, HOME: root, XDG_CONFIG_HOME: join(root, 'config'), XDG_STATE_HOME: join(root, 'state'), XDG_DATA_HOME: join(root, 'data'), XDG_RUNTIME_DIR: join(root, 'runtime')}, stdio: 'ignore'});
+  chrome = spawn(process.env.CHROMIUM_BIN ?? 'chromium', ['--headless=new', '--enable-unsafe-extension-debugging', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--no-first-run', '--no-default-browser-check', '--remote-debugging-port=0', '--user-data-dir=' + profile, '--load-extension=' + extension, '--disable-extensions-except=' + extension, 'about:blank'], {env: {...isolatedEnv, HOME: root, XDG_CONFIG_HOME: join(root, 'config'), XDG_STATE_HOME: join(root, 'state'), XDG_DATA_HOME: join(root, 'data'), XDG_RUNTIME_DIR: join(root, 'runtime')}, stdio: 'ignore'});
   let port;
   for (let attempt = 0; attempt < 100; attempt++) {try {port = await chromiumPort(profile); if (port) break; await delay(50);} catch {await delay(50);}}
   assert.ok(port, 'Isolated Chromium started');
   const targets = () => fetch(`http://127.0.0.1:${port}/json`).then(response => response.json());
-  const pageTarget = (await targets()).find(target => target.url === base + '/page'); assert.ok(pageTarget);
+  const pageTarget = (await targets()).find(target => target.type==='page'&&target.url==='about:blank'); assert.ok(pageTarget);
   const page = await cdp(pageTarget.webSocketDebuggerUrl); sockets.push(page);
   const created = await page.call('Target.createTarget', {url: `chrome-extension://${extensionId}/sidepanel.html`});
   let panelTarget;
@@ -133,6 +135,21 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   assert.match(denied, /activeTab|all_urls|permission/i, 'No screenshot grant before a toolbar action');
   const browserTarget = await fetch(`http://127.0.0.1:${port}/json/version`).then(response => response.json());
   const browserControl = await cdp(browserTarget.webSocketDebuggerUrl); sockets.push(browserControl);
+  const workNavigation=page.call('Page.navigate',{url:base+'/page'});void workNavigation.catch(()=>{});
+  // Read-only startup barrier within the existing 45-second case / 100×50ms
+  // startup allowance. A discovered target is not a committed work document.
+  // BEGIN work-document readiness
+  let workDocumentReady=false,heldDocumentObserved=false;
+  for(let attempt=0;attempt<100;attempt++){
+    const present=await panel.evaluate(`chrome.tabs.query({}).then(tabs=>tabs.some(tab=>tab.url===${JSON.stringify(base+'/page')}))`);
+    if(holdWorkDocument&&releaseWorkDocument){
+      assert.equal(present,false,'The held initial document reproduces the old absent-tab lookup');assert.equal(modelInputs.length,0);heldDocumentObserved=true;t.diagnostic('Held initial work document: old toolbar lookup absent; no model request.');const release=releaseWorkDocument;releaseWorkDocument=undefined;release();
+    }
+    if(present){try{workDocumentReady=await page.evaluate(`location.href===${JSON.stringify(base+'/page')}&&document.readyState==='complete'&&Boolean(document.querySelector('#fixture-input'))`);if(workDocumentReady)break;}catch{/* Navigation can retire the previous context; no action is retried. */}}
+    await delay(50);
+  }
+  assert.equal(workDocumentReady,true,'The authored work document and its extension tab identity must be ready before toolbar selection');if(holdWorkDocument)assert(heldDocumentObserved);
+  // END work-document readiness
   // triggerAction resolves the target's window, then invokes the action on that
   // window's active tab. Its targetId does not select the intended work tab;
   // Page.bringToFront alone did not establish that precondition reliably.
@@ -143,6 +160,7 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   })()`);
   assert.equal(selectedWorkTab.url, base + '/page');
   assert.equal(selectedWorkTab.active, true, 'Select the actual work tab before the fixture toolbar action');
+  const navigation=await workNavigation;assert.equal(navigation.errorText,undefined);
   const tabTargets = await browserControl.call('Target.getTargets', {filter: [{type: 'tab', exclude: false}]});
   const workTab = tabTargets.targetInfos.find(target => target.url === base + '/page'); assert.ok(workTab);
   await browserControl.call('Extensions.triggerAction', {id: extensionId, targetId: workTab.targetId});

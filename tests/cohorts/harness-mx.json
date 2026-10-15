@@ -107,6 +107,7 @@
     "tests/plan-mode-contracts.test.mjs",
     "tests/harness-plan-mode-chromium.test.mjs",
     "tests/harness-question-drafts.test.mjs",
-    "tests/harness-question-drafts-chromium.test.mjs"
+    "tests/harness-question-drafts-chromium.test.mjs",
+    "tests/harness-local-plan-proof.test.mjs"
   ]
 }

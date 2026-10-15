@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Optional local plan proof](../docs/PI-PLAN-MODE.md#repeat-the-local-model--original-gui-proof)
+uses an explicit loopback declaration and private QA actors, never CI inference.
+Five help/refusal cases join the standard/shared SDK checks. The Codex Browser
+fixture's held initial-document before/after reproduces the absent toolbar lookup;
+its new read-only readiness barrier keeps permissions, images, queue assertions
+and the existing 45-second case bound. Final cohort evidence is separate.
+
 [Plan compaction and cold native titles](../docs/PI-PLAN-MODE.md#cold-owner-titles-and-actual-manual-compaction--october-15)
 add actual public-SDK/Host cases to `pi-plan-mode`: bounded manual compaction,
 pending mode/restart and exact file identity after reasoning loads. A retained

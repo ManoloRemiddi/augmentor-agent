@@ -267,3 +267,18 @@ image alternative text and manually followed links retain normal rendering.
 This is not a global audit of all Markdown paths or authorized external pages.
 Existing native-history retention and diagnostic clearing remain separate; no
 new household/session erase or support-export workflow is added.
+
+### Optional local plan qualification output
+
+The source-only [local plan probe](PI-PLAN-MODE.md#repeat-the-local-model--original-gui-proof)
+requires explicit QA application/interpreter/local-model declaration/output paths.
+It refuses credential fields, remote endpoints and output inside the application
+inventory before creating its proof profile. A fresh private root holds only its
+own authored workspace and generated configuration, raw model requests/SSE,
+native/display records, diagnostic receipts, actor logs and screenshots. Explicit
+configuration/receipt files are private; the enclosing output directory is mode
+0700. Runtime sockets use a separate short private directory, removed only after
+owned actors terminate. Raw output remains local; publish only a sanitized
+qualification summary. Browser storage and model replies in this proof are
+separate from the owner's running profiles. This command does not manage system
+services; any authorized model/voice restoration is a separate recorded operation.
