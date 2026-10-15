@@ -2,6 +2,43 @@
 
 # Pi voice integration
 
+## Original DSH web microphone — October 16, 2026
+
+The complete pinned public DSH snapshot **d7432673** includes an optional original
+web voice interface, outside the current selected GUI supplier subset:
+[`@deepseek-ai/dsh-experimental-client-ui-voice-input`](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/experimental/client-ui-voice-input),
+version **0.2.1-alpha.2**, with **MIT** in its package metadata and the upstream
+MIT copyright/license. Its bundle is MIT as well. The original microphone uses
+`conversation.input.activity`, between the model selector and Send. It provides
+the original recording toolbar, waveform, Cancel/Stop, device picker and setup/
+readiness views. This is a reusable original DSH interface for the remaining web
+entry point; a newly designed composer is unnecessary.
+
+The upstream workflow transcribes into an **editable draft**. It creates no
+conversation event and does not automatically send, speak replies, maintain a
+hands-free conversation, stream captions or listen for a wake word. Revision-bound
+insertion retains a transcript for explicit insertion if the draft changed.
+Session changes, cancellation, page hiding and disposal retire late results and
+join audio resources. See the [original subsystem](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/docs/subsystems/voice-input.md).
+
+Reuse the original public UI/components and attribution, then adapt recognition
+to Augmentor's existing CPU ASR service through an authenticated, bounded and
+cancellable Host contract. The upstream bundle installs its own SenseVoice
+runtime; selecting UI source does not authorize replacing the existing recognizer,
+downloading that runtime or changing model/device placement. Draft dictation must
+stay distinct from admitted spoken/hands-free submission and remain editable.
+Private HTTP ticket/close methods remain denied while a scoped recognition
+adapter is designed and qualified. Original supplier selection, composer/settings
+integration and retirement/late-result proofs are still implementation work.
+
+This is read-only source/license analysis, not a shipped microphone control. The
+full snapshot has **14,987 files**; all **615 existing supplier entries** verify
+against their recorded upstream source paths/hashes and selected-body hashes,
+including five already recorded adaptations. New candidate file hashes and the
+MIT license digest are in the [portable audit](../release/harness-original-web-voice-audit-20261016.json).
+No new supplier code, UI layout, dependency, ASR model, installed/review artifact
+or service configuration changes in this audit.
+
 ## Companion package acceptance — October 16, 2026
 
 A separately built **Resonant Voice 0.1.21** candidate now explicitly supports

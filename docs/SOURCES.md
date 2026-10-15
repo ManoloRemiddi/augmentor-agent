@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original DSH web microphone](PI-VOICE.md#original-dsh-web-microphone--october-16-2026)
+was found in the complete pinned public snapshot: the optional MIT 0.2.1-alpha.2
+plugin supplies the original microphone/toolbar/waveform/device picker and inserts
+editable drafts, with no automatic Send or speech playback. Reuse that original
+UI for the remaining web entry point while retaining the existing CPU ASR service;
+SenseVoice installation is not part of UI reuse. This is a read-only audit, with
+615 existing supplier records/five recorded adaptations reverified and no new
+source selected. [Portable audit](../release/harness-original-web-voice-audit-20261016.json).
+
 [Private Pi speech candidate](PI-VOICE.md#companion-package-acceptance--october-16-2026)
 **0.1.21/component add6fffb** now passes actual application acceptance in the
 speech repository's [draft PR #5](https://github.com/ManoloRemiddi/resonant-voice/pull/5).
