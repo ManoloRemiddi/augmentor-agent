@@ -2,6 +2,27 @@
 
 # Pi voice integration
 
+## Platform fixture correction — October 15, 2026
+
+Fixture source **760dd242** preserves the runtime at **999c1f5f**. The completed
+[38804829700 run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38804829700)
+passed Linux overall. The macOS voice step passed 36/37, including every actual
+Host case; its preview assertion expected a temporary-directory alias rather
+than the reader's canonical path. Windows passed 24/37: the same path assumption
+failed, and twelve Host cases stopped before startup because their speech
+fixture pre-created an ordinary directory that the private ACL helper correctly
+refused. No Windows Host/speech behavior was qualified by those failed cases.
+
+The corrected preview still submits its alias path and now requires the actual
+file's `realpath` namespace. Speech fixtures create a fresh unpredictable Windows
+directory through the existing atomic private creator. Existing directories are
+not repaired and no security check, assertion meaning, timeout or skip is relaxed.
+All 37 matching cases pass locally on Linux; corrected Mac/Windows hosting
+remains pending. The earlier Windows export-settlement failure is separate and
+unresolved. [Portable failed-run and correction record](../release/harness-pi-voice-platform-fixtures-20261015.json).
+This changes fixtures/documentation only; installed/review artifacts and model,
+voice and GPU configuration remain unchanged.
+
 ## Host ownership and joined close — October 15, 2026
 
 Host implementation **83d32ea7**, qualified with the **999c1f5f** Permission

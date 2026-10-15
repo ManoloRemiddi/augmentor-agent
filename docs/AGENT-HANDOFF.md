@@ -17,6 +17,14 @@ Hosted Linux/macOS SDK passes; Windows has two prompt-settlement timeouts before
 export is reached, with cause unproven. [Portable review evidence](../release/harness-export-context-review-20261015.json).
 
 
+[Platform voice fixture correction](PI-VOICE.md#platform-fixture-correction--october-15-2026)
+at **760dd242** keeps runtime **999c1f5f** unchanged and fixes canonical temporary
+path expectations plus atomic private Windows test-directory creation. Linux
+passes all 37 matching cases. Run 38804829700 retained macOS 36/37 (all Host cases
+passed) and Windows 24/37 (Host setup refused insecure pre-created directories).
+Corrected hosted behavior and the separate Windows export settlement remain
+unqualified; no deadlines/skips/guards, services or installed artifacts change.
+
 [Pi Host speech ownership](PI-VOICE.md#host-ownership-and-joined-close--october-15-2026)
 at **83d32ea7** binds the existing durable human queue/public SDK owner to scoped
 speech, Stop, orphan disconnect and joined setup/delivery shutdown. The 68-case
