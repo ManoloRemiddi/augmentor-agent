@@ -819,3 +819,9 @@ Node/dependency pins and original notices are unchanged. A shared authored promp
 function preserves Codex wording. A compatible real Pi companion is not yet a
 verified pin; controls/physical speech, installed migration and later platform
 artifacts remain pending.
+
+Implementation **cc6bbac59e88c6b347903cdeaac4df638d349d1b** qualifies source/fresh
+ordinary 712/two optional skips/zero failures, 123 files/all 53 Harness Chromium
+files, with 1,057 compiled/3,361 tracked inputs matching at freeze. Public/private
+source checks pass; no private component is published or pinned by these fixtures.
+[Portable scope, preserved failures and remaining gates](../release/harness-pi-input-mode-qualification.json).

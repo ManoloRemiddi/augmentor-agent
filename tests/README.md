@@ -8,7 +8,14 @@ unknown input. Unadmitted extension follow-ups cannot inherit human speech mode.
 Memory recall origin remains distinct from a later typed correction's style.
 The original GUI, current MX review and installed/services remain unchanged.
 Pi surface controls, compatible real companion and physical speech remain pending.
-Focused and full source/ordinary qualification is recorded below when complete.
+At **cc6bbac5**, source/fresh ordinary each pass **712/two existing optional
+skips/zero failures**, **123 files/all 53 Harness Chromium files**, unchanged
+workers/bounds. All **1,057 compiled/3,361 tracked inputs** match at freeze; focus
+83/83 (16 actual Host cases), real native branch/cold mode, 22 packaging/private
+boundary cases and two expected-failing isolated controls qualify. The pinned
+supplier/GUI source and dependencies remain unchanged. Earlier setup/projection/
+Qt failures and pending hosted/platform/installed gates are retained.
+[Portable qualification](../release/harness-pi-input-mode-qualification.json).
 
 `pi-input-mode.test.mjs` covers explicit mode validation, request-copy composition,
 legacy fingerprints, durable mode/recovery/editing, transcript source exclusions,

@@ -46,8 +46,29 @@ corrects that boundary. Later original-content checks were corrected for Pi's
 provider text-part array. Existing Codex native coverage initially used system
 Python without QtTest; qualification uses the established isolated interpreter.
 No deadlines, guards or skips were relaxed. TypeScript/build and the focused
-83/83 set pass with the established Qt interpreter. Full source/ordinary
-qualification is pending.
+83/83 set pass with the established Qt interpreter. At **cc6bbac5**, full source
+and fresh ordinary each pass **714 cases: 712 pass/two existing optional skips/
+zero failures**, **123 files/all 53 Harness Chromium files**, two workers and
+unchanged deadlines. All **1,057 compiled/3,361 tracked inputs** match at freeze.
+The 16 actual Host cases include same-owner steering and cold/edited queue input;
+the real native SDK child/cold proof preserves voice and text recall registers
+with no recall/tool replay. Two separate copies that remove live admission or
+typed style reset each fail the intended real Host test. The 22 notice/packaging/
+private-source cases and tracked/branch-history gate pass. An initial packaging
+command named two absent modules (six actual cases passed, two loader errors);
+the corrected four existing modules supply the 22-case result. The first generated
+GUI parity assertion expected exact bytes: only one spreadsheet chunk reference
+and four source-comment paths differ, with normalized code equal. Supplier,
+controller/layout/CSS, Node and 151 production npm instances stay unchanged.
+[Portable qualification and complete roster](../release/harness-pi-input-mode-qualification.json).
+
+Ten sealed inventories/eleven review owners, the selected configuration, canonical
+38 changes, private companion's four changes and six model/service configurations
+verify preserved. Qwen catalog returns HTTP 200. Breeze remains failed/zero PIDs
+and voice inactive; RTX 5090 has 2,012 MiB free against its existing 2,828 MiB
+startup requirement. It is not retried or moved and no model settings change.
+The current MX review remains application **8c159cb7**, without this new input-mode
+or Host-speech implementation; no new artifact is staged or activated.
 
 The preceding hosted run [38806598923](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38806598923)
 passes Linux and macOS overall at **d491e22b**. Windows advances through Host
@@ -62,6 +83,9 @@ remain separate. No private speech source or owner data is copied; the original
 GUI, current MX review, installed selection and services are unchanged.
 
 ## Platform fixture correction — October 15, 2026
+
+This dated fixture checkpoint is superseded for hosted status by the
+[spoken/typed checkpoint above](#spoken-and-typed-input--october-15-2026).
 
 Fixture source **760dd242** preserves the runtime at **999c1f5f**. The completed
 [38804829700 run](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38804829700)

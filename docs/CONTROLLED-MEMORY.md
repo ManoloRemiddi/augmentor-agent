@@ -21,7 +21,11 @@ A damaged/unknown latest record never falls back to an older one. Previous
 text-only readers reject a latest voice brief; installed downgrade/migration
 compatibility therefore remains an explicit qualification gate. Existing text
 snapshot bytes remain unchanged. No production memory processing or deployment
-settings change. Source/ordinary and actual SDK branch qualification is pending.
+settings change. At **cc6bbac5**, source/fresh ordinary each pass 712/two existing optional skips/
+zero failures, with 83 focused cases and real native SDK spoken/text brief,
+child/cold-owner restoration and no-recall/tool-replay checks passing. Full
+[portable evidence](../release/harness-pi-input-mode-qualification.json) records
+scope, retained failures and migration/platform gates.
 
 ## Memory-only llama.cpp request mode — October 14
 
