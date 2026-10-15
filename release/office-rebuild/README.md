@@ -1,5 +1,24 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The repaired low-optimization **full-LTO** attempt is now terminal: exit 1,
+OOMKilled=true, exact **8 GiB** peak/zero swap at final link. Its failed tree is
+retained. The separate [ThinLTO driver](run-thin-lto.sh) requires a **fresh Core
+build directory**, emits a verified LLVM ThinLTO summary and retains normal
+`-Oz` optimization. The actual standalone probe returns 42 and resolves the
+pinned Emscripten `thinlto` sysroot. Full-LTO objects are not reused.
+
+A first ThinLTO configure fails because global compiler flags included link-only
+options under a strict C++ check. The [additional MPL-2.0 build patch](thin-linker-resources.patch)
+puts one-thread/cache controls in the Emscripten link rule. Its initial placement
+conflicted with an earlier patch's reverse-check context; that failed tree is
+retained. The final appended rule passes **all 18 original reverse checks and its
+own reverse check** before launch. All original 39 recipe/source files are retained;
+the copied experimental recipe adds this one public patch. Its preferred source
+change is explicit. No warning check, module, format, runtime thread/memory policy
+or application dependency is removed. The final fresh attempt has passed configure
+and is compiling under the same 8 GiB cap, two CPUs, one job/nice 15 and no network.
+Its output, layout/performance, notices and public redistribution remain unqualified.
+
 The separate [low link-optimization driver](run-low-lto.sh) retains full LTO and existing Wasm runtime/thread/memory flags, but explicitly sets `--lto-O0 --lto-CGO0` alongside the existing one-thread controls. A small authored Wasm function compiles, executes to 42 and shows both flags exactly once in the pinned real linker invocation. The full source attempt uses a separately copied failed cache, the same **8 GiB/zero-swap** cap, two CPUs/one job/nice 15 and no network. It is an experimental build profile requiring its own output, performance and source/licence qualification; it does not update any application dependency or public release gate. The first full attempt fails before link because ccache writes outside the writable mount. Its complete failed tree/logs are retained. The repaired driver uses explicit `CCACHE_DIR`/`CCACHE_TEMPDIR` beneath `/office`; a separate copied cache reaches the real final linker, where both optimization flags and unchanged runtime memory/thread/table/entry flags are verified. The [environment record](environment.json) records the point-in-time process state, not a presumed build success. The source-built entry and public engine gate remain unchanged.
 
 The October 15 default entry is now [built from complete public source](../../packages/runtime/vendor/office-entry/BUILDING.md) as `@augmentor/office-entry@0.1.3-augmentor.1`. This replaces the opaque npm JavaScript entry; it does not rebuild the Wasm engine. The separate one-thread **8 GiB** final-link retry also OOMs (exit 1, exact cap, zero swap), so the engine/public binary gate remains open. The environment record retains all failed attempts. No additional unchanged retry or memory-cap increase follows automatically.

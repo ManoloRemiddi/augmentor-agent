@@ -7,7 +7,7 @@ import {createHash} from 'node:crypto';
 import {createServer} from 'node:http';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
-import {mkdtemp, mkdir, readFile, writeFile, rm} from 'node:fs/promises';
+import {mkdtemp, mkdir, readFile, writeFile, rm, symlink} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -16,6 +16,7 @@ import {CodexHost} from '../dist/codex-runtime/src/host.js';
 import {CodexIpcServer} from '../dist/codex-runtime/src/ipc.js';
 import {ProfileStore} from '../dist/codex-runtime/src/profiles.js';
 import {memoryServices} from './fixtures/codex/memory-services.mjs';
+import {useCodexTestNpmEntry} from './fixtures/codex/prerequisite.mjs';
 
 const repo = fileURLToPath(new URL('../', import.meta.url));
 async function cdp(url) {
@@ -31,8 +32,9 @@ async function cdp(url) {
 }
 
 test('loaded Chromium extension executes Codex-observed typing, clicking and screenshots on an isolated page', {skip: process.platform !== 'linux', timeout: 45000}, async t => {
+  const codexCli=useCodexTestNpmEntry(t);
   const root = await mkdtemp(join(tmpdir(), 'codex-chromium-')); const sockets = [];
-  let chrome, ipc, memory; let rounds = 0; const modelInputs = [];
+  let chrome, ipc, memory, interpreterRoot; let rounds = 0; const modelInputs = [];
   let queueMode = false, queueRounds = 0, releaseQueue; const queueInputs = [];
   const server = createServer(async (req, res) => {
     if (req.url === '/page') {
@@ -74,6 +76,7 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
     await ipc?.close(); server.closeAllConnections(); await new Promise(resolve => server.close(resolve));
     await memory?.close();
     await rm(root, {recursive: true, force: true, maxRetries: 5, retryDelay: 100});
+    if(interpreterRoot)await rm(interpreterRoot,{recursive:true,force:true});
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -88,9 +91,12 @@ test('loaded Chromium extension executes Codex-observed typing, clicking and scr
   const extensionId = createHash('sha256').update(Buffer.from(manifest.key, 'base64')).digest('hex').slice(0, 32).replace(/[0-9a-f]/g, char => String.fromCharCode(97 + parseInt(char, 16)));
   const profile = join(root, 'chromium'); await mkdir(join(profile, 'NativeMessagingHosts'), {recursive: true});
   const launcher = join(root, 'native-host');
-  const env = {AUGMENTOR_CODEX_STATE: join(root, 'host'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_BROWSER_WORKSPACE: join(root, 'workspace'), AUGMENTOR_WORKSPACE_PROFILE: '', AUGMENTOR_SHARED_STATE: memory.state, AUGMENTOR_SHARED_DATA: memory.data};
+  const env = {AUGMENTOR_CODEX_CLI:codexCli, AUGMENTOR_CODEX_STATE: join(root, 'host'), AUGMENTOR_CODEX_SOCKET: ipc.socketPath, AUGMENTOR_CODEX_BROWSER_WORKSPACE: join(root, 'workspace'), AUGMENTOR_WORKSPACE_PROFILE: '', AUGMENTOR_SHARED_STATE: memory.state, AUGMENTOR_SHARED_DATA: memory.data};
+  // Linux shebangs cannot quote an interpreter path containing spaces. The
+  // private alias keeps the exact selected Node binary and structured argv.
+  interpreterRoot=await mkdtemp('/tmp/augmentor-codex-node-');const interpreter=join(interpreterRoot,'node');await symlink(process.execPath,interpreter);
   // JSON strings are valid JavaScript literals; executable path and argv never pass through a shell.
-  await writeFile(launcher, '#!' + process.execPath + '\n' + `Object.assign(process.env, ${JSON.stringify(env)});import(${JSON.stringify('file://' + join(repo, 'apps/browser/native-host.mjs'))});\n`, {mode: 0o700});
+  await writeFile(launcher, '#!' + interpreter + '\n' + `Object.assign(process.env, ${JSON.stringify(env)});import(${JSON.stringify('file://' + join(repo, 'apps/browser/native-host.mjs'))});\n`, {mode: 0o700});
   await writeFile(join(profile, 'NativeMessagingHosts/com.augmentor.agent.json'), JSON.stringify({name: 'com.augmentor.agent', description: 'Isolated Codex proof', path: launcher, type: 'stdio', allowed_origins: [`chrome-extension://${extensionId}/`]}));
   const isolatedEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(AUGMENTOR_|DSH_|PI_)/.test(key)));
   await mkdir(join(root, 'runtime'), {mode: 0o700});

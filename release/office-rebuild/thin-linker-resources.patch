@@ -1,0 +1,10 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: MPL-2.0
+# Additional build-only patch over the pinned public LibreOffice source.
+--- a/solenv/gbuild/platform/EMSCRIPTEN_INTEL_GCC.mk
++++ b/solenv/gbuild/platform/EMSCRIPTEN_INTEL_GCC.mk
+@@ -127,2 +127,5 @@
+ 
+ # vim: set noet sw=4 ts=4
++
++# Augmentor: link-only resource controls for the experimental ThinLTO build.
++gb_LinkTarget_LDFLAGS += -Wl,--threads=1,--thinlto-jobs=1,--thinlto-cache-dir=/office/thin-link-cache

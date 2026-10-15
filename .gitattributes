@@ -18,3 +18,5 @@ LICENSE -text
 # Preserve published Wiki supplier source and original notice bytes, including CRLF.
 packages/runtime/vendor/dsh-plugin-wiki-tools/** -text -whitespace
 packages/runtime/vendor/dsh-plugin-wiki-skills/** -text -whitespace
+# An empty source line has one required context space in a unified patch.
+release/office-rebuild/thin-linker-resources.patch whitespace=-blank-at-eol

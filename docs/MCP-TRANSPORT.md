@@ -27,9 +27,20 @@ drain fails the revised receipt assertion with a closed connection, so the new
 ordering still detects loss of admitted work. A first focus command named a
 nonexistent extra path, which Node ignored: its 39 cases cover four actual files;
 only the corrected seven-file 45-case run is claimed here. New shared SDK CI runs
-all six modes on Linux/macOS/Windows. Full source/ordinary and new-head hosted
-qualification remain to be recorded; this is synthetic account/service evidence,
-not live or installed acceptance.
+all six modes on Linux/macOS/Windows. At fixture **8ac2c40b83be21bcf26378a6a43db1a8ffe05146**, the complete root
+Node suite plus 21 common DOM cases passes **1,255 cases, six identified skips,
+zero failures** at two workers. The six skips are two optional controlled Codex
+Browser cases and four actual Windows Job-object cases on Linux. The first whole
+ordinary run retains **1,252 passes/three failures/six skips**: two absent external
+Codex prerequisites and a test native-host shebang that cannot represent its
+bundled Node path containing spaces. The [separate prerequisite fixture correction](CODEX-PACKAGING.md#production-qualification-uses-an-explicit-prerequisite--october-15)
+qualifies those affected files without changing production or bundling a CLI.
+A complete corrected ordinary run remains required and is recorded separately.
+
+The [SDK workflow at 8ac2c40](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38680199098)
+passes Linux/macOS/Windows, including all six cancellation/authorization modes.
+These are synthetic account/service and shared API checks, not live, physical,
+installed or complete migration acceptance.
 
 # Managed MCP dispatch and failed acknowledgments
 
