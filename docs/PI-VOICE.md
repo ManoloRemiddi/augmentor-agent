@@ -2,6 +2,73 @@
 
 # Pi voice integration
 
+## Audio processor lifecycle and hosted POSIX qualification — October 16, 2026
+
+The private companion's next **0.1.21** source
+**2d25ba0c52b42f1ed693465cc63b7d63ea0dce8d** fixes a reproduced missing-FFmpeg
+pipe-drain failure and joins its owned input/processor before cleanup settles.
+Cancellation checks raw passthrough and buffered transformed PCM, retaining the
+existing processing settings and SIGTERM path. A failed processor returns a
+readable error; speech is not replayed. No agent owner, prompt input mode,
+conversation/memory contract, GUI layout or model/device placement changes.
+
+Source and fresh ordinary copies each pass **67 Node cases: 64 passed/three
+existing Windows-only skips/zero failures or cancellations**, **15 Python cases**
+and **four packed-companion actual Pi Host/SDK/Native/Browser cases** with two
+workers and unchanged deadlines. Actual isolated DSH 0.1.5 lifecycle and packed
+plugin install/compose/remove pass. All **90 tracked component/66 archive inputs**
+match. The new local candidate SHA-256 is
+`69313b72e92c60dcf206e9322e1620dcedff2773b51588a2de407e4409780571`.
+The older add6fffb archive below remains historical; no shared pin changes.
+[Portable acceptance](../release/harness-pi-audio-processor-qualification.json).
+
+[Hosted run 38822272331](https://github.com/ManoloRemiddi/resonant-voice/actions/runs/38822272331)
+at this exact component source passes **Linux x64 and macOS ARM64** full Node
+suites, each 67 cases/64 passes/three existing Windows-only skips, zero failures/
+cancellations. A pinned source-built FFmpeg **7.1.5** tool supplies the missing CI
+processor. Source/ordinary Linux recipes independently produce identical binary
+bits. Both actual processor safeguard-removal controls fail their one case as
+intended: removing buffered-output cancellation emits post-abort PCM; removing
+joined exit returns while the owned processor is still running.
+
+The tool selects PCM/WAV and tempo/volume/resampling support plus FFmpeg's command
+line dependencies. Source digest and configuration are locked; network,
+autodetection, GPL and nonfree configuration are disabled. FFmpeg remains a
+separate **LGPL-2.1-or-later CI tool**, excluded from the companion npm payload and
+public application/tests/CI; the companion's own source stays MIT. This does not
+adopt or redistribute a new product processor. See the
+[official release](https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz) and
+[licensing](https://ffmpeg.org/legal.html). Windows x64/ARM64 still stop at their
+working-FFmpeg prerequisite. No audio assertion is skipped, and the overall
+workflow remains failed; actual Windows app/audio support is not qualified here.
+
+Retained failures include the original missing-process control (unsettled await,
+exit 13), first buffered-PCM cancellation failure, and initial minimal configure
+names that omitted raw PCM support. The latter focus reports seven passes/two
+EPIPE failures; its complete development set reports 67 cases/62 passes/two
+failures/three existing Windows skips. Selecting `pcm_s16le` in configure and
+requiring a real PCM smoke test corrects the tooling. Prior cancelled hosted
+runs and failed prerequisite checks remain distinct from the qualified POSIX run.
+No bounds, worker counts or old skips are relaxed.
+
+These package/application integration checks still use a synthetic provider,
+ASR, PCM and audio devices. Recognition quality, Breeze generation and physical
+listening remain unqualified. No private source, fixture, archive or CI tool is
+copied into the public application. Reproduction requires private component
+access. Public application **4cb16513**, official Pi **1.1.0**, preserves all
+**3,366 tracked/1,057 compiled inputs**; the private external test copy's entire
+**27,067-entry inventory** is unchanged before/after, with no bytecode writes.
+
+Postflight re-verifies ten sealed reviews/eleven owners, selection, 38 canonical
+changes, four original companion changes and six service/model configurations.
+Qwen models return HTTP 200. Breeze remains failed/voice inactive with 2,012 MiB
+free on RTX 5090 against its existing 2,828 MiB admission requirement. The current
+MX review stays **20261015-211446-7474ddb2/application 8c159cb7**; it has no new
+speech artifact. Private distribution/pin/adoption, original DSH web microphone
+wiring, physical speech, full migration/owner feedback and later OS/public release
+gates remain. This component result also leaves application Windows and Office
+notice/public-rebuild packaging gates open.
+
 ## Original DSH web microphone — October 16, 2026
 
 The complete pinned public DSH snapshot **d7432673** includes an optional original

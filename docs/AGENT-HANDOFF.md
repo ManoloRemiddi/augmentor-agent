@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Audio processor cleanup and POSIX qualification](PI-VOICE.md#audio-processor-lifecycle-and-hosted-posix-qualification--october-16-2026)
+now fixes missing-tool backpressure, buffered PCM cancellation and joined owned
+process/input cleanup in private companion **0.1.21/component 2d25ba0**. Source/
+fresh ordinary each pass 64 Node cases plus three existing Windows-only skips,
+15 Python and four packed Pi cases, with pinned DSH lifecycle/install/remove,
+90 tracked/66 archive inputs and two expected-failing real-processor controls.
+Hosted **38822272331** passes Linux x64/macOS ARM64 full suites using pinned
+CI-only FFmpeg 7.1.5 source builds. Windows remains at its processor prerequisite;
+overall workflow failure is retained. Private code/tool artifacts stay outside
+public app/tests/CI; shared 0.1.19 pins, GUI, current MX review and services stay
+unchanged. Physical audio, distribution/adoption and full migration remain open.
+[Portable acceptance](../release/harness-pi-audio-processor-qualification.json).
+
 [Hosted component diagnosis](PI-VOICE.md#companion-package-acceptance--october-16-2026)
 retains private run 38819354223's four job-limit cancellations before tempo/pitch
 completion. Local CI-environment checks pass; the hosted cause is unproven.
