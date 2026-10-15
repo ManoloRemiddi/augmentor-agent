@@ -3,8 +3,11 @@
 [Plan mode](../docs/PI-PLAN-MODE.md) adds common mode contracts, actual SDK/Host
 Native/Browser, queue/steering and original Chromium chip/review checks. The
 shared interaction tests cover a ten-minute simulated review wait, Stop and
-disconnect while preserving hard action-approval deadlines. Exact full-cohort
-results and installed/physical/platform limits remain separate.
+disconnect while preserving hard action-approval deadlines. At bd03b15, source
+and fresh ordinary each pass 419/two optional skips/zero failures across 86 files
+and all 47 Harness Chromium files, plus five interaction-wait cases each. Thirteen
+shared offscreen dialog and eleven packaging/source-boundary cases pass.
+[Exact cohort and limits](../release/harness-plan-mode-qualification.json).
 
 [ThinLTO Office source-build diagnostic](../release/office-rebuild/README.md#inspect-a-completed-thinlto-build-without-changing-the-app)
 is reproduced with `prepare-thin-candidate.mjs` and `compare-thin-candidate.mjs`.

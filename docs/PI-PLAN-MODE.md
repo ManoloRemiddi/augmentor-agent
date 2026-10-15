@@ -5,7 +5,7 @@
 The Harness retains the original MIT DSH plan chip, full review panel, plan cards
 and sidebar. Its root conversation's existing Pi AgentSession owns the mode,
 request guidance and `exit_plan_mode` tool. The separate [reported plan/todo
-registry](PI-QUESTIONS.md#structured-batches-and-original-plan-review--october-15)
+registry](PI-PLANNING.md)
 continues to store progress; reviewing a plan does not update its steps or create
 a persistent goal.
 
@@ -113,8 +113,22 @@ failing test is retained. The post-projection hook preserves that prompt and the
 planning section. A Browser-surface probe also retained its actual policy refusal
 before the communication tool was added to the Browser allowlist; native tools
 remain excluded. Earlier fixture-only failures are recorded separately from
-product qualification. Full source/ordinary results and exact tested revision are
-recorded in the subsequent qualification checkpoint.
+product qualification. A separate retained command-menu control fails before the
+explicit capability check and passes after it.
+
+At **bd03b155f8478419a50bfb84edd9ac0e7cc42d78**, strict check/build and source/fresh
+ordinary each pass **419/two optional skips/zero failures**, across **86 files**,
+including all **47 Harness Chromium files**, with two workers per cohort and
+unchanged bounds. Each also passes five separate interaction-wait cases; thirteen
+shared offscreen dialog and eleven packaging/source-boundary cases pass. All
+**1,019 compiled files** and **3,268 tracked inputs** match after testing; the
+production dependencies remain 20,702 files/symlinks and 151 npm instances. All
+593 supplier inputs verify, including the two verbatim MIT chip files; the prior
+591 rows are unchanged. All four sealed inventories, five review processes,
+selection and 38 canonical pre-existing changes verify; Qwen catalog and the
+existing review respond HTTP 200. The latter still runs runtime ea3775b and does
+not contain this plan-mode implementation.
+[Portable qualification and exact cohort](../release/harness-plan-mode-qualification.json).
 
 This is Harness/source integration, not installed adoption or complete migration.
 Physical MX feedback, representative live providers, actual manual compaction with

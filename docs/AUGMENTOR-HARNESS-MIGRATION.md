@@ -1,11 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Original plan mode on Pi](PI-PLAN-MODE.md) adds the original MIT chip and
-`/plan`, persistent advisory state and full reviewed exit to the existing SDK
-owner. Approval keeps existing permissions; Request changes ends that turn and
-disarms automatic goal continuation without clearing its objective. Reviews wait
-while an operator is connected; action approval deadlines remain unchanged.
-Source/ordinary qualification and installed/platform adoption are distinct.
+[Original plan mode on Pi](PI-PLAN-MODE.md) at **bd03b15** preserves the MIT chip,
+`/plan`, persistent advisory state and full reviewed exits on the existing SDK
+owner. Source/fresh ordinary each pass **419/two optional skips/zero failures**,
+86 files/all 47 Harness Chromium files, two workers and unchanged bounds, plus
+five interaction-wait cases each and 24 packaging/boundary/shared-dialog checks.
+All 1,019 compiled/3,268 tracked inputs match; production dependencies and the
+prior 591 supplier rows remain unchanged, with two new verbatim MIT chip inputs.
+Approval keeps permissions; Request changes ends the turn/disarms auto-goal
+continuation, preserving its objective. Reviews wait while connected; action
+approval deadlines remain. All four sealed reviews, five processes, selection,
+canonical changes and Qwen catalog verify. The existing review still runs
+ea3775b; new-head hosted, live/physical/installed/platform/full migration gates
+remain open. [Portable evidence](../release/harness-plan-mode-qualification.json).
 
 [Source-built Office engine](HARNESS-OFFICE-PREVIEWS.md#fresh-thinlto-engine-build--october-15)
 now completes compile/package, **exit 0/no OOM**, below the unchanged **8 GiB**
