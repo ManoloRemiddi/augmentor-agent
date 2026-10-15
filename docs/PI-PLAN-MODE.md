@@ -26,6 +26,9 @@ attachments is rejected before a mode change or queue admission. Bare mode
 commands perform no inference and leave a new conversation's title available for
 its first actual instruction. Their notices report the selected mode directly.
 
+The plan-mode capability is explicit: older and other backend adapters retain
+their existing reported-plan command when it is absent.
+
 The original command-menu Plan action enters the mode after confirmed admission;
 late replies cannot consume an edited draft or another conversation's selection.
 The original chip occupies its original input-bar slot, shows the effective target
