@@ -6,9 +6,13 @@ It preserves current conversation policies and commits settings before changing
 accepted memory/revision. The actual failed-write and missing-row controls fail
 before; focused 29/29 passes after, with narrow/wide Light/Dark rendering and no
 inference. Six verbatim MIT inputs bring the supplier selection to 599; no DSH
-backend is loaded. Current-session `/permission` remains a separate gap. Full/
-fresh-copy, shared hosted and installed/physical qualification remain separate;
-current owner reviews/selection are unchanged.
+backend is loaded. At **5a7024e**, source/fresh ordinary each pass **469/two
+optional skips/zero failures**, 94 files/all 49 Harness Chromium files, unchanged
+workers/bounds. All 1,019 compiled/3,290 tracked inputs match; eleven packaging/
+boundary cases pass. Six sealed builds/seven reviews, selection, canonical changes
+and service settings verify preserved. Current-session `/permission`, new-head
+hosted and installed/physical acceptance remain open; this row is source-only.
+[Portable evidence](../release/harness-permission-default-qualification.json).
 
 [Plan mode](PI-PLAN-MODE.md) selects the pinned original MIT PlanModeControl
 and CSS verbatim, bringing the DSH supplier selection to 593 files. Its Pi state,

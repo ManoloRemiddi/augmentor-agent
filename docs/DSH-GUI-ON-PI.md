@@ -44,7 +44,14 @@ pre-change row-absence and failed-write controls fail as expected. Initial setup
 used the wrong fixture method; an initial responsive rule reserved supplier CSS
 names and was corrected with wrapper structure. The retained 401 px/zero-width
 row-fit failure precedes the final readable layout. No assertion or deadline was
-relaxed. Full source/fresh-copy qualification follows separately.
+relaxed. At **5a7024e**, source and a fresh unsealed ordinary copy each pass
+**469/two existing optional skips/zero failures**, **94 files/all 49 Harness
+Chromium files**, two workers and unchanged bounds. All **1,019 compiled/3,290
+tracked inputs** match; production dependencies/Node remain unchanged. Eleven
+packaging/source-boundary cases pass. Six sealed inventories, seven review
+processes, the selected configuration, 38 canonical changes and service settings
+verify preserved; current review and Qwen catalog respond HTTP 200. Breeze remains
+failed/terminal and speech is unqualified. [Portable evidence](../release/harness-permission-default-qualification.json).
 
 This is source-only. The separate 20261015-144829-1de182ad review, earlier sealed
 artifacts, installed selection and owner profiles remain unchanged; this new row
