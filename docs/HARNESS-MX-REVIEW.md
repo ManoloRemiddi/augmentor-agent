@@ -7,7 +7,57 @@ operator link is supplied privately in the chat/browser panel, never in this
 repository. The installed desktop preview, its draft and the earlier feedback
 profile keep their own settings and history.
 
+## Separate plan-mode review — October 15
+
+Private **20261015-130013-ae5dfe06** now provides the original plan chip and
+`/plan` controls on the existing Pi owner. It runs public **d7e6318** / tested
+application **bd03b15**, product **0.2.13** / Pi **1.1.0**. Its sealed inventory is
+**24,395 entries**, SHA-256
+**9f764f9b9e8f2f43d8d2d4f4a5225792cef9e2c74d9e9c2702b6d7d3cefacd39**.
+All **1,019 compiled files** match source after sealed-target tests and startup;
+151 production npm instances, Node, native components and 909 notices remain
+from the verified prior review. Seven notice guards pass.
+
+Source, fresh ordinary and sealed-target each pass **419/two optional skips/zero
+failures**, across **86 files/all 47 Harness Chromium files**, two workers and
+unchanged deadlines. Each also passes five separate interaction-wait cases.
+Drivers/static imports stay in the qualification checkout; the actual runtime,
+GUI and native targets use the sealed build. No test output is stored inside it.
+[Source qualification](../release/harness-plan-mode-qualification.json).
+
+The fresh read-only/keyless profile preserves Qwen's 262,144-token context and
+8,192-token output declaration, without importing credentials, conversations or
+memory/voice/MCP configuration. Initial actual-owner QA observes **zero sessions,
+model requests, tools, logins and unsent drafts**, both animated 2 px Augmentor
+marks, black Light smoke, retained Dark flare and readable Settings text. Nine
+account choices and the original confirmation work without login. Screenshots
+were inspected; browser errors and failed responses are zero. This is initial QA,
+not an inference about later owner activity or live-model acceptance.
+
+The installed selection, all four preceding sealed inventories and five prior
+review processes remain unchanged; the new sixth owner is separate. Qwen catalog
+and this review respond HTTP 200. The private link is supplied in chat only.
+Choose **New Session**, then `/plan` to enter advisory planning; bare `/plan off`
+leaves without inference. Plan review approval does not add tool permissions.
+[Mode behavior](PI-PLAN-MODE.md).
+
+[Hosted SDK run d7e6318](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38724081341)
+passes Linux/macOS but fails Windows while preparing its private companion,
+before mode assertions. Its source supervisor needs Qt, while that workflow had
+only installed pywin32. The test setup now uses the existing hash-locked product
+Qt/shiboken/pywin32 subset; a new Windows result and complete cause proof remain
+pending. The Linux review bytes are unchanged by this CI-only preparation change.
+
+Physical MX/live workflows, manual compaction/crash/attachment coverage, floating
+Native/extension UI, late answers/reload drafts, other platform artifacts and full
+migration acceptance remain open. The experimental source-built Office engine
+is excluded; default engine and public distribution gate remain unchanged.
+[Portable review evidence](../release/harness-plan-mode-review-20261015.json).
+
 ## Current separate review — October 15
+
+**Historical checkpoint:** superseded for new owner feedback by the separate
+plan-mode review above. Its build and profile remain preserved.
 
 Private release **20261015-103820-b0d02caa** runs product **0.2.13** / Pi
 **1.1.0**, public source **f0d241aaa787ff153dd0283a3557316c5d76a3f7** and tested

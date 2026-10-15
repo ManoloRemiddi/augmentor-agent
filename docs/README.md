@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Separate plan-mode MX review](HARNESS-MX-REVIEW.md#separate-plan-mode-review--october-15)
+**20261015-130013-ae5dfe06** now runs public d7e6318/runtime bd03b15, unselected.
+Source/ordinary/sealed-target each pass **419/two optional skips/zero failures**,
+86 files/all 47 Harness Chromium files, unchanged bounds, plus five wait cases
+each. All **24,395 entries/1,019 compiled files** verify after initial original
+Light/Dark/account QA with zero sessions/inference/tools/logins/drafts. Prior
+reviews/selection/services remain preserved. Hosted Linux/macOS pass; Windows
+fails companion preparation and awaits the locked Qt test-setup correction.
+Physical/live/platform/Office/distribution/full migration gates remain open.
+[Portable record](../release/harness-plan-mode-review-20261015.json).
+
 [Original plan mode on Pi](PI-PLAN-MODE.md) at **bd03b15** preserves the MIT chip,
 `/plan`, persistent advisory state and full reviewed exits on the existing SDK
 owner. Source/fresh ordinary each pass **419/two optional skips/zero failures**,
@@ -10,7 +21,7 @@ prior 591 supplier rows remain unchanged, with two new verbatim MIT chip inputs.
 Approval keeps permissions; Request changes ends the turn/disarms auto-goal
 continuation, preserving its objective. Reviews wait while connected; action
 approval deadlines remain. All four sealed reviews, five processes, selection,
-canonical changes and Qwen catalog verify. The existing review still runs
+canonical changes and Qwen catalog verify. The preceding review retains
 ea3775b; new-head hosted, live/physical/installed/platform/full migration gates
 remain open. [Portable evidence](../release/harness-plan-mode-qualification.json).
 

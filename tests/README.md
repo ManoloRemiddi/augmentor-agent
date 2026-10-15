@@ -7,7 +7,10 @@ disconnect while preserving hard action-approval deadlines. At bd03b15, source
 and fresh ordinary each pass 419/two optional skips/zero failures across 86 files
 and all 47 Harness Chromium files, plus five interaction-wait cases each. Thirteen
 shared offscreen dialog and eleven packaging/source-boundary cases pass.
-[Exact cohort and limits](../release/harness-plan-mode-qualification.json).
+[Exact cohort and limits](../release/harness-plan-mode-qualification.json). The
+[separate review](../release/harness-plan-mode-review-20261015.json) repeats those
+results and five wait cases against the sealed target, with seven notice guards.
+Its initial owner QA remains distinct from physical/live acceptance.
 
 [ThinLTO Office source-build diagnostic](../release/office-rebuild/README.md#inspect-a-completed-thinlto-build-without-changing-the-app)
 is reproduced with `prepare-thin-candidate.mjs` and `compare-thin-candidate.mjs`.

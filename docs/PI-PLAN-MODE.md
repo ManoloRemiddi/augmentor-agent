@@ -98,6 +98,10 @@ from peer mode notifications.
 
 ## Qualification and remaining work
 
+The [separate Linux owner review](HARNESS-MX-REVIEW.md#separate-plan-mode-review--october-15)
+now includes this mode on sealed runtime bd03b15. Its full sealed-target cohort
+repeats 419/two optional skips/zero failures; the installed selection stays separate.
+
 The new contracts exercise revisions, cancellation/no-op, corrupt records, actual
 SDK compaction-entry ancestry, a refused append, forced prompt/tool preservation,
 cancelled/unadmitted contexts, old reviews after reload and retired controller
@@ -126,9 +130,17 @@ production dependencies remain 20,702 files/symlinks and 151 npm instances. All
 593 supplier inputs verify, including the two verbatim MIT chip files; the prior
 591 rows are unchanged. All four sealed inventories, five review processes,
 selection and 38 canonical pre-existing changes verify; Qwen catalog and the
-existing review respond HTTP 200. The latter still runs runtime ea3775b and does
-not contain this plan-mode implementation.
+preceding review respond HTTP 200. That earlier review runs runtime ea3775b and
+does not contain this plan-mode implementation.
 [Portable qualification and exact cohort](../release/harness-plan-mode-qualification.json).
+
+The first hosted run at d7e6318 passes Linux/macOS but fails Windows while
+preparing the private companion, before any mode assertion. The source Windows
+supervisor requires Qt; that workflow installed only pywin32. Its qualification
+setup now uses the exact hash-locked Qt/shiboken/pywin32 subset of the existing
+Windows x64 product lock. No runtime, test deadline or platform assertion changes.
+The retained failure remains evidence; a passing new Windows run is still needed
+before claiming that platform or the failure's complete cause qualified.
 
 This is Harness/source integration, not installed adoption or complete migration.
 Physical MX feedback, representative live providers, actual manual compaction with

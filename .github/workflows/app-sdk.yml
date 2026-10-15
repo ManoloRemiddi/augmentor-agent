@@ -2,7 +2,7 @@
 name: Application SDK platform contracts
 on:
   pull_request:
-    paths: ['services/workspaces/**', 'apps/browser/**', 'apps/harness/**', 'packages/codex-runtime/**', 'packages/runtime/src/model-account*', 'packages/runtime/src/model-settings.ts', 'packages/runtime/src/tool-argument-snapshots.ts', 'packages/runtime/src/office-*', 'packages/runtime/src/host.ts', 'packages/runtime/src/harness-server.ts', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/model-account*', 'tests/tool-argument-snapshots.test.mjs', 'tests/office-native-linux.test.mjs', 'tests/harness-account-scope*', 'tests/harness-model-invalidation*', 'tests/harness-session-create*', 'tests/test_app_sdk_platform.py', 'apps/home/**', 'packages/home-client/**', 'packages/runtime/src/home.ts', 'packages/runtime/src/questions.ts', 'packages/runtime/src/plan-mode*', 'tests/pi-plan-mode.test.mjs', 'tests/plan-mode-contracts.test.mjs', 'packages/runtime/src/interactions.ts', 'packages/pi-linux/**', 'tests/pi-question*.mjs', 'tests/pi-interactions.test.mjs', 'adapters/dsh-home/**', 'tests/home-client.test.mjs', '.github/workflows/app-sdk.yml']
+    paths: ['services/workspaces/**', 'apps/browser/**', 'apps/harness/**', 'packages/codex-runtime/**', 'packages/runtime/src/model-account*', 'packages/runtime/src/model-settings.ts', 'packages/runtime/src/tool-argument-snapshots.ts', 'packages/runtime/src/office-*', 'packages/runtime/src/host.ts', 'packages/runtime/src/harness-server.ts', 'scripts/app-sdk-*', 'scripts/install-embedding.py', 'scripts/embed-launch.py', 'tests/*workspace*', 'tests/model-account*', 'tests/tool-argument-snapshots.test.mjs', 'tests/office-native-linux.test.mjs', 'tests/harness-account-scope*', 'tests/harness-model-invalidation*', 'tests/harness-session-create*', 'tests/test_app_sdk_platform.py', 'apps/home/**', 'packages/home-client/**', 'packages/runtime/src/home.ts', 'packages/runtime/src/questions.ts', 'packages/runtime/src/plan-mode*', 'tests/pi-plan-mode.test.mjs', 'tests/plan-mode-contracts.test.mjs', 'tests/fixtures/windows-plan-*', 'packages/runtime/src/interactions.ts', 'packages/pi-linux/**', 'tests/pi-question*.mjs', 'tests/pi-interactions.test.mjs', 'adapters/dsh-home/**', 'tests/home-client.test.mjs', '.github/workflows/app-sdk.yml']
   workflow_dispatch:
 permissions:
   contents: read
@@ -27,8 +27,9 @@ jobs:
       - run: uv venv --python 3.13.5 .sdk-test-python
       - name: Select isolated qualification interpreter
         run: node -e "const fs=require('fs'),p=require('path'); const py=p.resolve('.sdk-test-python',process.platform==='win32'?'Scripts/python.exe':'bin/python');fs.appendFileSync(process.env.GITHUB_ENV,'AUGMENTOR_PYTHON='+py+'\nPYTHONDONTWRITEBYTECODE=1\n');"
-      - if: runner.os == 'Windows'
-        run: uv pip install --python .sdk-test-python/Scripts/python.exe pywin32==312
+      - name: Prepare locked Windows companion test dependencies
+        if: runner.os == 'Windows'
+        run: uv pip install --python .sdk-test-python/Scripts/python.exe --require-hashes --no-deps --only-binary=:all: -r tests/fixtures/windows-plan-requirements.txt
       - run: npm ci --ignore-scripts
       - run: npm run check
       - name: Verify original GUI dependency resolution on this platform
