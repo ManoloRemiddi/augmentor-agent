@@ -30,7 +30,7 @@ The separate focused outage run, external driver **50c8f2af** against applicatio
 **03fb7039**, now passes actual Pi/Qwen chat during memory-service loss and capture
 recovery after restart: **one conversational request, exactly one user/assistant
 pair, zero tools, zero memory-inference budgets and no model/tool replay**. The
-native brief is empty during the outage, provider output limits stay 262144/8192,
+native brief is empty during the outage, context/output declarations stay 262144/8192,
 and all owned actors/engine join. Its fresh source overlay/cache and original
 engine identity/health remain unchanged. This independently qualifies outage
 recovery; it does not replace the failed full scenario. Existing MX review,
