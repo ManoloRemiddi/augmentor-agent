@@ -95,3 +95,17 @@ records; the existing Browser/inspection prompt workflow also passes. A separate
 attempted broader Pi improvement case reached its Qt fixture and was blocked by
 this environment's missing PySide6.QtTest. That prerequisite failure is retained;
 it is not counted as a pass or used to claim native Qt visual qualification.
+
+Private unselected MX release **20261016-131315-4602664d**, application **dc7582bd**,
+passes the same **nine/nine** cases against its exact staged runtime. All
+**24,561 sealed / 1,072 compiled** entries verify after browser QA;
+production Node/dependencies/components remain exact. Both idle reviews restart
+through the guarded protocol into the new artifact using the same private profiles
+and ports, with fresh authentication links. All **four saved conversations** stay;
+**389 regular backup files**, **32 cold-start inputs** and **28 post-browser persistent
+history/configuration/draft/archive inputs** verify (queue status is excluded from
+that last check). Both 12-prompt copies retain exact source names/bodies. Original
+DSH, the selected installation and GPU/model configuration stay preserved. Original
+GUI owner checks show zero console warnings/errors and submit no model/audio work.
+[Portable evidence](../release/harness-plugins-review-20261016.json). Installed
+activation, Agent service adoption, broader migration and later OSes remain open.
