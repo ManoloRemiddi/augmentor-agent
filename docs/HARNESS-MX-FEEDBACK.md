@@ -7,7 +7,56 @@ public installers and optional integrations. The immediate target is a usable
 review on the owner's MX machine. Preserve the original DSH presentation and
 current review conversations while preparing a separately staged correction.
 
-[Current archived-status review](CONTEXT-FLEET.md#archived-inspector-status-panels--october-16) advances both review application selections to **20261016-213718-135550f5 / d300543c**, with stable menu registry revision four. The initial opener installation evidence below is a preceding checkpoint; the opener bytes remain unchanged.
+[Current MCP review](MCP-TRANSPORT.md#existing-dsh-mcp-configuration-in-mx-reviews--october-16) runs both review application selections on **20261016-220504-b91df2e4 / 1633e00f**, with stable menu registry revision six. The initial opener installation evidence below is a preceding checkpoint; the opener bytes remain unchanged.
+
+## Real MX main review cold reopen — October 16
+
+The actual main review now passes a clean shutdown and cold reopen through the
+**installed** `augmentor-harness-review open main --print-url`. This supplements
+the earlier synthetic cold-start tests with the existing owner profile. It does
+not exercise a physical menu click or default-browser launch. The migration
+pilot keeps its original running process throughout.
+
+The exact running peer/build/profile and all 24,615 sealed inputs are verified
+first. The main review has no work or drafts, and its 15 protected files receive
+verified private backups before `host.shutdown` atomically checks admission.
+An owned PID descriptor confirms actual process exit; the profile scan confirms
+no remaining Host before starting anything. A full cold archive then verifies
+53 regular files against the stopped profile. The installed opener invokes the
+existing `ensure-runtime.py` lifecycle once, verifies the new owner, and obtains
+a fresh scoped private link. Two concurrent subsequent opens retain that same
+new owner. Registry revision six and selected artifacts remain unchanged.
+
+The original main native log receives four typed MCP close observations during
+shutdown and eighteen new-connection observations when the reopened GUI loads
+the conversation. The initial exact-byte check catches the first append; explicit
+read-only reconciliation verifies original byte prefixes, connection identities,
+sequence increments and metadata-only event types before proceeding. No old
+record is rewritten and none of these observations is an agent tool call. A
+separate private verifier initially reads Wiki's enabled flag at the wrong level;
+correcting that observation confirms the already-running new owner without
+another startup or configuration action.
+
+All original authoritative prefixes remain exact: 35 of 36 protected files are
+unchanged and one main native log has only the 22 verified metadata records.
+The main conversation and all three pilot conversations remain. All captured
+prompt/memory/eligibility/window/job/settings rows and engine configuration match
+the baseline, including twelve prompts and nineteen captured records. The pilot
+PID, original production selection and earlier Preview entry stay unchanged.
+
+The reopened original Plugins page shows keyless Search On/applied, Wiki On,
+and all five MCP connections with two On/three Off. Nine Wiki skills and
+Playwright/Blender's 24/26 tools are rediscovered. Actual GUI reads report zero
+console/HTTP errors and submit no settings or agent action. The new Host retains
+the explicit telemetry and version-check environment opt-outs; this observation
+does not establish a full network egress audit. No model request, project tool
+call, additional migration, production update or new artifact is submitted.
+
+[Portable owner checkpoint](../release/harness-owner-cold-reopen-review-20261016.json).
+The old main browser token expires with its old process; use the stable menu or
+CLI for a fresh link. Pilot feedback, ordinary model/project work and physical
+menu/browser acceptance remain open. MX remains first; voice and later OS rollout
+stay deferred.
 
 ## Stable MX review launch and recovery — October 16
 
