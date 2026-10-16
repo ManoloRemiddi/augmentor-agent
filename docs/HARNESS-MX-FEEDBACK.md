@@ -7,6 +7,62 @@ public installers and optional integrations. The immediate target is a usable
 review on the owner's MX machine. Preserve the original DSH presentation and
 current review conversations while preparing a separately staged correction.
 
+## Stable MX review launch and recovery — October 16
+
+`scripts/harness-review.py` registers separately staged reviews and installs a
+stable `augmentor-harness-review` opener with distinct application-menu entries.
+The current Harness and migration pilot retain separate native profiles and their
+existing shared prompt/memory services. Registration contains explicit local
+paths, sealed deployment identity, port and optional saved conversation ID; no
+browser bearer, provider credential or PID is persisted. Opening obtains the
+currently valid link from the authenticated local Host and passes it to
+`xdg-open`. Only explicit `open REVIEW --print-url` prints that private link.
+
+The opener verifies the full sealed inventory, bundled Node, private same-user
+IPC peer and actual Host build/profile before opening. A confirmed cold profile
+starts through the existing `ensure-runtime.py` and lifecycle lease, with an
+explicit environment and privacy flags. Concurrent opens converge through the
+registry/startup locks. A live process with unavailable IPC, conflicting build,
+changed seal or unknown startup outcome refuses replacement; nothing is killed,
+replayed or silently switched to an empty profile. Menu opening creates no
+conversation or model request. It does not perform a health check of every
+provider, memory engine or optional voice service.
+
+Registration changes require the current revision (`status`) and back up the
+previous registry and owned asset bytes. `register … --install` must run from a
+verified sealed tool artifact; it installs the version-independent command and
+menu paths. Edited or unowned destination files refuse overwriting. Desktop
+validation failure rolls back normal writes. Abrupt process death during asset
+installation has no automatic transaction recovery; preserve the backup and
+reconcile ownership before retrying. `remove REVIEW --expected-revision N`
+removes only its owned menu registration, retaining all review data, runtime and
+shared services. Other registered entries and the common opener/icon remain.
+
+Typical user commands after installation:
+
+```sh
+augmentor-harness-review open main
+augmentor-harness-review open pilot
+augmentor-harness-review status
+```
+
+These new menu entries do not repoint the earlier **Harness Preview** shortcut,
+installed Agent, selected Desktop release or login services. Review registration
+is a separate explicit selection of an already staged artifact. A later review
+update requires guarded adoption and registration of its verified new identity;
+changing source alone does not update a running owner. MX Linux is the qualified
+target; macOS, Windows and other distribution adapters remain separate.
+
+Source qualification passes **11 Node cases across four files**, including two
+original-GUI Chromium files and the actual sealed synthetic runtime warm/cold
+reopen, two concurrent cold opens, exact native-history preservation, live-owner
+IPC loss refusal and owned menu installation/removal. **41 Python cases** cover
+review records/seals/paths/environment, CAS, secret-free failures, desktop field
+escaping/collision/rollback, deployment lifecycle and licence/private-source
+boundaries. These focused checks do not repeat the preceding 303-case application
+cohort or claim public release/hosted qualification. Packaged and installed
+opener evidence is recorded separately after staging.
+
 ## Model picker
 
 The original dropdown scrolled its current selection into view on entering the

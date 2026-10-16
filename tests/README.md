@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+MX review opener: `python3 -B -m unittest discover -s tests -p test_harness_review.py` covers explicit private registration, inventory/path/environment guards, CAS and owned desktop changes/rollback. `node --test tests/harness-review-runtime.test.mjs` uses only authored profiles with an actual sealed Host/SDK: warm/cold/concurrent reopening, exact history/no replay, unavailable live IPC refusal and sealed menu installation/removal. Existing Plugins Chromium/control cases remain the original GUI regression scope. Linux-only lifecycle; other platforms skip explicitly.
+
 [MX picker/composer regression](../docs/HARNESS-MX-FEEDBACK.md) runs the real Chromium/Pi picker, Models, SDK configuration, shared invalidation, composer interactions and attachments: 28 cases pass across seven files, two workers, no skips. Authored provider evidence remains distinct from live Qwen.
 
 [Harness browser observation lifetimes](../docs/HARNESS-BROWSER-TESTS.md) adds

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Stable MX review launch](HARNESS-MX-FEEDBACK.md#stable-mx-review-launch-and-recovery--october-16) uses a separately staged tool and explicit review registry. Menu/CLI paths are version-independent and never point at a source checkout. The current reviews retain their qualified running artifact; installing the opener does not activate a new Desktop build or repoint the earlier Preview entry. Changed seals or mismatched live owners refuse replacement.
+
 [Current persona/metrics MX review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
 **20261016-083019-0c2b4855**, public artifact **f073d195** / application **ae951211**,
 runs as a separate unselected browser owner. Source/fresh ordinary/exact sealed
