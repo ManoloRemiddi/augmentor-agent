@@ -1,7 +1,7 @@
 {
   "schema": "augmentor-dsh-bundle-qualification/1",
   "date": "2026-10-17",
-  "scope": "MX source and separate ordinary packaged qualification; sealed qualification pending; no additional owner transfer",
+  "scope": "MX source, ordinary packaged and exact separately sealed unselected qualification; no owner adoption or further transfer",
   "sourceBaseRef": "307e27cbf63f61c872e463bad2d5cdd5d2b8bfff",
   "format": {
     "schema": "augmentor-dsh-project-export/2",
@@ -39,7 +39,7 @@
     "skips": 0,
     "deadlinesChanged": false,
     "ordinaryPackagedPass": 174,
-    "exactSealedPass": null,
+    "exactSealedPass": 174,
     "ownerAdoption": false,
     "testedInputsSha256": {
       "scripts/export-dsh-project.py": "e609e47dad41b21b038cb8bf89df87af814ba4ed3cab70538692445aa9d172cf",
@@ -57,7 +57,10 @@
     "ordinaryBaselineUnchangedInputsVerified": 23511,
     "sameFrozenRealPreparationAcceptedByOrdinary": true,
     "sameFrozenRealParentCount": 2,
-    "sameFrozenRealImageCount": 24
+    "sameFrozenRealImageCount": 24,
+    "exactSealedPythonPass": 47,
+    "sameFrozenRealPreparationAcceptedBySeal": true,
+    "sealedEntriesVerified": 24630
   },
   "realReadOnly": {
     "projectsChecked": 7,
@@ -95,11 +98,31 @@
     "Preview original-tail fixture cursor was corrected to point at the tool payload rather than trailing provenance."
   ],
   "remaining": [
-    "Seal and qualify a separate candidate before guarded adoption",
+    "Guarded adoption of the qualified separate candidate when wider migration is authorized",
     "Owner pilot feedback before extra transfers",
     "Independent source-format and source-observation refusals",
     "Existing finite per-history/profile/native relocation bounds",
     "Voice and later OS rollout deferred"
   ],
-  "implementationRef": "74b4328b"
+  "implementationRef": "74b4328b",
+  "applicationRef": "7372061b11a05f877d93d40330d545e73d19e036",
+  "separatelySealedCandidate": {
+    "releaseId": "20261017-003712-3e22586d",
+    "applicationRef": "7372061b11a05f877d93d40330d545e73d19e036",
+    "artifactSha256": "d54ec1becd7204b7a1fe7124a7fdcf2ae6154b3dfc3d6c11a9b47ba719b7bd08",
+    "inventoryEntriesVerified": 24630,
+    "compiledFilesVerified": 1108,
+    "activated": false,
+    "ownerDataCopied": false,
+    "runningReviewsAdopted": false
+  },
+  "preservation": {
+    "runningReviewOwnersUnchanged": 2,
+    "protectedOwnerFilesExact": 36,
+    "completeProtectedRegularPathSetsExact": true,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
+  }
 }

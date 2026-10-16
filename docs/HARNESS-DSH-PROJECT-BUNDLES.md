@@ -18,7 +18,7 @@ The following are synthetic example paths, not instructions to import an owner's
 projects before the pilot gate passes:
 
 ```sh
-python3 scripts/export-dsh-project.py --project /absolute/project --output /private/backups/project-bundle --bundle
+python3 -B scripts/export-dsh-project.py --project /absolute/project --output /private/backups/project-bundle --bundle
 node scripts/import-dsh-project.mjs /private/backups/project-bundle/project.json /private/new-state MANIFEST_SHA256 CURRENT_PROVIDER CURRENT_MODEL
 ```
 
@@ -156,5 +156,16 @@ failing logs remain private; passing checks use original scope and deadlines.
 The separate ordinary packaged copy passes the same 174 Node / 47 Python
 cases, with all 1,108 compiled files and 23,511 unchanged baseline inputs verified.
 The identical retained real bundle passes preparation for two parents/24 images.
-Sealed and installed qualification must be recorded separately before adoption. Voice,
+The exact separate seal passes the same 174 Node / 47 Python cases and identical
+real-input preparation. All 24,630 sealed / 1,108 compiled inputs verify afterward.
+Candidate **20261017-003712-3e22586d**, application
+**7372061b11a05f877d93d40330d545e73d19e036**, SHA-256
+**d54ec1becd7204b7a1fe7124a7fdcf2ae6154b3dfc3d6c11a9b47ba719b7bd08**
+is private and unselected. Both running owners remain on
+**20261016-220504-b91df2e4 / 1633e00f**: their PIDs, complete 36 protected regular
+file sets/hashes, registry and selected configurations stay unchanged; all 24,615
+existing sealed inputs verify. No owner restart, adoption, model work or extra
+project transfer follows. Use `-B` for standalone Python tool invocations from a
+sealed root, as the managed launch environment also disables bytecode writes.
+Installed adoption and owner pilot feedback remain separate gates. Voice,
 other operating systems and wider owner migration remain deferred.

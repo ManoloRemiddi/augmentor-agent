@@ -2149,8 +2149,9 @@ cases. The existing export suite adds one FIFO no-wait case. Eight existing
 Chromium files now cover eleven cases, with original rich-history/Fleet/branch
 flows run against both formats.
 
-The 28-file two-worker source and ordinary packaged focus each passes 174 Node
-cases, alongside 47 Python cases; all 1,108 compiled inputs match. CI registers common preview contracts and Linux bundle/publication cases.
+The 28-file two-worker source, ordinary and exact sealed focus each passes 174
+Node cases, alongside 47 Python cases; all 1,108 compiled inputs match and all
+24,630 sealed inputs verify. Candidate 20261017-003712-3e22586d remains unselected. CI registers common preview contracts and Linux bundle/publication cases.
 Real owner exports remain private, read-only assessment inputs; no owner
 conversation/model/tool work is a public fixture.
 [Protocol, commands, limits and deployment scope](../docs/HARNESS-DSH-PROJECT-BUNDLES.md).
