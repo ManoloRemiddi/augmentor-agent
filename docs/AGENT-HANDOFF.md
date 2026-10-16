@@ -5,8 +5,12 @@ selects three public MIT hunks from upstream **022583d4**, with exact original
 licence/source/base/output hashes. Only a fresh proof container gets a read-only
 source overlay. Document refresh now uses the configured two iterations, with
 job/call/time/token/concurrency/model/GPU settings and production installer
-unchanged. Exact public-source application/compilation and 43 common Python cases
-pass; fresh frozen/live qualification remains next. Original services, MX review,
+unchanged. Exact public-source application/compilation and source/fresh ordinary 43 Python/
+30 Node cases pass. Its first default live run produces a correctly grounded
+relationship page, then stops phase five at the original absolute deadline; all
+owned actors/engine join and failure is retained. A concise factual-page policy
+(revision three) preserves IDs/content while updating the managed source query;
+43 source Python cases pass and fresh frozen/live follow-up remains required. Original services, MX review,
 selection and prior failures remain preserved.
 
 [Memory gateway settlement](PI-MEMORY-LIVE.md) corrects a live sequential-stage

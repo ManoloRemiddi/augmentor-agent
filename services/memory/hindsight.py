@@ -26,6 +26,10 @@ MISSIONS = {
 PAGES = {
     'relationship': [('Preferences and boundaries', 'What supported communication preferences, boundaries and relational feedback are useful in future conversations? Exclude assistant offers and project task lists.')],
     'work': [('Current project state', 'What are the current project facts, decisions and reasons, constraints, blockers and next steps? Distinguish plans from completed work and explicitly supersede outdated decisions.')]}
+PAGE_POLICY = 3
+PAGE_STYLE = ('Write a compact memory note of at most 120 words, using short factual bullets. '
+              'Include only supported claims; omit empty categories, generic advice and boilerplate. '
+              'Preserve corrections and uncertainty. ')
 
 
 def page_content(value):
@@ -170,7 +174,7 @@ class HindsightMemory(DualMemory):
 
     def ensure(self, bank):
         route = self.route(bank['bank'])
-        if bank['ready'] != 2:
+        if bank['ready'] != PAGE_POLICY:
             self.api('PUT', route, {'name': 'Augmentor ' + bank['kind'], 'retain_mission': MISSIONS[bank['kind']],
                                    'reflect_mission': MISSIONS[bank['kind']], 'enable_observations': True})
             tree = self.api('GET', route + '/knowledge-base/tree')['roots']
@@ -183,7 +187,7 @@ class HindsightMemory(DualMemory):
                              {'trigger': {'refresh_after_consolidation': False}})
             names = {p['name'] for p in tree}
             for name, question in PAGES[bank['kind']]:
-                options = {'source_query': question + ' ' + COMMON, 'max_tokens': 768,
+                options = {'source_query': question + ' ' + PAGE_STYLE + COMMON, 'max_tokens': 768,
                     'trigger': {'mode': 'full', 'refresh_after_consolidation': False,
                     'min_refresh_interval_seconds': 120, 'fact_types': ['observation'], 'exclude_mental_models': True}}
                 if name not in names:
@@ -192,7 +196,7 @@ class HindsightMemory(DualMemory):
                     node = next(p for p in tree if p['name'] == name and p['kind'] == 'page')
                     self.api('PATCH', route + '/knowledge-base/nodes/' + quote(node['id'], safe=''), options)
             with self.connect() as db:
-                db.execute('UPDATE hindsight_banks SET ready=2 WHERE bank=?', (bank['bank'],))
+                db.execute('UPDATE hindsight_banks SET ready=? WHERE bank=?', (PAGE_POLICY, bank['bank']))
 
     def step(self):
         """Admission-controlled maintenance; archive/backlog is never implicit."""

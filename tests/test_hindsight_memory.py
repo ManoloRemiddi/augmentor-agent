@@ -249,12 +249,19 @@ class HindsightTests(unittest.TestCase):
 
     def test_existing_managed_page_policy_is_migrated_without_deleting_content(self):
         self.controlled(); self.live_append(); self.finish()
-        with self.store.connect() as db: db.execute('UPDATE hindsight_banks SET ready=1')
+        for bank in self.engine.banks.values():
+            bank['pages'][0].update(source_query='Legacy page question', body='Previously retained page content')
+        with self.store.connect() as db: db.execute('UPDATE hindsight_banks SET ready=2')
         self.live_append('new'); self.finish()
         for bank in self.engine.banks.values():
             self.assertEqual(len(bank['pages']), 1)
             self.assertEqual(bank['pages'][0]['trigger']['mode'], 'full')
             self.assertFalse(bank['pages'][0]['trigger']['refresh_after_consolidation'])
+            self.assertEqual(bank['pages'][0]['body'], 'Previously retained page content')
+            self.assertIn('120 words', bank['pages'][0]['source_query'])
+            self.assertIn('Preserve corrections and uncertainty', bank['pages'][0]['source_query'])
+        with self.store.connect() as db:
+            self.assertEqual([row[0] for row in db.execute('SELECT ready FROM hindsight_banks')], [3, 3])
 
 
 if __name__ == '__main__': unittest.main()

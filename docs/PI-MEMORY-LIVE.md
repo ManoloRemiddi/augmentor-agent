@@ -152,6 +152,38 @@ changed supplier/overlay inputs. Fresh frozen and actual-engine qualification
 remain required; the earlier failed/default proof is preserved. This is an opt-in
 Linux proof candidate; installed adoption and Mac/Windows transport remain gates.
 
+## First backport live result and concise page candidate
+
+Frozen **3af7f3c62480bcc1f30aa0d5ae49df6addaada87** source/fresh ordinary pass
+**43 Python / 30 shared Node** cases without skips, changed bounds or workers;
+12 public source/licence cases also pass. The first attempted preparation process
+is observed terminal before any engine record, container or cache was created;
+its empty log/private marker remain. A fresh preparation is observed healthy and
+then used once. This preparation failure is not live model evidence.
+
+The actual default-mode backport run verifies a read-only overlay and reaches a
+correct relationship page containing the synthetic calm preference. Reflect now
+records **two iterations and one observation-retrieval tool**, proving the missing
+retrieval is corrected. It spends 47.10 seconds on that page (including a 10.24
+second length rewrite). The subsequent work-page model call stops at the original
+absolute tool-window deadline: the persisted deadline maps to 01:39:51.880 UTC and
+its gateway refusal is logged at 01:39:51.937 UTC. The job remains **stopped at phase
+five**, nine admitted calls, zero budget failure charges, 7.21 job seconds/16,640
+tokens left. This is **failed full acceptance**, despite the first corrected page.
+No stage/window retry or limit extension occurs; all owned actors/engine terminate
+and the private database/cache/failure log remain.
+
+The next authored page policy asks for a compact factual note of at most 120 words,
+omitting empty categories, generic advice and boilerplate while preserving
+corrections/uncertainty. This makes the existing 768-token page target explicit in
+the topic prompt, without changing any provider/output/time/context/token limit.
+Policy revision **three** updates only managed page queries/options during normal
+admitted preparation; page IDs and prior content stay until the normal refresh.
+A migration case starts from revision two and verifies both page identity/content
+retention and the new revision/query. Source Python remains **43/43**. Frozen/live
+qualification of this concise policy remains next; no performance pass is inferred
+from a shorter instruction.
+
 ## Isolated proof ownership
 
 [`hindsight-isolated-proof-engine.py`](../scripts/hindsight-isolated-proof-engine.py)
