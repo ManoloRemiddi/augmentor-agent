@@ -130,9 +130,12 @@ class Handler(BaseHTTPRequestHandler):
             return self.answer(429, {'error': {'message': 'A memory model request is already active'}})
         reservation = None
         connection = None
+        response = None
+        watcher = None
         finished = threading.Event()
         usage = None
         failed = False
+        status, result = 503, {'error': {'message': 'Memory generation stopped or failed; previous memory is preserved'}}
         try:
             length = int(self.headers.get('Content-Length', '0'))
             if not 0 < length <= 128000:
@@ -179,16 +182,36 @@ class Handler(BaseHTTPRequestHandler):
             usage = value.get('usage', {}).get('total_tokens')
             if not self.server.budget.valid(reservation['token']):
                 raise BudgetDenied('Memory activity ended; model response discarded')
-            self.answer(200, value)
+            status, result = 200, value
         except BudgetDenied as error:
-            self.answer(409, {'error': {'message': str(error)}})
+            status, result = 409, {'error': {'message': str(error)}}
         except Exception:
             failed = bool(reservation and self.server.budget.valid(reservation['token']))
-            self.answer(503, {'error': {'message': 'Memory generation stopped or failed; previous memory is preserved'}})
         finally:
             finished.set()
-            if connection:
-                connection.close()
-            if reservation:
-                self.server.budget.settle(reservation, usage, failed)
-            self.server.single.release()
+            cleanup_failed = False
+            try:
+                for cleanup in (watcher.join if watcher else None,
+                                response.close if response else None,
+                                connection.close if connection else None):
+                    if cleanup:
+                        try:
+                            cleanup()
+                        except Exception:
+                            cleanup_failed = True
+                if reservation:
+                    self.server.budget.settle(reservation, None if cleanup_failed else usage,
+                                              failed or cleanup_failed)
+            except Exception:
+                cleanup_failed = True
+            finally:
+                self.server.single.release()
+            if cleanup_failed:
+                # A cleanup/commit failure cannot acknowledge a successful
+                # result or permanently strand the single-request guard. The
+                # durable reservation remains charged; no request is replayed.
+                status, result = 503, {'error': {'message': 'Memory request settlement could not be confirmed; previous memory is preserved'}}
+        # Hindsight can immediately start its next stage after reading this
+        # body. Confirm only after upstream cleanup, joined watcher and durable
+        # settlement have relinquished the previous model request's ownership.
+        self.answer(status, result)

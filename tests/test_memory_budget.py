@@ -11,6 +11,7 @@ import time
 import unittest
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'services'))
 from memory.dual import DualMemory
@@ -202,6 +203,58 @@ class BudgetTests(unittest.TestCase):
         self.assertEqual(value['usage']['total_tokens'], 123)
         self.assertEqual(value['choices'][0]['message']['tool_calls'], [{'id': 'call-1', 'type': 'function', 'function': {'name': 'recall', 'arguments': '{"query":"Atlas"}'}}])
         with self.assertRaises(ValueError): completion(Response(raw))
+
+    def gateway_fixture(self):
+        calls = []
+        class Model(BaseHTTPRequestHandler):
+            def log_message(self, *_): pass
+            def do_POST(self):
+                calls.append(json.loads(self.rfile.read(int(self.headers['Content-Length']))))
+                raw = json.dumps({'choices': [{'index': 0, 'message': {'role': 'assistant', 'content': 'Owned memory result'}, 'finish_reason': 'stop'}], 'usage': {'total_tokens': 42}}).encode()
+                self.send_response(200); self.send_header('Content-Type', 'application/json'); self.send_header('Content-Length', str(len(raw))); self.end_headers(); self.wfile.write(raw)
+        model = ThreadingHTTPServer(('127.0.0.1', 0), Model); model.daemon_threads = True
+        threading.Thread(target=model.serve_forever, daemon=True).start()
+        self.addCleanup(model.server_close); self.addCleanup(model.shutdown)
+        self.budget.activity('one', 'proof', 'tools'); self.budget.open('owned-job', 'one')
+        gate = Gateway(('127.0.0.1', 0), self.budget, {'modelUrl': f'http://127.0.0.1:{model.server_port}/v1', 'gatewayKey': 'x'*32})
+        threading.Thread(target=gate.serve_forever, daemon=True).start()
+        self.addCleanup(gate.server_close); self.addCleanup(gate.shutdown)
+        def send():
+            request = urllib.request.Request(f'http://127.0.0.1:{gate.server_port}/v1/chat/completions', data=json.dumps({'messages': [{'role': 'user', 'content': 'Independent memory fixture'}]}).encode(), headers={'Authorization': 'Bearer '+'x'*32})
+            try:
+                with urllib.request.urlopen(request, timeout=3) as response: return response.status, json.load(response)
+            except urllib.error.HTTPError as error: return error.code, json.load(error)
+        return gate, calls, send
+
+    def test_gateway_confirmation_waits_for_settlement_before_the_next_sequential_call(self):
+        gate, calls, send = self.gateway_fixture(); entered, release = threading.Event(), threading.Event()
+        original = self.budget.settle; settlements = []
+        def held(*args, **kwargs):
+            if not settlements:
+                entered.set()
+                if not release.wait(2): raise AssertionError('Test settlement gate was not released')
+            original(*args, **kwargs); settlements.append(True)
+        self.budget.settle = held
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pending = pool.submit(send)
+            try:
+                self.assertTrue(entered.wait(1)); time.sleep(.05)
+                self.assertFalse(pending.done(), 'A successful confirmation must not escape while its request still owns the serialization guard')
+                self.assertEqual(send()[0], 429, 'A genuinely overlapping request is still refused during settlement')
+                self.assertEqual(len(calls), 1)
+            finally: release.set()
+            self.assertEqual(pending.result(timeout=2)[0], 200)
+        self.assertEqual(send()[0], 200, 'An acknowledged previous result permits the next sequential request')
+        self.assertEqual(len(calls), 2); self.assertEqual(len(settlements), 2)
+
+    def test_gateway_settlement_failure_returns_failure_and_cannot_strand_the_serialization_guard(self):
+        gate, calls, send = self.gateway_fixture(); original = self.budget.settle
+        def failed(*args, **kwargs): raise OSError('Independent durable settlement failure')
+        self.budget.settle = failed
+        self.assertEqual(send()[0], 503)
+        self.budget.settle = original
+        self.assertEqual(send()[0], 200)
+        self.assertEqual(len(calls), 2)
 
 
 if __name__ == '__main__': unittest.main()

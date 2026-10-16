@@ -1124,3 +1124,5 @@ files available only in a developer's working directory.
 - [Application SDK alignment](SDK-ALIGNMENT.md): capability/permission states, experimental Codex application isolation and platform bootstrap/startup qualification.
 
 - [Original DSH Harness microphone](HARNESS-DICTATION.md): editable draft dictation, private recognition contract, original GUI ownership and qualification limits.
+
+- [Actual Pi memory and gateway settlement](PI-MEMORY-LIVE.md): isolated controlled engine/Host proof, joined confirmation and retained live failures.

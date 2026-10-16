@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Memory gateway settlement](PI-MEMORY-LIVE.md) corrects a live sequential-stage
+race: successful HTTP confirmation previously preceded upstream/budget/guard
+cleanup, allowing the next Hindsight request to receive a spurious 429. The new
+real-HTTP held-settlement case fails before the fix. Confirmation now follows
+joined cleanup and durable settlement; true overlap stays refused and failed
+settlement cannot strand the guard. The initial actual Pi/Hindsight/default-Qwen
+proof is retained failed at consolidation phase three, with all owned actors
+terminal and original services unchanged. New opt-in isolated engine/Host proof
+uses synthetic banks and offline public cache only. Frozen/live follow-up remains
+required; budgets, retries, model/GPU settings, current MX review and installed
+services stay unchanged.
+
 # Context selection and controlled memory processing
 
 [Pi Native/Browser controls](PI-VOICE.md#native-and-browser-controls--october-16-2026)
