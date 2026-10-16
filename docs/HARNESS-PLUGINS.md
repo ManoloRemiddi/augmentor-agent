@@ -138,7 +138,7 @@ GUI owner checks show zero console warnings/errors and submit no model/audio wor
 activation, Agent service adoption, broader migration and later OSes remain open.
 
 The overview-switch source build passes **18/18 cases across 13 focused files**,
-including ten Chromium/Pi Host files and eight control/lifecycle cases, two workers,
+including eleven Chromium/Pi Host files and seven control/lifecycle cases, two workers,
 unchanged limits/no skips. Four new lifecycle cases cover lost committed writes,
 retired/inspector reads, malformed state and unsaved Wiki draft reconciliation.
 The actual overview fixture toggles all five settings, verifies unchanged Search
