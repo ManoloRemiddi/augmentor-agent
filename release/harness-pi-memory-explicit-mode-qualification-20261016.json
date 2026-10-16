@@ -62,7 +62,8 @@
       "pass": 31,
       "fail": 0,
       "skipped": 0,
-      "workers": 2
+      "workers": 2,
+      "sourceFixtureRef": "b049d61541c0f3f96f01bfbc750237a0b8500bec"
     },
     "freshOrdinaryNode": {
       "pass": 31,
@@ -71,7 +72,8 @@
       "workers": 2
     },
     "sourceNodeInputsUnchangedFromPriorQualification": true,
-    "sourceCompiledInputsMatchFrozenQualification": true
+    "sourceCompiledInputsMatchFrozenQualification": true,
+    "sourcePythonInputsMatchApplicationRef": true
   },
   "frozenInputs": {
     "tracked": 3401,
@@ -157,7 +159,8 @@
         "failures": 0,
         "status": "pending"
       }
-    ]
+    ],
+    "budgetRowStateMeaning": "Budget row pending means its retained balance is not exhausted; job completion is recorded separately in memory_jobs and shown above."
   },
   "actualMemoryTransportReceipts": [
     {

@@ -16,8 +16,9 @@ The **same full scenario** now passes with the existing explicitly selected
 and external driver **9a6a7fcfac0c4b8e921ce566065fa6fcc40a9f13** use runtime
 **a8f49ced**, the same MIT page-budget backport and concise policy three. The
 original installed engine stays in **default** mode. No chat/voice declaration,
-server context/concurrency/precision/GPU setting, source batching/date/identity,
-assertion or processing budget changes for this test.
+server context/concurrency/precision/GPU setting, source batching/date/identity
+or processing budget changes for this test. Existing full-scenario assertions
+remain intact.
 
 Actual Pi/Hindsight/Qwen evidence passes seed pages, fresh scoped recall and answer,
 current PostgreSQL correction, exact historical SQLite native brief with no new
