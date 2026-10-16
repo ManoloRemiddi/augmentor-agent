@@ -645,7 +645,8 @@ The imported display boundary excludes old live history from new automatic
 memory capture. Subsequent human work follows normal capture settings. Target
 configuration, credentials, prompts and companion memory banks are not merged;
 source state-level login/MCP controls are archived without overriding the target
-configuration. This command does not move workspace folders, reconcile external
+configuration. Configure the source conversations’ model routes in the target
+before continuing; copying conversation metadata does not supply credentials. This command does not move workspace folders, reconcile external
 file links or connect separate prompt/memory services. Nonempty desktop-run artifact trees are refused until their link relocation
 adapter exists. Arbitrary provider/extension file references and further source
 formats still require explicit adapters. The same behavior is intended on other
@@ -665,4 +666,11 @@ normalization; these were corrected. GUI driver failures used an HTTP URL test
 for a Blob thumbnail and incomplete synthetic keyboard events. The final driver
 uses the actual decoded original gallery and established Lexical keyboard/draft
 barriers; original GUI source is unchanged. Logs retain those failures.
-Packaged-target qualification follows. No owner transfer or restart occurs.
+Private unselected MX **20261016-190100-835d445c**, application **d00484d2**,
+passes the same **237/237** cases against its exact packaged modules, plus all
+**19** exporter cases without Python site packages. All **24,594 sealed /
+1,093 compiled** inputs verify after GUI QA. Production Node,
+dependencies, components and original supplier GUI/licences stay unchanged. Both
+running owners, **32 protected files**, installed selection and 38 canonical
+local changes remain exact. No owner transfer or restart occurs.
+[Portable qualification](../release/harness-native-profile-review-20261016.json).

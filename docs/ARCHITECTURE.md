@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native profile relocation](HARNESS-DSH-MIGRATION-PILOT.md#relocation-between-cold-harness-profiles--october-16) retains native bodies/provider replay state and binds verified managed references through the existing Agent context transform. Branches retain their own attachment authority; an imported display boundary prevents old-memory recapture. The same SDK owner handles continuation, reload and Stop. Linux cold-state publication uses the existing transaction/lease; target configuration and companion prompt/memory ownership stay separate. Source/exact packaged qualification is **237/237 each**; owner adoption and other-OS adapters remain separate.
+
 [Current-chat Permission](DSH-GUI-ON-PI.md#original-current-chat-permission-controls--october-15)
 is product policy in the existing conversation metadata, with revisioned history
 anchored to display boundaries. An atomic save precedes accepted live policy;
