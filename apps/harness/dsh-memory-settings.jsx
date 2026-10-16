@@ -5,8 +5,8 @@ import {DshMemorySettings} from './dsh-memory-settings.mjs';
 
 const modeLabels={off:'Thinking off for memory requests',default:'Server default for memory requests',unknown:'Request mode not reported',unconfigured:'Memory engine not configured'};
 /** Existing native memory controls inside the original Settings shell. */
-export function MemorySettings({controller}){
- const profile=useMemo(()=>new DshMemorySettings(controller),[controller]);useEffect(()=>()=>profile.close(),[profile]);
+export function MemorySettings({controller,sharedProfile}){
+ const profile=useMemo(()=>sharedProfile??new DshMemorySettings(controller),[controller,sharedProfile]);useEffect(()=>()=>{if(!sharedProfile)profile.close();},[profile,sharedProfile]);
  const state=useSyncExternalStore(profile.subscribe,profile.getSnapshot),value=state.value;
  if(!profile.current())return null;
  return <fieldset data-memory-settings><legend>Automatic memory</legend>

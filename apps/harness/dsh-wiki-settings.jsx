@@ -5,8 +5,8 @@ import {DeveloperToolsRow} from '@dsh-gui/ui-settings-general/src/client/Develop
 import {DshWikiProfile} from './dsh-wiki-profile.mjs';
 import {WikiReceiptInspection} from './dsh-wiki-receipts.jsx';
 /** Original supplier form/control chrome; only the Pi settings owner is adapted. */
-export function WikiSettings({controller,onTrajectory}){
- const profile=useMemo(()=>new DshWikiProfile(controller),[controller]);useEffect(()=>()=>profile.close(),[profile]);
+export function WikiSettings({controller,onTrajectory,sharedProfile}){
+ const profile=useMemo(()=>sharedProfile??new DshWikiProfile(controller),[controller,sharedProfile]);useEffect(()=>()=>{if(!sharedProfile)profile.close();},[profile,sharedProfile]);
  const s=useSyncExternalStore(profile.subscribe,profile.getSnapshot),d=s.draft;let invalid=false;try{profile.proposed();}catch{invalid=true;}
  const t=key=>({'developerTools.title':'Wiki tools and skills','developerTools.description':'Six original Wiki tools and nine skills for Native conversations. Changes apply when saved; the vault is never created by Settings.','developerTools.error':'The change could not be staged.'}[key]??key);
  const field=(name,label,hint,numeric=false)=><SettingsValueField key={name} id={'augmentor-wiki-'+name} label={label} hint={hint} text={d?.[name]??''} numeric={numeric} overridden={false} invalid={false} overriddenLabel="Configured" resetLabel="Reset" invalidLabel="Check this value" disabled={!s.writable||s.busy} onEdit={value=>profile.edit(name,value)} onReset={()=>{}}/>;

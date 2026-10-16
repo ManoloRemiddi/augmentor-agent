@@ -6,8 +6,8 @@ import {WebSearchFreeCard} from './vendor/dsh-web-search-free/client.tsx';
 import {DshSearchScope} from './dsh-search-scope.mjs';
 import {KeylessSettings} from './dsh-keyless-settings.jsx';
 /** Original supplier card and DSH enable row; private Pi settings are the seam. */
-export function SearchSettings({controller}){
- const scope=useMemo(()=>new DshSearchScope(controller),[controller]);useEffect(()=>()=>scope.close(),[scope]);const s=useSyncExternalStore(scope.subscribe,scope.getSnapshot);
+export function SearchSettings({controller,sharedScope}){
+ const scope=useMemo(()=>sharedScope??new DshSearchScope(controller),[controller,sharedScope]);useEffect(()=>()=>{if(!sharedScope)scope.close();},[scope,sharedScope]);const s=useSyncExternalStore(scope.subscribe,scope.getSnapshot);
  const t=key=>({'developerTools.title':'Free Search tools','developerTools.description':'Web search and page fetching. Choose keyless engines or engines using your API keys.','developerTools.error':'Search settings could not be confirmed.'}[key]??key);
  return <div aria-label="Free Search settings"><DeveloperToolsRow t={t} useDeveloperTools={select=>select(s.accepted?.enabled??false)} setEnabled={enabled=>scope.enable(enabled)} disabled={!s.writable||s.busy}/>
  {scope.modes()&&<SegmentedControl id="augmentor-search-mode" label="Search mode" value={s.accepted?.mode??'configured'} options={[{value:'configured',label:'API engines'},{value:'keyless',label:'Keyless engines'}]} disabled={!s.writable||s.busy} onChange={value=>void scope.mode(value)}/>}

@@ -12,10 +12,37 @@ within Plugins, retaining their unsaved edits. Existing Search, Wiki, memory,
 Context, Metafolder, reasoning and MCP contracts retain their controls and guards.
 
 The directory's included features are not an installation or service-health
-inventory. Open a feature to check its real configuration. It does not enable
+inventory. Switchable features now show saved status on the overview; open a feature for detailed setup. It does not enable
 plugins, connect an MCP server, start voice, fetch a registry or run a model just
 by opening the directory. Technical Context attribution is below its settings.
 The original Model Picker navigation shortcut remains available.
+
+## Status and switches on the overview — October 16
+
+Five cards expose the actual saved enable setting directly: **Web search**,
+**Wiki tools & skills**, **Workspace folders**, **Adaptive reasoning** and
+**Automatic memory**. The directory and the original detail forms share accepted
+settings and revisions. A card switch never commits unrelated unsaved fields;
+Wiki reconciles untouched fields while keeping edited fields. Refreshing overview
+status also preserves those edits. There is no optimistic On state or automatic
+mutation retry. Failed or lost confirmations show **Unconfirmed**, block further
+switching, and require an explicit status refresh. Pending application is distinct
+from an applied On/Off state. On describes configuration, not external service health.
+
+Memory is labelled **Capture on/off**. Turning capture off also pauses processing;
+turning it back on does not resume processing. Its existing detail controls still
+own processing. Wiki needs an existing vault before enabling; opening Settings
+provides setup. Shared execution changes are disabled during active work, and the
+backend retains its guards for jobs/maintenance/revision conflicts. Read-only
+inspection does not read privileged settings or expose writable switches.
+
+Prompt library, prompt improvement, model picker and Context are integrated
+features without a global disable contract, so their cards say **Built in** rather
+than showing a cosmetic switch. **Connected tools** says **Per connection**, and
+voice says **On demand**; neither implies a live connection or running service.
+This increment does not introduce module unloading or silently change existing
+plugin defaults. Status reads alone do not enable a plugin or submit a model/audio
+request. Scope remains the private MX review; voice work/later OSes are deferred.
 
 ## Prompt library and Improve prompt
 
@@ -109,3 +136,13 @@ DSH, the selected installation and GPU/model configuration stay preserved. Origi
 GUI owner checks show zero console warnings/errors and submit no model/audio work.
 [Portable evidence](../release/harness-plugins-review-20261016.json). Installed
 activation, Agent service adoption, broader migration and later OSes remain open.
+
+The overview-switch source build passes **18/18 cases across 13 focused files**,
+including ten Chromium/Pi Host files and eight control/lifecycle cases, two workers,
+unchanged limits/no skips. Four new lifecycle cases cover lost committed writes,
+retired/inspector reads, malformed state and unsaved Wiki draft reconciliation.
+The actual overview fixture toggles all five settings, verifies unchanged Search
+keys/reasoning routes, checks detail-to-card updates, reload persistence, explicit
+stale-write recovery, and zero model requests. The existing Metafolder acceptance
+keeps its assertions and now enters through its directory card. **Sixteen** licence,
+private-source boundary and notice cases pass. Artifact/owner adoption follows.
