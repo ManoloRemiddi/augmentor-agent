@@ -146,3 +146,24 @@ keys/reasoning routes, checks detail-to-card updates, reload persistence, explic
 stale-write recovery, and zero model requests. The existing Metafolder acceptance
 keeps its assertions and now enters through its directory card. **Sixteen** licence,
 private-source boundary and notice cases pass. Artifact/owner adoption follows.
+
+### Qualified overview switches
+
+Application **adf7e719** in private unselected MX release
+**20261016-134148-602cfa22** passes **18/18** focused cases on source and the exact
+sealed runtime: 13 files, 11 actual Chromium files plus seven control cases,
+two workers, no skips or relaxed limits. Sixteen licence/private-source/notice
+checks pass. Final visual inspection caught an invisible enabled-switch thumb;
+a controlled test reproduces the intermediate failure, and both themes now pass
+thumb/track contrast >=3. Card groups also reject stray text. Original workflows,
+saved settings after reload, preserved keys/routes/dirty detail drafts and stale/
+lost-write guards pass. This does not claim live provider or external service health.
+
+Both private reviews retain their profiles/ports, four conversations and twelve
+saved prompts each. Guarded restarts verify **389 backup files**,
+**32 cold-start** and **28 post-browser persistent inputs**.
+Saved search/Wiki/folder/reasoning settings and full prompt snapshots match their
+pre-change hashes. QA does not toggle real owner flags or submit model/audio work.
+All **24,563 sealed / 1,072 compiled** inputs verify;
+selection, original DSH, production dependencies/components and GPU setup remain.
+[Portable evidence](../release/harness-plugin-switches-review-20261016.json).
