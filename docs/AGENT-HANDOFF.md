@@ -10,7 +10,13 @@ unchanged. Exact public-source application/compilation and source/fresh ordinary
 relationship page, then stops phase five at the original absolute deadline; all
 owned actors/engine join and failure is retained. A concise factual-page policy
 (revision three) preserves IDs/content while updating the managed source query;
-43 source Python cases pass and fresh frozen/live follow-up remains required. Original services, MX review,
+43 Python/30 Node source/fresh ordinary cases pass at **a8f49ced**. Its actual
+default run completes seed/correction, fresh scoped recall, exact historical
+branch, cold restart and pause; outage chat works but the proof queries the
+restarted session before the existing capture retry binds it. That failure remains
+retained. External observation now waits only for this known unbound-session state
+within the original 15-second bound; runtime/app bytes stay unchanged. A new real-
+timer client case passes with source Node 31/31; fresh frozen/live follow-up remains. Original services, MX review,
 selection and prior failures remain preserved.
 
 [Memory gateway settlement](PI-MEMORY-LIVE.md) corrects a live sequential-stage

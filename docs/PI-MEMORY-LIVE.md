@@ -184,6 +184,37 @@ retention and the new revision/query. Source Python remains **43/43**. Frozen/li
 qualification of this concise policy remains next; no performance pass is inferred
 from a shorter instruction.
 
+## Concise-policy live result and outage observation correction
+
+Frozen **a8f49ced0a86ec6256cc129e058815d59679593b** source/fresh ordinary pass
+43 Python/30 shared Node cases. Both actual default-Qwen memory batches finish
+all six stages without retries/failures: seed **eight calls**, 46.08 job seconds /
+30,094 tokens remaining; correction **ten calls**, 24.41 seconds / 19,748 tokens
+remaining. Both pages contain the expected facts. The first relationship page
+now takes 8.20 seconds with no length rewrite, versus the prior run's 47.10 seconds;
+these are two recorded live outcomes, not a general performance guarantee.
+
+Actual fresh recall/provider/native brief and answer, person/project isolation,
+PostgreSQL correction/new-conversation recall, exact historical SQLite brief with
+no fresh recall or parent mutation, cold Pi/memory restart and paused capture/
+recall with ordinary chat all pass. During the final memory outage ordinary chat
+also succeeds, using one provider request and an empty managed brief. The proof
+then fails immediately on **`Memory session is not bound`** after the memory
+companion restarts. It has not yet proved durable recovery or completed acceptance.
+All ten conversation requests and owned process/engine cleanup remain recorded.
+
+The application already retries pending transcript capture after five seconds.
+Socket readiness can therefore precede binding the newly created outage session.
+The external proof now treats only that exact unbound-session read as a pending
+observation within its unchanged **15-second** recovery bound. It never issues a
+fixture bind, writes/retries a memory stage, replays a model/tool action or suppresses
+another error. Required recovery remains exactly two source events and no extra
+provider request. Application/runtime/compiled bytes and all earlier assertions
+are unchanged. A new independent client case exercises the real existing timer:
+it observes a healthy-but-unbound service, then one bind/append and exactly two
+original source texts, without inference or duplicate capture. Source shared Node
+now passes **31/31**; fresh frozen/live follow-up remains required.
+
 ## Isolated proof ownership
 
 [`hindsight-isolated-proof-engine.py`](../scripts/hindsight-isolated-proof-engine.py)
