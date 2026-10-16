@@ -2007,9 +2007,10 @@
     },
     {
       "path": "packages/client/ui-trajectory/src/client/TrajectoryTable.tsx",
-      "sha256": "3e940787aa879629b5545e95012f09abf1566fdc0b0c3abc73fc4d930ac04749",
+      "sha256": "4fc694b6e2057fd6208d3e948bfb9c07bde7e8e1a35b962c20a27b1e1045dffa",
       "upstreamPath": "packages/client/ui-trajectory/src/client/TrajectoryTable.tsx",
-      "upstreamSha256": "3e940787aa879629b5545e95012f09abf1566fdc0b0c3abc73fc4d930ac04749"
+      "upstreamSha256": "3e940787aa879629b5545e95012f09abf1566fdc0b0c3abc73fc4d930ac04749",
+      "adaptation": "Modified by Augmentor (MIT): use pinned TanStack 3.13.12 scrollToIndex for initial virtual tail and follow-on-append; remove unsupported newer-version options. Original table/inspector layout and CSS retained."
     },
     {
       "path": "packages/client/ui-trajectory/src/client/TrajectoryTimeline.module.css",

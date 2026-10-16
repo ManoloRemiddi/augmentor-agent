@@ -109,3 +109,15 @@ fixtures or CI inputs.
 Actual private pilot results are recorded separately after qualification. Source
 and installed/running application identities must be reported separately: the
 importer is an offline operator tool, not a patch to the immutable application.
+
+## Large-history Trajectory compatibility
+
+The actual pilot exposed `rowVirtualizer.scrollToEnd is not a function` when the
+original table enabled virtualization above 100 records. The selected upstream
+component expected newer virtualizer methods/options than the pinned TanStack
+**3.13.12** supplies. A marked MIT adaptation uses supported `scrollToIndex` for
+initial tail positioning and append-follow, and removes unsupported newer-version
+options. The original table/inspector layout and CSS are preserved. A separately
+owned synthetic import with 140 completed tools reproduces the old frozen
+artifact's exact error. It qualifies the corrected virtual table, new explicit
+continuation, record inspection and return to Chat without historical tool replay.

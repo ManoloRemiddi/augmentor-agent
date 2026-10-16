@@ -1,3 +1,4 @@
+// Modified by Augmentor (MIT): supported pinned TanStack virtual tail scrolling.
 /** Turn-aware trajectory event ledger with a local record inspector. */
 
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
@@ -2187,11 +2188,8 @@ export function TrajectoryTable({
     getItemKey: getVirtualRowKey,
     getScrollElement: getTableScrollElement,
     initialRect: { width: 0, height: VIRTUAL_INITIAL_VIEWPORT_HEIGHT_PX },
-    anchorTo: 'end',
     overscan: VIRTUAL_OVERSCAN_ROWS,
     scrollMargin: virtualScrollMargin,
-    scrollEndThreshold: BOTTOM_FOLLOW_THRESHOLD_PX,
-    followOnAppend: 'auto',
   })
   const virtualIndexByRecordId = useMemo(() => {
     const indexes = new Map<string, number>()
@@ -2564,13 +2562,17 @@ export function TrajectoryTable({
       if (historyLoading) return
       tableScrollInitialized.current = true
       followsTableTail.current = true
-      if (virtualizationEnabled) rowVirtualizer.scrollToEnd({ behavior: 'auto' })
+      if (virtualizationEnabled && virtualRowStructure.length > 0) {
+        rowVirtualizer.scrollToIndex(virtualRowStructure.length - 1, { align: 'end', behavior: 'auto' })
+      }
       else pane.scrollTop = pane.scrollHeight
       setTableScrollReady(true)
       return
     }
     if (!followsTableTail.current) return
-    if (!virtualizationEnabled) pane.scrollTop = pane.scrollHeight
+    if (virtualizationEnabled && virtualRowStructure.length > 0) {
+      rowVirtualizer.scrollToIndex(virtualRowStructure.length - 1, { align: 'end', behavior: 'auto' })
+    } else pane.scrollTop = pane.scrollHeight
   }, [
     historyLoading,
     historyStartSeq,
