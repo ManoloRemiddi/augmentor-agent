@@ -1,13 +1,27 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Shared Pi persona](PI-INSTRUCTIONS.md) closes the omitted approved application
-persona in root Host composition. Public SDK append/native custom snapshots retain
-exact source/guard hashes before user input, private pre-message bootstrap, cold
-identity and historical branch selection; legacy no-snapshot branches/workers do
-not gain the root persona. Existing Context exposes native/source/range links and
-separate effective literal presence without new UI or global causal claims.
-Twelve focused cases pass; full source/artifact/live qualification remains pending
-at this checkpoint. Current MX Edit review/selection/services remain unchanged.
+[Shared Pi persona](PI-INSTRUCTIONS.md), application **4f4812cc**, now binds the
+approved common file through public SDK append/native custom snapshots. Exact
+source/guard hashes, pre-message metadata fallback and native IDs survive cold
+reopen and branches; legacy no-snapshot branches/workers retain their distinct
+composition. Existing Context shows captured range/native-source links and
+separate SDK/provider literal presence; no new UI, tool, permission or global
+causal claim. Source/fresh ordinary each pass **781/two existing skips**, 138 files/
+all 57 Harness Chromium files, two workers/unchanged bounds; 3,424 tracked/1,066
+compiled/37,629 source dependency inputs verify, with exact ordinary compilation
+and unchanged production dependencies/components. Twelve focused and nineteen
+licence/private-boundary cases pass; old sealed control fails at missing persona.
+Actual Qwen ordinary proof confirms exact persona source/presence in four requests,
+prior native read and parent bytes/draft preservation, zero model requests during
+Edit and zero additional tools after explicit typed replacement. GUI/app/supplier/
+CSS source remains unchanged; generated Excel overlay paths/chunk names differ,
+with strict new artifact freeze intact. Thirteen seals/fourteen review owners plus
+recognition, selection, 38 canonical/four private changes and six config hashes
+remain preserved. Existing MX Edit review does not include this increment; no new
+review/activation/merge/public binary follows. Preceding 3aed SDK Linux/macOS pass,
+Windows cancelled; Debian fails loaded Codex Browser branch selection, cause
+unproven. Full provenance/optional metrics/embedded roles, owner feedback, speech,
+migration/distribution and later platforms remain open. [Portable evidence](../release/harness-pi-instructions-qualification-20261016.json).
 
 [Original-GUI sent-message Edit](HARNESS-MESSAGE-EDIT.md) at application **dfe855f3**
 restores latest-human text/original file/image bytes into the existing composer of

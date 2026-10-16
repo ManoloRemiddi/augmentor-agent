@@ -88,9 +88,49 @@ its Host while leaving polling active. Those failed logs remain retained. Correc
 fixtures use the public receipt and retire their document before Host shutdown;
 assertions, budgets, deadlines, workers and product behavior are not relaxed.
 
-Full source/fresh artifact and actual local-model qualification remain pending at
-this implementation checkpoint. The currently running MX Edit review and selected
-installation are unchanged. No new review activation, merge or public binary is
-authorized by these tests. Full instruction/resource/causal provenance, optional
-response-metrics tooling, other embedded roles, representative provider behavior,
-physical MX feedback and wider migration/platform gates remain open.
+At application **4f4812cc**, full frozen source and fresh ordinary packaged copy
+each pass **781 cases/two existing optional skips**, zero failures/cancellations,
+across **138 files/all 57 Harness Chromium files**, two workers and unchanged
+limits/deadlines. All **3,424 tracked/1,066 compiled/37,629 source dependency**
+inputs verify; the ordinary compiled tree matches exactly and production Node/
+npm/components retain baseline bytes. Nineteen licence/private-source Python
+cases pass. The preceding sealed Edit build fails the new control at the actual
+provider's missing shared persona, before GUI inspection, as intended.
+
+The actual local **Qwen** proof on the fresh ordinary copy passes: four request
+snapshots identify the selected persona's exact source digest and its presence
+in both canonical SDK and effective provider system content. Its preceding native
+read is retained through Edit, which makes zero model requests; explicit typed
+replacement uses that earlier result with no additional tool call. Parent native
+bytes and unsent draft stay exact. Existing 262,144 context/8,192 output declaration,
+server, GPU and speech settings remain unchanged. This proves this binding and
+workflow; it does not certify every behavioral instruction or all providers.
+
+All Harness UI/app sources, 625 MIT DSH supplier records and CSS remain exact to
+the prior review. Rebuilding the existing spreadsheet overlay changes temporary
+paths, manifests and an Excel chunk filename; the main GUI is equal after only
+that import name is normalized. This comparison explains generated-byte changes;
+qualification still checks the new frozen compiled bytes exactly, without ignored
+files or relaxed inventory checks.
+
+The running MX Edit review **20261016-065534-c8cdf03c/application dfe855f3** does not
+include this source increment. Thirteen seals/fourteen review owners plus existing
+CPU recognition, selected installation, 38 canonical/four private local changes
+and six model/speech configuration hashes verify preserved. No new review,
+activation, merge, service restart or public binary follows. The preceding
+**3aed0c64** hosted SDK passes Linux/macOS, while Windows is cancelled. Debian is
+blocked at an existing loaded Codex Browser branch-selection assertion; its cause
+is not established. Earlier Windows jobs/native and macOS packaging failures stay
+retained. New-head hosted acceptance remains separate from local results.
+
+Owner adoption/physical MX feedback, full instruction/resource/opaque-handler
+provenance, optional response-metrics tooling, other embedded roles, representative
+behavior/provider/speech acceptance and all broader memory/plugin/Home/Office/data
+migration/distribution/later-platform gates remain open. The Harness goal remains
+active. [Portable evidence](../release/harness-pi-instructions-qualification-20261016.json).
+
+Reproduce the authored contract/browser checks from a development checkout with
+`node --test --test-concurrency=2 tests/pi-application-instructions.test.mjs tests/harness-application-instructions-chromium.test.mjs`.
+Set the existing isolated `AUGMENTOR_PYTHON` prerequisite as described in the test
+guide. Live acceptance additionally uses the owner's explicitly declared local
+provider in a fresh private profile; no owner history, key or workspace is imported.

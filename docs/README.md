@@ -3,7 +3,9 @@
 [Shared Augmentor persona on Pi](PI-INSTRUCTIONS.md) now binds the approved source
 to native conversation snapshots and existing Context evidence. Root roles retain
 selection through cold reopen and branches; legacy branches/workers stay distinct.
-Focused Native/Browser/GUI checks pass; broader artifact/live acceptance follows.
+Source/fresh ordinary each pass 781/two existing skips; actual Qwen source/context
+and edit preservation pass. Current MX review stays unchanged; adoption, complete
+provenance and broader migration/platform gates remain open.
 
 [Sent-message Edit](HARNESS-MESSAGE-EDIT.md) restores the latest human input and
 original attachments into the existing DSH composer of a Pi child. Explicit Send,
