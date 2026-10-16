@@ -2125,3 +2125,15 @@ including clean-preview Refresh and writes in both directions without inference.
 `test_shared_profile_lease.py` provides the common kernel-lifetime/fence contract;
 Node adoption/Chromium cases remain Linux-only. See the shared-profile guide for
 current source, exact packaged and real-review adoption boundaries.
+
+## Compact DSH export — October 17
+
+`python3 -m unittest discover -s tests -p test_dsh_project_export.py -v` now
+passes 23 cases. Four additions cover indentation-only size refusal without any
+field loss, exact published Unicode/newline bytes, real CLI checksum/private-file
+publication and no-overwrite, and oversized refusal leaving no files.
+The focused Node source run uses two workers and passes 66 cases across
+`dsh-project-import`, `dsh-project-rich`, `dsh-project-setup`,
+`dsh-archived-family` and `dsh-branch-history`. No model request or owner import
+is part of these checks. [Contract, real read-only observations and deployment
+limits](../docs/HARNESS-DSH-MIGRATION-PILOT.md#compact-project-export--october-17).

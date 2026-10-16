@@ -1,5 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import copy,importlib.util,unittest,os,tempfile,hashlib,base64
+import copy,importlib.util,unittest,os,tempfile,hashlib,base64,json,sys,types,io,contextlib
 from unittest.mock import patch
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('dsh_project_export',Path(os.environ.get('AUGMENTOR_PI_TEST_ROOT',Path(__file__).resolve().parents[1]))/'scripts/export-dsh-project.py')
@@ -34,6 +34,43 @@ class MultiRemote(RemoteFixture):
         return value
 
 class ExportTests(unittest.TestCase):
+    def test_compact_export_preserves_every_field_when_indentation_alone_exceeds_bound(self):
+        value=module.export_project(RemoteFixture(),'authored-project')
+        compact=module.encode_export(value);pretty=(json.dumps(value,indent=2)+'\n').encode()
+        self.assertLess(len(compact),len(pretty))
+        with patch.object(module,'MAX_EXPORT_BYTES',len(pretty)-1):
+            captured=module.export_project(RemoteFixture(),'authored-project')
+            self.assertEqual(module.encode_export(captured),compact)
+        self.assertEqual(json.loads(compact),value)
+    def test_published_byte_bound_includes_unicode_escapes_and_final_newline(self):
+        value={'authored':{'text':'Caffè 🌍\n  keep whitespace\t','unknown':{'nested':[None,True,1.25]}}}
+        raw=module.encode_export(value)
+        self.assertEqual(json.loads(raw),value);self.assertTrue(raw.endswith(b'\n'))
+        with patch.object(module,'MAX_EXPORT_BYTES',len(raw)):
+            self.assertEqual(module.encode_export(value),raw)
+        with patch.object(module,'MAX_EXPORT_BYTES',len(raw)-1):
+            with self.assertRaisesRegex(ValueError,'size bound'):module.encode_export(value)
+    def test_cli_publishes_exact_bounded_bytes_and_never_overwrites_previous_export(self):
+        self.addCleanup(os.umask,os.umask(0o077))
+        with tempfile.TemporaryDirectory(prefix='augmentor-dsh-compact-export-') as folder:
+            output=Path(folder)/'export.json';fake=types.ModuleType('dsh.remote');fake.Remote=lambda *args:RemoteFixture()
+            argv=['export-dsh-project.py','--project','authored-project','--output',str(output)]
+            with patch.dict(sys.modules,{'dsh.remote':fake}),patch.object(sys,'argv',argv):
+                report=io.StringIO()
+                with contextlib.redirect_stdout(report):module.main()
+                raw=output.read_bytes();receipt=json.loads(report.getvalue())
+                self.assertEqual(output.stat().st_mode&0o077,0)
+                self.assertEqual(raw,module.encode_export(module.export_project(RemoteFixture(),'authored-project')))
+                self.assertEqual(receipt['bytes'],len(raw));self.assertEqual(receipt['sha256'],hashlib.sha256(raw).hexdigest())
+                with self.assertRaisesRegex(ValueError,'never overwrite'):module.main()
+                self.assertEqual(output.read_bytes(),raw);self.assertEqual(list(Path(folder).iterdir()),[output])
+    def test_cli_refuses_oversized_archive_without_creating_output_or_temporary_files(self):
+        self.addCleanup(os.umask,os.umask(0o077))
+        with tempfile.TemporaryDirectory(prefix='augmentor-dsh-compact-refusal-') as folder:
+            output=Path(folder)/'export.json';fake=types.ModuleType('dsh.remote');fake.Remote=lambda *args:RemoteFixture()
+            with patch.dict(sys.modules,{'dsh.remote':fake}),patch.object(sys,'argv',['export-dsh-project.py','--project','authored-project','--output',str(output)]),patch.object(module,'MAX_EXPORT_BYTES',1):
+                with self.assertRaisesRegex(ValueError,'size bound'):module.main()
+            self.assertEqual(list(Path(folder).iterdir()),[])
     def test_captures_direct_family_and_membership_through_read_only_calls(self):
         remote=RemoteFixture();value=module.export_project(remote,'authored-project')
         self.assertEqual(len(value['sessions']),1);self.assertEqual(len(value['relatedSessions']),1)

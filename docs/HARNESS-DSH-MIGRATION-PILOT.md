@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Compact DSH exports](HARNESS-DSH-MIGRATION-PILOT.md#compact-project-export--october-17) remove indentation overhead without truncating history or raising bounds. Three formerly oversized exports now fit; two projects/seven parents pass read-only preparation, while a third still refuses malformed tool arguments. Source qualification: 23 exporter tests and 66 migration cases. Source-only; running reviews and further-transfer gates remain unchanged. [Evidence](../release/harness-dsh-compact-qualification-20261017.json).
+
 [Setup-only conversations](#setup-only-conversations--october-16) now migrate without fabricated chat, restored old grants or automatic work. The preceding action-completeness refusals actually include sixteen setup-only conversations among seven projects/twenty-one parents; identical frozen exports now pass corrected read-only preparation. Source/ordinary/exact sealed pass **120 Node cases** across twenty-one files/eight Chromium files and **35 Python** each. Public SDK snapshot persistence handles its deferred custom-only files; actual SDK first-turn/branch/cold and original empty-composer GUI checks pass. Both running reviews/all 36 protected inputs stay unchanged. [Portable evidence](../release/harness-dsh-setup-qualification-20261016.json). Private unselected **20261016-232907-d1ee67b2 / eeb10814** verifies **24,620 sealed/1,102 compiled inputs**; adopt it before wider migration; owner pilot feedback still gates further transfer.
 
 [Standard checkpoint framing](#standard-checkpoint-framing--october-16) fixes a real preparation refusal without importing another project. Source/ordinary/exact sealed each pass **104 Node cases** across eighteen files/seven Chromium files and **35 Python cases**. Three identical real exports/six parent conversations refuse under the preceding sealed converter and pass corrected read-only preparation. Both running reviews and all 36 protected inputs remain unchanged. The corrected runtime is separately staged/qualified, unselected **20261016-230037-48cf9df1 / 51f6e3e6**; adopt it before broader migration; owner pilot feedback still gates additional transfer. [Portable evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
@@ -383,6 +385,52 @@ Both owner PIDs/roots, **32 protected files** and installed selection stay uncha
 No extra owner import, provider request or review restart occurs.
 [Portable qualification](../release/harness-dsh-rich-history-review-20261016.json).
 
+
+## Compact project export — October 17
+
+The read-only ten-project size diagnosis distinguishes **three** final JSON
+indentation refusals, **four** image-bundle aggregate refusals and **three**
+history-capture aggregate refusals. This corrects the earlier informal count of
+five indentation-only cases; it is not a refreshed whole-catalogue readiness
+assessment. Opening snapshots observed during that scan do not establish complete
+cuts for histories whose capture was refused.
+
+The version-one exporter now uses compact JSON separators for both its final
+size check and published bytes. Every field, nested value, image body and text
+whitespace survives; only structural formatting changes. The schema and importer
+are unchanged. Unicode escapes and the final newline count toward the exact
+32 MiB output limit. Existing conservative cumulative capture/image byte charging,
+128 parents, 32 related children, 30,000 records per history, immutable image
+checks, final source cut/membership checks and exclusive private publication all
+remain. This does not admit bigger logical histories or truncate any record. Newly
+generated files have their own exact byte checksum; existing archives/checksums
+are never rewritten.
+
+A fresh stable read-only capture of those three projects preserves **eleven parent
+conversations**. Compact bytes are 20,829,664 / 17,978,257 / 29,632,502; the preceding
+pretty encoder would produce 55,678,517 / 51,226,574 / 79,933,330 bytes from the same
+captured values. Semantic JSON round trips match every value. Two projects/seven
+parents, including two image objects, pass current read-only parent preparation.
+The remaining four-parent project reaches a separate `malformed tool arguments`
+refusal. Its source is not repaired, discarded or admitted by relaxing validation.
+No destination is published, continuation model assigned, or model request sent.
+Real temporary exports remain private and are removed after validation.
+
+Source checks pass **39 Python tests**, including **23 exporter tests** and
+sixteen existing licence/private-boundary/notice checks. Four new cases cover the
+indentation regression, exact Unicode/newline byte boundary, CLI private-file
+checksum/no-overwrite behavior and oversized-export refusal without temporary
+files. The five-file Node focus passes **66 cases**, two workers/no skips:
+project import, rich reasoning/images, setup-only history, archived families and
+historical branching. This is source qualification, not a new sealed artifact,
+running-review update, fresh whole-catalogue readiness claim or owner acceptance.
+The exporter is shared source; non-MX installed artifact qualification is deferred.
+
+[Portable evidence](../release/harness-dsh-compact-qualification-20261017.json)
+contains only synthetic-test/build scope and aggregate counts. Next work is a
+bounded full-history format for remaining capture/image aggregate refusals,
+followed by the other independently refused formats. Owner pilot feedback still
+gates further real transfers. Voice and later operating systems remain deferred.
 
 ## Setup-only conversations — October 16
 

@@ -8,6 +8,12 @@ MAX_PROJECT_SESSIONS=128
 MAX_RELATED_SESSIONS=32
 MAX_EXPORT_BYTES=32*1024*1024
 
+def encode_export(value):
+    """Bound the exact published bytes, without expanding nested history indentation."""
+    raw=(json.dumps(value,separators=(',',':'))+'\n').encode()
+    if len(raw)>MAX_EXPORT_BYTES:raise ValueError('Project export exceeds the size bound; no partial archive was published.')
+    return raw
+
 def image_bundle(sessions, dsh_home, charge):
     """Read only named immutable images, never follow a symlink or scan the store."""
     refs={}
@@ -105,7 +111,7 @@ def export_project(remote, project, dsh_home=None):
     if any(sid not in final or final[sid]['running'] for sid in roots):raise ValueError('A source conversation started or disappeared during export.')
     result={'schema':'augmentor-dsh-project-export/1','workspace':workspace,'sessions':sessions,'relatedSessions':related,'archivedSessionIds':[s for s in after['archivedSessionIds'] if s in roots],'pinnedSessionIds':[s for s in after['pinnedSessionIds'] if s in roots]}
     if attachments:result['attachments']=attachments
-    if len((json.dumps(result,indent=2)+'\n').encode())>MAX_EXPORT_BYTES:raise ValueError('Project export exceeds the size bound; no partial archive was published.')
+    encode_export(result)
     return result
 
 def main():
@@ -117,8 +123,7 @@ def main():
     args=parser.parse_args();os.umask(0o077)
     from dsh.remote import Remote
     if args.output.exists():raise ValueError('Output exists; exports never overwrite previous data.')
-    value=export_project(Remote(args.base,args.dsh_home),args.project,args.dsh_home);raw=(json.dumps(value,indent=2)+'\n').encode()
-    if len(raw)>MAX_EXPORT_BYTES:raise ValueError('Export exceeds the project size bound.')
+    value=export_project(Remote(args.base,args.dsh_home),args.project,args.dsh_home);raw=encode_export(value)
     temp=args.output.with_name(args.output.name+'.'+uuid.uuid4().hex+'.tmp')
     try:
         with temp.open('xb') as stream:stream.write(raw);stream.flush();os.fsync(stream.fileno())

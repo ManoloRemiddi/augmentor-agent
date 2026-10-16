@@ -1,0 +1,70 @@
+{
+  "schema": "augmentor-dsh-compact-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Source-only compact version-one project export; no installed update or extra owner import",
+  "sourceBaseRef": "dafd6d8e",
+  "format": {
+    "schemaUnchanged": true,
+    "compactJsonSeparators": true,
+    "dataFieldsRemoved": false,
+    "textWhitespaceChanged": false,
+    "maxExportBytes": 33554432,
+    "cumulativeCaptureAndImageChargingChanged": false,
+    "sessionAndRecordBoundsChanged": false,
+    "sourceStabilityAndImageIntegrityGuardsChanged": false
+  },
+  "privateReadOnlyDiagnosis": {
+    "previousSizeRefusalsInspected": 10,
+    "finalIndentationRefusals": 3,
+    "imageAggregateRefusals": 4,
+    "captureAggregateRefusals": 3,
+    "correctsEarlierInformalIndentationCount": 5
+  },
+  "freshReadOnlyValidation": {
+    "projectsExportedCompletely": 3,
+    "parentsExportedCompletely": 11,
+    "precedingPrettyEncoderWouldRejectAllThree": true,
+    "compactBytes": [
+      20829664,
+      17978257,
+      29632502
+    ],
+    "precedingPrettyBytes": [
+      55678517,
+      51226574,
+      79933330
+    ],
+    "semanticRoundTripExact": true,
+    "parentPreparationAcceptedProjects": 2,
+    "parentPreparationAcceptedConversations": 7,
+    "imageObjectsInAcceptedProjects": 2,
+    "remainingProjectPreparationRefusal": "malformed tool arguments",
+    "scopeLimit": "Parent preparation only; not child inspection, continuation or full catalogue readiness",
+    "targetPublications": 0,
+    "continuationModelsAssigned": 0,
+    "modelRequests": 0,
+    "ownerDataPublished": false
+  },
+  "qualification": {
+    "sourceExporterPythonPass": 23,
+    "newExporterCases": 4,
+    "sourceMigrationNodePass": 66,
+    "nodeFiles": 5,
+    "workers": 2,
+    "skips": 0,
+    "newSealedArtifact": false,
+    "runningReviewAdoption": false,
+    "sourcePythonPassIncludingBoundaryAndNotices": 39,
+    "testedInputsSha256": {
+      "scripts/export-dsh-project.py": "5d50c3d6a0bf346c1b586de3222e05e34b852a260640f9a791ab1955d0cba3d1",
+      "tests/test_dsh_project_export.py": "6e877c075d53dc78a416d7b56bd220d3afbf3a9085e53cafd3a71266e7ff60c8"
+    }
+  },
+  "remaining": [
+    "Bounded complete-history format for capture/image aggregate refusals",
+    "Independent source-format refusals including malformed tool arguments",
+    "Owner pilot feedback before any additional real transfers",
+    "Qualified separate packaging and guarded adoption before using changed exporter in installed reviews",
+    "Voice and later operating-system rollout deferred"
+  ]
+}
