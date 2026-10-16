@@ -1,0 +1,196 @@
+{
+  "schema": "augmentor-harness-original-microphone-mx-review/1",
+  "date": "2026-10-16",
+  "releaseId": "20261016-022659-869fe1e8",
+  "artifactSha256": "3a0946cd880cb54e888d312b21417a3b67ef6c7ef97fde39586771019df2a07c",
+  "inventoryEntries": 24507,
+  "publicArtifactSourceRef": "9ecc45bada0c7978677399315474707fd958e5ec",
+  "applicationRef": "159c99f2fc19f24b166a5d388016580fe905f931",
+  "externalTestDriverSourceRef": "c2e479822f4560411875b92ebced2fa62e800b71",
+  "baseSourceRef": "a0db6ea1f6e019f31e14f8152443bfc4a87838d5",
+  "baseArtifactSha256": "17c82a5e372fe1ad72e8c26b795da09cdf6bc6f9feab422d76199d7db2d7d851",
+  "scope": "private unselected MX review; no public binary/distribution/installed activation",
+  "productVersion": "0.2.13",
+  "piSdkVersion": "1.1.0",
+  "originalDshGuiVersion": "0.2.1-alpha.2",
+  "supplierInputs": 625,
+  "newVerbatimMicrophoneUiInputs": 10,
+  "compiledInputs": 1060,
+  "sealedTarget": {
+    "initialRetained": {
+      "tests": 750,
+      "pass": 745,
+      "fail": 3,
+      "cancelled": 0,
+      "skipped": 2
+    },
+    "correctedExternalDriverFocus": {
+      "source": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "ordinary": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "sealed": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      }
+    },
+    "final": {
+      "tests": 750,
+      "pass": 748,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2
+    },
+    "files": 129,
+    "harnessChromiumFiles": 54,
+    "workers": 2,
+    "runtimeChangedForCorrection": false,
+    "sealedArtifactPatchedOrResealed": false,
+    "causeOfInitialFailures": "Test driver requested public synthetic audio/Python fixtures inside the product artifact; fixtures now resolve beside the external test source while actual Native/Browser/Host modules remain selected from the sealed artifact.",
+    "boundsOrSkipsChanged": false
+  },
+  "sourceAndFreshOrdinary": {
+    "testedRef": "159c99f2fc19f24b166a5d388016580fe905f931",
+    "each": {
+      "tests": 750,
+      "pass": 748,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2
+    },
+    "trackedInputs": 3389,
+    "compiledInputs": 1060,
+    "beforeAfterMatch": true
+  },
+  "ownerStartup": {
+    "releaseId": "20261016-022659-869fe1e8",
+    "artifactSha256": "3a0946cd880cb54e888d312b21417a3b67ef6c7ef97fde39586771019df2a07c",
+    "passed": true,
+    "recognition": {
+      "cached": true,
+      "device": "cpu",
+      "language": "en",
+      "maxDurationSeconds": 600,
+      "noRecordingOrInferenceSubmitted": true
+    },
+    "themes": {
+      "Light": {
+        "stroke": "2px",
+        "color": "rgb(0, 0, 0)",
+        "background": "rgba(0, 0, 0, 0)",
+        "flare": "conic-gradient(from 40deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.396), rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))",
+        "settingsText": "rgb(15, 17, 21)",
+        "bodyText": "rgb(15, 17, 21)",
+        "animations": [
+          "brand-shape",
+          "brand-flow",
+          "brand-breath"
+        ]
+      },
+      "Dark": {
+        "stroke": "2px",
+        "color": "rgb(249, 250, 251)",
+        "background": "rgba(0, 0, 0, 0)",
+        "flare": "conic-gradient(from 40deg, rgba(0, 0, 0, 0), rgba(180, 160, 255, 0.396), rgba(0, 0, 0, 0) 50%, rgba(122, 174, 255, 0.5), rgba(0, 0, 0, 0))",
+        "settingsText": "rgb(249, 250, 251)",
+        "bodyText": "rgb(249, 250, 251)",
+        "animations": [
+          "brand-shape",
+          "brand-flow",
+          "brand-breath"
+        ]
+      }
+    },
+    "permissionControls": {
+      "futureDefaultReadOnly": true,
+      "fullConfirmationOpenedAndCancelled": true,
+      "unacknowledgedAcceptanceDisabled": true,
+      "currentCapability": true,
+      "noModeWrite": true
+    },
+    "finiteDialogTransitionsSettled": true,
+    "accountControls": {
+      "registeredProviders": 9,
+      "storedCredentials": 0,
+      "originalConfirmationOpenedAndClosed": true,
+      "sdkLoginAdmitted": false
+    },
+    "checks": {
+      "exactRuntimeAndProfile": true,
+      "product": "0.2.13",
+      "piSdk": "1.1.0",
+      "sessions": 0,
+      "activeTurns": 0,
+      "unsentDrafts": 0,
+      "readOnly": true,
+      "keylessSearch": true,
+      "localCapture": true,
+      "originalStartPage": true,
+      "planModeCapability": true,
+      "currentPermissionCapability": true,
+      "skillReferencesCapability": true,
+      "sessionExportCapability": true,
+      "newChatPermissionDefaultRow": true,
+      "twoAugmentorMarks": true,
+      "composerDisabledUntilNewSession": true,
+      "settingsAvailable": true,
+      "browserErrors": 0,
+      "failedResponses": 0,
+      "noModelOrToolWorkSubmitted": true
+    },
+    "ownedQaBrowserTerminal": true
+  },
+  "speech": {
+    "reviewOnlyPrivateCompanion": "0.1.22",
+    "componentSourceRef": "1e1e6880bae876c0c56e5742b65b8d8eeb3567e6",
+    "archiveSha256": "5f0e2f8ac79ef7d32aa3cb13ea873563e622dca985a3af7e3bf1a1ec0d6e56c9",
+    "packageInputsPreserved": 70,
+    "outsidePublicArtifactAndCi": true,
+    "installedUnitChanged": false,
+    "sharedAppPin": "0.1.19 unchanged",
+    "privateRecognitionConfigurationReused": true,
+    "cpuCacheAvailable": true,
+    "language": "en",
+    "maxUtteranceSeconds": 600,
+    "modelSettingsAndPlacementPreserved": true,
+    "physicalMicrophoneOrPlaybackQualified": false,
+    "breezeState": "failed",
+    "rtx5090FreeMiB": 2012,
+    "existingBreezeStartRequirementMiB": 2828,
+    "breezeRetriedOrTuned": false
+  },
+  "preservation": {
+    "sealedInventoriesVerified": 11,
+    "reviewOwnersPresent": 12,
+    "separateRecognitionOwnerPresent": true,
+    "selectedConfigurationSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "privateOriginalPreexistingChanges": 4,
+    "originalServiceModelConfigFilesPreserved": 6,
+    "previousReviewsPreserved": true,
+    "selectedInstallationChanged": false,
+    "qwenCatalogHttpStatus": 200,
+    "privateSourceOrAudioCopiedToPublicAppTestsOrCi": false
+  },
+  "sharedCiCoverage": "14 common recognition-only transport/Host cases added to existing Linux/macOS/Windows SDK workflow; new hosted results remain separate",
+  "remaining": [
+    "Owner MX microphone/device/UX feedback and real accuracy",
+    "Full conversational TTS/playback/interruption/hands-free and Breeze eligibility",
+    "Shared speech distribution/pin/installed adoption",
+    "Remaining plugin/Home/Office/memory/profile/history migration",
+    "Windows/macOS/other Linux artifacts and final DSH retirement"
+  ]
+}

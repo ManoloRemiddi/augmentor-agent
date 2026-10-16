@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX microphone review](HARNESS-MX-REVIEW.md#original-dsh-microphone-review--october-16)
+**20261016-022659-869fe1e8** is running, unselected: public artifact **9ecc45ba**,
+application **159c99f2**, external test driver **c2e47982**. Source/ordinary/final
+sealed target each pass **748/two existing optional skips**, 129 files/all 54
+Harness Chromium files, unchanged workers/bounds. The original DSH microphone/
+waveform/Stop/Cancel/device picker and editable draft now have a separate private
+**0.1.22** recognition service with the existing offline CPU model. Both themes/
+2px marks/settings, cache readiness and fresh zero-session owner QA pass; full
+24,507-entry seal/1,060 compiled inputs, 625 suppliers and 70 private component
+inputs verify. Initial staged three fixture-location failures remain; corrected
+four-case source/ordinary/sealed and full sealed follow-up pass without patching
+the artifact. Eleven seals/twelve review owners plus the separate recognition
+owner, selection, 38 canonical/four original private changes and six config hashes
+remain preserved. Qwen is online; Breeze remains failed and is not retried/tuned.
+Physical MX feedback, full voice, shared distribution/pin/adoption, remaining
+workflows/migration and later OS releases remain open.
+[Portable review](../release/harness-dictation-review-20261016.json).
+
 [Sealed voice-fixture correction](HARNESS-DICTATION.md#sealed-artifact-fixture-correction)
 keeps runtime **159c99f2** and the sealed microphone artifact unchanged. The
 first staged cohort retains 745 pass/three fixture-location failures/two existing

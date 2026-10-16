@@ -139,9 +139,11 @@
     "existingBreezeStartRequirementMiB": 2828
   },
   "currentMxReview": {
-    "releaseId": "20261015-211446-7474ddb2",
-    "containsThisIncrement": false,
-    "newReview": "not yet staged"
+    "releaseId": "20261016-022659-869fe1e8",
+    "artifactSha256": "3a0946cd880cb54e888d312b21417a3b67ef6c7ef97fde39586771019df2a07c",
+    "containsThisIncrement": true,
+    "selected": false,
+    "qualification": "release/harness-dictation-review-20261016.json"
   },
   "remaining": [
     "Isolated sealed MX review and owner physical microphone feedback",

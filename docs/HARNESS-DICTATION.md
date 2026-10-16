@@ -174,3 +174,17 @@ worker count or skip changes. The complete corrected sealed cohort is next.
 The common application SDK workflow now runs the 14 recognition-only transport/
 Host cases immediately after build on Linux/macOS/Windows, with explicit source/
 fixture path triggers. This is CI coverage, not a new hosted/platform pass.
+
+## Current isolated MX review
+
+[20261016-022659-869fe1e8](HARNESS-MX-REVIEW.md#original-dsh-microphone-review--october-16)
+now runs the exact unchanged sealed artifact with a separately installed private
+0.1.22 CPU recognition service. The corrected final sealed cohort passes
+748 plus two existing optional skips; the failed initial staged record is retained.
+Initial owner QA verifies both themes/marks/settings and offline cache readiness
+without creating chats, drafts, login, recording or model/tool work. The 70 private
+package inputs remain unchanged and outside the public artifact/tests/CI. Existing
+review/selection/services and GPU settings stay preserved. Use New Session →
+microphone → Stop → inspect/edit draft → Send. Device choice is in Settings →
+Plugins → Voice input. This is an unselected review; owner physical microphone
+feedback, full voice and installed/distribution adoption remain open.

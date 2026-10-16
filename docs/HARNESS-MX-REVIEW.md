@@ -1,5 +1,51 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Original DSH microphone review — October 16
+
+Private unselected **20261016-022659-869fe1e8** runs product 0.2.13/Pi SDK 1.1.0,
+public artifact **9ecc45ba** / application **159c99f2** with the original DSH
+0.2.1-alpha.2 microphone, toolbar, waveform, Cancel/Stop, stale-draft feedback
+and device picker. Its full 24,507-entry artifact is sealed as
+`3a0946cd880cb54e888d312b21417a3b67ef6c7ef97fde39586771019df2a07c`.
+It preserves the original GUI, Context/Trajectory/Insights, models/settings,
+permissions/skills/export and themed 2px Augmentor marks. Shared dependencies
+and baseline components stay byte-identical; private 0.1.22 recognition is an
+external review-only service, not copied into public product/tests/CI.
+
+Open the new private review link from chat, choose **New Session**, then the
+microphone. **Stop** recognizes into the editable draft; **Send** is still your
+separate action. **Cancel** discards that capture. In **Settings → Plugins →
+Voice input**, **Choose microphone** opens the original device picker/meter.
+The existing cached recognizer runs locally on CPU, currently English, with
+the unchanged ten-minute budget; no download or Breeze synthesis is needed.
+New permission/device/physical recognition feedback remains owner acceptance.
+
+Source/fresh ordinary/final sealed target each pass **748 plus two existing
+optional skips**, zero failures/cancellations, across **129 files/all 54 Harness
+Chromium files**, unchanged two workers/bounds. All 3,389 tracked/1,060 compiled
+inputs match at source/ordinary freeze, 625 GUI supplier records verify, and 22
+notice/packaging/private-source checks pass. The initial staged run retains
+745 passes/three missing-test-fixture failures/two skips: its old driver searched
+for public synthetic audio/Python fixtures inside the product. Correcting only
+external driver paths gives four-case source/ordinary/sealed passes and the full
+positive sealed repeat. Runtime/fixture bodies/seal stay unchanged.
+
+Actual public transport/private packed-component acceptance recognizes 25/25
+synthetic words offline, no TTS/LLM request, with joined worker exit. Initial
+owner Chromium checks verify both themes/marks/settings, CPU cache, zero stored
+accounts, no admitted login, sessions, drafts, recordings or model/tool work.
+This is not physical audio or full conversational voice acceptance.
+
+Eleven sealed inventories/twelve review owners plus the private recognition
+owner remain present. Selection, previous reviews, 38 canonical/four original
+private changes and six model/service configuration hashes stay preserved.
+Qwen catalog is reachable; original Breeze is failed with 2,012 MiB free versus
+its unchanged 2,828 MiB start threshold. No GPU move, tuning, eviction or retry.
+Shared speech pin stays 0.1.19; installed adoption and public Windows/Office/
+distribution gates remain open. No public binary or installed activation occurs.
+[Portable review](../release/harness-dictation-review-20261016.json) ·
+[Microphone contract and retained failures](HARNESS-DICTATION.md).
+
 [Current MX export/Context review](HARNESS-MX-REVIEW.md#export-and-live-context-review--october-15)
 **20261015-211446-7474ddb2** runs public **681a858/application 8c159cb7**, unselected.
 It includes the original DSH session-download menu/dialog and `/export`, late

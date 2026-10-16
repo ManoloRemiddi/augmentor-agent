@@ -621,3 +621,9 @@ Runtime 159c99f2, fixture bodies and the sealed artifact remain unchanged.
 [Harness microphone qualification](HARNESS-DICTATION.md#sealed-artifact-fixture-correction)
 owns the full staged follow-up. Common dictation CI coverage is added separately;
 no new hosted qualification is inferred.
+
+The [current isolated MX microphone review](HARNESS-MX-REVIEW.md#original-dsh-microphone-review--october-16)
+now qualifies the final sealed follow-up at 748 plus two existing optional skips.
+Private 0.1.22 CPU recognition is available outside the unchanged shared 0.1.19
+product graph. Physical owner audio, full Breeze voice and installed adoption
+remain separate; no public binary, selected release or original service changed.
