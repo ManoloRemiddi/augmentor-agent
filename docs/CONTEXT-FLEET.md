@@ -60,7 +60,26 @@ Source build and 294/294 Node cases across 62 files (18 actual Chromium files),
 plus sixteen licence/private-boundary/notice Python cases, pass. The first
 cohort retained 293 passes and one missing-QtTest environment failure. The
 existing isolated pinned PySide6-Essentials 6.8.2.1 environment passes the
-Native inspector focus and the complete unchanged cohort. Packaging is separate.
+Native inspector focus and the complete unchanged cohort.
+
+Private unselected MX **20261016-202020-adced449**, application
+**4434b0313b624fe8d314f642b92fe525f3672ebc**, artifact
+**b222b0d2f58b09aa70282a7a4119d22e5335223612bca153b671f7a63bc644ec**,
+also passes 294/294 exact-target cases and sixteen clean packaged-Python checks.
+All **24,607 sealed / 1,099 compiled** inputs verify after testing. The first
+packaged cohort retained 289 passes and one module-load failure for test-only
+JSDOM, which is intentionally absent from production. A separate wrapper adds
+only the existing external development dependency; application imports remain on
+verified sealed bytes. Production Node, dependencies, Python and components are
+unchanged. The preceding sealed application fails the archived-family regression
+at its absent historical catalogue, as expected.
+
+Both current owner review PIDs/roots stay on **20261016-193501-a9131856**.
+There is no owner restart, additional DSH project import, shared-data adoption,
+selected-install change, live provider work or model/GPU/audio adjustment in this
+checkpoint. Source/packaged qualification does not deploy this feature into those
+open reviews. Hosted CI, later OS artifacts and public binary distribution remain
+unqualified.
 
 **Remaining migration gate:** direct reply-branching at an imported DSH assistant
 message currently fails because that historical reply is a labelled custom native

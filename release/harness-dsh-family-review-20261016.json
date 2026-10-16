@@ -2,7 +2,7 @@
   "schema": "augmentor-dsh-family-review/1",
   "date": "2026-10-16",
   "scope": "MX synthetic archived DSH family inspection in original Fleet and conversation UI",
-  "applicationRef": null,
+  "applicationRef": "4434b0313b624fe8d314f642b92fe525f3672ebc",
   "qualification": {
     "sourceNodeCases": 294,
     "sourceNodeFiles": 62,
@@ -11,7 +11,7 @@
     "sourcePythonLicenceBoundaryNoticeCases": 16,
     "qtTestDependency": "isolated existing PySide6-Essentials 6.8.2.1; production Python unchanged",
     "initialDefaultPythonQtTestFailureRetained": true,
-    "sealedTarget": "pending",
+    "sealedTarget": "passed; exact application/runtime files with isolated external test-only Qt and JSDOM dependencies",
     "sourceNodeCohort": [
       "dsh-project-import",
       "dsh-project-multi-runtime",
@@ -75,7 +75,22 @@
       "native-history-index",
       "harness-native-history",
       "pi-inspection"
-    ]
+    ],
+    "sealedTargetNodeCases": 294,
+    "sealedTargetNodeFiles": 62,
+    "actualChromiumFiles": 18,
+    "nodeWorkers": 2,
+    "nodeDeadlinesRelaxed": false,
+    "sealedTargetPythonLicenceBoundaryNoticeCases": 16,
+    "sealedInventoryVerifiedAfterTests": true,
+    "nativePiInspectorWithPinnedQtTestPassed": true,
+    "initialSealedJSDOMTestDependencyFailureRetained": true,
+    "initialSealedPasses": 289,
+    "initialSealedModuleFailures": 1,
+    "sourceAndSealedAppDependenciesUnchanged": true,
+    "precedingSealMissingArchivedCoverageReproduced": true,
+    "ownerDataUsedAsFixture": false,
+    "currentHostedQualification": false
   },
   "adoption": {
     "ownerReviewsRestarted": false,
@@ -83,12 +98,19 @@
     "installedSelectionChanged": false,
     "voiceModelGpuSettingsChanged": false,
     "publicBinaryReleased": false,
-    "draftPrMerged": false
+    "draftPrMerged": false,
+    "ownerReviewRunningRelease": "20261016-193501-a9131856",
+    "ownerReviewPidsAndRootsVerifiedUnchanged": true,
+    "installedSelectionVerifiedUnchanged": true
   },
   "remaining": [
     "Direct branch from imported DSH assistant replies is not mapped to native Pi messages",
     "Owner pilot feedback and remaining real project migration",
     "Archived effective-provider context, live child continuation and Teams/mailbox parity",
     "Later OS artifact adoption and public distribution qualification"
-  ]
+  ],
+  "releaseId": "20261016-202020-adced449",
+  "artifactSha256": "b222b0d2f58b09aa70282a7a4119d22e5335223612bca153b671f7a63bc644ec",
+  "sealedEntries": 24607,
+  "compiledFiles": 1099
 }
