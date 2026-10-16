@@ -4,7 +4,8 @@ function checked(row){
  if(!row.connected)return {protocol:row.protocol,connected:false,message:'Memory status is unavailable. Refresh to check it again.'};
  if(typeof row.enabled!=='boolean'||typeof row.configured!=='boolean'||typeof row.available!=='boolean'||!['default','off','unknown','unconfigured'].includes(row.requestMode)||
   !['events','pending','stopped'].every(key=>Number.isSafeInteger(row[key])&&row[key]>=0)||typeof row.actions?.capture!=='boolean'||typeof row.actions?.processing!=='boolean'||typeof row.processing?.known!=='boolean'||
-  row.processing.known&&(typeof row.processing.paused!=='boolean'||typeof row.processing.active!=='boolean'))throw Error('Memory status could not be confirmed.');
+  row.processing.known&&(typeof row.processing.paused!=='boolean'||typeof row.processing.active!=='boolean')||
+  row.processing.issue!==undefined&&row.processing.issue!=='gateway-in-use')throw Error('Memory status could not be confirmed.');
  return row;
 }
 export class DshMemorySettings {

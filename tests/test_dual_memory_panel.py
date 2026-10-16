@@ -48,6 +48,18 @@ class MemoryPanelTests(unittest.TestCase):
         self.assertIn(('memory.dual.processing', {'paused': True, 'expectedPaused': False}), calls)
         self.assertEqual(panel.processing_toggle.text(), 'Resume memory processing')
 
+    def test_gateway_conflict_keeps_capture_control_and_explains_disabled_processing(self):
+        panel, state, calls, _ = self.panel()
+        state['configurationGuards']['processing'] = 0
+        state['processingIssue'] = 'gateway-in-use'
+        state['message'] = 'Memory processing gateway port is in use. Capture and cached recall remain available.'
+        panel.refresh.click(); self.until(lambda: not panel.busy)
+        self.assertTrue(panel.toggle.isEnabled())
+        self.assertFalse(panel.processing_toggle.isEnabled())
+        self.assertIn('gateway port is in use', panel.status.text())
+        before = len(calls); panel.processing_toggle.click()
+        self.assertEqual(len(calls), before)
+
     def test_unconfirmed_change_disables_writes_until_explicit_refresh_without_replay(self):
         panel, state, calls, failure = self.panel(); failure.append(True)
         panel.toggle.click(); self.until(lambda: not panel.busy)

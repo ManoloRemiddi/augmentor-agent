@@ -279,6 +279,32 @@ class HindsightTests(unittest.TestCase):
         self.finish()
         with self.assertRaisesRegex(ValueError, 'limit'): self.call('retry', job=job['id'], reviewed=True)
 
+    def test_gateway_conflict_preserves_cached_banks_and_blocks_inference_without_saving_a_pause(self):
+        self.controlled()
+        self.store.processing_issue = 'gateway-in-use'
+        self.live_append()
+        with self.store.connect() as db:
+            banks = self.store.banks(db)
+            for bank in banks:
+                db.execute('UPDATE hindsight_banks SET snapshot=? WHERE bank=?',
+                           (json.dumps({'summary': 'Authored cached ' + bank['kind'], 'items': [], 'pages': [], 'stale': False}), bank['bank']))
+        self.store.checked = True
+        self.store.step()
+        self.assertEqual(self.engine.banks, {})
+        self.assertIsNone(self.store.last_error)
+        status = self.call('describe')
+        self.assertFalse(status['available'])
+        self.assertFalse(status['processing']['paused'])
+        self.assertEqual(status['configurationGuards'], {'capture': 1, 'processing': 0})
+        recalled = self.call('recall')
+        self.assertTrue(recalled['unavailable'])
+        self.assertEqual(recalled['relationship']['summary'], 'Authored cached relationship')
+        self.assertEqual(recalled['work']['summary'], 'Authored cached work')
+        self.assertEqual(len(self.call('export')['events']), 1)
+        with self.assertRaisesRegex(ValueError, 'gateway is unavailable'):
+            self.call('processing', paused=False)
+        self.assertFalse(self.call('describe')['processing']['paused'])
+
     def test_existing_managed_page_policy_is_migrated_without_deleting_content(self):
         self.controlled(); self.live_append(); self.finish()
         for bank in self.engine.banks.values():

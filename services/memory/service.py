@@ -2,6 +2,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Private automatic-memory companion, independently startable by either harness."""
 import json
+import errno
 import os
 from pathlib import Path
 import signal
@@ -88,9 +89,17 @@ if __name__ == '__main__':
     configuration = server.memory.processing.configuration
     if configuration.get('processingProtocol') == 'augmentor-memory-processing/1':
         from memory.gateway import Gateway
-        gateway = Gateway(('127.0.0.1', configuration['gatewayPort']), server.memory.processing.budget,
-                          configuration, admission=server.admission)
-        threading.Thread(target=gateway.serve_forever, daemon=True).start()
+        try:
+            gateway = Gateway(('127.0.0.1', configuration['gatewayPort']), server.memory.processing.budget,
+                              configuration, admission=server.admission)
+        except OSError as error:
+            if error.errno != errno.EADDRINUSE:
+                raise
+            # A copied review configuration must not kill local capture/status
+            # or send its jobs through an unrelated companion's budget gateway.
+            server.memory.processing_issue = 'gateway-in-use'
+        if gateway:
+            threading.Thread(target=gateway.serve_forever, daemon=True).start()
     stopped = threading.Event()
     def maintain():
         while not stopped.is_set():

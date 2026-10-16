@@ -31,3 +31,12 @@ test('a changed setting with a lost acknowledgement is not replayed and exposes 
  await assert.rejects(api.configure(false,true),error=>/Nothing was retried/.test(error.message)&&!error.message.includes('synthetic-private'));
  assert.equal(writes,1);assert.equal((await api.describe()).enabled,false);assert.equal(writes,1);
 });
+test('only the known gateway issue is exposed and it cannot grant processing authority',async()=>{
+ const raw={...status(),available:false,processingIssue:'gateway-in-use',configurationGuards:{capture:1,processing:0}},calls=[];
+ const api=new MemorySettings(async method=>{calls.push(method);return raw;});
+ const view=await api.describe();assert.equal(view.processing.issue,'gateway-in-use');assert.equal(view.actions.capture,true);assert.equal(view.actions.processing,false);
+ raw.available=true;raw.configurationGuards.processing=1;
+ assert.equal((await api.describe()).available,false);assert.equal((await api.describe()).actions.processing,false,'a blocked gateway cannot grant processing even with a stale guard');
+ await assert.rejects(api.processing(false,false),/cannot be confirmed/);assert(calls.every(method=>method==='memory.dual.describe'));
+ raw.processingIssue='synthetic-private-error';assert.equal((await api.describe()).processing.issue,undefined);assert(!JSON.stringify(await api.describe()).includes('synthetic-private'));
+});

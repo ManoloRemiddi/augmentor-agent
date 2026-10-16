@@ -163,3 +163,38 @@ remaining plugin/Home/Office workflows and later OS releases remain open.
 now qualifies separately with synthetic offline-cache Docker banks and actual
 restart/replacement/archive restoration. This does not update the existing owner
 review or adopt its data into an installed engine.
+
+## Memory gateway recovery — October 16
+
+An occupied local processing port previously terminated the entire memory
+companion after publishing its socket. This was observed in the MX pilot after
+review profiles copied one gateway setting. Saved capture status then appeared
+unavailable even though chat history remained intact. Engine downtime is a
+separate condition; saved capture On never proves external engine health.
+
+The companion now catches only the address-in-use failure. It continues local
+capture, cached recall and status, advertises `processingIssue: gateway-in-use`,
+and refuses processing resume. Its maintenance worker makes no engine/model
+requests while blocked. The issue is transient: it does not rewrite configuration,
+change ports, adopt another companion's gateway, clear work, retry stopped jobs or
+change the saved processing pause. Once the conflict is resolved, restarting the
+companion rechecks the port; processing remains subject to the saved pause and
+ordinary explicit activity/budget admission.
+
+The sanitized Host projection exposes only the fixed issue code, keeps capture
+writable and disables processing even if a stale companion advertises its old
+guard. Harness overview/detail and the existing Native panel explain the failure.
+Legacy status without the optional field remains compatible; arbitrary private
+error text is not forwarded. Native uses the same processing guard. Shared code
+and offscreen Native checks run on MX; macOS/Windows installer and artifact
+qualification remain deferred. The Linux Docker engine setup is unchanged.
+
+The real occupied-port companion regression also reads through `MemorySettings`
+and the frontend state owner, captures/exports a source record, checks pause
+semantics, releases the port and restarts with exact source preservation. No
+request reaches its independently authored HTTP engine/model fixture. A separate
+bank-cache test verifies retained relationship/work summaries without engine work;
+the Native test verifies that capture remains enabled while processing is disabled.
+The new regression fails against the preceding sealed application because the
+companion cannot report connected status. Final source/sealed and owner adoption
+evidence follows; no installed selection or model/GPU/speech changes are implied.

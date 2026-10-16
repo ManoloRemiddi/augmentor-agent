@@ -45,6 +45,7 @@ class HindsightMemory(DualMemory):
         self.guard = threading.RLock()
         self.last_error = None
         self.checked = False
+        self.processing_issue = None  # Transient local gateway failure; never a saved pause choice.
         self.configuration = configuration
         if configuration is None:
             config_path = self.path.parent / 'hindsight.json'
@@ -87,6 +88,8 @@ class HindsightMemory(DualMemory):
     def call(self, method, p):
         action = method.removeprefix('memory.dual.')
         if action in ('activity', 'processing', 'import', 'jobs', 'retry'):
+            if action == 'processing' and p.get('paused') is False and self.processing_issue:
+                raise ValueError('Memory processing gateway is unavailable. Resolve the conflict and restart the memory companion.')
             return self.processing.call(action, p)
         if action == 'append':
             result = super().call(method, p)
@@ -118,11 +121,12 @@ class HindsightMemory(DualMemory):
                 request_mode = 'unknown'
             return {'protocol': PROTOCOL, 'pid': __import__('os').getpid(), **config, 'engine': 'hindsight', 'version': VERSION,
                     'requestMode': request_mode, 'requestModeSource': 'configured-memory-engine',
-                    'configurationGuards': {'capture': 1, 'processing': 1},
-                    'configured': bool(self.configuration), 'available': self.checked and not self.last_error,
+                    'configurationGuards': {'capture': 1, 'processing': int(not self.processing_issue)},
+                    'configured': bool(self.configuration), 'available': bool(self.checked and not self.last_error and not self.processing_issue),
+                    **({'processingIssue': self.processing_issue} if self.processing_issue else {}),
                     'events': events, 'pending': pending,
                     'failures': processing['jobs'].get('stopped', 0), 'processing': processing,
-                    'message': self.last_error or ('Capture and cached recall remain available. Memory inference is limited to active tool windows; stopped jobs require review.' if processing['configured'] else 'Memory inference is stopped until the controlled engine is installed. Transcripts and cached memory are preserved.')}
+                    'message': ('Memory processing gateway port is in use. Capture and cached recall remain available; resolve the conflict and restart the memory companion.' if self.processing_issue else self.last_error) or ('Capture and cached recall remain available. Memory inference is limited to active tool windows; stopped jobs require review.' if processing['configured'] else 'Memory inference is stopped until the controlled engine is installed. Transcripts and cached memory are preserved.')}
         with self.connect() as db:
             config = dict(db.execute('SELECT enabled,person FROM settings').fetchone())
             banks = self.banks(db)
@@ -155,7 +159,7 @@ class HindsightMemory(DualMemory):
                 rows = db.execute("SELECT * FROM events WHERE session=? AND role='user' ORDER BY seq DESC LIMIT 24", (session['id'],)).fetchall()
                 result['userReceipts'] = [{k: r[k] for k in ('seq', 'session', 'event_id', 'role', 'mode', 'status', 'content')} for r in reversed(rows)]
                 result['recent'] = []  # Assistant-heavy project excerpts are no longer injected.
-                result['unavailable'] = not self.configuration or bool(self.last_error)
+                result['unavailable'] = not self.configuration or bool(self.last_error) or bool(self.processing_issue)
                 return result
         query = p.get('query')
         if not isinstance(query, str) or not query.strip() or len(query) > 4096:
@@ -205,6 +209,8 @@ class HindsightMemory(DualMemory):
 
     def step(self):
         """Admission-controlled maintenance; archive/backlog is never implicit."""
+        if self.processing_issue:
+            return  # Capture/cached recall remain available; never use another owner's gateway.
         try:
             self.processing.step()
             self.last_error = None
