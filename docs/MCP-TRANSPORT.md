@@ -122,9 +122,14 @@ application workflow or continuing service health. The first probe's logging
 wrapper recursed; it is corrected outside product code and its failure retained.
 
 Playwright's original DSH `--user-data-dir` and `--output-dir` are not safe to
-share between simultaneous owners. Harness uses new private per-review browser
-and output directories; it does not copy DSH cookies, sign-ins, screenshots or
-profile files. The configured browser executable remains unchanged. Independent
+share between simultaneous owners. Harness uses explicit `--isolated`, a private per-review temporary root and
+output directory; it does not copy DSH cookies, sign-ins, screenshots or profile
+files. Each live MCP instance gets its own temporary browser context/profile.
+Merely omitting `--user-data-dir` still reused a shared cache and reproduced a
+second-client collision. Two actual clients now navigate authored localhost
+pages, expose distinct nonce/cookies, snapshot and close (six calls), with two
+owned private temporary profiles verified. The original DSH profile is not used.
+This isolated browser state does not persist across restart. The configured browser executable remains unchanged. Independent
 logins may therefore be required. The original DSH browser and other application
 processes remain available. Blender's already installed external helper is not
 copied or licensed for redistribution by this step; its earlier GPL/source
@@ -146,8 +151,33 @@ also pass. The missing-status control fails before correction; an initial new
 assertion wrongly expected configuration to leave no display receipts. The
 corrected assertion retains the original prefix and permits only the documented
 sign-in/configuration notices, with one explicit configuration receipt and no
-chat/model/tool event. Packaged qualification and owner profile adoption follow
-separately. MX is the actual adoption target; native installed Agent and later OS
+chat/model/tool event. The exact packaged application passes the same 28/28 Node cases and 41 Python
+checks. Private unselected **20261016-220504-b91df2e4**, source **1633e00f**,
+artifact **2164f1ec0e5f5bc0aa8b100ad24d322ba1bf83d8829e7de7f5ee80a474aa92b1**,
+verifies **24,615 sealed/1,102 compiled** inputs; production Node/dependencies,
+the Python runtime and components retain the prior qualified bytes.
+
+Both reviews adopt it at guarded idle boundaries, with 410 verified cold backup
+files and all 34 protected inputs exact before MCP changes. Each actual original
+Plugins editor then saves one backed-up five-server profile through the ordinary
+configuration receipt. The source full configuration changed independently during
+preparation; re-reading confirmed all five MCP entries semantically unchanged.
+Three unreachable HTTP endpoints remain off; two stdio peers initialize/discover
+24/26 tools. The 120/600/1800/300-second durations preserve the original millisecond
+values. No MCP tool/model action is executed through either owner profile.
+
+MCP registration intentionally adds 36 native connection records and two display
+management notices. Every old authoritative native/display prefix remains exact;
+other inputs remain byte-identical except four dependent display index/manifests,
+whose record checksums, envelope/source/index stamps and counts verify. Earlier
+private-verifier assumptions about HTTP self-reception, event wrappers and derived
+binary files are corrected by read-only reconciliation of the completed first
+receipt, without another configuration call. All four conversations, caller
+permissions, nine Wiki skills/16 Wiki files, shared prompts/memory/eligibility/jobs
+and engine settings survive. Both original GUI checks have zero console or HTTP
+errors; selector On/Off matches two enabled/three disabled entries. The stable
+review registry is revision six. Installed Agent/earlier Preview/selection stay
+unchanged. [Portable evidence](../release/harness-owner-mcp-review-20261016.json). MX is the actual adoption target; native installed Agent and later OS
 artifacts are not updated by a source label change.
 
 
