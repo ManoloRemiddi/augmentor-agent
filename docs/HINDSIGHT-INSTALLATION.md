@@ -93,3 +93,74 @@ They are distinct from actual Docker/Qwen acceptance. Production adoption of the
 owner's current engine and existing personal banks remains gated on live lifecycle
 evidence and the owner's installed-update workflow. The running MX review remains
 the separately qualified [guarded-memory review](HARNESS-MEMORY-SETTINGS.md).
+
+## Actual installation and rollback qualification — October 16
+
+Functional installer **60fa55f4e6089ddd017ede74ae89898a1571f3f6** passes source and
+fresh ordinary **61 Python cases**, plus **31 fresh ordinary memory Node cases**.
+The source Node/runtime inputs retain the preceding qualification; no app or GUI
+code changes. Twenty-five source/licence cases pass. Frozen **3,415 tracked /
+1,063 compiled / one Node / 20,702 dependency inputs** verify unchanged after use.
+Existing bounds/workers/skips remain unchanged. No dependency or image is updated.
+
+Actual Docker setup uses the exact already-cached image, three distinct ports,
+fresh named volume/private profile, **43 verified public cache inputs**, explicit
+memory-only **off**, the reviewed source backport and restart policy **no**.
+The installer extracts the exact public base from its never-started source
+container, applies/verifies the selected MIT patch, joins source-container removal
+and starts the actual engine. Its full actual Pi/Hindsight/Qwen scenario passes:
+18 memory requests all explicitly carry false and finish, ten conversation
+requests/two authored tools, both six-stage jobs completed at attempt zero/no
+failures. Remaining balances are **102.50 seconds / 37,527 tokens** and
+**96.80 seconds / 26,853 tokens**. Seed/correction, scoped recall, isolation,
+historical branch, cold companion restart, pause and outage recovery pass without
+replay. The proof uses unchanged runtime **b7e0afaa**, budgets and source/date/scope
+contracts; all proof actors/its initial engine join cleanup.
+
+A subsequent native catalogue baseline is taken after the first installer start.
+The deliberately tested same-instance stop/start, stopped replacement with base
+source, and stopped replacement restoring the reviewed backport preserve the
+**complete native responses** exactly: two banks, six documents and every document
+detail, fifteen facts, page tree and two full pages. No fields/entries are filtered.
+The source journal is byte-identical, both replacement archives validate/hash,
+and old instances remain stopped/non-restarting on their original named volume.
+
+One real archive is then restored into a separately confirmed empty named volume
+through a uniquely owned never-started transfer container. The original database
+volume is never mounted during restoration. A fresh actual installer instance on
+that restored volume returns the exact same complete native catalogue, canonical
+SHA-256 `a4158de57d27eb114237737e3bcd7e14af4c175058b326e9fe610e0273d3f525`.
+The transfer container is removed and restored engine stopped.
+
+Followup **d6361bd1bd3a36e9dd787c08ccb7569dcb0b18e8** adds only the previous private
+configuration to the backup manifest. Its source/fresh ordinary each pass the
+same **61 Python cases**. The exact rollback assertion fails against 60fa because
+that field is absent. An independent actual stopped replacement verifies the
+complete previous configuration, including credentials/source choice, in a
+**0600** manifest; the archive hash and entire native state remain exact. That
+engine is stopped. The full inference/initial lifecycle result belongs to 60fa;
+the focused followup proves the one-field addition without relabelling its tested
+revision or rerunning unchanged inference. Both frozen trees/compiled inputs verify.
+
+All **five created engine instances** are terminal; both temporary public-source
+containers and the archive-transfer container are removed. Cache inventories and
+source overlays verify. Twelve sealed inventories/thirteen review owners plus
+recognition, selected installation, 38 canonical/four original private changes
+and six model/service configuration hashes remain preserved. The original memory
+engine remains **default**; the existing MX review remains available and unchanged.
+Qwen is online; Breeze remains below its unchanged GPU prerequisite, without
+retry, tuning or eviction. No new artifact is staged/activated or binary published.
+
+Retained preparation failures include older fixture identity/mount omissions, an
+expanded fixture import path, its Docker peer intercepting the real patch tool,
+and an observer initially selecting obsolete `ready=1` rather than all actual
+banks. The failed observer captures no native baseline; the qualified lifecycle
+uses all banks and complete native responses. The rollback missing-field negative
+control is also retained. These failures are not counted as passes.
+
+This qualifies the **offline-cache Linux synthetic-bank path**, not automatic
+owner adoption or every interruption scenario. Larger/older banks, uncached
+downloads, other providers, remaining interruption/rename/configuration rollback
+boundaries, owner physical feedback/installed workflow, full voice and later OS
+release gates remain. Original default-mode timing failures stay retained.
+[Portable installation, lifecycle and restoration evidence](../release/harness-hindsight-installation-20261016.json).

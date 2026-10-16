@@ -158,3 +158,8 @@ Physical MX feedback, installed adoption/backport installation and existing-bank
 migration, default-mode timing/broader load/semantics, full voice/distribution,
 remaining plugin/Home/Office workflows and later OS releases remain open.
 [Portable qualification and review evidence](../release/harness-memory-settings-review-20261016.json).
+
+[The installation path](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16)
+now qualifies separately with synthetic offline-cache Docker banks and actual
+restart/replacement/archive restoration. This does not update the existing owner
+review or adopt its data into an installed engine.

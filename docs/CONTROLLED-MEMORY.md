@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current installation/lifecycle qualification](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16)
+adds actual pinned Docker setup/full Pi/Qwen use, exact nonempty-bank restart and
+stopped source replacement, real archive restoration and private configuration
+rollback. Original engine, owner review and installed selection remain unchanged.
+[Portable result](../release/harness-hindsight-installation-20261016.json).
+
 [Shared memory settings](HARNESS-MEMORY-SETTINGS.md) expose configured request mode,
 independent capture/processing pauses and guarded changes in the original Harness
 Plugins screen and existing native panel. Configuration is labelled separately

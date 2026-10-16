@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current installation/lifecycle qualification](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16)
+adds actual pinned Docker setup/full Pi/Qwen use, exact nonempty-bank restart and
+stopped source replacement, real archive restoration and private configuration
+rollback. Original engine, owner review and installed selection remain unchanged.
+[Portable result](../release/harness-hindsight-installation-20261016.json).
+
 # Actual Pi memory qualification and gateway settlement
 
 This work exercises the existing controlled memory architecture with the actual

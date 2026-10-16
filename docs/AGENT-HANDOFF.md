@@ -1,13 +1,24 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Installer candidate](HINDSIGHT-INSTALLATION.md) now materializes the exact MIT
-refresh-default backport from a never-started pinned image instance, mounts it
-read-only, preserves saved ports/cache/mode and refuses changed running engines.
-Stopped replacement verifies a private database backup before exact-ID rename;
-creation acknowledgement recovery verifies its private receipt without another
-creation. Source common checks pass 61 Python; live Docker/fresh-copy qualification
-is next, with the running MX review, original engine and selected installation
-unchanged. No production adoption is claimed by these fixtures.
+[Qualified memory installation](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16)
+at **60fa55f4**, private rollback metadata fix **d6361bd1**, passes source/fresh
+ordinary **61 Python/31 memory Node** with unchanged b7 runtime/GUI and 25 source/
+licence cases. Actual offline-cache Docker installation passes the full Pi/Qwen
+scenario: 18 explicit-false memory requests, ten conversation requests/two authored
+tools, both six-stage jobs at attempt zero/no failures, over 96 seconds/26,000
+tokens remaining. Exact complete native catalogue (two banks/six documents/
+fifteen facts/two pages), IDs/dates/content and journal survive deliberate restart,
+stopped base/backport replacements and real archive restoration into a fresh
+volume. The one-field rollback configuration assertion fails before/passes after;
+actual 0600 backup manifest retains the exact old private config. All five test
+engines are stopped; two source containers/one transfer container are removed.
+Both 3,415-input source freezes/1,063 compiled/20,702 dependencies, public caches
+and source overlays verify. Twelve seals/thirteen review owners plus recognition,
+selection, canonical/private changes and six config hashes remain preserved.
+Original engine stays default, MX review unchanged, Qwen online/Breeze prerequisite
+unmet. Owner adoption, larger/uncached/provider/interruption boundaries, physical
+feedback/full voice and migration/platform gates remain. No activation/merge/public
+binary follows. [Portable evidence](../release/harness-hindsight-installation-20261016.json).
 
 [Current guarded-memory MX review](HARNESS-MEMORY-SETTINGS.md#qualified-mx-review--october-16)
 **20261016-050949-2145f2db**, application **b7e0afaa**, runs unselected with the

@@ -1,9 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Controlled Hindsight installation](HINDSIGHT-INSTALLATION.md) adds explicit verified
-source-backport/cache/port choices, exact stopped-instance backup/replacement and
-private-receipt recovery. Source fixtures pass; live installation/adoption evidence
-is recorded separately. Existing review and production selection stay unchanged.
+[Controlled Hindsight installation and rollback](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16)
+now passes actual pinned Docker/full Pi/Qwen use, exact nonempty-bank restart and
+stopped replacement, plus real archive restoration into a fresh volume. Source/
+fresh ordinary pass 61 Python/31 memory Node; private configuration rollback is
+preserved. Existing review, original engine and selected installation stay intact;
+owner adoption and wider release gates remain open.
 
 [Shared memory settings](HARNESS-MEMORY-SETTINGS.md) expose configured request mode,
 independent capture/processing pauses and guarded changes in the original Harness

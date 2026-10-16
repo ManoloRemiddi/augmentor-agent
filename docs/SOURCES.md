@@ -750,8 +750,10 @@ with retained full default-window failures and no installed adoption.
 The [installation candidate](HINDSIGHT-INSTALLATION.md) also supports this exact
 selection, extracting the public base from a never-started pinned image instance,
 checking the same digests and retaining the MIT notice in its separate artifact.
-No additional supplier source is selected. Authored file/transport fixtures pass;
-actual installation/restart/nonempty-volume qualification is recorded separately.
+No additional supplier source is selected. Authored file/transport fixtures and actual offline-cache installation/full Pi/Qwen,
+nonempty-volume restart/replacement and archive restoration now qualify at
+**60fa55f4**, with private rollback configuration followup **d6361bd1**. See the
+[exact evidence and limits](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16).
 The original production engine and current owner review are not adopted by this
 source change.
 
