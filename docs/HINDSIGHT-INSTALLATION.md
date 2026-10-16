@@ -9,6 +9,13 @@ Linux Docker host networking; other OS installation/release artifacts require
 separate qualification. Existing MX reviews and selected installations are not
 updated by a source change.
 
+A fresh backport artifact also requires the system `patch` command (Debian/MX:
+`sudo apt install patch`). The Debian CI container declares it explicitly; the
+preceding `3c739944` run lacked it and reports seven installer-fixture errors.
+That failed run is retained; adding the prerequisite does not skip those tests
+or relax source hashes or zero-fuzz application. Cached artifacts are verified
+without reapplying their patch.
+
 The explicit `--refresh-budget-backport` option selects the
 [reviewed MIT refresh-default fix](SOURCES.md). `--no-refresh-budget-backport`
 deliberately selects the pinned base source. Omission preserves a saved choice;
