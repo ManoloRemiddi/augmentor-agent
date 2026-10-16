@@ -574,10 +574,19 @@ leaving the durable startup fence. Explicit rollback restores the exact original
 and retains the built candidate. Separate second-rename failure/finish, changed
 recovery-copy refusal, whole-state mode/hash backup and live-profile refusal pass.
 No owner project, native chat, model/audio request, configuration or running review
-is adopted by these independently authored fixtures. Artifact qualification follows.
+is adopted by these independently authored fixtures.
+
+Private unselected MX **20261016-182813-0b3cbf08**, application **39caf00c**,
+passes the same **169/169 Node cases** against its actual packaged modules and all
+**19 clean-Python exporter cases**. All **24,586 sealed / 1,087 compiled**
+inputs verify after testing, including the exact new helper/CLI bytes. A controlled
+preceding seal admits two owners through different sockets for one synthetic
+profile; the corrected seal admits one and its follower exits without opening
+journals. Both owner reviews retain their PIDs/roots, **32 protected files** and
+selected installation. [Portable qualification](../release/harness-dsh-batch-review-20261016.json).
 
 The state transaction is **MX/Linux qualified**. The POSIX runtime lease is shared
-source on Linux/macOS; common owner tests enter SDK CI, but macOS artifact/kernel
+source on Linux/macOS; owner tests enter the Linux SDK job, but macOS artifact/kernel
 qualification remains open. Windows keeps its existing named-pipe owner guard and
 honors a pending migration fence; transactional consolidation is explicitly refused
 until its ownership/recovery adapter is qualified. User-directed voice and later
