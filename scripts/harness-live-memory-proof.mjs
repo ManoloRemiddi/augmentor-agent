@@ -13,12 +13,13 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {createHash,randomUUID} from 'node:crypto';
 import {setTimeout as delay} from 'node:timers/promises';
 
-const usage='Usage: node scripts/harness-live-memory-proof.mjs --app FROZEN_APP --python PYTHON --provider-json LOCAL_DECLARATION --engine-root PRIVATE_PREPARED_ROOT';
+const usage='Usage: node scripts/harness-live-memory-proof.mjs --app FROZEN_APP --python PYTHON --provider-json LOCAL_DECLARATION --engine-root PRIVATE_PREPARED_ROOT [--scenario full|outage]';
 if(process.argv.length===3&&process.argv[2]==='--help'){console.log(usage);process.exit(0);}
 if(process.platform!=='linux')throw Error('This optional controlled-engine proof is currently Linux-only.');
-const args=new Map(),allowed=new Set(['--app','--python','--provider-json','--engine-root']);
+const args=new Map(),allowed=new Set(['--app','--python','--provider-json','--engine-root','--scenario']);
 for(let i=2;i<process.argv.length;i+=2){if(!allowed.has(process.argv[i])||!process.argv[i+1]||args.has(process.argv[i]))throw Error(usage);args.set(process.argv[i],process.argv[i+1]);}
-if(args.size!==allowed.size)throw Error(usage);
+if(['--app','--python','--provider-json','--engine-root'].some(key=>!args.has(key)))throw Error(usage);
+const scenario=args.get('--scenario')??'full';if(!['full','outage'].includes(scenario))throw Error(usage);
 const app=await realpath(resolve(args.get('--app'))),root=await realpath(resolve(args.get('--engine-root'))),python=await realpath(resolve(args.get('--python'))),inside=relative(app,root);
 if(!inside||inside!=='..'&&!inside.startsWith('..'+sep)&&!isAbsolute(inside))throw Error('Keep the proof outside the application inventory.');
 const engine=JSON.parse(await readFile(join(root,'engine.json'),'utf8')),declaration=JSON.parse(await readFile(resolve(args.get('--provider-json')),'utf8'));
@@ -33,7 +34,7 @@ const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'C
 for(const path of [config,join(config,'agent'),state,workspace,otherWorkspace,shared,memoryState,join(root,'home'),join(root,'runtime')])await mkdir(path,{mode:0o700,recursive:true});
 const sha=bytes=>createHash('sha256').update(bytes).digest('hex'),actors=[],logs=[],requests=[],memoryCalls=[],activeProxy=new Set(),proxySockets=new Set();
 let provider,bridge,owner,connection,memoryActor,promptActor;
-const report={passed:false,phase:'preflight',applicationHostSha256:sha(await readFile(join(app,'dist/runtime/src/host.js'))),driverSha256:sha(await readFile(fileURLToPath(import.meta.url))),piVersion:'1.1.0',hindsightVersion:'0.10.0',model:model.id,contextWindow:model.contextWindow,maxTokens:model.maxTokens,ownerDataUsed:false,originalServiceOrModelSettingsChanged:false,physicalVoiceQualified:false};
+const report={passed:false,scenario,phase:'preflight',applicationHostSha256:sha(await readFile(join(app,'dist/runtime/src/host.js'))),driverSha256:sha(await readFile(fileURLToPath(import.meta.url))),piVersion:'1.1.0',hindsightVersion:'0.10.0',model:model.id,contextWindow:model.contextWindow,maxTokens:model.maxTokens,ownerDataUsed:false,originalServiceOrModelSettingsChanged:false,physicalVoiceQualified:false};
 const checkpoint=phase=>{report.phase=phase;console.log(JSON.stringify({phase,conversationRequests:requests.length}));};
 const until=async(fn,label,ms=20000)=>{const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(100);}throw Error('Live memory proof timeout: '+label);};
 const exists=path=>access(path).then(()=>true,()=>false);
@@ -96,6 +97,7 @@ try{
  });await new Promise(resolve=>bridge.listen(join(shared,'dual-memory.sock'),resolve));
  await startMemory('memory-first');promptActor=await startActor('prompts',python,['-Xutf8','-B',join(app,'services/prompt-library/service.py')]);await until(()=>exists(join(shared,'prompts.sock')),'prompt service');
  const person='proof-'+randomUUID();await callMemory('configure',{person,enabled:true});await startOwner('pi-first');
+ if(scenario==='full'){
  checkpoint('actual-sdk-tool-window-and-retain');
  const first='memory-seed';await create(first);await prompt(first,'Synthetic test facts: My name is Mira. I prefer a calm check-in before technical discussion. For Project Cedar we chose SQLite for local storage; the export screen is still unfinished. Call browser_memory_proof_wait once with phase seed, then reply with MEMORY_SEED_DONE.');
  await until(()=>exists(join(control,'seed-entered')),'actual SDK seed tool',90000);
@@ -123,11 +125,13 @@ try{
  const cold=requests.length;await prompt(child,'Repeat the database choice at this same historical point, without tools.');await settled(child);assert(asText(requests[cold]).includes('SQLite'));assert(!asText(requests[cold]).includes('PostgreSQL'));assert.equal(sha((await snapshot(child)).context),oldHash);assert.equal(memoryCalls.filter(row=>row.method==='memory.dual.recall'&&row.session==='pi:'+child).length,recallsBefore);assert((await native(parent)).bytes.equals(original.bytes));report.coldBranchAndMemoryRestart=true;
  checkpoint('paused-capture-and-ordinary-chat');
  await callMemory('configure',{enabled:false});const beforePause=(await callMemory('describe')).events,paused='memory-paused';await create(paused);await prompt(paused,'Reply with MEMORY_PAUSED_NORMAL_CHAT, without tools.');await settled(paused);assert((await answer(paused)).includes('MEMORY_PAUSED_NORMAL_CHAT'));assert.equal((await callMemory('describe')).events,beforePause);assert.equal((await snapshot(paused)).context,'');await callMemory('configure',{enabled:true});report.pause={chatAvailable:true,captureAndRecallSuppressed:true};
+ }
+ await callMemory('processing',{paused:true});
  checkpoint('memory-outage-without-chat-replay');
  await terminate(memoryActor);const outage='memory-outage';await create(outage);const outageStart=requests.length;await prompt(outage,'Reply with MEMORY_OUTAGE_NORMAL_CHAT, without tools.');await settled(outage);assert((await answer(outage)).includes('MEMORY_OUTAGE_NORMAL_CHAT'));assert.equal(requests.length,outageStart+1);assert.equal((await snapshot(outage)).context,'');
  await startMemory('memory-third');await until(async()=>{const exported=await callMemory('export',{session:'pi:'+outage}).catch(error=>{if(error.message==='Memory session is not bound')return undefined;throw error;});return exported?.events.filter(row=>row.session==='pi:'+outage).length===2;},'recovered durable transcript',15000);assert.equal(requests.length,outageStart+1);report.memoryOutage={ordinaryChat:true,emptyManagedBrief:true,durableCaptureRecoveredOnce:true,modelOrToolReplay:false};
- const toolResults=[];for(const sid of [first,parent]){const n=await native(sid);toolResults.push(...n.bytes.toString().trim().split('\n').map(JSON.parse).filter(row=>row.type==='message'&&row.message.role==='toolResult'&&row.message.toolName==='browser_memory_proof_wait'));}
- assert.equal(toolResults.length,2);assert(toolResults.every(row=>!row.message.isError));report.authoredToolExecutions=toolResults.length;report.conversationRequests=requests.length;report.memoryRpcCalls=memoryCalls.length;report.providerOutputLimitsPreserved=requests.every(body=>body.max_completion_tokens===8192&&body.model===model.id);report.passed=true;checkpoint('qualified');
+ const toolResults=[];for(const sid of scenario==='full'?['memory-seed','memory-parent']:[]){const n=await native(sid);toolResults.push(...n.bytes.toString().trim().split('\n').map(JSON.parse).filter(row=>row.type==='message'&&row.message.role==='toolResult'&&row.message.toolName==='browser_memory_proof_wait'));}
+ assert.equal(toolResults.length,scenario==='full'?2:0);if(scenario==='outage')assert.equal(requests.length,1);assert(toolResults.every(row=>!row.message.isError));report.authoredToolExecutions=toolResults.length;report.conversationRequests=requests.length;report.memoryRpcCalls=memoryCalls.length;report.providerOutputLimitsPreserved=requests.every(body=>body.max_completion_tokens===8192&&body.model===model.id);report.passed=true;checkpoint('qualified');
 }catch(error){report.error=String(error);throw error;}finally{
  for(const phase of ['seed','update'])try{await writeFile(join(root,'tool-control',phase+'-release'),'cleanup-release',{mode:0o600,flag:'wx'});}catch{}
  connection?.close();for(const controller of activeProxy)controller.abort();

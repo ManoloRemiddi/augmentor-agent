@@ -16,7 +16,11 @@ branch, cold restart and pause; outage chat works but the proof queries the
 restarted session before the existing capture retry binds it. That failure remains
 retained. External observation now waits only for this known unbound-session state
 within the original 15-second bound; runtime/app bytes stay unchanged. A new real-
-timer client case passes with source Node 31/31; fresh frozen/live follow-up remains. Original services, MX review,
+timer client case passes with source/fresh ordinary Node 31/31 and Python 43/43.
+The **03fb7039** full rerun passes seed/recall/isolation but hits the correction
+window deadline before recovery, so full default timing stays unqualified. An
+explicit independent outage scenario preserves all its original assertions; its
+focused result cannot replace the full scenario. Live follow-up remains required. Original services, MX review,
 selection and prior failures remain preserved.
 
 [Memory gateway settlement](PI-MEMORY-LIVE.md) corrects a live sequential-stage

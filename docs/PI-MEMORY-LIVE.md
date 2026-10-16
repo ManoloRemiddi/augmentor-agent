@@ -215,6 +215,29 @@ it observes a healthy-but-unbound service, then one bind/append and exactly two
 original source texts, without inference or duplicate capture. Source shared Node
 now passes **31/31**; fresh frozen/live follow-up remains required.
 
+## Unchanged-runtime rerun and focused outage case
+
+Frozen application/external driver **03fb703958b161fc491498f510dd7e59d689dadf**
+keeps the concise application's runtime bytes unchanged. Fresh ordinary passes
+43 Python/31 Node, with source Node 31 and unchanged Python runtime/tests already
+qualified. The full live rerun passes seed/fresh recall/isolation, then stops the
+correction at phase five: its work-page gateway failure (01:56:03.820 UTC) follows
+the persisted absolute-window deadline (01:56:03.803 UTC). Its remaining job budget
+is 6.87 seconds/zero tokens, ten calls and zero failure charges. All owned actors/
+engine terminate. The earlier complete correction/branch/restart/pause passes and
+the first outage observation failure remain valid; this rerun does not close full
+default-mode timing or exercise the corrected recovery observation.
+
+A separate **`--scenario outage`** selection now exercises actual Pi/Qwen ordinary
+chat while its actual memory companion is stopped, then source capture recovery.
+It uses fresh state, paused memory inference, one conversational request and zero
+SDK tools; all original outage assertions and the 15-second recovery observation
+bound remain. The default **`full`** selection still requires every seed/update/
+branch/restart/pause/outage assertion. A focused outage result cannot replace a
+failed full scenario. This external-driver addition changes no application code,
+page policy, inference limit or production/installed state. Focused live evidence
+remains required. [Portable retained results](../release/harness-pi-memory-page-qualification-20261016.json).
+
 ## Isolated proof ownership
 
 [`hindsight-isolated-proof-engine.py`](../scripts/hindsight-isolated-proof-engine.py)
