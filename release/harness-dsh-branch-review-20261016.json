@@ -1,7 +1,7 @@
 {
   "schema": "augmentor-dsh-branch-review/1",
   "date": "2026-10-16",
-  "applicationRef": null,
+  "applicationRef": "deea778d26eaf6d2d74efc60d1a1be85ab160520",
   "scope": "MX historical DSH source-cut branching through original GUI and one public Pi SDK owner",
   "qualification": {
     "sourceNodeCases": 303,
@@ -79,24 +79,55 @@
       "harness-dsh-branch-chromium",
       "harness-branch-controls-chromium"
     ],
-    "sealed": "pending",
+    "sealed": "passed; exact sealed application files and external pinned Qt/JSDOM test dependencies",
     "realOwnerModelWorkSubmitted": false,
     "historicalActionsReplayed": false,
     "newNativeEntryIdsForReconstructedChild": true,
     "sourceAndParentArchivePreserved": true,
-    "sdkOnlyProjection": true
+    "sdkOnlyProjection": true,
+    "sealedNodeCases": 303,
+    "sealedNodeFiles": 65,
+    "sealedPythonLicenceBoundaryNoticeCases": 16,
+    "distinctAssistantOnlyImageAndColdLegacyFormatRefusal": true,
+    "preCompactionPreOffloadAndRepeatedTextCuts": true,
+    "originalGuiLostAckColdRecoveryAndExplicitSend": true,
+    "coldNativeRelocationPreservesCanonicalBodiesAndHeaderBinding": true,
+    "nativeAndSourceArchiveIntegrityAfterTests": true,
+    "precedingSealOriginalFailureReproduced": true,
+    "hostedQualification": false
   },
   "adoption": {
-    "ownerReviews": "pending idle-only backup and guarded update after sealed qualification",
+    "ownerReviews": "running after guarded idle-only shutdown, complete verified backups and same-profile/port restart",
     "moreRealProjectsMigrated": false,
     "installedSelectionChanged": false,
     "modelGpuAudioConfigurationChanged": false,
-    "publicBinaryPublished": false
+    "publicBinaryPublished": false,
+    "runningOwners": 2,
+    "conversationsPreserved": 4,
+    "backupRegularFilesVerified": 408,
+    "protectedInputsColdAndPostGuiVerified": 32,
+    "sharedPrompts": 12,
+    "sharedCapturedRecords": 19,
+    "pendingEligibleMemoryRecords": 17,
+    "memoryActivityJobsEligibilityFlagsAndEngineConfigurationPreserved": true,
+    "configuredGroups": 10,
+    "models": 431,
+    "pins": 10,
+    "actualOwnerGuiErrors": 0,
+    "actualOwnerGuiHttpFailures": 0,
+    "realPilotArchivedChildrenReadOnlyInspected": 2,
+    "actualPilotOriginalRecordExcerptsRead": true,
+    "realOwnerBranchOrModelWorkSubmitted": false
   },
   "remaining": [
     "Broader source schema and owner pilot acceptance before bulk migration",
     "Original camera-upload Edit when original receipts are absent",
     "Historical child execution, Teams/mailbox and effective-provider reconstruction",
     "Voice, later OS artifacts and production/public rollout"
-  ]
+  ],
+  "qualificationRef": "34f43a99551e3c7b24a57dfac5be841982a66c93",
+  "releaseId": "20261016-204440-a6f079ca",
+  "artifactSha256": "1b61b0080b87be0ccfa76689fd3069069b587d19df10b1e331f365c54b9a9e82",
+  "sealedEntries": 24611,
+  "compiledFiles": 1102
 }

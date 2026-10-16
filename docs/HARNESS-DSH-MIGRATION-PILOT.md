@@ -1,6 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Archived DSH child inspection](CONTEXT-FLEET.md#archived-dsh-child-inspection--october-16) adds verified read-only families to the original Fleet and conversation shell. Source and exact packaged tests pass **294/294** across 62 files / 18 Chromium files, plus sixteen licence/private-boundary/notice Python checks each. Private unselected MX **20261016-202020-adced449**, application **4434b031**, verifies **24,607 sealed / 1,099 compiled** inputs. Nested children, source excerpts and child-only images retain parent/cut/archive scope without Pi jobs, replay or inferred provider usage. Both owner review PIDs/roots remain on the preceding shared-companion review; no restart, real project transfer or installed activation occurs. [Portable evidence](../release/harness-dsh-family-review-20261016.json). Direct imported-assistant reply branches remain an explicit migration gap. MX first; later OS artifact adoption is unqualified.
+[Historical DSH reply branches](HARNESS-DSH-MIGRATION-PILOT.md#historical-reply-branches--october-16) now run in both existing MX reviews. Private unselected **20261016-204440-a6f079ca**, application **deea778d** / test qualification **34f43a99**, passes **303/303 source and exact packaged cases** across 65 files / 20 Chromium files, plus sixteen licence/private-boundary/notice checks each. Source-cut reconstruction retains then-current compactions/offloads/images and fixes native reply/Edit ordinals after import. Guarded idle-only adoption verifies **408 backup files / 32 cold and post-GUI protected inputs**, four conversations, 12 prompts, 19 captured records and 17 pending memory entries. Actual pilot read-only inspection exposes two archived children and source excerpts without new work. Configured 10 groups/431 models/10 pins and engine/settings/selected installation remain unchanged. [Portable evidence](../release/harness-dsh-branch-review-20261016.json). No further real projects, owner branch/model work, voice or later-OS rollout; pilot feedback remains required before bulk migration.
+
+[Archived DSH child inspection — preceding checkpoint](CONTEXT-FLEET.md#archived-dsh-child-inspection--october-16) adds verified read-only families to the original Fleet and conversation shell. Source and exact packaged tests pass **294/294** across 62 files / 18 Chromium files, plus sixteen licence/private-boundary/notice Python checks each. Private unselected MX **20261016-202020-adced449**, application **4434b031**, verifies **24,607 sealed / 1,099 compiled** inputs. Nested children, source excerpts and child-only images retain parent/cut/archive scope without Pi jobs, replay or inferred provider usage. At that checkpoint both owner reviews stayed on the shared-companion build, with no restart, real project transfer or installed activation. [Portable evidence](../release/harness-dsh-family-review-20261016.json). That checkpoint’s imported-reply branching gap is addressed by the later source-cut qualification. MX first; later OS artifact adoption is unqualified.
 
 # DSH project migration pilot — MX Linux
 
@@ -733,7 +735,37 @@ exercise pre-compaction and pre-offload cuts, identical replies, live Pi replies
 and edits after import, nested branch/family scope, image context, cold relocation,
 archive/display tampering, no old-memory capture, and recovery/GUI contracts.
 Source fixtures and controlled provider requests are distinct from real-owner
-continuation and production installation. Exact packaged qualification follows
-before idle-only owner review adoption. Broader source formats, missing original
-camera uploads, historical child execution/Teams/provider reconstruction, owner
+continuation and production installation. Private unselected MX
+**20261016-204440-a6f079ca**, application
+**deea778d26eaf6d2d74efc60d1a1be85ab160520**, test qualification
+**34f43a99551e3c7b24a57dfac5be841982a66c93**, artifact
+**1b61b0080b87be0ccfa76689fd3069069b587d19df10b1e331f365c54b9a9e82**,
+also passes the same 303/303 cases and sixteen clean packaged-Python checks.
+All **24,611 sealed / 1,102 compiled** inputs verify after tests and adoption.
+Existing external pinned Qt 6.8.2.1/JSDOM test dependencies stay outside the seal;
+production Node, Python, components and dependency bytes are unchanged.
+
+The stronger image fixture gives an assistant its own distinct image, so a user
+image receipt cannot satisfy its authorization. Cold HTTP inspection reads exact
+bytes without an AgentSession and refuses a legacy native header without migration.
+Initial fixture failures (paused-response body retrieval, old-port polling during
+intentional restart, required intent settlement and documented relocation header
+rebinding) are retained; corrected tests preserve the original integrity/recovery
+assertions. The preceding sealed runtime reproduces the imported-reply mapping
+failure. No failing cohort is counted as qualification.
+
+Both reviews adopt this artifact on their existing private profiles/ports after
+guarded idle-only shutdown. Complete cold backups verify **408 regular files**;
+all **32 protected inputs** stay exact at startup and after actual original-GUI
+checks. Four conversations, the original project/archive, 12 shared prompts,
+19 captured records and 17 existing pending memory entries remain. Eligibility,
+activity windows/jobs, capture/processing settings and engine installation/config
+are unchanged. The actual configured catalogue retains 10 groups/431 models/10 pins.
+The actual pilot exposes two verified archived children; one opens in the original
+read-only shell and reads source records/excerpts with zero GUI/HTTP errors and
+no new conversation, model or tool work. There is no owner branch creation or
+additional real project transfer. These are private running reviews, not an
+installed selection change, public binary, merged PR or later-OS release.
+
+Broader source formats, missing original camera uploads, historical child execution/Teams/provider reconstruction, owner
 pilot acceptance, remaining project migration, voice and later OS adoption remain.
