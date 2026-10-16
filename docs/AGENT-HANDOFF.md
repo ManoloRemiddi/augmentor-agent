@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original DSH microphone](HARNESS-DICTATION.md) now reuses ten verbatim MIT
+inputs for recording/waveform/Stop/Cancel/device selection and editable drafts.
+Trusted Pi recognition owns credentials, bounded acknowledged PCM and scoped
+cleanup; it starts no conversational owner and never sends a prompt or TTS.
+Development Host/Chromium checks cover rootless/running turns, the full ten-minute
+budget, draft conflicts, read-only denial and both themes. Private 0.1.22 is
+qualified separately; shared 0.1.19 pins, current review and installed/services
+remain unchanged. Frozen acceptance, isolated MX review, physical audio and full
+migration remain open.
+
 [Audio processor cleanup and POSIX qualification](PI-VOICE.md#audio-processor-lifecycle-and-hosted-posix-qualification--october-16-2026)
 now fixes missing-tool backpressure, buffered PCM cancellation and joined owned
 process/input cleanup in private companion **0.1.21/component 2d25ba0**. Source/

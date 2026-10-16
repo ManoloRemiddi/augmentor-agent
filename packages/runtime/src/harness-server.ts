@@ -152,6 +152,31 @@ export class HarnessServer {
           }finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}return;
         }
         if(req.method==='GET'&&url.pathname==='/api/access'){this.send(res,200,{mode:access.mode,...(access.mode==='read-only'?{sessionId:access.sessionId,expiresAt:access.expiresAt}:{})});return;}
+        if(url.pathname.startsWith('/api/dictation/')){
+          if(access.mode!=='operator'||req.method!=='POST')throw Error('Draft dictation requires operator authority.');
+          const action=url.pathname.slice('/api/dictation/'.length);
+          if(!['catalog','open','heartbeat','transcribe','close'].includes(action))throw Error('Unknown dictation operation.');
+          const abort=new AbortController(),cancel=()=>{if(!res.writableFinished)abort.abort(Error('Dictation request disconnected.'));};req.once('aborted',cancel);res.once('close',cancel);
+          try{const result=await this.host.receiveHarnessRequest(async()=>{
+            if(action==='transcribe'){
+              if([...url.searchParams.keys()].some(key=>!['clientId','captureId'].includes(key))||url.searchParams.getAll('clientId').length!==1||url.searchParams.getAll('captureId').length!==1)throw Error('Supply exact dictation identities.');
+              if(req.headers['content-type']!=='audio/wav'||Number(req.headers['content-length']??0)>19200044)throw Error('Supply a bounded WAV recording.');
+              return this.host.dictation.transcribe(url.searchParams.get('clientId')!,url.searchParams.get('captureId')!,async signal=>{
+                const stop=()=>req.destroy();signal.addEventListener('abort',stop,{once:true});
+                try{signal.throwIfAborted();let size=0;const chunks:Buffer[]=[];for await(const chunk of req){size+=chunk.length;if(size>19200044)throw Error('Recording exceeds the ten-minute limit.');chunks.push(Buffer.from(chunk));}signal.throwIfAborted();return Buffer.concat(chunks);}finally{signal.removeEventListener('abort',stop);}
+              },abort.signal);
+            }
+            if(url.search)throw Error('Use the dictation request body.');
+            const p=await this.body(req);if(!p||typeof p!=='object'||Array.isArray(p))throw Error('Supply a dictation request.');
+            const keys=action==='catalog'?['refresh']:action==='open'?['clientId','captureId','sessionId']:['clientId','captureId'];
+            if(Object.keys(p).some(key=>!keys.includes(key)))throw Error('Unexpected dictation parameters.');
+            if(action==='catalog'){if(p.refresh!==undefined&&typeof p.refresh!=='boolean')throw Error('Choose an explicit refresh.');return this.host.dictation.catalog(abort.signal,p.refresh===true);}
+            if(typeof p.clientId!=='string'||typeof p.captureId!=='string'||p.sessionId!==undefined&&typeof p.sessionId!=='string')throw Error('Supply exact dictation identities.');
+            if(action==='open')return this.host.dictation.open(p.clientId,p.captureId,p.sessionId,abort.signal);
+            if(action==='heartbeat')return this.host.dictation.heartbeat(p.clientId,p.captureId);
+            return this.host.dictation.closeCapture(p.clientId,p.captureId);
+          });this.send(res,200,result);}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}return;
+        }
         if(req.method==='GET'&&url.pathname==='/api/appearance/revision'){
           if(access.mode!=='operator')throw Error('Appearance profile revisions require operator authority.');
           this.send(res,200,{appearanceRevision:this.host.appearanceRevision,metafoldersRevision:this.host.metafoldersRevision,modelsRevision:this.host.modelsRevision});return;

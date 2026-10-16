@@ -49,7 +49,7 @@ export class ScopedVoice {
       return JSON.parse(content);
     } catch {throw new Error('Resonant Voice did not confirm the operation. Reconnect voice; speech was not replayed.');}
   }
-  async ticket(session: string, surface: 'linux' | 'browser', prepare?: () => Promise<void>, openId?: string): Promise<Data> {
+  async ticket(session: string, surface: 'linux' | 'browser', prepare?: () => Promise<void>, openId?: string, purpose?: 'dictation'): Promise<Data> {
     if (this.closed || this.owns(session)) throw new Error('Voice is already opening or connected. Close it before reconnecting.');
     let settle!: () => void;
     const done = new Promise<void>(resolve => {settle = resolve;});
@@ -64,8 +64,9 @@ export class ScopedVoice {
       const health = await this.http(connection, '/health');
       if (health.protocol !== 'resonant-voice/1' || health.capabilities?.scopedHarnessBridge !== 1) throw new Error('Voice requires Resonant Voice with its scoped harness bridge (Codex: 0.1.17).');
       if (this.harness === 'pi' && (!Array.isArray(health.capabilities?.scopedHarnesses) || !health.capabilities.scopedHarnesses.includes('pi'))) throw new Error('Pi voice requires a companion that explicitly advertises its scoped Pi bridge.');
+      if (purpose && (this.harness !== 'pi' || health.capabilities?.dictation !== 1)) throw new Error('Dictation requires a companion that explicitly advertises recognition-only input.');
       if (this.closed || opening.cancelled) throw new Error('Voice is closing.');
-      const result = await this.http(connection, '/internal/ticket', {sessionId: session, surface, harness: this.harness});
+      const result = await this.http(connection, '/internal/ticket', {sessionId: session, surface, harness: this.harness, ...(purpose ? {purpose} : {})});
       if (result.protocol !== 'resonant-voice/1' || result.sessionId !== session || result.url !== connection.base.replace('http:', 'ws:') + '/voice' ||
           !/^[a-f0-9]{64}$/.test(result.ticket) || !/^[a-f0-9]{64}$/.test(result.bridgeId) || result.bridgeLeaseMs !== 8000) throw new Error('Incompatible scoped voice ticket.');
       const lease: Lease = {openId, session, connection, bridgeId: result.bridgeId, seq: 0, epoch: 0, pending: 0, bytes: 0, chain: Promise.resolve(), items: new Map(), closed: false};

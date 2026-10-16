@@ -2019,3 +2019,7 @@ Chromium files. Both run concurrently, with two workers per cohort and unchanged
 deadlines. Product bytes and installed/review artifacts stay unchanged; original
 failure evidence and remaining hosted/live/release gates stay explicit in the
 [checkpoint](../release/harness-browser-toolbar-qualification.json).
+
+[Harness dictation](../docs/HARNESS-DICTATION.md) uses independent scripted
+recognition/provider peers, actual Host/SDK and the original Chromium controls
+with fake browser audio. After build, run `node --test tests/harness-dictation.test.mjs tests/harness-dictation-host.test.mjs tests/harness-dictation-chromium.test.mjs`. This does not qualify physical speech or install a companion.

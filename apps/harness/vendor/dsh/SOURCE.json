@@ -3762,6 +3762,66 @@
       "sha256": "88580bdc24194b8e637cfe5ba059f2ee258e016b127a5a4cfdefcd0e2ff54475",
       "upstreamPath": "packages/session-query/session-log-export/src/routes.ts",
       "upstreamSha256": "88580bdc24194b8e637cfe5ba059f2ee258e016b127a5a4cfdefcd0e2ff54475"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/package.json",
+      "sha256": "d2e60aaab7484056c57fd35402277f7c59520c7dbcd14f1f965840cf853a27a1",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/package.json",
+      "upstreamSha256": "d2e60aaab7484056c57fd35402277f7c59520c7dbcd14f1f965840cf853a27a1"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/MicrophonePicker.tsx",
+      "sha256": "0ebc6f1253c45fda7bbbd0a605e68c00b63d6b221442e224a01048c65eae568b",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/MicrophonePicker.tsx",
+      "upstreamSha256": "0ebc6f1253c45fda7bbbd0a605e68c00b63d6b221442e224a01048c65eae568b"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/VoiceInput.module.css",
+      "sha256": "f881e77b0550417b02817385a78f70b194cbbc5aed881a61cf43fd3b8ed838ba",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/VoiceInput.module.css",
+      "upstreamSha256": "f881e77b0550417b02817385a78f70b194cbbc5aed881a61cf43fd3b8ed838ba"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/VoiceInput.tsx",
+      "sha256": "07f865d164279a36fe53587c7dcd59afc36a16fd34bd981885222557b41d90c6",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/VoiceInput.tsx",
+      "upstreamSha256": "07f865d164279a36fe53587c7dcd59afc36a16fd34bd981885222557b41d90c6"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/VoiceSetupDialog.tsx",
+      "sha256": "c08555d7d2f210f31b81c229e906c0752c85e803d89624010f3346918c54a828",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/VoiceSetupDialog.tsx",
+      "upstreamSha256": "c08555d7d2f210f31b81c229e906c0752c85e803d89624010f3346918c54a828"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/Waveform.tsx",
+      "sha256": "c4c6adfa8b60dd5193de92a325d2ba07d670e5021cd7607e3501f843e3b767d3",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/Waveform.tsx",
+      "upstreamSha256": "c4c6adfa8b60dd5193de92a325d2ba07d670e5021cd7607e3501f843e3b767d3"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/audio.ts",
+      "sha256": "890d7cf703ad664fc9aeb763ff6cd8d9baafc90e9ebae08d354c3f9458bf1b27",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/audio.ts",
+      "upstreamSha256": "890d7cf703ad664fc9aeb763ff6cd8d9baafc90e9ebae08d354c3f9458bf1b27"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/failure-text.ts",
+      "sha256": "671eb2cd4cd3a09690283157042923f2637a38cacf47c8e24271daff872a2809",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/failure-text.ts",
+      "upstreamSha256": "671eb2cd4cd3a09690283157042923f2637a38cacf47c8e24271daff872a2809"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/locales.ts",
+      "sha256": "e559a939659e677d61029502ed8f70f4a7edaf203094009002ece519720256c7",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/locales.ts",
+      "upstreamSha256": "e559a939659e677d61029502ed8f70f4a7edaf203094009002ece519720256c7"
+    },
+    {
+      "path": "packages/experimental/client-ui-voice-input/src/client/microphone-device.ts",
+      "sha256": "a8c9db72f4e259e00da74eed152c5a25f2701d9e65a38845e15906e94ca5e935",
+      "upstreamPath": "packages/experimental/client-ui-voice-input/src/client/microphone-device.ts",
+      "upstreamSha256": "a8c9db72f4e259e00da74eed152c5a25f2701d9e65a38845e15906e94ca5e935"
     }
   ]
 }

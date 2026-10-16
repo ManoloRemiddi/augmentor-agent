@@ -879,3 +879,14 @@ controller/maintenance 146/146 each. All 1,057 compiled/3,366 tracked inputs mat
 at freeze; compiled bits retain the initial implementation's bytes. The exact
 ordinary tracked Git blobs and private-source history gate verify. [Evidence,
 retained failures and remaining gates](../release/harness-pi-voice-surfaces-qualification.json).
+
+## Original DSH microphone selection — October 16, 2026
+
+Ten additional verbatim MIT UI inputs from the existing pinned public DSH
+`d743267388641bc76f17c45ce8b4c231aed1d32c` / 0.2.1-alpha.2 are selected in
+[`SOURCE.json`](../apps/harness/vendor/dsh/SOURCE.json): microphone, recording,
+waveform, device picker, setup dialog, locale and style closure. The manifest
+now records 625 inputs; supplier notice and original bodies remain intact.
+Only Augmentor Host/draft/readiness adapters are newly authored. No SenseVoice
+backend/bundle, private speech source, private archive or audition asset enters
+the public graph. See [Harness dictation](HARNESS-DICTATION.md).

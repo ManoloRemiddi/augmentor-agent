@@ -1122,3 +1122,5 @@ files available only in a developer's working directory.
 - [0.2.13 browser reliability release](RELEASE-0.2.13.md): general browser evidence recovery and matched public artifacts.
 
 - [Application SDK alignment](SDK-ALIGNMENT.md): capability/permission states, experimental Codex application isolation and platform bootstrap/startup qualification.
+
+- [Original DSH Harness microphone](HARNESS-DICTATION.md): editable draft dictation, private recognition contract, original GUI ownership and qualification limits.
