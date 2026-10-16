@@ -33,7 +33,25 @@ including active reasoning/partial output, Stop, both themes, reduced motion,
 original brand seats/actions, Context/Trajectory inspection and restart. The
 provider is an independently authored local fixture, not a live-model inference
 claim. **Sixteen** licence/private-boundary/notice cases pass. Immutable review
-staging and owner-profile continuity are recorded separately below.
+staging and owner-profile continuity are qualified in private unselected release
+**20261016-125125-c4472f8e**, application **fe184a9f**. Source and exact staged
+runtime each pass **six/six** cases; all **24556 sealed / 1,072 compiled**
+entries verify after browser checks. Production Node/dependencies/components stay
+exact. Both idle review instances were gracefully closed through the guarded
+protocol, backed up and restarted against the new immutable root, keeping the
+same ports and private profiles with fresh connection tokens. All **four saved
+conversations** survive; **381 regular backup files** verify, **32 protected inputs**
+match after cold startup, and **28 persistent history/configuration/draft/archive inputs**
+match after owner reconnection (queue status is excluded from that latter check).
+Original DSH, installed selection, the pilot project and GPU/model services stay
+preserved. No owner prompts, tools or audio were submitted during this update.
+
+A separate CUA scratch conversation visually shows the Light running mark and
+settles Stop. Its initial synthetic typing emitted one Lexical update-listener
+recursion warning; this is retained as an unclassified editor observation. The
+six focused Chromium cases pass without warnings, and both owner reconnect reads
+show the saved conversation/access state. This increment does not claim to repair
+that isolated warning or qualify the whole application. [Portable evidence](../release/harness-branding-review-20261016.json).
 
 
 The dated logo/theme checkpoint below is superseded for runtime identity by
