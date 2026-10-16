@@ -52,6 +52,20 @@ class ProofInputTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'identity changed'):
             proof.same_instance({'Id': 'different-instance'}, 'authored-owned')
 
+    def test_installer_proof_cleanup_requires_both_exact_identity_and_ready_private_receipt(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); shared = root / 'shared-data'; shared.mkdir()
+            receipt = {'protocol': 'augmentor-memory-installation/1', 'phase': 'ready', 'installationId': 'authored-installation',
+                       'containerId': 'authored-instance', 'name': 'augmentor-pi-memory-proof-authored', 'volume': 'authored-volume'}
+            (shared / 'hindsight-installation.json').write_text(json.dumps(receipt))
+            record = {**receipt, 'installerOwnership': {'protocol': receipt['protocol'], 'installationId': receipt['installationId']}}
+            current = {'Id': receipt['containerId'], 'Config': {'Labels': {'org.augmentor.memory.installation': receipt['installationId']}}}
+            proof.validate_stop_owner(record, current, root)
+            for bad in [{**current, 'Id': 'replacement'}, {**current, 'Config': {'Labels': {}}}]:
+                with self.assertRaisesRegex(ValueError, 'exact installer-owned'): proof.validate_stop_owner(record, bad, root)
+            (shared / 'hindsight-installation.json').write_text(json.dumps({**receipt, 'phase': 'creating'}))
+            with self.assertRaisesRegex(ValueError, 'exact installer-owned'): proof.validate_stop_owner(record, current, root)
+
     def test_backport_refuses_an_unknown_engine_before_creating_an_overlay(self):
         backport = proof.backport_module()
         with tempfile.TemporaryDirectory() as temp:

@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Installer candidate](HINDSIGHT-INSTALLATION.md) now materializes the exact MIT
+refresh-default backport from a never-started pinned image instance, mounts it
+read-only, preserves saved ports/cache/mode and refuses changed running engines.
+Stopped replacement verifies a private database backup before exact-ID rename;
+creation acknowledgement recovery verifies its private receipt without another
+creation. Source common checks pass 61 Python; live Docker/fresh-copy qualification
+is next, with the running MX review, original engine and selected installation
+unchanged. No production adoption is claimed by these fixtures.
+
 [Current guarded-memory MX review](HARNESS-MEMORY-SETTINGS.md#qualified-mx-review--october-16)
 **20261016-050949-2145f2db**, application **b7e0afaa**, runs unselected with the
 original DSH GUI, configured mode and independent guarded capture/processing

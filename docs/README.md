@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Controlled Hindsight installation](HINDSIGHT-INSTALLATION.md) adds explicit verified
+source-backport/cache/port choices, exact stopped-instance backup/replacement and
+private-receipt recovery. Source fixtures pass; live installation/adoption evidence
+is recorded separately. Existing review and production selection stay unchanged.
+
 [Shared memory settings](HARNESS-MEMORY-SETTINGS.md) expose configured request mode,
 independent capture/processing pauses and guarded changes in the original Harness
 Plugins screen and existing native panel. Configuration is labelled separately

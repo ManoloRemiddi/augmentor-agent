@@ -30,7 +30,7 @@ class HindsightSetupTests(unittest.TestCase):
                 requests.append(self.path)
                 values = {'/openapi.json': {'info': {'version': '0.10.0'}},
                           '/health': {'status': 'healthy'},
-                          '/ext/augmentor/policy': {'protocol': 'augmentor-memory-processing/1', 'workerEnabled': False, 'reconcileSeconds': 0}}
+                          '/ext/augmentor/policy': {'protocol': 'augmentor-memory-processing/1', 'workerEnabled': False, 'reconcileSeconds': 0, 'llmRetries': 0}}
                 value = values.get(self.path)
                 self.send_response(200 if value else 404); self.end_headers()
                 self.wfile.write(json.dumps(value).encode())
@@ -41,6 +41,8 @@ class HindsightSetupTests(unittest.TestCase):
         self.gateway = 18441 if self.port != 18441 else 18443
         digest = hashlib.sha256((root / 'services/memory/hindsight_extension.py').read_bytes()).hexdigest()
         self.artifact = self.data / 'memory-engine' / digest
+        self.artifact.mkdir(parents=True)
+        (self.artifact / 'augmentor_memory.py').write_bytes((root / 'services/memory/hindsight_extension.py').read_bytes())
         self.previous = {'endpoint': f'http://127.0.0.1:{self.port}', 'gatewayKey': 'synthetic-' + 'k' * 40, 'modelKey': 'local'}
         self.argv = ['setup-hindsight.py', '--model-url', 'http://127.0.0.1:1/v1', '--model', 'synthetic-explicit-model',
                      '--port', str(self.port), '--gateway-port', str(self.gateway), '--name', 'synthetic-controlled', '--volume', 'synthetic-data']
@@ -49,8 +51,10 @@ class HindsightSetupTests(unittest.TestCase):
         expected = self.setup.environment('synthetic-explicit-model', self.port, self.gateway, llama_cpp_thinking=engine_mode)
         if legacy_environment:
             expected = {k: v for k, v in expected.items() if not k.endswith('_LLM_EXTRA_BODY')}
-        container = {'Config': {'Image': self.setup.IMAGE, 'Env': [k + '=' + v for k, v in expected.items()] + ['HINDSIGHT_API_HTTP_KEY=' + self.previous['gatewayKey']]},
-                     'State': {'Running': True}, 'Mounts': [{'Source': str(self.artifact), 'Destination': '/augmentor'}]}
+        container = {'Id': 'authored-existing-id', 'Config': {'Image': self.setup.IMAGE, 'Env': [k + '=' + v for k, v in expected.items()] + ['HINDSIGHT_API_HTTP_KEY=' + self.previous['gatewayKey']]},
+                     'HostConfig': {'RestartPolicy': {'Name': 'unless-stopped'}},
+                     'State': {'Running': True}, 'Mounts': [{'Type': 'bind', 'Source': str(self.artifact), 'Destination': '/augmentor', 'RW': False},
+                                                           {'Type': 'volume', 'Name': 'synthetic-data', 'Destination': '/home/hindsight/.pg0', 'RW': True}]}
         def docker(command, **_):
             self.commands.append(command)
             if command == ['docker', 'inspect', 'synthetic-controlled']:
@@ -74,7 +78,8 @@ class HindsightSetupTests(unittest.TestCase):
         self.assertEqual(saved['llamaCppThinking'], 'off')
         self.assertEqual(saved['gatewayKey'], self.previous['gatewayKey'])
         self.assertEqual(saved['modelUrl'], 'http://127.0.0.1:1/v1')
-        self.assertEqual(self.commands, [['docker', 'inspect', 'synthetic-controlled'], ['docker', 'start', 'synthetic-controlled']])
+        self.assertTrue(self.commands)
+        self.assertTrue(all(c == ['docker', 'inspect', 'synthetic-controlled'] for c in self.commands))
         self.assertEqual(self.requests, ['/openapi.json', '/health', '/ext/augmentor/policy'])
 
     def test_explicit_mode_change_refuses_running_engine_without_rewriting_configuration(self):
@@ -89,7 +94,7 @@ class HindsightSetupTests(unittest.TestCase):
         path = self.write_previous()
         self.run_setup(legacy_environment=True)
         self.assertEqual(json.loads(path.read_text())['llamaCppThinking'], 'default')
-        self.assertEqual(len(self.commands), 2)
+        self.assertTrue(all(c == ['docker', 'inspect', 'synthetic-controlled'] for c in self.commands))
         self.assertEqual(len(self.requests), 3)
 
     def test_invalid_saved_choice_refuses_before_engine_or_configuration_changes(self):

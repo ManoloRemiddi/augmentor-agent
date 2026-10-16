@@ -197,15 +197,33 @@ def stop(args):
         if record.get('created'): raise ValueError('The recorded proof container disappeared; preserve its evidence.')
         return
     current = json.loads(found.stdout)[0]
-    if current['Config'].get('Labels', {}).get('org.augmentor.proof') != record['name']:
-        raise ValueError('The container is not owned by this proof.')
+    validate_stop_owner(record, current, root)
     if record.get('containerId'): same_instance(current, record['containerId'])
-    if current['State']['Running']: run(['docker', 'stop', '--time', '30', record['name']])
-    assert not inspect(record['name'])['State']['Running']
+    if current['State']['Running']: run(['docker', 'stop', '--time', '30', current['Id']])
+    terminal = inspect(record['name']); same_instance(terminal, current['Id'])
+    assert not terminal['State']['Running']
     if identity(inspect(record['baselineContainer'])) != record['baselineIdentity']: raise ValueError('The original memory engine changed; preserve evidence for inspection.')
     if cache_inventory(root / 'model-cache') != record['cacheManifest']: raise ValueError('The read-only public model cache changed.')
     if record.get('refreshBudgetBackport'): backport_module().verify(record['refreshBudgetBackport'])
     print(json.dumps({'phase': 'isolated-engine-stopped', 'originalEngineUnchanged': True, 'cacheUnchanged': True, 'privateDatabasePreserved': True}), flush=True)
+
+
+def validate_stop_owner(record, current, root):
+    """An installer-backed proof carries both the exact ID and private ready receipt."""
+    installed = record.get('installerOwnership')
+    if installed is not None:
+        receipt_path = Path(root) / 'shared-data/hindsight-installation.json'
+        if receipt_path.is_symlink(): raise ValueError('Installer proof receipt cannot be a link.')
+        receipt = json.loads(receipt_path.read_text())
+        if (not isinstance(installed, dict) or installed.get('protocol') != 'augmentor-memory-installation/1' or
+                receipt.get('protocol') != installed['protocol'] or receipt.get('phase') != 'ready' or
+                receipt.get('installationId') != installed.get('installationId') or
+                current['Config'].get('Labels', {}).get('org.augmentor.memory.installation') != installed.get('installationId') or
+                receipt.get('containerId') != current['Id'] or record.get('containerId') != current['Id'] or
+                receipt.get('name') != record['name'] or receipt.get('volume') != record['volume']):
+            raise ValueError('The container does not match the exact installer-owned proof receipt.')
+    elif current['Config'].get('Labels', {}).get('org.augmentor.proof') != record['name']:
+        raise ValueError('The container is not owned by this proof.')
 
 
 if __name__ == '__main__':

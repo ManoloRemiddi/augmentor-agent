@@ -747,6 +747,14 @@ and [current results](PI-MEMORY-LIVE.md#current-page-and-outage-results--october
 actual retrieval/concise pages and an independent outage recovery pass are recorded,
 with retained full default-window failures and no installed adoption.
 
+The [installation candidate](HINDSIGHT-INSTALLATION.md) also supports this exact
+selection, extracting the public base from a never-started pinned image instance,
+checking the same digests and retaining the MIT notice in its separate artifact.
+No additional supplier source is selected. Authored file/transport fixtures pass;
+actual installation/restart/nonempty-volume qualification is recorded separately.
+The original production engine and current owner review are not adopted by this
+source change.
+
 ### Explicit memory-only request-mode qualification, 2026-10-16
 
 The isolated helper reuses the existing supported installer `default|off` option;
