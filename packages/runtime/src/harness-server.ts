@@ -104,6 +104,7 @@ export class HarnessServer {
       case 'session.history':return family.history(scope,p);
       case 'session.archiveEntries':return family.originals(scope,p);
       case 'session.archiveRead':return family.original(scope,p);
+      case 'session.jobs':return {...unavailable,items:[],scope:'archived-dsh-cut; no native Pi job catalogue',reason:'This archived DSH cut has no native Pi job catalogue. Inspect recorded children in Fleet and original records in Context.'};
       case 'session.models':return {current:null};
       case 'session.queue':return queue;
       case 'observation.list':return {records:[],hasMore:false,coverage:unavailable};

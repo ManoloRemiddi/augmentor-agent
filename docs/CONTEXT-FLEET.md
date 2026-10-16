@@ -4,6 +4,35 @@
 
 # Original Fleet on Pi
 
+## Archived inspector status panels — October 16
+
+The original archived-child shell now handles **Jobs**, **Plan** and **Goal** as
+archive-only inspection. Jobs returns an explicit unavailable native catalogue,
+with no items, and points to Fleet's recorded children and Context originals.
+It does not claim that no historical work existed. Native job mutation/detail
+methods remain refused, foreign session IDs remain outside the token scope, and
+all reads still verify the archive checksum and exact source ownership.
+
+The shared Jobs view distinguishes an unavailable catalogue from a verified
+empty one; it retains native rows/producer labels when they are present. Archive
+inspectors omit native queue/compaction status controls because those execution
+owners do not exist for the cut. The previous UI wrongly labelled their normal
+unavailability as failed compaction storage and offered a disabled queue resume.
+Native live/read-only inspectors keep existing receipts and controls. Recorded
+DSH compaction/source events remain inspectable in the original transcript and
+Context source-record viewer. Original supplier layout and source are unchanged.
+
+The preceding source reproduces the HTTP 400 when opening archived Jobs. The
+corrected check/build and **32/32 Node cases across eleven files/four Chromium
+files**, unchanged two workers/deadlines and no skips, cover archived tabs,
+refresh, exact-parent authority, corrupt archives, historical branches, native
+jobs/Fleet, compaction and stable warm/cold opening. **41 Python checks** cover
+launcher/deployment and licence/private-source/notice contracts. These are
+independently authored fixtures; they do not transfer another owner project or
+execute a historical action. Shared backend/UI contracts remain one source for
+all platforms; actual artifact/runtime adoption in this pass targets MX only.
+Packaged qualification and review adoption are recorded separately after staging.
+
 ## Archived DSH child inspection — October 16
 
 Imported project families now have a separate **read-only archive** path in the

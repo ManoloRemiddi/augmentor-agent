@@ -21,7 +21,10 @@ export function attachJobs({container,rpc,current}){
    const editorOpen=view?.editor?.open??false;
    const status=view?.status??node('p');status.textContent='';status.setAttribute('role','status');
    view={context,status,source:retainedSource};
-   container.replaceChildren(node('h2','Background jobs'),node('p','Each delegated job has its own Pi conversation and explicit tool grants. Completed is a producer report to verify. Stop cancels this conversation’s jobs. Restart leaves unfinished outcomes unknown and never replays them.','job-boundary'));
+   container.replaceChildren(node('h2','Background jobs'));
+   // An archive or inaccessible catalogue is not an empty native job list.
+   // Keep retained native rows visible after a persistence gap.
+   if(result.available!==false||result.items.length)container.append(node('p','Each delegated job has its own Pi conversation and explicit tool grants. Completed is a producer report to verify. Stop cancels this conversation’s jobs. Restart leaves unfinished outcomes unknown and never replays them.','job-boundary'));
    container.append(status);
    const displayed=()=>sameContext()&&container.contains(status);
    function beginWork(){
@@ -51,7 +54,7 @@ export function attachJobs({container,rpc,current}){
     const start=button('Start job',async()=>{const work=beginWork();if(!work)return;preserve();const value={...draft};try{const result=await rpc('session.startJob',{sessionId:context.sessionId,spec:{requestId:value.requestId,kind:value.kind,task:value.kind==='desktop'?JSON.stringify({task:value.task,successCriteria:value.criteria,constraints:value.constraints}):value.task,allowedTools:value.kind==='delegate'?value.grants.split(',').map(s=>s.trim()).filter(Boolean):[],limits:{timeoutMs:Number(value.duration)*1000,maxRequests:Number(value.requests),maxTools:Number(value.tools),maxOutputTokens:Number(value.tokens)}}});if(work.active()){selected=result.job.id;draft=null;view.editor.open=false;work.finish();await refresh();}}catch(error){if(work.active()){work.finish();status.textContent=error.message+' The draft and request ID are preserved.';}}});
     editor.append(node('label','Job kind'),kind,node('label','Task or command, including constraints'),task,desktopFields,node('label','Explicit delegated tool grants'),grants,node('label','Time limit in seconds'),duration,node('label','Provider request limit'),requests,node('label','Tool dispatch limit'),tools,node('label','Reported output token limit'),tokens,start);
    }
-   if(!result.items.length)container.append(node('p','No background jobs recorded.'));
+   if(result.available!==false&&!result.items.length)container.append(node('p','No background jobs recorded.'));
    for(const job of result.items){const row=node('article');row.className='job-row';row.append(button(job.kind+' · '+job.state+' · '+job.id,()=>{selected=job.id;void refresh();}));if(!context.readOnly&&['starting','running','stopping'].includes(job.state))row.append(button('Stop job',()=>action('session.cancelJob',{jobId:job.id})));container.append(row);}
    if(detail){
     const result=detail,job=result.job;

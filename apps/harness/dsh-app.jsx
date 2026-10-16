@@ -271,6 +271,9 @@ function InteractionTakeover({frame,state}){
   return frame.method==='approval/requested'?<ApprovalPanel matched={pending} t={t.approval} resolveReason={x=>String(x)} renderSlot={()=>null}/>:<QuestionComposer matched={pending} t={t.question} useStore={useQuestionDraft} actions={draft.actions} useQuestionCard={(_,selector=x=>x)=>selector(pending.snapshot())} renderSlot={(name,owner)=>name==='conversation.plan-review.actions'?<planReviews.Actions {...owner} state={state}/>:null}/>;
 }
 function QueueStatus({state}){
+  // Archived cuts have no native queue/compaction owner. Their unavailable
+  // snapshots must not look like damaged storage or resumable waiting work.
+  if(state.capabilities?.archivedDsh===true)return null;
   const queue=state.queue;if(!queue)return null;
   const uncertain=(queue.items||[]).filter(x=>x.canResolve);
   const compact=state.compaction,unknown=compact?.lastReceipt?.state==='unknown'&&!compact.lastReceipt.acknowledged;
