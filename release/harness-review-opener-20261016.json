@@ -1,0 +1,61 @@
+{
+  "schema": "augmentor-harness-mx-review-opener/1",
+  "date": "2026-10-16",
+  "implementationRef": "f5751a33e0a234958d148581da02b067c57131b6",
+  "toolReleaseId": "20261016-212908-9907b5b0",
+  "toolArtifactSha256": "7bab92a149e10a22f4081543d9949db1be098dd692659ccfb82bc86de1a45451",
+  "toolSealedEntries": 24612,
+  "compiledFiles": 1102,
+  "scope": "Private MX review opener and separate application-menu registration; not installed Agent activation",
+  "runningApplicationRef": "deea778d26eaf6d2d74efc60d1a1be85ab160520",
+  "runningApplicationReleaseId": "20261016-204440-a6f079ca",
+  "runningApplicationArtifactSha256": "1b61b0080b87be0ccfa76689fd3069069b587d19df10b1e331f365c54b9a9e82",
+  "qualification": {
+    "sourceNodePass": 11,
+    "sealedNodePass": 11,
+    "focusedNodeFiles": 4,
+    "chromiumFiles": 2,
+    "sourcePythonPass": 41,
+    "sealedPythonPass": 41,
+    "skips": 0,
+    "failures": 0,
+    "workers": 2,
+    "runtimeColdConcurrentOpens": 2,
+    "nativeHistoryUnchangedWithoutReplay": true,
+    "liveMissingIpcOwnerRefused": true,
+    "foreignProfileRefused": true,
+    "sealedToolInstallerAndOwnedRemovalTested": true,
+    "privateLinkBrowserOutputSuppressed": true,
+    "desktopEscapingCollisionRollbackTested": true,
+    "productionCompiledNodeDependenciesComponentsUnchanged": true,
+    "fullEarlier303CaseCohortRepeated": false,
+    "publicRedistributionQualified": false
+  },
+  "mxInstallation": {
+    "menuEntries": [
+      "Augmentor Harness (MX)",
+      "Augmentor Harness - Migration Pilot"
+    ],
+    "stableCommand": "augmentor-harness-review",
+    "registryRevision": 2,
+    "ownersVerified": 2,
+    "nativeConversationsVerified": 4,
+    "protectedInputsVerified": 32,
+    "runningOwnerPidsAndApplicationSealUnchanged": true,
+    "sharedPromptsMemoryConfigurationRowsUnchanged": true,
+    "earlierPreviewEntryAndInstalledSelectionsUnchanged": true,
+    "actualOpenerPrivateLinksVerified": true,
+    "physicalMenuClickOrDefaultBrowserAcceptance": false,
+    "realOwnerColdRestartPerformed": false,
+    "modelOrAudioWorkSubmitted": false,
+    "additionalDshProjectImports": 0
+  },
+  "limits": [
+    "MX Linux qualification only; other OS adapters deferred",
+    "Normal installation failures roll back; abrupt installer death requires reconciliation from retained backups",
+    "A registered obsolete or mismatched build refuses automatic replacement; guarded adoption and registration remain required",
+    "Provider, memory engine and optional voice service health is not implied by opening the page",
+    "Owner pilot feedback required before transferring remaining DSH projects",
+    "Draft PR remains unmerged; no public binary release or production Agent activation"
+  ]
+}

@@ -60,8 +60,20 @@ IPC loss refusal and owned menu installation/removal. **41 Python cases** cover
 review records/seals/paths/environment, CAS, secret-free failures, desktop field
 escaping/collision/rollback, deployment lifecycle and licence/private-source
 boundaries. These focused checks do not repeat the preceding 303-case application
-cohort or claim public release/hosted qualification. Packaged and installed
-opener evidence is recorded separately after staging.
+cohort or claim public release/hosted qualification. The exact sealed tool passes the same 11/11 Node and 41/41 Python cases, with
+unchanged workers/deadlines and no skips. Separate private unselected tool
+**20261016-212908-9907b5b0**, source **f5751a33**, verifies **24,612 sealed /
+1,102 compiled** inputs. It retains compiled application, Node, dependencies and
+components from running application **deea778d / 20261016-204440-a6f079ca**.
+
+The two installed entries are **Augmentor Harness (MX)** and **Augmentor Harness
+- Migration Pilot**, at registry revision two. Actual installed-opener link
+requests confirm both original owner PIDs, all four native conversations, 32
+protected inputs, shared prompt/memory/configuration rows, earlier Preview entry
+and selected releases unchanged. No owner restart, new project import, prompt,
+model or audio work occurs. Physical menu-click/default-browser acceptance and a
+real owner cold restart remain user feedback, distinct from the passing synthetic
+cold/concurrent proof. [Portable evidence](../release/harness-review-opener-20261016.json).
 
 ## Model picker
 
