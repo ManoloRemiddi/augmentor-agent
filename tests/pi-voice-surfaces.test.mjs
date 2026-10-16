@@ -7,14 +7,16 @@ import {promisify} from 'node:util';
 import {once} from 'node:events';
 import {writeFile,readFile} from 'node:fs/promises';
 import {join,resolve,delimiter} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {setTimeout as delay} from 'node:timers/promises';
 import {piVoiceFixture} from './fixtures/pi-voice.mjs';
 import {until} from './fixtures/plans.mjs';
 import {BrowserVoice} from '../apps/browser/shared/voice-client.mjs';
 const artifact=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.');
+const fixtures=fileURLToPath(new URL('./fixtures/',import.meta.url));
 async function audioEnvironment(f){
  const site=join(f.root,'sitecustomize.py');await writeFile(site,'# Independently authored synthetic audio proof only.\nimport fake_audio\n');
- return {...f.env,AUGMENTOR_PI_NO_AUTOSTART:'1',AUGMENTOR_PI_WORKSPACE:f.workspace,AUGMENTOR_PI_BROWSER_WORKSPACE:f.workspace,AUGMENTOR_WINDOW_ID:'main',AUGMENTOR_WORKSPACE_PROFILE:'',AUGMENTOR_PYTHON:process.env.AUGMENTOR_PYTHON??'python3',PYTHONPATH:[f.root,join(artifact,'tests/fixtures/codex'),join(artifact,'apps/native')].join(delimiter),QT_QPA_PLATFORM:'offscreen',AUGMENTOR_VOICE_TEST_AUDIO_LOG:join(f.root,'audio')};
+ return {...f.env,AUGMENTOR_PI_NO_AUTOSTART:'1',AUGMENTOR_PI_WORKSPACE:f.workspace,AUGMENTOR_PI_BROWSER_WORKSPACE:f.workspace,AUGMENTOR_WINDOW_ID:'main',AUGMENTOR_WORKSPACE_PROFILE:'',AUGMENTOR_PYTHON:process.env.AUGMENTOR_PYTHON??'python3',PYTHONPATH:[f.root,join(fixtures,'codex'),join(artifact,'apps/native')].join(delimiter),QT_QPA_PLATFORM:'offscreen',AUGMENTOR_VOICE_TEST_AUDIO_LOG:join(f.root,'audio')};
 }
 async function browser(t,f){
  const child=spawn(process.execPath,[join(artifact,'apps/browser/pi-bridge.mjs')],{env:await audioEnvironment(f),stdio:['pipe','pipe','pipe']});
@@ -27,7 +29,7 @@ async function browser(t,f){
 }
 test('actual Pi Native hold/release, PCM playback and original Send preserve spoken/typed continuity', {timeout:30000},async t=>{
  const f=await piVoiceFixture(t,{jobMode:{}}),env=await audioEnvironment(f);
- const result=await promisify(execFile)(env.AUGMENTOR_PYTHON,[join(artifact,'tests/fixtures/pi-voice-native.py')],{env,timeout:20000});
+ const result=await promisify(execFile)(env.AUGMENTOR_PYTHON,[join(fixtures,'pi-voice-native.py')],{env,timeout:20000});
  const proof=JSON.parse(result.stdout);assert.equal(proof.nativePiVoice,'passed');assert.equal(proof.typedFollowup,true);await f.settled(proof.sessionId);
  const events=(await f.call('session.history',{sessionId:proof.sessionId})).events.map(row=>row.event),users=events.filter(row=>row.type==='user/message');
  assert.deepEqual(users.map(row=>row.data.inputMode),['voice','text']);assert.match(users[0].data.source.rpcId,/^resonant-voice:/);

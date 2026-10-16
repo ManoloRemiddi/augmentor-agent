@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Sealed voice-fixture correction](HARNESS-DICTATION.md#sealed-artifact-fixture-correction)
+keeps runtime **159c99f2** and the sealed microphone artifact unchanged. The
+first staged cohort retains 745 pass/three fixture-location failures/two existing
+optional skips. Its driver now takes public synthetic fixtures from the test
+source and actual application/native/worker modules from the selected artifact.
+All four surface cases pass against source/ordinary/exact-sealed; full corrected
+staged qualification remains next. Shared dictation CI adds 14 common cases on
+Linux/macOS/Windows; hosted results are separate. No bounds/workers/skips change.
+
 [Original DSH microphone](HARNESS-DICTATION.md) now reuses ten verbatim MIT
 inputs for recording/waveform/Stop/Cancel/device selection and editable drafts.
 Trusted Pi recognition owns credentials, bounded acknowledged PCM and scoped

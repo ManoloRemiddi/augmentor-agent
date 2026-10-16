@@ -157,3 +157,20 @@ preserved. Qwen catalog is online; Breeze remains failed with 2,012 MiB free on
 the RTX 5090, below its unchanged 2,828 MiB manager prerequisite. No retry, tuning
 or GPU move occurred. Current MX review is unchanged; a new sealed review is next.
 [Portable qualification](../release/harness-dictation-qualification.json).
+
+## Sealed-artifact fixture correction
+
+The first sealed-target cohort records **745 passes/three failures/two existing
+optional skips**. Only the older Pi Native/Browser surface driver fails: it
+incorrectly looks for `fake_audio` and its Python entrypoint inside the product
+artifact. Those files are test inputs, not product dependencies. The driver now
+resolves its independently authored fixtures beside its test source, while keeping
+actual native modules, Browser worker and SDK owner selected from the artifact.
+The fixture bodies and 1,060 compiled product inputs remain unchanged; the sealed
+artifact is never patched or resealed. Corrected four-case voice-surface checks
+pass against source, frozen ordinary and the exact sealed artifact. No deadline,
+worker count or skip changes. The complete corrected sealed cohort is next.
+
+The common application SDK workflow now runs the 14 recognition-only transport/
+Host cases immediately after build on Linux/macOS/Windows, with explicit source/
+fixture path triggers. This is CI coverage, not a new hosted/platform pass.

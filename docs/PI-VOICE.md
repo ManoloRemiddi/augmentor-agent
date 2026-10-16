@@ -609,3 +609,15 @@ Required next work is:
 The current Breeze out-of-device-memory failure and incomplete full migration,
 platform and installed release gates remain open. No lower context, precision,
 concurrency, alternate GPU or workload eviction is introduced by this work.
+
+## Voice test inputs outside sealed products — October 16, 2026
+
+The Pi surface proof now resolves synthetic audio/Python drivers from its test
+source and actual application/native/worker modules from `AUGMENTOR_PI_TEST_ROOT`.
+A release artifact need not carry test fixtures. The initial microphone-review
+sealed cohort retains 745 passes/three missing-fixture failures/two existing
+optional skips; corrected four-case source/ordinary/exact-sealed checks pass.
+Runtime 159c99f2, fixture bodies and the sealed artifact remain unchanged.
+[Harness microphone qualification](HARNESS-DICTATION.md#sealed-artifact-fixture-correction)
+owns the full staged follow-up. Common dictation CI coverage is added separately;
+no new hosted qualification is inferred.
