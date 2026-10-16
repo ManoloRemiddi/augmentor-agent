@@ -9,7 +9,10 @@ branch/worker scope, unavailable states and bounded metadata/native windows are
 explicit. Eleven focused authored/SDK/original-Trajectory checks pass; the initial
 collapsed-tree browser assertion is retained/corrected using existing expanders.
 No GUI, provider setting, execution authority, review or installed selection is
-changed. Full source/fresh ordinary/live qualification follows separately.
+changed. The first broad run retains five failures from incomplete minimal
+observation peers; real public in-memory managers now supply the required
+interface without dropping assertions. A duplicate-tool case verifies the
+SDK's existing refusal before dispatch. Full qualification follows separately.
 
 [Shared Pi persona](PI-INSTRUCTIONS.md), application **4f4812cc**, now binds the
 approved common file through public SDK append/native custom snapshots. Exact

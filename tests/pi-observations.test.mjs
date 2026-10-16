@@ -4,13 +4,14 @@ import assert from 'node:assert/strict';
 import {mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
+import {SessionManager} from '@earendil-works/pi-coding-agent';
 import {observeSession} from '../dist/runtime/src/observations.js';
 import {ObservationStore,DEFAULT_RETENTION} from '../dist/observation/src/store.js';
 function fixture(t,capture=true){
  const root=mkdtempSync(join(tmpdir(),'augmentor-stream-observer-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
  const store=new ObservationStore(root,()=>({...DEFAULT_RETENTION,capturePayloads:capture}));let listener;
  const oldProvider=async data=>{data.transformed=true;},agent={onPayload:async payload=>({...payload,seed:42}),onProviderStreamEvent:oldProvider};
- const session={agent,thinkingLevel:'off',subscribe:callback=>{listener=callback;return()=>{};}};
+ const session={agent,sessionManager:SessionManager.inMemory(root),thinkingLevel:'off',subscribe:callback=>{listener=callback;return()=>{};}};
  const model={id:'fixture',provider:'fixture',api:'openai-completions',contextWindow:32000};
  const observer=observeSession(session,store,'fixture',()=>({selected:{provider:'fixture',model:'fixture'}}),()=>{},message=>assert.fail(message));
  const emit=(type,message={role:'assistant',content:[],stopReason:'stop'})=>listener({type,message});
@@ -22,6 +23,7 @@ test('parsed streams compose prior hooks, retain immutable JSON and redact crede
  const record=f.store.page('fixture').records.find(r=>r.kind==='provider/stream');
  assert.equal(record.data.coverage,'complete');assert.deepEqual(record.data.credentialRedactions,['apiKey']);
  const body=JSON.parse(f.store.payload('fixture',record.id).text);assert.equal(body.events[0].data.delta,'PRIVATE_FIXTURE_TEXT');assert.equal(body.events[0].data.transformed,true);assert(!JSON.stringify(body).includes('SYNTHETIC_SECRET'));
+ const complete=f.store.page('fixture').records.find(r=>r.kind==='model/complete');assert.equal(complete.data.nativeResponse.parentId,null);assert.equal(complete.data.nativeResponse.state,'observed');assert.equal(typeof complete.data.nativeResponse.sha256,'string');
  f.observer.dispose();assert.equal(f.agent.onProviderStreamEvent,f.oldProvider);
 });
 test('parsed-stream capture reports its bound and metadata mode retains no contents',async t=>{
@@ -39,7 +41,7 @@ test('request observation records SDK effort separately from saved effort and pr
  const root=mkdtempSync(join(tmpdir(),'augmentor-thinking-observer-'));t.after(()=>rmSync(root,{recursive:true,force:true}));
  const store=new ObservationStore(root,()=>({...DEFAULT_RETENTION,capturePayloads:true}));let listener;
  const agent={streamFunction:async(model,context,options)=>{await agent.onPayload({reasoning_effort:options.reasoning},model);return 'fixture-stream';}};
- const original=agent.streamFunction,session={agent,thinkingLevel:'off',subscribe(fn){listener=fn;return()=>{};}},model={id:'route',provider:'fixture',api:'openai-completions',contextWindow:32000};
+ const original=agent.streamFunction,session={agent,sessionManager:SessionManager.inMemory(root),thinkingLevel:'off',subscribe(fn){listener=fn;return()=>{};}},model={id:'route',provider:'fixture',api:'openai-completions',contextWindow:32000};
  const observer=observeSession(session,store,'thinking',()=>({selected:{provider:'fixture',model:'virtual'},reasoning:{active:true,tier:'high'}}),()=>{},assert.fail);
  assert.equal(await agent.streamFunction(model,{},{reasoning:'high'}),'fixture-stream');listener({type:'message_end',message:{role:'assistant',content:[],stopReason:'stop',thinkingLevel:'high',providerThinkingLevel:'deep',model:'route',provider:'fixture'}});
  const records=store.page('thinking').records,request=records.find(r=>r.kind==='model/request'),done=records.find(r=>r.kind==='model/complete');assert.equal(request.data.thinkingLevel,'high');assert.equal(request.data.savedThinkingLevel,'off');assert.match(request.data.thinkingBoundary,/sdk-stream-options/);assert.equal(request.data.model,'route');assert.equal(done.data.providerThinkingLevel,'deep');assert.equal(done.data.thinkingLevel,'high');observer.dispose();assert.equal(agent.streamFunction,original);

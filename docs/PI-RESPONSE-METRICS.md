@@ -69,15 +69,22 @@ execution or replay authority.
 
 ## Qualification and remaining work
 
-Eleven focused authored/real-SDK/original-Chromium checks pass on MX Linux with
+Eleven initial focused authored/real-SDK/original-Chromium checks pass on MX Linux with
 two workers and unchanged time limits. They cover native-before-persistence
 correlation, exact same-step previews, cold reopen, branch/foreign-session
 isolation, read-only Browser policy, payload opt-out, declared server fields,
 per-request reset, missing/zero counters, old/ambiguous/unmatched data and bounds.
 The initial browser assertion did not expand the original JSON tree; its failure
 log is retained and the driver now uses the existing expanders. No GUI or bound
-was changed to accommodate it. Full source/fresh ordinary, live provider and
-publication evidence are recorded separately once completed.
+was changed to accommodate it. The first complete 794-case run retained five
+failures in older minimal observation peers lacking the newly used public SDK
+session-manager interface. Those peers now use real in-memory `SessionManager`s;
+all original assertions remain and the numeric correlation is additionally
+checked. A twelfth focused case verifies that the SDK already refuses a duplicate
+tool supplied by an approved resource before dispatch. Its initial external
+driver expected an application-specific error rather than the SDK's actual
+collision error; that assertion failure is retained. Full source/fresh ordinary,
+live provider and publication evidence are recorded separately once completed.
 
 The current MX owner review **20261016-065534-c8cdf03c/application dfe855f3** does
 not include this increment or the preceding shared-persona increment. Installed

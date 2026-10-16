@@ -102,7 +102,7 @@ test('identical native projections retain all candidates instead of inventing a 
 test('observer preserves original hooks and an unsupported adapter cannot reuse a prior boundary record',async t=>{
  const f=setup(t);let listener;const oldTransform=async messages=>messages.slice(1),oldStream=async()=> 'unchanged-stream';
  const agent={transformContext:oldTransform,streamFunction:oldStream,onPayload:async payload=>{payload.apiKey='SECRET';payload.changed=true;}};
- const session={agent,thinkingLevel:'off',subscribe(fn){listener=fn;return()=>{};}},model={id:'fixture',provider:'fixture',api:'openai-completions',contextWindow:32000};
+ const session={agent,sessionManager:SessionManager.inMemory(),thinkingLevel:'off',subscribe(fn){listener=fn;return()=>{};}},model={id:'fixture',provider:'fixture',api:'openai-completions',contextWindow:32000};
  const observer=observeSession(session,f.store,'fixture',()=>({selected:{provider:'fixture',model:'fixture'}}),()=>{},assert.fail,f.provenance);t.after(()=>observer.dispose());
  observer.beginTurn({});const messages=[{role:'user',content:'OMITTED'},{role:'user',content:'RETAINED'}];
  const transformed=await agent.transformContext(messages);assert.deepEqual(transformed,[messages[1]]);assert.equal(await agent.streamFunction(model,{messages:transformed},{}),'unchanged-stream');
