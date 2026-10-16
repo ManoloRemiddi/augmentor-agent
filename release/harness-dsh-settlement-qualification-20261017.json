@@ -1,7 +1,7 @@
 {
   "schema": "augmentor-dsh-settlement-qualification/1",
   "date": "2026-10-17",
-  "scope": "MX source and separate ordinary packaged qualification; sealed pending; no owner transfer",
+  "scope": "MX source, ordinary packaged and exact separately sealed qualification; no owner update or transfer",
   "sourceBaseRef": "cf0278429cb033ec26ccfafb4ab5e878c3dbb00a",
   "primaryProtocol": {
     "repository": "deepseek-ai/deepseek-harness",
@@ -49,7 +49,7 @@
     "skips": 0,
     "deadlinesChanged": false,
     "ordinaryNodePass": 190,
-    "exactSealedNodePass": null,
+    "exactSealedNodePass": 190,
     "ownerAdoption": false,
     "testedInputsSha256": {
       "packages/runtime/src/dsh-project-import.ts": "c07aa494fee46dc2ba03345443440b45e45f45b0a0d6fef39306bdca110fab90",
@@ -60,7 +60,11 @@
     "ordinaryPythonPass": 47,
     "compiledFilesVerified": 1108,
     "ordinaryUnchangedBaselineInputsVerified": 23517,
-    "sameFrozenRealPreparationAcceptedByOrdinary": true
+    "sameFrozenRealPreparationAcceptedByOrdinary": true,
+    "exactSealedPythonPass": 47,
+    "sameFrozenRealPreparationAcceptedBySeal": true,
+    "sealedEntriesVerified": 24631,
+    "privateVerifierCorrection": "After all 190 Node and 47 Python tests passed, the adapted driver referenced a nonexistent renamed assessment helper. Final same-input assessment and complete seal/compiled/selection checks now use the existing helper; no test rerun or candidate modification."
   },
   "realFrozenComparison": {
     "projects": 1,
@@ -76,11 +80,31 @@
     "rawDataPublished": false
   },
   "remaining": [
-    "Separate packaged/sealed qualification before guarded adoption",
+    "Guarded adoption of qualified separate candidate before wider migration",
     "Owner pilot feedback before further transfers",
     "File/content and dispatch-less tool-result cases",
     "Source-observation failures and other independent formats",
     "Voice and later OS rollout deferred"
   ],
-  "implementationRef": "7caa7281"
+  "implementationRef": "7caa7281",
+  "applicationRef": "335df05ab14ad02d7cc9afc284e367f827fb0345",
+  "separatelySealedCandidate": {
+    "releaseId": "20261017-005619-4a45cc63",
+    "applicationRef": "335df05ab14ad02d7cc9afc284e367f827fb0345",
+    "artifactSha256": "ffaeda12ed55cc6a3e97b669b2447dee873b677693ed5650c760fca91221a170",
+    "inventoryEntriesVerified": 24631,
+    "compiledFilesVerified": 1108,
+    "activated": false,
+    "runningReviewsAdopted": false,
+    "ownerDataCopied": false
+  },
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "completeProtectedRegularFileSetsAndHashesExact": true,
+    "protectedOwnerFilesExact": 36,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
+  }
 }

@@ -2165,5 +2165,7 @@ uses the real SDK with a synthetic provider: cold reopen, one explicit human
 request/read-only tool, native reply branch, another cold continuation and no
 historical replay or live child job. The thirty-file source focus passes 190
 Node cases/two workers, plus 47 Python checks. New unit contracts join shared CI;
-the SDK runtime case remains MX qualification.
+the SDK runtime case remains MX qualification. Source, ordinary and exact sealed
+each pass the same 190 Node / 47 Python focus. All 24,631 sealed / 1,108 compiled
+inputs verify; the private unselected candidate is 20261017-005619-4a45cc63.
 [Contract and deployment limits](../docs/HARNESS-DSH-MIGRATION-PILOT.md#legacy-child-settlement-reasoning--october-17).

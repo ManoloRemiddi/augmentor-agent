@@ -427,8 +427,16 @@ fresh read-only tool, native reply branching and another cold continuation. Its
 source fixture has no owner content. Source build/check and the complete
 **190-case, thirty-file Node focus** pass with two workers/eight Chromium
 files/eleven GUI cases, alongside **47 Python checks**. A separate ordinary
-packaged copy passes the same 190/47, verifies all 1,108 compiled files and accepts
-the identical frozen real export; sealed qualification remains separate. [Portable evidence](../release/harness-dsh-settlement-qualification-20261017.json)
+packaged copy and the exact separate seal each pass the same 190/47 and accept
+the identical frozen real export. Private unselected **20261017-005619-4a45cc63**,
+application **335df05ab14ad02d7cc9afc284e367f827fb0345**, SHA-256
+**ffaeda12ed55cc6a3e97b669b2447dee873b677693ed5650c760fca91221a170**,
+verifies all **24,631 sealed / 1,108 compiled inputs**. The adapted final private
+verifier initially referenced a missing renamed helper after every test passed;
+the final same-input, seal, compiled and selection checks use the existing helper,
+with no test rerun or candidate modification. Both owner PIDs and complete 36
+protected regular file sets/hashes, registry and selections stay unchanged; all
+24,615 existing running sealed inputs verify. Installed adoption remains open. [Portable evidence](../release/harness-dsh-settlement-qualification-20261017.json)
 records the current phase and limits.
 
 The exact same frozen real bundle refuses the preceding sealed converter and
