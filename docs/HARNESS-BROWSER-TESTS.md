@@ -34,6 +34,12 @@ have explicit scopes. Missing identities do not mean all contexts. Retired
 sessions/closed transports refuse another observation before sending it. Retired
 request IDs are removed; late replies cannot settle a fresh read. Only small
 identity fields are snapshotted, independent of later caller-argument mutation.
+Context clearing retires context-bound evaluation/world preparation, while
+target/frame inventory reads survive a JavaScript world transition. The first
+801-case run caught an over-broad cancellation of initial target inventory in
+the new browser peer; its 798-pass/one-failure/two-skip log is retained. Narrowing
+the lifetime predicate and adding an explicit inventory-survival assertion fixes
+that helper defect without discarding an assertion or changing a timer.
 
 The HTML test uses the observed unique execution-context ID paired with its
 actual frame/session, and discards detached cached session mappings. It never

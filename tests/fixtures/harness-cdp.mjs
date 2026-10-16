@@ -24,7 +24,7 @@ export async function harnessCdp(url){
       if(frame.method==='Runtime.executionContextsCleared')forgetContexts(route);
       if(frame.method==='Page.frameDetached'&&typeof p.frameId==='string')forgetContexts(route,c=>c.frameId===p.frameId);
       if(frame.method==='Runtime.executionContextDestroyed')retire(r=>(r.sessionId??'')===route&&((p.executionContextId!==undefined&&r.params.contextId===p.executionContextId)||(p.executionContextUniqueId!==undefined&&r.params.uniqueContextId===p.executionContextUniqueId)),frame.method);
-      if(frame.method==='Runtime.executionContextsCleared')retire(r=>(r.sessionId??'')===route,frame.method);
+      if(frame.method==='Runtime.executionContextsCleared')retire(r=>(r.sessionId??'')===route&&['Runtime.evaluate','Page.createIsolatedWorld'].includes(r.method),frame.method);
       if(frame.method==='Target.detachedFromTarget'&&typeof p.sessionId==='string'&&p.sessionId)retireSession(p.sessionId);
       if(frame.method==='Inspector.detached')retireSession(route);
       if(frame.method==='Page.frameDetached'&&typeof p.frameId==='string'&&p.frameId)retire(r=>(r.sessionId??'')===route&&r.params.frameId===p.frameId,frame.method);
