@@ -3,6 +3,21 @@ import test from 'node:test';import assert from 'node:assert/strict';import {rea
 import {dshBranchFixture,preparedBranch,SessionManager} from './fixtures/dsh-branch-runtime.mjs';import {authoredDshProject} from './fixtures/dsh-project.mjs';import {authoredDshFamily} from './fixtures/dsh-family-project.mjs';
 const root=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.');const {branchPublicationContext}=await import(pathToFileURL(join(root,'dist/runtime/src/branches.js')));
 const body=manager=>JSON.stringify(manager.buildSessionContext().messages);
+test('a historical reply restores its then-current framed checkpoint without later summaries or action replay',{timeout:45000},async t=>{
+ const {authoredFramedSurfaceDshProject,checkpointFrame}=await import('./fixtures/dsh-surface-project.mjs');
+ const make=async cwd=>{
+  const f=await authoredFramedSurfaceDshProject(cwd),rows=f.session.records;
+  const add=(type,data,metadata={})=>{const seq=rows.length;rows.push({type:'event',event:{seq,time:1700000010000+seq,type,data,...metadata}});};
+  const id='authored-later-third',start=f.expectedSurface[0],end=f.expectedSurface.at(-1),summary=[{type:'text',text:'LATER-THIRD-CHECKPOINT'}];
+  add('compaction/start',{compactionId:id,turn:null});add('compaction/summary',{compactionId:id,summary,shadowedRange:{start,end},shadowedSeqs:f.expectedSurface,shadowedTokenCount:120,provider:'fixture',model:'fixture'});
+  add('user/message',{role:'user',source:{kind:'compact-checkpoint',compactionId:id},content:[{type:'text',text:checkpointFrame.open},...summary,{type:'text',text:checkpointFrame.close}]},{surfaceOp:{op:'replace',startSeq:start,endSeq:end},sourceEventSeqs:f.expectedSurface});add('compaction/end',{compactionId:id,turn:null});f.session.opening.cursor=rows.length-1;return f;
+ };
+ const f=await dshBranchFixture(t,make),parent=await f.native(f.sid),answer=f.session.records.find(r=>r.event.type==='assistant/message'&&r.event.data.message.content.some(p=>p.text==='CURRENT-SOURCE-ANSWER'));
+ assert(answer);const {branch}=await preparedBranch(f,f.sid,answer.event.seq+1),native=await f.native(branch.sessionId),context=body(SessionManager.open(native.file));
+ assert(context.includes('FINAL-SOURCE-CHECKPOINT'));assert(context.includes('<compacted-summary>'));assert(context.includes('</compacted-summary>'));assert(context.includes('CURRENT-SOURCE-ANSWER'));assert(!context.includes('LATER-THIRD-CHECKPOINT'));assert(!context.includes('SUPERSEDED-FIRST-CHECKPOINT'));assert.equal(f.requests.length,0);assert((await f.native(f.sid)).bytes.equals(parent.bytes));
+ await f.stop();await f.start();await f.call('session.history',{sessionId:branch.sessionId});assert((await f.native(branch.sessionId)).bytes.equals(native.bytes));assert.equal(f.requests.length,0);
+ await f.prompt(branch.sessionId,{kind:'read'});assert.equal(f.requests.length,2);const sent=JSON.stringify(f.requests[0].messages);assert(sent.includes('FINAL-SOURCE-CHECKPOINT'));assert(sent.includes('<compacted-summary>'));assert(!sent.includes('LATER-THIRD-CHECKPOINT'));assert(!sent.includes('SUPERSEDED-FIRST-CHECKPOINT'));assert((await f.native(f.sid)).bytes.equals(parent.bytes));assert.equal(await readFile(join(f.state,f.receipt.rawArchive),'utf8'),f.sourceBytes);
+});
 test('historical reply branch rebuilds its source surface before later nested compactions, cold-opens distinct images and continues once without replay',{timeout:45000},async t=>{
  const f=await dshBranchFixture(t),parent=await f.native(f.sid),original=SessionManager.open(parent.file),rows=f.value.sessions[0].records,target=rows.find(r=>r.event.type==='assistant/message'&&r.event.data.message.content.some(p=>p.text==='SUPERSEDED-SECOND-ANSWER')).event.seq;
  assert(!body(original).includes('SUPERSEDED-SECOND-ANSWER'));assert(body(original).includes('FINAL-SOURCE-CHECKPOINT'));

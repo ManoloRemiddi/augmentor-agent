@@ -1,5 +1,12 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {authoredRichDshProject} from './dsh-rich-project.mjs';
+// Public DSH d7432673 compaction-basic/src/summarizer.ts frameSummary
+// protocol literals: Copyright (c) 2026 DeepSeek, MIT; full notice retained in
+// apps/harness/vendor/dsh/LICENSE. Conversation/summary payloads are authored fixtures.
+export const checkpointFrame={
+ open:'This is an automatically generated checkpoint condensing an earlier span of the conversation to free up context. Treat the captured context as established background and build on it without restating it. Continue the task directly from the messages that follow, without acknowledging this checkpoint.\n\n<compacted-summary>',
+ close:'</compacted-summary>',
+};
 /** Authored nested positional compactions, pruned tool result and inherited cut. */
 export async function authoredSurfaceDshProject(cwd){
  const rich=await authoredRichDshProject(cwd),session=rich.value.sessions[0],rows=session.records;
@@ -23,4 +30,13 @@ export async function authoredSurfaceDshProject(cwd){
  const latestAnswer=add('assistant/message',{turn:3,step:1,message:{role:'assistant',content:[{type:'text',text:'CURRENT-SOURCE-ANSWER'}]}},{surfaceOp:'append'});add('turn/end',{turn:3,reason:{kind:'completed'}});
  session.opening.cursor=rows.length-1;
  return {...rich,session,pruneSeq,first,second,seedCut,expectedSurface:[second.checkpoint,latestUser,latestAnswer]};
+}
+
+export async function authoredFramedSurfaceDshProject(cwd){
+ const f=await authoredSurfaceDshProject(cwd);
+ for(const {event:e} of f.session.records)if(e.type==='user/message'&&e.data.source?.kind==='compact-checkpoint'){
+  const summary=f.session.records[e.seq-1].event.data.summary;
+  e.data.content=[{type:'text',text:checkpointFrame.open},...structuredClone(summary),{type:'text',text:checkpointFrame.close}];
+ }
+ return f;
 }

@@ -58,7 +58,10 @@ function records(session:Data,cut=false){
      calls.set(p.id,p.name);
     }
    }
-   m.content=checkedContent(m.content);
+   const checked=checkedContent(m.content);
+   // Summary correlation compares original checkpoint blocks, before the
+   // ordinary display/context normalization can discard additional fields.
+   if(e.type!=='user/message'||m.source?.kind!=='compact-checkpoint')m.content=checked;
    if(e.type==='user/message'&&m.source?.kind==='user')human=true;
    if(e.type==='tool/result'){
     if((e.surfaceOp?.op!=='replace'&&!pending.delete(m.toolCallId))||!calls.has(m.toolCallId))fail('tool result has no matching historical call.');

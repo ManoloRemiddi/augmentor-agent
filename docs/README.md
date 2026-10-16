@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Framed DSH checkpoint migration](HARNESS-DSH-MIGRATION-PILOT.md#standard-checkpoint-framing--october-16): exact public framing and original summary blocks now validate; three same-byte real exports/six parent conversations pass corrected preparation. Source/ordinary **104 Node + 35 Python** each pass; running reviews/data remain unchanged. [Assessment, evidence and remaining migration gates](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
+
 [Real MX main cold reopen](HARNESS-MX-FEEDBACK.md#real-mx-main-review-cold-reopen--october-16): installed stable opener restores the existing main review after guarded shutdown and a verified 53-file cold backup, preserving the running pilot/shared data/selections. Original plugin readiness returns; all 24,615 sealed inputs and original history prefixes verify. [Evidence and physical/owner limits](../release/harness-owner-cold-reopen-review-20261016.json).
 
 [MX search verification](HARNESS-PLUGIN-PARITY.md#existing-mx-review-search-verification--october-16): both reviews already have keyless search On/applied; actual original plugin status/switches and packaged public search/fetch pass. Source/exact packaged **19/19** focused cases each and all **24,615 sealed inputs** verify. No application/configuration change or restart; [evidence and acceptance limits](../release/harness-owner-search-review-20261016.json).

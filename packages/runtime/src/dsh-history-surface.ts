@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {isDeepStrictEqual} from 'node:util';
+import {createHash} from 'node:crypto';
 import type {Data} from '../../protocol/src/index.js';
 
 const eligible=new Set(['system/message','developer/message','user/message','assistant/message','tool/result']);
@@ -10,6 +11,15 @@ const seq=(value:unknown):value is number=>Number.isSafeInteger(value)&&Number(v
 const identity=(value:unknown)=>typeof value==='string'&&value.length>0&&value.length<=256;
 const object=(value:unknown):value is Data=>!!value&&typeof value==='object'&&!Array.isArray(value);
 function fail(message:string):never{throw Error('DSH history surface: '+message);}
+// Pinned public DSH d7432673 compaction-basic/src/summarizer.ts frameSummary.
+// Match exact protocol text-block fingerprints, never arbitrary surrounding
+// instructions or a summary substring. Legacy unframed checkpoints stay valid.
+const checkpointFrame=['7986ebcdf3457b678a1d08a59d9ec746ade700b5a5cb036c72284169103aca2d','396eac8b7d03e4f0b95511caeeb28c11c88c7e09d2e0d2fabe9c01f7d8e357a5'];
+function checkpointMatches(summary:Data[],content:unknown){
+ if(isDeepStrictEqual(summary,content))return true;
+ if(!Array.isArray(content)||content.length!==summary.length+2||!isDeepStrictEqual(summary,content.slice(1,-1)))return false;
+ return [content[0],content.at(-1)].every((part,i)=>object(part)&&Object.keys(part).sort().join(',')==='text,type'&&part.type==='text'&&typeof part.text==='string'&&createHash('sha256').update(part.text).digest('hex')===checkpointFrame[i]);
+}
 export interface DshReplacement {seq:number;start:number;end:number;shadowedSeqs:number[];kind:'summary'|'prune'|'replace';summarySeq?:number}
 export interface DshSurface {nodes:number[];replacements:DshReplacement[];seedCuts:number[];endedSeedCompactions:number[]}
 /** Reconstruct source message membership/order, not its old runtime instructions.
@@ -46,7 +56,7 @@ export function dshHistorySurface(events:Data[],strictMarkers=false,allowOpenTur
    const owner=compactions.get(d.compactionId);
    if(!owner||owner.command!==d.sourceCommandId||owner.summary!==undefined||!Array.isArray(d.summary)||d.summary.some((p:Data)=>p?.type!=='text'||typeof p.text!=='string')||!identity(d.provider)||!identity(d.model))fail('summary has no unique completed plaintext producer.');
    const next=events[e.seq+1],source=next?.data?.source;
-   if(next?.type!=='user/message'||source?.kind!=='compact-checkpoint'||source.compactionId!==d.compactionId||source.sourceCommandId!==d.sourceCommandId||!isDeepStrictEqual(d.summary,next.data.content))fail('summary is not followed by its exact replacement checkpoint.');
+   if(next?.type!=='user/message'||source?.kind!=='compact-checkpoint'||source.compactionId!==d.compactionId||source.sourceCommandId!==d.sourceCommandId||!checkpointMatches(d.summary,next.data.content))fail('summary is not followed by its exact replacement checkpoint.');
    owner.summary=e.seq;
   }
   if(e.type==='compaction/end'){

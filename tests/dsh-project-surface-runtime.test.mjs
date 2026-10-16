@@ -1,6 +1,11 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';import {readFile} from 'node:fs/promises';
-import {richRuntimeFixture} from './fixtures/dsh-rich-runtime.mjs';import {authoredSurfaceDshProject} from './fixtures/dsh-surface-project.mjs';
+import {richRuntimeFixture} from './fixtures/dsh-rich-runtime.mjs';import {authoredSurfaceDshProject,authoredFramedSurfaceDshProject} from './fixtures/dsh-surface-project.mjs';
+test('public framed source checkpoints reach the actual Pi provider as historical context and survive cold reads without replay',{timeout:45000},async t=>{
+ const f=await richRuntimeFixture(t,{vision:false,projectFactory:authoredFramedSurfaceDshProject}),sessionIds=(await f.call('session.list')).items.map(s=>s.sessionId).sort();assert.equal(f.requests.length,0);await f.prompt(f.sid,{kind:'read'});assert.equal(f.requests.length,2);
+ const messages=JSON.stringify(f.requests[0].messages);assert(messages.includes('FINAL-SOURCE-CHECKPOINT'));assert(messages.includes('<compacted-summary>'));assert(messages.includes('</compacted-summary>'));assert(!messages.includes('SUPERSEDED-FIRST-CHECKPOINT'));assert(!messages.includes('SUPERSEDED-SECOND-QUESTION'));assert(!messages.includes('image_url'));
+ const native=await f.native(f.sid);await f.stop();await f.start();const history=await f.call('session.history',{sessionId:f.sid});assert(JSON.stringify(history).includes('SUPERSEDED-SECOND-QUESTION'));assert.equal(f.requests.length,2);assert.deepEqual((await f.native(f.sid)).bytes,native.bytes);assert.equal(await readFile(f.source,'utf8'),f.raw);assert.deepEqual((await f.call('session.list')).items.map(s=>s.sessionId).sort(),sessionIds);
+});
 test('real Pi continuation uses final source replacements and never revives shadowed images or old tool work',{timeout:45000},async t=>{
  const f=await richRuntimeFixture(t,{vision:false,projectFactory:authoredSurfaceDshProject});assert.equal(f.requests.length,0);assert.equal((await f.call('memory.status')).events,0);await f.call('events.subscribe',{sessionId:f.sid});
  await f.prompt(f.sid,{kind:'read'});assert.equal(f.requests.length,2);const request=JSON.stringify(f.requests[0].messages);

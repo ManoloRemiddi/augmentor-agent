@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Standard checkpoint framing](#standard-checkpoint-framing--october-16) fixes a real preparation refusal without importing another project. Source/separate ordinary each pass **104 Node cases** across eighteen files/seven Chromium files and **35 Python cases**. Three identical real exports/six parent conversations refuse under the preceding sealed converter and pass corrected read-only preparation. Both running reviews and all 36 protected inputs remain unchanged. The corrected runtime must be staged before broader migration; owner pilot feedback still gates additional transfer. [Portable evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
+
 [Archived inspector status panels](CONTEXT-FLEET.md#archived-inspector-status-panels--october-16) now run in both MX reviews. Private unselected **20261016-213718-135550f5**, application **d300543c**, passes source/exact packaged **32/32 Node cases** (eleven files/four Chromium) plus **41 Python cases** each. All **24,613 sealed/1,102 compiled** inputs verify. Guarded idle-only updates retain four conversations, **408 verified backup files/32 cold and post-GUI protected inputs**, 12 shared prompts/19 captured records/17 existing pending entries and engine/settings/installed selections. Stable menu registration is revision four. Actual pilot archive Jobs/Plan/Goal, source excerpts and absence of false native recovery pass with zero GUI/HTTP errors and no new project/model/tool work. [Portable evidence](../release/harness-archive-status-review-20261016.json). Owner pilot feedback still gates bulk migration.
 
 [Historical DSH reply branches](HARNESS-DSH-MIGRATION-PILOT.md#historical-reply-branches--october-16) now run in both existing MX reviews. Private unselected **20261016-204440-a6f079ca**, application **deea778d** / test qualification **34f43a99**, passes **303/303 source and exact packaged cases** across 65 files / 20 Chromium files, plus sixteen licence/private-boundary/notice checks each. Source-cut reconstruction retains then-current compactions/offloads/images and fixes native reply/Edit ordinals after import. Guarded idle-only adoption verifies **408 backup files / 32 cold and post-GUI protected inputs**, four conversations, 12 prompts, 19 captured records and 17 pending memory entries. Actual pilot read-only inspection exposes two archived children and source excerpts without new work. Configured 10 groups/431 models/10 pins and engine/settings/selected installation remain unchanged. [Portable evidence](../release/harness-dsh-branch-review-20261016.json). No further real projects, owner branch/model work, voice or later-OS rollout; pilot feedback remains required before bulk migration.
@@ -379,6 +381,68 @@ Both owner PIDs/roots, **32 protected files** and installed selection stay uncha
 No extra owner import, provider request or review restart occurs.
 [Portable qualification](../release/harness-dsh-rich-history-review-20261016.json).
 
+
+## Standard checkpoint framing — October 16
+
+A new read-only assessment checks all thirty current projects / 107 parent
+conversations against the exporter and actual preparation routine. Seventeen
+complete bounded project exports succeed; four projects/eight parent conversations
+pass preparation. The first refusal for each other project is: ten archive-size
+bounds, seven incomplete/unresolved parent histories, three source child-descriptor
+version failures, three checkpoint-framing failures, two unavailable workspace
+folder/name cases and one non-assistant reasoning case. Membership stays stable.
+This is current-project, first-refusal coverage, not a full import, child-family,
+continuation, model mapping or batch-acceptance result. Nothing is transferred.
+
+The checkpoint refusals expose an actual converter mismatch. Public DSH's pinned
+[`frameSummary`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/compaction/compaction-basic/src/summarizer.ts#L189)
+surrounds the raw summary blocks with a standard introductory text block and
+closing tag. The old converter requires raw-summary/checkpoint-array equality,
+so correctly framed completed histories are refused. The public Git tree/blob
+and exact source bytes are verified; no private implementation is copied.
+
+The authored converter now accepts either exact legacy unframed content or the
+exact pinned framing around an unchanged middle block array. The framing is
+recognized by UTF-8 SHA-256 fingerprints and exact text-block shape. It does not
+accept arbitrary surrounding instructions, substrings, new blocks, changed text,
+wrapper metadata or reordered parts. Original checkpoint blocks survive until
+correlation, so ordinary normalization cannot discard fields before comparison.
+Compaction/command identity, adjacency, replacement membership/order, citations,
+shadow pricing, lifecycle, source/version and all record/byte bounds remain.
+Raw summaries and source archives are unchanged. Framed continuation remains
+labelled historical data under current Augmentor instructions.
+
+Three targeted real exports with six parent conversations fail preparation under
+the preceding sealed converter and pass the corrected converter using identical
+frozen bytes for each before/after pair. No new target, SDK owner, model request
+or continuation-model assignment is created. This comparison does not rerun or
+relabel the full catalogue as ready.
+
+Check/build and **104/104 Node cases** pass in source and a separate ordinary
+packaged copy, across eighteen files/seven Chromium files, two workers, no skips
+and unchanged deadlines. Ten added cases exercise exact multipart framing,
+changed/injected framing refusal before publication, actual SDK/provider input,
+cold history and a historical reply between framed compactions that excludes a
+later third summary. Existing import/image/multi-project/batch/archived-family,
+branch and original-GUI regressions remain. **35 Python cases** pass in both
+copies. All 1,102 compiled files match and 23,513 other non-package/non-compiled
+baseline entries verify unchanged; no dependency, GUI or OS adapter changes.
+This ordinary copy is not a sealed/selected release or a later-OS qualification.
+
+The original pre-fix failure is retained. Initial focused failures reveal the
+normalization issue and an incorrect fixture session-count assumption; exact
+identity comparison replaces that assumption. The first expanded branch fixture
+selects a reply before its supposed checkpoint existed; the corrected fixture
+adds a later third compaction and verifies a real intermediate source cut.
+Original isolation, immutable-history, cold-reopen and no-replay assertions stay.
+
+Both actual review owners, all 36 protected inputs, shared prompt/memory/
+eligibility/job/settings rows, engine configuration and registry/selections stay
+unchanged; all 24,615 existing sealed inputs verify. Stage the corrected runtime
+before any future broader migration so historical branching uses the same new
+converter. Owner pilot feedback still gates further transfer. The other first
+refusals require separate work; voice and later OS rollout remain deferred.
+[Portable evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
 
 ## Source replacements, compaction and inherited history — October 16
 
