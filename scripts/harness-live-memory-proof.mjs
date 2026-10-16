@@ -136,5 +136,6 @@ try{
  for(const file of logs)await file.close();
  try{await promisify(execFile)(python,[join(driverRoot,'hindsight-isolated-proof-engine.py'),'stop','--root',root],{timeout:60000,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1'}});report.engineStopped=true;}catch(error){report.engineCleanupError=String(error);}
  report.actors=actors.map(({name,child})=>({name,pid:child.pid,exitCode:child.exitCode,signal:child.signalCode,terminal:child.exitCode!==null||child.signalCode!==null}));report.allOwnedActorsTerminal=report.engineStopped&&report.actors.every(actor=>actor.terminal);
+ if(report.cleanupError||report.engineCleanupError||!report.allOwnedActorsTerminal){report.passed=false;process.exitCode=1;}
  await writeFile(join(root,'conversation-requests.json'),JSON.stringify(requests,null,2)+'\n',{mode:0o600,flag:'wx'});await writeFile(join(root,'result.json'),JSON.stringify(report,null,2)+'\n',{mode:0o600,flag:'wx'});console.log(JSON.stringify({outputRoot:root,passed:report.passed,phase:report.phase,conversationRequests:requests.length,allOwnedActorsTerminal:report.allOwnedActorsTerminal,error:report.error}));
 }

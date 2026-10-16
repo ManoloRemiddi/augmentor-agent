@@ -40,7 +40,8 @@ Existing 45-second per-call, 120-second job/absolute-window, 65,536-token job an
 concurrency, precision, GPU placement, default thinking choice, retry policy,
 active workload or installed service is changed to obtain a result. The existing
 source/fresh-ordinary memory and native-snapshot evidence remains separately
-dated. Fresh frozen application/live evidence for this fix is still required.
+dated. The combined frozen/live result below qualifies these ownership fixes but
+retains failed page-semantic acceptance.
 
 ## October 16 status and settlement lock order
 
@@ -63,8 +64,63 @@ The test establishes the lock inversion, without claiming it explains every
 elapsed second or the entire second live failure. Both source fixes together pass
 **41/41 focused Python cases**: budget/gateway HTTP ownership, Hindsight status,
 capture/scoping, isolated proof boundaries and setup compatibility. No test
-workers, runtime budgets or live request settings change. Fresh ordinary and
-actual-engine qualification of the combined fixes remains required.
+workers, runtime budgets or live request settings change. The combined frozen
+qualification below supersedes the pending follow-up, preserving both failures.
+
+## Combined frozen qualification — October 16
+
+At **934a280eb752347e28f01719968aa22520fdfd94**, source and a fresh ordinary
+application each pass **41/41 Python** and **30/30 shared Node memory/SDK cases**,
+without skips, changed bounds or worker counts (Node remains two). The fresh
+application comes from that exact Git archive; all **3,395 tracked inputs**,
+**1,060 compiled inputs**, one Node executable and **20,702 dependency file/link
+inputs** remain unchanged after testing/live use. Twelve additional public
+source/licence/nested-notice boundary cases pass. No GUI, SDK/dependency pin or
+compiled JavaScript is changed by these Python service fixes.
+
+The third fresh actual Pi/Hindsight/default-Qwen proof completes **all six seed
+stages**, six model calls and **zero model-call failures**, with **47.82 seconds /
+39,078 tokens** left. It no longer stops at phase three. However, the strict proof
+still **fails** its required page semantics: two relationship and three work
+claims include the expected synthetic preference/database, while both nonempty,
+reported-fresh pages say no evidence was retrieved. The proof times out at its
+unchanged assertion bound. Fresh conversation recall, correction, historical
+branch, cold restart, pause and outage are **not reached** and are not credited.
+
+Inspection of the exact pinned public engine explains the retrieval gap. Page
+refresh invokes Reflect without an explicit budget; its LOW default halves the
+configured two iterations to one. The agent's final iteration removes tools,
+so the first iteration becomes a forced answer with no bank retrieval. Actual
+logs confirm both pages use one iteration and **zero tool calls**, despite
+successful consolidation/recall of observations. No engine source/configuration,
+iteration/token/time allowance, request thinking choice, retry or model setting
+is changed to bypass this gate. Evidence-bearing page generation within the
+accepted processing policy remains work. Earlier separately dated optional-mode
+proofs do not qualify this fresh default-mode candidate.
+
+All owned Pi/prompt/memory actors and the third labelled engine are terminal;
+the private database/cache and raw failures remain outside Git. Its 43 public
+cache inputs and original memory engine identity/health verify unchanged. Postflight
+also verifies eleven sealed inventories, twelve existing review owners plus the
+separate recognition owner, selected installation, 38 canonical/four original
+private changes and six model/service configuration hashes. The MX microphone
+review remains unchanged and available. These fixes are source/fresh-copy work,
+not an installed update or a whole-Harness completion claim.
+
+[Portable acceptance and retained failure metadata](../release/harness-pi-memory-settlement-20261016.json).
+
+Reproduce the common cases from either the source tree or its fresh ordinary copy:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=tests python3 -m unittest -v \
+  test_memory_budget test_hindsight_memory test_hindsight_isolated_proof \
+  test_dual_memory test_hindsight_setup
+node --test --test-concurrency=2 tests/memory-client.test.mjs \
+  tests/memory-context.test.mjs tests/pi-memory-snapshot.test.mjs \
+  tests/pi-input-mode.test.mjs tests/pi-context-provenance.test.mjs \
+  tests/pi-mcp-options-memory.test.mjs
+```
+
 
 ## Isolated proof ownership
 
@@ -98,6 +154,10 @@ restart, capture pause and ordinary chat during/recovering from memory outage.
 It verifies original provider context, native receipts, tool execution counts and
 no model/tool replay. These are required assertions, not inferred from an engine
 health response or nonempty page. Physical voice remains separate.
+
+The final report also refuses success and returns a failing exit status if any
+owned cleanup fails or an actor/engine is not terminal, even after assertions pass.
+This reporting-only follow-up does not rerun or relabel the failed frozen proof.
 
 Failures keep their records and stop the owned actors. Stopped memory jobs are
 never automatically retried or relabelled; new experiments use fresh proof state.

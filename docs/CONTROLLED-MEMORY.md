@@ -8,12 +8,19 @@ joined cleanup and durable settlement; true overlap stays refused and failed
 settlement cannot strand the guard. The initial actual Pi/Hindsight/default-Qwen
 proof is retained failed at consolidation phase three, with all owned actors
 terminal and original services unchanged. New opt-in isolated engine/Host proof
-uses synthetic banks and offline public cache only. A second failed live proof
-finds no spurious 429. A separate deterministic SQLite probe proves status could
-hold the journal writer while waiting for budget settlement; status now observes
-processing before its read-only journal access. Combined source cases pass 41/41.
-Fresh ordinary/live follow-up remains required; budgets, retries, model/GPU
-settings, current MX review and installed services stay unchanged.
+uses synthetic banks and offline public cache only. Status also now observes
+processing before read-only journal access, fixing a separately reproduced writer/
+budget lock inversion. At **934a280e**, source/fresh ordinary each pass **41 Python /
+30 Node**, unchanged bounds/workers/no skips; 12 source/licence boundary cases pass.
+All 3,395 tracked/1,060 compiled/20,702 dependency inputs verify unchanged. The
+third default-mode live proof completes all six seed stages/six model calls with
+zero call failures, but **fails page semantics**: Reflect uses one forced iteration
+and zero retrieval tools, despite correct extracted claims. Later recall/branch/
+restart/pause/outage scenarios are not reached. No limits/settings/retries change;
+all owned actors/engine join, original engine health, eleven seals/twelve reviews
+plus recognition, selection and prior changes/configurations are preserved. Page
+evidence, physical voice, adoption and full migration/platform gates remain open.
+[Portable result](../release/harness-pi-memory-settlement-20261016.json).
 
 # Context selection and controlled memory processing
 

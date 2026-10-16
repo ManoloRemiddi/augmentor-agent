@@ -173,7 +173,15 @@ worker count or skip changes. The complete corrected sealed cohort is next.
 
 The common application SDK workflow now runs the 14 recognition-only transport/
 Host cases immediately after build on Linux/macOS/Windows, with explicit source/
-fixture path triggers. This is CI coverage, not a new hosted/platform pass.
+fixture path triggers. [Hosted run 38831002313](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38831002313)
+at **bf2c033e** passes the complete SDK jobs on Linux and macOS. Windows is
+cancelled during the recognition/Host step; its log contains a named-pipe
+`FileNotFoundError` from the memory-companion fixture and a pending dictation-host
+promise at cancellation. These observations do not establish the complete cause
+of the hang or a Windows pass. Existing cancellation/deadlines are retained; no
+rerun, worker/skip change or platform acceptance is inferred. The same head's
+Validate job still refuses Office public source/rebuild packaging; the source
+boundary check passes. These hosted results do not qualify a release.
 
 ## Current isolated MX review
 
