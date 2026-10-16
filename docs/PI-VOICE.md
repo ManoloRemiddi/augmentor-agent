@@ -4,10 +4,13 @@
 inputs for recording/waveform/Stop/Cancel/device selection and editable drafts.
 Trusted Pi recognition owns credentials, bounded acknowledged PCM and scoped
 cleanup; it starts no conversational owner and never sends a prompt or TTS.
-Development Host/Chromium checks cover rootless/running turns, the full ten-minute
-budget, draft conflicts, read-only denial and both themes. Private 0.1.22 is
-qualified separately; shared 0.1.19 pins, current review and installed/services
-remain unchanged. Frozen acceptance, isolated MX review, physical audio and full
+At **159c99f2**, source/fresh ordinary each pass 748 plus two existing optional
+skips across 129 files/all 54 Harness Chromium files, unchanged workers/bounds;
+3,389 tracked/1,060 compiled inputs match and 22 packaging/private-boundary cases
+pass. Exact public transport/private packed 0.1.22 also recognizes 25/25 synthetic
+words offline, with no TTS/LLM request and joined exit. Private source stays out of
+public app/tests/CI. Shared 0.1.19 pins, existing review and installed/services stay
+unchanged. Initial failures remain; isolated MX review, physical audio and full
 migration remain open.
 
 # Pi voice integration

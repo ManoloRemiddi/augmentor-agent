@@ -135,3 +135,25 @@ node --test tests/harness-dictation.test.mjs tests/harness-dictation-host.test.m
 
 Chromium uses fake audio devices for this proof; no owner recording or private
 component is required. Optional screenshots use `AUGMENTOR_DICTATION_PROOF_OUTPUT`.
+
+## Frozen source and ordinary qualification — October 16, 2026
+
+Corrected **159c99f2fc19f24b166a5d388016580fe905f931** source and fresh ordinary
+each pass **748 tests plus two existing optional skips, zero failures/cancellations**,
+across **129 files/all 54 Harness Chromium files**, unchanged two-worker cohort
+and bounds. All **3,389 tracked/1,060 compiled inputs** match before/after; the
+625 supplier inputs, ten new verbatim UI bodies, dependency/license inputs and
+22 notice/packaging/private-source cases verify. The failed initial source and
+ordinary copy remain preserved; the initial ordinary cohort was not run.
+
+The exact public transport/frozen ordinary also works against the privately
+installed 0.1.22 archive and existing cached CPU decoder: 25/25 synthetic words,
+zero edits, no TTS/LLM request and explicitly joined worker exit. No private source,
+archive or audition enters the public application/tests/CI. This does not qualify
+physical audio, general accuracy, installed pins or platform release artifacts.
+Ten sealed inventories/eleven review owners, selected artifact, 38 canonical and
+four original private changes and six service/model configuration files remain
+preserved. Qwen catalog is online; Breeze remains failed with 2,012 MiB free on
+the RTX 5090, below its unchanged 2,828 MiB manager prerequisite. No retry, tuning
+or GPU move occurred. Current MX review is unchanged; a new sealed review is next.
+[Portable qualification](../release/harness-dictation-qualification.json).
