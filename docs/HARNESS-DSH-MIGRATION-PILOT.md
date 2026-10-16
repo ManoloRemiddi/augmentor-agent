@@ -106,9 +106,9 @@ an authored read-only remote fixture and exercise family capture, running-source
 refusal and changing-source detection. Private owner exports are never test
 fixtures or CI inputs.
 
-Actual private pilot results are recorded separately after qualification. Source
-and installed/running application identities must be reported separately: the
-importer is an offline operator tool, not a patch to the immutable application.
+Actual private pilot results are recorded below. Source and installed/running
+application identities remain separate: the importer is an offline operator tool,
+not a patch to the immutable application.
 
 ## Large-history Trajectory compatibility
 
@@ -121,3 +121,45 @@ options. The original table/inspector layout and CSS are preserved. A separately
 owned synthetic import with 140 completed tools reproduces the old frozen
 artifact's exact error. It qualifies the corrected virtual table, new explicit
 continuation, record inspection and return to Chat without historical tool replay.
+
+## Qualified private pilot — October 16, 2026
+
+Importer **787c301a** and Trajectory correction/application **48dfd15a** are tested
+with Pi 1.1.0/product 0.2.13. Private unselected release
+**20261016-114926-035cf359** verifies **24,555 sealed / 1,072 compiled** entries;
+its seal is `5f201670a2d7bf07f0e8407103497cd7f6434af71e992dfdaff58880108a6eca`.
+Source and exact staged runtime pass **29/29 across seven focused files**, two
+workers, unchanged bounds and no skips/failures/cancellations. Four exporter, seven
+licence, two private-source and seven notice-assembly cases pass.
+
+The private whole-store backup verifies 96,988 regular files and preserves 63,556
+hard-link paths. Its project/profile restore verifies 138 files. Postflight checks
+109 original project files and seven original parent/child-session files against
+the backup without changes. One parent conversation retains all 631 source events
+and 126 historical completed calls; both historical children remain archived. The
+continuation has 137 native context messages with bounded tool excerpts. No parent
+attachments are present, so attachment conversion is not qualified.
+
+Actual staged local Qwen recalls the saved historical decision, distinguishes
+current project files from historical versions and reads the current files. A
+fresh validation marker survives graceful restart without replay. Stop settles an
+explicit test generation. A separate scratch write/read matches the exact new
+contents; the file and conversation persist across another cold restart, and the
+qualification permission returns to Read Only. This is real owner-data inference
+conducted privately; no owner export is a public fixture or CI input. Memory
+processing/capture availability warnings occurred during qualification; this pilot
+does not qualify memory service health or migrate existing memory banks.
+
+The clean owner profile contains the import and its ordinary bootstrap metadata,
+with no qualification messages or copied qualification memory journal. Original
+Chat and virtualized Trajectory open with 50 rendered rows and zero initial
+console warnings/errors. Its empty post-restart paused queue is inspected and
+resumed with zero messages/actions. Owner QA submits no prompts/audio. Earlier
+review, selected installation, DSH originals, model/GPU configuration and original
+Node/dependency/component bytes remain preserved. No public binary, installed
+activation, merge or DSH retirement follows.
+
+[Portable evidence](../release/harness-dsh-migration-review-20261016.json) contains
+counts and build identities only. Private operator receipts retain the complete
+backup path, exact source hash, profile/socket, authenticated link and local
+qualification outputs. Those credentials and histories are not published.
