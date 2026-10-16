@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Standard checkpoint framing](#standard-checkpoint-framing--october-16) fixes a real preparation refusal without importing another project. Source/separate ordinary each pass **104 Node cases** across eighteen files/seven Chromium files and **35 Python cases**. Three identical real exports/six parent conversations refuse under the preceding sealed converter and pass corrected read-only preparation. Both running reviews and all 36 protected inputs remain unchanged. The corrected runtime must be staged before broader migration; owner pilot feedback still gates additional transfer. [Portable evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
+[Standard checkpoint framing](#standard-checkpoint-framing--october-16) fixes a real preparation refusal without importing another project. Source/ordinary/exact sealed each pass **104 Node cases** across eighteen files/seven Chromium files and **35 Python cases**. Three identical real exports/six parent conversations refuse under the preceding sealed converter and pass corrected read-only preparation. Both running reviews and all 36 protected inputs remain unchanged. The corrected runtime is separately staged/qualified, unselected **20261016-230037-48cf9df1 / 51f6e3e6**; adopt it before broader migration; owner pilot feedback still gates additional transfer. [Portable evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
 
 [Archived inspector status panels](CONTEXT-FLEET.md#archived-inspector-status-panels--october-16) now run in both MX reviews. Private unselected **20261016-213718-135550f5**, application **d300543c**, passes source/exact packaged **32/32 Node cases** (eleven files/four Chromium) plus **41 Python cases** each. All **24,613 sealed/1,102 compiled** inputs verify. Guarded idle-only updates retain four conversations, **408 verified backup files/32 cold and post-GUI protected inputs**, 12 shared prompts/19 captured records/17 existing pending entries and engine/settings/installed selections. Stable menu registration is revision four. Actual pilot archive Jobs/Plan/Goal, source excerpts and absence of false native recovery pass with zero GUI/HTTP errors and no new project/model/tool work. [Portable evidence](../release/harness-archive-status-review-20261016.json). Owner pilot feedback still gates bulk migration.
 
@@ -426,8 +426,8 @@ cold history and a historical reply between framed compactions that excludes a
 later third summary. Existing import/image/multi-project/batch/archived-family,
 branch and original-GUI regressions remain. **35 Python cases** pass in both
 copies. All 1,102 compiled files match and 23,513 other non-package/non-compiled
-baseline entries verify unchanged; no dependency, GUI or OS adapter changes.
-This ordinary copy is not a sealed/selected release or a later-OS qualification.
+baseline entries match at ordinary qualification; no dependency, GUI or OS adapter changes.
+That ordinary copy is not a selected release or a later-OS qualification.
 
 The original pre-fix failure is retained. Initial focused failures reveal the
 normalization issue and an incorrect fixture session-count assumption; exact
@@ -438,9 +438,18 @@ Original isolation, immutable-history, cold-reopen and no-replay assertions stay
 
 Both actual review owners, all 36 protected inputs, shared prompt/memory/
 eligibility/job/settings rows, engine configuration and registry/selections stay
-unchanged; all 24,615 existing sealed inputs verify. Stage the corrected runtime
-before any future broader migration so historical branching uses the same new
-converter. Owner pilot feedback still gates further transfer. The other first
+unchanged; all 24,615 existing sealed inputs verify. The corrected application
+**51f6e3e6fc77b429c1025087fdb907e09490f58e** is now separately staged as private
+unselected **20261016-230037-48cf9df1**, artifact
+**a9efeb0a278951440f8a49a9c7940ccccccd052e77984813db54e3aa4fe56c7d**.
+All **24,619 sealed/1,102 compiled** inputs verify. Selected public documentation,
+source and provenance are refreshed before sealing; all compiled inputs match
+the qualified ordinary copy. The exact sealed candidate passes the same 104/104
+Node and 35 Python cases, with unchanged workers/deadlines and no skips; the
+retained real two-parent export also passes read-only preparation through its
+actual packaged converter. No model or source profile is copied into the artifact.
+Adopt this qualified runtime before future broader migration so historical
+branching uses the same new converter. Owner pilot feedback still gates further transfer. The other first
 refusals require separate work; voice and later OS rollout remain deferred.
 [Portable evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
 

@@ -1,7 +1,7 @@
 {
   "schema": "augmentor-dsh-checkpoint-frame-qualification/1",
   "date": "2026-10-16",
-  "scope": "MX source and separate ordinary packaged migration converter; no owner import or installed update",
+  "scope": "MX source, separate ordinary packaged copy and separately sealed migration candidate; no owner import or adoption",
   "upstreamContract": {
     "repository": "https://github.com/deepseek-ai/deepseek-harness",
     "commit": "d743267388641bc76f17c45ce8b4c231aed1d32c",
@@ -30,7 +30,12 @@
       "unavailableWorkspaceFolderOrName": 2,
       "nonAssistantReasoning": 1
     },
-    "readOnlyApiMethods": ["workspace.list", "session.list", "session/follow", "session/page"],
+    "readOnlyApiMethods": [
+      "workspace.list",
+      "session.list",
+      "session/follow",
+      "session/page"
+    ],
     "continuationModelAssigned": false,
     "importAttempted": false,
     "archivedChildInspectionQualified": false,
@@ -68,7 +73,10 @@
       "First focus: 39/41. Checkpoint normalization hid unexpected wrapper metadata; correlation now keeps original blocks. The new runtime fixture assumed two sessions; it now checks exact initial identities across restart.",
       "First expanded cohort: 103/104. The new historical branch target preceded its supposed checkpoint. The corrected fixture adds a later third compaction and verifies the actual then-current framed summary, excluding both earlier shadowed and later context."
     ],
-    "actualSdkSyntheticProviderChecks": "Framed full import and historical reply cut, explicit continuation, exact immutable archive, cold native history and no historical action replay"
+    "actualSdkSyntheticProviderChecks": "Framed full import and historical reply cut, explicit continuation, exact immutable archive, cold native history and no historical action replay",
+    "exactSealedNodePass": 104,
+    "exactSealedPythonPass": 35,
+    "sameRealExportPreparationAcceptedBySeal": true
   },
   "preservation": {
     "runningReviewOwnersUnchanged": 2,
@@ -82,9 +90,21 @@
     "guiOrOsAdapterChanged": false
   },
   "remaining": [
-    "Stage and qualify the corrected runtime before using it for broader owner migration",
+    "Adopt the separately qualified corrected runtime before using it for broader owner migration",
     "Owner pilot feedback before any additional project transfer",
     "Large archives, source descriptor versions, unresolved histories, unavailable folders and non-assistant reasoning need separate handling",
     "Voice and later operating-system rollout remain deferred"
-  ]
+  ],
+  "applicationRef": "51f6e3e6fc77b429c1025087fdb907e09490f58e",
+  "separatelySealedCandidate": {
+    "releaseId": "20261016-230037-48cf9df1",
+    "applicationRef": "51f6e3e6fc77b429c1025087fdb907e09490f58e",
+    "artifactSha256": "a9efeb0a278951440f8a49a9c7940ccccccd052e77984813db54e3aa4fe56c7d",
+    "sealedEntries": 24619,
+    "compiledFilesVerified": 1102,
+    "activated": false,
+    "runningReviewsAdopted": false,
+    "sourceRefAndProvenanceRecorded": true,
+    "note": "Only selected public documentation/source/provenance were refreshed after ordinary qualification; compiled files match exactly and the exact sealed cohort passes."
+  }
 }
