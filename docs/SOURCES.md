@@ -931,3 +931,11 @@ now records 625 inputs; supplier notice and original bodies remain intact.
 Only Augmentor Host/draft/readiness adapters are newly authored. No SenseVoice
 backend/bundle, private speech source, private archive or audition asset enters
 the public graph. See [Harness dictation](HARNESS-DICTATION.md).
+
+
+DSH source-history migration follows the already pinned public MIT baseline
+`d743267388641bc76f17c45ce8b4c231aed1d32c` session `SurfaceOp`, compaction/checkpoint
+and fork-prefix schemas, using an independently authored converter. The original
+supplier CompactionNodeView is reused from the existing selected GUI; no supplier
+source, dependency version or licence selection changes. [Migration scope and
+qualification](HARNESS-DSH-MIGRATION-PILOT.md#source-replacements-compaction-and-inherited-history--october-16).

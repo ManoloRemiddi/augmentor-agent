@@ -42,6 +42,7 @@ export function projectDsh(state){
       if(!data.skillNames.length)delete data.skillNames;
       n={kind:'user',data};navigation.push({turn:currentTurn,anchorKey:key,prompt:item.text.slice(0,100),response:''});
     }
+    if(item.kind==='compaction')n={kind:'compaction',data:item.marker};
     if(item.kind==='assistant')n={kind:'assistant-step',data:{blocks:[...(item.thinking?[{kind:'reasoning',text:item.thinking}]:[]),...(item.text?[{kind:'text',text:item.text}]:[]),...(item.images??[]).map(p=>({kind:'image',attachment:p.attachment}))],step:ordinal,status:item.status==='streaming'?'running':item.partial?'interrupted':'complete',...(item.seq?{finalNode:{seq:item.seq}}:{})}};
     if(item.kind==='tool'){const binding=ownership.get(item.seq),proposal=state.events.find(e=>e.seq===binding?.proposalSeq),start=state.events.find(e=>e.seq===item.seq),raw=retainedToolArguments(start?.data??{}),call=proposal?.data.message?.content?.find(p=>(p.id??p.callId)===item.toolCallId)??(raw===undefined?undefined:{name:item.name,arguments:JSON.parse(raw)});n={kind:'pi-tool',data:{...item,call,result:state.events.find(e=>e.type==='tool/result'&&ownership.get(e.seq)?.id===binding?.id&&ownership.get(e.seq)?.startSeq===item.seq)?.data.result}};}
     if(['status','warning'].includes(item.kind))n={kind:'pi-notice',data:item};

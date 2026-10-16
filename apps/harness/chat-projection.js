@@ -41,6 +41,8 @@ export function projectChat(events,{running=false,toolBindings}={}){
    const reason=data.reason?.kind||'interrupted';flush(reason);
    for(const tool of tools.values())tool.status='outcome unknown';tools.clear();
    if(['aborted','interrupted','error'].includes(reason))items.push({kind:'status',text:data.message||({aborted:'Stopped.',error:'This turn ended with an error.',interrupted:'The runtime stopped; pending action outcomes may be unknown.'})[reason]});
+  }else if(event.type==='dsh/compaction'){
+   flush('partial');items.push({kind:'compaction',seq:event.seq,marker:data.marker});
   }else if(event.type==='runtime/notice'){
    flush('partial',true);items.push({kind:'status',text:data.message||'Execution status unavailable.'});
   }else if(event.type==='runtime/error'||event.type==='runtime/warning'){

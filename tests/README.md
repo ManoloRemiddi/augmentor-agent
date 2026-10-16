@@ -2069,3 +2069,13 @@ Exporter cases also cover descriptor-relative symlink refusal, deduplication,
 byte/hash checks, combined-size charging and final source revalidation after reads.
 Linux image-export cases are explicit skips on non-POSIX test hosts, not platform
 release qualification. See the [owning migration guide](../docs/HARNESS-DSH-MIGRATION-PILOT.md#reasoning-and-stored-images--october-16).
+
+
+DSH source-surface migration uses authored `fixtures/dsh-surface-project.mjs`,
+`dsh-project-surface.test.mjs` and `dsh-project-surface-runtime.test.mjs`.
+The actual provider assertion rejects stale overwritten human input, rather than
+only checking receipt metadata. Nested source replacements use surface order,
+retain exact source/fork provenance and do not revive shadowed images/tools.
+`harness-dsh-surface-import-chromium.test.mjs` opens the original supplier compaction
+disclosures and continues through its original composer. Owner histories remain
+private and are not copied into tests. See the [source-history contract](../docs/HARNESS-DSH-MIGRATION-PILOT.md#source-replacements-compaction-and-inherited-history--october-16).

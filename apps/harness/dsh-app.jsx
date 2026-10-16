@@ -39,7 +39,7 @@ import {DshSessionExport} from './dsh-session-export.mjs';
 import {ModelSelect} from '@dsh-gui/ui-model-selection/src/client/ModelSelect.tsx';
 import {ChatView} from '@dsh-gui/ui-chat/src/client/chat/ChatView.tsx';
 import {ChatFlow} from '@dsh-gui/ui-chat/src/client/chat/ChatFlow.tsx';
-import {UserMessageNodeView,TurnErrorNodeView} from '@dsh-gui/ui-chat/src/client/chat/MessageItem.tsx';
+import {UserMessageNodeView,TurnErrorNodeView,CompactionNodeView} from '@dsh-gui/ui-chat/src/client/chat/MessageItem.tsx';
 import {AssistantNodeView} from '@dsh-gui/ui-chat/src/client/chat/AssistantNodeView.tsx';
 import {ApprovalPanel} from '@dsh-gui/ui-approval/src/client/ApprovalPanel.tsx';
 import {QuestionComposer} from '@dsh-gui/ui-user-questions/src/client/QuestionComposer.tsx';
@@ -390,6 +390,7 @@ function App(){
       case 'conversation.chat.node':
         if(owner.node.kind==='user')return <UserMessageNodeView {...p} t={t.chat} onEdit={!state.readOnly&&state.capabilities?.messageEditDrafts===1&&owner.node.data.messageSeq===messageTargets(state.events).editSeq?()=>edit(owner.node.data.messageSeq):undefined} editUnavailable={state.phase!=='ready'||!draftState.ready||!!state.branchPending||current?.running===true||!!state.unconfirmed||state.compactionPending||state.compaction?.blocked||attachmentDrafts.busy}/>;
         if(owner.node.kind==='assistant-step')return <><OwnedMessage {...p}/>{Number.isSafeInteger(owner.node.data.finalNode?.seq)&&messageTargets(state.events).replies.has(owner.node.data.finalNode.seq)&&<MessageIconActions text={owner.node.data.blocks.filter(x=>x.kind==='text').map(x=>x.text).join('')} clock="end" t={t.chat} onBranch={state.readOnly?undefined:()=>branch(owner.node.data.finalNode.seq)} branchUnavailable={current?.running===true||!!state.branchPending}/>}</>;
+        if(owner.node.kind==='compaction')return <CompactionNodeView {...p} t={t.chat}/>;
         if(owner.node.kind==='pi-tool')return <PiTool node={owner.node} state={state} onInspect={()=>setView('trajectory')}/>;
         return <p role="status">{owner.node.data.text}</p>;
       case 'conversation.chat.reasoning.body':return <MarkdownText text={owner.text} streaming={owner.running}/>;

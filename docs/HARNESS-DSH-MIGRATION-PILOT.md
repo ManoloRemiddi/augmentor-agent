@@ -84,9 +84,7 @@ request-source snapshots and live Fleet-job ownership are not manufactured.
 
 The initial single-conversation pilot refused multi-conversation projects. The
 [current project importer](#multi-conversation-projects--october-16) adds that
-cardinality support. Unresolved tool calls, sequence gaps, edited/compacted/branched
-record forms, non-image attachments and opaque reasoning parts in parent messages still
-require their own converters. [Plaintext reasoning and stored images](#reasoning-and-stored-images--october-16) now have an explicit converter. Their originals remain backed up. Historical
+cardinality support. The [source-history converter](#source-replacements-compaction-and-inherited-history--october-16) now handles current-format replacements, completed compaction and inherited cuts. Unresolved tool calls, sequence gaps, other historical formats, non-image attachments and opaque reasoning parts still require conversion. [Plaintext reasoning and stored images](#reasoning-and-stored-images--october-16) now have an explicit converter. Their originals remain backed up. Historical
 subagent logs are archived, not recreated as live Pi Fleet jobs. Branching at an
 old imported answer, historical request-context reconstruction and original usage
 accounting are not qualified. Existing memory banks, Wiki data, credentials,
@@ -374,3 +372,82 @@ Production Node/dependencies/components and supplier sources/licences stay exact
 Both owner PIDs/roots, **32 protected files** and installed selection stay unchanged.
 No extra owner import, provider request or review restart occurs.
 [Portable qualification](../release/harness-dsh-rich-history-review-20261016.json).
+
+
+## Source replacements, compaction and inherited history — October 16
+
+The previous importer appended every recognized message into continuation context.
+That is wrong for a DSH `surfaceOp: {op: "replace", startSeq, endSeq}`: the original
+message stays in the human transcript, while the replacement occupies its old
+position in model input. A controlled preceding sealed build reproduces a real
+provider request containing both an overwritten human prompt and its replacement.
+The corrected importer supplies only the replacement at the original position.
+
+This independently authored adapter follows the public pinned DSH
+[`surface.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/session/src/surface.ts),
+[compaction/checkpoint contracts](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/compaction/compaction/src/types.ts)
+and [fork seed](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/session/src/fork.ts).
+Public source reads are pinned and Git-blob verified. No private repository code,
+owner logs or owner project contents become public fixtures. No new dependency or
+supplier-source edit is introduced. MX is the deployment qualification target;
+common pure/SDK cases enter the existing three-OS workflow without claiming other
+OS artifact acceptance.
+
+The converter folds the ordered message surface from the complete bounded source
+prefix before staging any conversation. Version-four messages require explicit
+surface operations; earlier synthetic fixtures without a version retain the
+legacy append convention. Replacement boundaries must still be current, citations
+must include all shadowed nodes, and a tool-result rewrite may change only its
+single original result's content. The source system head remains protected.
+Ranges follow *surface positions*: a high-sequence summary can stand before a
+lower-sequence later conversation, so numeric `startSeq > endSeq` can be valid.
+Unknown required event types, unrecognized versions, malformed lineage, missing
+citations and unsupported opaque formats are refused. Explicitly ignorable
+unknown records remain archived without affecting context.
+
+Completed `compaction/start` / `summary` / checkpoint / `end` sequences retain their
+source lifecycle/command identity, exact plaintext checkpoint, source range and
+shadow price. Summary/checkpoint and prune/replacement adjacency must match. A
+source `session/end-seed` boundary ends inherited incomplete compaction brackets;
+an incomplete bracket at the live source tail is still refused. Source parent ID,
+inherited cut markers, replacement ledger and effective source sequences are
+retained in a non-context native `augmentor.dsh-surface.v1` audit entry and import
+receipts. They do not manufacture Pi parent sessions, running Fleet jobs, old
+permissions or a new compaction request. Unknown-outcome calls remain refused.
+
+Native continuation uses the final source message order with current Augmentor
+instructions, historical-data labels, existing bounded tool excerpts and lazy
+image admission. Compact checkpoints are labelled historical user-role data, not
+new human requests. Tool excerpt counters now explicitly cover **effective source
+tool results only**; shadowed originals stay in the raw archive. Images shadowed
+by a summary stay available in their original gallery but never re-enter a new
+provider request merely because migration retained the original bytes.
+
+The Chat transcript retains append-origin human/assistant/tool rows. Replacement
+copies remain source history instead of duplicate human messages or tool endings.
+Compaction checkpoints use DSH's existing **CompactionNodeView** and expandable
+summary, preserving the original layout. Every display event retains one-based to
+zero-based provenance, source surface operation and citations. The exact archive
+remains unchanged; no historical records are recaptured as new automatic memory.
+The source's `forked` closure is labelled as an ended historical cut, not a newly
+completed action. Native branch-family restoration and historical request-context
+reconstruction remain distinct unfinished work.
+
+Source build and **150/150 Node cases** across twenty-three files/seven actual
+Chromium files pass with two workers and unchanged deadlines. **35 Python cases**
+pass, including the nineteen exporter cases and sixteen licence/private-source/
+notice checks. Authored fixtures cover nested summaries with decreasing numeric
+range endpoints, tool pruning, ordinary message edits, source cuts, malformed
+range/lifecycle/citation/version/identity refusal and whole-project atomicity.
+Actual Host/provider/cold-reopen tests prove that superseded text/media stay out
+of input while history/gallery bytes remain inspectable. The original GUI opens
+both nested summaries and continues through its existing composer with no page
+or HTTP errors. The previous sealed build fails the ordinary replacement assertion
+at the observed stale provider input. An initial test wrongly expected a bracket
+ended by a source seed cut to remain pending; it now independently covers both a
+completed inherited lifecycle and a genuinely unresolved tail.
+
+A read-only inspection of the already backed-up owner pilot confirms source
+header version four and 248 append surface markers; no extra owner project is
+exported or imported and no owner inference is submitted. Wider real-source
+acceptance is not inferred from synthetic evidence. Artifact qualification follows.
