@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {PluginSettings} from './dsh-plugins.jsx';
 import {DictationSettings} from './dsh-dictation.jsx';
 import {MemorySettings} from './dsh-memory-settings.jsx';
 import {SearchSettings} from './dsh-search-settings.jsx';
@@ -114,7 +115,16 @@ export function OriginalSettings({wide,state,controller,preferences,developerToo
       if(options.only==='general')return <GeneralSection renderSlot={renderSlot}/>;
       if(options.only==='model-picker-augmented')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ModelPickerSettings key={controller.epoch} controller={controller}/></div>}/>;
       if(options.only==='models')return <OriginalModels key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></OriginalModels>;
-      if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension">{!state.readOnly&&state.phase==='ready'&&<DictationSettings/>}<MemorySettings key={["memory",controller.epoch,state.phase,state.readOnly].join(":")} controller={controller}/><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><MetafolderSettings profile={metafolders}/><WikiSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller} onTrajectory={sid=>{settingsShell.actions.close();onTrajectory(sid);}}/><SearchSettings key={['search',controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
+      if(options.only==='plugins')return <GeneralSection renderSlot={()=> <PluginSettings canEditPrompts={!state.readOnly&&state.phase==='ready'} onPrompts={initialTab=>{settingsShell.actions.close();onPrompts(initialTab);}} onModels={()=>settingsShell.actions.openSection('model-picker-augmented')} panels={{
+        voice:<div className="augmentor-extension">{!state.readOnly&&state.phase==='ready'?<DictationSettings/>:<p>Voice settings need an active operator connection.</p>}</div>,
+        memory:<div className="augmentor-extension"><MemorySettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}/></div>,
+        mcp:<div className="augmentor-extension"><p>Connect tools such as Playwright, Blender, ComfyUI or Unreal through MCP. Connections need their own setup; a listed integration does not mean its service is running.</p><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/></div>,
+        reasoning:<div className="augmentor-extension"><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></div>,
+        folders:<div className="augmentor-extension"><MetafolderSettings profile={metafolders}/></div>,
+        wiki:<div className="augmentor-extension"><WikiSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller} onTrajectory={sid=>{settingsShell.actions.close();onTrajectory(sid);}}/></div>,
+        search:<div className="augmentor-extension"><SearchSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}/></div>,
+        context:<div className="augmentor-extension"><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button><p className="plugin-help">Context dashboard by bowenliang123 · dsh-context 0.68.1 · Apache-2.0</p></div>,
+      }}/ >}/>;
     }
     if(name==='settings.general.item')return <><PermissionDefaultSetting key={[controller.epoch,state.phase,state.readOnly,state.capabilities?.permissionDefaults===true].join(':')} controller={controller}/><fieldset disabled={!palette.writable||palette.busy} style={{display:"contents",border:0,padding:0,margin:0}}><AppearanceRow t={themeT} useStore={useAppearance} setTheme={setTheme}/></fieldset>{developerTools&&<HtmlPreviewSetting developerTools={developerTools} state={state}/>}<div className="augmentor-extension"><Button disabled={state.readOnly} onClick={()=>{settingsShell.actions.close();onPrompts();}}>Prompt library</Button><InspectionSettings state={state} controller={controller}/></div>{shortcutsUi?.render('settings.general.item')}<CurrentVersionRow t={t}/></>;
     return options.fallback??null;

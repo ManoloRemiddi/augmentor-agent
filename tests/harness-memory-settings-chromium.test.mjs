@@ -23,7 +23,7 @@ test('original Plugins exposes configured memory mode and guarded controls in bo
  const q=s=>'document.querySelector('+JSON.stringify(s)+')',shell=q('[data-shortcut-modal=settings]'),card=q('[data-memory-settings]');
  const button=(label,within='document')=>'Array.from('+within+'.querySelectorAll("button")).find(b=>b.textContent.trim()==='+JSON.stringify(label)+')';
  const visible=expression=>until(()=>panel.evaluate('Boolean('+expression+')'),expression),click=expression=>harnessPointerClick(panel,expression,until);
- const settings=q('button[aria-label="Settings"]');await visible(settings);await click(settings);await visible(shell);await click(button('Plugins',shell));
+ const settings=q('button[aria-label="Settings"]');await visible(settings);await click(settings);await visible(shell);await click(button('Plugins',shell));await click('document.querySelector('+JSON.stringify('button[aria-label="Open Automatic memory settings"]')+')');
  await visible(card+'?.innerText.includes("Thinking off for memory requests")');
  assert((await panel.evaluate(card+'.innerText')).includes('configured engine choice'));
  assert(!(await panel.evaluate(card+'.innerText')).includes('authored-private-memory-key'));
@@ -44,13 +44,13 @@ test('original Plugins exposes configured memory mode and guarded controls in bo
  const output=process.env.AUGMENTOR_MEMORY_SETTINGS_PROOF_OUTPUT;if(output)await mkdir(output,{recursive:true});
  for(const theme of ['Dark','Light']){
   await click(button('General',shell));await click(button(theme,shell));await visible('document.body.hasAttribute("data-ds-dark-theme")==='+String(theme==='Dark'));
-  await click(button('Plugins',shell));await visible(card+'?.innerText.includes("Thinking off for memory requests")');
+  await click(button('Plugins',shell));await click('document.querySelector('+JSON.stringify('button[aria-label="Open Automatic memory settings"]')+')');await visible(card+'?.innerText.includes("Thinking off for memory requests")');
   const contrasts=await panel.evaluate(`(()=>{const luminance=rgb=>{const c=rgb.match(/[\\d.]+/g).slice(0,3).map(Number).map(n=>{n/=255;return n<=.04045?n/12.92:((n+.055)/1.055)**2.4});return c[0]*.2126+c[1]*.7152+c[2]*.0722;};return Array.from(${card}.querySelectorAll('p,legend')).map(el=>{let bg=el;while(bg.parentElement&&['rgba(0, 0, 0, 0)','transparent'].includes(getComputedStyle(bg).backgroundColor))bg=bg.parentElement;const a=luminance(getComputedStyle(el).color),b=luminance(getComputedStyle(bg).backgroundColor);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);});})()`);
   assert(contrasts.every(ratio=>ratio>=4.5),theme+' text contrast: '+contrasts.join(','));
   if(output)await writeFile(join(output,'memory-settings-'+theme.toLowerCase()+'.png'),Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));
  }
  const inspection=await f.call('inspection.open',{sessionId:'memory-settings'});await panel.navigate(inspection.url);await visible(q('[data-composer-input][aria-disabled=true]'));
- await click(settings);await visible(shell);await click(button('Plugins',shell));await visible(button('MCP servers',shell));assert.equal(await panel.evaluate('Boolean('+card+')'),false);
+ await click(settings);await visible(shell);await click(button('Plugins',shell));await click('document.querySelector('+JSON.stringify('button[aria-label="Open Automatic memory settings"]')+')');await click(button('← All plugins',shell));await click('document.querySelector('+JSON.stringify('button[aria-label="Open Connected tools settings"]')+')');await visible(button('MCP servers',shell));assert.equal(await panel.evaluate('Boolean('+card+')'),false);
  const final=await f.call('memory.status');assert.equal(final.enabled,true);assert.equal(final.processing.paused,true);assert.equal(final.processing.active,false);assert.equal(final.events,0);
  assert.equal(f.requests.length,0);assert.equal(f.errors(),'');assert.equal(panel.failedResponses.length,1);
  assert.equal(panel.errors.length,1);assert.equal(panel.errors[0].source,'network');assert.equal(panel.errors[0].networkRequestId,conflict.id);

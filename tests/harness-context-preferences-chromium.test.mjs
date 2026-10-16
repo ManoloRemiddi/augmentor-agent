@@ -34,7 +34,7 @@ test('original Context preferences persist across Host restart, drive dashboard 
  const shell='document.querySelector("[data-shortcut-modal=settings]")';
  const originalOrigin=url.origin;
  const settings='document.querySelector("button[aria-label=\\"Settings\\"]")';
- const prefs=async()=>{await click(settings);await click(button('Plugins',shell));await visible('document.querySelector(".lc-settings-prefs")');};
+ const prefs=async()=>{await click(settings);await click(button('Plugins',shell));await click('document.querySelector('+JSON.stringify('button[aria-label="Open Context & insights settings"]')+')');await visible('document.querySelector(".lc-settings-prefs")');};
  const row=label=>'Array.from(document.querySelectorAll(".lc-settings-row")).find(x=>x.querySelector(".lc-settings-label")?.textContent==='+JSON.stringify(label)+')';
  const choice=label=>row(label)+'.querySelector("button")';
  const namespace=async()=>((await rpc('settings.describe')).namespaces.find(x=>x.ns==='dsh-context'));

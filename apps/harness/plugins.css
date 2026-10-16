@@ -1,0 +1,27 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+.augmentor-plugins,.augmentor-prompt-library{color:var(--dsw-alias-label-primary);font-size:14px;line-height:1.5;min-width:0;width:100%;box-sizing:border-box}
+.augmentor-plugins [hidden],.augmentor-prompt-library [hidden]{display:none!important}
+.augmentor-plugins h2,.augmentor-prompt-library h2{font-size:21px;line-height:1.25;margin:0 0 8px;font-weight:600}
+.augmentor-plugins header p,.plugin-help,.plugin-card-description,.prompt-help{color:var(--dsw-alias-label-secondary);margin:0 0 16px}
+.plugin-search,.augmentor-prompt-library label{display:flex;flex-direction:column;gap:6px;font-weight:500;margin:16px 0}
+.plugin-search input,.augmentor-prompt-library input,.augmentor-prompt-library textarea{font:inherit;color:inherit;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l2);border-radius:9px;padding:10px 12px;box-sizing:border-box;min-width:0;width:100%}
+.plugin-search input:focus-visible,.augmentor-prompt-library input:focus-visible,.augmentor-prompt-library textarea:focus-visible,.plugin-card:focus-visible{outline:2px solid var(--dsw-alias-link);outline-offset:3px}
+.plugin-help{font-size:12px;margin:12px 0 22px}
+.plugin-group{margin:24px 0}.plugin-group h3{font-size:13px;font-weight:600;margin:0 0 10px}
+.plugin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:10px}
+.plugin-card{display:flex;flex-direction:column;align-items:stretch;text-align:left;font:inherit;color:inherit;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l2);border-radius:12px;padding:14px;cursor:pointer;min-width:0;transition:background-color .15s}
+.plugin-card:hover{background:var(--dsw-alias-interactive-bg-hover)}
+.plugin-card-title{display:flex;justify-content:space-between;gap:12px;font-weight:600}.plugin-card-title>span{color:var(--dsw-alias-label-secondary)}
+.plugin-card-description{font-size:13px;font-weight:400;margin:6px 0 14px}.plugin-card-action{font-size:12px;font-weight:500;margin-top:auto;color:var(--dsw-alias-label-primary)}
+.plugin-detail-heading{margin:18px 0 24px}.augmentor-plugins [data-plugin-panel]>fieldset{min-width:0;margin:0;border:0;padding:0}.augmentor-plugins [data-plugin-panel] p{overflow-wrap:anywhere}
+.augmentor-prompt-library textarea{resize:vertical;min-height:150px;font-weight:400}.prompt-tabs,.prompt-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.prompt-tabs button[aria-pressed=true]{background:var(--dsw-alias-interactive-bg-hover);font-weight:600}
+.prompt-results{display:flex;flex-direction:column;max-height:180px;overflow:auto;gap:6px;margin:12px 0}
+.prompt-results button{text-align:left;justify-content:flex-start;flex:none}.prompt-results small{display:block;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dsw-alias-label-secondary)}
+.prompt-preview{white-space:pre-wrap;overflow-wrap:anywhere;max-height:230px;overflow:auto;border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);border-radius:10px;padding:14px;margin:12px 0}
+.prompt-notice{min-height:22px;overflow-wrap:anywhere}.prompt-confirmation{padding:14px;border:1px solid var(--dsw-alias-border-l2);border-radius:10px;margin:12px 0}
+.augmentor-plugins :focus-visible,.augmentor-prompt-library :focus-visible{scroll-margin-block:18px}
+@media(prefers-reduced-motion:reduce){.plugin-card{transition:none}}
+
+.augmentor-library-modal{width:min(760px,100%);max-height:100%;padding-bottom:16px}
+.augmentor-library-content{min-height:0;overflow:auto;overscroll-behavior:contain}
