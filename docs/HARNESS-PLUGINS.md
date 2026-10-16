@@ -2,6 +2,8 @@
 
 # Plugins and shared writing tools
 
+[Cold shared-profile consolidation](HARNESS-SHARED-PROFILES.md) now provides an explicit backed-up transfer and one prompt/memory owner per data root. Adoption evidence there supersedes the historical separate-copy status below only when explicitly recorded. Source support alone does not connect the installed Agent or older reviews.
+
 The October 16 owner request authorizes reorganizing the confusing Plugins page.
 The existing DSH settings shell, themes and surrounding conversation UI remain.
 Plugins now opens a searchable directory grouped by Writing, Research & knowledge,

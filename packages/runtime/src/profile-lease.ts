@@ -7,19 +7,26 @@ import {pythonExecutable,componentEnvironment} from '../../platform/src/index.js
 export class ProfileBusy extends Error{}
 export const isTransactionTree=(state:string)=>/^\..+\.import-[-a-f0-9]{36}\.(?:stage|backup)$/.test(basename(state));
 export const isNativeArchive=(state:string)=>/[\\/]native-imports[\\/][a-f0-9]{64}[\\/]state$/.test(state);
+export const isSharedArchive=(state:string)=>/[\\/]shared-imports[\\/][a-f0-9]{64}[\\/]data$/.test(state);
 export function profileFence(state:string){const absolute=resolve(state);return join(dirname(absolute),'.'+basename(absolute)+'.augmentor-migration.json');}
 /** POSIX flock belongs to Node's retained open file description, not a helper
  * process or PID file. It survives a helper's exit, and releases on owner death.
  * The lease/fence live outside the replaceable state directory. */
 export function acquireProfileLease(state:string,{maintenance=false}={}){
+ if(isSharedArchive(resolve(state)))throw Error('Shared source archives are evidence copies; restore them through an explicit migration.');
  if(isNativeArchive(resolve(state)))throw Error('Native source archives are evidence copies; restore them through an explicit migration before opening Harness.');
  if(!maintenance&&isTransactionTree(resolve(state)))throw Error('Migration backups/staging trees must be restored to the original state path before opening Harness.');
  if(process.platform==='win32'){if(maintenance)throw Error('Profile consolidation is not qualified on Windows.');if(existsSync(profileFence(state)))throw Error('An unfinished profile migration requires inspection before starting Harness.');return {close(){}};}
  const requested=resolve(state);mkdirSync(dirname(requested),{recursive:true,mode:0o700});
  const absolute=existsSync(requested)?realpathSync(requested):join(realpathSync(dirname(requested)),basename(requested)),parent=dirname(absolute);
+ if(isSharedArchive(absolute))throw Error('Shared source archives are evidence copies; restore them through an explicit migration.');
  if(isNativeArchive(absolute))throw Error('Native source archives are evidence copies; restore them through an explicit migration before opening Harness.');
  if(!maintenance&&isTransactionTree(absolute))throw Error('Migration backups/staging trees must be restored to the original state path before opening Harness.');
- const path=join(parent,'.'+basename(absolute)+'.augmentor-owner.lock'),fd=openSync(path,constants.O_RDWR|constants.O_CREAT|(constants.O_NOFOLLOW??0),0o600);let held=true;
+ return acquireFileLease(join(parent,'.'+basename(absolute)+'.augmentor-owner.lock'),()=>{if(!maintenance&&existsSync(profileFence(absolute)))throw Error('An unfinished profile migration requires inspection before starting Harness.');});
+}
+/** Interoperates with a companion's existing exclusive state lease. */
+export function acquireFileLease(path:string,check:()=>void=()=>{}){
+ const fd=openSync(path,constants.O_RDWR|constants.O_CREAT|(constants.O_NOFOLLOW??0),0o600);let held=true;
  const close=()=>{if(held){held=false;closeSync(fd);}};
  try{
   const a=fstatSync(fd),b=lstatSync(path);if(!a.isFile()||a.uid!==process.getuid?.()||a.nlink!==1||(a.mode&0o077)||a.dev!==b.dev||a.ino!==b.ino)throw Error('Profile lease needs a private owned regular file.');
@@ -27,7 +34,7 @@ export function acquireProfileLease(state:string,{maintenance=false}={}){
   const result=spawnSync(pythonExecutable(),['-I','-B',helper],{stdio:['ignore','pipe','pipe',fd],encoding:'utf8',env:componentEnvironment(),timeout:10000,maxBuffer:65536});
   if(result.status===3)throw new ProfileBusy('This profile is already owned by a runtime or migration.');
   if(result.error||result.status!==0||result.stdout.trim()!=='locked')throw Error('The profile kernel lease could not be acquired.');
-  if(!maintenance&&existsSync(profileFence(absolute)))throw Error('An unfinished profile migration requires inspection before starting Harness.');
+  check();
   return {close};
  }catch(error){close();throw error;}
 }

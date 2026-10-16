@@ -19,7 +19,7 @@ export function PromptLibraryContent({controller,onUse,initialTab='saved',onDirt
   try{await action(valid);}catch(error){if(valid())setNote(error.message+' Your edits are kept. Refresh before trying another change.');}
   finally{gate.current=false;if(valid())setBusy(false);}
  };
- const accept=value=>{setLibrary(value);};
+ const accept=value=>{setLibrary(value);if(!draft.current.dirty&&!editing)setForm(previous=>value.prompts.find(row=>row.id===previous.id)??empty());};
  const refresh=()=>transact(async valid=>{const value=await controller.rpc('prompts.list');if(!valid())return;accept(value);setNote('Library refreshed. Unsaved edits are kept.');});
  useEffect(()=>{life.current++;void transact(async valid=>{const value=await controller.rpc('prompts.list');if(!valid())return;accept(value);setInstructions(value.improvement);setText(value.improvement?.content??'');setNote('');});return()=>{life.current++;};},[controller]);
  const guard=(action,message='Discard your unsaved prompt changes?')=>{if(draft.current.dirty)setConfirmation({message,action});else action();};

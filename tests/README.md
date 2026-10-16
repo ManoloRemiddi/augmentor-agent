@@ -2105,3 +2105,15 @@ Both Linux-only drivers use independent authored fixtures; the runtime cases joi
 the Linux SDK job. Existing profile transaction crash/rollback tests cover the
 shared publication mechanism. Source and packaged-target results are recorded
 separately in the migration guide; no owner data or new live-model proof is implied.
+
+`shared-profile-import.test.mjs` covers cold companion consolidation, exact source
+and target backups, prompt conflicts/deletion ledgers, memory identity/scopes,
+sequence references/caches, retained engine job identities/charges and refusal of
+changed/foreign/unknown stores. `shared-profile-runtime.test.mjs` runs actual
+Python peers, maintenance startup fences and two public Pi owners reopening on
+one service without old-memory recapture. `harness-shared-profile-chromium.test.mjs`
+verifies the original prompt editor against an actual Native client after merge,
+including clean-preview Refresh and writes in both directions without inference.
+`test_shared_profile_lease.py` provides the common kernel-lifetime/fence contract;
+Node adoption/Chromium cases remain Linux-only. See the shared-profile guide for
+current source, exact packaged and real-review adoption boundaries.

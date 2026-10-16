@@ -2,7 +2,7 @@
 import {constants,chmodSync,openSync,closeSync,readSync,fstatSync,lstatSync,readdirSync,cpSync,rmSync,renameSync,readFileSync,fsyncSync,realpathSync} from 'node:fs';
 import {join,dirname,basename,isAbsolute,resolve} from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
-import {acquireProfileLease,profileFence,isTransactionTree,isNativeArchive} from './profile-lease.js';
+import {acquireProfileLease,profileFence,isTransactionTree,isNativeArchive,isSharedArchive} from './profile-lease.js';
 import {atomicJson,privateDir} from './storage.js';
 export const present=(path:string)=>{try{return lstatSync(path);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return undefined;throw error;}};
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
@@ -31,6 +31,7 @@ function targetPath(state:string){
  if(process.platform!=='linux')throw Error('Transactional profile consolidation is currently qualified only on Linux.');
  if(isTransactionTree(state))throw Error('Choose the original state path, not a migration backup or stage.');
  if(isNativeArchive(state))throw Error('Choose an active profile path, not an archived source snapshot.');
+ if(isSharedArchive(state))throw Error('Choose an active shared-data path, not an archived source snapshot.');
  if(!isAbsolute(state)||resolve(state)!==state)throw Error('Choose a canonical absolute state path.');const parent=dirname(state),stat=lstatSync(parent);
  if(realpathSync(parent)!==parent||!stat.isDirectory()||stat.isSymbolicLink()||stat.uid!==process.getuid?.()||(stat.mode&0o077))throw Error('State migration needs a private owned parent.');
  const old=present(state);if(old&&(!old.isDirectory()||old.isSymbolicLink()||(old.mode&0o077)))throw Error('State migration requires a private real directory.');return state;

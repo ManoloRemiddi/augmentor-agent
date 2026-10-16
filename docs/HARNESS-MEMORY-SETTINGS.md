@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared-profile consolidation](HARNESS-SHARED-PROFILES.md) provides an explicit cold-store merge and data-root ownership fence. It preserves capture/processing choices and archives old inference admissions. Actual review adoption and external bank migration remain separate from source support; later dated evidence there supersedes the two-gateway status below.
+
 # Shared automatic-memory settings
 
 The original DSH **Settings → Plugins** now exposes the existing automatic-memory

@@ -17,6 +17,7 @@ from platform_adapters.paths import private_directory
 from platform_adapters.transport import ThreadingLocalServer, prepare_endpoint
 from lifecycle.admission import Admission, MaintenanceBusy, METHODS as MAINTENANCE_METHODS
 from lifecycle.idle import IdleServerMixin
+from lifecycle.shared_profile import SharedProfile
 
 
 class Handler(socketserver.StreamRequestHandler):
@@ -71,8 +72,10 @@ if __name__ == '__main__':
     os.umask(0o077)
     state = Path(os.environ.get('AUGMENTOR_SHARED_STATE', Path(os.environ.get('XDG_STATE_HOME', Path.home() / '.local/state')) / 'augmentor'))
     data = Path(os.environ.get('AUGMENTOR_SHARED_DATA', Path(os.environ.get('XDG_DATA_HOME', Path.home() / '.local/share')) / 'augmentor'))
-    for directory in (state, data):
-        private_directory(directory)
+    private_directory(state)
+    try: shared_profile = SharedProfile(data, 'memory')
+    except BlockingIOError: raise SystemExit(0)
+    private_directory(data)
     lock = (state / 'dual-memory.lock').open('a')
     try:
         fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
