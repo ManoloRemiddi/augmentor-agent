@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared Pi persona](PI-INSTRUCTIONS.md) closes the omitted approved application
+persona in root Host composition. Public SDK append/native custom snapshots retain
+exact source/guard hashes before user input, private pre-message bootstrap, cold
+identity and historical branch selection; legacy no-snapshot branches/workers do
+not gain the root persona. Existing Context exposes native/source/range links and
+separate effective literal presence without new UI or global causal claims.
+Twelve focused cases pass; full source/artifact/live qualification remains pending
+at this checkpoint. Current MX Edit review/selection/services remain unchanged.
+
 [Original-GUI sent-message Edit](HARNESS-MESSAGE-EDIT.md) at application **dfe855f3**
 restores latest-human text/original file/image bytes into the existing composer of
 one durable Pi child, awaiting Send; parent native history/tools/drafts remain.

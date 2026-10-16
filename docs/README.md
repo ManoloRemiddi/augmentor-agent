@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared Augmentor persona on Pi](PI-INSTRUCTIONS.md) now binds the approved source
+to native conversation snapshots and existing Context evidence. Root roles retain
+selection through cold reopen and branches; legacy branches/workers stay distinct.
+Focused Native/Browser/GUI checks pass; broader artifact/live acceptance follows.
+
 [Sent-message Edit](HARNESS-MESSAGE-EDIT.md) restores the latest human input and
 original attachments into the existing DSH composer of a Pi child. Explicit Send,
 parent drafts and cold recovery identities are preserved. Source/fresh ordinary/

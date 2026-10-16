@@ -1,6 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {createHash} from 'node:crypto';
 import {managedSkillSources} from './managed-skill-provenance.js';
+import {APPLICATION_INSTRUCTIONS_TYPE,validateApplicationInstructions,type ApplicationInstructionSelection} from './instructions.js';
 import {sessionEntryToContextMessages,type AgentSession,type ExtensionFactory} from '@earendil-works/pi-coding-agent';
 import {getCurrentSystemPrompt,getSystemMessageText,normalizeContext,type SystemMessage} from '@earendil-works/pi-ai';
 import {payloadText} from '../../observation/src/store.js';
@@ -22,6 +23,7 @@ const summary=({value,...metadata}:Frame)=>metadata;
 export class ContextProvenance {
   private session?:AgentSession;
   private skillEvents?:(()=>readonly any[]);
+  private applicationSource?:(()=>ApplicationInstructionSelection);
   private run=new Map<string,Frame>();
   private request=new Map<string,Frame>();
   private runBytes=0;
@@ -29,7 +31,7 @@ export class ContextProvenance {
   private memoryStatus?:Omit<MemoryContribution,'context'>;
   private inputModeStatus?:Omit<InputModeContribution,'text'>;
   constructor(private readonly capture:()=>boolean){}
-  attach(session:AgentSession,skillEvents?:()=>readonly any[]){this.session=session;this.skillEvents=skillEvents;}
+  attach(session:AgentSession,skillEvents?:()=>readonly any[],applicationSource?:()=>ApplicationInstructionSelection){this.session=session;this.skillEvents=skillEvents;this.applicationSource=applicationSource;}
   readonly extension:ExtensionFactory=pi=>{
     pi.on('input',event=>{this.save(this.run,'input',{text:event.text,images:event.images,source:event.source,streamingBehavior:event.streamingBehavior});});
     pi.on('before_agent_start',event=>{
@@ -148,14 +150,42 @@ export class ContextProvenance {
       this.save(this.request,'managedSkills',value,INSTRUCTION_SOURCES_LIMIT);
     }catch{this.save(this.request,'managedSkills',()=>{});}
   }
+  private applicationInstructions(api?:string){
+    if(!this.applicationSource)return;
+    if(!this.capture()){this.save(this.request,'applicationInstructions',undefined);return;}
+    const preparation=this.run.get('preparation');
+    if(preparation?.state!=='retained'){this.save(this.request,'applicationInstructions',{state:'unavailable',reason:'The primary before-agent options were not retained; no instruction source was compared.'},INSTRUCTION_SOURCES_LIMIT);return;}
+    try{
+      const selected=this.applicationSource();
+      const boundary='managed application source selected on native ancestry; before-agent append linkage and literal current-system presence; no opaque-handler attribution';
+      if(selected.state!=='selected'||!selected.snapshot){this.save(this.request,'applicationInstructions',{state:selected.state,boundary,rows:[]},INSTRUCTION_SOURCES_LIMIT);return;}
+      const snapshot=validateApplicationInstructions(selected.snapshot),append=preparation.value?.systemPromptOptions?.appendSystemPrompt;
+      const sdk=this.request.get('sdkContext'),provider=this.request.get('afterProviderHooks');let currentSystem:unknown;
+      if(sdk?.state==='retained')try{currentSystem={instructions:getCurrentSystemPrompt(normalizeContext(sdk.value).messages)};}catch{}
+      const redacted=!!preparation.redactions?.length;
+      const rows=[['shared-persona',snapshot.source,snapshot.text,snapshot.sha256,'/text'],['capability-guidance',APPLICATION_INSTRUCTIONS_TYPE,snapshot.capabilityGuidance,snapshot.capabilityGuidanceSha256,'/capabilityGuidance']].map(([kind,source,text,sha256,dataPointer])=>{
+        const ranges:{start:number;end:number}[]=[];let count=0;
+        if(!redacted&&typeof append==='string')for(let start=append.indexOf(text);start>=0;start=append.indexOf(text,start+text.length)){count++;if(ranges.length<16)ranges.push({start,end:start+text.length});}
+        return {kind,source,sourceSha256:sha256,sourceCharacters:text.length,
+          nativeSource:selected.entryId?{customType:APPLICATION_INSTRUCTIONS_TYPE,entryId:selected.entryId,dataPointer}:null,
+          valuePointer:'/snapshots/preparation/systemPromptOptions/appendSystemPrompt',
+          appendLinkage:redacted?'not-compared-redacted':typeof append!=='string'?'unavailable':count===1?'exact-text-present':count?'ambiguous-identical-text':'not-present',candidateCount:redacted||typeof append!=='string'?null:count,candidateRanges:ranges,rangeLimit:16,rangeUnits:'UTF-16 code units',
+          sdkSystemPresence:sdk?.redactions?.length?'not-compared-redacted':currentSystem===undefined?'unavailable':systemTextPresence(currentSystem,text,'openai-responses'),
+          providerSystemPresence:provider?.redactions?.length?'not-compared-redacted':provider?.state==='retained'?systemTextPresence(provider.value,text,api):'unavailable'};
+      });
+      this.save(this.request,'applicationInstructions',{state:'selected',origin:selected.origin,boundary,rows,maxAnnotationBytes:INSTRUCTION_SOURCES_LIMIT,
+        limitations:['A selected native source is distinct from effective provider presence.','Literal matches do not attribute opaque extension handlers or server transformations.','Legacy branches without a snapshot and delegated roles do not gain the current root persona.']},INSTRUCTION_SOURCES_LIMIT);
+    }catch{this.save(this.request,'applicationInstructions',()=>{});}
+  }
   finish(payload:unknown,api?:string){
     this.save(this.request,'afterProviderHooks',payload);
     // Primary snapshots have priority over this optional derived annotation.
     this.instructionSources(api);
     this.managedSkills(api);
+    this.applicationInstructions(api);
     if(!this.capture())this.dropBodies();
     const frames=new Map([...this.run,...this.request]);
-    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','promptWrapping','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks','instructionSources','managedSkills',...(this.inputModeStatus?['inputMode']:[])];
+    const names=['input','memory','preparation','resources','beforeTransform','nativeLineage','promptWrapping','afterTransform','sdkContext','beforeProviderHooks','afterProviderHooks','instructionSources','managedSkills',...(this.applicationSource?['applicationInstructions']:[]),...(this.inputModeStatus?['inputMode']:[])];
     const snapshots=Object.fromEntries(names.map(key=>[key,summary(frames.get(key)??missing())]));
     const before=frames.get('beforeTransform'),after=frames.get('afterTransform');
     const difference=messageDifference(before,after);
@@ -172,7 +202,7 @@ export class ContextProvenance {
     this.endRequest();
     return result;
   }
-  dispose(){this.beginTurn();this.session=undefined;this.skillEvents=undefined;}
+  dispose(){this.beginTurn();this.session=undefined;this.skillEvents=undefined;this.applicationSource=undefined;}
 }
 
 function messageDifference(before?:Frame,after?:Frame){
