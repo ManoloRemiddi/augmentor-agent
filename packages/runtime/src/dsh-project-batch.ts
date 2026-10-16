@@ -3,6 +3,7 @@ import {readFileSync,lstatSync,readdirSync} from 'node:fs';
 import {join,isAbsolute,resolve,dirname} from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
 import {SessionManager} from '@earendil-works/pi-coding-agent';
+import {loadDshProjectArchive,dshRecordsDigest} from './dsh-project-archive.js';
 import {prepareDshProject,type ImportOptions} from './dsh-project-import.js';
 import {stateTransaction,present} from './profile-transaction.js';
 import {WorkspaceRegistry} from './workspace-registry.js';
@@ -20,8 +21,8 @@ function json(path:string,max=32*1024*1024):Data{const stat=lstatSync(path);if(!
 export async function importDshProjects(inputs:DshProjectInput[],targetState:string){
  if(!Array.isArray(inputs)||!inputs.length||inputs.length>128)throw Error('Choose one to 128 project exports.');
  let exportBytes=0;for(const input of inputs){if(!input||typeof input.sourceFile!=='string'||!isAbsolute(input.sourceFile))throw Error('Choose an absolute project export file.');const info=lstatSync(input.sourceFile);exportBytes+=info.size;if(!info.isFile()||info.isSymbolicLink()||info.size>32*1024*1024||exportBytes>256*1024*1024)throw Error('Combined regular exports exceed their 32 MiB/project or 256 MiB batch bound.');}
- const projects=inputs.map(input=>{if(!input||!isAbsolute(input.sourceFile))throw Error('Choose an absolute project export file.');return prepareDshProject(input.sourceFile,input.options);});
- if(projects.reduce((n,p)=>n+p.bytes.length,0)>256*1024*1024)throw Error('Combined exports exceed 256 MiB.');
+ const projects:ReturnType<typeof prepareDshProject>[]=[];let expandedBytes=0;
+ for(const input of inputs){const project=prepareDshProject(input.sourceFile,input.options,256*1024*1024-expandedBytes);expandedBytes+=project.expandedBytes;projects.push(project);}
  const workspaces=new Set<string>(),sourceIds=new Set<string>();
  for(const project of projects){if(workspaces.has(project.cwd))throw Error('The same workspace appears in more than one export.');workspaces.add(project.cwd);for(const id of project.ids){if(sourceIds.has(id))throw Error('A source conversation belongs to more than one chosen project.');sourceIds.add(id);}}
  const batchId=randomUUID();
@@ -44,8 +45,8 @@ export async function importDshProjects(inputs:DshProjectInput[],targetState:str
     const origin=audit?.type==='custom'?audit.data as Data:undefined;
     if(!origin||origin.sourceSessionId!==id||!/^[a-f0-9]{64}$/.test(origin.sha256))throw Error('Existing conversation is not a verified copy of this source.');
     const archivePath=join(stage,'dsh-imports',origin.sha256+'.json'),raw=readFileSync(archivePath);if(digest(raw)!==origin.sha256)throw Error('Existing source archive checksum differs.');
-    const archive=json(archivePath),old=archive.sessions?.find((row:Data)=>row.opening?.header?.id===id),current=project.sourceCut(id);
-    if(!old||!current||old.opening.header.cwd!==project.cwd||old.opening.cursor!==current.opening.cursor||digest(JSON.stringify(old.records))!==digest(JSON.stringify(current.records)))throw Error('DSH and the earlier Harness import diverged. Preserve both; choose a conflict policy before migration.');
+    const archive=loadDshProjectArchive(archivePath,origin.sha256).source,old=archive.sessions?.find((row:Data)=>row.opening?.header?.id===id),current=project.sourceCut(id);
+    if(!old||!current||old.opening.header.cwd!==project.cwd||old.opening.cursor!==current.opening.cursor||dshRecordsDigest(old.records)!==dshRecordsDigest(current.records))throw Error('DSH and the earlier Harness import diverged. Preserve both; choose a conflict policy before migration.');
     retained.push({sourceSessionId:id,sessionId:sid,cwd:meta.cwd,selection:meta.selection,reason:'Original source cut matches; entire existing Harness continuation retained unchanged'});
    }
    const written=await project.write(stage,targetState,include);created.push(...written.receipts);projectReceipts.push({sourceSha256:project.sha256,cwd:project.cwd,createdSessionIds:written.receipts.map(row=>row.sessionId),retainedSessionIds:project.ids.filter(id=>!include.has(id)).map(targetId)});

@@ -632,7 +632,7 @@ fails and is not retried. Earlier real 6027df0 branch/cold proof and all prepara
 semantic/page failures retain their refs. See [exact evidence and limits](../docs/CONTROLLED-MEMORY.md#extracted-claims-and-engine-deadlines--october-14).
 
 At **6027df00dc0456b2b63b5263b402ba0f5761997d**, strict check/build and final
-source/fresh ordinary **173/173 each** pass across 24 files, two workers, unchanged
+source/fresh ordinary **174/173 each** pass across 24 files, two workers, unchanged
 deadlines/no skips; exact 905-file compiled set/bytes, 155 npm instances and bundled
 Node contract match. New `pi-memory-snapshot` cases use the actual SDK, native
 files/public branch projection and authored provider/memory/tool fixtures. They
@@ -2137,3 +2137,20 @@ The focused Node source run uses two workers and passes 66 cases across
 `dsh-archived-family` and `dsh-branch-history`. No model request or owner import
 is part of these checks. [Contract, real read-only observations and deployment
 limits](../docs/HARNESS-DSH-MIGRATION-PILOT.md#compact-project-export--october-17).
+
+## Complete DSH project bundles — October 17
+
+`dsh-project-bundle.test.mjs`, `dsh-project-bundle-runtime.test.mjs` and
+`dsh-display-preview.test.mjs` exercise the real read-only exporter CLI, large
+complete histories/images, SDK/cold/reply continuation, archived child authority,
+exact originals, relocation, mixed v1/v2 retention and bounded corruption/quota
+refusals. `test_dsh_project_bundle.py` has seven Linux atomic-publication/segment
+cases. The existing export suite adds one FIFO no-wait case. Eight existing
+Chromium files now cover eleven cases, with original rich-history/Fleet/branch
+flows run against both formats.
+
+The 28-file two-worker source focus passes 174 Node cases, alongside 47 Python
+cases. CI registers common preview contracts and Linux bundle/publication cases.
+Real owner exports remain private, read-only assessment inputs; no owner
+conversation/model/tool work is a public fixture.
+[Protocol, commands, limits and deployment scope](../docs/HARNESS-DSH-PROJECT-BUNDLES.md).

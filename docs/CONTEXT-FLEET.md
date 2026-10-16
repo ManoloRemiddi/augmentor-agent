@@ -461,3 +461,12 @@ selected root, online/model-ready/idle. Profile values and production selection
 remain preserved. No updater activation, installed family/Fleet acceptance,
 live owner inference, other-platform implementation or DSH retirement occurs.
 The subsequent qualification publication changes documentation only.
+
+## Bundled source history — October 17
+
+The [complete project bundle reader](HARNESS-DSH-PROJECT-BUNDLES.md) now serves
+archived Fleet children, images, source excerpts and historical reply cuts for
+both single-file and segmented imports. Oversized imported display records use
+labelled previews with exact original entry/hash pointers; full journals and
+source-cut reconstruction remain intact. Original GUI v1/v2 Fleet and branch
+flows qualify in source; this checkpoint does not update owner reviews.

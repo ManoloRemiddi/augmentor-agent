@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Complete segmented DSH bundles](HARNESS-DSH-PROJECT-BUNDLES.md) preserve large histories/images with checksummed objects, exact original lookup and historical branching. Source passes **174 Node / 47 Python**, including original v1/v2 GUI flows. Five more real projects/seventeen parents/four children now export completely; two projects/five parents pass read-only preparation. Source formats and two source-observation failures remain. No owner transfer or running-review update; packaging/adoption and pilot gates stay explicit. [Evidence](../release/harness-dsh-bundle-qualification-20261017.json).
+
 [Compact DSH exports](HARNESS-DSH-MIGRATION-PILOT.md#compact-project-export--october-17) remove indentation overhead without truncating history or raising bounds. Three formerly oversized exports now fit; two projects/seven parents pass read-only preparation, while a third still refuses malformed tool arguments. Source qualification: 23 exporter tests and 66 migration cases. Source-only; running reviews and further-transfer gates remain unchanged. [Evidence](../release/harness-dsh-compact-qualification-20261017.json).
 
 [Setup-only DSH conversations](HARNESS-DSH-MIGRATION-PILOT.md#setup-only-conversations--october-16) now preserve unused roots alongside completed conversations without old grants/work or invented chat. Seven same-byte real exports/twenty-one parents, including sixteen setup-only roots, refuse the preceding converter and pass corrected preparation. Source/ordinary/exact sealed pass **120 Node cases** (twenty-one files/eight Chromium) and **35 Python** each, two workers/no skips/unchanged bounds. Exact public SDK snapshot persistence handles deferred custom-only files; first explicit SDK work/native reply branching/cold and original empty-composer GUI qualify. All original GUI/native prefixes survive; only typed current persona/thinking metadata appends during SDK preparation. Both running owners/all 36 protected inputs/shared data/selection stay unchanged; all 24,615 existing sealed inputs verify. [Evidence](../release/harness-dsh-setup-qualification-20261016.json). Private unselected **20261016-232907-d1ee67b2 / eeb10814** verifies **24,620 sealed/1,102 compiled inputs**; adopt it before wider migration, and wait for owner pilot feedback before extra transfers. Other formats/voice/later OS gates remain.
@@ -924,7 +926,7 @@ reopen restore selected originals without current recall; empty/invalid/unavaila
 records do not fall back. Edit cuts exclude later request snapshots. System text
 recognition excludes assistant/user/metadata quotations; unsupported encodings stay
 unavailable. Native-write refusal stops dispatch, independent of optional capture.
-Strict check/build and source/fresh ordinary **173/173 each**, 24 files, two workers,
+Strict check/build and source/fresh ordinary **174/173 each**, 24 files, two workers,
 unchanged deadlines/no skips pass; exact 905-file compiled tree/155 npm instances
 and Node contract match. SDK/provider/native fixtures qualify tool context, one
 execution, unchanged parents, cold replay, capture-off, override and failure paths.

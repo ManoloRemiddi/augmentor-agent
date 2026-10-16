@@ -2,6 +2,7 @@
 import {existsSync,chmodSync,lstatSync,realpathSync,mkdirSync,readFileSync,writeFileSync,renameSync,rmSync,openSync,closeSync,fsyncSync,constants} from 'node:fs';
 import {dirname,isAbsolute,join,resolve} from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
+import {loadDshProjectArchive,copyDshProjectArchive,dshAttachmentBytes,DSH_BUNDLE_BYTES} from './dsh-project-archive.js';
 import {dshHistorySurface,type DshSurface} from './dsh-history-surface.js';
 import {SessionManager,CURRENT_SESSION_VERSION} from '@earendil-works/pi-coding-agent';
 import {PiAttachments,promptAttachments,IMAGE_LIMITS} from './attachments.js';
@@ -45,7 +46,7 @@ function records(session:Data,cut=false){
  let human=false;const effective:Data[]=[],bySeq=new Map<number,Data>();
  for(const row of rows){
   const e=structuredClone(row?.event);
-  if(row?.type!=='event'||!e||!Number.isSafeInteger(e.seq)||e.seq!==previous+1||typeof e.type!=='string'||!e.data||!Number.isSafeInteger(e.time))fail('history has a gap or unsupported record.');
+  if(row?.type!=='event'||!e||!Number.isSafeInteger(e.seq)||e.seq!==previous+1||typeof e.type!=='string'||e.type.length>128||!e.data||!Number.isSafeInteger(e.time))fail('history has a gap or unsupported record.');
   previous=e.seq;
   if(/compact|context\/edit|message\/edit|branch|fork/.test(e.type)&&!['compaction/start','compaction/summary','compaction/prune','compaction/end'].includes(e.type))fail('edited, compacted or branched history needs a separate converter.');
   if(messageTypes.has(e.type)){
@@ -194,7 +195,8 @@ function writeSession(original:Data,events:Data[],surface:DshSurface,stage:strin
   chmodSync(nativeFile,0o600);const reopened=SessionManager.open(nativeFile);if(reopened.buildSessionContext().messages.length!==contextEntries+1)fail('native cold-open context does not match.');
   const notice=setupOnly?'Imported conversation. Send your first message to start working here.':'Imported DSH history. Past calls are completed records; continuation uses a labelled transcript. Exact source and two-way sequence provenance are retained in the private import archive. Old tool outputs use bounded excerpts in continuation context; the full display/archive is preserved. Historical subagent logs stay archived, not live Fleet jobs. Plaintext reasoning is historical data, never signed provider replay. Imported images retain the exact stored bytes; original camera uploads are not reconstructed. Source replacements determine continuation context; original append-only records stay inspectable.';
   display.push({seq:display.length+1,type:'runtime/notice',data:{message:notice,importedFrom:{archiveSha256:sha256}}});
-  writeFileSync(join(sessions,sid+'.events.jsonl'),display.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600,flag:'wx'});
+  const displayFile=openSync(join(sessions,sid+'.events.jsonl'),constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);
+  try{for(const event of display)writeFileSync(displayFile,JSON.stringify(event)+'\n');fsyncSync(displayFile);}finally{closeSync(displayFile);}
   const finalNative=join(targetState,'sessions',sid,nativeFile.split(/[\\/]/).at(-1)!);
   atomicJson(join(sessions,sid+'.meta.json'),{id:sid,cwd,file:finalNative,selection,title:typeof title==='string'?title:workspace.title,saved:true,policy:'read-only',surface:'linux',updatedAt:now,requests:[],running:false});
   const receipt={schema:'augmentor-dsh-pilot-import/1',sourceSha256:sha256,sourceSessionId:original.opening.header.id,sessionId:sid,selection,cwd,...(setupOnly?{sourceHistoryKind:'setup-only'}:{}),contextEntries,sourceEvents:events.length,effectiveSourceSeqs:surface.nodes,sourceReplacements:surface.replacements.length,shadowedSourceMessages:events.filter(e=>messageTypes.has(e.type)&&!activeSeqs.has(e.seq)).length,sourceLineage,displayEvents:display.length,skippedInstructionMessages,archivedToolProposalMessages,toolPayloadCoverage:'effective source tool results only; shadowed originals remain archived',toolPayloadContextLimitChars:16384,toolPayloadContextChars:16384-toolContextLeft,toolPayloadCharsNotInContext:toolPayloadChars-(16384-toolContextLeft),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
@@ -205,11 +207,12 @@ function writeSession(original:Data,events:Data[],surface:DshSurface,stage:strin
  * All parents validate before staging; the whole project is published by one rename.
  * The single-conversation receipt stays compatible with the earlier pilot. */
 /** Prepare a bounded export without touching a destination or model. */
-export function prepareDshProject(sourceFile:string,options:ImportOptions){
+export function prepareDshProject(sourceFile:string,options:ImportOptions,maxExpandedBytes=DSH_BUNDLE_BYTES){
  const info=lstatSync(sourceFile);if(!info.isFile()||info.isSymbolicLink()||info.size>MAX_EXPORT)fail('source must be a bounded regular export.');
- const bytes=readFileSync(sourceFile),sha256=digest(bytes);if(sha256!==options.sourceSha256)fail('source checksum changed.');
- const source=JSON.parse(bytes.toString('utf8')) as Data;
- if(source.schema!=='augmentor-dsh-project-export/1'||!source.workspace||!Array.isArray(source.sessions)||source.sessions.length>MAX_PROJECT_SESSIONS)fail('choose a project with at most 128 conversations.');
+ const archive=loadDshProjectArchive(sourceFile,options.sourceSha256),{bytes,sha256,source}=archive;
+ if(archive.expandedBytes>maxExpandedBytes)throw Error('Combined exports exceed their 256 MiB expanded bound.');
+ for(const ref of archive.objects.values())archive.readObject(ref);
+ if(!['augmentor-dsh-project-export/1','augmentor-dsh-project-export/2'].includes(source.schema)||!source.workspace||!Array.isArray(source.sessions)||source.sessions.length>MAX_PROJECT_SESSIONS)fail('choose a project with at most 128 conversations.');
  const workspace=source.workspace,cwd=workspace.path;
  if(typeof cwd!=='string'||!isAbsolute(cwd)||resolve(cwd)!==cwd||!lstatSync(cwd).isDirectory()||typeof workspace.title!=='string'||!workspace.title.trim())fail('workspace folder/name is unavailable.');
  const ids=workspace.sessionIds;
@@ -221,35 +224,39 @@ export function prepareDshProject(sourceFile:string,options:ImportOptions){
   if(!options.sessionSelections||typeof options.sessionSelections!=='object'||Array.isArray(options.sessionSelections))fail('session model choices must be keyed by source conversation.');
   for(const [id,value] of Object.entries(options.sessionSelections)){if(!byId.has(id))fail('session model choice belongs to another project.');selected.set(id,checkedSelection(value));}
  }
- const prepared=ids.map(id=>{const original=byId.get(id)!;if(original.opening.header.cwd!==cwd)fail('source conversation belongs to another workspace.');return {original,...records(original)};});
+ const prepared=ids.map(id=>{const original=byId.get(id)!;if(original.opening.header.cwd!==cwd)fail('source conversation belongs to another workspace.');records(original);return {original};});
  const organization=(key:string)=>{const value=source[key]??[];if(!Array.isArray(value)||new Set(value).size!==value.length||value.some(id=>typeof id!=='string'||!byId.has(id)))fail('session organization differs from project membership.');return new Set<string>(value);};
  const archived=organization('archivedSessionIds'),pinned=organization('pinnedSessionIds');
  if(source.relatedSessions!==undefined&&(!Array.isArray(source.relatedSessions)||source.relatedSessions.length>32))fail('related-session archive exceeds its project bound.');
  const attachmentRows=source.attachments??[];
  if(!Array.isArray(attachmentRows)||attachmentRows.length>10000)fail('invalid image attachment bundle.');
- const blobs=new Map<string,Buffer>();
+ const blobs=new Map<string,{bytes:number}>();
  for(const row of attachmentRows){
-  if(!row||Object.keys(row).sort().join(',')!=='attachmentId,bytes,data'||!/^sha256:[a-f0-9]{64}$/.test(row.attachmentId)||blobs.has(row.attachmentId)||!Number.isSafeInteger(row.bytes)||row.bytes<1||row.bytes>IMAGE_LIMITS.maxImageBytes||typeof row.data!=='string'||row.data.length>Math.ceil(IMAGE_LIMITS.maxImageBytes/3)*4)fail('invalid image attachment bundle entry.');
-  const data=Buffer.from(row.data,'base64');
-  if(data.toString('base64')!==row.data||data.length!==row.bytes||'sha256:'+digest(data)!==row.attachmentId)fail('image attachment checksum or encoding differs.');
-  blobs.set(row.attachmentId,data);
+  const bundle=source.schema==='augmentor-dsh-project-export/2';
+  if(!row||Object.keys(row).sort().join(',')!==(bundle?'attachmentId,bytes,sha256':'attachmentId,bytes,data')||!/^sha256:[a-f0-9]{64}$/.test(row.attachmentId)||blobs.has(row.attachmentId)||!Number.isSafeInteger(row.bytes)||row.bytes<1||row.bytes>IMAGE_LIMITS.maxImageBytes||!bundle&&(typeof row.data!=='string'||row.data.length>Math.ceil(IMAGE_LIMITS.maxImageBytes/3)*4))fail('invalid image attachment bundle entry.');
+  const data=dshAttachmentBytes(source,row);
+  if(!bundle&&data.toString('base64')!==row.data||data.length!==row.bytes||'sha256:'+digest(data)!==row.attachmentId)fail('image attachment checksum or encoding differs.');
+  blobs.set(row.attachmentId,{bytes:row.bytes});
  }
+
  const used=new Set<string>();
- for(const {events} of prepared)for(const e of events)if(messageTypes.has(e.type))for(const p of (e.type==='user/message'?e.data:e.data.message).content)if(p.type==='image'){
-  const bytes=blobs.get(p.attachment.attachmentId);if(!bytes||bytes.length!==p.attachment.bytes)fail('image attachment bytes are unavailable.');used.add(p.attachment.attachmentId);
- }
+ for(const {original} of prepared)for(const row of original.records){const e=row.event;if(messageTypes.has(e.type))for(const p of (e.type==='user/message'?e.data:e.data.message).content)if(p.type==='image'){
+  const bytes=blobs.get(p.attachment.attachmentId);if(!bytes||bytes.bytes!==p.attachment.bytes)fail('image attachment bytes are unavailable.');used.add(p.attachment.attachmentId);
+ }}
  // Child-only objects remain in the exact archive, never a parent's receipts.
- for(const child of source.relatedSessions??[])for(const row of child?.records??[]){const e=row?.event,m=e?.type==='user/message'?e.data:['assistant/message','tool/result'].includes(e?.type)?e.data?.message:undefined;for(const p of m?.content??[])if(p?.type==='image'){const [part]=checkedContent([p]);const b=blobs.get(part.attachment.attachmentId);if(!b||b.length!==part.attachment.bytes)fail('archived child image bytes are unavailable.');used.add(part.attachment.attachmentId);}}
+ for(const child of source.relatedSessions??[])for(const row of child?.records??[]){const e=row?.event,m=e?.type==='user/message'?e.data:['assistant/message','tool/result'].includes(e?.type)?e.data?.message:undefined;for(const p of m?.content??[])if(p?.type==='image'){const [part]=checkedContent([p]);const b=blobs.get(part.attachment.attachmentId);if(!b||b.bytes!==part.attachment.bytes)fail('archived child image bytes are unavailable.');used.add(part.attachment.attachmentId);}}
  if([...blobs.keys()].some(id=>!used.has(id)))fail('image attachment bundle contains an unreferenced object.');
- return {cwd,source,sha256,bytes,ids,pinned,archived,
+ return {cwd,source,sha256,bytes,expandedBytes:archive.expandedBytes,ids,pinned,archived,
   sourceCut:(id:string)=>prepared.find(row=>row.original.opening.header.id===id)?.original,
   async write(stage:string,targetState:string,includeIds:Set<string>=new Set(ids)){
-  privateDir(join(stage,'sessions'));const archiveDir=privateDir(join(stage,'dsh-imports'));const rawPath=join(archiveDir,sha256+'.json');if(present(rawPath)){if(!lstatSync(rawPath).isFile()||digest(readFileSync(rawPath))!==sha256)fail('existing source archive differs.');}else writeFileSync(rawPath,bytes,{mode:0o600,flag:'wx'});
-  const attachments=new PiAttachments(stage);
-  for(const {original,events} of prepared.filter(row=>includeIds.has(row.original.opening.header.id))){const sid='dsh-import-'+digest(original.opening.header.id).slice(0,24),seen=new Set<string>();
-   for(const e of events)if(messageTypes.has(e.type))for(const p of (e.type==='user/message'?e.data:e.data.message).content)if(p.type==='image'){const key=JSON.stringify(p.attachment);if(!seen.has(key)){seen.add(key);await attachments.importStoredImage(sid,p.attachment,blobs.get(p.attachment.attachmentId)!);}}
+  privateDir(join(stage,'sessions'));const frozen=copyDshProjectArchive(archive,join(stage,'dsh-imports')),source=frozen.source;
+  const attachments=new PiAttachments(stage),receipts:ReturnType<typeof writeSession>[]=[],imageRows=new Map<string,Data>((source.attachments??[]).map((row:Data)=>[row.attachmentId,row]));
+  const frozenById=new Map<string,Data>(source.sessions.map((row:Data)=>[row.opening.header.id,row]));
+  for(const id of ids){if(!includeIds.has(id))continue;const original=frozenById.get(id)!;
+   const {events,surface}=records(original),sid='dsh-import-'+digest(original.opening.header.id).slice(0,24),seen=new Set<string>();
+   for(const e of events)if(messageTypes.has(e.type))for(const p of (e.type==='user/message'?e.data:e.data.message).content)if(p.type==='image'){const key=JSON.stringify(p.attachment);if(!seen.has(key)){seen.add(key);const row=imageRows.get(p.attachment.attachmentId);if(!row)fail('image attachment bytes are unavailable.');await attachments.importStoredImage(sid,p.attachment,dshAttachmentBytes(source,row));}}
+   receipts.push(writeSession(original,events,surface,stage,targetState,source,selected.get(original.opening.header.id)??fallback,sha256,Date.now()));
   }
-  const receipts=prepared.filter(row=>includeIds.has(row.original.opening.header.id)).map(({original,events,surface})=>writeSession(original,events,surface,stage,targetState,source,selected.get(original.opening.header.id)??fallback,sha256,Date.now()));
   const receipt=receipts.length===1?receipts[0]:{schema:'augmentor-dsh-project-import/2',sourceSha256:sha256,cwd,sessions:receipts,sourceEvents:receipts.reduce((sum,row)=>sum+row.sourceEvents,0),displayEvents:receipts.reduce((sum,row)=>sum+row.displayEvents,0),contextEntries:receipts.reduce((sum,row)=>sum+row.contextEntries,0),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
    return {receipt,receipts};
   }};

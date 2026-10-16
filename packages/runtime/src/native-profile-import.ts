@@ -2,6 +2,7 @@
 import {readFileSync,writeFileSync,lstatSync,readdirSync,mkdirSync,cpSync,chmodSync} from 'node:fs';
 import {join,dirname,relative,isAbsolute,resolve} from 'node:path';
 import {createHash} from 'node:crypto';
+import {loadDshProjectArchive,copyDshProjectArchive} from './dsh-project-archive.js';
 import {CURRENT_SESSION_VERSION} from '@earendil-works/pi-coding-agent';
 import {acquireProfileLease} from './profile-lease.js';
 import {stateTransaction,stateInventory,requireColdState,present} from './profile-transaction.js';
@@ -72,7 +73,7 @@ export async function importNativeProfile(sourceState:string,targetState:string,
    }
    const copied:string[]=[];
    for(const prefix of ['sessions','attachments','observations','harness-drafts','jobs','desktop-runs']){const path=join(archive,prefix);if(present(path)){copyTree(path,join(stage,prefix),key=>{if(!key)return true;const receipt=prefix==='attachments'?/^v1\/([^/]+)\.json$/.exec(key):prefix==='harness-drafts'?/^v1\/(?:records|edit-origins)\/([^/]+)\.json$/.exec(key):null;if(receipt)return sourceMetas.has(receipt[1]);if(prefix==='observations')return sourceMetas.has(key.split('/')[0]);if(prefix==='sessions')return [...sourceMetas.keys()].some(id=>key===id||key.startsWith(id+'/')||key.startsWith(id+'.'));return true;});copied.push(prefix);}}
-   const imports=join(archive,'dsh-imports');if(present(imports))for(const name of readdirSync(imports)){if(/^[a-f0-9]{64}\.json$/.test(name)){if(hash(readFileSync(join(imports,name)))!==name.slice(0,-5))throw Error('Source DSH archive checksum differs.');copyTree(join(imports,name),join(stage,'dsh-imports',name));}else if(name==='batches')copyTree(join(imports,name),join(stage,'dsh-imports','batches'));}
+   const imports=join(archive,'dsh-imports');if(present(imports))for(const name of readdirSync(imports)){if(/^[a-f0-9]{64}\.json$/.test(name)){const source=loadDshProjectArchive(join(imports,name),name.slice(0,-5),undefined,true);copyDshProjectArchive(source,join(stage,'dsh-imports'));}else if(name==='batches')copyTree(join(imports,name),join(stage,'dsh-imports','batches'));}
    const attachments=present(join(archive,'attachments','v1'))?new PiAttachments(archive,(sid,part)=>(events.get(sid)??[]).some(e=>e.type==='user/message'&&e.data.source?.sessionId!==sid&&(e.data.submittedContent??e.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))),true):undefined;
    const relocated=[];
    for(const [sid,m] of sourceMetas){

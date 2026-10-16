@@ -339,3 +339,14 @@ owned actors terminate. Raw output remains local; publish only a sanitized
 qualification summary. Browser storage and model replies in this proof are
 separate from the owner's running profiles. This command does not manage system
 services; any authorized model/voice restoration is a separate recorded operation.
+
+## Complete DSH project bundles — October 17
+
+[Version-two bundles](HARNESS-DSH-PROJECT-BUNDLES.md) privately retain complete
+source JSON values and exact stored image bytes in a manifest plus checksum-named
+objects. Keep the whole directory together in backups. Imported state stores the
+manifest under `dsh-imports/<sha>.json` and only its named objects under
+`dsh-imports/objects/`; cold transfer revalidates that closure. Transport previews
+leave complete source/display journals untouched. No telemetry, provider replay,
+old grants or automatic memory recapture is introduced. This source checkpoint
+does not migrate additional owner projects or change installed review profiles.

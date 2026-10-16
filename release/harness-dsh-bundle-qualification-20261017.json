@@ -1,0 +1,98 @@
+{
+  "schema": "augmentor-dsh-bundle-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Source and read-only owner-source assessment; ordinary/sealed qualification pending; no additional owner transfer",
+  "sourceBaseRef": "307e27cbf63f61c872e463bad2d5cdd5d2b8bfff",
+  "format": {
+    "schema": "augmentor-dsh-project-export/2",
+    "legacyV1Preserved": true,
+    "manifestBytes": 33554432,
+    "objectBytes": 16777216,
+    "segmentTargetBytes": 8388608,
+    "segmentRecords": 512,
+    "expandedBundleBytes": 268435456,
+    "distinctObjects": 16384,
+    "parents": 128,
+    "related": 32,
+    "recordsPerHistory": 30000,
+    "expandedBatchBytes": 268435456,
+    "expandedReferencesDiscountedForDeduplication": false,
+    "sourceFieldsOrRecordsDiscarded": false,
+    "exactStoredImageBytes": true,
+    "linuxPublication": "renameat2 RENAME_NOREPLACE; private synced unpublished stage",
+    "runtimeSource": "Shared bounded verified reader, private frozen named closure, one parent projection at a time",
+    "nativePolicy": "Explicit current model; read-only import; historical work is labelled data, never replayed",
+    "display": "1 MiB frame unchanged; labelled bounded preview with exact original pointer; full journal/source/branch/provider data preserved",
+    "nonMxPublicationQualified": false
+  },
+  "qualification": {
+    "sourceCheckBuildPass": true,
+    "sourceNodePass": 174,
+    "nodeFiles": 28,
+    "chromiumFiles": 8,
+    "chromiumCases": 11,
+    "sourcePythonPass": 47,
+    "exportPythonCases": 24,
+    "newBundlePythonCases": 7,
+    "boundaryAndNoticePythonCases": 16,
+    "workers": 2,
+    "skips": 0,
+    "deadlinesChanged": false,
+    "ordinaryPackagedPass": null,
+    "exactSealedPass": null,
+    "ownerAdoption": false,
+    "testedInputsSha256": {
+      "scripts/export-dsh-project.py": "e609e47dad41b21b038cb8bf89df87af814ba4ed3cab70538692445aa9d172cf",
+      "scripts/dsh_project_bundle.py": "1336d42edf492e07b5b3bfde287cd683bb278c974f0bee7d65ec603bbdf3f47f",
+      "packages/runtime/src/dsh-project-archive.ts": "5dd3897d49b87a40ab5f616c376424d90520d3526f9edf7c0da7d890cf9b4d25",
+      "packages/runtime/src/dsh-display-preview.ts": "d1fce0bc42fc930d9712ce187e3fcd4fa7ff7f71fed7260f449628c83f039112",
+      "packages/runtime/src/dsh-project-import.ts": "c0d790574153fb37c52befbbf66c80d4729e0ac69429d2d9fce41f03678b8078",
+      "packages/runtime/src/dsh-archived-family.ts": "56b49c3e1e3b530d7ff4c7acf6091350f51dffc21bc9414c35d0cba9d0e8a72d",
+      "packages/runtime/src/dsh-project-batch.ts": "ec18cea6f4618eca67f2cba04de10428ca4a71708e5ff8ae84b737db380e7449",
+      "packages/runtime/src/native-profile-import.ts": "ab3d8963ad060cdc37b51da4ed1063b9e03d5beba524c113caef7b9eaebe3a43",
+      "packages/runtime/src/display-history.ts": "50e291b6ee1f62429e06bebc888891be94207ec4c59e6fa4453cca987bd52a25"
+    }
+  },
+  "realReadOnly": {
+    "projectsChecked": 7,
+    "completeBundleProjects": 5,
+    "completeParentConversations": 17,
+    "completeArchivedChildren": 4,
+    "parentRecords": 28877,
+    "childRecords": 878,
+    "imageObjects": 188,
+    "expandedBytesRange": [
+      28323483,
+      47545853
+    ],
+    "namedObjectVerificationAcceptedProjects": 5,
+    "countsAndCutsExactProjects": 5,
+    "sameFrozenV1SizeRefusals": 5,
+    "parentPreparationAcceptedProjects": 2,
+    "parentPreparationAcceptedConversations": 5,
+    "independentPreparationRefusals": [
+      "Unsupported attachment/reasoning content",
+      "Reasoning outside historical assistant messages",
+      "Unmatched historical tool result"
+    ],
+    "sourceObservationFailures": 2,
+    "scopeLimit": "Capture/object/cut checks and parent preparation only; no full-catalogue readiness or owner acceptance claim",
+    "targetPublications": 0,
+    "modelRequests": 0,
+    "continuationModelsAssigned": 0,
+    "ownerDataPublished": false
+  },
+  "retainedInitialFailures": [
+    "Reversed source array order was caught by existing project tests; publication now follows workspace membership order.",
+    "Manifest file mode depended on CLI umask; writer now creates it explicitly with mode 0600.",
+    "Image-byte fixture now checks actual normalized display references; ownership checks were not relaxed.",
+    "Preview original-tail fixture cursor was corrected to point at the tool payload rather than trailing provenance."
+  ],
+  "remaining": [
+    "Separate packaged/sealed qualification and guarded adoption",
+    "Owner pilot feedback before extra transfers",
+    "Independent source-format and source-observation refusals",
+    "Existing finite per-history/profile/native relocation bounds",
+    "Voice and later OS rollout deferred"
+  ]
+}

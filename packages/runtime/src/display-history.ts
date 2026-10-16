@@ -2,6 +2,7 @@
 import {appendFileSync,closeSync,existsSync,lstatSync,openSync,readSync,readdirSync,renameSync,rmSync,statSync,truncateSync,writeSync} from 'node:fs';
 import {createHash,randomUUID} from 'node:crypto';
 import {basename,dirname,join} from 'node:path';
+import {dshDisplayPreview} from './dsh-display-preview.js';
 import {MAX_FRAME,type DisplayEvent} from '../../protocol/src/index.js';
 import {atomicJson,readJson} from './storage.js';
 
@@ -140,7 +141,7 @@ export class DisplayHistory {
      if(entry.flags&IGNORED){position=entry.previous;continue;}return position;
     }return -1;};
     const events:{event:DisplayEvent}[]=[];let position=visible(end-1),bytes=0;
-    while(position>=first){const entry=this.entry(idx,position,s),event=this.read(fd,entry),size=Buffer.byteLength(JSON.stringify({event}))+1;
+    while(position>=first){const entry=this.entry(idx,position,s),event=dshDisplayPreview(this.read(fd,entry)),size=Buffer.byteLength(JSON.stringify({event}))+1;
      if(bytes+size>MAX_FRAME-4096){if(!events.length)throw Error('A saved display event exceeds the connection limit. The original history is preserved.');break;}
      events.push({event});bytes+=size;position=visible(position-1);
     }

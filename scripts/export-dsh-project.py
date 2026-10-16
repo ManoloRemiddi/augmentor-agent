@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Private, cold DSH project snapshot. Does not submit or replay requests."""
-import argparse,base64,hashlib,json,os,re,stat,sys,uuid
+import argparse,base64,hashlib,json,os,re,stat,sys,uuid,shutil,tempfile
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'services'))
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from dsh_project_bundle import ProjectBundle,MAX_BUNDLE_BYTES,publish
 MAX_PROJECT_SESSIONS=128
 MAX_RELATED_SESSIONS=32
 MAX_EXPORT_BYTES=32*1024*1024
@@ -14,7 +16,7 @@ def encode_export(value):
     if len(raw)>MAX_EXPORT_BYTES:raise ValueError('Project export exceeds the size bound; no partial archive was published.')
     return raw
 
-def image_bundle(sessions, dsh_home, charge):
+def image_bundle(sessions, dsh_home, charge, bundle=None):
     """Read only named immutable images, never follow a symlink or scan the store."""
     refs={}
     for session in sessions:
@@ -38,18 +40,21 @@ def image_bundle(sessions, dsh_home, charge):
             fd=os.open(dsh_home,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fds.append(fd)
             for component in ('attachments','v1','objects',sha[:2]):
                 fd=os.open(component,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW,dir_fd=fd);fds.append(fd)
-            fd=os.open(sha,os.O_RDONLY|os.O_NOFOLLOW,dir_fd=fd);fds.append(fd);before=os.fstat(fd)
+            fd=os.open(sha,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK,dir_fd=fd);fds.append(fd);before=os.fstat(fd)
             if not stat.S_ISREG(before.st_mode) or before.st_size!=size:raise ValueError('Source image size or file type differs.')
             with os.fdopen(os.dup(fd),'rb') as stream:raw=stream.read(size+1)
             after=os.fstat(fd)
             if (before.st_ino,before.st_size,before.st_mtime_ns)!=(after.st_ino,after.st_size,after.st_mtime_ns) or len(raw)!=size or hashlib.sha256(raw).hexdigest()!=sha:
                 raise ValueError('Source image changed or checksum differs.')
-            item={'attachmentId':identity,'bytes':size,'data':base64.b64encode(raw).decode('ascii')};charge(item);result.append(item)
+            if bundle is None:item={'attachmentId':identity,'bytes':size,'data':base64.b64encode(raw).decode('ascii')}
+            else:
+                ref=bundle.put(raw);charge(raw);item={'attachmentId':identity,'bytes':size,'sha256':ref['sha256']}
+            charge(item);result.append(item)
         finally:
             for fd in reversed(fds):os.close(fd)
     return result
 
-def export_project(remote, project, dsh_home=None):
+def export_project(remote, project, dsh_home=None, bundle=None):
     workspaces=remote.call('workspace.list')
     matches=[w for w in workspaces['items'] if project in (w['workspaceId'],w['path'])]
     if len(matches)!=1:raise ValueError('Choose one exact DSH workspace ID or absolute folder path.')
@@ -63,8 +68,8 @@ def export_project(remote, project, dsh_home=None):
     captured_bytes=0
     def charge(value):
         nonlocal captured_bytes
-        captured_bytes+=len(json.dumps(value).encode())
-        if captured_bytes>MAX_EXPORT_BYTES:raise ValueError('Project export exceeds the size bound; no partial archive was published.')
+        captured_bytes+=len(value) if isinstance(value,bytes) else len(json.dumps(value).encode())
+        if captured_bytes>(MAX_BUNDLE_BYTES if bundle is not None else MAX_EXPORT_BYTES):raise ValueError('Project export exceeds the size bound; no partial archive was published.')
     charge(workspace)
     def opening(address):
         sock=remote.stream('session/follow',{'request':{'address':address,'maxMessages':1}})
@@ -101,7 +106,7 @@ def export_project(remote, project, dsh_home=None):
                 continue
             if len(related)>=MAX_RELATED_SESSIONS:raise ValueError('Related-session family exceeds project bound.')
             seen[sid]=address;child=capture(address);related.append(child);pending.append(child)
-    attachments=image_bundle(sessions+related,dsh_home,charge)
+    attachments=image_bundle(sessions+related,dsh_home,charge,bundle)
     # Revalidate every captured cut and project membership after family capture.
     for row in sessions+related:
         if opening(row['address'])['cursor']!=row['opening']['cursor']:raise ValueError('A captured source changed before export completed.')
@@ -111,18 +116,31 @@ def export_project(remote, project, dsh_home=None):
     if any(sid not in final or final[sid]['running'] for sid in roots):raise ValueError('A source conversation started or disappeared during export.')
     result={'schema':'augmentor-dsh-project-export/1','workspace':workspace,'sessions':sessions,'relatedSessions':related,'archivedSessionIds':[s for s in after['archivedSessionIds'] if s in roots],'pinnedSessionIds':[s for s in after['pinnedSessionIds'] if s in roots]}
     if attachments:result['attachments']=attachments
-    encode_export(result)
+    if bundle is None:encode_export(result)
     return result
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--project',required=True,help='Exact workspace ID or absolute folder path')
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--bundle',action='store_true',help='Linux: publish a complete checksummed bundle directory instead of one JSON file')
     parser.add_argument('--base',default='http://127.0.0.1:3080')
     parser.add_argument('--dsh-home',type=Path,default=Path.home()/'.dsh')
     args=parser.parse_args();os.umask(0o077)
     from dsh.remote import Remote
     if args.output.exists():raise ValueError('Output exists; exports never overwrite previous data.')
+    if args.bundle:
+        if not sys.platform.startswith('linux'):raise ValueError('Bundle publication currently requires Linux.')
+        destination=args.output.absolute();parent=destination.parent
+        if parent.resolve()!=parent:raise ValueError('Bundle output parent must not contain symbolic links.')
+        stage=Path(tempfile.mkdtemp(prefix='.'+destination.name+'.',dir=parent))
+        try:
+            bundle=ProjectBundle(stage);value=export_project(Remote(args.base,args.dsh_home),args.project,args.dsh_home,bundle)
+            manifest,raw=bundle.finish(value);publish(stage,destination)
+        finally:
+            if stage.exists():shutil.rmtree(stage)
+        print(json.dumps({'exportedSessions':len(manifest['sessions']),'archivedRelatedSessions':len(manifest['relatedSessions']),'manifestBytes':len(raw),'expandedBytes':bundle.total+len(raw),'objects':len(bundle.hashes),'sha256':hashlib.sha256(raw).hexdigest(),'format':manifest['schema']}))
+        return
     value=export_project(Remote(args.base,args.dsh_home),args.project,args.dsh_home);raw=encode_export(value)
     temp=args.output.with_name(args.output.name+'.'+uuid.uuid4().hex+'.tmp')
     try:

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Complete segmented DSH bundles](HARNESS-DSH-PROJECT-BUNDLES.md) preserve large histories/images with checksummed objects, exact original lookup and historical branching. Source passes **174 Node / 47 Python**, including original v1/v2 GUI flows. Five more real projects/seventeen parents/four children now export completely; two projects/five parents pass read-only preparation. Source formats and two source-observation failures remain. No owner transfer or running-review update; packaging/adoption and pilot gates stay explicit. [Evidence](../release/harness-dsh-bundle-qualification-20261017.json).
+
 [Compact DSH exports](HARNESS-DSH-MIGRATION-PILOT.md#compact-project-export--october-17) remove indentation overhead without truncating history or raising bounds. Three formerly oversized exports now fit; two projects/seven parents pass read-only preparation, while a third still refuses malformed tool arguments. Source qualification: 23 exporter tests and 66 migration cases. Source-only; running reviews and further-transfer gates remain unchanged. [Evidence](../release/harness-dsh-compact-qualification-20261017.json).
 
 [Setup-only DSH migration](HARNESS-DSH-MIGRATION-PILOT.md#setup-only-conversations--october-16): unused conversations preserve title/source/organization and start only on explicit human input. Source/ordinary/exact sealed **120 Node + 35 Python** each pass; seven same-byte real exports/twenty-one parents pass corrected preparation. Existing reviews/data remain unchanged; [qualification and remaining adoption/pilot gates](../release/harness-dsh-setup-qualification-20261016.json).
@@ -695,7 +697,7 @@ semantic/live/installed/physical/platform/distribution acceptance remains open.
 
 [Native managed-memory request originals](CONTROLLED-MEMORY.md#native-managed-memory-request-snapshots--october-14)
 records 6027df0: final applied bounded briefs survive historical branch/cold reopen,
-with no new recall/tool replay or stale fallback. Source/ordinary 173/173 each and
+with no new recall/tool replay or stale fallback. Source/ordinary 174/173 each and
 strict check/build pass; known text-boundary fixtures are distinct from new live/
 installed/full-context acceptance. [Data scope](DATA-AND-SUPPORT.md#native-managed-memory-originals)
 explains unredacted native retention independent of optional diagnostics/banks.

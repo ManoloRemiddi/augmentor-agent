@@ -180,6 +180,9 @@ class ImageExportTests(unittest.TestCase):
         with self.assertRaises(OSError):module.export_project(self.remote(),'authored-project',self.home)
         self.path.unlink();self.path.parent.rmdir();self.path.parent.symlink_to(self.home,target_is_directory=True)
         with self.assertRaises(OSError):module.export_project(self.remote(),'authored-project',self.home)
+    def test_named_fifo_is_refused_without_waiting_for_a_writer(self):
+        self.path.unlink();os.mkfifo(self.path,0o600)
+        with self.assertRaisesRegex(ValueError,'file type'):module.export_project(self.remote(),'authored-project',self.home)
     def test_image_payload_is_charged_to_existing_whole_export_bound(self):
         with patch.object(module,'MAX_EXPORT_BYTES',500):
             with self.assertRaisesRegex(ValueError,'size bound'):module.export_project(self.remote(),'authored-project',self.home)

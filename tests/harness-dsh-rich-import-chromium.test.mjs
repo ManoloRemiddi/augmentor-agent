@@ -2,8 +2,8 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';import {once} from 'node:events';import {mkdtemp,writeFile,rm,mkdir} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
 import {richRuntimeFixture} from './fixtures/dsh-rich-runtime.mjs';import {until} from './fixtures/plans.mjs';import {chromiumPort} from './fixtures/chromium-ready.mjs';import {harnessCdp} from './fixtures/harness-cdp.mjs';import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
-test('original GUI opens imported images and reasoning, then continues their real native conversation',{skip:process.platform!=='linux',timeout:60000},async t=>{
- const f=await richRuntimeFixture(t),link=await f.link(),profile=await mkdtemp(join(tmpdir(),'augmentor-rich-chromium-'));let chrome,panel;
+for(const bundle of [false,true])test('original GUI opens imported images and reasoning, then continues their real native conversation'+(bundle?' [v2 bundle]':' [v1 JSON]'),{skip:process.platform!=='linux',timeout:60000},async t=>{
+ const f=await richRuntimeFixture(t,{bundle}),link=await f.link(),profile=await mkdtemp(join(tmpdir(),'augmentor-rich-chromium-'));let chrome,panel;
  t.after(async()=>{panel?.close();if(chrome?.exitCode===null){const ended=once(chrome,'exit');chrome.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
  let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'rich-import Chromium');
