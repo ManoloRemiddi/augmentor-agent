@@ -71,5 +71,30 @@ evidence. Mounting every curation card beneath Models initially interfered with
 its provider menu; the plugin now has its own original-shell settings section,
 and the original Models workflow passes without weakened assertions.
 
-Separate artifact qualification and the fresh private review are recorded here
-after staging. Earlier review sessions and selected installation remain intact.
+## Corrected private review
+
+Application/source `1f050f03410272611944158bb3dde9f4eccf79c9` is staged in
+**20261016-102350-38ccb6f8**, seal
+`a67bb9f8048b8902058004c87782a508ca10202831bcf71f84cb6653d3db1123`.
+The same 28 focused cases pass against the exact staged runtime/GUI with its
+bundled Node; 16 notice/private-boundary cases pass. All 24,546 sealed files and
+1,069 compiled inputs verify after owner-browser QA. Production dependencies,
+Node and components retain the preceding verified baseline bytes. An initial
+unsealed assembly omitted the existing preferred runtime supplier source; it
+remains preserved and the complete assembly passes the original notice checks.
+
+The private review is running and connected. Browser QA confirms first group
+Pinned, local Qwen first exactly once, initial scroll zero, readable curation
+controls in the original Settings shell, and zero console warnings/errors. Its
+profile copies only the preceding review configuration, starts with local Qwen
+pinned and one empty conversation, and submits no prompts/audio. It reuses the
+existing review memory gateway and CPU recognition service without installing or
+moving either. Existing conversation history stays in the preceding review;
+there is no production-profile or conversation migration. Earlier review processes
+and selected installation remain intact. Private links and filesystem/profile
+records stay outside public evidence. See the [portable review
+record](../release/harness-mx-picker-review-20261016.json).
+
+This qualifies the requested local feedback changes. Broader MX workflow/migration
+acceptance remains open; voice, later platforms, full-release CI and public binary
+redistribution remain separate. No DSH retirement, installed activation or merge.

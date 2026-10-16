@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## MX picker and composer feedback review — October 16
+
+The corrected private MX review **20261016-102350-38ccb6f8**, application/source **1f050f03410272611944158bb3dde9f4eccf79c9**, is now running separately. Source and exact-staged-target each pass **28/28** across seven focused files, two workers and unchanged deadlines; **16** notice/private-boundary cases pass. All **24,546 sealed / 1,069 compiled** inputs verify after browser QA. The original review and its conversation stay available; selected installation, model/speech placement and production dependencies are preserved. [Feedback guide](HARNESS-MX-FEEDBACK.md) · [Portable review](../release/harness-mx-picker-review-20261016.json).
+
+Use the full private link supplied in chat in your regular browser. This review has a separate profile and one empty conversation, with local Qwen initially pinned. Existing conversation history remains in the preceding review. The old bare URL does not authenticate another browser. Settings → Model Picker Augmented exposes the restored MIT pin/hide/reorder controls; the original context meter is inside the composer toolbar. Voice and other operating systems are deferred.
+
 ## Shared persona and response-metrics review — October 16
 
 Current private unselected **20261016-083019-0c2b4855** runs public artifact source
