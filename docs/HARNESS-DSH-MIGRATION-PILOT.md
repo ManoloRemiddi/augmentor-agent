@@ -58,7 +58,8 @@ request-source snapshots and live Fleet-job ownership are not manufactured.
    ```
 
    Use the reported SHA-256 for the import. Exports never overwrite an existing
-   output. The current exporter deliberately accepts one project conversation.
+   output. The exporter accepts one project with zero to 128 parent conversations;
+   rich image exports also read its explicitly selected `--dsh-home` attachment store.
 3. Prepare a new private profile parent and copy the already qualified Harness
    configuration privately. Keep its `state` destination absent. Build the importer
    with the repository's pinned TypeScript toolchain, then:
@@ -84,8 +85,8 @@ request-source snapshots and live Fleet-job ownership are not manufactured.
 The initial single-conversation pilot refused multi-conversation projects. The
 [current project importer](#multi-conversation-projects--october-16) adds that
 cardinality support. Unresolved tool calls, sequence gaps, edited/compacted/branched
-record forms, attachments and opaque reasoning parts in parent messages still
-require their own converters. Their originals remain backed up. Historical
+record forms, non-image attachments and opaque reasoning parts in parent messages still
+require their own converters. [Plaintext reasoning and stored images](#reasoning-and-stored-images--october-16) now have an explicit converter. Their originals remain backed up. Historical
 subagent logs are archived, not recreated as live Pi Fleet jobs. Branching at an
 old imported answer, historical request-context reconstruction and original usage
 accounting are not qualified. Existing memory banks, Wiki data, credentials,
@@ -295,3 +296,69 @@ Both owner reviews keep their same PIDs and roots; **32 protected files** and th
 installed selection remain exact. No extra owner project, conversation, provider
 request, voice request or running-review update is performed by this qualification.
 [Portable evidence](../release/harness-dsh-multichat-review-20261016.json).
+
+
+## Reasoning and stored images — October 16
+
+The offline importer now accepts plaintext assistant `reasoning` blocks and
+content-addressed PNG/JPEG/WebP/GIF image references in completed parent histories.
+The formats were checked against the already selected public MIT DSH baseline
+[`d7432673` message schema](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/llm/llm/src/message.ts).
+The existing MIT attachment store/decoder and original GUI gallery/reasoning
+components are reused; no new dependency or supplier-source edit is introduced.
+
+Exports optionally contain a deduplicated `attachments` list of
+`{attachmentId,bytes,data}` with canonical base64. Only image hashes actually named
+by captured parent/archived-child messages are read from the explicitly selected
+DSH home. Descriptor-relative reads refuse linked directories/objects, mismatched
+sizes and changed digests. Image collection is inside the existing whole-export
+32 MiB budget and precedes the final cursor/catalogue checks. This store-export
+path is qualified on MX Linux; other OS deployment remains deferred.
+
+Import verifies every declared hash/encoding/reference and fully decodes parent
+images against the existing pixel/dimension limits. Exact stored bytes are
+published through the existing immutable store, without recompression, and only
+the parent that referenced an image receives its receipt. Child-only objects stay
+in the raw archive. Missing/corrupt/unsupported media refuses the whole project;
+failed asynchronous admission removes the entire staged state. The public
+`importDshProject` helper is now asynchronous: callers must `await` it. CLI arguments
+and the existing single-/multi-conversation receipt shapes stay compatible.
+
+Plaintext reasoning appears in the original Think disclosure and is labelled
+historical data in continuation. Opaque reasoning/provider signatures and model
+replay state are never supplied as live provider thinking; their exact source
+stays archived. Reasoning-only assistant records are retained. Historical tool
+text remains bounded and old calls never become executable proposals.
+
+Native history retains compact supported Pi custom messages with checked durable
+image references. A lifecycle-owned public Agent `transformContext` hook resolves
+only the active messages against the current conversation's attachment authority
+at request time, after SDK context transforms and before request observation.
+It is composed/unwound with the existing execution/reasoning/Stop/reload hooks;
+there is still one SDK AgentSession. A missing receipt, changed object or text-only
+current model stops before provider dispatch. Repeated images cannot inflate the
+saved native JSONL; an active request exceeding 20 MiB or 64 imported inline images
+is explicitly refused, without silently dropping data.
+
+DSH `image/offload` targets are checked in sequence against earlier user/tool
+messages. Strict increasing indexes and unique targets prevent ambiguous removal.
+Derived history keeps the selected images offloaded and provides their authorized
+read-only stored path instead of putting them inline again. The exact raw export
+remains unchanged. The gallery loads the source's stored image; pre-normalization
+camera uploads are not invented, and imported-image composer Edit recovery is not
+qualified by this increment. Old edited/compacted/branched source histories,
+generic files, historical child navigation and full effective-context recreation
+remain separate work.
+
+Source build and **120/120 Node cases** across nineteen files, including six
+actual Chromium files, pass with two workers and unchanged deadlines. The source
+also passes **35 Python cases**: nineteen exporter and sixteen licence/private-source/
+notice cases. Actual Host/provider requests contain the exact image bytes after
+cold reopen, preserve historical reasoning, omit opaque replay data and execute
+only the new fixture tool. Original GUI image lightbox, reasoning disclosure and
+composer continuation pass with no page/HTTP errors; foreign conversation access
+is refused. Initial GUI-driver observations (click before thumbnail loaded; React
+boolean attribute serialized as `true`) are retained in private logs; the final
+driver waits for decoded pixels and asserts the observed disclosure state.
+These are independently authored synthetic histories, with no owner-data model
+requests. Artifact qualification follows.

@@ -8,7 +8,7 @@ test('whole-project imports are listed and continued independently by the real H
  const f=await planFixture(t,{policy:'read-only'});await f.stop();await rename(f.state,f.state+'-before-import');
  const modelFile=join(f.config,'agent/models.json'),models=JSON.parse(await readFile(modelFile));models.providers.fixture.models.push({...models.providers.fixture.models[0],id:'plan-fixture-beta',name:'Authored Beta model'});await writeFile(modelFile,JSON.stringify(models),{mode:0o600});
  const value=authoredDshProject(f.workspace),bytes=JSON.stringify(value),source=join(f.root,'authored-project.json');await writeFile(source,bytes,{mode:0o600});
- const betaSelection={...f.selection,model:'plan-fixture-beta'},receipt=importDshProject(source,f.state,{sourceSha256:createHash('sha256').update(bytes).digest('hex'),selection:f.selection,sessionSelections:{'authored-beta':betaSelection}});
+ const betaSelection={...f.selection,model:'plan-fixture-beta'},receipt=await importDshProject(source,f.state,{sourceSha256:createHash('sha256').update(bytes).digest('hex'),selection:f.selection,sessionSelections:{'authored-beta':betaSelection}});
  await f.start();const [alpha,beta,gamma]=receipt.sessions.map(r=>r.sessionId),beforeAlpha=await f.native(alpha),beforeGamma=await f.native(gamma);
  const listed=(await f.call('session.list')).items;assert.equal(listed.length,3);assert(listed.every(x=>!x.running));
  const workspaces=await f.call('workspace.list');assert.equal(workspaces.items.length,1);assert.deepEqual(new Set(workspaces.items[0].sessionIds),new Set([alpha,beta,gamma]));assert.deepEqual(workspaces.pinnedSessionIds,[beta,alpha]);assert.deepEqual(workspaces.archivedSessionIds,[gamma]);
@@ -28,6 +28,6 @@ test('whole-project imports are listed and continued independently by the real H
 test('an empty imported project is retained by the Host without creating a session or inference',{timeout:30000},async t=>{
  const f=await planFixture(t);await f.stop();await rename(f.state,f.state+'-before-empty-import');const value=authoredDshProject(f.workspace);value.sessions=[];value.workspace.sessionIds=[];value.pinnedSessionIds=[];value.archivedSessionIds=[];
  const bytes=JSON.stringify(value),source=join(f.root,'authored-empty-project.json');await writeFile(source,bytes,{mode:0o600});
- importDshProject(source,f.state,{sourceSha256:createHash('sha256').update(bytes).digest('hex'),selection:f.selection});await f.start();
+ await importDshProject(source,f.state,{sourceSha256:createHash('sha256').update(bytes).digest('hex'),selection:f.selection});await f.start();
  assert.deepEqual((await f.call('session.list')).items,[]);const w=await f.call('workspace.list');assert.equal(w.items.length,1);assert.equal(w.items[0].title,value.workspace.title);assert.deepEqual(w.items[0].sessionIds,[]);assert.equal(f.requests.length,0);
 });

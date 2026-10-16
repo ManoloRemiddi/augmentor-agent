@@ -1,5 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import copy,importlib.util,unittest,os
+import copy,importlib.util,unittest,os,tempfile,hashlib,base64
 from unittest.mock import patch
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('dsh_project_export',Path(os.environ.get('AUGMENTOR_PI_TEST_ROOT',Path(__file__).resolve().parents[1]))/'scripts/export-dsh-project.py')
@@ -113,4 +113,47 @@ class ExportTests(unittest.TestCase):
         with patch.object(module,'MAX_EXPORT_BYTES',1100):
             with self.assertRaisesRegex(ValueError,'size bound'):module.export_project(remote,'authored-project')
         self.assertEqual(remote.calls.count('session/page'),2)
+
+@unittest.skipUnless(os.name=='posix','Descriptor-relative MX image export')
+class ImageExportTests(unittest.TestCase):
+    def setUp(self):
+        self.temp=tempfile.TemporaryDirectory(prefix='augmentor-dsh-image-export-');self.addCleanup(self.temp.cleanup);self.home=Path(self.temp.name)
+        self.raw=b'Independently authored immutable stored bytes';self.sha=hashlib.sha256(self.raw).hexdigest();self.identity='sha256:'+self.sha
+        self.path=self.home/'attachments/v1/objects'/self.sha[:2]/self.sha;self.path.parent.mkdir(parents=True);self.path.write_bytes(self.raw)
+        self.part={'type':'image','attachment':{'attachmentId':self.identity,'bytes':len(self.raw)}}
+    def remote(self):
+        part=self.part
+        class Images(RemoteFixture):
+            def invoke(self,method,p):
+                self.calls.append(method)
+                return {'records':[{'type':'event','event':{'type':'user/message','seq':0,'data':{'content':[copy.deepcopy(part),copy.deepcopy(part)]}}}],'hasMore':False}
+        return Images()
+    def test_reads_only_exact_named_objects_once_and_preserves_bytes(self):
+        value=module.export_project(self.remote(),'authored-project',self.home)
+        self.assertEqual(len(value['attachments']),1);blob=value['attachments'][0]
+        self.assertEqual(blob['attachmentId'],self.identity);self.assertEqual(base64.b64decode(blob['data']),self.raw)
+        self.assertEqual(self.path.read_bytes(),self.raw)
+    def test_missing_and_changed_image_abort_the_whole_export(self):
+        self.path.unlink()
+        with self.assertRaises(FileNotFoundError):module.export_project(self.remote(),'authored-project',self.home)
+        self.path.write_bytes(b'X'*len(self.raw))
+        with self.assertRaisesRegex(ValueError,'checksum'):module.export_project(self.remote(),'authored-project',self.home)
+    def test_no_symlink_is_followed_for_object_or_parent(self):
+        other=self.home/'private-unrelated';other.write_bytes(self.raw);self.path.unlink();self.path.symlink_to(other)
+        with self.assertRaises(OSError):module.export_project(self.remote(),'authored-project',self.home)
+        self.path.unlink();self.path.parent.rmdir();self.path.parent.symlink_to(self.home,target_is_directory=True)
+        with self.assertRaises(OSError):module.export_project(self.remote(),'authored-project',self.home)
+    def test_image_payload_is_charged_to_existing_whole_export_bound(self):
+        with patch.object(module,'MAX_EXPORT_BYTES',500):
+            with self.assertRaisesRegex(ValueError,'size bound'):module.export_project(self.remote(),'authored-project',self.home)
+    def test_image_export_requires_explicit_store_and_rejects_path_ids(self):
+        with self.assertRaisesRegex(ValueError,'explicit DSH home'):module.export_project(self.remote(),'authored-project')
+        self.part['attachment']['attachmentId']='../../unrelated'
+        with self.assertRaisesRegex(ValueError,'Invalid source image'):module.export_project(self.remote(),'authored-project',self.home)
+    def test_source_cursor_is_rechecked_after_image_reads(self):
+        remote=self.remote();original=module.image_bundle
+        def capture(*args):
+            value=original(*args);remote.cursors['authored-root']+=1;return value
+        with patch.object(module,'image_bundle',capture):
+            with self.assertRaisesRegex(ValueError,'source changed'):module.export_project(remote,'authored-project',self.home)
 if __name__=='__main__':unittest.main()

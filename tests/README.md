@@ -2055,3 +2055,17 @@ packages. The common Node/export contracts are registered in the three-OS SDK
 workflow, without claiming hosted or other-OS artifact success. The earlier
 sealed application fails the new three-chat regression at its single-parent
 gate. [Owning scope and remaining conversion work](../docs/HARNESS-DSH-MIGRATION-PILOT.md#multi-conversation-projects--october-16).
+
+
+Rich DSH migration uses independently authored `fixtures/dsh-rich-project.mjs`
+and `fixtures/dsh-rich-runtime.mjs`. `dsh-project-rich.test.mjs` checks exact bytes,
+reasoning/replay separation, atomic missing/corrupt/metadata/codec/offload refusal,
+conversation authority, Stop and compact native history with bounded request-time
+expansion. `dsh-project-rich-runtime.test.mjs` exercises actual Host/SDK/provider
+payloads, text-only refusal and cold continuation. The original GUI lightbox,
+reasoning disclosure and new composer submission run through
+`harness-dsh-rich-import-chromium.test.mjs`; no owner history is a fixture.
+Exporter cases also cover descriptor-relative symlink refusal, deduplication,
+byte/hash checks, combined-size charging and final source revalidation after reads.
+Linux image-export cases are explicit skips on non-POSIX test hosts, not platform
+release qualification. See the [owning migration guide](../docs/HARNESS-DSH-MIGRATION-PILOT.md#reasoning-and-stored-images--october-16).

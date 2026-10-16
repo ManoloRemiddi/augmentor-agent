@@ -77,6 +77,7 @@ import {piReassessment} from './reassessment.js';
 import {PiExecution,EXECUTION_POLICY,type ExecutionContract} from './execution.js';
 import {PiPromptQueue,promptIdentity} from './queue.js';
 import {PiCompactions} from './compaction.js';
+import {PiDshHistoryMedia} from './dsh-history-media.js';
 import {PiSteering} from './steering.js';
 import {validateSteeringInput} from './steering-input.js';
 import {getSupportedThinkingLevels} from '@earendil-works/pi-ai';
@@ -90,7 +91,7 @@ import {PiJobs,jobSpec,jobsExtension,shellJob,boundChild,JOB_GUIDANCE,type JobRe
 import type {Usage} from '@earendil-works/pi-ai';
 const browserRecovery = readFileSync(new URL('../../../config/browser-recovery.md', import.meta.url), 'utf8');
 interface Meta {applicationInstructionsBootstrap?:ApplicationInstructions;permissionHistory?:PermissionRecord[];planModeBootstrap?:PlanModeRecord;delegation?:{parentId:string;jobId:string;allowedTools:string[];resources:Data};reasoning?:SavedReasoning;memoryStartSeq?:number;surface?:"linux"|"browser";id:string;cwd:string;file?:string;selection:Data;title:string;saved:boolean;policy:string;updatedAt:number;requests:string[];running:boolean;fork?:{sessionId:string;messageSeq:number;mode:'reply'|'edit'}}
-interface Loaded {requestedMode?:InputMode;humanInput?:{requestId:string;mode:InputMode};inputMode?:InputMode|'unattributed';inputOrigin?:'user'|'goal'|'delegation'|'unattributed';voiceSeen?:boolean;skillInputs:Map<string,PreparedSkill>;permissionSteer?:{id:string;text:string};planMode:PiPlanMode;resources:Data;searchEnabled?:boolean;searchMode?:'configured'|'keyless';wiki?:WikiBinding;wikiRevision?:string;memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];goals:PiGoals;mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean;reason?:string})=>Promise<void>;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
+interface Loaded {requestedMode?:InputMode;humanInput?:{requestId:string;mode:InputMode};inputMode?:InputMode|'unattributed';inputOrigin?:'user'|'goal'|'delegation'|'unattributed';voiceSeen?:boolean;skillInputs:Map<string,PreparedSkill>;permissionSteer?:{id:string;text:string};planMode:PiPlanMode;resources:Data;searchEnabled?:boolean;searchMode?:'configured'|'keyless';wiki?:WikiBinding;wikiRevision?:string;memory:DualMemoryClient;meta:Meta;session:AgentSession;manager:SessionManager;events:DisplayEvent[];goals:PiGoals;mcp?:ManagedMcp;reloading?:boolean;reloadError?:boolean;reload?:(options:{removeAutoCodemode:boolean;reason?:string})=>Promise<void>;historyMedia?:PiDshHistoryMedia;reasoning?:PiReasoning;execution?:PiExecution;steering?:PiSteering;phase?:'preparing'|'running'|'settling';initialDelivered?:boolean;preparingInput?:boolean;interruptedInput?:boolean;observation?:ReturnType<typeof observeSession>;turnId?:string;activeRequestId?:string;cancelled:boolean;failed?:boolean;task?:Promise<void>}
 /** Admission is serialized; extension preparation must not hold the host's
  * state lock while waiting for a UI answer, another RPC or an input handler.
  */
@@ -530,10 +531,11 @@ export class Host {
     await memory.append(history.flatMap(event=>piTranscriptEvent(event)));
     await created.session.bindExtensions({mode:'rpc',uiContext:this.interactions.ui(m.delegation?.parentId??m.id,m.id),onError:error=>{if(record?.reloading)record.reloadError=true;this.append(m,'runtime/error',{message:record?.reloading?'A Pi resource reported a reload problem. Inspect the configuration receipt before continuing.':error.error});}});
     record.execution=execution;
+    record.historyMedia=new PiDshHistoryMedia(this.attachments,m.id);
     record.steering=new PiSteering(created.session);
     record.reasoning=new PiReasoning(created.session,m.surface==='browser'?'augmentor-browser-pi':'augmentor-linux-pi',data=>record!.observation?.record('execution/reasoning',data));
     const installBindings=()=>{
-    execution.install(created.session);record!.steering!.install();record!.reasoning!.install();
+    record!.historyMedia!.install(created.session);execution.install(created.session);record!.steering!.install();record!.reasoning!.install();
     if(!m.delegation)planMode.install(created.session);
     provenance.attach(created.session,()=>record!.events,()=>applicationInstructions);
     record.observation=observeSession(created.session,this.observations,m.id,
@@ -550,7 +552,7 @@ export class Host {
       // Unwind in reverse composition order; the public reload replaces the
       // runner captured by execution's nested-tool hooks, but keeps this owner.
       record!.observation?.dispose();record!.observation=undefined;
-      planMode.dispose();record!.reasoning?.dispose();record!.steering?.dispose();execution.dispose();
+      planMode.dispose();record!.reasoning?.dispose();record!.steering?.dispose();execution.dispose();record!.historyMedia?.dispose();
       await created.session.reload({beforeSessionStart:()=>{
         checkPlanNames();checkWikiNames();
         checkSearchNames();
@@ -712,7 +714,7 @@ export class Host {
       return {state:control.signal.aborted?'cancelled':child.failed||child.execution?.incomplete||this.queue(m).read(requestId).status!=='completed'||!child.initialDelivered?'failed':'completed',reason:control.signal.aborted?'Child stopped; its dispatched actions may have effects.':'Child turn settled. Verify the reported result and retained originals.',usage:{provider:m.selection.provider,model:m.selection.model,value}};
     }finally{
       control.signal.removeEventListener('abort',abort);unsubscribe?.();
-      if(child){child.goals.disarm();child.observation?.record('job/child-close',{jobId:row.id,parentId:parent.id});child.observation?.dispose();child.planMode.dispose();child.reasoning?.dispose();child.steering?.dispose();child.execution?.dispose();child.memory.close();await child.memory.flush();await child.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});child.session.dispose();this.loaded.delete(m.id);}
+      if(child){child.goals.disarm();child.observation?.record('job/child-close',{jobId:row.id,parentId:parent.id});child.observation?.dispose();child.planMode.dispose();child.reasoning?.dispose();child.steering?.dispose();child.execution?.dispose();child.historyMedia?.dispose();child.memory.close();await child.memory.flush();await child.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});child.session.dispose();this.loaded.delete(m.id);}
       void this.flushJobReceipts(parent.id).catch(()=>{});this.wakeGoals();
     }
   }
@@ -1328,7 +1330,7 @@ export class Host {
     case 'prompts.improvementSave':return promptCall('prompts.improvement.save',p,id);
     default:throw new Error('Unsupported method: '+method);
   }}
-  async close(){this.quiescing=true;await this.dictation.close();await this.voice.close();await this.sessionExports.close().catch(()=>console.warn('[augmentor-export] Private archive cleanup could not be verified; preserved scratch requires inspection.'));await this.modelAccounts.close();this.modelSettings.cancelDiscoveries();await this.officePreview?.close();this.fileReferences.close();this.setup.cancel();await this.jobs.close();await this.improvements.close();for(const m of this.metadata.values())if(this.compactions.busySession(m.id)){this.compactions.cancelSession(m.id);await this.compactions.waitSession(m.id);}for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.planMode.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.session.dispose();}await this.mcpManagement.settled();}
+  async close(){this.quiescing=true;await this.dictation.close();await this.voice.close();await this.sessionExports.close().catch(()=>console.warn('[augmentor-export] Private archive cleanup could not be verified; preserved scratch requires inspection.'));await this.modelAccounts.close();this.modelSettings.cancelDiscoveries();await this.officePreview?.close();this.fileReferences.close();this.setup.cancel();await this.jobs.close();await this.improvements.close();for(const m of this.metadata.values())if(this.compactions.busySession(m.id)){this.compactions.cancelSession(m.id);await this.compactions.waitSession(m.id);}for(const r of this.loaded.values()){await this.cancel(r.meta.id,'runtime-shutdown');await r.task;await r.session.extensionRunner.emit({type:'session_shutdown',reason:'quit'});r.memory.close();await r.memory.flush();r.observation?.record('session/close',{source:'runtime-shutdown'});r.observation?.dispose();r.planMode.dispose();r.reasoning?.dispose();r.steering?.dispose();r.execution?.dispose();r.historyMedia?.dispose();r.session.dispose();}await this.mcpManagement.settled();}
 }
 
 /** Normalized public native usage, including nested tools, with one owner. */

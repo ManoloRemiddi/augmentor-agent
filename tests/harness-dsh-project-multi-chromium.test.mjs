@@ -8,7 +8,7 @@ const {importDshProject}=await import(pathToFileURL(resolve(process.env.AUGMENTO
 test('original workspace sidebar switches imported chats and continues only the selected native history',{skip:process.platform!=='linux',timeout:60000},async t=>{
  const f=await planFixture(t,{policy:'read-only'});await f.stop();await rename(f.state,f.state+'-before-import');
  const value=authoredDshProject(f.workspace),bytes=JSON.stringify(value),source=join(f.root,'authored-project.json');await writeFile(source,bytes,{mode:0o600});
- const receipt=importDshProject(source,f.state,{sourceSha256:createHash('sha256').update(bytes).digest('hex'),selection:f.selection});await f.start();
+ const receipt=await importDshProject(source,f.state,{sourceSha256:createHash('sha256').update(bytes).digest('hex'),selection:f.selection});await f.start();
  const [alpha,beta]=receipt.sessions.map(r=>r.sessionId),importedAlpha=await f.native(alpha),link=await f.link();
  const profile=await mkdtemp(join(tmpdir(),'augmentor-project-chromium-'));let chrome,panel;
  t.after(async()=>{panel?.close();if(chrome?.exitCode===null){const ended=once(chrome,'exit');chrome.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});

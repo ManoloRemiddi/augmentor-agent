@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Reasoning and stored-image migration](HARNESS-DSH-MIGRATION-PILOT.md#reasoning-and-stored-images--october-16) adds verified deduplicated media, original GUI reasoning/gallery display and compact lazy Pi context resolution. Source build and **120/120** Node cases across nineteen files/six Chromium files, plus **35 Python** cases, pass. Real Host/cold continuation preserves exact image bytes, omits opaque replay data, rejects text-only routes/foreign access and replays no old calls. Source histories/owner reviews stay separate; artifact qualification and wider history conversion follow.
+
 [Multi-conversation DSH project imports](HARNESS-DSH-MIGRATION-PILOT.md#multi-conversation-projects--october-16) now qualify independent chats, explicit model routing, ordered pins/archive state and empty workspace registration in isolated source tests. Wider formats, multi-project consolidation and owner rollout remain separate.
 
 [Plugins and writing tools](HARNESS-PLUGINS.md) documents the human-readable directory, full Harness prompt/instruction editor and current read-only DSH/Agent gap audit. MX review profiles retain separate prompt copies; installed adoption/live sync and wider plugin acceptance remain separate.

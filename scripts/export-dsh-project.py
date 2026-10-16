@@ -1,14 +1,49 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Private, cold DSH project snapshot. Does not submit or replay requests."""
-import argparse,hashlib,json,os,sys,uuid
+import argparse,base64,hashlib,json,os,re,stat,sys,uuid
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'services'))
 MAX_PROJECT_SESSIONS=128
 MAX_RELATED_SESSIONS=32
 MAX_EXPORT_BYTES=32*1024*1024
 
-def export_project(remote, project):
+def image_bundle(sessions, dsh_home, charge):
+    """Read only named immutable images, never follow a symlink or scan the store."""
+    refs={}
+    for session in sessions:
+        for row in session['records']:
+            event=row.get('event',{});kind=event.get('type');data=event.get('data',{})
+            message=data if kind=='user/message' else data.get('message',{}) if kind in ('assistant/message','tool/result') else {}
+            for part in message.get('content',[]):
+                if part.get('type')!='image':continue
+                ref=part.get('attachment',{});identity=ref.get('attachmentId','');size=ref.get('bytes')
+                if not re.fullmatch(r'sha256:[a-f0-9]{64}',identity) or type(size) is not int or not 0<size<=10*1024*1024:
+                    raise ValueError('Invalid source image reference.')
+                if identity in refs and refs[identity]!=size:raise ValueError('Conflicting source image sizes.')
+                refs[identity]=size
+    if not refs:return []
+    if dsh_home is None:raise ValueError('An explicit DSH home is required for image export.')
+    if os.name!='posix':raise ValueError('Stored image export currently requires Linux descriptor-relative reads.')
+    result=[]
+    for identity,size in refs.items():
+        sha=identity[7:];fds=[]
+        try:
+            fd=os.open(dsh_home,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fds.append(fd)
+            for component in ('attachments','v1','objects',sha[:2]):
+                fd=os.open(component,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW,dir_fd=fd);fds.append(fd)
+            fd=os.open(sha,os.O_RDONLY|os.O_NOFOLLOW,dir_fd=fd);fds.append(fd);before=os.fstat(fd)
+            if not stat.S_ISREG(before.st_mode) or before.st_size!=size:raise ValueError('Source image size or file type differs.')
+            with os.fdopen(os.dup(fd),'rb') as stream:raw=stream.read(size+1)
+            after=os.fstat(fd)
+            if (before.st_ino,before.st_size,before.st_mtime_ns)!=(after.st_ino,after.st_size,after.st_mtime_ns) or len(raw)!=size or hashlib.sha256(raw).hexdigest()!=sha:
+                raise ValueError('Source image changed or checksum differs.')
+            item={'attachmentId':identity,'bytes':size,'data':base64.b64encode(raw).decode('ascii')};charge(item);result.append(item)
+        finally:
+            for fd in reversed(fds):os.close(fd)
+    return result
+
+def export_project(remote, project, dsh_home=None):
     workspaces=remote.call('workspace.list')
     matches=[w for w in workspaces['items'] if project in (w['workspaceId'],w['path'])]
     if len(matches)!=1:raise ValueError('Choose one exact DSH workspace ID or absolute folder path.')
@@ -60,6 +95,7 @@ def export_project(remote, project):
                 continue
             if len(related)>=MAX_RELATED_SESSIONS:raise ValueError('Related-session family exceeds project bound.')
             seen[sid]=address;child=capture(address);related.append(child);pending.append(child)
+    attachments=image_bundle(sessions+related,dsh_home,charge)
     # Revalidate every captured cut and project membership after family capture.
     for row in sessions+related:
         if opening(row['address'])['cursor']!=row['opening']['cursor']:raise ValueError('A captured source changed before export completed.')
@@ -68,6 +104,7 @@ def export_project(remote, project):
     final={s['sessionId']:s for s in remote.call('session.list')['items']}
     if any(sid not in final or final[sid]['running'] for sid in roots):raise ValueError('A source conversation started or disappeared during export.')
     result={'schema':'augmentor-dsh-project-export/1','workspace':workspace,'sessions':sessions,'relatedSessions':related,'archivedSessionIds':[s for s in after['archivedSessionIds'] if s in roots],'pinnedSessionIds':[s for s in after['pinnedSessionIds'] if s in roots]}
+    if attachments:result['attachments']=attachments
     if len((json.dumps(result,indent=2)+'\n').encode())>MAX_EXPORT_BYTES:raise ValueError('Project export exceeds the size bound; no partial archive was published.')
     return result
 
@@ -80,7 +117,7 @@ def main():
     args=parser.parse_args();os.umask(0o077)
     from dsh.remote import Remote
     if args.output.exists():raise ValueError('Output exists; exports never overwrite previous data.')
-    value=export_project(Remote(args.base,args.dsh_home),args.project);raw=(json.dumps(value,indent=2)+'\n').encode()
+    value=export_project(Remote(args.base,args.dsh_home),args.project,args.dsh_home);raw=(json.dumps(value,indent=2)+'\n').encode()
     if len(raw)>MAX_EXPORT_BYTES:raise ValueError('Export exceeds the project size bound.')
     temp=args.output.with_name(args.output.name+'.'+uuid.uuid4().hex+'.tmp')
     try:

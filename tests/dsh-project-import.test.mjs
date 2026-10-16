@@ -30,7 +30,7 @@ async function fixture(t){
  return {root,cwd,source,state,value,save,selection};
 }
 test('offline import cold-opens labelled Pi context and completed GUI tools without executing originals',async t=>{
- const f=await fixture(t),options=await f.save(),sourceBefore=await readFile(f.source);const receipt=importDshProject(f.source,f.state,options);
+ const f=await fixture(t),options=await f.save(),sourceBefore=await readFile(f.source);const receipt=await importDshProject(f.source,f.state,options);
  const meta=JSON.parse(await readFile(join(f.state,'sessions',receipt.sessionId+'.meta.json'))),manager=SessionManager.open(meta.file),context=manager.buildSessionContext();
  assert.equal(meta.policy,'read-only');assert.equal(meta.running,false);assert.deepEqual(meta.requests,[]);assert.deepEqual(meta.selection,f.selection);assert.equal(meta.memoryStartSeq,undefined);
  assert.equal(context.messages.filter(m=>m.role==='user').length,1);assert(!context.messages.some(m=>m.role==='assistant'||m.role==='toolResult'),'old calls are labelled data, never native executable proposals');
@@ -42,8 +42,8 @@ test('offline import cold-opens labelled Pi context and completed GUI tools with
  manager.appendMessage({role:'user',content:'New explicit human follow-up',timestamp:1700000001000});assert.equal(SessionManager.open(meta.file).buildSessionContext().messages.at(-1).content,'New explicit human follow-up');
 });
 test('changed source and an occupied target fail without overwriting either side',async t=>{
- const f=await fixture(t),options=await f.save();assert.throws(()=>importDshProject(f.source,f.state,{...options,sourceSha256:'0'.repeat(64)}),/checksum changed/);assert(!existsSync(f.state));
- await mkdir(f.state);await writeFile(join(f.state,'sentinel'),'Existing work');assert.throws(()=>importDshProject(f.source,f.state,options),/new absolute path/);assert.equal(await readFile(join(f.state,'sentinel'),'utf8'),'Existing work');
+ const f=await fixture(t),options=await f.save();await assert.rejects(()=>importDshProject(f.source,f.state,{...options,sourceSha256:'0'.repeat(64)}),/checksum changed/);assert(!existsSync(f.state));
+ await mkdir(f.state);await writeFile(join(f.state,'sentinel'),'Existing work');await assert.rejects(()=>importDshProject(f.source,f.state,options),/new absolute path/);assert.equal(await readFile(join(f.state,'sentinel'),'utf8'),'Existing work');
 });
 for(const [name,change,pattern] of [
  ['gap',v=>{v.sessions[0].records[3].event.seq=99;},/gap/],
@@ -54,12 +54,12 @@ for(const [name,change,pattern] of [
  ['image attachment',v=>{v.sessions[0].records[3].event.data.content.push({type:'image',attachment:{}});},/attachment/],
  ['unfinished turn',v=>{v.sessions[0].records.pop();v.sessions[0].opening.cursor--;},/finish/],
  ['membership',v=>{v.workspace.sessionIds=['other'];},/membership/]
-])test('unsupported '+name+' leaves no partial destination',async t=>{const f=await fixture(t);change(f.value);const options=await f.save();assert.throws(()=>importDshProject(f.source,f.state,options),pattern);assert(!existsSync(f.state));assert(!(await readdir(f.root)).some(x=>x.startsWith('.dsh-import-')));assert.equal(await readFile(join(f.cwd,'original.txt'),'utf8'),'Original authored bytes\n');});
+])test('unsupported '+name+' leaves no partial destination',async t=>{const f=await fixture(t);change(f.value);const options=await f.save();await assert.rejects(()=>importDshProject(f.source,f.state,options),pattern);assert(!existsSync(f.state));assert(!(await readdir(f.root)).some(x=>x.startsWith('.dsh-import-')));assert.equal(await readFile(join(f.cwd,'original.txt'),'utf8'),'Original authored bytes\n');});
 
-test('dangling destination link is preserved rather than replaced',async t=>{const f=await fixture(t),options=await f.save();await symlink(join(f.root,'missing'),f.state);assert.throws(()=>importDshProject(f.source,f.state,options),/new absolute path/);assert.equal(await readlink(f.state),join(f.root,'missing'));});
+test('dangling destination link is preserved rather than replaced',async t=>{const f=await fixture(t),options=await f.save();await symlink(join(f.root,'missing'),f.state);await assert.rejects(()=>importDshProject(f.source,f.state,options),/new absolute path/);assert.equal(await readlink(f.state),join(f.root,'missing'));});
 test('large old tool payloads are bounded in continuation context while exact source/display stay intact',async t=>{
  const f=await fixture(t);f.value.sessions[0].records[6].event.data.message.content[0].text='AUTHORED_HEAD '+('Retained exact source text. '.repeat(15000))+' AUTHORED_TAIL';
- const options=await f.save(),receipt=importDshProject(f.source,f.state,options),meta=JSON.parse(await readFile(join(f.state,'sessions',receipt.sessionId+'.meta.json'))),messages=SessionManager.open(meta.file).buildSessionContext().messages;
+ const options=await f.save(),receipt=await importDshProject(f.source,f.state,options),meta=JSON.parse(await readFile(join(f.state,'sessions',receipt.sessionId+'.meta.json'))),messages=SessionManager.open(meta.file).buildSessionContext().messages;
  const text=JSON.stringify(messages);assert(text.length<12000);assert(text.includes('AUTHORED_HEAD'));assert(text.includes('AUTHORED_TAIL'));assert(text.includes('excerpt cut'));assert(text.includes('Full source archive'));
  assert.equal(receipt.toolPayloadContextChars,256);assert(receipt.toolPayloadCharsNotInContext>300000);assert.equal(receipt.archivedToolProposalMessages,1);assert.deepEqual(await readFile(join(f.state,receipt.rawArchive)),await readFile(f.source));
  const display=[...new DisplayHistory(join(f.state,'sessions',receipt.sessionId+'.events.jsonl')).all()];assert.equal(display.find(e=>e.type==='tool/result').data.result.content[0].text,f.value.sessions[0].records[6].event.data.message.content[0].text);
@@ -76,7 +76,7 @@ async function multiFixture(t){
  return f;
 }
 test('a whole project cold-opens separate native conversations with exact pin order, archive membership and one raw archive',async t=>{
- const f=await multiFixture(t);f.value.sessions.reverse();const options=await f.save();options.sessionSelections={'authored-beta':{provider:'explicit-beta-provider',model:'explicit-beta-model'}};const sourceBefore=await readFile(f.source),receipt=importDshProject(f.source,f.state,options);
+ const f=await multiFixture(t);f.value.sessions.reverse();const options=await f.save();options.sessionSelections={'authored-beta':{provider:'explicit-beta-provider',model:'explicit-beta-model'}};const sourceBefore=await readFile(f.source),receipt=await importDshProject(f.source,f.state,options);
  assert.equal(receipt.schema,'augmentor-dsh-project-import/2');assert.equal(receipt.sessionId,undefined);assert.equal(receipt.sessions.length,3);
  assert.deepEqual(receipt.sessions.map(r=>r.sourceSessionId),f.value.workspace.sessionIds);assert.equal(receipt.sourceEvents,27);assert.equal(receipt.displayEvents,30);
  assert.equal(receipt.relatedSessionsArchived,1);assert.equal((await readdir(join(f.state,'dsh-imports'))).length,2,'one shared original plus one project receipt');
@@ -108,12 +108,12 @@ for(const [name,change,pattern] of [
  ['malformed organization',v=>{v.archivedSessionIds='not-an-array';},/organization/],
  ['overflow',v=>{v.sessions=Array.from({length:129},()=>v.sessions[0]);},/128/]
 ])test('whole-project '+name+' publishes no partial conversations',async t=>{
- const f=await multiFixture(t);change(f.value);const options=await f.save(),before=await readFile(f.source);assert.throws(()=>importDshProject(f.source,f.state,options),pattern);
+ const f=await multiFixture(t);change(f.value);const options=await f.save(),before=await readFile(f.source);await assert.rejects(()=>importDshProject(f.source,f.state,options),pattern);
  assert(!existsSync(f.state));assert(!(await readdir(f.root)).some(x=>x.startsWith('.dsh-import-')));assert.deepEqual(await readFile(f.source),before);
 });
 test('an empty source project preserves its folder registration without inventing a conversation',async t=>{
  const f=await fixture(t);f.value.sessions=[];f.value.workspace.sessionIds=[];f.value.relatedSessions=[];f.value.pinnedSessionIds=[];
- const receipt=importDshProject(f.source,f.state,await f.save());assert.equal(receipt.schema,'augmentor-dsh-project-import/2');assert.deepEqual(receipt.sessions,[]);assert.equal(receipt.sourceEvents,0);assert.equal(receipt.contextEntries,0);
+ const receipt=await importDshProject(f.source,f.state,await f.save());assert.equal(receipt.schema,'augmentor-dsh-project-import/2');assert.deepEqual(receipt.sessions,[]);assert.equal(receipt.sourceEvents,0);assert.equal(receipt.contextEntries,0);
  assert.deepEqual(await readdir(join(f.state,'sessions')),[]);assert.equal(JSON.parse(await readFile(join(f.state,'workspaces.json'))).items[0].cwd,f.cwd);
 });
 
@@ -123,7 +123,7 @@ for(const [name,sessionSelections] of [
  ['extra credential fields',{'authored-beta':{provider:'explicit',model:'choice',apiKey:'authored-not-a-real-key'}}],
  ['array mapping',[]]
 ])test('invalid per-conversation model '+name+' leaves the whole destination absent',async t=>{
- const f=await multiFixture(t),options=await f.save();assert.throws(()=>importDshProject(f.source,f.state,{...options,sessionSelections}),/model|project/);assert(!existsSync(f.state));
+ const f=await multiFixture(t),options=await f.save();await assert.rejects(()=>importDshProject(f.source,f.state,{...options,sessionSelections}),/model|project/);assert(!existsSync(f.state));
 });
 
 test('offline CLI accepts an explicit bounded session-model map and reports all source mappings',async t=>{
@@ -138,6 +138,6 @@ test('offline CLI accepts an explicit bounded session-model map and reports all 
 test('a second native writer failure removes the entire staged project and preserves its source',async t=>{
  const f=await multiFixture(t),options=await f.save(),before=await readFile(f.source),create=SessionManager.create;let written=0;
  t.mock.method(SessionManager,'create',(...args)=>{if(++written===2)throw Error('Authored second native writer failure');return create(...args);});
- assert.throws(()=>importDshProject(f.source,f.state,options),/Authored second native writer failure/);assert.equal(written,2);
+ await assert.rejects(()=>importDshProject(f.source,f.state,options),/Authored second native writer failure/);assert.equal(written,2);
  assert(!existsSync(f.state));assert(!(await readdir(f.root)).some(x=>x.startsWith('.dsh-import-')));assert.deepEqual(await readFile(f.source),before);assert.equal(await readFile(join(f.cwd,'original.txt'),'utf8'),'Original authored bytes\n');
 });

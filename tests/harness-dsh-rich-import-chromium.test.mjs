@@ -1,0 +1,23 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import test from 'node:test';import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';import {once} from 'node:events';import {mkdtemp,writeFile,rm,mkdir} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
+import {richRuntimeFixture} from './fixtures/dsh-rich-runtime.mjs';import {until} from './fixtures/plans.mjs';import {chromiumPort} from './fixtures/chromium-ready.mjs';import {harnessCdp} from './fixtures/harness-cdp.mjs';import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
+test('original GUI opens imported images and reasoning, then continues their real native conversation',{skip:process.platform!=='linux',timeout:60000},async t=>{
+ const f=await richRuntimeFixture(t),link=await f.link(),profile=await mkdtemp(join(tmpdir(),'augmentor-rich-chromium-'));let chrome,panel;
+ t.after(async()=>{panel?.close();if(chrome?.exitCode===null){const ended=once(chrome,'exit');chrome.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+ let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'rich-import Chromium');
+ const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(r=>r.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);
+ for(const domain of ['Runtime','Log','Page','Network'])await panel.call(domain+'.enable');await panel.call('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});await panel.navigate(link.url+'&session='+f.sid);
+ const q=s=>'document.querySelector('+JSON.stringify(s)+')',visible=expr=>until(async()=>{assert.deepEqual(panel.errors,[]);return panel.evaluate('Boolean('+expr+')');},expr),click=expr=>harnessPointerClick(panel,expr,until);
+ await visible(q('button[aria-label="authored-history.png, click to view original"] img')+'?.naturalWidth===3');assert.equal(f.requests.length,0);
+ await click(q('button[aria-label="authored-history.png, click to view original"]'));await visible(q('[role=dialog] img'));assert.equal(await panel.evaluate(q('[role=dialog] img')+'.naturalWidth'),3);assert.equal(await panel.evaluate(q('[role=dialog] img')+'.naturalHeight'),2);
+ await click(q('button[aria-label="Close original image preview"]'));
+ await visible(q('[data-variant="think"]'));
+ const think=q('[data-variant="think"]');await click(q('[data-variant="think"] [data-disclosure-row]'));await visible(think+'?.getAttribute("data-expanded")!==null && '+think+'?.innerText.includes("AUTHORED-REASONING")');
+ assert.equal(await panel.evaluate(think+'?.getAttribute("data-expanded")'),'true', 'reasoning is expanded through the original disclosure');
+ const editor=q('[contenteditable=true]');await click(editor);await panel.call('Input.insertText',{text:JSON.stringify({kind:'read'})});await visible(q('button[aria-label="Send message"]')+' && !'+q('button[aria-label="Send message"]')+'.disabled');await click(q('button[aria-label="Send message"]'));await visible('document.body.innerText.includes("Synthetic planning reply")');
+ assert.equal(f.requests.length,2);const images=f.requests[0].messages.flatMap(m=>Array.isArray(m.content)?m.content:[]).filter(p=>p.type==='image_url');assert.equal(images.length,2);assert(images.every(p=>p.image_url.url==='data:image/png;base64,'+f.bytes.toString('base64')));
+ await panel.reload();await visible('document.body.innerText.includes("Synthetic planning reply") && '+q('button[aria-label="authored-history.png, click to view original"]'));assert.equal(f.requests.length,2,'reload never resends the imported or new turn');assert.deepEqual(panel.errors,[]);assert.deepEqual(panel.failedResponses,[]);
+ if(process.env.AUGMENTOR_GUI_PROOF_DIR){await mkdir(process.env.AUGMENTOR_GUI_PROOF_DIR,{recursive:true});await writeFile(join(process.env.AUGMENTOR_GUI_PROOF_DIR,'rich-history-import.png'),Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));}
+});

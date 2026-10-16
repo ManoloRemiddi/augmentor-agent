@@ -7,7 +7,8 @@ import {identifier} from '../../protocol/src/index.js';
 import type {ArchiveFileSource} from './archive-snapshot.js';
 import {privateDir,atomicJson} from './storage.js';
 import {saveFileVerbatim,storedFilePath,readFileStreamVerbatim,fileLeafName} from '../vendor/dsh-attachment/file-store.js';
-import {saveImageFile,readImageFile,normalizedImagePath} from '../vendor/dsh-attachment/store.js';
+import {saveImageFile,readImageFile,normalizedImagePath,publishImmutableObject} from '../vendor/dsh-attachment/store.js';
+import {detectImage} from '../vendor/dsh-attachment/image.js';
 import type {FileAttachmentRef,ImageAttachmentRef,ImageMediaType} from '../vendor/dsh-attachment/types.js';
 
 export type PromptAttachment={type:'file';attachment:FileAttachmentRef}|{type:'image';attachment:ImageAttachmentRef & {originalAttachmentId?:string}};
@@ -40,6 +41,18 @@ export class PiAttachments {
   catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return [];throw error;}
  }
  private commit(sid:string,part:PromptAttachment,original?:FileAttachmentRef){const rows=this.receipts(sid);if(rows.length>=10000)throw Error('This conversation has too many attachment receipts.');const receipt={receiptId:randomUUID(),part,...(original?{original}:{})};atomicJson(this.path(sid),[...rows,receipt]);if(process.platform!=='win32'){for(const path of [this.path(sid),this.root]){const fd=openSync(path,'r');try{fsyncSync(fd);}finally{closeSync(fd);}}}return receipt;}
+ /** Admit exact already-normalized DSH bytes without recompression. No camera
+  * original is invented: an imported reference retains its stored image only. */
+ async importStoredImage(sid:string,attachment:ImageAttachmentRef,data:Uint8Array){
+  identifier(sid);promptAttachments([{type:'image',attachment}]);
+  if(data.byteLength!==attachment.bytes||data.byteLength>IMAGE_LIMITS.maxImageBytes)throw Error('Imported image exceeds its byte bound.');
+  const decoded=await detectImage(data,{maxPixels:IMAGE_LIMITS.maxImagePixels,maxDimension:IMAGE_LIMITS.maxImageDimension});
+  if(decoded.mediaType!==attachment.mediaType||decoded.width!==attachment.width||decoded.height!==attachment.height)throw Error('Imported image metadata differs from its bytes.');
+  await publishImmutableObject(this.root,normalizedImagePath(this.root,attachment),data,attachment.attachmentId.slice(7));
+  const part:PromptAttachment={type:'image',attachment};
+  if(!this.receipts(sid).some(row=>JSON.stringify(row.part)===JSON.stringify(part)))this.commit(sid,part);
+ }
+ historicalImagePath(sid:string,attachment:ImageAttachmentRef){this.authorize(sid,{type:'image',attachment});return normalizedImagePath(this.root,attachment);}
  async uploadImage(sid:string,data:Uint8Array,name:string,mediaType:ImageMediaType){
   if(!IMAGE_LIMITS.mediaTypes.includes(mediaType))throw Error('Unsupported image type.');
   const normalized=await saveImageFile(this.root,{data,name,mediaType},IMAGE_LIMITS,{maxPixels:4_000_000,maxDimension:4096,maxBytes:5*1024*1024});
