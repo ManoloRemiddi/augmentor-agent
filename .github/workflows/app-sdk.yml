@@ -40,7 +40,7 @@ jobs:
       - name: Verify recognition-only Pi transport and operator gateway
         run: node --test tests/harness-dictation.test.mjs tests/harness-dictation-host.test.mjs
       - name: Verify shared memory settings, stale choices and inspector boundaries
-        run: node --test tests/memory-settings.test.mjs tests/harness-memory-settings.test.mjs tests/pi-memory-settings.test.mjs
+        run: node --test --test-concurrency=2 tests/memory-settings.test.mjs tests/harness-memory-settings.test.mjs tests/pi-memory-settings.test.mjs
       - name: Verify Pi input modes, memory and scoped voice transport
         run: node --test tests/pi-input-mode.test.mjs tests/pi-memory-snapshot.test.mjs tests/pi-prompt-queue.test.mjs tests/pi-context-provenance.test.mjs tests/pi-voice.test.mjs tests/pi-voice-host.test.mjs tests/pi-upload-maintenance.test.mjs tests/harness-file-preview.test.mjs tests/harness-file-references.test.mjs
       - name: Verify shared Harness session creation and draft scopes

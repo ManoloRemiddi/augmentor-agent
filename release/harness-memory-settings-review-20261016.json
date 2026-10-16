@@ -1,0 +1,733 @@
+{
+  "schema": "augmentor-harness-memory-settings-review/1",
+  "date": "2026-10-16",
+  "applicationSourceRef": "b7e0afaa86db9e76e3422583f5e9c4a77cbdf314",
+  "externalDriverSourceRef": "b7e0afaa86db9e76e3422583f5e9c4a77cbdf314",
+  "driverRuntimeUnchangedFromRef": "9a6a7fcfac0c4b8e921ce566065fa6fcc40a9f13",
+  "productVersion": "0.2.13",
+  "piSdkVersion": "1.1.0",
+  "scope": "Shared guarded memory controls in original DSH Settings and existing native panel; isolated full actual Pi/Hindsight/Qwen acceptance and new unselected MX review",
+  "contract": {
+    "statusProtocol": "augmentor-memory-settings/1",
+    "statusModeMeaning": "Configured memory-engine choice; actual provider request not inferred from configuration",
+    "guard": "Expected boolean current state inside existing transaction/lock; not a revision-history or ABA guarantee",
+    "captureResumePreservesProcessingPause": true,
+    "processingResumeCreatesActivityLeaseOrBudget": false,
+    "inspectionAllowsGlobalMemoryStatusOrMutation": false,
+    "statusExcludesPrivateIdentityConfigurationSourcesAndJobs": true,
+    "unconfirmedWritesReplayed": false,
+    "legacyCompanionWithoutGuardsMayReceiveNewUiWrites": false,
+    "newMemoryModeWriteOrRestartRoute": false,
+    "schemaMigrationRequired": false
+  },
+  "qualification": {
+    "source": {
+      "pass": 761,
+      "fail": 0,
+      "skipped": 2,
+      "cancelled": 0
+    },
+    "freshOrdinary": {
+      "pass": 761,
+      "fail": 0,
+      "skipped": 2,
+      "cancelled": 0
+    },
+    "exactSealedTarget": {
+      "pass": 761,
+      "fail": 0,
+      "skipped": 2,
+      "cancelled": 0
+    },
+    "cohort": {
+      "files": 134,
+      "harnessChromiumFiles": 55,
+      "workers": 2,
+      "existingBoundsWorkersSkipsChanged": false,
+      "tests": [
+        "apps/browser/test/jobs-refresh.test.mjs",
+        "apps/browser/test/prompt-editor-ordering.test.mjs",
+        "apps/browser/test/prompts.test.mjs",
+        "tests/codex-browser-chromium.test.mjs",
+        "tests/codex-external-runtime.test.mjs",
+        "tests/codex-memory-runtime.test.mjs",
+        "tests/harness-account-login-chromium.test.mjs",
+        "tests/harness-account-scope.test.mjs",
+        "tests/harness-appearance-chromium.test.mjs",
+        "tests/harness-branch-chromium.test.mjs",
+        "tests/harness-branch-controls-chromium.test.mjs",
+        "tests/harness-branch-controls.test.mjs",
+        "tests/harness-brand-chromium.test.mjs",
+        "tests/harness-build-resolution.test.mjs",
+        "tests/harness-context-chromium.test.mjs",
+        "tests/harness-context-insights-chromium.test.mjs",
+        "tests/harness-context-insights.test.mjs",
+        "tests/harness-context-modal-chromium.test.mjs",
+        "tests/harness-context-preferences-chromium.test.mjs",
+        "tests/harness-context-providers-chromium.test.mjs",
+        "tests/harness-context-sidebar-chromium.test.mjs",
+        "tests/harness-disabled-pointer-chromium.test.mjs",
+        "tests/harness-drafts-chromium.test.mjs",
+        "tests/harness-drafts.test.mjs",
+        "tests/harness-dsh-attachments-chromium.test.mjs",
+        "tests/harness-dsh-chromium.test.mjs",
+        "tests/harness-dsh-interactions-chromium.test.mjs",
+        "tests/harness-dsh-question-batches-chromium.test.mjs",
+        "tests/harness-dsh-questions-chromium.test.mjs",
+        "tests/harness-dsh-settings-chromium.test.mjs",
+        "tests/harness-dsh.test.mjs",
+        "tests/harness-file-preview-chromium.test.mjs",
+        "tests/harness-file-references-chromium.test.mjs",
+        "tests/harness-fleet-chromium.test.mjs",
+        "tests/harness-goals-chromium.test.mjs",
+        "tests/harness-html-chromium.test.mjs",
+        "tests/harness-index-chromium.test.mjs",
+        "tests/harness-jobs-chromium.test.mjs",
+        "tests/harness-mcp-chromium.test.mjs",
+        "tests/harness-metafolder-navigation-chromium.test.mjs",
+        "tests/harness-metafolders-chromium.test.mjs",
+        "tests/harness-model-invalidation.test.mjs",
+        "tests/harness-models-chromium.test.mjs",
+        "tests/harness-navigation-chromium.test.mjs",
+        "tests/harness-nested-tools-chromium.test.mjs",
+        "tests/harness-office-chromium.test.mjs",
+        "tests/harness-office-preview.test.mjs",
+        "tests/harness-pdf-chromium.test.mjs",
+        "tests/harness-plan-mode-chromium.test.mjs",
+        "tests/harness-plans-chromium.test.mjs",
+        "tests/harness-pointer-chromium.test.mjs",
+        "tests/harness-prompts-chromium.test.mjs",
+        "tests/harness-reasoning-chromium.test.mjs",
+        "tests/harness-search-settings-chromium.test.mjs",
+        "tests/harness-session-create-chromium.test.mjs",
+        "tests/harness-session-create.test.mjs",
+        "tests/harness-shortcuts-chromium.test.mjs",
+        "tests/harness-spreadsheet-chromium.test.mjs",
+        "tests/harness-tool-arguments-chromium.test.mjs",
+        "tests/harness-wiki-review-chromium.test.mjs",
+        "tests/harness-wiki-settings-chromium.test.mjs",
+        "tests/harness-workspace-ordering-chromium.test.mjs",
+        "tests/harness-workspace-ordering.test.mjs",
+        "tests/mcp-connection.test.mjs",
+        "tests/mcp-transport.test.mjs",
+        "tests/model-account-login.test.mjs",
+        "tests/model-accounts.test.mjs",
+        "tests/model-discovery.test.mjs",
+        "tests/model-settings.test.mjs",
+        "tests/office-native-linux.test.mjs",
+        "tests/pi-mcp-authorization.test.mjs",
+        "tests/pi-mcp-connection-gap.test.mjs",
+        "tests/pi-mcp-connection.test.mjs",
+        "tests/pi-mcp-parallel.test.mjs",
+        "tests/pi-mcp-token-provider.test.mjs",
+        "tests/pi-model-configuration.test.mjs",
+        "tests/pi-plan-mode.test.mjs",
+        "tests/pi-privacy.test.mjs",
+        "tests/pi-prompt-queue.test.mjs",
+        "tests/pi-question-batches.test.mjs",
+        "tests/pi-question-contracts.test.mjs",
+        "tests/pi-session-organization.test.mjs",
+        "tests/pi-workspaces.test.mjs",
+        "tests/plan-mode-contracts.test.mjs",
+        "tests/runtime.test.mjs",
+        "tests/tool-argument-snapshots.test.mjs",
+        "tests/harness-question-drafts.test.mjs",
+        "tests/harness-question-drafts-chromium.test.mjs",
+        "tests/pi-interactions.test.mjs",
+        "tests/pi-compaction.test.mjs",
+        "tests/harness-local-plan-proof.test.mjs",
+        "tests/pi-permission-defaults.test.mjs",
+        "tests/harness-permission-defaults.test.mjs",
+        "tests/harness-permission-defaults-chromium.test.mjs",
+        "tests/session-permission-contracts.test.mjs",
+        "tests/pi-session-permissions.test.mjs",
+        "tests/harness-session-permissions.test.mjs",
+        "tests/harness-session-permissions-chromium.test.mjs",
+        "tests/session-skills.test.mjs",
+        "tests/pi-skill-workflows.test.mjs",
+        "tests/harness-skills.test.mjs",
+        "tests/harness-skills-chromium.test.mjs",
+        "tests/provider-user.test.mjs",
+        "tests/managed-skill-provenance.test.mjs",
+        "tests/pi-skill-provenance.test.mjs",
+        "tests/pi-context-provenance.test.mjs",
+        "tests/pi-observations.test.mjs",
+        "tests/observation.test.mjs",
+        "tests/harness-dsh-context.test.mjs",
+        "tests/harness-context-live-chromium.test.mjs",
+        "tests/archive-snapshot.test.mjs",
+        "tests/pi-session-archive.test.mjs",
+        "tests/pi-session-exports.test.mjs",
+        "tests/harness-session-export.test.mjs",
+        "tests/harness-session-export-chromium.test.mjs",
+        "tests/harness-dsh-commands.test.mjs",
+        "tests/codex-voice.test.mjs",
+        "tests/pi-voice.test.mjs",
+        "tests/pi-voice-host.test.mjs",
+        "tests/pi-upload-maintenance.test.mjs",
+        "tests/harness-file-preview.test.mjs",
+        "tests/harness-file-references.test.mjs",
+        "tests/pi-input-mode.test.mjs",
+        "tests/pi-voice-surfaces.test.mjs",
+        "tests/browser-shared-voice.test.mjs",
+        "apps/browser/test/voice.test.mjs",
+        "tests/harness-dictation.test.mjs",
+        "tests/harness-dictation-host.test.mjs",
+        "tests/harness-dictation-chromium.test.mjs",
+        "tests/harness-server.test.mjs",
+        "tests/memory-settings.test.mjs",
+        "tests/harness-memory-settings.test.mjs",
+        "tests/pi-memory-settings.test.mjs",
+        "tests/harness-memory-settings-chromium.test.mjs"
+      ]
+    },
+    "sourceAndOrdinaryPython": {
+      "passEach": 52,
+      "fail": 0,
+      "skipped": 0,
+      "nativeOffscreenCases": 4
+    },
+    "sourceAndOrdinaryMemoryNode": {
+      "passEach": 31,
+      "fail": 0,
+      "skipped": 0,
+      "workers": 2
+    },
+    "sourceLicenseBoundary": {
+      "pass": 25,
+      "fail": 0,
+      "skipped": 0
+    },
+    "guardNegativeControls": {
+      "baseSourceRef": "dcb157deb0d5b5a706a36092f5fa50045a34bf52",
+      "failAsExpected": 2,
+      "reason": "ValueError not raised for a conflicting current capture or processing state",
+      "samePositiveAssertionsPass": true
+    },
+    "buildAndTypeCheck": true,
+    "existingOfficeDuplicateKeyWarningRetained": true,
+    "sharedThreeOsCiStepRegistered": true,
+    "newHeadHostedResultsQualifiedByThisRecord": false
+  },
+  "frozenInputs": {
+    "tracked": 3411,
+    "compiled": 1063,
+    "nodeExecutables": 1,
+    "dependencyInputs": 20702,
+    "browserTestDependencyInputs": 1932,
+    "beforeAfterUnchanged": true,
+    "inventorySha256": {
+      "dist": "d46cc2a135506b52bca0787fc11fcde0a090c90f5793d4c1d089bcf251a8f934",
+      "node": "7cf49748be9dfbbd046a98a2769dfc8b8366eeb661a450827711c5094a9b5a24",
+      "node_modules": "0704a733803a7dabae4dd66e7726e15cd750c0b6d29d552c604ba7dd331b4bab",
+      "apps/browser/test/node_modules": "1986b7f62d4ba532fc7a6f4471c8c55df17250360be682a86e25cc508d87be2c"
+    }
+  },
+  "fullActualMemoryResult": {
+    "passed": true,
+    "scenario": "full",
+    "phase": "qualified",
+    "memoryThinkingMode": "off",
+    "baselineMemoryThinkingMode": "default",
+    "explicitMemoryModeOverride": true,
+    "applicationHostSha256": "6b05f2eed32ac17e558f464b8494b991ffc80c42ce55d780312cce056d865a78",
+    "driverSha256": "87d025929a4bc17333e96437681b9f10e40a7084787a3cfee61fd3c229d68d95",
+    "seed": {
+      "relationshipSha256": "47932db81ed79cd5b297df1335b38f52cfba278da9a4d8dc32fe960e9f51d6b3",
+      "workSha256": "02448a2b704672a5e9f21cdae9b6eaad381c5326b8effd383dbdf5827c269d8a"
+    },
+    "recall": {
+      "nativeBriefSha256": "686a069d5f6ed80916611d493b6afe121cf50d7d8191e9aeb1a86e28b25108a3",
+      "actualProviderContext": true,
+      "actualAnswer": true
+    },
+    "personProjectIsolation": true,
+    "updatedMemorySha256": "53b2e6a9edcdb6d4f5096e8db8f67ca120cb804eb0a6c26763de94b92630de86",
+    "historicalBranch": {
+      "originalBriefSha256": "686a069d5f6ed80916611d493b6afe121cf50d7d8191e9aeb1a86e28b25108a3",
+      "noFreshRecall": true,
+      "parentUnchanged": true
+    },
+    "coldBranchAndMemoryRestart": true,
+    "pause": {
+      "chatAvailable": true,
+      "captureAndRecallSuppressed": true
+    },
+    "memoryOutage": {
+      "ordinaryChat": true,
+      "emptyManagedBrief": true,
+      "durableCaptureRecoveredOnce": true,
+      "modelOrToolReplay": false
+    },
+    "authoredToolExecutions": 2,
+    "conversationRequests": 10,
+    "memoryRpcCalls": 1721,
+    "providerOutputLimitsPreserved": true,
+    "engineStopped": true,
+    "allOwnedActorsTerminal": true
+  },
+  "completedJobs": [
+    {
+      "phase": 6,
+      "status": "completed",
+      "attempt": 0
+    },
+    {
+      "phase": 6,
+      "status": "completed",
+      "attempt": 0
+    }
+  ],
+  "completedJobBudgets": [
+    {
+      "remainingSeconds": 102.32549243106041,
+      "remainingTokens": 37515,
+      "calls": 8,
+      "failures": 0,
+      "status": "pending"
+    },
+    {
+      "remainingSeconds": 93.49521882005502,
+      "remainingTokens": 25727,
+      "calls": 10,
+      "failures": 0,
+      "status": "pending"
+    }
+  ],
+  "actualMemoryTransportReceipts": [
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2789
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 3756
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2367
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 3056
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1250
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1721
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1367
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1363
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1999
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1915
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2661
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2935
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2518
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 3433
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1259
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2711
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1820
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 5248
+    }
+  ],
+  "upstreamBackport": {
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "license": "MIT",
+    "copyright": "Copyright (c) 2025 Vectorize AI, Inc.",
+    "upstreamFixRef": "022583d43b3ae460233c9df880040c0770f24e0b",
+    "upstreamFixPath": "hindsight-api-slim/hindsight_api/engine/memory_engine.py",
+    "baseRef": "5d46f9c8c8eb4fb96f549aa63abe1191b82a7840",
+    "baseGitBlob": "df43b37f0093fb5d3c3037858126620f9e5b4790",
+    "baseImage": "ghcr.io/vectorize-io/hindsight@sha256:3edcb6165cefdeaa6721dd0fce43cfd13b7a9c346ce0d2c5f4b4bf7bc3c8ac0b",
+    "containerPath": "/app/api/hindsight_api/engine/memory_engine.py",
+    "baseSha256": "770ea9011dec620c6c6584f8889ccf73740f9489586e5745fd0164fd636eafba",
+    "resultSha256": "dd82621a04fc20f3535be823d3a6a2712572928e54ac9fa73541cdb463ecf4f0",
+    "patchSha256": "229dd6019362cabf8bca9b126babe22a6aa15d98d05b0bf37c81bc4b54a0cbcc",
+    "licenseSha256": "01fde0bedf83bdc185065d7af524a61690efe576a67f922eaff3a1280c17b63a",
+    "adaptation": "Only the upstream refresh budget constant, per-refresh selection and explicit Reflect argument are backported into the exact 0.10.0 image source; shortened comment/context adapted. Newer API/UI/CLI/schema/config-option changes are not selected.",
+    "scope": "Opt-in isolated proof overlay only; configured max iterations remains two and existing job/call/time/token/output/concurrency/model settings remain unchanged."
+  },
+  "processingLimits": {
+    "jobAndAbsoluteToolWindowSeconds": 120,
+    "jobTokens": 65536,
+    "callSeconds": 45,
+    "callOutputTokens": 4096,
+    "reflectContextTokens": 8000,
+    "configuredRefreshIterations": 2,
+    "memoryConcurrency": 1,
+    "contextWindow": 262144,
+    "conversationOutputTokens": 8192,
+    "sourceIdsDatesAndScopesPreserved": true,
+    "serverContextConcurrencyPrecisionGpuOrVoiceSettingsChanged": false
+  },
+  "proofOwnership": {
+    "allOwnedActorsAndProofEngineTerminal": true,
+    "publicCacheInputsUnchanged": 43,
+    "sourceOverlayVerified": true,
+    "originalEngineIdentityPreserved": true,
+    "privateEngineLog": {
+      "bytes": 61588,
+      "sha256": "4f4848a170670469902e5e36d586b0574cf919707eef0766e846caecfc99d69e",
+      "published": false
+    }
+  },
+  "mxReview": {
+    "releaseId": "20261016-050949-2145f2db",
+    "artifactSha256": "d9a4016e51fbbb1b22a4486354381ac5c9b089e12cdeb850fb4d9b5072cf353b",
+    "sealedEntries": 24524,
+    "applicationRef": "b7e0afaa86db9e76e3422583f5e9c4a77cbdf314",
+    "unselected": true,
+    "installedSelectionChanged": false,
+    "ownerDataOrCredentialsImported": false,
+    "freshEmptyProfileAndFreshEngineVolume": true,
+    "modeExplicitlySelected": "off",
+    "originalEngineMode": "default",
+    "privateRecognitionComponentVersion": "0.1.22",
+    "existingCpuRecognitionProcessAndProfileReusedWithoutMutation": true,
+    "sharedDistributionPinsChanged": false,
+    "ownerBrowserQa": {
+      "passed": true,
+      "recognition": {
+        "cached": true,
+        "device": "cpu",
+        "language": "en",
+        "maxDurationSeconds": 600,
+        "noRecordingOrInferenceSubmitted": true
+      },
+      "themes": {
+        "Light": {
+          "stroke": "2px",
+          "color": "rgb(0, 0, 0)",
+          "background": "rgba(0, 0, 0, 0)",
+          "flare": "conic-gradient(from 40deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.396), rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))",
+          "settingsText": "rgb(15, 17, 21)",
+          "bodyText": "rgb(15, 17, 21)",
+          "animations": [
+            "brand-shape",
+            "brand-flow",
+            "brand-breath"
+          ]
+        },
+        "Dark": {
+          "stroke": "2px",
+          "color": "rgb(249, 250, 251)",
+          "background": "rgba(0, 0, 0, 0)",
+          "flare": "conic-gradient(from 40deg, rgba(0, 0, 0, 0), rgba(180, 160, 255, 0.396), rgba(0, 0, 0, 0) 50%, rgba(122, 174, 255, 0.5), rgba(0, 0, 0, 0))",
+          "settingsText": "rgb(249, 250, 251)",
+          "bodyText": "rgb(249, 250, 251)",
+          "animations": [
+            "brand-shape",
+            "brand-flow",
+            "brand-breath"
+          ]
+        }
+      },
+      "permissionControls": {
+        "futureDefaultReadOnly": true,
+        "fullConfirmationOpenedAndCancelled": true,
+        "unacknowledgedAcceptanceDisabled": true,
+        "currentCapability": true,
+        "noModeWrite": true
+      },
+      "accountControls": {
+        "registeredProviders": 9,
+        "storedCredentials": 0,
+        "originalConfirmationOpenedAndClosed": true,
+        "sdkLoginAdmitted": false
+      },
+      "memory": {
+        "configuredMode": "off",
+        "liveProviderVerificationClaimedByStatus": false,
+        "capturePauseAndResume": true,
+        "processingPausePreservedUntilExplicitResume": true,
+        "initialStateRestored": true,
+        "events": 0,
+        "pending": 0,
+        "stopped": 0
+      },
+      "checks": {
+        "exactRuntimeAndProfile": true,
+        "product": "0.2.13",
+        "piSdk": "1.1.0",
+        "sessions": 0,
+        "activeTurns": 0,
+        "unsentDrafts": 0,
+        "readOnly": true,
+        "keylessSearch": true,
+        "localCapture": true,
+        "originalStartPage": true,
+        "planModeCapability": true,
+        "currentPermissionCapability": true,
+        "skillReferencesCapability": true,
+        "sessionExportCapability": true,
+        "newChatPermissionDefaultRow": true,
+        "twoAugmentorMarks": true,
+        "composerDisabledUntilNewSession": true,
+        "settingsAvailable": true,
+        "browserErrors": 0,
+        "failedResponses": 0,
+        "noModelOrToolWorkSubmitted": true
+      },
+      "ownedQaBrowserTerminal": true
+    },
+    "ownerHostAndMemoryEngineIntentionallyRunning": true,
+    "startupAddsAutostart": false,
+    "productionBackportInstallerOrExistingBankMigrationQualified": false,
+    "initialOwnerMemoryEventsJobsAndBudgetRows": 0
+  },
+  "preservation": {
+    "sealedInventoriesVerified": 12,
+    "reviewProcessesPresent": 13,
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "privateCompanionPreexistingDirtyFiles": 4,
+    "modelSpeechGpuConfigurationFilesPreserved": 6,
+    "currentMxReviewHttpStatus": 200,
+    "newMxReviewHttpStatus": 200,
+    "qwenCatalogHttpStatus": 200,
+    "recognitionReviewProcessPresent": true,
+    "originalMemoryEngineIdentityPreserved": true,
+    "newReviewSealedInventoryPreserved": true,
+    "speechOrGpuServiceMutationsThisCheckpoint": false,
+    "newArtifactActivated": false,
+    "privateSpeechSourceCopied": false
+  },
+  "retainedPreparationFailures": [
+    "Initial TypeScript optional success-state narrowing; corrected with literal connection discriminants",
+    "Initial Python invocation named two nonexistent modules; corrected to the owning memory modules",
+    "Initial negative-control class name error; corrected and both stale-state cases fail as expected",
+    "New Chromium expected stale HTTP rejection initially treated as unexpected; now exact method/params/status/body and no unrelated errors are asserted",
+    "Relative ordinary-driver executable path refused before a suite starts; corrected to the absolute frozen root",
+    "Unsealed assembly omitted preferred Office licence source; a separate assembly includes verified public preferred vendor inputs",
+    "Initial sealed-driver working directory lacked external Browser test dependencies: four module-load failures; corrected established external-source driver passes full cohort; seal unchanged"
+  ],
+  "priorMemoryEvidence": "harness-pi-memory-explicit-mode-qualification-20261016.json",
+  "retainedDefaultFailures": "harness-pi-memory-page-qualification-20261016.json",
+  "localEvidenceDigests": {
+    "harness-memory-settings-node-focus-initial-20261016.log": {
+      "bytes": 1342,
+      "sha256": "4662c327a64e0ae3917aa9215fa617aa76ac9ad9efbfde53b529d65d76aee5b2"
+    },
+    "harness-memory-settings-chromium-initial-20261016.log": {
+      "bytes": 1660,
+      "sha256": "998bf6833eefeec5ac2fff341c3fddf3473f307148417af10d19304e894bfe3c"
+    },
+    "harness-memory-settings-chromium-followup-20261016.log": {
+      "bytes": 238,
+      "sha256": "d07134373d4b0298dc89afb2a556a87a82486b32086a8ba99afa70ce2413723e"
+    },
+    "harness-memory-settings-python-final-source-20261016.log": {
+      "bytes": 9316,
+      "sha256": "a01a5a14152c55b7fbe99f63f06cc3bdf8b607906895bc2f429ae95cab2d97fc"
+    },
+    "harness-memory-settings-python-final-followup-source-20261016.log": {
+      "bytes": 9369,
+      "sha256": "b7ec0fae49a57a023d549f9643e58d2a39911a4c0adde3c4cd6a6f8a77111637"
+    },
+    "harness-memory-settings-python-ordinary-20261016.log": {
+      "bytes": 9369,
+      "sha256": "fe2bd10538d0ebf2097579a4c36aa105f0f1c811cd4a67cfb7720a7207d67d44"
+    },
+    "harness-memory-settings-node-memory-source-20261016.log": {
+      "bytes": 3518,
+      "sha256": "a6474738d51fd533f3a18ccd019842cab2859b3293a7246a80108f5b18b57de3"
+    },
+    "harness-memory-settings-node-memory-ordinary-20261016.log": {
+      "bytes": 3519,
+      "sha256": "bb938536be2aa135bc87249123632eaf2b7963289b53f4a1d8e1c9a1844e566c"
+    },
+    "harness-memory-settings-source-cohort-initial-20261016.log": {
+      "bytes": 85609,
+      "sha256": "4acb63886fa908f6ed482f857d921ea2efe9f239081d7f3fc5dcfb912b37f325"
+    },
+    "harness-memory-settings-ordinary-cohort-initial-20261016.log": {
+      "bytes": 5276,
+      "sha256": "31536a415d06f60fe55197cc6d23e4ad72f7da8b04b01790718ad0d26d553036"
+    },
+    "harness-memory-settings-ordinary-cohort-followup-20261016.log": {
+      "bytes": 85604,
+      "sha256": "66d1020bc073ee067c4a7f1d38eb5c410a85a13ef54c208e490871454f6c50c3"
+    },
+    "harness-memory-settings-sealed-cohort-20261016.log": {
+      "bytes": 5310,
+      "sha256": "9413fa35f00e87ca0c136b4fe3abd8920e46f0f2e04daa0ce23d58177296b6c3"
+    },
+    "harness-memory-settings-negative-initial-20261016.log": {
+      "bytes": 1346,
+      "sha256": "3a14f657937fab128e94c0228600953b659935b091d3c4bcd7f91e55fa2537cd"
+    },
+    "harness-memory-settings-negative-followup-20261016.log": {
+      "bytes": 1805,
+      "sha256": "d37f625a5665f6d7bbfd0b0a2df5754737d1e5849672e8c6c91ef589f2de4d1a"
+    },
+    "harness-memory-settings-stage-driver-20261016.log": {
+      "bytes": 1293,
+      "sha256": "956358dcc6a30ef7f6df6c0b0569df4114d5da8f27d3f6b63bef9fa49a156ae4"
+    },
+    "harness-memory-settings-notice-diagnostic-20261016.log": {
+      "bytes": 1124,
+      "sha256": "bd9ea06a5b981c72af36f76c248c9e98ddb5bf5c4bca723100e681144f68cc7a"
+    },
+    "harness-memory-settings-stage-followup-driver-20261016.log": {
+      "bytes": 254,
+      "sha256": "8f06c0f3e7bbbdd0e409d6862e2fc83d05d9b6599a2886c008873a97e996f3d7"
+    },
+    "harness-memory-settings-boundary-source-20261016.log": {
+      "bytes": 5070,
+      "sha256": "bda005d694a6560933218e01b78169f66d09a820262f9b367ae2deaa675e72f4"
+    },
+    "harness-memory-settings-engine-20261016.log": {
+      "bytes": 228,
+      "sha256": "0afe5646d480554cdcb6082978c673c2e89c0577d1b758c9ace7dd294a6c1e62"
+    },
+    "harness-memory-settings-live-proof-20261016.log": {
+      "bytes": 802,
+      "sha256": "5edce373536dab1155d466afad9edecb16fde2e655ecaa806c431756087970a0"
+    },
+    "harness-memory-settings-check-initial-20261016.log": {
+      "bytes": 649,
+      "sha256": "145d812d7b6a85d70a21b4c586899ae1dc6da95a3d6046f67b979536a6131cd8"
+    },
+    "harness-memory-settings-check-final-20261016.log": {
+      "bytes": 121,
+      "sha256": "fdb848896bbc76bd3619da963b85a271eca6a558e166148427f89863f005e81c"
+    },
+    "harness-memory-settings-build-initial-20261016.log": {
+      "bytes": 1576,
+      "sha256": "f7ccc7116b5929dbaaa0289f35febb90b0140338be5ccb86a65ecf5a2ea9ffd8"
+    },
+    "harness-memory-settings-sealed-cohort-followup-20261016.log": {
+      "bytes": 85605,
+      "sha256": "bb1ab93dda68cd9770c8779009d98ef954821dc4ebf62f786e5d845d4ea75a1c"
+    },
+    "harness-memory-settings-review-owner-qa-20261016.log": {
+      "bytes": 2100,
+      "sha256": "7b0b97026e3430323a5b289c2800ae6009e2b52d3b7323aaad077d6a524c4720"
+    },
+    "harness-memory-settings-postflight-20261016.log": {
+      "bytes": 1976,
+      "sha256": "133348c1f76a9a05b44c99650b9d4386ded04ba2f033b4a24ec262e1e3ab6e79"
+    }
+  },
+  "remaining": [
+    "Physical MX feedback on the new original-GUI review and microphone",
+    "Production backport install/restart, existing-bank migration and guarded installed adoption",
+    "Default-mode timing and broader memory semantics/load/providers",
+    "Full voice and shared component distribution/pin/adoption; Breeze GPU prerequisite remains unmet",
+    "Remaining plugin/Home/Office workflows, migration and later OS release gates"
+  ],
+  "publicBinaryPublished": false,
+  "merged": false,
+  "wholeHarnessGoalComplete": false,
+  "observedAtUtc": "2026-10-16T03:19:47.793860+00:00"
+}

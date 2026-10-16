@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current guarded-memory MX review](HARNESS-MX-REVIEW.md#guarded-automatic-memory-review--october-16)
+**20261016-050949-2145f2db** / application **b7e0afaa** runs unselected, with an
+independent empty memory profile/engine and explicit memory-only off. Source/
+ordinary/sealed-target each pass 761/two existing optional skips, unchanged bounds;
+all 24,524 sealed entries/1,063 compiled inputs verify after owner browser QA.
+Earlier reviews/recognition and installed selection remain preserved. This does
+not adopt the experimental backport into the production installer or migrate
+existing banks; full platform, physical voice and release gates remain open.
+
 [Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
 **20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
 It includes managed skill links in original Raw Pi Context and the large-JSON

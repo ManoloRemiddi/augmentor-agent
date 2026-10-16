@@ -9,6 +9,25 @@ owner or change the original DSH GUI. [Controlled memory](CONTROLLED-MEMORY.md)
 owns the budgets, source selection, previous optional thinking-mode evidence and
 production deployment boundaries.
 
+## Current shared-settings application and MX review — October 16
+
+Application **b7e0afaa** repeats the full actual Pi/Hindsight/Qwen scenario after
+adding guarded shared memory controls. All 18 memory calls explicitly carry false
+and complete; both jobs finish six stages at attempt zero/no failures, with
+102.33/93.50 seconds and 37,515/25,727 tokens remaining. Ten conversation requests/
+two authored tools pass the same correction/scoped recall/historical branch/cold
+restart/pause/outage assertions; proof actors and engine join. Source/fresh
+ordinary pass 52 Python/31 Node plus the 761/two-skip wider suite; the new sealed
+MX review passes that same 134-file/55-Chromium suite and final empty-profile QA.
+The original default-mode engine, source semantics and budgets remain unchanged.
+[Shared settings and exact review](HARNESS-MEMORY-SETTINGS.md#qualified-mx-review--october-16)
+now make the configured choice visible without claiming transport verification
+from a configuration value. Production source-backport installation/existing-bank
+adoption and broader semantic/load/default-mode qualification remain open.
+[Portable record](../release/harness-memory-settings-review-20261016.json).
+
+The preceding explicit-mode run and all retained failures follow.
+
 ## Current explicit-mode qualification — October 16
 
 The **same full scenario** now passes with the existing explicitly selected

@@ -1,14 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Shared automatic-memory controls](HARNESS-MEMORY-SETTINGS.md) now expose configured
-request mode and independent capture/processing pauses in original Harness
-Plugins and the existing native panel. Operator metadata is sanitized; inspectors
-are excluded. Service-level boolean guards reject conflicting current state;
-unconfirmed writes require Refresh without replay. Source focused checks pass
-52 Python, 12 Node controls and one actual Chromium UI case in both themes; two
-guard cases fail against preceding source as intended. Broader/fresh-copy/live
-qualification is recorded separately when complete. Existing engine mode, MX
-review, installed selection and owner/private state remain unchanged.
+[Current guarded-memory MX review](HARNESS-MEMORY-SETTINGS.md#qualified-mx-review--october-16)
+**20261016-050949-2145f2db**, application **b7e0afaa**, runs unselected with the
+original DSH GUI, configured mode and independent guarded capture/processing
+controls. Source/fresh ordinary/exact sealed target each pass **761/two existing
+optional skips**, 134 files/all 55 Harness Chromium files; common memory/native
+checks each pass **52 Python/31 Node**, with 25 source/licence cases. Both stale
+state controls fail against preceding source. The full actual Pi/Hindsight/Qwen
+proof passes ten conversation requests/two authored tools; all 18 memory requests
+carry false, both six-stage jobs complete at attempt zero/no failures with over
+93 seconds/25,000 tokens remaining. All proof actors/engine are terminal. The new
+review uses its own empty profile/engine/volume and explicit memory-only off;
+original mode stays default, existing CPU recognition 0.1.22 is reused unchanged.
+Owner start/Light/Dark/logo/memory/recognition QA passes with zero sessions/events/
+jobs/budgets; all 24,524 sealed entries/1,063 compiled inputs verify. Twelve seals/
+thirteen review owners plus recognition, selection, 38 canonical/four original
+private changes and six config hashes are preserved. Qwen is online; Breeze stays
+failed below its GPU prerequisite, without tuning/retry. Physical MX feedback,
+production install/existing-bank adoption, full voice/distribution, remaining
+plugin/Home/Office/migration and later OS gates remain open. No installed update,
+merge or public binary follows. [Portable evidence](../release/harness-memory-settings-review-20261016.json).
 
 [Explicit memory-only mode](PI-MEMORY-LIVE.md#current-explicit-mode-qualification--october-16)
 now passes the unchanged **full actual Pi/Hindsight/Qwen scenario**, application

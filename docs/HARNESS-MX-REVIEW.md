@@ -1,5 +1,47 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Guarded automatic-memory review — October 16
+
+Current private unselected **20261016-050949-2145f2db** runs application/source
+**b7e0afaa**, product **0.2.13** / Pi SDK **1.1.0**. The original DSH GUI, 2px
+animated marks, Context/Trajectory/Insights, microphone and existing controls are
+preserved. **Settings → Plugins → Automatic memory** exposes configured mode,
+independent pauses and Refresh. This review explicitly selects memory-only
+thinking **off**, uses its own fresh engine/volume/empty profile, and reuses the
+existing cached CPU recognition service without changing it. The original memory
+engine, earlier review and selected installation remain intact.
+
+Source/fresh ordinary/exact sealed target each pass **761 with two existing
+optional skips**, 134 files/all 55 Harness Chromium files; focused common memory/
+native checks pass 52 Python/31 Node each. The full actual Pi/Hindsight/Qwen proof
+passes, including correction/recall/branch/restart/pause/outage and joined cleanup.
+All 18 memory requests explicitly carry false; source dates/IDs/scopes and limits
+remain unchanged. Owner Light/Dark/logo/memory/recognition/Permission/account QA
+starts with zero sessions/events/jobs/budget rows and submits no model/audio work.
+The **24,524-entry** seal is
+`d9a4016e51fbbb1b22a4486354381ac5c9b089e12cdeb850fb4d9b5072cf353b`.
+All 1,063 compiled inputs and the complete seal verify after qualification/startup;
+production dependency/Node/component bytes stay identical to the prior sealed
+baseline. Initial driver/notice assembly failures remain retained and the sealed
+artifact is never repaired in place.
+
+Use the private link in chat. Choose **New Session** for chat/microphone testing,
+or open Settings directly to inspect memory. The mode label reports configuration;
+it does not claim to inspect every live provider request. Capture pause also
+pauses processing; capture resume keeps that pause until explicitly resumed.
+An unconfirmed setting requires Refresh and is never replayed.
+
+Twelve sealed inventories/thirteen review owners plus recognition, selected
+configuration, existing canonical/private changes and six model/service hashes
+are preserved. Qwen is online; Breeze is still below its unchanged RTX 5090
+prerequisite and is not retried or moved. Physical MX feedback, production memory
+installation/existing-bank migration, full voice/component distribution, broader
+workflows and later OS releases remain open. No installed activation, merge or
+public binary follows. [Controls, evidence and lifecycle](HARNESS-MEMORY-SETTINGS.md#qualified-mx-review--october-16),
+[portable record](../release/harness-memory-settings-review-20261016.json).
+
+The preceding microphone-only review remains available with its own profile:
+
 ## Original DSH microphone review — October 16
 
 Private unselected **20261016-022659-869fe1e8** runs product 0.2.13/Pi SDK 1.1.0,

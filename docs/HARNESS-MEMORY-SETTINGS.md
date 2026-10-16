@@ -83,3 +83,78 @@ node --test --test-concurrency=2 tests/memory-settings.test.mjs \
   tests/harness-memory-settings.test.mjs tests/pi-memory-settings.test.mjs \
   tests/harness-memory-settings-chromium.test.mjs tests/harness-server.test.mjs
 ```
+
+## Qualified MX review — October 16
+
+Application **b7e0afaa86db9e76e3422583f5e9c4a77cbdf314**, product **0.2.13** /
+Pi SDK **1.1.0**, is staged as unselected review **20261016-050949-2145f2db**.
+The **24,524-entry** seal is SHA-256
+`d9a4016e51fbbb1b22a4486354381ac5c9b089e12cdeb850fb4d9b5072cf353b`.
+No sealed release is patched to obtain a pass.
+
+| Scope | Result |
+| --- | --- |
+| Source / fresh ordinary / exact sealed target | Each 761 pass, two existing optional skips, zero failures/cancellations; 134 files, all 55 Harness Chromium files. |
+| Common memory / native settings | Source and fresh ordinary each 52 Python and 31 memory Node cases; new controls are also in the wider cohort. |
+| Source and licence boundaries | 25 cases pass; Office public redistribution gate remains closed. |
+| Frozen input verification | 3,411 tracked, 1,063 compiled, one Node executable, 20,702 dependency inputs and 1,932 Browser test inputs remain unchanged after use. |
+
+Both guard negative controls fail against **dcb157de**, specifically because a
+stale write raises no error. Positive cases pass with the same assertions. Build
+and type check pass; the existing Office duplicate-key build warning remains.
+Existing test bounds/workers stay unchanged, with two cohort workers. The added
+shared CI step uses those two workers; its hosted result is separate evidence.
+
+The **full actual Pi/Hindsight/Qwen scenario** also passes against this frozen
+application and its frozen driver. All 18 observed memory requests carry
+`enable_thinking: false` and finish. Both jobs complete six stages at attempt zero,
+with no call failures and respectively **102.33 seconds / 37,515 tokens** and
+**93.50 seconds / 25,727 tokens** remaining. Ten conversation requests/two authored
+tools verify seed/correction, scoped fresh recall, person/project isolation, exact
+historical branch, cold restart, paused capture/ordinary chat and outage recovery
+without replay. All proof actors and its engine are terminal; public cache and
+source overlay verify. Existing 120-second/65,536-token job/window, 45-second/
+4,096-output call, model/server/GPU and source/date/scope contracts are unchanged.
+Earlier default-mode failures remain retained and unqualified by this pass.
+
+The owner review starts with a separate empty profile, fresh labelled engine and
+volume, explicit memory-only **off** and the verified MIT refresh-default overlay.
+Its engine owns no previous banks. The original engine remains **default**. The
+existing CPU recognition-only **0.1.22** service is reused without changing its
+profile/process; shared distribution pins remain unchanged. Browser QA verifies
+both 2px animated marks/themes, Settings text, the configured mode, capture and
+processing controls, original Permission/account confirmation, cached recognition
+and zero initial sessions/events/jobs/budget rows. QA submits no recording or
+model/tool work and restores the initial memory settings. Its browser is closed;
+the review Host and its own memory engine intentionally remain available.
+
+Twelve sealed inventories/thirteen review owners plus recognition, the selected
+installation, 38 canonical/four original private changes and six model/service
+configuration hashes are preserved. Qwen is online. Breeze remains failed below
+its unchanged GPU-memory prerequisite; no service retry, GPU move or tuning occurs.
+
+Retained preparation failures include the initial type narrowing, two incorrect
+Python module names, an incorrect negative-control class name, expected stale-HTTP
+rejection classification, a relative ordinary-driver path, missing preferred
+Office licence input in an unsealed assembly, and a sealed-driver working directory
+that lacked external test dependencies. They are not counted as passing evidence.
+The corrected assembly includes the public preferred vendor source. The corrected
+sealed driver uses external public tests/dependencies and the sealed application;
+the seal verifies unchanged before and after. No limits, workers or skips change.
+
+For this review only, the engine is prepared by the opt-in
+[`hindsight-isolated-proof-engine.py`](../scripts/hindsight-isolated-proof-engine.py)
+with the explicit backport/off options, a new private ownership marker and the
+unchanged public local-model declaration. Its fresh `hindsight.json` is placed in
+the review's private shared-data directory before Host startup; credentials/data
+remain outside the seal and public record. It is not a production installer or
+existing-bank migration. Startup does not activate the installed selection or add
+autostart. The private owner receipt records exact Host/container identities and
+the local access link. To retire this review, drain its Host first, then use the
+helper's `stop --root` for that exact owned engine. Preserve its volume/profile;
+the reused recognition service and original engine belong to other owners.
+
+Physical MX feedback, installed adoption/backport installation and existing-bank
+migration, default-mode timing/broader load/semantics, full voice/distribution,
+remaining plugin/Home/Office workflows and later OS releases remain open.
+[Portable qualification and review evidence](../release/harness-memory-settings-review-20261016.json).
