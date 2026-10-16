@@ -2,7 +2,7 @@
 
 # Complete DSH project bundles
 
-October 17 source qualification adds `augmentor-dsh-project-export/2` alongside
+October 17 source and ordinary packaged qualification adds `augmentor-dsh-project-export/2` alongside
 existing version-one JSON exports. A bundle preserves the complete captured JSON
 values and exact stored image bytes across bounded files. It does not reconstruct
 original DSH journal whitespace, camera uploads, signed provider state or usage.
@@ -153,5 +153,8 @@ publication now follows exact workspace membership order. A writer-level private
 manifest permission assertion also caught reliance on the CLI umask; the writer
 now creates its manifest explicitly with mode 0600. Initial fixture errors and
 failing logs remain private; passing checks use original scope and deadlines.
-A packaging/installed result must be recorded separately before adoption. Voice,
+The separate ordinary packaged copy passes the same 174 Node / 47 Python
+cases, with all 1,108 compiled files and 23,511 unchanged baseline inputs verified.
+The identical retained real bundle passes preparation for two parents/24 images.
+Sealed and installed qualification must be recorded separately before adoption. Voice,
 other operating systems and wider owner migration remain deferred.

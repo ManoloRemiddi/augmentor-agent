@@ -1,7 +1,7 @@
 {
   "schema": "augmentor-dsh-bundle-qualification/1",
   "date": "2026-10-17",
-  "scope": "Source and read-only owner-source assessment; ordinary/sealed qualification pending; no additional owner transfer",
+  "scope": "MX source and separate ordinary packaged qualification; sealed qualification pending; no additional owner transfer",
   "sourceBaseRef": "307e27cbf63f61c872e463bad2d5cdd5d2b8bfff",
   "format": {
     "schema": "augmentor-dsh-project-export/2",
@@ -38,7 +38,7 @@
     "workers": 2,
     "skips": 0,
     "deadlinesChanged": false,
-    "ordinaryPackagedPass": null,
+    "ordinaryPackagedPass": 174,
     "exactSealedPass": null,
     "ownerAdoption": false,
     "testedInputsSha256": {
@@ -51,7 +51,13 @@
       "packages/runtime/src/dsh-project-batch.ts": "ec18cea6f4618eca67f2cba04de10428ca4a71708e5ff8ae84b737db380e7449",
       "packages/runtime/src/native-profile-import.ts": "ab3d8963ad060cdc37b51da4ed1063b9e03d5beba524c113caef7b9eaebe3a43",
       "packages/runtime/src/display-history.ts": "50e291b6ee1f62429e06bebc888891be94207ec4c59e6fa4453cca987bd52a25"
-    }
+    },
+    "ordinaryPackagedPythonPass": 47,
+    "compiledFilesVerified": 1108,
+    "ordinaryBaselineUnchangedInputsVerified": 23511,
+    "sameFrozenRealPreparationAcceptedByOrdinary": true,
+    "sameFrozenRealParentCount": 2,
+    "sameFrozenRealImageCount": 24
   },
   "realReadOnly": {
     "projectsChecked": 7,
@@ -89,10 +95,11 @@
     "Preview original-tail fixture cursor was corrected to point at the tool payload rather than trailing provenance."
   ],
   "remaining": [
-    "Separate packaged/sealed qualification and guarded adoption",
+    "Seal and qualify a separate candidate before guarded adoption",
     "Owner pilot feedback before extra transfers",
     "Independent source-format and source-observation refusals",
     "Existing finite per-history/profile/native relocation bounds",
     "Voice and later OS rollout deferred"
-  ]
+  ],
+  "implementationRef": "74b4328b"
 }
