@@ -1,7 +1,7 @@
 {
   "schema": "augmentor-dsh-settlement-qualification/1",
   "date": "2026-10-17",
-  "scope": "MX source and read-only frozen parent preparation; separate package qualification pending; no owner transfer",
+  "scope": "MX source and separate ordinary packaged qualification; sealed pending; no owner transfer",
   "sourceBaseRef": "cf0278429cb033ec26ccfafb4ab5e878c3dbb00a",
   "primaryProtocol": {
     "repository": "deepseek-ai/deepseek-harness",
@@ -48,7 +48,7 @@
     "workers": 2,
     "skips": 0,
     "deadlinesChanged": false,
-    "ordinaryNodePass": null,
+    "ordinaryNodePass": 190,
     "exactSealedNodePass": null,
     "ownerAdoption": false,
     "testedInputsSha256": {
@@ -56,7 +56,11 @@
       "tests/dsh-project-settlement.test.mjs": "81fdfc4798233ce7d66731c1eb915404013e9148181054b69d4d5a6039b1781d",
       "tests/dsh-project-settlement-runtime.test.mjs": "204bc10a5a023cd8c1c158952798f72d15eaacadfc3e8a30a8d6f068d98aa70e",
       "tests/fixtures/dsh-settlement-project.mjs": "8d23493c8683401d07f4d059bcb2b3143bdd5173139db45736b3458691ade230"
-    }
+    },
+    "ordinaryPythonPass": 47,
+    "compiledFilesVerified": 1108,
+    "ordinaryUnchangedBaselineInputsVerified": 23517,
+    "sameFrozenRealPreparationAcceptedByOrdinary": true
   },
   "realFrozenComparison": {
     "projects": 1,
@@ -77,5 +81,6 @@
     "File/content and dispatch-less tool-result cases",
     "Source-observation failures and other independent formats",
     "Voice and later OS rollout deferred"
-  ]
+  ],
+  "implementationRef": "7caa7281"
 }

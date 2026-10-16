@@ -426,8 +426,9 @@ actual SDK case: cold reopen without work, an explicit new human request with on
 fresh read-only tool, native reply branching and another cold continuation. Its
 source fixture has no owner content. Source build/check and the complete
 **190-case, thirty-file Node focus** pass with two workers/eight Chromium
-files/eleven GUI cases, alongside **47 Python checks**; packaging is qualified
-separately. [Portable evidence](../release/harness-dsh-settlement-qualification-20261017.json)
+files/eleven GUI cases, alongside **47 Python checks**. A separate ordinary
+packaged copy passes the same 190/47, verifies all 1,108 compiled files and accepts
+the identical frozen real export; sealed qualification remains separate. [Portable evidence](../release/harness-dsh-settlement-qualification-20261017.json)
 records the current phase and limits.
 
 The exact same frozen real bundle refuses the preceding sealed converter and
