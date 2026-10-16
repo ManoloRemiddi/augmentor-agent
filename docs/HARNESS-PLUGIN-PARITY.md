@@ -75,7 +75,19 @@ Trajectory, no replay, future intent and cold recovery assertions remain intact.
 The corrected source and exact packaged application each pass **13/13 cases
 across six files/two Chromium files**, unchanged two workers/deadlines/no skips.
 No runtime, GUI layout, dependency, supplier or seal bytes are changed by the
-driver correction. Actual owner GUI/preservation evidence is recorded separately.
+driver correction. Actual owner GUI checks pass overview On/usable switch,
+exact path/query limit and applied status in both reviews, with zero browser or
+HTTP errors and no mutation/inference from opening the page. Post-GUI verification
+preserves the 32 old inputs, 16 Wiki files, shared prompts/memory/eligibility/jobs
+and engine configuration; only two private Wiki configurations are added.
+
+Qualification **7fc068ee** tests the unchanged application **d300543c** in
+**20261016-213718-135550f5**, artifact
+**283eaff2ca07ccd5253cb8dbb6daf62c56e0eed9870ec334f8c49822017856db**.
+All **24,613 sealed/1,102 compiled** inputs verify. PIDs and stable review
+registration revision four remain unchanged. The GUI/profile acceptance changes
+no selected installation or runtime artifact.
+[Portable evidence](../release/harness-existing-wiki-review-20261016.json).
 MX is the qualified target; installed Agent adoption, real-owner mutation and
 representative skill/companion CLI, later OS and full migration gates remain.
 
