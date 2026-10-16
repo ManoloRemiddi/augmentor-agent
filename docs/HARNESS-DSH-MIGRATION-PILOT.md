@@ -163,3 +163,43 @@ activation, merge or DSH retirement follows.
 counts and build identities only. Private operator receipts retain the complete
 backup path, exact source hash, profile/socket, authenticated link and local
 qualification outputs. Those credentials and histories are not published.
+
+
+## Wider project inventory — October 16
+
+A subsequent read-only API inventory finds **30 projects / 107 project
+conversations**: nine single-conversation projects, twenty multi-conversation
+projects and one empty project. The source catalogue lists 1,226 conversations;
+the other 1,119 are outside these current project memberships and are not inspected
+by this project pass. This does not classify them as deleted or safe to discard.
+There are no source conversations reported running at the initial catalogue read;
+that is not a guarantee of a frozen history cut.
+
+The bounded scan reads **95 stable complete parent cuts**. Nine parent cursors
+change during the scan, and three histories exceed the existing 30,000-record /
+32 MiB pilot bound; those twelve are **not qualified as complete exports**. The
+workspace membership is stable. Across full and partial parent reads, it observes
+126,633 records, 248 image parts, 14,348 reasoning parts and 32 historical child
+references. Child bodies and the conversations outside current projects are not
+scanned. These are observed counts, not exhaustive attachment/child totals.
+
+The overlapping parent flags are: 76 attachment/opaque-content histories,
+39 edited/compacted/branched histories and 20 unfinished/no-turn histories,
+in addition to the nine changing cuts and three bounded partial reads. These
+flags are a format inventory, not the importer's complete validation: exact
+tool pairing, malformed messages, source-folder availability and conversion
+semantics still require their own checks. Only the **existing representative
+pilot** is a single-conversation project with a stable cut and no observed format
+flags. The previous pilot qualification remains separate evidence.
+
+This confirms the next migration work: multi-conversation workspace membership
+and atomic import first; explicit image/reasoning and edit/compaction/branch
+conversion with preserved originals; stable cold exports for changing/oversized
+histories; historical child-family archival/links; then a separately scoped pass
+for conversations outside current projects. Preserve the backed-up original
+stores and never treat a partially scanned history as transferable. No extra
+project is transferred and no model work is submitted by this inventory. Owner
+acceptance of continuing real work in the pilot is still needed before wider
+transfer. [Aggregate inventory](../release/harness-dsh-inventory-review-20261016.json)
+contains no project names, paths, source IDs or conversation content; detailed
+source metadata and digests remain private.
