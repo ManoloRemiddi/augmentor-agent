@@ -450,4 +450,12 @@ completed inherited lifecycle and a genuinely unresolved tail.
 A read-only inspection of the already backed-up owner pilot confirms source
 header version four and 248 append surface markers; no extra owner project is
 exported or imported and no owner inference is submitted. Wider real-source
-acceptance is not inferred from synthetic evidence. Artifact qualification follows.
+acceptance is not inferred from synthetic evidence.
+
+Private unselected MX **20261016-180145-0db955b0**, application **c3d45c47**,
+passes the same **150/150 Node cases** against actual packaged modules and all
+**19 clean-Python exporter cases**. All **24,574 sealed / 1,078 compiled**
+inputs verify after qualification. Production Node/dependencies/components and
+supplier sources/licences stay exact. Both owner PIDs/roots, **32 protected files**
+and installed selection stay unchanged; no additional owner import, provider
+request or review restart occurs. [Portable qualification](../release/harness-dsh-source-surface-review-20261016.json).
