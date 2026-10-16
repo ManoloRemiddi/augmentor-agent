@@ -48,7 +48,7 @@ export function PluginSettings({controller,folders,panels,onPrompts,onModels,can
      <div className="plugin-card-status"><span className="plugin-state" data-enabled={known?String(row.enabled):undefined} role="status">{label}</span>{row&&<button type="button" className="plugin-switch" role="switch" aria-label={title} aria-checked={known&&row.enabled} aria-describedby={'plugin-note-'+id} disabled={!row.writable} onClick={()=>void controls.toggle(id)}><span aria-hidden="true"/></button>}</div>
      <button type="button" className="plugin-card-open" aria-label={'Open '+title+' settings'} disabled={(id==='prompts'||id==='improve')&&!canEditPrompts} onClick={e=>open(id,e)}><span className="plugin-card-title">{title}<span aria-hidden="true">→</span></span><span className="plugin-card-description">{description}</span><span className="plugin-card-action">{id==='prompts'?'Open library':id==='improve'?'Instructions & help':'Settings'}</span></button>
      {row&&<p id={'plugin-note-'+id} className="plugin-state-note">{row.error||row.note}</p>}
-    </article>;})}}</div></section>:null;})}
+    </article>;})}</div></section>:null;})}
    {!entries.some(row=>row.join(' ').toLocaleLowerCase().includes(q))&&!groups.some(([group])=>group.toLocaleLowerCase().includes(q))&&<p role="status">No plugins match “{query}”. Try a feature name such as prompts, search or context.</p>}
   </div>
   <div hidden={!selected}>
