@@ -41,7 +41,7 @@
     "boundsRaised": false
   },
   "qualification": {
-    "phase": "source and ordinary passed; exact seal pending",
+    "phase": "source, ordinary and exact separately sealed candidate passed; no owner adoption",
     "workers": 2,
     "deadlinesChanged": false,
     "testedInputsSha256": {
@@ -72,7 +72,12 @@
     "ordinaryPythonPass": 47,
     "ordinaryUnchangedBaselineInputsVerified": 23515,
     "compiledFilesVerified": 1111,
-    "sameFrozenRealPreparationAcceptedByOrdinary": true
+    "sameFrozenRealPreparationAcceptedByOrdinary": true,
+    "exactSealedNodePass": 237,
+    "exactSealedPythonPass": 47,
+    "sameFrozenRealPreparationAcceptedBySeal": true,
+    "sealedEntriesVerified": 24636,
+    "ownerAdoption": false
   },
   "realFrozenComparison": {
     "projects": 1,
@@ -92,5 +97,26 @@
     "Owner pilot feedback before further transfers",
     "File attachments and malformed argument/source observation formats",
     "Voice and later OS rollout deferred"
-  ]
+  ],
+  "implementationRef": "3dc14e0fab3bf8cff604b924b07b39d804e6683c",
+  "applicationRef": "3dc14e0fab3bf8cff604b924b07b39d804e6683c",
+  "separatelySealedCandidate": {
+    "releaseId": "20261017-012419-496245d5",
+    "applicationRef": "3dc14e0fab3bf8cff604b924b07b39d804e6683c",
+    "artifactSha256": "d064f17087360656c4d66b4b4e29882428b1e8d2f074abca8e1b9919b893fae5",
+    "activated": false,
+    "inventoryEntriesVerified": 24636,
+    "compiledFilesVerified": 1111,
+    "runningReviewsAdopted": false,
+    "ownerDataCopied": false
+  },
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "completeProtectedRegularFileSetsAndHashesExact": true,
+    "protectedOwnerFilesExact": 36,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
+  }
 }

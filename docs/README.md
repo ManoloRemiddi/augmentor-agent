@@ -2,9 +2,11 @@
 
 [Recorded DSH tool recovery](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-recovery--october-17)
 retains exact interrupted/forked recovery records as labelled historical data,
-without invented dispatches or retries. Source and separate ordinary package each
-pass **237 Node / 47 Python** checks; a frozen six-parent real project now passes
-read-only preparation. Exact sealed qualification and adoption remain pending.
+without invented dispatches or retries. Source/ordinary/exact sealed each pass
+**237 Node / 47 Python** checks; the same six-parent real project passes read-only
+preparation. Private unselected **20261017-012419-496245d5 / 3dc14e0f** verifies
+24,636 sealed/1,111 compiled inputs. Both running reviews/all 36 protected files,
+registry and selections remain exact. Owner adoption and pilot feedback remain open.
 [Evidence](../release/harness-dsh-recovery-qualification-20261017.json).
 
 [Legacy child settlement reasoning](HARNESS-DSH-MIGRATION-PILOT.md#legacy-child-settlement-reasoning--october-17) preserves documented older manager notices as attributed historical data, with no invented human/provider turn or live child. One identical real export/four parents now passes corrected preparation after refusing the preceding converter. Source/ordinary/exact sealed each pass **190 Node / 47 Python**; private unselected **20261017-005619-4a45cc63 / 335df05a** verifies 24,631 sealed/1,108 compiled inputs. Both owner PIDs/all 36 protected regular files, registry and selections stay exact; no adoption or further transfer. Owner pilot feedback still gates further transfers. [Evidence](../release/harness-dsh-settlement-qualification-20261017.json).

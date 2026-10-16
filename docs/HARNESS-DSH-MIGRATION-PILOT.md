@@ -1093,4 +1093,17 @@ No real destination, model assignment or transfer is created. The final source
 cohort includes a refusal for unexpected original plaintext metadata. Initial
 fixture failures (an overwritten RPC helper, shadowed setup options and an
 unsubscribed event-stream assertion) are retained privately; final GUI assertions
-read saved history. Exact sealed qualification and owner adoption remain pending.
+read saved history. The exact sealed result follows; owner adoption remains pending.
+
+The exact private unselected candidate **20261017-012419-496245d5**, application
+**3dc14e0fab3bf8cff604b924b07b39d804e6683c**, SHA-256
+**d064f17087360656c4d66b4b4e29882428b1e8d2f074abca8e1b9919b893fae5**,
+passes the same **237 Node / 47 Python** cases and identical frozen six-parent
+preparation. All **24,636 sealed / 1,111 compiled inputs** verify after testing;
+external test dependencies and private source input stay outside the seal.
+The same two review PIDs and complete sets/hashes of all 36 protected regular
+files remain exact, as do the registry and installed selections. Existing running
+24,615-input seals also verify. No owner restart, candidate activation or further
+project transfer occurred. Source publication does not update either review.
+File attachments, malformed arguments/other source formats and two observation
+failures remain separate work; owner pilot feedback still gates further transfers.

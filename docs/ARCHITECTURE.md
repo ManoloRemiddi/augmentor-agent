@@ -2,9 +2,11 @@
 
 [Recorded DSH tool recovery](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-recovery--october-17)
 retains exact interrupted/forked recovery records as labelled historical data,
-without invented dispatches or retries. Source and separate ordinary package each
-pass **237 Node / 47 Python** checks; a frozen six-parent real project now passes
-read-only preparation. Exact sealed qualification and adoption remain pending.
+without invented dispatches or retries. Source/ordinary/exact sealed each pass
+**237 Node / 47 Python** checks; the same six-parent real project passes read-only
+preparation. Private unselected **20261017-012419-496245d5 / 3dc14e0f** verifies
+24,636 sealed/1,111 compiled inputs. Both running reviews/all 36 protected files,
+registry and selections remain exact. Owner adoption and pilot feedback remain open.
 [Evidence](../release/harness-dsh-recovery-qualification-20261017.json).
 
 [MX review opener](HARNESS-MX-FEEDBACK.md#stable-mx-review-launch-and-recovery--october-16) is an OS launch adapter over the existing Pi owner, not a second execution loop. Explicit revisioned registration binds a verified seal to native/shared profile paths; private IPC supplies the current browser link. Confirmed cold startup uses existing ensure-runtime/package leases; conflicting or unconfirmed live owners are preserved. It does not change Desktop selection, migrate data or own prompt/memory services.
