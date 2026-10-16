@@ -57,8 +57,9 @@
     "sourcePythonPassIncludingBoundaryAndNotices": 39,
     "testedInputsSha256": {
       "scripts/export-dsh-project.py": "5d50c3d6a0bf346c1b586de3222e05e34b852a260640f9a791ab1955d0cba3d1",
-      "tests/test_dsh_project_export.py": "6e877c075d53dc78a416d7b56bd220d3afbf3a9085e53cafd3a71266e7ff60c8"
-    }
+      "tests/test_dsh_project_export.py": "9934b34beba3753cb8940db4fee44f574a4cf5c28b7d3f82a2e063cff6c85073"
+    },
+    "filePermissionAssertionScope": "POSIX; no Windows filesystem permission inference"
   },
   "remaining": [
     "Bounded complete-history format for capture/image aggregate refusals",

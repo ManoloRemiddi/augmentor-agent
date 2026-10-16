@@ -424,7 +424,8 @@ files. The five-file Node focus passes **66 cases**, two workers/no skips:
 project import, rich reasoning/images, setup-only history, archived families and
 historical branching. This is source qualification, not a new sealed artifact,
 running-review update, fresh whole-catalogue readiness claim or owner acceptance.
-The exporter is shared source; non-MX installed artifact qualification is deferred.
+The exporter is shared source; the file-mode assertion applies only to POSIX.
+Non-MX installed artifact qualification is deferred.
 
 [Portable evidence](../release/harness-dsh-compact-qualification-20261017.json)
 contains only synthetic-test/build scope and aggregate counts. Next work is a

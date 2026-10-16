@@ -59,7 +59,7 @@ class ExportTests(unittest.TestCase):
                 report=io.StringIO()
                 with contextlib.redirect_stdout(report):module.main()
                 raw=output.read_bytes();receipt=json.loads(report.getvalue())
-                self.assertEqual(output.stat().st_mode&0o077,0)
+                if os.name=='posix':self.assertEqual(output.stat().st_mode&0o077,0)
                 self.assertEqual(raw,module.encode_export(module.export_project(RemoteFixture(),'authored-project')))
                 self.assertEqual(receipt['bytes'],len(raw));self.assertEqual(receipt['sha256'],hashlib.sha256(raw).hexdigest())
                 with self.assertRaisesRegex(ValueError,'never overwrite'):module.main()
