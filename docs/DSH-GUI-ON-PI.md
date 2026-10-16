@@ -1606,8 +1606,9 @@ Unsupported operations retain an explicit missing-binding response.
 
 Final assistant branching uses the original DSH branch control. Latest-human
 [Edit](HARNESS-MESSAGE-EDIT.md) now restores the message and original attachments
-in the existing composer of a Pi child, awaiting explicit Send; fresh-artifact
-qualification remains separate. The original [question controls](PI-QUESTIONS.md)
+in the existing composer of a Pi child, awaiting explicit Send. Source/fresh
+ordinary/exact sealed MX qualification each pass 769/two existing skips; the
+separate empty review runs application dfe855f3, with physical acceptance pending. The original [question controls](PI-QUESTIONS.md)
 already bind Take time, editing and renewable focus leases to the Pi Host.
 Approvals retain their hard timeout; AbortSignal, Stop and last-operator loss
 still settle unanswered questions. [Scoped saved answer drafts and structured batches](PI-QUESTIONS.md), together

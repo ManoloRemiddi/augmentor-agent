@@ -2,8 +2,10 @@
 
 [Sent-message Edit](HARNESS-MESSAGE-EDIT.md) restores the latest human input and
 original attachments into the existing DSH composer of a Pi child. Explicit Send,
-parent drafts and cold recovery identities are preserved. Source recovery and
-pointer qualification pass; artifact/owner review qualification follows separately.
+parent drafts and cold recovery identities are preserved. Source/fresh ordinary/
+exact sealed MX target each pass 769/two existing skips; actual Qwen and new empty
+review startup/theme/logo/settings/readiness QA pass. Installation stays unchanged;
+physical feedback and full migration/platform gates remain.
 
 [Controlled Hindsight installation and rollback](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16)
 now passes actual pinned Docker/full Pi/Qwen use, exact nonempty-bank restart and

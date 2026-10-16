@@ -1,0 +1,117 @@
+{
+  "schema": "augmentor-harness-message-edit-qualification/1",
+  "applicationSourceRef": "dfe855f3c862c7651b82b5f921257cbf134b17ff",
+  "ciPrerequisiteRef": "a021d10808327d129656f3354d2c4b29f56c9b41",
+  "productVersion": "0.2.13",
+  "piVersion": "1.1.0",
+  "scope": "Private unselected MX Linux review; no public distribution qualification",
+  "qualification": {
+    "source": {
+      "tests": 771,
+      "pass": 769,
+      "existingOptionalSkips": 2,
+      "failures": 0
+    },
+    "freshOrdinary": {
+      "tests": 771,
+      "pass": 769,
+      "existingOptionalSkips": 2,
+      "failures": 0
+    },
+    "exactSealedTarget": {
+      "tests": 771,
+      "pass": 769,
+      "existingOptionalSkips": 2,
+      "failures": 0
+    },
+    "testFiles": 136,
+    "harnessChromiumFiles": 56,
+    "workers": 2,
+    "boundsOrSkipsRelaxed": false,
+    "focusedRecoveryCases": 19,
+    "licenceAndPrivateBoundaryPythonCases": 19,
+    "installerPrerequisiteCases": 8,
+    "precedingBuildControl": "expected failure: Edit action absent",
+    "initialFailuresRetained": [
+      "fixture attempted writing a read-only immutable test object",
+      "fixture used nonexistent file-upload route",
+      "browser observed draft acknowledgement before actual model turn settlement"
+    ],
+    "actualQwen": {
+      "passed": true,
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "contextWindow": 262144,
+      "maxTokens": 8192,
+      "sourceRef": "dfe855f3c862c7651b82b5f921257cbf134b17ff",
+      "freshOrdinary": true,
+      "priorNativeReadRetained": true,
+      "parentDraftPreserved": true,
+      "parentNativeBytesPreserved": true,
+      "editProviderRequests": 0,
+      "childTools": 0,
+      "explicitSend": true,
+      "ownerDataImported": false,
+      "modelSpeechGpuSettingsChanged": false
+    }
+  },
+  "inputs": {
+    "trackedAtApplicationCommit": 3419,
+    "compiled": 1063,
+    "sourceDependencyInputs": 37629,
+    "artifactCountsUnchangedFromBaseline": {
+      "node": 1,
+      "node_modules": 20702,
+      "components": 37
+    },
+    "supplierDshFiles": 625,
+    "supplierFilesAdaptedInThisChange": 2,
+    "allFrozenApplicationInputsUnchanged": true,
+    "onlyLaterNonApplicationChanges": [
+      "Debian patch prerequisite declaration",
+      "owning prerequisite/qualification documentation"
+    ]
+  },
+  "review": {
+    "releaseId": "20261016-065534-c8cdf03c",
+    "artifactSha256": "c242bfdb3f6fe6e1a7f07776eda298bdfaf9bd7e5d27c3206bd78ea9c13f7fca",
+    "inventoryEntries": 24529,
+    "freshProfile": true,
+    "freshMemoryEngineAndVolume": true,
+    "originalMemoryEngineDefaultUnchanged": true,
+    "reviewMemoryThinkingMode": "off",
+    "memoryBackportExplicit": true,
+    "cpuRecognitionReusedWithoutMutation": true,
+    "ownerQaPassed": true,
+    "ownerQaSessions": 0,
+    "ownerQaBrowserErrors": 0,
+    "ownerQaFailedResponses": 0,
+    "activated": false
+  },
+  "privacy": {
+    "ownerConversationsImported": false,
+    "ownerCredentialsImported": false,
+    "privateSpeechSourceCopiedIntoPublicRepositoryOrCi": false,
+    "originalCanonicalAndPrivateChangesPreserved": true,
+    "allPreviousReviewsPreserved": true,
+    "modelSpeechGpuSettingsChanged": false,
+    "selectedInstallationChanged": false,
+    "publicBinaryPublished": false
+  },
+  "hostedStatus": {
+    "precedingRef": "3c739944ef11720142e7fdea22505e5bffe290e9",
+    "sdkLinux": "passed",
+    "sdkMacos": "passed",
+    "sdkWindows": "cancelled",
+    "debian": "failed: seven installer fixtures lacked patch; declaration corrected, fresh hosted result pending",
+    "windowsJobsAndMacosPackaging": "preceding failures retained; not declared resolved",
+    "newHead": "pending after publication"
+  },
+  "remaining": [
+    "physical MX owner feedback",
+    "full speech and installed companion adoption",
+    "broader memory load/provider and interrupted rollback boundaries",
+    "remaining plugin/Home/Office/workflow and data migration",
+    "public distribution and installed activation",
+    "later Windows/macOS and other Linux distro qualification"
+  ]
+}

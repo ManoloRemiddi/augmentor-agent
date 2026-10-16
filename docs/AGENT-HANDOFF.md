@@ -1,12 +1,27 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Original-GUI sent-message Edit](HARNESS-MESSAGE-EDIT.md) now binds the latest human
-input to a durable Pi edit child and restores original text/files/images into the
-existing composer, awaiting explicit Send. Supplier icon/CSS retained, two source
-adaptations recorded; no redesign or parallel agent loop. Focused source recovery
-passes 19, including actual partial-publication SIGKILL and original GUI pointer
-checks; full artifact and owner-review qualification remain pending at this
-checkpoint. Current memory/recognition reviews, services and selection stay intact.
+[Original-GUI sent-message Edit](HARNESS-MESSAGE-EDIT.md) at application **dfe855f3**
+restores latest-human text/original file/image bytes into the existing composer of
+one durable Pi child, awaiting Send; parent native history/tools/drafts remain.
+Two supplier adaptations retain original icon/CSS; no redesign/parallel owner.
+Source/fresh ordinary/exact sealed MX each pass **769/two existing skips**, 136
+files/all 56 Harness Chromium files, two workers/unchanged limits. Real partial-
+publication SIGKILL, corrupt acknowledgements/cold reopen and original normalized
+images pass; the preceding sealed build fails at absent Edit as intended. Actual
+Qwen ordinary proof inherits the prior read, makes no request during Edit and no
+additional tool call on explicit typed replacement; parent bytes/draft stay exact.
+New unselected **20261016-065534-c8cdf03c** passes original welcome/Light/Dark/2px
+marks/settings/readiness QA, zero sessions/events/model/tool work/errors. Its own
+fresh installer-owned memory engine/volume uses explicit off/backport; original
+mode remains default. Existing CPU recognition 0.1.22 is reused unchanged. All
+24,529 sealed/1,063 compiled entries verify; thirteen seals/fourteen review owners
+plus recognition, selection, 38 canonical/four private changes and six config
+hashes stay preserved. CI-only **a021d108** declares missing Debian `patch`;
+eight installer cases pass locally, fresh hosted results pending. Previous Windows
+jobs/macOS packaging failures remain unresolved. Qwen online/Breeze prerequisite
+unmet; no retry/tuning/eviction. Physical MX feedback, full voice/migration/
+distribution/later platforms remain open; no activation/merge/public binary.
+[Portable evidence](../release/harness-message-edit-qualification-20261016.json).
 
 [Qualified memory installation](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16)
 at **60fa55f4**, private rollback metadata fix **d6361bd1**, passes source/fresh
