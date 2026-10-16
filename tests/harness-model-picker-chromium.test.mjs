@@ -25,9 +25,21 @@ test('MX picker opens at the top, saves ordered pins without duplicates, hides m
  const url=new URL(link.url),token=new URLSearchParams(url.hash.slice(1)).get('token');
  const rpc=async(method,params={},credential=token)=>{const response=await fetch(url.origin+'/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+credential,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params})});const body=await response.json();if(body.error)throw Error(body.error.message);return body.result;};
  const modelFile=join(link.config,'agent/models.json'),models=JSON.parse(await readFile(modelFile,'utf8'));
- models.providers['fixture-twin']={...structuredClone(models.providers.fixture),name:'Authored twin',models:models.providers.fixture.models.map(m=>({...m,name:'Authored twin model'}))};
+ const original=models.providers.fixture;
+ models.providers={
+  openai:{models:[{id:'gpt-4',name:'Authored single OpenAI entry'}]},
+  'fixture-many':{...structuredClone(original),name:'Authored catalog',models:Array.from({length:40},(_,i)=>({...structuredClone(original.models[0]),id:'extra-'+i,name:'Authored extra '+i}))},
+  'fixture-twin':{...structuredClone(original),name:'Authored twin',models:original.models.map(m=>({...m,name:'Authored twin model'}))},
+  'fixture-needs-auth':{...structuredClone(original),apiKey:undefined,name:'Authored missing credential',models:original.models.map(m=>({...m,name:'Authored credentials needed'}))},
+  fixture:original,
+ };
  await writeFile(modelFile,JSON.stringify(models));await rpc('models.settingsRefresh');
  const initial=await rpc('models.list'),selection=initial.default;
+ assert.deepEqual(initial.groups.map(g=>g.provider).sort(),['fixture','fixture-many','fixture-needs-auth','fixture-twin','openai'],'bundled unconfigured providers must not appear');
+ assert.equal(initial.groups.reduce((n,g)=>n+g.models.length,0),44);
+ assert.equal(initial.groups.find(g=>g.provider==='fixture-many').name,'Authored catalog');
+ assert.deepEqual(initial.groups.find(g=>g.provider==='openai').models.map(m=>m.model),['gpt-4'],'explicit built-in profile must not expand into every bundled model');
+ assert.deepEqual(initial.groups.map(g=>g.provider),Object.keys(models.providers),'configured provider order must survive');
  await rpc('session.create',{sessionId:'picker-parent',cwd:link.workspace,selection});
  await rpc('session.prompt',{sessionId:'picker-parent',requestId:'picker-seed',content:[{type:'text',text:'Independent seed before model configuration.'}]});
  await until(async()=>(await rpc('session.history',{sessionId:'picker-parent'})).events.some(row=>row.event.type==='turn/end'),'authored seed settled');
@@ -80,6 +92,7 @@ test('MX picker opens at the top, saves ordered pins without duplicates, hides m
  const unavailable=initial.groups.find(group=>group.provider!=='fixture'&&group.provider!=='fixture-twin'&&group.models.some(model=>!model.available));
  const rejected=unavailable.models.find(model=>!model.available),selectsBefore=[...panel.requests.values()].filter(row=>row.method==='session.selectModel').length;
  await openPicker();await click(search);await panel.call('Input.insertText',{text:rejected.name});
+ await visible(menu+'.innerText.includes("Credentials required")');
  await click('Array.from('+menu+'.querySelectorAll("button")).find(e=>e.title==='+JSON.stringify(rejected.name)+')');
  await visible('document.body.innerText.includes("needs credentials")');
  assert.equal((await rpc('session.models',{sessionId:'picker-parent'})).current.provider,'fixture-twin');

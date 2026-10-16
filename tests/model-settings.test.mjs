@@ -15,6 +15,7 @@ const profile=d=>d.namespaces[0].user.providers['fixture-a'];
 test('cold original Models descriptors and installed catalog reads never resolve command keys or expose hidden secrets',async t=>{
  const initial=config(),marker=join(tmpdir(),crypto.randomUUID());initial.providers['fixture-a'].apiKey='!touch '+marker;t.after(()=>rmSync(marker,{force:true}));
  const f=await fixture(t,initial),before=f.raw(),d=await f.settings.describe(),serialized=JSON.stringify(d);
+ const picker=f.settings.pickerProfiles(),pickerJson=JSON.stringify([...picker].map(([id,p])=>({id,name:p.name,models:[...(p.models??[])]})));assert.equal(picker.get('fixture-a').name,'Fixture A');assert(!pickerJson.includes('touch '+marker)&&!pickerJson.includes('private-header'));
  for(const secret of ['touch '+marker,'private-header','model-secret','supportsStore','cacheRead','opaqueTop'])assert(!serialized.includes(secret),secret);
  assert.equal(d.rows.find(x=>x.entry.provider==='fixture-a').derivedCredential.writable,false);
  assert.equal((await f.settings.discover({provider:'fixture-a'})).models.length,2);
@@ -49,7 +50,7 @@ test('custom creation, literal credential storage, key replacement and removal u
 test('busy work, external file changes, hidden-field edits, invalid endpoints and invalid catalogs do not persist',async t=>{
  const f=await fixture(t),d=await f.settings.describe(),before=f.raw();
  for(const op of [{op:'set',path:['providers','fixture-a','headers'],value:{}},{op:'set',path:['providers','fixture-a','baseURL'],value:'https://u:secret@example.invalid/?token=secret'},{op:'set',path:['providers','fixture-a','models'],value:[{id:'x',contextWindow:128,maxTokens:256}]},{op:'set',path:['providers','fixture-a','models'],value:[{id:'x',headers:{Auth:'secret'}}]}])await assert.rejects(f.settings.mutate([op],d.revision));
- assert.equal(f.raw(),before);assert.equal(f.writes,0);writeFileSync(f.file,JSON.stringify({...f.stored(),changedOutside:true}));assert.equal((await f.settings.mutate([{op:'unset',path:['providers','fixture-a']}],d.revision)).kind,'conflict');f.block();await assert.rejects(f.settings.setCredential('FIXTURE_A_API_KEY','different',(await f.settings.describe()).revision),/Busy/);assert.equal(f.writes,0);
+ assert.equal(f.raw(),before);assert.equal(f.writes,0);writeFileSync(f.file,JSON.stringify({...f.stored(),changedOutside:true}));assert.throws(()=>f.settings.pickerProfiles(),/Refresh model settings/);assert.equal((await f.settings.mutate([{op:'unset',path:['providers','fixture-a']}],d.revision)).kind,'conflict');f.block();await assert.rejects(f.settings.setCredential('FIXTURE_A_API_KEY','different',(await f.settings.describe()).revision),/Busy/);assert.equal(f.writes,0);
 });
 function client(rpc){const listeners=new Set(),controller={epoch:1,state:{phase:'ready',readOnly:false,capabilities:{modelSettings:true}},subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn);},rpc,update(patch){Object.assign(this.state,patch);for(const fn of listeners)fn();}};return {controller,scope:new DshModelScope(controller)};}
 test('lost writes retire original form authority, never replay, and explicit reads recover',async t=>{

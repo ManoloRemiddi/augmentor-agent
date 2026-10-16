@@ -977,16 +977,17 @@
     },
     {
       "path": "packages/client/ui-model-selection/src/client/ModelSelect.module.css",
-      "sha256": "7754687bfd5b18693e326f29367bf96a5ecf2906f0a00da82290406c9f12f80b",
+      "sha256": "de6d2685de1764c81b17a951fe4b6194173f2981d44d580196f0b41a9a8d9fc1",
       "upstreamPath": "packages/client/ui-model-selection/src/client/ModelSelect.module.css",
-      "upstreamSha256": "7754687bfd5b18693e326f29367bf96a5ecf2906f0a00da82290406c9f12f80b"
+      "upstreamSha256": "7754687bfd5b18693e326f29367bf96a5ecf2906f0a00da82290406c9f12f80b",
+      "adaptation": "Optional Augmentor ordered pins/hidden filtering, top-first opening and explicit credentials-required status; exact provider identity and original selection/effort/keyboard controls retained."
     },
     {
       "path": "packages/client/ui-model-selection/src/client/ModelSelect.tsx",
-      "sha256": "806e8c4c3422f3691955d9f7f1c678156e423da4c70cd6151f2e3839209a9f6d",
+      "sha256": "a6f264b2daad09c88c1a742caedc250bd0039e3808d06038d5806fc991023530",
       "upstreamPath": "packages/client/ui-model-selection/src/client/ModelSelect.tsx",
       "upstreamSha256": "932eb3bc96f269a93a55d845957596065ec50ff933590743a77c36b3a404320f",
-      "adaptation": "Optional Augmentor curation: ordered Pinned section, hidden filtering and top-first opening; exact provider identities, original selection/effort/keyboard UI retained."
+      "adaptation": "Optional Augmentor ordered pins/hidden filtering, top-first opening and explicit credentials-required status; exact provider identity and original selection/effort/keyboard controls retained."
     },
     {
       "path": "packages/client/ui-model-selection/src/client/catalog.ts",

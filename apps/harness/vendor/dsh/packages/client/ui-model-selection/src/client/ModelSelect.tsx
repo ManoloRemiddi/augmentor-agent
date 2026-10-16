@@ -63,7 +63,7 @@ const MEASURE_STYLE: CSSProperties = { visibility: 'hidden', left: 0, top: 0 }
  */
 export function ModelSelect(
   { locked, available, directory, load, select, t, curation, openAtTop = false }:
-  ModelSelectInjected & { locked: boolean; curation?: {pinned: readonly string[]; hidden: readonly string[]}; openAtTop?: boolean } & PropsLocale<'model'>,
+  ModelSelectInjected & { locked: boolean; curation?: {pinned: readonly string[]; hidden: readonly string[]; unavailable?: readonly string[]}; openAtTop?: boolean } & PropsLocale<'model'>,
 ) {
   const state = useSyncExternalStore(
     fn => directory.subscribe(fn),
@@ -604,6 +604,7 @@ export function ModelSelect(
                           >
                             <span className={css.optionCopy}>
                               <span className={css.modelName}>{model.name}</span>
+                              {curation?.unavailable?.includes(`${model.provider}/${model.id}`) && <span className={css.modelStatus}>Credentials required</span>}
                             </span>
                             <span className={css.check}>
                               {pending?.provider === model.provider && pending.model === model.id

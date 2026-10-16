@@ -260,6 +260,12 @@
   min-width: 0;
 }
 
+.modelStatus {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
 .modelName {
   overflow: hidden;
   color: inherit;

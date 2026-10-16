@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Configured model catalogue](HARNESS-CONFIGURED-MODELS.md) corrects the owner-reported built-in catalogue leak: main pickers now use configured/credential-ready providers, explicit model subsets, original names/order and a credentials-required label. Source build and 28 targeted MX cases pass; the running DSH reference is inspected privately, with owner-profile adoption staged separately. Voice and later platforms remain deferred.
+
 ## Peer refresh qualification ordering — October 15
 
 A peer's explicit Models refresh can advance the operator revision hint while

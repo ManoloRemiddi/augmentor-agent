@@ -404,11 +404,18 @@ export class Host {
     const model=this.modelRuntime.getModel(selection.provider,selection.model);if(!model)throw new Error('The selected model is unavailable. Refresh models or update model configuration.');
     const available=await this.modelRuntime.getAvailable(selection.provider,{signal:AbortSignal.timeout(10000)});if(!available.some(m=>m.id===model.id))throw new Error('The selected provider needs credentials. Configure Pi before sending.');return model;
   }
-  async catalog(){const available=new Set((await this.modelRuntime.getAvailable(undefined,{signal:AbortSignal.timeout(10000)})).map(m=>m.provider+'/'+m.id));const groups=new Map<string,Data>();
-    for(const m of this.modelRuntime.getModels()){if(!groups.has(m.provider))groups.set(m.provider,{provider:m.provider,name:m.provider,models:[]});
+  async catalog(){const ready=await this.modelRuntime.getAvailable(undefined,{signal:AbortSignal.timeout(10000)}),available=new Set(ready.map(m=>m.provider+'/'+m.id));const groups=new Map<string,Data>(),profiles=this.modelSettings.pickerProfiles();
+    const configured=new Set([...profiles.keys(),...ready.map(m=>m.provider),...this.modelRuntime.getRegisteredProviderIds()]);
+    for(const m of this.modelRuntime.getModels()){
+      if(!configured.has(m.provider))continue;
+      const profile=profiles.get(m.provider);if(profile?.models&&!profile.models.has(m.id))continue;
+      if(!groups.has(m.provider))groups.set(m.provider,{provider:m.provider,name:profile?.name??this.modelRuntime.getProvider(m.provider)?.name??m.provider,models:[]});
       let local=false;try{local=['127.0.0.1','[::1]','localhost'].includes(new URL(m.baseUrl??'').hostname);}catch{}
       groups.get(m.provider)!.models.push({provider:m.provider,model:m.id,name:m.name,location:local?'Local':'Network',available:available.has(m.provider+'/'+m.id),thinkingLevels:getSupportedThinkingLevels(m)});}
-    return {revision:this.settings.revision,groups:[...groups.values()],pinned:this.settings.pinned.map((p:any)=>typeof p==='string'?p:p.provider+'/'+p.model),hidden:this.settings.hidden,default:this.settings.defaultModel,failures:[]};
+    const order=new Map([...configured].map((id,index)=>[id,index]));
+    const ordered=[...groups.values()].sort((a,b)=>order.get(a.provider)!-order.get(b.provider)!);
+    for(const group of ordered){const ids=profiles.get(group.provider)?.models;if(ids){const positions=new Map([...ids].map((id,index)=>[id,index]));group.models.sort((a:Data,b:Data)=>positions.get(a.model)!-positions.get(b.model)!);}}
+    return {revision:this.settings.revision,groups:ordered,pinned:this.settings.pinned.map((p:any)=>typeof p==='string'?p:p.provider+'/'+p.model),hidden:this.settings.hidden,default:this.settings.defaultModel,failures:[]};
   }
   getMeta(id:unknown){const m=this.metadata.get(identifier(id));if(!m)throw new Error('Conversation not found');permissionSelection(m);return m;}
   jobInspectionTarget(parentId:unknown,jobId:unknown){

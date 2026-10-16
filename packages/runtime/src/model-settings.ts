@@ -54,6 +54,15 @@ export class ModelSettings {
     return {config,hash};
   }
   private provider(value:unknown){if(typeof value!=='string'||!value||value.length>256||/[\x00-\x1f]/.test(value)||['__proto__','constructor','prototype'].includes(value))throw Error('Choose a valid provider.');return value;}
+  /** Picker declarations only; no keys, command resolution or endpoint probes. */
+  pickerProfiles(){
+    const {config,hash}=this.read();
+    if(hash!==this.appliedHash)throw Error('Model configuration changed. Refresh model settings before using the picker.');
+    return new Map<string,{name?:string;models?:Set<string>}>(Object.entries(config.providers).map(([id,value]:[string,any])=>[id,{
+      ...(typeof value?.name==='string'?{name:value.name}:{}),
+      ...(Array.isArray(value?.models)?{models:new Set<string>(value.models.map((model:any)=>model.id))}:{}),
+    }]));
+  }
   private profile(provider:string,value:Data,hash:string){
     const projected:Data={};for(const [field,key] of [['name','displayName'],['baseUrl','baseURL'],['api','api']])if(own(value,field)){if(field==='baseUrl'){try{endpoint(value[field]);}catch{continue;}}projected[key]=value[field];}
     if(Array.isArray(value.models))projected.models=value.models.map((model:Data,index:number)=>{
