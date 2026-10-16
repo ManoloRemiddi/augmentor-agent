@@ -364,4 +364,13 @@ driver waits for decoded pixels and asserts the observed disclosure state. A lat
 image-only regression driver exposed a quoted-selector syntax error; it now builds
 the selector as JSON data, retaining the actual gallery-count assertion.
 These are independently authored synthetic histories, with no owner-data model
-requests. Artifact qualification follows.
+requests. Private unselected candidate **20261016-174458-49f743c2**, application
+**6579f09c**, passes the same **126/126** Node cases against its exact
+packaged modules and all **19** exporter cases without Python site packages.
+All **24,570 sealed / 1,075 compiled** inputs verify after testing.
+The test-only source vendor assertion path maps to the byte-identical actual
+packaged vendor directory; its initial source-layout failure remains recorded.
+Production Node/dependencies/components and supplier sources/licences stay exact.
+Both owner PIDs/roots, **32 protected files** and installed selection stay unchanged.
+No extra owner import, provider request or review restart occurs.
+[Portable qualification](../release/harness-dsh-rich-history-review-20261016.json).
