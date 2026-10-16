@@ -729,6 +729,21 @@ value omits internal failures. Streaming gateway assembly was tested against the
 existing Qwen endpoint, including real cancellation. DSH surface replacement and
 Pi lifecycle hooks retain their pinned versions. See [contract and evidence](CONTROLLED-MEMORY.md).
 
+### Isolated Hindsight refresh-budget backport, 2026-10-16
+
+The opt-in proof selects three budget-default hunks from public MIT upstream
+[022583d4](https://github.com/vectorize-io/hindsight/commit/022583d43b3ae460233c9df880040c0770f24e0b)
+onto the exact existing 0.10.0 image's public engine file, verified against image
+revision **5d46f9c8** and public Git blob **df43b37f**. The original Vectorize MIT
+licence, base/result/patch/licence hashes and explicit adaptation record are in
+[`SOURCE.json`](../services/memory/vendor/hindsight-refresh-budget/SOURCE.json).
+The isolated helper's explicit flag creates a separate read-only source overlay;
+it never edits the original container or changes production installation. It
+corrects document refresh from implicit LOW (one iteration) to MID (the configured
+two), preserving overall processing/model/GPU settings. Whole-image replacement,
+other upstream changes and installed adoption are not part of this selection.
+See [qualification scope](PI-MEMORY-LIVE.md#opt-in-upstream-refresh-budget-backport--october-16).
+
 ### Windows voice configuration candidate (28 September 2026)
 
 The shared DSH graph now selects Resonant Voice 0.1.17 from source `aae6a51`

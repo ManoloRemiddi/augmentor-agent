@@ -4,6 +4,7 @@ import importlib.util
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('isolated_memory_proof', Path(__file__).resolve().parents[1] / 'scripts/hindsight-isolated-proof-engine.py')
 proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(proof)
@@ -37,6 +38,31 @@ class ProofInputTests(unittest.TestCase):
         proof.same_instance({'Id': 'authored-owned'}, 'authored-owned')
         with self.assertRaisesRegex(ValueError, 'identity changed'):
             proof.same_instance({'Id': 'different-instance'}, 'authored-owned')
+
+    def test_backport_refuses_an_unknown_engine_before_creating_an_overlay(self):
+        backport = proof.backport_module()
+        with tempfile.TemporaryDirectory() as temp:
+            destination = Path(temp) / 'overlay'
+            with self.assertRaisesRegex(ValueError, 'pinned base'):
+                backport.prepare(b'Independently authored unknown engine', destination)
+            self.assertFalse(destination.exists())
+
+    def test_backport_rejects_changed_supplier_inputs_and_changed_mounted_output(self):
+        backport = proof.backport_module()
+        with tempfile.TemporaryDirectory() as temp:
+            vendor = Path(temp) / 'vendor'; vendor.mkdir()
+            for name in ('SOURCE.json', 'LICENSE', 'refresh-budget.patch'):
+                (vendor / name).write_bytes((backport.VENDOR / name).read_bytes())
+            with patch.object(backport, 'VENDOR', vendor):
+                backport.manifest()
+                (vendor / 'refresh-budget.patch').write_bytes(b'Independently authored replacement')
+                with self.assertRaisesRegex(ValueError, 'input changed'):
+                    backport.manifest()
+            output = Path(temp) / 'memory_engine.py'; output.write_bytes(b'Independently authored original')
+            value = {'path': str(output), 'sha256': backport.digest(output.read_bytes())}
+            backport.verify(value); output.write_bytes(b'Independently authored replacement')
+            with self.assertRaisesRegex(ValueError, 'overlay changed'):
+                backport.verify(value)
 
 
 if __name__ == '__main__': unittest.main()

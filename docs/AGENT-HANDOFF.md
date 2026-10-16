@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Opt-in page-budget backport](PI-MEMORY-LIVE.md#opt-in-upstream-refresh-budget-backport--october-16)
+selects three public MIT hunks from upstream **022583d4**, with exact original
+licence/source/base/output hashes. Only a fresh proof container gets a read-only
+source overlay. Document refresh now uses the configured two iterations, with
+job/call/time/token/concurrency/model/GPU settings and production installer
+unchanged. Exact public-source application/compilation and 43 common Python cases
+pass; fresh frozen/live qualification remains next. Original services, MX review,
+selection and prior failures remain preserved.
+
 [Memory gateway settlement](PI-MEMORY-LIVE.md) corrects a live sequential-stage
 race: successful HTTP confirmation previously preceded upstream/budget/guard
 cleanup, allowing the next Hindsight request to receive a spurious 429. The new

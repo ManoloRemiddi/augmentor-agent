@@ -122,6 +122,36 @@ node --test --test-concurrency=2 tests/memory-client.test.mjs \
 ```
 
 
+## Opt-in upstream refresh-budget backport — October 16
+
+Upstream [022583d43b3ae460233c9df880040c0770f24e0b](https://github.com/vectorize-io/hindsight/commit/022583d43b3ae460233c9df880040c0770f24e0b)
+fixes this exact document-refresh default: refresh selects MID explicitly, which
+uses the configured iteration count. The isolated proof can now select a small
+backport with **`--refresh-budget-backport`**. The global configured maximum stays
+**two**; the refreshed page can retrieve on its first iteration and synthesize on
+its second. This changes the faulty operation default from half of the configured
+allowance to the configured allowance. Overall 120-second/65,536-token job,
+45-second/4,096-output per-call, 8,000-context Reflect and single-request limits
+remain unchanged, as do retries/thinking/model/server/GPU settings.
+
+Only three budget-related hunks are selected from that MIT fix. The pinned image's
+1,087,129-byte public engine file is verified byte-for-byte against upstream base
+**5d46f9c8c8eb4fb96f549aa63abe1191b82a7840**, Git blob
+**df43b37f0093fb5d3c3037858126620f9e5b4790**. The exact MIT licence and a source/
+adaptation manifest accompany the 1,437-byte patch under
+[`services/memory/vendor/hindsight-refresh-budget`](../services/memory/vendor/hindsight-refresh-budget/SOURCE.json).
+The expected source/patch/licence/output digests must match; a separate output is
+compiled and mounted read-only into only the new proof container. The original
+container/file, production installer, data and every existing review remain
+unchanged. Other upstream API/UI/CLI/schema/default-option changes are not selected.
+No network download is needed when applying the already reviewed backport.
+
+The actual exact-source application/compilation check passes. Common Python now
+passes **43/43**, including refusal before writing an unknown base and rejection of
+changed supplier/overlay inputs. Fresh frozen and actual-engine qualification
+remain required; the earlier failed/default proof is preserved. This is an opt-in
+Linux proof candidate; installed adoption and Mac/Windows transport remain gates.
+
 ## Isolated proof ownership
 
 [`hindsight-isolated-proof-engine.py`](../scripts/hindsight-isolated-proof-engine.py)

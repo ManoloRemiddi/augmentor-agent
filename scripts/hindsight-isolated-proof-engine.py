@@ -86,6 +86,13 @@ def free_port():
         return listener.getsockname()[1]
 
 
+def backport_module():
+    path = Path(__file__).resolve().parents[1] / 'services/memory/hindsight_backport.py'
+    spec = importlib.util.spec_from_file_location('proof_hindsight_backport', path)
+    value = importlib.util.module_from_spec(spec); spec.loader.exec_module(value)
+    return value
+
+
 def prepare(args):
     if os.name != 'posix' or not Path('/proc/meminfo').exists():
         raise ValueError('This isolated Docker proof is currently Linux-only.')
@@ -123,6 +130,15 @@ def prepare(args):
                      'HF_HUB_OFFLINE': '1', 'TRANSFORMERS_OFFLINE': '1', 'HF_HUB_DISABLE_TELEMETRY': '1',
                      'DO_NOT_TRACK': '1', 'OTEL_SDK_DISABLED': 'true', 'PYTHONDONTWRITEBYTECODE': '1'}
     configuration['HINDSIGHT_API_DATABASE_URL'] = 'pg0://hindsight:' + str(postgres)
+    overlay = None
+    if args.refresh_budget_backport:
+        backport = backport_module(); reviewed = backport.manifest()
+        if reviewed['baseImage'] != setup.IMAGE:
+            raise ValueError('The backport is not reviewed for this engine image.')
+        public_source = root / 'public-engine-base.py'
+        run(['docker', 'cp', args.cache_container + ':' + reviewed['containerPath'], str(public_source)])
+        public_source.chmod(0o444)
+        overlay = backport.prepare(public_source.read_bytes(), root / 'engine-source-backport')
     envfile = root / 'engine.env'
     with envfile.open('x') as stream:
         envfile.chmod(0o600)
@@ -133,13 +149,15 @@ def prepare(args):
               'image': setup.IMAGE, 'baselineContainer': args.cache_container, 'baselineId': baseline['Id'],
               'baselineIdentity': identity(baseline), 'cacheManifest': inventory,
               'extensionSha256': hashlib.sha256(source.read_bytes()).hexdigest(), 'llamaCppThinking': thinking,
-              'model': model['id'], 'created': False}
+              'model': model['id'], 'created': False, 'refreshBudgetBackport': overlay}
     write(root / 'engine.json', record)
     run(['docker', 'volume', 'create', record['volume']])
+    overlay_mount = ['-v', overlay['path'] + ':' + overlay['containerPath'] + ':ro'] if overlay else []
     container_id = run(['docker', 'run', '-d', '--pull=never', '--name', name, '--label', 'org.augmentor.proof=' + name,
          '--restart=no', '--network=host', '--cpus=4', '--memory=8g',
          '-v', record['volume'] + ':/home/hindsight/.pg0', '-v', str(extension) + ':/augmentor:ro',
-         '-v', str(cache) + ':/home/hindsight/.cache/huggingface/hub:ro', '--env-file', str(envfile), setup.IMAGE])
+         '-v', str(cache) + ':/home/hindsight/.cache/huggingface/hub:ro', *overlay_mount,
+         '--env-file', str(envfile), setup.IMAGE])
     record.update(created=True, containerId=container_id)
     (root / 'engine.json').write_text(json.dumps(record, indent=2) + '\n')
     endpoint = 'http://127.0.0.1:' + str(port)
@@ -178,12 +196,14 @@ def stop(args):
     assert not inspect(record['name'])['State']['Running']
     if identity(inspect(record['baselineContainer'])) != record['baselineIdentity']: raise ValueError('The original memory engine changed; preserve evidence for inspection.')
     if cache_inventory(root / 'model-cache') != record['cacheManifest']: raise ValueError('The read-only public model cache changed.')
+    if record.get('refreshBudgetBackport'): backport_module().verify(record['refreshBudgetBackport'])
     print(json.dumps({'phase': 'isolated-engine-stopped', 'originalEngineUnchanged': True, 'cacheUnchanged': True, 'privateDatabasePreserved': True}), flush=True)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('action', choices=['prepare', 'stop']); parser.add_argument('--root', required=True)
     parser.add_argument('--provider-json'); parser.add_argument('--cache-container', default='augmentor-hindsight')
+    parser.add_argument('--refresh-budget-backport', action='store_true', help='Opt in to the exact public MIT page-budget source overlay on this separate proof only.')
     options = parser.parse_args()
     if options.action == 'prepare':
         if not options.provider_json: parser.error('prepare requires --provider-json')
