@@ -441,6 +441,39 @@ Windows adapter is changed in this checkpoint. Mac packaging retains its Sharp/
 libvips and Koffi notice/source gates. Owner-installed, physical voice, broader
 plugin/live/privacy/rebuild and platform migration acceptance remain required.
 
+## Existing MX review search verification — October 16
+
+Both current MX reviews already have **keyless search On**, with the saved
+settings applied to their one loaded Native conversation each and no pending
+application. No API credentials or configuration migration are needed for this
+path. Actual original Plugins pages show On, an enabled overview switch and the
+keyless detail panel; read-only verification submits no settings or agent action
+and reports zero console/HTTP errors. Both running owners and their full Search
+snapshots remain unchanged.
+
+The existing private unselected **20261016-220504-b91df2e4**, application
+**1633e00f**, retains all **24,615** verified sealed inputs. Source and the exact
+packaged Search cohort each pass **19/19 cases across four files**, including the
+original Light/Dark Chromium settings, key/draft preservation, stale/lost-write
+fencing, network boundaries and supported synthetic Pi-session contracts. Two
+workers and original deadlines are unchanged; no skips. The first packaged run
+failed because its external test wrapper lacked the screenshot output directory.
+That failure is retained; creating the external directory permits the unchanged
+cohort to pass without changing the sealed application or assertions.
+
+Direct execution of the packaged tools using the current keyless settings
+completes one public search through Bing, including an official Debian source,
+and one fetch of Debian's release notes page. Neither uses API credentials or a
+model. This verifies actual network/tool operation separately from the synthetic
+SDK tests; it is **not** a model-turn or owner-conversation acceptance test.
+No review restart, profile write, production selection or additional project
+transfer occurs. Credentialed engine/quota/outage reliability, owner daily-use
+and migration-pilot feedback remain open; voice and later OS rollout stay
+deferred. The accepted MIT alternatives remain the source choice; no code from
+the historically unidentified Free Web Search 0.1.0 is copied.
+
+[Portable checkpoint](../release/harness-owner-search-review-20261016.json).
+
 ## Qualified unselected search MX candidate — October 14
 
 Implementation **454db9d9915724b53998e187c30c2943a0d7d3b2**, product **0.2.13**,
