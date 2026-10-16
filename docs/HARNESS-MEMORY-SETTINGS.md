@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [qualified shared-profile review](HARNESS-SHARED-PROFILES.md#running-mx-reviews) now runs both MX reviews on one library/memory pair: 12 prompts, 19 captured records, preserved native conversations and no gateway conflict. This supersedes their older isolated-copy/port-conflict status below; installed Agent service adoption remains separate.
+
 [Shared-profile consolidation](HARNESS-SHARED-PROFILES.md) provides an explicit cold-store merge and data-root ownership fence. It preserves capture/processing choices and archives old inference admissions. Actual review adoption and external bank migration remain separate from source support; later dated evidence there supersedes the two-gateway status below.
 
 # Shared automatic-memory settings

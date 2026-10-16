@@ -148,4 +148,53 @@ idle/startup and licence/private-source/notice contracts. The initial fixture
 parent-permission refusal and disabled-capture source-read assertion remain in
 private logs; they were corrected without relaxing the private-path/authorization
 guards. The first GUI peer test reproduced the clean-preview Refresh bug, fixed
-in the existing authored editor. Packaged-target qualification follows.
+in the existing authored editor. Packaged-target and running-review evidence follows.
+
+Private unselected MX **20261016-193501-a9131856**, application **0a1b7005**,
+passes the same **270/270** cases against exact packaged modules and **82 Python
+passes/one actual-Windows-owner skip** without site packages. The source and seal
+also pass six focused runtime cases each, including one additional explicit
+previously-admitted-queue carryover contract. All **24,602 sealed /
+1,096 compiled** inputs verify after actual review GUI QA.
+Production Node/dependencies/components and supplier sources/licences stay exact.
+[Portable evidence](../release/harness-shared-profile-review-20261016.json).
+
+### Running MX reviews
+
+Both idle review owners now run this candidate at their existing profiles/ports,
+using one shared companion pair. Guarded idle shutdown, confirmed companion
+retirement and **389 verified regular backup files** precede consolidation.
+All **four original conversations**, **32 cold/post-GUI protected inputs**,
+target improvement instructions, capture/processing preferences and engine
+configuration/installer identity verify. The unused original pilot data's **five
+files** remain exact. Its complete checked archive and original target backup are
+retained privately. The twelve prompt copies deduplicate into **12 shared prompts**;
+all **19 captured records** retain their text, timestamps and event identities.
+No additional DSH project or native conversation profile was transferred.
+
+The generated pilot default person is explicitly mapped to the primary default;
+no processed banks/jobs existed. After verifying the exact old eligibility and
+sequence map, the operator explicitly carries **16 already-admitted source records**
+through the existing `memory.dual.import` interval action. Together with the one
+primary pending record there are **17 pending records**. Raw captured text is
+unchanged; no activity window, processing job or inference request is created.
+Only the verified previously-admitted subset is selected, not arbitrary historical
+text. Unknown imported job outcomes remain stopped. This preserves the existing
+queue's intent without inventing a new live processing window.
+
+For an analogous reviewed carryover, select only source `memory_eligible` rows
+whose job is null, verify their mapped target event digests/session bindings,
+and submit exact per-session `memory.dual.import` intervals (at most 100 records
+per call). Read back target eligibility after any uncertain response before further
+calls. Never renew old activity owners or reset job budgets as part of migration.
+
+Actual original-GUI checks open both libraries and memory pages, show twelve
+prompts and nineteen records with processing enabled and no gateway conflict,
+and report zero console/HTTP errors. They change no flags and send no model/audio
+work. Initial private QA omitted the prompt modal's normal Escape/reopen route;
+the corrected driver uses the existing controls without changing the UI.
+The installed selection, original DSH/Agent data, GPU/model/audio configuration
+and canonical local changes remain intact. Shared Native **client** parity is
+qualified; installed Agent adoption/physical Qt use and broader project/OS rollout
+remain separate. The engine's availability is still reported from actual runtime
+state; this change does not claim a new live inference proof.
