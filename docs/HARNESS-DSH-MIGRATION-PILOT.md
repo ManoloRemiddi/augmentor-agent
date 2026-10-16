@@ -1043,3 +1043,54 @@ installed selection change, public binary, merged PR or later-OS release.
 
 Broader source formats, missing original camera uploads, historical child execution/Teams/provider reconstruction, owner
 pilot acceptance, remaining project migration, voice and later OS adoption remain.
+
+
+## Recorded tool recovery — October 17
+
+DSH can durably close a proposed tool without a matching `tool/call`. Its pinned
+public [recovery producer](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/session/src/repair.ts)
+uses `ToolNotStartedError` / `TOOL_NOT_STARTED` when that history cut contains no
+recorded start. A recorded call with no durable result instead receives
+`ToolOutcomeUnknownError` / `TOOL_OUTCOME_UNKNOWN`. Both interruption and fork
+recovery exist. Absence of a recorded start does not prove the parent never
+executed the action elsewhere or after the captured fork.
+
+The converter recognizes only the exact version-four producer contract: active
+same-turn/step proposal, error name/code, message/source fields, synthetic identity,
+append operation, single plaintext block and pinned public text fingerprint.
+Recognition checks original fields before display normalization. A not-started
+record must have no dispatch or source-event citation; an unknown-outcome record
+must cite exactly its earlier matching dispatch. Missing proofs, extra plaintext
+metadata, duplicate terminal results, later conflicting starts and closed-step
+proposals refuse the complete import atomically. Ordinary tool matching, source
+surface/cut integrity, image authority and byte/record bounds remain in force.
+
+Exact raw source stays archived. Native custom history, audit and per-conversation
+receipts carry finite `sourceToolRecovery` / `sourceToolRecoveries` metadata;
+replacement results retain the original verified marker and count it only once.
+No executable historical proposal, synthesized dispatch, successful outcome,
+permission, retry or child job is introduced. Effective source membership still
+owns continuation context. Explicit human Send is required to begin new work.
+
+The original Chat shows a historical recovery notice. Trajectory can show the
+recorded proposal's name/arguments beside its result without inventing a start or
+execution time. Unknown outcomes keep that label. Verified archived child
+inspectors receive the same read-only labels within their existing archive scope;
+unsupported child bodies retain the existing read-only fallback.
+
+The recovery text in the independently authored fixture is public DSH protocol
+data with its MIT copyright and supplier licence reference retained. Private owner
+messages, IDs, arguments and exports are absent from public fixtures and proofs.
+Qualification and the installed/adoption boundary are recorded in
+[the portable recovery evidence](../release/harness-dsh-recovery-qualification-20261017.json).
+
+Source check/build and the separate ordinary packaged copy each pass **237 Node
+and 47 Python checks**, with two workers/no skips across 37 Node files, eleven
+Chromium files/fourteen GUI cases. All **1,111 compiled files** match. The same
+frozen six-parent real project refuses under the preceding converter and passes
+source/ordinary read-only preparation, including two not-started recoveries.
+No real destination, model assignment or transfer is created. The final source
+cohort includes a refusal for unexpected original plaintext metadata. Initial
+fixture failures (an overwritten RPC helper, shadowed setup options and an
+unsubscribed event-stream assertion) are retained privately; final GUI assertions
+read saved history. Exact sealed qualification and owner adoption remain pending.

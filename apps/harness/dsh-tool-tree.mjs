@@ -37,7 +37,8 @@ export function attachToolChildren(state,nodes,runningCalls,ownership){
  }
  for(const node of nodes)if(node.kind==='tool-result'){
   const binding=ownership.get(node.seq),start=starts.get(binding?.startSeq);
-  node.call=start?.call??null;
+  const proposal=node.sourceRecovery?.code==='TOOL_NOT_STARTED'?bySeq.get(binding?.proposalSeq):undefined,block=proposal?.blocks?.find(b=>b.kind==='tool-call'&&b.callId===binding?.id);
+  node.call=start?.call??(block?{name:block.name,argsRaw:block.argsRaw}:null);
   if(start&&start.binding.id===binding.id)trees.set(binding.startSeq,node);
  }
  for(const [seq,{binding}] of starts){

@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {sourceToolRecovery} from './dsh-source-recovery.mjs';
 import {projectChat} from './chat-projection.js';
 import {invokedSkillNames} from './dsh-skills.mjs';
 import {trajectoryStream} from './dsh-trajectory-stream.mjs';
@@ -25,7 +26,7 @@ export function projectDsh(state){
     }
     if(e.type==='tool/result'){
       const binding=ownership.get(e.seq),start=observedTool(state.records,'tool/start',e,binding),end=observedTool(state.records,'tool/end',e,binding);
-      n={kind:'tool-result',seq:e.seq,time:end?.time??null,callTime:start?.time??null,turn:t,step,callId:binding.id,sdkCallId:d.toolCallId,name:d.name,content:d.result?.content||[],isError:d.isError,subCalls:[]};
+      n={kind:'tool-result',...(sourceToolRecovery(e)?{sourceRecovery:sourceToolRecovery(e)}:{}),seq:e.seq,time:end?.time??null,callTime:start?.time??null,turn:t,step,callId:binding.id,sdkCallId:d.toolCallId,name:d.name,content:d.result?.content||[],isError:d.isError,subCalls:[]};
     }
     if(n){eventNodes.push(n);locations.set(e.seq,{kind:'session'});}
   }

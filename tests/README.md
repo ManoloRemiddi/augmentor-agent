@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+DSH tool-recovery coverage: `dsh-project-tool-recovery.test.mjs` checks exact
+interrupted/forked recovery contracts, refusals, source cuts/replacements and
+archived-child labels. `dsh-project-tool-recovery-runtime.test.mjs` checks actual
+SDK cold/reply continuation without historical writes. The original GUI case
+`harness-dsh-tool-recovery-chromium.test.mjs` checks Chat/Trajectory, one explicit
+fresh read-only turn and reload without replay. Retain the migration family,
+shared Chat, nested-tool and argument-stream regressions with these changes.
+These fixtures use an authored provider; owner pilot acceptance remains separate.
+
 Original MCP management: `harness-mcp-original-chromium.test.mjs` follows Plugins → Connected tools → MCP servers, observes saved On/Off, one explicit server change, original settings fields, both themes and 1280/640/420 containment with no model or tool call. `native-mcp.test.mjs` retains actual Qt/coherent reload checks and asserts the same saved state labels. Keep profile/configuration/management/options/loader-recovery/connection and advanced-inspector regressions with these shared controls.
 
 Wiki receipt-review Chromium navigation opens Plugins → Wiki tools & skills before the existing action inspector. Run the six-file Wiki cohort (`wiki-settings`, `wiki-scope`, `wiki-receipts`, `pi-wiki`, `harness-wiki-settings-chromium`, `harness-wiki-review-chromium`) for settings/scope/receipts/SDK and original GUI regressions. Owner vault query/configuration evidence is separate from authored mutation/unknown-outcome fixtures.

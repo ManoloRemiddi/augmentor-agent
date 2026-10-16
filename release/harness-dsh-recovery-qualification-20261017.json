@@ -1,0 +1,96 @@
+{
+  "schema": "augmentor-dsh-recovery-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX migration compatibility; source and private separate package qualification; no owner update or transfer",
+  "sourceBaseRef": "38d2ec296b13409e01fbcbe21efc001fcc8caee2",
+  "primaryProtocol": {
+    "repository": "deepseek-ai/deepseek-harness",
+    "ref": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+    "path": "packages/core/session/src/repair.ts",
+    "blob": "bb32f01ca06af2c496fa4c68fed287297e1b7fce",
+    "sha256": "c2835c920aba203c709e44686e55f43bb4d357ea59cfef3561c371b8ff115540",
+    "supplierImplementationCopied": false,
+    "publicProtocolWordingCopiedInAuthoredFixture": true,
+    "protocolDataLicence": "MIT; credited in fixture; supplier apps/harness/vendor/dsh/LICENSE",
+    "ownerContentInPublicFixture": false
+  },
+  "contract": {
+    "sourceVersion": 4,
+    "codes": [
+      "TOOL_NOT_STARTED",
+      "TOOL_OUTCOME_UNKNOWN"
+    ],
+    "causes": [
+      "interrupted",
+      "forked"
+    ],
+    "exactOriginalProducerFieldsBeforeNormalization": true,
+    "notStartedRequiresAbsentCallAndCitation": true,
+    "unknownRequiresMatchingEarlierCallAndExactCitation": true,
+    "sameActiveTurnStepRequired": true,
+    "replacementMarkerRetainedCountedOnce": true,
+    "metadataFields": [
+      "sourceToolRecovery",
+      "sourceToolRecoveries"
+    ],
+    "fabricatedDispatches": 0,
+    "historicalRetries": 0,
+    "nativeExecutableHistoricalProposals": 0,
+    "archivedChildRuntime": "Read-only original labels; no native job or extra authority",
+    "unknownOutcome": "Not success; verify external state before a new action",
+    "boundsRaised": false
+  },
+  "qualification": {
+    "phase": "source and ordinary passed; exact seal pending",
+    "workers": 2,
+    "deadlinesChanged": false,
+    "testedInputsSha256": {
+      "packages/runtime/src/dsh-tool-recovery.ts": "77d74d373c9832ca5f3f34e13c30f206d070c8c43895b085b537c7bb99afefb0",
+      "packages/runtime/src/dsh-project-import.ts": "f7b485c6c63eddba6f890a3eea7ebc62b50a6ef01260ecf505a6b01c2c1abf1a",
+      "packages/runtime/src/dsh-archived-family.ts": "6f1562105cb18b3a0c922f3171ec313b1a8edf3b6d62f35a61899d9f8656a077",
+      "apps/harness/dsh-source-recovery.mjs": "548c4306aabb9a110abf27835d16d8409867c998a2cad3dd41a70cf0981db0d6",
+      "apps/harness/dsh-call-identity.mjs": "3606b27606fc5c1f08360b18de65099940fc8ec85d790b7371882f390eb54211",
+      "apps/harness/dsh-pi-projection.mjs": "2dcf7efd06af4c53fcff4fcc8bb8cd1377b613291fc4aa9ad93cadef5a8ddc64",
+      "apps/harness/dsh-tool-tree.mjs": "b23c59f9ba52c8c19bc105a89ab1e8882198cad49dc41fc15296d01fcb5a184a",
+      "apps/harness/chat-projection.js": "3832a61c70d1b89a991bfcca0cdbccfc358ad494a62d9b2870e7e2cdd48d369f",
+      "tests/dsh-project-tool-recovery.test.mjs": "6ea05df9a4d94d85f6532c74f7a233941390f371a8016ae33e62984e3b1529e9",
+      "tests/dsh-project-tool-recovery-runtime.test.mjs": "c92f9d076eab0d06dc6559db43a7b58570e9b9c838a2b6781529c006f1784a98",
+      "tests/harness-dsh-tool-recovery-chromium.test.mjs": "c3b23159bff9d51f536516255e2a65f4a7b4ab4d45cb0525d3befdd28a13c6cb",
+      "tests/fixtures/dsh-tool-recovery-project.mjs": "f34013ff0dcfd941dfb2a536a53c5540dfd3949d3c5e794be7d6616c51a3c565"
+    },
+    "sourceCheckBuildPass": true,
+    "sourceNodePass": 237,
+    "nodeFiles": 37,
+    "newUnitCases": 27,
+    "newSdkCases": 2,
+    "newGuiCases": 1,
+    "chromiumFiles": 11,
+    "chromiumCases": 14,
+    "sourcePythonPass": 47,
+    "skips": 0,
+    "ordinaryNodePass": 237,
+    "ordinaryPythonPass": 47,
+    "ordinaryUnchangedBaselineInputsVerified": 23515,
+    "compiledFilesVerified": 1111,
+    "sameFrozenRealPreparationAcceptedByOrdinary": true
+  },
+  "realFrozenComparison": {
+    "projects": 1,
+    "parents": 6,
+    "archivedChildren": 0,
+    "notStartedResults": 2,
+    "precedingSealedPreparationAccepted": false,
+    "correctedSourcePreparationAccepted": true,
+    "identicalFrozenManifestAndObjects": true,
+    "scopeLimit": "Read-only parent preparation; no native destination/model assignment or owner continuation",
+    "ownerImports": 0,
+    "modelRequests": 0,
+    "privateDataPublished": false
+  },
+  "remaining": [
+    "Guarded adoption of qualified separate candidate before wider migration",
+    "Owner pilot feedback before further transfers",
+    "File attachments and malformed argument/source observation formats",
+    "Voice and later OS rollout deferred"
+  ]
+}

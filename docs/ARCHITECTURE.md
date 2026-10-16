@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Recorded DSH tool recovery](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-recovery--october-17)
+retains exact interrupted/forked recovery records as labelled historical data,
+without invented dispatches or retries. Source and separate ordinary package each
+pass **237 Node / 47 Python** checks; a frozen six-parent real project now passes
+read-only preparation. Exact sealed qualification and adoption remain pending.
+[Evidence](../release/harness-dsh-recovery-qualification-20261017.json).
+
 [MX review opener](HARNESS-MX-FEEDBACK.md#stable-mx-review-launch-and-recovery--october-16) is an OS launch adapter over the existing Pi owner, not a second execution loop. Explicit revisioned registration binds a verified seal to native/shared profile paths; private IPC supplies the current browser link. Confirmed cold startup uses existing ensure-runtime/package leases; conflicting or unconfirmed live owners are preserved. It does not change Desktop selection, migrate data or own prompt/memory services.
 
 [Historical DSH reply branches](HARNESS-DSH-MIGRATION-PILOT.md#historical-reply-branches--october-16) now run in both existing MX reviews. Private unselected **20261016-204440-a6f079ca**, application **deea778d** / test qualification **34f43a99**, passes **303/303 source and exact packaged cases** across 65 files / 20 Chromium files, plus sixteen licence/private-boundary/notice checks each. Source-cut reconstruction retains then-current compactions/offloads/images and fixes native reply/Edit ordinals after import. Guarded idle-only adoption verifies **408 backup files / 32 cold and post-GUI protected inputs**, four conversations, 12 prompts, 19 captured records and 17 pending memory entries. Actual pilot read-only inspection exposes two archived children and source excerpts without new work. Configured 10 groups/431 models/10 pins and engine/settings/selected installation remain unchanged. [Portable evidence](../release/harness-dsh-branch-review-20261016.json). No further real projects, owner branch/model work, voice or later-OS rollout; pilot feedback remains required before bulk migration.

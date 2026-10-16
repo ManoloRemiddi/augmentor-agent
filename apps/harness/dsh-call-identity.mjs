@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Presentation identifiers only. Recorded SDK IDs and execution are unchanged.
+import {sourceToolRecovery} from './dsh-source-recovery.mjs';
 const identity=v=>typeof v==='string'&&v.length>0&&v.length<=256;
 const toolId=v=>typeof v==='string'&&v.length>0&&v.length<=4096;
 export const callViewId=(scope,id)=>JSON.stringify([scope,id]);
@@ -20,7 +21,7 @@ export function toolOwnership(events){
    const k=key(event.turnId,d.toolCallId),known=identity(d.requestId)||identity(d.captureId),proposal=proposals.get(k),scope=known?callScope(d,event.turnId,event.seq):undefined;
    const parentRawId=toolId(d.parentToolCallId)?d.parentToolCallId:undefined,parent=parentRawId?active.get(key(event.turnId,parentRawId)):undefined;
    const previous=active.get(k),matched=previous&&(!known||previous.scope===scope)&&previous.parentRawId===parentRawId?previous:undefined;
-   const owner=known?{scope,requestId:d.requestId,captureId:d.captureId,...(proposal?.scope===scope?{proposalSeq:proposal.proposalSeq}:{})}:event.type==='tool/call'?(parent??proposal):matched;
+   const owner=known?{scope,requestId:d.requestId,captureId:d.captureId,...(proposal?.scope===scope?{proposalSeq:proposal.proposalSeq}:{})}:event.type==='tool/call'?(parent??proposal):matched??(sourceToolRecovery(event)?.code==='TOOL_NOT_STARTED'?proposal:undefined);
    const binding={...(owner??{scope:JSON.stringify([event.turnId??null,'unlinked-dispatch',event.seq])}),rawId:d.toolCallId};binding.id=callViewId(binding.scope,d.toolCallId);bindings.set(event.seq,binding);
    // Only a preceding live parent in this same recorded scope can own a child.
    // SDK ids are opaque: their slash spelling supplies no hierarchy evidence.
