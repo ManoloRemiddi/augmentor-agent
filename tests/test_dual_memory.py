@@ -24,6 +24,17 @@ class DualMemoryTests(unittest.TestCase):
     def append(self, eid='1', content='We agreed to review it tomorrow.', **p):
         return self.call('append', events=[{'id': eid, 'role': 'user', 'mode': 'voice', 'content': content}], **p)
 
+    def test_stale_capture_choice_cannot_overwrite_a_newer_choice(self):
+        self.call('configure', enabled=False, expectedEnabled=True)
+        with self.assertRaisesRegex(ValueError, 'changed'):
+            self.call('configure', enabled=True, expectedEnabled=True)
+        self.assertFalse(self.call('describe')['enabled'])
+        self.call('configure', enabled=True)  # Existing explicit native callers remain compatible.
+        with self.assertRaisesRegex(ValueError, 'expected'):
+            self.call('configure', enabled=False, expectedEnabled=1)
+        self.assertTrue(self.call('describe')['enabled'])
+        self.assertEqual(self.call('describe')['configurationGuards']['capture'], 1)
+
     def commit(self, job, text='An open commitment'):
         return self.call('commit', token=job['token'], value={'summary': text, 'items': [{'text': text, 'sources': [job['events'][-1]['seq']], 'state': 'open'}]})
 

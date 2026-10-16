@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared memory settings](HARNESS-MEMORY-SETTINGS.md) expose configured request mode,
+independent capture/processing pauses and guarded changes in the original Harness
+Plugins screen and existing native panel. Configuration is labelled separately
+from live provider proof; engine adoption and sealed review remain separate gates.
+
 [Audio processor cleanup and POSIX qualification](PI-VOICE.md#audio-processor-lifecycle-and-hosted-posix-qualification--october-16-2026)
 now fixes missing-tool backpressure, buffered PCM cancellation and joined owned
 process/input cleanup in private companion **0.1.21/component 2d25ba0**. Source/

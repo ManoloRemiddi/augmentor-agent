@@ -80,6 +80,38 @@ class HindsightTests(unittest.TestCase):
     def finish(self):
         for _ in range(10): self.store.step()
 
+    def test_request_mode_status_is_configured_metadata_without_network_or_private_values(self):
+        def no_network(*args): raise AssertionError('Status must not trigger engine or model work')
+        for stored, expected in [('off', 'off'), ('default', 'default'), ('synthetic-secret-invalid-mode', 'unknown')]:
+            config = {**self.config, 'llamaCppThinking': stored, 'gatewayKey': 'synthetic-private-gateway-key', 'modelKey': 'synthetic-private-model-key'}
+            store = HindsightMemory(self.path, config, no_network, lambda: self.now)
+            observed = store.call('memory.dual.describe', {})
+            self.assertEqual(observed['requestMode'], expected)
+            self.assertEqual(observed['requestModeSource'], 'configured-memory-engine')
+            self.assertEqual(observed['configurationGuards'], {'capture': 1, 'processing': 1})
+            for secret in ('synthetic-private-gateway-key', 'synthetic-private-model-key', 'synthetic-secret-invalid-mode'):
+                self.assertNotIn(secret, json.dumps(observed))
+        unconfigured = HindsightMemory(Path(self.tmp.name) / 'unconfigured.sqlite3', request=no_network)
+        self.assertEqual(unconfigured.call('memory.dual.describe', {})['requestMode'], 'unconfigured')
+
+    def test_stale_processing_choice_is_refused_without_changing_the_current_pause(self):
+        self.call('processing', paused=True, expectedPaused=False)
+        with self.assertRaisesRegex(ValueError, 'changed'):
+            self.call('processing', paused=False, expectedPaused=False)
+        self.assertTrue(self.call('processing')['paused'])
+        with self.assertRaisesRegex(ValueError, 'expected'):
+            self.call('processing', paused=False, expectedPaused='yes')
+        self.assertTrue(self.call('processing')['paused'])
+
+    def test_capture_resume_keeps_processing_paused_and_never_grants_an_activity_window(self):
+        self.call('configure', enabled=False, expectedEnabled=True)
+        self.call('configure', enabled=True, expectedEnabled=False)
+        self.assertTrue(self.call('processing')['paused'])
+        self.call('processing', paused=False, expectedPaused=True)
+        self.store.step()
+        self.assertEqual(self.engine.operations, {})
+        self.assertFalse(self.store.processing.budget.allowed('one'))
+
     def test_status_read_cannot_hold_a_journal_write_lock_while_budget_settlement_progresses(self):
         self.append(); budget = self.store.processing.budget
         budget.activity('one', 'owned-tool-window', 'tools'); budget.open('owned-job', 'one')

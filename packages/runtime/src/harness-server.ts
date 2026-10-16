@@ -20,6 +20,7 @@ const allowed = new Set([
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.prepareBranch', 'session.settleBranch', 'session.branchRecovery', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
   'session.queue', 'session.updateQueue', 'session.continueQueue', 'session.resolveQueue', 'session.compact', 'session.compaction', 'session.acknowledgeCompaction',
+  'memory.status','memory.configure','memory.processing',
   'observation.describe', 'observation.configure', 'observation.list', 'observation.search', 'observation.payload', 'observation.clear',
   'search.describe','search.set','search.refresh','wiki.describe','wiki.set','wiki.refresh','wiki.receipts','wiki.review','metafolders.describe','metafolders.set','appearance.describe','appearance.set','shortcuts.describe', 'shortcuts.edit', 'settings.describe', 'settings.mutate', 'prompts.list', 'prompts.save', 'prompts.delete', 'prompts.improvementSave', 'interaction.respond', 'interaction.wait',
   'models.settingsDescribe','models.settingsMutate','models.settingsDiscover','models.credentialDescribe','models.credentialSet','models.settingsRefresh','models.accountLogout',

@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared memory settings](HARNESS-MEMORY-SETTINGS.md) expose configured request mode,
+independent capture/processing pauses and guarded changes in the original Harness
+Plugins screen and existing native panel. Configuration is labelled separately
+from live provider proof; engine adoption and sealed review remain separate gates.
+
 [Current explicit-mode qualification](PI-MEMORY-LIVE.md#current-explicit-mode-qualification--october-16)
 passes the unchanged full actual Pi/Hindsight/Qwen scenario with the existing
 memory-only **off** option. Original installed mode stays **default** and its failed

@@ -113,7 +113,12 @@ class HindsightMemory(DualMemory):
             with self.connect() as db:
                 config = dict(db.execute('SELECT enabled,person FROM settings').fetchone())
                 events = db.execute('SELECT count(*) FROM events').fetchone()[0]
+            request_mode = self.processing.configuration.get('llamaCppThinking', 'default') if self.configuration else 'unconfigured'
+            if request_mode not in ('default', 'off', 'unconfigured'):
+                request_mode = 'unknown'
             return {'protocol': PROTOCOL, 'pid': __import__('os').getpid(), **config, 'engine': 'hindsight', 'version': VERSION,
+                    'requestMode': request_mode, 'requestModeSource': 'configured-memory-engine',
+                    'configurationGuards': {'capture': 1, 'processing': 1},
                     'configured': bool(self.configuration), 'available': self.checked and not self.last_error,
                     'events': events, 'pending': pending,
                     'failures': processing['jobs'].get('stopped', 0), 'processing': processing,

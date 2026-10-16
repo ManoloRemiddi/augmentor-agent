@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared automatic-memory controls](HARNESS-MEMORY-SETTINGS.md) now expose configured
+request mode and independent capture/processing pauses in original Harness
+Plugins and the existing native panel. Operator metadata is sanitized; inspectors
+are excluded. Service-level boolean guards reject conflicting current state;
+unconfirmed writes require Refresh without replay. Source focused checks pass
+52 Python, 12 Node controls and one actual Chromium UI case in both themes; two
+guard cases fail against preceding source as intended. Broader/fresh-copy/live
+qualification is recorded separately when complete. Existing engine mode, MX
+review, installed selection and owner/private state remain unchanged.
+
 [Explicit memory-only mode](PI-MEMORY-LIVE.md#current-explicit-mode-qualification--october-16)
 now passes the unchanged **full actual Pi/Hindsight/Qwen scenario**, application
 **2b751081** / external driver **9a6a7fcf**, runtime **a8f49ced**. All 18 observed
