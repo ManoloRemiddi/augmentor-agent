@@ -34,7 +34,8 @@ export function submittedParts(input:string,attachments:PromptAttachment[]=[]){r
  */
 export class PiAttachments {
  readonly root:string;
- constructor(state:string,private inherited:(sid:string,part:PromptAttachment)=>boolean=()=>false){this.root=privateDir(join(state,'attachments','v1'));}
+ constructor(state:string,private inherited:(sid:string,part:PromptAttachment)=>boolean=()=>false,private readOnly=false){this.root=join(state,'attachments','v1');if(readOnly){const stat=lstatSync(this.root);if(!stat.isDirectory()||stat.isSymbolicLink()||stat.uid!==process.getuid?.()||(stat.mode&0o077))throw Error('Attachment source is not a private owned store.');}else privateDir(this.root);}
+ private writable(){if(this.readOnly)throw Error('This attachment store is read only.');}
  private path(sid:string){return join(this.root,sid+'.json');}
  private receipts(sid:string):Receipt[]{
   try{const stat=lstatSync(this.path(sid));if(!stat.isFile()||stat.isSymbolicLink()||process.getuid&&stat.uid!==process.getuid()||process.platform!=='win32'&&stat.mode&0o077)throw Error('Attachment receipts require a private owned file.');const raw=readFileSync(this.path(sid),'utf8');if(raw.length>4*1024*1024)throw Error('Attachment receipts exceed their bounds.');const rows=JSON.parse(raw);if(!Array.isArray(rows)||rows.length>10000)throw Error('Invalid attachment receipts.');for(const row of rows){if(typeof row.receiptId!=='string')throw Error('Invalid attachment receipt.');promptAttachments([row.part]);}return rows;}
@@ -44,7 +45,7 @@ export class PiAttachments {
  /** Admit exact already-normalized DSH bytes without recompression. No camera
   * original is invented: an imported reference retains its stored image only. */
  async importStoredImage(sid:string,attachment:ImageAttachmentRef,data:Uint8Array){
-  identifier(sid);promptAttachments([{type:'image',attachment}]);
+  this.writable();identifier(sid);promptAttachments([{type:'image',attachment}]);
   if(data.byteLength!==attachment.bytes||data.byteLength>IMAGE_LIMITS.maxImageBytes)throw Error('Imported image exceeds its byte bound.');
   const decoded=await detectImage(data,{maxPixels:IMAGE_LIMITS.maxImagePixels,maxDimension:IMAGE_LIMITS.maxImageDimension});
   if(decoded.mediaType!==attachment.mediaType||decoded.width!==attachment.width||decoded.height!==attachment.height)throw Error('Imported image metadata differs from its bytes.');
@@ -53,18 +54,18 @@ export class PiAttachments {
   if(!this.receipts(sid).some(row=>JSON.stringify(row.part)===JSON.stringify(part)))this.commit(sid,part);
  }
  historicalImagePath(sid:string,attachment:ImageAttachmentRef){this.authorize(sid,{type:'image',attachment});return normalizedImagePath(this.root,attachment);}
- async uploadImage(sid:string,data:Uint8Array,name:string,mediaType:ImageMediaType){
+ async uploadImage(sid:string,data:Uint8Array,name:string,mediaType:ImageMediaType){this.writable();
   if(!IMAGE_LIMITS.mediaTypes.includes(mediaType))throw Error('Unsupported image type.');
   const normalized=await saveImageFile(this.root,{data,name,mediaType},IMAGE_LIMITS,{maxPixels:4_000_000,maxDimension:4096,maxBytes:5*1024*1024});
   const original=await saveFileVerbatim(this.root,{data,name}),attachment={...normalized,originalAttachmentId:original.attachmentId};const receipt=this.commit(sid,{type:'image',attachment},original);return {receiptId:receipt.receiptId,attachment};
  }
- async upload(sid:string,data:Uint8Array,name:string){if(data.byteLength>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');const file=await saveFileVerbatim(this.root,{data,name});const receipt=this.commit(sid,{type:'file',attachment:file});return {receiptId:receipt.receiptId,file};}
+ async upload(sid:string,data:Uint8Array,name:string){this.writable();if(data.byteLength>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');const file=await saveFileVerbatim(this.root,{data,name});const receipt=this.commit(sid,{type:'file',attachment:file});return {receiptId:receipt.receiptId,file};}
  private authorize(sid:string,part:PromptAttachment){
   promptAttachments([part]);
   if(!this.receipts(sid).some(row=>JSON.stringify(row.part)===JSON.stringify(part))&&!this.inherited(sid,part))throw Error('Attachment does not belong to this conversation.');
  }
  async admit(sid:string,content:unknown):Promise<{input:string;attachments:PromptAttachment[]}>{
-  if(!Array.isArray(content)||content.length>32)throw Error('Invalid prompt content.');
+  this.writable();if(!Array.isArray(content)||content.length>32)throw Error('Invalid prompt content.');
   let bytes=0,count=0;const attachments:PromptAttachment[]=[],texts:string[]=[];
   for(const p of content){
    if(p?.type==='text'&&typeof p.text==='string'){texts.push(p.text);continue;}
@@ -115,7 +116,7 @@ export class PiAttachments {
   }
   return {part:structuredClone(part),original:receipt.original,data,name:part.attachment.name??original.name,mediaType};
  }
- grantEdit(sid:string,original:{part:PromptAttachment;original?:FileAttachmentRef}){
+ grantEdit(sid:string,original:{part:PromptAttachment;original?:FileAttachmentRef}){this.writable();
   identifier(sid);const receipt=this.receipts(sid).find(row=>JSON.stringify(row.part)===JSON.stringify(original.part))??this.commit(sid,original.part,original.original);
   return {...structuredClone(receipt.part),receiptId:receipt.receiptId};
  }

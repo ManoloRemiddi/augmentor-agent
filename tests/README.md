@@ -2092,3 +2092,16 @@ adapter cases explicitly skip outside Linux, which does not qualify other OS
 artifacts. `harness-dsh-batch-import-chromium.test.mjs` drives the unchanged original
 workspace expansion/sidebar/composer. All fixtures are independently authored;
 actual owner profiles are not test inputs. [Owning contract](../docs/HARNESS-DSH-MIGRATION-PILOT.md#multi-project-consolidation-into-a-cold-profile--october-16).
+
+`native-profile-import.test.mjs` exercises complete cold native profile relocation
+into an existing destination, exact source/archive/destination bytes, parent-header
+rebinding, drafts, memory cutoffs and real SDK file reads after removing the old
+state. It checks changed sources/files, unknown formats, missing receipts/parents,
+duplicate IDs, live owners, foreign image authority, image-incompatible routes,
+DSH image/archive continuation, repeated relocation and native compaction quotes.
+`harness-native-profile-import-chromium.test.mjs` opens the unchanged original
+GUI, restores the draft and decoded image, and continues through its composer.
+Both Linux-only drivers use independent authored fixtures; the runtime cases join
+the Linux SDK job. Existing profile transaction crash/rollback tests cover the
+shared publication mechanism. Source and packaged-target results are recorded
+separately in the migration guide; no owner data or new live-model proof is implied.

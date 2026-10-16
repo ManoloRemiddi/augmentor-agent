@@ -15,7 +15,7 @@ import {pythonExecutable} from '../../dist/platform/src/index.js';
 import {privateDir,atomicJson} from '../../dist/runtime/src/storage.js';
 import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
-export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,permissionMode=false,forcePrompt=false,voiceMode,metricsMode=false}={}){
+export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,permissionMode=false,forcePrompt=false,voiceMode,metricsMode=false,attachmentMode=false}={}){
  const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
  const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])privateDir(path);
  const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
@@ -30,6 +30,15 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
   res.writeHead(200,{'content-type':'text/event-stream'});
   const send=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'plan-fixture',object:'chat.completion.chunk',model:'plan-fixture',choices:[{index:0,delta,finish_reason:finish}]})+'\n\n');
   const last=body.messages.at(-1),proposal=body.messages.findLast(m=>m.role==='assistant'&&m.tool_calls?.length),toolName=proposal?.tool_calls?.at(-1)?.function?.name;
+  if(attachmentMode&&op.kind==='read-attachment'){
+   if(last?.role!=='tool'){
+    const text=body.messages.filter(m=>m.role==='user').flatMap(m=>typeof m.content==='string'?[m.content]:m.content?.filter(p=>p.type==='text').map(p=>p.text)??[]).findLast(text=>text.includes('Attached files (read their exact contents using the file tools):'));
+    const record=text?.split('Attached files (read their exact contents using the file tools):\n').at(-1)?.split('\n')[0],guide=body.messages.filter(m=>m.role==='user').flatMap(m=>typeof m.content==='string'?[m.content]:m.content?.filter(p=>p.type==='text').map(p=>p.text)??[]).find(text=>text.startsWith('Managed attachments were copied into this profile.'));
+    const path=record?JSON.parse(record).path:guide?JSON.parse(guide.split('\n').at(-1))[0].current:undefined;if(!path)throw Error('Authored provider has no effective attachment path');
+    send({role:'assistant',tool_calls:[{index:0,id:'relocated-read-'+requests.length,type:'function',function:{name:'read',arguments:JSON.stringify({path})}}]},'tool_calls');
+   }else send({role:'assistant',content:'Authored attachment result: '+JSON.stringify(last.content)},'stop');
+   res.end('data: [DONE]\n\n');return;
+  }
   if(metricsMode){
    const id='metrics-fixture-'+requests.length,chunk=(delta,finish=null)=>({id,object:'chat.completion.chunk',model:'plan-fixture',choices:[{index:0,delta,finish_reason:finish}]}),emit=value=>res.write('data: '+JSON.stringify(value)+'\n\n');
    if(last?.role!=='tool'){

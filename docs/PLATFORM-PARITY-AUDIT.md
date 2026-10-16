@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native profile relocation](HARNESS-DSH-MIGRATION-PILOT.md#relocation-between-cold-harness-profiles--october-16) uses shared native-history/reference/memory semantics and the existing Linux-only cold-state transaction. Linux runtime/Chromium fixtures qualify this step; macOS/Windows transaction adapters and artifacts remain explicit gaps. The hook is inert without a relocation binding, preserving ordinary profiles on every OS. Configuration, workspace folders and companion banks are not implicitly transferred.
+
 [Cold-profile consolidation](HARNESS-DSH-MIGRATION-PILOT.md#multi-project-consolidation-into-a-cold-profile--october-16) uses a shared batch/import/receipt contract. The transaction is currently qualified only on MX Linux and refuses adoption on other OSes. Linux/macOS runtime startup share the retained-open-description POSIX flock adapter; owner cases enter the Linux SDK job, with macOS artifact/kernel evidence pending. Windows retains its named-pipe guard and honors pending migration fences; a Windows consolidation ownership/recovery adapter is an explicit gap. No later-OS or installed acceptance is inferred from source registration.
 
 [Archive snapshots](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)

@@ -2,7 +2,7 @@
 import {constants,chmodSync,openSync,closeSync,readSync,fstatSync,lstatSync,readdirSync,cpSync,rmSync,renameSync,readFileSync,fsyncSync,realpathSync} from 'node:fs';
 import {join,dirname,basename,isAbsolute,resolve} from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
-import {acquireProfileLease,profileFence,isTransactionTree} from './profile-lease.js';
+import {acquireProfileLease,profileFence,isTransactionTree,isNativeArchive} from './profile-lease.js';
 import {atomicJson,privateDir} from './storage.js';
 export const present=(path:string)=>{try{return lstatSync(path);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return undefined;throw error;}};
 const hash=(value:string)=>createHash('sha256').update(value).digest('hex');
@@ -30,11 +30,13 @@ function flushTree(root:string){for(const name of readdirSync(root)){const path=
 function targetPath(state:string){
  if(process.platform!=='linux')throw Error('Transactional profile consolidation is currently qualified only on Linux.');
  if(isTransactionTree(state))throw Error('Choose the original state path, not a migration backup or stage.');
+ if(isNativeArchive(state))throw Error('Choose an active profile path, not an archived source snapshot.');
  if(!isAbsolute(state)||resolve(state)!==state)throw Error('Choose a canonical absolute state path.');const parent=dirname(state),stat=lstatSync(parent);
  if(realpathSync(parent)!==parent||!stat.isDirectory()||stat.isSymbolicLink()||stat.uid!==process.getuid?.()||(stat.mode&0o077))throw Error('State migration needs a private owned parent.');
  const old=present(state);if(old&&(!old.isDirectory()||old.isSymbolicLink()||(old.mode&0o077)))throw Error('State migration requires a private real directory.');return state;
 }
-function cold(state:string){
+export function requireColdState(state:string){
+ targetPath(state);if(present(profileFence(state)))throw Error('Inspect the unfinished migration before using this profile.');
  const descriptor=join(state,'harness.json');if(!present(descriptor))return;
  const info=lstatSync(descriptor);if(!info.isFile()||info.isSymbolicLink()||info.size>65536)throw Error('Harness owner descriptor is invalid.');
  const pid=JSON.parse(readFileSync(descriptor,'utf8')).pid;
@@ -57,7 +59,7 @@ function complete(value:Journal,status:string){atomicJson(profileFence(value.sta
 export async function stateTransaction<T>(state:string,build:(stage:string)=>Promise<T>){
  targetPath(state);const lease=acquireProfileLease(state,{maintenance:true});let stage:string|undefined,armed=false;
  try{
-  if(present(profileFence(state)))throw Error('Inspect the unfinished migration before starting another.');cold(state);
+  if(present(profileFence(state)))throw Error('Inspect the unfinished migration before starting another.');requireColdState(state);
   const original=present(state),before=original?stateInventory(state):null,id=randomUUID(),paths=locations(state,id);stage=paths.stage;
   if(present(stage)||present(paths.backup))throw Error('Migration staging path exists.');
   privateDir(stage);if(original){cpSync(state,stage,{recursive:true,preserveTimestamps:true,errorOnExist:true,force:false});for(const row of before!.rows)chmodSync(row.path?join(stage,...row.path.split('/')):stage,row.mode);}

@@ -6,15 +6,18 @@ import {fileURLToPath} from 'node:url';
 import {pythonExecutable,componentEnvironment} from '../../platform/src/index.js';
 export class ProfileBusy extends Error{}
 export const isTransactionTree=(state:string)=>/^\..+\.import-[-a-f0-9]{36}\.(?:stage|backup)$/.test(basename(state));
+export const isNativeArchive=(state:string)=>/[\\/]native-imports[\\/][a-f0-9]{64}[\\/]state$/.test(state);
 export function profileFence(state:string){const absolute=resolve(state);return join(dirname(absolute),'.'+basename(absolute)+'.augmentor-migration.json');}
 /** POSIX flock belongs to Node's retained open file description, not a helper
  * process or PID file. It survives a helper's exit, and releases on owner death.
  * The lease/fence live outside the replaceable state directory. */
 export function acquireProfileLease(state:string,{maintenance=false}={}){
+ if(isNativeArchive(resolve(state)))throw Error('Native source archives are evidence copies; restore them through an explicit migration before opening Harness.');
  if(!maintenance&&isTransactionTree(resolve(state)))throw Error('Migration backups/staging trees must be restored to the original state path before opening Harness.');
  if(process.platform==='win32'){if(maintenance)throw Error('Profile consolidation is not qualified on Windows.');if(existsSync(profileFence(state)))throw Error('An unfinished profile migration requires inspection before starting Harness.');return {close(){}};}
  const requested=resolve(state);mkdirSync(dirname(requested),{recursive:true,mode:0o700});
  const absolute=existsSync(requested)?realpathSync(requested):join(realpathSync(dirname(requested)),basename(requested)),parent=dirname(absolute);
+ if(isNativeArchive(absolute))throw Error('Native source archives are evidence copies; restore them through an explicit migration before opening Harness.');
  if(!maintenance&&isTransactionTree(absolute))throw Error('Migration backups/staging trees must be restored to the original state path before opening Harness.');
  const path=join(parent,'.'+basename(absolute)+'.augmentor-owner.lock'),fd=openSync(path,constants.O_RDWR|constants.O_CREAT|(constants.O_NOFOLLOW??0),0o600);let held=true;
  const close=()=>{if(held){held=false;closeSync(fd);}};
