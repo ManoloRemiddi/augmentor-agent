@@ -83,7 +83,7 @@ try{
    let size=0;const parts=[];for await(const chunk of req){size+=chunk.length;if(size>8*1024*1024)throw Error('Proof request too large');parts.push(chunk);}const bytes=Buffer.concat(parts),body=JSON.parse(bytes);assert.equal(body.model,model.id);assert.equal(body.max_completion_tokens,model.maxTokens);requests.push(body);
    const response=await fetch(new URL('/v1/chat/completions',upstream),{method:'POST',headers:{'content-type':'application/json'},body:bytes,signal:abort.signal});
    res.writeHead(response.status,{'content-type':response.headers.get('content-type')??'application/json'});for await(const chunk of response.body)res.write(chunk);res.end();
-  }catch{if(!res.destroyed)res.writeHead(502).end();}finally{activeProxy.delete(abort);req.removeListener('aborted',cancel);res.removeListener('close',cancel);}
+  }catch{if(!res.destroyed){if(res.headersSent)res.destroy();else res.writeHead(502).end();}}finally{activeProxy.delete(abort);req.removeListener('aborted',cancel);res.removeListener('close',cancel);}
  });await new Promise(resolve=>provider.listen(0,'127.0.0.1',resolve));
  memoryProvider=httpServer(async(req,res)=>{
   const abort=new AbortController();activeProxy.add(abort);const cancel=()=>{if(!res.writableFinished)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);let receipt,started;
@@ -94,7 +94,7 @@ try{
    assert.equal(body.model,model.id);assert(body.max_tokens>=64&&body.max_tokens<=4096);assert.equal(body.stream,true);if(engine.llamaCppThinking==='off')assert.equal(receipt.enableThinking,false);
    const response=await fetch(new URL('/v1/chat/completions',upstream),{method:'POST',headers:{'content-type':'application/json'},body:bytes,signal:abort.signal});
    res.writeHead(response.status,{'content-type':response.headers.get('content-type')??'application/json'});for await(const chunk of response.body)res.write(chunk);res.end();receipt.completed=true;
-  }catch{if(!res.destroyed)res.writeHead(502).end();}finally{if(receipt)receipt.durationMs=Date.now()-started;activeProxy.delete(abort);req.removeListener('aborted',cancel);res.removeListener('close',cancel);}
+  }catch{if(!res.destroyed){if(res.headersSent)res.destroy();else res.writeHead(502).end();}}finally{if(receipt)receipt.durationMs=Date.now()-started;activeProxy.delete(abort);req.removeListener('aborted',cancel);res.removeListener('close',cancel);}
  });await new Promise(resolve=>memoryProvider.listen(0,'127.0.0.1',resolve));
  const memoryConfigurationPath=join(root,'shared-data/hindsight.json'),memoryConfiguration=JSON.parse(await readFile(memoryConfigurationPath,'utf8'));assert.equal(memoryConfiguration.modelUrl,declaration.baseUrl.replace(/\/$/,''));
  await writeFile(memoryConfigurationPath,JSON.stringify({...memoryConfiguration,modelUrl:'http://127.0.0.1:'+memoryProvider.address().port+'/v1'})+'\n',{mode:0o600});

@@ -292,7 +292,9 @@ The external driver now transparently observes the actual memory-to-provider
 request stream in its private profile: model, bounded output, streaming flag,
 `chat_template_kwargs.enable_thinking`, completion and elapsed time. It forwards
 the unchanged request/response bytes without replay, and cancellation aborts its
-owned upstream fetch. Prompts/credentials are not included in these receipts.
+owned upstream fetch. An interrupted response with headers already sent is
+destroyed instead of attempting a second HTTP status. Prompts/credentials are not
+included in these receipts.
 For explicit `off`, every memory request must actually carry false; recording an
 environment value alone is insufficient. Conversation requests keep their existing
 separate observer/declaration. All owned servers join the existing cleanup.
