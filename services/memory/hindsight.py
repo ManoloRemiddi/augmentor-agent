@@ -101,17 +101,22 @@ class HindsightMemory(DualMemory):
                 return result
         if action not in ('describe', 'recall', 'search', 'source'):
             return super().call(method, p)
+        if action == 'describe':
+            # Budget operations own their lock before opening the journal. Status
+            # must follow that order too; bank discovery writes to the journal.
+            processing = self.processing.status()
+            pending = processing['pendingRecords'] + processing['jobs'].get('pending', 0)
+            with self.connect() as db:
+                config = dict(db.execute('SELECT enabled,person FROM settings').fetchone())
+                events = db.execute('SELECT count(*) FROM events').fetchone()[0]
+            return {'protocol': PROTOCOL, 'pid': __import__('os').getpid(), **config, 'engine': 'hindsight', 'version': VERSION,
+                    'configured': bool(self.configuration), 'available': self.checked and not self.last_error,
+                    'events': events, 'pending': pending,
+                    'failures': processing['jobs'].get('stopped', 0), 'processing': processing,
+                    'message': self.last_error or ('Capture and cached recall remain available. Memory inference is limited to active tool windows; stopped jobs require review.' if processing['configured'] else 'Memory inference is stopped until the controlled engine is installed. Transcripts and cached memory are preserved.')}
         with self.connect() as db:
             config = dict(db.execute('SELECT enabled,person FROM settings').fetchone())
             banks = self.banks(db)
-            if action == 'describe':
-                processing = self.processing.status()
-                pending = processing['pendingRecords'] + processing['jobs'].get('pending', 0)
-                return {'protocol': PROTOCOL, 'pid': __import__('os').getpid(), **config, 'engine': 'hindsight', 'version': VERSION,
-                        'configured': bool(self.configuration), 'available': self.checked and not self.last_error,
-                        'events': db.execute('SELECT count(*) FROM events').fetchone()[0], 'pending': pending,
-                        'failures': processing['jobs'].get('stopped', 0), 'processing': processing,
-                        'message': self.last_error or ('Capture and cached recall remain available. Memory inference is limited to active tool windows; stopped jobs require review.' if processing['configured'] else 'Memory inference is stopped until the controlled engine is installed. Transcripts and cached memory are preserved.')}
             session = self.session(db, p.get('session'))
             scopes = self.scopes(session)
             if not config['enabled']:

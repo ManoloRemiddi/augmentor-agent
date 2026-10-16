@@ -42,6 +42,30 @@ active workload or installed service is changed to obtain a result. The existing
 source/fresh-ordinary memory and native-snapshot evidence remains separately
 dated. Fresh frozen application/live evidence for this fix is still required.
 
+## October 16 status and settlement lock order
+
+A second fresh application copy includes only the gateway fix. It no longer
+records the spurious 429, but the default-mode live job still stops during phase
+three, with one failed call and 84.26 seconds remaining. This remains a failed
+proof; no later recall/branch scenario is credited. Its actors and separate
+engine join cleanly and original services remain unchanged.
+
+Investigation also finds that `describe` opened a journal transaction and called
+bank discovery, which writes, before reading processing/budget status. Settlement
+holds the budget lock before writing the journal. Concurrent status and settlement
+could therefore wait on each other's locks. A deterministic independent SQLite
+writer probe fails against the preceding status implementation with `database is
+locked`; the corrected status reads processing before opening its read-only
+journal observation. Status no longer discovers or writes bank rows. Actual
+recall and processing retain their existing discovery behavior.
+
+The test establishes the lock inversion, without claiming it explains every
+elapsed second or the entire second live failure. Both source fixes together pass
+**41/41 focused Python cases**: budget/gateway HTTP ownership, Hindsight status,
+capture/scoping, isolated proof boundaries and setup compatibility. No test
+workers, runtime budgets or live request settings change. Fresh ordinary and
+actual-engine qualification of the combined fixes remains required.
+
 ## Isolated proof ownership
 
 [`hindsight-isolated-proof-engine.py`](../scripts/hindsight-isolated-proof-engine.py)

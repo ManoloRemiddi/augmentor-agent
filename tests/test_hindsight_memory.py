@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from contextlib import contextmanager
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'services'))
 from memory.dual import DualMemory
 from memory.hindsight import HindsightMemory
@@ -78,6 +79,27 @@ class HindsightTests(unittest.TestCase):
 
     def finish(self):
         for _ in range(10): self.store.step()
+
+    def test_status_read_cannot_hold_a_journal_write_lock_while_budget_settlement_progresses(self):
+        self.append(); budget = self.store.processing.budget
+        budget.activity('one', 'owned-tool-window', 'tools'); budget.open('owned-job', 'one')
+        reservation = budget.reserve(512, 100); original_status = budget.status
+        @contextmanager
+        def nonblocking_writer():
+            with self.store.connect() as db:
+                # A deterministic contention probe, not a changed runtime deadline.
+                db.execute('PRAGMA busy_timeout=0')
+                yield db
+        budget.connect = nonblocking_writer
+        settlements = []
+        def racing_status():
+            budget.settle(reservation, usage=42)
+            settlements.append(True)
+            return original_status()
+        budget.status = racing_status
+        observed = self.call('describe')
+        self.assertEqual(observed['events'], 1)
+        self.assertEqual(settlements, [True], 'Status observation cannot monopolize the journal writer while waiting for budget status')
 
     def test_unfinished_pages_are_not_facts_and_real_page_text_is_preserved(self):
         self.controlled(); self.live_append(); self.finish()

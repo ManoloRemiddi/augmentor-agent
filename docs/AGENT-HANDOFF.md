@@ -8,9 +8,12 @@ joined cleanup and durable settlement; true overlap stays refused and failed
 settlement cannot strand the guard. The initial actual Pi/Hindsight/default-Qwen
 proof is retained failed at consolidation phase three, with all owned actors
 terminal and original services unchanged. New opt-in isolated engine/Host proof
-uses synthetic banks and offline public cache only. Frozen/live follow-up remains
-required; budgets, retries, model/GPU settings, current MX review and installed
-services stay unchanged.
+uses synthetic banks and offline public cache only. A second failed live proof
+finds no spurious 429. A separate deterministic SQLite probe proves status could
+hold the journal writer while waiting for budget settlement; status now observes
+processing before its read-only journal access. Combined source cases pass 41/41.
+Fresh ordinary/live follow-up remains required; budgets, retries, model/GPU
+settings, current MX review and installed services stay unchanged.
 
 [Current MX microphone review](HARNESS-MX-REVIEW.md#original-dsh-microphone-review--october-16)
 **20261016-022659-869fe1e8** is running, unselected: public artifact **9ecc45ba**,
