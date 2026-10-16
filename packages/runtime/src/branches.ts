@@ -3,11 +3,14 @@ import {SessionManager,CURRENT_SESSION_VERSION} from '@earendil-works/pi-coding-
 import {constants,openSync,closeSync,readSync,fstatSync,lstatSync,existsSync,writeFileSync,fsyncSync} from 'node:fs';
 import {type DisplayEvent} from '../../protocol/src/index.js';
 import {identifier} from '../../protocol/src/index.js';
+import {importedBranchContext,ordinaryBranchEntries,type BranchSourceScope} from './dsh-branch-history.js';
+import {join,dirname} from 'node:path';
 import {GOAL_ROUND_TYPE,goalUserHash,goalProjection} from './goals.js';
 
 const messageText=(content:any):string=>typeof content==='string'?content:(content??[]).filter((p:any)=>p.type==='text').map((p:any)=>p.text).join('\n');
 
-export function inspectBranchContext(file:string, directory:string, events:DisplayEvent[], seq:number, mode:'reply'|'edit') {
+export function inspectBranchContext(file:string, directory:string, events:DisplayEvent[], seq:number, mode:'reply'|'edit',scope?:BranchSourceScope) {
+  if(scope&&dirname(file)!==join(scope.state,'sessions',identifier(scope.sessionId)))throw Error('The native branch source does not belong to its selected profile conversation.');
   const target=events.find(e=>e.seq===seq);
   const type=mode==='edit'?'user/message':'assistant/message';
   if(!target||target.type!==type)throw new Error('Choose a message from this conversation.');
@@ -24,9 +27,16 @@ export function inspectBranchContext(file:string, directory:string, events:Displ
     if(header?.type!=='session'||header.version!==CURRENT_SESSION_VERSION)throw Error('This native session format needs a reviewed migration before branching; originals were preserved.');
   }finally{closeSync(fd);}
   const manager=SessionManager.open(file,directory);
+  let cutoff=seq;
+  if(mode==='edit'){
+    const start=events.findLast(e=>e.seq<seq&&e.type==='turn/start')?.seq??seq;
+    // A steered correction shares the host turn with earlier native messages.
+    // Its parent includes those messages; only an initial input cuts at start.
+    cutoff=events.some(e=>e.type==='user/message'&&e.seq>start&&e.seq<seq)?seq:start;
+  }
+  const imported=importedBranchContext(manager,events,target,cutoff,mode,scope);if(imported)return imported;
   const role=mode==='edit'?'user':'assistant';
-  const ordinal=events.filter(e=>e.type===type&&e.seq<=seq).length-1;
-  const entry=manager.getBranch().filter(e=>e.type==='message'&&e.message.role===role)[ordinal];
+  const ordinary=ordinaryBranchEntries(manager,events,type,seq,role),entry=ordinary.entries[ordinary.ordinal];
   const content=mode==='edit'?target.data.content:target.data.message?.content;
   if(!entry||entry.type!=='message'||messageText((entry.message as any).content)!==messageText(content))throw new Error('Cannot locate this message in Pi history. Reload the conversation.');
   if(mode==='reply'&&entry.message.role==='assistant'&&entry.message.content.some(p=>p.type==='toolCall'))throw new Error('Choose the reply after the tools have finished.');
@@ -39,21 +49,21 @@ export function inspectBranchContext(file:string, directory:string, events:Displ
     // falsely attribute the replacement user message to the old goal round.
     leaf=admission.parentId;
   }
-  let cutoff=seq;
-  if(mode==='edit'){
-    const start=events.findLast(e=>e.seq<seq&&e.type==='turn/start')?.seq??seq;
-    // A steered correction shares the host turn with earlier native messages.
-    // Its parent includes those messages; only an initial input cuts at start.
-    cutoff=events.some(e=>e.type==='user/message'&&e.seq>start&&e.seq<seq)?seq:start;
-  }
   const inherited=events.filter(e=>mode==='edit'?e.seq<cutoff:e.seq<=cutoff);
-  return {manager,leaf,events:inherited};
+  return {manager,leaf,events:inherited,rebuilt:false as const};
 }
 
-export function branchContext(file:string,directory:string,events:DisplayEvent[],seq:number,mode:'reply'|'edit'){
+export function branchContext(file:string,directory:string,events:DisplayEvent[],seq:number,mode:'reply'|'edit',scope?:BranchSourceScope){
   const info=lstatSync(directory);
   if(!info.isDirectory()||info.isSymbolicLink()||process.platform!=='win32'&&(info.uid!==process.getuid!()||(info.mode&0o077)!==0))throw Error('Use the private branch directory; originals were preserved.');
-  const plan=inspectBranchContext(file,directory,events,seq,mode);
+  const plan=inspectBranchContext(file,directory,events,seq,mode,scope);
+  if(plan.rebuilt){
+    const header=plan.manager.getHeader();if(!header)throw Error('The rebuilt historical header is unavailable.');
+    const rebuiltFile=join(directory,identifier(header.id)+'.jsonl'),fd=openSync(rebuiltFile,constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);
+    try{for(const entry of [{...header,parentSession:file},...plan.manager.getEntries()])writeFileSync(fd,JSON.stringify(entry)+'\n');fsyncSync(fd);}finally{closeSync(fd);}
+    if(process.platform!=='win32'){const fd=openSync(directory,constants.O_RDONLY|(constants.O_DIRECTORY??0)|(constants.O_NOFOLLOW??0));try{fsyncSync(fd);}finally{closeSync(fd);}}
+    return {manager:SessionManager.open(rebuiltFile,directory),file:rebuiltFile,events:plan.events};
+  }
   const fileName=plan.leaf?plan.manager.createBranchedSession(plan.leaf):undefined;
   let manager=plan.leaf?plan.manager:undefined;
   if(manager&&fileName&&!existsSync(fileName)){
@@ -74,11 +84,11 @@ export function branchContext(file:string,directory:string,events:DisplayEvent[]
 }
 
 /** Public SDK projection prepared in memory before filesystem publication. */
-export function branchPublicationContext(file:string,events:DisplayEvent[],seq:number,mode:'reply'|'edit'){
-  const plan=inspectBranchContext(file,'',events,seq,mode);
+export function branchPublicationContext(file:string,events:DisplayEvent[],seq:number,mode:'reply'|'edit',scope?:BranchSourceScope){
+  const plan=inspectBranchContext(file,'',events,seq,mode,scope);
   if(!plan.leaf)return {events:plan.events};
   const manager=SessionManager.inMemory(plan.manager.getCwd(),undefined,[plan.manager.getHeader()!,...plan.manager.getEntries()]);
-  manager.createBranchedSession(plan.leaf);
+  if(!plan.rebuilt)manager.createBranchedSession(plan.leaf);
   const header=manager.getHeader();if(!header||header.version!==CURRENT_SESSION_VERSION)throw Error('The projected branch header is unavailable.');
   const name=identifier(header.id)+'.jsonl';
   // parentSession is a documented native header field. The in-memory SDK has

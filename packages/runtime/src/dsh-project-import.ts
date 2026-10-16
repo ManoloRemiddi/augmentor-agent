@@ -31,9 +31,9 @@ function checkedContent(content:Data[]):Data[]{
   return {type:'image',attachment:{attachmentId:a.attachmentId,mediaType:a.mediaType,bytes:a.bytes,width:a.width,height:a.height,...(a.name===undefined?{}:{name:a.name}),...(dimensions?{originalDimensions:{width:dimensions.width,height:dimensions.height}}:{})},...(p.offloaded?{offloaded:true}:{})};
  });
 }
-function records(session:Data){
+function records(session:Data,cut=false){
  const rows=session.records,opening=session.opening;
- if(!opening?.header?.id||!Array.isArray(rows)||!rows.length||rows.length>30000)fail('missing bounded complete session.');
+ if(!opening?.header?.id||!Array.isArray(rows)||(!rows.length&&!cut)||rows.length>30000)fail('missing bounded complete session.');
  identifier(opening.header.id);
  if(opening.header.version!==undefined&&opening.header.version!==4)fail('unsupported source session format version.');
  if(opening.header.isSeeded!==undefined&&typeof opening.header.isSeeded!=='boolean')fail('invalid source lineage marker.');
@@ -82,12 +82,12 @@ function records(session:Data){
    pending.add(e.data.callId);dispatched.add(e.data.callId);
   }
  }
- if(previous!==opening.cursor||pending.size||calls.size!==dispatched.size||!human)fail('history is incomplete or has unresolved actions.');
+ if(previous!==opening.cursor||pending.size||calls.size!==dispatched.size||(!human&&!cut))fail('history is incomplete or has unresolved actions.');
  const turn=rows.map((r:Data)=>r.event).filter((e:Data)=>e.type==='turn/start'||e.type==='turn/end').at(-1);
- if(turn?.type!=='turn/end')fail('finish the source conversation before importing it.');
- const surface=dshHistorySurface(effective,opening.header.version===4);
+ if(!cut&&turn?.type!=='turn/end')fail('finish the source conversation before importing it.');
+ const surface=dshHistorySurface(effective,opening.header.version===4,cut);
  const parent=opening.header.parentSession;if(parent!==undefined){identifier(parent);if(parent===opening.header.id)fail('source lineage cannot name itself.');}
- if(opening.header.isSeeded===true&&!surface.seedCuts.length)fail('seeded source is missing its inherited boundary.');
+ if(!cut&&opening.header.isSeeded===true&&!surface.seedCuts.length)fail('seeded source is missing its inherited boundary.');
  return {events:effective,surface};
 }
 
@@ -99,12 +99,9 @@ function checkedSelection(value:unknown):ModelSelection{
  if(!row||typeof row!=='object'||Array.isArray(row)||Object.keys(row).some(key=>!['provider','model'].includes(key))||typeof row.provider!=='string'||!row.provider.trim()||typeof row.model!=='string'||!row.model.trim())fail('choose the current continuation model explicitly.');
  return {provider:row.provider,model:row.model};
 }
-/** One native conversation; historical calls never become executable Pi proposals. */
-function writeSession(original:Data,events:Data[],surface:DshSurface,stage:string,targetState:string,source:Data,selection:ModelSelection,sha256:string,now:number){
- const workspace=source.workspace,cwd=workspace.path,sid='dsh-import-'+digest(original.opening.header.id).slice(0,24);
- const sessions=privateDir(join(stage,'sessions')),nativeDir=privateDir(join(sessions,sid));
-  const manager=SessionManager.create(cwd,nativeDir),title=original.opening.projections?.values?.title??workspace.title;
-  manager.appendSessionInfo(typeof title==='string'?title:workspace.title);
+/** Shared full-import and source-cut projection. This only appends labelled
+ * history through the public SDK; it never restores old provider/tool actions. */
+function appendDshTranscript(manager:ReturnType<typeof SessionManager.inMemory>,original:Data,events:Data[],surface:DshSurface,source:Data,sha256:string,targetState:string){
   manager.appendCustomEntry('augmentor.dsh-import.v1',{sha256,sourceSessionId:original.opening.header.id,throughSeq:original.opening.cursor,source:'DSH',context:'labelled historical transcript; not reconstructed effective DSH context',rawArchive:'dsh-imports/'+sha256+'.json',historicalUsage:'original archive only; no invented Pi accounting',relatedSessionsArchived:(source.relatedSessions??[]).length,relatedSessionRuntime:'not imported as live Pi jobs'});
   const contextEvents=surface.nodes.map(seq=>events[seq]),activeSeqs=new Set(surface.nodes),replacements=new Map(surface.replacements.map(row=>[row.seq,row]));
   const sourceLineage={parentSession:original.opening.header.parentSession??null,isSeeded:original.opening.header.isSeeded??null,seedCuts:surface.seedCuts};
@@ -151,6 +148,30 @@ function writeSession(original:Data,events:Data[],surface:DshSurface,stage:strin
    contextEntries++;
   }
   manager.appendCustomMessageEntry('augmentor.dsh-history.v1','End of imported DSH history. All recorded calls are historical. No old request, permission, goal, queue, command or agent job is pending in Pi. Wait for a new human request. Current Augmentor instructions and selected model govern future work. Full source archive for exact historical lookup: '+join(targetState,'dsh-imports',sha256+'.json'),false,{archiveSha256:sha256,boundary:'end-of-import'});
+  return {display,contextEntries,skippedInstructionMessages,archivedToolProposalMessages,activeSeqs,sourceLineage,toolContextLeft,toolPayloadChars};
+}
+
+/** Rebuild a historical branch at its original source cut, including then-current
+ * replacements and image offload state. Future source edits never enter it.
+ * Full archive validation is separate from the intentionally open prefix turn. */
+export function dshHistoryCut(original:Data,source:Data,sha256:string,state:string,throughSeq:number){
+ records(original);
+ if(!Number.isSafeInteger(throughSeq)||throughSeq< -1||throughSeq>original.opening.cursor)fail('invalid historical branch cut.');
+ const prefix={...original,opening:{...original.opening,cursor:throughSeq},records:original.records.slice(0,throughSeq+1)};
+ const {events,surface}=records(prefix,true),manager=SessionManager.inMemory(source.workspace.path);
+ const title=original.opening.projections?.values?.title??source.workspace.title;manager.appendSessionInfo(typeof title==='string'?title:'Imported DSH branch');
+ const projected=appendDshTranscript(manager,original,events,surface,source,sha256,state);
+ manager.appendCustomEntry('augmentor.dsh-cut.v1',{archiveSha256:sha256,sourceSessionId:original.opening.header.id,throughSeq,fullSourceThroughSeq:original.opening.cursor,policy:'explicit source prefix; current Augmentor instructions; no historical action replay'});
+ return {manager,display:projected.display};
+}
+
+/** One native conversation; historical calls never become executable Pi proposals. */
+function writeSession(original:Data,events:Data[],surface:DshSurface,stage:string,targetState:string,source:Data,selection:ModelSelection,sha256:string,now:number){
+ const workspace=source.workspace,cwd=workspace.path,sid='dsh-import-'+digest(original.opening.header.id).slice(0,24);
+ const sessions=privateDir(join(stage,'sessions')),nativeDir=privateDir(join(sessions,sid));
+  const manager=SessionManager.create(cwd,nativeDir),title=original.opening.projections?.values?.title??workspace.title;
+  manager.appendSessionInfo(typeof title==='string'?title:workspace.title);
+  const {display,contextEntries,skippedInstructionMessages,archivedToolProposalMessages,activeSeqs,sourceLineage,toolContextLeft,toolPayloadChars}=appendDshTranscript(manager,original,events,surface,source,sha256,targetState);
   const nativeFile=manager.getSessionFile();if(!nativeFile||!existsSync(nativeFile))fail('Pi did not persist the imported context.');
   chmodSync(nativeFile,0o600);const reopened=SessionManager.open(nativeFile);if(reopened.buildSessionContext().messages.length!==contextEntries+1)fail('native cold-open context does not match.');
   const notice='Imported DSH history. Past calls are completed records; continuation uses a labelled transcript. Exact source and two-way sequence provenance are retained in the private import archive. Old tool outputs use bounded excerpts in continuation context; the full display/archive is preserved. Historical subagent logs stay archived, not live Fleet jobs. Plaintext reasoning is historical data, never signed provider replay. Imported images retain the exact stored bytes; original camera uploads are not reconstructed. Source replacements determine continuation context; original append-only records stay inspectable.';

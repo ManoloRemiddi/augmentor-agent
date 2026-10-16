@@ -17,21 +17,27 @@ function records(row:Data){
  for(let i=0;i<rows.length;i++){const r=rows[i],e=r?.event;if(r?.type!=='event'||e?.seq!==i||!number(e.time)||typeof e.type!=='string'||!e.data||typeof e.data!=='object'||Array.isArray(e.data))fail();}
  return rows as Data[];
 }
+/** Exact private source binding, shared by inspection and historical branching.
+ * No SDK owner or source service is opened and no data is written. */
+export function readDshArchive(state:string,binding:Data){
+  if(!/^[a-f0-9]{64}$/.test(binding?.sha256)||binding.rawArchive!=='dsh-imports/'+binding.sha256+'.json'||typeof binding.sourceSessionId!=='string'||!number(binding.throughSeq))fail();
+  const dir=join(state,'dsh-imports'),path=join(dir,binding.sha256+'.json');
+  if(lstatSync(dir).isSymbolicLink()||realpathSync(dir)!==dir)fail();
+  const fd=openSync(path,constants.O_RDONLY|(constants.O_NOFOLLOW??0));let bytes:Buffer;
+  try{const s=fstatSync(fd);if(!s.isFile()||s.nlink!==1||s.size>32*1024*1024||process.platform!=='win32'&&(s.uid!==process.getuid?.()||(s.mode&0o077)!==0))fail();bytes=readFileSync(fd);if(bytes.length!==s.size||hash(bytes)!==binding.sha256)fail();}finally{closeSync(fd);}
+  const source=JSON.parse(bytes.toString('utf8'));
+  if(source.schema!=='augmentor-dsh-project-export/1'||!Array.isArray(source.sessions)||source.sessions.length>128||!Array.isArray(source.relatedSessions??[])||(source.relatedSessions??[]).length>32)fail();
+  const roots=new Map<string,Data>();for(const row of source.sessions){const id=row?.opening?.header?.id;if(typeof id!=='string'||roots.has(id))fail();roots.set(id,row);}
+  const root=roots.get(binding.sourceSessionId)!;if(!root||root.opening.cursor!==binding.throughSeq)fail();records(root);
+  return {source,root:root!,roots};
+}
 /** Archived seats never enter Host metadata, Pi jobs, SDK ownership or memory.
  * Every construction verifies the complete private raw archive against the
  * selected native import binding and visible parent catalogue provenance. */
 export class DshArchivedFamily {
  readonly rows=new Map<string,Data>();readonly parents=new Map<string,string>();readonly seats=new Map<string,string>();readonly source:Data;readonly root:Data;
  constructor(readonly state:string,readonly ownerId:string,readonly binding:Data,readonly visible:readonly DisplayEvent[]){
-  if(!/^[a-f0-9]{64}$/.test(binding?.sha256)||binding.rawArchive!=='dsh-imports/'+binding.sha256+'.json'||typeof binding.sourceSessionId!=='string'||!number(binding.throughSeq))fail();
-  const dir=join(state,'dsh-imports'),path=join(dir,binding.sha256+'.json');
-  if(lstatSync(dir).isSymbolicLink()||realpathSync(dir)!==dir)fail();
-  const fd=openSync(path,constants.O_RDONLY|(constants.O_NOFOLLOW??0));let bytes:Buffer;
-  try{const s=fstatSync(fd);if(!s.isFile()||s.nlink!==1||s.size>32*1024*1024||process.platform!=='win32'&&(s.uid!==process.getuid?.()||(s.mode&0o077)!==0))fail();bytes=readFileSync(fd);if(bytes.length!==s.size||hash(bytes)!==binding.sha256)fail();}finally{closeSync(fd);}
-  this.source=JSON.parse(bytes.toString('utf8'));
-  if(this.source.schema!=='augmentor-dsh-project-export/1'||!Array.isArray(this.source.sessions)||this.source.sessions.length>128||!Array.isArray(this.source.relatedSessions??[])||(this.source.relatedSessions??[]).length>32)fail();
-  const roots=new Map<string,Data>();for(const row of this.source.sessions){const id=row?.opening?.header?.id;if(typeof id!=='string'||roots.has(id))fail();roots.set(id,row);}
-  this.root=roots.get(binding.sourceSessionId)!;if(!this.root||this.root.opening.cursor!==binding.throughSeq)fail();records(this.root);
+  const {source,root,roots}=readDshArchive(state,binding);this.source=source;this.root=root;
   const all=new Map<string,Data>();
   for(const row of this.source.relatedSessions??[]){const id=row?.opening?.header?.id,a=row?.address;records(row);if(roots.has(id)||all.has(id)||a?.kind!=='subagent'||a.childSessionId!==id||typeof a.parentSessionId!=='string'||typeof a.mode!=='string'||!a.mode||a.mode.length>128)fail();all.set(id,row);}
   // Validate the archive graph globally; unrelated project roots grant no access.

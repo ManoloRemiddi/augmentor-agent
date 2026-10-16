@@ -81,7 +81,7 @@ checkpoint. Source/packaged qualification does not deploy this feature into thos
 open reviews. Hosted CI, later OS artifacts and public binary distribution remain
 unqualified.
 
-**Remaining migration gate:** direct reply-branching at an imported DSH assistant
+**Historical gate at the archived-child checkpoint** (superseded in source by [historical reply branches](HARNESS-DSH-MIGRATION-PILOT.md#historical-reply-branches--october-16); open reviews require adoption): direct reply-branching at an imported DSH assistant
 message currently fails because that historical reply is a labelled custom native
 record, not a Pi assistant message. This pass qualifies the real pre-catalogue
 user-edit branch boundary; it does not claim imported-reply branch parity.

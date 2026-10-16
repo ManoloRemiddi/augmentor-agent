@@ -30,6 +30,7 @@ import {captureSessionArchive} from './session-archive.js';
 import {HarnessDrafts} from './harness-drafts.js';
 import {SessionOrganization} from './session-organization.js';
 import {sessionFamily} from './session-family.js';
+import {inheritedDshImage,coldDshImage} from './dsh-branch-history.js';
 import {DshArchivedFamily,type DshArchiveScope} from './dsh-archived-family.js';
 import {contextPreferences,contextPreferenceChange,CONTEXT_PREFERENCE_FIELDS} from './context-preferences.js';
 import {ShortcutPreferences} from './shortcut-preferences.js';
@@ -137,7 +138,12 @@ export class Host {
   }
   readonly metafolders=new MetafolderPreferences(join(this.dirs.config,'harness-metafolders.json'));
   metafoldersRevision=0;
-  readonly attachments=new PiAttachments(this.dirs.state,(sid,part)=>this.events(this.getMeta(sid)).some(event=>event.type==='user/message'&&event.data.source?.sessionId!==sid&&(event.data.submittedContent??event.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))));
+  readonly attachments=new PiAttachments(this.dirs.state,(sid,part)=>{
+    const m=this.getMeta(sid);
+    if(this.events(m).some(event=>event.type==='user/message'&&event.data.source?.sessionId!==sid&&(event.data.submittedContent??event.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))))return true;
+    if(!m.fork||part.type!=='image'||!m.file||!existsSync(m.file))return false;
+    const loaded=this.loaded.get(m.id);return loaded?inheritedDshImage(loaded.manager,this.dirs.state,part):coldDshImage(m.file,this.dirs.state,part);
+  });
   readonly sessionExports=new SessionExports(this.dirs.state,(sid,signal,parent)=>captureSessionArchive(this,sid,signal,parent));
   readonly voice=new PiVoice(undefined,(sid,message)=>{const m=this.metadata.get(sid);if(m)try{this.append(m,'runtime/warning',{message});}catch{/* Speech diagnostics cannot change agent execution. */}});
   readonly dictation=new PiDictation(sid=>{
@@ -765,7 +771,7 @@ export class Host {
     const boundary=branchBoundary(p),source=this.getMeta(boundary.sessionId);
     if(source.running)throw Error('Stop the current response before preparing a branch.');
     if(!source.file||!existsSync(source.file))throw Error('This conversation has no persisted Pi history yet.');
-    inspectBranchContext(source.file,this.dirs.sessions,this.loaded.get(source.id)?.events??this.events(source),boundary.messageSeq,boundary.mode);
+    inspectBranchContext(source.file,this.dirs.sessions,this.loaded.get(source.id)?.events??this.events(source),boundary.messageSeq,boundary.mode,{state:this.dirs.state,sessionId:source.id});
     return this.branchIntents.reserve(boundary,randomUUID());
   }
   private editSource(p:Data){
@@ -786,7 +792,7 @@ export class Host {
     if(!source.file||!existsSync(source.file))throw Error('This conversation has no persisted Pi history yet.');
     // Validate the exact native cutoff before reserving a child or copying any
     // bytes. This path never loads an AgentSession or calls a provider.
-    branchPublicationContext(source.file,events,event.seq,'edit');
+    branchPublicationContext(source.file,events,event.seq,'edit',{state:this.dirs.state,sessionId:source.id});
     const intent=this.branchIntents.reserve({sessionId:source.id,messageSeq:event.seq,mode:'edit'},randomUUID());
     if(!this.harnessDrafts.preparedEdit(intent.newSessionId,origin)){
       this.uploads++;
@@ -849,7 +855,7 @@ export class Host {
     if(p.prepared===true){this.branchIntents.begin(branchIntent(p));if(!this.branchTargetEmpty(sid))throw Error('Branch publication is incomplete. Original files were preserved; no branch was repeated.');}
     else if(p.prepared!==undefined&&p.prepared!==false||reserved)throw Error('Use the exact prepared branch identity before creating its child.');
     if(p.prepared===true&&process.platform==='linux'){
-      const context=branchPublicationContext(source.file,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
+      const context=branchPublicationContext(source.file,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode,{state:this.dirs.state,sessionId:source.id});
       const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.name?join(this.dirs.sessions,sid,context.name):undefined,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,...permissionAtBoundary(source,p.messageSeq),updatedAt:Date.now(),requests:[],running:false,fork};
       const inherited=context.events.map(event=>event.type==='user/message'?{...event,data:{...event.data,source:{...event.data.source,sessionId:event.data.source?.sessionId??source.id}}}:event);
       let seq=inherited.at(-1)?.seq??0;if(p.mode==='reply')inherited.push({seq:++seq,type:'turn/end',data:{reason:{kind:'completed'}}});inherited.push({seq:++seq,type:'session/title',data:{title:m.title}});
@@ -859,7 +865,7 @@ export class Host {
       const committed=this.branchPublications.finish(branchIntent(p)) as Meta;this.metadata.set(sid,committed);return row(committed);
     }
     applyEdit();const directory=privateDir(join(this.dirs.sessions,sid));
-    const context=branchContext(source.file,directory,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode);
+    const context=branchContext(source.file,directory,this.loaded.get(source.id)?.events??this.events(source),p.messageSeq,p.mode,{state:this.dirs.state,sessionId:source.id});
     const m:Meta={reasoning:{...this.reasoningSettings(source)},memoryStartSeq:context.events.at(-1)?.seq??0,surface:source.surface,id:sid,cwd:source.cwd,file:context.file,selection:{...source.selection},title:((p.mode==='edit'?'Edit · ':'Branch · ')+source.title).slice(0,200),saved:false,...permissionAtBoundary(source,p.messageSeq),updatedAt:Date.now(),requests:[],running:false,fork};
     const inherited=context.events.map(event=>event.type==='user/message'?{...event,data:{...event.data,source:{...event.data.source,sessionId:event.data.source?.sessionId??source.id}}}:event);
     writeFileSync(join(this.dirs.sessions,sid+'.events.jsonl'),inherited.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600});

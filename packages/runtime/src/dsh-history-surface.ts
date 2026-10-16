@@ -16,7 +16,7 @@ export interface DshSurface {nodes:number[];replacements:DshReplacement[];seedCu
  * Based on the pinned public SurfaceOp/checkpoint contracts. The source log
  * remains immutable; replacement identities use surface positions, not numeric
  * sequence intervals (a later summary can occupy an older position). */
-export function dshHistorySurface(events:Data[],strictMarkers=false):DshSurface{
+export function dshHistorySurface(events:Data[],strictMarkers=false,allowOpenTurn=false):DshSurface{
  if(events.length>30000||events.some((e,i)=>e?.seq!==i))fail('source sequence is not a bounded complete prefix.');
  const nodes:number[]=[],replacements:DshReplacement[]=[],seedCuts:number[]=[],endedSeedCompactions:number[]=[];
  const compactions=new Map<string,{turn:number|null;start:number;command?:string;summary?:number}>(),usedCompactions=new Set<string>();let turn:number|undefined;
@@ -83,6 +83,6 @@ export function dshHistorySurface(events:Data[],strictMarkers=false):DshSurface{
   if(e.type==='user/message'&&d.source?.kind==='compact-checkpoint'&&kind!=='summary')fail('checkpoint has no adjacent summary evidence.');
   replacements.push({seq:e.seq,start:op.startSeq,end:op.endSeq,shadowedSeqs,kind,...(kind==='summary'?{summarySeq:pricing.seq}:{})});nodes.splice(start,shadowedSeqs.length,e.seq);
  }
- if(turn!==undefined||compactions.size)fail('history ends with an unresolved lifecycle.');
+ if((turn!==undefined&&!allowOpenTurn)||compactions.size)fail('history ends with an unresolved lifecycle.');
  return {nodes,replacements,seedCuts,endedSeedCompactions};
 }

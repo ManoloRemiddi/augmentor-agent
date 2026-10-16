@@ -676,3 +676,64 @@ dependencies, components and original supplier GUI/licences stay unchanged. Both
 running owners, **32 protected files**, installed selection and 38 canonical
 local changes remain exact. No owner transfer or restart occurs.
 [Portable qualification](../release/harness-native-profile-review-20261016.json).
+
+
+## Historical reply branches — October 16
+
+The original **Branch into a new conversation** action now supports imported DSH
+assistant replies, including replies shadowed by later source compactions. It
+verifies the selected native import binding, original source session/sequence/time,
+archive checksum and displayed content. It reuses the importer's public-SDK
+transcript writer to rebuild **that source prefix**, with source replacements,
+pruning and image offload state as they existed at the selected cut. A later
+summary, edited question, answer or child catalogue cannot enter an earlier
+branch's context. Repeated answer text is not an identity. The parent's native
+file and exact export remain unchanged.
+
+The new native child has a fresh header and entry IDs, `parentSession` lineage
+and an explicit `augmentor.dsh-cut.v1` record. The original import binding still
+names the complete immutable archive; the cut record names the subset used for
+continuation. The child uses current Augmentor instructions/model policy. Historical
+system/bootstrap messages, provider replay signatures, executable tool proposals,
+old jobs/goals/queues and historical token accounting are not activated. Its
+historical tool excerpts keep the original 16,384-character aggregate / 256 per
+result bound, recomputed at the selected source cut. Source cuts may stop within
+the selected reply's turn; unresolved compactions or tool proposals still refuse.
+No synthetic terminal source record is added to the raw archive.
+
+After a native Pi continuation, Branch and Edit use only native messages after
+the import boundary and exclude historical display ordinals. This also works on
+branches of imported branches. First-source-input Edit can produce a custom-only
+native child without inventing a user input. Editing original imported camera
+uploads still requires their actual original receipts; missing camera originals
+are not fabricated from stored DSH images.
+
+User/assistant/tool images retained in the selected DSH native media entries may
+resolve only their exact source-parent reference in the verified archive. This
+permits earlier images shadowed or offloaded later, without granting child-only
+or unrelated project images. Cold inspection first verifies the current native
+format and a private owned regular file, preventing an SDK read from migrating
+an old source in place. Existing stored-byte decode/hash limits remain. Cold
+native-profile relocation changes the documented parent header path, retains all
+canonical entry bytes, rebinds the managed archive reference and continues image
+resolution without the former state path.
+
+Preparation stays in memory. The existing branch-intent identity and recoverable
+Linux publication transaction own creation. Duplicate requests and lost/unreadable
+acknowledgements recover the same child; a changed archive refuses before child
+publication. Restoring the exact verified source permits the same prepared intent
+to finish, without model/tool replay. The original GUI keeps a newer parent draft,
+reconciles the same child after browser/Host replacement, and invokes Pi only after
+explicit Send. No controls or layouts are added or moved.
+
+Qualification and adoption are tracked by the [portable branch review](../release/harness-dsh-branch-review-20261016.json).
+Source build and **303/303 Node cases** across 65 files (20 Chromium files), plus
+sixteen licence/private-boundary/notice Python checks, pass. Authored fixtures
+exercise pre-compaction and pre-offload cuts, identical replies, live Pi replies
+and edits after import, nested branch/family scope, image context, cold relocation,
+archive/display tampering, no old-memory capture, and recovery/GUI contracts.
+Source fixtures and controlled provider requests are distinct from real-owner
+continuation and production installation. Exact packaged qualification follows
+before idle-only owner review adoption. Broader source formats, missing original
+camera uploads, historical child execution/Teams/provider reconstruction, owner
+pilot acceptance, remaining project migration, voice and later OS adoption remain.
