@@ -198,3 +198,34 @@ the Native test verifies that capture remains enabled while processing is disabl
 The new regression fails against the preceding sealed application because the
 companion cannot report connected status. Final source/sealed and owner adoption
 evidence follows; no installed selection or model/GPU/speech changes are implied.
+
+### Qualified MX recovery review
+
+Application **8eaf167f** runs unselected as **20261016-162216-9765db35**.
+Source and exact sealed target each pass **28/28** Node cases across 18 files,
+including 12 actual Chromium files, with two workers/no skips or changed bounds.
+**64** source Python/offscreen Native cases pass, including 16 notice/private-source
+checks. Pure frontend state owners use the same public module bytes as the seal.
+The occupied-port original-GUI test verifies Capture on, a usable capture control,
+explicit Processing unavailable, disabled processing and ordinary pause semantics,
+with zero fixture engine/model work and no browser errors or failed responses.
+This is distinct from new live Hindsight/Qwen inference or physical desktop proof.
+
+The existing private review engine is restored through its exact installer identity;
+its **142,538,240-byte / 2,864-file stopped-database backup** is verified.
+Its configuration is unchanged; health and disabled autonomous-worker policy are
+checked without model work. Both review Hosts and their idle memory companions
+restart with complete profile backups: **389 files**, **32 cold-start** and
+**28 post-browser persistent inputs** verify. Four conversations, nineteen
+existing journal events, saved capture/pause choices, plugin choices and both
+12-prompt libraries remain. All **24,564 sealed / 1,072 compiled** inputs verify.
+No owner QA prompt, recording or flag toggle is submitted.
+
+The configured review owns the available local gateway. The isolated pilot now
+reports Capture on with an explicit processing-port conflict rather than losing
+its whole memory companion. Those two profiles still share one configured engine/
+port; permanent simultaneous processing requires one shared memory owner or
+separate gateway/engine provisioning. Existing banks are not migrated. The memory
+status page does not perform engine health checks or claim live inference success.
+Original DSH, installed selection, production dependency/component bytes, model/
+GPU settings and voice remain unchanged. [Portable review](../release/harness-memory-recovery-review-20261016.json).
