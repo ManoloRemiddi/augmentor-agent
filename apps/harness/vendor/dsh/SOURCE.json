@@ -790,10 +790,10 @@
     },
     {
       "path": "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx",
-      "sha256": "99402152b7b0c22e93d458cf27cf89d098555bd5c35cc96f9b4ad36bbe7be4cf",
+      "sha256": "d146bed31371cd161df9ba1dbf0c6aff977c4dab5dde653489da2b1bfd632177",
       "upstreamPath": "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx",
       "upstreamSha256": "0ad3522921b4ba58346e052fa6ec10e64b514a64d51d8a85d5ac748f5ea8065d",
-      "adaptation": "Replace the Cordis image-service value import with a presentation-only media type predicate; visual source unchanged."
+      "adaptation": "Presentation-only media predicate plus optional toolbar ContextMeter placement; original meter and default dock placement retained."
     },
     {
       "path": "packages/client/ui-conversation/src/client/skeleton/control-row-layout.ts",
@@ -983,9 +983,10 @@
     },
     {
       "path": "packages/client/ui-model-selection/src/client/ModelSelect.tsx",
-      "sha256": "932eb3bc96f269a93a55d845957596065ec50ff933590743a77c36b3a404320f",
+      "sha256": "806e8c4c3422f3691955d9f7f1c678156e423da4c70cd6151f2e3839209a9f6d",
       "upstreamPath": "packages/client/ui-model-selection/src/client/ModelSelect.tsx",
-      "upstreamSha256": "932eb3bc96f269a93a55d845957596065ec50ff933590743a77c36b3a404320f"
+      "upstreamSha256": "932eb3bc96f269a93a55d845957596065ec50ff933590743a77c36b3a404320f",
+      "adaptation": "Optional Augmentor curation: ordered Pinned section, hidden filtering and top-first opening; exact provider identities, original selection/effort/keyboard UI retained."
     },
     {
       "path": "packages/client/ui-model-selection/src/client/catalog.ts",

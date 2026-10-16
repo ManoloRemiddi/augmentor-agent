@@ -62,8 +62,8 @@ const MEASURE_STYLE: CSSProperties = { visibility: 'hidden', left: 0, top: 0 }
  * @returns the trigger and, while open, the two-level menu.
  */
 export function ModelSelect(
-  { locked, available, directory, load, select, t }:
-  ModelSelectInjected & { locked: boolean } & PropsLocale<'model'>,
+  { locked, available, directory, load, select, t, curation, openAtTop = false }:
+  ModelSelectInjected & { locked: boolean; curation?: {pinned: readonly string[]; hidden: readonly string[]}; openAtTop?: boolean } & PropsLocale<'model'>,
 ) {
   const state = useSyncExternalStore(
     fn => directory.subscribe(fn),
@@ -91,6 +91,20 @@ export function ModelSelect(
   const id = useId()
 
   const groups = useMemo(() => orderModelProviders(state.groups), [state.groups])
+  // Augmentor: the owner's MIT Model Picker Augmented semantics. Pins retain
+  // their saved order and exact provider identity; hidden entries remain in
+  // the unfiltered directory so the current model/effort never changes here.
+  const displayGroups = useMemo(() => {
+    const hidden = new Set(curation?.hidden ?? [])
+    const pins = new Set(curation?.pinned ?? [])
+    const all = groups.map(group => ({...group, key: `provider:${group.id}`, models: group.models.map(model => ({...model, provider: group.id}))}))
+    const byKey = new Map(all.flatMap(group => group.models.map(model => [`${model.provider}/${model.id}`, model] as const)))
+    const pinned = [...pins].filter(key => !hidden.has(key)).flatMap(key => {const model = byKey.get(key); return model === undefined ? [] : [model]})
+    return [
+      ...(pinned.length ? [{id: '', key: 'pinned', name: 'Pinned', models: pinned}] : []),
+      ...all.map(group => ({...group, models: group.models.filter(model => !hidden.has(`${model.provider}/${model.id}`) && !pins.has(`${model.provider}/${model.id}`))})),
+    ]
+  }, [groups, curation])
   const choices = useMemo(() => groups.flatMap(group =>
     group.models.map(model => ({
       group,
@@ -104,15 +118,15 @@ export function ModelSelect(
       } satisfies ModelSelection,
     }))), [groups])
   const showSearch = choices.length > 4
-  const filteredGroups = useMemo(() => groups.map(group => ({
+  const filteredGroups = useMemo(() => displayGroups.map(group => ({
     ...group, models: rankByName(group.models, showSearch ? query.trim() : ''),
-  })).filter(group => group.models.length > 0), [groups, query, showSearch])
+  })).filter(group => group.models.length > 0), [displayGroups, query, showSearch])
   const visibleModels = useMemo(() => filteredGroups.flatMap(group => group.models.map(model => ({
-    provider: group.id, model: model.id,
+    provider: model.provider, model: model.id,
   }))), [filteredGroups])
   const currentVisibleIndex = visibleModels.findIndex(model =>
     model.provider === state.current?.provider && model.model === state.current.model)
-  const activeModelIndex = Math.min(highlightedIndex ?? Math.max(0, currentVisibleIndex), visibleModels.length - 1)
+  const activeModelIndex = Math.min(highlightedIndex ?? Math.max(0, openAtTop ? 0 : currentVisibleIndex), visibleModels.length - 1)
   const selectedIndex = state.current === null
     ? -1
     : choices.findIndex(c => c.selection.provider === state.current?.provider && c.selection.model === state.current.model)
@@ -183,7 +197,8 @@ export function ModelSelect(
       // The checked row is the value in use; a pane without one opens on its
       // first row.
       const checked = menuRef.current?.querySelector<HTMLElement>('[role="menuitemradio"][aria-checked="true"]:not([disabled])')
-      const target = checked ?? itemRefs.current.find(item => item !== null && !item.disabled)
+      const first = itemRefs.current.find(item => item !== null && !item.disabled)
+      const target = pane === 'model' && openAtTop ? first : checked ?? first
       // Rows a selection in flight disabled cannot take the keyboard; the
       // trigger does, so the card's keys still reach the menu.
       ;(target ?? triggerRef.current)?.focus()
@@ -191,7 +206,7 @@ export function ModelSelect(
     }
     const cell = itemRefs.current[intent === 'effort' ? 1 : 0]
     ;(cell !== null && cell !== undefined && !cell.disabled ? cell : triggerRef.current)?.focus()
-  }, [open, pane, showSearch])
+  }, [open, pane, showSearch, openAtTop])
 
   useEffect(() => {
     const viewport = groupsRef.current
@@ -201,9 +216,10 @@ export function ModelSelect(
 
   useLayoutEffect(() => {
     if (open && pane === 'model' && activeModelIndex >= 0) {
+      if (openAtTop && highlightedIndex === null) { if (groupsRef.current) groupsRef.current.scrollTop = 0; return }
       itemRefs.current[activeModelIndex]?.scrollIntoView({ block: 'nearest' })
     }
-  }, [open, pane, activeModelIndex, visibleModels])
+  }, [open, pane, activeModelIndex, visibleModels, openAtTop, highlightedIndex])
 
   // Portaled placement (the Menu primitive's portal rules: fixed from the
   // anchor rect, measured before paint, clamped inside the viewport): above
@@ -560,10 +576,10 @@ export function ModelSelect(
               >
                 {filteredGroups.map((group) => {
                   return (
-                    <MenuGroup key={group.id} label={group.id === 'deepseek-account' ? t('provider.account') : group.name}>
+                    <MenuGroup key={group.key} label={group.id === 'deepseek-account' ? t('provider.account') : group.name}>
                       {group.models.map((model) => {
                         const index = modelIndex++
-                        const selected = state.current?.provider === group.id && state.current.model === model.id
+                        const selected = state.current?.provider === model.provider && state.current.model === model.id
                         return (
                           <button
                             ref={itemRef()}
@@ -581,16 +597,16 @@ export function ModelSelect(
                               if (showSearch) setHighlightedIndex(index)
                               else itemRefs.current[index]?.focus()
                             }}
-                            key={model.id}
+                            key={`${model.provider}/${model.id}`}
                             title={model.name}
                             disabled={busy}
-                            onClick={() => { choose({ provider: group.id, model: model.id }) }}
+                            onClick={() => { choose({ provider: model.provider, model: model.id }) }}
                           >
                             <span className={css.optionCopy}>
                               <span className={css.modelName}>{model.name}</span>
                             </span>
                             <span className={css.check}>
-                              {pending?.provider === group.id && pending.model === model.id
+                              {pending?.provider === model.provider && pending.model === model.id
                                 ? <StateDot state="ongoing" />
                                 : selected ? <IconCheckOutlineRegular /> : null}
                             </span>

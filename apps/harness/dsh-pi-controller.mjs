@@ -397,6 +397,12 @@ export class DshPiController {
     const page=await this.rpc('session.history',{sessionId,maxMessages:100,beforeSeq});if(epoch!==this.epoch)return;
     const merged=new Map([...page.events.map(x=>x.event),...this.state.events].map(x=>[x.seq,x]));this.update({events:[...merged.values()].sort((a,b)=>a.seq-b.seq),hasMore:page.hasMore===true});
   }
+  async curateModel(selection,action){
+    if(this.state.phase!=='ready'||this.state.readOnly)throw Error('Connect with operator access to change the model picker.');
+    const epoch=this.epoch,revision=this.state.catalog.revision;
+    const catalog=await this.rpc('models.curate',{...selection,action,revision});
+    if(epoch===this.epoch&&!this.state.readOnly){this.catalogRead++;this.update({catalog});}
+  }
   async choose(selection){
     const sessionId=this.state.sessionId,epoch=this.epoch;if(!sessionId)throw Error('Choose a workspace first.');
     let current=this.state.selection;

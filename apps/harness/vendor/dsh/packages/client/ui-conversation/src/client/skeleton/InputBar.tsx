@@ -41,7 +41,9 @@ import { ContextMeter } from './ContextMeter.tsx'
 import { observeControlRow } from './control-row-layout.ts'
 import css from './InputBar.module.css'
 
-export type InputBarProps = ComposerBarProps
+// Augmentor opt-in: keep the original meter in the composer controls instead
+// of a detached footer. The upstream/default placement remains available.
+export type InputBarProps = ComposerBarProps & { contextMeterPlacement?: 'dock' | 'toolbar' }
 
 export const InputBar = memo(function InputBar({
   useSession, useInput, inputActions, keyboard, addFiles, removeAttachment, resolveDraftAttachments,
@@ -50,7 +52,7 @@ export const InputBar = memo(function InputBar({
   renderSlot, useBusyEnter, useFileUploads, useNotices, useLexicon, useMenuLauncher, useStopShortcut,
   useProjection, sessionId, variant, disabled: inert = false, blocked,
   workspacePickerOpen = false, onRequestWorkspace,
-  placeholder, accessory,
+  placeholder, accessory, contextMeterPlacement = 'dock',
 }: InputBarProps) {
   const input = useInput(s => s)
   const notice = useNotices(s => s)
@@ -463,6 +465,7 @@ export const InputBar = memo(function InputBar({
             <div className={css.modes}>
               {sessionId === undefined ? null : renderSlot('conversation.input.permission', { locked })}
               {sessionId === undefined ? null : renderSlot('conversation.input.plan', { locked })}
+              {contextMeterPlacement === 'toolbar' && <ContextMeter useProjection={useProjection} t={t} />}
             </div>
             {input === undefined || sessionId === undefined
               ? null
@@ -521,7 +524,7 @@ export const InputBar = memo(function InputBar({
         {variant === 'composer' && input !== undefined && sessionId !== undefined
           ? renderSlot('conversation.composer.dock', {})
           : null}
-        {activity ? null : <ContextMeter useProjection={useProjection} t={t} />}
+        {activity || contextMeterPlacement === 'toolbar' ? null : <ContextMeter useProjection={useProjection} t={t} />}
       </div>
     </div>
   )

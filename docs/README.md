@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[MX model-picker feedback](HARNESS-MX-FEEDBACK.md) restores top-first ordered pins, the MIT plugin curation page, correct model-selection results and an in-composer context meter. Source build and 28 targeted MX cases pass; artifact review is staged separately. Voice and later platforms are deferred under the owner’s narrowed priority.
+
 [Browser observation lifetimes](HARNESS-BROWSER-TESTS.md) now retire opt-in test
 reads on matching CDP scope loss and use unique iframe context identities. A real
 Chromium control reproduces the old lost reply/ten-second wait; seven focused

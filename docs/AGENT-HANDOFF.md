@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[MX model-picker feedback](HARNESS-MX-FEEDBACK.md) restores top-first ordered pins, the MIT plugin curation page, correct model-selection results and an in-composer context meter. Source build and 28 targeted MX cases pass; artifact review is staged separately. Voice and later platforms are deferred under the owner’s narrowed priority.
+
 [Browser test observations](HARNESS-BROWSER-TESTS.md) now use explicit scoped
 read lifetimes, unique context IDs and bounded lifecycle receipts. An actual
 opaque-iframe removal reproduces the preceding lost reply/ten-second timer; the

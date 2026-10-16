@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[MX picker/composer regression](../docs/HARNESS-MX-FEEDBACK.md) runs the real Chromium/Pi picker, Models, SDK configuration, shared invalidation, composer interactions and attachments: 28 cases pass across seven files, two workers, no skips. Authored provider evidence remains distinct from live Qwen.
+
 [Harness browser observation lifetimes](../docs/HARNESS-BROWSER-TESTS.md) adds
 five local WebSocket/CDP contracts plus a real sandbox reload/removal proof.
 `harness-html-chromium.test.mjs` uses current unique contexts and scoped read

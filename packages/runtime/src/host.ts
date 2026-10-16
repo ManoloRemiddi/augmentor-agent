@@ -408,7 +408,7 @@ export class Host {
     for(const m of this.modelRuntime.getModels()){if(!groups.has(m.provider))groups.set(m.provider,{provider:m.provider,name:m.provider,models:[]});
       let local=false;try{local=['127.0.0.1','[::1]','localhost'].includes(new URL(m.baseUrl??'').hostname);}catch{}
       groups.get(m.provider)!.models.push({provider:m.provider,model:m.id,name:m.name,location:local?'Local':'Network',available:available.has(m.provider+'/'+m.id),thinkingLevels:getSupportedThinkingLevels(m)});}
-    return {groups:[...groups.values()],pinned:this.settings.pinned.map((p:any)=>typeof p==='string'?p:p.provider+'/'+p.model),hidden:this.settings.hidden,default:this.settings.defaultModel,failures:[]};
+    return {revision:this.settings.revision,groups:[...groups.values()],pinned:this.settings.pinned.map((p:any)=>typeof p==='string'?p:p.provider+'/'+p.model),hidden:this.settings.hidden,default:this.settings.defaultModel,failures:[]};
   }
   getMeta(id:unknown){const m=this.metadata.get(identifier(id));if(!m)throw new Error('Conversation not found');permissionSelection(m);return m;}
   jobInspectionTarget(parentId:unknown,jobId:unknown){
@@ -1111,6 +1111,18 @@ export class Host {
       this.setup.saved();return {selection:checked.selection,catalog:await this.catalog()};
     }
     case 'models.validate':await this.selected(p);return {valid:true};
+    case 'models.curate':{
+      if(p.revision!==this.settings.revision)throw Error('Model picker settings changed. Refresh before editing again.');
+      if(typeof p.provider!=='string'||typeof p.model!=='string'||!this.modelRuntime.getModel(p.provider,p.model))throw Error('The model is no longer in the catalog. Refresh before editing.');
+      if(!['pin','unpin','hide','show','up','down'].includes(p.action))throw Error('Unknown model picker action.');
+      const key=p.provider+'/'+p.model,pins=[...new Set<string>(this.settings.pinned.map((m:any)=>typeof m==='string'?m:m.provider+'/'+m.model))],hidden=new Set<string>(this.settings.hidden);
+      const index=pins.indexOf(key);
+      if(p.action==='pin'&&index<0)pins.push(key);
+      if(p.action==='unpin'&&index>=0)pins.splice(index,1);
+      if((p.action==='up'||p.action==='down')&&index>=0){const next=index+(p.action==='up'?-1:1);if(next>=0&&next<pins.length)[pins[index],pins[next]]=[pins[next],pins[index]];}
+      if(p.action==='hide')hidden.add(key);if(p.action==='show')hidden.delete(key);
+      this.settings.pinned=pins;this.settings.hidden=[...hidden];this.persistSettings();return this.catalog();
+    }
     case 'models.pin':{await this.selected(p);const key=p.provider+'/'+p.model;this.settings.pinned=this.settings.pinned.map((m:any)=>typeof m==='string'?m:m.provider+'/'+m.model).filter((m:string)=>m!==key);if(p.pinned)this.settings.pinned.push(key);this.persistSettings();return this.catalog();}
     case 'models.configure':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before changing providers');await this.modelSettings.configure(p.config);return this.catalog();
     case 'models.reload':if(this.improvements.busy)throw Error('Finish or cancel prompt improvement before reloading models');await this.reloadModelSettings();return this.catalog();

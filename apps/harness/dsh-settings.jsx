@@ -24,6 +24,7 @@ import {attachMcpManagement} from './mcp-management.js';
 import {DshContextSettingsCard} from './dsh-context-settings.jsx';
 import {MetafolderSettings} from './dsh-metafolder.jsx';
 import {OriginalModels} from './dsh-models.jsx';
+import {ModelPickerSettings} from './dsh-model-picker.jsx';
 import {WikiSettings} from './dsh-wiki-settings.jsx';
 
 export const settingsShell=createSettingsShellStore().create();
@@ -32,7 +33,7 @@ const bind=source=>(select=x=>x)=>select(useSyncExternalStore(source.subscribe,s
 const useShell=bind(settingsShell);
 const translate=dictionary=>(key,args={})=>String(dictionary[key]??key).replace(/\{(\w+)\}/g,(_,name)=>String(args[name]??''));
 const t=translate(settingsEn),themeT=translate(themeEn);
-const sections=[{id:'general',order:0,label:t('general.nav')},{id:'models',order:1,label:'Models'},{id:'plugins',order:2,label:'Plugins'}];
+const sections=[{id:'general',order:0,label:t('general.nav')},{id:'models',order:1,label:'Models'},{id:'plugins',order:2,label:'Plugins'},{id:'model-picker-augmented',order:3,label:'Model Picker Augmented'}];
 
 // Existing light/dark choices keep their meaning until an explicit new choice.
 const persisted=localStorage.getItem('augmentor.dsh.theme');
@@ -111,6 +112,7 @@ export function OriginalSettings({wide,state,controller,preferences,developerToo
     if(name==='settings.close')return <CloseLabel t={t}/>;
     if(name==='settings.section'){
       if(options.only==='general')return <GeneralSection renderSlot={renderSlot}/>;
+      if(options.only==='model-picker-augmented')return <GeneralSection renderSlot={()=> <div className="augmentor-extension"><ModelPickerSettings key={controller.epoch} controller={controller}/></div>}/>;
       if(options.only==='models')return <OriginalModels key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}><p>Current model: {state.selection?state.selection.provider+' / '+state.selection.model:'No model selected'}. Use the conversation model chooser to change it.</p><ManagedSetting kind="reasoning" state={state} controller={controller} notice={notice}/></OriginalModels>;
       if(options.only==='plugins')return <GeneralSection renderSlot={()=> <div className="augmentor-extension">{!state.readOnly&&state.phase==='ready'&&<DictationSettings/>}<MemorySettings key={["memory",controller.epoch,state.phase,state.readOnly].join(":")} controller={controller}/><ManagedSetting kind="mcp" state={state} controller={controller} notice={notice}/><MetafolderSettings profile={metafolders}/><WikiSettings key={[controller.epoch,state.phase,state.readOnly].join(':')} controller={controller} onTrajectory={sid=>{settingsShell.actions.close();onTrajectory(sid);}}/><SearchSettings key={['search',controller.epoch,state.phase,state.readOnly].join(':')} controller={controller}/><p>dsh-context 0.68.1 · Apache-2.0</p><DshContextSettingsCard preferences={preferences}/><Button onClick={()=>{owner.close();onContext();}}>Open Context</Button></div>}/>;
     }
