@@ -286,4 +286,12 @@ no extra project is transferred by this implementation. Image/reasoning and
 edit/compaction/branch conversion, changing/oversized cuts, child navigation,
 multi-project consolidation into one profile, existing companion data and wider
 owner acceptance remain required for full migration. New source/staged evidence
-must not be read as completed bulk migration. Artifact qualification follows.
+must not be read as completed bulk migration. Private unselected artifact **20261016-170525-c772392c**, application
+**4a7ef0a8**, passes the same **50/50** Node cases against its exact
+target, plus all **13** exporter cases without Python site packages. All
+**24,566 sealed / 1,072 compiled** entries verify after
+qualification; production Node/dependencies/components match the prior baseline.
+Both owner reviews keep their same PIDs and roots; **32 protected files** and the
+installed selection remain exact. No extra owner project, conversation, provider
+request, voice request or running-review update is performed by this qualification.
+[Portable evidence](../release/harness-dsh-multichat-review-20261016.json).
