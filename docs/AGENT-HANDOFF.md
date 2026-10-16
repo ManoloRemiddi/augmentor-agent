@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Explicit memory-only mode comparison](PI-MEMORY-LIVE.md#explicit-memory-only-request-mode-comparison--october-16)
+reuses the existing installer `default|off` request choice in fresh proof profiles.
+Omission preserves the original mode; explicit selection records both choices and
+cannot change original services or chat/voice settings. A transparent bounded
+memory-provider observer requires actual false request flags for `off` and joins
+owned cancellation/servers. Native source IDs/dates/scopes, full scenario/assertions,
+limits and retained default failures remain. Source Python passes 44/44; fresh
+frozen/live qualification remains required. Production/default adoption is unchanged.
+
 [Memory-page qualification](PI-MEMORY-LIVE.md#current-page-and-outage-results--october-16)
 backports three public MIT hunks from upstream **022583d4** into a separately
 verified read-only engine overlay. Page refresh uses the configured two iterations;

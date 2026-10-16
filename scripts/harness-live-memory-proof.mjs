@@ -32,9 +32,9 @@ const {PiConnection}=await import(pathToFileURL(join(app,'dist/client/src/socket
 const {localConnect}=await import(pathToFileURL(join(app,'dist/platform/src/transport.js')));
 const config=join(root,'config'),state=join(root,'state'),workspace=join(root,'Cedar'),otherWorkspace=join(root,'Other'),shared=join(root,'client-state'),memoryState=join(root,'memory-state');
 for(const path of [config,join(config,'agent'),state,workspace,otherWorkspace,shared,memoryState,join(root,'home'),join(root,'runtime')])await mkdir(path,{mode:0o700,recursive:true});
-const sha=bytes=>createHash('sha256').update(bytes).digest('hex'),actors=[],logs=[],requests=[],memoryCalls=[],activeProxy=new Set(),proxySockets=new Set();
-let provider,bridge,owner,connection,memoryActor,promptActor;
-const report={passed:false,scenario,phase:'preflight',applicationHostSha256:sha(await readFile(join(app,'dist/runtime/src/host.js'))),driverSha256:sha(await readFile(fileURLToPath(import.meta.url))),piVersion:'1.1.0',hindsightVersion:'0.10.0',model:model.id,contextWindow:model.contextWindow,maxTokens:model.maxTokens,ownerDataUsed:false,originalServiceOrModelSettingsChanged:false,physicalVoiceQualified:false};
+const sha=bytes=>createHash('sha256').update(bytes).digest('hex'),actors=[],logs=[],requests=[],memoryRequests=[],memoryCalls=[],activeProxy=new Set(),proxySockets=new Set();
+let provider,memoryProvider,bridge,owner,connection,memoryActor,promptActor;
+const report={passed:false,scenario,memoryThinkingMode:engine.llamaCppThinking,baselineMemoryThinkingMode:engine.baselineLlamaCppThinking??engine.llamaCppThinking,explicitMemoryModeOverride:engine.thinkingExplicitOverride===true,phase:'preflight',applicationHostSha256:sha(await readFile(join(app,'dist/runtime/src/host.js'))),driverSha256:sha(await readFile(fileURLToPath(import.meta.url))),piVersion:'1.1.0',hindsightVersion:'0.10.0',model:model.id,contextWindow:model.contextWindow,maxTokens:model.maxTokens,ownerDataUsed:false,originalServiceOrModelSettingsChanged:false,physicalVoiceQualified:false};
 const checkpoint=phase=>{report.phase=phase;console.log(JSON.stringify({phase,conversationRequests:requests.length}));};
 const until=async(fn,label,ms=20000)=>{const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(100);}throw Error('Live memory proof timeout: '+label);};
 const exists=path=>access(path).then(()=>true,()=>false);
@@ -85,6 +85,19 @@ try{
    res.writeHead(response.status,{'content-type':response.headers.get('content-type')??'application/json'});for await(const chunk of response.body)res.write(chunk);res.end();
   }catch{if(!res.destroyed)res.writeHead(502).end();}finally{activeProxy.delete(abort);req.removeListener('aborted',cancel);res.removeListener('close',cancel);}
  });await new Promise(resolve=>provider.listen(0,'127.0.0.1',resolve));
+ memoryProvider=httpServer(async(req,res)=>{
+  const abort=new AbortController();activeProxy.add(abort);const cancel=()=>{if(!res.writableFinished)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);let receipt,started;
+  try{
+   if(req.method!=='POST'||req.url!=='/v1/chat/completions'){res.writeHead(404).end();return;}
+   let size=0;const parts=[];for await(const chunk of req){size+=chunk.length;if(size>256000)throw Error('Memory observer request too large');parts.push(chunk);}const bytes=Buffer.concat(parts),body=JSON.parse(bytes);
+   receipt={model:body.model,maxTokens:body.max_tokens,stream:body.stream,enableThinking:body.chat_template_kwargs?.enable_thinking??'not-overridden'};memoryRequests.push(receipt);started=Date.now();
+   assert.equal(body.model,model.id);assert(body.max_tokens>=64&&body.max_tokens<=4096);assert.equal(body.stream,true);if(engine.llamaCppThinking==='off')assert.equal(receipt.enableThinking,false);
+   const response=await fetch(new URL('/v1/chat/completions',upstream),{method:'POST',headers:{'content-type':'application/json'},body:bytes,signal:abort.signal});
+   res.writeHead(response.status,{'content-type':response.headers.get('content-type')??'application/json'});for await(const chunk of response.body)res.write(chunk);res.end();receipt.completed=true;
+  }catch{if(!res.destroyed)res.writeHead(502).end();}finally{if(receipt)receipt.durationMs=Date.now()-started;activeProxy.delete(abort);req.removeListener('aborted',cancel);res.removeListener('close',cancel);}
+ });await new Promise(resolve=>memoryProvider.listen(0,'127.0.0.1',resolve));
+ const memoryConfigurationPath=join(root,'shared-data/hindsight.json'),memoryConfiguration=JSON.parse(await readFile(memoryConfigurationPath,'utf8'));assert.equal(memoryConfiguration.modelUrl,declaration.baseUrl.replace(/\/$/,''));
+ await writeFile(memoryConfigurationPath,JSON.stringify({...memoryConfiguration,modelUrl:'http://127.0.0.1:'+memoryProvider.address().port+'/v1'})+'\n',{mode:0o600});
  await writeFile(join(config,'agent/models.json'),JSON.stringify({providers:{'mx-qwen':{...declaration,baseUrl:'http://127.0.0.1:'+provider.address().port+'/v1',apiKey:'not-required'}}})+'\n',{mode:0o600,flag:'wx'});
  await writeFile(join(config,'settings.json'),JSON.stringify({revision:0,defaultPreset:'danger-full-access',pinned:[],hidden:[],defaultModel:{provider:'mx-qwen',model:model.id},observation:{capturePayloads:true}})+'\n',{mode:0o600,flag:'wx'});
  const extension=join(config,'agent/memory-proof.mjs'),control=join(root,'tool-control');await mkdir(control,{mode:0o700});
@@ -136,9 +149,10 @@ try{
  for(const phase of ['seed','update'])try{await writeFile(join(root,'tool-control',phase+'-release'),'cleanup-release',{mode:0o600,flag:'wx'});}catch{}
  connection?.close();for(const controller of activeProxy)controller.abort();
  for(const actor of [...actors].reverse())try{await terminate(actor);}catch(error){report.cleanupError=String(error);}
- for(const socket of proxySockets)socket.destroy();if(bridge)await new Promise(resolve=>bridge.close(resolve));if(provider){provider.closeAllConnections();await new Promise(resolve=>provider.close(resolve));}
+ for(const socket of proxySockets)socket.destroy();if(bridge)await new Promise(resolve=>bridge.close(resolve));for(const server of [provider,memoryProvider])if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
  for(const file of logs)await file.close();
  try{await promisify(execFile)(python,[join(driverRoot,'hindsight-isolated-proof-engine.py'),'stop','--root',root],{timeout:60000,env:{...process.env,PYTHONDONTWRITEBYTECODE:'1'}});report.engineStopped=true;}catch(error){report.engineCleanupError=String(error);}
+ report.memoryModelRequests=memoryRequests;
  report.actors=actors.map(({name,child})=>({name,pid:child.pid,exitCode:child.exitCode,signal:child.signalCode,terminal:child.exitCode!==null||child.signalCode!==null}));report.allOwnedActorsTerminal=report.engineStopped&&report.actors.every(actor=>actor.terminal);
  if(report.cleanupError||report.engineCleanupError||!report.allOwnedActorsTerminal){report.passed=false;process.exitCode=1;}
  await writeFile(join(root,'conversation-requests.json'),JSON.stringify(requests,null,2)+'\n',{mode:0o600,flag:'wx'});await writeFile(join(root,'result.json'),JSON.stringify(report,null,2)+'\n',{mode:0o600,flag:'wx'});console.log(JSON.stringify({outputRoot:root,passed:report.passed,phase:report.phase,conversationRequests:requests.length,allOwnedActorsTerminal:report.allOwnedActorsTerminal,error:report.error}));

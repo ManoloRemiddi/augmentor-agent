@@ -35,6 +35,16 @@ def provider(value):
     return model
 
 
+def thinking_mode(env, requested=None):
+    extras = [json.loads(env.get('HINDSIGHT_API_' + op + 'LLM_EXTRA_BODY', 'null')) for op in ('', 'RETAIN_', 'REFLECT_', 'CONSOLIDATION_')]
+    if all(value is None for value in extras): saved = 'default'
+    elif all(value == {'chat_template_kwargs': {'enable_thinking': False}} for value in extras): saved = 'off'
+    else: raise ValueError('The existing memory request policy is not the supported uniform default/off choice.')
+    if requested not in (None, 'default', 'off'):
+        raise ValueError('Choose the explicit memory-only default/off request mode.')
+    return saved, requested if requested is not None else saved
+
+
 def cache_inventory(root):
     """Only public model-cache directories, no hub credential or escaping link."""
     root = root.resolve()
@@ -108,10 +118,7 @@ def prepare(args):
     env = dict(row.split('=', 1) for row in baseline['Config']['Env'] if '=' in row)
     if env.get('HINDSIGHT_API_LLM_MODEL') != model['id']:
         raise ValueError('The proof model differs from the configured memory engine; no setting was changed.')
-    extras = [json.loads(env.get('HINDSIGHT_API_' + op + 'LLM_EXTRA_BODY', 'null')) for op in ('', 'RETAIN_', 'REFLECT_', 'CONSOLIDATION_')]
-    if all(value is None for value in extras): thinking = 'default'
-    elif all(value == {'chat_template_kwargs': {'enable_thinking': False}} for value in extras): thinking = 'off'
-    else: raise ValueError('The existing memory request policy is not the supported uniform default/off choice.')
+    saved_thinking, thinking = thinking_mode(env, args.llama_cpp_thinking)
     available = int(next(line.split()[1] for line in Path('/proc/meminfo').read_text().splitlines() if line.startswith('MemAvailable:')))
     if available < 10 * 1024 * 1024:
         raise ValueError('Insufficient free host memory for a separate bounded proof engine; existing workloads remain untouched.')
@@ -149,6 +156,7 @@ def prepare(args):
               'image': setup.IMAGE, 'baselineContainer': args.cache_container, 'baselineId': baseline['Id'],
               'baselineIdentity': identity(baseline), 'cacheManifest': inventory,
               'extensionSha256': hashlib.sha256(source.read_bytes()).hexdigest(), 'llamaCppThinking': thinking,
+              'baselineLlamaCppThinking': saved_thinking, 'thinkingExplicitOverride': args.llama_cpp_thinking is not None,
               'model': model['id'], 'created': False, 'refreshBudgetBackport': overlay}
     write(root / 'engine.json', record)
     run(['docker', 'volume', 'create', record['volume']])
@@ -204,6 +212,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__); parser.add_argument('action', choices=['prepare', 'stop']); parser.add_argument('--root', required=True)
     parser.add_argument('--provider-json'); parser.add_argument('--cache-container', default='augmentor-hindsight')
     parser.add_argument('--refresh-budget-backport', action='store_true', help='Opt in to the exact public MIT page-budget source overlay on this separate proof only.')
+    parser.add_argument('--llama-cpp-thinking', choices=('default', 'off'), help='Explicit memory-only mode for this new proof; omission preserves the original engine mode.')
     options = parser.parse_args()
     if options.action == 'prepare':
         if not options.provider_json: parser.error('prepare requires --provider-json')

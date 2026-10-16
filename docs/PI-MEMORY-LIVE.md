@@ -270,6 +270,44 @@ failed full scenario. This external-driver addition changes no application code,
 page policy, inference limit or production/installed state. The current result
 above records its subsequent focused pass while keeping full acceptance false. [Portable retained results](../release/harness-pi-memory-page-qualification-20261016.json).
 
+## Explicit memory-only request-mode comparison — October 16
+
+The existing production installer already supports explicit `default|off` memory-
+only llama.cpp requests, with separately dated October 14 evidence in
+[controlled memory](CONTROLLED-MEMORY.md#memory-only-llamacpp-request-mode--october-14).
+The isolated helper now accepts the same **`--llama-cpp-thinking default|off`**
+selection. Omission preserves the original uniform mode. An explicit selection
+applies only to the new proof container/profile; both baseline and selected mode
+and the fact that it was explicit are recorded. Mixed/unknown original policies
+remain refused. The installed engine, original configuration and chat/voice
+provider settings are not changed by an experiment.
+
+Native per-document source IDs, individual event dates, both banks and all stages
+stay intact. No raw sources are merged or filtered to reduce calls. This comparison
+keeps the same full seed/correction/recall/branch/restart/pause/outage assertions,
+120-second/65,536-token windows/jobs and 45-second/4,096-output model-call limits.
+Default-mode failures remain retained even if a distinct explicit mode qualifies.
+
+The external driver now transparently observes the actual memory-to-provider
+request stream in its private profile: model, bounded output, streaming flag,
+`chat_template_kwargs.enable_thinking`, completion and elapsed time. It forwards
+the unchanged request/response bytes without replay, and cancellation aborts its
+owned upstream fetch. Prompts/credentials are not included in these receipts.
+For explicit `off`, every memory request must actually carry false; recording an
+environment value alone is insufficient. Conversation requests keep their existing
+separate observer/declaration. All owned servers join the existing cleanup.
+
+Source **44/44 Python** cases pass, including preserve-by-default, explicit mode
+selection and refusal of mixed/unknown policy. Driver syntax/help checks pass.
+Fresh frozen/live comparison remains required; production adoption is unchanged.
+
+```sh
+python3 scripts/hindsight-isolated-proof-engine.py prepare \
+  --root /absolute/private-proof-directory \
+  --provider-json /absolute/local-provider-declaration.json \
+  --refresh-budget-backport --llama-cpp-thinking off
+```
+
 ## Isolated proof ownership
 
 [`hindsight-isolated-proof-engine.py`](../scripts/hindsight-isolated-proof-engine.py)

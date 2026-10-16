@@ -1,6 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Pure preparation gates; no Docker, model or personal configuration needed."""
 import importlib.util
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -11,6 +12,18 @@ proof = importlib.util.module_from_spec(spec); spec.loader.exec_module(proof)
 
 
 class ProofInputTests(unittest.TestCase):
+    def test_memory_only_mode_preserves_the_existing_choice_unless_explicitly_selected(self):
+        off = {'HINDSIGHT_API_' + op + 'LLM_EXTRA_BODY': json.dumps({'chat_template_kwargs': {'enable_thinking': False}})
+               for op in ('', 'RETAIN_', 'REFLECT_', 'CONSOLIDATION_')}
+        self.assertEqual(proof.thinking_mode({}), ('default', 'default'))
+        self.assertEqual(proof.thinking_mode(off), ('off', 'off'))
+        self.assertEqual(proof.thinking_mode({}, 'off'), ('default', 'off'))
+        self.assertEqual(proof.thinking_mode(off, 'default'), ('off', 'default'))
+        with self.assertRaisesRegex(ValueError, 'uniform'):
+            proof.thinking_mode({**off, 'HINDSIGHT_API_RETAIN_LLM_EXTRA_BODY': 'null'}, 'off')
+        with self.assertRaisesRegex(ValueError, 'default/off'):
+            proof.thinking_mode({}, 'automatic')
+
     def test_local_public_declaration_preserves_limits_and_rejects_credentials_or_remote_targets(self):
         good = {'api': 'openai-completions', 'baseUrl': 'http://127.0.0.1:8080/v1',
                 'models': [{'id': 'declared-model', 'contextWindow': 262144, 'maxTokens': 8192}]}
