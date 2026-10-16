@@ -6,9 +6,11 @@ os.umask(0o077)
 root,source,output=sys.argv[1:];root=Path(root);source=Path(source);output=Path(output)
 spec=importlib.util.spec_from_file_location('exporter',root/'scripts/export-dsh-project.py');exporter=importlib.util.module_from_spec(spec);spec.loader.exec_module(exporter)
 value=json.loads(source.read_text());value['workspace']['workspaceId']='authored-bundle-project';home=source.parent/'source-dsh';home.mkdir(mode=0o700)
-for row in value.get('attachments',[]):
- raw=base64.b64decode(row['data']);sha=hashlib.sha256(raw).hexdigest();assert row['attachmentId']=='sha256:'+sha
- path=home/'attachments/v1/objects'/sha[:2]/sha;path.parent.mkdir(mode=0o700,parents=True,exist_ok=True);path.write_bytes(raw)
+for kind,rows in [('objects',value.get('attachments',[])),('file-objects',value.get('files',[]))]:
+ for row in rows:
+  raw=base64.b64decode(row['data']);sha=hashlib.sha256(raw).hexdigest();assert row['attachmentId']=='sha256:'+sha
+  path=home/'attachments/v1'/kind/sha[:2]/sha;path.parent.mkdir(mode=0o700,parents=True,exist_ok=True);path.write_bytes(raw)
+
 class ReadOnly:
  def __init__(self):self.counts=collections.Counter();self.rows={row['opening']['header']['id']:row for row in value['sessions']+value['relatedSessions']}
  def call(self,method):

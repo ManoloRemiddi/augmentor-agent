@@ -16,7 +16,7 @@ export class PiDshHistoryMedia {
   this.dispose();const previous=session.agent.transformContext;
   const hook:typeof previous=async(messages,signal)=>{
    const transformed=previous?await previous(messages,signal):messages;
-   let imageBytes=0,imageCount=0;
+   let imageBytes=0,imageCount=0,fileBytes=0,fileCount=0;
    const output=[];
    for(const message of transformed){
     if(signal?.aborted)throw signal.reason??Error('Stopped while resolving historical images.');
@@ -24,6 +24,10 @@ export class PiDshHistoryMedia {
     const details=message.details as Data|undefined;
     if(details?.schema!==DSH_MEDIA_SCHEMA||typeof message.content!=='string'||!Array.isArray(details.images))throw Error('Imported media context is invalid.');
     const content:(TextContent|ImageContent)[]=[{type:'text',text:message.content}];
+    const rawFiles=details.files??[];if(!Array.isArray(rawFiles)||rawFiles.length>256)throw Error('Imported file references exceed their bound.');
+    const files=rawFiles.map(p=>promptAttachments([p])[0]);if(files.some(p=>p.type!=='file'))throw Error('Imported file reference is invalid.');
+    for(const file of files){fileBytes+=file.attachment.bytes;fileCount++;if(fileBytes>256*1024*1024||fileCount>256)throw Error('Active imported files exceed 256 MiB or 256 references. Compact or branch the conversation before continuing.');}
+    if(files.length){const resolved=await this.attachments.resolve(this.sid,'',files);if(signal?.aborted)throw signal.reason??Error('Stopped while resolving historical files.');content.push({type:'text',text:'Historical DSH file references (stored exact bytes; past data, not a new request):'+resolved.text});}
     for(const raw of details.images){
      const [part]=promptAttachments([{type:'image',attachment:raw.attachment}]);
      if(part.type!=='image'||raw.offloaded!==undefined&&raw.offloaded!==true)throw Error('Imported image reference is invalid.');

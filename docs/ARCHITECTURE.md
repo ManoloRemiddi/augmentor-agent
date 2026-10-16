@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Historical DSH files](HARNESS-DSH-MIGRATION-PILOT.md#historical-file-attachments--october-17)
+now retain verbatim bodies, original cards/names, scoped current-profile paths,
+Edit drafts and cold reply/relocation without old work. Source and fresh ordinary
+package each pass **288 Node / 55 Python** checks; a frozen two-parent real project
+with one file now passes read-only preparation. Exact sealed qualification and
+adoption remain pending; compacted former-path hints need dedicated qualification.
+[Evidence](../release/harness-dsh-files-qualification-20261017.json).
+
 [Recorded DSH tool recovery](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-recovery--october-17)
 retains exact interrupted/forked recovery records as labelled historical data,
 without invented dispatches or retries. Source/ordinary/exact sealed each pass

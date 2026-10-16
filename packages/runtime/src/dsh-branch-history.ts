@@ -44,21 +44,24 @@ export function ordinaryBranchEntries(manager:SessionManager,events:DisplayEvent
  if(end<0)throw failure();
  return {entries:branch.slice(end+1).filter(e=>e.type==='message'&&e.message.role===role),ordinal:events.filter(e=>e.type===type&&e.seq<=seq&&e.seq>displayCut&&e.data.importedFrom?.system!=='DSH').length-1};
 }
-/** Historical assistant/tool images have no invented user-upload receipt. A
+/** Historical assistant/tool attachments have no invented user-upload receipt. A
  * branch may resolve only references actually retained in its selected native
  * DSH media entries and in the checksum-verified source parent's record. */
-export function inheritedDshImage(manager:SessionManager,state:string,part:Data){
- if(part.type!=='image')return false;const native=bindingOf(manager);if(!native||native.type!=='custom')return false;const binding=native.data as Data;
- const entries=manager.getBranch().filter(e=>e.type==='custom_message'&&e.customType==='augmentor.dsh-media.v1'&&(e.details as Data)?.images?.some((p:Data)=>isDeepStrictEqual(p.attachment,part.attachment)));
+export function inheritedDshAttachment(manager:SessionManager,state:string,part:Data){
+ if(part.type!=='image'&&part.type!=='file')return false;const native=bindingOf(manager);if(!native||native.type!=='custom')return false;const binding=native.data as Data;
+ const entries=manager.getBranch().filter(e=>e.type==='custom_message'&&e.customType==='augmentor.dsh-media.v1'&&[...((e.details as Data)?.images??[]),...((e.details as Data)?.files??[])].some((p:Data)=>p.type===part.type&&isDeepStrictEqual(p.attachment,part.attachment)));
  if(!entries.length)return false;const {root}=readDshArchive(state,binding);
- return entries.some(entry=>{if(entry.type!=='custom_message')return false;const d=entry.details as Data;if(d.archiveSha256!==binding.sha256||d.sourceSessionId!==binding.sourceSessionId)return false;const e=root.records[d.sourceSeq]?.event;if(!e||!['user/message','assistant/message','tool/result'].includes(e.type))return false;const content=(e.type==='user/message'?e.data:e.data.message)?.content;return Array.isArray(content)&&content.some((p:Data)=>p.type==='image'&&isDeepStrictEqual(p.attachment,part.attachment));});
+ return entries.some(entry=>{if(entry.type!=='custom_message')return false;const d=entry.details as Data;if(d.archiveSha256!==binding.sha256||d.sourceSessionId!==binding.sourceSessionId)return false;const e=root.records[d.sourceSeq]?.event;if(!e||!['user/message','assistant/message','tool/result'].includes(e.type))return false;const content=(e.type==='user/message'?e.data:e.data.message)?.content;return Array.isArray(content)&&content.some((p:Data)=>p.type===part.type&&isDeepStrictEqual(p.attachment,part.attachment));});
 }
 
-/** Image inspection must not let SDK.open migrate an older native file. */
-export function coldDshImage(file:string,state:string,part:Data){
+/** Attachment inspection must not let SDK.open migrate an older native file. */
+export function coldDshAttachment(file:string,state:string,part:Data){
  const fd=openSync(file,constants.O_RDONLY|(constants.O_NOFOLLOW??0)|(constants.O_NONBLOCK??0));
  try{const info=fstatSync(fd);if(!info.isFile()||info.nlink!==1||process.platform!=='win32'&&(info.uid!==process.getuid?.()||(info.mode&0o077)!==0))throw failure();
   const buffer=Buffer.alloc(65536),bytes=readSync(fd,buffer,0,buffer.length,0),end=buffer.subarray(0,bytes).indexOf(10);if(end<0)throw failure();const header=JSON.parse(buffer.subarray(0,end).toString('utf8'));if(header.type!=='session'||header.version!==CURRENT_SESSION_VERSION)throw failure();
  }finally{closeSync(fd);}
- return inheritedDshImage(SessionManager.open(file),state,part);
+ return inheritedDshAttachment(SessionManager.open(file),state,part);
 }
+
+// Retain internal image-helper imports used by existing integration checks.
+export {inheritedDshAttachment as inheritedDshImage,coldDshAttachment as coldDshImage};

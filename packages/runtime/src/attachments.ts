@@ -1,5 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {randomUUID} from 'node:crypto';
+import {randomUUID,createHash} from 'node:crypto';
 import {join} from 'node:path';
 import {readFileSync,lstatSync,openSync,closeSync,fsyncSync} from 'node:fs';
 import type {ImageContent} from '@earendil-works/pi-ai';
@@ -53,6 +53,14 @@ export class PiAttachments {
   const part:PromptAttachment={type:'image',attachment};
   if(!this.receipts(sid).some(row=>JSON.stringify(row.part)===JSON.stringify(part)))this.commit(sid,part);
  }
+ /** Preserve exact historical file bytes and their original sanitized name. */
+ async importStoredFile(sid:string,attachment:FileAttachmentRef,data:Uint8Array){
+  this.writable();identifier(sid);promptAttachments([{type:'file',attachment}]);
+  if(typeof attachment.name!=='string'||attachment.name!==fileLeafName(attachment.name)||Object.keys(attachment).sort().join(',')!=='attachmentId,bytes,name'||data.byteLength!==attachment.bytes||data.byteLength>FILE_LIMIT||'sha256:'+createHash('sha256').update(data).digest('hex')!==attachment.attachmentId)throw Error('Imported file metadata differs from its bytes.');
+  const stored=await saveFileVerbatim(this.root,{data,name:attachment.name});
+  if(stored.attachmentId!==attachment.attachmentId||stored.bytes!==attachment.bytes||stored.name!==attachment.name)throw Error('Imported file storage differs from its source.');
+  const part:PromptAttachment={type:'file',attachment};if(!this.receipts(sid).some(row=>JSON.stringify(row.part)===JSON.stringify(part)))this.commit(sid,part);
+ }
  historicalImagePath(sid:string,attachment:ImageAttachmentRef){this.authorize(sid,{type:'image',attachment});return normalizedImagePath(this.root,attachment);}
  async uploadImage(sid:string,data:Uint8Array,name:string,mediaType:ImageMediaType){this.writable();
   if(!IMAGE_LIMITS.mediaTypes.includes(mediaType))throw Error('Unsupported image type.');
@@ -89,7 +97,7 @@ export class PiAttachments {
   const images:ImageContent[]=[],files:string[]=[];
   for(const part of attachments){this.authorize(sid,part);
    if(part.type==='image'){const stored=await readImageFile(this.root,part.attachment);images.push({type:'image',mimeType:part.attachment.mediaType,data:Buffer.from(stored.data).toString('base64')});}
-   else{for await(const _ of readFileStreamVerbatim(this.root,part.attachment)){}files.push(JSON.stringify({name:part.attachment.name,path:storedFilePath(this.root,part.attachment),bytes:part.attachment.bytes}));}
+   else{let bytes=0;for await(const chunk of readFileStreamVerbatim(this.root,part.attachment)){bytes+=chunk.byteLength;if(bytes>part.attachment.bytes||bytes>FILE_LIMIT)throw Error('Stored file exceeds its declared byte bound.');}files.push(JSON.stringify({name:part.attachment.name,path:storedFilePath(this.root,part.attachment),bytes:part.attachment.bytes}));}
   }
   return {text:input+(files.length?'\n\nAttached files (read their exact contents using the file tools):\n'+files.join('\n'):''),images};
  }

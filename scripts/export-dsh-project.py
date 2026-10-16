@@ -16,6 +16,49 @@ def encode_export(value):
     if len(raw)>MAX_EXPORT_BYTES:raise ValueError('Project export exceeds the size bound; no partial archive was published.')
     return raw
 
+def stored_attachment_bytes(dsh_home,identity,size,kind):
+    """Read only one digest-named immutable object through directory descriptors."""
+    if dsh_home is None:raise ValueError('An explicit DSH home is required for attachment export.')
+    if os.name!='posix':raise ValueError('Stored attachment export currently requires Linux descriptor-relative reads.')
+    sha=identity[7:];fds=[]
+    try:
+        fd=os.open(dsh_home,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fds.append(fd)
+        for component in ('attachments','v1','file-objects' if kind=='file' else 'objects',sha[:2]):
+            fd=os.open(component,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW,dir_fd=fd);fds.append(fd)
+        fd=os.open(sha,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK,dir_fd=fd);fds.append(fd);before=os.fstat(fd)
+        if not stat.S_ISREG(before.st_mode) or before.st_size!=size:raise ValueError('Source attachment size or file type differs.')
+        with os.fdopen(os.dup(fd),'rb') as stream:raw=stream.read(size+1)
+        after=os.fstat(fd)
+        if (before.st_ino,before.st_size,before.st_mtime_ns,before.st_ctime_ns)!=(after.st_ino,after.st_size,after.st_mtime_ns,after.st_ctime_ns) or len(raw)!=size or hashlib.sha256(raw).hexdigest()!=sha:
+            raise ValueError('Source attachment changed or checksum differs.')
+        return raw
+    finally:
+        for fd in reversed(fds):os.close(fd)
+
+
+def file_bundle(sessions,dsh_home,charge,bundle=None):
+    refs={}
+    for session in sessions:
+        for row in session['records']:
+            e=row.get('event',{});d=e.get('data',{});m=d if e.get('type')=='user/message' else d.get('message',{}) if e.get('type') in ('assistant/message','tool/result') else {}
+            for part in m.get('content',[]):
+                if part.get('type')!='file':continue
+                a=part.get('attachment',{});identity=a.get('attachmentId','');size=a.get('bytes')
+                if not isinstance(identity,str) or not re.fullmatch(r'sha256:[a-f0-9]{64}',identity) or type(size) is not int or not 0<=size<=20*1024*1024:raise ValueError('Invalid source file reference.')
+                if identity in refs and refs[identity]!=size:raise ValueError('Conflicting source file sizes.')
+                refs[identity]=size
+    if len(refs)>10000:raise ValueError('Too many distinct source file objects.')
+    result=[]
+    for identity,size in refs.items():
+        raw=stored_attachment_bytes(dsh_home,identity,size,'file')
+        if bundle is None:item={'attachmentId':identity,'bytes':size,'data':base64.b64encode(raw).decode('ascii')}
+        else:
+            # Keep the existing 16 MiB object ceiling, including 20 MiB files.
+            chunks=[bundle.put(raw[start:start+8*1024*1024]) for start in range(0,size,8*1024*1024)]
+            charge(raw);item={'attachmentId':identity,'bytes':size,'chunks':chunks}
+        charge(item);result.append(item)
+    return result
+
 def image_bundle(sessions, dsh_home, charge, bundle=None):
     """Read only named immutable images, never follow a symlink or scan the store."""
     refs={}
@@ -31,27 +74,13 @@ def image_bundle(sessions, dsh_home, charge, bundle=None):
                 if identity in refs and refs[identity]!=size:raise ValueError('Conflicting source image sizes.')
                 refs[identity]=size
     if not refs:return []
-    if dsh_home is None:raise ValueError('An explicit DSH home is required for image export.')
-    if os.name!='posix':raise ValueError('Stored image export currently requires Linux descriptor-relative reads.')
     result=[]
     for identity,size in refs.items():
-        sha=identity[7:];fds=[]
-        try:
-            fd=os.open(dsh_home,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW);fds.append(fd)
-            for component in ('attachments','v1','objects',sha[:2]):
-                fd=os.open(component,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW,dir_fd=fd);fds.append(fd)
-            fd=os.open(sha,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK,dir_fd=fd);fds.append(fd);before=os.fstat(fd)
-            if not stat.S_ISREG(before.st_mode) or before.st_size!=size:raise ValueError('Source image size or file type differs.')
-            with os.fdopen(os.dup(fd),'rb') as stream:raw=stream.read(size+1)
-            after=os.fstat(fd)
-            if (before.st_ino,before.st_size,before.st_mtime_ns)!=(after.st_ino,after.st_size,after.st_mtime_ns) or len(raw)!=size or hashlib.sha256(raw).hexdigest()!=sha:
-                raise ValueError('Source image changed or checksum differs.')
-            if bundle is None:item={'attachmentId':identity,'bytes':size,'data':base64.b64encode(raw).decode('ascii')}
-            else:
-                ref=bundle.put(raw);charge(raw);item={'attachmentId':identity,'bytes':size,'sha256':ref['sha256']}
-            charge(item);result.append(item)
-        finally:
-            for fd in reversed(fds):os.close(fd)
+        raw=stored_attachment_bytes(dsh_home,identity,size,'image')
+        if bundle is None:item={'attachmentId':identity,'bytes':size,'data':base64.b64encode(raw).decode('ascii')}
+        else:
+            ref=bundle.put(raw);charge(raw);item={'attachmentId':identity,'bytes':size,'sha256':ref['sha256']}
+        charge(item);result.append(item)
     return result
 
 def export_project(remote, project, dsh_home=None, bundle=None):
@@ -107,6 +136,7 @@ def export_project(remote, project, dsh_home=None, bundle=None):
             if len(related)>=MAX_RELATED_SESSIONS:raise ValueError('Related-session family exceeds project bound.')
             seen[sid]=address;child=capture(address);related.append(child);pending.append(child)
     attachments=image_bundle(sessions+related,dsh_home,charge,bundle)
+    files=file_bundle(sessions+related,dsh_home,charge,bundle)
     # Revalidate every captured cut and project membership after family capture.
     for row in sessions+related:
         if opening(row['address'])['cursor']!=row['opening']['cursor']:raise ValueError('A captured source changed before export completed.')
@@ -116,6 +146,7 @@ def export_project(remote, project, dsh_home=None, bundle=None):
     if any(sid not in final or final[sid]['running'] for sid in roots):raise ValueError('A source conversation started or disappeared during export.')
     result={'schema':'augmentor-dsh-project-export/1','workspace':workspace,'sessions':sessions,'relatedSessions':related,'archivedSessionIds':[s for s in after['archivedSessionIds'] if s in roots],'pinnedSessionIds':[s for s in after['pinnedSessionIds'] if s in roots]}
     if attachments:result['attachments']=attachments
+    if files:result['files']=files
     if bundle is None:encode_export(result)
     return result
 

@@ -30,7 +30,7 @@ import {captureSessionArchive} from './session-archive.js';
 import {HarnessDrafts} from './harness-drafts.js';
 import {SessionOrganization} from './session-organization.js';
 import {sessionFamily} from './session-family.js';
-import {inheritedDshImage,coldDshImage} from './dsh-branch-history.js';
+import {inheritedDshAttachment,coldDshAttachment} from './dsh-branch-history.js';
 import {DshArchivedFamily,type DshArchiveScope} from './dsh-archived-family.js';
 import {contextPreferences,contextPreferenceChange,CONTEXT_PREFERENCE_FIELDS} from './context-preferences.js';
 import {ShortcutPreferences} from './shortcut-preferences.js';
@@ -141,8 +141,8 @@ export class Host {
   readonly attachments=new PiAttachments(this.dirs.state,(sid,part)=>{
     const m=this.getMeta(sid);
     if(this.events(m).some(event=>event.type==='user/message'&&event.data.source?.sessionId!==sid&&(event.data.submittedContent??event.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))))return true;
-    if(!m.fork||part.type!=='image'||!m.file||!existsSync(m.file))return false;
-    const loaded=this.loaded.get(m.id);return loaded?inheritedDshImage(loaded.manager,this.dirs.state,part):coldDshImage(m.file,this.dirs.state,part);
+    if(!m.fork||!['image','file'].includes(part.type)||!m.file||!existsSync(m.file))return false;
+    const loaded=this.loaded.get(m.id);return loaded?inheritedDshAttachment(loaded.manager,this.dirs.state,part):coldDshAttachment(m.file,this.dirs.state,part);
   });
   readonly sessionExports=new SessionExports(this.dirs.state,(sid,signal,parent)=>captureSessionArchive(this,sid,signal,parent));
   readonly voice=new PiVoice(undefined,(sid,message)=>{const m=this.metadata.get(sid);if(m)try{this.append(m,'runtime/warning',{message});}catch{/* Speech diagnostics cannot change agent execution. */}});

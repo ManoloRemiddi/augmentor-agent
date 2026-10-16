@@ -169,3 +169,36 @@ project transfer follows. Use `-B` for standalone Python tool invocations from a
 sealed root, as the managed launch environment also disables bytecode writes.
 Installed adoption and owner pilot feedback remain separate gates. Voice,
 other operating systems and wider owner migration remain deferred.
+
+
+## Verbatim file objects — October 17
+
+Exports now capture referenced `file` bodies as well as stored images. Only exact
+content-addressed source `attachments/v1/file-objects` entries are opened, through
+non-following directory/file descriptors. Size, regular-file type, timestamps and
+complete SHA-256 are rechecked. File aliases, unrelated source files and the
+attachment store are not scanned. An explicit DSH home is required; missing or
+changed bodies fail the export before publication. All source cursors/membership
+are rechecked after both image and file reads.
+
+The optional `files` array is distinct from normalized image `attachments`.
+Version one stores canonical base64 with the exact `attachmentId` and `bytes`.
+Version two stores `attachmentId`, `bytes` and ordered `chunks`, each an existing
+bounded `{sha256, bytes}` object reference. Files keep the existing **20 MiB** upload
+bound; 8 MiB chunks retain the **16 MiB object** ceiling. Empty files have the
+empty-content digest and an empty chunk list. Original sanitized names remain in
+each source message, allowing multiple names for the same complete byte sequence.
+Whole-file digest, chunk order/size and every object are verified; referenced
+bytes count toward the existing **256 MiB** expanded project/batch budget.
+Manifest, record, transport and object-count bounds are unchanged.
+
+The importer validates complete bodies and exact reference fields before staging.
+It refuses missing/extra/unreferenced bodies, duplicate identities, noncanonical
+encoding, unsafe names, unknown metadata, invalid sizes and file offload flags.
+Only that parent receives matching file receipts. Child-only files stay within
+the verified archive and original read-only seat, without parent receipts or jobs.
+Full raw records and file bodies survive exact archive closure copying.
+
+[Continuation, Edit, branches and relocation](HARNESS-DSH-MIGRATION-PILOT.md#historical-file-attachments--october-17)
+retain names and use the existing verbatim store. Qualification and deployment
+scope are tracked in [the file evidence](../release/harness-dsh-files-qualification-20261017.json).

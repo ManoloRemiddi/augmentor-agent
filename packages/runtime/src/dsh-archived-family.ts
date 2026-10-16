@@ -60,8 +60,8 @@ export class DshArchivedFamily {
   try{
    if(['user/message','assistant/message','tool/result'].includes(type)){
     const content=(type==='user/message'?d:d.message)?.content;
-    if(!Array.isArray(content)||content.some((p:Data)=>!p||!['text','reasoning','image','tool-call'].includes(p.type)||['text','reasoning'].includes(p.type)&&typeof p.text!=='string'))throw Error('Unsupported historical message display.');
-    for(const p of content)if(p.type==='image')promptAttachments([p]);
+    if(!Array.isArray(content)||content.some((p:Data)=>!p||!['text','reasoning','image','file','tool-call'].includes(p.type)||['text','reasoning'].includes(p.type)&&typeof p.text!=='string'))throw Error('Unsupported historical message display.');
+    for(const p of content)if(p.type==='image'||p.type==='file')promptAttachments([p]);
    }
    if(type==='tool/call')data={toolCallId:d.callId,name:d.name,arguments:d.arguments};
    else if(type==='tool/result')data={toolCallId:d.message.toolCallId,...(recovery?{sourceToolRecovery:recovery.recovery,name:recovery.name}:{}),isError:d.message.isError===true,result:{content:d.message.content}};

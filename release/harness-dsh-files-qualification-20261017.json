@@ -1,0 +1,103 @@
+{
+  "schema": "augmentor-dsh-files-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX complete file migration; private source/ordinary/exact sealed qualification; no owner transfer or update",
+  "sourceBaseRef": "ec4bbd264ffdb0b992e63c0d07e911827a7eccdf",
+  "contract": {
+    "optionalExportField": "files",
+    "v1": "Exact canonical base64, attachmentId, bytes",
+    "v2": "Ordered bounded chunks, attachmentId, complete bytes",
+    "sourceStore": "Only digest-named attachments/v1/file-objects; no source-store or alias scan",
+    "sourceDescriptorRelativeNoFollow": true,
+    "originalSanitizedNamesRetained": true,
+    "fileBytes": [
+      0,
+      20971520
+    ],
+    "chunkBytes": 8388608,
+    "objectCeilingUnchanged": 16777216,
+    "expandedProjectBatchCeilingUnchanged": 268435456,
+    "fileObjectCount": 10000,
+    "exactWholeFileAndChunkDigestsRequired": true,
+    "perParentReceipts": true,
+    "childOnlyFiles": "Complete verified archive and original read-only seat; no parent receipts or native jobs",
+    "nativeContext": "Labelled custom historical file references with verified current-profile paths; no inline body, historical tool call or provider replay",
+    "activeFiles": {
+      "references": 256,
+      "bytes": 268435456,
+      "newUploadPickerCountUsedAsHistoryLimit": false
+    },
+    "edit": "Existing prepareEdit and seedDraft protocol retains exact file originals without model work",
+    "branches": "Selected native media plus original parent archive authority",
+    "relocation": "Current-state dynamic bindings; original state may be absent; canonical history retained",
+    "fileReadDeclaredByteBound": true,
+    "currentSdkLifecycleChanged": false,
+    "supplierVendorFilesModified": false
+  },
+  "qualification": {
+    "phase": "source and ordinary passed; exact sealed pending",
+    "workers": 2,
+    "deadlinesChanged": false,
+    "newUnitCases": 27,
+    "newSdkCases": 6,
+    "newGuiCases": 2,
+    "newExporterCases": 8,
+    "testedInputsSha256": {
+      "packages/runtime/src/attachments.ts": "00367a08f513105660f9e65e4903da295fce4853cafee1a336a21aafe78b520d",
+      "packages/runtime/src/dsh-archived-family.ts": "8effb286a744ff8516e003cf9c77178e91aa8332329de539ea60a96f78b0eaa6",
+      "packages/runtime/src/dsh-branch-history.ts": "15868ba1c4532387cdfc3a8aa01b668ae538663a8b2619bd0e10806e24c24aaf",
+      "packages/runtime/src/dsh-history-media.ts": "629a0ab43889c937055d064aacf45b8cbe2e36c959b3e0cf87e36b7d26106c73",
+      "packages/runtime/src/dsh-project-archive.ts": "58d573c58c12c4f7c87444e4e448aaf75b4f705299f1f97d831df774238ce621",
+      "packages/runtime/src/dsh-project-import.ts": "f806567ff24249274bcecb904dfdb35c104bd26d51cc2427470eb22c0f289895",
+      "packages/runtime/src/host.ts": "7a14ce15dab9ce205af28d766fdfd0c2fdbcfd6224f38cad6b7c9e97ae665641",
+      "scripts/export-dsh-project.py": "010b71c50504a04905b0d89afc150269f7670a603c8cb19aa92fd574416ed514",
+      "tests/dsh-project-files-runtime.test.mjs": "b65a66e1671e9dcc8c0174f9443637aa07f4daae6dd96f9f69dcbe0bac591627",
+      "tests/dsh-project-files.test.mjs": "f576334e4328c3ab166b3d956f23758e981d65f07eba17a6c2109c1816e8d3a8",
+      "tests/fixtures/dsh-file-project.mjs": "f4a92192975c1a41aa76a49bd427b3c4e8cfb6a152b2f5879133187e3942a411",
+      "tests/fixtures/dsh-rich-runtime.mjs": "d3ed490fbfb6f201db269545478454220632ace4a8de0a7be5ef200ae866365b",
+      "tests/fixtures/export-dsh-bundle.py": "218588b16b582a2c9bbe162bad7f99eef18458cb5eb39dbc07659f371dd29918",
+      "tests/harness-dsh-files-chromium.test.mjs": "243be6253f0a2d415772d0a538405a7ded6b849b78e0b58a7467ba38af69af27",
+      "tests/test_dsh_project_files.py": "60af3f62133814cda5d35ab1ede4f6f72f2a1d2dc35d7734e605940d4f9c4d97"
+    },
+    "sourceCheckBuildPass": true,
+    "sourceNodePass": 288,
+    "sourcePythonPass": 55,
+    "nodeFiles": 45,
+    "chromiumFiles": 14,
+    "chromiumCases": 18,
+    "skips": 0,
+    "environment": {
+      "distribution": "MX 25.3 Infinity KDE x64 (Debian 13)",
+      "node": "24.19.0",
+      "python": "3.13.5",
+      "piCodingAgent": "1.1.0",
+      "product": "0.2.13"
+    },
+    "ordinaryNodePass": 288,
+    "ordinaryPythonPass": 55,
+    "compiledFilesVerified": 1111,
+    "ordinaryUnchangedBaselineInputsVerified": 23519,
+    "sameFrozenRealPreparationAcceptedByOrdinary": true,
+    "legacyArchivedChildSnapshotsPreserved": true
+  },
+  "realFrozenComparison": {
+    "projects": 1,
+    "parents": 2,
+    "archivedChildren": 0,
+    "fileObjects": 1,
+    "precedingSealedPreparationAccepted": false,
+    "correctedSourcePreparationAccepted": true,
+    "identicalFrozenManifestAndObjects": true,
+    "scopeLimit": "Read-only export/preparation only; no real destination, model assignment or owner continuation",
+    "ownerImports": 0,
+    "modelRequests": 0,
+    "privateDataPublished": false
+  },
+  "remaining": [
+    "Guarded adoption of qualified candidate before wider migration",
+    "Owner pilot feedback before additional real projects",
+    "Native compaction summaries quoting former request-time historical file paths after relocation require dedicated qualification",
+    "Malformed tool arguments, independent source formats and two source-observation failures",
+    "Voice and later OS rollout deferred"
+  ]
+}

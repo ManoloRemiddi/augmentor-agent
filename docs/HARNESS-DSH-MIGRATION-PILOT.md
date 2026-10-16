@@ -1107,3 +1107,64 @@ files remain exact, as do the registry and installed selections. Existing runnin
 project transfer occurred. Source publication does not update either review.
 File attachments, malformed arguments/other source formats and two observation
 failures remain separate work; owner pilot feedback still gates further transfers.
+
+
+## Historical file attachments — October 17
+
+The original Chat file cards and Trajectory user attachment details retain source
+names and lengths. Complete file bodies are privately exported and imported into
+the existing verbatim attachment store with exact per-parent receipts. The
+[segmented file contract](HARNESS-DSH-PROJECT-BUNDLES.md#verbatim-file-objects--october-17)
+keeps the existing image/file/object/project bounds and rejects incomplete bodies.
+
+Native continuation stores labelled historical file references in the existing
+`augmentor.dsh-media.v1` custom records, alongside any images. It never embeds the
+file body as base64 or reconstructs an old executable tool call. The existing
+public SDK context transform verifies each authorized file and supplies its
+**current profile's** stored path before a request. Text-only models may use
+file-only history. Old system/bootstrap inputs remain omitted, and source
+replacements/cuts still decide active historical membership. Files outside a cut
+do not enter that branch's native context. Active file metadata is bounded to
+256 references/256 MiB per request; exceedances fail before provider submission
+and ask for compaction or a narrower branch. Stop is rechecked after resolution.
+
+A cold historical reply branch may resolve only exact references retained in its
+native media entries and verified in the source parent's original records.
+Receipts do not grant another conversation access. Native relocation copies the
+immutable objects/receipts/archive; dynamic file bindings resolve against the new
+state, while canonical history and literal past text remain intact. No old-state
+path needs to stay available. Changed file bytes abort before a provider call.
+File verification also stops when bytes exceed the declared length.
+
+Edit uses the existing original-input preparation and publication protocol:
+`session.prepareEdit`, then prepared branch creation with `seedDraft`. Because a
+verbatim file is its own original, its exact bytes/name can return to a private
+draft without a model request. This does not invent missing original camera
+uploads for historical images. Opening a conversation, branch, inspector, draft
+or relocated profile never automatically retries or starts historical work.
+
+The real frozen two-parent project includes one file body. The preceding sealed
+converter refuses its file part; corrected source passes read-only preparation
+on the identical manifest and exact objects. No real destination, model
+assignment, inference or further owner project transfer is created. Independently
+authored fixtures separately exercise actual Pi reads, cold/reply/Edit/relocation,
+original GUI cards/Trajectory and explicit Send. The
+[portable evidence](../release/harness-dsh-files-qualification-20261017.json)
+records final qualification and the owner adoption boundary.
+
+The file relocation checks above retain the historical media entries in active
+context. Native compaction summaries that quote a former request-time file path,
+after the original media entry leaves active context, require separate path-hint
+qualification. The existing ordinary-upload relocation map is not evidence for
+that new historical-file case. Broader migration/adoption remains open.
+
+Source check/build and a fresh ordinary package each pass **288 Node / 55 Python**
+checks on MX 25.3 KDE x64, Node 24.19.0, Python 3.13.5 and Pi 1.1.0. The Node focus
+has 45 files/fourteen Chromium files/eighteen GUI cases, two workers/no skips and
+unchanged deadlines. The same frozen real export passes ordinary preparation;
+all 1,111 compiled files match. Coverage includes 27 new unit guards, six actual
+SDK cases, two original GUI cases and eight exporter cases. The broader cohort
+found and fixed the new scan's assumption that every older archived child has a
+records array; existing archive-only snapshots remain preserved. Branch coverage
+includes user, assistant and tool file references. Exact sealed qualification and
+owner adoption remain pending; this is not bulk-migration or owner acceptance.

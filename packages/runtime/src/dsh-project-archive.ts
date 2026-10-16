@@ -64,12 +64,26 @@ export function loadDshProjectArchive(sourceFile:string,sha256:string,objectDir=
  const source:Data={...document,sessions:document.sessions.map(session),relatedSessions:document.relatedSessions.map(session)};
  const attachments=document.attachments??[];if(!Array.isArray(attachments)||attachments.length>10000)fail();
  const ids=new Set<string>();for(const row of attachments){if(!keys(row,'attachmentId,bytes,sha256')||row.attachmentId!=='sha256:'+row.sha256||ids.has(row.attachmentId)||!integer(row.bytes,1,10*1024*1024))fail();ids.add(row.attachmentId);reference({sha256:row.sha256,bytes:row.bytes});}
+ const files=document.files??[];if(!Array.isArray(files)||files.length>10000)fail();
+ const fileIds=new Set<string>();for(const row of files){
+  if(!keys(row,'attachmentId,bytes,chunks')||typeof row.attachmentId!=='string'||!/^sha256:[a-f0-9]{64}$/.test(row.attachmentId)||fileIds.has(row.attachmentId)||!integer(row.bytes,0,20*1024*1024)||!Array.isArray(row.chunks)||row.chunks.length>3)fail();
+  fileIds.add(row.attachmentId);let size=0;for(const chunk of row.chunks)size+=reference(chunk).bytes;if(size!==row.bytes)fail();
+ }
  const result={source,bytes,sha256,expandedBytes,objects,readObject};bundled.set(source,result);return result;
 }
 export function dshAttachmentBytes(source:Data,row:Data):Buffer{
  const bundle=bundled.get(source);if(bundle){if(!bundle.objects.has(row.sha256)||row.attachmentId!=='sha256:'+row.sha256)fail();return bundle.readObject({sha256:row.sha256,bytes:row.bytes});}
  return Buffer.from(row.data,'base64');
 }
+/** Files retain their complete verbatim digest across bounded object chunks. */
+export function dshFileBytes(source:Data,row:Data):Buffer{
+ const bundle=bundled.get(source);let raw:Buffer;
+ if(!integer(row.bytes,0,20*1024*1024)||typeof row.attachmentId!=='string'||!/^sha256:[a-f0-9]{64}$/.test(row.attachmentId))fail();
+ if(bundle){if(!Array.isArray(row.chunks)||row.chunks.length>3||row.chunks.some((r:Ref)=>!integer(r.bytes,1,DSH_OBJECT_BYTES))||row.chunks.reduce((n:number,r:Ref)=>n+r.bytes,0)!==row.bytes)fail();raw=Buffer.concat(row.chunks.map((ref:Ref)=>bundle.readObject(ref)));}
+ else {if(typeof row.data!=='string'||row.data.length>Math.ceil(20*1024*1024/3)*4)fail();raw=Buffer.from(row.data,'base64');if(raw.toString('base64')!==row.data)fail();}
+ if(raw.length!==row.bytes||raw.length>20*1024*1024||'sha256:'+hash(raw)!==row.attachmentId)fail();return raw;
+}
+
 function writeObject(dir:string,name:string,raw:Buffer){
  folder(dir);const path=join(dir,name);let fd:number|undefined;
  try{fd=openSync(path,constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);writeFileSync(fd,raw);fsyncSync(fd);}

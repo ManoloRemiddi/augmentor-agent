@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+DSH files: `test_dsh_project_files.py` checks exact descriptor-relative export,
+20 MiB chunking, empty bodies, source changes and refusal paths.
+`dsh-project-files.test.mjs` checks v1/v2 complete bodies, references, guards,
+source cuts, child-only scope, active context bounds and cold relocation.
+`dsh-project-files-runtime.test.mjs` uses the actual SDK/read tool for cold/reply,
+Edit draft restoration, relocation without the old state and pre-request integrity
+failure. `harness-dsh-files-chromium.test.mjs` retains original file cards,
+Trajectory details, explicit Send and reopen in both formats. Include existing
+Pi attachment, draft, migration/branch and original attachment GUI regressions.
+These use authored files/providers; real-owner continuation remains separate.
+
 DSH tool-recovery coverage: `dsh-project-tool-recovery.test.mjs` checks exact
 interrupted/forked recovery contracts, refusals, source cuts/replacements and
 archived-child labels. `dsh-project-tool-recovery-runtime.test.mjs` checks actual
