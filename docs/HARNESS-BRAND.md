@@ -1,5 +1,41 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Running-turn branding — October 16
+
+The owner reported the remaining whale-tail icon and “Deep diving” label while
+testing MX Linux. The shared Augmentor elastic circle now occupies the running
+indicator, including black outline/smoke in Light, the existing Dark palette and
+reduced-motion behavior. The indicator describes the entire running turn, so its
+label is **Working**; its existing optional timed copy is **Working for {duration}**.
+The accessible status says Working without announcing clock ticks. This change
+does not add a missing turn timestamp or claim a new timing measurement.
+
+The current application dictionary also replaces the supplier welcome slogan
+with **Build with Augmentor** and removes DSH-specific recovery/unsupported-action
+wording. The Context information card uses the Augmentor application glyph while
+retaining the third-party plugin name and source repository link. Actual DeepSeek
+provider/account names, source attribution, licences and imported historical text
+keep their identities. The existing sidebar/welcome marks and favicon were
+already Augmentor. The audit covered the mounted application bindings, selected
+supplier presentation and compiled graph; internal package identifiers and unused
+supplier translations are preserved rather than relabelled as product copy.
+
+A narrow build alias supplies the existing authored brand component to two marked
+supplier adaptations. DSH remains MIT and dsh-context Apache-2.0; original hashes,
+copyrights and licence bodies remain, with updated adapted hashes and bundled
+modification notices. No new dependency, GUI layout/CSS redesign, agent owner or
+model/GPU configuration change is involved. Shared Native/Browser presentation
+receives the source change; qualification for this increment targets MX Linux
+only, with later platforms deferred under the owner's priority.
+
+Source GUI build and **six Chromium/Pi Host cases across three files** pass,
+including active reasoning/partial output, Stop, both themes, reduced motion,
+original brand seats/actions, Context/Trajectory inspection and restart. The
+provider is an independently authored local fixture, not a live-model inference
+claim. **Sixteen** licence/private-boundary/notice cases pass. Immutable review
+staging and owner-profile continuity are recorded separately below.
+
+
 The dated logo/theme checkpoint below is superseded for runtime identity by
 [current installed appearance qualification](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification).
 Brand sources/CSS and original supplier seats remain unchanged; the authored

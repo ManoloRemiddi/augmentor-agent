@@ -309,9 +309,10 @@
     },
     {
       "path": "packages/client/ui-chat/src/client/chat/RunningWhaleTail.tsx",
-      "sha256": "0ddb0ab3819c0eb3b8a5ab96d8c3d5ada30771fa66d16e594faa5e552161905d",
+      "sha256": "17bd0f394851b4280e95f9c8a4af96979a079c249478b20df75edac8036fdea2",
       "upstreamPath": "packages/client/ui-chat/src/client/chat/RunningWhaleTail.tsx",
-      "upstreamSha256": "0ddb0ab3819c0eb3b8a5ab96d8c3d5ada30771fa66d16e594faa5e552161905d"
+      "upstreamSha256": "0ddb0ab3819c0eb3b8a5ab96d8c3d5ada30771fa66d16e594faa5e552161905d",
+      "adaptation": "Marked MIT adaptation: retain the decorative running-icon contract with the shared theme-aware, reduced-motion Augmentor circle in place of the whale."
     },
     {
       "path": "packages/client/ui-chat/src/client/chat/TurnNavigator.module.css",

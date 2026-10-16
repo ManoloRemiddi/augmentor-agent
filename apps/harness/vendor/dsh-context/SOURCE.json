@@ -283,8 +283,8 @@
       "path": "src/client/components/pluginInfo.tsx",
       "sourcePath": "src/client/components/pluginInfo.tsx",
       "sourceSha256": "5a085daed950c8f121db503ad4fc21395fa425c3e8af9419338977cd561a0007",
-      "sha256": "03acd931db90d19060dd4df0e112b3e9c96e8828e092955abed3c647aa4a6851",
-      "adaptation": "Prominently marked Pi qualification: external registry/settings hooks, DSH-only threshold or unobserved skill/fleet figures removed/marked unavailable; original visual structure preserved."
+      "sha256": "22f5565a4cb7bad47779f242fc081fb72cdbe8d995ac9e4bfc8ff320d1244ed5",
+      "adaptation": "Marked Apache-2.0 adaptation: automatic registry checks/unbound settings shortcut removed; application icon uses shared Augmentor mark while plugin identity/repository attribution remain."
     },
     {
       "path": "src/client/components/requestDetail.tsx",

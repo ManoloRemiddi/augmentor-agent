@@ -142,7 +142,7 @@ const useLayout=bind(layout),useWorkspaceView=bind(workspaceView),useWorkspaceSh
 const useRowNotice=bind(rowNotice),useArchiveRequest=bind(archiveRequest);
 const notifyRow=(kind,extra={})=>rowNotice.set({kind,...extra,seq:++noticeSeq});
 const tr=dictionary=>(key,args={})=>String(dictionary[key]??commonEn[key]??key).replace(/\{(\w+)\}/g,(_,name)=>String(args[name]??''));
-const t={conversation:tr(conversationEn),sidebar:tr(sidebarEn),workspace:tr(workspaceEn),chat:tr(chatEn),trajectory:tr(trajectoryEn),model:tr(modelEn),goal:tr(goalEn),approval:tr(approvalEn),question:tr(questionEn),common:tr(commonEn),command:tr(commandEn),menu:tr(menuEn)};
+const t={conversation:tr({...conversationEn,'hero.headline':'Build with Augmentor','error.sessionInUse':'This conversation is already open in another Harness instance. Close that instance and try again.'}),sidebar:tr(sidebarEn),workspace:tr(workspaceEn),chat:tr({...chatEn,'chat.deepDiving':'Working','chat.deepDivingFor':'Working for {duration} ···'}),trajectory:tr(trajectoryEn),model:tr(modelEn),goal:tr(goalEn),approval:tr(approvalEn),question:tr(questionEn),common:tr(commonEn),command:tr(commandEn),menu:tr(menuEn)};
 const settingsNotice=text=>controller.update({error:text});
 const harnessShortcuts=new DshShortcuts(controller,{previews:filePreviews,layout,workspaceControls:shortcuts,settingsShell,dictionaries:{workspace:workspaceEn,sidebarRight:sidebarRightEn,settings:settingsEn,layout:layoutShortcutEn}});filePreviews.useShortcuts=harnessShortcuts.useCatalog;
 const control={run:async action=>{try{return await action();}catch(error){if(!error.presentedByBranch&&!error.presentedByCreate)controller.update({error:error.message});return undefined;}}};
@@ -341,7 +341,7 @@ function App(){
   const sessionActions={t:t.workspace,usePinned:selectorFace(new Set(workspaces.pinnedSessionIds)),useArchived:selectorFace(new Set(workspaces.archivedSessionIds)),useShortcuts:harnessShortcuts.useCatalog,pinSession:sid=>pinSession(sid,'pin'),unpinSession:sid=>pinSession(sid,'unpin'),archiveSession,unarchiveSession:sid=>void control.run(()=>restoreSession(sid)),forkSession:sid=>void control.run(()=>forkLast(sid)),requestSessionRename:(sid,title)=>setDialog({kind:'rename',sid,title})};
   useLayoutEffect(()=>{harnessShortcuts.update({startSession,forkSession:sid=>forkLast(sid),archiveSession},state.phase==='ready'&&current?{...list.byId[state.sessionId],blank:composed.session.blank}:null);});
   const createWorkspace=async({path})=>controller.adoptWorkspace(path);
-  const unsupported=()=>Promise.reject(Error('This DSH operation is not yet connected to Pi. Use Full Pi record inspector in Settings for the retained Augmentor controls.'));
+  const unsupported=()=>Promise.reject(Error('This operation is not yet available in Harness. Use Full Pi record inspector in Settings for the retained Augmentor controls.'));
   const branch=seq=>{const revision=draftRev;void control.run(()=>controller.forkAt(seq,()=>draftRev===revision));};
   const edit=seq=>{const revision=draftRev,sid=controller.state.sessionId,epoch=controller.epoch;void control.run(async()=>{await draftArchive.flush(sid);if(draftRev!==revision||controller.epoch!==epoch||controller.state.sessionId!==sid)return;return controller.editAt(seq,()=>draftRev===revision);});};
   const renderMessageImages=props=><MessageImages {...props} loadImage={loadImage} t={t.conversation}/>;

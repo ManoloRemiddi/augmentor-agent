@@ -18,3 +18,5 @@ The prompt-wrapping follow-up selects the verbatim public src/host/promptInjecti
 
 
 The measured-timing follow-up updates only the already-marked overviewPanel.tsx optional seat: range-scoped Pi totals and card-only truthful labels reuse the original StatsTiming/TimingStrip/card markup and CSS. All other 107 records are unchanged. The selection remains 108 files, 92 verbatim/16 marked, under the same Apache-2.0 licence and copyright. Authored public-SDK capture/folding is separate; no upstream Host/network/price/telemetry service is mounted. [Measurement, coverage and qualification](../../../../docs/CONTEXT-TIMING.md).
+
+October 16 application branding replaces the running whale / Context application glyph through a narrow shared Augmentor brand binding. The application adapter overrides the running label and welcome tagline; provider identities, plugin names, attribution, licences and historical messages remain. Original and adapted hashes are recorded in SOURCE.json.

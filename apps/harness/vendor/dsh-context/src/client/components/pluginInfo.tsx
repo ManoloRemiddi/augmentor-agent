@@ -1,9 +1,10 @@
-// Modified by Augmentor, 2026-10-11: automatic registry checks and the unbound DSH settings shortcut removed. SPDX-License-Identifier: Apache-2.0
+// Modified by Augmentor, 2026-10-11: automatic registry checks and the unbound DSH settings shortcut removed; 2026-10-16 application mark replaced with Augmentor. SPDX-License-Identifier: Apache-2.0
 /** The card beside Context stats introducing the plugin. Metadata is baked in from package.json via tsdown `define`;
  * one live npm-registry check appends an `↑ vX.Y.Z` chip when newer. */
 
 import { type ReactElement, type ReactNode } from 'react'
-import { siDeepseek, siGithub, type SimpleIcon } from 'simple-icons'
+import { siGithub, type SimpleIcon } from 'simple-icons'
+import { AugmentorBrand } from '@augmentor-harness/brand'
 import { PLUGIN_NAME, PLUGIN_REPO, PLUGIN_REPO_SHORT, PLUGIN_VERSION } from '../meta'
 import type { ViewKit } from '../viewkit'
 
@@ -41,7 +42,7 @@ export function makePluginInfo(kit: ViewKit): () => ReactElement {
           </a>
         </div>
         <div className="lc-pi-grid">
-          {row(<SiteMark icon={siDeepseek} />, t('plugin.name'), nameValue, PLUGIN_REPO, update !== null ? nameText + ' ↑ v' + update : nameText)}
+          {row(<AugmentorBrand size={14} />, t('plugin.name'), nameValue, PLUGIN_REPO, update !== null ? nameText + ' ↑ v' + update : nameText)}
           {row(<SiteMark icon={siGithub} />, t('plugin.github'), PLUGIN_REPO_SHORT, PLUGIN_REPO, PLUGIN_REPO_SHORT)}
 
         </div>

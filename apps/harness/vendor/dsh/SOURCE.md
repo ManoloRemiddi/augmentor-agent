@@ -67,3 +67,5 @@ October 16 MX feedback marks ModelSelect for optional ordered pins/hidden filter
 The configured-catalogue follow-up marks ModelSelect and its stylesheet for an optional credentials-required sublabel. Pi filters configured providers and declared model subsets before presenting the original controls; original supplier hashes/default behaviour remain recorded. See docs/HARNESS-CONFIGURED-MODELS.md.
 
 October 16 migration pilot marks TrajectoryTable for pinned TanStack 3.13.12 compatibility. Initial virtual tail and append-follow use supported scrollToIndex rather than the unavailable scrollToEnd/newer anchoring options. The large-history crash is reproduced with authored imported tool records; original table/inspector layout, CSS, dependency versions and upstream hash remain intact.
+
+October 16 application branding replaces the running whale / Context application glyph through a narrow shared Augmentor brand binding. The application adapter overrides the running label and welcome tagline; provider identities, plugin names, attribution, licences and historical messages remain. Original and adapted hashes are recorded in SOURCE.json.
