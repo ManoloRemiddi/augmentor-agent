@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Existing MCP review configuration](MCP-TRANSPORT.md#existing-dsh-mcp-configuration-in-mx-reviews--october-16) inventories five actual DSH clients, qualifies metadata-only discovery for the two installed stdio launchers and keeps three unreachable HTTP endpoints disabled. Separate Playwright browser/output profiles preserve the original DSH profile. Web/Qt selectors expose saved On/Off state; source 28/28 Node cases (twelve files/three Chromium plus one Qt) and 41 Python checks pass. Exact packaged/adoption evidence follows separately; no owner tool/model/project action occurs.
+
 [Existing Wiki vault adoption](HARNESS-PLUGIN-PARITY.md#existing-owner-wiki-vault-in-the-mx-reviews--october-16) now connects both MX reviews to the original configured vault without moving it. Six supported tools/nine approved skills, both actual read modes, overview On/detail application, configuration backups and unchanged prior review/vault bytes are verified. Owner writes/ingest and all skill workflows remain separate; installed Agent/DSH still uses its existing setup.
 
 The [qualified shared-profile review](HARNESS-SHARED-PROFILES.md#running-mx-reviews) now runs both MX reviews on one library/memory pair: 12 prompts, 19 captured records, preserved native conversations and no gateway conflict. This supersedes their older isolated-copy/port-conflict status below; installed Agent service adoption remains separate.

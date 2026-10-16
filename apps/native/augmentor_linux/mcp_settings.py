@@ -89,7 +89,7 @@ class McpDialog(QDialog):
             self.reading=False;info,receipt,error=result
             if error:self.note.setText(error);self.controls();return
             selected=self.server.currentData();self.servers=info.get('servers',[]);self.server.blockSignals(True);self.server.clear()
-            for row in self.servers:self.server.addItem(row['name']+' · '+row['transport']+' · '+row['exposure']+' · '+str(row['toolCount'])+' tools',row['name'])
+            for row in self.servers:self.server.addItem(row['name']+' · '+('On' if row.get('enabled') else 'Off')+' · '+row['transport']+' · '+row['exposure']+' · '+str(row['toolCount'])+' tools',row['name'])
             index=self.server.findData(selected)
             if index>=0:self.server.setCurrentIndex(index)
             self.server.blockSignals(False);self.receipt=receipt;self.available=info.get('available') is True and info.get('management',{}).get('available') is True;self.blocked=info.get('management',{}).get('busy') is True

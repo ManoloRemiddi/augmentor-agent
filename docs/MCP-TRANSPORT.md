@@ -100,6 +100,58 @@ remain unqualified.
 
 # Managed MCP dispatch and failed acknowledgments
 
+## Existing DSH MCP configuration in MX reviews — October 16
+
+The current DSH web profile has five configured clients: Playwright, Blender,
+two Comfy endpoints and Unreal. The Harness reviews previously had no managed
+MCP profile. Configuration conversion retains each server name, exact endpoint
+or installed command/arguments, and converts `toolCallTimeoutMs` to Pi's seconds
+without reducing the configured duration. Streamable HTTP maps to Pi HTTP; stdio
+keeps an explicit working directory. Unsupported source fields must be reviewed,
+not silently discarded. Source configuration, paths and any credentials stay
+private. These are existing external services, not newly bundled components.
+
+At this checkpoint the three HTTP endpoints refuse a bounded TCP connection.
+They must remain stored but disabled, not claimed healthy or started by this
+migration. Do not start Comfy/Unreal or change GPU/model placement to make a
+catalogue check pass. The two installed stdio launchers answer initialization and
+`tools/list` through the existing managed transport: Playwright exposes 24 tools
+and Blender 26. No `tools/call`, browser navigation, scene mutation or provider
+request is sent. This proves protocol/catalogue compatibility, not a complete
+application workflow or continuing service health. The first probe's logging
+wrapper recursed; it is corrected outside product code and its failure retained.
+
+Playwright's original DSH `--user-data-dir` and `--output-dir` are not safe to
+share between simultaneous owners. Harness uses new private per-review browser
+and output directories; it does not copy DSH cookies, sign-ins, screenshots or
+profile files. The configured browser executable remains unchanged. Independent
+logins may therefore be required. The original DSH browser and other application
+processes remain available. Blender's already installed external helper is not
+copied or licensed for redistribution by this step; its earlier GPL/source
+qualification remains in the plugin-parity guide.
+
+The common web MCP selector and native Qt source now show each server's saved
+**On/Off** value before transport/exposure/tool count. Saved On means configured
+for connection, not observed application health. Original settings and modal
+placement remain. A new original-GUI check opens Plugins → Connected tools → MCP
+servers, changes one authored server, preserves private fields, checks both
+Light/Dark at 1280/640/420 widths, and verifies zero model/tool execution. Native
+Qt checks the same saved status labels. The original advanced inspector and
+OAuth/receipt/reload/scope cases remain.
+
+Source check/build and **28/28 Node cases across twelve files/three Chromium
+files plus one actual offscreen Qt case** pass, with unchanged two workers,
+deadlines and no skips. **41 Python launcher/deployment/licence-boundary checks**
+also pass. The missing-status control fails before correction; an initial new
+assertion wrongly expected configuration to leave no display receipts. The
+corrected assertion retains the original prefix and permits only the documented
+sign-in/configuration notices, with one explicit configuration receipt and no
+chat/model/tool event. Packaged qualification and owner profile adoption follow
+separately. MX is the actual adoption target; native installed Agent and later OS
+artifacts are not updated by a source label change.
+
+
+
 The accepted Harness migration requires unknown action outcomes to survive reconnect without replay. Pi 1.1.0's SDK retries any MCP request once after `McpSessionExpiredError`, assuming an HTTP 404 means the server did not execute it. An independently authored actual HTTP/SDK-owner fixture disproved that assumption for a server that applied a mutation before returning 404: one logical tool call changed the fixture twice. This is a reproduced integration failure, not a claim that compliant MCP servers normally behave this way.
 
 Augmentor now supplies `managedMcpTransport` through the supported `createMcpExtension({createTransport})` hook. The pinned public `@earendil-works/pi-mcp` **1.1.0** transport package is declared directly; it was already present in the production lock graph. The SDK retains its existing AgentSession, MCP clients, discovery, tool pipeline, nested calls, OAuth credentials and lifecycle. No separate agent loop or SDK-private import is added.

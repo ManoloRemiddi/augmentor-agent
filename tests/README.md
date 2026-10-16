@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Original MCP management: `harness-mcp-original-chromium.test.mjs` follows Plugins → Connected tools → MCP servers, observes saved On/Off, one explicit server change, original settings fields, both themes and 1280/640/420 containment with no model or tool call. `native-mcp.test.mjs` retains actual Qt/coherent reload checks and asserts the same saved state labels. Keep profile/configuration/management/options/loader-recovery/connection and advanced-inspector regressions with these shared controls.
+
 Wiki receipt-review Chromium navigation opens Plugins → Wiki tools & skills before the existing action inspector. Run the six-file Wiki cohort (`wiki-settings`, `wiki-scope`, `wiki-receipts`, `pi-wiki`, `harness-wiki-settings-chromium`, `harness-wiki-review-chromium`) for settings/scope/receipts/SDK and original GUI regressions. Owner vault query/configuration evidence is separate from authored mutation/unknown-outcome fixtures.
 
 Archived DSH shell status coverage extends `dsh-archived-family.test.mjs` and `harness-dsh-family-chromium.test.mjs`: Jobs is unavailable rather than an empty native catalogue, Plan/Goal stay read-only/unavailable, archive checksum/session scope apply to Jobs reads, and no native queue/compaction recovery is offered. Retain native Jobs, Fleet, compaction, branch and launcher regressions when changing these shared surfaces.

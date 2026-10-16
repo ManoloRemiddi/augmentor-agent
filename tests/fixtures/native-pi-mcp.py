@@ -57,6 +57,7 @@ try:
             dialog=None
             try:
                 dialog=window.findChildren(McpDialog)[-1];until(lambda:dialog.available and not dialog.reading,'MCP registrations');assert dialog.server.count()==3
+                for server,status in [('web','On'),('disabled','Off'),('header','Off')]:assert ' · '+status+' · ' in dialog.server.itemText(dialog.server.findData(server)), 'Saved server state must be visible before selection'
                 click(dialog.actions['login'],'Sign in');until(lambda:bool(dialog.authorization_url) and bool(dialog.receipt.get('waitingForRedirect')),'authorization URL')
                 try:urllib.request.build_opener(NoRedirect()).open(dialog.authorization_url)
                 except urllib.error.HTTPError as response:
