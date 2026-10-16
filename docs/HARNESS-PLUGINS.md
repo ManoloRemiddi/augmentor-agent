@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Existing Wiki vault adoption](HARNESS-PLUGIN-PARITY.md#existing-owner-wiki-vault-in-the-mx-reviews--october-16) now connects both MX reviews to the original configured vault without moving it. Six supported tools/nine approved skills, both actual read modes, overview On/detail application, configuration backups and unchanged prior review/vault bytes are verified. Owner writes/ingest and all skill workflows remain separate; installed Agent/DSH still uses its existing setup.
+
 The [qualified shared-profile review](HARNESS-SHARED-PROFILES.md#running-mx-reviews) now runs both MX reviews on one library/memory pair: 12 prompts, 19 captured records, preserved native conversations and no gateway conflict. This supersedes their older isolated-copy/port-conflict status below; installed Agent service adoption remains separate.
 
 # Plugins and shared writing tools
@@ -93,7 +95,7 @@ configuration, prompt contents, local paths and raw host exports stay private.
 | Adaptive Reasoning | Active | Existing Models reasoning controls, now discoverable in Plugins | Existing adapter/shared forms; actual provider thinking support still needs representative acceptance |
 | Context | Installed but currently disabled | Existing Context/Insights/sidebar/Fleet and retained Trajectory; independent supported presentation | Full copied dashboard is a Harness surface; native Agent does not gain it from a DSH package install |
 | Metafolder | Active | Existing original sidebar grouping and private profile setting; new directory entry | DSH web grouping is not a native Qt feature; physical folder moves remain unimplemented |
-| Wiki Tools / Wiki Skills | Both active | Existing six tools/nine skills and vault settings | Preserve native tool access through the selected harness; existing vault/settings/content migration remains open |
+| Wiki Tools / Wiki Skills | Both active | Existing six tools/nine skills and vault settings | Preserve native tool access through the selected harness; current MX reviews now reuse the verified existing vault; content moves and representative owner writes remain open |
 | Free Web Search | Active | Accepted tested MIT API/keyless alternatives and configuration retained | Existing model-facing search; engine health/keys and owner configuration remain separate |
 | MCP Playwright / Blender / Comfy / Unreal | Corresponding client entries active, including two Comfy entries | Existing MCP manager; directory explains connection setup | Core manager exists; live services/configuration are not copied or enabled by this UI change |
 | Voice | Legacy Resonant entry disabled; separate Augmentor companion entry active | Existing dictation settings remain under Connections | Voice acceptance and changes remain deferred at the owner's request |

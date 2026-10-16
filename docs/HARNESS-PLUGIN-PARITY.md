@@ -30,6 +30,55 @@ workflow. This register separates implemented Pi behavior, copied presentation,
 source fixtures, installed acceptance and live-service qualification. It does
 not qualify DSH retirement or infer parity from the total test count.
 
+## Existing owner Wiki vault in the MX reviews — October 16
+
+Both current reviews now use the existing Wiki vault path from the running DSH
+web profile. Read-only configuration inspection finds only that explicit path;
+query limit ten and default type-folder routing retain the supplier defaults.
+The active Wiki Tools/Skills entries and local configuration are distinct from
+package installation. DSH settings and vault files are not moved or rewritten,
+and no private plugin source is copied into this repository.
+
+The configured root is a larger personal archive, not a newly created empty
+vault. The preflight uses the exact sealed Wiki binding with read-only IO: quick
+mode reads the existing index/hot pages, and standard mode returns matches from
+an existing page. All **16 Wiki files** retain their hashes. This is mechanical
+query evidence, not an LLM inference on private knowledge or verification of all
+nine skill workflows. No scaffold, ingest, rename, archive or write is performed
+on the owner vault. Mutations and unknown-outcome review are tested only in
+independently authored temporary vaults.
+
+Before applying, all **32 existing protected review files** are copied and hash
+verified in a private backup, together with the source configuration/old settings
+and registration record. This is a configuration-change backup, not a full copy
+of the larger personal archive. `wiki.set` applies the explicit configuration
+against each exact prior revision through normal idle/queue/goal guards and SDK
+resource reload. Both running PIDs and four conversations remain; execution
+permissions, prior native/history/drafts/settings and provider configuration are
+unchanged. The two intentional additions are private `config/wiki.json` files.
+Two existing loaded conversations each expose all **nine approved Wiki skills**;
+other conversations receive the same approved resources when loaded. No owner
+conversation, model request or Wiki action receipt is created by the adoption.
+
+The original Plugins overview shows **Wiki tools & skills → On** with a usable
+switch. Its detail confirms the exact source vault path, query limit and applied
+loaded-session count. Existing tabs may need **Refresh plugin status** to observe
+another client's saved change. Turning the overview switch off uses the same
+idle/revision guards and removes the tools/skills; it keeps the vault data and
+path. Do not restore a raw configuration backup beneath a live owner.
+
+The existing Wiki receipt-review Chromium test still navigated to Plugins as if
+all forms were mounted on the overview. Source and exact-sealed preceding runs
+retain **12 passes/one navigation failure**. Its pointer route now opens the Wiki
+card before inspecting the same receipt; unknown bytes, explicit risk review,
+Trajectory, no replay, future intent and cold recovery assertions remain intact.
+The corrected source and exact packaged application each pass **13/13 cases
+across six files/two Chromium files**, unchanged two workers/deadlines/no skips.
+No runtime, GUI layout, dependency, supplier or seal bytes are changed by the
+driver correction. Actual owner GUI/preservation evidence is recorded separately.
+MX is the qualified target; installed Agent adoption, real-owner mutation and
+representative skill/companion CLI, later OS and full migration gates remain.
+
 ### Accepted Search source choice — October 14
 
 The owner confirms: **“Not sure—continue with the tested MIT alternatives.”**
