@@ -243,7 +243,7 @@ function ContextView({state}){
   },[provenance?.id,request?.id,state.sessionId]);
   return <div className="augmentor-extension"><h2>Context</h2><label>Recorded request <select value={request?.id||''} onChange={e=>set(e.target.value)}>{requests.map(r=><option key={r.id} value={r.id}>{r.data.provider}/{r.data.model} · #{r.seq}</option>)}</select></label>{!request?<p>No provider request has been recorded for this conversation.</p>:<><JsonBlock payload={request.data} label="Request settings"/><JsonBlock payload={request.payload||{available:false}} label="Retained payload identity"/>{error&&<p role="status">{error}</p>}{payload&&<><JsonBlock label="Effective provider request" payload={payload}/><JsonBlock label="Tool declarations" payload={payload.tools||[]}/>{lineage&&<><JsonBlock label="Composition coverage" payload={lineage.metadata}/>{lineage.available?Object.entries(lineage.value.snapshots||{}).map(([name,value])=><JsonBlock key={name} label={name} payload={value}/>):<p role="status">{lineage.reason}</p>}</>}</>}</>}<NativeRecords state={state}/></div>;
 }
-function NativeRecords({state}){const ref=useRef(null);useEffect(()=>{let live=true;attachNativeHistory(ref.current,{rpc:(m,p)=>controller.rpc(m,p),sessionId:state.sessionId,alive:()=>live});return()=>{live=false;ref.current?.replaceChildren();};},[state.sessionId]);return <div ref={ref}/>;}
+function NativeRecords({state}){const ref=useRef(null);useEffect(()=>{let live=true;attachNativeHistory(ref.current,{rpc:(m,p)=>controller.rpc(m,p),sessionId:state.sessionId,alive:()=>live,archived:state.capabilities?.archivedDsh===true});return()=>{live=false;ref.current?.replaceChildren();};},[state.sessionId]);return <div ref={ref}/>;}
 function PromptLibrary({close,initialTab}){
  const [dirty,setDirty]=useState(false),[confirm,setConfirm]=useState(null);
  const afterEdits=action=>{if(dirty)setConfirm(()=>action);else action();};
@@ -311,12 +311,13 @@ function CommandOverlays(){
 }
 function App(){
   const hasContextTab=useSyncExternalStore(contextTab.subscribe,contextTab.getSnapshot);
-  const hasFleetTab=useSyncExternalStore(contextTab.fleet.subscribe,contextTab.fleet.getSnapshot);
+  const fleetPreference=useSyncExternalStore(contextTab.fleet.subscribe,contextTab.fleet.getSnapshot);
   const contextPrefs=useSyncExternalStore(contextPreferences.subscribe,contextPreferences.getSnapshot);
   const metafolderState=useSyncExternalStore(metafolders.subscribe,metafolders.getSnapshot);
   const settingsState=useSyncExternalStore(settingsShell.subscribe,settingsShell.getSnapshot);
   const shortcutRename=useWorkspaceShortcuts(state=>state.renameTarget);
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
+  const hasFleetTab=fleetPreference||state.capabilities?.archivedDsh===true;
   const pickerCuration=React.useMemo(()=>({...state.catalog,unavailable:state.catalog.groups.flatMap(group=>group.models.filter(model=>model.available===false).map(model=>group.provider+'/'+model.model))}),[state.catalog]);
   useEffect(()=>{document.title=state.readOnly?'Conversation inspector · Augmentor Harness':'Augmentor Harness';},[state.readOnly]);
   React.useLayoutEffect(()=>{if(!hasContextTab&&view==='context'||!hasFleetTab&&view==='fleet')setView('chat');contextModal.sync();if(state.phase!=='ready'||state.readOnly||contextPrefs.value.insightsEntry==='hide')layout.actions.selectPanel(null);});
@@ -371,7 +372,7 @@ function App(){
       case 'rightbar':return <DshPreviewSidebar previews={filePreviews} state={state} {...owner}/>;
       case 'conversation.session.header.corner':return <DshPreviewExpand previews={filePreviews} state={state}/>;
       case 'conversation.header':return <ConversationHeader {...p}/>;
-      case 'conversation.header.leading':return state.readOnly?<span role="status" aria-label="Read-only conversation inspector" data-augmentor-access="read-only">Read-only</span>:options.fallback??null;
+      case 'conversation.header.leading':return state.readOnly?<span role="status" aria-label="Read-only conversation inspector" data-augmentor-access="read-only">Read-only{state.capabilities?.archivedDsh?' · Archived DSH cut':''}</span>:options.fallback??null;
       case 'conversation.session.header':return <ConversationSessionHeader {...p} open={open} selectView={setView}/>;
       case 'conversation.session.header.utilities':return state.readOnly||!state.capabilities?.sessionExport?null:<SessionLogDownloadHeaderAction {...p} t={tr(exportEn)} useSessionLogDownload={useSessionLogDownload} useFeedbackAvailable={selector=>selector(false)} request={sid=>control.run(()=>sessionExports.download(sid))} dismiss={sessionExports.dismiss} openFeedback={noOp}/>;
       case 'conversation.session.header.actions':return <Button variant="ghost" disabled={state.readOnly} aria-label="Rename conversation" onClick={()=>setDialog({kind:'rename',sid:state.sessionId,title:current?.title||''})}><IconEditOutlineRegular/></Button>;

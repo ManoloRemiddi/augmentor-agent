@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Archived DSH child inspection](CONTEXT-FLEET.md#archived-dsh-child-inspection--october-16) adds verified read-only source families to the original Fleet and conversation shell. Nested children, source excerpts and child-only images retain exact parent/cut/archive authority, with no Pi jobs, replay or inferred provider usage. Native worker inspection remains separate. Source/sealed qualification and deployment status are recorded in the [portable review](../release/harness-dsh-family-review-20261016.json); no owner import or review restart is part of this change. Direct imported-assistant reply branches remain an explicit migration gap. MX first; later OS artifact adoption is unqualified.
+
 # DSH project migration pilot — MX Linux
 
 The operator-approved pilot copies one inactive DSH project conversation into a

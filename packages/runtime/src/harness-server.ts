@@ -10,12 +10,13 @@ import {MAX_FRAME, identifier, request, type Data} from '../../protocol/src/inde
 import {FILE_LIMIT} from './attachments.js';
 import {PreviewReadError} from './file-preview.js';
 import type {Host} from './host.js';
+import type {DshArchiveScope} from './dsh-archived-family.js';
 
 const allowed = new Set([
   'session.fileReferences','workspaceFiles.stat','workspaceFiles.read','workspaceFiles.readBytes',
   'draft.describe','draft.text','draft.remove','draft.prepare','draft.settle','draft.acknowledge',
   'host.describe', 'session.organize', 'workspace.list', 'workspace.adopt', 'workspace.rename', 'workspace.remove', 'workspace.move', 'workspace.listDirectory', 'workspace.createDirectory', 'models.list', 'models.validate', 'setup.test', 'setup.cancel', 'setup.save',
-  'session.jobInspection', 'session.family', 'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.setPlanMode', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.skills','session.permission','session.selectPermission','session.planMode', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
+  'session.archiveInspection','session.archiveHistory','session.jobInspection', 'session.family', 'session.jobs', 'session.job', 'session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload', 'session.startJob', 'session.cancelJob', 'session.removeJob', 'session.waitJob', 'session.list', 'session.create', 'session.setPlanMode', 'session.updateGoal', 'session.history', 'session.nativeHistory', 'session.nativeRead', 'session.goal', 'session.skills','session.permission','session.selectPermission','session.planMode', 'session.plan', 'session.originalSearch', 'session.originalRead', 'session.mcpInfo', 'session.mcpProfile', 'session.mcpConfigure', 'session.mcpAction', 'session.mcpActionStatus', 'session.mcpCancelAction', 'session.mcpSubmitRedirect', 'session.models', 'session.selectModel',
   'session.reasoning', 'session.selectReasoning', 'reasoning.describe', 'reasoning.configure',
   'prompt.improve', 'prompt.cancelImprovement', 'prompt.improvementStatus',
   'session.prompt', 'session.cancel', 'session.prepareBranch', 'session.prepareEdit', 'session.settleBranch', 'session.branchRecovery', 'session.branch', 'session.rename', 'session.trimTools', 'chats.saved',
@@ -27,8 +28,8 @@ const allowed = new Set([
   'models.accountDescribe','models.accountStart','models.accountStatus','models.accountRespond','models.accountCancel',
 ]);
 interface Watch {sessionId: string; seen: number; interactive:boolean}
-type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number};
-const inspectionReads=new Set(['session.jobInspection','session.family','session.jobs','session.job','session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.permission','session.planMode', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','session.compaction','observation.describe','observation.list', 'observation.search','observation.payload']);
+type Access={mode:'operator';token:string}|{mode:'read-only';token:string;sessionId:string;expiresAt:number;archive?:DshArchiveScope};
+const inspectionReads=new Set(['session.archiveEntries','session.archiveRead','session.archiveInspection','session.archiveHistory','session.jobInspection','session.family','session.jobs','session.job','session.jobHistory', 'session.jobNativeHistory', 'session.jobNativeRead', 'session.jobObservations', 'session.jobPayload','host.describe','models.list','session.list','session.history','session.nativeHistory','session.nativeRead', 'session.goal', 'session.permission','session.planMode', 'session.plan', 'session.originalSearch', 'session.originalRead','session.mcpInfo','session.models','session.queue','session.compaction','observation.describe','observation.list', 'observation.search','observation.payload']);
 interface LiveFrame {seq: number; sessionId: string; frame: Data}
 const LIVE_BYTES = 16 * 1024 * 1024;
 
@@ -62,14 +63,14 @@ export class HarnessServer {
     }
     return [...this.watches.values()].some(watch => watch.sessionId === sessionId&&watch.interactive);
   }
-  openInspection(sessionId:string,through?:number){
-    this.host.getMeta(sessionId);
+  openInspection(sessionId:string,through?:number,archive?:DshArchiveScope){
+    if(archive)this.host.archivedSeat(archive);else this.host.getMeta(sessionId);
     for(const [token,scope] of this.inspections)if(scope.expiresAt<=Date.now())this.inspections.delete(token);
     if(!this.base)throw Error('The conversation inspector is not available.');
     if(this.inspections.size>=128)throw Error('Too many active inspector links. Wait for a link to expire or restart the Pi runtime while idle.');
     const token=randomBytes(32).toString('hex'),expiresAt=Math.min(Date.now()+4*60*60*1000,through??Infinity);
     if(!Number.isFinite(expiresAt)||expiresAt<=Date.now())throw Error('The parent inspector has expired. Open a fresh parent link.');
-    this.inspections.set(token,{mode:'read-only',token,sessionId,expiresAt});
+    this.inspections.set(token,{mode:'read-only',token,sessionId,expiresAt,...(archive?{archive}:{})});
     return {url:this.base+'/#token='+token+'&session='+encodeURIComponent(sessionId)+'&view=trajectory',origin:this.base,sessionId,mode:'read-only',expiresAt};
   }
   publish(sessionId: string, frame: Data) {
@@ -93,9 +94,35 @@ export class HarnessServer {
   }
   private watchKey(access:Access,clientId:string){return access.mode==='operator'?clientId:access.token+':'+clientId;}
   private scopedSession(access:Access,sessionId:unknown){if(access.mode==='read-only'&&sessionId!==access.sessionId)throw Error('This inspector can read only its selected conversation.');}
+  private archiveRead(access:Extract<Access,{mode:'read-only'}>,method:string,p:Data){
+    const scope=access.archive!,family=this.host.archivedSeat(scope),row=family.seat(scope),unavailable={available:false,reason:'This is an archived DSH cut, without a native Pi session or captured provider request.'};
+    const children=family.items(scope.sessionId),queue={sessionId:scope.sessionId,revision:0,paused:true,items:[],interrupted:[],busy:false};
+    switch(method){
+      case 'host.describe':return {workspace:row.opening.header.cwd??'',capabilities:{inspection:true,archivedDsh:true}};
+      case 'models.list':return {groups:[],pinned:[],hidden:[],failures:[],default:null};
+      case 'session.list':return {items:[{sessionId:scope.sessionId,title:typeof row.opening.projections?.values?.title==='string'?row.opening.projections.values.title:'Archived DSH child',cwd:row.opening.header.cwd??'',saved:true,running:false,blank:false,updatedAt:row.records.at(-1)?.event.time??0}]};
+      case 'session.history':return family.history(scope,p);
+      case 'session.archiveEntries':return family.originals(scope,p);
+      case 'session.archiveRead':return family.original(scope,p);
+      case 'session.models':return {current:null};
+      case 'session.queue':return queue;
+      case 'observation.list':return {records:[],hasMore:false,coverage:unavailable};
+      case 'observation.describe':return {...unavailable,capabilities:{}};
+      case 'session.goal':return {...unavailable,goal:null,activation:'disarmed'};
+      case 'session.family':return {available:true,items:[{sessionId:scope.sessionId,relation:'root',title:typeof row.opening.projections?.values?.title==='string'?row.opening.projections.values.title:'Archived DSH child',cwd:row.opening.header.cwd??'',running:false,updatedAt:row.records.at(-1)?.event.time??0},...children],coverage:{retainedJobs:0,agentJobs:0,verifiedChildren:0,pendingChildren:0,unavailableChildren:0,archivedChildren:children.length,archiveAvailable:true}};
+      case 'session.archiveHistory':case 'session.archiveInspection':{
+        if(!children.some(child=>child.sessionId===p.childId))throw Error('The child does not belong to this archived inspection subtree.');
+        const child=family.scope(p.childId);return method==='session.archiveHistory'?family.history(child,p):this.openInspection(child.sessionId,access.expiresAt,child);
+      }
+      case 'session.compaction':case 'session.plan':case 'session.planMode':case 'session.nativeHistory':case 'session.nativeRead':case 'session.originalSearch':case 'session.originalRead':case 'observation.payload':case 'observation.search':return unavailable;
+      default:throw Error('This archived DSH inspector is read-only and cannot access live Pi resources.');
+    }
+  }
   private async inspect(access:Extract<Access,{mode:'read-only'}>,method:string,params:Data,id:string){
     if(!inspectionReads.has(method))throw Error('This conversation inspector is read-only.');
     if(method.startsWith('session.')&&method!=='session.list'||method.startsWith('observation.')&&method!=='observation.describe')this.scopedSession(access,params.sessionId);
+    if(access.archive)return this.archiveRead(access,method,params);
+    if(method==='session.archiveInspection'){const scope=this.host.archivedTarget(params.sessionId,params.childId);return this.openInspection(scope.sessionId,access.expiresAt,scope);}
     if(method==='session.jobInspection')return this.openInspection(this.host.jobInspectionTarget(params.sessionId,params.jobId),access.expiresAt);
     const result=await this.host.dispatch(method,params,id),meta=this.host.getMeta(access.sessionId);
     if(method==='session.list')return {items:meta.delegation?[this.host.inspectionSessionRow(access.sessionId)]:result.items.filter((row:Data)=>row.sessionId===access.sessionId)};
@@ -207,14 +234,14 @@ export class HarnessServer {
         }
         if(req.method==='GET'&&url.pathname==='/api/attachments/image'){
           const sid=identifier(url.searchParams.get('sessionId'));this.scopedSession(access,sid);
-          const ref=JSON.parse(url.searchParams.get('ref')??'null'),stored=await this.host.attachmentImage(sid,ref);
+          const ref=JSON.parse(url.searchParams.get('ref')??'null'),stored=access.mode==='read-only'&&access.archive?await this.host.archivedSeat(access.archive).image(access.archive,ref):await this.host.attachmentImage(sid,ref);
           res.writeHead(200,{'Content-Type':stored.ref.mediaType,'Content-Length':stored.data.byteLength});res.end(stored.data);return;
         }
         if (req.method === 'GET' && url.pathname === '/api/events') {
           const sessionId = identifier(url.searchParams.get('sessionId'));
           const clientId = identifier(url.searchParams.get('clientId'));
           this.scopedSession(access,sessionId);
-          this.host.getMeta(sessionId);
+          if(access.mode==='read-only'&&access.archive)this.host.archivedSeat(access.archive);else this.host.getMeta(sessionId);
           const watch = this.watches.get(this.watchKey(access,clientId));
           if (!watch || watch.sessionId !== sessionId) throw new Error('Subscribe to this session before polling');
           watch.seen = Date.now();
@@ -254,10 +281,10 @@ export class HarnessServer {
           if (rpc.method === 'events.subscribe') {
             const sessionId = identifier(params.sessionId), clientId = identifier(params.clientId);
             this.scopedSession(access,sessionId);
-            this.host.getMeta(sessionId);
+            if(access.mode==='read-only'&&access.archive)this.host.archivedSeat(access.archive);else this.host.getMeta(sessionId);
             this.watches.set(this.watchKey(access,clientId), {sessionId, seen: Date.now(),interactive:access.mode==='operator'});
             this.send(res, 200, {id: rpc.id, result: {subscribed: true, cursor: this.sequence,
-              queue:{sessionId,...this.host.queueSnapshot(sessionId)},pending: access.mode==='operator'?this.host.interactions.frames(sessionId):[]}});
+              queue:access.mode==='read-only'&&access.archive?this.archiveRead(access,'session.queue',{}):{sessionId,...this.host.queueSnapshot(sessionId)},pending: access.mode==='operator'?this.host.interactions.frames(sessionId):[]}});
             return;
           }
           if(access.mode==='read-only'){const result=await this.inspect(access,rpc.method,params,rpc.id);this.send(res,200,{id:rpc.id,result});return;}
@@ -270,6 +297,7 @@ export class HarnessServer {
           let result;
           if(['workspaceFiles.stat','workspaceFiles.read','workspaceFiles.readBytes'].includes(rpc.method)){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{const paramsRead=rpc.method==='workspaceFiles.readBytes'&&params.range===undefined?{...params,range:{offset:0,length:256*1024}}:params;try{result={ok:true,value:await this.host.previewFile(params.sessionId,rpc.method==='workspaceFiles.stat'?'stat':rpc.method==='workspaceFiles.read'?'read':'bytes',paramsRead,abort.signal)};}catch(error){const e=error as any;result={ok:false,error:{code:e.code??'gateway/internal',message:e.message,details:e.details??{}}};}}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
           else if(rpc.method==='session.fileReferences'){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{result=await this.host.listFileReferences(params.sessionId,params.query,abort.signal);}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
+          else if(rpc.method==='session.archiveInspection'){const scope=this.host.archivedTarget(params.sessionId,params.childId);result=this.openInspection(scope.sessionId,undefined,scope);}
           else if(rpc.method==='session.jobInspection')result=this.openInspection(this.host.jobInspectionTarget(params.sessionId,params.jobId));
           else if(rpc.method==='models.settingsDiscover'){const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};req.once('aborted',cancel);res.once('close',cancel);try{result=await this.host.discoverModels(params.request??{},abort.signal);}finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}}
           else result = await this.host.dispatch(rpc.method, params, rpc.id);

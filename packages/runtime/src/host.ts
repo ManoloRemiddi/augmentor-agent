@@ -30,6 +30,7 @@ import {captureSessionArchive} from './session-archive.js';
 import {HarnessDrafts} from './harness-drafts.js';
 import {SessionOrganization} from './session-organization.js';
 import {sessionFamily} from './session-family.js';
+import {DshArchivedFamily,type DshArchiveScope} from './dsh-archived-family.js';
 import {contextPreferences,contextPreferenceChange,CONTEXT_PREFERENCE_FIELDS} from './context-preferences.js';
 import {ShortcutPreferences} from './shortcut-preferences.js';
 import {ModelSettings} from './model-settings.js';
@@ -427,6 +428,15 @@ export class Host {
     if(!['delegate','desktop'].includes(job.spec.kind)||!child||child.id===parent.id||child.delegation?.parentId!==parent.id||child.delegation.jobId!==job.id)throw Error('This saved job has no verified child conversation.');
     return child.id;
   }
+  archivedFamily(ownerId:unknown){
+    const m=this.getMeta(ownerId);if(m.delegation||!m.file||!existsSync(m.file))return null;
+    const native=new NativeHistory(m.file,join(this.dirs.state,'native-index',m.id));
+    const binding=native.latestCustom('augmentor.dsh-import.v1',this.loaded.get(m.id)?.manager.getLeafId());
+    if(!binding.available)throw Error(binding.reason);if(!binding.entry)return null;
+    return new DshArchivedFamily(this.dirs.state,m.id,binding.entry.data as Data,this.events(m));
+  }
+  archivedSeat(scope:DshArchiveScope){const family=this.archivedFamily(scope.ownerId);if(!family)throw Error('The archived DSH family is no longer available.');family.seat(scope);return family;}
+  archivedTarget(parentId:unknown,childId:unknown){const family=this.archivedFamily(parentId);if(!family)throw Error('No recorded DSH family belongs to this conversation.');return family.scope(childId);}
   inspectionSessionRow(id:unknown){
     const m=this.getMeta(id);let running=m.running;
     if(m.delegation){try{const job=this.jobs.lookup(m.delegation.parentId,m.delegation.jobId);running=job.childId===m.id&&['starting','running','stopping'].includes(job.state);}catch{running=false;}}
@@ -1018,7 +1028,9 @@ export class Host {
       });
       this.queue(m).pause();return accepted;
     }
-    case 'session.family':{const m=this.getMeta(p.sessionId);return sessionFamily(m,this.jobs.list(m.id),sid=>this.metadata.get(sid),this.jobs.problem);}
+    case 'session.family':{const m=this.getMeta(p.sessionId),result=sessionFamily(m,this.jobs.list(m.id),sid=>this.metadata.get(sid),this.jobs.problem);if(!result.available)return result;
+      try{const archive=this.archivedFamily(m.id),items=archive?.items()??[];return {...result,items:[...result.items,...items],coverage:{...result.coverage,archivedChildren:items.length,archiveAvailable:true,archiveScope:'visible parent catalogues and verified recursive source addresses; no live Pi jobs or usage'}};}catch{return {...result,coverage:{...result.coverage,archivedChildren:0,archiveAvailable:false,archiveReason:'Archived DSH family unavailable; exact source preserved. Native workers are unaffected.'}};}}
+    case 'session.archiveHistory':{const scope=this.archivedTarget(p.sessionId,p.childId);return this.archivedSeat(scope).history(scope,p);}
     case 'session.jobs':{const m=this.getMeta(p.sessionId);return {available:!this.jobs.problem,reason:this.jobs.problem,items:this.jobs.list(m.id),scope:'exact-parent-conversation; reported producer outcomes; reads do not add usage'};}
     case 'session.job':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));return {job,output:this.jobs.output(m.id,job.id,p.from)};}
     case 'session.jobHistory':{const m=this.getMeta(p.sessionId),job=this.jobs.lookup(m.id,identifier(p.jobId));if(!job.childId)return {available:false,reason:'This job has no delegated conversation.'};const childId=this.jobInspectionTarget(m.id,job.id);return {available:true,childId,...this.history(this.getMeta(childId)).page(p.maxMessages,p.beforeSeq)};}

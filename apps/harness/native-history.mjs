@@ -4,10 +4,10 @@ const node=(tag,text)=>{const element=document.createElement(tag);if(text!==unde
 /** Bounded pages/excerpts from original conversation storage. No inference or
  * reconstruction of an uncaptured effective request. Keep selection on paging.
  */
-export function attachNativeHistory(container,{rpc,sessionId,alive,native,lineage}){
- const section=node('section'),list=node('div'),status=node('p'),viewer=node('div'),load=node('button','Read saved Pi entries'),recent=node('button','Recent entries'),older=node('button','Earlier entries');
+export function attachNativeHistory(container,{rpc,sessionId,alive,native,lineage,archived=false}){
+ const section=node('section'),list=node('div'),status=node('p'),viewer=node('div'),load=node('button',archived?'Read archived DSH records':'Read saved Pi entries'),recent=node('button','Recent entries'),older=node('button','Earlier entries');
  section.className='native-history';list.className='native-entry-page';viewer.className='native-entry-viewer';
- section.append(node('h3','Saved conversation originals'),node('p','These originals come from saved conversation history, including when context capture was off. Edits and added instructions can change what reaches the model.'),load,recent,older,status,list,viewer);container.append(section);recent.hidden=true;older.hidden=true;
+ section.append(node('h3','Saved conversation originals'),node('p',archived?'Serialized source records from a checksum-verified DSH archive. Original whitespace stays in the raw archive. These records do not establish effective provider input.':'These originals come from saved conversation history, including when context capture was off. Edits and added instructions can change what reaches the model.'),load,recent,older,status,list,viewer);container.append(section);recent.hidden=true;older.hidden=true;
  let pageEpoch=0,readEpoch=0,cursor,selectedId,selectedSource='pi',reading=false,displayed;
  const identity={...(native?.sessionId?{nativeSessionId:native.sessionId}:{}),...(native?.leafId!==undefined?{leafId:native.leafId}:{})};
  const mark=()=>section.querySelectorAll('button[data-entry-id]').forEach(button=>button.classList.toggle('selected',button.dataset.entryId===selectedId&&(button.dataset.source||'pi')===selectedSource));
@@ -24,7 +24,7 @@ export function attachNativeHistory(container,{rpc,sessionId,alive,native,lineag
   const epoch=++readEpoch;reading=true;selectedId=id;selectedSource=original?.source||'pi';const params={sessionId,entryId:id,offset:at,...(original?original:identity.nativeSessionId?{nativeSessionId:identity.nativeSessionId}:{}),...(pathHash?{pathHash}:{}),...(entryHash?{entryHash}:{})};
   viewer.replaceChildren(node('p','Reading saved entry…'));
   try{
-   const result=await rpc(original?'session.originalRead':'session.nativeRead',params);if(!alive()||epoch!==readEpoch)return;
+   const result=await rpc(archived?'session.archiveRead':original?'session.originalRead':'session.nativeRead',params);if(!alive()||epoch!==readEpoch)return;
    reading=false;if(!result.available){displayed=undefined;viewer.replaceChildren(node('p',result.reason));return;}
    if(result.entryId!==id||(original&&(result.source!==original.source||result.sessionIdentity!==original.sessionIdentity)))throw Error('Original entry reply belongs to another source or conversation.');
    displayed={id,at,result,original,offsets};render(displayed);
@@ -33,9 +33,9 @@ export function attachNativeHistory(container,{rpc,sessionId,alive,native,lineag
  const page=async(reset=false)=>{
   const epoch=++pageEpoch;load.disabled=true;older.disabled=true;
   try{
-   const result=await rpc('session.nativeHistory',{sessionId,limit:50,...identity,...(!reset&&cursor?{cursor}:{})});if(!alive()||epoch!==pageEpoch)return;
+   const result=await rpc(archived?'session.archiveEntries':'session.nativeHistory',{sessionId,limit:50,...identity,...(!reset&&cursor?{cursor}:{})});if(!alive()||epoch!==pageEpoch)return;
    if(!result.available){status.textContent=result.reason;return;}
-   status.textContent=result.entries.length+' saved entries on the selected ancestry'+(result.coverage.incompleteTailBytes?' · incomplete tail preserved':'')+'.';
+   status.textContent=result.entries.length+(archived?' archived DSH source records':' saved entries on the selected ancestry')+(result.coverage.incompleteTailBytes?' · incomplete tail preserved':'')+'.';
    // Only the current metadata page is rendered. The independent selected
    // excerpt stays attached while older pages replace these bounded buttons.
    list.replaceChildren(...result.entries.map(entry=>{const button=node('button',(entry.role||entry.type)+' · '+entry.entryId);button.dataset.entryId=entry.entryId;button.classList.toggle('selected',selectedSource==='pi'&&entry.entryId===selectedId);button.onclick=()=>void read(entry.entryId,entry.pathHash,entry.entryHash);return button;}));
@@ -51,7 +51,7 @@ export function attachNativeHistory(container,{rpc,sessionId,alive,native,lineag
   if(lineage.entries.length>200)section.insertBefore(node('p','The first 200 recorded sources are listed. Use saved-entry pages to browse the full ancestry.'),status);
  }
  const search=node('div');section.insertBefore(search,viewer);
- attachOriginalSearch(search,{rpc,sessionId,alive,identity,selected:()=>({id:selectedId,source:selectedSource}),open:(entry,source,sessionIdentity)=>void read(entry.entryId,entry.pathHash,entry.entryHash,0,{source,sessionIdentity}),invalidateRead:()=>{
+ if(!archived)attachOriginalSearch(search,{rpc,sessionId,alive,identity,selected:()=>({id:selectedId,source:selectedSource}),open:(entry,source,sessionIdentity)=>void read(entry.entryId,entry.pathHash,entry.entryHash,0,{source,sessionIdentity}),invalidateRead:()=>{
   if(!reading)return;++readEpoch;reading=false;if(displayed){selectedId=displayed.id;selectedSource=displayed.original?.source||'pi';render(displayed);}else viewer.replaceChildren();viewer.append(node('p','Pending original read cancelled after the search changed.'));
  }});
  return section;

@@ -165,7 +165,7 @@ export class NativeHistory {
   /** Bounded cold projection of one custom state on the selected ancestry.
    * Never opens/migrates the SDK owner or rewrites the native source. */
   latestCustom(customType:string,leafId?:string|null){
-    if(this.displaySessionId||typeof customType!=='string'||!/^[A-Za-z0-9/_-]{1,128}$/.test(customType))throw Error('Choose a supported native custom type.');
+    if(this.displaySessionId||typeof customType!=='string'||!/^[A-Za-z0-9/_.-]{1,128}$/.test(customType))throw Error('Choose a supported native custom type.');
     return this.withIndex((fd,lookup,s)=>{
       let position=leafId===null?-1:leafId===undefined?s.count-1:this.position(leafId,lookup,s),scanned=0,customBytes=0;
       const verify=this.verifier(s);let result:{available:true;entry:Extract<SessionEntry,{type:'custom'}>|null}|{available:false;reason:string}|undefined;

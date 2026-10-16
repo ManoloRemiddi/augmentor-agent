@@ -4,6 +4,73 @@
 
 # Original Fleet on Pi
 
+## Archived DSH child inspection — October 16
+
+Imported project families now have a separate **read-only archive** path in the
+original Fleet presentation. Settings → Plugins → Context & insights → Fleet tab
+→ Show exposes recorded children alongside retained native Pi workers. Select a
+child, then **Open session** for the original Chat/Trajectory/Context shell.
+The header says **Archived DSH cut**, the composer is disabled, and Fleet in that
+inspector exposes only its recorded descendants. Empty children remain inspectable.
+The Context originals disclosure pages **Read archived DSH records** and bounded
+UTF-8 excerpts of their serialized source records. JSON whitespace is normalized
+in excerpts; the complete raw export stays byte-exact in its private archive.
+There is no archived search index or reconstruction of effective provider input.
+
+A selected native `augmentor.dsh-import.v1` entry binds the SHA-256, source parent,
+source cut and exact archive-relative name. Native inspection uses the bounded
+selected-ancestry reader (4,096 entries / 4 MiB custom bytes), without loading an
+AgentSession. Each family/read/link/image/poll revalidates the private, owned,
+unlinked, checksum-verified **32 MiB** archive. Parent display ancestry must retain
+the matching original `subagent/catalog` provenance; branches cut before that
+catalogue cannot discover future children. Related source addresses, modes,
+contiguous complete cuts, uniqueness and acyclic ownership must agree, including
+nested children (at most 32 per exported project / 30,000 records per source).
+Seed-lineage `header.parentSession` is not a spawn-ownership proof.
+
+Archive identities include the native owner, archive hash and source child.
+They never enter Host metadata, the workspace conversation list, Pi jobs, memory
+or execution accounting. Inspector tokens expire within four hours and cannot
+outlive the parent token. Child inspectors cannot widen to parents, siblings,
+settings, drafts, files or live jobs. Image reads require that exact child's
+original reference and verified bundle bytes; format/dimensions/pixel limits are
+checked before serving. No parent image receipt is created for a child-only image.
+Native Pi worker inspection retains its existing job/delegation proof and scope.
+
+The original graph has no provider composition or token totals for archived
+children. Reported source outcomes are not verified task success; incomplete
+stable cuts stay historical, with no request replay or resumable action. Unknown
+records remain available through originals. Missing, corrupted, ambiguous or
+older opaque `relatedSessions` formats disable archive coverage with an explicit
+notice; native workers and the existing imported parent remain available.
+
+The authored fixtures cover real Host/cold reopening, empty and interrupted
+children, nested ownership, missing/duplicate/cyclic/conflicting addresses, source
+cut exclusion, symlink refusal, corruption, foreign/parent image denial and narrower
+HTTP scopes. Chromium drives the original parent Fleet → actual child window →
+tools/image/Context originals → nested Fleet/window, with no model request, old-tool
+execution, memory capture or archive-inspector native writes. Ordinary operator
+opening still performs the existing parent SDK initialization; its old native
+prefix is preserved and the archive inspector causes no subsequent native writes.
+`tests/harness-fleet-chromium.test.mjs` retains native-worker assertions and now
+navigates through the already-reorganized Context & insights plugin detail.
+The [qualification record](../release/harness-dsh-family-review-20261016.json)
+tracks exact source/seal, cohort, test environment and adoption separately.
+Source build and 294/294 Node cases across 62 files (18 actual Chromium files),
+plus sixteen licence/private-boundary/notice Python cases, pass. The first
+cohort retained 293 passes and one missing-QtTest environment failure. The
+existing isolated pinned PySide6-Essentials 6.8.2.1 environment passes the
+Native inspector focus and the complete unchanged cohort. Packaging is separate.
+
+**Remaining migration gate:** direct reply-branching at an imported DSH assistant
+message currently fails because that historical reply is a labelled custom native
+record, not a Pi assistant message. This pass qualifies the real pre-catalogue
+user-edit branch boundary; it does not claim imported-reply branch parity.
+Source replacement/compaction originals are inspectable, but archived child
+continuation, historical provider reconstruction, Teams/mailbox functionality and
+later OS artifact adoption are not provided. Keep the owner pilot and remaining
+DSH projects unchanged until these migration gates and owner feedback are reviewed.
+
 ## Installed MX qualification — October 12
 
 Corrected tested runtime **a449d28b90e0d20877daae51a7075b765ce3ad12** is
