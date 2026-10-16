@@ -1,6 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current guarded-memory MX review](HARNESS-MX-REVIEW.md#guarded-automatic-memory-review--october-16)
+[Current persona/metrics MX review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
+**20261016-083019-0c2b4855**, public artifact **f073d195** / application **ae951211**,
+runs as a separate unselected browser owner. Source/fresh ordinary/exact sealed
+target each pass 793/two existing optional skips, 140 files/all 58 Harness Chromium
+files, unchanged two workers/bounds. All 24,540 sealed/1,069 compiled inputs verify
+after exact-sealed Qwen persona/metrics proofs and initial original-GUI owner QA.
+Both themes, expanded/collapsed/welcome marks, 84 visible Settings text rows and
+limited browser network scope pass; no initial owner model/audio/session work.
+Its fresh empty memory engine/volume uses explicit memory-only off/backport;
+cached CPU recognition 0.1.22 is reused with 70 package inputs verified. Fourteen
+seals/fifteen reviews plus recognition, selection, canonical/private changes and
+model/service hashes remain preserved. This stages a private review; installed
+activation, merge, public redistribution and owner acceptance remain separate.
+The broader hosted HTML dependency-reload CDP timeout remains unresolved; this
+private review qualification does not authorize installed promotion.
+[Portable evidence](../release/harness-persona-metrics-review-20261016.json).
+
+[Earlier guarded-memory MX review](HARNESS-MX-REVIEW.md#guarded-automatic-memory-review--october-16)
 **20261016-050949-2145f2db** / application **b7e0afaa** runs unselected, with an
 independent empty memory profile/engine and explicit memory-only off. Source/
 ordinary/sealed-target each pass 761/two existing optional skips, unchanged bounds;

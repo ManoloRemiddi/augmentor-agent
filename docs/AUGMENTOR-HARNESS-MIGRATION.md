@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX review and acceptance scope](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
+records private **20261016-083019-0c2b4855**, public artifact **f073d195** /
+application **ae951211**, retaining the original GUI, adopted Apache-2.0 Context
+dashboard, selected MIT Search alternatives and existing controls, now including
+shared persona/native response metrics. Source/ordinary/sealed each pass 793/two
+existing skips and exact-sealed Qwen checks pass; initial empty-profile GUI QA
+preserves existing installations and reviews. Earlier proposal/checkpoint text
+below retains its dated scope. Use the maintained subsystem and review guides
+for current implementation status. Owner feedback, full voice, migration,
+distribution and later-platform requirements remain open; DSH is preserved.
+
 [Session-export archive foundation](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)
 adds an immutable, verified snapshot API and a selected MIT DSH bounded ZIP
 producer, with private cleanup and joined compression/cancellation. At **46ad4a9**,

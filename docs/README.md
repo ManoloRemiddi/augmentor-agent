@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX persona/metrics review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
+**20261016-083019-0c2b4855** runs public **f073d195/application ae951211** as a
+separate unselected owner. Source/ordinary/exact sealed each pass 793/two existing
+skips, all 58 Harness Chromium files. Exact-sealed Qwen persona/context/Edit and
+metrics proofs, original Light/Dark/expanded-logo/84-text-row QA and all 24,540
+sealed/1,069 compiled inputs pass. Fourteen seals/fifteen reviews plus recognition,
+selection, canonical/private changes and model/service hashes remain preserved.
+Owner feedback, full voice/migration/distribution/later platforms stay open.
+The wider hosted f073 Node run retains an HTML dependency-reload CDP timeout,
+with cause unproven; local passing cohorts do not close that CI gate.
+[Portable review](../release/harness-persona-metrics-review-20261016.json).
+
 [Pi response metrics](PI-RESPONSE-METRICS.md) binds the existing response-preview
 workflow to exact native assistant messages, with separate client/server timing
 and original Trajectory presentation. Source/fresh ordinary each pass 793/two

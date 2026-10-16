@@ -1,5 +1,35 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX persona/metrics review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
+**20261016-083019-0c2b4855**, public artifact **f073d195** / application **ae951211**,
+runs unselected with original GUI and shared instructions/response metrics.
+Source/ordinary/exact sealed each pass **793/two existing optional skips**, 140
+files/all 58 Harness Chromium files, two workers/unchanged bounds; nineteen licence/
+private-source cases pass. Exact-sealed Qwen persona/context/prior read/Edit and
+same-step native response metrics/cold reopen pass in separate synthetic profiles.
+Initial owner QA creates zero sessions/events/model/tool/audio work; original
+Light/Dark, transparent 2px expanded/collapsed/welcome marks, 36 General/48 Plugins
+visible text rows, account/permission confirmation, memory pause/resume and cached
+CPU recognition pass. Limited owner welcome/settings browser scope makes zero
+external requests; no global/backend egress claim. All **24,540 sealed/1,069 compiled**,
+3,430 public-source/37,629 regular dependency inputs and 834 GUI app/supplier sources
+verify; production Node/dependencies/components remain exact. New empty installer-
+owned memory engine/volume uses explicit off/backport; original default remains.
+Existing private recognition 0.1.22 is reused; all 70 package inputs match its
+qualified archive without copying private code/fixtures to public source/CI.
+Fourteen seals/fifteen owners plus recognition, selection, 38 canonical/four private
+changes and six config hashes stay preserved. Panel opening is queued, not owner
+interaction; use the private chat link. Qwen online/Breeze prerequisite unmet, no
+retry/tuning/eviction. Physical feedback, broader provider/provenance, full voice,
+migration/distribution/later platforms remain open. No installed activation,
+merge/public binary/DSH retirement. [Portable review](../release/harness-persona-metrics-review-20261016.json).
+Hosted f073 SDK Linux/macOS pass, Windows cancelled; broader Debian Node retains
+1,556 pass/one HTML-preview dependency-reload CDP `Runtime.evaluate` timeout/44
+existing skips, with later native/package steps unreached. All three local relevant
+cohorts passed that case; cause remains unproven. Next inspect iframe/session/
+execution-context read lifetimes with lifecycle evidence, keeping limits and the
+original failure log. No blanket CI acceptance is claimed.
+
 [Pi response metrics](PI-RESPONSE-METRICS.md), implementation **582fb579**/tested
 **ae951211**, registers read-only Native/Browser inspection through the public
 SDK, preserving the public MIT DSH adapter's preview workflow and original

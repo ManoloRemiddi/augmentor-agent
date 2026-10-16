@@ -1,6 +1,82 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Shared persona and response-metrics review — October 16
+
+Current private unselected **20261016-083019-0c2b4855** runs public artifact source
+**f073d195**, tested application **ae951211**, product **0.2.13** / Pi SDK **1.1.0**.
+It includes the shared Augmentor persona and exact native response metrics, plus
+the original DSH GUI, Context/dashboard/Insights/Trajectory, message Edit, models,
+memory, microphone, permissions, skills and existing previews/export controls.
+No GUI or runtime source changed during this packaging checkpoint. The private
+operator link is supplied in chat; it is never stored in this repository.
+
+The [shared persona](PI-INSTRUCTIONS.md) is selected and retained through native
+history, including cold reopen and branches. [Response metrics](PI-RESPONSE-METRICS.md)
+match the exact saved assistant message and distinguish client-observed whole-
+step speed/first-delta latency from same-response server-reported decode timing.
+Choose **New Session**, ask for a paragraph followed by its response metrics, then
+inspect the matching preview/result in **Trajectory** and the request sources in
+**Context**. A metric's missing/unknown state must remain unavailable. The original
+GUI's JSON tree expands to show nested fields.
+
+Source/fresh ordinary/exact sealed target each pass **793 tests with two existing
+optional skips**, 140 files/all 58 Harness Chromium files, two workers/unchanged
+bounds, zero failures/cancellations. Nineteen licence/private-source Python cases
+pass. All **24,540 sealed entries** and **1,069 compiled inputs** verify after
+qualification and owner GUI QA. The seal is
+`2d2f9122591bc307f7f2a62a0b58826070bf8d1635fc28dc9a9c981c1ac091f1`.
+All 3,430 public-source/37,629 regular dependency inputs verify at the packaging
+checkpoint; production Node/dependencies/components and all 834 GUI app/supplier
+sources, including 625 MIT DSH selections, stay exact.
+
+Separate actual Qwen checks execute this exact sealed release in independent
+synthetic profiles. Persona/context delivery, native read preservation, metadata-
+only Edit and explicit replacement Send pass. A second proof writes its paragraph
+before the sole metrics tool, matches the native message/preview with payload
+capture off, reports distinct observed/server timing and cold reopens without
+replay. These profiles are separate from the empty owner profile.
+
+Initial owner QA verifies expanded/collapsed and welcome marks, transparent logo
+seats, 2px outlines, black light-theme smoke and the retained dark flare. Visual
+inspection and a scan of 36 General/48 Plugins visible text rows find no black
+text on dark backgrounds in those views. Both themes, original account/permission
+confirmations, memory pause/resume and cached CPU recognition pass. Welcome/
+Settings/account-confirmation/memory-control browser traffic has zero external
+requests; this limited check is not a backend egress audit. There are zero initial
+sessions/events/jobs/model/tool/audio requests, browser errors or failed responses.
+The QA browser is retired; queued panel opening is not evidence of owner testing.
+
+The fresh Read Only profile enables the tested MIT keyless Search alternative
+and local diagnostic capture. It has its own installer-owned empty memory engine/
+volume with explicit memory-only **off** and verified source backport; the original
+engine retains its default. Existing cached English CPU recognition **0.1.22** is
+reused, with all 70 packaged inputs verified against its private qualified archive.
+No private speech source/archive/fixtures enter public product code or CI. No owner
+history, credentials or MCP configuration is imported.
+
+Fourteen seals/fifteen review owners plus recognition, the selected installation,
+38 canonical/four private local changes and six model/speech configuration hashes
+verify preserved. Qwen is online. Breeze remains failed below its unchanged GPU
+prerequisite; there is no retry, GPU move, eviction or model tuning. Physical MX
+feedback, full voice, representative provider/provenance coverage, existing-data
+migration, remaining plugin/Home/Office workflows, public distribution and later
+platforms remain open. No installed activation, merge, public binary or DSH
+retirement follows. [Portable evidence](../release/harness-persona-metrics-review-20261016.json).
+
+Hosted **f073d195** SDK Linux/macOS pass and Windows is cancelled. Its broader
+Debian Node run has **1,556 pass/one failure/44 existing skips**: the HTML-preview
+case times out in CDP `Runtime.evaluate` while observing a changed related script
+at `tests/harness-html-chromium.test.mjs:26`. The original failure log is retained;
+all three local relevant cohorts passed that case, and the cause remains unproven.
+Later native/package steps were not reached. Inspect iframe/session/context read
+lifetimes and capture stronger lifecycle evidence before calling it fixed; do not
+relax limits or infer a product/driver cause from later green runs. Existing Office
+public rebuild, Windows jobs/native and macOS packaging gates also remain open.
+
 ## Guarded automatic-memory review — October 16
+
+Historical checkpoint: the separate persona/metrics review above is current for
+new feedback. This earlier review, its engine, profile and history remain intact.
 
 Current private unselected **20261016-050949-2145f2db** runs application/source
 **b7e0afaa**, product **0.2.13** / Pi SDK **1.1.0**. The original DSH GUI, 2px

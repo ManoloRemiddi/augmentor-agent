@@ -2,6 +2,13 @@
 
 # Response metrics on Pi
 
+The [current unselected MX review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
+**20261016-083019-0c2b4855** includes this binding and the shared persona. Source/
+ordinary/exact sealed target each pass 793/two existing optional skips, all 58
+Harness Chromium files. Exact-sealed Qwen metrics and persona/Edit proofs pass,
+with a separate empty owner profile and original GUI QA; owner feedback remains
+open. [Review evidence](../release/harness-persona-metrics-review-20261016.json).
+
 Pi now registers `response_metrics` for Native and Browser conversations through
 the supported extension API. It carries forward the response-preview workflow
 from the public MIT [Augmentor DSH adapter](../adapters/dsh-response-metrics/index.mjs).
@@ -130,7 +137,8 @@ a later pass does not establish a fix. Existing Windows jobs/native and macOS
 packaging failures remain. New-head hosted acceptance is separate from these
 local results; no licence or CI gate has been weakened.
 
-The current MX owner review **20261016-065534-c8cdf03c/application dfe855f3** does
+At the source-only checkpoint the MX owner review
+**20261016-065534-c8cdf03c/application dfe855f3** does
 not include this increment or the preceding shared-persona increment. Installed
 activation, owner acceptance, public distribution, representative other-provider
 timing formats and later-platform adoption remain separate. No merge or public

@@ -2,6 +2,12 @@
 
 # Shared Augmentor persona on Pi
 
+The [current unselected MX review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
+**20261016-083019-0c2b4855** includes this binding and response metrics. Exact-
+sealed Qwen instruction/context/Edit and metrics checks pass; source/ordinary/
+sealed each pass 793/two existing optional skips. Initial owner GUI QA uses an
+empty profile; no owner acceptance or installed adoption is inferred.
+
 The Pi Host now explicitly supplies `config/agent-persona.md`, the same approved
 application persona used by DSH and Codex. Previously Pi supplied browser recovery
 and its other adapter guidance but omitted this shared file. It adds the persona
@@ -115,7 +121,8 @@ that import name is normalized. This comparison explains generated-byte changes;
 qualification still checks the new frozen compiled bytes exactly, without ignored
 files or relaxed inventory checks.
 
-The running MX Edit review **20261016-065534-c8cdf03c/application dfe855f3** does not
+At this source-only checkpoint the MX Edit review
+**20261016-065534-c8cdf03c/application dfe855f3** does not
 include this source increment. Thirteen seals/fourteen review owners plus existing
 CPU recognition, selected installation, 38 canonical/four private local changes
 and six model/speech configuration hashes verify preserved. No new review,

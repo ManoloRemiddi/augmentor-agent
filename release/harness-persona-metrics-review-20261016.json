@@ -1,0 +1,290 @@
+{
+  "schema": "augmentor-persona-metrics-mx-review/1",
+  "date": "2026-10-16",
+  "publicArtifactSourceRef": "f073d195e3359f533dbe4be330692342440fb6be",
+  "testedApplicationSourceRef": "ae9512116ae53e872682d82b88768be656ff12e1",
+  "productVersion": "0.2.13",
+  "piVersion": "1.1.0",
+  "scope": "Private unselected MX Linux review; owner acceptance and public redistribution remain separate",
+  "review": {
+    "releaseId": "20261016-083019-0c2b4855",
+    "artifactSha256": "2d2f9122591bc307f7f2a62a0b58826070bf8d1635fc28dc9a9c981c1ac091f1",
+    "inventoryEntries": 24540,
+    "compiledInputs": 1069,
+    "freshProfile": true,
+    "readOnlyDefault": true,
+    "keylessMitSearchEnabled": true,
+    "localDiagnosticPayloadCapture": true,
+    "freshInstallerOwnedMemoryEngineAndVolume": true,
+    "reviewMemoryOnlyThinkingMode": "off",
+    "originalMemoryEngineDefaultUnchanged": true,
+    "memorySourceBackportExplicitAndVerified": true,
+    "cachedCpuRecognitionReused": true,
+    "recognitionVersion": "0.1.22",
+    "recognitionPackageInputsVerified": 70,
+    "privateRecognitionCodeArchiveOrFixturesCopiedToPublic": false,
+    "ownerHistoryCredentialsOrMcpConfigurationImported": false,
+    "selectedInstalledBuildChanged": false,
+    "activated": false,
+    "publicBinaryPublished": false
+  },
+  "qualification": {
+    "source": {
+      "tests": 795,
+      "pass": 793,
+      "existingOptionalSkips": 2,
+      "failures": 0,
+      "cancellations": 0
+    },
+    "freshOrdinary": {
+      "tests": 795,
+      "pass": 793,
+      "existingOptionalSkips": 2,
+      "failures": 0,
+      "cancellations": 0
+    },
+    "exactSealedTarget": {
+      "tests": 795,
+      "pass": 793,
+      "existingOptionalSkips": 2,
+      "failures": 0,
+      "cancellations": 0
+    },
+    "testFiles": 140,
+    "harnessChromiumFiles": 58,
+    "workers": 2,
+    "boundsOrSkipsRelaxed": false,
+    "licencePrivateBoundaryPythonCases": 19,
+    "actualQwen": {
+      "persona": {
+        "passed": true,
+        "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+        "contextWindow": 262144,
+        "maxTokens": 8192,
+        "sourceRef": "ae9512116ae53e872682d82b88768be656ff12e1",
+        "freshOrdinary": false,
+        "exactSealedTarget": true,
+        "sharedPersonaNativeAndProviderPresence": true,
+        "observedInstructionSourceRequests": 4,
+        "sharedPersonaSourceSha256": "5c9c40fa21329b018f067297c47aadce38e6e07c82ef68446bbefce1c2f0ef2b",
+        "priorNativeReadRetained": true,
+        "parentDraftPreserved": true,
+        "parentNativeBytesPreserved": true,
+        "editProviderRequests": 0,
+        "childTools": 0,
+        "explicitSend": true,
+        "ownerDataImported": false,
+        "modelSpeechGpuSettingsChanged": false
+      },
+      "responseMetrics": {
+        "passed": true,
+        "sourceRef": "ae9512116ae53e872682d82b88768be656ff12e1",
+        "freshOrdinary": false,
+        "exactSealedTarget": true,
+        "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+        "contextWindow": 262144,
+        "maxTokens": 8192,
+        "payloadCapture": false,
+        "nativeResponseMatched": true,
+        "nativeParentMatched": true,
+        "responsePreviewMatched": true,
+        "requests": 2,
+        "tools": 1,
+        "observed": {
+          "durationMs": 4488.542593,
+          "firstObservedDeltaMs": 2194.144519,
+          "outputTokens": 270,
+          "outputTokensPerSecond": 60.15315537410118,
+          "boundary": "final provider-payload hook to SDK assistant message_end; includes first-delta latency and reported reasoning/tool-call output; excludes prompt preparation, later tool execution and other steps",
+          "tokenBoundary": "SDK-normalized output; zero is unknown-or-zero and produces no rate; partial/error responses may have partial counters"
+        },
+        "serverDecode": {
+          "state": "reported",
+          "boundary": "llama.cpp terminal provider chunk timings",
+          "predictedTokens": 270,
+          "predictedMs": 2291.553,
+          "reportedTokensPerSecond": 117.82402588986596
+        },
+        "coldReopenWithoutReplay": true,
+        "ownerDataImported": false,
+        "modelSpeechGpuSettingsChanged": false
+      }
+    },
+    "initialOwnerQa": {
+      "releaseId": "20261016-083019-0c2b4855",
+      "artifactSha256": "2d2f9122591bc307f7f2a62a0b58826070bf8d1635fc28dc9a9c981c1ac091f1",
+      "passed": true,
+      "recognition": {
+        "cached": true,
+        "device": "cpu",
+        "language": "en",
+        "maxDurationSeconds": 600,
+        "noRecordingOrInferenceSubmitted": true
+      },
+      "sidebarMarks": {
+        "collapsed": {
+          "stroke": "2px",
+          "background": "rgba(0, 0, 0, 0)",
+          "svg": false,
+          "fits": true
+        },
+        "expanded": {
+          "stroke": "2px",
+          "background": "rgba(0, 0, 0, 0)",
+          "svg": false,
+          "fits": true
+        },
+        "oldSvgAbsent": true
+      },
+      "themes": {
+        "Light": {
+          "stroke": "2px",
+          "color": "rgb(0, 0, 0)",
+          "background": "rgba(0, 0, 0, 0)",
+          "flare": "conic-gradient(from 40deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.396), rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0))",
+          "settingsText": "rgb(15, 17, 21)",
+          "bodyText": "rgb(15, 17, 21)",
+          "animations": [
+            "brand-shape",
+            "brand-flow",
+            "brand-breath"
+          ]
+        },
+        "Dark": {
+          "stroke": "2px",
+          "color": "rgb(249, 250, 251)",
+          "background": "rgba(0, 0, 0, 0)",
+          "flare": "conic-gradient(from 40deg, rgba(0, 0, 0, 0), rgba(180, 160, 255, 0.396), rgba(0, 0, 0, 0) 50%, rgba(122, 174, 255, 0.5), rgba(0, 0, 0, 0))",
+          "settingsText": "rgb(249, 250, 251)",
+          "bodyText": "rgb(249, 250, 251)",
+          "animations": [
+            "brand-shape",
+            "brand-flow",
+            "brand-breath"
+          ]
+        }
+      },
+      "darkText": {
+        "General": {
+          "examined": 36,
+          "blackTextOnDarkBackground": []
+        },
+        "Plugins": {
+          "examined": 48,
+          "blackTextOnDarkBackground": []
+        }
+      },
+      "permissionControls": {
+        "futureDefaultReadOnly": true,
+        "fullConfirmationOpenedAndCancelled": true,
+        "unacknowledgedAcceptanceDisabled": true,
+        "currentCapability": true,
+        "noModeWrite": true
+      },
+      "finiteDialogTransitionsSettled": true,
+      "accountControls": {
+        "registeredProviders": 9,
+        "storedCredentials": 0,
+        "originalConfirmationOpenedAndClosed": true,
+        "sdkLoginAdmitted": false
+      },
+      "memory": {
+        "configuredMode": "off",
+        "liveProviderVerificationClaimedByStatus": false,
+        "capturePauseAndResume": true,
+        "processingPausePreservedUntilExplicitResume": true,
+        "initialStateRestored": true,
+        "events": 0,
+        "pending": 0,
+        "stopped": 0
+      },
+      "browserNetwork": {
+        "scope": "owner welcome/settings/account confirmation/memory controls only",
+        "externalRequests": 0,
+        "backendEgressAudit": false
+      },
+      "checks": {
+        "exactRuntimeAndProfile": true,
+        "product": "0.2.13",
+        "piSdk": "1.1.0",
+        "sessions": 0,
+        "activeTurns": 0,
+        "unsentDrafts": 0,
+        "readOnly": true,
+        "keylessSearch": true,
+        "localCapture": true,
+        "originalStartPage": true,
+        "messageEditDraftsCapability": true,
+        "planModeCapability": true,
+        "currentPermissionCapability": true,
+        "skillReferencesCapability": true,
+        "sessionExportCapability": true,
+        "newChatPermissionDefaultRow": true,
+        "twoAugmentorMarks": true,
+        "composerDisabledUntilNewSession": true,
+        "settingsAvailable": true,
+        "browserErrors": 0,
+        "failedResponses": 0,
+        "noModelOrToolWorkSubmitted": true
+      },
+      "ownedQaBrowserTerminal": true
+    },
+    "ownerInteractionInferred": false,
+    "panelOpening": "queued; not evidence of owner testing"
+  },
+  "inputs": {
+    "publicSourceTrackedInputs": 3430,
+    "regularSourceDependencyFiles": 37629,
+    "sourceFreezeAndCompiledInputsVerified": true,
+    "sealedCompiledMatchesSourceAndOrdinary": true,
+    "productionNpmInstances": 151,
+    "productionDependencyFiles": 20702,
+    "productionNodeDependenciesComponentsIdenticalToBaseline": true,
+    "baselineArtifactSha256": "c242bfdb3f6fe6e1a7f07776eda298bdfaf9bd7e5d27c3206bd78ea9c13f7fca",
+    "guiAppAndSupplierSourceFilesExact": 834,
+    "mitDshSupplierFiles": 625,
+    "newGuiOrRuntimeSourceChangesThisCheckpoint": 0
+  },
+  "preservation": {
+    "sealedInventoriesVerified": 14,
+    "reviewOwnerProcessesPresent": 15,
+    "recognitionOwnerPresent": true,
+    "canonicalPreexistingChanges": 38,
+    "privateSpeechPreexistingDirtyFiles": 4,
+    "modelSpeechGpuConfigurationHashesPreserved": 6,
+    "newReviewEngineSeparateFromOriginalAndEarlierReviews": true,
+    "earlierReviewsAndProfilesPreserved": true,
+    "qwenCatalogStatus": 200,
+    "breeze": "failed below unchanged GPU prerequisite; no retry/tuning/eviction",
+    "speechGpuOrModelSettingsChanged": false,
+    "installedSelectionChanged": false,
+    "merged": false
+  },
+  "remaining": [
+    "physical MX owner feedback on the new review",
+    "representative other-provider metrics and broader instruction/opaque-handler provenance",
+    "full voice and compatible speech distribution/adoption",
+    "existing-data and profile migration plus remaining plugin/Home/Office workflows",
+    "Office exact source/rebuild and other public distribution gates",
+    "later-platform qualification/adoption and eventual DSH retirement"
+  ],
+  "hostedStatus": {
+    "sourceRef": "f073d195e3359f533dbe4be330692342440fb6be",
+    "sdkLinux": "success",
+    "sdkMacos": "success",
+    "sdkWindows": "cancelled",
+    "debianNode": {
+      "tests": 1601,
+      "pass": 1556,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 44
+    },
+    "debianFailure": "HTML preview changed related script observation at tests/harness-html-chromium.test.mjs:26 times out in CDP Runtime.evaluate",
+    "failureCause": "unproven; local source/ordinary/sealed relevant cohorts passed the same case",
+    "laterNativePackagingSteps": "not reached",
+    "nextInvestigation": "iframe/session/execution-context read lifecycle evidence; no bounds/worker/skip relaxation",
+    "otherExistingGates": "Office public exact source/rebuild, Windows jobs/native and macOS packaging remain open",
+    "newHeadHostedAcceptance": "not implied by local review qualification"
+  }
+}
