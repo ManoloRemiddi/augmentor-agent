@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Setup-only conversations](#setup-only-conversations--october-16) now migrate without fabricated chat, restored old grants or automatic work. The preceding action-completeness refusals actually include sixteen setup-only conversations among seven projects/twenty-one parents; identical frozen exports now pass corrected read-only preparation. Source/separate ordinary pass **120 Node cases** across twenty-one files/eight Chromium files and **35 Python** each. Public SDK snapshot persistence handles its deferred custom-only files; actual SDK first-turn/branch/cold and original empty-composer GUI checks pass. Both running reviews/all 36 protected inputs stay unchanged. [Portable evidence](../release/harness-dsh-setup-qualification-20261016.json). Stage/adopt the corrected runtime before wider migration; owner pilot feedback still gates further transfer.
+[Setup-only conversations](#setup-only-conversations--october-16) now migrate without fabricated chat, restored old grants or automatic work. The preceding action-completeness refusals actually include sixteen setup-only conversations among seven projects/twenty-one parents; identical frozen exports now pass corrected read-only preparation. Source/ordinary/exact sealed pass **120 Node cases** across twenty-one files/eight Chromium files and **35 Python** each. Public SDK snapshot persistence handles its deferred custom-only files; actual SDK first-turn/branch/cold and original empty-composer GUI checks pass. Both running reviews/all 36 protected inputs stay unchanged. [Portable evidence](../release/harness-dsh-setup-qualification-20261016.json). Private unselected **20261016-232907-d1ee67b2 / eeb10814** verifies **24,620 sealed/1,102 compiled inputs**; adopt it before wider migration; owner pilot feedback still gates further transfer.
 
 [Standard checkpoint framing](#standard-checkpoint-framing--october-16) fixes a real preparation refusal without importing another project. Source/ordinary/exact sealed each pass **104 Node cases** across eighteen files/seven Chromium files and **35 Python cases**. Three identical real exports/six parent conversations refuse under the preceding sealed converter and pass corrected read-only preparation. Both running reviews and all 36 protected inputs remain unchanged. The corrected runtime is separately staged/qualified, unselected **20261016-230037-48cf9df1 / 51f6e3e6**; adopt it before broader migration; owner pilot feedback still gates additional transfer. [Portable evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
 
@@ -433,8 +433,8 @@ two workers/no skips/unchanged deadlines. Sixteen new cases cover minimal/full
 setup, mixed projects, immutable originals and source organization, unchanged
 pending-action/workflow/lineage guards, actual SDK first human work, selected model
 and isolated native reply branching/cold history, and original GUI opening without
-automatic work. The first SDK GUI preparation appends only its validated current
-persona snapshot and typed thinking setting; every original native byte remains
+automatic work. In the authored MCP-free GUI fixture, first SDK preparation
+appends only its validated current persona snapshot and typed thinking setting; every original native byte remains
 an exact prefix, no chat/model/tool work is invented, and console/HTTP errors are
 zero. Cold inspection before SDK preparation is byte-exact. The 1,102 compiled
 inputs match the ordinary copy; at ordinary qualification, 23,517 other baseline
@@ -451,9 +451,17 @@ deadlines and workers are unchanged.
 
 Both running review owners, all 36 protected inputs, shared prompt/memory/
 eligibility/jobs/settings rows, engine configuration and registry/selections are
-unchanged, with all 24,615 running sealed inputs verified. This checkpoint is
-source/ordinary only until separately staged/qualified. Adopt the corrected
-runtime before future broader migration. Owner pilot feedback still gates any
+unchanged, with all 24,615 running sealed inputs verified. Corrected application
+**eeb10814f1d74e08b24a2a98b3c0a393786e30ad** is separately staged as private
+unselected **20261016-232907-d1ee67b2**, artifact
+**714a1b1d114a25308de88a9b0f226916197cae4f93ed55381de20fa24e4654fb**.
+All **24,620 sealed/1,102 compiled** inputs verify; compiled files match the
+qualified ordinary copy after selected public documentation/source/provenance
+refresh. The exact sealed candidate passes the same 120/120 Node and 35 Python
+cases, unchanged workers/deadlines/no skips. Its actual converter also accepts
+the retained real setup-only export through read-only preparation. No source
+profile or model data enters the artifact. Adopt this qualified runtime before
+future broader migration. Owner pilot feedback still gates any
 additional transfer; large archives, source descriptor versions, folders and
 non-assistant reasoning remain separate work. Voice/later OS rollout stays deferred.
 [Portable qualification](../release/harness-dsh-setup-qualification-20261016.json).
