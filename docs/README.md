@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Browser observation lifetimes](HARNESS-BROWSER-TESTS.md) now retire opt-in test
+reads on matching CDP scope loss and use unique iframe context identities. A real
+Chromium control reproduces the old lost reply/ten-second wait; seven focused
+cases pass. No runtime/GUI or current review changes; broader qualification and
+the original hosted HTML failure's exact cause remain separate.
+
 [Current MX persona/metrics review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
 **20261016-083019-0c2b4855** runs public **f073d195/application ae951211** as a
 separate unselected owner. Source/ordinary/exact sealed each pass 793/two existing

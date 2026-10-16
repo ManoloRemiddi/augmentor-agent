@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Browser test observations](HARNESS-BROWSER-TESTS.md) now use explicit scoped
+read lifetimes, unique context IDs and bounded lifecycle receipts. An actual
+opaque-iframe removal reproduces the preceding lost reply/ten-second timer; the
+corrected read retires on actual session loss without replay. Seven focused
+peer/Chromium/original-HTML cases pass. Generic actions keep unknown outcomes;
+page errors/HTTP failures, original bounds/workers/assertions remain. No runtime,
+GUI, app dependency or running owner changes. The original hosted failure's
+precise cause remains unproven; broader source/artifact qualification follows.
+
 [Current MX persona/metrics review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
 **20261016-083019-0c2b4855**, public artifact **f073d195** / application **ae951211**,
 runs unselected with original GUI and shared instructions/response metrics.

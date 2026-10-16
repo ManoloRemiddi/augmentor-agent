@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Harness browser observation lifetimes](../docs/HARNESS-BROWSER-TESTS.md) adds
+five local WebSocket/CDP contracts plus a real sandbox reload/removal proof.
+`harness-html-chromium.test.mjs` uses current unique contexts and scoped read
+retirement; generic action calls never replay. The command/loop/case limits,
+original sandbox/asset/pointer/network assertions and page error collection stay
+unchanged. Focused checks pass; full local and hosted acceptance are separate.
+
 [Native and Browser Pi voice controls](../docs/PI-VOICE.md#native-and-browser-controls--october-16-2026)
 now reuse the existing orb, gesture/audio engine and private Pi owner. Final ASR
 submissions carry explicit spoken mode; native Send remains typed and Browser
