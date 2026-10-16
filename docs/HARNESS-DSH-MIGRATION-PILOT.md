@@ -1166,5 +1166,22 @@ all 1,111 compiled files match. Coverage includes 27 new unit guards, six actual
 SDK cases, two original GUI cases and eight exporter cases. The broader cohort
 found and fixed the new scan's assumption that every older archived child has a
 records array; existing archive-only snapshots remain preserved. Branch coverage
-includes user, assistant and tool file references. Exact sealed qualification and
-owner adoption remain pending; this is not bulk-migration or owner acceptance.
+includes user, assistant and tool file references. The exact sealed result follows;
+owner adoption and bulk-migration acceptance remain open.
+
+The exact private unselected candidate **20261017-014627-69b95d0e**, application
+**afef0e54d53e0c834881bb118ef55e516ab94bdb**, SHA-256
+**07b77e4c26f5f1f6e15bd6427e84ea4f31874050d1679eecca9e324da2d9879c**,
+passes the same **288 Node / 55 Python** checks and identical frozen preparation.
+All **24,637 sealed / 1,111 compiled inputs** verify after tests. Development/test
+resources and private source input stay external. The same two review PIDs,
+complete protected path sets/hashes of 36 regular files, registry and installed
+selections remain exact; existing 24,615-input running seals also verify. No owner
+restart, candidate activation or further project transfer occurred.
+
+A separate authored public-SDK compaction/relocation probe **reproduces** the
+former-path limitation at this application ref: the media entry leaves active
+context, its saved summary quote remains intact, and no current-file hint appears
+after the old state is removed. That diagnostic is excluded from the passing
+qualification claim; the path-hint fix remains required before treating compacted
+historical-file relocation as ready. No owner data or model request is involved.

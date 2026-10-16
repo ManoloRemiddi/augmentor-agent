@@ -35,7 +35,7 @@
     "supplierVendorFilesModified": false
   },
   "qualification": {
-    "phase": "source and ordinary passed; exact sealed pending",
+    "phase": "source, ordinary and exact separately sealed passed within stated active-history scope; no owner adoption",
     "workers": 2,
     "deadlinesChanged": false,
     "newUnitCases": 27,
@@ -78,7 +78,12 @@
     "compiledFilesVerified": 1111,
     "ordinaryUnchangedBaselineInputsVerified": 23519,
     "sameFrozenRealPreparationAcceptedByOrdinary": true,
-    "legacyArchivedChildSnapshotsPreserved": true
+    "legacyArchivedChildSnapshotsPreserved": true,
+    "exactSealedNodePass": 288,
+    "exactSealedPythonPass": 55,
+    "sameFrozenRealPreparationAcceptedBySeal": true,
+    "sealedEntriesVerified": 24637,
+    "ownerAdoption": false
   },
   "realFrozenComparison": {
     "projects": 1,
@@ -96,8 +101,40 @@
   "remaining": [
     "Guarded adoption of qualified candidate before wider migration",
     "Owner pilot feedback before additional real projects",
-    "Native compaction summaries quoting former request-time historical file paths after relocation require dedicated qualification",
+    "Reproduced missing current-path hint for a native compaction summary quoting a former request-time historical file path after relocation",
     "Malformed tool arguments, independent source formats and two source-observation failures",
     "Voice and later OS rollout deferred"
-  ]
+  ],
+  "implementationRef": "afef0e54d53e0c834881bb118ef55e516ab94bdb",
+  "applicationRef": "afef0e54d53e0c834881bb118ef55e516ab94bdb",
+  "separatelySealedCandidate": {
+    "releaseId": "20261017-014627-69b95d0e",
+    "applicationRef": "afef0e54d53e0c834881bb118ef55e516ab94bdb",
+    "artifactSha256": "07b77e4c26f5f1f6e15bd6427e84ea4f31874050d1679eecca9e324da2d9879c",
+    "activated": false,
+    "inventoryEntriesVerified": 24637,
+    "compiledFilesVerified": 1111,
+    "runningReviewsAdopted": false,
+    "ownerDataCopied": false
+  },
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "completeProtectedRegularFileSetsAndHashesExact": true,
+    "protectedOwnerFilesExact": 36,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
+  },
+  "compactionPathHintGap": {
+    "scope": "Isolated authored public-SDK compaction and cold relocation; diagnostic only; no owner data/model calls",
+    "sourceCodeRef": "afef0e54",
+    "oldSourceStateAbsent": true,
+    "activeMediaEntries": 0,
+    "originalSummaryQuoteRetained": true,
+    "currentFilePathHintPresent": false,
+    "ownerImports": 0,
+    "modelRequests": 0,
+    "releaseQualification": false
+  }
 }

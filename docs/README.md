@@ -2,10 +2,12 @@
 
 [Historical DSH files](HARNESS-DSH-MIGRATION-PILOT.md#historical-file-attachments--october-17)
 now retain verbatim bodies, original cards/names, scoped current-profile paths,
-Edit drafts and cold reply/relocation without old work. Source and fresh ordinary
-package each pass **288 Node / 55 Python** checks; a frozen two-parent real project
-with one file now passes read-only preparation. Exact sealed qualification and
-adoption remain pending; compacted former-path hints need dedicated qualification.
+Edit drafts and cold reply/relocation without old work. Source/ordinary/exact
+sealed each pass **288 Node / 55 Python** checks; the same two-parent real project
+with one file passes read-only preparation. Private unselected
+**20261017-014627-69b95d0e / afef0e54** verifies 24,637 sealed/1,111 compiled inputs.
+Both reviews/all 36 protected files, registry and selections remain exact. Adoption
+and pilot feedback remain open; compacted former-path hints have a reproduced gap.
 [Evidence](../release/harness-dsh-files-qualification-20261017.json).
 
 [Recorded DSH tool recovery](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-recovery--october-17)
