@@ -1,0 +1,373 @@
+{
+  "schema": "augmentor-pi-memory-explicit-mode-qualification/1",
+  "date": "2026-10-16",
+  "runtimeSourceRef": "a8f49ced0a86ec6256cc129e058815d59679593b",
+  "applicationFreezeRef": "2b751081c91b15325725da8b260b2d36326222b5",
+  "externalDriverRef": "9a6a7fcfac0c4b8e921ce566065fa6fcc40a9f13",
+  "productVersion": "0.2.13",
+  "piSdkVersion": "1.1.0",
+  "hindsightBaseVersion": "0.10.0",
+  "scope": "Isolated Linux full-scenario qualification of the explicit memory-only off option; original engine remains default and no installed or owner-review adoption",
+  "explicitMode": {
+    "original": "default",
+    "proof": "off",
+    "selectedExplicitly": true,
+    "appliesTo": "Hindsight retain/consolidation/Reflect requests only",
+    "chatVoiceProviderOrServerSettingsChanged": false
+  },
+  "upstreamBackport": {
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "license": "MIT",
+    "copyright": "Copyright (c) 2025 Vectorize AI, Inc.",
+    "upstreamFixRef": "022583d43b3ae460233c9df880040c0770f24e0b",
+    "upstreamFixPath": "hindsight-api-slim/hindsight_api/engine/memory_engine.py",
+    "baseRef": "5d46f9c8c8eb4fb96f549aa63abe1191b82a7840",
+    "baseGitBlob": "df43b37f0093fb5d3c3037858126620f9e5b4790",
+    "baseImage": "ghcr.io/vectorize-io/hindsight@sha256:3edcb6165cefdeaa6721dd0fce43cfd13b7a9c346ce0d2c5f4b4bf7bc3c8ac0b",
+    "containerPath": "/app/api/hindsight_api/engine/memory_engine.py",
+    "baseSha256": "770ea9011dec620c6c6584f8889ccf73740f9489586e5745fd0164fd636eafba",
+    "resultSha256": "dd82621a04fc20f3535be823d3a6a2712572928e54ac9fa73541cdb463ecf4f0",
+    "patchSha256": "229dd6019362cabf8bca9b126babe22a6aa15d98d05b0bf37c81bc4b54a0cbcc",
+    "licenseSha256": "01fde0bedf83bdc185065d7af524a61690efe576a67f922eaff3a1280c17b63a",
+    "adaptation": "Only the upstream refresh budget constant, per-refresh selection and explicit Reflect argument are backported into the exact 0.10.0 image source; shortened comment/context adapted. Newer API/UI/CLI/schema/config-option changes are not selected.",
+    "scope": "Opt-in isolated proof overlay only; configured max iterations remains two and existing job/call/time/token/output/concurrency/model settings remain unchanged."
+  },
+  "processingLimits": {
+    "configuredReflectIterations": 2,
+    "jobAndAbsoluteToolWindowSeconds": 120,
+    "jobTokens": 65536,
+    "callSeconds": 45,
+    "callOutputTokens": 4096,
+    "reflectContextTokens": 8000,
+    "memoryModelConcurrency": 1,
+    "stageRetries": 0,
+    "boundsWorkersSkipsChangedForQualification": false
+  },
+  "providerDeclarations": {
+    "contextWindow": 262144,
+    "conversationOutputTokens": 8192
+  },
+  "tests": {
+    "sourcePython": {
+      "pass": 44,
+      "fail": 0,
+      "skipped": 0
+    },
+    "freshOrdinaryPython": {
+      "pass": 44,
+      "fail": 0,
+      "skipped": 0
+    },
+    "unchangedSourceNode": {
+      "pass": 31,
+      "fail": 0,
+      "skipped": 0,
+      "workers": 2
+    },
+    "freshOrdinaryNode": {
+      "pass": 31,
+      "fail": 0,
+      "skipped": 0,
+      "workers": 2
+    },
+    "sourceNodeInputsUnchangedFromPriorQualification": true,
+    "sourceCompiledInputsMatchFrozenQualification": true
+  },
+  "frozenInputs": {
+    "tracked": 3401,
+    "compiled": 1060,
+    "nodeExecutables": 1,
+    "dependencyFileAndLinkInputs": 20702,
+    "beforeAfterUnchanged": true,
+    "inventorySha256": {
+      "dist": "e772c7ae5cc6d6f26e44c7dac00a3d3ab576dbb2a80e92b5ac181ee47ac52ae1",
+      "node": "7cf49748be9dfbbd046a98a2769dfc8b8366eeb661a450827711c5094a9b5a24",
+      "node_modules": "0704a733803a7dabae4dd66e7726e15cd750c0b6d29d552c604ba7dd331b4bab"
+    },
+    "applicationRuntimeAndProductionInstallerUnchangedFromPreviousCheckpoint": true,
+    "externalDriverChangedOnlyForExplicitModeReceiptsAndInterruptedResponseHandling": true
+  },
+  "fullLiveResult": {
+    "passed": true,
+    "scenario": "full",
+    "memoryThinkingMode": "off",
+    "baselineMemoryThinkingMode": "default",
+    "explicitMemoryModeOverride": true,
+    "applicationHostSha256": "05d4d7b04989c1d85e8d3ff46eec2295fa22b7bad2d471fbbdcd460719baf270",
+    "driverSha256": "87d025929a4bc17333e96437681b9f10e40a7084787a3cfee61fd3c229d68d95",
+    "seed": {
+      "relationshipSha256": "0553c0046424d3b1ef1f0667ca439573756e2f8b981894ae3297f5c0b3fa2d2b",
+      "workSha256": "519d7a1bc118e6beb2835bce70ef58064e35c7b738e9cea579091675a1d8dc9e"
+    },
+    "recall": {
+      "nativeBriefSha256": "c474a1051198597c7c58e2ba689f063a6e54749640c362a464e7c0cec710ead9",
+      "actualProviderContext": true,
+      "actualAnswer": true
+    },
+    "personProjectIsolation": true,
+    "updatedMemorySha256": "3cb479f10cb1d24c46ad0e49212783aea8a4fe609db99d8ce1d2aa9584a555d8",
+    "historicalBranch": {
+      "originalBriefSha256": "c474a1051198597c7c58e2ba689f063a6e54749640c362a464e7c0cec710ead9",
+      "noFreshRecall": true,
+      "parentUnchanged": true
+    },
+    "coldBranchAndMemoryRestart": true,
+    "pause": {
+      "chatAvailable": true,
+      "captureAndRecallSuppressed": true
+    },
+    "memoryOutage": {
+      "ordinaryChat": true,
+      "emptyManagedBrief": true,
+      "durableCaptureRecoveredOnce": true,
+      "modelOrToolReplay": false
+    },
+    "authoredToolExecutions": 2,
+    "conversationRequests": 10,
+    "memoryRpcCalls": 1652,
+    "providerOutputLimitsPreserved": true,
+    "engineStopped": true,
+    "allOwnedActorsTerminal": true
+  },
+  "completedJobs": {
+    "phases": [
+      6,
+      6
+    ],
+    "status": [
+      "completed",
+      "completed"
+    ],
+    "attempt": [
+      0,
+      0
+    ],
+    "budgets": [
+      {
+        "remainingSeconds": 101.36018059408525,
+        "remainingTokens": 37491,
+        "calls": 8,
+        "failures": 0,
+        "status": "pending"
+      },
+      {
+        "remainingSeconds": 96.76918604900129,
+        "remainingTokens": 28115,
+        "calls": 10,
+        "failures": 0,
+        "status": "pending"
+      }
+    ]
+  },
+  "actualMemoryTransportReceipts": [
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2786
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 3095
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2238
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2716
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1263
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2497
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1350
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2690
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2011
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1917
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2269
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2917
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2328
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 3477
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1393
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2966
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 1311
+    },
+    {
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "maxTokens": 4096,
+      "stream": true,
+      "enableThinking": false,
+      "completed": true,
+      "durationMs": 2636
+    }
+  ],
+  "ownership": {
+    "allOwnedActorsAndEngineTerminal": true,
+    "publicCacheInputsUnchanged": 43,
+    "sourceOverlayUnchanged": true,
+    "originalEngineIdentityAndHealthPreserved": true,
+    "ownerConversationsCredentialsOrBanksCopied": false,
+    "privateSpeechSourceCopied": false
+  },
+  "retainedDefaultEvidence": "harness-pi-memory-page-qualification-20261016.json",
+  "defaultModeTimingQualifiedByThis": false,
+  "productionModeAdopted": false,
+  "ownerMxReviewUpdated": false,
+  "publicBinaryPublished": false,
+  "merged": false,
+  "privateEngineLog": {
+    "bytes": 61415,
+    "sha256": "af0bf842e83c6011b142ad02c661c02b3935a28cab8ede87f6da3d26ab0acd83",
+    "published": false
+  },
+  "localEvidenceDigests": {
+    "harness-memory-explicit-mode-python-source-20261016.log": {
+      "bytes": 7839,
+      "sha256": "11b18de1560df487477efcc41122dceef23b04cc96bf119bf754e04d93e61d15"
+    },
+    "harness-memory-explicit-off-python-ordinary-20261016.log": {
+      "bytes": 7839,
+      "sha256": "11b18de1560df487477efcc41122dceef23b04cc96bf119bf754e04d93e61d15"
+    },
+    "harness-memory-explicit-off-node-ordinary-20261016.log": {
+      "bytes": 3517,
+      "sha256": "e4f9a4ffe5086cbf326dc3a6a40efa23de9d3955aa8cb2e443c43afe27a72c5a"
+    },
+    "harness-memory-recovery-node-source-20261016.log": {
+      "bytes": 3516,
+      "sha256": "77b9fbdc1e42e509b2810a7a54744a29ad01b71ac79e2a80bb90a4716974cd74"
+    },
+    "harness-memory-explicit-off-live-proof-20261016.log": {
+      "bytes": 793,
+      "sha256": "4b6861cac4dc1ea035ca653d6beee9ead51fc61701fa780d5c8f2dd530c28cbe"
+    },
+    "harness-memory-explicit-off-engine-20261016.log": {
+      "bytes": 228,
+      "sha256": "2f210d745f90d6cbfbf5318fcf5e5e280e724dee01dc0468b468eeb88300bd73"
+    }
+  },
+  "remaining": [
+    "Owner review with an explicit visible memory-mode choice",
+    "Production source-backport installation/restart and existing-bank adoption",
+    "Default-mode timing and broader provider/semantic/load coverage",
+    "Physical MX feedback/full voice and shared distribution/pin/adoption",
+    "Remaining Harness plugin/Home/Office/migration and later OS release gates"
+  ],
+  "wholeHarnessGoalComplete": false,
+  "preservation": {
+    "sealedInventoriesVerified": 11,
+    "reviewProcessesPresent": 12,
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "modelSpeechGpuConfigurationFilesPreserved": 6,
+    "privateCompanionPreexistingDirtyFiles": 4,
+    "currentMxReviewHttpStatus": 200,
+    "qwenCatalogHttpStatus": 200,
+    "recognitionReviewProcessPresent": true,
+    "newArtifactActivated": false
+  }
+}

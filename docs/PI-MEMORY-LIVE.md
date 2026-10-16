@@ -9,6 +9,44 @@ owner or change the original DSH GUI. [Controlled memory](CONTROLLED-MEMORY.md)
 owns the budgets, source selection, previous optional thinking-mode evidence and
 production deployment boundaries.
 
+## Current explicit-mode qualification — October 16
+
+The **same full scenario** now passes with the existing explicitly selected
+**memory-only `off` request mode**. Frozen application **2b751081c91b15325725da8b260b2d36326222b5**
+and external driver **9a6a7fcfac0c4b8e921ce566065fa6fcc40a9f13** use runtime
+**a8f49ced**, the same MIT page-budget backport and concise policy three. The
+original installed engine stays in **default** mode. No chat/voice declaration,
+server context/concurrency/precision/GPU setting, source batching/date/identity,
+assertion or processing budget changes for this test.
+
+Actual Pi/Hindsight/Qwen evidence passes seed pages, fresh scoped recall and answer,
+current PostgreSQL correction, exact historical SQLite native brief with no new
+recall/parent mutation, cold owner/memory restart, paused capture/recall with chat,
+and outage chat plus exactly-once durable capture recovery. The run uses ten
+conversation requests and two authored SDK tools; it replays no model/tool action.
+All **18** observed memory-provider requests actually carry
+`chat_template_kwargs.enable_thinking=false`, preserve streaming and the existing
+4,096 output cap, and finish. The seed/correction jobs complete six stages each,
+at attempt zero with no failures, retaining **101.36 / 96.77 seconds** and
+**37,491 / 28,115 tokens** from their original budgets (eight/ten calls).
+
+Source/fresh ordinary each pass **44 Python / 31 Node**, with no skips, changed
+existing bounds or worker counts. Source Node test/compiled inputs match the prior
+qualification; the new helper's explicit-mode case is the added Python coverage.
+All **3,401** tracked frozen inputs, **1,060** compiled inputs, the Node executable,
+**20,702** dependency inputs, the external driver, 43 cache inputs and the read-only
+backport verify unchanged. All owned actors/engine are terminal. Original engine
+identity/health, eleven seals/twelve reviews plus recognition, selection and prior
+changes/configurations remain preserved.
+
+This qualifies this explicit option on the tested MX/Qwen/template configuration.
+It does not relabel the retained default-mode timing failures or adopt a production
+choice. An owner review with a visible mode selection, production source-backport
+installation/existing-bank adoption, broader semantics/load/provider coverage,
+physical voice/full migration and later OS releases remain required.
+
+[Portable full result, transport receipts and preserved-state metadata](../release/harness-pi-memory-explicit-mode-qualification-20261016.json).
+
 ## Current page and outage results — October 16
 
 The opt-in MIT upstream budget-default backport and concise managed-page policy
@@ -301,7 +339,8 @@ separate observer/declaration. All owned servers join the existing cleanup.
 
 Source **44/44 Python** cases pass, including preserve-by-default, explicit mode
 selection and refusal of mixed/unknown policy. Driver syntax/help checks pass.
-Fresh frozen/live comparison remains required; production adoption is unchanged.
+The current explicit-mode section records the subsequent frozen/full live pass.
+Production adoption remains unchanged.
 
 ```sh
 python3 scripts/hindsight-isolated-proof-engine.py prepare \

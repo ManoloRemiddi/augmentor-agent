@@ -747,6 +747,19 @@ and [current results](PI-MEMORY-LIVE.md#current-page-and-outage-results--october
 actual retrieval/concise pages and an independent outage recovery pass are recorded,
 with retained full default-window failures and no installed adoption.
 
+### Explicit memory-only request-mode qualification, 2026-10-16
+
+The isolated helper reuses the existing supported installer `default|off` option;
+new selection/protocol observation is independently authored with Python/Node
+standard libraries. No supplier code, dependency, SDK or engine image is changed.
+The exact MIT refresh-budget backport above remains selected. An explicitly off
+profile now passes the complete actual Pi/Hindsight/Qwen scenario at application
+**2b751081** / driver **9a6a7fcf**; all 18 memory requests carry the false flag.
+Original engine stays default, with prior failures retained. Source/fresh ordinary
+44 Python/31 Node and immutable inputs/owned cleanup qualify; installed/user-mode
+adoption, broader load/semantics/provider and OS gates remain.
+[Full scope and receipts](PI-MEMORY-LIVE.md#current-explicit-mode-qualification--october-16).
+
 ### Windows voice configuration candidate (28 September 2026)
 
 The shared DSH graph now selects Resonant Voice 0.1.17 from source `aae6a51`

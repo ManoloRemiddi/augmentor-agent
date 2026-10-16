@@ -1,13 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Explicit memory-only mode comparison](PI-MEMORY-LIVE.md#explicit-memory-only-request-mode-comparison--october-16)
-reuses the existing installer `default|off` request choice in fresh proof profiles.
-Omission preserves the original mode; explicit selection records both choices and
-cannot change original services or chat/voice settings. A transparent bounded
-memory-provider observer requires actual false request flags for `off` and joins
-owned cancellation/servers. Native source IDs/dates/scopes, full scenario/assertions,
-limits and retained default failures remain. Source Python passes 44/44; fresh
-frozen/live qualification remains required. Production/default adoption is unchanged.
+[Explicit memory-only mode](PI-MEMORY-LIVE.md#current-explicit-mode-qualification--october-16)
+now passes the unchanged **full actual Pi/Hindsight/Qwen scenario**, application
+**2b751081** / external driver **9a6a7fcf**, runtime **a8f49ced**. All 18 observed
+memory requests carry the explicit off flag and finish; source dates/IDs/scopes,
+chat/voice/server/GPU settings and all 120-second/65,536-token/45-second/4,096-output
+limits stay intact. Seed/correction, scoped recall, exact historical branch, cold
+restart, pause and outage/recovery pass: ten conversation requests/two authored
+tools, no replay; jobs complete six stages each at attempt zero/no failures, with
+101.36/96.77 seconds and 37,491/28,115 tokens remaining. Source/fresh ordinary pass
+**44 Python/31 Node**, unchanged existing bounds/workers/no skips; 3,401 tracked/
+1,060 compiled/20,702 dependency inputs and external driver/cache/overlay verify.
+All owned actors/engine join; original engine remains **default**, current MX
+review/recognition/selection and prior states are preserved. Default failures stay
+retained; no production choice or update is adopted. Visible owner-review mode,
+backport installation/existing-bank adoption, broader load/semantics, voice/full
+migration/platform gates remain. [Portable result](../release/harness-pi-memory-explicit-mode-qualification-20261016.json).
 
 [Memory-page qualification](PI-MEMORY-LIVE.md#current-page-and-outage-results--october-16)
 backports three public MIT hunks from upstream **022583d4** into a separately

@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current explicit-mode qualification](PI-MEMORY-LIVE.md#current-explicit-mode-qualification--october-16)
+passes the unchanged full actual Pi/Hindsight/Qwen scenario with the existing
+memory-only **off** option. Original installed mode stays **default** and its failed
+timing evidence remains. All 18 observed memory requests carry false; both jobs
+complete six stages, no failures/retries, with over 96 seconds and 28,000 tokens
+remaining. Source/fresh ordinary pass 44 Python/31 Node and all frozen inputs/
+owned cleanup verify. No source/date/scope loss, chat/server/GPU/limit change,
+owner review update or production adoption occurs. See the guide for exact refs,
+transport evidence and remaining review/adoption/semantics/platform gates.
+
 [Current page and outage evidence](PI-MEMORY-LIVE.md#current-page-and-outage-results--october-16)
 uses an opt-in verified MIT upstream refresh-default backport and concise managed
 pages. Source/fresh ordinary pass 43 Python/31 Node with unchanged existing bounds.
