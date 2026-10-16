@@ -4,11 +4,13 @@ import {chmodSync,existsSync,lstatSync,unlinkSync} from 'node:fs';
 import {join} from 'node:path';
 import {Host} from './host.js';
 import {HarnessServer} from './harness-server.js';
-import {atomicJson,readJson,paths} from './storage.js';
+import {atomicJson,readJson,paths,statePath} from './storage.js';
 import {MAX_FRAME,PROTOCOL,request,type Data} from '../../protocol/src/index.js';
 import {localServer} from '../../platform/src/server.js';
 import type {LocalConnection} from '../../platform/src/transport.js';
+import {acquireProfileLease,ProfileBusy} from './profile-lease.js';
 process.umask(0o077);
+let profileLease:ReturnType<typeof acquireProfileLease>;try{profileLease=acquireProfileLease(statePath());}catch(error){if(error instanceof ProfileBusy){console.error('Augmentor Pi profile is already running or in maintenance');process.exit(0);}throw error;}
 // SDK facilities whose defaults use getAgentDir (including MCP OAuth state)
 // belong to this same managed owner profile rather than a separate Pi install.
 process.env.PI_CODING_AGENT_DIR=paths().agent;
@@ -80,5 +82,5 @@ try{
 }catch(error){failedOwner!(error);for(const socket of clients.keys())socket.destroy();server.close();unlinkOwnedSocket();throw error;}
 if(process.env.AUGMENTOR_HARNESS==='1')await openHarness();
 console.log(JSON.stringify({ready:true,socket:path,protocol:PROTOCOL}));
-async function shutdown(){if(closing)return;closing=true;await harness?.close();await host?.close();server.close();for(const client of clients.keys())client.destroy();unlinkOwnedSocket();if(host){const descriptor=join(host.dirs.state,'harness.json');if(readJson<Data>(descriptor,{}).pid===process.pid)unlinkSync(descriptor);}}
+async function shutdown(){if(closing)return;closing=true;await harness?.close();await host?.close();server.close();for(const client of clients.keys())client.destroy();unlinkOwnedSocket();if(host){const descriptor=join(host.dirs.state,'harness.json');if(readJson<Data>(descriptor,{}).pid===process.pid)unlinkSync(descriptor);}profileLease.close();}
 process.on('SIGTERM',()=>void shutdown());process.on('SIGINT',()=>void shutdown());

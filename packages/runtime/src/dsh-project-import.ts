@@ -92,7 +92,7 @@ function records(session:Data){
 }
 
 type ModelSelection={provider:string;model:string};
-type ImportOptions={selection:ModelSelection;sessionSelections?:Record<string,ModelSelection>;sourceSha256:string};
+export type ImportOptions={selection:ModelSelection;sessionSelections?:Record<string,ModelSelection>;sourceSha256:string};
 const MAX_PROJECT_SESSIONS=128;
 function checkedSelection(value:unknown):ModelSelection{
  const row=value as ModelSelection;
@@ -165,7 +165,8 @@ function writeSession(original:Data,events:Data[],surface:DshSurface,stage:strin
 /** Offline project import. Never opens a runtime/provider or modifies an existing target.
  * All parents validate before staging; the whole project is published by one rename.
  * The single-conversation receipt stays compatible with the earlier pilot. */
-export async function importDshProject(sourceFile:string,targetState:string,options:ImportOptions){
+/** Prepare a bounded export without touching a destination or model. */
+export function prepareDshProject(sourceFile:string,options:ImportOptions){
  const info=lstatSync(sourceFile);if(!info.isFile()||info.isSymbolicLink()||info.size>MAX_EXPORT)fail('source must be a bounded regular export.');
  const bytes=readFileSync(sourceFile),sha256=digest(bytes);if(sha256!==options.sourceSha256)fail('source checksum changed.');
  const source=JSON.parse(bytes.toString('utf8')) as Data;
@@ -181,8 +182,6 @@ export async function importDshProject(sourceFile:string,targetState:string,opti
   if(!options.sessionSelections||typeof options.sessionSelections!=='object'||Array.isArray(options.sessionSelections))fail('session model choices must be keyed by source conversation.');
   for(const [id,value] of Object.entries(options.sessionSelections)){if(!byId.has(id))fail('session model choice belongs to another project.');selected.set(id,checkedSelection(value));}
  }
- if(!isAbsolute(targetState)||present(targetState))fail('destination state must be a new absolute path; existing profiles are never merged.');
- const parent=dirname(targetState),parentInfo=lstatSync(parent);if(realpathSync(parent)!==resolve(parent)||!parentInfo.isDirectory()||parentInfo.isSymbolicLink()||process.platform!=='win32'&&(parentInfo.uid!==process.getuid!()||(parentInfo.mode&0o077)!==0))fail('destination needs a private operator-owned parent.');
  const prepared=ids.map(id=>{const original=byId.get(id)!;if(original.opening.header.cwd!==cwd)fail('source conversation belongs to another workspace.');return {original,...records(original)};});
  const organization=(key:string)=>{const value=source[key]??[];if(!Array.isArray(value)||new Set(value).size!==value.length||value.some(id=>typeof id!=='string'||!byId.has(id)))fail('session organization differs from project membership.');return new Set<string>(value);};
  const archived=organization('archivedSessionIds'),pinned=organization('pinnedSessionIds');
@@ -203,19 +202,32 @@ export async function importDshProject(sourceFile:string,targetState:string,opti
  // Child-only objects remain in the exact archive, never a parent's receipts.
  for(const child of source.relatedSessions??[])for(const row of child?.records??[]){const e=row?.event,m=e?.type==='user/message'?e.data:['assistant/message','tool/result'].includes(e?.type)?e.data?.message:undefined;for(const p of m?.content??[])if(p?.type==='image'){const [part]=checkedContent([p]);const b=blobs.get(part.attachment.attachmentId);if(!b||b.length!==part.attachment.bytes)fail('archived child image bytes are unavailable.');used.add(part.attachment.attachmentId);}}
  if([...blobs.keys()].some(id=>!used.has(id)))fail('image attachment bundle contains an unreferenced object.');
- const stage=join(parent,'.dsh-import-'+randomUUID());privateDir(stage);let published=false;
- try{
-  privateDir(join(stage,'sessions'));const archiveDir=privateDir(join(stage,'dsh-imports'));writeFileSync(join(archiveDir,sha256+'.json'),bytes,{mode:0o600,flag:'wx'});
+ return {cwd,source,sha256,bytes,ids,pinned,archived,
+  sourceCut:(id:string)=>prepared.find(row=>row.original.opening.header.id===id)?.original,
+  async write(stage:string,targetState:string,includeIds:Set<string>=new Set(ids)){
+  privateDir(join(stage,'sessions'));const archiveDir=privateDir(join(stage,'dsh-imports'));const rawPath=join(archiveDir,sha256+'.json');if(present(rawPath)){if(!lstatSync(rawPath).isFile()||digest(readFileSync(rawPath))!==sha256)fail('existing source archive differs.');}else writeFileSync(rawPath,bytes,{mode:0o600,flag:'wx'});
   const attachments=new PiAttachments(stage);
-  for(const {original,events} of prepared){const sid='dsh-import-'+digest(original.opening.header.id).slice(0,24),seen=new Set<string>();
+  for(const {original,events} of prepared.filter(row=>includeIds.has(row.original.opening.header.id))){const sid='dsh-import-'+digest(original.opening.header.id).slice(0,24),seen=new Set<string>();
    for(const e of events)if(messageTypes.has(e.type))for(const p of (e.type==='user/message'?e.data:e.data.message).content)if(p.type==='image'){const key=JSON.stringify(p.attachment);if(!seen.has(key)){seen.add(key);await attachments.importStoredImage(sid,p.attachment,blobs.get(p.attachment.attachmentId)!);}}
   }
-  const receipts=prepared.map(({original,events,surface})=>writeSession(original,events,surface,stage,targetState,source,selected.get(original.opening.header.id)??fallback,sha256,Date.now()));
-  atomicJson(join(stage,'workspaces.json'),{schema:'augmentor-workspaces/1',revision:1,items:[{workspaceId:cwd,cwd,title:workspace.title}],removed:[]});
+  const receipts=prepared.filter(row=>includeIds.has(row.original.opening.header.id)).map(({original,events,surface})=>writeSession(original,events,surface,stage,targetState,source,selected.get(original.opening.header.id)??fallback,sha256,Date.now()));
+  const receipt=receipts.length===1?receipts[0]:{schema:'augmentor-dsh-project-import/2',sourceSha256:sha256,cwd,sessions:receipts,sourceEvents:receipts.reduce((sum,row)=>sum+row.sourceEvents,0),displayEvents:receipts.reduce((sum,row)=>sum+row.displayEvents,0),contextEntries:receipts.reduce((sum,row)=>sum+row.contextEntries,0),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
+   return {receipt,receipts};
+  }};
+}
+
+/** Backwards-compatible one-project import into a new private destination. */
+export async function importDshProject(sourceFile:string,targetState:string,options:ImportOptions){
+ const project=prepareDshProject(sourceFile,options),{cwd,ids,pinned,archived,sha256}=project;
+ if(!isAbsolute(targetState)||present(targetState))fail('destination state must be a new absolute path; existing profiles are never merged.');
+ const parent=dirname(targetState),parentInfo=lstatSync(parent);if(realpathSync(parent)!==resolve(parent)||!parentInfo.isDirectory()||parentInfo.isSymbolicLink()||process.platform!=='win32'&&(parentInfo.uid!==process.getuid!()||(parentInfo.mode&0o077)!==0))fail('destination needs a private operator-owned parent.');
+ const stage=join(parent,'.dsh-import-'+randomUUID());privateDir(stage);let published=false;
+ try{
+  const {receipt,receipts}=await project.write(stage,targetState);
+  atomicJson(join(stage,'workspaces.json'),{schema:'augmentor-workspaces/1',revision:1,items:[{workspaceId:cwd,cwd,title:project.source.workspace.title}],removed:[]});
   const mapped=new Map(receipts.map(row=>[row.sourceSessionId,row.sessionId]));
   atomicJson(join(stage,'session-organization.json'),{schema:'augmentor-session-organization/1',revision:1,pinnedSessionIds:[...pinned].filter(id=>!archived.has(id)).map(id=>mapped.get(id)!),archivedSessionIds:[...archived].map(id=>mapped.get(id)!)});
-  const receipt=receipts.length===1?receipts[0]:{schema:'augmentor-dsh-project-import/2',sourceSha256:sha256,cwd,sessions:receipts,sourceEvents:receipts.reduce((sum,row)=>sum+row.sourceEvents,0),displayEvents:receipts.reduce((sum,row)=>sum+row.displayEvents,0),contextEntries:receipts.reduce((sum,row)=>sum+row.contextEntries,0),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
-  atomicJson(join(archiveDir,'receipt.json'),receipt);
+  atomicJson(join(stage,'dsh-imports','receipt.json'),receipt);
   if(present(targetState))fail('destination appeared during staging; nothing was merged.');
   renameSync(stage,targetState);published=true;return receipt;
  }finally{if(!published)rmSync(stage,{recursive:true,force:true});}

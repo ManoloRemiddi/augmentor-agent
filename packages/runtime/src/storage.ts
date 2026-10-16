@@ -15,8 +15,9 @@ export function atomicJson(path: string, data: unknown) {
   privateDir(dirname(path));const tmp=path+'.'+randomUUID()+'.tmp';
   writeFileSync(tmp,JSON.stringify(data,null,2)+'\n',{mode:0o600});renameSync(tmp,path);
 }
+export function statePath(){return process.env.AUGMENTOR_PI_STATE || join(process.env.XDG_STATE_HOME || join(homedir(),'.local/state'),'augmentor-pi');}
 export function paths() {
   const config=process.env.AUGMENTOR_PI_CONFIG || join(process.env.XDG_CONFIG_HOME || join(homedir(),'.config'),'augmentor-pi');
-  const state=process.env.AUGMENTOR_PI_STATE || join(process.env.XDG_STATE_HOME || join(homedir(),'.local/state'),'augmentor-pi');
+  const state=statePath();
   return {config:privateDir(config),state:privateDir(state),agent:privateDir(join(config,'agent')),sessions:privateDir(join(state,'sessions')),socket:process.env.AUGMENTOR_PI_SOCKET || join(state,'runtime.sock')};
 }

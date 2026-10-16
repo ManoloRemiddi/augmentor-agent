@@ -2079,3 +2079,16 @@ retain exact source/fork provenance and do not revive shadowed images/tools.
 `harness-dsh-surface-import-chromium.test.mjs` opens the original supplier compaction
 disclosures and continues through its original composer. Owner histories remain
 private and are not copied into tests. See the [source-history contract](../docs/HARNESS-DSH-MIGRATION-PILOT.md#source-replacements-compaction-and-inherited-history--october-16).
+
+
+`dsh-project-batch.test.mjs` and `dsh-project-batch-runtime.test.mjs` cover offline
+multiple-project adoption, byte-exact old native continuations, explicit routes,
+source divergence/foreign-path refusal, whole-state backups and actual cold Host
+continuation. `profile-transaction.test.mjs` uses real kernel leases, process death
+between renames, actual startup fencing and verified finish/rollback without
+rebuilding. The POSIX `pi-owner.test.mjs` adds different custom sockets for the same
+profile; existing bind-loser/drain/fresh-owner tests remain. The batch/recovery
+adapter cases explicitly skip outside Linux, which does not qualify other OS
+artifacts. `harness-dsh-batch-import-chromium.test.mjs` drives the unchanged original
+workspace expansion/sidebar/composer. All fixtures are independently authored;
+actual owner profiles are not test inputs. [Owning contract](../docs/HARNESS-DSH-MIGRATION-PILOT.md#multi-project-consolidation-into-a-cold-profile--october-16).

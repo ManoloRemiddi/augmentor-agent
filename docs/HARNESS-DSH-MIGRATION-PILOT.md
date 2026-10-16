@@ -459,3 +459,128 @@ inputs verify after qualification. Production Node/dependencies/components and
 supplier sources/licences stay exact. Both owner PIDs/roots, **32 protected files**
 and installed selection stay unchanged; no additional owner import, provider
 request or review restart occurs. [Portable qualification](../release/harness-dsh-source-surface-review-20261016.json).
+
+
+## Multi-project consolidation into a cold profile — October 16
+
+The batch importer adds multiple DSH projects to **one new or cold existing Harness
+state at its original path**. Existing native conversations, their JSONL bytes,
+metadata, queues, drafts, uploads, observation data and archive files are copied
+unchanged, except the two shared workspace/organization catalogues. Configuration,
+credentials, prompt libraries and companion-service roots outside `state` stay at
+their original locations. This is state adoption; the existing full-backup and
+owner-pilot acceptance procedure still precedes wider owner transfer.
+
+`prepareDshProject` retains the validated single-project conversion contract; its
+private materializer writes new parents into a shared stage with final paths to
+the original state location. Up to 128 project exports / 256 MiB of source bytes
+are admitted, retaining the 32 MiB/project, 128-parent/project and 30,000-event/history
+limits. The resulting catalogue is bounded at 5,000 conversations/1,000 workspaces.
+A complete state snapshot is bounded at four GiB/100,000 filesystem entries.
+Export metadata is charged before loading every project into memory.
+
+Existing workspace titles/order, pin/archive preferences and explicit model routes
+win for retained conversations. Newly imported projects follow manifest order,
+with their own saved pins/archive state and models. Removed workspaces, duplicate
+workspace/source identities and existing native paths into another owner are
+refused. A source conversation already imported into this profile is retained
+only if its verified original archive, cursor, folder and complete event cut match.
+All its newer Harness work stays byte exact. If DSH has diverged, the tool refuses
+instead of overwriting Harness or silently hiding newer DSH work.
+
+This increment preserves **one existing native profile** while adding DSH exports.
+It does not yet combine two independent existing native profiles: imported paths,
+original-upload references and companion ownership need explicit relocation for
+that separate operation. Neither current owner review is merged or restarted by
+this qualification. Existing conversation bodies are not rewritten to make them
+appear portable; backups restore to the original state path and are not active
+profiles. Starting a generated backup/staging tree directly is refused.
+
+### Ownership and recoverable publication
+
+POSIX runtime startup now holds a profile lease outside the replaceable state
+folder, independently of its chosen socket. Node opens the private regular lock
+file and passes that same open file description to a small Python `flock` helper.
+The helper exits without unlocking; the actual Node descriptor retains kernel
+ownership until close/process death. This avoids depending on a helper PID or a
+stale lock-record interpretation. The lease covers SDK shutdown/drain and is taken
+before creating profile journals. Both different-socket and simultaneous-owner
+regressions use actual processes.
+
+The Linux consolidation command takes that same lease and refuses live legacy
+Harness descriptors, active sockets, links/unsupported state objects, malformed
+metadata and incomplete earlier migration. Stop the old owner before migration
+and keep older runtime versions closed until it finishes; an old executable does
+not know the new maintenance protocol. Copied configurations with native paths
+into another owner require explicit relocation first.
+
+A private copy is hashed against the cold original, including file/directory
+modes; copied modes are restored explicitly because Node `cpSync` did not preserve
+private directory modes in the initial experiment. New imports/catalogues validate
+inside that copy. After flushing the staged tree and rechecking the original
+identity/content, a durable external journal fences startup across the two
+same-parent renames. The original whole state becomes a private backup; the built
+state takes its original location. A completion record removes the startup fence.
+The source, backup and new state never share writable file inodes.
+
+A process failure between renames leaves the journal, backup and built candidate.
+Starting Harness refuses the unresolved migration **without creating an empty
+state directory**. Explicit recovery hashes all copies before finishing publication
+or restoring the original. Recovery never repeats export/conversion, model work,
+commands or tools. Changed/ambiguous copies are preserved and refused, never
+selected by filename or a presumed operation outcome.
+
+Use the qualified immutable MX application and a private manifest, for example:
+
+```json
+{
+  "schema": "augmentor-dsh-project-batch-input/1",
+  "projects": [{
+    "sourceFile": "/private/project-export.json",
+    "options": {
+      "sourceSha256": "SHA256_FROM_EXPORT",
+      "selection": {"provider": "CONFIGURED_PROVIDER", "model": "CONFIGURED_MODEL"}
+    }
+  }]
+}
+```
+
+```sh
+node scripts/import-dsh-projects.mjs import /private/manifest.json /private/profile/state
+node scripts/import-dsh-projects.mjs inspect /private/profile/state
+node scripts/import-dsh-projects.mjs finish /private/profile/state
+node scripts/import-dsh-projects.mjs rollback /private/profile/state
+```
+
+`inspect`, `finish` and `rollback` apply only to a pending journal. Keep the reported
+backup/completion receipt and the earlier full DSH/config/project backups. Do not
+start a backup at its backup path: restore it using the verified transaction.
+The existing single-project command still requires a new absent destination.
+
+### Qualification and remaining scope
+
+Source build and **169/169 Node cases** across twenty-eight files/eight actual
+Chromium files pass, with unchanged two workers/deadlines and no skips. **35 Python
+cases** pass (nineteen exporter, sixteen licence/private-boundary/notice). A real
+Host retains one existing native conversation while adding six chats in two
+projects, continues both projects independently, preserves configuration bytes
+and old automatic-memory counts, and cold-reopens without replay. Earlier imports
+with new native turns remain exact; divergence/foreign native paths fail without
+publication. The original sidebar uses its existing workspace expansion controls;
+the initial driver incorrectly assumed every group was already expanded.
+
+Actual Node process death after the first rename releases the kernel lease while
+leaving the durable startup fence. Explicit rollback restores the exact original
+and retains the built candidate. Separate second-rename failure/finish, changed
+recovery-copy refusal, whole-state mode/hash backup and live-profile refusal pass.
+No owner project, native chat, model/audio request, configuration or running review
+is adopted by these independently authored fixtures. Artifact qualification follows.
+
+The state transaction is **MX/Linux qualified**. The POSIX runtime lease is shared
+source on Linux/macOS; common owner tests enter SDK CI, but macOS artifact/kernel
+qualification remains open. Windows keeps its existing named-pipe owner guard and
+honors a pending migration fence; transactional consolidation is explicitly refused
+until its ownership/recovery adapter is qualified. User-directed voice and later
+OS rollout remain deferred. Multi-profile native relocation, prompt/memory-owner
+convergence, stable larger exports, other historical formats/child navigation and
+owner acceptance remain required before full migration is claimed.
