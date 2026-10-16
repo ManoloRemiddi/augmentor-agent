@@ -11,6 +11,10 @@ test('rootless web dictation starts no conversation; original ordinary Send rema
  const caption=await f.ok('transcribe',{...ids,bytes:syntheticWave()});assert.deepEqual(caption,{text:'A synthetic editable draft.'});assert.equal((await f.call('session.list')).items.length,0);assert.equal(f.requests.length,0);assert.equal((await f.call('host.describe')).activeDictations,0);
  const sid='dictated-root';await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});await f.call('events.subscribe',{sessionId:sid});await f.call('session.prompt',{sessionId:sid,requestId:crypto.randomUUID(),content:[{type:'text',text:caption.text}]});await f.settled(sid);const history=await f.call('session.history',{sessionId:sid});assert.equal(history.events.find(row=>row.event.type==='user/message').event.data.inputMode,'text');assert(f.requests.length>0);assert(!JSON.stringify(f.requests).includes('The user spoke this request.'));
 });
+test('an absent dictation capability is an unavailable readiness observation, while recording remains strictly denied',{timeout:25000},async t=>{
+ const f=await dictationHost(t,{legacy:true}),status=await f.ok('catalog');assert.equal(status.connected,false);assert.match(status.error,/unavailable/);assert.equal(status.available,undefined);
+ const response=await f.post('open',{clientId:crypto.randomUUID(),captureId:crypto.randomUUID()});assert.equal(response.status,400);assert.equal(f.peer.connections.length,0);assert(!f.peer.requests.some(row=>row.path==='/internal/ticket'));assert.equal(f.requests.length,0);assert.equal((await f.call('host.describe')).activeDictations,0);
+});
 test('operator gateway admits binary audio above JSON limits and denies read-only inspectors and private speech RPCs',{timeout:25000},async t=>{
  const f=await dictationHost(t),sid='dictation-access',ids={clientId:crypto.randomUUID(),captureId:crypto.randomUUID()};await f.call('session.create',{sessionId:sid,cwd:f.workspace,selection:f.selection});
  const inspection=await f.call('inspection.open',{sessionId:sid}),readOnly=new URLSearchParams(new URL(inspection.url).hash.slice(1)).get('token');

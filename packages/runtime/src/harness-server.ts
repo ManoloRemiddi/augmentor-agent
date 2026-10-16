@@ -170,7 +170,7 @@ export class HarnessServer {
             const p=await this.body(req);if(!p||typeof p!=='object'||Array.isArray(p))throw Error('Supply a dictation request.');
             const keys=action==='catalog'?['refresh']:action==='open'?['clientId','captureId','sessionId']:['clientId','captureId'];
             if(Object.keys(p).some(key=>!keys.includes(key)))throw Error('Unexpected dictation parameters.');
-            if(action==='catalog'){if(p.refresh!==undefined&&typeof p.refresh!=='boolean')throw Error('Choose an explicit refresh.');return this.host.dictation.catalog(abort.signal,p.refresh===true);}
+            if(action==='catalog'){if(p.refresh!==undefined&&typeof p.refresh!=='boolean')throw Error('Choose an explicit refresh.');try{return await this.host.dictation.catalog(abort.signal,p.refresh===true);}catch{abort.signal.throwIfAborted();return {connected:false,error:'Recognition-only input is unavailable. Check the configured local companion. No model download was started.'};}}
             if(typeof p.clientId!=='string'||typeof p.captureId!=='string'||p.sessionId!==undefined&&typeof p.sessionId!=='string')throw Error('Supply exact dictation identities.');
             if(action==='open')return this.host.dictation.open(p.clientId,p.captureId,p.sessionId,abort.signal);
             if(action==='heartbeat')return this.host.dictation.heartbeat(p.clientId,p.captureId);

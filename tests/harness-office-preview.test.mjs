@@ -31,7 +31,7 @@ test('real pinned Linux Wasm converts an independent DOCX, exposes missing fonts
  await converter.close();assert.throws(()=>converter.generation(signal),e=>e.code==='gateway/service-unavailable');
 });
 test('Pi maintenance refuses Office teardown after the HTTP reader has canceled; forbidden surfaces never obtain a converter',async()=>{
- const host=Object.assign(Object.create(Host.prototype),{voice:{active:false,owns:()=>false}}),meta={id:'one',cwd:'/independent-office',surface:'browser'};Object.assign(host,{quiescing:false,sessionExports:{active:0},previewReads:0,uploads:0,organization:{archived:()=>false},getMeta:()=>meta,jobs:{busy:false},compactions:{busy:false},officePreview:{busy:true}});
+ const host=Object.assign(Object.create(Host.prototype),{dictation:{active:false},voice:{active:false,owns:()=>false}}),meta={id:'one',cwd:'/independent-office',surface:'browser'};Object.assign(host,{quiescing:false,sessionExports:{active:0},previewReads:0,uploads:0,organization:{archived:()=>false},getMeta:()=>meta,jobs:{busy:false},compactions:{busy:false},officePreview:{busy:true}});
  await assert.rejects(host.previewOffice('one',{path:'document.docx'},new AbortController().signal),/unavailable/);assert.throws(()=>host.officeGeneration('one',new AbortController().signal),/unavailable/);meta.surface='linux';meta.delegation={};await assert.rejects(host.previewOffice('one',{path:'document.docx'},new AbortController().signal),/unavailable/);meta.delegation=undefined;
  await assert.rejects(host.handle('host.prepareShutdown',{},'maintenance'),/Office-preview conversion and cleanup/);assert.equal(host.quiescing,false);
 });

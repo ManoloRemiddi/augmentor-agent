@@ -56,6 +56,12 @@ Authenticated operator-only loopback `POST /api/dictation/` operations are:
 | `transcribe` | Exact IDs in query; binary `audio/wav`, canonical mono 16 kHz PCM16; one submission only |
 | `close` | Exact IDs; idempotently retire only that capture and join accepted local work |
 
+An optional missing/incompatible companion is a successful readiness observation
+with `connected:false` and a non-sensitive unavailable message; it does not emit
+repeated HTTP failures into unrelated GUI workflows. Opening still strictly
+requires the explicit compatible capability. No readiness/microphone consumer
+mounts before operator access is resolved or inside a read-only inspector.
+
 Read-only inspectors cannot use any of these routes. The general JSON RPC gateway
 still denies private `voice.ticket` and `voice.close`. Existing same-origin,
 loopback host, bearer, no-store and maintenance admission remain in force.
@@ -101,7 +107,19 @@ claim. Hosted component run **38827292939** passes Linux x64/macOS ARM64 full
 suites; Windows retains its working-FFmpeg prerequisite failure and the overall
 failed result. The application’s existing Windows/Office/distribution gates remain.
 
-Exact frozen public source/ordinary/companion acceptance, an isolated MX review,
+The first frozen source cohort **709fdfc4** records 700 passes, 47 failures and
+two existing optional skips. GUI failures exposed optional readiness HTTP errors;
+constructor-bypassing unit fixtures lacked the new inactive dictation field. One
+owned model-account test child was explicitly terminated after that missing field
+prevented its held gate from entering. This failed/interrupted result and original
+copy remain. The expanded read-only browser driver also initially waited for an
+editable composer in an explicitly read-only inspector; its corrected assertion
+uses the existing disabled-composer marker, with the failed record retained.
+The correction exposes unavailable readiness as data, keeps opening
+strict, gates observers by resolved operator access, and supplies inactive state
+to those existing unit fixtures. No bounds, skips or worker counts are relaxed.
+
+Exact corrected frozen public source/ordinary/companion acceptance, an isolated MX review,
 owner microphone feedback and shared distribution/pin/adoption are still required.
 Current review `20261015-211446-7474ddb2` and selected installation remain unchanged
 and do **not** contain this microphone integration. Full voice, physical speech,

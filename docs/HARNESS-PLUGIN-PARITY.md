@@ -552,8 +552,10 @@ installed 1.6.0 package is a separate API-engine implementation. The public
 says MIT, while its [licence file](https://github.com/sjlgg/dsh-free-web-search/blob/9bfbd111ea5c84a9dba86d8ca613d33ca3e12dd5/LICENSE)
 is Apache-2.0. Package name/version do not prove that it is the historical
 installed artifact. That conflicting candidate's code is not copied. An optional
-owner identity question is pending; no licence exception or private source/key
-publication is inferred.
+owner identity question is resolved as a preference: on October 16 the owner
+did not know the historical repository and explicitly directed continued use of
+the tested MIT alternatives. Historical identity remains unconfirmed and is not
+a delivery blocker; no licence exception or private source/key publication is inferred.
 
 Instead the selected public MIT sources are:
 

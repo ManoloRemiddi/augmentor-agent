@@ -26,7 +26,7 @@ test('late lookup loses its session authority and propagates the supplier cancel
 });
 test('Host lookup lease blocks maintenance while metadata is pending, releases on abort, and refuses archived/browser authority before discovery',async()=>{
  // Component lifecycle evidence: a controlled metadata wait, no SDK/provider.
- const host=Object.assign(Object.create(Host.prototype),{voice:{active:false,owns:()=>false},sessionExports:{active:0}}),meta={id:'one',cwd:'/authored-workspace',surface:'linux'},abort=new AbortController();let entered=0;
+ const host=Object.assign(Object.create(Host.prototype),{dictation:{active:false},voice:{active:false,owns:()=>false},sessionExports:{active:0}}),meta={id:'one',cwd:'/authored-workspace',surface:'linux'},abort=new AbortController();let entered=0;
  Object.assign(host,{referenceRequests:0,quiescing:false,organization:{archived:()=>false},jobs:{busy:false},compactions:{busy:false},uploads:0,getMeta:()=>meta,fileReferences:{list:async(_sid,_cwd,_q,signal)=>{entered++;return new Promise((_,reject)=>signal.addEventListener('abort',()=>reject(Error('lookup aborted')),{once:true}));}}});
  const pending=host.listFileReferences('one','',abort.signal),rejection=assert.rejects(pending,/aborted/);assert.equal(host.referenceRequests,1);await assert.rejects(host.handle('host.prepareShutdown',{},'maintenance'),/file-reference lookups/);abort.abort();await rejection;assert.equal(host.referenceRequests,0);
  meta.surface='browser';await assert.rejects(host.listFileReferences('one',''),/unavailable/);meta.surface='linux';host.organization.archived=()=>true;await assert.rejects(host.listFileReferences('one',''),/unavailable/);assert.equal(entered,1);

@@ -55,7 +55,7 @@ test('registered provider overrides retain complete configuration support and re
 
 test('an aborted refresh, provider error or concurrent profile replacement keeps configuration unconfirmed',async()=>{
  for(const outcome of ['aborted','error','replacement']){
-  const host=Object.assign(Object.create(Host.prototype),{voice:{active:false,owns:()=>false}});let fingerprint='initial',marked=false;
+  const host=Object.assign(Object.create(Host.prototype),{dictation:{active:false},voice:{active:false,owns:()=>false}});let fingerprint='initial',marked=false;
   Object.assign(host,{metadata:new Map(),loaded:new Map(),jobs:{busy:false},compactions:{busy:false},improvements:{busy:false},mcpManagement:{busy:false},modelSettings:{get fingerprint(){return fingerprint;},cancelDiscoveries(){},markApplied(){marked=true;}},modelRuntime:{getError:()=>undefined,refresh:async()=>{if(outcome==='replacement')fingerprint='replacement';return {aborted:outcome==='aborted',errors:new Map(outcome==='error'?[['fixture',Error('AUTHORED_SECRET')]]:[])};}}});
   await assert.rejects(host.reloadModelSettings(),error=>error.message.includes('Work stays blocked')&&!error.message.includes('AUTHORED_SECRET'));assert.equal(host.modelSettingsProblem,true);assert.equal(host.modelSettingsBusy,false);assert.equal(marked,false);
  }

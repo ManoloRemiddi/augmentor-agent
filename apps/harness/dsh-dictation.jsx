@@ -23,6 +23,7 @@ function useReadiness(select=x=>x){
     const abort=new AbortController();let timer;
     const poll=async()=>{
       try{const value=await transport.catalog(abort.signal);if(abort.signal.aborted)return;
+        if(value.connected===false){setReadiness({connected:false,catalog:null,error:value.error});return;}
         setReadiness({connected:true,error:null,catalog:{providers:[{id:'resonant-cpu',name:'Configured Whisper · CPU',location:'host-local',preparation:{phase:value.available?'standby':'failed'}}],selection:{providerId:'resonant-cpu',language:'en'},maxAudioBytes:value.maxAudioBytes,maxDurationSeconds:value.maxDurationSeconds}});
       }catch(error){if(!abort.signal.aborted)setReadiness({connected:false,catalog:null,error:error.message});}
       finally{if(!abort.signal.aborted)timer=setTimeout(poll,5000);}
