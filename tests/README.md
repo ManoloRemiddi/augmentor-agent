@@ -2032,3 +2032,26 @@ failure evidence and remaining hosted/live/release gates stay explicit in the
 [Harness dictation](../docs/HARNESS-DICTATION.md) uses independent scripted
 recognition/provider peers, actual Host/SDK and the original Chromium controls
 with fake browser audio. After build, run `node --test tests/harness-dictation.test.mjs tests/harness-dictation-host.test.mjs tests/harness-dictation-chromium.test.mjs`. This does not qualify physical speech or install a companion.
+
+
+## Multi-conversation DSH imports — October 16
+
+The authored `fixtures/dsh-project.mjs` supplies three independent completed
+histories with reused historical tool IDs. `dsh-project-import.test.mjs` checks
+whole-project cold contexts, exact pin/archive order, one source archive, explicit
+per-chat model choices/CLI mapping, empty project registration, source/target
+preservation and complete staging cleanup when the second native writer throws.
+`dsh-project-multi-runtime.test.mjs` checks the actual Host, routed synthetic
+continuation and cold restart. `harness-dsh-project-multi-chromium.test.mjs` drives
+the original sidebar/composer, switches chats without mixed context and leaves
+an initialized sibling native file unchanged. First-open SDK settings may append;
+the complete imported prefix remains exact. The existing long Trajectory case
+is retained. No owner history or private source is used in these fixtures.
+
+A focused source cohort of 50 cases across nine files/four Chromium files passes
+with two workers/no skips/unchanged bounds. Python qualification passes 29 cases,
+including all 13 read-only exporter cases; those 13 also pass without site
+packages. The common Node/export contracts are registered in the three-OS SDK
+workflow, without claiming hosted or other-OS artifact success. The earlier
+sealed application fails the new three-chat regression at its single-parent
+gate. [Owning scope and remaining conversion work](../docs/HARNESS-DSH-MIGRATION-PILOT.md#multi-conversation-projects--october-16).

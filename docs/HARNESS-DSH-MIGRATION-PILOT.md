@@ -81,9 +81,11 @@ request-source snapshots and live Fleet-job ownership are not manufactured.
 
 ## Pilot limits
 
-This importer intentionally refuses multi-conversation projects, unresolved tool
-calls, sequence gaps, edited/compacted/branched record forms, attachments or opaque
-reasoning parts in parent messages. Their originals remain backed up. Historical
+The initial single-conversation pilot refused multi-conversation projects. The
+[current project importer](#multi-conversation-projects--october-16) adds that
+cardinality support. Unresolved tool calls, sequence gaps, edited/compacted/branched
+record forms, attachments and opaque reasoning parts in parent messages still
+require their own converters. Their originals remain backed up. Historical
 subagent logs are archived, not recreated as live Pi Fleet jobs. Branching at an
 old imported answer, historical request-context reconstruction and original usage
 accounting are not qualified. Existing memory banks, Wiki data, credentials,
@@ -203,3 +205,85 @@ acceptance of continuing real work in the pilot is still needed before wider
 transfer. [Aggregate inventory](../release/harness-dsh-inventory-review-20261016.json)
 contains no project names, paths, source IDs or conversation content; detailed
 source metadata and digests remain private.
+
+## Multi-conversation projects — October 16
+
+The offline exporter/importer now handles **one project with zero to 128 distinct
+parent conversations**. An empty project registers its existing folder without
+inventing a conversation. Each parent gets a separate native Pi history, title,
+continuation model selection, display journal and source-sequence provenance.
+Old tool-call IDs may repeat between chats without sharing execution state.
+Workspace membership, exact relative pin order and archived membership survive;
+archived chats are excluded from ordinary pinned/visible lists. No original
+project file is copied over or changed by importing its folder registration.
+
+All parents and organization/model mappings validate before a destination is
+staged. The project is published through one directory rename only after every
+native writer and cold-context check succeeds. Failure leaves no published
+partial conversations. The destination must be a new private state directory;
+this does **not merge into a running or existing profile**. Existing single-parent
+callers retain the pilot receipt fields (with an added explicit selection).
+Multi-parent/empty receipts use `augmentor-dsh-project-import/2` with a `sessions`
+array mapping every source ID to its native ID and selected continuation model.
+The original `augmentor-dsh-project-export/1` bundle already contains a sessions
+array and stays compatible; its raw bytes are archived once for the whole project.
+
+The exporter rechecks every parent/family cursor, workspace membership and final
+parent running/catalogue state. Repeated child references must have the same
+parent/mode; a child cannot alias a root or silently move between parents.
+There are at most 32 archived related conversations per bundle. The existing
+30,000-record per-history and 32 MiB whole-export bounds remain. A cumulative
+byte check now limits collection before all parent/family records accumulate;
+formatted output is checked again. No bound, provider/inference budget or native
+tool-excerpt limit is increased. Old child histories remain archived rather than
+being started as jobs. Current request context, permissions, queues and automatic
+memory do not reactivate historical actions.
+
+Continuation uses an explicit currently configured default model. An optional
+private source-ID mapping selects different current models for individual chats;
+it accepts only provider/model IDs, not credentials or provider configuration.
+Unknown source IDs, blank models, duplicate/foreign membership and malformed
+organization fail before staging. Legacy source model metadata stays in the raw
+archive rather than automatically choosing a future provider.
+
+```sh
+python3 scripts/export-dsh-project.py --project EXACT_WORKSPACE_ID \
+  --output /absolute/private/project-export.json
+node scripts/import-dsh-project.mjs /absolute/private/project-export.json \
+  /absolute/private/new-state EXACT_EXPORT_SHA256 CURRENT_PROVIDER CURRENT_MODEL \
+  --session-selections /absolute/private/model-choices.json
+```
+
+The optional JSON maps source conversation IDs to objects such as
+`{"provider":"current-provider","model":"current-model"}`. Its regular-file bound
+is 1 MiB. Without the option all chats receive the explicit default; their later
+model-picker choices remain independent. The import command does not open a
+runtime or submit model requests. It does not create the surrounding provider/
+companion configuration or activate an installed application.
+
+Source qualification passes **50/50 Node cases across nine files**, including
+four actual Chromium files, plus **29 Python cases** (13 exporter and 16 licence/
+private-source/notice checks). The exporter tests also pass all 13 cases with
+Python site packages disabled, as shared helper imports need only the standard
+library. The common import/runtime/export contracts are registered in the existing
+three-OS SDK workflow; hosted results and other-OS artifacts are separate gates.
+The implementation uses the existing shared Node/Python/SDK paths, with no new
+OS helper, dependency or supplier source. MX is the qualified local platform.
+
+The controlled earlier sealed build rejects the new three-chat test at its
+single-parent restriction. Current actual Host tests check per-chat routing,
+zero historical replay/capture, one explicit new turn and cold restart. Original
+GUI tests switch Alpha/Beta in the unchanged workspace sidebar, keep archived
+Gamma hidden and continue Beta through the actual composer with exactly two
+synthetic provider calls. Its request contains Beta history without Alpha/Gamma;
+Alpha's imported prefix stays exact. First opening may append normal current SDK
+model/thinking settings, and a later Beta turn leaves the initialized Alpha file
+unchanged. The existing 140-tool Trajectory regression remains. No real owner
+conversation or model is used by these synthetic checks.
+
+The running owner's representative pilot remains on its existing build/profile;
+no extra project is transferred by this implementation. Image/reasoning and
+edit/compaction/branch conversion, changing/oversized cuts, child navigation,
+multi-project consolidation into one profile, existing companion data and wider
+owner acceptance remain required for full migration. New source/staged evidence
+must not be read as completed bulk migration. Artifact qualification follows.

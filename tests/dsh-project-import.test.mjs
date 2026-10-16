@@ -6,8 +6,14 @@ import {existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
-import {SessionManager} from '@earendil-works/pi-coding-agent';
-import {importDshProject} from '../dist/runtime/src/dsh-project-import.js';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+const applicationRoot=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.');
+const sdkRoot=resolve(applicationRoot,'node_modules/@earendil-works/pi-coding-agent'),sdkPackage=JSON.parse(await readFile(join(sdkRoot,'package.json'),'utf8'));
+const {SessionManager}=await import(pathToFileURL(resolve(sdkRoot,sdkPackage.exports['.'].import)));
+const {importDshProject}=await import(pathToFileURL(resolve(applicationRoot,'dist/runtime/src/dsh-project-import.js')));
 import {piTranscriptEvent} from '../dist/memory/src/pi.js';
 import {DisplayHistory} from '../dist/runtime/src/display-history.js';
 import {toolOwnership} from '../apps/harness/dsh-call-identity.mjs';
@@ -57,4 +63,81 @@ test('large old tool payloads are bounded in continuation context while exact so
  const text=JSON.stringify(messages);assert(text.length<12000);assert(text.includes('AUTHORED_HEAD'));assert(text.includes('AUTHORED_TAIL'));assert(text.includes('excerpt cut'));assert(text.includes('Full source archive'));
  assert.equal(receipt.toolPayloadContextChars,256);assert(receipt.toolPayloadCharsNotInContext>300000);assert.equal(receipt.archivedToolProposalMessages,1);assert.deepEqual(await readFile(join(f.state,receipt.rawArchive)),await readFile(f.source));
  const display=[...new DisplayHistory(join(f.state,'sessions',receipt.sessionId+'.events.jsonl')).all()];assert.equal(display.find(e=>e.type==='tool/result').data.result.content[0].text,f.value.sessions[0].records[6].event.data.message.content[0].text);
+});
+
+async function multiFixture(t){
+ const f=await fixture(t),first=f.value.sessions[0];
+ f.value.workspace.sessionIds=['authored-source','authored-beta','authored-gamma'];
+ f.value.sessions=f.value.workspace.sessionIds.map((id,index)=>{const s=structuredClone(first);s.opening.header.id=id;s.opening.projections.values.title='Authored chat '+index;
+  s.records[3].event.data.content[0].text='Authored isolated question '+index;
+  s.records[6].event.data.message.content[0].text='Authored isolated result '+index;
+  s.records[7].event.data.message.content[0].text='Authored isolated answer '+index;return s;});
+ f.value.archivedSessionIds=['authored-gamma'];f.value.pinnedSessionIds=['authored-beta','authored-gamma','authored-source'];
+ return f;
+}
+test('a whole project cold-opens separate native conversations with exact pin order, archive membership and one raw archive',async t=>{
+ const f=await multiFixture(t);f.value.sessions.reverse();const options=await f.save();options.sessionSelections={'authored-beta':{provider:'explicit-beta-provider',model:'explicit-beta-model'}};const sourceBefore=await readFile(f.source),receipt=importDshProject(f.source,f.state,options);
+ assert.equal(receipt.schema,'augmentor-dsh-project-import/2');assert.equal(receipt.sessionId,undefined);assert.equal(receipt.sessions.length,3);
+ assert.deepEqual(receipt.sessions.map(r=>r.sourceSessionId),f.value.workspace.sessionIds);assert.equal(receipt.sourceEvents,27);assert.equal(receipt.displayEvents,30);
+ assert.equal(receipt.relatedSessionsArchived,1);assert.equal((await readdir(join(f.state,'dsh-imports'))).length,2,'one shared original plus one project receipt');
+ const native=[];
+ for(const [index,row] of receipt.sessions.entries()){
+  const meta=JSON.parse(await readFile(join(f.state,'sessions',row.sessionId+'.meta.json'))),manager=SessionManager.open(meta.file),text=JSON.stringify(manager.buildSessionContext().messages);
+  assert.equal(meta.title,'Authored chat '+index);assert.equal(manager.getSessionName(),'Authored chat '+index);assert.equal(meta.policy,'read-only');assert.equal(meta.running,false);assert.deepEqual(meta.requests,[]);assert.deepEqual(meta.selection,index===1?options.sessionSelections['authored-beta']:f.selection);assert.deepEqual(row.selection,meta.selection);
+  assert(text.includes('Authored isolated question '+index));assert(text.includes('Authored isolated result '+index));assert(text.includes('Authored isolated answer '+index));
+  for(const other of [0,1,2].filter(n=>n!==index))assert(!text.includes('Authored isolated question '+other),'no cross-conversation context');
+  assert(!manager.buildSessionContext().messages.some(m=>m.role==='assistant'||m.role==='toolResult'));
+  const display=[...new DisplayHistory(join(f.state,'sessions',row.sessionId+'.events.jsonl')).all()];
+  assert(display.slice(0,-1).every(e=>e.data.importedFrom.sourceSessionId===row.sourceSessionId));assert.deepEqual(display.flatMap(piTranscriptEvent),[]);
+  assert.equal(projectChat(display,{toolBindings:toolOwnership(display)}).find(x=>x.kind==='tool').status,'finished','reused old-call identities remain local to each conversation');
+  native.push({manager,file:meta.file,bytes:await readFile(meta.file)});
+ }
+ const organization=JSON.parse(await readFile(join(f.state,'session-organization.json')));assert.deepEqual(organization.pinnedSessionIds,[receipt.sessions[1].sessionId,receipt.sessions[0].sessionId]);assert.deepEqual(organization.archivedSessionIds,[receipt.sessions[2].sessionId]);
+ assert.equal(JSON.parse(await readFile(join(f.state,'workspaces.json'))).items.length,1);assert.deepEqual(await readFile(join(f.state,receipt.rawArchive)),sourceBefore);assert.deepEqual(await readFile(f.source),sourceBefore);
+ native[1].manager.appendMessage({role:'user',content:'New explicit Beta continuation',timestamp:1700000001000});
+ assert.equal(SessionManager.open(native[1].file).buildSessionContext().messages.at(-1).content,'New explicit Beta continuation');
+ for(const index of [0,2])assert.deepEqual(await readFile(native[index].file),native[index].bytes);
+ assert.equal(await readFile(join(f.cwd,'original.txt'),'utf8'),'Original authored bytes\n');
+});
+for(const [name,change,pattern] of [
+ ['invalid second history',v=>{v.sessions[1].records[6].event.type='unresolved-original';},/unresolved/],
+ ['duplicate source identity',v=>{v.sessions[1].opening.header.id=v.sessions[0].opening.header.id;},/membership/],
+ ['duplicate project membership',v=>{v.workspace.sessionIds[1]=v.workspace.sessionIds[0];},/membership/],
+ ['second conversation in another folder',v=>{v.sessions[1].opening.header.cwd+='/other';},/another workspace/],
+ ['foreign pin',v=>{v.pinnedSessionIds.push('not-in-the-project');},/organization/],
+ ['malformed organization',v=>{v.archivedSessionIds='not-an-array';},/organization/],
+ ['overflow',v=>{v.sessions=Array.from({length:129},()=>v.sessions[0]);},/128/]
+])test('whole-project '+name+' publishes no partial conversations',async t=>{
+ const f=await multiFixture(t);change(f.value);const options=await f.save(),before=await readFile(f.source);assert.throws(()=>importDshProject(f.source,f.state,options),pattern);
+ assert(!existsSync(f.state));assert(!(await readdir(f.root)).some(x=>x.startsWith('.dsh-import-')));assert.deepEqual(await readFile(f.source),before);
+});
+test('an empty source project preserves its folder registration without inventing a conversation',async t=>{
+ const f=await fixture(t);f.value.sessions=[];f.value.workspace.sessionIds=[];f.value.relatedSessions=[];f.value.pinnedSessionIds=[];
+ const receipt=importDshProject(f.source,f.state,await f.save());assert.equal(receipt.schema,'augmentor-dsh-project-import/2');assert.deepEqual(receipt.sessions,[]);assert.equal(receipt.sourceEvents,0);assert.equal(receipt.contextEntries,0);
+ assert.deepEqual(await readdir(join(f.state,'sessions')),[]);assert.equal(JSON.parse(await readFile(join(f.state,'workspaces.json'))).items[0].cwd,f.cwd);
+});
+
+for(const [name,sessionSelections] of [
+ ['foreign source',{'not-a-source':{provider:'explicit',model:'choice'}}],
+ ['blank model',{'authored-beta':{provider:'explicit',model:'  '}}],
+ ['extra credential fields',{'authored-beta':{provider:'explicit',model:'choice',apiKey:'authored-not-a-real-key'}}],
+ ['array mapping',[]]
+])test('invalid per-conversation model '+name+' leaves the whole destination absent',async t=>{
+ const f=await multiFixture(t),options=await f.save();assert.throws(()=>importDshProject(f.source,f.state,{...options,sessionSelections}),/model|project/);assert(!existsSync(f.state));
+});
+
+test('offline CLI accepts an explicit bounded session-model map and reports all source mappings',async t=>{
+ const f=await multiFixture(t),options=await f.save(),mapFile=join(f.root,'authored-model-map.json');
+ const chosen={provider:'explicit-beta-provider',model:'explicit-beta-model'};await writeFile(mapFile,JSON.stringify({'authored-beta':chosen}),{mode:0o600});
+ const script=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.','scripts/import-dsh-project.mjs');
+ const {stdout}=await promisify(execFile)(process.execPath,[script,f.source,f.state,options.sourceSha256,f.selection.provider,f.selection.model,'--session-selections',mapFile]);
+ const receipt=JSON.parse(stdout);assert.equal(receipt.sessions.length,3);assert.deepEqual(receipt.sessions[1].selection,chosen);assert.deepEqual(receipt.sessions[0].selection,f.selection);
+ const meta=JSON.parse(await readFile(join(f.state,'sessions',receipt.sessions[1].sessionId+'.meta.json')));assert.deepEqual(meta.selection,chosen);
+});
+
+test('a second native writer failure removes the entire staged project and preserves its source',async t=>{
+ const f=await multiFixture(t),options=await f.save(),before=await readFile(f.source),create=SessionManager.create;let written=0;
+ t.mock.method(SessionManager,'create',(...args)=>{if(++written===2)throw Error('Authored second native writer failure');return create(...args);});
+ assert.throws(()=>importDshProject(f.source,f.state,options),/Authored second native writer failure/);assert.equal(written,2);
+ assert(!existsSync(f.state));assert(!(await readdir(f.root)).some(x=>x.startsWith('.dsh-import-')));assert.deepEqual(await readFile(f.source),before);assert.equal(await readFile(join(f.cwd,'original.txt'),'utf8'),'Original authored bytes\n');
 });

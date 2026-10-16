@@ -4,7 +4,9 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';import {once} from 'node:events';
 import {mkdtemp,writeFile,rename,rm} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';import {createHash} from 'node:crypto';import {setTimeout as delay} from 'node:timers/promises';
 import {planFixture} from './fixtures/plans.mjs';import {chromiumPort} from './fixtures/chromium-ready.mjs';import {harnessCdp} from './fixtures/harness-cdp.mjs';import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
-import {importDshProject} from '../dist/runtime/src/dsh-project-import.js';
+import {resolve} from 'node:path';
+import {pathToFileURL} from 'node:url';
+const {importDshProject}=await import(pathToFileURL(resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.','dist/runtime/src/dsh-project-import.js')));
 async function until(fn,label){const end=Date.now()+12000;while(Date.now()<end){if(await fn())return;await delay(30);}throw Error('Imported trajectory timeout: '+label);}
 test('large imported history renders virtualized Trajectory and inspection without replay or page errors',{skip:process.platform!=='linux',timeout:60000},async t=>{
  const f=await planFixture(t,{policy:'read-only'});await f.stop();await rename(f.state,f.state+'-before-import');

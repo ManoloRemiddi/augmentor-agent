@@ -52,27 +52,18 @@ function records(session:Data){
  return rows.map((r:Data)=>r.event) as Data[];
 }
 
-/** Offline pilot only. Never opens a runtime, provider, shell, original store or existing target.
- * Historical messages become labelled native custom context, not executable tool proposals.
- * Exact raw source is retained alongside a separate derived display timeline. */
-export function importDshProject(sourceFile:string,targetState:string,options:{selection:{provider:string;model:string};sourceSha256:string}){
- const info=lstatSync(sourceFile);if(!info.isFile()||info.isSymbolicLink()||info.size>MAX_EXPORT)fail('source must be a bounded regular export.');
- const bytes=readFileSync(sourceFile),sha256=digest(bytes);if(sha256!==options.sourceSha256)fail('source checksum changed.');
- const source=JSON.parse(bytes.toString('utf8')) as Data;
- if(source.schema!=='augmentor-dsh-project-export/1'||!source.workspace||!Array.isArray(source.sessions)||source.sessions.length!==1)fail('this pilot accepts exactly one project conversation.');
- const workspace=source.workspace,cwd=workspace.path;
- if(typeof cwd!=='string'||!isAbsolute(cwd)||resolve(cwd)!==cwd||!lstatSync(cwd).isDirectory()||typeof workspace.title!=='string'||!workspace.title.trim())fail('workspace folder/name is unavailable.');
- if(!Array.isArray(workspace.sessionIds)||workspace.sessionIds.length!==1||workspace.sessionIds[0]!==source.sessions[0].opening?.header?.id)fail('workspace membership differs from the export.');
- if(!options.selection?.provider||!options.selection.model)fail('choose the current continuation model explicitly.');
- if(!isAbsolute(targetState)||present(targetState))fail('destination state must be a new absolute path; existing profiles are never merged.');
- const parent=dirname(targetState),parentInfo=lstatSync(parent);if(realpathSync(parent)!==resolve(parent)||!parentInfo.isDirectory()||parentInfo.isSymbolicLink()||process.platform!=='win32'&&(parentInfo.uid!==process.getuid!()||(parentInfo.mode&0o077)!==0))fail('destination needs a private operator-owned parent.');
- if(source.sessions[0].opening?.header?.cwd!==cwd)fail('source conversation belongs to another workspace.');
- const original=source.sessions[0],events=records(original),sid='dsh-import-'+digest(original.opening.header.id).slice(0,24),now=Date.now();
- const stage=join(parent,'.dsh-import-'+randomUUID());privateDir(stage);
- let published=false;
- try{
-  const sessions=privateDir(join(stage,'sessions')),nativeDir=privateDir(join(sessions,sid)),archiveDir=privateDir(join(stage,'dsh-imports'));
-  writeFileSync(join(archiveDir,sha256+'.json'),bytes,{mode:0o600,flag:'wx'});
+type ModelSelection={provider:string;model:string};
+type ImportOptions={selection:ModelSelection;sessionSelections?:Record<string,ModelSelection>;sourceSha256:string};
+const MAX_PROJECT_SESSIONS=128;
+function checkedSelection(value:unknown):ModelSelection{
+ const row=value as ModelSelection;
+ if(!row||typeof row!=='object'||Array.isArray(row)||Object.keys(row).some(key=>!['provider','model'].includes(key))||typeof row.provider!=='string'||!row.provider.trim()||typeof row.model!=='string'||!row.model.trim())fail('choose the current continuation model explicitly.');
+ return {provider:row.provider,model:row.model};
+}
+/** One native conversation; historical calls never become executable Pi proposals. */
+function writeSession(original:Data,events:Data[],stage:string,targetState:string,source:Data,selection:ModelSelection,sha256:string,now:number){
+ const workspace=source.workspace,cwd=workspace.path,sid='dsh-import-'+digest(original.opening.header.id).slice(0,24);
+ const sessions=privateDir(join(stage,'sessions')),nativeDir=privateDir(join(sessions,sid));
   const manager=SessionManager.create(cwd,nativeDir),title=original.opening.projections?.values?.title??workspace.title;
   manager.appendSessionInfo(typeof title==='string'?title:workspace.title);
   manager.appendCustomEntry('augmentor.dsh-import.v1',{sha256,sourceSessionId:original.opening.header.id,throughSeq:original.opening.cursor,source:'DSH',context:'labelled historical transcript; not reconstructed effective DSH context',rawArchive:'dsh-imports/'+sha256+'.json',historicalUsage:'original archive only; no invented Pi accounting',relatedSessionsArchived:(source.relatedSessions??[]).length,relatedSessionRuntime:'not imported as live Pi jobs'});
@@ -106,11 +97,44 @@ export function importDshProject(sourceFile:string,targetState:string,options:{s
   display.push({seq:display.length+1,type:'runtime/notice',data:{message:notice,importedFrom:{archiveSha256:sha256}}});
   writeFileSync(join(sessions,sid+'.events.jsonl'),display.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600,flag:'wx'});
   const finalNative=join(targetState,'sessions',sid,nativeFile.split(/[\\/]/).at(-1)!);
-  atomicJson(join(sessions,sid+'.meta.json'),{id:sid,cwd,file:finalNative,selection:options.selection,title:typeof title==='string'?title:workspace.title,saved:true,policy:'read-only',surface:'linux',updatedAt:now,requests:[],running:false});
+  atomicJson(join(sessions,sid+'.meta.json'),{id:sid,cwd,file:finalNative,selection,title:typeof title==='string'?title:workspace.title,saved:true,policy:'read-only',surface:'linux',updatedAt:now,requests:[],running:false});
+  const receipt={schema:'augmentor-dsh-pilot-import/1',sourceSha256:sha256,sourceSessionId:original.opening.header.id,sessionId:sid,selection,cwd,contextEntries,sourceEvents:events.length,displayEvents:display.length,skippedInstructionMessages,archivedToolProposalMessages,toolPayloadContextLimitChars:16384,toolPayloadContextChars:16384-toolContextLeft,toolPayloadCharsNotInContext:toolPayloadChars-(16384-toolContextLeft),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
+ return receipt;
+}
+
+/** Offline project import. Never opens a runtime/provider or modifies an existing target.
+ * All parents validate before staging; the whole project is published by one rename.
+ * The single-conversation receipt stays compatible with the earlier pilot. */
+export function importDshProject(sourceFile:string,targetState:string,options:ImportOptions){
+ const info=lstatSync(sourceFile);if(!info.isFile()||info.isSymbolicLink()||info.size>MAX_EXPORT)fail('source must be a bounded regular export.');
+ const bytes=readFileSync(sourceFile),sha256=digest(bytes);if(sha256!==options.sourceSha256)fail('source checksum changed.');
+ const source=JSON.parse(bytes.toString('utf8')) as Data;
+ if(source.schema!=='augmentor-dsh-project-export/1'||!source.workspace||!Array.isArray(source.sessions)||source.sessions.length>MAX_PROJECT_SESSIONS)fail('choose a project with at most 128 conversations.');
+ const workspace=source.workspace,cwd=workspace.path;
+ if(typeof cwd!=='string'||!isAbsolute(cwd)||resolve(cwd)!==cwd||!lstatSync(cwd).isDirectory()||typeof workspace.title!=='string'||!workspace.title.trim())fail('workspace folder/name is unavailable.');
+ const ids=workspace.sessionIds;
+ if(!Array.isArray(ids)||ids.length!==source.sessions.length||new Set(ids).size!==ids.length||ids.some(id=>typeof id!=='string'))fail('workspace membership differs from the export.');
+ const byId=new Map<string,Data>();
+ for(const session of source.sessions){const id=session?.opening?.header?.id;if(typeof id!=='string'||!ids.includes(id)||byId.has(id))fail('workspace membership differs from the export.');byId.set(id,session);}
+ const fallback=checkedSelection(options.selection),selected=new Map<string,ModelSelection>();
+ if(options.sessionSelections!==undefined){
+  if(!options.sessionSelections||typeof options.sessionSelections!=='object'||Array.isArray(options.sessionSelections))fail('session model choices must be keyed by source conversation.');
+  for(const [id,value] of Object.entries(options.sessionSelections)){if(!byId.has(id))fail('session model choice belongs to another project.');selected.set(id,checkedSelection(value));}
+ }
+ if(!isAbsolute(targetState)||present(targetState))fail('destination state must be a new absolute path; existing profiles are never merged.');
+ const parent=dirname(targetState),parentInfo=lstatSync(parent);if(realpathSync(parent)!==resolve(parent)||!parentInfo.isDirectory()||parentInfo.isSymbolicLink()||process.platform!=='win32'&&(parentInfo.uid!==process.getuid!()||(parentInfo.mode&0o077)!==0))fail('destination needs a private operator-owned parent.');
+ const prepared=ids.map(id=>{const original=byId.get(id)!;if(original.opening.header.cwd!==cwd)fail('source conversation belongs to another workspace.');return {original,events:records(original)};});
+ const organization=(key:string)=>{const value=source[key]??[];if(!Array.isArray(value)||new Set(value).size!==value.length||value.some(id=>typeof id!=='string'||!byId.has(id)))fail('session organization differs from project membership.');return new Set<string>(value);};
+ const archived=organization('archivedSessionIds'),pinned=organization('pinnedSessionIds');
+ if(source.relatedSessions!==undefined&&(!Array.isArray(source.relatedSessions)||source.relatedSessions.length>32))fail('related-session archive exceeds its project bound.');
+ const stage=join(parent,'.dsh-import-'+randomUUID());privateDir(stage);let published=false;
+ try{
+  privateDir(join(stage,'sessions'));const archiveDir=privateDir(join(stage,'dsh-imports'));writeFileSync(join(archiveDir,sha256+'.json'),bytes,{mode:0o600,flag:'wx'});
+  const receipts=prepared.map(({original,events})=>writeSession(original,events,stage,targetState,source,selected.get(original.opening.header.id)??fallback,sha256,Date.now()));
   atomicJson(join(stage,'workspaces.json'),{schema:'augmentor-workspaces/1',revision:1,items:[{workspaceId:cwd,cwd,title:workspace.title}],removed:[]});
-  const archived=source.archivedSessionIds?.includes(original.opening.header.id)===true,pinned=!archived&&source.pinnedSessionIds?.includes(original.opening.header.id)===true;
-  atomicJson(join(stage,'session-organization.json'),{schema:'augmentor-session-organization/1',revision:1,pinnedSessionIds:pinned?[sid]:[],archivedSessionIds:archived?[sid]:[]});
-  const receipt={schema:'augmentor-dsh-pilot-import/1',sourceSha256:sha256,sourceSessionId:original.opening.header.id,sessionId:sid,cwd,contextEntries,sourceEvents:events.length,displayEvents:display.length,skippedInstructionMessages,archivedToolProposalMessages,toolPayloadContextLimitChars:16384,toolPayloadContextChars:16384-toolContextLeft,toolPayloadCharsNotInContext:toolPayloadChars-(16384-toolContextLeft),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
+  const mapped=new Map(receipts.map(row=>[row.sourceSessionId,row.sessionId]));
+  atomicJson(join(stage,'session-organization.json'),{schema:'augmentor-session-organization/1',revision:1,pinnedSessionIds:[...pinned].filter(id=>!archived.has(id)).map(id=>mapped.get(id)!),archivedSessionIds:[...archived].map(id=>mapped.get(id)!)});
+  const receipt=receipts.length===1?receipts[0]:{schema:'augmentor-dsh-project-import/2',sourceSha256:sha256,cwd,sessions:receipts,sourceEvents:receipts.reduce((sum,row)=>sum+row.sourceEvents,0),displayEvents:receipts.reduce((sum,row)=>sum+row.displayEvents,0),contextEntries:receipts.reduce((sum,row)=>sum+row.contextEntries,0),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
   atomicJson(join(archiveDir,'receipt.json'),receipt);
   if(present(targetState))fail('destination appeared during staging; nothing was merged.');
   renameSync(stage,targetState);published=true;return receipt;
