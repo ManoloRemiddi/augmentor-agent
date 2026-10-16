@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi response metrics](PI-RESPONSE-METRICS.md) binds the existing response-preview
+workflow to exact native assistant messages, with separate client/server timing
+and original Trajectory presentation. Focused checks pass; broader qualification
+and owner adoption remain separate.
+
 [Shared Augmentor persona on Pi](PI-INSTRUCTIONS.md) now binds the approved source
 to native conversation snapshots and existing Context evidence. Root roles retain
 selection through cold reopen and branches; legacy branches/workers stay distinct.

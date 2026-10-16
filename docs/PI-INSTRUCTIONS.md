@@ -12,7 +12,9 @@ changes instruction composition; it introduces no tool, permission or service.
 The shared text remains unchanged. An additional capability boundary clarifies
 that mentioning an optional tool or service does not register/connect it, permit
 a consent bypass, or authorize invented results. In particular, the persona's
-`response_metrics` guidance does not mean Pi has that optional tool. Current
+`response_metrics` guidance does not by itself register a tool. The subsequent
+[Pi response-metrics binding](PI-RESPONSE-METRICS.md) supplies that capability
+with exact native matching and explicit measurement boundaries. Current
 registered tools, permission mode, role/workspace and explicit user instructions
 remain authoritative. No filesystem, shell or general desktop authority is
 added to browser-only conversations. Bounded workers retain their existing
@@ -124,7 +126,7 @@ is not established. Earlier Windows jobs/native and macOS packaging failures sta
 retained. New-head hosted acceptance remains separate from local results.
 
 Owner adoption/physical MX feedback, full instruction/resource/opaque-handler
-provenance, optional response-metrics tooling, other embedded roles, representative
+provenance, representative response-metrics providers, other embedded roles, representative
 behavior/provider/speech acceptance and all broader memory/plugin/Home/Office/data
 migration/distribution/later-platform gates remain open. The Harness goal remains
 active. [Portable evidence](../release/harness-pi-instructions-qualification-20261016.json).

@@ -14,7 +14,7 @@ export interface ExecutionContract {
  effect?:(args:unknown)=>Effect;
  outcome?:(args:unknown,result:AfterToolCallContext['result'])=>{status:Outcome;jobId?:string};
 }
-const reads=new Set(['read','ls','find','grep','tool_result_excerpt','memory_recall','memory_source','home_devices','home_read','home_status','home_result','linux_system_profile','desktop_evidence','browser_tabs_list','browser_snapshot','browser_screenshot','linux_desktop_observe','linux_desktop_snapshot']);
+const reads=new Set(['response_metrics','read','ls','find','grep','tool_result_excerpt','memory_recall','memory_source','home_devices','home_read','home_status','home_result','linux_system_profile','desktop_evidence','browser_tabs_list','browser_snapshot','browser_screenshot','linux_desktop_observe','linux_desktop_snapshot']);
 const stable=(value:unknown):unknown=>Array.isArray(value)?value.map(stable):value&&typeof value==='object'?
  Object.fromEntries(Object.keys(value).sort().map(key=>[key,stable((value as Record<string,unknown>)[key])])):value;
 export function executionKey(name:string,args:unknown){

@@ -15,7 +15,7 @@ import {pythonExecutable} from '../../dist/platform/src/index.js';
 import {privateDir,atomicJson} from '../../dist/runtime/src/storage.js';
 import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
-export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,permissionMode=false,forcePrompt=false,voiceMode}={}){
+export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,permissionMode=false,forcePrompt=false,voiceMode,metricsMode=false}={}){
  const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
  const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])privateDir(path);
  const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
@@ -30,6 +30,16 @@ export async function planFixture(t,{policy='danger-full-access',goalMode,jobMod
   res.writeHead(200,{'content-type':'text/event-stream'});
   const send=(delta,finish=null)=>res.write('data: '+JSON.stringify({id:'plan-fixture',object:'chat.completion.chunk',model:'plan-fixture',choices:[{index:0,delta,finish_reason:finish}]})+'\n\n');
   const last=body.messages.at(-1),proposal=body.messages.findLast(m=>m.role==='assistant'&&m.tool_calls?.length),toolName=proposal?.tool_calls?.at(-1)?.function?.name;
+  if(metricsMode){
+   const id='metrics-fixture-'+requests.length,chunk=(delta,finish=null)=>({id,object:'chat.completion.chunk',model:'plan-fixture',choices:[{index:0,delta,finish_reason:finish}]}),emit=value=>res.write('data: '+JSON.stringify(value)+'\n\n');
+   if(last?.role!=='tool'){
+    emit(chunk({role:'assistant',reasoning_content:'Authored private reasoning; not a preview.'}));
+    emit(chunk({content:op.text??'Authored response measured before its tool call.'}));
+    emit(chunk({tool_calls:[{index:0,id:'metrics-call-'+requests.length,type:'function',function:{name:'response_metrics',arguments:JSON.stringify(op.arguments??{limit:3})}}]},'tool_calls'));
+   }else emit(chunk({role:'assistant',content:'Authored metrics tool result received.'},'stop'));
+   if(!op.omitUsage)emit({id,choices:[],usage:{prompt_tokens:20,completion_tokens:10,total_tokens:30},...(last?.role!=='tool'&&op.serverTiming?{timings:{predicted_n:12,predicted_ms:240,predicted_per_second:50}}:{})});
+   res.end('data: [DONE]\n\n');return;
+  }
   if(permissionMode&&['permission-write','permission-hold-write'].includes(op.kind)){
    const complete=()=>{if(res.writableEnded||res.destroyed)return;if(last?.role!=='tool')send({role:'assistant',tool_calls:[{index:0,id:'permission-'+requests.length,type:'function',function:{name:'write',arguments:JSON.stringify({path:op.path,content:'Authored permission action.'})}}]},'tool_calls');else send({role:'assistant',content:'Authored permission result received.'},'stop');res.end('data: [DONE]\n\n');};
    if(op.kind==='permission-hold-write'&&last?.role!=='tool'){send({role:'assistant',content:'Authored provider awaiting a permission choice. '});permissionMode.release=complete;return;}complete();return;

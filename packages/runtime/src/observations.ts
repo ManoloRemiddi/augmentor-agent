@@ -4,6 +4,7 @@ import {ObservationStore,payloadText} from '../../observation/src/store.js';
 import type {Data} from '../../protocol/src/index.js';
 import type {ContextProvenance} from './context-provenance.js';
 import {StepTiming} from './step-timing.js';
+import {responseCorrelation,llamaResponseTiming} from './response-metrics.js';
 
 /** Observe the supported SDK pipeline after all registered payload transforms. */
 export function observeSession(session: AgentSession, store: ObservationStore, sessionId: string,
@@ -16,8 +17,11 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
   let requestOpen = false;
   const providerRedactions = new Set<string>();
   let providerEvents: {index: number; elapsedMs?: number; data: unknown}[] = [];
+  const llamaProviders=new Set((process.env.AUGMENTOR_PI_LLAMA_CPP_PROVIDERS??'').split(',').map(value=>value.trim()).filter(Boolean));
+  let serverTiming:ReturnType<typeof llamaResponseTiming>=null,serverProvider:string|undefined;
   const resetProvider = () => {
     providerCount = 0; providerBytes = 0; providerDropped = 0; providerEvents = []; providerRedactions.clear();
+    serverTiming=null;serverProvider=undefined;
     captureProvider = store.policy().capturePayloads;
   };
   const tools = new Map<string, number>();
@@ -103,6 +107,9 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
     await previousProvider?.(data, model);
     if (!requestOpen) {requestId = undefined; started = 0; firstToken = false; resetProvider(); requestOpen = true;}
     providerCount++;
+    // Numeric same-response metadata remains useful when payload capture is off.
+    // This does not ask the provider for new fields or change request options.
+    if(llamaProviders.has(model.provider)){const value=llamaResponseTiming(data);if(value){serverTiming=value;serverProvider=model.provider;}}
     if (!captureProvider || !store.policy().capturePayloads) {providerDropped++; return;}
     try {
       // Take an immutable JSON copy. The SDK/provider may reuse mutable data.
@@ -135,6 +142,9 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
       firstToken = true; record('model/firstToken', {elapsedMs: performance.now() - started});
     }
     if (event.type === 'message_end' && event.message.role === 'assistant') {
+      const durationMs=requestId&&started>0?performance.now()-started:undefined;
+      let nativeResponse=responseCorrelation(undefined,null);
+      inspect(()=>{nativeResponse=responseCorrelation(event.message,session.sessionManager.getLeafId());});
       inspect(()=>timing.modelEnd());
       const observedProviderCount = providerCount;
       if (providerCount) record('provider/stream', {boundary: 'parsed-provider-events-after-hooks-before-normalization',
@@ -148,7 +158,9 @@ export function observeSession(session: AgentSession, store: ObservationStore, s
         usageBoundary: 'sdk-normalized; zero fields may be unavailable',
         requestCoverage: requestId ? 'observed-after-hooks' : 'not-observed',
         providerEventCoverage: observedProviderCount ? 'observed' : 'not-observed',
-        ...(requestId && started > 0 ? {durationMs: performance.now() - started} : {}), model: event.message.model, provider: event.message.provider},
+        ...(durationMs===undefined?{}:{durationMs}), model: event.message.model, provider: event.message.provider,
+        nativeResponse,
+        ...(serverTiming&&serverProvider===event.message.provider&&serverTiming.responseId===event.message.responseId?{serverTiming}:{})},
       event.message);
       requestOpen = false;
       requestedThinking=undefined;

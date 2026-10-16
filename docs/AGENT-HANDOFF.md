@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pi response metrics](PI-RESPONSE-METRICS.md) now registers a read-only Native/
+Browser tool through the public SDK. Its preview workflow comes from the public
+MIT Augmentor DSH adapter; exact before-persistence parent/hash matching prevents
+borrowing another reply's rate. Client-observed whole-step latency and terminal
+same-response declared llama.cpp decode fields stay distinct. Payload opt-out,
+branch/worker scope, unavailable states and bounded metadata/native windows are
+explicit. Eleven focused authored/SDK/original-Trajectory checks pass; the initial
+collapsed-tree browser assertion is retained/corrected using existing expanders.
+No GUI, provider setting, execution authority, review or installed selection is
+changed. Full source/fresh ordinary/live qualification follows separately.
+
 [Shared Pi persona](PI-INSTRUCTIONS.md), application **4f4812cc**, now binds the
 approved common file through public SDK append/native custom snapshots. Exact
 source/guard hashes, pre-message metadata fallback and native IDs survive cold
