@@ -7,6 +7,8 @@ public installers and optional integrations. The immediate target is a usable
 review on the owner's MX machine. Preserve the original DSH presentation and
 current review conversations while preparing a separately staged correction.
 
+[Current archived-status review](CONTEXT-FLEET.md#archived-inspector-status-panels--october-16) advances both review application selections to **20261016-213718-135550f5 / d300543c**, with stable menu registry revision four. The initial opener installation evidence below is a preceding checkpoint; the opener bytes remain unchanged.
+
 ## Stable MX review launch and recovery — October 16
 
 `scripts/harness-review.py` registers separately staged reviews and installs a
@@ -66,7 +68,7 @@ unchanged workers/deadlines and no skips. Separate private unselected tool
 1,102 compiled** inputs. It retains compiled application, Node, dependencies and
 components from running application **deea778d / 20261016-204440-a6f079ca**.
 
-The two installed entries are **Augmentor Harness (MX)** and **Augmentor Harness
+At the initial opener installation, the two entries were **Augmentor Harness (MX)** and **Augmentor Harness
 - Migration Pilot**, at registry revision two. Actual installed-opener link
 requests confirm both original owner PIDs, all four native conversations, 32
 protected inputs, shared prompt/memory/configuration rows, earlier Preview entry

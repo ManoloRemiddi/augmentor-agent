@@ -31,7 +31,24 @@ launcher/deployment and licence/private-source/notice contracts. These are
 independently authored fixtures; they do not transfer another owner project or
 execute a historical action. Shared backend/UI contracts remain one source for
 all platforms; actual artifact/runtime adoption in this pass targets MX only.
-Packaged qualification and review adoption are recorded separately after staging.
+The exact packaged candidate passes the same 32/32 Node cases and 41 Python
+checks, with existing external test dependencies outside the seal. Private
+unselected MX **20261016-213718-135550f5**, application **d300543c**, artifact
+**283eaff2ca07ccd5253cb8dbb6daf62c56e0eed9870ec334f8c49822017856db**,
+verifies **24,613 sealed/1,102 compiled** inputs. Node, production dependencies,
+components and Python retain the prior qualified bytes.
+
+Both reviews adopt it only after the normal idle/draft/upload/job/export gates.
+Complete cold backups verify 408 regular files; 32 protected inputs stay exact
+at startup and after original-GUI inspection. Four conversations, 12 shared
+prompts, 19 captured records, 17 pending memory items, eligibility/windows/jobs
+and engine/settings remain unchanged. Stable menu registration advances to
+revision four; both installed openers return the new current private links.
+Actual owner composer/Plugins/prompt/memory checks and archived child Jobs,
+Plan, Goal, refresh and source excerpts pass with no browser or HTTP errors.
+No new project, conversation, owner model/tool/audio work or selected-install
+change occurs. [Portable evidence](../release/harness-archive-status-review-20261016.json).
+Earlier artifact/adoption paragraphs below remain historical checkpoints.
 
 ## Archived DSH child inspection — October 16
 
