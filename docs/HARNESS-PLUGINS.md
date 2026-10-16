@@ -167,3 +167,7 @@ pre-change hashes. QA does not toggle real owner flags or submit model/audio wor
 All **24,563 sealed / 1,072 compiled** inputs verify;
 selection, original DSH, production dependencies/components and GPU setup remain.
 [Portable evidence](../release/harness-plugin-switches-review-20261016.json).
+
+The final configured-owner read reports memory **Unconfirmed** after explicit
+refresh, while the runtime reports capture unavailable. Its switch stays guarded;
+passing isolated switch tests does not qualify that owner memory service.

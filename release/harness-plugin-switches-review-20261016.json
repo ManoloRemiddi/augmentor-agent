@@ -31,7 +31,8 @@
     "backupRegularFilesVerified": 389,
     "coldStartupProtectedInputsVerified": 32,
     "postBrowserPersistentInputsVerified": 28,
-    "ownerSavedSettingsAnd12PromptsPerReviewUnchanged": true
+    "ownerSavedSettingsAnd12PromptsPerReviewUnchanged": true,
+    "ownerMemoryStatus": "Unconfirmed after explicit refresh; owner runtime reports automatic memory capture unavailable. Switch stays disabled; service health not qualified."
   },
   "controls": {
     "savedSwitches": [
