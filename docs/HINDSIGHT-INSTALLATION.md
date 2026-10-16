@@ -64,13 +64,14 @@ Changed source/mode/environment is refused while the engine runs, including when
 that option. Replacement supports only the exact pinned image and matching named
 data volume. It first copies the stopped database into a private archive, checks
 the archive and durable write, and records its SHA-256 and source ID in a separate
-backup manifest. Failure leaves the original instance/name/configuration intact.
+backup manifest, together with the previous private configuration for rollback.
+Failure leaves the original instance/name/configuration intact.
 Only then is the exact stopped ID made non-restarting and renamed; its volume,
 container and backup remain retained. The replacement uses that same data volume.
 No archive queue is drained and no historical processing is authorized by setup.
 
-`hindsight.json` and `hindsight-installation.json` are **private credential-bearing
-files**. The installation receipt records the desired configuration before Docker
+`hindsight.json`, `hindsight-installation.json` and the backup manifests are
+**private credential-bearing files**. The installation receipt records the desired configuration before Docker
 creation. After a lost acknowledgement, ordinary invocation refuses an automatic
 repeat. `--recover-pending` verifies the recorded matching instance and completes
 readiness/configuration without another creation or replacement. A missing or

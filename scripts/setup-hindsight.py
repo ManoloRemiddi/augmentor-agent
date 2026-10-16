@@ -221,7 +221,8 @@ def main():
         backup_name = name + '-before-controlled-' + stamp
         atomic(backup.with_suffix('.json'), {'protocol': 'augmentor-memory-backup/1', 'sourceContainerId': identity,
                'image': container['Config']['Image'], 'volume': volume, 'sha256': backup_hash,
-               'bytes': backup.stat().st_size, 'plannedBackupContainer': backup_name})
+               'bytes': backup.stat().st_size, 'plannedBackupContainer': backup_name,
+               'configuration': previous})
         plan.update(backupContainer=backup_name, backupContainerId=identity, backupSha256=backup_hash)
         atomic(receipt_path, {**plan, 'phase': 'renaming', 'backup': str(backup), 'backupContainer': backup_name})
         checked(docker, ['rename', identity, backup_name], stdout=subprocess.DEVNULL)
