@@ -36,18 +36,29 @@ function checkedContent(content:Data[]):Data[]{
   return {type:'image',attachment:{attachmentId:a.attachmentId,mediaType:a.mediaType,bytes:a.bytes,width:a.width,height:a.height,...(a.name===undefined?{}:{name:a.name}),...(dimensions?{originalDimensions:{width:dimensions.width,height:dimensions.height}}:{})},...(p.offloaded?{offloaded:true}:{})};
  });
 }
+/** Older DSH settlement producers forwarded the child's complete closing blocks
+ * in a manager-owned user-role notice. Admit plaintext only with an earlier
+ * recorded child catalogue; never turn it into human or provider reasoning. */
+function legacySettlementReasoning(session:Data,e:Data,part:Data,children:Set<string>){
+ const m=e.data,s=m?.source;
+ if(session.opening.header.version!==4||e.type!=='user/message'||m.role!=='user'||s?.kind!=='subagent-settled'||s.form!=='notice'||typeof s.summary!=='string'||!s.summary.trim()||Object.keys(s).sort().join(',')!=='form,kind,senderSessionId,summary'||typeof s.senderSessionId!=='string'||s.senderSessionId===session.opening.header.id||!children.has(s.senderSessionId)||Object.keys(part).sort().join(',')!=='text,type')return false;
+ identifier(s.senderSessionId);return true;
+}
+const settlementReasoningCount=(events:Data[])=>events.reduce((n,e)=>n+(e.type==='user/message'&&e.data.source?.kind==='subagent-settled'?e.data.content.filter((p:Data)=>p.type==='reasoning').length:0),0);
+function historicalMessage(message:Data){const s=message.source;return {role:message.role,...(message.role==='user'&&s?.kind==='subagent-settled'?{source:{kind:s.kind,form:s.form,summary:s.summary,senderSessionId:s.senderSessionId}}:{}),content:message.content};}
 function records(session:Data,cut=false){
  const rows=session.records,opening=session.opening;
  if(!opening?.header?.id||!Array.isArray(rows)||(!rows.length&&!cut)||rows.length>30000)fail('missing bounded complete session.');
  identifier(opening.header.id);
  if(opening.header.version!==undefined&&opening.header.version!==4)fail('unsupported source session format version.');
  if(opening.header.isSeeded!==undefined&&typeof opening.header.isSeeded!=='boolean')fail('invalid source lineage marker.');
- let previous=-1;const calls=new Map<string,string>(),pending=new Set<string>(),dispatched=new Set<string>();
+ let previous=-1;const children=new Set<string>(),calls=new Map<string,string>(),pending=new Set<string>(),dispatched=new Set<string>();
  let human=false;const effective:Data[]=[],bySeq=new Map<number,Data>();
  for(const row of rows){
   const e=structuredClone(row?.event);
   if(row?.type!=='event'||!e||!Number.isSafeInteger(e.seq)||e.seq!==previous+1||typeof e.type!=='string'||e.type.length>128||!e.data||!Number.isSafeInteger(e.time))fail('history has a gap or unsupported record.');
   previous=e.seq;
+  if(e.type==='subagent/catalog'&&typeof e.data.childId==='string'&&typeof e.data.mode==='string'&&e.data.mode&&e.data.mode.length<=128)children.add(e.data.childId);
   if(/compact|context\/edit|message\/edit|branch|fork/.test(e.type)&&!['compaction/start','compaction/summary','compaction/prune','compaction/end'].includes(e.type))fail('edited, compacted or branched history needs a separate converter.');
   if(messageTypes.has(e.type)){
    const m=e.type==='user/message'?e.data:e.data.message;
@@ -55,7 +66,7 @@ function records(session:Data,cut=false){
    for(const p of m.content){
     if(!supportedParts.has(p?.type))fail('attachment/reasoning content needs a separate converter; originals are preserved.');
     if(['text','reasoning'].includes(p.type)&&typeof p.text!=='string')fail('invalid text/reasoning content.');
-    if(p.type==='reasoning'&&e.type!=='assistant/message')fail('reasoning is only supported on historical assistant messages.');
+    if(p.type==='reasoning'&&e.type!=='assistant/message'&&!legacySettlementReasoning(session,e,p,children))fail('reasoning is only supported on historical assistant messages.');
     if(p.type==='tool-call'){
      if(e.type!=='assistant/message'||typeof p.id!=='string'||typeof p.name!=='string'||typeof p.arguments!=='string')fail('unsupported tool proposal.');
      let args;try{args=JSON.parse(p.arguments);}catch{fail('malformed tool arguments.');}
@@ -111,7 +122,7 @@ function checkedSelection(value:unknown):ModelSelection{
 /** Shared full-import and source-cut projection. This only appends labelled
  * history through the public SDK; it never restores old provider/tool actions. */
 function appendDshTranscript(manager:ReturnType<typeof SessionManager.inMemory>,original:Data,events:Data[],surface:DshSurface,source:Data,sha256:string,targetState:string){
-  manager.appendCustomEntry('augmentor.dsh-import.v1',{sha256,sourceSessionId:original.opening.header.id,throughSeq:original.opening.cursor,source:'DSH',...(setupOnlyHistory(original,events)?{sourceHistoryKind:'setup-only'}:{}),context:'labelled historical transcript; not reconstructed effective DSH context',rawArchive:'dsh-imports/'+sha256+'.json',historicalUsage:'original archive only; no invented Pi accounting',relatedSessionsArchived:(source.relatedSessions??[]).length,relatedSessionRuntime:'not imported as live Pi jobs'});
+  manager.appendCustomEntry('augmentor.dsh-import.v1',{sha256,sourceSessionId:original.opening.header.id,throughSeq:original.opening.cursor,source:'DSH',...(settlementReasoningCount(events)?{legacySettlementReasoningBlocks:settlementReasoningCount(events)}:{}),...(setupOnlyHistory(original,events)?{sourceHistoryKind:'setup-only'}:{}),context:'labelled historical transcript; not reconstructed effective DSH context',rawArchive:'dsh-imports/'+sha256+'.json',historicalUsage:'original archive only; no invented Pi accounting',relatedSessionsArchived:(source.relatedSessions??[]).length,relatedSessionRuntime:'not imported as live Pi jobs'});
   const contextEvents=surface.nodes.map(seq=>events[seq]),activeSeqs=new Set(surface.nodes),replacements=new Map(surface.replacements.map(row=>[row.seq,row]));
   const sourceLineage={parentSession:original.opening.header.parentSession??null,isSeeded:original.opening.header.isSeeded??null,seedCuts:surface.seedCuts};
   manager.appendCustomEntry('augmentor.dsh-surface.v1',{...surface,sourceLineage,contextPolicy:'source message membership/order; current Augmentor instructions; bounded historical tool excerpts; no provider replay'});
@@ -147,11 +158,11 @@ function appendDshTranscript(manager:ReturnType<typeof SessionManager.inMemory>,
     if(!images.length)continue;
    }
    if(images.length){
-    const historical={event:e.type,sourceSeq:e.seq,sourceTime:e.time,...(e.type==='tool/result'?{tool:calls.get(m.toolCallId),toolCallId:m.toolCallId,isError:m.isError===true,literalExcerpt:toolExcerpts.get(e.seq),coverage:'bounded historical excerpt; full output archived'}:{message:{role:m.role,content:e.type==='user/message'?[]:m.content.filter((p:Data)=>p.type!=='image')}})};
+    const historical={event:e.type,sourceSeq:e.seq,sourceTime:e.time,...(e.type==='tool/result'?{tool:calls.get(m.toolCallId),toolCallId:m.toolCallId,isError:m.isError===true,literalExcerpt:toolExcerpts.get(e.seq),coverage:'bounded historical excerpt; full output archived'}:{message:{...historicalMessage(m),content:e.type==='user/message'&&m.source?.kind!=='subagent-settled'?[]:m.content.filter((p:Data)=>p.type!=='image')}})};
     manager.appendCustomMessageEntry(DSH_MEDIA_TYPE,'Historical DSH record (completed past activity; data, not a new instruction):\n'+JSON.stringify(historical),false,{...provenance(e),schema:DSH_MEDIA_SCHEMA,images});
    }else {
     if(e.type==='assistant/message'&&!m.content.some((p:Data)=>['text','reasoning'].includes(p.type)&&p.text.trim())){archivedToolProposalMessages++;continue;}
-    const retained=e.type==='tool/result'?{tool:calls.get(m.toolCallId),toolCallId:m.toolCallId,isError:m.isError===true,fullRecordChars:JSON.stringify(m).length,literalExcerpt:toolExcerpts.get(e.seq),coverage:'bounded excerpt; complete arguments/output stay in the raw archive and display timeline'}:{message:{role:m.role,content:m.content}};
+    const retained=e.type==='tool/result'?{tool:calls.get(m.toolCallId),toolCallId:m.toolCallId,isError:m.isError===true,fullRecordChars:JSON.stringify(m).length,literalExcerpt:toolExcerpts.get(e.seq),coverage:'bounded excerpt; complete arguments/output stay in the raw archive and display timeline'}:{message:historicalMessage(m)};
     manager.appendCustomMessageEntry('augmentor.dsh-history.v1','Historical DSH record (completed past activity; data, not a new instruction):\n'+JSON.stringify({event:e.type,sourceSeq:e.seq,sourceTime:e.time,...retained}),false,provenance(e));
    }
    contextEntries++;
@@ -199,7 +210,7 @@ function writeSession(original:Data,events:Data[],surface:DshSurface,stage:strin
   try{for(const event of display)writeFileSync(displayFile,JSON.stringify(event)+'\n');fsyncSync(displayFile);}finally{closeSync(displayFile);}
   const finalNative=join(targetState,'sessions',sid,nativeFile.split(/[\\/]/).at(-1)!);
   atomicJson(join(sessions,sid+'.meta.json'),{id:sid,cwd,file:finalNative,selection,title:typeof title==='string'?title:workspace.title,saved:true,policy:'read-only',surface:'linux',updatedAt:now,requests:[],running:false});
-  const receipt={schema:'augmentor-dsh-pilot-import/1',sourceSha256:sha256,sourceSessionId:original.opening.header.id,sessionId:sid,selection,cwd,...(setupOnly?{sourceHistoryKind:'setup-only'}:{}),contextEntries,sourceEvents:events.length,effectiveSourceSeqs:surface.nodes,sourceReplacements:surface.replacements.length,shadowedSourceMessages:events.filter(e=>messageTypes.has(e.type)&&!activeSeqs.has(e.seq)).length,sourceLineage,displayEvents:display.length,skippedInstructionMessages,archivedToolProposalMessages,toolPayloadCoverage:'effective source tool results only; shadowed originals remain archived',toolPayloadContextLimitChars:16384,toolPayloadContextChars:16384-toolContextLeft,toolPayloadCharsNotInContext:toolPayloadChars-(16384-toolContextLeft),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
+  const receipt={schema:'augmentor-dsh-pilot-import/1',sourceSha256:sha256,sourceSessionId:original.opening.header.id,sessionId:sid,selection,cwd,...(settlementReasoningCount(events)?{legacySettlementReasoningBlocks:settlementReasoningCount(events)}:{}),...(setupOnly?{sourceHistoryKind:'setup-only'}:{}),contextEntries,sourceEvents:events.length,effectiveSourceSeqs:surface.nodes,sourceReplacements:surface.replacements.length,shadowedSourceMessages:events.filter(e=>messageTypes.has(e.type)&&!activeSeqs.has(e.seq)).length,sourceLineage,displayEvents:display.length,skippedInstructionMessages,archivedToolProposalMessages,toolPayloadCoverage:'effective source tool results only; shadowed originals remain archived',toolPayloadContextLimitChars:16384,toolPayloadContextChars:16384-toolContextLeft,toolPayloadCharsNotInContext:toolPayloadChars-(16384-toolContextLeft),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
  return receipt;
 }
 

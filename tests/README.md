@@ -2155,3 +2155,15 @@ Node cases, alongside 47 Python cases; all 1,108 compiled inputs match and all
 Real owner exports remain private, read-only assessment inputs; no owner
 conversation/model/tool work is a public fixture.
 [Protocol, commands, limits and deployment scope](../docs/HARNESS-DSH-PROJECT-BUNDLES.md).
+
+## Legacy child settlement reasoning — October 17
+
+`dsh-project-settlement.test.mjs` has fifteen independently authored cases for
+attributed plaintext history, mixed images, exact originals/cuts and strict
+source/catalogue/role/opaque/signed refusals. `dsh-project-settlement-runtime.test.mjs`
+uses the real SDK with a synthetic provider: cold reopen, one explicit human
+request/read-only tool, native reply branch, another cold continuation and no
+historical replay or live child job. The thirty-file source focus passes 190
+Node cases/two workers, plus 47 Python checks. New unit contracts join shared CI;
+the SDK runtime case remains MX qualification.
+[Contract and deployment limits](../docs/HARNESS-DSH-MIGRATION-PILOT.md#legacy-child-settlement-reasoning--october-17).

@@ -388,6 +388,56 @@ No extra owner import, provider request or review restart occurs.
 [Portable qualification](../release/harness-dsh-rich-history-review-20261016.json).
 
 
+## Legacy child settlement reasoning — October 17
+
+A complete frozen export with four parents/four archived children contains one
+plaintext reasoning block in a `user/message` whose source is the manager-owned
+`subagent-settled` notice. The earlier converter refused it as non-assistant
+reasoning. This is a documented historical producer shape: DSH's public
+[September text-only correction](https://github.com/deepseek-ai/deepseek-harness/commit/29debb8b24b57997e7918f6c597d4415721df670)
+replaced forwarding the child's complete closing blocks with text-only closing
+blocks. The inspected parent is
+`28a4241e9f0b29b3bec32e7858ae50876d6d785a`; the current pinned
+`d743267388641bc76f17c45ce8b4c231aed1d32c` producer keeps that filter. No upstream
+implementation or private source was copied into the converter or tests.
+
+The authored compatibility rule admits plaintext reasoning only in a version-four
+user-role notice with exactly the known `kind`, `form`, `summary` and
+`senderSessionId` attribution fields, `form: notice`, a nonempty summary, a valid
+non-self child ID and an earlier recorded child catalogue. The reasoning part
+must contain exactly `type` and string `text`. Human, tool-role, unknown-source,
+relay, opaque/signed, untyped-source and missing/late/foreign-child forms retain
+their refusals. Ordinary source cuts, pending work, complete-turn, real-human,
+record/byte and image authority checks remain.
+
+Native continuation retains the manager attribution and plaintext in a labelled
+historical custom record, including when the notice carries images. It is never
+added as current human input or signed/provider-native assistant reasoning. Exact
+source and original display records remain intact; non-human history is not
+presented as a new Chat request. Historical cuts before the notice exclude it;
+later cuts retain it with its child attribution. Native import audit and
+conversation receipts report `legacySettlementReasoningBlocks` when nonzero.
+That count covers the full captured history; effective source membership still
+governs which historical messages enter continuation context.
+No historical child becomes a Pi job or receives old permissions or queued work.
+
+The new independently authored focus has fifteen conversion/guard cases and one
+actual SDK case: cold reopen without work, an explicit new human request with one
+fresh read-only tool, native reply branching and another cold continuation. Its
+source fixture has no owner content. Source build/check and the complete
+**190-case, thirty-file Node focus** pass with two workers/eight Chromium
+files/eleven GUI cases, alongside **47 Python checks**; packaging is qualified
+separately. [Portable evidence](../release/harness-dsh-settlement-qualification-20261017.json)
+records the current phase and limits.
+
+The exact same frozen real bundle refuses the preceding sealed converter and
+passes corrected read-only parent preparation for all four conversations. This
+is not owner import, archived-child inspection qualification, current model
+assignment, model work or pilot acceptance. Its raw data remains private and
+external to public tests, artifacts and CI. Other file/content, dispatch-less
+error and source-observation cases require separate work. Owner feedback still
+gates further transfers; voice and later OS rollout remain deferred.
+
 ## Compact project export — October 17
 
 The read-only ten-project size diagnosis distinguishes **three** final JSON
