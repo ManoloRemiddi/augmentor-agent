@@ -318,8 +318,8 @@ export function PendingSubmissionBubble({ submission, renderMessageImages, t }: 
 
 /** User and admitted-steering keyed Chat renderer. */
 export const UserMessageNodeView = memo(function UserMessageNodeView({
-  node, renderMessageImages, openFile, openSkill, t,
-}: ChatNodeViewProps<'user' | 'steering'>) {
+  node, renderMessageImages, openFile, openSkill, t, onEdit, editUnavailable,
+}: ChatNodeViewProps<'user' | 'steering'> & { onEdit?: (() => void) | undefined; editUnavailable?: boolean | undefined }) {
   const data = node.data
   return (
     <UserStyleBubble
@@ -334,6 +334,8 @@ export const UserMessageNodeView = memo(function UserMessageNodeView({
           text={text}
           time={data.time}
           clock="start"
+          onEdit={onEdit}
+          editUnavailable={editUnavailable}
           className={css.actions}
           t={t}
         />

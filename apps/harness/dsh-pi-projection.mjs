@@ -38,7 +38,7 @@ export function projectDsh(state){
     const key=item.seq?'event:'+item.seq:'tail:'+ordinal,anchorSeq=item.seq??state.events.at(-1)?.seq??0;
     let n;
     if(item.kind==='user'){
-      currentTurn++;const event=state.events.find(e=>e.seq===item.seq),data={content:event?.data.submittedContent??event?.data.content??[{type:'text',text:item.text}],time:times.get(event?.turnId),skillNames:invokedSkillNames(event)};
+      currentTurn++;const event=state.events.find(e=>e.seq===item.seq),data={messageSeq:item.seq,content:event?.data.submittedContent??event?.data.content??[{type:'text',text:item.text}],time:times.get(event?.turnId),skillNames:invokedSkillNames(event)};
       if(!data.skillNames.length)delete data.skillNames;
       n={kind:'user',data};navigation.push({turn:currentTurn,anchorKey:key,prompt:item.text.slice(0,100),response:''});
     }

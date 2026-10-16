@@ -271,9 +271,10 @@
     },
     {
       "path": "packages/client/ui-chat/src/client/chat/MessageIconActions.tsx",
-      "sha256": "57bbf290748e848503b92d8659b4197c6cc62293cd2301bbe95bec43c8626fb5",
+      "sha256": "78f06199d3a1f893b2fd7b59eb0a2204d3aac9fbac07371e80683151a41d838a",
       "upstreamPath": "packages/client/ui-chat/src/client/chat/MessageIconActions.tsx",
-      "upstreamSha256": "57bbf290748e848503b92d8659b4197c6cc62293cd2301bbe95bec43c8626fb5"
+      "upstreamSha256": "57bbf290748e848503b92d8659b4197c6cc62293cd2301bbe95bec43c8626fb5",
+      "adaptation": "Modified by Augmentor: optional Pi-backed sent-message Edit callback in the original message action row; supplier layout and CSS retained."
     },
     {
       "path": "packages/client/ui-chat/src/client/chat/MessageItem.module.css",
@@ -283,9 +284,10 @@
     },
     {
       "path": "packages/client/ui-chat/src/client/chat/MessageItem.tsx",
-      "sha256": "c9e3bffd724e93ffe7fcb3566d02d2300ae6ab55678bd094f26e4e58d6c24713",
+      "sha256": "e992496517e4c88246735f994825a87ad2fe89f150898887853a9126af0e0f9f",
       "upstreamPath": "packages/client/ui-chat/src/client/chat/MessageItem.tsx",
-      "upstreamSha256": "c9e3bffd724e93ffe7fcb3566d02d2300ae6ab55678bd094f26e4e58d6c24713"
+      "upstreamSha256": "c9e3bffd724e93ffe7fcb3566d02d2300ae6ab55678bd094f26e4e58d6c24713",
+      "adaptation": "Modified by Augmentor: optional Pi-backed sent-message Edit callback in the original message action row; supplier layout and CSS retained."
     },
     {
       "path": "packages/client/ui-chat/src/client/chat/ReasoningRow.module.css",

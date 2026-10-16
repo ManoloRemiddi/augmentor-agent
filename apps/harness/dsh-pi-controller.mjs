@@ -161,16 +161,17 @@ export class DshPiController {
     catch(error){await this.refresh().catch(()=>{});throw error;}
   }
   forkAt(messageSeq,canSelect=()=>true){return this.forkBoundary(this.state.sessionId,messageSeq,canSelect);}
+  editAt(messageSeq,canSelect=()=>true){return this.forkBoundary(this.state.sessionId,messageSeq,canSelect,'edit');}
   forkLast(sessionId,canSelect=()=>true){return this.forkBoundary(sessionId,null,canSelect);}
-  async forkBoundary(sessionId,messageSeq,canSelect){
+  async forkBoundary(sessionId,messageSeq,canSelect,mode='reply'){
     // One explicit UI action. The Host retains prepared child identity across
     // process replacement; cleanup never retries branch creation or inference.
     if(this.branchFlight)return null;
     const scope={epoch:this.epoch,sessionId:this.state.sessionId};
     const current=()=>scope.epoch===this.epoch&&scope.sessionId===this.state.sessionId&&!this.state.readOnly;
     const durable=this.state.capabilities?.durableBranches===true;
-    const flight={sessionId,messageSeq};let intent,key,attempted=false,creationConfirmed=false,warning=null;
-    const matches=row=>row?.sessionId===intent.newSessionId&&row?.fork?.sessionId===sessionId&&row?.fork?.messageSeq===messageSeq&&row?.fork?.mode==='reply';
+    const flight={sessionId,messageSeq,mode};let intent,sourceHash,key,attempted=false,creationConfirmed=false,warning=null;
+    const matches=row=>row?.sessionId===intent.newSessionId&&row?.fork?.sessionId===sessionId&&row?.fork?.messageSeq===messageSeq&&row?.fork?.mode===mode;
     const releaseUncreated=async()=>{
       const row=await this.rpc('session.settleBranch',{...intent,outcome:'not-created'});
       return row?.settled===true&&row?.outcome==='not-created'&&row?.newSessionId===intent.newSessionId;
@@ -180,7 +181,9 @@ export class DshPiController {
       if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
       if(this.state.phase!=='ready'||!sessionId||this.state.unconfirmed||this.state.compactionPending||this.state.compaction?.blocked)throw Error('Review the current conversation state before branching.');
       if(this.state.sessions.find(row=>row.sessionId===sessionId)?.running)throw Error('Stop the current response before branching.');
-      if(messageSeq!==null&&(!Number.isSafeInteger(messageSeq)||!messageTargets(this.state.events).replies.has(messageSeq)))throw Error('Choose a loaded assistant reply after its tools have finished.');
+      if(mode==='edit'&&(!durable||this.state.capabilities?.messageEditDrafts!==1))throw Error('This Host does not support complete message edit drafts.');
+      if(mode==='edit'&&messageTargets(this.state.events).editSeq!==messageSeq)throw Error('Choose the latest persisted human message before editing.');
+      if(mode==='reply'&&messageSeq!==null&&(!Number.isSafeInteger(messageSeq)||!messageTargets(this.state.events).replies.has(messageSeq)))throw Error('Choose a loaded assistant reply after its tools have finished.');
       this.update({branchPending:flight,error:null});
       if(messageSeq===null){
         const history=await this.rpc('session.history',{sessionId,maxMessages:100});
@@ -190,10 +193,11 @@ export class DshPiController {
         messageSeq=last.event.seq;
       }
       if(!current())return null;
-      key=JSON.stringify([sessionId,messageSeq,'reply']);
+      key=JSON.stringify([sessionId,messageSeq,mode]);
       if(durable){
-        intent=await this.rpc('session.prepareBranch',{sessionId,messageSeq,mode:'reply'});
-        if(intent?.sessionId!==sessionId||intent?.messageSeq!==messageSeq||intent?.mode!=='reply'||typeof intent?.newSessionId!=='string'||!/^[a-zA-Z0-9_-]{1,128}$/.test(intent.newSessionId)||intent.newSessionId===sessionId){intent=null;throw Error('Branch preparation is unconfirmed. No child was requested; an explicit click can read its saved identity.');}
+        intent=await this.rpc(mode==='edit'?'session.prepareEdit':'session.prepareBranch',{sessionId,messageSeq,...(mode==='reply'?{mode}:{})});
+        sourceHash=intent?.sourceHash;
+        if(intent?.sessionId!==sessionId||intent?.messageSeq!==messageSeq||intent?.mode!==mode||mode==='edit'&&!/^sha256:[a-f0-9]{64}$/.test(sourceHash??'')||typeof intent?.newSessionId!=='string'||!/^[a-zA-Z0-9_-]{1,128}$/.test(intent.newSessionId)||intent.newSessionId===sessionId){intent=null;throw Error('Branch preparation is unconfirmed. No child was requested; an explicit click can read its saved identity.');}
         if(!current()){await releaseUncreated().catch(()=>false);return null;}
       }else{
         // Explicit compatibility with older Hosts; their loaded-controller
@@ -201,11 +205,11 @@ export class DshPiController {
         intent=this.branchIntents.get(key);
         if(!intent){
           if(this.branchIntents.size>=64)throw Error('Review unconfirmed branch operations before starting another.');
-          intent={sessionId,newSessionId:crypto.randomUUID(),messageSeq,mode:'reply'};this.branchIntents.set(key,intent);
+          intent={sessionId,newSessionId:crypto.randomUUID(),messageSeq,mode};this.branchIntents.set(key,intent);
         }
       }
-      attempted=true;const row=await this.rpc('session.branch',{...intent,...(durable?{prepared:true}:{})});
-      if(!matches(row))throw Error('The branch response did not match the requested boundary.');
+      attempted=true;const row=await this.rpc('session.branch',{...intent,...(durable?{prepared:true}:{}),...(mode==='edit'?{seedDraft:true,sourceHash}:{})});
+      if(!matches(row)||mode==='edit'&&(row.editDraft?.ready!==true||row.editDraft?.sourceHash!==sourceHash))throw Error('The branch response did not match the requested boundary or edit draft.');
       creationConfirmed=true;
       if(durable){
         try{const settled=await this.rpc('session.settleBranch',{...intent,outcome:'created'});if(settled?.settled!==true||settled?.outcome!=='created'||!matches(settled))throw Error('Recovery acknowledgment mismatch.');}

@@ -80,6 +80,32 @@ export class PiAttachments {
   return {text:input+(files.length?'\n\nAttached files (read their exact contents using the file tools):\n'+files.join('\n'):''),images};
  }
  async image(sid:string,attachment:ImageAttachmentRef){this.authorize(sid,{type:'image',attachment});return readImageFile(this.root,attachment);}
+ /** Recover only the original bytes named by this submitted message. A child
+  * receives its own receipt, referencing the same immutable supplier objects. */
+ async editOriginal(sid:string,originSid:string,part:PromptAttachment){
+  identifier(sid);identifier(originSid);this.authorize(sid,part);
+  const receipt=this.receipts(originSid).find(row=>JSON.stringify(row.part)===JSON.stringify(part));
+  if(!receipt)throw Error('The original attachment receipt is unavailable; the message was not edited.');
+  const original=part.type==='file'?part.attachment:receipt.original;
+  if(!original||part.type==='image'&&original.attachmentId!==part.attachment.originalAttachmentId)throw Error('The original image is unavailable; the message was not edited.');
+  if(original.bytes>(part.type==='image'?IMAGE_LIMITS.maxImageBytes:FILE_LIMIT))throw Error('The original attachment exceeds its bounds.');
+  const chunks:Buffer[]=[];let bytes=0;
+  for await(const chunk of readFileStreamVerbatim(this.root,original)){bytes+=chunk.byteLength;if(bytes>FILE_LIMIT)throw Error('The original attachment exceeds its bounds.');chunks.push(Buffer.from(chunk));}
+  const data=Buffer.concat(chunks);let mediaType='application/octet-stream';
+  if(part.type==='image'){
+   await readImageFile(this.root,part.attachment);
+   if(data.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])))mediaType='image/png';
+   else if(data[0]===255&&data[1]===216&&data[2]===255)mediaType='image/jpeg';
+   else if(['GIF87a','GIF89a'].includes(data.subarray(0,6).toString('ascii')))mediaType='image/gif';
+   else if(data.subarray(0,4).toString('ascii')==='RIFF'&&data.subarray(8,12).toString('ascii')==='WEBP')mediaType='image/webp';
+   else throw Error('The original image type is unavailable; the message was not edited.');
+  }
+  return {part:structuredClone(part),original:receipt.original,data,name:part.attachment.name??original.name,mediaType};
+ }
+ grantEdit(sid:string,original:{part:PromptAttachment;original?:FileAttachmentRef}){
+  identifier(sid);const receipt=this.receipts(sid).find(row=>JSON.stringify(row.part)===JSON.stringify(original.part))??this.commit(sid,original.part,original.original);
+  return {...structuredClone(receipt.part),receiptId:receipt.receiptId};
+ }
  /** Select only the immutable objects named by an already authorized part.
   * Receipt tables and workspace aliases are never exported or scanned. */
  archiveSources(sid:string,part:PromptAttachment):ArchiveFileSource[]{

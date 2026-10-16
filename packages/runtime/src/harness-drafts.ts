@@ -11,6 +11,8 @@ import {draftReferences,type DraftReference} from '../../protocol/src/draft-refe
 export interface DraftFile {id:string;kind:'file'|'image';name:string;mediaType:string;lastModified:number;bytes:number;sha256:string;part:PromptAttachment & {receiptId:string}}
 export interface DraftSubmission {requestId:string;mode:'queue'|'steer';text:string;attachmentIds:string[];attachments:PromptAttachment[];preparedAt:number}
 export interface HarnessDraft {version:1;revision:number;textRevision:number;attachmentsRevision:number;text:string;references?:DraftReference[];attachments:DraftFile[];submission:DraftSubmission|null}
+export interface EditDraftOrigin {sessionId:string;messageSeq:number;sha256:string}
+interface PreparedEdit {version:1;origin:EditDraftOrigin;phase:'prepared'|'applied';draft:HarnessDraft}
 const blank=():HarnessDraft=>({version:1,revision:0,textRevision:0,attachmentsRevision:0,text:'',attachments:[],submission:null});
 const integer=(v:unknown)=>Number.isSafeInteger(v)&&Number(v)>=0;
 const keys=(value:any,names:string[])=>value&&typeof value==='object'&&!Array.isArray(value)&&Object.keys(value).every(k=>names.includes(k));
@@ -34,8 +36,8 @@ function validate(value:any):asserts value is HarnessDraft {
  * identity is deliberately separate from the Pi queue's execution truth.
  */
 export class HarnessDrafts {
- readonly root:string;readonly records:string;readonly objects:string;
- constructor(state:string){const directory=(p:string)=>{try{this.privatePath(p,true);}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}return privateDir(p);};directory(join(state,'harness-drafts'));this.root=directory(join(state,'harness-drafts','v1'));this.records=directory(join(this.root,'records'));this.objects=directory(join(this.root,'objects'));}
+ readonly root:string;readonly records:string;readonly objects:string;readonly editOrigins:string;
+ constructor(state:string){const directory=(p:string)=>{try{this.privatePath(p,true);}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}return privateDir(p);};directory(join(state,'harness-drafts'));this.root=directory(join(state,'harness-drafts','v1'));this.records=directory(join(this.root,'records'));this.objects=directory(join(this.root,'objects'));this.editOrigins=directory(join(this.root,'edit-origins'));}
  private privatePath(path:string,directory=false){const stat=lstatSync(path);if(stat.isSymbolicLink()||!(directory?stat.isDirectory():stat.isFile())||process.getuid&&stat.uid!==process.getuid()||process.platform!=='win32'&&stat.mode&0o077)throw Error('Harness drafts require private owned storage.');return stat;}
  private path(sid:string){return join(this.records,identifier(sid)+'.json');}
  private read(path:string,max:number){this.privatePath(path);const fd=openSync(path,constants.O_RDONLY|(constants.O_NOFOLLOW??0));try{const stat=fstatSync(fd);if(!stat.isFile()||stat.size>max)throw Error('Saved Harness draft exceeds its bounds.');return readFileSync(fd);}finally{closeSync(fd);}}
@@ -48,10 +50,44 @@ export class HarnessDrafts {
  attach(sid:string,expected:unknown,input:unknown,data:Uint8Array){
   const value=this.editable(sid);this.compare(value.attachmentsRevision,expected);const hash='sha256:'+createHash('sha256').update(data).digest('hex'),entry={...(input as any),bytes:data.byteLength,sha256:hash};file(entry);if(value.attachments.some(f=>f.id===entry.id))throw Error('This draft attachment identity is already saved; it was not uploaded again.');
   const next={...value,revision:value.revision+1,attachmentsRevision:value.attachmentsRevision+1,attachments:[...value.attachments,entry]};validate(next);
-  const path=join(this.objects,hash.slice(7)+'.bin');try{const fd=openSync(path,constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);try{writeFileSync(fd,data);fsyncSync(fd);}finally{closeSync(fd);}}catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;const saved=this.read(path,FILE_LIMIT);if(saved.byteLength!==data.byteLength||'sha256:'+createHash('sha256').update(saved).digest('hex')!==hash)throw Error('The saved draft attachment is corrupt.');}
-  if(process.platform!=='win32'){const fd=openSync(this.objects,'r');try{fsyncSync(fd);}finally{closeSync(fd);}}
+  this.storeObject(hash,data);
   return this.commit(sid,next);
  }
+ private storeObject(hash:string,data:Uint8Array){
+  if(data.byteLength>FILE_LIMIT||hash!=='sha256:'+createHash('sha256').update(data).digest('hex'))throw Error('The original draft bytes do not match their identity.');
+  const path=join(this.objects,hash.slice(7)+'.bin');try{const fd=openSync(path,constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);try{writeFileSync(fd,data);fsyncSync(fd);}finally{closeSync(fd);}}catch(error){if((error as NodeJS.ErrnoException).code!=='EEXIST')throw error;const saved=this.read(path,FILE_LIMIT);if(saved.byteLength!==data.byteLength||'sha256:'+createHash('sha256').update(saved).digest('hex')!==hash)throw Error('The saved draft attachment is corrupt.');}
+  if(process.platform!=='win32'){const fd=openSync(this.objects,'r');try{fsyncSync(fd);}finally{closeSync(fd);}}
+ }
+ private editPath(sid:string){return join(this.editOrigins,identifier(sid)+'.json');}
+ private editOrigin(origin:EditDraftOrigin){identifier(origin.sessionId);if(!integer(origin.messageSeq)||origin.messageSeq<1||!/^sha256:[a-f0-9]{64}$/.test(origin.sha256)||!keys(origin,['sessionId','messageSeq','sha256']))throw Error('Invalid edit draft origin.');}
+ private readEdit(sid:string):PreparedEdit|null{
+  try{const value=JSON.parse(this.read(this.editPath(sid),1024*1024).toString('utf8'));if(!keys(value,['version','origin','phase','draft'])||value.version!==1||!['prepared','applied'].includes(value.phase))throw Error('Invalid prepared edit draft.');this.editOrigin(value.origin);validate(value.draft);return value;}
+  catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return null;throw error;}
+ }
+ private saveEdit(sid:string,value:PreparedEdit){
+  const entries=readdirSync(this.editOrigins);if(entries.length>=1024&&!entries.includes(identifier(sid)+'.json'))throw Error('The prepared edit store is full.');
+  atomicJson(this.editPath(sid),value);if(process.platform!=='win32')for(const path of [this.editPath(sid),this.editOrigins]){const fd=openSync(path,'r');try{fsyncSync(fd);}finally{closeSync(fd);}}
+ }
+ preparedEdit(sid:string,origin:EditDraftOrigin){this.editOrigin(origin);const saved=this.readEdit(sid);if(saved&&JSON.stringify(saved.origin)!==JSON.stringify(origin))throw Error('The prepared edit source changed; no draft was replaced.');return saved!==null;}
+ prepareEdit(sid:string,origin:EditDraftOrigin,text:string,files:{entry:DraftFile;data:Uint8Array}[]){
+  if(this.preparedEdit(sid,origin))return;
+  if(JSON.stringify(this.describe(sid))!==JSON.stringify(blank()))throw Error('The child already has a draft; no content was replaced.');
+  const draft:HarnessDraft={...blank(),revision:1,textRevision:1,attachmentsRevision:files.length?1:0,text,attachments:files.map(f=>f.entry)};validate(draft);
+  for(const f of files)this.storeObject(f.entry.sha256,f.data);
+  this.saveEdit(sid,{version:1,origin,phase:'prepared',draft});
+ }
+ applyEdit(sid:string,origin:EditDraftOrigin){
+  if(!this.preparedEdit(sid,origin))throw Error('Prepare the original message and attachments before creating the edit branch.');
+  const saved=this.readEdit(sid)!;if(saved.phase==='applied')return;
+  const current=this.describe(sid);
+  for(const f of saved.draft.attachments){const data=this.read(join(this.objects,f.sha256.slice(7)+'.bin'),FILE_LIMIT);if(data.byteLength!==f.bytes||'sha256:'+createHash('sha256').update(data).digest('hex')!==f.sha256)throw Error('The prepared edit attachment is corrupt.');}
+  if(JSON.stringify(current)!==JSON.stringify(saved.draft)){
+   if(JSON.stringify(current)!==JSON.stringify(blank()))throw Error('The child draft changed; no content was replaced.');
+   this.commit(sid,saved.draft);
+  }
+  this.saveEdit(sid,{...saved,phase:'applied'});
+ }
+ editApplied(sid:string){const saved=this.readEdit(sid);return saved?.phase==='applied'||!!saved&&this.describe(sid).revision!==0;}
  remove(sid:string,expected:unknown,id:unknown){const value=this.editable(sid);this.compare(value.attachmentsRevision,expected);identifier(id);if(!value.attachments.some(f=>f.id===id))throw Error('This draft attachment is no longer saved.');return this.commit(sid,{...value,revision:value.revision+1,attachmentsRevision:value.attachmentsRevision+1,attachments:value.attachments.filter(f=>f.id!==id)});}
  bytes(sid:string,id:unknown,sha256:unknown){identifier(id);const entry=this.describe(sid).attachments.find(f=>f.id===id&&f.sha256===sha256);if(!entry)throw Error('This draft attachment does not belong to the conversation.');const data=this.read(join(this.objects,entry.sha256.slice(7)+'.bin'),FILE_LIMIT);if(data.byteLength!==entry.bytes||'sha256:'+createHash('sha256').update(data).digest('hex')!==entry.sha256)throw Error('The saved draft attachment is corrupt.');return {entry,data};}
  prepare(sid:string,expected:unknown,requestId:unknown,mode:unknown,attachments:PromptAttachment[]=[]){const value=this.editable(sid);this.compare(value.revision,expected);if(value.references?.some(r=>r.invalid))throw Error('Remove unavailable draft references before sending.');identifier(requestId);if(!['queue','steer'].includes(String(mode))||!value.text.trim()&&!value.attachments.length)throw Error('Choose a non-empty draft and submission mode.');for(const f of value.attachments)this.bytes(sid,f.id,f.sha256);return this.commit(sid,{...value,revision:value.revision+1,submission:{requestId:requestId as string,mode:mode as 'queue'|'steer',text:value.text,attachmentIds:value.attachments.map(f=>f.id),attachments:promptAttachments(attachments),preparedAt:Date.now()}});}

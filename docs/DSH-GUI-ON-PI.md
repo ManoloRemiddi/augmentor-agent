@@ -1604,8 +1604,10 @@ are connected. Virtual/extension-provider editing, advanced hidden controls,
 representative live providers and common Native/Browser management remain open.
 Unsupported operations retain an explicit missing-binding response.
 
-Final assistant branching uses the original DSH branch control; current-message
-Edit remains in the advanced inspector. The original [question controls](PI-QUESTIONS.md)
+Final assistant branching uses the original DSH branch control. Latest-human
+[Edit](HARNESS-MESSAGE-EDIT.md) now restores the message and original attachments
+in the existing composer of a Pi child, awaiting explicit Send; fresh-artifact
+qualification remains separate. The original [question controls](PI-QUESTIONS.md)
 already bind Take time, editing and renewable focus leases to the Pi Host.
 Approvals retain their hard timeout; AbortSignal, Stop and last-operator loss
 still settle unanswered questions. [Scoped saved answer drafts and structured batches](PI-QUESTIONS.md), together

@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Original-GUI sent-message Edit](HARNESS-MESSAGE-EDIT.md) now binds the latest human
+input to a durable Pi edit child and restores original text/files/images into the
+existing composer, awaiting explicit Send. Supplier icon/CSS retained, two source
+adaptations recorded; no redesign or parallel agent loop. Focused source recovery
+passes 19, including actual partial-publication SIGKILL and original GUI pointer
+checks; full artifact and owner-review qualification remain pending at this
+checkpoint. Current memory/recognition reviews, services and selection stay intact.
+
 [Qualified memory installation](HINDSIGHT-INSTALLATION.md#actual-installation-and-rollback-qualification--october-16)
 at **60fa55f4**, private rollback metadata fix **d6361bd1**, passes source/fresh
 ordinary **61 Python/31 memory Node** with unchanged b7 runtime/GUI and 25 source/
