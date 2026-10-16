@@ -742,7 +742,10 @@ it never edits the original container or changes production installation. It
 corrects document refresh from implicit LOW (one iteration) to MID (the configured
 two), preserving overall processing/model/GPU settings. Whole-image replacement,
 other upstream changes and installed adoption are not part of this selection.
-See [qualification scope](PI-MEMORY-LIVE.md#opt-in-upstream-refresh-budget-backport--october-16).
+See [qualification scope](PI-MEMORY-LIVE.md#opt-in-upstream-refresh-budget-backport--october-16)
+and [current results](PI-MEMORY-LIVE.md#current-page-and-outage-results--october-16):
+actual retrieval/concise pages and an independent outage recovery pass are recorded,
+with retained full default-window failures and no installed adoption.
 
 ### Windows voice configuration candidate (28 September 2026)
 

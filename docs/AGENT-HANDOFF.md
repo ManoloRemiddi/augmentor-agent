@@ -1,27 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Opt-in page-budget backport](PI-MEMORY-LIVE.md#opt-in-upstream-refresh-budget-backport--october-16)
-selects three public MIT hunks from upstream **022583d4**, with exact original
-licence/source/base/output hashes. Only a fresh proof container gets a read-only
-source overlay. Document refresh now uses the configured two iterations, with
-job/call/time/token/concurrency/model/GPU settings and production installer
-unchanged. Exact public-source application/compilation and source/fresh ordinary 43 Python/
-30 Node cases pass. Its first default live run produces a correctly grounded
-relationship page, then stops phase five at the original absolute deadline; all
-owned actors/engine join and failure is retained. A concise factual-page policy
-(revision three) preserves IDs/content while updating the managed source query;
-43 Python/30 Node source/fresh ordinary cases pass at **a8f49ced**. Its actual
-default run completes seed/correction, fresh scoped recall, exact historical
-branch, cold restart and pause; outage chat works but the proof queries the
-restarted session before the existing capture retry binds it. That failure remains
-retained. External observation now waits only for this known unbound-session state
-within the original 15-second bound; runtime/app bytes stay unchanged. A new real-
-timer client case passes with source/fresh ordinary Node 31/31 and Python 43/43.
-The **03fb7039** full rerun passes seed/recall/isolation but hits the correction
-window deadline before recovery, so full default timing stays unqualified. An
-explicit independent outage scenario preserves all its original assertions; its
-focused result cannot replace the full scenario. Live follow-up remains required. Original services, MX review,
-selection and prior failures remain preserved.
+[Memory-page qualification](PI-MEMORY-LIVE.md#current-page-and-outage-results--october-16)
+backports three public MIT hunks from upstream **022583d4** into a separately
+verified read-only engine overlay. Page refresh uses the configured two iterations;
+concise page policy three preserves existing IDs/content until normal refresh.
+Source/fresh ordinary pass **43 Python / 31 Node** plus 12 source/licence cases,
+without changed existing bounds/workers/skips. All **3,400 tracked / 1,060 compiled /
+20,702 dependency inputs** remain unchanged after live use. At **a8f49ced**, actual
+default-Qwen seed/correction, scoped fresh recall, exact historical branch, cold
+restart and pause pass; its premature outage read fails. The unchanged-runtime
+**03fb7039** rerun hits the correction deadline, so full default timing remains
+unqualified. External **50c8f2af** separately passes actual outage chat/recovery:
+one Qwen request, exactly one human/assistant source pair, zero tools/memory
+inference/replay, all actors/engine terminal. This focused pass does not close the
+full scenario. Original engine health, eleven seals/twelve reviews plus recognition,
+selection, prior changes/configuration and GUI remain preserved. New review and
+production adoption, broader load/semantics, full voice/migration/platform gates
+remain open. [Portable results](../release/harness-pi-memory-page-qualification-20261016.json).
 
 [Memory gateway settlement](PI-MEMORY-LIVE.md) corrects a live sequential-stage
 race: successful HTTP confirmation previously preceded upstream/budget/guard

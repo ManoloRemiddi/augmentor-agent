@@ -83,7 +83,13 @@
     "compiledInputs": 1060,
     "nodeExecutables": 1,
     "dependencyInputs": 20702,
-    "allFrozenInputsUnchangedAfterUse": true
+    "allFrozenInputsUnchangedAfterUse": true,
+    "frozenInventorySha256": {
+      "dist": "e772c7ae5cc6d6f26e44c7dac00a3d3ab576dbb2a80e92b5ac181ee47ac52ae1",
+      "node": "7cf49748be9dfbbd046a98a2769dfc8b8366eeb661a450827711c5094a9b5a24",
+      "node_modules": "0704a733803a7dabae4dd66e7726e15cd750c0b6d29d552c604ba7dd331b4bab"
+    },
+    "allFrozenInputsUnchangedAfterFocusedOutage": true
   },
   "retainedExperiments": [
     {
@@ -308,6 +314,14 @@
     "harness-memory-recovery-live-proof-20261016.log": {
       "bytes": 2168,
       "sha256": "b98af19765d96949178ea2912bf732441bf02c42f65514ca4fe331187e8641bf"
+    },
+    "harness-memory-outage-live-proof-20261016.log": {
+      "bytes": 319,
+      "sha256": "dbd7204f52c8c1824e469e92a0866da96c527febcc9f27ceda219829acd69400"
+    },
+    "harness-memory-outage-engine-20261016.log": {
+      "bytes": 228,
+      "sha256": "f0ae81771092df02f4cea1052e1d9b2bf1d4231710a0519eebdd864d1f491b39"
     }
   },
   "deployment": {
@@ -321,11 +335,95 @@
     "merged": false
   },
   "remaining": [
+    "Repeatable full default-mode acceptance within unchanged processing windows and token budgets",
     "Owner physical MX feedback and updated review adoption",
     "Production memory backport distribution/install/restart and existing-bank migration acceptance",
     "Broader memory semantics/load and provider modes",
     "Full voice/shared dependency distribution and remaining Harness migration",
     "Windows/macOS/other Linux release qualification"
   ],
-  "wholeHarnessGoalComplete": false
+  "wholeHarnessGoalComplete": false,
+  "focusedOutageQualification": {
+    "scenario": "outage",
+    "passed": true,
+    "fullScenarioQualifiedByThis": false,
+    "externalDriverRef": "50c8f2afe8fc1284b9e70c60b46abdce60a97595",
+    "externalDriverSha256": "8f0d17560971c0d61850574a3ab6c7f40581f8de0031be3fd7ad73a8632df51e",
+    "applicationRef": "03fb703958b161fc491498f510dd7e59d689dadf",
+    "ordinaryChat": true,
+    "emptyManagedBrief": true,
+    "sourceRoles": {
+      "assistant": 1,
+      "user": 1
+    },
+    "conversationRequests": 1,
+    "sdkToolExecutions": 0,
+    "memoryInferenceBudgets": 0,
+    "durableCaptureRecoveredExactlyOnce": true,
+    "modelOrToolReplay": false,
+    "providerOutputLimitsPreserved": true,
+    "allOwnedActorsAndEngineTerminal": true,
+    "sourceOverlayAndPublicCacheUnchanged": true,
+    "privateEngineLog": {
+      "bytes": 28258,
+      "sha256": "bfc78a08e27e158c40ebd5a3e8fb58fe2cbcddb146a35a36910869a5945bfd3b",
+      "published": false
+    }
+  },
+  "runtimeInputSha256": {
+    "services/memory/gateway.py": "42ab674345d7b0acc870a3fdc084b5f8611cac983df6dd640cb8b6ad04a26955",
+    "services/memory/hindsight.py": "60b3c9950ef24e636ab0ae76866c6814ea40bd6daa6ed203614e8b45a5339a85",
+    "services/memory/hindsight_backport.py": "787c6c6993b4fafae4aa1f91de92e90521ba65c80a757fa452ce504fd83400e4",
+    "dist/runtime/src/host.js": "05d4d7b04989c1d85e8d3ff46eec2295fa22b7bad2d471fbbdcd460719baf270"
+  },
+  "engineEnvironmentReadOnlyComparison": {
+    "LLM_TIMEOUT": {
+      "original": null,
+      "proof": "45"
+    },
+    "LLM_MAX_CONCURRENT": {
+      "original": "1",
+      "proof": "1"
+    },
+    "RETAIN_MAX_CONCURRENT": {
+      "original": "1",
+      "proof": "1"
+    },
+    "CONSOLIDATION_LLM_PARALLELISM": {
+      "original": "1",
+      "proof": "1"
+    },
+    "REFLECT_MAX_ITERATIONS": {
+      "original": "2",
+      "proof": "2"
+    },
+    "REFLECT_MAX_CONTEXT_TOKENS": {
+      "original": "8000",
+      "proof": "8000"
+    },
+    "REFLECT_SOURCE_FACTS_MAX_TOKENS": {
+      "original": "1200",
+      "proof": "1200"
+    },
+    "REFLECT_MAX_COMPLETION_TOKENS": {
+      "original": "4096",
+      "proof": "4096"
+    },
+    "LLM_MAX_RETRIES": {
+      "original": "0",
+      "proof": "0"
+    }
+  },
+  "preservation": {
+    "sealedInventoriesVerified": 11,
+    "reviewProcessesPresent": 12,
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "modelSpeechGpuConfigurationFilesPreserved": 6,
+    "privateCompanionPreexistingDirtyFiles": 4,
+    "currentMxReviewHttpStatus": 200,
+    "qwenCatalogHttpStatus": 200,
+    "recognitionReviewProcessPresent": true,
+    "newArtifactActivated": false
+  }
 }

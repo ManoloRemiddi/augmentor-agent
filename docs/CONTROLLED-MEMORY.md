@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current page and outage evidence](PI-MEMORY-LIVE.md#current-page-and-outage-results--october-16)
+uses an opt-in verified MIT upstream refresh-default backport and concise managed
+pages. Source/fresh ordinary pass 43 Python/31 Node with unchanged existing bounds.
+One actual default-Qwen run passes seed/correction/scoped recall/historical branch/
+cold restart/pause, but full acceptance remains false after retained observation/
+window failures. A separate focused actual outage run passes one normal Qwen
+request and exactly-once source recovery, zero tools/memory inference/replay and
+joined cleanup. Installed services, limits/model/GPU settings, current MX review
+and selection remain preserved. See the guide for exact refs, source attribution,
+failures and deployment/semantics/load/platform gates.
+
 [Memory gateway settlement](PI-MEMORY-LIVE.md) corrects a live sequential-stage
 race: successful HTTP confirmation previously preceded upstream/budget/guard
 cleanup, allowing the next Hindsight request to receive a spurious 429. The new

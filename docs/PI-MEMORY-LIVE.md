@@ -9,6 +9,38 @@ owner or change the original DSH GUI. [Controlled memory](CONTROLLED-MEMORY.md)
 owns the budgets, source selection, previous optional thinking-mode evidence and
 production deployment boundaries.
 
+## Current page and outage results — October 16
+
+The opt-in MIT upstream budget-default backport and concise managed-page policy
+now retrieve evidence and generate factual pages within the existing configured
+two iterations. Source/fresh ordinary each pass **43 Python / 31 Node**, with 12
+additional public source/licence cases and no existing deadline/worker/skip changes.
+All 3,400 frozen tracked inputs, 1,060 compiled inputs, the Node executable and
+20,702 dependency file/link inputs verify unchanged after live use.
+
+The **a8f49ced** actual default-Qwen run completes seed/correction and verifies
+current scoped recall/provider/native evidence, historical branch fidelity, cold
+restart and pause, then fails a premature outage-recovery observation. Its frozen
+runtime **03fb7039** follow-up corrects that observation, but hits the correction
+window deadline before reaching it. **Full default-mode acceptance stays false**;
+the fix does not guarantee every batch finishes within the existing 120-second/
+65,536-token policy. All earlier failures/budgets remain retained without retry.
+
+The separate focused outage run, external driver **50c8f2af** against application
+**03fb7039**, now passes actual Pi/Qwen chat during memory-service loss and capture
+recovery after restart: **one conversational request, exactly one user/assistant
+pair, zero tools, zero memory-inference budgets and no model/tool replay**. The
+native brief is empty during the outage, provider output limits stay 262144/8192,
+and all owned actors/engine join. Its fresh source overlay/cache and original
+engine identity/health remain unchanged. This independently qualifies outage
+recovery; it does not replace the failed full scenario. Existing MX review,
+selection, eleven seals/twelve reviews plus recognition and prior configurations/
+changes remain preserved. Production backport distribution/adoption, existing-bank
+migration, broader semantics/load, physical voice and later OS gates remain.
+
+[Portable acceptance and retained failures](../release/harness-pi-memory-page-qualification-20261016.json).
+The following sections preserve the preceding checkpoints and their failures.
+
 ## October 16 sequential-request race
 
 The first new isolated proof reaches a real SDK-held tool window and retains
@@ -235,8 +267,8 @@ SDK tools; all original outage assertions and the 15-second recovery observation
 bound remain. The default **`full`** selection still requires every seed/update/
 branch/restart/pause/outage assertion. A focused outage result cannot replace a
 failed full scenario. This external-driver addition changes no application code,
-page policy, inference limit or production/installed state. Focused live evidence
-remains required. [Portable retained results](../release/harness-pi-memory-page-qualification-20261016.json).
+page policy, inference limit or production/installed state. The current result
+above records its subsequent focused pass while keeping full acceptance false. [Portable retained results](../release/harness-pi-memory-page-qualification-20261016.json).
 
 ## Isolated proof ownership
 
