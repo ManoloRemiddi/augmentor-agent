@@ -1,9 +1,9 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {existsSync,chmodSync,lstatSync,realpathSync,mkdirSync,readFileSync,writeFileSync,renameSync,rmSync} from 'node:fs';
+import {existsSync,chmodSync,lstatSync,realpathSync,mkdirSync,readFileSync,writeFileSync,renameSync,rmSync,openSync,closeSync,fsyncSync,constants} from 'node:fs';
 import {dirname,isAbsolute,join,resolve} from 'node:path';
 import {createHash,randomUUID} from 'node:crypto';
 import {dshHistorySurface,type DshSurface} from './dsh-history-surface.js';
-import {SessionManager} from '@earendil-works/pi-coding-agent';
+import {SessionManager,CURRENT_SESSION_VERSION} from '@earendil-works/pi-coding-agent';
 import {PiAttachments,promptAttachments,IMAGE_LIMITS} from './attachments.js';
 import {DSH_MEDIA_TYPE,DSH_MEDIA_SCHEMA} from './dsh-history-media.js';
 import {atomicJson,privateDir} from './storage.js';
@@ -15,6 +15,10 @@ const present=(path:string)=>{try{lstatSync(path);return true;}catch(error){if((
 const messageTypes=new Set(['assistant/message','tool/result','user/message']);
 const omittedSources=new Set(['agent-instructions','runtime-context','skill-catalog','repeat-tool-reminder']);
 const supportedParts=new Set(['text','reasoning','image','tool-call']);
+const setupEvents=new Set('permission/preset sandbox/mode approval/policy agent-preset/selected model/selection working-directory/change session/title session/end-seed agent/inbox/spliced subagent/model-selection-policy'.split(' '));
+/** Current-format setup metadata is a saved conversation even before its first
+ * human message. No turn, action, goal, workflow or context message qualifies. */
+function setupOnlyHistory(session:Data,events:Data[]){return session.opening.header.version===4&&events.length>0&&events.every(e=>setupEvents.has(e.type));}
 function fail(message:string):never{throw Error('DSH pilot import: '+message);}
 function checkedContent(content:Data[]):Data[]{
  return content.map(p=>{
@@ -85,9 +89,10 @@ function records(session:Data,cut=false){
    pending.add(e.data.callId);dispatched.add(e.data.callId);
   }
  }
- if(previous!==opening.cursor||pending.size||calls.size!==dispatched.size||(!human&&!cut))fail('history is incomplete or has unresolved actions.');
+ const setupOnly=setupOnlyHistory(session,effective);
+ if(previous!==opening.cursor||pending.size||calls.size!==dispatched.size||(!human&&!cut&&!setupOnly))fail('history is incomplete or has unresolved actions.');
  const turn=rows.map((r:Data)=>r.event).filter((e:Data)=>e.type==='turn/start'||e.type==='turn/end').at(-1);
- if(!cut&&turn?.type!=='turn/end')fail('finish the source conversation before importing it.');
+ if(!cut&&!setupOnly&&turn?.type!=='turn/end')fail('finish the source conversation before importing it.');
  const surface=dshHistorySurface(effective,opening.header.version===4,cut);
  const parent=opening.header.parentSession;if(parent!==undefined){identifier(parent);if(parent===opening.header.id)fail('source lineage cannot name itself.');}
  if(!cut&&opening.header.isSeeded===true&&!surface.seedCuts.length)fail('seeded source is missing its inherited boundary.');
@@ -105,7 +110,7 @@ function checkedSelection(value:unknown):ModelSelection{
 /** Shared full-import and source-cut projection. This only appends labelled
  * history through the public SDK; it never restores old provider/tool actions. */
 function appendDshTranscript(manager:ReturnType<typeof SessionManager.inMemory>,original:Data,events:Data[],surface:DshSurface,source:Data,sha256:string,targetState:string){
-  manager.appendCustomEntry('augmentor.dsh-import.v1',{sha256,sourceSessionId:original.opening.header.id,throughSeq:original.opening.cursor,source:'DSH',context:'labelled historical transcript; not reconstructed effective DSH context',rawArchive:'dsh-imports/'+sha256+'.json',historicalUsage:'original archive only; no invented Pi accounting',relatedSessionsArchived:(source.relatedSessions??[]).length,relatedSessionRuntime:'not imported as live Pi jobs'});
+  manager.appendCustomEntry('augmentor.dsh-import.v1',{sha256,sourceSessionId:original.opening.header.id,throughSeq:original.opening.cursor,source:'DSH',...(setupOnlyHistory(original,events)?{sourceHistoryKind:'setup-only'}:{}),context:'labelled historical transcript; not reconstructed effective DSH context',rawArchive:'dsh-imports/'+sha256+'.json',historicalUsage:'original archive only; no invented Pi accounting',relatedSessionsArchived:(source.relatedSessions??[]).length,relatedSessionRuntime:'not imported as live Pi jobs'});
   const contextEvents=surface.nodes.map(seq=>events[seq]),activeSeqs=new Set(surface.nodes),replacements=new Map(surface.replacements.map(row=>[row.seq,row]));
   const sourceLineage={parentSession:original.opening.header.parentSession??null,isSeeded:original.opening.header.isSeeded??null,seedCuts:surface.seedCuts};
   manager.appendCustomEntry('augmentor.dsh-surface.v1',{...surface,sourceLineage,contextPolicy:'source message membership/order; current Augmentor instructions; bounded historical tool excerpts; no provider replay'});
@@ -175,14 +180,24 @@ function writeSession(original:Data,events:Data[],surface:DshSurface,stage:strin
   const manager=SessionManager.create(cwd,nativeDir),title=original.opening.projections?.values?.title??workspace.title;
   manager.appendSessionInfo(typeof title==='string'?title:workspace.title);
   const {display,contextEntries,skippedInstructionMessages,archivedToolProposalMessages,activeSeqs,sourceLineage,toolContextLeft,toolPayloadChars}=appendDshTranscript(manager,original,events,surface,source,sha256,targetState);
-  const nativeFile=manager.getSessionFile();if(!nativeFile||!existsSync(nativeFile))fail('Pi did not persist the imported context.');
+  const nativeFile=manager.getSessionFile(),setupOnly=setupOnlyHistory(original,events);
+  if(nativeFile&&setupOnly&&!existsSync(nativeFile)){
+   // Like custom-only native branches, the SDK deliberately defers setup-only
+   // files. Save its exact public snapshot in this unpublished private stage;
+   // do not invent a user/assistant message or run an agent just to flush it.
+   const header=manager.getHeader();if(!header||header.version!==CURRENT_SESSION_VERSION)fail('Pi setup snapshot is unavailable.');
+   const fd=openSync(nativeFile,constants.O_WRONLY|constants.O_CREAT|constants.O_EXCL|(constants.O_NOFOLLOW??0),0o600);
+   try{for(const entry of [header,...manager.getEntries()])writeFileSync(fd,JSON.stringify(entry)+'\n');fsyncSync(fd);}finally{closeSync(fd);}
+   if(process.platform!=='win32'){const fd=openSync(nativeDir,constants.O_RDONLY|(constants.O_DIRECTORY??0)|(constants.O_NOFOLLOW??0));try{fsyncSync(fd);}finally{closeSync(fd);}}
+  }
+  if(!nativeFile||!existsSync(nativeFile))fail('Pi did not persist the imported context.');
   chmodSync(nativeFile,0o600);const reopened=SessionManager.open(nativeFile);if(reopened.buildSessionContext().messages.length!==contextEntries+1)fail('native cold-open context does not match.');
-  const notice='Imported DSH history. Past calls are completed records; continuation uses a labelled transcript. Exact source and two-way sequence provenance are retained in the private import archive. Old tool outputs use bounded excerpts in continuation context; the full display/archive is preserved. Historical subagent logs stay archived, not live Fleet jobs. Plaintext reasoning is historical data, never signed provider replay. Imported images retain the exact stored bytes; original camera uploads are not reconstructed. Source replacements determine continuation context; original append-only records stay inspectable.';
+  const notice=setupOnly?'Imported conversation. Send your first message to start working here.':'Imported DSH history. Past calls are completed records; continuation uses a labelled transcript. Exact source and two-way sequence provenance are retained in the private import archive. Old tool outputs use bounded excerpts in continuation context; the full display/archive is preserved. Historical subagent logs stay archived, not live Fleet jobs. Plaintext reasoning is historical data, never signed provider replay. Imported images retain the exact stored bytes; original camera uploads are not reconstructed. Source replacements determine continuation context; original append-only records stay inspectable.';
   display.push({seq:display.length+1,type:'runtime/notice',data:{message:notice,importedFrom:{archiveSha256:sha256}}});
   writeFileSync(join(sessions,sid+'.events.jsonl'),display.map(e=>JSON.stringify(e)+'\n').join(''),{mode:0o600,flag:'wx'});
   const finalNative=join(targetState,'sessions',sid,nativeFile.split(/[\\/]/).at(-1)!);
   atomicJson(join(sessions,sid+'.meta.json'),{id:sid,cwd,file:finalNative,selection,title:typeof title==='string'?title:workspace.title,saved:true,policy:'read-only',surface:'linux',updatedAt:now,requests:[],running:false});
-  const receipt={schema:'augmentor-dsh-pilot-import/1',sourceSha256:sha256,sourceSessionId:original.opening.header.id,sessionId:sid,selection,cwd,contextEntries,sourceEvents:events.length,effectiveSourceSeqs:surface.nodes,sourceReplacements:surface.replacements.length,shadowedSourceMessages:events.filter(e=>messageTypes.has(e.type)&&!activeSeqs.has(e.seq)).length,sourceLineage,displayEvents:display.length,skippedInstructionMessages,archivedToolProposalMessages,toolPayloadCoverage:'effective source tool results only; shadowed originals remain archived',toolPayloadContextLimitChars:16384,toolPayloadContextChars:16384-toolContextLeft,toolPayloadCharsNotInContext:toolPayloadChars-(16384-toolContextLeft),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
+  const receipt={schema:'augmentor-dsh-pilot-import/1',sourceSha256:sha256,sourceSessionId:original.opening.header.id,sessionId:sid,selection,cwd,...(setupOnly?{sourceHistoryKind:'setup-only'}:{}),contextEntries,sourceEvents:events.length,effectiveSourceSeqs:surface.nodes,sourceReplacements:surface.replacements.length,shadowedSourceMessages:events.filter(e=>messageTypes.has(e.type)&&!activeSeqs.has(e.seq)).length,sourceLineage,displayEvents:display.length,skippedInstructionMessages,archivedToolProposalMessages,toolPayloadCoverage:'effective source tool results only; shadowed originals remain archived',toolPayloadContextLimitChars:16384,toolPayloadContextChars:16384-toolContextLeft,toolPayloadCharsNotInContext:toolPayloadChars-(16384-toolContextLeft),relatedSessionsArchived:(source.relatedSessions??[]).length,policy:'read-only',historicalToolCallsExecutable:false,rawArchive:'dsh-imports/'+sha256+'.json'};
  return receipt;
 }
 

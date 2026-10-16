@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Setup-only conversations](#setup-only-conversations--october-16) now migrate without fabricated chat, restored old grants or automatic work. The preceding action-completeness refusals actually include sixteen setup-only conversations among seven projects/twenty-one parents; identical frozen exports now pass corrected read-only preparation. Source/separate ordinary pass **120 Node cases** across twenty-one files/eight Chromium files and **35 Python** each. Public SDK snapshot persistence handles its deferred custom-only files; actual SDK first-turn/branch/cold and original empty-composer GUI checks pass. Both running reviews/all 36 protected inputs stay unchanged. [Portable evidence](../release/harness-dsh-setup-qualification-20261016.json). Stage/adopt the corrected runtime before wider migration; owner pilot feedback still gates further transfer.
+
 [Standard checkpoint framing](#standard-checkpoint-framing--october-16) fixes a real preparation refusal without importing another project. Source/ordinary/exact sealed each pass **104 Node cases** across eighteen files/seven Chromium files and **35 Python cases**. Three identical real exports/six parent conversations refuse under the preceding sealed converter and pass corrected read-only preparation. Both running reviews and all 36 protected inputs remain unchanged. The corrected runtime is separately staged/qualified, unselected **20261016-230037-48cf9df1 / 51f6e3e6**; adopt it before broader migration; owner pilot feedback still gates additional transfer. [Portable evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
 
 [Archived inspector status panels](CONTEXT-FLEET.md#archived-inspector-status-panels--october-16) now run in both MX reviews. Private unselected **20261016-213718-135550f5**, application **d300543c**, passes source/exact packaged **32/32 Node cases** (eleven files/four Chromium) plus **41 Python cases** each. All **24,613 sealed/1,102 compiled** inputs verify. Guarded idle-only updates retain four conversations, **408 verified backup files/32 cold and post-GUI protected inputs**, 12 shared prompts/19 captured records/17 existing pending entries and engine/settings/installed selections. Stable menu registration is revision four. Actual pilot archive Jobs/Plan/Goal, source excerpts and absence of false native recovery pass with zero GUI/HTTP errors and no new project/model/tool work. [Portable evidence](../release/harness-archive-status-review-20261016.json). Owner pilot feedback still gates bulk migration.
@@ -381,6 +383,80 @@ Both owner PIDs/roots, **32 protected files** and installed selection stay uncha
 No extra owner import, provider request or review restart occurs.
 [Portable qualification](../release/harness-dsh-rich-history-review-20261016.json).
 
+
+## Setup-only conversations — October 16
+
+The preceding assessment's seven generic action-completeness refusals are now
+inspected more closely. Their twenty-one parent histories contain sixteen
+conversations with only setup metadata and five ordinary completed conversations.
+No pending dispatched action is observed in those captured cuts. Requiring a
+historical human message and ended turn rejects an otherwise valid unused
+conversation, which then prevents its entire multi-conversation project from
+being prepared. Source originals and all memberships remain preserved.
+
+The authored converter admits a complete, nonempty **version-four** prefix
+containing only explicitly recognized setup events: permission/sandbox/approval,
+agent preset/model/working directory/title, seed boundaries, inbox-splice metadata
+and subagent model-selection policy. Message, turn, action, goal, tool-workflow,
+unknown-event and legacy/header-only histories do not receive this exception.
+Original sequence/cursor, format/lineage, bounds and pending/undispatched-action
+guards remain. Seed markers are validated when present; the observed minimal
+permission/sandbox/approval prefix is also supported.
+
+Receipts and native import provenance label this new category `setup-only`.
+Its effective historical source surface is empty; title, source records, pins,
+archive state, membership and exact private archive are retained. Existing import
+policy remains read-only with an explicitly chosen current model. Old source
+permission, sandbox, preset/model and inbox metadata never become current grants,
+configuration or live work. The existing generated custom end-of-import boundary
+remains; no user/assistant message is invented. The original conversation surface
+shows a short invitation to send the first message, with its normal composer.
+
+Pi intentionally defers persistence until a real user/assistant message exists.
+For this new custom-only import, its exact **public** `getHeader()` / `getEntries()`
+snapshot is written exclusively with mode 0600 inside the unpublished private
+stage, then synced and opened through a fresh supported manager. The current
+native version is checked. This follows the existing custom-only branch approach;
+it does not call private SDK persistence methods, alter SDK state or start an
+agent/model to force a file into existence. Ordinary imports keep their existing
+SDK persistence path. A failed stage is not published over an existing profile.
+
+All seven targeted real exports/twenty-one parent conversations fail preparation
+under the preceding **51f6e3e6** converter and pass the corrected converter using
+identical frozen bytes per pair. No extra real target or continuation-model
+assignment is created. These are read-only parent checks, not a new full-catalog,
+child-family, continuation or migration acceptance result.
+
+Check/build and source/separate ordinary qualification pass **120/120 Node
+cases**, twenty-one files/eight Chromium files, plus **35 Python cases** each,
+two workers/no skips/unchanged deadlines. Sixteen new cases cover minimal/full
+setup, mixed projects, immutable originals and source organization, unchanged
+pending-action/workflow/lineage guards, actual SDK first human work, selected model
+and isolated native reply branching/cold history, and original GUI opening without
+automatic work. The first SDK GUI preparation appends only its validated current
+persona snapshot and typed thinking setting; every original native byte remains
+an exact prefix, no chat/model/tool work is invented, and console/HTTP errors are
+zero. Cold inspection before SDK preparation is byte-exact. The 1,102 compiled
+inputs match the ordinary copy; at ordinary qualification, 23,517 other baseline
+non-package/non-compiled entries also match. No dependency, supplier GUI layout
+or OS adapter changes; later OS artifacts remain unqualified.
+
+The pre-fix failures and initial missing-file failure are retained. A type check
+catches an omitted cleanup import before the passing build. The shared test
+fixture now understands both existing one- and multi-conversation receipt forms.
+The first GUI assertion incorrectly expects no SDK metadata append; a read-only
+observation confirms and the final test strictly validates the two legitimate
+records plus exact original prefixes. Historical-byte/no-work guards remain;
+deadlines and workers are unchanged.
+
+Both running review owners, all 36 protected inputs, shared prompt/memory/
+eligibility/jobs/settings rows, engine configuration and registry/selections are
+unchanged, with all 24,615 running sealed inputs verified. This checkpoint is
+source/ordinary only until separately staged/qualified. Adopt the corrected
+runtime before future broader migration. Owner pilot feedback still gates any
+additional transfer; large archives, source descriptor versions, folders and
+non-assistant reasoning remain separate work. Voice/later OS rollout stays deferred.
+[Portable qualification](../release/harness-dsh-setup-qualification-20261016.json).
 
 ## Standard checkpoint framing — October 16
 

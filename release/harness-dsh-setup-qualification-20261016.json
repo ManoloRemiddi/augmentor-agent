@@ -1,0 +1,87 @@
+{
+  "schema": "augmentor-dsh-setup-qualification/1",
+  "date": "2026-10-16",
+  "scope": "MX source and separate ordinary packaged migration converter; no additional owner project import",
+  "observedRefusal": {
+    "projects": 7,
+    "parentConversations": 21,
+    "setupOnlyConversations": 16,
+    "otherCompletedConversations": 5,
+    "pendingDispatchedActionsObserved": 0,
+    "precedingConverterApplicationRef": "51f6e3e6fc77b429c1025087fdb907e09490f58e",
+    "precedingConverterPreparationRefusals": 7,
+    "correctedPreparationAcceptances": 7,
+    "identicalFrozenBytesPerBeforeAfterPair": true,
+    "scopeLimit": "Targeted read-only parent preparation, not owner import, model mapping, child inspection, continuation or a fresh whole-catalog readiness result",
+    "ownerDataPublished": false,
+    "ownerModelRequests": 0,
+    "additionalOwnerProjectTransfers": 0
+  },
+  "admission": {
+    "sourceVersion": 4,
+    "completeNonemptySourcePrefixRequired": true,
+    "setupOnlyEventTypes": [
+      "permission/preset",
+      "sandbox/mode",
+      "approval/policy",
+      "agent-preset/selected",
+      "model/selection",
+      "working-directory/change",
+      "session/title",
+      "session/end-seed",
+      "agent/inbox/spliced",
+      "subagent/model-selection-policy"
+    ],
+    "sourceHistoryKind": "setup-only",
+    "historicalContextEntries": 0,
+    "existingCustomEndOfImportBoundaryRetained": true,
+    "userOrAssistantMessageInvented": false,
+    "oldGrantsModelsTasksOrInboxesResumed": false,
+    "snapshotPersistence": "Exact public SDK getHeader/getEntries snapshot, exclusive private file and file sync in unpublished import stage; directory sync on qualified POSIX path; cold reopen through a fresh supported manager",
+    "sdkPrivateMethodsUsed": false,
+    "headerOnlyLegacyUnknownWorkflowAndUnresolvedActionGuardsRetained": true,
+    "productBoundsRaised": false
+  },
+  "qualification": {
+    "checkAndBuildPass": true,
+    "sourceNodePass": 120,
+    "ordinaryPackagedNodePass": 120,
+    "nodeFiles": 21,
+    "chromiumFiles": 8,
+    "newCases": 16,
+    "sourcePythonPass": 35,
+    "ordinaryPackagedPythonPass": 35,
+    "workers": 2,
+    "skips": 0,
+    "deadlinesChanged": false,
+    "compiledFilesVerified": 1102,
+    "ordinaryBaselineNonCompiledNonPackageInputsVerified": 23517,
+    "ordinarySealedOrSelected": false,
+    "precedingValidSetupFailureReproduced": true,
+    "actualSdkSyntheticProvider": "Idle cold reopen, one explicit first human turn, selected model, one fresh read-only tool, native reply branch and cold preservation; no imported activity replay or cross-conversation context",
+    "originalGui": "Empty composer, friendly existing notice, no invented historical chat, no prompt/job/branch action or provider request, zero console/HTTP failures",
+    "firstGuiSdkMetadata": "Original native prefix remains exact; only one validated current Augmentor persona snapshot and one typed thinking-level setting append during ordinary SDK preparation",
+    "retainedFailures": [
+      "Valid setup-only sources fail the preceding converter's generic incomplete/unresolved-history check.",
+      "First source focus: 11/16. SDK intentionally defers files with no real user/assistant message; exact public snapshot persistence replaces the missing file without a fabricated conversation.",
+      "Type check catches an omitted cleanup import; it is restored before the passing build.",
+      "Next focus: 15/16. GUI preparation legitimately appends current persona/thinking settings. Read-only observation confirms exact original prefixes and only those two typed records; assertions now validate their shape and current persona contents.",
+      "Shared test fixture now handles both official single-conversation and multi-conversation receipt shapes."
+    ]
+  },
+  "preservation": {
+    "runningReviewOwnersUnchanged": 2,
+    "protectedOwnerInputsExact": 36,
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryAndSelectionsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "dependenciesChanged": false,
+    "supplierGuiOrOsAdapterChanged": false
+  },
+  "remaining": [
+    "Stage and qualify the corrected runtime before any broader owner migration",
+    "Owner pilot feedback before additional project transfers",
+    "Large archives, source descriptor versions, unavailable folders and non-assistant reasoning still need separate handling",
+    "Voice and later operating-system rollout remain deferred"
+  ]
+}
