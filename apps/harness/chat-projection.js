@@ -19,11 +19,12 @@ export function projectChat(events,{running=false,toolBindings}={}){
    const parts=data.message?.content||[];
    const text=parts.filter(p=>p.type==='text').map(p=>p.text||'').join('\n');
    const thinking=parts.filter(p=>p.type==='thinking'||p.type==='reasoning').map(p=>p.thinking||p.text||'').join('\n');
-   if(text||thinking){
+   const images=parts.filter(p=>p.type==='image'&&p.attachment);
+   if(text||thinking||images.length){
     // A final SDK message already contains its deltas, including partial
     // messages on Stop/error. Do not display those bytes a second time.
     const stop=data.message?.stopReason,partial=['aborted','error','length'].includes(stop);
-    const complete={kind:'assistant',text,thinking,seq:event.seq,partial,status:partial?stop:'complete'};
+    const complete={kind:'assistant',text,thinking,...(images.length?{images}:{}),seq:event.seq,partial,status:partial?stop:'complete'};
     if(pendingItem)Object.assign(pendingItem,complete);else items.push(complete);
     pending={text:'',thinking:''};pendingItem=undefined;
    }else flush('partial');

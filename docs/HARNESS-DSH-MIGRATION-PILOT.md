@@ -305,7 +305,8 @@ content-addressed PNG/JPEG/WebP/GIF image references in completed parent histori
 The formats were checked against the already selected public MIT DSH baseline
 [`d7432673` message schema](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/llm/llm/src/message.ts).
 The existing MIT attachment store/decoder and original GUI gallery/reasoning
-components are reused; no new dependency or supplier-source edit is introduced.
+components are reused. The Harness projection now retains assistant image blocks,
+including image-only answers, in the supplier gallery and Trajectory; no new dependency or supplier-source edit is introduced.
 
 Exports optionally contain a deduplicated `attachments` list of
 `{attachmentId,bytes,data}` with canonical base64. Only image hashes actually named
@@ -350,7 +351,7 @@ qualified by this increment. Old edited/compacted/branched source histories,
 generic files, historical child navigation and full effective-context recreation
 remain separate work.
 
-Source build and **120/120 Node cases** across nineteen files, including six
+Source build and **126/126 Node cases** across twenty files, including six
 actual Chromium files, pass with two workers and unchanged deadlines. The source
 also passes **35 Python cases**: nineteen exporter and sixteen licence/private-source/
 notice cases. Actual Host/provider requests contain the exact image bytes after
@@ -359,6 +360,8 @@ only the new fixture tool. Original GUI image lightbox, reasoning disclosure and
 composer continuation pass with no page/HTTP errors; foreign conversation access
 is refused. Initial GUI-driver observations (click before thumbnail loaded; React
 boolean attribute serialized as `true`) are retained in private logs; the final
-driver waits for decoded pixels and asserts the observed disclosure state.
+driver waits for decoded pixels and asserts the observed disclosure state. A later
+image-only regression driver exposed a quoted-selector syntax error; it now builds
+the selector as JSON data, retaining the actual gallery-count assertion.
 These are independently authored synthetic histories, with no owner-data model
 requests. Artifact qualification follows.

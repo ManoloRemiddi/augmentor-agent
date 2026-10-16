@@ -4,7 +4,7 @@ import {invokedSkillNames} from './dsh-skills.mjs';
 import {trajectoryStream} from './dsh-trajectory-stream.mjs';
 import {callScope,callViewId,toolOwnership,observedTool} from './dsh-call-identity.mjs';
 import {attachToolChildren,retainedToolArguments} from './dsh-tool-tree.mjs';
-const blocks=(content,scope)=>(content||[]).flatMap(p=>p.type==='text'?[{kind:'text',text:p.text||''}]:['thinking','reasoning'].includes(p.type)?[{kind:'reasoning',text:p.thinking??p.text??''}]:['toolCall','tool-call'].includes(p.type)?[{kind:'tool-call',callId:callViewId(scope,p.id??p.callId),sdkCallId:p.id??p.callId,name:p.name,argsRaw:JSON.stringify(p.arguments??p.args??{}),subCalls:[]}]:[]);
+const blocks=(content,scope)=>(content||[]).flatMap(p=>p.type==='text'?[{kind:'text',text:p.text||''}]:p.type==='image'&&p.attachment?[{kind:'image',attachment:p.attachment}]:['thinking','reasoning'].includes(p.type)?[{kind:'reasoning',text:p.thinking??p.text??''}]:['toolCall','tool-call'].includes(p.type)?[{kind:'tool-call',callId:callViewId(scope,p.id??p.callId),sdkCallId:p.id??p.callId,name:p.name,argsRaw:JSON.stringify(p.arguments??p.args??{}),subCalls:[]}]:[]);
 const usage=u=>u?{inputTokens:u.input,outputTokens:u.output,cacheReadTokens:u.cacheRead,cacheWriteTokens:u.cacheWrite}:undefined;
 /** Pure projection into DSH presentation contracts. Missing timestamps remain absent. */
 export function projectDsh(state){
@@ -42,7 +42,7 @@ export function projectDsh(state){
       if(!data.skillNames.length)delete data.skillNames;
       n={kind:'user',data};navigation.push({turn:currentTurn,anchorKey:key,prompt:item.text.slice(0,100),response:''});
     }
-    if(item.kind==='assistant')n={kind:'assistant-step',data:{blocks:[...(item.thinking?[{kind:'reasoning',text:item.thinking}]:[]),...(item.text?[{kind:'text',text:item.text}]:[])],step:ordinal,status:item.status==='streaming'?'running':item.partial?'interrupted':'complete',...(item.seq?{finalNode:{seq:item.seq}}:{})}};
+    if(item.kind==='assistant')n={kind:'assistant-step',data:{blocks:[...(item.thinking?[{kind:'reasoning',text:item.thinking}]:[]),...(item.text?[{kind:'text',text:item.text}]:[]),...(item.images??[]).map(p=>({kind:'image',attachment:p.attachment}))],step:ordinal,status:item.status==='streaming'?'running':item.partial?'interrupted':'complete',...(item.seq?{finalNode:{seq:item.seq}}:{})}};
     if(item.kind==='tool'){const binding=ownership.get(item.seq),proposal=state.events.find(e=>e.seq===binding?.proposalSeq),start=state.events.find(e=>e.seq===item.seq),raw=retainedToolArguments(start?.data??{}),call=proposal?.data.message?.content?.find(p=>(p.id??p.callId)===item.toolCallId)??(raw===undefined?undefined:{name:item.name,arguments:JSON.parse(raw)});n={kind:'pi-tool',data:{...item,call,result:state.events.find(e=>e.type==='tool/result'&&ownership.get(e.seq)?.id===binding?.id&&ownership.get(e.seq)?.startSeq===item.seq)?.data.result}};}
     if(['status','warning'].includes(item.kind))n={kind:'pi-notice',data:item};
     if(n)chatNodes.set(key,{...n,key,anchorSeq,location:{kind:'session'}});ordinal++;

@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Reasoning and stored-image migration](HARNESS-DSH-MIGRATION-PILOT.md#reasoning-and-stored-images--october-16) adds verified deduplicated media, original GUI reasoning/gallery display and compact lazy Pi context resolution. Source build and **120/120** Node cases across nineteen files/six Chromium files, plus **35 Python** cases, pass. Real Host/cold continuation preserves exact image bytes, omits opaque replay data, rejects text-only routes/foreign access and replays no old calls. Source histories/owner reviews stay separate; artifact qualification and wider history conversion follow.
+[Reasoning and stored-image migration](HARNESS-DSH-MIGRATION-PILOT.md#reasoning-and-stored-images--october-16) adds verified deduplicated media, original GUI reasoning/gallery display and compact lazy Pi context resolution. Source build and **126/126** Node cases across twenty files/six Chromium files, plus **35 Python** cases, pass. Real Host/cold continuation preserves exact image bytes, omits opaque replay data, rejects text-only routes/foreign access and replays no old calls. Source histories/owner reviews stay separate; artifact qualification and wider history conversion follow.
 
 [Multi-conversation DSH project imports](HARNESS-DSH-MIGRATION-PILOT.md#multi-conversation-projects--october-16) now qualify independent chats, explicit model routing, ordered pins/archive state and empty workspace registration in isolated source tests. Wider formats, multi-project consolidation and owner rollout remain separate.
 
@@ -627,7 +627,7 @@ at **7910acdac34d4c72c7e35a7752ae740a99165246** reproduces departing cold-Host
 RPC refusals and early input Stop's unknown receipt. The tests retire a held-refresh
 document before shutdown and distinguish inspected/acknowledged preparation from
 actual delivered-provider Stop. No product/UI/dependency changes occur. Source/
-ordinary **120/120 each across 43 files** pass at two workers, unchanged deadlines/
+ordinary **126/126 each across 43 files** pass at two workers, unchanged deadlines/
 no skips; compiled 905-file set/bytes, 155 npm instances and Node stay unchanged.
 Preceding 37da933/Validate38547232811 passes these two older cases but fails narrow
 Insights Send readiness and Jobs pointer hit-testing; causes/new-head acceptance

@@ -10,6 +10,7 @@ export async function authoredRichDshProject(cwd){
  rows[2].event.data.message.content.unshift({type:'reasoning',text:'AUTHORED-REASONING: compare the historical blue image.',signature:'OPAQUE-REPLAY-MUST-NOT-ENTER-CONTEXT'});
  rows[2].event.data.message.source={kind:'model',provider:'old-fixture',model:'old-model',replayState:{opaque:'OPAQUE-REPLAY-MUST-NOT-ENTER-CONTEXT'}};
  rows[4].event.data.message.content.push(structuredClone(image));
+ rows[5].event.data.message.content=[structuredClone(image)];
  rows.splice(rows.length-1,0,{type:'event',event:{type:'image/offload',time:1700000000008,data:{targets:[{seq:1,imageIndexes:[1]}]}}});
  rows.forEach((row,i)=>row.event.seq=i);value.sessions[0].opening.cursor=rows.length-1;
  value.attachments=[{attachmentId:attachment.attachmentId,bytes:bytes.length,data:bytes.toString('base64')}];

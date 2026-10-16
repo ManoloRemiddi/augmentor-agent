@@ -26,7 +26,7 @@ test('reasoning and exact stored images cold-open without provider replay or inl
  assert.equal(JSON.parse(await readFile(join(store.root,n.sid+'.json'))).length,1,'repeated identical references share one receipt');
  const session={model:{input:['text','image']},agent:{transformContext:async m=>m}},binding=new PiDshHistoryMedia(store,n.sid);binding.install(session);
  const resolved=await session.agent.transformContext(n.messages,new AbortController().signal),inline=resolved.flatMap(m=>Array.isArray(m.content)?m.content:[]).filter(p=>p.type==='image');
- assert.equal(inline.length,2);assert(inline.every(p=>p.data===f.bytes.toString('base64')));assert(JSON.stringify(resolved).includes('explicitly offloaded'));assert.equal(JSON.stringify(n.messages),text,'request resolution never changes the canonical native history');binding.dispose();
+ assert.equal(inline.length,3);assert(inline.every(p=>p.data===f.bytes.toString('base64')));assert(JSON.stringify(resolved).includes('explicitly offloaded'));assert.equal(JSON.stringify(n.messages),text,'request resolution never changes the canonical native history');binding.dispose();
 });
 for(const [name,mutate,pattern] of [
  ['missing blob',f=>{f.value.attachments=[];},/unavailable/],
