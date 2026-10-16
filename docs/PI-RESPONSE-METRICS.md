@@ -83,11 +83,64 @@ all original assertions remain and the numeric correlation is additionally
 checked. A twelfth focused case verifies that the SDK already refuses a duplicate
 tool supplied by an approved resource before dispatch. Its initial external
 driver expected an application-specific error rather than the SDK's actual
-collision error; that assertion failure is retained. Full source/fresh ordinary,
-live provider and publication evidence are recorded separately once completed.
+collision error; that assertion failure is retained. Final evidence follows.
+
+## Qualified source and ordinary assembly — October 16
+
+Implementation **582fb579**, tested tree **ae951211**, passes **793 tests with two
+existing optional skips** in both source and a fresh ordinary production assembly:
+140 files, all 58 Harness Chromium files, two workers, unchanged bounds, zero
+failures/cancellations. Twelve new focused cases and 26 combined metrics/observation
+cases pass, as do nineteen licence/private-source Python cases. The previous exact
+sealed review fails the new control because its real provider catalogue lacks
+`response_metrics`, before any browser inspection; this is not a missing-module
+shortcut. All failed runs described above remain retained separately.
+
+All **3,429 tracked inputs**, **1,069 compiled files** and **37,629 regular source
+dependency files** verify unchanged across qualification. Ordinary compilation
+matches exactly; bundled Node, all 151 production npm instances/20,702 dependency
+files and components match the sealed baseline, including after both cohorts.
+All 834 GUI app/supplier source files, including 625 MIT DSH selections and CSS,
+remain exact. Generated GUI chunk/manifest bytes still reflect the previously
+documented temporary spreadsheet overlay naming; actual new compilation/artifact
+comparisons remain strict, without normalization.
+
+Actual Qwen on the fresh ordinary assembly, in a private synthetic workspace,
+writes the requested paragraph and calls just `response_metrics` in that same
+step. The tool matches the exact saved native message, preceding parent and
+response preview with payload capture **off**. Two model requests/one tool
+complete; cold reopening adds no request and preserves native bytes. One sample
+reports **343 output tokens**, about **67 tokens/s client-observed** including
+**2.19 seconds** to the first parsed delta, versus about **117 tokens/s server-
+reported decode**. These are two boundaries for one step, not a throughput
+benchmark or text-only speed. No owner history/configuration or server/GPU tuning
+is used. [Portable evidence](../release/harness-pi-response-metrics-qualification-20261016.json).
+
+Thirteen seals/fourteen review owners plus CPU recognition, the selected install,
+38 canonical/four private local changes and six model/speech configuration hashes
+verify preserved. Qwen is online. Breeze remains failed below its unchanged GPU
+prerequisite, with no retry, eviction or tuning. No new owner review, activation,
+merge or public binary follows.
+
+The preceding **5b1f1549** hosted run passes SDK Linux/macOS; Windows is cancelled.
+Debian passes its Node, setup and Qt checks, including the later loaded Codex
+Browser branch flow, then refuses packaging at the existing Office exact-source/
+rebuild redistribution gate. The earlier branch failure's cause remains unproven;
+a later pass does not establish a fix. Existing Windows jobs/native and macOS
+packaging failures remain. New-head hosted acceptance is separate from these
+local results; no licence or CI gate has been weakened.
 
 The current MX owner review **20261016-065534-c8cdf03c/application dfe855f3** does
 not include this increment or the preceding shared-persona increment. Installed
 activation, owner acceptance, public distribution, representative other-provider
 timing formats and later-platform adoption remain separate. No merge or public
 binary follows from source checks.
+
+Reproduce the new contracts and original Trajectory proof with
+`node --test --test-concurrency=2 tests/pi-response-metrics.test.mjs tests/harness-response-metrics-chromium.test.mjs`.
+Use the established isolated Python prerequisite for real Host fixtures. The
+additional observation peers are `tests/pi-observations.test.mjs` and
+`tests/pi-context-provenance.test.mjs`; provider live proof requires the explicitly
+declared local model and independent private profile. Other provider timing
+formats, broader opaque-handler provenance, physical MX feedback, full voice,
+existing-data migration, distribution and later platforms remain open.

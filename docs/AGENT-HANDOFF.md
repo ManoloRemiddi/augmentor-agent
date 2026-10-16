@@ -1,18 +1,31 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Pi response metrics](PI-RESPONSE-METRICS.md) now registers a read-only Native/
-Browser tool through the public SDK. Its preview workflow comes from the public
-MIT Augmentor DSH adapter; exact before-persistence parent/hash matching prevents
-borrowing another reply's rate. Client-observed whole-step latency and terminal
-same-response declared llama.cpp decode fields stay distinct. Payload opt-out,
-branch/worker scope, unavailable states and bounded metadata/native windows are
-explicit. Eleven focused authored/SDK/original-Trajectory checks pass; the initial
-collapsed-tree browser assertion is retained/corrected using existing expanders.
-No GUI, provider setting, execution authority, review or installed selection is
-changed. The first broad run retains five failures from incomplete minimal
-observation peers; real public in-memory managers now supply the required
-interface without dropping assertions. A duplicate-tool case verifies the
-SDK's existing refusal before dispatch. Full qualification follows separately.
+[Pi response metrics](PI-RESPONSE-METRICS.md), implementation **582fb579**/tested
+**ae951211**, registers read-only Native/Browser inspection through the public
+SDK, preserving the public MIT DSH adapter's preview workflow and original
+Trajectory GUI. Exact before-persistence parent/hash matching on selected native
+ancestry prevents borrowing a different response's rate; client whole-step timing
+and terminal same-response declared llama.cpp decode fields remain separate.
+Payload opt-out, explicit worker grants, branch scope, unavailable states and
+500-observation/4,096-native/5-response bounds remain explicit. Source/fresh
+ordinary each pass **793/two existing skips**, 140 files/all 58 Harness Chromium
+files, two workers/unchanged bounds; twelve new/26 combined focused cases and
+nineteen licence/private-boundary cases pass. Initial collapsed-tree, incomplete
+minimal-peer and external collision-error assertions are retained/corrected
+without dropping assertions or relaxing gates. All 3,429 tracked/1,069 compiled/
+37,629 regular dependency inputs verify; production Node/dependencies/components
+and all 834 GUI app/supplier sources remain exact. Actual Qwen writes the paragraph
+before its sole metrics tool, matches native source/preview with capture off,
+reports distinct client/server values and cold reopens without replay. Thirteen
+seals/fourteen review owners plus recognition, selection, 38 canonical/four private
+changes and six config hashes remain preserved. Existing MX Edit review excludes
+this and the persona increment; no new review/activation/merge/public binary.
+Preceding 5b1f SDK Linux/macOS pass, Windows cancelled; Debian passes Node/setup/Qt
+then refuses Office public exact-source/rebuild packaging. Earlier Codex branch
+failure cause remains unproven; Windows jobs/native and macOS packaging failures
+remain. Owner feedback, next review, provider/provenance breadth, full voice,
+migration/distribution/later platforms stay open.
+[Portable evidence](../release/harness-pi-response-metrics-qualification-20261016.json).
 
 [Shared Pi persona](PI-INSTRUCTIONS.md), application **4f4812cc**, now binds the
 approved common file through public SDK append/native custom snapshots. Exact

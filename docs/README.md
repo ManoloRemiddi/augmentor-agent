@@ -2,8 +2,10 @@
 
 [Pi response metrics](PI-RESPONSE-METRICS.md) binds the existing response-preview
 workflow to exact native assistant messages, with separate client/server timing
-and original Trajectory presentation. Focused checks pass; broader qualification
-and owner adoption remain separate.
+and original Trajectory presentation. Source/fresh ordinary each pass 793/two
+existing skips, all 58 Harness Chromium files, with actual Qwen same-step/cold
+reopen proof and exact frozen inputs. Running MX review/installed selection stay
+unchanged; owner adoption, provider breadth and distribution remain separate.
 
 [Shared Augmentor persona on Pi](PI-INSTRUCTIONS.md) now binds the approved source
 to native conversation snapshots and existing Context evidence. Root roles retain
