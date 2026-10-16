@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Configured model reference review — October 16
+
+The current configured-model MX review **20261016-105557-8890e8e5**, application **1dd0fc0c6d700c7d58e46a85357aa90f3dcce50f**, matches the read-only running DSH reference: **10 configured groups / 431 models**, **430 visible** after the saved hidden preference and **10 matching pins**. Source and staged-target each pass **28/28** across seven MX files; **16** notice/private-boundary cases pass. All **24,548 sealed / 1,069 compiled** entries verify after original-GUI QA. Private provider credentials/configuration stay local; DSH, GPU settings, older reviews and selected installation are unchanged. [Configured catalogue](HARNESS-CONFIGURED-MODELS.md) · [Portable review](../release/harness-configured-models-review-20261016.json).
+
+Use the complete private link supplied in chat in the normal browser. This is a separate review profile with the actual DSH provider setup, effective pin order and saved visibility. The prior profiles/conversations remain available. Configuration and credential readiness are verified; endpoint health and inference through every imported provider are not implied. Voice and later platforms remain deferred.
+
 ## MX picker and composer feedback review — October 16
 
 The corrected private MX review **20261016-102350-38ccb6f8**, application/source **1f050f03410272611944158bb3dde9f4eccf79c9**, is now running separately. Source and exact-staged-target each pass **28/28** across seven focused files, two workers and unchanged deadlines; **16** notice/private-boundary cases pass. All **24,546 sealed / 1,069 compiled** inputs verify after browser QA. The original review and its conversation stay available; selected installation, model/speech placement and production dependencies are preserved. [Feedback guide](HARNESS-MX-FEEDBACK.md) · [Portable review](../release/harness-mx-picker-review-20261016.json).

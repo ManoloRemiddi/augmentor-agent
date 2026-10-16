@@ -60,5 +60,28 @@ containment. Existing Models/forms, peer fencing, SDK reconciliation, commands
 and attachments remain covered. A command-key scope read stays nonexecuting and
 an unapplied external edit refuses the picker projection.
 
-Staged qualification and the exact private DSH-reference comparison are recorded
-after assembly. Voice and other operating systems remain deferred.
+## Corrected private review
+
+Application `1dd0fc0c6d700c7d58e46a85357aa90f3dcce50f` is staged in
+**20261016-105557-8890e8e5**, artifact
+`0f3c82e4de5cab82b2e4ed99c57a1bebd800d227dde093c59e1ab76da58e9efb`.
+The same 28 targeted cases pass against its staged runtime/GUI with bundled Node;
+16 licence/private-boundary cases pass. All 24,548 sealed and 1,069
+compiled inputs verify after owner-browser QA, with production dependencies,
+Node and components unchanged from the verified preceding release.
+
+A private comparison asserts equality of every provider name, model ID/name and
+provider/model order against the live DSH reference, plus exact effective pin and
+hidden preferences and the original default model. The rendered original picker
+shows 430 visible entries, ten matching pins in the original order, initial scroll
+zero and no console warnings/errors. Nine providers have the referenced credential
+material; the legacy credential-missing alias has an explicit status. No inference
+or endpoint-health probe is submitted during this comparison or owner QA.
+
+The separate profile imports the live provider settings and matching curation,
+retains one empty conversation and leaves prior review histories intact. DSH's
+historical references remain preserved; personal settings/keys and the operator
+link are not included in public evidence. Original DSH and model/GPU services,
+selected installation and existing review processes remain unchanged. Voice and
+other operating systems remain deferred. See the [portable review
+record](../release/harness-configured-models-review-20261016.json).
