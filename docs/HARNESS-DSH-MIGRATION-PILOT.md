@@ -764,7 +764,12 @@ are unchanged. The actual configured catalogue retains 10 groups/431 models/10 p
 The actual pilot exposes two verified archived children; one opens in the original
 read-only shell and reads source records/excerpts with zero GUI/HTTP errors and
 no new conversation, model or tool work. There is no owner branch creation or
-additional real project transfer. These are private running reviews, not an
+additional real project transfer. Read-only projection of the earliest and latest
+eligible historical replies in the actual pilot also verifies both source cuts
+(three eligible replies observed), without reserving an intent, creating a branch,
+loading an AgentSession or changing native/display bytes.
+
+These are private running reviews, not an
 installed selection change, public binary, merged PR or later-OS release.
 
 Broader source formats, missing original camera uploads, historical child execution/Teams/provider reconstruction, owner

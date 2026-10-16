@@ -117,7 +117,10 @@
     "actualOwnerGuiHttpFailures": 0,
     "realPilotArchivedChildrenReadOnlyInspected": 2,
     "actualPilotOriginalRecordExcerptsRead": true,
-    "realOwnerBranchOrModelWorkSubmitted": false
+    "realOwnerBranchOrModelWorkSubmitted": false,
+    "realPilotHistoricalRepliesObserved": 3,
+    "realPilotReadOnlySourceCutProjectionsValidated": 2,
+    "readOnlySourceCutChecksReserveNoIntentAndWriteNoNativeOrDisplayBytes": true
   },
   "remaining": [
     "Broader source schema and owner pilot acceptance before bulk migration",
