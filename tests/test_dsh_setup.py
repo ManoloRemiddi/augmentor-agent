@@ -20,7 +20,7 @@ class SetupHistoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             home=Path(temporary)/'authored-dsh';home.mkdir();configuration=Path(temporary)/'harnesses.json'
             remote=Mock();remote.call.return_value={'version':None,'versionVerified':False,'catalogContract':setup.CATALOG_CONTRACT}
-            with patch.object(setup,'cli_directory',return_value=Path(temporary)),patch.object(setup,'modules_directory',return_value=(Path(temporary),{})),patch.object(setup,'remote_client',return_value=remote),patch.object(setup,'existing_prompt_plugin',return_value=None),patch.object(setup,'http',return_value={}),patch.object(setup,'configuration',return_value=configuration):
+            with patch.object(setup,'cli_directory',return_value=Path(temporary)),patch.object(setup,'cli_family',return_value=setup.LEGACY_DSH),patch.object(setup,'modules_directory',return_value=(Path(temporary),{})),patch.object(setup,'remote_client',return_value=remote),patch.object(setup,'existing_prompt_plugin',return_value=None),patch.object(setup,'http',return_value={}),patch.object(setup,'configuration',return_value=configuration):
                 check=setup.Setup();result=check.check({'endpoint':'http://127.0.0.1:3080','home':str(home)})
                 self.assertFalse(result['installed']);self.assertIsNotNone(check.pending)
                 self.assertEqual(list(home.iterdir()),[]);self.assertFalse(configuration.exists())
@@ -84,6 +84,7 @@ class SetupHistoryTests(unittest.TestCase):
     def test_pinned_dependencies_can_be_hoisted_in_a_local_cli_install(self):
         with tempfile.TemporaryDirectory() as directory:
             modules=Path(directory)/'node_modules';cli=modules/'@deepseek-ai/dsh';cli.mkdir(parents=True)
+            (cli/'package.json').write_text(json.dumps({'name':'@deepseek-ai/dsh','version':setup.LEGACY_DSH}))
             for name,version in [('dsh-base','0.1.5-rc.1'),('dsh-tools','0.1.5-rc.1'),('schemastery','3.18.2')]:
                 path=modules/'@deepseek-ai'/name;path.mkdir(parents=True)
                 (path/'package.json').write_text(json.dumps({'version':version}))
