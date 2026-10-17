@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Contained Office boundary/resource checks](../release/office-rebuild/README.md#contained-external-resources-and-memory-refusal--october-17):
+five automatic parser controls in `test_office_boundaries.py` distinguish actual
+IP/NSS attribution, pair interleaved syscalls and reject extra/missing evidence.
+The separate real-engine diagnostic passes ten baseline cases under 3 GiB but
+retains a genuine ThinLTO OOM/exit137 failure. Installed engine and packaging gate
+are unchanged; macro/full-security and memory-cause acceptance remain open.
+
 [Rich Office operator checks](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17):
 six authored formats/16 pages pass paired semantic/text/image/font/source/cache/
 raw-pixel checks. One actual original-GUI rich DOCX case passes all original

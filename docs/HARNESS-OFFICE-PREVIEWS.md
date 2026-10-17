@@ -1,5 +1,40 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Contained external resources and memory refusal — October 17
+
+The [contained original-provider diagnostic](../release/office-rebuild/README.md#contained-external-resources-and-memory-refusal--october-17)
+now checks the current engine and existing source-built ThinLTO candidate with
+authored documents under an actual **3 GiB / zero-swap / one CPU / 128-PID**
+container limit. Mounts are read-only except synthetic work and bounded temporary
+storage; the root filesystem is read-only, capabilities dropped and network
+namespace isolated. This is diagnostic containment, not an installed app sandbox.
+
+The current engine completes **ten cases**, including seven verified PDF outputs:
+embedded-image control, external HTTP/file images, cached INCLUDETEXT fields,
+WEBSERVICE, two archive-limit rejections, actual Wasm-startup cancellation and a
+distinct uncached recovery. Text/images verify; the saved external formula result
+is 41.50. A calibrated live container-local HTTP endpoint receives no document
+requests. Tracing shows no converter opens of the outside image/text canaries;
+only the driver's two calibration/preservation reads of each occur. The sole IP
+connect is the driver's positive HTTP control. Two failed parent NSS Unix-socket
+lookups are recorded separately. Eight actual Wasm opens and paired syscall
+returns verify the work. Provider/scratch teardown settles.
+
+The baseline peaks at **2,011,688,960 bytes** of cgroup-accounted memory and 20
+PIDs. The ThinLTO candidate completes three documents, with post-conversion memory
+of 1,337,466,880 / 2,148,909,056 / 2,678,329,344 bytes, then is **OOM-killed, exit
+137**, during the next case at the same 3 GiB cap. Its full boundary run fails.
+The cause of the higher retained memory is unproven; no unchanged retry, cap
+increase or promotion follows. Earlier functional/pixel parity does not establish
+resource acceptance.
+
+The earlier cached-cancellation and NSS-attribution failures remain separate.
+Source/engine identity and owner postflight preserve both actual MX reviews,
+four conversations/all 36 protected sets, shared settings, menus and GPU/voice
+state. The installed engine stays unchanged. Macro/custom-font/large-corpus and
+broader security, source/third-party/distribution gates remain open.
+[Evidence](../release/office-rebuild/contained-boundaries-qualification-20261017.json).
+
 ## Rich document and original-GUI comparison — October 17
 
 The [reproducible rich-fixture diagnostic](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17)
@@ -17,7 +52,7 @@ values verify three source-built converter opens plus one driver hash read,
 zero default Wasm opens and no unresolved calls. GUI observations have zero
 errors/unexpected HTTP destinations. The fixture uses an authored synthetic seed;
 there is no real inference or document content sent to the model. Rich Calc/
-Impress GUI, custom fonts/large corpus, broad resource/security and full source/
+Impress GUI (subsequently qualified in the linked operator guide), custom fonts/large corpus, broad resource/security and full source/
 distribution/promotion acceptance are separate. No engine build/default or
 installed update, owner change or further real migration occurs.
 [Evidence](../release/office-rebuild/rich-documents-qualification-20261017.json).

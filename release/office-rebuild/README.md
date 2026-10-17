@@ -1,5 +1,62 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Contained external resources and memory refusal — October 17
+
+[`contained-boundaries.py`](contained-boundaries.py) runs
+[`boundaries-probe.mjs`](boundaries-probe.mjs) through the actual original
+Office provider and public-source entry. It uses an unselected ordinary app,
+the already prepared Thin app and the independent rich fixture directory:
+
+```sh
+python3 -B release/office-rebuild/contained-boundaries.py \
+  --app "$UNSELECTED_DEFAULT_APP" --thin-app "$EXISTING_PREPARED_THIN_APP" \
+  --fixtures "$AUTHORED_RICH_FIXTURES" \
+  --output "$PWD/outputs/office-new-contained-boundaries"
+```
+
+Inputs must be private unlinked `outputs/` directories; output must be new.
+Node 24.19.0 is taken from the verified app. The immutable builder image, Docker,
+host strace/matching loader/libraries, Poppler and Liberation fonts must already
+exist. No dependencies are installed. Probe source is snapshotted into the new
+tree and mounted read-only. Trace tools are private diagnostic copies with
+identities retained; they are not new release components.
+
+Each retained container has **3 GiB memory, zero swap, one CPU, 128 PIDs**, a
+256 MiB temporary filesystem, read-only root and input mounts, dropped capabilities,
+no-new-privileges and an isolated network namespace. It exposes no owner profile,
+document, service, display, GPU or host network. One live internal HTTP canary is
+positively calibrated, so lack of document requests is not inferred merely from
+network isolation. Outside-file canaries remain readable to the driver but are
+not mounted into Wasm MEMFS. Ordinary operator-selected file reads retain their
+existing contract; this is untrusted document-link testing.
+
+The current engine passes ten cases and seven PDF text/image checks, actual
+Wasm-startup cancellation, distinct uncached recovery and teardown. Both archive
+limit failures have the expected invalid-document reason. The initial cancellation
+fixture had reused cached bytes; that failure is retained and its corrected case
+must observe a successful converter-thread Wasm open before aborting.
+
+Scoped tracing pairs unfinished/resumed calls by thread identity. The baseline
+has eight Wasm opens, zero converter canary-file reads and zero document HTTP
+requests. Its one IP connect is the driver's HTTP control; two failed parent-only
+container NSS Unix-socket lookups are explicit. Five automatic parser controls
+reject missing observations, extra connections, converter canary reads and
+unpaired calls. These tests are separate from real-engine evidence.
+
+**The recorded command returns nonzero because ThinLTO fails the memory bound.**
+The baseline peaks at **2,011,688,960 bytes / 20 PIDs**. The source-built candidate's
+post-conversion usage rises through **1,337,466,880 / 2,148,909,056 / 2,678,329,344**
+bytes, then its container is OOM-killed with exit 137 in the fourth document.
+Successful baseline evidence stays in `progress.json`; failed Thin logs, trace,
+inspection and completed-case progress remain. Both handles are verified terminal.
+Do not repeat that unchanged failing run or increase its cap as qualification.
+Retained-memory attribution is the next task.
+
+No installed engine/sandbox, full macro/font/corpus/security, throughput benchmark
+or public redistribution acceptance is claimed. Read-only owner postflight passes.
+The installed/current entry and engines retain their existing original licences.
+[Qualification](contained-boundaries-qualification-20261017.json).
+
 ## Rich document and original-GUI comparison — October 17
 
 ### Rich sheets/decks and newly saved files — subsequent checkpoint
