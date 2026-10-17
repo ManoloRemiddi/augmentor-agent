@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Recovered historical admission](HARNESS-DSH-HISTORICAL-IMPORT.md#historical-settlement-and-interrupted-seed-admission)
+now prepares the same five frozen projects/42 parents/35 archived descendants
+read-only. Complete-v3 direct-child evidence, inherited ancestor ownership and
+interrupted-turn/adjacent-seed forms retain exact historical data without live
+jobs, future source content or replay. Original GUI/SDK and cold native relocation
+use authored fixtures; owner transfer/adoption and current-catalogue refresh stay
+separate from format preparation. The older 23/64 readiness snapshot below is
+historical, not refreshed by this focused assessment. MX first; voice/later OS
+remain deferred.
+
 [Legacy descriptor-v2 offline proof](HARNESS-DSH-MIGRATION-PILOT.md#legacy-descriptor-v2-offline-format-proof--october-17)
 reuses 51 pinned public MIT format modules without a Host/agent loop. An authored
 validator preserves the known old descriptor; its August schema reference is

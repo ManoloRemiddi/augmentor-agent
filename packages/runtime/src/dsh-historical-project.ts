@@ -11,6 +11,15 @@ const integer=(v:unknown,min:number,max:number)=>typeof v==='number'&&Number.isS
 const exact=(v:Data,keys:string)=>v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).sort().join(',')===keys;
 const digest=(v:unknown)=>typeof v==='string'&&/^[a-f0-9]{64}$/.test(v);
 const same=(a:unknown,b:unknown)=>isDeepStrictEqual(a,b);
+const historicalScopes=new WeakMap<Data,{sourceId:string;children:Map<string,Data>;inheritedCut:number;ancestorChildren:Map<string,Data>}>();
+/** Only rows constructed after complete v3 closure validation carry this
+ * capability. JSON fields on an ordinary export cannot create it. */
+export function historicalSettlementCatalogue(row:Data,sourceId:string,childId:string){
+ const scope=historicalScopes.get(row);if(!scope||scope.sourceId!==sourceId)return undefined;const fact=scope.children.get(childId);return fact?structuredClone(fact):undefined;
+}
+export function historicalInheritedSettlement(row:Data,sourceId:string,childId:string,seq:number){
+ const scope=historicalScopes.get(row);if(!scope||scope.sourceId!==sourceId||!Number.isSafeInteger(seq)||seq<0||seq>=scope.inheritedCut)return undefined;const fact=scope.ancestorChildren.get(childId);return fact?structuredClone(fact):undefined;
+}
 export const DSH_DERIVED_COORDINATES='derived-dsh-v4';
 /** The trusted operator recomputes the view before producing this envelope.
  * Runtime admission checks the expected envelope hash and its entire data-only
@@ -50,13 +59,13 @@ export function historicalProject(document:Data,reference:(v:Data)=>Ref,read:(v:
  const rows=(id:string)=>{
   if(cachedId!==id){const result:Data[]=[];for(const segment of segments.get(id)!){const part=decode(segment);if(!Array.isArray(part)||part.length!==segment.count)fail();for(let i=0;i<part.length;i++){const event=part[i];if(event?.seq!==segment.firstSeq+i||!integer(event.time,0,Number.MAX_SAFE_INTEGER)||typeof event.type!=='string'||!event.data||typeof event.data!=='object'||Array.isArray(event.data))fail();result.push({type:'event',event});}}cachedId=id;cachedRows=result;}return cachedRows;
  };
- const children=new Map<string,{parent:string;mode:string}>(),imageRequests=new Map<string,number>(),fileRequests=new Map<string,number>(),occurrences:Data[]=[];let occurrenceBytes=0;
+ const children=new Map<string,{parent:string;mode:string;catalogueSeq:number}>(),imageRequests=new Map<string,number>(),fileRequests=new Map<string,number>(),occurrences:Data[]=[];let occurrenceBytes=0;
  for(const [id,node] of nodes){
-  const direct:string[]=[];
+  const direct:string[]=[];if(headers.get(id)!.isSeeded===true){const marker=rows(id)[node.inheritedEventCount]?.event;if(marker?.type!=='session/end-seed'||marker.data.inherited!==true||Object.keys(marker.data).sort().join(',')!=='inherited')fail();}
   for(const {event:e} of rows(id)){
    if(e.type==='session/title'&&typeof e.data.title==='string')titles.set(id,e.data.title);
    if(e.type==='subagent/catalog'){
-    const child=e.data.childId,mode=e.data.mode,original=originals.get(child);if(!original||roots.has(child)||original.header.parentSession!==id||typeof mode!=='string'||!mode||mode.length>128)fail();const previous=children.get(child);if(previous&&(previous.parent!==id||previous.mode!==mode))fail();children.set(child,{parent:id,mode});direct.push(child);
+    const child=e.data.childId,mode=e.data.mode,original=originals.get(child);if(!original||roots.has(child)||original.header.parentSession!==id||typeof mode!=='string'||!mode||mode.length>128)fail();const previous=children.get(child);if(previous&&(previous.parent!==id||previous.mode!==mode))fail();children.set(child,{parent:id,mode,catalogueSeq:previous?.catalogueSeq??e.seq});direct.push(child);
    }
    const message=e.type==='user/message'?e.data:['assistant/message','tool/result'].includes(e.type)?e.data.message:undefined;if(!message)continue;if(!Array.isArray(message.content))fail();
    for(const [partIndex,part] of message.content.entries())if(['image','file'].includes(part?.type)){
@@ -78,9 +87,13 @@ export function historicalProject(document:Data,reference:(v:Data)=>Ref,read:(v:
  }
  for(const key of ['archivedSessionIds','pinnedSessionIds']){const value=family.organization?.[key];if(!Array.isArray(value)||new Set(value).size!==value.length||value.some((id:unknown)=>typeof id!=='string'||!roots.has(id)))fail();}
  const derivation={coordinates:DSH_DERIVED_COORDINATES,viewSha256:viewRef.sha256,sourceFamilySha256:familyRef.sha256,supplierRevision:view.normalization.supplierRevision,originalCompressedSourcesRetained:true,physicalRowMapping:'No one-to-one physical-row mapping; derived event coordinates use the retained v4 view'};
+ const headerSeedCut=(id:string)=>headers.get(id)!.isSeeded===true?nodes.get(id)!.inheritedEventCount:0;
  const session=(id:string)=>{
   const original=originals.get(id)!,child=children.get(id),node=nodes.get(id)!;
   const row:Data={address:child?{kind:'subagent',parentSessionId:child.parent,childSessionId:id,mode:child.mode}:{kind:'session',sessionId:id},historicalOriginal:{sourceFormat:original.version,sourceSha256:original.sourceSha256,compressedBytes:original.compressedBytes,chunks:original.chunks},historicalDerivation:derivation};
+  const facts=new Map<string,Data>();for(const [childId,entry] of children)if(entry.parent===id)facts.set(childId,{sourceSessionId:id,childId,catalogueSeq:entry.catalogueSeq,childCreatedAt:originals.get(childId)!.header.createdAt,viewSha256:viewRef.sha256,sourceFamilySha256:familyRef.sha256,scope:'verified complete direct-child archive; not a live child or provider replay'});const ancestorChildren=new Map<string,Data>(),inheritedCut=headerSeedCut(id);
+  if(inheritedCut>0){const ancestors=new Set<string>();let at=original.header.parentSession;while(typeof at==='string'&&originals.has(at)){if(at===id||ancestors.has(at))fail();ancestors.add(at);at=originals.get(at)!.header.parentSession;}for(const [childId,entry] of children)if(ancestors.has(entry.parent))ancestorChildren.set(childId,{sourceSessionId:id,childId,ancestorSourceSessionId:entry.parent,ancestorCatalogueSeq:entry.catalogueSeq,inheritedBeforeSeq:inheritedCut,viewSha256:viewRef.sha256,sourceFamilySha256:familyRef.sha256,scope:'verified inherited notice from a recorded ancestor-owned child; not a child of this conversation; no live job or provider replay'});}
+  historicalScopes.set(row,{sourceId:id,children:facts,inheritedCut,ancestorChildren});
   Object.defineProperties(row,{
    opening:{enumerable:true,get(){const title=titles.get(id);return {header:headers.get(id),cursor:node.eventCount-1,projections:{values:typeof title==='string'?{title}:{}}};}},
    records:{enumerable:true,get(){return rows(id);}},

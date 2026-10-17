@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Native recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) now provide an explicit v3 envelope over this unchanged companion and its view. The native envelope is separately validated; the intermediate files alone remain refused, and real legacy-format preparation still has explicit blockers.
+[Native recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) now provide an explicit v3 envelope over this unchanged companion and its view. All five frozen projects pass complete read-only preparation after the separately qualified historical admission fixes. Intermediate files alone remain refused. The asset-only checkpoint below and its 23/64 readiness count are historical; owner adoption and pilot-feedback gates remain separate.
 
 # Assets for recovered DSH histories — October 17
 

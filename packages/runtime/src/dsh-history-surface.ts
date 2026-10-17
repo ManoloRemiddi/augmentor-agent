@@ -38,7 +38,17 @@ export function dshHistorySurface(events:Data[],strictMarkers=false,allowOpenTur
   }
   if(!eligible.has(e.type)&&(op!==undefined||e.sourceEventSeqs!==undefined))fail('log-only event carries message replacement metadata.');
   if(e.type==='turn/start'){if(!seq(d.turn)||turn!==undefined)fail('turn lifecycle is ambiguous.');turn=d.turn;}
-  if(e.type==='turn/end'){if(turn!==d.turn)fail('turn ending has no matching opening.');for(const row of compactions.values())if(row.turn===turn)fail('turn ends with an unresolved compaction.');turn=undefined;}
+  if(e.type==='turn/end'){
+   if(turn!==d.turn)fail('turn ending has no matching opening.');
+   for(const row of compactions.values())if(row.turn===turn){
+    // The next recorded seed closes an interrupted prior process lifecycle.
+    // Keep this bracket unknown until that exact marker is actually read; do
+    // not fabricate compaction/end or admit a prefix that omits the boundary.
+    const interruptedSeed=strictMarkers&&d.reason?.kind==='interrupted'&&row.summary===undefined&&events[e.seq+1]?.type==='session/end-seed';
+    if(!interruptedSeed)fail('turn ends with an unresolved compaction.');
+   }
+   turn=undefined;
+  }
   if(e.type==='session/end-seed'){
    if(!object(d)||Object.keys(d).some(key=>key!=='inherited')||d.inherited!==undefined&&d.inherited!==true)fail('invalid inherited history boundary.');
    if(d.inherited===true)seedCuts.push(e.seq);

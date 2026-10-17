@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Historical admission coverage: `dsh-deferred-settlement.test.mjs` checks the
+private complete-v3 catalogue capability, exact quoted child proposals, source
+cuts and forged/foreign/opaque refusals. `dsh-inherited-settlement.test.mjs`
+requires captured ancestor ownership and a verified inherited cut without adding
+a child to the fork. `dsh-interrupted-compaction.test.mjs` requires the exact
+interrupted-turn/adjacent-seed form and refuses incomplete cuts. Their runtime
+companions use the actual Pi SDK with an independent synthetic provider;
+`harness-dsh-historical-closures-chromium.test.mjs` checks the original Chat and
+Context controls, inspect-without-work, explicit fresh Send and cold reopen for
+all three forms. The v3 archive suite now also relocates a cold native profile
+with the former state/export unavailable. The eight-group public-codec operator
+proof constructs an authored physical v3 fork and runs the actual pinned codec
+chain. Real frozen projects are assessed read-only, never fixture-imported.
+
 Recovered native archive coverage: `dsh-historical-project.test.mjs` checks v3
 closure reuse, original compressed hashes, derived coordinates and rehashed
 malformed family/catalogue/assets; its runtime companion exercises the real Pi
@@ -15,7 +29,8 @@ ownership, whole-content checksums, complete named closures and malformed data;
 `test_dsh_legacy_assets.py` covers preflight-before-read, binary/empty content and
 safe source object reads. `proof-dsh-legacy-assets.mjs` runs actual public codecs
 and the full capture/verifier pipeline with a child-only PNG and empty/20 MiB
-files, independent of owner data. Native admission remains an explicit refusal.
+files, independent of owner data. The intermediate view/companion alone still
+refuse native admission; the separately qualified v3 envelope connects them.
 See [recipe, byte bounds and next integration](../docs/HARNESS-DSH-LEGACY-ASSETS.md).
 
 Historical family coverage: `dsh-legacy-family.test.mjs` binds direct parentage,

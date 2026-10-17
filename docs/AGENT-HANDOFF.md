@@ -1,5 +1,28 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Historical admission](HARNESS-DSH-HISTORICAL-IMPORT.md#historical-settlement-and-interrupted-seed-admission)
+now prepares all five same-frozen recovered projects: **42 parents / 35 archived
+descendants / 28 images**. The preceding sealed `9cf713a8` reproduces all five
+first refusals against the identical manifests. Complete-v3 direct-child
+capabilities admit migration-appended catalogues, exact quoted closing proposals
+stay inert, inherited notices require captured ancestor ownership and the verified
+seed cut, and interrupted compaction requires the exact adjacent seed form.
+No future event, child ownership, completion or old job is invented.
+
+Source build/type-check and fresh ordinary each pass **525 Node / 92 Python** (65 files/seventeen
+Chromium/24 GUI cases), two workers/no skips; eight public-codec/native groups,
+actual SDK/original GUI continuation and dedicated v3 cold relocation pass with
+authored data. Ordinary shipped-code eight-group proof and the same five frozen
+preparations pass; 1,117 compiled inputs match. Exact sealed status is in the
+[admission record](../release/harness-dsh-historical-admission-qualification-20261017.json).
+Both owner reviews/all 36 protected regular files, PIDs, seals and selections
+remain unchanged. No extra real transfer, restart or model work. The older 23/64
+catalogue scan is historical; fresh source cuts/folders/models and owner pilot
+feedback remain before wider migration. MX first; voice/later OS deferred.
+
+The archive-only checkpoint below is superseded for historical admission and
+dedicated v3 cold relocation; its dated qualification remains intact.
+
 [Native recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) add v3 envelopes with original compressed logs, derived segments and assets registered once. Source/ordinary/exact sealed each pass **490 Node / 92 Python** (58 files/sixteen Chromium/21 GUI cases), with 1,117 compiled inputs matching and shipped-code public-codec/native proofs. Private unselected **20261017-041731-e0f51dd5 / 9cf713a8** verifies 24,678 sealed inputs. All five real families export/read v3 within bounds but still refuse settlement-before-catalogue or compaction forms during complete preparation; readiness stays 23/64. Public v3→v4 appends missing catalogues at finish. Continue explicit historical admission/cut tests and dedicated v3 native relocation, not a broad bypass. Both reviews/all 36 protected file sets/hashes, PIDs, selections and 24,615 running sealed inputs remain exact; no update/transfer/owner model work. Keep the pilot-feedback gate. [Qualification](../release/harness-dsh-historical-import-qualification-20261017.json).
 
 [Recovered-history assets](HARNESS-DSH-LEGACY-ASSETS.md) pass for all five frozen legacy families: 28 images / 34 occurrences, no referenced files. Authored binary/empty/20 MiB files and child-only images qualify separately. **90 Node / 9 Python helper / 16 licence-boundary-notice cases**, 9 pipeline groups and app type-check pass. Native import still refuses the intermediate formats; readiness stays 23 projects/64 parents. Largest combined input is 255,268,957 bytes: the native archive contract must reuse event segments once, preserve originals/provenance and hydrate wrappers on read. Both reviews/all 36 protected files, PIDs, selections and seals remain exact; no update/transfer/model work. [Evidence](../release/harness-dsh-legacy-assets-qualification-20261017.json).

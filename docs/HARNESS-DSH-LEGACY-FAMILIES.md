@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Referenced assets](HARNESS-DSH-LEGACY-ASSETS.md) now have a separately verified immutable companion. All five frozen families pass; the native original/derived archive contract and continuation remain pending. The source-family/view format described below stays unchanged.
+[Referenced assets](HARNESS-DSH-LEGACY-ASSETS.md) now have a separately verified immutable companion. [Native v3 archives and historical admission](HARNESS-DSH-HISTORICAL-IMPORT.md) qualify authored SDK/GUI continuation and all five frozen projects' read-only preparation. Real transfer/adoption still require the owner pilot gate. The source-family/view format and the earlier source-only evidence below stay unchanged.
 
 # Historical DSH source families — October 17
 

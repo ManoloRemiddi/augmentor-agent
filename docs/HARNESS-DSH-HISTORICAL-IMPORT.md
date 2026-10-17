@@ -8,7 +8,7 @@ preserves compressed originals, derived histories and attachments in one named
 closure, without storing a second wrapped copy of every derived event. Version
 one JSON and version two bundles remain supported.
 
-Source qualification passes **490 Node / 92 Python** across 58 Node files,
+The preceding archive-only checkpoint passed **490 Node / 92 Python** across 58 Node files,
 sixteen Chromium files and 21 GUI cases, with two workers and no skips. An
 independent public-codec pipeline imports authored v0/descriptor-v2 histories,
 empty/20 MiB files and a child-only PNG through the new envelope. Original GUI
@@ -16,13 +16,53 @@ Fleet/Chat/Context source reads and actual Pi Host historical branching, fresh
 work and cold continuation pass with authored data and a synthetic provider.
 Ordinary/exact sealed qualification is recorded separately below.
 
-**The five real recovered projects are not ready for native transfer.** They
-export as v3 and pass closure reading, including 28 stored images, but all five
-still refuse complete parent preparation: four first encounter older settlement
-reasoning before a catalogue; one first encounters an unresolved compaction
-lifecycle. Refusing preparation creates no target or model request. The earlier
-**23-project / 64-parent** preparation assessment and owner pilot-feedback gate
-remain unchanged. Do not relabel fixture success as owner migration acceptance.
+**All five frozen recovered projects now pass read-only preparation:** 42 parent
+conversations and 35 archived descendants, with 28 stored images retained. The
+same manifests and complete records still reproduce their former refusals in the
+preceding sealed application. This is format admission, not an additional owner
+transfer or acceptance of configured model routes. The earlier **23-project /
+64-parent** full-catalogue assessment remains a dated snapshot; adding the newly
+prepared histories does not refresh current folders, source cuts or model access.
+The owner pilot-feedback gate remains in place.
+
+## Historical settlement and interrupted-seed admission
+
+The pinned public v3→v4 migration appends missing direct-child catalogues in
+[`finish`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/session/session-format-v3-to-v4/src/migration.ts#L137).
+A complete validated v3 envelope now grants an internal row capability for that
+checked direct child. A known manager-owned `subagent-settled` notice can retain
+its plaintext reasoning before the later catalogue. An ordinary v1/v2 JSON field,
+serialized proof or cloned row cannot grant that capability. A historical cut
+includes only content through its cut: no future catalogue event or child seat
+is inserted into the earlier conversation.
+
+Older notices can also quote the child's closing `tool-call` blocks. Exact
+primitive id/name/argument fields remain quoted historical content, including
+unparsed argument text and reused IDs. They never register a parent proposal,
+dispatch or result. Opaque extra fields and ordinary human tool-call blocks still
+refuse admission. Original display/archive data remain exact.
+
+A seeded fork may inherit a notice from an ancestor-owned child. Admission
+requires its verified inherited cut, exact recorded seed marker, captured parent
+lineage and actual sender ownership within that same archive. Only notices before
+the inherited cut qualify. Attribution names the ancestor; no child ownership or
+Fleet job is added to the fork. Missing/unrelated lineage, absent senders,
+post-cut notices and serialized capability claims still refuse.
+
+An unresolved compaction can cross a recorded process boundary only when a typed
+v4 turn ends as `interrupted`, no summary exists, and the immediately next event
+is a valid `session/end-seed`. The bracket remains unknown until that marker is
+read. An earlier cut, completed turn, missing/late/malformed seed or mismatched
+turn still refuses. Display and receipts label the historical interruption; no
+completion, summary, native compaction or old job is invented.
+
+Authored unit, actual Pi SDK and original-GUI cases cover all three forms,
+historical reply cuts, cold reopen and explicit new work. The independent public
+codec/native pipeline now has eight groups, including an authored physical v3
+inherited fork and an actual migration-appended catalogue. Dedicated v3 cold
+native-profile relocation also preserves compressed originals and child assets
+after the former state/export become unavailable. These are synthetic import
+proofs; real owner data are used only for read-only preparation.
 
 ## Archive and coordinate contract
 
@@ -137,7 +177,27 @@ The separate operator proof runs that actual codec chain, byte capture, native
 export/import and exact compressed-original/attachment checks. Actual Host tests
 separately establish SDK behavior with an independent local synthetic provider.
 
-## Packaged qualification and owner preservation
+## Current admission qualification
+
+Source type-check/build and **525 Node / 92 Python** pass, across 65 Node files,
+seventeen Chromium files and 24 GUI cases, with two workers and no skips.
+The eight-group public-codec/native proof passes separately. The same frozen
+five-project preparation now succeeds while the preceding sealed `9cf713a8`
+reproduces four settlement and one interrupted-compaction first refusals. All
+parent/descendant record identities and archive manifests remain unchanged.
+Model labels in these private preparation assessments are placeholders; no
+model-route availability or real continuation claim is made.
+
+A fresh ordinary package also passes **525 Node / 92 Python**, eight shipped-code
+public-codec/native groups and all five frozen preparations, with **1,117 compiled
+inputs** matching and 23,554 unchanged baseline inputs verified. Exact sealed
+qualification remains separate and is recorded in the
+[admission evidence](../release/harness-dsh-historical-admission-qualification-20261017.json).
+Keep this separate from the earlier archive-only candidate below and from both
+running owner reviews. Owner pilot acceptance, guarded adoption and current
+catalogue/folder/cut/model checks remain before wider transfer.
+
+## Preceding packaged checkpoint — archive closure only
 
 Source, a fresh ordinary package and the exact separately sealed candidate each
 pass **490 Node / 92 Python**, with **1,117 compiled inputs** matching. Ordinary
@@ -161,7 +221,7 @@ owner model request is submitted. Source and packaged proof data stay separate
 from the actual profiles. [Portable qualification](../release/harness-dsh-historical-import-qualification-20261017.json)
 records the scope; a source commit is not an installed update.
 
-## Current real refusal evidence and next work
+## Preceding refusal evidence — superseded by admission above
 
 All five frozen projects and their 35 descendants now form native-readable v3
 archives. Complete preparation still refuses rather than bypassing older history
@@ -178,6 +238,10 @@ with public producer-contract evidence, synthetic regression/SDK/GUI tests and
 same-frozen-input comparisons. Do not drop reasoning, invent catalogue events,
 mark unknown compaction work completed or relax every lifecycle check to get a
 passing preparation count.
+
+The narrow admission above resolves these same frozen first refusals without
+discarding content or fabricating lifecycle/child facts. A fresh current-catalogue
+assessment and owner pilot feedback still precede wider migration.
 
 MX Linux is the qualified target. Voice, other operating systems, owner transfers
 and selected/running adoption remain separate. Both current owner reviews and
