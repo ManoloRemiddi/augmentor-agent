@@ -80,7 +80,15 @@ owner permissions remain untouched. The probe mounts basic devices, and its
 actor tests open `/dev/null`. Product/version failures are still refused.
 
 Previous Linux SDK **39049376766** is now a terminal success at e018c8c9 / runtime
-b78996eb. New-source hosted qualification remains pending. The full owner main/
+b78996eb. New-source Linux SDK **39053669426** at b6bfaa2a / runtime 517b71db
+failed before application checks: distribution bubblewrap 0.9.0 reports
+`setting up uid map: Permission denied` in the namespace smoke test. No backend
+probe cases ran. The corrected workflow grants `userns` to a runner-local copy
+of the distribution executable using the exact-path AppArmor profile approach
+in [Ubuntu’s release notes](https://documentation.ubuntu.com/release-notes/24.04/#unprivileged-user-namespace-restrictions).
+This affects only the ephemeral CI runner when its restriction is enabled;
+it preserves the host-wide restriction and distribution profile. Corrected-head
+hosted qualification remains pending. The full owner main/
 pilot, 36 protected file sets/PIDs, registry 18, shared rows/configuration, menus
 and model/GPU/voice services remain unchanged; scratch is empty and root stays
 about 99 GiB free. Next finish full cold-backup/entrypoint evidence and matching

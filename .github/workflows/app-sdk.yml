@@ -42,6 +42,21 @@ jobs:
             sudo apt-get update
             sudo apt-get install --yes bubblewrap
           fi
+          # Ubuntu 24.04 restricts unconfined user namespaces. Grant this
+          # ephemeral CI-only executable permission without changing the
+          # system-wide restriction or the distribution's bwrap profile.
+          # https://documentation.ubuntu.com/release-notes/24.04/#unprivileged-user-namespace-restrictions
+          if [ "$(cat /proc/sys/kernel/apparmor_restrict_unprivileged_userns 2>/dev/null || true)" = 1 ]; then
+            probe_bin="$RUNNER_TEMP/augmentor-backend-probe-bin"
+            mkdir -m 700 "$probe_bin"
+            install -m 755 "$(command -v bwrap)" "$probe_bin/bwrap"
+            printf '%s\n' 'abi <abi/4.0>,' 'include <tunables/global>' \
+              "profile augmentor-ci-backend-probe \"$probe_bin/bwrap\" flags=(unconfined) {" \
+              '  userns,' '}' > "$RUNNER_TEMP/augmentor-ci-backend-probe.apparmor"
+            sudo apparmor_parser -r "$RUNNER_TEMP/augmentor-ci-backend-probe.apparmor"
+            echo "$probe_bin" >> "$GITHUB_PATH"
+            export PATH="$probe_bin:$PATH"
+          fi
           bwrap --version
           bwrap --ro-bind / / --unshare-user --unshare-pid --as-pid-1 --die-with-parent --proc /proc --dev /dev -- /usr/bin/true
       - name: Prepare locked Linux profile-inspection dependencies

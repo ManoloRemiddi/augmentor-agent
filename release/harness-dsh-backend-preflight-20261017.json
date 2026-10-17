@@ -88,7 +88,16 @@
   "previousArtifactDoesNotContainThisController": true,
   "installedChanged": false,
   "ownerProjectsTransferred": 0,
-  "newRuntimeSdk": "Pending",
+  "newRuntimeSdk": {
+    "run": 39053669426,
+    "head": "b6bfaa2a1dee19d9d535457b4056e874df3bbc72",
+    "runtime": "517b71dbb0293aa78f306b127ae444e51ce09b95",
+    "status": "completed",
+    "conclusion": "failure",
+    "failedStep": "Prepare Linux controlled-backend namespace dependency",
+    "observedError": "bwrap: setting up uid map: Permission denied",
+    "probeChecksExecuted": false
+  },
   "previousRuntimeSdk": {
     "run": 39049376766,
     "head": "e018c8c941db00fde6d9906996e00542eb4200ce",
@@ -110,5 +119,11 @@
     "harness-backend-probe-owner-preservation-20261017.log": "b67e752f52292a87903b9ee701ce57d7c168c9dd9dcb644249ec86ba13e063b4"
   },
   "mixed0600And0644OriginalModesCovered": true,
-  "testFixtureFollowUpAfterRuntimeRef": "One original asset is explicitly 0644 in the transaction regression; runtime remains 517b71db."
+  "testFixtureFollowUpAfterRuntimeRef": "One original asset is explicitly 0644 in the transaction regression; runtime remains 517b71db.",
+  "ciCorrection": {
+    "scope": "Ephemeral GitHub Ubuntu runner only; no installed application changes",
+    "approach": "Runner-local copy of distribution bwrap with an exact-executable AppArmor userns profile when the Ubuntu restriction is enabled; no global sysctl change or distribution profile replacement",
+    "source": "https://documentation.ubuntu.com/release-notes/24.04/#unprivileged-user-namespace-restrictions",
+    "qualification": "Pending corrected-head Linux SDK"
+  }
 }

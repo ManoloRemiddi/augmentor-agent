@@ -7,7 +7,8 @@ metadata/CLI bindings and stale inherited endpoint handling pass. Config writes
 stay blocked while probing, normal cleanup joins and successful checks keep the
 startup fence. Actual owner staging binds 48 inputs/10 edits, with 20 paths kept.
 No installed change/new app copy; full backups, real graph/client adoption and
-selection/finalization/reverse remain. Prior SDK 39049376766 succeeds; new CI pending.
+selection/finalization/reverse remain. Prior SDK 39049376766 succeeds. New SDK 39053669426 fails its Ubuntu userns
+smoke before app checks; exact-path CI-only AppArmor permission is pending validation.
 [Record](../release/harness-dsh-backend-preflight-20261017.json).
 
 [Cold configuration journal and profile gate](HARNESS-DSH-INSTALLATION.md#cold-configuration-journal-and-managed-startup-fence--october-17)
@@ -16,8 +17,8 @@ Real upstream DSH retains/releases its profile reader and refuses a pending fenc
 on an authored isolated profile. Apply/reverse survive per-file process death;
 completed config remains fenced pending client orchestration. No installed apply
 command, owner change or new app copy. Full backups, client selection/finalization
-and real owner acceptance remain. Linux SDK 39049376766 has passed its changed
-preservation/profile-gate steps; the overall run is still in progress.
+and real owner acceptance remain. Linux SDK 39049376766 is a terminal success, including the changed
+preservation/profile-gate steps.
 [Record](../release/harness-dsh-configuration-transaction-20261017.json).
 
 [Immutable preservation candidate](HARNESS-DSH-INSTALLATION.md#immutable-preserved-integration-candidate--october-17)
