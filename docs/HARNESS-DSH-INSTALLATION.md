@@ -2,6 +2,73 @@
 
 # Linux DSH integration installation
 
+## Retained roles, cold ownership and Prompt Library bridge — October 17
+
+Source **e07e5db623d2b777eeb4e25ece5646da858b8b90** closes two concrete preservation gaps. The retained 0.2.0 Prompt
+Library backend reads/saves templates but rejects `improvement.save`, despite its
+retained frontend exposing that setting. A preserved frontend bundle alone was
+therefore insufficient. The stage now keeps the bundle/client unchanged, disables
+only its legacy backend entry, and inserts the standard `augmentor-product-prompts`
+backend from the incoming public build. The old library version/patch structure,
+package alias and backend/client bytes are bound; unknown versions, custom
+conflicting overrides or alias changes refuse. Reviewed repeats update the owned
+replacement without duplicating it. Root-owned suppliers are accepted only as
+explicit bound, non-group/world-writable supplier files; owner inputs stay guarded.
+
+This uses DSH's actual include-patch contract: `name` in a non-insert patch is an
+identity guard, not a module replacement. A name-only override would be skipped.
+The supported disable-plus-insert form was verified against the real upstream
+runtime, including disabled legacy and active replacement inventory entries.
+It leaves frontend metadata and controls unchanged; final owner rendering remains
+separate acceptance, rather than being inferred from a backend response.
+
+Mixed releases also load identical public entry modules from different old roots.
+Within the two owned personal roles, an entry whose bytes exactly equal its public
+incoming counterpart can now move to that counterpart. Its relative imports then
+use current clients/services instead of potentially cold-spawning an old helper.
+Changed/private entries are left at their existing paths. Module edits record that
+reason and bind both inputs; this copies no private adapter code. The actual stage
+now binds **46 inputs**, proposes **10 module-name changes** (eight identical-public
+role references plus two original integration references), and adds the library
+backend bridge. Peer edits/settings remain exact. **20 literal module paths** still
+remain elsewhere/unchanged; their original roots are retained.
+
+### Runtime evidence
+
+The two actual personal-role definitions were extracted as configuration only.
+Their retained modules were executed **in place**, with the host filesystem mounted
+read-only, user runtime sockets hidden and a distinct network/PID namespace. Only
+a disposable fixture workspace was writable. No private module was copied into
+source, test archives or CI; no original full profile or owner bank was run.
+
+Nine original personal modules register/create both roles and preserve authored
+identity snapshots and cold history events against prestarted current services.
+The old Prompt Library's selected-target reads pass, while instruction-save is a
+negative control. With the staged public-entry rebindings/library bridge applied
+only to the fixture, **all shared services are stopped before cold startup**.
+Both saved roles then continue through a controlled local OpenAI-compatible model,
+with authored identity visible in their actual model input and the current source
+memory service owning the cold-started store. Shared instruction save/readback and
+template save/delete pass. A third controlled call improves a draft using those
+shared instructions without adding a conversation turn. **Three authored model
+requests / zero owner or external model requests**; no live Qwen/tool/speech
+acceptance is inferred. Existing cached bank rows, person/disabled settings and all
+stale-source database bytes remain exact. Namespace processes and scratch retire.
+
+Source focus **90 Python cases** passes, including **16 preservation cases**.
+Five additions cover frontend/backend bridge, alias/custom-override/version refusal,
+repeat update and identical-public versus private entry handling. Previous Linux
+SDK **39043965407** is now a terminal success at b3cbb4e7 / runtime 3777cc92;
+new source hosted qualification remains separate. [Record](../release/harness-dsh-retained-graph-20261017.json).
+
+The actual owner's profile was separately re-staged read-only; it was not activated
+or executed in that test. Its main/pilot data, launchers, registry, model/GPU/voice
+services and prior immutable releases remain unchanged. Next qualify an immutable
+incoming build and a cold-backed-up activation/reverse transaction with matching
+clients. Real owner banks/history/budgets/busy work/live continuation, other retained
+project/plugin paths and final UI/pilot feedback remain. No further project transfer,
+DSH retirement, voice work or later-platform rollout is claimed.
+
 ## Preserved custom integration stage — October 17
 
 Source **3777cc92961fc3d21c84cf3a1390970fcea851cb** adds `scripts/stage-dsh-preservation.py stage` and `verify`.

@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Preservation focus is now 16 cases/90 overlapping Python cases overall. It covers
+legacy bundle alias/provenance, supported backend replacement (DSH patch `name` is
+an identity guard), repeated updates, and identical-public entry rebindings while
+private edits remain untouched. Actual retained modules execute only in a private
+read-only/isolated-network operator fixture; no private source enters public tests
+or CI. [Evidence and scope](../docs/HARNESS-DSH-INSTALLATION.md#retained-roles-cold-ownership-and-prompt-library-bridge--october-17).
+
 `test_dsh_preservation.py` adds 11 authored Linux cases for private staging,
 precise module edits and provenance/stale/tamper/link refusal. The exact CLI is
 exercised without profile execution. `test_dsh_modern_setup.py` also checks that

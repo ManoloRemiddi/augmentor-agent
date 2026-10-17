@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cold retained-role fixture qualification](HARNESS-DSH-INSTALLATION.md#retained-roles-cold-ownership-and-prompt-library-bridge--october-17)
+now includes controlled replies, identity/current memory startup and shared prompt
+instruction/draft behavior. This closes the prestarted-services-only evidence gap
+for those paths. The owner app remains unchanged; immutable activation/rollback,
+real owner data/model/tool/UI acceptance and pilot feedback remain required.
+
 [Actual custom configuration staging](HARNESS-DSH-INSTALLATION.md#preserved-custom-integration-stage--october-17)
 now preserves the edited peer metadata and exact profile outside two proposed
 module changes. Twenty-one retained module paths require separate qualification;

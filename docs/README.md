@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Retained role and library qualification](HARNESS-DSH-INSTALLATION.md#retained-roles-cold-ownership-and-prompt-library-bridge--october-17)
+adds e07e5db6: source Python 90 pass. Actual retained personal modules run in place
+inside a read-only filesystem/isolated-network fixture. Cold saved-role replies,
+current memory ownership, identity, shared instructions/templates and non-submitting
+draft improvement pass with three controlled local model calls. The stage keeps
+the frontend, replaces its limited backend, and rebinds identical public entries:
+46 inputs/10 module changes; 20 remaining literal paths stay protected. Actual
+owner app/data remain unchanged; immutable cold activation/reverse and full real
+owner acceptance remain. Prior Linux SDK 39043965407 succeeds; new code CI pending.
+[Record](../release/harness-dsh-retained-graph-20261017.json).
+
 [Custom DSH preservation stage](HARNESS-DSH-INSTALLATION.md#preserved-custom-integration-stage--october-17)
 adds source-only private staging/verification at 3777cc92. Python 85 pass. Actual
 profile staging binds 28 inputs, keeps peer edits and proposes two module changes;
