@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Queue control correction](QUEUE-AND-STEERING.md#empty-queue-resume-control-and-live-tool-steering--october-17)
+hides Resume for an empty paused queue while retaining real waiting-work controls.
+The actual GUI regression reproduces the old error; source/fresh ordinary each
+pass **238 Node / 41 Python**, 29 files/eleven Chromium, two workers/no skips,
+1,120 compiled matches. Runtime bytes stay unchanged; exact-seal qualification/
+adoption remain pending and both reviews still run ee80c054. Actual original-GUI/
+Qwen steering on that earlier seal lets the same executing command finish once,
+then delivers the correction in its turn and the follow-up in the next. Initial
+strict cold-observation equality remains failed on typed load/close records;
+read-only postflight verifies exact old prefix and those appends, no replay or
+inference. Linux SDK d531ba6c passes; full Debian still runs. Owner data/settings/
+PIDs and GPU/voice state verify. [Evidence](../release/harness-queue-controls-qualification-20261017.json).
+
 [Live running-tool Stop](QUEUE-AND-STEERING.md#live-pi-running-tool-stop-and-cold-inspection--october-17)
 now qualifies actual sealed ee80c054/original GUI/Qwen during a controlled native
 bash command: shell/sleep terminal after Stop, partial write preserved, native

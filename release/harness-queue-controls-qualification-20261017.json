@@ -1,0 +1,172 @@
+{
+  "schema": "augmentor-harness-queue-controls-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Hide an empty paused-queue Resume control; source and fresh ordinary qualification, plus actual running-tool steering on the unchanged preceding sealed runtime",
+  "baseSourceRef": "e9e3d700067ee33976e6411ba0ccab026fa1a58d",
+  "changedApplicationFile": "apps/harness/dsh-app.jsx",
+  "inputsSha256": {
+    "apps/harness/dsh-app.jsx": "faaadcf60d841d7e8c62c745d562e66dbf242165bb36920f708b84577d9d1d75",
+    "tests/harness-queue-resume-chromium.test.mjs": "9e37357c0eddd7388880ca0f1fec9085d8ec3fc3220b397cf73b09a9cb8ca197"
+  },
+  "behavior": {
+    "before": "Cold reopening an empty paused queue renders Resume waiting messages.",
+    "after": "The control requires a paused non-empty queue; real waiting work retains its existing Resume path and uncertainty fences.",
+    "queueProtocolAndLifecycleChanged": false,
+    "mutationsReplayed": false
+  },
+  "regression": {
+    "originalRenderedFailureReproduced": true,
+    "initialFailure": "Empty paused queue advertised waiting messages; all earlier positive pause/cold/resume checks reached this final assertion.",
+    "checks": [
+      "Actual GUI sends a held request and queues a follow-up.",
+      "Stop preserves one waiting input and offers Resume.",
+      "Cold reopen preserves that identity/native bytes and submits no inference.",
+      "Explicit Resume delivers the waiting input once.",
+      "Empty cold queue has no Resume control, with exact native/display history and unchanged request count."
+    ]
+  },
+  "sourceAndOrdinaryQualification": {
+    "buildAndCheckPassed": true,
+    "eachNodePass": 238,
+    "eachPythonPass": 41,
+    "nodeFiles": 29,
+    "chromiumFiles": 11,
+    "workers": 2,
+    "nodeFailures": 0,
+    "nodeSkipped": 0,
+    "compiledInputsMatched": 1120,
+    "baselineOrdinaryUnchangedInputs": 23565,
+    "compiledRuntimeBytesUnchanged": true,
+    "workerCodeUnchangedAfterOnlyTemporaryOverlayCommentMapping": true,
+    "mainGuiNormalizedChange": "Only the non-empty-queue visibility condition; temporary overlay comments and derived worker import filename are mapped read-only.",
+    "newProductDependencies": false,
+    "sealedCandidateQualification": "pending",
+    "ownerAdoption": "pending"
+  },
+  "liveSteering": {
+    "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+    "releaseId": "20261017-071945-90183f89",
+    "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+    "scope": "Actual Qwen, original GUI and one exactly guarded temporary native shell command; earlier installed runtime, not the new UI candidate",
+    "userInputs": 3,
+    "providerRequests": 4,
+    "guiMutationCounts": {
+      "session.prompt": 3,
+      "session.updateQueue": 1,
+      "session.cancel": 0,
+      "session.continueQueue": 0
+    },
+    "successfulTools": [
+      "bash",
+      "read"
+    ],
+    "journal": "started\ncompleted\n",
+    "bashRuns": 1,
+    "processChecks": {
+      "steerDuringToolPreservesSameRunningProcessIdentities": true,
+      "commandCompletesExactlyOnceBeforeCorrectionDelivery": true,
+      "sameTurnCorrectionAndNextTurnFollowupOnce": true,
+      "oneSuccessfulReadAndNoBashReplay": true
+    },
+    "observedShellAndSleepIdentitiesStayLiveAfterSteer": true,
+    "sameTurnCorrectionAfterToolResult": true,
+    "untouchedFollowupInNextTurn": true,
+    "modelMarkersAndJournalContentsMatch": true,
+    "runtimeErrors": 0,
+    "pageErrors": 0,
+    "pageHttpFailures": 0,
+    "initialDriverStatus": "failed",
+    "initialDriverFailure": "Strict cold observation bytes equality encounters a typed SDK session/load record; own shutdown then appends session/close. Completed commands are not rerun.",
+    "readOnlyPostflight": {
+      "passed": true,
+      "checks": {
+        "priorLiveProcessAndSteeringChecksRetained": true,
+        "sameTurnCorrectionNextTurnFollowupAndOriginalToolResultsVerified": true,
+        "initialFourProviderRequestsOnly": true,
+        "originalGuiColdNativeDisplayJournalAndConfigurationByteExact": true,
+        "originalObservationPrefixExactOnlyOneTypedLoadAppend": true,
+        "noInferenceOrMutationsOnColdInspection": true,
+        "onlyOneTypedCloseOnOwnHostShutdown": true,
+        "gracefulOwnHostAndBrowserShutdown": true
+      },
+      "newModelInputs": 0,
+      "newPageMutations": 0,
+      "typedObservationAppends": [
+        "session/load",
+        "session/close"
+      ],
+      "allOriginalObservationPrefixBytesExact": true,
+      "nativeDisplayJournalConfigurationBytesExact": true,
+      "coldScreenshotVisuallyInspected": true
+    },
+    "privateDriverSha256": "f03eee590557885ce3bf9c11c95c80f989d7cc32954604576750c0d51a3258b7",
+    "privatePostflightSha256": "80f29251cb476380626385e4e632c2f92e79357a92ec02ae709ba1ef2f8d63fe",
+    "cleanup": {
+      "retiredCompanions": 1,
+      "retiredBrowserHelpers": 0,
+      "authoredProfilesAudited": 1,
+      "remainingMatchingActors": 0,
+      "scope": "Same UID, exact temporary HOME/home and shared-state; original Hosts/browser closed, only known scoped companions eligible for pidfd retirement."
+    }
+  },
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      },
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 14,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "installedReviews": {
+    "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+    "releaseId": "20261017-071945-90183f89",
+    "changed": false
+  },
+  "hosted": {
+    "linuxSdkSourceRef": "d531ba6cac125203aed79eb8751e5a761ca782d3",
+    "linuxSdkJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39008117619/job/117324660967",
+    "linuxSdkConclusion": "success",
+    "debianRun": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39008117625",
+    "debianStatusAtCheckpoint": "in_progress",
+    "wholeWorkflowAcceptanceClaimed": false
+  },
+  "remaining": [
+    "Qualify the exact sealed candidate and perform guarded adoption before claiming the UI is installed.",
+    "Observe full hosted Linux acceptance.",
+    "Owner migration pilot feedback before additional separately backed-up real transfers.",
+    "Other programs/external effects/MCP transports and physical menu/browser use are separate from this controlled live sample.",
+    "Voice and later operating systems remain deferred."
+  ]
+}

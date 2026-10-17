@@ -1,5 +1,52 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Empty-queue Resume control and live tool steering — October 17
+
+A cold original-GUI review exposed **Resume waiting messages** even when its
+paused queue was empty. The Harness visibility condition now requires at least
+one queue row. Actual waiting work retains its existing Resume action and
+unknown-outcome/compaction fences; SDK queue state and dispatch are unchanged.
+The new real-Chromium regression first fails on the old empty state, then verifies
+GUI Send/Queue/Stop, paused cold reopen, explicit one-time Resume and an empty
+cold reopen with exact history and no inference. It adds no replay or timing relaxation.
+
+Source check/build and a fresh ordinary copy each pass **238 Node / 41 Python**,
+29 files/eleven Chromium files, two workers/no skips. All **1,120 compiled inputs**
+match the ordinary copy; 23,565 other baseline inputs verify. Compiled runtime
+bytes stay exact. A read-only generated-bundle comparison isolates the one GUI
+condition after mapping only temporary spreadsheet source-comment directories
+and their derived import filename; the worker program remains unchanged.
+The candidate is not yet installed or exact-seal qualified at this checkpoint.
+Both owner reviews remain **ee80c054 / 20261017-071945-90183f89**.
+
+That existing sealed runtime also now has actual-Qwen/original-GUI evidence for
+**Steer during tool execution**. An exactly guarded command writes a start line,
+sleeps twelve seconds, then writes completion in one authored temporary journal.
+The owned shell and sleep remain live after Steer. The command completes once;
+its successful result is saved before the identified correction enters the same
+turn. Qwen reads the complete journal once and answers the correction. The other
+queued follow-up enters the next turn once. Three inputs/four provider requests/
+four page mutations produce two successful tools, no replay/guard denial and
+zero browser, HTTP or runtime errors. This sample uses a test-only exact-command
+resource, not a default OS sandbox or arbitrary-program/MCP qualification.
+
+The initial driver's strict cold observation equality **remains failed**: lazy
+SDK loading correctly adds a `session/load` observation, followed by `session/close`
+on shutdown. No command is repeated. A separate read-only postflight of the same
+profile verifies the exact original observation prefix and only those two typed,
+unattributed metadata appends. Native/display/journal/configuration bytes stay
+exact; cold GUI inspection has no input, tool, provider request or page mutation.
+The final journal contents and requested model markers agree with actual results.
+One scoped companion is retired after all test Hosts/browsers close.
+
+Read-only checks retain both owner PIDs/all 36 protected file sets, shared rows/
+settings, registry fourteen, menus/selections, both seals and GPU/voice state.
+No owner request or further real transfer occurs. The preceding d531ba6c Linux
+SDK job passes; full Debian remains in progress. [Aggregate record](../release/harness-queue-controls-qualification-20261017.json)
+separates live earlier-runtime evidence, source/ordinary UI qualification and
+remaining sealed/adoption/hosted gates. Owner pilot feedback remains the gate
+for more migration; voice/later OS stay deferred.
+
 ## Live Pi running-tool Stop and cold inspection — October 17
 
 On the existing sealed MX application **ee80c054 / 20261017-071945-90183f89**,
