@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared prompt CI prerequisites](HARNESS-SHARED-PROFILES.md#shared-prompt-ci-startup-prerequisites--october-17) · private smoke-profile parent, locked clean-interpreter dependency and local/hosted evidence.
+
 [Packaged privacy lifecycle](PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
 now observes the actual unchanged e37d79b6/b1edf4d2 Host trees and original GUI:
 six packaged plus two default-source fresh/cold/upgrade/rollback phases, eight

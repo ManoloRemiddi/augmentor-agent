@@ -27,6 +27,8 @@ jobs:
       - run: uv venv --python 3.13.5 .sdk-test-python
       - name: Select isolated qualification interpreter
         run: node -e "const fs=require('fs'),p=require('path'); const py=p.resolve('.sdk-test-python',process.platform==='win32'?'Scripts/python.exe':'bin/python');fs.appendFileSync(process.env.GITHUB_ENV,'AUGMENTOR_PYTHON='+py+'\nPYTHONDONTWRITEBYTECODE=1\n');"
+      - name: Prepare locked shared companion test dependencies
+        run: node -e "const cp=require('child_process'); const r=cp.spawnSync('uv',['pip','install','--python',process.env.AUGMENTOR_PYTHON,'--require-hashes','--no-deps','--only-binary=:all:','-r','tests/fixtures/shared-companion-requirements.txt'],{stdio:'inherit'});process.exit(r.status??1);"
       - name: Prepare locked Windows companion test dependencies
         if: runner.os == 'Windows'
         run: >-

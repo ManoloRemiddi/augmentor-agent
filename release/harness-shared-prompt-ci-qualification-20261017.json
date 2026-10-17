@@ -1,0 +1,111 @@
+{
+  "schema": "augmentor-harness-shared-prompt-ci-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Repair hosted shared-prompt test profile and clean-interpreter prerequisites; no runtime or installed application change",
+  "baseSourceRef": "45088675ccffaf827701bcd185abc4a59b33965b",
+  "applicationCodeChanged": false,
+  "newProductDependency": false,
+  "inputsSha256": {
+    ".github/workflows/validate.yml": "ef4abd16db22217cdeb096341a5ef641f9885acd2d7e31edef57757ca068294d",
+    ".github/workflows/app-sdk.yml": "60fc5ced85b7de0ef0f77bdf23ee28fae2b303825ea6a905caab2e3d6fc5c536",
+    "tests/fixtures/shared-companion-requirements.txt": "115e9819a802434af83009fb6936b31cba9c8d4b8563815a2c30914e8d0c2247",
+    "packages/prompt-library/src/client.ts": "483f4f33a6350a3e501a6fa3e890464dfb0a74143c53a9b130b4a865feb76f5e",
+    "services/lifecycle/shared_profile.py": "aa77def5d8a65c5233d69d805eb061ea0123e618f9e3f3cf78387b36c4c4e8fe",
+    "services/prompt-library/service.py": "915ec5371dc8be09a933cf5457261ffc2a33d4545885b7492deff6d01a7431f8",
+    "tests/shared-profile-import.test.mjs": "bfde6a2536067c16ddabb588e3a91b95cfd25e0147e78f9f95fa6d80e155a2eb",
+    "tests/shared-profile-runtime.test.mjs": "5551e114d21de4a8ad32adeb93b1aa3001bd0a889bbb5cbe95f1e7fc6d23e898",
+    "tests/fixtures/shared-profile-data.py": "b68a704079c6872d5edae5e95d69cd34d3ede422bf77a658bc928e6a50f6532a",
+    "tests/test_shared_profile_lease.py": "3865f8ff0bc4db8ba034139cf42606b2abcecb3effad7ec1e38df29498b890f2",
+    "tests/test_shared_prompts.py": "290ad499a3a8c8da2ad438966746c151d4781dddb776c890a1e20fc3cbb65846",
+    "tests/test_prompts.py": "fe1953a07ec83114937262d6637e77903c6a24761dbce0d146c8327db39f7bea"
+  },
+  "observedHostedFailures": {
+    "homeJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39003292023/job/117310562263",
+    "homeFailure": "Packaged prompt client cannot start when the shared data parent is the unprotected shared temporary directory",
+    "linuxSdkJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39003291989/job/117310530537",
+    "linuxSdkFailure": "Isolated Python 3.13.5 lacks websocket module imported by the real shared prompt service"
+  },
+  "corrections": {
+    "homeSmokePrivateParentCreatedByRuntimeUser": true,
+    "homeSmokeParentMode": "0700",
+    "sharedDataOwnershipPolicyUnchanged": true,
+    "commonSdkTestPrerequisite": "websocket-client==1.8.0",
+    "universalWheelSha256": "17b44cc997f5c498e809b22cdf2d9c7a9e71c02c8cc2b6c56e7c2d1239bfa526",
+    "existingProductLockSources": [
+      "release/windows/requirements-x64.txt",
+      "release/windows/requirements-arm64.txt",
+      "release/macos-requirements.txt"
+    ],
+    "hashCheckedNoDepsInstallation": true,
+    "windowsSpecificPrerequisitesRetained": true
+  },
+  "localQualification": {
+    "freshPython": "3.13.5",
+    "moduleAbsentBeforeLockedInstall": true,
+    "lockedModuleInstalledVersion": "1.8.0",
+    "actualNodePromptClientColdStartPassed": true,
+    "worldWritableParentRefusedBeforeDataCreation": true,
+    "promptRows": 0,
+    "nodePass": 10,
+    "nodeFiles": 2,
+    "pythonPass": 23,
+    "pythonFiles": 3,
+    "nodeSkipped": 0,
+    "ownerDataUsed": false,
+    "modelRequests": 0,
+    "ownPromptCompanionsRetired": 1,
+    "productionCompanionsRetired": 0
+  },
+  "hostedCorrectionStatus": "Awaiting a new published-head Home/SDK run; local evidence is not a passing container or hosted job",
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-055628-b9afa698",
+        "applicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+        "artifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+        "sealedInputsVerified": 24686
+      },
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-061143-d0c0fc29",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-061143-d0c0fc29",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 12,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "limits": [
+    "These are fixture/prerequisite corrections; they do not change the prompt-service security policy or shipping dependency graph",
+    "Local direct-client/source tests do not substitute for the complete new-head Home container and SDK matrix jobs",
+    "Other hosted failures can surface after these prerequisites are corrected; no full CI or platform acceptance is claimed",
+    "Owner reviews remain on b1edf4d2, no further real migration; owner pilot feedback, voice and later OS rollout remain separate"
+  ],
+  "publicationChecks": {
+    "privateBoundaryLicenceAndNoticeCasesPassed": 16,
+    "privateSourceIdentitiesChecked": 77,
+    "privateSourceIdentityMatches": 0
+  }
+}

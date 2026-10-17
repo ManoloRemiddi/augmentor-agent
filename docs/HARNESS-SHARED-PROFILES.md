@@ -1,5 +1,38 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Shared prompt CI startup prerequisites — October 17
+
+Hosted source **45088675** exposes two test-setup failures. Home’s final image
+smoke check places shared data at `/tmp/data`. The real shared-profile guard
+requires its immediate parent to be owned by the service user and protected from
+other writers, so the world-writable shared temporary directory is invalid.
+The test now creates its own **0700** parent as the container’s ordinary runtime
+user before calling the same packaged prompt client. The service’s ownership
+checks remain unchanged; existing data is not moved or re-permissioned.
+
+The Linux SDK job’s fresh Python **3.13.5** environment also lacks the
+`websocket` module imported by the actual prompt service’s optional DSH setup
+binding. A new shared test-prerequisite file selects the **existing product**
+`websocket-client==1.8.0` universal wheel and its existing Windows/macOS lock hash.
+The SDK workflow installs it with hashes, binary-only and no dependency resolution
+on all matrix platforms. The separate Windows Qt/native prerequisites remain.
+No runtime dependency, DSH source, service behavior or installed application changes.
+
+A fresh local Python 3.13.5 environment confirms the missing module before the
+locked installation, then passes **10 Node cases across two files** for complete
+shared-data consolidation, process ownership, cold reopen and no recapture.
+**23 Python cases across three files** pass with the prepared Qt interpreter and
+normal native import path. A separate actual Node prompt-client cold start passes
+under a new private parent; a writable-parent control refuses before creating data.
+Only its own temporary prompt service is retired; no model or owner data is used.
+
+[Qualification](../release/harness-shared-prompt-ci-qualification-20261017.json)
+records input hashes, failing hosted jobs and correction status. Full new-head
+Home-container/SDK matrix results remain distinct from local source/client checks.
+Both current MX review PIDs/all 36 protected paths/hashes, shared rows, registry,
+menus/selections and GPU/voice states still match the preceding checkpoint.
+No new app deployment, owner project transfer or NAS change follows.
+
 # Shared prompts and memory during Harness consolidation
 
 Harness, Native and Browser clients share one prompt/memory service when their

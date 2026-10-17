@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared prompt CI prerequisites](HARNESS-SHARED-PROFILES.md#shared-prompt-ci-startup-prerequisites--october-17)
+correct the Home smoke profile’s unprotected parent and install the existing locked
+websocket prerequisite in clean SDK interpreters. Fresh Python 3.13.5 passes ten
+Node consolidation/reopen cases; 23 prepared Python cases and an actual cold
+prompt-client/writable-parent control pass. Runtime/security policy and both MX
+reviews remain unchanged. Hosted new-head results are tracked separately.
+[Evidence](../release/harness-shared-prompt-ci-qualification-20261017.json).
+
 [Packaged privacy lifecycle](PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
 now observes the actual unchanged e37d79b6/b1edf4d2 Host trees and original GUI:
 six packaged plus two default-source fresh/cold/upgrade/rollback phases, eight

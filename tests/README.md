@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The SDK matrix’s clean Python interpreter now installs
+[`shared-companion-requirements.txt`](fixtures/shared-companion-requirements.txt)
+with hashes/no dependencies before importing the real prompt service. The existing
+websocket-client product wheel is required even when a fixture never connects to
+DSH. Home’s smoke profile uses an owned private parent. See [local versus hosted
+qualification](../docs/HARNESS-SHARED-PROFILES.md#shared-prompt-ci-startup-prerequisites--october-17).
+
 [MX privacy lifecycle](../docs/PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
 adds `kernel-network-audit` (actual descendant TCP/UDP negative controls) and
 `harness-privacy-upgrade-chromium` (normal Linux source fresh/cold; explicit sealed

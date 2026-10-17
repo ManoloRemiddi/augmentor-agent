@@ -44,9 +44,9 @@ jobs:
         run: node apps/home/pi/proof.mjs augmentor-home-pi:ci
       - name: Exercise the packaged shared prompt library
         run: >-
-          docker run --rm --tmpfs /tmp -e AUGMENTOR_SHARED_STATE=/tmp/run
-          -e AUGMENTOR_SHARED_DATA=/tmp/data augmentor-home:ci
-          node --input-type=module -e 'import {promptCall} from "../../dist/prompt-library/src/client.js"; const r=await promptCall("prompts.list"); if(!Array.isArray(r.prompts))process.exit(1);'
+          docker run --rm --tmpfs /tmp -e AUGMENTOR_SHARED_STATE=/tmp/augmentor-home-prompt-proof/run
+          -e AUGMENTOR_SHARED_DATA=/tmp/augmentor-home-prompt-proof/data augmentor-home:ci
+          node --input-type=module -e 'import {mkdirSync} from "node:fs"; import {dirname} from "node:path"; import {promptCall} from "../../dist/prompt-library/src/client.js"; mkdirSync(dirname(process.env.AUGMENTOR_SHARED_DATA),{recursive:true,mode:0o700}); const r=await promptCall("prompts.list"); if(!Array.isArray(r.prompts))process.exit(1);'
   debian:
     needs: [source-boundary, handy]
     runs-on: ubuntu-24.04

@@ -13,6 +13,14 @@ have a shared Home adapter and pairing settings; installed artifact identity is
 tracked separately from source. The NAS access preview is deployed; full V1
 qualification remains open.
 
+## Shared prompt smoke profile
+
+The packaged shared prompt check must create a **0700** parent owned by the
+container runtime user before selecting child shared state/data paths. Placing
+the data directory directly under world-writable `/tmp` is refused. The CI smoke
+fixture now follows that contract; it does not change the Home deployment, NAS,
+service access policy or owner configuration. [Evidence and hosted status](HARNESS-SHARED-PROFILES.md#shared-prompt-ci-startup-prerequisites--october-17).
+
 ## Integrate existing homes
 
 Home Assistant owns discovery, device drivers, vendor account linking, areas,
