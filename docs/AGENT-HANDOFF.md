@@ -1,17 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Interrupted-response context candidate](AUGMENTOR-HARNESS.md#model-context-after-an-interrupted-response--october-17)
+[Interrupted-response context](AUGMENTOR-HARNESS.md#model-context-after-an-interrupted-response--october-17)
 addresses an actual b1 original-GUI/Qwen failure: Resume reads the new file, then
 the model restarts the old numbered task. The effective provider request omits
 the aborted assistant and has no interruption explanation. A public SDK per-turn
 system note now derives only from the selected native aborted-response boundary,
 preserves all history and allows explicit continuation without claiming rollback.
-Source check/build and both source/fresh ordinary **229 Node/41 Python** cases
-pass (23 files/five Chromium, two workers/no skips; 1,120 compiled inputs match); sealed/live results
-and owner adoption remain separate in the
+Source check/build and source/fresh ordinary/exact sealed each pass **229 Node /
+41 Python** (23 files/five Chromium, two workers/no skips; 1,120 compiled inputs
+match). Original GUI/actual Qwen passes five inputs/eight page mutations, same-turn
+steering, paused cold reopen and explicit one-time resume/two reads, with the note
+in both provider bodies and zero browser/HTTP/runtime errors. Exact results are in the
 [qualification record](../release/harness-interrupted-context-qualification-20261017.json).
-No GUI change or owner app update yet; b1 remains running. Earlier GUI-driver
-row-label/selector failures and the later genuine model-answer failure are retained.
+Both owner reviews now run **ee80c054 / 20261017-071945-90183f89**, after 418 verified
+backup files/installed-opener adoption. Four conversations/all 36 original prefixes,
+shared data/settings, menus/selections and GPU/voice states remain; only eight close
+and 36 startup MCP metadata records append, registry fourteen. Both Plugins panels
+pass without private profile reads/settings/agent actions. All **24,693 sealed
+inputs** verify, warm opens retain both new owners. No owner inference or further
+real migration. Earlier driver/source-wrapper failures remain recorded; GUI source
+and layout stay unchanged. Hosted/physical and owner pilot feedback remain separate.
 
 [Live Qwen queue/steering/Stop](AUGMENTOR-HARNESS.md#live-qwen-queue-steering-and-stop--october-17)
 passes two cases on exact sealed **b1edf4d2 / 20261017-061143-d0c0fc29**:

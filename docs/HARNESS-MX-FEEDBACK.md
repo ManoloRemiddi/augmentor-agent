@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Interrupted-response context](AUGMENTOR-HARNESS.md#model-context-after-an-interrupted-response--october-17)
+now runs in both actual reviews at **ee80c054 / 20261017-071945-90183f89**.
+The original GUI/Qwen probe verifies Steer, Stop, paused cold open and explicit
+Resume; the model receives the saved interruption boundary and answers the new
+request after its read. Source/ordinary/sealed each pass **229 Node / 41 Python**,
+all 1,120 compiled inputs and the 24,693-input seal verify. Guarded adoption retains
+418 verified backup files/four conversations/all 36 original prefixes, shared
+prompts/memory/settings, menus/selections and GPU/voice states. Only typed MCP
+close/startup metadata append; no owner inference or extra project transfer.
+Use the stable review opener for a fresh link after the confirmed owner restart.
+Physical use and pilot feedback remain open; voice/later OS stay deferred.
+
 [Packaged privacy lifecycle](PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
 now observes the actual unchanged e37d79b6/b1edf4d2 Host trees and original GUI:
 six packaged plus two default-source fresh/cold/upgrade/rollback phases, eight

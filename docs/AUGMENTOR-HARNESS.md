@@ -510,10 +510,44 @@ later completed turn and original native bytes remain a prefix. The common
 Linux/macOS/Windows SDK workflow now runs execution tests directly; hosted and
 physical platform acceptance remain separate.
 
-[Candidate qualification](../release/harness-interrupted-context-qualification-20261017.json)
-records exact inputs, source/package evidence and the remaining sealed/live and
-owner-adoption gates. Current reviews stay on b1edf4d2 until guarded qualification
-and adoption. Voice, later OS rollout and further real migration remain deferred.
+[Qualification](../release/harness-interrupted-context-qualification-20261017.json)
+now verifies implementation **ee80c054444cdc46c78544cb7ef927f3e3ef283f** in source,
+fresh ordinary and exact sealed **20261017-071945-90183f89**: each passes
+**229 Node / 41 Python** cases across 23 Node files/five Chromium files, two
+workers/no skips. All **1,120 compiled inputs** match; the **24,693-input** seal
+verifies after testing. The rebuilt GUI bundles differ only in temporary
+spreadsheet overlay comments and the derived chunk name/import; read-only
+comparison maps those two build details and confirms equal JavaScript bodies.
+Actual qualified bytes remain untouched. The external licence-test wrapper needs
+the selected public goal-fold TS input separately from compiled application code;
+its first missing-fixture failure and complete corrected rerun are retained.
+
+The original GUI/Qwen rerun uses the same prompts and actual pointer/typing
+controls. Five authored inputs cover two cases; all eight mutations originate in
+the page (**five Send/Queue, one Steer, one Stop, one Resume**). Same-turn
+correction/next-turn follow-up, paused cold open, one-time explicit resume and two
+read results pass, with zero browser/HTTP/runtime errors. Qwen gives the requested
+short resumed answer; captured effective provider bodies contain the note before
+and after its read. This is bounded live evidence, not guaranteed semantic
+compliance across every request or provider. Earlier row-label/selector driver
+failures remain separate from the actual old-build answer failure.
+
+Both actual **main and pilot reviews now run ee80c054 /
+20261017-071945-90183f89**, artifact
+**cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c**.
+Idle-only adoption verifies shared SQLite/pre-shutdown/full cold backups
+(**418 regular files**) and installed-opener startup. Four conversations and all
+36 original authoritative prefixes remain; only eight typed close and 36 typed
+new-connection metadata entries append. Twelve prompts, nineteen captured memory
+records, processing/engine settings, queues, original menus and earlier selections
+stay exact. Registry revision is fourteen. Both actual Plugins panels retain
+usable overview switches and collapsed advanced/technical details, with no
+browser errors, private profile reads, settings or agent actions. Warm installed
+opens retain the same new owners. Qwen configuration/unit/PID and other GPU/voice
+states remain unchanged. No owner model request or further real migration occurs.
+
+Matching-head hosted/physical acceptance remains separate. Voice, later OS rollout,
+owner pilot feedback and further backed-up project migration remain deferred.
 
 ## Live Qwen queue, steering and Stop — October 17
 
