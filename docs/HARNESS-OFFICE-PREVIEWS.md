@@ -1,5 +1,49 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Managed Office scratch recovery — October 17
+
+The opt-in `linux-managed-wasm` Host now places conversion copies in its own
+private `state/office-scratch/v1/data/`, with bounded external ownership receipts
+in `records/`. The existing shared/native and unmanaged process seats retain their
+transient scratch behavior. Default `pinned-kit` and both installed reviews remain
+unchanged. The factory requires the Host's private state explicitly; it does not
+invent a global location or scan unrelated temporary/workspace directories.
+
+An exact root identity and full Linux owner identity (PID, process start token,
+boot ID) are written and synced before readiness allows document bytes to be
+copied. Normal cleanup records a durable deleting phase outside the data tree,
+removes contents through the verified directory descriptor, then retires the
+receipt. The next managed converter initialization can reclaim dead-owner copies
+and resume a deleting phase. This is often the first Office use after restarting;
+ordinary chat does not eagerly initialize this optional backend. A live owner or
+held kernel renderer lease prevents reclamation. Missing ready roots, replaced
+directories, linked/unknown/malformed/duplicate receipts and incomplete metadata
+publication are preserved and refuse managed Office admission. Other chat state
+and original workspace documents are not cleanup targets.
+
+Ten recovery cases pass, including actual Node plus independent-cleaner death;
+an admitted real-entry startup with renderer/supervisor stopped and all owners
+killed; independent shared-lease refusal/release; live-owner and foreign-current-
+owner refusal; authored PID-reuse/prior-boot identity controls; outside-symlink
+target preservation; unknown/partial record retention and deleting-phase resume.
+Deleting-phase interruption is represented by authored valid phase receipts,
+rather than claimed as a power-loss test. Actual kernel/manager and original-GUI
+checks remain part of the **298-pass source cohort** (45 files, 19 Chromium files,
+two workers, no skips/failures), plus **43 Python** source/notice/packaging checks.
+The changed shared helper also passes **24 actual native-backend compatibility
+cases**, without skips. A separate actual managed Host/original-GUI test also
+passes the existing Thin engine, with all 53 engine package files verified and
+unchanged assertions/deadlines. This source candidate is not installed or promoted.
+
+Uncommitted allocation/record-publication windows deliberately remain preserved
+if identity cannot be proved. Full bootstrap/process-window qualification,
+power-loss/filesystem durability, broader font/document/macro/security and public
+source/rebuild/third-party gates remain, along with exact ordinary/sealed/installed
+adoption and rollback. Process/resource supervision does not imply a filesystem/
+network sandbox. [Recovery contract and reproduction](../release/office-rebuild/README.md#managed-office-scratch-recovery--october-17)
+and [data retention](DATA-AND-SUPPORT.md#managed-office-recovery-copies--october-17).
+[Exact source/evidence](../release/office-rebuild/managed-scratch-recovery-qualification-20261017.json).
+
 ## MX managed Office resource limits — October 17
 
 An additional explicit source candidate, `AUGMENTOR_OFFICE_BACKEND=linux-managed-wasm`,

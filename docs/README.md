@@ -6,6 +6,8 @@
 
 [MX managed Office limits](HARNESS-OFFICE-PREVIEWS.md#mx-managed-office-resource-limits--october-17) · real user scopes, verified kernel memory/task/CPU limits and external frozen-owner deadlines; opt-in source only, with durable recovery and package/adoption gates remaining.
 
+[Managed Office scratch recovery](HARNESS-OFFICE-PREVIEWS.md#managed-office-scratch-recovery--october-17) · private profile receipts, exact dead-owner cleanup and live/held/replaced-root preservation; bootstrap/power-loss and package/adoption limits remain explicit.
+
 [Office retained memory/process prototype](HARNESS-OFFICE-PREVIEWS.md#retained-memory-and-process-boundary-prototype--october-17) · measured process-exit reclamation and twenty real-provider cases below the existing memory cap; production integration/fault/source gates remain.
 
 [Office boundary/resource diagnostic](HARNESS-OFFICE-PREVIEWS.md#contained-external-resources-and-memory-refusal--october-17) · ten current-engine cases, calibrated external-file/network controls and bounded cancellation/recovery; preceding same-process Thin OOM remains recorded.

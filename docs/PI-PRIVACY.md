@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Optional managed Office recovery state — October 17
+
+The source-only managed Office candidate now retains private conversion ownership
+receipts and crash-left copies inside its own profile, rather than recovering by
+scanning unrelated temporary/workspace directories. Normal cleanup removes both;
+verified dead-owner recovery occurs on managed converter initialization. Unknown
+state is preserved and refuses that optional preview backend. This adds no agent
+loop, inference or telemetry destination. It does not qualify a filesystem/network
+sandbox, power-loss recovery or public redistribution. The installed default is
+unchanged. [Exact data, backup and retention scope](DATA-AND-SUPPORT.md#managed-office-recovery-copies--october-17).
+
 ## Packaged MX lifecycle network qualification — October 17
 
 The unchanged current **b1edf4d2 / 20261017-061143-d0c0fc29** and preceding

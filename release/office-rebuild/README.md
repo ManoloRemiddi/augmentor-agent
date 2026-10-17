@@ -1,5 +1,60 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Managed Office scratch recovery — October 17
+
+The actual Host passes its private state directory to
+`createLinuxManagedOfficeConverter(options, stateDirectory)`. The new
+`office-scratch-state.ts`/`office-scratch-journal.py` bridge prepares only
+`stateDirectory/office-scratch/v1/{data,records}`. Mode/UID/shape checks and bounded
+receipts precede admission; state is explicit, and neither `/tmp` nor another
+profile/workspace is swept. `createLinuxOfficeScratch(state)` retains its separate
+cleanup process, now recording root dev/inode and owner PID/start/boot identity
+before publishing readiness. The no-state native/unmanaged seats are preserved.
+
+Root leases and a journal-directory lock serialize cooperating cleanup. Recovery
+uses nonblocking exclusive root leases and preserves a still-held renderer root.
+Live owner tokens are skipped, including across concurrent converter instances;
+a stale PID number alone grants neither liveness nor signaling authority. Cleanup
+never signals a discovered PID. An external atomically published deleting receipt
+precedes descriptor-anchored content removal. An absent deleting root can retire
+its receipt; an absent ready root remains unknown. Nested symlinks are unlinked,
+and replaced root contents are not traversed. Unknown record/allocation names,
+partial writes, invalid schemas/duplicates/links/permissions or identity mismatch
+preserve evidence and refuse managed Office admission. Ordinary chat/default
+Office remain available through their existing paths; no automatic fallback is
+selected for a refused managed conversion.
+
+After `npm run build`, run:
+
+```sh
+AUGMENTOR_MANAGED_OFFICE_TEST=1 node --test --test-concurrency=1 \
+  tests/office-scratch-recovery.test.mjs \
+  tests/office-process-managed.test.mjs \
+  tests/harness-office-managed-chromium.test.mjs
+```
+
+The ten recovery cases use actual independent owners/helpers and private authored
+data. The admitted original entry startup is stopped before owner loss; it is not
+claimed as an independently traced Wasm-open/CPU-stage boundary. Kernel process
+tokens confirm all admitted actors are gone before cold recovery. Separate
+deleting-phase cases author valid phase receipts with data present/absent; they
+qualify restart interpretation, not power-loss or a killed real deletion syscall.
+Authored PID-reuse/prior-boot controls are separate from actual process death.
+Outside symlink targets and replaced/unknown roots stay exact. The full source
+cohort passes 298 Node/45 files/19 Chromium, focused Python passes43 and changed
+shared-helper native compatibility passes24, without skips/failures. Existing
+engine assets are reused; no heavy rebuild or installed change occurs.
+
+The journal is converter-initialized, often at first Office use after a cold
+restart. Normal completion removes data and receipts. Force loss can retain
+plaintext private copies until verified recovery; full profile backups can include
+them. This is not encryption, filesystem/network isolation or guaranteed recovery
+from every bootstrap/publication/power-loss window. Unverifiable pre-ready
+allocations are preserved, never guessed. Exact ordinary/sealed/installed package
+and rollback qualification, wider corpus/security/source/public packaging gates
+remain. [Data policy](../../docs/DATA-AND-SUPPORT.md#managed-office-recovery-copies--october-17)
+and [exact source/evidence](managed-scratch-recovery-qualification-20261017.json).
+
 ## MX managed Office resource limits — October 17
 
 `AUGMENTOR_OFFICE_BACKEND=linux-managed-wasm` selects an additional, uninstalled

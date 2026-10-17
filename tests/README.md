@@ -2147,6 +2147,17 @@ Original PDF preview: `harness-pdf-chromium.test.mjs` uses authored PDF/JPX byte
 
 ## Original Office preview qualification
 
+`office-scratch-recovery.test.mjs` adds ten Linux x64 cases for the profile-bound
+managed scratch journal: receipt-before-bytes, actual owner/cleaner loss and cold
+recovery, admitted real-entry startup/all-owner death (explicit manager opt-in),
+live and foreign-current owner refusal, authored PID/start/boot controls,
+outside-symlink preservation, replaced/unknown/linked/duplicate/partial metadata,
+held kernel lease refusal/release and deleting-phase restart interpretation.
+The deleting-phase receipts are authored controls, not power-loss evidence.
+Current 45-file/19-Chromium source cohort passes298, Python43 and separate changed
+shared-helper actual native compatibility24, without skips/failures. Default
+backends/owner installs are unchanged. [Data and recovery contract](../docs/HARNESS-OFFICE-PREVIEWS.md#managed-office-scratch-recovery--october-17).
+
 `AUGMENTOR_MANAGED_OFFICE_TEST=1 node --test --test-concurrency=1 tests/office-process-managed.test.mjs tests/harness-office-managed-chromium.test.mjs`
 requires a real MX systemd user manager/cgroup v2; absent explicit opt-in, these
 six resource/lifecycle cases and one original-GUI case skip. An opted-in missing

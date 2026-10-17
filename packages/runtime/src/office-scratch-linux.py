@@ -8,6 +8,7 @@ The native supervisor/broker hold a shared directory lease until they exit.
 import ctypes
 import fcntl
 import json
+import importlib.util
 import os
 from pathlib import Path
 import resource
@@ -26,12 +27,19 @@ def interrupted(_signum, _frame):
 def main():
     owner = int(sys.argv[1])
     parent = Path(sys.argv[2])
+    state = sys.argv[3] if len(sys.argv) == 4 else None
+    journal = None
+    if state:
+        spec = importlib.util.spec_from_file_location('office_journal', Path(__file__).with_name('office-scratch-journal.py'))
+        journal = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(journal)
     if owner <= 1 or os.getppid() != owner or not parent.is_absolute() or not shutil.rmtree.avoids_symlink_attacks:
         raise ValueError('Unconfirmed scratch owner.')
     owner_fd = os.pidfd_open(owner)
     parent_fd = os.open(parent, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW | os.O_CLOEXEC)
     root_fd = None
     name = None
+    registered = False
     try:
         if os.getppid() != owner or select.select([owner_fd], [], [], 0)[0]:
             raise InterruptedError('Scratch owner exited before allocation.')
@@ -43,6 +51,9 @@ def main():
         identity = os.fstat(root_fd)
         if identity.st_uid != os.getuid() or stat.S_IMODE(identity.st_mode) != 0o700:
             raise ValueError('Invalid private scratch directory.')
+        if journal:
+            journal.register(state, name, identity, parent_fd, owner)
+            registered = True
         # Readiness means both exact owner and cleanup authority are established.
         if os.getppid() != owner or select.select([owner_fd], [], [], 0)[0]:
             raise InterruptedError('Scratch owner exited before readiness.')
@@ -70,7 +81,15 @@ def main():
             original = os.fstat(root_fd)
             if not stat.S_ISDIR(current.st_mode) or current.st_uid != os.getuid() or stat.S_IMODE(current.st_mode) != 0o700 or (current.st_dev, current.st_ino) != (original.st_dev, original.st_ino):
                 raise ValueError('Office scratch identity changed.')
-            shutil.rmtree(name, dir_fd=parent_fd)
+            if registered:
+                journal.begin_cleanup(state, name, original)
+            if registered:
+                journal.remove_root(parent_fd, name, root_fd, {'dev': str(original.st_dev), 'ino': str(original.st_ino)})
+            else:
+                shutil.rmtree(name, dir_fd=parent_fd)
+            os.fsync(parent_fd)
+            if registered:
+                journal.finish_cleanup(state, name, original)
             os.close(root_fd)
         os.close(parent_fd)
         os.close(owner_fd)
@@ -83,6 +102,8 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, interrupted)
     signal.signal(signal.SIGINT, interrupted)
     try:
+        if len(sys.argv) not in (3, 4):
+            raise ValueError('Invalid Office scratch arguments.')
         main()
     except BaseException:
         sys.exit(1)

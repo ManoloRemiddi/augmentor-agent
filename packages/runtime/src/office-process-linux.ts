@@ -14,6 +14,7 @@ import {createLinuxOfficeScratch,type LinuxOfficeScratch} from './office-scratch
 import {OFFICE_PROCESS_SCHEMA,OFFICE_PROCESS_REQUEST_BYTES,OFFICE_PROCESS_REPLY_BYTES,processObject,processOptions,processRequest,processReply,type ProcessReply} from './office-process-protocol.js';
 import {processFileReceipt} from './office-process-files.js';
 import {officeProcessScope} from './office-process-scope.js';
+import {prepareLinuxOfficeScratchState} from './office-scratch-state.js';
 
 interface Root {scratch:LinuxOfficeScratch;stop:AbortController;operations:Set<Promise<unknown>>;closing:boolean;release?:Promise<void>;}
 const helper=fileURLToPath(new URL('./office-process-linux.py',import.meta.url));
@@ -28,14 +29,15 @@ export async function createLinuxProcessOfficeConverter(options:ConverterOptions
 }
 
 /** Explicit systemd-user/cgroup-v2 candidate; failure never selects an unbounded seat. */
-export async function createLinuxManagedOfficeConverter(options:ConverterOptions={}):Promise<OfficeConverter>{
- return processConverter(options,true);
+export async function createLinuxManagedOfficeConverter(options:ConverterOptions,stateDirectory:string):Promise<OfficeConverter>{
+ return processConverter(options,true,stateDirectory);
 }
 
-async function processConverter(options:ConverterOptions,managed:boolean):Promise<OfficeConverter>{
+async function processConverter(options:ConverterOptions,managed:boolean,stateDirectory?:string):Promise<OfficeConverter>{
  if(process.platform!=='linux'||process.arch!=='x64')throw unavailable();
  const fontDirectories=options.fontDirectories??[...new Set([...(process.env.XDG_DATA_DIRS??'/usr/local/share:/usr/share').split(':').filter(Boolean).map(p=>join(p,'fonts')),join(homedir(),'.fonts'),join(process.env.XDG_DATA_HOME??join(homedir(),'.local/share'),'fonts')])];
  const resolved=processOptions({...options,fontDirectories});
+ const scratchState=managed?await prepareLinuxOfficeScratchState(stateDirectory!):undefined;
  const lifetime=new AbortController(),operations=new Set<Promise<unknown>>(),roots=new Map<string,Root>();
  let tail:Promise<unknown>=Promise.resolve(),release:Promise<void>|undefined;
  function track<T>(pending:Promise<T>){operations.add(pending);pending.then(()=>operations.delete(pending),()=>operations.delete(pending));return pending;}
@@ -99,7 +101,7 @@ async function processConverter(options:ConverterOptions,managed:boolean):Promis
  }
  return {
   createScratch(){return track((async()=>{
-   lifetime.signal.throwIfAborted();const scratch=await createLinuxOfficeScratch();
+   lifetime.signal.throwIfAborted();const scratch=await createLinuxOfficeScratch(scratchState);
    if(lifetime.signal.aborted){await scratch.dispose();lifetime.signal.throwIfAborted();}
    const root:Root={scratch,stop:new AbortController(),operations:new Set(),closing:false};roots.set(scratch.directory,root);
    return {directory:scratch.directory,signal:AbortSignal.any([lifetime.signal,root.stop.signal,...(scratch.signal?[scratch.signal]:[])]),dispose:()=>releaseRoot(root)};

@@ -1,5 +1,26 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Managed Office recovery copies — October 17
+
+The uninstalled `linux-managed-wasm` candidate stores authorized document/PDF and
+nested entry copies under its private application state's `office-scratch/v1/data`.
+Private `records` contain only nonce root identity, device/inode, owner PID/start/
+boot identity and cleanup phase; they do not contain original workspace paths or
+document content. Directory/file access is restricted by UID/mode, not encryption.
+Normal settled cleanup removes copies and receipts. Total owner loss can leave
+copies until the next managed converter initialization, often first Office use
+after restarting. Full profile backups can include those copies and require the
+same private treatment. Unknown/replaced/linked state is preserved for inspection
+and blocks that optional Office backend; it does not erase conversations or source
+workspace documents. Recovery does not replay conversion, model requests or tools.
+The default/installed backend and current owner state are unchanged.
+[Contract, exact test scope and remaining limits](HARNESS-OFFICE-PREVIEWS.md#managed-office-scratch-recovery--october-17).
+
+## Earlier session-export foundation — historical
+
+The [current original session-download workflow](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
+supersedes the following foundation-only UI/authority gaps.
+
 [Session-export snapshot source](AUGMENTOR-HARNESS.md#session-export-archive-foundation--october-15)
 creates private temporary copies only when an internal caller explicitly invokes
 the API. Normal completion/cancel/close joins its producer and removes its own

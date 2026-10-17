@@ -6,13 +6,14 @@ import {fileURLToPath} from 'node:url';
 import {lstat,rm} from 'node:fs/promises';
 import type {OfficeScratch} from '../vendor/dsh-office/index.js';
 import {OfficeToPdfError} from '../vendor/dsh-office/errors.js';
+import {cleanupLinuxOfficeScratchState,type LinuxOfficeScratchState} from './office-scratch-state.js';
 
 /** A separate cleanup owner is ready before the MIT provider copies bytes. */
 export interface LinuxOfficeScratch extends OfficeScratch {readonly identity:Readonly<{dev:bigint;ino:bigint}>;}
-export async function createLinuxOfficeScratch():Promise<LinuxOfficeScratch>{
+export async function createLinuxOfficeScratch(state?:LinuxOfficeScratchState):Promise<LinuxOfficeScratch>{
   if(process.platform!=='linux')throw new OfficeToPdfError('unavailable','Native Office scratch ownership requires Linux.');
-  const parent=tmpdir(),helper=fileURLToPath(new URL('./office-scratch-linux.py',import.meta.url));
-  const child=spawn('/usr/bin/python3',['-I','-B',helper,String(process.pid),parent],{detached:true,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8'},stdio:['pipe','pipe','ignore']});
+  const parent=state?.parent??tmpdir(),helper=fileURLToPath(new URL('./office-scratch-linux.py',import.meta.url));
+  const child=spawn('/usr/bin/python3',['-I','-B',helper,String(process.pid),parent,...(state?[state.stateDirectory]:[])],{detached:true,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8'},stdio:['pipe','pipe','ignore']});
   const lifetime=new AbortController();let data='',directory:string|undefined,identity:{dev:bigint;ino:bigint}|undefined,disposing=false,failure:unknown,release:Promise<void>|undefined,killTimer:NodeJS.Timeout|undefined;
   let admit!:(value:unknown)=>void,reject!:(cause:unknown)=>void;
   const ready=new Promise<any>((resolve,fail)=>{admit=resolve;reject=fail;});
@@ -39,7 +40,8 @@ export async function createLinuxOfficeScratch():Promise<LinuxOfficeScratch>{
     if(child.exitCode===null&&child.signalCode===null){killTimer??=setTimeout(()=>child.kill('SIGKILL'),2000);killTimer.unref();}
     const code=await closed;
     // The live provider retains its exact-root fallback after guard loss.
-    try{const current=await lstat(directory!,{bigint:true});if(!current.isDirectory()||current.dev!==identity!.dev||current.ino!==identity!.ino||Number(current.mode&0o777n)!==0o700||current.uid!==BigInt(process.getuid!()))throw new OfficeToPdfError('failed','Office scratch identity changed.');await rm(directory!,{recursive:true,force:true});}catch(cause){if((cause as NodeJS.ErrnoException).code!=='ENOENT')throw cause;}
+    if(state)await cleanupLinuxOfficeScratchState(state,directory!,identity!);
+    try{const current=await lstat(directory!,{bigint:true});if(!current.isDirectory()||current.dev!==identity!.dev||current.ino!==identity!.ino||Number(current.mode&0o777n)!==0o700||current.uid!==BigInt(process.getuid!()))throw new OfficeToPdfError('failed','Office scratch identity changed.');if(state)throw new OfficeToPdfError('failed','Office recovery could not confirm cleanup.');await rm(directory!,{recursive:true,force:true});}catch(cause){if((cause as NodeJS.ErrnoException).code!=='ENOENT')throw cause;}
     let confirmed=false;try{const lines=data.trim().split('\n');confirmed=lines.length===2&&JSON.parse(lines[1]).released===true;}catch{}
     if(code!==0||!confirmed||failure)throw unavailable();
   })();}};
