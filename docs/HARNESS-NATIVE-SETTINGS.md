@@ -133,11 +133,11 @@ writes use the existing startup installer's small per-file snapshot/CAS mechanis
 do not copy whole launcher folders or weaken their directory checks just to archive
 additional metadata. Exact affected bootstrap paths still need binding before use.
 
-Before a matching Native update, preserve the existing configured voice provider.
-Read-only selection metadata confirms that the working primary uses `openai-live`,
-while the candidate still lacks its provider-specific Window/Controller path.
+Before a matching Native update, preserve configured voice-provider behavior.
+The candidate still lacks the existing alternate-provider Window/Controller path.
 Verified public 51272530/c1b2279a compatibility source is available; carry forward
 existing behavior without changing credentials, provider, services or GPU placement.
+Exact owner selections remain in private operator evidence.
 This preservation prerequisite does not reopen deferred voice expansion.
 
 No owner data, settings, service, selected app or project was changed. All local
