@@ -110,3 +110,27 @@ all callers; prepare the protected parent; capture once; bind data, Browser,
 configuration, reviews and clients; apply/finalize; reopen normally and verify the
 owner can continue the pilot. More transfers need pilot feedback; VR-RasterStudio
 stays in DSH. Voice expansion and later operating systems remain deferred.
+
+## Current owner readiness — October 18
+
+[Read-only preparation](../release/harness-mx-current-cut-preparation-20261018.json)
+revalidates the existing **48-input / ten-edit** configuration stage and renders
+**32 startup/registration images**. Only the review registry content changes,
+prospectively **20 to 21**; the installed helpers already match. Every exact
+before-hash, prospective selector and renderer must be recomputed/compared under
+the actual cold guard. This advisory plan is not permission to skip that guard.
+
+Three ordinary Native windows and both registered reviews are currently idle;
+the read-only DSH list explicitly reports no running sessions, and the registered
+workspace has no queued/running/dispatching jobs. The older Native
+`harness-preview` instance has an **unsent draft** and refuses safe shutdown. It
+was left untouched; the owner has been asked to save/finish it and close that
+window. Chromium exit/reload coordination also remains. Other older live reviews
+use separate stores outside this cut; their data and processes were preserved.
+
+[SDK run 39079128742](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39079128742)
+at source **16ba7d09** has passed the affected Linux publication/recovery step;
+the full Linux job is still running at this snapshot. Mac failed the shared-memory
+fixture step (cause unqualified), Windows is still running; no whole-matrix pass
+is claimed. No owner file, selector, data, model, maintenance reservation, stop,
+restart, archive or application copy was created by this live preparation.

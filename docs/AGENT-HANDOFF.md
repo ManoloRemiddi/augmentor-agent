@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX cut preparation](HARNESS-BROWSER-CODE-PUBLICATION.md#current-owner-readiness--october-18)
+verifies the 48-input stage and 32 prospective startup/registration images; only
+the registry content changes (20→21). Ordinary Native/reviews and DSH/workspace
+jobs are idle, but the older `harness-preview` has an unsent draft and refuses
+shutdown. Preserve it and wait for owner save/close; Chromium coordination remains.
+Linux hosted publication/recovery passes; full Linux job is still running at the
+recorded snapshot. No owner mutation or app copy. [Record](../release/harness-mx-current-cut-preparation-20261018.json).
+
 [Browser code publication](HARNESS-BROWSER-CODE-PUBLICATION.md) now binds the small
 extension code folder to client transaction **schema 4**, with exact atomic reverse
 and forward-only finalization. **167 Python** pass, including 23 Browser cases and
