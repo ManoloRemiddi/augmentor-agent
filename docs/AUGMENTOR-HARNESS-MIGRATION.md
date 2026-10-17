@@ -553,6 +553,14 @@ The established Desktop and Browser layout stays the baseline. Implementing an i
 
 ## Privacy and network policy
 
+The [October 17 exact packaged lifecycle proof](PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
+adds kernel-observed Host/descendant destinations and original-GUI page resources
+for fresh/cold, e37→b1 application update and rollback with Pi 1.1.0 unchanged.
+A default Linux source fresh/cold gate is now mandatory. This advances those
+bounded workflows; future pins, real external accounts/extensions/services,
+public installation and full privacy/migration qualification remain separate.
+No owner app or further real project is changed by this evidence-only checkpoint.
+
 The [October 13 managed SDK privacy correction](PI-PRIVACY.md) closes inherited
 environment precedence over a false Host setting, proven through real provider
 headers in three synthetic managed paths. Its destination inventory and pinned

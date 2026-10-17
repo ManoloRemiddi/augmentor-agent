@@ -1,5 +1,81 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Packaged MX lifecycle network qualification — October 17
+
+The unchanged current **b1edf4d2 / 20261017-061143-d0c0fc29** and preceding
+**e37d79b6 / 20261017-055628-b9afa698** now have direct packaged network evidence.
+The qualification starts the real bundled Host/SDK under `strace` before imports,
+follows descendant tasks and observes IP connect/send calls without a Node
+network monkeypatch, firewall, `PI_OFFLINE` or version-check suppression. Trace
+payload strings are suppressed. Actual child-process TCP/UDP loopback canaries
+prove that the observer detects destinations outside the allowlist, rather than
+merely producing an empty log. This requires Linux `strace` and permission to
+trace the caller’s own child tasks; Linux validation now installs that prerequisite.
+
+One authored profile runs fresh/cold on the predecessor, upgrades to the current
+artifact and rolls back to the predecessor. A second new profile runs fresh/cold
+on the current artifact. The default source path also runs fresh/cold, and is now
+a mandatory Linux test without needing private artifact paths. **Six packaged /
+two source phases** each use one original Send and inspect Trajectory, Context,
+Insights and Plugins. The only eight kernel IP attempts reach their explicitly
+configured local provider; all **528 page HTTP/resource requests** stay at their
+own Harness origins. No real owner content or provider account is used.
+
+The inherited environment deliberately enables Pi telemetry. Saved CLI settings
+enable install reporting, analytics, cache warming, a synthetic tracking ID and
+an unapproved package entry. Managed settings still omit unsolicited Pi provider
+attribution and the tracking ID, retain an explicit authored header, and leave
+those saved CLI/model/product bytes unchanged. Startup, cold reopening and GUI
+inspection send no model/cache-warming request. Every existing native prefix
+survives transition; no accepted request is replayed. Privacy is enforced by the
+existing managed owner policy, not by rewriting the CLI file or choosing a hidden
+test offline mode.
+
+A controlled delayed cold `draft.describe` verifies that the composer remains
+non-editable while loading. The test types only after the actual editor/focus
+state is ready and checks the inserted text before its one Send. Earlier Send
+unavailability observations and a diagnostic quoting defect remain in private
+logs; this driver correction is not a claimed product fix or proof of every
+older failure’s cause. The first controlled assertion expected a missing ARIA
+flag, but the real disabled control correctly includes it. The final assertion
+checks the actual disabled/editable contract. The initial network run also needed
+operator retirement of its own persistent prompt services. The final fixture
+waits for its exact test Host exit and retires only its own temporary services;
+it leaves browser helpers alone until browser exit.
+
+The final packaged cohort passes **20/20** across kernel/lifecycle, managed-core,
+prompt-improvement and specialist files. Supplemental current fresh/cold and
+normal source fresh/cold each pass their one multi-phase case, with no skips.
+Both immutable inventories verify after use (**24,686 / 24,689 inputs**), and all
+**1,120 source compiled files** still match the current artifact. Both actual MX
+review PIDs/all 36 protected file sets/hashes, shared rows, registry twelve,
+original menus/selections and Qwen/GPU/voice settings remain exact. No owner app
+restart/update, inference, additional project transfer or new runtime code follows.
+[Exact inputs and aggregate evidence](../release/harness-packaged-privacy-qualification-20261017.json).
+
+Run the default source gate after a normal build with:
+
+```sh
+node --test tests/kernel-network-audit.test.mjs tests/harness-privacy-upgrade-chromium.test.mjs
+```
+
+For separately verified package roots, set `AUGMENTOR_PI_TEST_ROOT` to the current
+release and `AUGMENTOR_PRIVACY_BASE_ROOT` to the prior release. The lifecycle test
+then adds the real upgrade/rollback pair. Set `AUGMENTOR_PRIVACY_CURRENT_FRESH=1`
+for a separate current-package fresh/cold check. An optional
+`AUGMENTOR_PRIVACY_PROOF_DIR` must be a fresh directory; otherwise temporary proof
+data is removed. Verify both seals before/after; supplying a directory alone is
+not an integrity check. This transition directly changes which immutable Host
+opens an authored profile; installed-opener/deployment transactions remain their
+separately qualified workflows.
+
+This is bounded workflow evidence for Pi **1.1.0** and these exact artifacts.
+Rerun it for a new pin/package. It is not a firewall, full-machine/browser egress
+or residency guarantee, and does not audit arbitrary extensions, real account
+refresh, configured external MCP/memory/speech services every browser transport protocol or every document worker.
+Those destination-specific gates, physical owner acceptance and later OS/public
+release remain separate. Further real projects still await the owner pilot feedback.
+
 [Session download](AUGMENTOR-HARNESS.md#original-session-download-workflow--october-15)
 is an explicit local operator action. It downloads saved conversation, declared
 upload and retained diagnostic contents through an opaque one-use grant; no

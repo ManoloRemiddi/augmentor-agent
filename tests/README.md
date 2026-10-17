@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[MX privacy lifecycle](../docs/PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
+adds `kernel-network-audit` (actual descendant TCP/UDP negative controls) and
+`harness-privacy-upgrade-chromium` (normal Linux source fresh/cold; explicit sealed
+roots add upgrade/rollback). Linux requires strace/self-child ptrace permission.
+The original Send/Context/Insights/Plugins workflow uses authored data, inherited
+telemetry opt-ins, payload-suppressed kernel traces and page-request observations.
+No network/offline guard hides Host traffic. Final counts and retained preliminary
+readiness/cleanup failures are in the owning qualification record.
+
 [Connected tools presentation](../docs/MCP-TRANSPORT.md#connected-tools-panel-in-the-original-plugins-page--october-17)
 uses the actual original/inspection GUI MCP flows plus partial/unknown receipt
 presentation checks. The GUI verifies both themes, four widths, footer visibility,

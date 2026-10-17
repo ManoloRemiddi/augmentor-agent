@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Packaged privacy lifecycle](PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
+now observes the actual unchanged e37d79b6/b1edf4d2 Host trees and original GUI:
+six packaged plus two default-source fresh/cold/upgrade/rollback phases, eight
+explicit synthetic model calls, zero unexpected IP/page destinations. Final
+20-case cohort plus current/source matrix checks pass; both seals and all 1,120
+compiled source inputs match. The Linux source gate runs automatically and now
+requires `strace`; future pins still need qualification. Both MX owner PIDs/all
+36 protected file sets/hashes, shared rows, registry twelve, menus/selections and
+GPU/voice settings remain exact. Tests/CI/docs only: no app update/restart or
+additional migration. [Evidence](../release/harness-packaged-privacy-qualification-20261017.json).
+
 [Connected tools settings](MCP-TRANSPORT.md#connected-tools-panel-in-the-original-plugins-page--october-17)
 now groups On/Off, sign-in and reconnect, with advanced tool access/JSON and
 separate technical evidence. Both themes at 1280/640/420/320 widths pass footer,
