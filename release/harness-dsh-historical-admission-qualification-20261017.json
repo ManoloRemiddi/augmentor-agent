@@ -68,7 +68,7 @@
     "dedicatedV3ColdNativeProfileRelocationPassed": true,
     "actualSdkAndOriginalGuiAuthoredCasesPassed": true,
     "ordinaryQualificationPending": false,
-    "exactSealedQualificationPending": true,
+    "exactSealedQualificationPending": false,
     "ownerAdoption": false,
     "nodeTestFiles": [
       "tests/dsh-checkpoint-frame.test.mjs",
@@ -155,7 +155,17 @@
     "ordinaryCompiledInputsVerified": 1117,
     "unchangedBaselineInputsVerified": 23554,
     "ordinaryShippedCodePublicCodecNativeGroups": 8,
-    "sameFrozenPreparationInSourceAndOrdinaryPass": true
+    "sameFrozenPreparationInSourceAndOrdinaryPass": true,
+    "sealedNodePass": 525,
+    "sealedPythonPass": 92,
+    "sealedShippedCodePublicCodecNativeGroups": 8,
+    "allSealedInputsVerified": 24679,
+    "compiledInputsVerified": 1117,
+    "sourceCodeAndCompiledInputsMatchExactSealed": true,
+    "sameFrozenRealPreparationInExactSealedPass": true,
+    "completedTemporaryQualificationCopiesRemoved": 3,
+    "exactSealedCandidateAndFrozenInputsRetained": true,
+    "publicBoundaryLicenseAndNoticeCasesPass": 16
   },
   "realFamilies": {
     "projects": 5,
@@ -243,5 +253,14 @@
     "Owner pilot feedback before any further real project transfers",
     "Physical compressed-source GUI browsing remains unavailable",
     "MX Linux first; voice and other OS deferred"
-  ]
+  ],
+  "applicationRef": "d157ffe190bdd91c600b8f76c2a2e3c2bd6a0e52",
+  "candidate": {
+    "releaseId": "20261017-045822-6b886151",
+    "applicationRef": "d157ffe190bdd91c600b8f76c2a2e3c2bd6a0e52",
+    "artifactSha256": "02b597295bb93dd9764d3f34e3ddb5f431b055d83306af549cd36e1d0d616bbe",
+    "inventoryEntries": 24679,
+    "compiledFiles": 1117,
+    "activated": false
+  }
 }

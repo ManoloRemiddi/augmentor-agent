@@ -188,14 +188,25 @@ parent/descendant record identities and archive manifests remain unchanged.
 Model labels in these private preparation assessments are placeholders; no
 model-route availability or real continuation claim is made.
 
-A fresh ordinary package also passes **525 Node / 92 Python**, eight shipped-code
-public-codec/native groups and all five frozen preparations, with **1,117 compiled
-inputs** matching and 23,554 unchanged baseline inputs verified. Exact sealed
-qualification remains separate and is recorded in the
-[admission evidence](../release/harness-dsh-historical-admission-qualification-20261017.json).
-Keep this separate from the earlier archive-only candidate below and from both
-running owner reviews. Owner pilot acceptance, guarded adoption and current
-catalogue/folder/cut/model checks remain before wider transfer.
+Source, fresh ordinary and exact separately sealed packages each pass **525 Node
+/ 92 Python**, eight shipped-code public-codec/native groups and the same five
+frozen preparations. **1,117 compiled inputs** match; 23,554 unchanged baseline
+inputs verify in the ordinary package. The exact sealed candidate verifies all
+**24,679 inputs** after tests: private unselected
+**20261017-045822-6b886151**, application **d157ffe1**,
+artifact SHA-256 **02b597295bb93dd9764d3f34e3ddb5f431b055d83306af549cd36e1d0d616bbe**. No selected or sealed root was patched.
+Completed temporary ordinary/test copies were removed after checking process
+references; the exact candidate, frozen inputs and proof records remain.
+
+Both owner reviews remain **20261016-220504-b91df2e4 / 1633e00f**. Their PIDs,
+all 36 protected regular path sets/hashes, registry, selected configurations and
+24,615 running sealed inputs verify unchanged. No additional owner target,
+restart, update or model request occurred. The
+[admission evidence](../release/harness-dsh-historical-admission-qualification-20261017.json)
+records exact source inputs, test membership and scope. This candidate is separate
+from the earlier archive-only build below and both running reviews. Owner pilot
+acceptance, guarded adoption and current catalogue/folder/cut/model checks remain
+before wider transfer. Source publication does not activate a candidate.
 
 ## Preceding packaged checkpoint — archive closure only
 

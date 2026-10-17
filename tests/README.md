@@ -9,7 +9,10 @@ interrupted-turn/adjacent-seed form and refuses incomplete cuts. Their runtime
 companions use the actual Pi SDK with an independent synthetic provider;
 `harness-dsh-historical-closures-chromium.test.mjs` checks the original Chat and
 Context controls, inspect-without-work, explicit fresh Send and cold reopen for
-all three forms. The v3 archive suite now also relocates a cold native profile
+all three forms. Source/fresh ordinary/exact sealed each pass 525 Node and 92
+Python, with 65 Node files/seventeen Chromium files/24 GUI cases, two workers and
+no skips. [Exact qualification and test membership](../release/harness-dsh-historical-admission-qualification-20261017.json).
+The v3 archive suite now also relocates a cold native profile
 with the former state/export unavailable. The eight-group public-codec operator
 proof constructs an authored physical v3 fork and runs the actual pinned codec
 chain. Real frozen projects are assessed read-only, never fixture-imported.

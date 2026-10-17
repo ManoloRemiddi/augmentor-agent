@@ -9,11 +9,14 @@ stay inert, inherited notices require captured ancestor ownership and the verifi
 seed cut, and interrupted compaction requires the exact adjacent seed form.
 No future event, child ownership, completion or old job is invented.
 
-Source build/type-check and fresh ordinary each pass **525 Node / 92 Python** (65 files/seventeen
+Source build/type-check, fresh ordinary and exact sealed each pass **525 Node / 92 Python** (65 files/seventeen
 Chromium/24 GUI cases), two workers/no skips; eight public-codec/native groups,
 actual SDK/original GUI continuation and dedicated v3 cold relocation pass with
-authored data. Ordinary shipped-code eight-group proof and the same five frozen
-preparations pass; 1,117 compiled inputs match. Exact sealed status is in the
+authored data. Shipped-code eight-group proofs and the same five frozen
+preparations pass in both packages; 1,117 compiled inputs match. Private unselected
+**20261017-045822-6b886151 / d157ffe1** verifies **24,679 sealed inputs**.
+Completed temporary copies were removed; exact candidate/inputs/evidence remain.
+The exact candidate hash and source/test membership are in the
 [admission record](../release/harness-dsh-historical-admission-qualification-20261017.json).
 Both owner reviews/all 36 protected regular files, PIDs, seals and selections
 remain unchanged. No extra real transfer, restart or model work. The older 23/64
