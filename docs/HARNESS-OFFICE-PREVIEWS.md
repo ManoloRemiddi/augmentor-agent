@@ -1,5 +1,27 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Rich document and original-GUI comparison — October 17
+
+The [reproducible rich-fixture diagnostic](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17)
+now compares the source-built and current default engines through the original
+provider on six authored DOC/DOCX/XLS/XLSX/PPT/PPTX files. All **16 pages** have equal
+text/page/image/font reports and raw pixels at 96 DPI, with source/cache ownership
+preserved. Required checks include writer headers/footers/tables/mixed fonts and
+pictures, sheet formula/cross-sheet results/literal text/hidden rows, and slide
+columns/pictures/footers/notes exclusions. Sample pages were visually inspected.
+
+The actual original GUI/current Thin Host also passes the rich three-page DOCX,
+font details, zoom, reload, invalid-file Retry/recovery and responsive close.
+Native/history/request evidence remains exact during previews. Kernel return
+values verify three source-built converter opens plus one driver hash read,
+zero default Wasm opens and no unresolved calls. GUI observations have zero
+errors/unexpected HTTP destinations. The fixture uses an authored synthetic seed;
+there is no real inference or document content sent to the model. Rich Calc/
+Impress GUI, custom fonts/large corpus, broad resource/security and full source/
+distribution/promotion acceptance are separate. No engine build/default or
+installed update, owner change or further real migration occurs.
+[Evidence](../release/office-rebuild/rich-documents-qualification-20261017.json).
+
 ## Emscripten runtime source companion — October 17
 
 The [runtime companion exporter](../release/office-rebuild/README.md#emscripten-runtime-source-companion--october-17)

@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Rich Office operator checks](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17):
+six authored formats/16 pages pass paired semantic/text/image/font/source/cache/
+raw-pixel checks. One actual original-GUI rich DOCX case passes all original
+font/zoom/reload/error/Retry/recovery/narrow-close controls; scoped kernel opens
+verify the Thin engine. No changes to the existing automatic GUI test, compiled
+app or installed owners; broad GUI/performance/security/release acceptance stays
+separate. Use the new commands in the owning guide with fresh private directories.
+
 [Office runtime source companion](../release/office-rebuild/README.md#emscripten-runtime-source-companion--october-17):
 ten new cases plus the preceding source/notice/packaging cohort pass **34 Python**,
 no skips. Actual pinned source matching, 15 library/one startup-object inputs,

@@ -1,5 +1,65 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Rich document and original-GUI comparison — October 17
+
+The [authored fixture generator](rich-office-fixtures.py) produces DOC/DOCX,
+XLS/XLSX and PPT/PPTX using the existing isolated native exporter. Writer files
+have three pages, headers/footers, tables, pictures, mixed fonts and accented/
+Greek/euro text. Sheets have two worksheets, merged headings, multiplication,
+SUM/cross-sheet results, hidden rows and literal formula-looking text. Three-slide
+decks have columns, pictures, footers and notes excluded from normal export.
+Native LibreOffice produces the fixtures; both preview paths use the actual Wasm
+Office provider. No owner document is used.
+
+```sh
+mkdir -m 700 "$PWD/outputs/office-new-rich-fixtures"
+/usr/bin/python3 -B release/office-rebuild/rich-office-fixtures.py \
+  "$PWD/outputs/office-new-rich-fixtures"
+node release/office-rebuild/compare-rich-candidate.mjs \
+  "$UNSELECTED_THIN_APP" "$UNSELECTED_BASELINE_APP" \
+  "$PWD/outputs/office-new-rich-fixtures" "$PWD/outputs/office-new-rich-comparison"
+node release/office-rebuild/rich-office-gui-probe.mjs \
+  "$UNSELECTED_THIN_APP" "$PWD/outputs/office-new-rich-fixtures" \
+  "$PWD/outputs/office-new-rich-gui"
+```
+
+Use the already prepared current-GUI Thin candidate and a separate private
+baseline app with the original entry/engine. Neither may be a sealed deployment;
+read-only diagnostic wrappers are not deployable artifacts. Every output must be
+new. Generation needs the existing x64/Debian LibreOffice/bubblewrap/Liberation
+payload described below; it installs nothing. Comparison also needs Node 24.19.0,
+locked Sharp and Poppler. GUI qualification needs Chromium and the root's locked
+SDK. The original GUI/proof fixture source remains unchanged.
+
+All six richer files pass the paired original-provider check across **16 pages**:
+exact required text and exclusions, equal text/page/image/missing-font results,
+unchanged source bytes, owned cache bytes and identical raw pixels at **96 DPI**.
+The DOCX fallback reports the authored missing font in both engines. Rendered
+sample Writer/Calc/Impress pages were visually inspected. Raw PDF hashes differ;
+the comparison verifies text and rendered pixels rather than metadata identity.
+The single sequential pair's timings are observations, not performance acceptance.
+
+The separate actual original-GUI/Thin Host case passes the rich three-page DOCX,
+header/footer text layer, original font details, zoom, reload, malformed-file
+error/Retry/recovery, narrow fullscreen and close/cleanup. Native history and
+the synthetic provider request log remain exact during previews. Scoped kernel
+evidence confirms three converter descendant/thread opens of the source-built
+Wasm, plus one driver identity-hash read, and zero default Wasm opens. There are
+no unresolved target calls. This is not a whole-machine/network audit; the GUI
+observer records zero errors/unexpected HTTP destinations. One authored seed is
+used, with no real provider inference or document content submitted to a model.
+
+The GUI case is DOCX only; rich Calc/Impress results above are provider comparisons.
+Full custom-font/large-corpus/resource/security, complete source delivery/rebuild/
+third-party coverage and promotion/rollback remain separate. Both installed MX
+reviews and their data/services stay unchanged; public packaging remains refused.
+[Qualification](rich-documents-qualification-20261017.json).
+
+The preceding `90dd25ef` Linux SDK job passes; its full Debian validation remains
+in progress at this checkpoint. This operator-diagnostics/documentation commit
+uses the CI skip instruction to preserve that existing run. It changes no
+compiled runtime, GUI or automatic test and claims no new-head/whole-workflow pass.
+
 ## Emscripten runtime source companion — October 17
 
 [`collect-runtime-inputs.py`](collect-runtime-inputs.py) complements the verified

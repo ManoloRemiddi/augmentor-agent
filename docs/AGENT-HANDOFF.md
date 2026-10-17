@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Rich Office comparison](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17)
+passes six authored formats/16 pages through both actual providers: required text/
+exclusions, page/image/font/cache/source and identical 96-DPI raw pixels. Actual
+original GUI/Thin Host passes rich three-page DOCX/font details/zoom/reload/error/
+Retry/recovery/narrow close, with exact native/history/request logs. Kernel opens
+confirm three converter Thin Wasm reads plus one identity-hash read, zero default
+Wasm opens/unresolved calls. Zero observed GUI errors/unexpected HTTP destinations;
+synthetic seed only/no real inference. All owner files/shared state/seals/services
+remain. These are operator diagnostics, not an installed/default engine update.
+Rich Calc/Impress GUI, large/custom-font/resource/security/source-distribution and
+promotion remain open; public gate stays intact.
+[Evidence](../release/office-rebuild/rich-documents-qualification-20261017.json).
+The preceding 90dd25ef Linux SDK job passes; Debian 39013782461/117341843619
+continues. This operator-only diagnostic/docs commit preserves that run with the
+skip instruction; no compiled app/automatic test or new-head acceptance changes.
+
 [Office runtime source companion](../release/office-rebuild/README.md#emscripten-runtime-source-companion--october-17)
 retains the pinned public Emscripten archive/eleven notices and verifies 4,890
 selected source files. Two SDK version/revision overlays are explicit. The final
