@@ -22,7 +22,7 @@
     "supplierMITNoticesPreserved": true
   },
   "qualification": {
-    "phase": "source and ordinary passed; exact sealed pending",
+    "phase": "source, ordinary and exact separately sealed passed; no owner adoption",
     "sourceCheckBuildPass": true,
     "focusedUnitAndSdkPass": 29,
     "focusedChromiumPass": 1,
@@ -63,7 +63,12 @@
     "ordinaryUnchangedBaselineInputsVerified": 23517,
     "compiledFilesVerified": 1114,
     "sameFrozenRealArgumentCheckPassedByOrdinary": true,
-    "existingTwoParentFileProjectStillPrepares": true
+    "existingTwoParentFileProjectStillPrepares": true,
+    "exactSealedNodePass": 345,
+    "exactSealedPythonPass": 55,
+    "sameFrozenRealArgumentCheckPassedBySeal": true,
+    "sealedEntriesVerified": 24643,
+    "ownerAdoption": false
   },
   "sameFrozenRealExport": {
     "parents": 4,
@@ -82,5 +87,26 @@
     "Guarded owner adoption of a qualified candidate",
     "Owner pilot feedback before further real transfers",
     "Voice and later OS rollout deferred"
-  ]
+  ],
+  "applicationRef": "016f44cebc9c1cbe0c2254ba85cf4e5a92c5ac0a",
+  "implementationRef": "016f44cebc9c1cbe0c2254ba85cf4e5a92c5ac0a",
+  "separatelySealedCandidate": {
+    "releaseId": "20261017-024110-584cc337",
+    "applicationRef": "016f44cebc9c1cbe0c2254ba85cf4e5a92c5ac0a",
+    "artifactSha256": "eeae2a2df7a7ff7e2bd52eedf774808729f2f60c865649581659408b403005b1",
+    "activated": false,
+    "inventoryEntriesVerified": 24643,
+    "compiledFilesVerified": 1114,
+    "runningReviewsAdopted": false,
+    "ownerDataCopied": false
+  },
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "protectedOwnerFilesExact": 36,
+    "completeProtectedRegularFileSetsAndHashesExact": true,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
+  }
 }

@@ -4,8 +4,11 @@
 preserve attested v4 validation errors as labelled history with exact argument
 text in the original Chat/Trajectory. No replay or fabricated argument object.
 The same four-parent real export passes the argument check but still refuses a
-separate recovery format; it is not ready for transfer. Source/ordinary checks each pass **345 Node / 55 Python** (fifty files/fifteen
-Chromium files), with 1,114 compiled files matching. Exact sealed qualification is pending; existing reviews and the pilot-feedback gate remain unchanged.
+separate recovery format; it is not ready for transfer. Source/ordinary/exact
+sealed each pass **345 Node / 55 Python** (fifty files/fifteen Chromium files), with 1,114 compiled files matching. Private unselected
+**20261017-024110-584cc337 / 016f44ce** verifies 24,643 sealed inputs;
+both owners/all 36 protected files, registry and selections remain exact.
+Existing reviews and the pilot-feedback gate remain unchanged.
 [Evidence](../release/harness-dsh-arguments-qualification-20261017.json).
 
 [Audio processor cleanup and POSIX qualification](PI-VOICE.md#audio-processor-lifecycle-and-hosted-posix-qualification--october-16-2026)

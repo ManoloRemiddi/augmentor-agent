@@ -1327,5 +1327,21 @@ and reply continuation, and original Chat/Trajectory/reload checks. The fresh or
 1,114 compiled inputs match and 23,517 unchanged baseline inputs verify. Both
 phases retain the existing two-parent real-file preparation regression and the
 same four-parent argument-check/next-refusal result. Exact sealed qualification
-is pending. Both existing MX reviews stay on their current build. Adoption is separate. MX first; voice,
+is recorded below. Both existing MX reviews stay on their current build. Adoption is separate. MX first; voice,
 Windows, macOS and other Linux distribution rollout remain deferred.
+
+
+The exact private unselected candidate **20261017-024110-584cc337**, application
+**016f44cebc9c1cbe0c2254ba85cf4e5a92c5ac0a**, SHA-256
+**eeae2a2df7a7ff7e2bd52eedf774808729f2f60c865649581659408b403005b1**, passes the same **345 Node / 55 Python** checks.
+All **24,643 sealed / 1,114 compiled inputs** verify after testing. The same frozen
+real export retains two attested argument failures and still refuses the next
+recovery format; the existing two-parent real-file preparation regression passes.
+Test/development dependencies and private assessment data stay external. Use the
+qualified converter/GUI together for this format: earlier adapters do not understand
+the versioned raw-text marker. Existing imported conversations are unchanged.
+Both owner PIDs, complete regular path sets/hashes of all 36 protected files,
+registry and installed selections remain exact; their 24,615-input running seal
+verifies unchanged. No owner update, restart, additional transfer or real model
+work occurred. Guarded adoption, pilot acceptance and remaining source formats
+are separate gates. Voice and later OS rollout remain deferred.

@@ -4,8 +4,11 @@
 preserve attested v4 validation errors as labelled history with exact argument
 text in the original Chat/Trajectory. No replay or fabricated argument object.
 The same four-parent real export passes the argument check but still refuses a
-separate recovery format; it is not ready for transfer. Source/ordinary checks each pass **345 Node / 55 Python** (fifty files/fifteen
-Chromium files), with 1,114 compiled files matching. Exact sealed qualification is pending; existing reviews and the pilot-feedback gate remain unchanged.
+separate recovery format; it is not ready for transfer. Source/ordinary/exact
+sealed each pass **345 Node / 55 Python** (fifty files/fifteen Chromium files), with 1,114 compiled files matching. Private unselected
+**20261017-024110-584cc337 / 016f44ce** verifies 24,643 sealed inputs;
+both owners/all 36 protected files, registry and selections remain exact.
+Existing reviews and the pilot-feedback gate remain unchanged.
 [Evidence](../release/harness-dsh-arguments-qualification-20261017.json).
 
 [Legacy child settlement reasoning](HARNESS-DSH-MIGRATION-PILOT.md#legacy-child-settlement-reasoning--october-17) preserves documented older manager notices as attributed historical data, with no invented human/provider turn or live child. One identical real export/four parents now passes corrected preparation after refusing the preceding converter. Source/ordinary/exact sealed each pass **190 Node / 47 Python**; private unselected **20261017-005619-4a45cc63 / 335df05a** verifies 24,631 sealed/1,108 compiled inputs. Both owner PIDs/all 36 protected regular files, registry and selections stay exact; no adoption or further transfer. Owner pilot feedback still gates further transfers. [Evidence](../release/harness-dsh-settlement-qualification-20261017.json).
