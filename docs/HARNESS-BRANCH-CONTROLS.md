@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Historical Branch test interception lifecycle — October 17
+
+The `1417db62` Debian run finishes with **2,127 pass / one failure / 52 skips**,
+before packaging. The historical v1 Branch test reports `Fetch domain is not
+enabled`: a queued automatic CDP continuation races explicit domain disable.
+The fixture now leaves Fetch enabled for its private browser lifetime and clears
+its selected paused-method set after fulfilling the held reply. Later requests
+continue; no CDP/page error, application assertion or timeout is suppressed.
+Both original-GUI **v1 JSON / v2 bundle** cases pass: one child, lost acknowledgement,
+newer draft preservation, cold reconciliation and explicit Send from the exact
+historical prefix, with unchanged parent/archive evidence. Product code and owner
+projects are unchanged. Fresh full hosted acceptance remains separate.
+[Exact hosted failure and corrected GUI evidence](../release/harness-branch-fetch-lifecycle-qualification-20261017.json).
+
 [Linux attested publication recovery](HARNESS-BRANCH-PUBLICATION.md) extends the
 exact-boundary journal below. Explicit retries finish a verified native/display/
 metadata publication after denied writes or process death, preserving the same

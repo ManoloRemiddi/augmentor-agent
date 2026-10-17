@@ -5,6 +5,13 @@ remain **97d95d58 / 20261017-095821-fb78d6df**, with the original DSH GUI and
 default Office engine. No additional owner project transfer is authorized before
 pilot feedback; voice and later OS work stay deferred.
 
+[Historical Branch test lifecycle](HARNESS-BRANCH-CONTROLS.md#historical-branch-test-interception-lifecycle--october-17)
+corrects a queued CDP continuation/Fetch-disable race without filtering errors.
+Both original v1/v2 cases pass; prior1417db62 Debian ends2,127/one failure/52 skips
+before packaging. Product code is unchanged. Currentc351558f normal CI continues
+with its existing test revision; this test/docs-only checkpoint preserves that
+run and claims no whole-workflow approval.
+
 [Stopped cleanup owner correction](HARNESS-OFFICE-PREVIEWS.md#stopped-cleanup-owner--october-17)
 adds a verified kernel SIGCONT wake before scratch admission. A real old-runtime
 negative reproduces suspended-helper retention after owner death. Four new actual

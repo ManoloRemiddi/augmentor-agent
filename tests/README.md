@@ -119,6 +119,12 @@ against the saved local model. A preserved unanswered approval is a refusal, not
 a passing write. Live evidence is separate from the 525/92 code cohort and the
 actual public-codec derivation proof; no real owner history is used.
 
+Historical Branch interception keeps CDP Fetch enabled for the authored browser
+lifetime, clearing paused RPC selection after the held acknowledgement. This
+prevents queued continuation/domain-disable races without filtering errors.
+Both original v1/v2 GUI cases pass unchanged child/draft/cold/send/history checks.
+[Hosted failure and corrected evidence](../docs/HARNESS-BRANCH-CONTROLS.md#historical-branch-test-interception-lifecycle--october-17).
+
 Historical admission coverage: `dsh-deferred-settlement.test.mjs` checks the
 private complete-v3 catalogue capability, exact quoted child proposals, source
 cuts and forged/foreign/opaque refusals. `dsh-inherited-settlement.test.mjs`
