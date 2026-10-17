@@ -1,5 +1,46 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Completed-build source and notice export — October 17
+
+[`collect-source-inputs.py`](collect-source-inputs.py) exports the already completed
+ThinLTO diagnostic's source inputs to a new private directory. It checks the exact
+terminal producer, engine assets, Core/Emsdk revisions, source diff and resource
+drivers before copying anything. No builder restarts, engine adoption, network
+fetch or model request is involved. Two small read-only/no-network XSLT containers
+use the pinned builder image to reproduce the original generated licence files.
+
+```sh
+python3 -B release/office-rebuild/collect-source-inputs.py \
+  --cache "$BUILT_CACHE" --producer "$TERMINAL_CONTAINER" \
+  --output "$PWD/outputs/office-new-source-inputs"
+```
+
+The actual corrected export contains **123 files / 661,286,937 bytes**: committed
+Core/Emsdk snapshots, the exact separate Core patch, 65 external files verified
+against Core's `download.lst`, 59 unpacked-source receipts, recipe/resource/build
+inputs, and the generated `LICENSE`, `LICENSE.html` and `NOTICE`. Both generated
+licence files reproduce byte-for-byte using the actual build configuration.
+
+An initial export used `git archive`, which honours Core's `export-ignore` and
+omits tracked schema sources. Its directory/log and the failing authored regression
+are retained. The corrected exporter streams Git blobs directly. Independent
+inspection verifies all **149,173 Core files, including 58 schema files**, and all
+**138 Emsdk files** against their committed Git object IDs. The exported patch
+applies to restored original files and reconstructs all **33 modified Core files**
+exactly. Source/default/installed engines and the completed build remain unchanged.
+
+The new eight-case source-export suite plus existing Office/private-public notice
+and packaging checks pass **24 Python tests**, no skips. Shell/Make evaluation,
+unsafe identities/paths, linked inputs, changed sources and existing outputs refuse.
+Committed source survives export-ignore; generated/uncommitted files are excluded.
+[Qualification](source-inputs-qualification-20261017.json).
+
+This is a verified **input export**, not a claim of complete corresponding source
+or public distribution approval. Three Core gitlinks are explicitly excluded and
+recorded. Emscripten runtime/toolchain source and notices, submodule scope, complete
+rebuild/source delivery, representative documents/fonts/resource/security and
+installed promotion/rollback remain separate. The public Office gate stays intact.
+
 The repaired low-optimization **full-LTO** attempt is now terminal: exit 1,
 OOMKilled=true, exact **8 GiB** peak/zero swap at final link. Its failed tree is
 retained. The separate [ThinLTO driver](run-thin-lto.sh) requires a **fresh Core

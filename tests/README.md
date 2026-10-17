@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Office source-input export](../release/office-rebuild/README.md#completed-build-source-and-notice-export--october-17):
+eight new cases plus Office/notice/packaging checks pass **24 Python**, no skips.
+The export-ignore omission is reproduced and corrected. Actual 123-file export,
+all committed Core/Emsdk blobs, 33-file patch reconstruction and two byte-identical
+generated licence files have separate independent verification. No app build,
+installed update, source-closure/public redistribution approval is inferred.
+
 [Historical decoder preflight](../docs/HARNESS-DSH-LEGACY-FAMILIES.md#decoder-prerequisite--october-17):
 source **52 Python / 90 Node**, no skips, including a real missing-decoder CLI
 subprocess with zero loopback connections/no source or output changes. The

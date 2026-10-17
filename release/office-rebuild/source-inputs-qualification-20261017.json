@@ -1,0 +1,145 @@
+{
+  "schema": "augmentor-office-source-inputs-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Private Linux source-input/notice export of existing completed ThinLTO engine; no installed or default engine change",
+  "sourceEvidenceBaseRef": "bcf53e479b11e122db5341b1d9e423b4421013b0",
+  "toolSha256": "f2381fed6a8bc70bf798d54171831c522da026c1bcc3f7001890df702983dc6f",
+  "testsSha256": "25c16589cc36fd3654bfbb7e104a0bb645772853f089b0dae4d0c99adbe73c0f",
+  "engine": {
+    "coreCommit": "bce0998afefdbc355585ca324285661a2170ba77",
+    "emsdkCommit": "5eb0bde7585670252e8ba05e9d361627bffd08b5",
+    "wasmSha256": "b6459203d1b9ca41ddf5945d6bfa02e5f1b9a9f8f33a438a9fd32b9a150c4c1d",
+    "builderImageId": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924",
+    "producerVerifiedTerminal": "exit 0; OOMKilled false; exact mount/image/assets/revisions/source diff",
+    "engineBuildsStarted": 0
+  },
+  "export": {
+    "files": 123,
+    "bytes": 661286937,
+    "allExportedFilesHashVerified": true,
+    "externalInputs": 65,
+    "externalBytes": 271432562,
+    "allExternalFilesMatchCoreDownloadSha256Pins": true,
+    "unpackedSourceReceipts": 59,
+    "committedSnapshots": {
+      "core": {
+        "allCommittedBlobPathsExact": true,
+        "allGitBlobObjectIdsExact": true,
+        "files": 149173,
+        "schemaFiles": 58,
+        "gitlinksExcludedAndDisclosed": true
+      },
+      "emsdk": {
+        "allCommittedBlobPathsExact": true,
+        "allGitBlobObjectIdsExact": true,
+        "files": 138,
+        "schemaFiles": 0,
+        "gitlinksExcludedAndDisclosed": false
+      }
+    },
+    "corePatchRestoresActualModifiedFiles": 33,
+    "sourceArchives": {
+      "source/core.tar.gz": {
+        "bytes": 388087194,
+        "sha256": "f5e51b8be1e3fbafd612647a483dee34526047fce7a6f3214c1b6f43f95adcae"
+      },
+      "source/emsdk.tar.gz": {
+        "bytes": 199476,
+        "sha256": "8105c88a91fd9683065a68a7952f9183e8a2ba4e6f17e6d19f4a6ac0881b7aac"
+      }
+    },
+    "sourceManifestSha256": "e57aac45ba485cbefa144172539bd36602bc3ab8890303eb72bef15ef6ef4f94",
+    "coreGitlinksExcludedAndDisclosed": [
+      "160000 commit f635f236d61598d9ea701150bab1829b2d57ed29\tdictionaries",
+      "160000 commit 01137682c74914a5a5483fdfcd1a132444599aca\thelpcontent2",
+      "160000 commit 611044787da34e99d9ad5e587a521fccb4a1226f\ttranslations"
+    ],
+    "preferredSourceRecipesAndResourceControlsIncluded": true
+  },
+  "notices": {
+    "fullGeneratedLicenseBundleCopied": true,
+    "textAndHtmlReproduceByteForByte": true,
+    "reproductionSha256": {
+      "LICENSE": "31c915ae5b7eafe51f06fc2537d2e7fefdee08e40d6b0d761d03d9f0fd58d660",
+      "LICENSE.html": "77c8257a2128c2450f5c898f015f8af5cf84ada025df5289d1821be65f92b215"
+    },
+    "source": "Exact Core licence XML/stylesheets and actual config_host.mk BUILD_TYPE/OS/WITH_THEMES/MPL_SUBSET; pinned image xsltproc",
+    "execution": "Two read-only/no-network one-CPU/256-MiB diagnostic containers; no builder restart"
+  },
+  "qualification": {
+    "pythonTests": 24,
+    "pythonPass": 24,
+    "pythonFailures": 0,
+    "pythonSkip": 0,
+    "newSourceExportCases": 8,
+    "testFiles": [
+      "test_office_source_inputs.py",
+      "test_office_engine_packaging.py",
+      "test_nested_package_notices.py",
+      "test_codex_packaging.py"
+    ],
+    "coverage": [
+      "Literal upstream variable expansion; shell/Make execution and cycles refused.",
+      "Duplicate/unsafe/missing identities, linked/changed inputs and existing output refused.",
+      "Independent copied bytes; exact committed source despite export-ignore; generated/uncommitted files excluded.",
+      "Actual source blob paths/object IDs and patch reconstruction verified independently.",
+      "Existing Office public packaging refusal and notice/native identity boundaries retained."
+    ],
+    "newCompiledRuntimeOrGuiTestsClaimed": false,
+    "newHostedAcceptanceClaimed": false
+  },
+  "retainedInitialFailure": {
+    "firstExporter": "git archive honoured upstream export-ignore and omitted tracked schema files",
+    "authoredRegressionFailures": 1,
+    "initialExportAndFailingLogRetained": true,
+    "correction": "Stream committed blobs with git cat-file; full exported source membership verified",
+    "sourceEngineOrDependenciesChanged": false
+  },
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      },
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 16,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "publicRedistributionQualified": false,
+  "remaining": [
+    "Emscripten/runtime/toolchain source and third-party notice coverage.",
+    "Submodule inclusion/exclusion and full source-closure/rebuild proof.",
+    "Representative document/font/resource/security and installed/rollback qualification.",
+    "Public source delivery and final packaging approval."
+  ]
+}

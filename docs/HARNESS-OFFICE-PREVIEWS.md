@@ -1,5 +1,25 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Completed-build source and notice export — October 17
+
+The [private source-input exporter](../release/office-rebuild/README.md#completed-build-source-and-notice-export--october-17)
+now retains exact committed Core/Emsdk sources, the applied Core patch, recipe,
+65 pinned external files/59 unpacked receipts and the actual generated full licence
+bundle. Both generated licence files reproduce byte-for-byte. A first `git archive`
+attempt omits tracked schema files; its export and failed regression remain.
+Direct blob export independently verifies **149,173 Core / 138 Emsdk files**,
+including 58 schema files. Applying the exported patch reconstructs all 33 changed
+Core files exactly. The 123-file export totals 661,286,937 bytes.
+
+Eight new source-export cases and existing notice/Office packaging checks pass
+**24 Python tests**, no skips. No engine compile, dependency/default change,
+installed adoption, owner inference or additional migration occurs. Existing
+reviews, protected files/shared state and services verify unchanged. This narrows
+the source/notice packaging gap; Emscripten runtime/toolchain and submodule scope,
+complete source delivery/rebuild, broader document/font/resource/security and
+promotion remain open. The public packaging gate is unchanged.
+[Evidence](../release/office-rebuild/source-inputs-qualification-20261017.json).
+
 ## Current original GUI with the source-built engine — October 17
 
 The completed ThinLTO engine now passes a separate **current-GUI functional**

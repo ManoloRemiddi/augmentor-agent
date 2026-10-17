@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Completed-build Office source/notice export](../release/office-rebuild/README.md#completed-build-source-and-notice-export--october-17)
+reproduces both generated licences and retains 123 verified files/65 pinned
+externals/59 unpacked receipts. Direct Git-blob archives preserve all 149,173 Core
+and 138 Emsdk files, including 58 schema files omitted by the initial `git archive`
+attempt. The separate patch reconstructs 33 changed Core files exactly; the first
+export and failed regression remain. Source/export/notice/packaging cohort passes
+24 Python/no skips. No builder restart or default/installed engine update; owners,
+all 36 protected file sets/shared state/seals/services remain. Runtime/toolchain/
+submodule/source delivery and wider Office acceptance still need closure; public
+packaging remains refused. [Evidence](../release/office-rebuild/source-inputs-qualification-20261017.json).
+
 [Historical capture decoder preflight](HARNESS-DSH-LEGACY-FAMILIES.md#decoder-prerequisite--october-17)
 declares `zstd` in the Debian runtime dependencies and checks it before DSH client
 creation/source capture. Missing decoder produces a clear operator error, zero

@@ -2,6 +2,8 @@
 
 [Current MX review and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17) · installed queue-control correction, main/pilot menu entries, available core features, verified preservation and current CI/public-packaging limits.
 
+[Office source/notice export](../release/office-rebuild/README.md#completed-build-source-and-notice-export--october-17) · verified Core/Emsdk snapshots, patch reconstruction, pinned external inputs and byte-for-byte licence generation; remaining public packaging scope.
+
 [Historical capture prerequisite](HARNESS-DSH-LEGACY-FAMILIES.md#decoder-prerequisite--october-17) · declared `zstd` runtime dependency and an actionable preflight before DSH contact or source capture; current installed reviews stay unchanged.
 
 [Source-built Office/current GUI](HARNESS-OFFICE-PREVIEWS.md#current-original-gui-with-the-source-built-engine--october-17) · existing completed engine reused, seven private functional/compatibility cases, actual Wasm file evidence and current Linux CI result; public packaging gate stays intact.
