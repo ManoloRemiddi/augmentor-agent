@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Actual custom configuration staging](HARNESS-DSH-INSTALLATION.md#preserved-custom-integration-stage--october-17)
+now preserves the edited peer metadata and exact profile outside two proposed
+module changes. Twenty-one retained module paths require separate qualification;
+this does not activate the profile or prove real historical/model continuation.
+Fresh cold backups, matching clients, immutable activation/reverse and pilot
+feedback remain required.
+
 [Modern Linux setup qualification](HARNESS-DSH-INSTALLATION.md) closes the fresh
 0.2 integration install/preset-registration gap. Actual custom owner migration,
 matching clients, guarded shared-store adoption and real continuation acceptance

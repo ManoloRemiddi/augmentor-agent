@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+`test_dsh_preservation.py` adds 11 authored Linux cases for private staging,
+precise module edits and provenance/stale/tamper/link refusal. The exact CLI is
+exercised without profile execution. `test_dsh_modern_setup.py` also checks that
+preserved ownership cannot be overwritten by normal setup. Linux SDK inspection
+uses a hash-pinned PyYAML wheel; source focus is 85 cases. Actual owner staging and
+its 21 retained dependencies remain distinct from full runtime/cutover acceptance.
+[Scope](../docs/HARNESS-DSH-INSTALLATION.md#preserved-custom-integration-stage--october-17).
+
 Linux modern DSH setup: `test_dsh_modern_setup.py` uses authored manifests/profile
 text and real filesystem transactions to test family pins, role declarations,
 custom-expression/metadata preservation, external library retention and rollback.

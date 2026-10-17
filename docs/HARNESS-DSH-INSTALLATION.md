@@ -2,6 +2,77 @@
 
 # Linux DSH integration installation
 
+## Preserved custom integration stage — October 17
+
+Source **3777cc92961fc3d21c84cf3a1390970fcea851cb** adds `scripts/stage-dsh-preservation.py stage` and `verify`.
+They prepare and verify a private review directory; they do **not** install,
+execute a profile, start/stop DSH, update launchers or modify an owner file.
+Activation is deliberately absent from this command. It still requires an
+immutable qualified incoming artifact, full cold backups, matching clients and
+transaction/reverse acceptance; this preparation is not a replacement for them.
+
+The stage binds the exact modern CLI/SDK metadata, original package provenance,
+owned/active Browser code, peer edits, owned preset files, profile/settings/token
+inputs and incoming integration bytes. An active compatibility Browser copy must
+match the recorded owned code. Original package metadata must match the recorded
+supplier hash; existing edits must be confined to peer dependencies explicitly
+supporting the tested modern SDK. Those peer values are retained in the candidate
+package while incoming public package metadata/version/code supplies the upgrade.
+Unrecognized code, metadata or preset edits refuse rather than being discarded.
+
+Custom YAML is parsed as bounded nodes only: no `!!js` construction/evaluation,
+no YAML 1.1 value conversion and no full-document serializer. Only identified
+owned module-name scalar spans are replaced. Comments, Unicode, prompts, custom
+settings, `off`, expressions, Browser overrides and other plugins remain exact.
+Aliased/duplicate/ambiguous structures refuse. Both existing declarative role IDs
+must remain present. New preserved ownership records the deliberate migration,
+not a forged historical insertion or reset of an edited-file checksum. Normal
+setup refuses overwriting that ownership and requires another reviewed migration.
+
+The output contains a candidate patch, small plugin files and a private plan with
+concrete module edits, input/output hashes and retained module references. It must
+be an absent directory outside the application/profile; output files are private.
+`verify --sha256` checks the reviewed plan hash, staged assets and current inputs.
+A changed profile, supplier, staged asset or newly created optional configuration
+refuses. Partial output is removed only from the newly allocated owned stage;
+existing output and all input bytes are preserved. Use the disposable build
+workspace for rehearsal; do not retain another full application per checkpoint.
+
+### Actual profile evidence and remaining graph qualification
+
+The actual profile currently loads Browser code from a separate compatibility
+folder. Its code matches the owned expected hash, and its package matches the
+owned edited package; the original supplier package satisfies the recorded hash.
+The actual preservation stage succeeds against **28 bound inputs**, proposes
+**two module-reference changes**, and keeps peer settings exact. No real profile
+is executed or owner file changed. The temporary stage is removed afterward;
+small private plan/receipt evidence is retained outside GitHub.
+
+The existing role definitions also reference **21 retained literal module paths**
+across older/other adapter roots. They are preserved, not silently rebased to
+unqualified replacements. Those dependencies and any dynamic expressions need
+separate runtime/companion qualification before activation. The stage's input
+checks are not whole-graph, model/tool, old-bank or historical acceptance. Existing
+roots must remain available; no DSH retirement or original-project transfer occurs.
+
+Focused **85 Python tests** pass: 11 preservation cases plus nine modern setup
+cases and the existing setup/readiness/leases/deployment checks. Preservation
+covers exact edits/peers/private output, actual CLI staging/verification, untracked
+active code, non-peer edits, provenance/preset changes, aliases/duplicates, mixed
+SDK/ranges, stale input/new credentials, tampering, links/overlap and late change
+cleanup. New tests use independently authored profiles/code only. The Linux SDK
+workflow now installs a hash-pinned PyYAML inspection wheel and runs these cases;
+no new production dependency or binary publication is implied.
+[Portable evidence](../release/harness-dsh-preservation-20261017.json).
+
+Earlier Linux SDK **39042645605** succeeds at 0ca81395 / runtime 6a82cf82.
+Earlier full validations **39041187997** (f640ce8c) and **39041724378** (14e3c523 /
+runtime c6653b75) finish their application checks and fail at the retained **Office
+public source/exact-engine-rebuild packaging gate**. Source-boundary/Home/component
+jobs pass. Those are terminal results, superseding earlier live observations;
+neither is restarted, and no whole-workflow/package approval is claimed. New
+preservation source still needs its own hosted qualification.
+
 ## Modern setup qualification — October 17, 2026
 
 Source **6a82cf8209a7e6783efba41b15d0d8c4282043b0** supports explicit existing DSH **0.2.0-rc.2** on Linux, alongside

@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Custom DSH preservation stage](HARNESS-DSH-INSTALLATION.md#preserved-custom-integration-stage--october-17)
+adds source-only private staging/verification at 3777cc92. Python 85 pass. Actual
+profile staging binds 28 inputs, keeps peer edits and proposes two module changes;
+21 retained module paths still need graph qualification. No owner execution/write
+or activation, no full app copy. Immutable incoming/cold backup/matching-client
+transaction and reverse acceptance remain. [Record](../release/harness-dsh-preservation-20261017.json).
+
+Terminal CI: prior Linux SDK 39042645605 succeeds. Full validations 39041187997
+and 39041724378 pass application checks then refuse the existing public Office
+source/rebuild packaging gate. Earlier live observations below are historical;
+no whole-workflow/package or later-platform approval is claimed.
+
 [Linux DSH 0.2 installer qualification](HARNESS-DSH-INSTALLATION.md) adds exact
 family checks, declarative presets and modern workflow composition at 6a82cf82.
 Source Python 73 pass; exact SDK setup command 18 overlapping cases pass. Actual

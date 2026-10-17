@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Preserved DSH staging uses the already-present PyYAML node parser without
+constructing custom tags or serializing owner configuration. Linux CPython 3.13
+CI inspection pins the PyPI 6.0.2 wheel and SHA-256 in
+`tests/fixtures/dsh-preservation-requirements.txt`. Private profile/code bytes
+are not published; tests use independent authored inputs. Current source-stage
+scope and retained runtime dependencies are in [installation](HARNESS-DSH-INSTALLATION.md#preserved-custom-integration-stage--october-17).
+
 Linux existing-CLI setup additionally qualifies the exact DSH 0.2.0-rc.2 /
 Cordis 4.0.4 / Schemastery 3.18.4 family, with actual fresh integration installation
 and cold reopening of both owned roles. The complete-runtime distribution lock
