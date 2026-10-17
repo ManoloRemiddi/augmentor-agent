@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cold configuration journal and profile gate](HARNESS-DSH-INSTALLATION.md#cold-configuration-journal-and-managed-startup-fence--october-17)
+adds b78996eb: source 117 Python/four Node pass; exact SDK discovery 27 overlaps.
+Real upstream DSH retains/releases its profile reader and refuses a pending fence
+on an authored isolated profile. Apply/reverse survive per-file process death;
+completed config remains fenced pending client orchestration. No installed apply
+command, owner change or new app copy. Full backups, client selection/finalization
+and real owner acceptance remain; new-runtime CI pending.
+[Record](../release/harness-dsh-configuration-transaction-20261017.json).
+
 [Immutable preservation candidate](HARNESS-DSH-INSTALLATION.md#immutable-preserved-integration-candidate--october-17)
 qualifies 73675d62 / 20261017-180443-c8315564 (a4dc0eb2…6ef93): ordinary/sealed
 42 Node/90 Python, recorded Python repeats 90, plus 11 sealed Office/inspection

@@ -2,6 +2,84 @@
 
 # Linux DSH integration installation
 
+## Cold configuration journal and managed startup fence — October 17
+
+Source **b78996ebc0e06b1f0bb27e27231ee36cc3006196** adds the internal
+`services/dsh/preservation_transaction.py` kernel and the standalone Linux
+`scripts/dsh-profile-gate.py` lifetime gate. This is configuration transaction
+source, **not a complete installed activation command**. The existing `stage` /
+`verify` CLI still cannot apply an owner upgrade. The previous immutable
+20261017-180443-c8315564 candidate does **not** contain this change; no new full
+app mirror or sealed release is created for this checkpoint.
+
+The internal `maintenance` context owns the selected deployment's exclusive
+managed-launch gate, specified shared-pair companion locks and the DSH home's
+exclusive profile gate. Selection bytes and the selected pair are checked.
+Known unmanaged DSH hosts using that home also veto maintenance, including custom
+profiles whose shared-store environment differs. Arbitrary old custom callers
+cannot all be discovered; outer cutover must inventory/stop or adopt them. New
+managed DSH launchers hold an inherited shared profile lock through `exec`.
+Bootstrap installs the separate small gate beside the generated wrapper; existing
+owner bootstraps are not changed by a source commit.
+
+`prepare` requires a reviewed stage, verified immutable incoming artifact, the
+same cold guard and absent private transaction storage outside the profile,
+application, deployment, stage and source checkout. It writes durable before/after
+copies and original modes for exactly four destinations: owned Browser code,
+package metadata, ownership metadata and the profile patch. The transaction plan
+binds the stage, incoming artifact, home and original desktop selection. Backup
+files/directories are flushed before an exclusive, atomic no-replace startup
+fence is published. No full profile serializer or JavaScript expression runs.
+These four-file backups are **not full conversation/shared-store backups**.
+
+`commit` applies or resumes only those reviewed config bytes. It rechecks stage
+inputs/package aliases, the incoming seal, current selection and every destination.
+A death after a rename is recovered by actual before/after bytes, not a progress
+counter. Unexpected destination edits/mode changes, damaged backups, foreign
+fences, stale selections/inputs or unknown phases refuse replacement. Completed
+configuration remains **startup-fenced**: applying four files does not prove that
+matching clients and services have been adopted. No fence-finalization API or
+installed apply command is exposed yet. Do not remove that fence manually to
+turn this component into a cutover.
+
+`rollback` restores exact original bytes/modes without touching databases,
+replaying writes or discarding unrelated edits. It does not require an undamaged
+incoming artifact, but requires valid recovery copies and the original deployment
+binding. A reversed status interrupted before fence removal can finish safely;
+an exact successful reverse removes and flushes its own fence. Backups stay for
+operator review. A later deployment-selection change needs the outer reverse
+orchestrator; this kernel will not guess which client selection to overwrite.
+
+### Qualification and limits
+
+**117 source Python cases / four source Node launcher cases pass**, zero failures
+or skips. Eleven new transaction cases include real process exits after each of
+the four apply replacements and each reverse replacement, interrupted final fence
+removal, idempotent recovery, input/alias changes, corrupted recovery data, owner
+edits and cold-gate contention. The new launcher case proves profile-lock lifetime
+after actual `exec` and pending-fence refusal with no private diagnostic content.
+The exact SDK discovery pattern passes **27 overlapping cases** (16 staging plus
+11 transaction). New public fixtures are independently authored.
+
+The actual installed upstream DSH **0.2.0-rc.2** is separately executed **in place**
+with an empty authored profile, read-only host files and isolated network/PID
+namespaces. Catalogue/inventory reads pass. The real idle server retains the
+profile reader, vetoes maintenance, and releases the cold gate when stopped.
+The generated wrapper refuses a pending fence before starting that backend.
+Both authored shared database sets stay exact; zero owner profiles/models used.
+Namespace/scratch processes and fixture data are retired. This is not actual
+owner-profile execution, a full integration upgrade or matching-GUI acceptance.
+
+The owner main/pilot, all 36 protected file sets/PIDs, registry revision 18, shared
+rows/configuration, menus and model/GPU/voice services remain exact. New-runtime
+hosted qualification is pending; prior SDK 39047120454 success covers earlier code.
+Next integrate full cold-backup evidence, explicit entrypoint adoption, controlled
+backend startup/preflight and matching-client selection/fence finalization into
+one guarded operation, then qualify full installed activation/reverse and owner
+continuation. Pilot feedback still gates more transfers. Voice/later OS remain
+deferred; the separate public Office rebuild/distribution gate remains open.
+[Record](../release/harness-dsh-configuration-transaction-20261017.json).
+
 ## Immutable preserved-integration candidate — October 17
 
 The existing source is now qualified as one private **unselected** MX candidate:

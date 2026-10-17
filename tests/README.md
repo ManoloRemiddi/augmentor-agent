@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [configuration transaction kernel](../docs/HARNESS-DSH-INSTALLATION.md#cold-configuration-journal-and-managed-startup-fence--october-17)
+adds 11 authored cases, including actual process exits after every forward/reverse
+file replacement. Source focus is 117 Python plus four launcher Node cases; the
+SDK discovery pattern covers 27 overlapping preservation cases. Actual upstream
+DSH lifetime/fence evidence is a separate private, isolated empty-profile test.
+This is source-only, with no owner activation/fence-finalization command.
+
 The [immutable preservation candidate](../docs/HARNESS-DSH-INSTALLATION.md#immutable-preserved-integration-candidate--october-17)
 now repeats the 90-case focus against ordinary/sealed code and the recorded Python;
 42 Node cases pass at each artifact stage, plus 11 sealed Office/inspection cases.

@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cold configuration journal and profile gate](HARNESS-DSH-INSTALLATION.md#cold-configuration-journal-and-managed-startup-fence--october-17)
+adds b78996eb: source 117 Python/four Node pass; exact SDK discovery 27 overlaps.
+Real upstream DSH retains/releases its profile reader and refuses a pending fence
+on an authored isolated profile. Apply/reverse survive per-file process death;
+completed config remains fenced pending client orchestration. No installed apply
+command, owner change or new app copy. Full backups, client selection/finalization
+and real owner acceptance remain; new-runtime CI pending.
+[Record](../release/harness-dsh-configuration-transaction-20261017.json).
+
 [Retained role and library qualification](HARNESS-DSH-INSTALLATION.md#retained-roles-cold-ownership-and-prompt-library-bridge--october-17)
 adds e07e5db6: source Python 90 pass. Actual retained personal modules run in place
 inside a read-only filesystem/isolated-network fixture. Cold saved-role replies,
