@@ -1,5 +1,51 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Embedded entrypoint and actual production compatibility — October 17
+
+Linux's stable `embed-launch.py` now reads the same selected state/data pair as
+the desktop and managed Browser host. It holds the managed reader lock across
+the existing SDK Python adapter and Node server for the server's entire lifetime,
+including before any browser connects. The known-process cold guard also detects
+an idle legacy embedding server, which can otherwise create a shared client later.
+The desktop bootstrap installer backs up and refreshes this external launcher;
+`augmentor-agent --embed` provides the same selected route. No systemd service is
+started/restarted by this source change. Existing fixed entrypoints still require
+explicit adoption during the guarded cutover.
+
+The actual generated launcher → SDK adapter → embedding server → Native Messaging
+host passes selected-library reads against authored shared services, with a stale
+inherited pair deliberately pointing elsewhere. An idle server blocks both the
+managed exclusive gate and known-process guard. Proxy authentication still applies;
+an SDK workspace can read prompts but cannot save them or administer memory.
+Denied writes leave both libraries unchanged. Closing the server releases the
+reader. Node injection variables are removed; recorded Node/Python and the SDK
+lifetime lease remain in use. Linux shared dispatch/preflight mocks remain labelled;
+this does not establish a physical mobile or installed owner workspace acceptance.
+Source focus: **42 Node / 82 Python**, zero failures/skips, plus `npm run check`.
+The three additional workspace files overlap the existing platform/SDK contracts;
+counts do not imply complete feature parity. [Source record](../release/harness-shared-embed-20261017.json).
+
+A separate **actual production preflight** now establishes a concrete cutover
+blocker. The installed selection and matching running DSH product integration are
+**0.2.11**; the fresh sealed 22103e61 candidate is **0.2.13**. The live integration's
+home-token identity matches, but the candidate's real `check(connected=True)`
+refuses at the product-version check before the catalogue request. Sealed bytes
+remain unchanged. This is not a fixture or a network outage, and no version check
+is bypassed. Existing Native primary/secondary/mobile status was idle with no
+draft at that read-only observation; that is not a reserved maintenance window.
+
+The entrypoint audit also finds separate managed Native, mobile, embedded and
+four per-user Browser registrations, with differing current host routes. It records
+private paths/hashes only in private operator evidence. No registration, installed
+selection, DSH composition, prompt/memory data, model/GPU/audio setting, window or
+project is changed. Source/bootstrap tests cannot qualify that real mixed-version
+installation. Prepare the matching DSH/product/extension deployment through the
+normal backed-up ownership-checked path before cold export/shared binding. Retain
+all original conversation/model/voice integration and custom preset settings;
+any edited ownership records need deliberate preservation, never replacement to
+make a preflight pass. Fresh cold backups, real banks/settings/history/busy-work/
+restart/rollback acceptance and pilot-feedback gates remain.
+
 ## Sealed shared-launch candidate — October 17
 
 Source **22103e61** now has a fresh **unselected** immutable MX candidate:

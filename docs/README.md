@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Embedded shared launch and production preflight](HARNESS-SHARED-PROFILES.md#embedded-entrypoint-and-actual-production-compatibility--october-17)
+adds the missing idle embedding-server reader/selected pair while retaining SDK
+proxy and write restrictions. Source 42 Node/82 Python pass. Actual sealed 22103e61
+preflight refuses the real 0.2.11 DSH integration (candidate 0.2.13), before catalogue;
+home identity matches. No owner update/restart/export, version bypass or extra
+project transfer. Matching integration/extension and normal guarded cold cutover
+remain. [Record](../release/harness-shared-embed-20261017.json).
+
 [Sealed shared-launch candidate](HARNESS-SHARED-PROFILES.md#sealed-shared-launch-candidate--october-17)
 qualifies **22103e61 / 20261017-151405-6c6b7080**, artifact 63ea2dd8…da5c08:
 24,759 inputs/1,143 compiled; source/ordinary/sealed each 29 Node/77 Python,

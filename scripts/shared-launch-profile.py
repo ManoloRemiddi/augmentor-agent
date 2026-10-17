@@ -131,7 +131,7 @@ def assert_no_clients(pairs):
             if process.stat().st_uid!=os.getuid():continue
             args=(process/'cmdline').read_bytes().split(b'\0')
             known=any(a in (b'augmentor_linux',b'augmentor_linux.macos_shortcut_service') or
-                      a.endswith((b'/apps/mobile/native_runner.py',b'/apps/mobile/start.py',b'/apps/browser/native-host.mjs',b'/apps/browser/pi-bridge.mjs',b'/apps/browser/codex-bridge.mjs',b'/apps/browser/pipe.mjs',b'/dist/runtime/src/main.js',b'/services/memory/service.py',b'/services/prompt-library/service.py')) for a in args)
+                      a.endswith((b'/apps/mobile/native_runner.py',b'/apps/mobile/start.py',b'/apps/browser/embed/server.mjs',b'/apps/browser/native-host.mjs',b'/apps/browser/pi-bridge.mjs',b'/apps/browser/codex-bridge.mjs',b'/apps/browser/pipe.mjs',b'/dist/runtime/src/main.js',b'/services/memory/service.py',b'/services/prompt-library/service.py')) for a in args)
             if not known:continue
             env=dict(row.split('=',1) for row in (process/'environ').read_text().split('\0') if '=' in row)
             home=Path(env.get('HOME',pwd.getpwuid(os.getuid()).pw_dir))

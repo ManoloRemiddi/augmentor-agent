@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Embedded shared-launch qualification](../release/harness-shared-embed-20261017.json):
+42 Node/82 Python source cases include actual generated embedding launcher, SDK
+adapter, server and Native host. Idle reader/process guards, selected prompt reads,
+proxy authentication and denied SDK prompt/memory mutations pass. Actual sealed
+production preflight independently refuses mixed product 0.2.11/0.2.13 before catalog;
+no owner model work or update. Earlier 29/77 candidate remains immutable.
+
 [Exact shared-launch package](../release/harness-shared-launch-package-20261017.json):
 fresh unselected 22103e61 artifact passes the same 29 Node/77 Python checks as source
 and ordinary copy. Recorded Python additionally passes 11 overlapping binding cases.

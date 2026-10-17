@@ -44,8 +44,10 @@ class SharedLaunchTests(unittest.TestCase):
         (source/'release').mkdir();(source/'release/product.json').write_text('{"version":"authored"}')
         mobile=source/'apps/mobile/start.py';mobile.parent.mkdir(parents=True);mobile.write_text('# Independently authored supervisor\n')
         manifest=source/'apps/browser/extension/manifest.json';manifest.parent.mkdir(parents=True);manifest.write_text('{"key":"YXV0aG9yZWQta2V5"}')
-        for name in ('shared-launch-profile.py','desktop-launch.py','desktop-browser-launch.py'):
+        server=source/'apps/browser/embed/server.mjs';server.parent.mkdir(parents=True);server.write_text('// Independently authored embedding marker\n')
+        for name in ('shared-launch-profile.py','desktop-launch.py','desktop-browser-launch.py','embed-launch.py'):
             path=source/'scripts'/name;path.parent.mkdir(exist_ok=True);shutil.copy2(ROOT/'scripts'/name,path)
+        (source/'scripts/app-sdk-launch.py').write_text('# Independently authored SDK adapter marker\n')
         for name in ('companion_import.py','memory/dual.py'):
             path=source/'services'/name;path.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(ROOT/'services'/name,path)
         self.original={'root':str(source),'python':sys.executable,'node':shutil.which('node'),'dshService':None,'version':'authored'}
@@ -64,13 +66,21 @@ class SharedLaunchTests(unittest.TestCase):
         selected={**self.selection,'sharedProfile':self.after};self.deploy.atomic(self.deploy.DATA/'desktop.json',selected)
         # Mobile supervisor dispatch has no display/service side effect before exec.
         os.environ['RESONANT_VOICE_HOME']='/authored/unchanged-speech';self.addCleanup(lambda:os.environ.pop('RESONANT_VOICE_HOME',None))
-        for args in (['--service-run'],['--instance','secondary'],['--mobile','--preview']):
+        for args in (['--service-run'],['--instance','secondary'],['--mobile','--preview'],['--embed']):
             with self.subTest(args=args),patch.object(self.launch,'exchange',return_value=None),patch.object(self.launch.os,'execve') as execute:
                 self.launch.main(args)
                 argv=execute.call_args.args;env=argv[2]
                 self.assertEqual(env['AUGMENTOR_SHARED_STATE'],self.after['state']);self.assertEqual(env['AUGMENTOR_SHARED_DATA'],self.after['data'])
                 self.assertEqual(env['RESONANT_VOICE_HOME'],'/authored/unchanged-speech');self.assertEqual(env['AUGMENTOR_PYTHON'],sys.executable)
                 self.assertEqual(env['AUGMENTOR_PI_NODE'],self.selection['node']);self.assertEqual(env['PI_TELEMETRY'],'0')
+
+    def test_embedding_rechecks_selected_pair_and_preserves_sdk_adapter_and_clean_node_environment(self):
+        selected={**self.selection,'sharedProfile':self.after};self.deploy.atomic(self.deploy.DATA/'desktop.json',selected)
+        embedding=load('authored_embedding',ROOT/'scripts/embed-launch.py')
+        with patch.dict(os.environ,{'NODE_OPTIONS':'--require /authored-never-load','NODE_PATH':'/authored-never-load'}),patch.object(embedding.os,'execve') as execute:
+            embedding.main()
+        args=execute.call_args.args;self.assertEqual(args[0],self.selection['python']);self.assertEqual(args[1][1:3],['-I','-B']);self.assertTrue(args[1][3].endswith('/scripts/app-sdk-launch.py'));self.assertEqual(args[1][4],'embed')
+        self.assertEqual(args[2]['AUGMENTOR_SHARED_DATA'],self.after['data']);self.assertNotIn('NODE_OPTIONS',args[2]);self.assertNotIn('NODE_PATH',args[2])
 
     def test_cold_activation_preserves_database_bytes_and_reverse_manifest_restores_original_selection(self):
         before=self.shared.component_fingerprint(self.before);after=self.shared.component_fingerprint(self.after)

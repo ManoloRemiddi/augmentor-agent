@@ -92,6 +92,10 @@ def main(args):
 
 
 def _main(args):
+    if args[:1]==['--embed']:
+        config=configuration();script=Path(config['root'])/'scripts/embed-launch.py'
+        if not script.is_file():raise RuntimeError('The selected deployment has no embedding launcher.')
+        os.execve(config['python'],[config['python'],'-B',str(script),*args[1:]],launch_environment(config));return 0
     if args[:1]==['--mobile']:
         config=configuration();script=Path(config['root'])/'apps/mobile/start.py'
         if not script.is_file():raise RuntimeError('The selected deployment has no mobile supervisor.')

@@ -162,6 +162,16 @@ The original specification's ten scenarios remain acceptance requirements:
 | 9 Long histories and stable inspection | Indexed/paged/context fixtures and original UI; representative breadth/performance remains open. |
 | 10 Install/update/privacy/busy veto/recovery | Private installed MX/lifecycle proofs; public installer, broader services and later platforms remain open. |
 
+## Actual production version prerequisite
+
+The [embedded-entrypoint/preflight follow-up](HARNESS-SHARED-PROFILES.md#embedded-entrypoint-and-actual-production-compatibility--october-17)
+closes the missing idle-server launch route in source (42 Node/82 Python). Real
+22103e61 sealed preflight against the actual selected integration refuses its
+0.2.11 product version; candidate is 0.2.13 and home identity matches. This is a
+concrete version prerequisite, not permission to bypass the guard or change
+existing voice/model/preset configuration. Normal matching integration/client
+update and fresh cold backup/export/adoption remain; no owner app was updated.
+
 ## Next priorities
 
 Finish the Agent shared-service qualification above while keeping the installed
