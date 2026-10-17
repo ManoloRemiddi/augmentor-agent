@@ -82,5 +82,26 @@
     "umask": "0022",
     "productionGuardsUnchanged": true,
     "physicalMacNotQualified": true
+  },
+  "sourceRef": "24bee26f7ed56fd1a31fa77cdfb9ed7356eed2fc",
+  "fixtureRef": "24bee26f7ed56fd1a31fa77cdfb9ed7356eed2fc",
+  "linuxSdk": {
+    "run": 39072231157,
+    "sourceRef": "24bee26f7ed56fd1a31fa77cdfb9ed7356eed2fc",
+    "status": "in_progress",
+    "conclusion": "",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39072231157"
+  },
+  "precedingFeatureSdk": {
+    "run": 39071819986,
+    "sourceRef": "42d3e41eacfe3055a4e2a6a47dc466c33b36a7d9",
+    "linuxJobStatus": "in_progress",
+    "linuxJobConclusion": "",
+    "adoptionAndPublicationStep": "success",
+    "macOfflineImportPass": 93,
+    "macOfflineImportFail": 20,
+    "macOfflineImportSkip": 14,
+    "remainingFixtureAliasesNowQualifiedLocally": true,
+    "wholeWorkflowPassClaimed": false
   }
 }

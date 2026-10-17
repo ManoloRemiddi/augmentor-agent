@@ -124,3 +124,9 @@ VR-RasterStudio stays DSH. Voice expansion and later OS remain deferred.
 See [client publication](HARNESS-CLIENT-PUBLICATION.md),
 [build storage](HARNESS-BUILD-STORAGE.md) and
 [the qualification record](../release/harness-shared-data-adoption-20261017.json).
+
+Runtime **42d3e41eacfe3055a4e2a6a47dc466c33b36a7d9**, fixture follow-up
+**24bee26f7ed56fd1a31fa77cdfb9ed7356eed2fc**. The new data/publication step
+succeeds on the preceding Linux SDK job; that matrix still has a macOS fixture
+failure. [Current SDK 39072231157](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39072231157)
+is running at the fixture follow-up. No whole hosted success is claimed yet.
