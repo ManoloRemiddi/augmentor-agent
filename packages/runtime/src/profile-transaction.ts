@@ -57,11 +57,12 @@ function complete(value:Journal,status:string){atomicJson(profileFence(value.sta
 /** Copy-on-write, same-location adoption. A durable external journal fences
  * startup across both renames; a crash preserves every tree for explicit recovery.
  * Old native messages/absolute attachment paths remain byte-for-byte valid. */
-export async function stateTransaction<T>(state:string,build:(stage:string)=>Promise<T>){
+export async function stateTransaction<T>(state:string,build:(stage:string)=>Promise<T>,{requireAbsent=false}={}){
  targetPath(state);const lease=acquireProfileLease(state,{maintenance:true});let stage:string|undefined,armed=false;
  try{
   if(present(profileFence(state)))throw Error('Inspect the unfinished migration before starting another.');requireColdState(state);
-  const original=present(state),before=original?stateInventory(state):null,id=randomUUID(),paths=locations(state,id);stage=paths.stage;
+  const original=present(state);if(requireAbsent&&original)throw Error('Choose a new absent dedicated state path; another owner created this destination.');
+  const before=original?stateInventory(state):null,id=randomUUID(),paths=locations(state,id);stage=paths.stage;
   if(present(stage)||present(paths.backup))throw Error('Migration staging path exists.');
   privateDir(stage);if(original){cpSync(state,stage,{recursive:true,preserveTimestamps:true,errorOnExist:true,force:false});for(const row of before!.rows)chmodSync(row.path?join(stage,...row.path.split('/')):stage,row.mode);}
   if(before&&stateInventory(stage).sha256!==before.sha256)throw Error('State copy differs from its source.');

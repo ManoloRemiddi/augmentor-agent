@@ -25,15 +25,17 @@ function legacyLeases(profile:SharedProfile){
  try{for(const name of ['prompts','dual-memory'])held.push(acquireFileLease(join(profile.state,name+'.lock')));return {close(){while(held.length)held.pop()!.close();}};}
  catch(error){while(held.length)held.pop()!.close();throw error;}
 }
-function buildDatabases(source:string,target:string,sha256:string,mapDefaultPerson:boolean):Promise<any>{
+function databaseHelper(value:Record<string,unknown>):Promise<any>{
  return new Promise((done,reject)=>{
   const helper=fileURLToPath(new URL('../../../services/companion_import.py',import.meta.url)),child=spawn(pythonExecutable(),['-I','-B',helper],{stdio:['pipe','pipe','pipe'],env:componentEnvironment(),windowsHide:true});let output='',error='',finished=false;
   const timer=setTimeout(()=>{child.kill('SIGKILL');},120000);
   child.stdout.on('data',b=>{output+=b;if(Buffer.byteLength(output)>1024*1024)child.kill('SIGKILL');});child.stderr.on('data',b=>{error+=b;if(error.length>65536)child.kill('SIGKILL');});
-  child.once('error',failure=>{clearTimeout(timer);finished=true;reject(failure);});child.once('close',code=>{clearTimeout(timer);if(finished)return;if(code!==0){reject(Error('Shared database merge refused; both profiles remain preserved. '+error.slice(-6000)));return;}try{done(JSON.parse(output));}catch(failure){reject(failure);}});
-  child.stdin.on('error',()=>{});child.stdin.end(JSON.stringify({source,target,sha256,mapDefaultPerson}));
+  child.once('error',failure=>{clearTimeout(timer);finished=true;reject(failure);});child.once('close',code=>{clearTimeout(timer);if(finished)return;if(code!==0){reject(Error((value.action==='validate'?'Shared database validation refused; source remains preserved. ':'Shared database merge refused; both profiles remain preserved. ')+error.slice(-6000)));return;}try{done(JSON.parse(output));}catch(failure){reject(failure);}});
+  child.stdin.on('error',()=>{});child.stdin.end(JSON.stringify(value));
  });
 }
+export function validateSharedDatabases(data:string){return databaseHelper({action:'validate',data});}
+function buildDatabases(source:string,target:string,sha256:string,mapDefaultPerson:boolean){return databaseHelper({source,target,sha256,mapDefaultPerson});}
 /** Hash and inspect a stopped shared store without changing its databases. */
 export function inspectSharedProfile(profile:SharedProfile){
  validate(profile);const old=legacyLeases(profile);let lease:ReturnType<typeof acquireProfileLease>|undefined;

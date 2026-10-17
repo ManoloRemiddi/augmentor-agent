@@ -265,6 +265,21 @@ def merge(source,target,cut,map_default):
     return result
 
 
+def validate(data):
+    """Read-only schema/integrity qualification, without constructing services."""
+    data=Path(data)
+    for name,schema in [('prompts.sqlite3',PROMPT),('dual-memory.sqlite3',DUAL),('memory.sqlite3',MANUAL)]:
+        check=database(data/name,schema)
+        check.close()
+    for name in ['hindsight.json','hindsight-installation.json']:
+        if (data/name).exists() and not isinstance(json.loads((data/name).read_text()),dict):
+            raise ValueError('Engine configuration must be a JSON object.')
+    return {'schema':'augmentor-shared-databases-validation/1','databases':3,'readOnly':True}
+
+
 if __name__=='__main__':
     value=json.load(sys.stdin)
-    print(json.dumps(merge(value['source'],value['target'],value['sha256'],value['mapDefaultPerson'])))
+    if value.get('action')=='validate':
+        print(json.dumps(validate(value['data'])))
+    else:
+        print(json.dumps(merge(value['source'],value['target'],value['sha256'],value['mapDefaultPerson'])))

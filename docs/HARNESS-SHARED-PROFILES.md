@@ -1,5 +1,90 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Dedicated legacy-store preparation — October 17
+
+The source now provides **`inspect-legacy` / `export-legacy`** in
+`scripts/import-shared-profile.mjs`. This closes the mixed-layout preparation gap:
+copy the authoritative legacy prompt/memory components into a **new absent
+dedicated data directory**, retaining the mixed application directory in place.
+It does not replace that application directory or switch any launcher.
+[Qualification](../release/harness-legacy-shared-export-20261017.json).
+
+Only `prompts.sqlite3`, `dual-memory.sqlite3`, `memory.sqlite3` and, when present,
+`hindsight.json` / `hindsight-installation.json` are selected. Each file's bytes
+and permissions are retained. Person, prompt and bank identities, cached records,
+external engine configuration, jobs/charges and capture/processing choices remain
+unchanged. Application files, releases and unrelated databases are neither copied
+nor recursively inventoried. Existing `shared-imports` requires another explicit
+adapter; it is not silently omitted.
+
+This is a **cold export**, not a live SQLite snapshot. Stop every known Native,
+Browser and Harness caller and both legacy companions first; take fresh verified
+full backups separately. The operation holds the specified legacy state locks
+and current data maintenance lease. An arbitrary older helper using a different
+unlisted state root does not understand that lease: the operator must identify
+and stop all old owners. The earlier online rehearsal copies remain archive
+evidence and must not be supplied as export sources.
+
+Use the existing private manifest schema. `source` names the actual stopped
+legacy pair; `target.state` is an existing new private directory; `target.data`
+must be absent, with a private owned real parent. Example paths are placeholders:
+
+```json
+{
+  "schema": "augmentor-shared-profile-input/1",
+  "source": {"state": "/private/legacy-state", "data": "/private/legacy-application-data"},
+  "target": {"state": "/private/dedicated-state", "data": "/private/dedicated-data"},
+  "sourceSha256": "REPLACE_WITH_LEGACY_COMPONENT_INSPECTION_SHA256"
+}
+```
+
+```sh
+node scripts/import-shared-profile.mjs inspect-legacy /private/manifest.json
+node scripts/import-shared-profile.mjs export-legacy /private/manifest.json > /private/export-receipt.json
+```
+
+The first command supplies the **selected-component checksum**. Before/after
+checks and read-only SQLite schema/integrity validation refuse changed files,
+journals, links, unexpected database schemas or invalid engine JSON. Components
+are bounded to two GiB per database, one MiB per JSON and four GiB combined.
+Source directories/components must be private and owned; the legacy parent may
+be owned 0755, provided others cannot write it. No existing permissions are fixed
+silently. A destination created during validation is refused under its maintenance
+lease; it is not backed up and replaced as a presumed export target.
+
+The existing durable transaction publishes only the new dedicated directory.
+An interrupted publication fences companion startup and preserves its staged
+bytes. `import-dsh-projects.mjs inspect/finish/rollback TARGET_DATA` recovers those
+verified bytes without re-exporting. A never-existing target has no original
+backup; rollback leaves it absent. Save the private CLI receipt outside the data
+root. It contains local paths/hashes and belongs outside GitHub.
+
+After export, separately inspect the **review** as the ordinary import source and
+merge into the dedicated production-authority copy with the existing explicit
+person policy. Its ordinary whole-store checksum differs from the legacy
+selected-component checksum. External Hindsight volumes are not copied or started.
+The existing importer retains production identity/configuration and archives
+review processing admissions as documented below. Matching deployment, full cold
+backup verification, paired launcher changes and live recall/outage/rollback are
+still separate cutover work; this command does not enable them automatically.
+
+Source and an independent ordinary application assembly pass **27 checks each**,
+including the real CLI, active-owner refusal, source/destination races, interrupted
+publication/recovery, existing importer/transaction guards and actual shared
+writing editors. **20 Python checks** pass. An exported populated authored store
+also retains cached bank identities and original job/charge data through real
+Native transport reads, explicit engine-search 503s and companion restart; only
+two expected search calls reach the synthetic engine, with no inference. Offline
+CLI export observes zero IP connections and no companion/engine calls.
+The ordinary assembly verifies 1,143 compiled files and 23,595 unchanged baseline
+inputs; it is **unsealed and unselected**, not an installed qualification.
+
+The first fixture run used direct class initialization with permissive ambient
+file modes; the fixture now applies the real entrypoint's 0077 umask. Private-file
+refusal remains in the exporter. This implementation is MX/Linux-only preparation;
+other platforms remain deferred, and neither installed MX review nor the real
+Agent/store has been updated or exported.
+
 ## Installed Agent alignment rehearsal — October 17
 
 The [current MX readiness audit](HARNESS-MX-READINESS.md) confirms a remaining
@@ -23,7 +108,8 @@ Two new synthetic cases qualify this merge direction into a populated target and
 refuse direct use of a mixed application root. Fourteen cases pass in source and
 against exact installed97d95d58, without skips, including existing service/peer/
 interruption/SDK and historical Branch v1/v2 checks. Importer/guard code stays
-unchanged. Actual installed Agent/Browser client acceptance, dedicated layout,
+unchanged in that rehearsal. Subsequent writing-client qualification and the
+dedicated export above add source/fixture evidence. Actual installed adoption,
 matched companion deployment, fresh full cold backups and guarded cutover/rollback
 remain. [Aggregate evidence](../release/harness-mx-readiness-agent-alignment-20261017.json).
 

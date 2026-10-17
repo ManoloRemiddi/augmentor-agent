@@ -2484,3 +2484,20 @@ it is not adoption approval. The older packaged Browser's Connecting failure is
 retained, not skipped or spoofed. [Results and limits](../docs/HARNESS-MX-READINESS.md#actual-writing-clients-isolated-qualification).
 This is Linux-only test instrumentation; no common UI/runtime behavior changes or
 later-platform parity claim are made.
+
+
+### Cold mixed-layout shared export (MX Linux)
+
+Build first, then run `node --test --test-concurrency=2 tests/shared-profile-export.test.mjs tests/shared-profile-import.test.mjs tests/shared-profile-runtime.test.mjs tests/profile-transaction.test.mjs tests/harness-writing-peers-chromium.test.mjs tests/harness-shared-profile-chromium.test.mjs`
+with Qt-capable `AUGMENTOR_PYTHON`, Chromium and strace. The seven new export
+cases exercise a populated mixed source with an owned 0755 parent, exact
+allowlisted bytes/configuration, subsequent review merge, owner/schema/link/journal
+refusal, source/destination races, interrupted publication and real recovery/CLI.
+The populated-cache case uses the actual Native PromptClient and memory companion;
+an authored engine returns two explicit search 503s, without inference/processing,
+while bank/cache/job/budget identity survives restart. The offline CLI trace makes
+no IP or companion/engine connections. All owner data stays outside these fixtures.
+The shared fixture uses the actual companion entrypoint's private 0077 file policy.
+Source and separate ordinary assembly each pass27/no skips; Python lease3 and
+Hindsight17 pass. No sealed/installed/physical or other-platform adoption claim.
+[Contract and remaining cutover](../docs/HARNESS-SHARED-PROFILES.md#dedicated-legacy-store-preparation--october-17).

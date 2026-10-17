@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import sys
+os.umask(0o077)  # Match the actual companion entrypoint's private-file policy.
 root,base=Path(sys.argv[1]),Path(sys.argv[2]);mode=sys.argv[3] if len(sys.argv)>3 else 'plain'
 sys.path.insert(0,str(root/'services'))
 from memory.hindsight import HindsightMemory

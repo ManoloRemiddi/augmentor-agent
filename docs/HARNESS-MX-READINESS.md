@@ -108,6 +108,14 @@ The concrete adoption path still requires:
 4. Verify one common service, actual cross-surface edits and existing memory banks,
    native histories, busy-work veto and rollback before declaring alignment complete.
 
+The [dedicated legacy export](HARNESS-SHARED-PROFILES.md#dedicated-legacy-store-preparation--october-17)
+now prepares a new store from the stopped mixed application layout without
+replacing application files, identities, engine settings or processing choices.
+Source/ordinary authored qualification covers exact export, races, interrupted
+publication and populated-cache Native recall through search outage/restart.
+It has not exported the real Agent store, changed launchers or updated the
+installed reviews. The unsealed ordinary assembly is not deployment evidence.
+
 ## Actual writing clients: isolated qualification
 
 The new [writing-client record](../release/harness-writing-client-qualification-20261017.json)

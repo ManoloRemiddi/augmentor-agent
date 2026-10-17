@@ -1,0 +1,154 @@
+{
+  "schema": "augmentor-harness-legacy-shared-export/1",
+  "date": "2026-10-17",
+  "runtimeEvidenceBaseRef": "6abfee80f8e6ada14780021d2724c4a176e60274",
+  "scope": "Cold MX Linux preparation from a mixed application/shared-data layout into a previously absent dedicated store; authored data only",
+  "commands": [
+    "node scripts/import-shared-profile.mjs inspect-legacy PRIVATE_MANIFEST",
+    "node scripts/import-shared-profile.mjs export-legacy PRIVATE_MANIFEST"
+  ],
+  "selectedComponents": [
+    "prompts.sqlite3",
+    "dual-memory.sqlite3",
+    "memory.sqlite3",
+    "hindsight.json (optional)",
+    "hindsight-installation.json (optional)"
+  ],
+  "contract": {
+    "sourceComponentBytesModesAndIdentitiesPreserved": true,
+    "sourceApplicationDirectoryNeverReplaced": true,
+    "unrelatedApplicationFilesNeverCopiedOrRecursivelyInventoried": true,
+    "externalEngineVolumesNeverCopiedOrCalled": true,
+    "launchersNeverRepointed": true,
+    "processingCaptureChoicesAndEngineConfigurationUnchangedByExport": true,
+    "readOnlySchemaIntegrityValidation": true,
+    "privateOwnedComponentsOnly": true,
+    "legacyOwnedParent0755Supported": true,
+    "targetRequiresPrivateParentAndAbsentDirectoryUnderLease": true,
+    "existingSharedImportArchivesRequireExplicitAdapter": true,
+    "allLegacyCallersMustBeStoppedEvenIfTheyDoNotUnderstandCurrentDataLease": true,
+    "fullColdBackupsRemainSeparate": true,
+    "sourceSnapshotRehearsalArchivesNotAdoptable": true,
+    "linuxOnlyQualification": true
+  },
+  "qualification": {
+    "files": 6,
+    "sourcePass": 27,
+    "ordinaryPass": 27,
+    "eachFail": 0,
+    "eachSkip": 0,
+    "workers": 2,
+    "pythonLeasePass": 3,
+    "pythonHindsightPass": 17,
+    "npmCheckPass": true,
+    "privateSourceBoundaryPass": true,
+    "newExportCases": 7,
+    "cases": [
+      "Exact populated source/config copy with unrelated application files and a 0755 owned source parent",
+      "Subsequent review consolidation keeps authoritative exported banks/jobs/settings/person",
+      "Actual prompt/memory and data-lease owner refusal",
+      "Changed source, open SQLite journals, source/target overlap and existing destination refusal",
+      "Links, permissive component modes, unsupported schemas/engine JSON and reserved evidence-root refusal",
+      "Destination created during validation is not replaced; source changed during copy is not published",
+      "Interrupted absent-root publication fences actual companion startup and explicit recovery finishes verified bytes",
+      "Real CLI under network trace: zero IP calls/companion/engine connections and zero inference",
+      "Cached populated-bank Native transport reads, two explicit synthetic search 503s and companion restart retain original bank/cache/job/charge identities"
+    ],
+    "networkScope": "The offline CLI trace has zero IP calls. The separate memory-outage fixture deliberately makes two POST recall searches to its authored 503 server, with no processing/inference. Other cohort cases use synthetic Pi providers; no owner model is used.",
+    "fixtureCorrection": "Direct-class fixture initialization now uses the actual companion entrypoint 0077 umask. Initial permissive fixture modes were rejected; export guard was retained."
+  },
+  "ordinaryAssembly": {
+    "sealed": false,
+    "selected": false,
+    "baseApplicationRef": "248828e69010a6b9e58ec9ad06294d8acffc6675",
+    "baseArtifactSha256": "c35084df299213de94fec5bd23717c67d7af54dc689978e2f591e7368d796057",
+    "unchangedBaselineInputsVerified": 23595,
+    "compiledFilesVerified": 1143,
+    "runtimeHashesReverifiedAfterTests": true,
+    "notInstalledQualification": true
+  },
+  "filesSha256": {
+    "packages/runtime/src/shared-profile-export.ts": "113fb456f9feb01db863682ed72ae8602259405112299381ac535ae201c62489",
+    "packages/runtime/src/shared-profile-import.ts": "a67c50382614fb562fcfd5a165a2e286842db2a572dfca83b19e7e4403f77bb7",
+    "packages/runtime/src/profile-transaction.ts": "e7b774e3b03b0f23dc37bd17031800ec09045b1f63a9761f34170a91eabb80a4",
+    "services/companion_import.py": "da62dfe3775b1902dc757bb14dd02ba07004adc24ab09da5d1b17f254348cc3d",
+    "scripts/import-shared-profile.mjs": "c07518bf77b41e1da3f7fdffd24384bedd4879b12f2d97f5aa238535574e8c4d",
+    "tests/shared-profile-export.test.mjs": "d13500f496469d8701500616055f8bf451a7a2a29ac413e8dd2e67f25421dfb2",
+    "tests/fixtures/shared-profile-data.py": "941828557dafcf5c1bbfde4d868de8f0f09700d0a234c1eb6d93b73ac19f7ced"
+  },
+  "privateEvidenceLogSha256": {
+    "harness-legacy-export-final-source-20261017.log": "e6cc8efd0cf6aba4a290fce2e66b71e60fd3d09e0c3684d15700f8e1e7263a9a",
+    "harness-legacy-export-final-ordinary-20261017.log": "f7bf8fcfc4c6986cd8efdc784f1e6daab783e8d25b2279ed360c0097ef35e4de",
+    "harness-legacy-export-python-lease-20261017.log": "921b60a7fd52e978fbb551cacd29df2d6708879400278e1fcc70fceeb0c6f8e0",
+    "harness-legacy-export-python-hindsight-20261017.log": "269a2e7374ad8158cd763db395947a75cee2461ad89d519e6b701db8ca385fde",
+    "harness-legacy-export-check-20261017.log": "fdb848896bbc76bd3619da963b85a271eca6a558e166148427f89863f005e81c",
+    "harness-legacy-export-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "precedingHosted": {
+    "ref": "6abfee80f8e6ada14780021d2724c4a176e60274",
+    "validateRun": 39030296212,
+    "debianJob": 117389472178,
+    "statusAtObservation": "in_progress",
+    "stepAtObservation": "Build and verify SDK contracts",
+    "linuxSdkRun": 39030296213,
+    "linuxSdkJob": 117389228775,
+    "linuxSdkConclusion": "success",
+    "macSdkConclusion": "failure",
+    "windowsSdkStatusAtObservation": "in_progress",
+    "newExportSourceIncluded": false,
+    "wholeWorkflowPass": false
+  },
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "realOwnerStoresExported": 0,
+  "realOwnerProjectTransfers": 0,
+  "realOwnerModelRequests": 0,
+  "realOwnerApplicationUpdates": 0,
+  "privateSourceCopiedToRepository": false,
+  "remaining": [
+    "Qualify and stage a sealed matched application/tool artifact; ordinary source proof is not installed adoption",
+    "Fresh full cold backups and exact stopped-caller/companion identities before any real export",
+    "Dedicated data/paired launcher cutover, actual existing-bank/session/service recall/outage, busy veto and rollback",
+    "Inspect the same live preceding CI; new runtime source still needs its own normal CI qualification",
+    "Owner pilot feedback before further project transfers; explicit exclusions remain in DSH",
+    "Public distribution and complete accepted parity remain open; voice and later platforms deferred"
+  ]
+}

@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cold legacy shared export](HARNESS-SHARED-PROFILES.md#dedicated-legacy-store-preparation--october-17)
+adds inspect-legacy/export-legacy for known prompt/memory DBs and engine JSON
+from a stopped mixed app root into a new absent dedicated root. Source stays
+exact; no launcher/service/model work. Under-lease absent-destination enforcement,
+source-change/journal/schema/link/owner refusal and existing fenced recovery pass.
+Source/ordinary 27 each plus Python20; authored populated-cache Native recall,
+503 search outage and restart preserve identities/jobs/charges. Ordinary copy is
+unsealed/unselected (1,143 compiled/23,595 unchanged base inputs), not installed.
+No real store export, owner update or further transfer. Next qualify a sealed
+matched artifact and guarded cold cutover/rollback; prior online clones are not
+adoptable. [Record](../release/harness-legacy-shared-export-20261017.json).
+
 [Current MX readiness / Agent alignment](HARNESS-MX-READINESS.md) retains all P0/P1
 requirements and ten scenarios. Installed main/pilot stay 97d95d58. Actual Native,
 loaded Browser and original Harness writing editors now pass shared edits,
