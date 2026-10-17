@@ -1398,8 +1398,23 @@ two actual SDK synthetic-provider cold/reply cases and one original GUI case pas
 Source check/build and **376 Node / 55 Python** pass across 53 Node files,
 sixteen Chromium files/twenty GUI cases, two workers/no skips/unchanged bounds.
 Fresh ordinary passed with matching compiled inputs; exact sealed qualification
-is pending. The same four-parent comparison passes in the ordinary root, with
+is recorded below. The same four-parent comparison passes in the ordinary root, with
 23,524 unchanged baseline inputs verified; the existing two-parent real-file
 preparation regression also remains accepted. Running reviews remain
 unchanged. Guarded adoption and owner pilot feedback still gate wider migration;
 independent source formats and source-observation failures remain to assess.
+
+
+The exact private unselected candidate **20261017-025154-ba9a5767**, application
+**0a7b15f721b89c84e8433d335647621ef1a3027e**, SHA-256
+**74f4fdcbd1311557d5c88d327ec97e273d0295599b83f1fb2fe7c10dc89f71d5**, passes the same **376 Node / 55 Python** checks.
+All **24,644 sealed / 1,114 compiled inputs** verify after tests. Each tested root
+accepts the same frozen four-parent real export, preserving all four retained-ID
+recovery records. The preceding sealed converter remains verified and refuses the
+same bytes; the existing two-parent real-file preparation regression also passes.
+Private assessment inputs/test resources stay external. Both running owner PIDs,
+complete protected sets/hashes of all 36 files, registry and installed selections
+remain exact; their 24,615-input seal verifies. There is no owner restart/update,
+additional real transfer or real model work. Further guarded adoption and owner
+pilot acceptance remain separate; other source formats/observation failures and
+voice/later OS rollout stay open.

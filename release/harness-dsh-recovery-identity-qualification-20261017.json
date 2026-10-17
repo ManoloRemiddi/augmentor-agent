@@ -18,7 +18,7 @@
     "supplierMITNoticesPreserved": true
   },
   "qualification": {
-    "phase": "source and ordinary passed; exact sealed pending",
+    "phase": "source, ordinary and exact separately sealed passed; no owner adoption",
     "sourceCheckBuildPass": true,
     "focusedConverterCases": 28,
     "focusedSdkCases": 2,
@@ -50,7 +50,12 @@
     "ordinaryUnchangedBaselineInputsVerified": 23524,
     "compiledFilesVerified": 1114,
     "sameFrozenRealPreparationAcceptedByOrdinary": true,
-    "existingTwoParentFileProjectStillPrepares": true
+    "existingTwoParentFileProjectStillPrepares": true,
+    "exactSealedNodePass": 376,
+    "exactSealedPythonPass": 55,
+    "sameFrozenRealPreparationAcceptedBySeal": true,
+    "sealedEntriesVerified": 24644,
+    "ownerAdoption": false
   },
   "sameFrozenRealExport": {
     "parents": 4,
@@ -73,5 +78,26 @@
     "v1ToV2MigrationSha256": "5e0514632eae19483f0c708084cc562afb604d476a2db3b894171bed6228e5c2",
     "v2ToV3ReferencesSha256": "21b25ff30128c6eb73ab03efe72202e00f8d7a34455228f0d31700963abe5857",
     "v3ToV4ReferencesSha256": "472fca4d333c00e6a9c79d5301403a5db657defab269ca1673498ca42037a746"
+  },
+  "applicationRef": "0a7b15f721b89c84e8433d335647621ef1a3027e",
+  "implementationRef": "0a7b15f721b89c84e8433d335647621ef1a3027e",
+  "separatelySealedCandidate": {
+    "releaseId": "20261017-025154-ba9a5767",
+    "applicationRef": "0a7b15f721b89c84e8433d335647621ef1a3027e",
+    "artifactSha256": "74f4fdcbd1311557d5c88d327ec97e273d0295599b83f1fb2fe7c10dc89f71d5",
+    "activated": false,
+    "inventoryEntriesVerified": 24644,
+    "compiledFilesVerified": 1114,
+    "runningReviewsAdopted": false,
+    "ownerDataCopied": false
+  },
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "protectedOwnerFilesExact": 36,
+    "completeProtectedRegularFileSetsAndHashesExact": true,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
   }
 }

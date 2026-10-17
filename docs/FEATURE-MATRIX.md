@@ -3,9 +3,12 @@
 [Retained recovery identities](HARNESS-DSH-MIGRATION-PILOT.md#recovery-identities-after-dsh-migration--october-17)
 separate a synthetic message ID's ordinal from current event/citation coordinates,
 following public DSH migration behavior. The same frozen four-parent real export
-now passes complete read-only preparation; no transfer or model work. Source/ordinary each pass **376 Node / 55 Python** (53 files/sixteen Chromium
-files), with 1,114 compiled inputs matching. Exact sealed qualification is pending. Original GUI, running
-reviews and the owner pilot-feedback gate remain unchanged.
+now passes complete read-only preparation; no transfer or model work.
+Source/ordinary/exact sealed each pass **376 Node / 55 Python** (53 files/
+sixteen Chromium files), with 1,114 compiled inputs matching. Private unselected
+**20261017-025154-ba9a5767 / 0a7b15f7** verifies 24,644 sealed inputs.
+Both owners/all 36 protected files, registry and selections remain exact.
+Original GUI, running reviews and the owner pilot-feedback gate remain unchanged.
 [Evidence](../release/harness-dsh-recovery-identity-qualification-20261017.json).
 
 [Recorded DSH argument failures](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-argument-errors--october-17)
