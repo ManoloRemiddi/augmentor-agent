@@ -85,7 +85,6 @@
     "noOtherGroupAccountsObserved": true,
     "accessAndDefaultAclAbsent": true,
     "firstAttempt": "Stopped before mode change because the secondary output receipt parent did not satisfy tx.atomic; resumed from the already protected durable receipt, without another recovery root",
-    "browserCodeBytesModesAndInodesUnchanged": true,
     "registryAndSelectionBytesUnchanged": true,
     "allNativeReviewPidsAnd36ProtectedFilesExact": true,
     "sharedRowsEngineMenusShortcutsAndServicesExact": true,
@@ -109,7 +108,8 @@
       "Fresh accepted-work-safe quiescence of every current caller and one full three-pair cold archive",
       "Recompute all prospective selectors/renderers under real guard; prepare data and Browser before configuration; coupled publication/finalization",
       "Ordinary loaded-client and owner continuation, then pilot feedback before further migration"
-    ]
+    ],
+    "browserCodeInventoryUnchanged": true
   },
   "followUpPrivateEvidenceSha256": {
     "harness-browser-parent-preparation-private-20261018.json": "d3ff1c5a955160ecbc3f2ff434ab60838db23ea5ca0fdfd8603113dbad34a24e",
