@@ -43,7 +43,7 @@ candidate, owner model request or owner-data migration was created by these chec
 Runtime **c0bf300075cde11d0a51f81e7ce0dbb5f32c652d**;
 [Linux SDK 39070128857](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39070128857)
 ended with Linux fixture-permission and macOS temporary-alias fixture failures;
-Windows was cancelled by the matrix. Those fixture corrections now pass locally
+Windows was cancelled; its cause is not qualified. Those fixture corrections now pass locally
 under umask 0022 and an aliased temporary directory. No hosted pass is claimed
 for that predecessor run.
 See [the source qualification record](../release/harness-preview-binding-20261017.json).

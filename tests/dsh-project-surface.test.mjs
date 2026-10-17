@@ -1,13 +1,13 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mkdtemp,mkdir,readFile,writeFile,readdir,rm} from 'node:fs/promises';import {existsSync} from 'node:fs';import {tmpdir} from 'node:os';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {createHash} from 'node:crypto';
+import {mkdtemp,mkdir,readFile,writeFile,readdir,rm,realpath} from 'node:fs/promises';import {existsSync} from 'node:fs';import {tmpdir} from 'node:os';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {createHash} from 'node:crypto';
 import {authoredSurfaceDshProject} from './fixtures/dsh-surface-project.mjs';
 const root=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.'),sdk=JSON.parse(await readFile(join(root,'node_modules/@earendil-works/pi-coding-agent/package.json')));
 const {SessionManager}=await import(pathToFileURL(join(root,'node_modules/@earendil-works/pi-coding-agent',sdk.exports['.'].import)));
 const {importDshProject}=await import(pathToFileURL(join(root,'dist/runtime/src/dsh-project-import.js')));
 const {dshHistorySurface}=await import(pathToFileURL(join(root,'dist/runtime/src/dsh-history-surface.js')));
 const {projectChat}=await import(pathToFileURL(join(root,'apps/harness/chat-projection.js')));
-async function fixture(t){const base=await mkdtemp(join(tmpdir(),'augmentor-source-surface-'));t.after(()=>rm(base,{recursive:true,force:true}));const cwd=join(base,'project');await mkdir(cwd);const rich=await authoredSurfaceDshProject(cwd),source=join(base,'source.json'),state=join(base,'state');const save=async()=>{const raw=JSON.stringify(rich.value);await writeFile(source,raw,{mode:0o600});return {sourceSha256:createHash('sha256').update(raw).digest('hex'),selection:{provider:'fixture',model:'fixture'}};};return {base,source,state,...rich,save};}
+async function fixture(t){const base=await realpath(await mkdtemp(join(tmpdir(),'augmentor-source-surface-')));t.after(()=>rm(base,{recursive:true,force:true}));const cwd=join(base,'project');await mkdir(cwd);const rich=await authoredSurfaceDshProject(cwd),source=join(base,'source.json'),state=join(base,'state');const save=async()=>{const raw=JSON.stringify(rich.value);await writeFile(source,raw,{mode:0o600});return {sourceSha256:createHash('sha256').update(raw).digest('hex'),selection:{provider:'fixture',model:'fixture'}};};return {base,source,state,...rich,save};}
 const events=f=>f.session.records.map(r=>r.event);
 test('nested compactions use surface order and preserve original GUI transcript, exact archive and fork provenance',async t=>{
  const f=await fixture(t),receipt=await importDshProject(f.source,f.state,await f.save()),row=receipt.sessions[0],meta=JSON.parse(await readFile(join(f.state,'sessions',row.sessionId+'.meta.json'))),manager=SessionManager.open(meta.file),context=JSON.stringify(manager.buildSessionContext().messages);

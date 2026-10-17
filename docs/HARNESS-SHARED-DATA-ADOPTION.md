@@ -105,6 +105,12 @@ and every startup-marker removal; partial multi-source forward/reverse; exact
 original restoration; immutable source/nested history; existing target history;
 foreign edits; missing full-source coverage; reserve refusal; ownership gaps;
 explicit partial sources; and post-reopen work preserved during finalization.
+The complete local focus passes **121 Python / 144 Node**, zero failures/skips.
+The 144 Node total includes 17 shared-profile/DSH cases and the complete
+127-case hosted offline-import command under an aliased temporary directory and
+umask 0022. Canonical authored fixture roots preserve the production alias/privacy
+refusal; they do not qualify a physical Mac or Windows installation.
+
 Publication backend health replies are synthetic. The separate backend-probe suite
 retains its real namespace/transport tests. No owner model call or data migration
 is implied by authored fixture success.

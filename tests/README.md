@@ -2,7 +2,7 @@
 
 [Shared-data adoption into the existing canonical store](../docs/HARNESS-SHARED-DATA-ADOPTION.md)
 now binds multiple full/explicitly partial sources to client publication schema 2,
-with cold archive schema 2. Local **121 Python / 57 Node** pass: 21 real SQLite
+with cold archive schema 2. Local **121 Python / 144 Node** pass: 21 real SQLite
 adoption cases, multi-source/partial-source recovery, exact component reverse and
 post-reopen work preservation. No full app copy, owner migration or installed
 change. A read-only advisory audit identifies a third legacy Native shared pair

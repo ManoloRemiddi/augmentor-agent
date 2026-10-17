@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mkdtemp,mkdir,readFile,writeFile,rm,readdir,symlink} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {createHash} from 'node:crypto';
+import {mkdtemp,mkdir,readFile,writeFile,rm,readdir,symlink,realpath} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {createHash} from 'node:crypto';
 import {execFile} from 'node:child_process';import {promisify} from 'node:util';
 import {authoredDshProject} from './fixtures/dsh-project.mjs';
 const root=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.');
@@ -10,7 +10,7 @@ const {stateInventory}=await import(pathToFileURL(join(root,'dist/runtime/src/pr
 const sdk=JSON.parse(await readFile(join(root,'node_modules/@earendil-works/pi-coding-agent/package.json')));
 const {SessionManager}=await import(pathToFileURL(join(root,'node_modules/@earendil-works/pi-coding-agent',sdk.exports['.'].import)));
 const sha=b=>createHash('sha256').update(b).digest('hex');
-async function fixture(t){const base=await mkdtemp(join(tmpdir(),'augmentor-project-batch-'));t.after(()=>rm(base,{recursive:true,force:true}));const state=join(base,'state'),selection={provider:'fixture',model:'fixture'};
+async function fixture(t){const base=await realpath(await mkdtemp(join(tmpdir(),'augmentor-project-batch-')));t.after(()=>rm(base,{recursive:true,force:true}));const state=join(base,'state'),selection={provider:'fixture',model:'fixture'};
  const inputs=[],values=[];
  for(const tag of ['A','B']){const cwd=join(base,tag);await mkdir(cwd);const value=authoredDshProject(cwd),ids=new Map(value.workspace.sessionIds.map(id=>[id,tag+'-'+id]));value.workspace.title='Authored '+tag;value.workspace.sessionIds=value.workspace.sessionIds.map(id=>ids.get(id));value.pinnedSessionIds=value.pinnedSessionIds.map(id=>ids.get(id));value.archivedSessionIds=value.archivedSessionIds.map(id=>ids.get(id));for(const s of value.sessions)s.opening.header.id=ids.get(s.opening.header.id);values.push(value);const sourceFile=join(base,tag+'.json'),raw=JSON.stringify(value);await writeFile(sourceFile,raw,{mode:0o600});inputs.push({sourceFile,options:{sourceSha256:sha(raw),selection}});}
  return {base,state,selection,inputs,values};}

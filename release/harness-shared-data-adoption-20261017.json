@@ -13,9 +13,9 @@
     "sharedAdoptionCases": 21,
     "publicationCases": 23,
     "previewCases": 7,
-    "nodePass": 57,
+    "nodePass": 144,
     "nodeSharedProfilesAndDsh": 17,
-    "nodeOfflineImportsWithAliasedTemp": 40,
+    "nodeOfflineImportsWithAliasedTemp": 127,
     "fail": 0,
     "skip": 0,
     "hostReadOnly": true,
@@ -26,7 +26,8 @@
     "publicationBackendRepliesSynthetic": true,
     "ownerModelRequests": 0,
     "fullAppCopiesCreated": 0,
-    "newInstalledArtifacts": 0
+    "newInstalledArtifacts": 0,
+    "nodeOriginalFortyCaseSubsetOverlaps": true
   },
   "sourceScope": [
     "One canonical complete target and up to four full or explicitly partial source pairs",
@@ -44,9 +45,10 @@
     "conclusion": "failure",
     "linuxFixtureUmaskFailure": true,
     "macFixtureTemporaryAliasFailure": true,
-    "windowsCancelledByMatrix": true,
     "localCorrectionsQualified": true,
-    "wholeWorkflowPassClaimed": false
+    "wholeWorkflowPassClaimed": false,
+    "windowsCancelled": true,
+    "cancellationCauseUnqualified": true
   },
   "ownerDataMigrated": false,
   "installedOwnerAppChanged": false,
@@ -66,7 +68,19 @@
   "privateEvidenceSha256": {
     "harness-shared-adoption-final-20261017.log": "779ce1ca17c5f64be8939ebe043d31582af2812f17fca81c03114f3f90356bb3",
     "harness-shared-adoption-node-20261017.log": "254217ac551de37c01170a44e20eccdccda67fefa4c9472c8c780387cfb0015f",
-    "harness-shared-adoption-legacy-preview-schema-private-20261017.json": "3d65b91f274ab9c678cac692df751bfdb328cbabaaa6f6456eb88261a5a0266e"
+    "harness-shared-adoption-legacy-preview-schema-private-20261017.json": "3d65b91f274ab9c678cac692df751bfdb328cbabaaa6f6456eb88261a5a0266e",
+    "harness-shared-adoption-import-matrix-final-20261017.log": "9c6282b8f542af03e35be9a104c2f2b79f852f057b73c95cdb16b90ca5e956b5"
   },
-  "hostedQualificationPending": true
+  "hostedQualificationPending": true,
+  "runtimeRef": "42d3e41eacfe3055a4e2a6a47dc466c33b36a7d9",
+  "fixtureFollowup": {
+    "scope": "Canonicalize every fixture root used by the offline import SDK step, including shared real-Host planning, batch, bundle and transaction fixtures",
+    "fullSdkOfflineImportNodePass": 127,
+    "fail": 0,
+    "skip": 0,
+    "aliasedTmpdir": true,
+    "umask": "0022",
+    "productionGuardsUnchanged": true,
+    "physicalMacNotQualified": true
+  }
 }

@@ -5,7 +5,7 @@ import http from 'node:http';
 import {spawn,execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import {once} from 'node:events';
-import {mkdtemp,mkdir,readFile,writeFile,rm} from 'node:fs/promises';
+import {mkdtemp,mkdir,readFile,writeFile,rm,realpath} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {setTimeout as delay} from 'node:timers/promises';
@@ -16,7 +16,7 @@ import {privateDir,atomicJson} from '../../dist/runtime/src/storage.js';
 import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
 export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,permissionMode=false,forcePrompt=false,voiceMode,metricsMode=false,attachmentMode=false,localRouteMode}={}){
- const root=process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-')),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
+ const root=await realpath(process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-'))),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
  const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])privateDir(path);
  const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
  if(forcePrompt){const extension=join(root,'authored-force-prompt.mjs');await writeFile(extension,"export default pi=>pi.on('before_agent_start',event=>({systemPrompt:event.systemPrompt+'\\n\\nAUTHORED_FORCED_PROMPT'}));\n");atomicJson(join(config,'resources.json'),{sources:[extension],skills:[]});}

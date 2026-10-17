@@ -1,10 +1,10 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {syncBuiltinESMExports} from 'node:module';
-import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises';import {spawn} from 'node:child_process';import {once} from 'node:events';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {tmpdir} from 'node:os';
+import {mkdtemp,mkdir,writeFile,readFile,rm,realpath} from 'node:fs/promises';import {spawn} from 'node:child_process';import {once} from 'node:events';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';import {tmpdir} from 'node:os';
 const root=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.');
 const {stateTransaction,stateInventory,recoverStateTransaction}=await import(pathToFileURL(join(root,'dist/runtime/src/profile-transaction.js')));
 const {acquireProfileLease,ProfileBusy,profileFence}=await import(pathToFileURL(join(root,'dist/runtime/src/profile-lease.js')));
-async function fixture(t){const base=await mkdtemp(join(tmpdir(),'augmentor-state-transaction-'));t.after(()=>rm(base,{recursive:true,force:true}));const state=join(base,'state');await mkdir(state,{mode:0o700});await writeFile(join(state,'old.txt'),'AUTHORED ORIGINAL',{mode:0o600});return {base,state};}
+async function fixture(t){const base=await realpath(await mkdtemp(join(tmpdir(),'augmentor-state-transaction-')));t.after(()=>rm(base,{recursive:true,force:true}));const state=join(base,'state');await mkdir(state,{mode:0o700});await writeFile(join(state,'old.txt'),'AUTHORED ORIGINAL',{mode:0o600});return {base,state};}
 async function until(fn,label){const end=Date.now()+12000;while(!await fn()){if(Date.now()>end)throw Error(label);await new Promise(r=>setTimeout(r,20));}}
 test('the real Node descriptor retains the kernel lease after its Python helper exits',{skip:process.platform!=='linux'},async t=>{
  const f=await fixture(t),first=acquireProfileLease(f.state);try{assert.throws(()=>acquireProfileLease(f.state),ProfileBusy);assert.equal(await readFile(join(f.state,'old.txt'),'utf8'),'AUTHORED ORIGINAL');}finally{first.close();}const second=acquireProfileLease(f.state);second.close();
