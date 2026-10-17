@@ -1,5 +1,36 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Stopped-cleaner private package — October 17
+
+The new helper now passes **304 Node checks each** in source, fresh ordinary and
+exact sealed **20261017-124857-6306bf21**, application **248828e6** /
+runtime change **c351558f**. Each package also passes **41 packaging / 43 Office
+Python** checks (overlapping groups). The **24,747-input seal / 1,140 compiled
+files** verify; artifact SHA-256 is
+`c35084df299213de94fec5bd23717c67d7af54dc689978e2f591e7368d796057`.
+The exact sealed package additionally passes both original historical Branch GUI
+cases, v1/v2, with the corrected CDP interception lifecycle and unchanged child,
+draft, cold recovery, explicit Send and native/archive assertions. No errors/skips.
+
+The first sealed run retains **303 pass / one failure** from an ESRCH read of a
+just-exited authored Host. The external privacy driver now captures the known
+process start token before shutdown and handles authoritative disappearance via
+the existing identity helper. All privacy/network/history/configuration assertions
+remain; the rerun uses the same unmodified sealed application.
+
+This is a private incremental preview with unchanged production dependencies,
+native binaries and Node, not a clean-room/public installer. External drivers and
+verified diagnostic copies preserve their output-root precondition. Both owner
+reviews remain **97d95d58 / 20261017-095821-fb78d6df**, pinned engine default;
+all 36 protected file sets, PIDs, shared state, menus and model/GPU/voice services
+verify unchanged. No engine rebuild, owner activation, inference or transfer.
+The preceding passing1417db62 and failed 76ace249 carriers remain separate/exact;
+the failed carrier must never activate. Current c351558f Linux SDK passes; Debian CI continues separately;
+248828e6 is test/docs-only and preserves that run. Source/public packaging,
+remaining startup/durability/corpus/security and explicit managed-backend selection/
+adoption/rollback stay open. Owner pilot feedback still gates further migration.
+[Exact package and preservation evidence](../release/office-rebuild/stopped-cleaner-package-qualification-20261017.json).
+
 ## Stopped cleanup owner — October 17
 
 A stopped independent scratch helper previously stayed stopped after its Node

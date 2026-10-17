@@ -2153,6 +2153,12 @@ Original PDF preview: `harness-pdf-chromium.test.mjs` uses authored PDF/JPX byte
 
 ## Original Office preview qualification
 
+The stopped-cleaner private carrier now passes the same 304 Node cases in source,
+fresh ordinary and exact sealed, plus 41 packaging/43 Office Python each (groups
+overlap). Exact sealed historical v1/v2 Branch GUI also passes separately. Runtime
+and immutable inputs are tested through external drivers without altering the
+artifact. [Package identities/scopes](../docs/HARNESS-OFFICE-PREVIEWS.md#stopped-cleaner-private-package--october-17).
+
 The stopped-cleaner extension adds four actual post-readiness fault cases: managed
 and transient stopped helpers wake on owner death; a separate live renderer lease
 preserves bytes until release; admitted real conversion loses its owner with all

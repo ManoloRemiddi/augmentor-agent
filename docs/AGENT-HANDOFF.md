@@ -7,21 +7,22 @@ pilot feedback; voice and later OS work stay deferred.
 
 [Historical Branch test lifecycle](HARNESS-BRANCH-CONTROLS.md#historical-branch-test-interception-lifecycle--october-17)
 corrects a queued CDP continuation/Fetch-disable race without filtering errors.
-Both original v1/v2 cases pass; prior1417db62 Debian ends2,127/one failure/52 skips
-before packaging. Product code is unchanged. Currentc351558f normal CI continues
+Both original v1/v2 cases pass; prior 1417db62 Debian ends 2,127/one failure/52 skips
+before packaging. Product code is unchanged. Current c351558f normal CI continues
 with its existing test revision; this test/docs-only checkpoint preserves that
 run and claims no whole-workflow approval.
 
-[Stopped cleanup owner correction](HARNESS-OFFICE-PREVIEWS.md#stopped-cleanup-owner--october-17)
-adds a verified kernel SIGCONT wake before scratch admission. A real old-runtime
-negative reproduces suspended-helper retention after owner death. Four new actual
-cases pass, including live renderer lease preservation; source304/43 Python,
-actual native24 and constrained-container24/two manager skips pass. Original
-managed Host/Thin GUI passes unchanged assertions. This helper change is not
-installed or included in the preceding1417db62 sealed carrier below. All owner
-state/services remain unchanged. Fresh ordinary/sealed/explicit backend adoption,
-pre-hook/publication/power-loss/corpus/security/public gates remain.
-[Evidence](../release/office-rebuild/stopped-cleaner-qualification-20261017.json).
+[Stopped-cleaner private package](HARNESS-OFFICE-PREVIEWS.md#stopped-cleaner-private-package--october-17)
+qualifies source/ordinary/exact sealed 304 each, package 41/43 Python, plus two
+exact-sealed original historical Branch GUI cases. Unselected release
+**20261017-124857-6306bf21**, app 248828e6 / runtime c351558f, artifact c35084df…796057,
+verifies 24,747 inputs/1,140 compiled files. Actual native24/ThinGUI and constrained
+container 24 / two explicit manager skips also pass. Both installed reviews above,
+all 36 protected file sets/shared state/services remain exact. No owner update,
+inference or transfer. This fixes the stopped admitted-cleaner window; startup/
+publication/durability/corpus/security/public gates and explicit managed-backend
+selection/adoption/rollback remain. Current c351558f Linux SDK passes; Debian continues; test/docs 248828e6
+preserves that run. [Evidence](../release/office-rebuild/stopped-cleaner-package-qualification-20261017.json).
 
 [Corrected private Office package](HARNESS-OFFICE-PREVIEWS.md#corrected-private-package-qualification--october-17)
 qualifies runtime **1417db62** in source/fresh ordinary/exact sealed **300 Node**

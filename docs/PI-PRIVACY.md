@@ -1,8 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Exact Host shutdown observation — October 17
+
+The private package qualification retains an initial 303-pass/one-failure run:
+Linux returned ESRCH while the authored Host's proc file disappeared after an
+accepted shutdown. The external driver now captures its full process start token
+before shutdown and uses the existing identity reader for disappearance, PID
+reuse and zombie state. It never signals a discovered PID or filters network/
+privacy errors. The same unmodified seal then passes 304 checks, including actual
+fresh/cold privacy tracing. Owner profiles and installed apps stay unchanged.
+[Exact test-driver and package evidence](../release/office-rebuild/stopped-cleaner-package-qualification-20261017.json).
+
 ## Optional managed Office recovery state — October 17
 
-The source-only managed Office candidate now retains private conversion ownership
+The uninstalled managed Office candidate now retains private conversion ownership
 receipts and crash-left copies inside its own profile, rather than recovering by
 scanning unrelated temporary/workspace directories. Normal cleanup removes both;
 verified dead-owner recovery occurs on managed converter initialization. Unknown

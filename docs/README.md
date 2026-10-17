@@ -10,7 +10,7 @@
 
 [Historical Branch test lifecycle](HARNESS-BRANCH-CONTROLS.md#historical-branch-test-interception-lifecycle--october-17) · queued CDP continuation fix; original v1/v2 child/draft/cold/Send assertions retained; prior hosted root 2,127/one failure/52 skips.
 
-[Stopped cleanup owner](HARNESS-OFFICE-PREVIEWS.md#stopped-cleanup-owner--october-17) · verified kernel wake after owner death, live-lease preservation, source 304/native 24; fresh package adoption remains separate.
+[Stopped-cleaner private package](HARNESS-OFFICE-PREVIEWS.md#stopped-cleaner-private-package--october-17) · 304 checks each in source/ordinary/exact sealed, package 41/43 Python, exact sealed historical Branch GUI v1/v2; installed MX unchanged.
 
 [Corrected private Office package](HARNESS-OFFICE-PREVIEWS.md#corrected-private-package-qualification--october-17) · 300 checks each in source/ordinary/exact sealed, package 41/43 Python, retained failed carrier, unchanged installed MX; hosted/adoption/public gates remain.
 
