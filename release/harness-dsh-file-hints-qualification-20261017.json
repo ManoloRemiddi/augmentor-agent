@@ -28,7 +28,7 @@
     "supplierGuiAndImplementationChanged": false
   },
   "qualification": {
-    "phase": "source and ordinary passed; exact separately sealed pending",
+    "phase": "source, ordinary and exact separately sealed passed; no owner adoption",
     "sourceCheckBuildPass": true,
     "sourceNodePass": 315,
     "sourcePythonPass": 55,
@@ -60,7 +60,13 @@
     "compiledFilesVerified": 1111,
     "ordinaryUnchangedBaselineInputsVerified": 23522,
     "sameFrozenAuthoredProfileAcceptedByOrdinary": true,
-    "sameFrozenRealPreparationRegressionAcceptedByOrdinary": true
+    "sameFrozenRealPreparationRegressionAcceptedByOrdinary": true,
+    "exactSealedNodePass": 315,
+    "exactSealedPythonPass": 55,
+    "sameFrozenAuthoredProfileAcceptedBySeal": true,
+    "sameFrozenRealPreparationRegressionAcceptedBySeal": true,
+    "sealedEntriesVerified": 24638,
+    "ownerAdoption": false
   },
   "sameFrozenAuthoredProfile": {
     "precedingApplicationRef": "afef0e54d53e0c834881bb118ef55e516ab94bdb",
@@ -88,5 +94,26 @@
     "alreadyAcceptedTwoParentFileProjectStillPrepares": true,
     "ownerImports": 0,
     "modelRequests": 0
+  },
+  "applicationRef": "bfb837be575ad4cb90177aa11565401e17080146",
+  "implementationRef": "bfb837be575ad4cb90177aa11565401e17080146",
+  "separatelySealedCandidate": {
+    "releaseId": "20261017-021446-691dfae7",
+    "applicationRef": "bfb837be575ad4cb90177aa11565401e17080146",
+    "artifactSha256": "bd8b3e2b5c88b3a10cd24d349ae46c6f84f25db53fc5cc7ec1f24ac27a101ece",
+    "activated": false,
+    "inventoryEntriesVerified": 24638,
+    "compiledFilesVerified": 1111,
+    "runningReviewsAdopted": false,
+    "ownerDataCopied": false
+  },
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "protectedOwnerFilesExact": 36,
+    "completeProtectedRegularFileSetsAndHashesExact": true,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
   }
 }

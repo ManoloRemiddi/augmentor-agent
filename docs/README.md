@@ -3,9 +3,11 @@
 [Compacted file relocation paths](HARNESS-DSH-MIGRATION-PILOT.md#compacted-file-relocation-paths--october-17)
 correct the preceding missing-hint case. Verified, scoped former locations survive
 several moves and post-move branches while saved summaries stay unchanged.
-Source/ordinary each pass **315 Node / 55 Python** checks; the same frozen authored
-profile gains its current path without resurrecting compacted media. Exact sealed
-qualification and adoption remain pending. [Evidence](../release/harness-dsh-file-hints-qualification-20261017.json).
+Source/ordinary/exact sealed each pass **315 Node / 55 Python** checks; the same
+frozen authored profile gains its current path without resurrecting compacted
+media. Private unselected **20261017-021446-691dfae7 / bfb837be** verifies 24,638
+sealed/1,111 compiled inputs. Both reviews/all 36 protected files, registry and
+selections remain exact; adoption and pilot feedback remain open. [Evidence](../release/harness-dsh-file-hints-qualification-20261017.json).
 
 [Historical DSH files](HARNESS-DSH-MIGRATION-PILOT.md#historical-file-attachments--october-17)
 now retain verbatim bodies, original cards/names, scoped current-profile paths,

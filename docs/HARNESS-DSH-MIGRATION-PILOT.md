@@ -1251,4 +1251,18 @@ actual SDK cases. All **1,111 compiled files** match. Both implementations also
 run the identical frozen authored-profile comparison against the preceding seal,
 and retain the same two-parent real-file preparation regression. Existing source
 snapshots, raw exports and model assignments remain unchanged. Exact sealed
-qualification and owner adoption remain pending.
+qualification follows; owner adoption remains pending.
+
+The exact private unselected candidate **20261017-021446-691dfae7**, application
+**bfb837be575ad4cb90177aa11565401e17080146**, SHA-256
+**bd8b3e2b5c88b3a10cd24d349ae46c6f84f25db53fc5cc7ec1f24ac27a101ece**,
+passes the same **315 Node / 55 Python** checks and both external same-input
+comparisons. All **24,638 sealed / 1,111 compiled inputs** verify after tests.
+Development/test resources and private data stay external. Both original review
+PIDs, complete sets/hashes of all 36 protected regular files, registry and installed
+selections remain exact; their existing 24,615-input running seals also verify.
+There is no owner restart, activation, new project transfer or real model work.
+The preceding 288-case file candidate's compacted-path gap is corrected by this
+qualification. Further guarded adoption, owner pilot acceptance, independent
+historical argument/source formats, two observation failures and later rollout
+remain separate gates. Voice and other OS work remain deferred.
