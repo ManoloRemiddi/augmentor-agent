@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Immutable preservation candidate](HARNESS-DSH-INSTALLATION.md#immutable-preserved-integration-candidate--october-17)
+qualifies 73675d62 / 20261017-180443-c8315564 (a4dc0eb2…6ef93): ordinary/sealed
+42 Node/90 Python, recorded Python repeats 90, plus 11 sealed Office/inspection
+cases. Actual retained-role cold replies/shared prompts pass against sealed code;
+actual configuration stages read-only with 46 inputs/10 edits. Linux SDK
+39047120454 succeeds. One scratch app removed and the superseded unreferenced
+candidate retired; owner main/pilot and data unchanged. Cold-backed-up integration
+activation/reverse, matching clients and real owner acceptance remain.
+[Record](../release/harness-dsh-preserved-package-20261017.json).
+
 [Cold retained-role fixture qualification](HARNESS-DSH-INSTALLATION.md#retained-roles-cold-ownership-and-prompt-library-bridge--october-17)
 now includes controlled replies, identity/current memory startup and shared prompt
 instruction/draft behavior. This closes the prestarted-services-only evidence gap

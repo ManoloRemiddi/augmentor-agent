@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [immutable preservation candidate](../docs/HARNESS-DSH-INSTALLATION.md#immutable-preserved-integration-candidate--october-17)
+now repeats the 90-case focus against ordinary/sealed code and the recorded Python;
+42 Node cases pass at each artifact stage, plus 11 sealed Office/inspection cases.
+Retained private modules execute only in place in isolated operator tests with
+external authored fixtures; no private source enters the artifact or public tests.
+Linux SDK 39047120454 is terminal success. Owner activation remains separate.
+
 Preservation focus is now 16 cases/90 overlapping Python cases overall. It covers
 legacy bundle alias/provenance, supported backend replacement (DSH patch `name` is
 an identity guard), repeated updates, and identical-public entry rebindings while

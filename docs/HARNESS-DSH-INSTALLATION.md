@@ -2,6 +2,58 @@
 
 # Linux DSH integration installation
 
+## Immutable preserved-integration candidate — October 17
+
+The existing source is now qualified as one private **unselected** MX candidate:
+application **73675d62d1f3db98ebc6490e5cc73c4e2629ddb8** (runtime e07e5db6),
+release **20261017-180443-c8315564**, artifact
+**a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93**.
+Its seal verifies **24,773 inputs / 1,143 compiled files**. The previous immutable
+candidate supplies checked dependencies/components/notices; changed public sources
+and freshly compiled runtime output supply this candidate. No private repository
+source or owner data is copied into it. It is not a public distribution approval.
+
+Ordinary and exact-sealed qualification each pass **42 Node / 90 Python** cases.
+The recorded Python interpreter repeats all 90 Python cases (overlapping coverage).
+An additional **11 exact-sealed Office process/Native inspection cases** pass,
+including the actual changed-source Wasm recovery regression. All final suites
+have zero failures/skips. The first operator attempts exposed excessive socket
+path length and a missing test-only Native import path; those fixture environments
+were corrected. Short `/tmp` bind mounts are backed by the same managed workspace,
+with read-only host files and isolated process/network namespaces. No app changes
+or additional sealed candidates were needed to correct those fixture failures.
+
+The actual owner's configuration stages and verifies against this exact immutable
+incoming build: **46 bound inputs / 10 module edits**, preserved peer settings,
+legacy frontend and current shared-library backend. Its 20 remaining literal paths
+remain retained and protected; the original full profile is neither executed nor
+activated. Separately, the original nine personal modules run **in place** against
+the exact sealed incoming services/adapters on authored data. Both saved roles
+cold-reopen and continue, identity reaches model input, the current sealed memory
+service owns cold startup, templates/instructions work, and Improve uses shared
+instructions without submitting a chat turn. Three controlled local model calls;
+zero owner/external model calls. Cached banks/settings and stale-source bytes stay
+exact. This is narrower than real owner historical/tool/model/UI acceptance.
+
+[Linux SDK run 39047120454](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39047120454)
+is a terminal success at the same source head. This supersedes the earlier pending
+SDK observation below; it does not waive the separate public Office source/rebuild
+packaging gate or prove later-platform parity.
+
+The one ordinary app mirror and all test/data fixtures are removed. The now
+superseded, unselected 20261017-151405-6c6b7080 candidate passed fresh seal and
+process/selection/launcher/profile-reference checks and was retired (0.548 GiB);
+its small manifest/provenance receipt remains. The new candidate and preceding
+embedding candidate remain; ambiguous older artifacts are still protected.
+The 64 GiB reserve and one-workspace policy remain mandatory.
+
+The actual main/pilot app, protected stores, launchers, registry and model/GPU/voice
+services remain unchanged. **No owner cutover is claimed.** Next implement and
+qualify the durable cold-backed-up custom integration activation/reverse operation,
+then match clients and qualify real owner continuation/busy/restart/reverse behavior.
+Pilot feedback still gates further project transfers. Voice/later OS stay deferred.
+[Aggregate evidence](../release/harness-dsh-preserved-package-20261017.json).
+
 ## Retained roles, cold ownership and Prompt Library bridge — October 17
 
 Source **e07e5db623d2b777eeb4e25ece5646da858b8b90** closes two concrete preservation gaps. The retained 0.2.0 Prompt

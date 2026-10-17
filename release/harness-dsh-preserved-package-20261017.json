@@ -1,0 +1,102 @@
+{
+  "schema": "augmentor-harness-dsh-preserved-package/1",
+  "date": "2026-10-17",
+  "applicationRef": "73675d62d1f3db98ebc6490e5cc73c4e2629ddb8",
+  "runtimeRef": "e07e5db623d2b777eeb4e25ece5646da858b8b90",
+  "releaseId": "20261017-180443-c8315564",
+  "artifactSha256": "a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93",
+  "baseArtifactSha256": "112ec5c4bbf146f03994dd1b6a0996d52d776c7f037914e0f4d33b6b2117dd53",
+  "inventoryEntriesVerified": 24773,
+  "compiledFilesVerified": 1143,
+  "scope": "One private unselected immutable MX candidate; exact-sealed fixtures, no owner activation",
+  "qualification": {
+    "ordinaryNodePass": 42,
+    "exactSealedNodePass": 42,
+    "ordinaryPythonPass": 90,
+    "exactSealedPythonPass": 90,
+    "recordedInterpreterPythonPass": 90,
+    "recordedInterpreterCasesOverlap90": true,
+    "exactSealedOfficeAndInspectionPass": 11,
+    "fail": 0,
+    "skip": 0,
+    "productionDependenciesComponentsNoticesUnchanged": true,
+    "immutableBytesVerifiedAfterTests": true,
+    "publicDistributionQualified": false
+  },
+  "actualProfileStage": {
+    "boundInputs": 46,
+    "moduleChanges": 10,
+    "identicalPublicRoleChanges": 8,
+    "retainedLiteralPaths": 20,
+    "peerEditsExact": true,
+    "ownerFilesChanged": false,
+    "stagePlanSha256": "f7e0e989bd5adca55f37c8cfe017b5966d1be8847501b930c2e50fb4b5ab847f"
+  },
+  "exactSealedRetainedRoles": {
+    "hostRootReadOnly": true,
+    "isolatedNetworkNamespace": true,
+    "retainedPersonalModules": 9,
+    "bothRetainedRolesRegistered": true,
+    "bothRetainedRolesCreated": true,
+    "authoredIdentitySnapshotsExact": true,
+    "coldRetainedRolesHistoryEventsExact": true,
+    "bridgedImprovementSavedAndShared": true,
+    "bridgedTemplateSaveDelete": true,
+    "legacyFrontendBundleRetained": true,
+    "coldNoOwnerRoleContinuation": true,
+    "currentMemoryOwnerAfterColdStart": true,
+    "identityInAuthoredModelInput": true,
+    "sharedInstructionsUsedForDraft": true,
+    "improveDoesNotSubmitConversation": true,
+    "existingCachedBankRowsExact": true,
+    "staleSourceDatabasesExact": true,
+    "fixtureProcessesTerminal": true,
+    "authoredModelRequests": 3,
+    "ownerModelRequests": 0
+  },
+  "storage": {
+    "persistentApplicationCandidatesCreated": 1,
+    "ordinaryMirrorsRemoved": true,
+    "fixturesAndTestViewsRemoved": true,
+    "managedReserveGiB": 64,
+    "socketFixtureBackingInsideWorkspace": true,
+    "supersededUnreferencedCandidateRemoved": "20261017-151405-6c6b7080",
+    "supersededBytesGiBRecovered": 0.548,
+    "workingAndRollbackAndRegisteredArtifactsPreserved": true,
+    "ambiguousOlderRootsRetained": true
+  },
+  "linuxSdk": {
+    "run": 39047120454,
+    "head": "73675d62d1f3db98ebc6490e5cc73c4e2629ddb8",
+    "conclusion": "success",
+    "scope": "Linux SDK workflow only"
+  },
+  "activated": false,
+  "installedChanged": false,
+  "ownerProjectsTransferred": 0,
+  "privateRepositorySourceCopied": false,
+  "remaining": [
+    "Durable cold-backed-up custom integration activation and reverse transaction",
+    "Matching installed Native/Browser clients and explicit custom entrypoint mapping",
+    "Actual owner bank/history/settings/budget/busy/restart/model/tool/UI acceptance",
+    "Owner pilot feedback before further project transfers; excluded project remains DSH",
+    "Public Office rebuild/distribution gate; voice and later operating systems deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-preserved-package-ordinary-node-20261017.log": "7a51953470301beaaf5af96252d2fa87755eb19fcd370054918cea11b1e2a12f",
+    "harness-preserved-package-ordinary-python-20261017.log": "e5f442153177ba0d37de6806e716ba17107f1035f228e9734d69565124ba063e",
+    "harness-preserved-package-sealed-node-20261017.log": "58e7622e1e72eb386e16de87516766a1a65ef216e43d6902cb8f574904b8c538",
+    "harness-preserved-package-sealed-python-20261017.log": "1ce39df8e85a810432f924bd8ee1e3f07bc356d3734ae7f9bca02f6bac834768",
+    "harness-preserved-package-sealed-declared-python-20261017.log": "f5ce75ec908d491d4a3ecb92874255c774accdb9c8e2ce52e78126c1e50674ea",
+    "harness-preserved-package-sealed-office-inspection-20261017.log": "3fb50f7b493594f1aa89f53494a556098ae966c65544d2678d421d0ac785d1ad",
+    "harness-preserved-package-sealed-retained-roles-20261017.log": "7f05250892adab591d5444501bf680ee039c193c3f814139d473887eb6639d20"
+  },
+  "ownerPreservation": {
+    "protectedFileSets": 36,
+    "mainAndPilotPidsAndFilesExact": true,
+    "registryRevision": 18,
+    "sharedRowsAndEngineConfigurationExact": true,
+    "menuSelectionsExact": true,
+    "qwenAndVoiceUnchanged": true
+  }
+}
