@@ -7,7 +7,9 @@ serializes cooperating journal metadata cleanup; held renderer/foreign roots
 remain preserved. A stopped metadata helper is killed at the existing ten-second
 Node exec deadline, with its private copy left recoverable. That deadline needs
 the caller event loop to run; owner death has a separate kernel hook. The first
-failed sealed carrier remains unactivated and unchanged.
+failed sealed carrier remains unactivated and unchanged. The [corrected private
+package](HARNESS-OFFICE-PREVIEWS.md#corrected-private-package-qualification--october-17)
+passes exact sealed tests separately; neither installed owner app is changed.
 
 The uninstalled `linux-managed-wasm` candidate stores authorized document/PDF and
 nested entry copies under its private application state's `office-scratch/v1/data`.

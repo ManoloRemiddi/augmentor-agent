@@ -5,18 +5,20 @@ remain **97d95d58 / 20261017-095821-fb78d6df**, with the original DSH GUI and
 default Office engine. No additional owner project transfer is authorized before
 pilot feedback; voice and later OS work stay deferred.
 
-[Packaged Office cleanup correction](HARNESS-OFFICE-PREVIEWS.md#packaged-cleanup-contention-correction--october-17)
-is source-only: the first sealed carrier **20261017-115954-59433a62** fails one
-concurrent cleanup case and must not be activated; its seal is retained exact.
-Cooperating journal locks now serialize, and the existing ten-second exec bound
-SIGKILLs a stopped helper. Source300/43 Python and isolated21/one manager skip
-pass; exact test scopes and 4c86603d hosted failures are in the linked evidence.
-The permission-negative fixture explicitly establishes its mode, recovery uses
-CI's declared DejaVu font, and Debian containers request an init process rather
-than relaxing orphan/reap assertions. Rebuild and requalify ordinary/exact sealed
-carriers before adoption; source/third-party/public packaging, remaining startup/
-power-loss/corpus/security and fresh hosted gates remain. Installed reviews,
-owner state and model/GPU/voice settings are preserved.
+[Corrected private Office package](HARNESS-OFFICE-PREVIEWS.md#corrected-private-package-qualification--october-17)
+qualifies runtime **1417db62** in source/fresh ordinary/exact sealed **300 Node**
+each (45 files/19 Chromium, two workers/no skips). Each package also passes
+41 packaging/43 Office Python checks. Unselected release
+**20261017-123104-dba3acbf**, artifact **bd72197a…f874f5**, verifies all
+24,744 inputs/1,140 compiled files. Existing Thin engine/actual original GUI also
+passes; no engine rebuild or owner adoption. Installed owners remain above,
+with all 36 protected file sets/shared state/services preserved. Failed carrier
+**20261017-115954-59433a62** stays rejected/immutable. The correction serializes
+metadata writers and hard-kills a stopped helper at the existing ten-second
+Node bound; live/held/foreign root guards remain. Linux SDK passes; hosted Debian
+continues, Mac matrix fails separately. Full hosted/source/third-party/public
+packaging, explicit backend selection/adoption/rollback, startup/power-loss and
+wider corpus/security remain. [Evidence](../release/office-rebuild/corrected-package-qualification-20261017.json).
 
 [Rich Office comparison](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17)
 passes six authored formats/16 pages through both actual providers: required text/

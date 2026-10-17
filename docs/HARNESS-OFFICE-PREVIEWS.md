@@ -1,6 +1,39 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Corrected private package qualification — October 17
+
+The corrected runtime **1417db62** now passes the same **300 Node checks** in
+source, a fresh ordinary package and the exact separately sealed carrier
+**20261017-123104-dba3acbf**. Each package also passes **41 packaging Python**
+and **43 Office Python** checks; these groups overlap and are not additive.
+The carrier's **24,744 sealed inputs / 1,140 compiled files** verify exactly;
+artifact SHA-256 is
+`bd72197a68841b6acac22f0e5c6b6d883243363e3edc327524dfe50140f874f5`.
+Tests cover 45 Node files/19 Chromium files, two workers, without failures/skips.
+The original actual managed Host/GUI also passes with the existing Thin engine
+in a separate unselected derivative; all 53 engine files verify. No engine rebuild.
+
+This is a private incremental preview over the verified `97d95d58` base, with
+23,580 unchanged baseline inputs and unchanged production dependencies/native/Node
+bytes. External test drivers and byte-identical Python diagnostic copies preserve
+their required private output-root precondition; the sealed application is not
+modified. It is not clean-room source installation or public package approval.
+The failed **20261017-115954-59433a62** carrier remains exact, unactivated and
+rejected; the passing carrier does not supersede that retained negative evidence.
+
+**Neither installed owner review is updated**: both remain `97d95d58` /
+`20261017-095821-fb78d6df`, with the default pinned Office engine. Read-only
+postflight confirms all 36 protected file sets, owner PIDs, shared state, menus,
+registry and model/GPU/voice services remain exact. No owner inference or transfer.
+Current `1417db62` Linux SDK passes; Debian CI remains in progress at this checkpoint,
+and the Mac matrix fails separately. Full hosted acceptance, explicit managed
+backend adoption/rollback, remaining startup/power-loss/corpus/security and public
+source/rebuild/third-party gates remain. Pilot feedback still gates more migration.
+[Exact package, test-scope and preservation evidence](../release/office-rebuild/corrected-package-qualification-20261017.json).
+
 ## Packaged cleanup contention correction — October 17
+
+Historical source checkpoint; [corrected package results](#corrected-private-package-qualification--october-17) supersede its pending package status.
 
 The first separately sealed managed-Office carrier, **20261017-115954-59433a62**,
 is **not qualified or activated**. Its 24,743-input seal remains exact after a
