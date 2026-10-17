@@ -1,0 +1,65 @@
+{
+  "schema": "augmentor-harness-dsh-modern-setup/1",
+  "date": "2026-10-17",
+  "sourceRef": "6a82cf8209a7e6783efba41b15d0d8c4282043b0",
+  "scope": "Linux source/developer setup; no owner or sealed artifact promotion",
+  "supportedExistingCliFamilies": [
+    "0.1.5-rc.1",
+    "0.2.0-rc.2"
+  ],
+  "completeRuntimeLockChanged": false,
+  "modernDependencies": {
+    "dsh-base": "0.2.0-rc.2",
+    "dsh-tools": "0.2.0-rc.2",
+    "dsh-agent-preset": "0.2.0-rc.2",
+    "dsh-agent-preset-registry": "0.2.0-rc.2",
+    "cordis": "4.0.4",
+    "schemastery": "3.18.4"
+  },
+  "qualification": {
+    "pythonPass": 73,
+    "fail": 0,
+    "skip": 0,
+    "workflowCommandSetupPass": 18,
+    "workflowCountOverlaps73": true,
+    "authoredModernCases": 8,
+    "actualUpstreamFreshInstall": true,
+    "bothRealOwnedRolesCreated": true,
+    "matchingProductHandshake": true,
+    "selectedAuthoredSharedLibraryRead": true,
+    "coldHistoriesEventsExact": true,
+    "coldHeaderDifferenceOnlyMissingDelegationDepthToZero": true,
+    "tracedPhases": 3,
+    "tracedInetConnects": 0,
+    "modelRequests": 0,
+    "realHistoricalOwnerContinuationProven": false
+  },
+  "preservation": {
+    "customTextExpressionAndOffBytesKept": true,
+    "editedPackagePresetCompositionStillRefused": true,
+    "externalPromptLibraryNotDuplicated": true,
+    "interruptedOwnedUpgradeRestoresBytes": true,
+    "ownerProfilesUsed": false,
+    "ownerServicesChanged": false,
+    "ownerProjectsTransferred": 0,
+    "neededBackupsRemoved": false,
+    "scratchFixtureCompanionsScopedAndStopped": true,
+    "scratchRemoved": true,
+    "persistentApplicationCopiesCreated": 0
+  },
+  "remaining": [
+    "Deliberate actual edited modern composition/package preservation migration",
+    "Matching installed product/Browser clients and immutable qualification",
+    "Fresh full cold shared-store backup/adoption, real history/bank/budget/busy/restart/reverse acceptance",
+    "Pilot feedback before further project transfers; voice/later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-dsh-modern-setup-final-python-20261017.log": "11fb907ea4d1aad6a7f2da6599542c4bfa9f8d608a6826373690b0841595b5c3",
+    "harness-dsh-modern-setup-workflow-command-20261017.log": "dcd29bbc7c7f1aed154440687a620f84b307d6f1e842013628dcf178ebc2d623",
+    "harness-dsh-modern-install-actual-summary-20261017.log": "5ba36aafa512732aef1e373c9c4c24d3553948182088449991dd8fa29c5e614b",
+    "harness-dsh-modern-setup-owner-preservation-private-20261017.json": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5",
+    "harness-dsh-modern-install-actual-1-network-private-20261017.log": "c16b6c8f4c410c359a7210b727c5c5ae7ac691f36f3842a04b93e6d07f84eeea",
+    "harness-dsh-modern-install-actual-2-network-private-20261017.log": "22f51c422d553e6e5620dfcadbe1652c706b5f3678ccde1c1d5d69ea2e6266a3",
+    "harness-dsh-modern-install-actual-3-network-private-20261017.log": "4f6473492ca2606e63fb71a2ed964053e3825013692210562ef0b4c420ec844e"
+  }
+}

@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Linux modern DSH setup: `test_dsh_modern_setup.py` uses authored manifests/profile
+text and real filesystem transactions to test family pins, role declarations,
+custom-expression/metadata preservation, external library retention and rollback.
+Eight cases are included in the Linux SDK workflow's exact 18-case setup command.
+Actual upstream installation/cold-role evidence stays distinct from those network
+mocks. See [qualification and remaining owner migration](../docs/HARNESS-DSH-INSTALLATION.md).
+
 DSH catalogue contract: `test_dsh_remote` refuses unknown catalogue shapes and
 prevents model defaults from forging backend identity. `test_dsh_setup` admits the
 catalogue contract with an explicitly unknown backend version, rejects the former

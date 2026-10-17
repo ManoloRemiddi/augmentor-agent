@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux DSH 0.2 installer qualification](HARNESS-DSH-INSTALLATION.md) adds exact
+family checks, declarative presets and modern workflow composition at 6a82cf82.
+Source Python 73 pass; exact SDK setup command 18 overlapping cases pass. Actual
+upstream 0.2 install/restart/both roles/selected shared library/cold histories pass
+on authored data, with only the upstream zero-depth header default. All three
+traced trees make zero INET connects; no owner model/profile/service change.
+Actual edited owner composition/metadata still requires deliberate preservation;
+normal automatic replacement remains refused. No new sealed application copy.
+
 [Public DSH contract correction and real managed backend](HARNESS-SHARED-PROFILES.md#public-dsh-catalogue-contract-and-actual-managed-backend--october-17)
 qualifies c6653b75: truthful unknown backend identity, four current-source live read
 routes and actual disposable DSH 0.2 idle-reader/release proof; Python 53/53 pass.

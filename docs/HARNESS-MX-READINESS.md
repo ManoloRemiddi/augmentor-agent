@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Modern Linux setup qualification](HARNESS-DSH-INSTALLATION.md) closes the fresh
+0.2 integration install/preset-registration gap. Actual custom owner migration,
+matching clients, guarded shared-store adoption and real continuation acceptance
+remain; the fresh role proof is not an owner cutover.
+
 # Augmentor Harness: current MX readiness
 
 This is the current acceptance map, checked on October 17. It preserves the full

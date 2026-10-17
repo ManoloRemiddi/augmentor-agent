@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Linux existing-CLI setup additionally qualifies the exact DSH 0.2.0-rc.2 /
+Cordis 4.0.4 / Schemastery 3.18.4 family, with actual fresh integration installation
+and cold reopening of both owned roles. The complete-runtime distribution lock
+remains legacy; modern macOS/Windows and actual edited owner migration remain
+unqualified. [Evidence](HARNESS-DSH-INSTALLATION.md).
+
 DSH source follow-up (October 17): existing installed upstream CLI/base/tools/web-app
 0.2.0-rc.2 execute in place with an authored empty profile for managed idle launch /
 reader / shutdown qualification. Current public-source catalogue, plugin inventory,
