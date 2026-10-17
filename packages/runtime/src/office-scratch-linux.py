@@ -2,8 +2,9 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Own one original-provider scratch directory before any document is copied.
 
-No document input, directory scan, model, network or persistent recovery state.
-The native supervisor/broker hold a shared directory lease until they exit.
+No original workspace scan, model or network access. Optional private journal
+receipts record the admitted root. The native supervisor/broker hold a shared
+directory lease until they exit.
 """
 import ctypes
 import fcntl
@@ -41,6 +42,17 @@ def main():
     name = None
     registered = False
     try:
+        # Keep this independent cleanup owner alive, but let the kernel wake it
+        # if it was stopped when its exact spawning owner died. The pidfd below
+        # still establishes death; a renderer's shared lease still blocks removal.
+        # Arm and verify before allocation/readiness, then close the parent race.
+        libc = ctypes.CDLL(None, use_errno=True)
+        signal.signal(signal.SIGCONT, signal.SIG_DFL)
+        if libc.prctl(1, signal.SIGCONT, 0, 0, 0) != 0:  # PR_SET_PDEATHSIG
+            raise ValueError('Scratch owner-death wake unavailable.')
+        wake = ctypes.c_int()
+        if libc.prctl(2, ctypes.byref(wake), 0, 0, 0) != 0 or wake.value != signal.SIGCONT:  # PR_GET_PDEATHSIG
+            raise ValueError('Scratch owner-death wake unconfirmed.')
         if os.getppid() != owner or select.select([owner_fd], [], [], 0)[0]:
             raise InterruptedError('Scratch owner exited before allocation.')
         if ctypes.CDLL(None).prctl(15, ctypes.c_char_p(b'aug-office-temp'), 0, 0, 0) != 0:

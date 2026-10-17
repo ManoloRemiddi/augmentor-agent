@@ -1,10 +1,10 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Actual separate owner; the test may stop/kill every one of its own processes.
 import {writeFile,readFile,readdir,stat} from 'node:fs/promises';import {join} from 'node:path';
-import {createLinuxManagedOfficeConverter} from '../../dist/runtime/src/office-process-linux.js';
+import {createLinuxManagedOfficeConverter,createLinuxProcessOfficeConverter} from '../../dist/runtime/src/office-process-linux.js';
 import {ownedProcesses,processIdentity,signalOwned} from './native-office-processes.mjs';
 import {previewDocx} from './preview-office.mjs';
-const [state,mode]=process.argv.slice(2),converter=await createLinuxManagedOfficeConverter({},state),scratch=await converter.createScratch();
+const [state,mode]=process.argv.slice(2),converter=mode==='transient'?await createLinuxProcessOfficeConverter():await createLinuxManagedOfficeConverter({},state),scratch=await converter.createScratch();
 await writeFile(join(scratch.directory,'source.docx'),mode==='render'?previewDocx('DURABLE_ACTIVE_CONVERSION','Liberation Sans'):'AUTHORED_PRIVATE_SNAPSHOT',{mode:0o600});
 let active;
 if(mode==='render'){

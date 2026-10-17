@@ -5,6 +5,17 @@ remain **97d95d58 / 20261017-095821-fb78d6df**, with the original DSH GUI and
 default Office engine. No additional owner project transfer is authorized before
 pilot feedback; voice and later OS work stay deferred.
 
+[Stopped cleanup owner correction](HARNESS-OFFICE-PREVIEWS.md#stopped-cleanup-owner--october-17)
+adds a verified kernel SIGCONT wake before scratch admission. A real old-runtime
+negative reproduces suspended-helper retention after owner death. Four new actual
+cases pass, including live renderer lease preservation; source304/43 Python,
+actual native24 and constrained-container24/two manager skips pass. Original
+managed Host/Thin GUI passes unchanged assertions. This helper change is not
+installed or included in the preceding1417db62 sealed carrier below. All owner
+state/services remain unchanged. Fresh ordinary/sealed/explicit backend adoption,
+pre-hook/publication/power-loss/corpus/security/public gates remain.
+[Evidence](../release/office-rebuild/stopped-cleaner-qualification-20261017.json).
+
 [Corrected private Office package](HARNESS-OFFICE-PREVIEWS.md#corrected-private-package-qualification--october-17)
 qualifies runtime **1417db62** in source/fresh ordinary/exact sealed **300 Node**
 each (45 files/19 Chromium, two workers/no skips). Each package also passes

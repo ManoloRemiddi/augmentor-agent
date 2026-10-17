@@ -8,6 +8,8 @@
 
 [Managed Office scratch recovery](HARNESS-OFFICE-PREVIEWS.md#managed-office-scratch-recovery--october-17) · private profile receipts, exact dead-owner cleanup and live/held/replaced-root preservation; bootstrap/power-loss and package/adoption limits remain explicit.
 
+[Stopped cleanup owner](HARNESS-OFFICE-PREVIEWS.md#stopped-cleanup-owner--october-17) · verified kernel wake after owner death, live-lease preservation, source 304/native 24; fresh package adoption remains separate.
+
 [Corrected private Office package](HARNESS-OFFICE-PREVIEWS.md#corrected-private-package-qualification--october-17) · 300 checks each in source/ordinary/exact sealed, package 41/43 Python, retained failed carrier, unchanged installed MX; hosted/adoption/public gates remain.
 
 [Office retained memory/process prototype](HARNESS-OFFICE-PREVIEWS.md#retained-memory-and-process-boundary-prototype--october-17) · measured process-exit reclamation and twenty real-provider cases below the existing memory cap; production integration/fault/source gates remain.

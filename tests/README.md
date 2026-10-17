@@ -2147,6 +2147,16 @@ Original PDF preview: `harness-pdf-chromium.test.mjs` uses authored PDF/JPX byte
 
 ## Original Office preview qualification
 
+The stopped-cleaner extension adds four actual post-readiness fault cases: managed
+and transient stopped helpers wake on owner death; a separate live renderer lease
+preserves bytes until release; admitted real conversion loses its owner with all
+three actors stopped. Tests wait for the kernel's actual stopped state before
+fault injection. Source 304 (45 files/19 Chromium), Python 43, actual native 24 and
+constrained container 24/two real-manager skips pass. An initial broader run
+retains missing QtTest interpreter errors and an asynchronous stop-observation
+race; the corrected run uses the existing qualified Python and confirms stopped
+state without relaxing assertions. [Scope and limits](../docs/HARNESS-OFFICE-PREVIEWS.md#stopped-cleanup-owner--october-17).
+
 Packaged qualification adds two real journal regressions: an independent held
 metadata lock must serialize instead of failing, and an actually stopped known
 helper is SIGKILLed at the existing ten-second exec deadline with a recoverable

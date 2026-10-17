@@ -2,6 +2,12 @@
 
 ## Managed Office recovery copies — October 17
 
+The [stopped-cleaner source correction](HARNESS-OFFICE-PREVIEWS.md#stopped-cleanup-owner--october-17)
+lets an already-admitted suspended helper wake on owner death and remove its exact
+copy after renderer leases release. This reduces one crash-retention window;
+pre-hook/publication/power-loss and total cleanup-owner loss remain distinct.
+Installed profiles/defaults remain unchanged.
+
 The [packaged contention correction](HARNESS-OFFICE-PREVIEWS.md#packaged-cleanup-contention-correction--october-17)
 serializes cooperating journal metadata cleanup; held renderer/foreign roots
 remain preserved. A stopped metadata helper is killed at the existing ten-second

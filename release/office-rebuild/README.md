@@ -1,5 +1,42 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Stopped cleanup owner — October 17
+
+A stopped independent scratch helper previously stayed stopped after its Node
+owner died, leaving its admitted private document copy until recovery. A real
+owned-process regression fails on that runtime. The helper now arms and reads
+back Linux's parent-death **SIGCONT** before allocation/readiness, then closes
+the parent-loss race using its existing pidfd and parent check. The kernel wakes
+the surviving helper; pidfd/lease/directory identity checks still determine cleanup.
+It does not kill the cleanup owner or grant authority from a stale numeric PID.
+A live renderer's shared lease still prevents removal until that lease is released.
+
+Four new real cases pass: stopped managed and transient helpers after owner loss;
+a separate live renderer lease preserving exact private bytes after the wake;
+and admitted real-entry conversion with the cleanup helper, supervisor and renderer
+all stopped before owner death. The broader source cohort passes **304 Node**
+(45 files/19 Chromium, two workers/no failures/skips), **43 Python**, and **24 actual
+native Office compatibility** cases. A read-only/networkless container at the same
+3 GiB/zero-swap/one-CPU/128-PID cap passes **24**, with two real-MX-manager cases
+explicitly skipped. The host cohort includes those cases. The original actual
+managed Host/GUI also passes with the unchanged Thin entry and its 53 engine files.
+
+This proves the post-readiness suspension/owner-loss case. It does not qualify
+pre-hook/bootstrap or uncommitted publication windows, simultaneous destruction
+of every cleanup owner, power loss, encryption or filesystem/network isolation.
+The journal's separate verified cold recovery remains available when all owners
+are lost. Linux parent-death signals track the spawning thread; an already-dead
+parent before arming is handled by the existing check rather than a promised signal.
+No owner app, profile, engine default, source document or model/GPU/voice setting
+is changed. The separately sealed passing `1417db62` carrier predates this fix;
+fresh ordinary/sealed/adoption checks for this new helper remain separate.
+[Exact fault, source and preservation evidence](stopped-cleaner-qualification-20261017.json).
+
+Linux's [parent-death contract](https://man7.org/linux/man-pages/man2/PR_SET_PDEATHSIG.2const.html)
+and [SIGCONT behavior](https://man7.org/linux/man-pages/man7/signal.7.html) explain
+the wake mechanism and its spawning-thread/arming limits. The existing pidfd,
+lease and verified root checks remain the removal authority.
+
 ## Corrected private package qualification — October 17
 
 The corrected runtime **1417db62** now passes the same **300 Node checks** in

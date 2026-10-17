@@ -37,6 +37,32 @@ test('a stopped journal helper is hard-killed at its existing deadline and leave
   await until(async()=>{helper=(await ownedProcesses()).find(p=>p.name==='aug-office-jrn'&&p.parent===process.pid);return helper;},'owned blocked journal helper');await signalOwned(helper,'SIGSTOP');assert.equal((await processIdentity(helper.pid)).state,'T');const result=await pending;assert(result.error);assert(Date.now()-started>=9000,'the actual configured deadline elapsed');assert.equal(await stillOwned(helper),false,'known exec child was killed and reaped');assert.equal(await readFile(join(f.scratch.directory,'source.docx'),'utf8'),'AUTHORED_CONTENDED_COPY');await holder.close();await cleanupLinuxOfficeScratchState(f.location,f.scratch.directory,f.scratch.identity);await assert.rejects(stat(f.scratch.directory),e=>e.code==='ENOENT');
  }finally{if(helper&&await stillOwned(helper)){await signalOwned(helper,'SIGCONT');await signalOwned(helper,'SIGKILL');}if(holder.child.exitCode===null)await holder.close();await f.scratch.dispose().catch(()=>{});}
 });
+// The fault is injected only after readiness; pre-hook/bootstrap loss is separate.
+for(const mode of ['allocated','transient'])test(`a stopped ${mode==='allocated'?'managed':'transient'} scratch cleaner wakes on owner death and removes its admitted private copy`,{skip,timeout:15000},async t=>{
+ const f=await orphan(t,mode);
+ try{
+  await signalOwned(f.ready.cleaner,'SIGSTOP');await until(async()=>(await processIdentity(f.ready.cleaner.pid))?.state==='T','owned cleaner confirmed stopped');await pause(100);assert.equal((await processIdentity(f.ready.cleaner.pid)).state,'T','live owner must not wake the deliberately stopped helper');assert.equal(await readFile(join(f.ready.directory,'source.docx'),'utf8'),'AUTHORED_PRIVATE_SNAPSHOT');
+  f.owner.kill('SIGKILL');await f.ended;await until(async()=>!await stillOwned(f.ready.cleaner),'kernel wake and cleanup after owner death');await assert.rejects(stat(f.ready.directory),e=>e.code==='ENOENT');
+  if(mode==='allocated'){await assert.rejects(stat(f.record),e=>e.code==='ENOENT');assert.deepEqual(await readdir(join(f.root,'office-scratch/v1/records')),[]);}
+ }finally{await signalOwned(f.ready.cleaner,'SIGCONT');if(f.owner.exitCode===null&&f.owner.signalCode===null)f.owner.kill('SIGKILL');await f.ended;await until(async()=>!await stillOwned(f.ready.cleaner),'owned fixture cleanup');}
+});
+test('owner death wakes a stopped scratch cleaner but a separate live renderer lease still protects its private bytes',{skip,timeout:15000},async t=>{
+ const f=await orphan(t),holder=spawn('/usr/bin/python3',['-I','-B','-c',"import os,fcntl,sys; fd=os.open(sys.argv[1],os.O_RDONLY|os.O_DIRECTORY); fcntl.flock(fd,fcntl.LOCK_SH); print('HELD',flush=True); sys.stdin.read(); os.close(fd)",f.ready.directory],{stdio:['pipe','pipe','ignore']});let output='';holder.stdout.on('data',b=>output+=b);const ended=once(holder,'close');
+ try{
+  await until(()=>output.includes('HELD'),'independent renderer lease');await signalOwned(f.ready.cleaner,'SIGSTOP');await until(async()=>(await processIdentity(f.ready.cleaner.pid))?.state==='T','owned cleaner confirmed stopped');f.owner.kill('SIGKILL');await f.ended;
+  await until(async()=>{const actor=await processIdentity(f.ready.cleaner.pid);return actor?.start===f.ready.cleaner.start&&!['T','t','Z'].includes(actor.state);},'kernel resumes the same blocked cleaner');assert.equal(await readFile(join(f.ready.directory,'source.docx'),'utf8'),'AUTHORED_PRIVATE_SNAPSHOT');assert.equal(JSON.parse(await readFile(f.record,'utf8')).phase,'ready');
+  holder.stdin.end();await ended;assert.equal(holder.exitCode,0);await until(async()=>!await stillOwned(f.ready.cleaner),'cleanup after exact renderer lease release');await assert.rejects(stat(f.ready.directory),e=>e.code==='ENOENT');await assert.rejects(stat(f.record),e=>e.code==='ENOENT');
+ }finally{if(holder.exitCode===null&&holder.signalCode===null)holder.kill('SIGKILL');await ended;await signalOwned(f.ready.cleaner,'SIGCONT');if(f.owner.exitCode===null&&f.owner.signalCode===null)f.owner.kill('SIGKILL');await f.ended;await until(async()=>!await stillOwned(f.ready.cleaner),'owned fixture cleanup');}
+});
+test('death of the owner resumes its stopped scratch cleaner while stopped admitted conversion actors are killed',{skip:skip||process.env.AUGMENTOR_MANAGED_OFFICE_TEST!=='1',timeout:20000},async t=>{
+ const f=await orphan(t,'render');
+ try{
+  for(const actor of [f.ready.actor,f.ready.guard,f.ready.cleaner]){await signalOwned(actor,'SIGSTOP');await until(async()=>(await processIdentity(actor.pid))?.state==='T','owned conversion actor confirmed stopped');}
+  f.owner.kill('SIGKILL');await f.ended;
+  for(const actor of [f.ready.actor,f.ready.guard,f.ready.cleaner])await until(async()=>!await stillOwned(actor),'admitted fixture actor terminated after owner death');
+  await assert.rejects(stat(f.ready.directory),e=>e.code==='ENOENT');await assert.rejects(stat(f.record),e=>e.code==='ENOENT');
+ }finally{if(f.owner.exitCode===null&&f.owner.signalCode===null)f.owner.kill('SIGKILL');await f.ended;for(const actor of [f.ready.actor,f.ready.guard])if(await stillOwned(actor))await signalOwned(actor,'SIGKILL');await signalOwned(f.ready.cleaner,'SIGCONT');await until(async()=>!await stillOwned(f.ready.cleaner),'owned fixture cleanup');}
+});
 test('cold managed converter reclaims verified private copies after the Node and independent cleanup owners are both killed',{skip,timeout:15000},async t=>{
  const f=await orphan(t);await f.killAll();assert.equal(JSON.parse(await readFile(f.record,'utf8')).phase,'ready');const converter=await createLinuxManagedOfficeConverter({},f.root);t.after(()=>converter.dispose());await assert.rejects(stat(f.ready.directory),e=>e.code==='ENOENT');await assert.rejects(stat(f.record),e=>e.code==='ENOENT');
  const scratch=await converter.createScratch();await writeFile(join(scratch.directory,'source.docx'),'DISTINCT_RECOVERY_INPUT',{mode:0o600});await scratch.dispose();assert.deepEqual(await readdir(join(f.root,'office-scratch/v1/data')),[]);
