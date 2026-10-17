@@ -7,7 +7,8 @@ inspection pass. Public historical body/recipe provenance is recorded; private
 baseline source is not copied. Current Handy/Quit/appearance/Pi inspector and
 maintenance/dirty-draft controls are preserved. No installed change, full app copy
 or new artifact. Matching activation/finalization/reverse and owner continuation
-remain. Hosted qualification is recorded separately.
+remain. Hosted Linux SDK **39060753072 succeeds** at runtime **c1475178**, including
+the 109-case Native group. [Qualification record](../release/harness-native-settings-20261017.json).
 
 [Cold data archive and current-cut binding](HARNESS-DSH-INSTALLATION.md#cold-data-archive-and-current-cut-binding--october-17)
 adds **a0f1f16d**. Source **143 Python / four Node** pass, including ten archive cases.

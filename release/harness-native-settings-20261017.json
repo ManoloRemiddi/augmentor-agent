@@ -1,0 +1,99 @@
+{
+  "schema": "augmentor-harness-native-settings-qualification/1",
+  "date": "2026-10-17",
+  "runtimeRef": "c1475178eaec00dbbdaa77227f1f4c64258f412c",
+  "precedingImplementationRef": "8a5a10b59637340ef12efd145f43cc2957b63794",
+  "scope": "Public Native settings recovery before matching-client shared-harness activation; no installed change",
+  "sourceQualification": {
+    "pythonPass": 137,
+    "nativeGroupPass": 109,
+    "controllerRemoteGroupPass": 28,
+    "nodePass": 20,
+    "fail": 0,
+    "skip": 0,
+    "typeCheckPass": true,
+    "actualQtVersion": "6.8.2.1",
+    "managedBuildWorkspace": true,
+    "reserveGiB": 64,
+    "hostReadOnlyNamespace": true,
+    "newFullAppCopies": 0,
+    "newImmutableArtifact": false,
+    "authoredOffscreenVisualThemes": [
+      "light",
+      "dark"
+    ],
+    "visualSourceRef": "8a5a10b59637340ef12efd145f43cc2957b63794",
+    "physicalDesktopAcceptance": false
+  },
+  "provenance": {
+    "publicSettingsBaseRef": "41e04412678f77e45c85f339161ba7572d6a843c",
+    "baseBlob": "12554f9ff5a1f9ca598f97b5ac6c915bcdedea2c",
+    "baseSha256": "4b374a2bb7ecdfbb4abeefa887f88afab4160106bde2f9d097c84f4261e259e4",
+    "publicRecipeRef": "98a961ae6cbad56358575e65f8f1b9668205fbc9",
+    "recipeBlob": "1afa2218024487951033f09b5d52276cc949dc1d",
+    "panelSubstitutions": 9,
+    "publicReconstructedSha256": "69a793cf700473d6a622800eb78fc8e835550d6b04fe55022eb1fe93d773eb9a",
+    "installedGeneratedModuleNotClaimedExactPublic": true,
+    "wholePrivateOverlayNotInvoked": true,
+    "privateRepositorySourceCopied": false,
+    "currentHostBindingsIndependentlyAuthored": true,
+    "sourceGuide": "docs/HARNESS-NATIVE-SETTINGS.md"
+  },
+  "preservedBehavior": [
+    "Current maintenance admission/dirty drafts/setup and prompt cancellation",
+    "Registered role/folder scope plus current workspace gates; subagents excluded",
+    "No personal memory authority granted by presentation ownership",
+    "Handy/normal Quit/shared appearance and existing voice placement",
+    "Pi inspector, reasoning and MCP controls",
+    "Named labels, DSH binding, retained history, shortcuts and model choices"
+  ],
+  "ownerScope": {
+    "installedAppChanged": false,
+    "ownerDataCopied": false,
+    "ownerProfilesExecuted": false,
+    "ownerModelCalls": 0,
+    "projectsTransferred": 0,
+    "ownerPreservationExact": true,
+    "pilotFeedbackPending": true,
+    "vrRasterStudioStaysDsh": true,
+    "voiceAndLaterOsDeferred": true
+  },
+  "cleanup": {
+    "removedUnusedCopies": 75,
+    "observedGiBRecovered": 40.89,
+    "rootFreeGiBApprox": 98.51,
+    "singleScratchRequired": true,
+    "selectedRunningRollbackReviewsAndNeededBackupsKept": true
+  },
+  "priorLinuxSdk": {
+    "run": 39060564972,
+    "ref": "8a5a10b59637340ef12efd145f43cc2957b63794",
+    "status": "completed",
+    "conclusion": "failure",
+    "reason": "Clean hosted runner lacked libEGL.so.1 for Qt imports; no full SDK pass. Native import requirements now include libegl1 plus pinned Pygments and NumPy."
+  },
+  "linuxSdk": {
+    "run": 39060753072,
+    "ref": "c1475178eaec00dbbdaa77227f1f4c64258f412c",
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39060753072",
+    "nativeGroupPass": 109
+  },
+  "remaining": [
+    "Review remaining actual client deltas; preserve existing progress/thinking behavior and defer voice redesign",
+    "Map real callers/data roots before owner cold checkpoint; couple backup to matching client selection and durable finalization/reverse",
+    "Qualify one combined immutable candidate and owner continuation; no new projects before pilot feedback",
+    "Existing public Office source/rebuild packaging gate and later OS acceptance remain separate"
+  ],
+  "privateEvidenceSha256": {
+    "harness-native-settings-complete-20261017.log": "b8694374b3a2e3cc51f736f1ecf80447144b270604a36ff3f0afac22f39f606a",
+    "harness-native-settings-controller-20261017.log": "b2325a1f56c565bf56f60d45b414e2877c29087256985bb7edf32bdca42e313e",
+    "harness-native-settings-node-20261017.log": "03487cff58b51044be61a7f49c43d33f80f372b933d243a00479d1e447ed90f9",
+    "harness-native-settings-check-20261017.log": "fdb848896bbc76bd3619da963b85a271eca6a558e166148427f89863f005e81c",
+    "harness-native-settings-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5",
+    "harness-native-settings-ci-39060564972-failed-20261017.log": "609038a303029ae0cbd0e38066bdb499ff21cac8ab96a6eda27cd6415bc4ab6c",
+    "harness-native-settings-owner-final-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5",
+    "harness-native-settings-ci-native-final-20261017.log": "6f31e5f182d6a3535ea35a9ab896ea5269386cfab4849b5b0b3418b5f2bdf2a3"
+  }
+}

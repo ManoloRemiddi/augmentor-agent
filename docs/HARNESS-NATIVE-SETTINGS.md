@@ -86,7 +86,9 @@ One legacy shortcut failure test now explicitly isolates its XDG data directory.
 Hosted run **39060564972** fails at Native test imports because the clean runner
 lacked `libEGL.so.1`; it is not a full SDK pass. The workflow now installs
 `libegl1` alongside OpenGL and locks the existing Pygments/NumPy requirements
-needed by the Native imports. Terminal final-source CI remains to be recorded.
+needed by the Native imports. Full Linux SDK **39060753072 succeeds** at **c1475178eaec00dbbdaa77227f1f4c64258f412c**,
+including all 109 Native cases. The [qualification record](../release/harness-native-settings-20261017.json)
+separates source, preview, installed and owner acceptance.
 
 The installed Native client and main/pilot Harness remain unchanged. This is a
 source parity prerequisite, not a completed shared-backend cutover. Next: verify
