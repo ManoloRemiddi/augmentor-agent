@@ -136,6 +136,34 @@ class SharedLaunchTests(unittest.TestCase):
             self.deploy.activate(self.release)
         self.assertEqual(self.deploy.read(self.deploy.DATA/'desktop.json'),newer)
 
+    def test_pending_preservation_fence_blocks_build_and_binding_selection_before_preflight(self):
+        self.deploy.atomic(self.deploy.DATA/'desktop.json',{**self.selection,'sharedProfile':self.after})
+        before=(self.deploy.DATA/'desktop.json').read_bytes()
+        self.deploy.atomic(self.deploy.DATA/'desktop.previous.json',{**self.selection,'sharedProfile':self.before})
+        binding=self.binding(self.after,self.before)
+        fence=self.deploy.DATA/self.shared.PRESERVATION_FENCE
+        fence.write_bytes(b'{"authored":"PRIVATE_UNFINISHED_UPDATE"}');fence.chmod(0o600)
+        self.check.stop()
+        with patch.object(self.deploy,'check') as preflight:
+            installer=load('authored_fenced_installer',ROOT/'scripts/install-desktop-startup.py')
+            for operation in (lambda:self.deploy.activate(self.release),lambda:self.deploy.rollback(),
+                              lambda:self.deploy.activate(self.release,binding),
+                              lambda:self.deploy.rollback(binding),
+                              lambda:installer.install(self.release,Path(sys.executable),Path(self.selection['node']),enable=False)):
+                with self.assertRaisesRegex(ValueError,'requires recovery'):operation()
+            preflight.assert_not_called()
+        self.check.start()
+        self.assertEqual((self.deploy.DATA/'desktop.json').read_bytes(),before)
+        self.assertIn(b'PRIVATE_UNFINISHED_UPDATE',fence.read_bytes())
+
+    def test_ordinary_build_selection_shares_existing_readers_but_refuses_maintenance_writer(self):
+        with self.shared.launch_lease(self.deploy.DATA):self.deploy.activate(self.release)
+        raw=(self.deploy.DATA/'desktop.json').read_bytes()
+        with self.shared.launch_lease(self.deploy.DATA,exclusive=True):
+            with self.assertRaisesRegex(ValueError,'managed client is active'):self.deploy.activate(self.release)
+            with self.assertRaisesRegex(ValueError,'managed client is active'):self.deploy.rollback()
+        self.assertEqual((self.deploy.DATA/'desktop.json').read_bytes(),raw)
+
     def test_binding_refuses_archive_alias_overlap_and_permissive_or_unknown_metadata(self):
         path=self.binding();path.chmod(0o644)
         with self.assertRaisesRegex(ValueError,'private owned'):self.deploy.activate(self.release,path)

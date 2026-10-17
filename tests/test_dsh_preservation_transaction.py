@@ -198,3 +198,110 @@ with tx.maintenance(home,data,[pair]) as guard:tx.rollback(backup,digest,guard)
                         with self.guard():pass
                 finally:child.communicate(timeout=5)
         with self.guard():pass
+
+    def test_pending_transaction_blocks_every_managed_launcher_after_writer_release(self):
+        self.deployment=self.base/'xdg-data/augmentor'
+        self.write(self.deployment/'desktop.json',{'root':str(self.old),'sharedProfile':self.pair})
+        env={**os.environ,'HOME':str(self.base),'XDG_DATA_HOME':str(self.base/'xdg-data'),'DSH_HOME':str(self.home)}
+        commands=[['scripts/desktop-launch.py',*args] for args in
+                  (['--service-run'],['--instance','secondary'],['--autostart'],['--recover'],
+                   ['--mobile'],['--embed'],['--dsh','/usr/bin/true'])]
+        commands += [['scripts/desktop-browser-launch.py'],['scripts/embed-launch.py'],
+                     ['apps/mobile/start.py'],['scripts/desktop-dsh-launch.py','/usr/bin/true']]
+        with self.guard() as guard:digest=self.prepare(guard)
+        for phase in ('prepared','applied'):
+            if phase=='applied':
+                with self.guard() as guard:tx.commit(self.backup,digest,guard)
+            for command in commands:
+                with self.subTest(phase=phase,command=command):
+                    run=subprocess.run([sys.executable,'-I','-B',str(tx.ROOT/command[0]),*command[1:]],env=env,capture_output=True,text=True,timeout=5)
+                    self.assertNotEqual(run.returncode,0)
+                    expected='Augmentor DSH launch failed' if command[0].endswith('/desktop-dsh-launch.py') else 'requires recovery'
+                    self.assertIn(expected,run.stderr);self.assertNotIn(str(self.backup),run.stderr)
+        with self.guard() as guard:tx.rollback(self.backup,digest,guard)
+        with tx.shared.launch_lease(self.deployment):pass
+        self.assert_before()
+
+    def test_real_process_death_after_each_fence_publication_can_reverse(self):
+        code="""import json,os,sys
+from pathlib import Path
+sys.path.insert(0,sys.argv[1]);from dsh import preservation_transaction as tx
+home,data,stage,backup=map(Path,sys.argv[2:6]);stage_sha,artifact=sys.argv[6:8];pair=json.loads(sys.argv[8]);index=int(sys.argv[9])
+original=tx.atomic;count=0
+with tx.maintenance(home,data,[pair]) as guard:
+ def die(path,*args,**kwargs):
+  global count
+  original(path,*args,**kwargs)
+  if path in tx.fence_paths(guard):
+   count+=1
+   if count==index:os._exit(77)
+ tx.atomic=die
+ tx.prepare(stage,stage_sha,backup,artifact,guard)
+"""
+        for index in (1,2):
+            with self.subTest(publishedMarkers=index):
+                self.backup=self.base/('publication-'+str(index))
+                run=subprocess.run([sys.executable,'-I','-B','-c',code,str(tx.ROOT/'services'),str(self.home),str(self.deployment),str(self.output),str(self.backup),self.stage_sha,self.artifact,json.dumps(self.pair),str(index)],capture_output=True,text=True)
+                self.assertEqual(run.returncode,77,run.stderr);self.assert_before()
+                digest=tx.preserve.sha((self.backup/'transaction.json').read_bytes())
+                with self.assertRaisesRegex(ValueError,'requires recovery'):
+                    with tx.shared.launch_lease(self.deployment):pass
+                with self.guard() as guard:
+                    if index==1:
+                        with self.assertRaisesRegex(ValueError,'fence is incomplete'):tx.commit(self.backup,digest,guard)
+                    else:tx.commit(self.backup,digest,guard)
+                    tx.rollback(self.backup,digest,guard)
+                    self.assertFalse(any(path.exists() for path in tx.fence_paths(guard)))
+                self.assert_before()
+
+    def test_real_process_death_after_each_fence_removal_can_finish(self):
+        code="""import json,os,sys
+from pathlib import Path
+sys.path.insert(0,sys.argv[1]);from dsh import preservation_transaction as tx
+home,data,backup=map(Path,sys.argv[2:5]);digest=sys.argv[5];pair=json.loads(sys.argv[6]);index=int(sys.argv[7]);original=Path.unlink;count=0
+with tx.maintenance(home,data,[pair]) as guard:
+ def die(path,*args,**kwargs):
+  global count
+  result=original(path,*args,**kwargs)
+  if path in tx.fence_paths(guard):
+   count+=1
+   if count==index:os._exit(78)
+  return result
+ Path.unlink=die
+ tx.rollback(backup,digest,guard)
+"""
+        for index in (1,2):
+            with self.subTest(removedMarkers=index):
+                self.backup=self.base/('removal-'+str(index))
+                with self.guard() as guard:digest=self.prepare(guard);tx.commit(self.backup,digest,guard)
+                run=subprocess.run([sys.executable,'-I','-B','-c',code,str(tx.ROOT/'services'),str(self.home),str(self.deployment),str(self.backup),digest,json.dumps(self.pair),str(index)],capture_output=True,text=True)
+                self.assertEqual(run.returncode,78,run.stderr);self.assert_before()
+                if index==1:
+                    with self.assertRaisesRegex(ValueError,'requires recovery'):
+                        with tx.shared.launch_lease(self.deployment):pass
+                else:
+                    with tx.shared.launch_lease(self.deployment):pass
+                with self.guard() as guard:
+                    self.assertFalse(tx.rollback(self.backup,digest,guard)['startupFenced'])
+                    self.assertFalse(any(path.exists() for path in tx.fence_paths(guard)))
+
+    def test_foreign_or_symlinked_deployment_fence_never_authorizes_apply_or_reverse(self):
+        with self.guard() as guard:digest=self.prepare(guard)
+        fence=self.deployment/tx.shared.PRESERVATION_FENCE;original=fence.read_bytes()
+        self.write(fence,b'{"authored":"FOREIGN_KEEP"}')
+        with self.guard() as guard:
+            for operation in (tx.commit,tx.rollback):
+                with self.assertRaisesRegex(ValueError,'fence changed'):operation(self.backup,digest,guard)
+        self.assertEqual(fence.read_bytes(),b'{"authored":"FOREIGN_KEEP"}');self.assert_before()
+        fence.unlink();fence.symlink_to(self.base/'absent-marker')
+        with self.assertRaisesRegex(ValueError,'requires recovery'):
+            with tx.shared.launch_lease(self.deployment):pass
+        with self.guard() as guard:
+            with self.assertRaisesRegex(ValueError,'without links'):tx.rollback(self.backup,digest,guard)
+        self.assertTrue(fence.is_symlink());self.assert_before()
+        fence.unlink();self.write(fence,original)
+        with self.guard() as guard:tx.rollback(self.backup,digest,guard)
+
+    def test_recovery_bypass_requires_an_exclusive_writer(self):
+        with self.assertRaisesRegex(ValueError,'exclusive cold launch'):
+            with tx.shared.launch_lease(self.deployment,preservation_recovery=True):pass

@@ -13,6 +13,7 @@ import sys
 import pwd
 
 SCHEMA = 'augmentor-shared-launch-binding/1'
+PRESERVATION_FENCE = 'dsh-preservation.json'
 DATABASES = ('prompts.sqlite3', 'dual-memory.sqlite3', 'memory.sqlite3')
 KNOWN = {*DATABASES, 'hindsight.json', 'hindsight-installation.json', 'shared-imports',
          *(name+tail for name in DATABASES for tail in ('-wal', '-shm', '-journal'))}
@@ -98,12 +99,19 @@ def binding(path, selection_bytes, previous, dedicated_next=True):
     return value
 
 
+def assert_startup_ready(data):
+    fence=Path(data)/PRESERVATION_FENCE
+    if fence.exists() or fence.is_symlink():
+        raise ValueError('Unfinished DSH configuration maintenance requires recovery before managed startup or deployment changes.')
+
+
 @contextmanager
-def launch_lease(data, exclusive=False):
+def launch_lease(data, exclusive=False, preservation_recovery=False):
     """Inherited reader lasts through exec; a cold binding change owns the writer.
 
-    Build-only updates keep using the deployment lock and may select a future
-    build while clients run. This gate applies to shared-store changes only.
+    Ordinary build selection shares readers with existing clients; cold binding
+    and configuration maintenance own the writer. Only the cold preservation
+    controller may bypass its durable marker, with the exclusive writer held.
     """
     data=Path(data);data.mkdir(parents=True,mode=0o700,exist_ok=True);directory(str(data))
     path=data/'shared-launch.lock';fd=os.open(path,os.O_RDWR|os.O_CREAT|os.O_NOFOLLOW,0o600)
@@ -113,6 +121,9 @@ def launch_lease(data, exclusive=False):
             raise ValueError('The shared launch gate must be private and owned.')
         try:fcntl.flock(fd,(fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH)|fcntl.LOCK_NB)
         except BlockingIOError as error:raise ValueError('Shared launch maintenance or an existing managed client is active.') from error
+        if preservation_recovery and not exclusive:
+            raise ValueError('Preservation recovery requires the exclusive cold launch gate.')
+        if not preservation_recovery:assert_startup_ready(data)
         os.set_inheritable(fd,not exclusive)
         yield fd
     finally:os.close(fd)

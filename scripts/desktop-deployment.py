@@ -148,7 +148,20 @@ def stage(source, source_ref, python=None, node=None):
         if temporary.exists(): shutil.rmtree(temporary)
 
 
+def launch_helper():
+    spec=importlib.util.spec_from_file_location('deployment_launch_gate',Path(__file__).with_name('shared-launch-profile.py'))
+    helper=importlib.util.module_from_spec(spec);spec.loader.exec_module(helper);return helper
+
+
 def activate(root, shared_binding=None):
+    # Ordinary build selection remains compatible with running readers, but
+    # cannot bypass an exclusive preservation writer or its durable fence.
+    if shared_binding is None:
+        with launch_helper().launch_lease(DATA):return _activate(root,None)
+    return _activate(root,shared_binding)
+
+
+def _activate(root, shared_binding):
     root = Path(root).resolve()
     release = verify(root)
     config = dict(release['deployment'])
@@ -165,6 +178,7 @@ def activate(root, shared_binding=None):
         shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)
         value=shared.binding(shared_binding,raw,previous)
         with shared.launch_lease(DATA,exclusive=True),shared.cold([value['previous'],value['next']]):
+            launch_helper().assert_startup_ready(DATA)
             shared.verify_target(config,value)
             if (DATA/'desktop.json').read_bytes()!=raw:raise ValueError('Desktop selection changed during binding validation.')
             config['sharedProfile']=value['next']
@@ -188,6 +202,12 @@ def _activate_checked(root,config,previous,expected_bytes,final_check=lambda:Non
 
 
 def rollback(shared_binding=None):
+    if shared_binding is None:
+        with launch_helper().launch_lease(DATA):return _rollback(None)
+    return _rollback(shared_binding)
+
+
+def _rollback(shared_binding):
     previous = read(DATA/'desktop.previous.json')
     if (Path(previous['root'])/MANIFEST).exists(): verify(Path(previous['root']))
     raw=(DATA/'desktop.json').read_bytes();current=json.loads(raw)
@@ -201,6 +221,7 @@ def rollback(shared_binding=None):
             'data':str(Path(os.environ.get('AUGMENTOR_SHARED_DATA',Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor')))}
         if value['next']!=target:raise ValueError('Reverse binding differs from the retained deployment paths; restore its original launch environment first.')
         with shared.launch_lease(DATA,exclusive=True),shared.cold([value['previous'],value['next']]):
+            launch_helper().assert_startup_ready(DATA)
             shared.verify_target(current,value)
             return _rollback_checked(previous,current,raw,lambda:shared.assert_target(value))
     if shared_binding is not None:raise ValueError('This rollback does not change shared-store paths.')

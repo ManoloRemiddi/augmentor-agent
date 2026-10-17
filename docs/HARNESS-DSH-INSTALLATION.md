@@ -2,6 +2,63 @@
 
 # Linux DSH integration installation
 
+## Managed-client maintenance fence — October 17
+
+The controlled backend work exposed a remaining interruption gap: the persistent
+DSH-home fence blocked the managed DSH server, while a released deployment writer
+could let Native, Browser, embedding or mobile launchers reopen before the
+configuration transaction had been recovered. The new source closes that gap
+before any installed activation is attempted.
+
+The configuration journal is now **`augmentor-dsh-configuration-transaction/2`**.
+It publishes a private deployment `dsh-preservation.json` first, followed by the
+existing profile marker, after durable recovery copies. Both markers bind the
+same transaction and digest. The common `launch_lease` refuses the deployment
+marker after acquiring its reader/writer lock, before any managed entrypoint
+can execute its app/service path. Recovery is the sole explicit bypass and
+requires the exclusive cold writer; presence of a record does not authorize
+replay. This covers source-managed Native/service/secondary/login/recovery,
+Browser Native Messaging, embedding, mobile and direct/delegated DSH launchers.
+Older fixed-path/custom callers still require explicit adoption; this is not a
+universal process or filesystem sandbox.
+
+Ordinary Desktop activation/reverse now take a **reader** through validation and
+selection, so they remain compatible with running readers but refuse a cold
+maintenance writer or unresolved marker. Shared-store selection still owns its
+exclusive writer and also checks the controller's current marker contract even
+when an older candidate supplies the binding helper. No generic updater can
+release the maintenance markers.
+
+Apply requires both owned markers. Reverse may recover an interrupted partial
+marker publication, verifies all existing marker identities and exact config
+bytes/modes, and completes protection under the cold writer before restoring.
+After durable original configuration/reversed status, it removes the profile
+marker first and deployment marker last. Death at either publication/removal
+boundary is recoverable; foreign markers, dangling links and changed config are
+preserved. Version 1 journals are deliberately refused by this new controller;
+use their original retained controller for inspection/reverse rather than
+relabeling an old record as version 2. No owner version-1 transaction is pending.
+
+Local source checks pass **133 Python / four managed-launch Node** cases, including
+**16 transaction** cases and **14 shared-launch / 12 deployment** cases. Eleven
+actual managed launcher commands refuse both prepared and applied authored
+transactions after the writer exits. Separate subprocesses die after each marker
+publication/removal; reverse completes with exact original config and no open
+marker. Selection fencing and reader compatibility are tested. These seven new
+Python cases overlap the 133, not extra totals. The actual upstream DSH and sealed
+candidate Native-adapter preflight/reverse also pass again on authored isolated
+data; that is separate from the authored launcher regression evidence. Linux SDK
+now explicitly runs the shared-launch and deployment files as well as the
+32 preservation-discovery and nine backend cases. Hosted qualification is pending.
+
+No installed app/bootstrap/service/selection changes, owner profile execution,
+model requests, project transfers or new app copy occur. Both reviews/all 36
+protected sets, registry 18, stores/settings, menus and GPU/voice state reverify.
+Full cold backups, all real profile/client adoption, matching selection and durable
+finalization/reverse orchestration, one combined immutable qualification and owner
+continuation remain. Pilot feedback gates further project transfers; voice and
+later OS remain deferred.
+
 ## Controlled replacement-backend and Native-adapter preflight — October 17
 
 Source **517b71dbb0293aa78f306b127ae444e51ce09b95** adds the internal

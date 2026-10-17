@@ -2,8 +2,9 @@
 """Internal cold configuration journal, not a complete installed activation API.
 
 Only the four reviewed integration/configuration files are replaced. Applied
-transactions retain a startup fence until orchestration qualifies matching
-clients. This module deliberately exposes no command to release that fence.
+transactions retain profile and deployment startup fences until orchestration
+qualifies matching clients. This module deliberately exposes no command to
+release those forward-activation fences.
 Full owner-store backup/client adoption remains an outer activation prerequisite.
 """
 from contextlib import contextmanager
@@ -21,7 +22,7 @@ import uuid
 from . import preserve
 
 ROOT=Path(__file__).resolve().parents[2]
-SCHEMA='augmentor-dsh-configuration-transaction/1'
+SCHEMA='augmentor-dsh-configuration-transaction/2'
 ASSETS=('integration/browser/dist/index.js','integration/browser/package.json',
         'integration/ownership.json','cordis.patch.yml')
 
@@ -106,7 +107,7 @@ def maintenance(home,data,pairs):
         'state':str(Path(os.environ.get('AUGMENTOR_SHARED_STATE',Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor')).resolve()),
         'data':str(Path(os.environ.get('AUGMENTOR_SHARED_DATA',Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor')).resolve())}
     if pairs[0]!=expected:raise ValueError('The maintenance pair differs from the selected shared profile.')
-    with gate.lease(home,exclusive=True),shared.launch_lease(data,exclusive=True) as launch_fd,shared.cold(pairs):
+    with gate.lease(home,exclusive=True),shared.launch_lease(data,exclusive=True,preservation_recovery=True) as launch_fd,shared.cold(pairs):
         assert_no_dsh(home)
         if preserve.read(data/'desktop.json',private=True)!=raw:raise ValueError('The desktop selection changed before maintenance.')
         guard=_Guard(home,data,raw,pairs,launch_fd)
@@ -149,8 +150,8 @@ def prepare(stage,stage_sha,output,artifact_sha,guard):
     private_directory(output.parent)
     if any(output.is_relative_to(p) or p.is_relative_to(output) for p in (home,incoming,stage,guard.data,ROOT)):
         raise ValueError('Keep transaction backups outside application/profile/deployment/stage/checkout roots.')
-    fence=home/gate.FENCE
-    if fence.exists() or fence.is_symlink():raise ValueError('Recover the existing configuration transaction first.')
+    if any(p.exists() or p.is_symlink() for p in fence_paths(guard)):
+        raise ValueError('Recover the existing configuration transaction first.')
     rows=[];originals=[];candidates=[]
     for asset,path in zip(ASSETS,destinations(home)):
         original=preserve.read(path);candidate=preserve.read(stage/asset,private=True);mode=path.stat().st_mode&0o777
@@ -174,11 +175,32 @@ def prepare(stage,stage_sha,output,artifact_sha,guard):
     parent=os.open(output.parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
     try:os.fsync(parent)  # Persist the new backup directory entry before its fence.
     finally:os.close(parent)
-    atomic(fence,encoded({'schema':SCHEMA,'transaction':str(output),'sha256':digest}),exclusive=True)
+    # Deployment first: all managed clients remain blocked after controller
+    # death, even if their old selection lacks explicit DSH-home metadata.
+    for fence in fence_paths(guard):
+        atomic(fence,encoded(fence_identity(output,digest)),exclusive=True)
     return {'transactionSha256':digest,'configurationApplied':False,'activationComplete':False}
 
 
-def inspect(output,digest,guard):
+def fence_paths(guard):return (guard.data/shared.PRESERVATION_FENCE,guard.home/gate.FENCE)
+
+
+def fence_identity(output,digest):return {'schema':SCHEMA,'transaction':str(output),'sha256':digest}
+
+
+def inspect_fences(output,digest,guard,allow_missing=False):
+    present=[]
+    for fence in fence_paths(guard):
+        exists=fence.exists() or fence.is_symlink()
+        if exists:
+            if preserve.document(preserve.read(fence,private=True))!=fence_identity(output,digest):
+                raise ValueError('Configuration fence changed; preserve it for inspection.')
+        elif not allow_missing:raise ValueError('Configuration startup fence is incomplete; recover before applying.')
+        present.append(exists)
+    return present
+
+
+def inspect(output,digest,guard,recovery=False):
     output=private_directory(output);raw=preserve.read(output/'transaction.json',private=True)
     if preserve.sha(raw)!=digest:raise ValueError('Transaction identity changed.')
     value=preserve.document(raw)
@@ -195,10 +217,7 @@ def inspect(output,digest,guard):
     if preserve.sha(preserve.read(output/'stage-plan.json',private=True))!=value.get('stagePlanSha256'):raise ValueError('Transaction stage provenance changed.')
     status=preserve.document(preserve.read(output/'status.json',private=True))
     if status.get('phase') not in ('prepared','applying','applied','reversing','reversed'):raise ValueError('Unknown transaction phase.')
-    fence=guard.home/gate.FENCE
-    if status['phase']=='reversed' and not fence.exists() and not fence.is_symlink():return value,status
-    expected_fence={'schema':SCHEMA,'transaction':str(output),'sha256':digest}
-    if preserve.document(preserve.read(fence,private=True))!=expected_fence:raise ValueError('Configuration fence changed; preserve it for inspection.')
+    inspect_fences(output,digest,guard,allow_missing=recovery or status['phase']=='reversed')
     return value,status
 
 
@@ -242,10 +261,14 @@ def validate_suppliers(output,value,guard):
 
 def rollback(output,digest,guard):
     """Restore exact config bytes/modes; never restore databases or replay writes."""
-    output=Path(output);value,status=inspect(output,digest,guard);targets(value)
-    if status['phase']=='reversed' and not (guard.home/gate.FENCE).exists():
+    output=Path(output);value,status=inspect(output,digest,guard,recovery=True);targets(value)
+    if status['phase']=='reversed' and not any(inspect_fences(output,digest,guard,allow_missing=True)):
         if targets(value)!=[row['beforeSha256'] for row in value['files']]:raise ValueError('Reversed configuration changed.')
         return {'configurationRestored':True,'startupFenced':False}
+    # Preparation may die between the two markers. Reverse alone may complete
+    # that protection under the cold writer before changing configuration.
+    for fence,exists in zip(fence_paths(guard),inspect_fences(output,digest,guard,allow_missing=True)):
+        if not exists:atomic(fence,encoded(fence_identity(output,digest)),exclusive=True)
     atomic(output/'status.json',encoded({'phase':'reversing'}))
     for index in reversed(range(4)):
         require(guard,guard.home);row=value['files'][index];current=targets(value)
@@ -253,12 +276,11 @@ def rollback(output,digest,guard):
             atomic(Path(row['destination']),preserve.read(output/'before'/str(index),private=True),row['mode'])
     if targets(value)!=[row['beforeSha256'] for row in value['files']]:raise ValueError('Configuration reverse did not settle.')
     atomic(output/'status.json',encoded({'phase':'reversed'}))
-    fence=guard.home/gate.FENCE
-    # A death after the status write is recoverable: inspect accepts reversed
-    # with the exact fence still present, and this same reverse can finish.
-    expected={'schema':SCHEMA,'transaction':str(output),'sha256':digest}
-    if preserve.document(preserve.read(fence,private=True))!=expected:raise ValueError('Configuration fence changed during reverse.')
-    fence.unlink();fd=os.open(guard.home,os.O_RDONLY|os.O_DIRECTORY)
-    try:os.fsync(fd)
-    finally:os.close(fd)
+    # Deployment last: interrupted removal must not reopen managed clients.
+    # A later reverse checks both identities before completing its own markers.
+    for fence in reversed(fence_paths(guard)):
+        inspect_fences(output,digest,guard,allow_missing=True)
+        fence.unlink();fd=os.open(fence.parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)
+        try:os.fsync(fd)
+        finally:os.close(fd)
     return {'configurationRestored':True,'startupFenced':False}
