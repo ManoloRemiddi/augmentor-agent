@@ -88,6 +88,18 @@ class OfficeBoundaryTraceTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             self.evidence(lines)
 
+    def test_closed_scratch_owner_lookup_is_explicit_and_does_not_grant_document_access(self):
+        self.result.update(diagnosticProcessBoundary=True, lookupHelpers=[{'pid': 50, 'kind': 'scratch-owner', 'closed': True}])
+        lines = [*self.lines, self.nss.replace('9     ', '50    '), self.nss.replace('9     ', '50    ')]
+        result = self.evidence(lines)
+        self.assertEqual(result['scratchOwnersConfirmedClosed'], 1)
+        self.assertEqual(result['failedScratchOwnerNssSocketCalls'], 2)
+        with self.assertRaises(AssertionError):
+            self.evidence([*lines, '50    openat(AT_FDCWD, "/work/outside/only-on-host.txt", O_RDONLY) = 18'])
+        self.result['lookupHelpers'][0]['closed'] = False
+        with self.assertRaises(AssertionError):
+            self.evidence(lines)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,50 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Opt-in Linux process converter — October 17
+
+The preceding diagnostic now has a source runtime implementation selected only
+with `AUGMENTOR_OFFICE_BACKEND=linux-process-wasm` on Linux x64. The default
+remains `pinned-kit`; neither installed MX review has changed. The original
+provider, queue/cache, authorized reader, Wasm entry, engine bytes and GUI remain.
+Each conversion gets a separate renderer supervised by a Linux helper, bounded
+versioned metadata pipes, an independent deadline and kernel parent-death hooks.
+The parent owns the publication descriptor; source/output receipts and original
+scratch-directory identity must still match before results are accepted.
+
+Ten fault tests pass, including stopped owner/supervisor/renderer death,
+independent timeout, reply overflow, changed real-Wasm input, replaced output
+preservation and a distinct successful recovery. The broader source cohort
+passes **281 Node tests** across 42 files, including 18 Chromium files; focused
+source/notice/packaging/parser checks pass **43 Python tests**, without skips.
+Shared scratch compatibility also passes **37 native-backend tests**, before the
+later Wasm publication refinement; this does not qualify that refinement on the
+native backend. The actual original Office GUI/Host test passes with both the
+default engine and prepared Thin engine, retaining its original assertions and
+deadlines. It checks PDF/font/zoom/reload/Retry/recovery/narrow-close controls
+and exact native-history/request evidence, using only an authored synthetic seed.
+
+The full contained source-backend matrix passes ten cases per engine and fourteen
+verified PDFs under the same **3 GiB / zero-swap / one CPU / 128-PID** diagnostic
+cap. Baseline/Thin memory peaks are **1,441,579,008 / 1,923,006,464 bytes**;
+PID peaks are 33. Each run confirms eight Wasm opens, ten closed renderers and
+ten closed scratch owners. Calibrated outside-file/HTTP canaries, real startup
+cancellation, distinct recovery and nested scratch cleanup pass. Twenty failed
+NSS Unix-socket lookups per engine belong to known closed scratch-owner helpers;
+only the driver's positive control makes an IP connection. Their attribution
+does not exempt converter/helper file or IP access. The first source-backend
+attempt retained as failed completed its cases but rejected these NSS calls in
+postflight; the corrected observer/parser records them explicitly.
+
+This is **process supervision, not a filesystem/network sandbox**. The diagnostic
+cgroup cap is not an installed per-job memory limit. Pre-ready/all-owner death
+windows, durable recovery, managed kernel resource controls, further lifecycle
+faults, exact ordinary/sealed/installed adoption and broader document/font/macro
+acceptance remain open. Existing source/third-party/public packaging gates stay
+intact; no public redistribution approval follows. Both actual MX reviews,
+all 36 protected file sets, shared settings, menus and GPU/voice state verify
+unchanged. [Reproduction](../release/office-rebuild/README.md#opt-in-linux-process-converter--october-17)
+and [source/evidence record](../release/office-rebuild/linux-process-seat-qualification-20261017.json).
+
 ## Retained memory and process-boundary prototype — October 17
 
 The [memory diagnostic and explicit process converter seat](../release/office-rebuild/README.md#retained-memory-and-process-boundary-prototype--october-17)

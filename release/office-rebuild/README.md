@@ -1,5 +1,66 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Opt-in Linux process converter — October 17
+
+The runtime implementation in `packages/runtime/src/office-process-*` is an
+explicit source-only Linux x64 backend, `AUGMENTOR_OFFICE_BACKEND=linux-process-wasm`.
+Unset/default `pinned-kit` behavior is unchanged. Do not set this on the owner's
+review as a substitute for package/adoption qualification.
+
+The original provider's converter factory runs one unmodified Wasm entry per
+renderer. A Python supervisor arms kernel parent-death hooks before admission,
+uses pidfds to kill/reap admitted work and enforces an independent deadline even
+while the Node owner is stopped. Scratch has its existing separate cleanup owner;
+a fresh supervisor lease is acquired after fork. The renderer inherits its
+owned directory and parent-created publication descriptors. It renders into a
+private nested output, verifies source identity and copies the bounded PDF into
+that publication. Matching device/inode/version/SHA-256 receipts are checked again
+by the parent after supervisor close. Failure removes only a matching owned
+publication inode, preserving a replacement. Request/reply metadata is versioned
+and byte bounded, options and font metadata are validated, and persistent font
+cache writes are disabled for this seat. Provider queue/cache/reader and GUI
+authority are unchanged; no new agent loop or engine dependency is introduced.
+
+After `npm run build`, run the focused faults and actual original GUI:
+
+```sh
+node --test tests/office-process-linux.test.mjs
+node --test tests/harness-office-process-chromium.test.mjs
+```
+
+The ten faults distinguish authored process actors from actual Wasm conversion
+races/recovery. Both default and prepared Thin engines pass the original GUI's
+unchanged assertions/deadlines. To qualify the source implementation with the
+full contained corpus, use a new unselected app containing current `dist`, the
+existing Thin engine and the original rich fixtures:
+
+```sh
+python3 -B release/office-rebuild/contained-boundaries.py \
+  --app "$UNSELECTED_CURRENT_RUNTIME_APP" \
+  --thin-app "$EXISTING_PREPARED_THIN_APP" \
+  --fixtures "$AUTHORED_RICH_FIXTURES" --supervised-process \
+  --output "$PWD/outputs/office-new-supervised-boundaries"
+```
+
+`--supervised-process` selects the actual runtime, whereas `--process-boundary`
+below retains the earlier prototype. They are mutually exclusive. The diagnostic
+observer records real spawn/ready/close events and returns the original child
+objects; it supplies no replacement actors. Each run passes ten cases/seven PDFs,
+eight Wasm opens, ten renderer closures and ten scratch-owner closures, with
+no unresolved trace calls. Baseline/Thin peaks are 1,441,579,008/1,923,006,464 bytes
+and 33 PIDs under the existing 3 GiB/zero-swap/one-CPU/128-PID cap. Only the HTTP
+positive control connects over IP. Twenty failed NSS Unix-socket probes belong
+to closed scratch owners; neither file nor IP access is exempted. The initial
+postflight failure is retained rather than relabelled as acceptance.
+
+This supervises processes; it is not a filesystem/network sandbox. The container
+cgroup limits are diagnostic and are not installed per-job controls. Pre-ready
+and simultaneous owner-loss windows, durable recovery, managed memory limits,
+further faults, ordinary/sealed/installed staging and broader fonts/corpus/macros
+remain. The earlier same-process Thin OOM remains valid. Full source/third-party
+and public packaging gates are unchanged. Neither installed review is replaced.
+[Evidence and exact source hashes](linux-process-seat-qualification-20261017.json).
+
 ## Retained memory and process-boundary prototype — October 17
 
 [`retention-diagnostic.py`](retention-diagnostic.py) and

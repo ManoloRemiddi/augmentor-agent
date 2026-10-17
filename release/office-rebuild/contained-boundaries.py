@@ -75,17 +75,24 @@ def trace_evidence(path, result):
     assert len(renderers) <= 20 and all(isinstance(r.get('pid'), int) and r['pid'] > 0 and r.get('closed') is True for r in renderers)
     renderer_pids = {row['pid'] for row in renderers}
     assert len(renderer_pids) == len(renderers) and result['driverPid'] not in renderer_pids
-    nss = [(pid, call) for pid, call in connects if pid in {result['driverPid'], *renderer_pids} and
+    helpers = result.get('lookupHelpers', [])
+    assert len(helpers) <= 20 and all(row.get('kind') == 'scratch-owner' and type(row.get('pid')) is int and row['pid'] > 0 and row.get('closed') is True for row in helpers)
+    helper_pids = {row['pid'] for row in helpers}
+    assert len(helper_pids) == len(helpers) and not helper_pids.intersection({result['driverPid'], *renderer_pids})
+    nss = [(pid, call) for pid, call in connects if pid in {result['driverPid'], *renderer_pids, *helper_pids} and
            re.fullmatch(r'connect\(\d+, \{sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"\}, 110\) = -1 ENOENT \(No such file or directory\)', call)]
     ip = [(pid, call) for pid, call in connects if (pid, call) not in nss]
     driver_nss = sum(pid == result['driverPid'] for pid, _ in nss)
     assert (driver_nss in {0, 2} if result.get('diagnosticProcessBoundary') else driver_nss == 2) and len(ip) == 1, connects
     assert all(sum(pid == renderer for pid, _ in nss) <= 4 for renderer in renderer_pids)
+    assert all(sum(pid == helper for pid, _ in nss) <= 2 for helper in helper_pids)
     pid, call = ip[0]
     assert pid == result['driverPid'] and '127.0.0.1' in call and f'htons({result["canaryPort"]})' in call, connects
     return {'successfulWasmOpens': wasm, 'outsideCanaryReads': canaries,
             'connectCalls': len(connects), 'failedParentContainerNssSocketCalls': len(nss),
             'ownedRendererProcessesConfirmedClosed': len(renderers),
+            'scratchOwnersConfirmedClosed': len(helpers),
+            'failedScratchOwnerNssSocketCalls': sum(pid in helper_pids for pid, _ in nss),
             'ipConnectCalls': 1, 'soleIpConnectIsDriverHttpPositiveControl': True,
             'unresolvedCalls': 0, 'traceSha256': sha(path),
             'scope': 'All traced processes/threads within this diagnostic container only'}
@@ -97,7 +104,9 @@ def main():
     parser.add_argument('--thin-app', required=True)
     parser.add_argument('--fixtures', required=True)
     parser.add_argument('--output', required=True)
-    parser.add_argument('--process-boundary', action='store_true', help='Explicit contained prototype; not installed/default behavior')
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument('--process-boundary', action='store_true', help='Explicit contained prototype; not installed/default behavior')
+    modes.add_argument('--supervised-process', action='store_true', help='Explicit compiled Linux supervisor seat; not installed/default behavior')
     args = parser.parse_args()
     os.umask(0o077)
     app, thin, fixtures = map(private_input, [args.app, args.thin_app, args.fixtures])
@@ -130,6 +139,8 @@ def main():
     if args.process_boundary:
         for name in ['process-converter.mjs', 'process-renderer.mjs']:
             shutil.copy2(ROOT / 'release/office-rebuild' / name, probe / name)
+    if args.supervised_process:
+        shutil.copy2(ROOT / 'release/office-rebuild/supervised-observer.mjs', probe / 'supervised-observer.mjs')
     operator_sha = sha(Path(__file__))
     trace_tools = output / 'trace-tools'
     trace_tools.mkdir()
@@ -156,7 +167,7 @@ def main():
                   '--memory', '3g', '--memory-swap', '3g', '--cpus', '1', '--pids-limit', '128',
                   '--user', f'{os.getuid()}:{os.getgid()}', '--workdir', '/work',
                   '--env', 'HOME=/work/home', '--env', 'PROBE_ENGINE=' + mode,
-                  '--env', 'PROBE_PROCESS_BOUNDARY=' + ('1' if args.process_boundary else '0'),
+                  '--env', 'PROBE_PROCESS_BOUNDARY=' + ('2' if args.supervised_process else '1' if args.process_boundary else '0'),
                   '--tmpfs', '/tmp:rw,nosuid,nodev,noexec,size=256m']
         for source, target in mounts:
             create += ['--mount', f'type=bind,src={source},dst={target},readonly']
@@ -204,7 +215,9 @@ def main():
               'engineIdentities': engine_identities,
               'probeSha256': sha(probe / 'boundaries-probe.mjs'),
               'processBoundaryPrototype': args.process_boundary,
+              'supervisedRuntimeSeat': args.supervised_process,
               'processPrototypeFilesSha256': {p.name: sha(p) for p in probe.iterdir() if p.name.startswith('process-')},
+              'probeFilesSha256': {p.name: sha(p) for p in probe.iterdir()},
               'engineBuildsStarted': 0, 'installedChanges': 0,
               'ownerProfilesOrDocumentsUsed': False, 'installedSandboxQualified': False,
               'macroExecutionQualified': False, 'publicRedistributionQualified': False}

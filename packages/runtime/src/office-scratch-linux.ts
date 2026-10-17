@@ -8,7 +8,8 @@ import type {OfficeScratch} from '../vendor/dsh-office/index.js';
 import {OfficeToPdfError} from '../vendor/dsh-office/errors.js';
 
 /** A separate cleanup owner is ready before the MIT provider copies bytes. */
-export async function createLinuxOfficeScratch():Promise<OfficeScratch>{
+export interface LinuxOfficeScratch extends OfficeScratch {readonly identity:Readonly<{dev:bigint;ino:bigint}>;}
+export async function createLinuxOfficeScratch():Promise<LinuxOfficeScratch>{
   if(process.platform!=='linux')throw new OfficeToPdfError('unavailable','Native Office scratch ownership requires Linux.');
   const parent=tmpdir(),helper=fileURLToPath(new URL('./office-scratch-linux.py',import.meta.url));
   const child=spawn('/usr/bin/python3',['-I','-B',helper,String(process.pid),parent],{detached:true,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8'},stdio:['pipe','pipe','ignore']});
@@ -33,7 +34,7 @@ export async function createLinuxOfficeScratch():Promise<OfficeScratch>{
     if(!current.isDirectory()||current.dev!==identity.dev||current.ino!==identity.ino||Number(current.mode&0o777n)!==0o700||current.uid!==BigInt(process.getuid!()))throw new Error('Unconfirmed scratch identity.');
     lifetime.signal.throwIfAborted();
   }catch(cause){disposing=true;child.stdin.end();await closed;throw cause;}finally{clearTimeout(startup);}
-  return {directory:directory!,signal:lifetime.signal,dispose(){return release??=(async()=>{
+  return {directory:directory!,identity:Object.freeze({...identity!}),signal:lifetime.signal,dispose(){return release??=(async()=>{
     disposing=true;child.stdin.end('R\n');
     if(child.exitCode===null&&child.signalCode===null){killTimer??=setTimeout(()=>child.kill('SIGKILL'),2000);killTimer.unref();}
     const code=await closed;

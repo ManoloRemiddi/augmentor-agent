@@ -13,6 +13,7 @@ import {WikiReceipts,wikiActionKey} from './wiki-receipts.js';
 import {PiFilePreview,PreviewReadError} from './file-preview.js';
 import {PiOfficePreview} from './office-preview.js';
 import {createLinuxNativeOfficeConverter} from './office-native-linux.js';
+import {createLinuxProcessOfficeConverter} from './office-process-linux.js';
 import {PiFileReferences} from './file-references.js';
 import {FILE_REFERENCE_PROMPT} from '../vendor/dsh-file-reference/guidance.js';
 import {desktopCapabilities} from '../../desktop/src/capabilities.js';
@@ -172,8 +173,8 @@ export class Host {
   private office(){
     if(this.officePreview)return this.officePreview;
     const backend=process.env.AUGMENTOR_OFFICE_BACKEND;
-    if(backend&&backend!=='pinned-kit'&&backend!=='linux-native')throw new PreviewReadError('gateway/service-unavailable','Unknown Office backend.');
-    return this.officePreview=new PiOfficePreview(async(scope,kind,p,signal)=>{if(this.previewAuthority(scope.sessionId).cwd!==scope.workspaceRoot)throw new PreviewReadError('gateway/forbidden','The preview workspace changed.');return this.previewFile(scope.sessionId,kind,p,signal);},backend==='linux-native'?createLinuxNativeOfficeConverter:undefined);
+    if(backend&&backend!=='pinned-kit'&&backend!=='linux-native'&&backend!=='linux-process-wasm')throw new PreviewReadError('gateway/service-unavailable','Unknown Office backend.');
+    return this.officePreview=new PiOfficePreview(async(scope,kind,p,signal)=>{if(this.previewAuthority(scope.sessionId).cwd!==scope.workspaceRoot)throw new PreviewReadError('gateway/forbidden','The preview workspace changed.');return this.previewFile(scope.sessionId,kind,p,signal);},backend==='linux-native'?createLinuxNativeOfficeConverter:backend==='linux-process-wasm'?createLinuxProcessOfficeConverter:undefined);
   }
   officeGeneration(sid:string,signal:AbortSignal){this.previewAuthority(sid);return this.office().generation(signal);}
   async previewOffice(sid:string,p:Data,signal:AbortSignal){const cwd=this.previewAuthority(sid).cwd;const result=await this.office().render({sessionId:sid,workspaceRoot:cwd},p,signal);if(this.previewAuthority(sid).cwd!==cwd)throw new PreviewReadError('gateway/forbidden','The preview workspace changed.');return result;}

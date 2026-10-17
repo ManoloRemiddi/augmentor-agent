@@ -2147,6 +2147,21 @@ Original PDF preview: `harness-pdf-chromium.test.mjs` uses authored PDF/JPX byte
 
 ## Original Office preview qualification
 
+The opt-in Linux x64 process backend is checked by
+`node --test tests/office-process-linux.test.mjs` after `npm run build`:
+ten bounded protocol/file, actual supervisor, stopped/dead owner/actor, deadline,
+overflow, real Wasm source/output race and recovery cases. Authored actors and
+actual conversion checks are labelled separately. The original viewer test also
+runs unchanged through `harness-office-process-chromium.test.mjs`, setting only
+`AUGMENTOR_HARNESS_PROOF_PROCESS_OFFICE=1`; it passes with default and prepared
+Thin engines. The current 42-file source cohort passes 281 Node tests, and the
+focused Python source/notice/packaging cohort passes 43, including seven trace
+parser cases. The earlier 37 native-backend compatibility checks cover the shared
+scratch identity change, before later Wasm publication refinement. The actual
+contained matrix uses `--supervised-process`, distinct from the earlier
+`--process-boundary` prototype. Diagnostic cgroup limits do not establish
+installed per-job controls. See [contracts, exact evidence and remaining gates](../docs/HARNESS-OFFICE-PREVIEWS.md#opt-in-linux-process-converter--october-17).
+
 `harness-office-preview.test.mjs` checks the copied queue's admission/sharing/cancellation teardown, real pinned Linux Wasm conversion/current-source authority and maintenance. `harness-office-chromium.test.mjs` exercises original Office/PDF/font/zoom/Retry controls over actual SDK/HTTP with no subsequent inference. `test_nested_package_notices.py` rejects changed/outside/link-shaped nested notices and keeps MPL admission bound to exact reviewed package versions. See [Office previews](../docs/HARNESS-OFFICE-PREVIEWS.md) for source/ordinary/installed scope and open public notice/source/rebuild gates.
 
 `test_office_engine_packaging.py` adds nine Linux cases against the real pinned
