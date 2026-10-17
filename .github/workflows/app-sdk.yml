@@ -88,7 +88,10 @@ jobs:
       - name: Verify DSH browser stream progress and scoped transport
         run: node --test tests/dsh-status.test.mjs tests/dsh-boundary.test.mjs
       - name: Verify Browser client progress and shared preferences
-        run: node --test --test-concurrency=2 apps/browser/test/*.test.mjs
+        run: |
+          npm ci --prefix apps/browser --ignore-scripts
+          npm ci --prefix apps/browser/test --ignore-scripts
+          node --test --test-concurrency=2 apps/browser/test/*.test.mjs
       - name: Verify Linux DSH setup family, preservation and rollback
         if: runner.os == 'Linux'
         run: node -e "const cp=require('child_process');const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-B','-m','unittest','discover','-s','tests','-p','test_dsh*setup.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"

@@ -93,7 +93,12 @@ behavior was updated to assert completion collapse **and** subsequent manual reo
 code-copy and workspace controls remain tested.
 
 Local **161 Python / 24 focused Node / 130 Browser unit** cases pass, zero failures
-or skips, plus type checks. Python comprises 121 Native/settings/shared-preference
+or skips, plus type checks. Hosted run **39063562845** passes the Native and
+transport stages, then fails Browser test imports because the SDK job omitted its
+separate test dependency lockfile (`jsdom`). The workflow now uses the existing
+validation recipe: `npm ci --prefix apps/browser` and `apps/browser/test`, both with
+`--ignore-scripts`. That failure is retained, not a complete SDK pass.
+Python comprises 121 Native/settings/shared-preference
 cases, 28 Controller/readiness/remote cases and 12 cold-backup cases. The new
 Browser/Native stream-opening and late-reply tests use authored data; no owner
 model or microphone is used. Hosted final-source results are recorded separately.
