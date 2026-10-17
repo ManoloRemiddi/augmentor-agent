@@ -384,5 +384,10 @@ No new app build, installed code update or owner cutover. Previous schema journa
 require matching historical operators. [Record](../release/harness-browser-code-publication-20261018.json).
 
 Actual remaining steps are Chromium coordination, accepted-work-safe quiescence,
-protected Browser parent preparation, one fresh full three-pair archive, coupled
+one fresh full three-pair archive, coupled
 publication/finalization, ordinary reopening and owner continuation.
+
+The Browser parent prerequisite is now complete (**0775→0755**, original mode
+durably retained, code unchanged). Both full Linux SDK runs pass for the identical
+controller. The older preview's unsent draft still blocks safe quiescence; see
+[the current installation boundary](HARNESS-BROWSER-CODE-PUBLICATION.md#protected-parent-and-full-linux-results--october-18).

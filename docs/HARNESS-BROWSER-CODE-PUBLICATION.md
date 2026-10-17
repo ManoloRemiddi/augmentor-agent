@@ -41,10 +41,10 @@ embedded, registered-workspace and DSH companion caller:
 
 Preparation leaves live code untouched. The target must be an explicit existing
 canonical direct child of the primary deployment's `browser` directory; both
-root and parent must be owned protected directories. The current real parent
-still has mode **0775** and needs only group-write removal before actual
-preparation, with its original mode recorded. That change was not made by this
-checkpoint. Browser profile data must never be put in this code folder.
+root and parent must be owned protected directories. The initial real parent
+had mode **0775**; the later prerequisite preparation below removed only group
+write, recording the original mode before changing it to **0755**. Browser profile
+data must never be put in this code folder.
 
 Recovery must be private persistent storage on the **same filesystem**, outside
 source, application, profile/data and archive roots. Known disposable build scratch
@@ -106,7 +106,7 @@ shortcuts and GPU/voice/service state verify unchanged. No app copy or release w
 created; scratch was removed and about 101 GiB remains free.
 
 Remaining: coordinate Chromium exit/reload; preserve accepted work while quiescing
-all callers; prepare the protected parent; capture once; bind data, Browser,
+all callers; capture once; bind data, Browser,
 configuration, reviews and clients; apply/finalize; reopen normally and verify the
 owner can continue the pilot. More transfers need pilot feedback; VR-RasterStudio
 stays in DSH. Voice expansion and later operating systems remain deferred.
@@ -134,3 +134,34 @@ the full Linux job is still running at this snapshot. Mac failed the shared-memo
 fixture step (cause unqualified), Windows is still running; no whole-matrix pass
 is claimed. No owner file, selector, data, model, maintenance reservation, stop,
 restart, archive or application copy was created by this live preparation.
+
+## Protected parent and full Linux results — October 18
+
+The [follow-up record](../release/harness-mx-current-cut-preparation-20261018.json)
+records the actual Browser parent prerequisite: **0775→0755**, only group write
+removed. Original device/inode/mode/ownership were durably recorded first; owner
+access and group read/execute remain. No other local group account or access/default
+ACL was observed. The initial secondary evidence-copy write refused before any
+mode change; recovery resumed from its protected receipt without creating another
+recovery root. Browser code inventory, registry and selection bytes remain exact.
+Full Native/review PIDs/builds, 36 protected files, shared rows/engine, menus,
+shortcuts and GPU/voice/services reverify unchanged. No stop, model call, data
+migration, full app copy or release artifact was created.
+
+Full Linux SDK succeeds at both source **16ba7d09**
+([39079128742](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39079128742/job/117532312384))
+and documentation follow-up **c74ab11a**
+([39079523341](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39079523341/job/117533451291)).
+Controller **5d67a8bf** hashes remain exact; application **4f83b7e8** remains the
+unchanged supplier. Mac shared-memory fixture failure remains unqualified; this
+is no whole-matrix or later-OS approval. A controlled isolated Linux probe
+reproduces unavailable memory status with a 112-byte socket and success with a
+56-byte socket, but the historical failing Mac root length was not observed.
+
+The older `harness-preview` still reports an unsent draft and refuses safe shutdown.
+The owner save/finish/close question remains unanswered; Chromium coordination
+also remains. Do not close it forcibly, overwrite or extract its in-memory draft,
+or prepare repeated owner snapshots while waiting. All remaining installation
+work needs this client quiesced, a fresh complete cold cut, ordinary reopening and
+owner continuation. No completion is claimed. More project transfers, voice
+expansion and later operating systems remain deferred.

@@ -69,5 +69,51 @@
     "harness-mx-legacy-ui-current-status-private-20261018.json": "cbb6ffb7a5ad057876685939b34aa1f71fae864fcadf8e0de28200aa87d312b3",
     "harness-mx-prospective-cut-plan-private-20261018.json": "3f8898f51b432cbbdc53941368f950a2373d0a1478e77889734c94d81aa99a72",
     "harness-mx-current-preparation-ci-private-20261018.json": "4b9c06038565da320f6e11bd5bee717775dd92cc12bcc6ce63837fb171eb11f3"
+  },
+  "initialSnapshotHistorical": true,
+  "followUpOwnerPrerequisites": {
+    "date": "2026-10-18",
+    "sourceRef": "c74ab11af515fd0857631d2fc58fd6f03db6b6f0",
+    "controllerRef": "5d67a8bfe45dd2d632a716b7854fd9860e08dd0b",
+    "applicationRef": "4f83b7e8497b6ea3e0f6f3acd033648f0abedf86",
+    "browserParentModeBefore": "0775",
+    "browserParentModeNow": "0755",
+    "onlyGroupWriteRemoved": true,
+    "originalModeDurablyRecordedBeforeChange": true,
+    "parentNowAcceptedByGate": true,
+    "groupReadExecuteAndOwnerAccessPreserved": true,
+    "noOtherGroupAccountsObserved": true,
+    "accessAndDefaultAclAbsent": true,
+    "firstAttempt": "Stopped before mode change because the secondary output receipt parent did not satisfy tx.atomic; resumed from the already protected durable receipt, without another recovery root",
+    "browserCodeBytesModesAndInodesUnchanged": true,
+    "registryAndSelectionBytesUnchanged": true,
+    "allNativeReviewPidsAnd36ProtectedFilesExact": true,
+    "sharedRowsEngineMenusShortcutsAndServicesExact": true,
+    "linuxFullSdkRun": 39079523341,
+    "linuxFullSdkHead": "c74ab11af515fd0857631d2fc58fd6f03db6b6f0",
+    "linuxFullSdkJob": 117533451291,
+    "linuxFullSdkConclusion": "success",
+    "precedingFullLinuxSdkRun": 39079128742,
+    "wholeMatrixSuccess": false,
+    "laterOsDeferred": true,
+    "ownerStops": 0,
+    "ownerModelRequests": 0,
+    "ownerDataMigrated": false,
+    "newFullAppCopies": 0,
+    "newAppArtifacts": 0,
+    "legacyPreviewDraftStillPresent": true,
+    "safeShutdownAccepted": false,
+    "requiredOwnerAction": "Save or finish the older harness-preview draft and close that window; then coordinate Chromium exit/reload",
+    "remaining": [
+      "Resolve the owner draft and coordinate Chromium exit/reload",
+      "Fresh accepted-work-safe quiescence of every current caller and one full three-pair cold archive",
+      "Recompute all prospective selectors/renderers under real guard; prepare data and Browser before configuration; coupled publication/finalization",
+      "Ordinary loaded-client and owner continuation, then pilot feedback before further migration"
+    ]
+  },
+  "followUpPrivateEvidenceSha256": {
+    "harness-browser-parent-preparation-private-20261018.json": "d3ff1c5a955160ecbc3f2ff434ab60838db23ea5ca0fdfd8603113dbad34a24e",
+    "harness-browser-parent-owner-preservation-private-20261018.json": "61693aca081d2925b579ab7c6b2558b07dbc806a77ee0ae1be4987b0f9355db5",
+    "harness-browser-parent-linux-sdk-terminal-private-20261018.json": "0e2c5e4ce2db58e4fa767f06e6a29a279eff9be3b0da80a4082543755e2da008"
   }
 }

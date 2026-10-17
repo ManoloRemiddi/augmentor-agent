@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Final independent MX prerequisites](HARNESS-BROWSER-CODE-PUBLICATION.md#protected-parent-and-full-linux-results--october-18)
+are complete: Browser parent protected with original mode retained and code
+unchanged; full Linux SDK **39079128742 / 39079523341** succeed. No new app copy
+or owner migration. The older preview still has an unsent draft and refuses
+shutdown; owner save/finish/close and Chromium coordination are required before
+the cold cut. Keep all clients/data intact while waiting.
+
 [Current MX cut preparation](HARNESS-BROWSER-CODE-PUBLICATION.md#current-owner-readiness--october-18)
 verifies the 48-input stage and 32 prospective startup/registration images; only
 the registry content changes (20→21). Ordinary Native/reviews and DSH/workspace
