@@ -14,6 +14,20 @@ spec.loader.exec_module(setup)
 
 
 class SetupHistoryTests(unittest.TestCase):
+    @unittest.skipUnless(setup.sys.platform=='linux','MX setup read-only contract qualification')
+    def test_connection_checks_catalogue_contract_not_a_fabricated_server_version(self):
+        from unittest.mock import Mock
+        with tempfile.TemporaryDirectory() as temporary:
+            home=Path(temporary)/'authored-dsh';home.mkdir();configuration=Path(temporary)/'harnesses.json'
+            remote=Mock();remote.call.return_value={'version':None,'versionVerified':False,'catalogContract':setup.CATALOG_CONTRACT}
+            with patch.object(setup,'cli_directory',return_value=Path(temporary)),patch.object(setup,'modules_directory',return_value=(Path(temporary),{})),patch.object(setup,'remote_client',return_value=remote),patch.object(setup,'existing_prompt_plugin',return_value=None),patch.object(setup,'http',return_value={}),patch.object(setup,'configuration',return_value=configuration):
+                check=setup.Setup();result=check.check({'endpoint':'http://127.0.0.1:3080','home':str(home)})
+                self.assertFalse(result['installed']);self.assertIsNotNone(check.pending)
+                self.assertEqual(list(home.iterdir()),[]);self.assertFalse(configuration.exists())
+                remote.call.return_value={'version':'0.1.5-rc.1'}
+                with self.assertRaisesRegex(ValueError,'catalogue API contract'):check.check({'endpoint':'http://127.0.0.1:3080','home':str(home)})
+                self.assertIsNone(check.pending)
+
     def test_product_token_has_private_user_ownership_without_changing_external_home(self):
         with tempfile.TemporaryDirectory() as temporary:
             home=Path(temporary)/'external DSH';home.mkdir()

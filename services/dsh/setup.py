@@ -16,7 +16,7 @@ from urllib.parse import urlsplit, parse_qs, urlunsplit
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from remote import client as remote_client
+from remote import client as remote_client, CATALOG_CONTRACT
 from platform_adapters.paths import link_directory
 import uuid
 
@@ -181,7 +181,7 @@ class Setup:
         modules,packages=modules_directory(cli)
         remote=remote_client(base,home,query.get('token',[None])[0]);remote.authorize()
         host=remote.call('host.describe')
-        if host.get('version')!='0.1.5-rc.1':raise ValueError('This DSH API version has not been verified for this preview.')
+        if host.get('catalogContract')!=CATALOG_CONTRACT:raise ValueError('This DSH catalogue API contract has not been verified for this preview.')
         prompt_plugin=existing_prompt_plugin(remote,base)
         installed=False
         try:
