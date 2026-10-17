@@ -11,6 +11,30 @@ this source checkpoint.
 
 ## Prepare one reviewed cut
 
+The public `scripts/harness-preview.py` now holds the deployment reader before
+configuration, status, Native or Browser startup. It refuses pending maintenance.
+An explicit selected `sharedProfile` changes only shared state/data; the existing
+preview config, state, socket, workspace, dictation and provider-routing paths
+are preserved. Only that mutable binding is omitted from the immutable deployment
+comparison; all other fields and the complete artifact inventory must still match.
+The installed single-file opener loads the protected helper from its stable
+deployment directory; a sibling helper supports a packaged installation. Missing,
+linked or group/other-writable helpers refuse. This requires deploying both files
+as reviewed bootstrap images before a real cold cut; the working opener is still
+unchanged. An absent binding retains the existing preview's separate shared pair.
+
+The reviewed bootstrap allowlist also accepts `home-launch.py` in declared
+deployment storage. Its existing bytes/mode are backed up and restored by the
+same publication transaction. This permits exact stable-helper adoption and does
+not authorize changing Home's separately selected suppliers or its UI.
+
+Local **51 Python** cases pass: seven protected preview fixtures, five review
+opening cases, 16 shared-launch cases and 23 publication cases. These use authored
+profiles, a read-only host and isolated network under the actual 64 GiB reserve;
+publication health replies remain synthetic. No full app mirror, installed
+candidate, owner model request or owner-data migration was created by these checks.
+See [the source qualification record](../release/harness-preview-binding-20261017.json).
+
 Inventory and adopt every real launcher first. In particular, the installed
 review opener must honor the deployment gate **before** any owner cut begins.
 The source opener now recognizes legacy registrations below `releases/`, holds
@@ -114,10 +138,9 @@ Full [Linux SDK 39067753095](https://github.com/ManoloRemiddi/augmentor-agent/ac
 including all 22 publication cases and actual registered-review reopening.
 [Portable qualification record](../release/harness-client-publication-20261017.json).
 
-The real bootstrap review also found a legacy preview opener that compares its
-entire immutable deployment record to mutable selection metadata. Before switching
-that selection, adopt a fence-aware opener that accepts a qualified shared binding
-and retains its current profile paths. Direct Browser/mobile launchers and the
+The real bootstrap review found a legacy preview opener whose full-record
+comparison prevented mutable shared selection. The source correction above still
+needs adoption before switching that selection. Direct Browser/mobile launchers and the
 stable Home helper still need exact adoption review. Preserve separately selected
 companion suppliers and the current interpreter contract. The approved Native/
 Harness prompt/capture merge or target receipt must be bound before a real store

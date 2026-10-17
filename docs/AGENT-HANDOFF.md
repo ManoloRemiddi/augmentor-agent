@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Protected preview shared binding](HARNESS-CLIENT-PUBLICATION.md) now preserves existing preview config/state/socket/provider paths while applying only an explicit shared pair. Native/Browser/status startup refuses pending maintenance; protected helpers are required. Reviewed Home helper publication reverses exactly. Local **51 Python** pass (seven new preview / 23 publication cases); no full app copy, installed change or owner data migration. The original 75-copy cleanup plus three verified duplicates now totals **78 copies / 42.51 GiB recovered**, with about **100 GiB free**. Ambiguous old output/profile trees remain. Qualify one combined artifact and bind shared-data adoption before the real cold cut.
+
 [Cold-backed matching client publication](HARNESS-CLIENT-PUBLICATION.md) now links
 configuration schema 3, reviewed bootstrap images and both build selectors. Exact
 pre-finalization reverse and interrupted forward finalization are covered; linked

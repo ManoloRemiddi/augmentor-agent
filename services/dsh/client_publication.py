@@ -22,7 +22,7 @@ SCHEMA='augmentor-dsh-client-publication/1'
 MAX_FILES=128
 MAX_BYTES=64*1024**2
 BOOTSTRAP_NAMES=frozenset(('shared-launch-profile.py','desktop-browser-launch.py','desktop-dsh-launch.py',
-    'dsh-profile-gate.py','embed-launch.py','desktop-launch.py','desktop-deployment.py','autostart.py'))
+    'dsh-profile-gate.py','embed-launch.py','desktop-launch.py','desktop-deployment.py','home-launch.py','autostart.py'))
 startup=tx.load('publication_startup_files',tx.ROOT/'scripts/install-desktop-startup.py') if sys.platform=='linux' else None
 
 

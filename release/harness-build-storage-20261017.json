@@ -79,5 +79,22 @@
     "unchangedSourceParserErrorPreserved": true,
     "inspectorProductionGuardUnchanged": true,
     "newHostedConclusionPending": true
+  },
+  "followUp": {
+    "date": "2026-10-17",
+    "additionalExactDuplicateCopies": 3,
+    "previousCopiesRemoved": 75,
+    "totalCopiesRemoved": 78,
+    "additionalObservedGiBRecovered": 1.63,
+    "totalObservedGiBRecovered": 42.52,
+    "rootFreeGiBApprox": 100.1,
+    "retainedMatchingSealedArtifacts": true,
+    "extraSourceFilesVerifiedAgainstGit": 24,
+    "unknownRootsRetained": true,
+    "ownerDataDeleted": false,
+    "privateReceiptHashes": {
+      "harness-storage-followup-cleanup-private-20261017.json": "366f34d5a2ed6e0e74a70fa63abb40bbbc7678e5b8549563992bb4436acb836b",
+      "harness-storage-followup-source-duplicates-private-20261017.json": "063f07229c731cf71cde2b2f53a85db68f17867ee495dcb46cb789e909ff7fac"
+    }
   }
 }

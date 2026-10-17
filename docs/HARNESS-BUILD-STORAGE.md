@@ -2,6 +2,22 @@
 
 # MX build storage and cleanup — October 17, 2026
 
+The latest verified total is **78 unused copies removed / 42.51 GiB recovered**,
+with about **100 GiB free**. The original cleanup below accounts for 75 copies.
+A follow-up removed three more unsealed app mirrors after checking their complete
+inventories against retained, intact sealed releases. Two mirrors also contained
+12 source files each; every extra byte matched the recorded Git commit before
+deletion. The matching releases, Git history and small qualification records remain.
+Exact live-process and persistent-launch reference checks found no use of these
+three roots. Main/pilot PIDs, protected files, shared stores, menu selections and
+GPU/service configuration passed before/after preservation checks.
+
+Older unclassified application/source/runtime/output folders remain; some contain
+nested test results or profile material. This is not a claim that every remaining
+large folder is needed. Further deletion requires classifying those exact bytes,
+preserving any unique data and identifying their current references. No historical
+source checkout, project, conversation or needed backup was removed.
+
 The owner-authorized cleanup removed **75 unused application copies**: the original
 34 ordinary copies, six more ordinary copies and 35 obsolete staged releases.
 Observed recovery was **40.89 GiB**. Root free space rose from about **58 GiB to

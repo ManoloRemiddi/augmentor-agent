@@ -114,6 +114,19 @@ with p.maintenance(home,data,pairs,[other]) as guard:
 
 
 class ClientPublicationTests(ClientPublicationFixture):
+    def test_reviewed_home_launcher_helper_can_be_updated_and_reversed(self):
+        home_helper=self.deployment/'home-launch.py'
+        self.write(home_helper,b'# AUTHORED EXISTING HOME HELPER\n')
+        before=publication.snapshot(home_helper)
+        self.bootstrap.append((home_helper,b'# AUTHORED MATCHING HOME HELPER\n',0o600))
+        with self.full_guard() as guard:
+            digest=self.prepared(guard)
+            self.apply(digest,guard)
+            self.assertEqual(home_helper.read_bytes(),b'# AUTHORED MATCHING HOME HELPER\n')
+            publication.rollback(self.publication,digest,guard)
+        self.assertEqual(publication.snapshot(home_helper),before)
+        self.assert_original()
+
     def test_apply_selects_one_matching_artifact_keeps_all_fences_then_exact_reverse(self):
         with self.full_guard() as guard:
             digest=self.prepared(guard)

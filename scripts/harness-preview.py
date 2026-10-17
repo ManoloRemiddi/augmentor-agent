@@ -4,12 +4,28 @@
 import argparse
 import hashlib
 import json
+import importlib.util
 import os
 from pathlib import Path
 import stat
 import subprocess
 import sys
 from urllib.parse import urlparse
+
+
+def shared_helper():
+    path=Path(__file__).resolve().with_name('shared-launch-profile.py')
+    if not path.is_file():
+        path=Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor-harness-preview/augmentor/shared-launch-profile.py'
+    if path.is_symlink() or not path.is_file():raise ValueError('Install the managed preview launch helper before opening this profile.')
+    info=path.stat()
+    if info.st_uid not in (0,os.getuid()) or info.st_mode&0o022:raise ValueError('The preview launch helper is not protected.')
+    spec=importlib.util.spec_from_file_location('preview_shared_launch',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+
+def deployment_data():
+    return Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor-harness-preview/augmentor'
 
 
 def private_directory(path):
@@ -33,10 +49,13 @@ def configuration():
         raise ValueError('Invalid private preview selection.')
     selected=json.loads(descriptor.read_text())
     root=Path(selected['root'])
-    if not root.is_absolute() or not root.resolve().is_relative_to((data/'augmentor/releases').resolve()) or root.is_symlink():
+    if not root.is_absolute() or root.resolve()!=root or not root.is_relative_to((data/'augmentor/releases').resolve()):
         raise ValueError('The preview selection must name its separate staged release.')
     manifest=json.loads((root/'desktop-release.json').read_text())
-    if manifest['deployment']!=selected or manifest['artifactSha256']!=selected['artifactSha256']:
+    # Shared-store choice is mutable per-user deployment metadata, not part of
+    # the immutable application. Every other recorded field still must match.
+    immutable=lambda value:{key:item for key,item in value.items() if key!='sharedProfile'}
+    if immutable(manifest['deployment'])!=immutable(selected) or manifest['artifactSha256']!=selected['artifactSha256']:
         raise ValueError('The selected preview does not match its staged identity.')
     # Verify every staged file before executing any candidate code.
     actual={}
@@ -62,6 +81,7 @@ def configuration():
     env['AUGMENTOR_PI_LLAMA_CPP_PROVIDERS']='mx-qwen'
     env['AUGMENTOR_PI_WORKSPACE']=str(data/'workspace')
     env['AUGMENTOR_DICTATION_STATE']=str(data/'dictation')
+    if 'sharedProfile' in selected:env=shared_helper().environment(selected['sharedProfile'],env)
     return selected,env
 
 
@@ -72,6 +92,11 @@ def main():
     group.add_argument('--native',action='store_true',help='Open the shared native desktop with Pi in this preview profile.')
     group.add_argument('--status',action='store_true',help='Print the selected preview identity without starting an owner or model.')
     args=parser.parse_args()
+    helper=shared_helper()
+    with helper.launch_lease(deployment_data()):return open_selected(args)
+
+
+def open_selected(args):
     selected,env=configuration();root=Path(selected['root'])
     if args.status:
         print(json.dumps({key:selected[key] for key in ('releaseId','version','sourceRef','artifactSha256','root')},indent=2));return
