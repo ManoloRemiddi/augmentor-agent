@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live Qwen queue/steering/Stop](AUGMENTOR-HARNESS.md#live-qwen-queue-steering-and-stop--october-17)
+passes two cases on exact sealed **b1edf4d2 / 20261017-061143-d0c0fc29**:
+five authored inputs/four turns, same-turn correction, next-turn follow-up,
+two successful reads, stale-turn/duplicate refusal, Stop pause, cold no-replay
+and explicit one-time resume. Actual RPC controls/provider generation are tested;
+physical GUI and executing-tool interruptions are separate. No runtime code,
+owner app/model settings or additional real migration changes. Postflight retains
+both owner PIDs/all 36 protected file sets, shared rows, registry twelve, menus,
+selections, both seals and GPU/voice states.
+[Aggregate evidence](../release/harness-live-queue-qualification-20261017.json).
+
 [Shared prompt CI prerequisites](HARNESS-SHARED-PROFILES.md#shared-prompt-ci-startup-prerequisites--october-17)
 correct the Home smoke profile’s unprotected parent and install the existing locked
 websocket prerequisite in clean SDK interpreters. Fresh Python 3.13.5 passes ten

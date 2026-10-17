@@ -471,6 +471,54 @@ Remaining full-migration gates include queues/steering, adaptive settings/routin
 The inspection follow-up is implementation source `42201ce3e8981b1fae6be34388bc21227f77a4c5` and removes inherited request IDs from turn-scoped `execution/*` records. Each `model/request.policies.execution.requestLimit` now carries its own post-transform cap, fields and coverage; the actual-SDK fixture checks both association and omitted stale IDs. Hook disposal follows reverse composition order, restoring the observer before the execution wrapper. This changes correlation/lifecycle metadata and leaves the recovery bounds, UI and dependencies intact. Build/type/version/whitespace and source-boundary checks pass; the full Node suite again has 560 cases, 558 pass and 2 platform skips, and all 39 staged runtime cases pass. Native/Browser implementation and dependency files are unchanged, so their preceding scoped evidence remains applicable. Fresh matching-head hosted gates remain required.
 
 
+## Live Qwen queue, steering and Stop — October 17
+
+The exact sealed MX application **b1edf4d2 / 20261017-061143-d0c0fc29** now
+passes two actual-Qwen control cases in a newly authored, read-only temporary
+project. Five human inputs are admitted across four Host turns; two read tools
+succeed, with no agent file changes or runtime errors. One existing provider
+definition is copied into otherwise empty private state. No owner conversations,
+prompt library, memory or project data enters the probe. The running model and
+saved context/concurrency/precision remain unchanged.
+
+The reproducible control sequence is:
+
+1. Create an isolated conversation and admit a long, tool-free numbered response.
+   Wait for actual text/reasoning chunks, then queue a short correction and a
+   separate request to read an independently authored marker file.
+2. Read `session.queue`. Reject a stale `expectedTurnId` through
+   `session.updateQueue` without changing the revision; promote the correction
+   using the observed active turn. Verify the original assistant ends `aborted`,
+   the correction appears exactly once in that same turn and its answer is saved.
+   The ordinary follow-up must run in the next turn, read the marker once and
+   return it. Repeating the completed correction's original request identity
+   returns its duplicate receipt without a native/display append or model turn.
+3. In a separate conversation, wait for live chunks, queue another marker read
+   and call `session.cancel`. Verify the active generation ends `aborted` while
+   the undelivered read remains **Paused**, with no tool dispatch.
+4. Gracefully close the temporary Host, reopen that same private profile, and
+   read its history and queue. Native bytes and turn count remain unchanged;
+   the waiting input stays paused. Only explicit `session.continueQueue` admits
+   it, once, with one successful read and the expected marker in the answer.
+
+Observed correction delivery is **29 ms** and Stop settlement **48 ms** in this
+run. These measure saved user-message delivery and Stop-to-idle respectively,
+not complete answer latency or a general performance guarantee. Saved native
+and display evidence records two interrupted assistants, seven total assistant
+messages, five user messages and two successful tool results. Both test Hosts
+close gracefully; no test companion remains to retire. Private logs/profiles
+are retained locally; only aggregate counts and hashes are published in the
+[qualification record](../release/harness-live-queue-qualification-20261017.json).
+
+This is actual Host/SDK/provider evidence using RPC controls. Physical GUI input,
+loaded Browser extension delivery and interruptions during already executing
+tools remain separate from this probe. The existing controlled-provider tests
+still cover the latter boundaries. Both owner review PIDs/all 36 protected file
+sets, shared rows, registry twelve, menu assets/selections, both seals and
+Qwen/GPU/voice settings verify unchanged afterward. No application update or
+additional real project migration follows. Owner pilot feedback and the other
+accepted requirements remain open; voice/later operating systems stay deferred.
+
 ## Durable prompt queue — October 10 source candidate
 
 The product owns waiting inputs in a private, durable queue, and the same Pi `AgentSession.prompt` owns each admitted turn. No parallel agent loop or second SDK session is introduced. Text, stable request ID and fingerprint are persisted before dispatch. Each waiting prompt is admitted once in FIFO order; removal acts on its existing ID. Completed receipts retain their ID/fingerprint while discarding prompt text. A duplicate RPC with the same input returns its receipt; changing the input under the same ID fails. The queue bounds 100 waiting/visible rows and 512 KiB of serialized waiting/visible state. IDs are not recycled after that bound or after completion.
