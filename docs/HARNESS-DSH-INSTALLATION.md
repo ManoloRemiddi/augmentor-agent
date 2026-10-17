@@ -2,6 +2,78 @@
 
 # Linux DSH integration installation
 
+## Cold data archive and current-cut binding — October 17
+
+The new internal `services/dsh/cold_backup.py` fills the data-backup prerequisite
+before configuration preparation. This is capture/verification source, **not an
+installed owner backup, activation command or automatic data restore**. Existing
+review/Agent data, services, selections and bootstrap files remain untouched.
+
+`capture(output, guard, additional)` requires the active cold maintenance guard,
+unchanged selection and no pending profile/deployment marker. Coverage is explicit:
+the whole DSH home, the selected/previous deployment JSON, and each guarded pair’s
+three shared databases plus optional Hindsight engine/installation JSON. Mixed
+Desktop data contributes named files rather than its application releases.
+Additional named Native/Harness data directories must be supplied by the caller;
+a data subtree inside mixed storage is allowed, the whole mixed root and program
+release/checkout trees are not. This is **not** a claim that every real caller’s
+data is covered without reviewing that list. SQLite journals refuse a cold cut.
+
+A private PAX tar stores byte content, ordinary modes, UID/GID and nanosecond
+mtime, directories, symlink text and original hardlink relationships within the
+covered roots. Source
+paths are read through directory descriptors without following symlinks. External
+module targets stay external; their retained supplier artifacts still need
+separate review. No artificial cross-file hardlinks are introduced for equal
+content. Special permission bits, FIFOs/devices/sockets and unsupported ownership
+require explicit scope review rather than being silently omitted. No code, model,
+service or archived action is executed by capture/verification.
+
+The fixed limits are 500,000 entries, two GiB per file, 16 GiB logical data,
+128 MiB metadata and a 20 GiB archive. Conservative planned space is checked before
+copying, followed by repeated **64 GiB free-space reserve** checks during copying
+and archive validation. An incomplete attempt publishes no success receipt and
+removes only its own unchanged-inode bulk files; a replaced foreign file is kept.
+A complete or unknown completion-publication outcome is preserved for inspection.
+Existing output directories are never reused or overwritten.
+
+The archive/manifest are independently hashed and every member is checked against
+the exact inventory. Source metadata, roots, selection and shared component cuts
+are rechecked before the durable receipt is published. `verify` can confirm a
+historical archive offline. `verify_for_guard` additionally binds it to the same
+home, deployment, shared pairs and still-original covered data; a valid old archive
+is refused as a *current* backup after source/selection changes. Neither result
+qualifies the unreviewed caller graph or authorizes activation. There is no live
+restore/extraction API; configuration reverse does not overwrite data banks or
+replay actions.
+
+Ten independently authored cases pass within **143 Python / four launcher Node**
+checks. Tests cover GNU tar offline restoration, exact bytes/modes, Unicode names,
+original hardlinks, symlinks without target traversal, selective mixed roots,
+quota refusal, mid-copy/source/late-tree failures, foreign-output preservation,
+corrupt/linked archives and current-cut refusal. Space is simulated in these tiny
+fixtures to test policy independently of runner capacity; this is not a hosted
+free-space claim. GNU tar uses `--same-permissions --no-same-owner` in a new private
+authored directory; original numeric ownership is recorded, not privileged chown.
+
+Separately, a real public fresh DSH integration and actual immutable candidate
+adapter run on authored isolated data with the **real** reserve check. The archive
+has **46 entries / 543,420 logical bytes** and restores both complete three-DB sets,
+an explicit Native history/draft and all current DSH-home regular file bodies/modes
+through GNU tar. DSH’s fresh setup moves its legacy settings pathname, so the proof
+checks the actual inventory rather than guessing that path. Same-cut verification,
+replacement-backend/Native-adapter preflight, exact config reverse and unchanged
+DBs/incoming seal all pass, with zero owner profile/model use. Python **3.13.5** and
+GNU tar **1.35** are tested locally. No new application mirror or immutable artifact
+is created. Hosted qualification is pending.
+
+The owner’s full cold backup and all required Native/Harness roots still need the
+real caller/data map and quiescence. Next couple this verified data receipt to
+matching-client selection and durable finalization/reverse, then qualify one
+combined immutable update and actual owner continuation. Pilot feedback still
+gates further project transfers; voice, later OS and public Office packaging
+remain separate.
+
 ## Managed-client maintenance fence — October 17
 
 The controlled backend work exposed a remaining interruption gap: the persistent
