@@ -25,6 +25,7 @@ class PreservationFixture(unittest.TestCase):
         self.home=self.base/'home';self.old=self.base/'old café';self.incoming=self.base/'incoming';self.output=self.base/'review'
         self.profile=self.home/'profiles/web';self.target=self.profile/'augmentor-product';self.compat=self.base/'compat/browser'
         self.cli=self.base/'cli';self.write(self.cli/'package.json',{'name':'@deepseek-ai/dsh','version':'0.2.0-rc.2'})
+        self.write(self.cli/'lib/bin.js',b'// Independently authored CLI entry fixture.\n')
         for name,version in {'dsh-base':'0.2.0-rc.2','dsh-tools':'0.2.0-rc.2','dsh-agent-preset':'0.2.0-rc.2','dsh-agent-preset-registry':'0.2.0-rc.2','cordis':'4.0.4','schemastery':'3.18.4'}.items():
             self.write(self.cli/'node_modules/@deepseek-ai'/name/'package.json',{'name':'@deepseek-ai/'+name,'version':version})
         self.old_package={'name':'authored-plugin','version':'0.2.11','peerDependencies':{'@deepseek-ai/dsh-tools':'0.1.5-rc.1'},'license':'AUTHORED'}

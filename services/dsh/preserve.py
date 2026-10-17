@@ -223,6 +223,7 @@ def stage(home,incoming,output,cli):
     manifest=next((p/'package.json' for p in (cli,*cli.parents) if (p/'package.json').is_file() and document(read(p/'package.json')).get('name')=='@deepseek-ai/dsh'),None)
     if manifest is None:raise ValueError('Cannot bind the selected CLI manifest.')
     snapshot(manifest)
+    cli_entry=manifest.parent/'lib/bin.js';snapshot(cli_entry)
     for name in packages:snapshot(modules/name/'package.json')
     profile=home/'profiles/web';target=profile/'augmentor-product'
     ownership_raw=snapshot(target/'ownership.json');owner=document(ownership_raw)
@@ -251,6 +252,9 @@ def stage(home,incoming,output,cli):
     if {k:v for k,v in active_package.items() if k!='peerDependencies'}!={k:v for k,v in reference.items() if k!='peerDependencies'}:
         raise ValueError('Package edits beyond peer dependencies need separate preservation review.')
     new_package_raw=snapshot(incoming/'apps/browser/plugin/package.json');new_package=document(new_package_raw)
+    # Executed launch metadata (including the recorded Python) is outside the
+    # artifact file-inventory hash. Bind its exact bytes when staging a seal.
+    snapshot(incoming/'desktop-release.json',optional=True)
     product=document(snapshot(incoming/'release/product.json'))
     if not isinstance(product.get('version'),str) or not re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+(?:-[A-Za-z0-9.-]+)?',product['version']) or new_package.get('name')!=reference.get('name') or new_package.get('version')!=product.get('version'):
         raise ValueError('Incoming product and plugin identity must match.')
@@ -278,7 +282,7 @@ def stage(home,incoming,output,cli):
             'integration/ownership.json':(json.dumps(new_owner,indent=2)+'\n').encode()}
     plan={'schema':SCHEMA,'home':str(home),'incoming':str(incoming),'target':str(target),
           'previousVersion':owner.get('version'),'candidateVersion':product['version'],
-          'cli':str(cli),'sdkPackages':packages,'rewrittenModuleReferences':count,'moduleEdits':edits,
+          'cli':str(cli),'cliEntry':str(cli_entry),'sdkPackages':packages,'rewrittenModuleReferences':count,'moduleEdits':edits,
           'libraryBackendBridge':bridge,'systemSupplierInputs':sorted(system_inputs),'aliasBindings':aliases,
           'retainedOldRootModules':retained,'retainedModulePaths':unchanged,
           'retainedDependenciesRequireSeparateQualification':True,'oldRootMustRemainAvailable':True,

@@ -114,7 +114,7 @@ def launch_lease(data, exclusive=False):
         try:fcntl.flock(fd,(fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH)|fcntl.LOCK_NB)
         except BlockingIOError as error:raise ValueError('Shared launch maintenance or an existing managed client is active.') from error
         os.set_inheritable(fd,not exclusive)
-        yield
+        yield fd
     finally:os.close(fd)
 
 

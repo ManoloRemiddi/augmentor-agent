@@ -270,6 +270,9 @@ class Setup:
             plugin=stage/'browser';(plugin/'dist').mkdir(parents=True)
             shutil.copy2(ROOT/'apps/browser/plugin/dist/index.js',plugin/'dist/index.js')
             shutil.copy2(ROOT/'apps/browser/plugin/package.json',plugin/'package.json')
+            # A source checkout may be group-writable. New private integration
+            # assets must not inherit that permission from copy2.
+            for asset in (plugin/'dist/index.js',plugin/'package.json'):asset.chmod(0o600)
             dependency=plugin/'node_modules';(dependency/'@deepseek-ai').mkdir(parents=True)
             for name in ('dsh-tools','schemastery'):link_directory(dependency/'@deepseek-ai'/name,Path(p['modules'])/'@deepseek-ai'/name)
             link_directory(dependency/'ws',ROOT/'node_modules/ws')

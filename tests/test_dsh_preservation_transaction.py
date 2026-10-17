@@ -11,7 +11,7 @@ from test_dsh_preservation import PreservationFixture
 from dsh import preservation_transaction as tx
 
 
-class PreservationTransactionTests(PreservationFixture):
+class PreservationTransactionFixture(PreservationFixture):
     def setUp(self):
         super().setUp()
         # mkdir(parents=True) does not apply its mode to intermediate fixture
@@ -33,6 +33,8 @@ class PreservationTransactionTests(PreservationFixture):
     def actual(self):return {str(p):p.read_bytes() for p in tx.destinations(self.home)}
     def assert_before(self):self.assertEqual(self.actual(),self.before)
 
+
+class PreservationTransactionTests(PreservationTransactionFixture):
     def test_apply_is_fenced_then_exact_reverse_preserves_modes_and_shared_bytes(self):
         modes={str(p):p.stat().st_mode&0o777 for p in tx.destinations(self.home)}
         data={p:p.read_bytes() for p in Path(self.pair['data']).iterdir()}

@@ -89,8 +89,9 @@ def assert_no_dsh(home):
 
 
 class _Guard:
-    def __init__(self,home,data,selection):
-        self.home=home;self.data=data;self.selection=selection;self.active=True
+    def __init__(self,home,data,selection,pairs,launch_fd):
+        self.home=home;self.data=data;self.selection=selection;self.pairs=pairs
+        self.launch_fd=launch_fd;self.active=True;self.probe=None
 
 
 @contextmanager
@@ -105,17 +106,21 @@ def maintenance(home,data,pairs):
         'state':str(Path(os.environ.get('AUGMENTOR_SHARED_STATE',Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor')).resolve()),
         'data':str(Path(os.environ.get('AUGMENTOR_SHARED_DATA',Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor')).resolve())}
     if pairs[0]!=expected:raise ValueError('The maintenance pair differs from the selected shared profile.')
-    with gate.lease(home,exclusive=True),shared.launch_lease(data,exclusive=True),shared.cold(pairs):
+    with gate.lease(home,exclusive=True),shared.launch_lease(data,exclusive=True) as launch_fd,shared.cold(pairs):
         assert_no_dsh(home)
         if preserve.read(data/'desktop.json',private=True)!=raw:raise ValueError('The desktop selection changed before maintenance.')
-        guard=_Guard(home,data,raw)
+        guard=_Guard(home,data,raw,pairs,launch_fd)
         try:yield guard
-        finally:guard.active=False
+        finally:
+            try:
+                if guard.probe is not None:guard.probe.close()
+            finally:guard.active=False
 
 
 def require(guard,home):
     if not isinstance(guard,_Guard) or not guard.active or guard.home!=home:
         raise ValueError('Hold the cold maintenance gates for this exact DSH home.')
+    if guard.probe is not None:raise ValueError('Stop the controlled backend before changing configuration.')
     if preserve.read(guard.data/'desktop.json',private=True)!=guard.selection:
         raise ValueError('The desktop selection changed during configuration maintenance.')
     assert_no_dsh(home)
@@ -211,15 +216,7 @@ def commit(output,digest,guard):
     """Apply/resume configuration only; retain the fence for client orchestration."""
     output=Path(output);value,status=inspect(output,digest,guard)
     if status['phase'] not in ('prepared','applying','applied'):raise ValueError('A reversing transaction cannot be applied.')
-    incoming=Path(value['incoming']);incoming_seal(incoming,value['artifactSha256'])
-    plan=preserve.document(preserve.read(output/'stage-plan.json',private=True));changed=set(destinations(guard.home))
-    for alias,target in plan.get('aliasBindings',{}).items():
-        if str(Path(alias).resolve())!=target:raise ValueError('A retained package alias changed before apply.')
-    for name,expected in plan['ownerInputs'].items():
-        path=Path(name)
-        if path in changed:continue
-        actual=None if expected is None and not path.exists() and not path.is_symlink() else preserve.sha(preserve.read(path,system_supplier=name in plan.get('systemSupplierInputs',[])))
-        if actual!=expected:raise ValueError('An owner or supplier input changed before apply.')
+    validate_suppliers(output,value,guard)
     targets(value);atomic(output/'status.json',encoded({'phase':'applying'}))
     for index,row in enumerate(value['files']):
         require(guard,guard.home);current=targets(value)
@@ -228,6 +225,19 @@ def commit(output,digest,guard):
     if targets(value)!=[row['afterSha256'] for row in value['files']]:raise ValueError('Configuration publication did not settle.')
     atomic(output/'status.json',encoded({'phase':'applied'}))
     return {'configurationApplied':True,'startupFenced':True,'activationComplete':False}
+
+
+def validate_suppliers(output,value,guard):
+    incoming=Path(value['incoming']);release=incoming_seal(incoming,value['artifactSha256'])
+    plan=preserve.document(preserve.read(output/'stage-plan.json',private=True));changed=set(destinations(guard.home))
+    for alias,target in plan.get('aliasBindings',{}).items():
+        if str(Path(alias).resolve())!=target:raise ValueError('A retained package alias changed before apply.')
+    for name,expected in plan['ownerInputs'].items():
+        path=Path(name)
+        if path in changed:continue
+        actual=None if expected is None and not path.exists() and not path.is_symlink() else preserve.sha(preserve.read(path,system_supplier=name in plan.get('systemSupplierInputs',[])))
+        if actual!=expected:raise ValueError('An owner or supplier input changed before apply.')
+    return plan,release
 
 
 def rollback(output,digest,guard):
