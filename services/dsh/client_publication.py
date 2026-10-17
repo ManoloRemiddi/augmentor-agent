@@ -21,8 +21,9 @@ from . import preservation_transaction as tx
 from . import cold_backup as archives
 from . import backend_probe as probes
 from . import shared_data_adoption as shared_data
+from . import browser_code_publication as browser_payload
 
-SCHEMA='augmentor-dsh-client-publication/3'
+SCHEMA='augmentor-dsh-client-publication/4'
 MAX_FILES=128
 MAX_BYTES=64*1024**2
 BOOTSTRAP_NAMES=frozenset(('shared-launch-profile.py','desktop-browser-launch.py','desktop-dsh-launch.py',
@@ -165,6 +166,7 @@ def inspect(output,digest,guard):
         raise ValueError('Unknown client publication phase.')
     publication_owner(output,digest,value,guard,allow_missing=status['phase']=='prepared')
     adoption(value,guard)
+    browser(value,guard)
     check_fences(value,guard)
     return value,status,directory,record
 
@@ -173,6 +175,7 @@ def publication_owner(output,digest,value,guard,allow_missing=False,create=False
     expected={'schema':SCHEMA,'publication':str(output),'sha256':digest}
     roots=[Path(value['configuration'])]
     if value.get('sharedAdoption') is not None:roots.append(Path(value['sharedAdoption']['root']))
+    if value.get('browserCode') is not None:roots.append(Path(value['browserCode']['root']))
     for root in roots:
         marker=root/'client-publication.json'
         if marker.exists() or marker.is_symlink():
@@ -237,7 +240,19 @@ def adoption(value,guard):
     return record,status
 
 
-def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),target_pair=None,*,shared_adoption=None,previous_pairs=None,reviews=None,bootstrap_expectations=None):
+def browser(value,guard):
+    reference=value.get('browserCode')
+    if reference is None:return None
+    if not isinstance(reference,dict) or set(reference)!={'root','sha256'}:
+        raise ValueError('Bind the exact prepared Browser code receipt.')
+    record,status=browser_payload.inspect(reference['root'],reference['sha256'],guard.configuration)
+    if (record['coldBackup']!=value['coldBackup'] or record['originalSelectionSha256']!=value['originalSelectionSha256'] or
+            record['incoming']!=value['incoming'] or record['artifactSha256']!=value['artifactSha256']):
+        raise ValueError('Browser code and client publication cold cuts or suppliers differ.')
+    return record,status
+
+
+def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),target_pair=None,*,shared_adoption=None,previous_pairs=None,reviews=None,bootstrap_expectations=None,browser_code=None):
     """Bind immutable client bytes to an already cold-backed, prepared config cut.
 
     bootstrap is an exact operator-reviewed list of (path, bytes, ordinary mode).
@@ -259,6 +274,11 @@ def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),targe
     linked=adoption({'sharedAdoption':shared_adoption,'coldBackup':cfg['coldBackup'],
                      'originalSelectionSha256':cfg['selectionSha256']},guard)
     if linked is not None and linked[1]['phase']!='prepared':raise ValueError('Bind a prepared shared-data adoption before publication.')
+    linked_browser=browser({'browserCode':browser_code,'coldBackup':cfg['coldBackup'],'originalSelectionSha256':cfg['selectionSha256'],'incoming':cfg['incoming'],'artifactSha256':cfg['artifactSha256']},guard)
+    if linked_browser is not None and linked_browser[1]['phase']!='prepared':raise ValueError('Bind prepared Browser code before publication.')
+    archived_browser_roots={str(Path(p).parent) for p in hashes if Path(p).name=='manifest.json' and Path(p).parent.parent==base.data/'browser'}
+    if archived_browser_roots and (linked_browser is None or archived_browser_roots!={linked_browser[0]['target']}):
+        raise ValueError('Bind the declared archived Browser code folder before publishing matching clients.')
     previous_pairs={} if previous_pairs is None else previous_pairs
     if not isinstance(previous_pairs,dict) or set(previous_pairs)-set(guard.deployments):
         raise ValueError('Declare existing shared pairs only for the exact guarded deployments.')
@@ -282,6 +302,7 @@ def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),targe
     forbidden=[base.home,Path(cfg['incoming']),tx.ROOT,Path(configuration_root),Path(cfg['coldBackup']['root']),
                *(Path(p) for p in guard.deployments),*(Path(p[k]) for p in base.pairs for k in ('state','data'))]
     if shared_adoption is not None:forbidden.append(Path(shared_adoption['root']))
+    if browser_code is not None:forbidden.append(Path(browser_code['root']))
     if any(output.is_relative_to(p) or p.is_relative_to(output) for p in forbidden):
         raise ValueError('Keep client backups outside code, data, archives and configuration recovery roots.')
     writes=[];selections=_selections(release,guard,pair)
@@ -355,7 +376,7 @@ def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),targe
     value={'schema':SCHEMA,'configuration':str(configuration_root),'configurationSha256':configuration_sha,
            'originalSelectionSha256':cfg['selectionSha256'],'coldBackup':cfg['coldBackup'],
            'incoming':cfg['incoming'],'artifactSha256':cfg['artifactSha256'],
-           'deployments':list(guard.deployments),'files':rows,'sharedAdoption':shared_adoption,
+           'deployments':list(guard.deployments),'files':rows,'sharedAdoption':shared_adoption,'browserCode':browser_code,
            'reviewRegistry':registry_record,
            'bootstrapExpectations':expectations,
            'previousPairs':{root:tx.preserve.document(raw).get('sharedProfile') or previous_pairs.get(root,base.pairs[0]) for root,raw in guard.deployments.items()}}
@@ -412,6 +433,8 @@ def apply(output,digest,guard,environment,cwd):
         tx.commit(directory,value['configurationSha256'],guard.configuration)
         if value['sharedAdoption'] is not None:
             reference=value['sharedAdoption'];shared_data.commit(reference['root'],reference['sha256'],guard.configuration)
+        if value['browserCode'] is not None:
+            reference=value['browserCode'];browser_payload.commit(reference['root'],reference['sha256'],guard.configuration)
     for row in value['files']:
         if not row['selector']:write_image(output,row,'after',guard)
     with probes.backend_probe(directory,value['configurationSha256'],guard.configuration,environment,cwd) as (handle,_):
@@ -421,6 +444,8 @@ def apply(output,digest,guard,environment,cwd):
     require(guard)
     linked=adoption(value,guard)
     if linked is not None and linked[1]['phase']!='applied':raise ValueError('Apply every shared component before selecting clients.')
+    linked_browser=browser(value,guard)
+    if linked_browser is not None and linked_browser[1]['phase']!='applied':raise ValueError('Apply matching Browser code before selecting clients.')
     tx.validate_suppliers(directory,record,guard.configuration)
     tx.atomic(output/'status.json',tx.encoded({'phase':'publishing'}))
     for row in value['files']:
@@ -446,6 +471,8 @@ def finalize(output,digest,guard,environment,cwd):
     if status['phase']=='finalized':
         linked=adoption(value,guard)
         if linked is not None and linked[1]['phase']!='released':raise ValueError('Finalized client publication has unreleased shared data.')
+        linked_browser=browser(value,guard)
+        if linked_browser is not None and linked_browser[1]['phase']!='released':raise ValueError('Finalized client publication has unreleased Browser code.')
         if any(snapshot(Path(r['path']))!=image(output,r,'after') for r in value['files']) or tx.targets(record)!=[r['afterSha256'] for r in record['files']]:
             raise ValueError('Finalized client/configuration bytes changed.')
         tx.validate_suppliers(Path(value['configuration']),record,guard.configuration)
@@ -468,6 +495,10 @@ def finalize(output,digest,guard,environment,cwd):
             reference=value['sharedAdoption']
             with configuration_owner(output,digest,value,guard):
                 shared_data.release(reference['root'],reference['sha256'],guard.configuration)
+        if value['browserCode'] is not None:
+            reference=value['browserCode']
+            with configuration_owner(output,digest,value,guard):
+                browser_payload.release(reference['root'],reference['sha256'],guard.configuration)
         remove_fences(value,guard)
         tx.atomic(output/'status.json',tx.encoded({'phase':'finalized'}))
     return {'clientPublicationComplete':True,'startupFenced':False,'activationComplete':False,
@@ -486,9 +517,11 @@ def rollback(output,digest,guard):
     for row in reversed(value['files']):
         if not row['selector']:write_image(output,row,'before',guard)
     with configuration_owner(output,digest,value,guard):
+        if value['browserCode'] is not None:
+            reference=value['browserCode'];browser_payload.rollback(reference['root'],reference['sha256'],guard.configuration)
         if value['sharedAdoption'] is not None:
             reference=value['sharedAdoption'];shared_data.rollback(reference['root'],reference['sha256'],guard.configuration)
         tx.rollback(directory,value['configurationSha256'],guard.configuration)
     remove_fences(value,guard)
     tx.atomic(output/'status.json',tx.encoded({'phase':'reversed'}))
-    return {'clientConfigurationRestored':True,'startupFenced':False,'dataRestored':value['sharedAdoption'] is not None}
+    return {'clientConfigurationRestored':True,'startupFenced':False,'dataRestored':value['sharedAdoption'] is not None,'browserCodeRestored':value['browserCode'] is not None}

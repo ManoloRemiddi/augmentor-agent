@@ -4,17 +4,15 @@
 
 `services/dsh/client_publication.py` connects a verified cold archive to the
 configuration, startup files and matching build selections. It is an internal
-Linux API. Version 3 binds selected review registrations and can bind [component-only shared-data adoption](HARNESS-SHARED-DATA-ADOPTION.md). It does not discover or stop owner processes, install a Browser
-extension, restart ordinary clients or establish owner acceptance. The installed main/pilot and Native app have not been updated by
-this source checkpoint.
+Linux API. Version 4 binds selected reviews, [component-only shared-data adoption](HARNESS-SHARED-DATA-ADOPTION.md) and [Browser code-folder recovery](HARNESS-BROWSER-CODE-PUBLICATION.md). It does not discover or stop owner processes, register/reload a Browser extension, restart ordinary clients or establish owner acceptance. This source checkpoint has not changed the running clients or their selected application.
 
 ## Prepare one reviewed cut
 
-Client publication **schema 3** now owns a bound shared-data journal as well as
+Client publication **schema 4** owns bound shared-data and Browser journals as well as
 configuration schema 3. Cold archive schema 2 records explicit partial secondary
 sources. A shared-pair switch requires its source in the adoption receipt; legacy
 additional selectors need their actual `previous_pairs`. The primary canonical
-store remains complete. Prepare data images before configuration fences; see
+store remains complete. Prepare data and Browser images before configuration fences; see
 [the complete pipeline and recovery rules](HARNESS-SHARED-DATA-ADOPTION.md).
 
 
@@ -64,7 +62,9 @@ writers plus the existing DSH and shared-store cold gates. Current process/launc
 maps are advisory; they cannot authorize a later cut. Preserve the current service
 command, cwd, environment, provider choices and external retained modules.
 
-Capture the complete reviewed data coverage with `cold_backup.capture`. Then call
+Capture the complete reviewed data coverage with `cold_backup.capture`, including
+the existing whole Browser code folder. Prepare bound shared-data and Browser
+images first, as described in their guides. Then call
 `preservation_transaction.prepare(..., cold_backup={root, sha256})`. Preparation
 verifies that archive against the still-original covered data, before writing
 configuration backups or fences. The configuration journal now uses **schema 3**;
@@ -102,7 +102,7 @@ not another application build or another copy of project data.
 `apply` resumes only known before/after bytes. Under all cold guards, recovery first
 restores its own exact original selectors and explicitly rebinds that verified
 guard value; the configuration API's original-selection invariant stays intact.
-It applies configuration, any bound shared DB components, and reviewed bootstrap images, runs the fixed controlled
+It applies configuration, bound shared DB components, matching Browser code and reviewed bootstrap images, runs the fixed controlled
 backend and actual candidate Native-adapter preflights, rechecks suppliers, then
 publishes matching selectors. It keeps all startup fences. No model call is
 requested by these preflights.
@@ -110,7 +110,8 @@ requested by these preflights.
 `finalize` requires the matching after-images, immutable supplier identity and a
 still-valid archive. A new guard reruns preflight while the phase is still applied. Once finalizing
 intent is durable, recovery finishes forward without replaying configuration or
-data application; released data verification permits new ordinary work. Durable finalizing intent precedes marker removal; primary deployment
+data/code application; released data verification permits new ordinary work. Browser
+release precedes opening startup; matching code verification preserves foreign edits. Durable finalizing intent precedes marker removal; primary deployment
 startup opens last. Interrupted finalization can complete forward. The result says
 `clientPublicationComplete`, with `activationComplete`, ordinary-client startup
 and owner continuation still **false**. Those remaining steps need actual evidence.
@@ -371,3 +372,17 @@ companions); capture one fresh archive; prepare shared data before configuration
 then publish/finalize, reopen ordinary clients and verify actual owner continuation.
 Further projects remain gated on pilot feedback; VR-RasterStudio stays DSH.
 [Portable record](../release/harness-bootstrap-preadoption-20261018.json).
+
+## Browser payload binding — October 18
+
+The [Browser code guide](HARNESS-BROWSER-CODE-PUBLICATION.md) supersedes the earlier
+source gap: schema 4 owns a cold-backed small code slot with exact atomic reverse
+and forward-only finalization. Local **167 Python** pass, including 23 new Browser
+cases and real process deaths; actual old/incoming inventory is read-only eligible.
+The controller runs from reviewed source; the application remains sealed **4f83b7e8**.
+No new app build, installed code update or owner cutover. Previous schema journals
+require matching historical operators. [Record](../release/harness-browser-code-publication-20261018.json).
+
+Actual remaining steps are Chromium coordination, accepted-work-safe quiescence,
+protected Browser parent preparation, one fresh full three-pair archive, coupled
+publication/finalization, ordinary reopening and owner continuation.

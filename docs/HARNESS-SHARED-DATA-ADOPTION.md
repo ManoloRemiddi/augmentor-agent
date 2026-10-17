@@ -42,12 +42,15 @@ Prepare in this order under the same cold guard:
 2. Call `shared_data_adoption.prepare(sources, recovery_root, cold_backup,
    guard.configuration, map_default_person=...)`. Choose the mapping explicitly;
    processed source banks/jobs still require the existing explicit bank migration.
-3. Prepare the matching configuration with the same cold archive.
-4. Prepare client publication with `shared_adoption={root, sha256}`. A deployment
+3. Prepare [Browser code](HARNESS-BROWSER-CODE-PUBLICATION.md) from the same archive
+   before configuration fences when publishing the existing unpacked extension.
+4. Prepare the matching configuration with the same cold archive.
+5. Prepare client publication with `shared_adoption={root, sha256}` and the exact
+   `browser_code={root, sha256}` receipt when that code folder is covered. A deployment
    changing shared pairs must have its previous source in this bound adoption.
    Legacy additional selectors without `sharedProfile` require `previous_pairs`.
    Registered reviews additionally require their exact cold registry coverage,
-   lock/revision/names and prior source pairs; see [schema-3 publication](HARNESS-CLIENT-PUBLICATION.md#registered-reviews-and-complete-launch-entrypoints--october-18).
+   lock/revision/names and prior source pairs; see [registered review binding](HARNESS-CLIENT-PUBLICATION.md#registered-reviews-and-complete-launch-entrypoints--october-18).
 
 Use protected, persistent recovery storage on the target filesystem for actual
 owner images; never disposable build scratch. Authored test profiles use the
@@ -68,10 +71,10 @@ engine files, merge receipts and the canonical root's device/inode. Source
 inventory hashes agree with the existing runtime `stateInventory`, including
 UTF-16 filename ordering, Unicode and nested history.
 
-Client publication **schema 3** owns both configuration and data journals. The
+Client publication **schema 4** owns configuration, data and any bound Browser code journals. The
 data API refuses standalone mutations. Configuration is applied, the three
 database slots are exchanged with Linux `renameat2(RENAME_EXCHANGE)`, source
-archives are published without replacement, then bootstrap/preflight/selections
+archives are published without replacement, then bound Browser code and bootstrap/preflight/selections
 complete. No mixed application directory is renamed. Every intermediate state
 must match the known before/after slot pair; a changed DB, source, archive,
 engine file or recovery image stops without overwriting it. The verified archive

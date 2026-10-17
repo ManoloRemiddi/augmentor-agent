@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Browser code publication](HARNESS-BROWSER-CODE-PUBLICATION.md) now binds the small
+extension code folder to client transaction **schema 4**, with exact atomic reverse
+and forward-only finalization. **167 Python** pass, including 23 Browser cases and
+real process deaths; actual old/incoming code checks are read-only. Controller-only:
+reuse sealed application **4f83b7e8**, no new app copy/release or owner cutover.
+Current apps, registry 20, 36 protected files, stores/settings and services verify
+unchanged. Chromium coordination, safe quiescence, one fresh three-pair cold cut
+and ordinary/owner continuation remain. [Record](../release/harness-browser-code-publication-20261018.json).
+
 [Installed MX launch guards](HARNESS-CLIENT-PUBLICATION.md#installed-mx-launch-guards--october-18)
 now cover Native/Home/mobile/Browser helpers, preview and review opening, embedding
 and future DSH/one existing workspace service starts. **29 startup files / two
