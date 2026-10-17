@@ -79,11 +79,20 @@ including actual Chromium file-menu, draft, PDF and spreadsheet lifecycle cases.
 New regressions cover first-lookup external add/rename/removal, missing roots,
 nested expiry, immediate tool invalidation, overlapping cancellation/invalidation
 and close/cwd/LRU cleanup. A separate actual rich XLS/XLSX/PPT/PPTX GUI diagnostic
-also passes with files added between previews. Source qualification does not
-establish installed adoption; the running MX reviews still use `fcf9d32a` at this
-checkpoint. [Rich GUI evidence](../release/office-rebuild/rich-sheet-deck-qualification-20261017.json).
+also passes with files added between previews.
+[Rich GUI evidence](../release/office-rebuild/rich-sheet-deck-qualification-20261017.json).
 The broader source cohort passes 270 Node and 41 Python checks, including
 original queue/plugins, migration lifecycle and the default Office engine.
+
+The correction is now installed in both actual MX reviews at **97d95d58 /
+20261017-095821-fb78d6df**, artifact
+`1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d`.
+Fresh ordinary and exact sealed repeat the 270 Node/41 Python cohort; all 1,120
+compiled files and 24,710 sealed inputs verify. Guarded backups/adoption preserve
+four conversations/all 36 authoritative prefixes and shared settings. Both actual
+GUIs pass with no settings/agent actions. The installed default Office engine,
+DSH and production Desktop stay unchanged. Hosted CI remains separate.
+[Installed qualification](../release/harness-file-reference-freshness-qualification-20261017.json).
 
 `host.describe.activeFileReferences` counts waiting discovery calls, including
 the native RPC carrier. They veto guarded maintenance before quiescing. Operator

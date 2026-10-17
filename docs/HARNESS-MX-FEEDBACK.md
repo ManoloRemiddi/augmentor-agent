@@ -2,6 +2,36 @@
 
 ## Current MX review — October 17
 
+Both reviews now run **97d95d58 / 20261017-095821-fb78d6df**. Open
+**Augmentor Harness (MX)** or **Augmentor Harness - Migration Pilot** from the
+application menu; the installed opener obtains a fresh private connection after
+the verified restart. Older tabs can retain the previous process's token.
+
+The [file-reference correction](HARNESS-FILE-REFERENCES.md#external-file-discovery-correction--october-17)
+makes newly saved root files appear on the next fuzzy lookup. Nested external
+changes refresh on demand after ten seconds; tool invalidation waits for fresh
+results. The original DSH menu, ranking and GUI remain unchanged. Rich XLS/XLSX
+and PPT/PPTX also pass the actual original-GUI/Thin-engine diagnostic; the
+installed app retains its existing default Office engine.
+
+Source, fresh ordinary and exact sealed each pass **270 Node / 41 Python** across
+40 files/17 Chromium cases. Additional ordinary/sealed decoder/packaging checks
+pass **90 Node / 52 Python** each. All **1,120 compiled files / 24,710 sealed
+inputs** verify. Guarded adoption verifies **418 backup files**, four conversations
+and all 36 authoritative prefixes, shared prompts/memory/settings, menu assets,
+selections and unchanged model/GPU/voice configuration. Only typed MCP metadata
+append; no owner inference or additional transfer. Both actual review GUIs verify
+usable Plugins On/Off, applied Search/Wiki and two On/three Off connections without
+settings or agent actions. [Installed evidence](../release/harness-file-reference-freshness-qualification-20261017.json).
+
+Normal hosted validation for `97d95d58` remains in progress at this checkpoint;
+the SDK matrix has a macOS failure, outside this MX adoption scope. No whole-CI
+pass is claimed. Public Office redistribution remains gated, and owner pilot
+feedback still gates further migration. Voice and later-platform rollout remain
+deferred. The existing main/pilot menu entries are ready for continued testing.
+
+## Earlier MX queue-control checkpoint — October 17
+
 Both reviews now run **fcf9d32a / 20261017-081210-48ea82e1**. Open
 **Augmentor Harness (MX)** for the main review, or **Augmentor Harness - Migration Pilot**
 for the transferred pilot, from the application menu. These entries obtain a fresh
