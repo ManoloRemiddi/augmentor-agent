@@ -25,14 +25,15 @@ LIMIT=4*1024**2
 def sha(value):return hashlib.sha256(value).hexdigest()
 
 
-def read(path,private=False):
+def read(path,private=False,system_supplier=False):
     path=Path(path)
     if not path.is_absolute() or path.resolve()!=path:
         raise ValueError('Choose canonical absolute files without links.')
     fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
     try:
         before=os.fstat(fd)
-        if not stat.S_ISREG(before.st_mode) or before.st_uid!=os.getuid() or before.st_nlink!=1 or before.st_size>LIMIT or private and before.st_mode&0o077:
+        owner_ok=before.st_uid==os.getuid() or system_supplier and before.st_uid==0 and not before.st_mode&0o022
+        if not stat.S_ISREG(before.st_mode) or not owner_ok or before.st_nlink!=1 or before.st_size>LIMIT or private and before.st_mode&0o077:
             raise ValueError('Migration input must be a bounded owned regular file.')
         data=bytearray()
         while len(data)<=LIMIT:
@@ -104,10 +105,10 @@ def rewrite(raw,incoming,target,inputs):
     if old_product is None or old_product.as_posix().endswith('/adapters/dsh-product/index.mjs') is False or active_browser is None:
         raise ValueError('Unknown active integration module needs manual review.')
     oldroot=old_product.parents[2];changes={};roles=set();retained=set()
-    def replace(node,path):
+    def replace(node,path,reason='owned-integration'):
         key=(node.start_mark.index,node.end_mark.index)
         if key in changes:raise ValueError('Overlapping integration references need manual review.')
-        changes[key]={'before':node.value,'after':str(path),'line':node.start_mark.line+1}
+        changes[key]={'before':node.value,'after':str(path),'line':node.start_mark.line+1,'reason':reason}
     inputs(old_product)
     inputs(incoming/'adapters/dsh-product/index.mjs')
     replace(products[0]['name'],incoming/'adapters/dsh-product/index.mjs')
@@ -124,11 +125,20 @@ def rewrite(raw,incoming,target,inputs):
         def plugins_walk(node):
             if isinstance(node,yaml.MappingNode):
                 f={k.value:v for k,v in node.value};value=f.get('name');path=module_path(value)
-                if path is not None and path.is_relative_to(oldroot):
-                    relative=path.relative_to(oldroot).as_posix()
+                if path is not None:
+                    relative=path.relative_to(oldroot).as_posix() if path.is_relative_to(oldroot) else None
                     if relative in ADAPTERS:
                         inputs(path);inputs(incoming/relative);replace(value,incoming/relative)
-                    else:retained.add(relative)
+                    elif relative is not None:retained.add(relative)
+                    else:
+                        # Mixed installations can load the same public entry
+                        # from a different old release. Move only byte-identical
+                        # entries, so their imports use the selected supplier;
+                        # modified/private adapters keep their original paths.
+                        match=next((name for name in ADAPTERS if path.as_posix().endswith('/'+name)),None)
+                        if match is not None and path!=incoming/match:
+                            before=inputs(path,system_supplier=True);after=inputs(incoming/match)
+                            if before==after:replace(value,incoming/match,'identical-public-entry')
                 for _,value in node.value:plugins_walk(value)
             elif isinstance(node,yaml.SequenceNode):
                 for value in node.value:plugins_walk(value)
@@ -142,6 +152,57 @@ def rewrite(raw,incoming,target,inputs):
     return changed.encode(),oldroot,active_browser,list(changes.values()),sorted(retained),unchanged
 
 
+def library_bridge(raw,profile,incoming,snapshot,aliases,previous):
+    """Retain the legacy frontend bundle, replace its limited backend only."""
+    package_raw=snapshot(profile/'package.json',optional=True)
+    if package_raw is None:return raw,None
+    package=document(package_raw)
+    try:bundles=package.get('dsh',{}).get('profile',{}).get('bundles',[])
+    except AttributeError:raise ValueError('Unknown profile bundle metadata.')
+    if not isinstance(bundles,list):raise ValueError('Unknown profile bundle list.')
+    if 'dsh-prompt-library' not in bundles:return raw,None
+    if bundles.count('dsh-prompt-library')!=1:raise ValueError('Duplicate prompt bundles need review.')
+    alias=profile/'node_modules/dsh-prompt-library';supplier=alias.resolve(strict=True)
+    aliases[str(alias)]=str(supplier)
+    metadata=document(snapshot(supplier/'package.json',system_supplier=True))
+    if metadata.get('name')!='dsh-prompt-library' or metadata.get('version')!='0.2.0':
+        raise ValueError('The retained prompt bundle version needs separate capability review.')
+    _,bundle_rows=composition(snapshot(supplier/'cordis.patch.yml',system_supplier=True))
+    backend=[fields for _,fields in bundle_rows if 'id' in fields]
+    if len(backend)!=1 or set(backend[0])!={'id','name'} or any(not isinstance(value,yaml.ScalarNode) or value.tag!=STRING for value in backend[0].values()) or backend[0]['id'].value!='prompt-library' or backend[0]['name'].value!='dsh-prompt-library':
+        raise ValueError('The retained prompt bundle structure needs separate review.')
+    snapshot(supplier/'lib/index.js',system_supplier=True)
+    snapshot(supplier/'lib/client.js',system_supplier=True)
+    target=incoming/'adapters/dsh-prompt-library/lib/index.js';target_sha=sha(snapshot(target))
+    text,rows=composition(raw)
+    existing=[fields for _,fields in rows if isinstance(fields.get('id'),yaml.ScalarNode) and fields['id'].value=='prompt-library']
+    replacements=[fields for _,fields in rows if isinstance(fields.get('id'),yaml.ScalarNode) and fields['id'].value=='augmentor-product-prompts']
+    if existing or replacements:
+        old=previous.get('libraryBridge')
+        if len(existing)!=1 or len(replacements)!=1 or not isinstance(old,dict):
+            raise ValueError('Existing prompt-library overrides require capability review.')
+        legacy,current=existing[0],replacements[0]
+        disabled=legacy.get('disabled');guard=legacy.get('name')
+        if set(legacy)!={'id','name','disabled'} or not isinstance(disabled,yaml.ScalarNode) or disabled.tag!='tag:yaml.org,2002:bool' or disabled.value.lower()!='true' or not isinstance(guard,yaml.ScalarNode) or guard.value!='dsh-prompt-library':
+            raise ValueError('Existing prompt-library overrides require capability review.')
+        if set(current)!={'id','name'} or module_path(current['name'])!=Path(old.get('module','')):
+            raise ValueError('Existing prompt-library overrides require capability review.')
+        if sha(snapshot(Path(old['module'])))!=old.get('moduleSha256'):
+            raise ValueError('The preserved prompt backend changed.')
+        node=current['name'];text=text[:node.start_mark.index]+json.dumps(str(target))+text[node.end_mark.index:]
+        appended=False
+    else:
+        # Include patches treat name as an identity guard, not a replacement.
+        # Disable only the legacy backend entry, retaining its frontend bundle,
+        # and insert the normal product backend with its own stable identity.
+        text+='\n# Augmentor shared Prompt Library backend; frontend bundle retained.\n- id: prompt-library\n  name: dsh-prompt-library\n  disabled: true\n- insert:\n  - id: augmentor-product-prompts\n    name: '+json.dumps(str(target))+'\n'
+        appended=True
+    composition(text.encode())
+    return text.encode(),{'bundle':'dsh-prompt-library','bundleVersion':'0.2.0','entryId':'prompt-library',
+                          'module':str(target),'moduleSha256':target_sha,'frontendRetained':True,
+                          'appendedOverride':appended,'legacyEntryDisabled':True,'replacementEntryId':'augmentor-product-prompts','improvementSaveRequired':True}
+
+
 def stage(home,incoming,output,cli):
     if setup.sys.platform!='linux':raise ValueError('Preserved DSH migration is Linux-only.')
     home,incoming,output,cli=(Path(value) for value in (home,incoming,output,cli))
@@ -150,10 +211,11 @@ def stage(home,incoming,output,cli):
     if output.exists() or output.is_symlink():raise ValueError('Choose an absent private staging directory.')
     if any(output.is_relative_to(path) or path.is_relative_to(output) for path in (home,incoming)):
         raise ValueError('Migration staging must be outside both the profile and application.')
-    snapshots={}
-    def snapshot(path,optional=False):
+    snapshots={};system_inputs=set();aliases={}
+    def snapshot(path,optional=False,system_supplier=False):
         key=str(path)
-        value=None if optional and not path.exists() and not path.is_symlink() else read(path)
+        value=None if optional and not path.exists() and not path.is_symlink() else read(path,system_supplier=system_supplier)
+        if system_supplier:system_inputs.add(key)
         if key in snapshots and snapshots[key]!=value:raise ValueError('Migration input changed during preparation.')
         snapshots[key]=value;return value
     if setup.cli_family(cli)!=setup.MODERN_DSH:raise ValueError('Use the qualified existing modern DSH CLI.')
@@ -178,6 +240,7 @@ def stage(home,incoming,output,cli):
     original=snapshot(profile/'cordis.patch.yml')
     patch,oldroot,active_browser,edits,retained,unchanged=rewrite(original,incoming,target,snapshot)
     count=len(edits)
+    patch,bridge=library_bridge(patch,profile,incoming,snapshot,aliases,owner.get('preservedMigration',{}))
     if sha(snapshot(active_browser))!=owner['files']['browser/dist/index.js']:
         raise ValueError('Active compatibility code differs from the owned code; preserve it separately.')
     active_package=document(snapshot(active_browser.parents[1]/'package.json'))
@@ -206,6 +269,7 @@ def stage(home,incoming,output,cli):
     migration={'sourcePackageSha256':sha(new_package_raw),'previousOwnershipSha256':sha(ownership_raw),
                'compositionBeforeSha256':sha(original),'compositionAfterSha256':sha(patch),
                'editedFieldsPreserved':['browser/package.json:peerDependencies']}
+    if bridge:migration['libraryBridge']=bridge
     new_owner={'schema':OWNERSHIP,'version':product['version'],
                'files':{'browser/dist/index.js':sha(js),'browser/package.json':sha(package_bytes)},
                'presets':owner['presets'],'preservedMigration':migration}
@@ -215,6 +279,7 @@ def stage(home,incoming,output,cli):
     plan={'schema':SCHEMA,'home':str(home),'incoming':str(incoming),'target':str(target),
           'previousVersion':owner.get('version'),'candidateVersion':product['version'],
           'cli':str(cli),'sdkPackages':packages,'rewrittenModuleReferences':count,'moduleEdits':edits,
+          'libraryBackendBridge':bridge,'systemSupplierInputs':sorted(system_inputs),'aliasBindings':aliases,
           'retainedOldRootModules':retained,'retainedModulePaths':unchanged,
           'retainedDependenciesRequireSeparateQualification':True,'oldRootMustRemainAvailable':True,
           'ownerInputs':{path:None if value is None else sha(value) for path,value in snapshots.items()},
@@ -222,8 +287,10 @@ def stage(home,incoming,output,cli):
           'ownerFilesChanged':False,'activated':False,'requiresColdBackupAndImmutableIncomingForActivation':True}
     # Recheck all source bytes before allocating even an output-only stage.
     for path,value in snapshots.items():
-        current=None if value is None and not Path(path).exists() and not Path(path).is_symlink() else read(Path(path))
+        current=None if value is None and not Path(path).exists() and not Path(path).is_symlink() else read(Path(path),system_supplier=path in system_inputs)
         if current!=value:raise ValueError('Migration input changed before staging.')
+    if any(str(Path(path).resolve())!=target for path,target in aliases.items()):
+        raise ValueError('A retained package alias changed before staging.')
     output.mkdir(mode=0o700);identity=output.stat()
     try:
         for name,data in {**assets,'plan.json':(json.dumps(plan,indent=2)+'\n').encode()}.items():
@@ -247,10 +314,12 @@ def verify(output,expected):
         raise ValueError('Unknown or applied preservation stage.')
     expected_assets={'cordis.patch.yml','integration/browser/dist/index.js','integration/browser/package.json','integration/ownership.json'}
     if set(plan.get('assets',{}))!=expected_assets:raise ValueError('The stage asset inventory changed.')
+    if any(str(Path(path).resolve())!=target for path,target in plan.get('aliasBindings',{}).items()):
+        raise ValueError('A retained package alias changed; prepare a fresh stage.')
     for name,digest in plan['assets'].items():
         if sha(read(output/name,private=True))!=digest:raise ValueError('A staged integration asset changed.')
     for path,digest in plan['ownerInputs'].items():
         file=Path(path)
-        actual=None if digest is None and not file.exists() and not file.is_symlink() else sha(read(file))
+        actual=None if digest is None and not file.exists() and not file.is_symlink() else sha(read(file,system_supplier=path in plan.get('systemSupplierInputs',[])))
         if actual!=digest:raise ValueError('An owner or supplier input changed; prepare a fresh stage.')
     return {'valid':True,'ownerFilesChanged':False,'activated':False}

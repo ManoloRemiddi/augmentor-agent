@@ -71,6 +71,49 @@ class DshPreservationTests(unittest.TestCase):
         plan=json.loads((self.output/'plan.json').read_text());self.assertEqual(plan['retainedOldRootModules'],['adapters/voice/index.mjs']);self.assertTrue(plan['requiresColdBackupAndImmutableIncomingForActivation']);self.assertEqual(len(plan['moduleEdits']),6)
         self.assertTrue(migration.verify(self.output,receipt['planSha256'])['valid'])
 
+    def legacy_bundle(self,version='0.2.0'):
+        supplier=self.base/'legacy-library';self.write(supplier/'package.json',{'name':'dsh-prompt-library','version':version})
+        self.write(supplier/'cordis.patch.yml',b'- insert:\n  - id: prompt-library\n    name: dsh-prompt-library\n')
+        self.write(supplier/'lib/index.js',b'// AUTHORED legacy backend only.\n');self.write(supplier/'lib/client.js',b'// AUTHORED retained frontend.\n')
+        alias=self.profile/'node_modules/dsh-prompt-library';alias.parent.mkdir(parents=True,exist_ok=True);alias.symlink_to(supplier,target_is_directory=True)
+        self.write(self.profile/'package.json',{'dsh':{'profile':{'bundles':['authored-other','dsh-prompt-library']}}})
+        self.write(self.incoming/'adapters/dsh-prompt-library/lib/index.js',b'// AUTHORED new shared-instructions backend.\n')
+        return supplier,alias
+
+    def test_legacy_library_frontend_is_retained_with_one_new_backend_override(self):
+        supplier,alias=self.legacy_bundle();before=self.inputs();receipt=self.stage();self.assertEqual(self.inputs(),before)
+        text=(self.output/'cordis.patch.yml').read_text();self.assertTrue(text.startswith(self.prefix));self.assertEqual(text.count('\n- id: prompt-library\n'),1)
+        plan=json.loads((self.output/'plan.json').read_text());bridge=plan['libraryBackendBridge'];self.assertTrue(bridge['frontendRetained']);self.assertTrue(bridge['appendedOverride']);self.assertEqual(bridge['module'],str(self.incoming/'adapters/dsh-prompt-library/lib/index.js'))
+        self.assertEqual(plan['aliasBindings'][str(alias)],str(supplier));self.assertIn(str(supplier/'lib/client.js'),plan['systemSupplierInputs'])
+        self.assertTrue(migration.verify(self.output,receipt['planSha256'])['valid'])
+
+    def test_legacy_library_alias_changes_and_unknown_custom_overrides_refuse(self):
+        supplier,alias=self.legacy_bundle();receipt=self.stage();alias.unlink();alias.symlink_to(self.incoming,target_is_directory=True)
+        with self.assertRaisesRegex(ValueError,'alias changed'):migration.verify(self.output,receipt['planSha256'])
+        alias.unlink();alias.symlink_to(supplier,target_is_directory=True);self.output=self.base/'next-stage'
+        with (self.profile/'cordis.patch.yml').open('a') as stream:stream.write('\n- id: prompt-library\n  name: authored-custom-library\n')
+        before=self.inputs()
+        with self.assertRaisesRegex(ValueError,'overrides require capability review'):self.stage()
+        self.assertEqual(self.inputs(),before);self.assertFalse(self.output.exists())
+
+    def test_unknown_legacy_library_versions_are_not_silently_replaced(self):
+        self.legacy_bundle('AUTHORED-UNREVIEWED');before=self.inputs()
+        with self.assertRaisesRegex(ValueError,'version needs separate'):self.stage()
+        self.assertEqual(self.inputs(),before);self.assertFalse(self.output.exists())
+
+    def test_reviewed_library_bridge_is_updated_without_duplicate_backend_rows(self):
+        self.legacy_bundle();self.stage()
+        for source,destination in [('cordis.patch.yml',self.profile/'cordis.patch.yml'),('integration/browser/dist/index.js',self.target/'browser/dist/index.js'),('integration/browser/package.json',self.target/'browser/package.json'),('integration/ownership.json',self.target/'ownership.json')]:self.write(destination,(self.output/source).read_bytes())
+        self.output=self.base/'next-stage';receipt=self.stage();plan=json.loads((self.output/'plan.json').read_text());self.assertFalse(plan['libraryBackendBridge']['appendedOverride']);self.assertEqual((self.output/'cordis.patch.yml').read_text().count('\n- id: prompt-library\n'),1);self.assertTrue(migration.verify(self.output,receipt['planSha256'])['valid'])
+
+    def test_identical_public_entries_in_other_releases_move_but_private_edits_stay(self):
+        alternate=self.base/'other-release';same=alternate/'adapters/dsh-memory/index.mjs';modified=alternate/'adapters/dsh-desktop/index.mjs'
+        self.write(same,(self.incoming/'adapters/dsh-memory/index.mjs').read_bytes());self.write(modified,b'// AUTHORED PRIVATE DESKTOP CUSTOMIZATION KEEP\n')
+        path=self.profile/'cordis.patch.yml';text=path.read_text().replace((self.old/'adapters/dsh-memory/index.mjs').as_uri(),str(same)).replace(str(self.old/'adapters/dsh-desktop/index.mjs'),str(modified));path.write_text(text)
+        receipt=self.stage();plan=json.loads((self.output/'plan.json').read_text());edits=[row for row in plan['moduleEdits'] if row['reason']=='identical-public-entry'];self.assertEqual(len(edits),2)
+        candidate=(self.output/'cordis.patch.yml').read_text();self.assertNotIn(str(same),candidate);self.assertIn(str(modified),candidate);self.assertEqual(modified.read_bytes(),b'// AUTHORED PRIVATE DESKTOP CUSTOMIZATION KEEP\n')
+        self.assertTrue(migration.verify(self.output,receipt['planSha256'])['valid'])
+
     def test_cli_stage_and_verify_are_private_and_refusal_does_not_echo_profile(self):
         cli=Path(__file__).resolve().parents[1]/'scripts/stage-dsh-preservation.py'
         result=subprocess.run([sys.executable,'-B',str(cli),'stage','--home',str(self.home),'--incoming',str(self.incoming),'--output',str(self.output),'--cli',str(self.cli)],capture_output=True,text=True,check=True)
