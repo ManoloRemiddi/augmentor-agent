@@ -1,5 +1,51 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Emscripten runtime source companion — October 17
+
+[`collect-runtime-inputs.py`](collect-runtime-inputs.py) complements the verified
+Core/source bundle below. It consumes the exact public Emscripten archive pinned
+in [`emscripten-runtime-inputs.json`](emscripten-runtime-inputs.json); fetch that
+immutable URL once and verify its SHA-256 before using it. The exporter performs
+no network request, engine compile or installed update:
+
+```sh
+python3 -B release/office-rebuild/collect-runtime-inputs.py \
+  --cache "$BUILT_CACHE" --producer "$TERMINAL_CONTAINER" \
+  --source-archive "$EMSCRIPTEN_SOURCE_ARCHIVE" \
+  --base-source-inputs "$VERIFIED_CORE_INPUTS" \
+  --output "$PWD/outputs/office-new-runtime-inputs"
+```
+
+The actual companion retains **16 files / 33,604,823 bytes**: the full public
+Emscripten source archive, eleven original notice/contributor files, the final
+link response, language configuration and two explicit release overlays. All
+**4,890 selected runtime/JavaScript/tool/third-party/root source files** match
+public revision `b7dc6e5747465580df5984e723b9d1f10d8e804b`. Runtime library sources,
+including musl and LLVM components, keep their original licence files. The Office
+entry/engine remain MPL-2.0; runtime components retain their own notices.
+
+The public Git version file says `4.0.10-git`; the installed SDK uses quoted
+`4.0.10` and a revision stamp. The pinned SDK installer explicitly rewrites the
+release version. Those exact installed overlay bytes are retained separately;
+this difference is not treated as an unmodified source-file match.
+
+The retained final response names **15 system-library archives and one startup
+object** whose current bytes match the recorded inputs. This establishes link
+inputs, not per-symbol attribution after optimization. All three Core submodule
+directories are empty in the completed producer. Its actual configuration omits
+help/dictionary build types and bundled dictionaries, with only en-US selected;
+those submodules supplied no source inputs for this build.
+
+Ten new cases plus the preceding source/Office/notice/packaging checks pass
+**34 Python tests**, no skips. Independent postflight verifies all **139 files**
+across both exports, the runtime source hashes, original notices, link inputs and
+release overlays. Neither source export is selected as an engine or public binary.
+[Evidence](runtime-inputs-qualification-20261017.json).
+
+Complete source-delivery/rebuild and third-party coverage review, representative
+documents/fonts/resource/security and installed promotion/rollback remain open.
+The public Office packaging refusal is unchanged.
+
 ## Completed-build source and notice export — October 17
 
 [`collect-source-inputs.py`](collect-source-inputs.py) exports the already completed

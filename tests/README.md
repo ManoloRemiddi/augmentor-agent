@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Office runtime source companion](../release/office-rebuild/README.md#emscripten-runtime-source-companion--october-17):
+ten new cases plus the preceding source/notice/packaging cohort pass **34 Python**,
+no skips. Actual pinned source matching, 15 library/one startup-object inputs,
+explicit release overlays, eleven original notices and all 139 exported file
+hashes have separate postflight evidence. Preceding 48f3d51e Linux SDK CI passes;
+new-source hosted/full distribution acceptance remains separate.
+
 [Office source-input export](../release/office-rebuild/README.md#completed-build-source-and-notice-export--october-17):
 eight new cases plus Office/notice/packaging checks pass **24 Python**, no skips.
 The export-ignore omission is reproduced and corrected. Actual 123-file export,

@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Office runtime source companion](../release/office-rebuild/README.md#emscripten-runtime-source-companion--october-17)
+retains the pinned public Emscripten archive/eleven notices and verifies 4,890
+selected source files. Two SDK version/revision overlays are explicit. The final
+link response's fifteen system libraries/one startup object match; all three Core
+submodules are empty with help/dictionaries omitted and en-US-only resources.
+Independent integrity/source/link/notice verification covers both exports' 139
+files; 34 Python/no skips pass. No engine build/default or installed update; both
+MX reviews/shared state/seals/services remain. Preceding 48f3d51e Linux SDK CI
+passes. Complete source delivery/rebuild/third-party coverage, broader Office
+acceptance and promotion remain; public packaging stays refused.
+[Evidence](../release/office-rebuild/runtime-inputs-qualification-20261017.json).
+
 [Completed-build Office source/notice export](../release/office-rebuild/README.md#completed-build-source-and-notice-export--october-17)
 reproduces both generated licences and retains 123 verified files/65 pinned
 externals/59 unpacked receipts. Direct Git-blob archives preserve all 149,173 Core

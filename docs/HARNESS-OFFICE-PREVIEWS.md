@@ -1,5 +1,26 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Emscripten runtime source companion — October 17
+
+The [runtime companion exporter](../release/office-rebuild/README.md#emscripten-runtime-source-companion--october-17)
+now retains the pinned public Emscripten source and eleven original notices.
+All 4,890 selected runtime/JavaScript/tool/third-party/root sources match the
+existing build's public revision. SDK release-version/revision files are explicit
+overlays, with the installer rewrite traced; they are not claimed as unmodified
+Git source. The final response's 15 system-library archives and one startup object
+match their recorded bytes. Actual empty Core submodules/configuration establish
+that no help/dictionary/translation submodule sources entered this build.
+
+The 16-file runtime companion and original Core export have **139 files /
+694,891,760 bytes** verified independently. Ten new cases and preceding source/
+notice/packaging checks pass **34 Python**, no skips. The exporter is offline;
+there is no engine compile, installed/default change, inference or real migration.
+Both MX reviews/shared data/services verify unchanged. Preceding 48f3d51e Linux SDK
+CI passes; new-source full hosted acceptance remains separate. Complete source
+delivery/rebuild and third-party coverage review, broader Office document/font/
+resource/security and promotion/rollback remain. The public packaging gate stays
+intact. [Evidence](../release/office-rebuild/runtime-inputs-qualification-20261017.json).
+
 ## Completed-build source and notice export — October 17
 
 The [private source-input exporter](../release/office-rebuild/README.md#completed-build-source-and-notice-export--october-17)
@@ -15,8 +36,8 @@ Eight new source-export cases and existing notice/Office packaging checks pass
 **24 Python tests**, no skips. No engine compile, dependency/default change,
 installed adoption, owner inference or additional migration occurs. Existing
 reviews, protected files/shared state and services verify unchanged. This narrows
-the source/notice packaging gap; Emscripten runtime/toolchain and submodule scope,
-complete source delivery/rebuild, broader document/font/resource/security and
+the source/notice packaging gap. The newer runtime companion above records the
+runtime and submodule inputs. Complete source delivery/rebuild, broader document/font/resource/security and
 promotion remain open. The public packaging gate is unchanged.
 [Evidence](../release/office-rebuild/source-inputs-qualification-20261017.json).
 
