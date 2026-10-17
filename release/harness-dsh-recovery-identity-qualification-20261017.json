@@ -1,0 +1,77 @@
+{
+  "schema": "augmentor-dsh-recovery-identity-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Retained typed DSH recovery message identities after envelope renumbering; MX source/private package qualification; no owner transfer",
+  "sourceBaseRef": "028857607053968b283b9944dbc080bc345d00ec",
+  "contract": {
+    "sourceVersion": 4,
+    "schema": "augmentor-dsh-tool-recovery/1",
+    "identityOrdinal": "Canonical nonnegative safe decimal; retained separately when different from current event sequence",
+    "identityOrdinalGrantsEventAuthority": false,
+    "currentProposalDispatchResultCoordinatesRetained": true,
+    "exactTypedErrorAndPublicTextFingerprintRequired": true,
+    "sameActiveProposalAndDispatchCitationRulesRequired": true,
+    "sourceOrIdentityRewritten": false,
+    "historicalActionsReplayed": false,
+    "originalSupplierGuiChanged": false,
+    "dependenciesChanged": false,
+    "supplierMITNoticesPreserved": true
+  },
+  "qualification": {
+    "phase": "source and ordinary passed; exact sealed pending",
+    "sourceCheckBuildPass": true,
+    "focusedConverterCases": 28,
+    "focusedSdkCases": 2,
+    "focusedChromiumCases": 1,
+    "workers": 2,
+    "deadlinesChanged": false,
+    "testedInputsSha256": {
+      "packages/runtime/src/dsh-tool-recovery.ts": "c0b236c6d5102fb5c181f06f16caea9075e171fe642fe5ca1e62d7166876c100",
+      "tests/fixtures/dsh-recovery-identity-project.mjs": "728cd65abc8cdddedcd50c584684c3489c01908a12bb60a84a8801585c386ff0",
+      "tests/dsh-project-recovery-identity.test.mjs": "a16301e0a64fa44b448b56bd4ceea80bfe2390911d776fd75518084b422e9b8d",
+      "tests/dsh-project-recovery-identity-runtime.test.mjs": "810ec5d239fbe11a931f0e64ce31047d01d929762f58c4092ba7d42959f764da",
+      "tests/harness-dsh-recovery-identity-chromium.test.mjs": "a5b99c9d2597b8da0c60d6f25987d1f19d366bb332f83f9ba21255922f320740"
+    },
+    "sourceNodePass": 376,
+    "sourcePythonPass": 55,
+    "nodeFiles": 53,
+    "chromiumFiles": 16,
+    "chromiumCases": 20,
+    "skips": 0,
+    "environment": {
+      "distribution": "MX 25.3 Infinity KDE x64 (Debian 13)",
+      "node": "24.19.0",
+      "python": "3.13.5",
+      "piCodingAgent": "1.1.0",
+      "product": "0.2.13"
+    },
+    "ordinaryNodePass": 376,
+    "ordinaryPythonPass": 55,
+    "ordinaryUnchangedBaselineInputsVerified": 23524,
+    "compiledFilesVerified": 1114,
+    "sameFrozenRealPreparationAcceptedByOrdinary": true,
+    "existingTwoParentFileProjectStillPrepares": true
+  },
+  "sameFrozenRealExport": {
+    "parents": 4,
+    "children": 0,
+    "sameSourceCutAndBytes": true,
+    "precedingPreparationAccepted": false,
+    "correctedPreparationAccepted": true,
+    "retainedIdentityRecoveryRecords": 4,
+    "ownerImports": 0,
+    "modelRequests": 0
+  },
+  "remaining": [
+    "Guarded adoption of qualified candidate",
+    "Owner pilot feedback before further real transfers",
+    "Independent source formats and source-observation failures",
+    "Voice and later OS rollout deferred"
+  ],
+  "primarySource": {
+    "revision": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+    "v1ToV2MigrationSha256": "5e0514632eae19483f0c708084cc562afb604d476a2db3b894171bed6228e5c2",
+    "v2ToV3ReferencesSha256": "21b25ff30128c6eb73ab03efe72202e00f8d7a34455228f0d31700963abe5857",
+    "v3ToV4ReferencesSha256": "472fca4d333c00e6a9c79d5301403a5db657defab269ca1673498ca42037a746"
+  }
+}

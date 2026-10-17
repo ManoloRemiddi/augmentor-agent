@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+DSH retained recovery IDs: `dsh-project-recovery-identity.test.mjs` covers both
+causes/start states, retained ordinals, current reference authority, malformed and
+foreign identities, replacement counts, source cuts and archived children.
+`dsh-project-recovery-identity-runtime.test.mjs` checks real SDK cold/reply
+continuation without old calls; `harness-dsh-recovery-identity-chromium.test.mjs`
+checks original Chat/Trajectory inspection, fresh Send and reload. See the
+[contract/evidence](../docs/HARNESS-DSH-MIGRATION-PILOT.md#recovery-identities-after-dsh-migration--october-17).
+
 DSH argument-error coverage: `dsh-project-argument-errors.test.mjs` covers typed
 proposal/dispatch/error correlation, exact large invalid strings, non-object and
 empty inputs, source cuts, replacement counting, archived children, file activity,

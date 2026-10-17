@@ -1345,3 +1345,61 @@ registry and installed selections remain exact; their 24,615-input running seal
 verifies unchanged. No owner update, restart, additional transfer or real model
 work occurred. Guarded adoption, pilot acceptance and remaining source formats
 are separate gates. Voice and later OS rollout remain deferred.
+
+## Recovery identities after DSH migration — October 17
+
+Current v4 DSH logs can contain recovery message IDs whose final numeric ordinal
+belongs to the history before DSH renumbered its events. The public v1→v2
+migration groups old stream chunks and remaps envelope references. Public v2→v3
+and v3→v4 migrations also remap event/citation coordinates while preserving
+message identities. `tool/result` payload IDs are not sequence references.
+Requiring that ID ordinal to equal the current result event sequence was an
+incorrect converter assumption.
+
+The converter still requires the exact typed v4 recovery error, public error-text
+fingerprint, matching cause/call identity, active proposal, turn/step, source
+fields and dispatch/citation rules. Only the identity suffix rule changes: a
+canonical nonnegative safe decimal integer is retained as `messageIdOrdinal`
+when it differs from the current event sequence. It grants no event authority.
+Current `sourceProposalSeq`, `sourceCallSeq`, `sourceResultSeq` and display/source
+provenance continue to use verified current coordinates. No message ID or source
+body is rewritten. Unsupported/foreign identities, unsafe/noncanonical ordinals,
+wrong causes, mismatched citations and incomplete calls still refuse atomically.
+
+Imported native messages remain labelled historical data with no executable old
+proposal, retry, restored grant/job or automatic memory capture. Unknown outcomes
+remain unknown. Original Chat/Trajectory warnings and inspectors retain their
+layout and show the recorded call/error; archived child recognition remains
+scoped and read-only. No supplier GUI/code, component pins or dependencies change.
+The recognizer is shared platform code; only MX package artifacts are qualified
+here. Voice, Windows, macOS and other distro rollout remain deferred.
+
+Primary public source at
+[`d7432673`](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c):
+[`repair.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/session/src/repair.ts),
+[`v1→v2 migration.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/session/session-format-v1-to-v2/src/migration.ts),
+[`v2→v3 references.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/session/session-format-v2-to-v3/src/references.ts)
+and [`v3→v4 references.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/session/session-format-v3-to-v4/src/references.ts).
+The recognizer and fixtures are independently authored; supplier MIT notices are
+preserved. This contract does not infer the exact upgrade chain of an owner's log
+from its current header alone.
+
+The identical frozen private export used for the preceding argument-error check
+contains four parents and no children. The preceding sealed converter refuses
+its recovery identities. The corrected converter preserves four such records
+and **all four conversations now pass complete read-only preparation**. Source
+cuts/hashes and bodies stay exact, with no destination or model work. This
+supersedes the previous checkpoint's remaining refusal for this project; it is
+preparation evidence, not owner transfer or acceptance.
+
+[Portable qualification](../release/harness-dsh-recovery-identity-qualification-20261017.json)
+records source and package checks. Twenty-eight new converter/presentation cases,
+two actual SDK synthetic-provider cold/reply cases and one original GUI case pass.
+Source check/build and **376 Node / 55 Python** pass across 53 Node files,
+sixteen Chromium files/twenty GUI cases, two workers/no skips/unchanged bounds.
+Fresh ordinary passed with matching compiled inputs; exact sealed qualification
+is pending. The same four-parent comparison passes in the ordinary root, with
+23,524 unchanged baseline inputs verified; the existing two-parent real-file
+preparation regression also remains accepted. Running reviews remain
+unchanged. Guarded adoption and owner pilot feedback still gate wider migration;
+independent source formats and source-observation failures remain to assess.
