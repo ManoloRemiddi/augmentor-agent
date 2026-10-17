@@ -39,3 +39,11 @@
   on the RTX 5090. Preserve Qwen context/concurrency/precision and the current
   CPU ASR/VAD path. Never move speech to another GPU or change model settings
   silently; report any failure and let the user direct the next change.
+
+## Build storage and retention
+
+- MX local build/test mirrors must use `python3 -B scripts/harness-build-workspace.py -- COMMAND ...`. Put generated application copies inside the provided `AUGMENTOR_BUILD_WORKSPACE`; do not create persistent per-checkpoint copies in `outputs/` or `/tmp`.
+- The helper allows one scratch build at a time, requires a 64 GiB free-space reserve, and removes its own workspace on command completion/failure. Retained or unknown leftovers require inspection before another run. Do not lower the reserve for real app work; zero is for small authored unit fixtures only.
+- Retain small external logs, source refs, manifests, hashes and receipts. Create a sealed release only when required for actual package/installed qualification, never for documentation-only changes. Remove an ordinary test mirror after its qualification instead of archiving the whole duplicate.
+- Keep the selected/running app, needed rollback, registered reviews, projects, histories and required backups. Keep at most the latest two additional unselected candidates, excluding any still-needed/currently referenced artifact. Review exact references/provenance before deleting whole obsolete app roots; never blanket-prune ambiguous old folders.
+- Never put owner profiles in disposable scratch, select scratch as an installed release, or route owner launchers into it. The helper is cooperative build hygiene, not a sandbox or a universal disk quota. See [build storage](docs/HARNESS-BUILD-STORAGE.md).

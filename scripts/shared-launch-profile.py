@@ -130,9 +130,12 @@ def assert_no_clients(pairs):
         try:
             if process.stat().st_uid!=os.getuid():continue
             args=(process/'cmdline').read_bytes().split(b'\0')
+            # Idle web servers can create prompt/memory clients later. The CLI
+            # may be a normal npm shim or its resolved public package entry.
+            dsh_web=b'web' in args and any(a==b'dsh' or a.endswith((b'/dsh',b'/dsh.cmd')) or b'/@deepseek-ai/dsh/' in a for a in args)
             known=any(a in (b'augmentor_linux',b'augmentor_linux.macos_shortcut_service') or
                       a.endswith((b'/apps/mobile/native_runner.py',b'/apps/mobile/start.py',b'/apps/browser/embed/server.mjs',b'/apps/browser/native-host.mjs',b'/apps/browser/pi-bridge.mjs',b'/apps/browser/codex-bridge.mjs',b'/apps/browser/pipe.mjs',b'/dist/runtime/src/main.js',b'/services/memory/service.py',b'/services/prompt-library/service.py')) for a in args)
-            if not known:continue
+            if not (known or dsh_web):continue
             env=dict(row.split('=',1) for row in (process/'environ').read_text().split('\0') if '=' in row)
             home=Path(env.get('HOME',pwd.getpwuid(os.getuid()).pw_dir))
             state=env.get('AUGMENTOR_SHARED_STATE',str(Path(env.get('XDG_STATE_HOME',home/'.local/state'))/'augmentor'))

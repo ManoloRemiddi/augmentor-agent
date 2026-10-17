@@ -92,6 +92,12 @@ def main(args):
 
 
 def _main(args):
+    if args[:1]==['--dsh']:
+        config=configuration();script=Path(config['root'])/'scripts/desktop-dsh-launch.py'
+        if not script.is_file():raise RuntimeError('The selected deployment has no managed DSH launcher.')
+        # DSH keeps its original service environment; the delegate applies the
+        # selected pair/interpreters without replacing PATH or PYTHONPATH.
+        os.execve(config['python'],[config['python'],'-B',str(script),*args[1:]],dict(os.environ));return 0
     if args[:1]==['--embed']:
         config=configuration();script=Path(config['root'])/'scripts/embed-launch.py'
         if not script.is_file():raise RuntimeError('The selected deployment has no embedding launcher.')

@@ -31,7 +31,6 @@
     "noPhysicalOwnerDesktopOrMobileAcceptance": true
   },
   "actualProductionPrerequisites": {
-    "installedDshHostVersion": "0.1.5-rc.1",
     "installedProductIntegrationVersion": "0.2.11",
     "candidateProductVersion": "0.2.13",
     "actualCandidatePreflightRefusesProductMismatch": true,
@@ -45,7 +44,14 @@
     "safeNonExecutingYamlNodeInspection": true,
     "standardAutomaticUpdateNotQualified": true,
     "deliberateCustomCompositionPreservationRequired": true,
-    "noVersionOrOwnershipGuardBypassed": true
+    "noVersionOrOwnershipGuardBypassed": true,
+    "installedAdapterReportedHostVersion": "0.1.5-rc.1",
+    "adapterVersionSynthesized": true,
+    "installedCliOnDiskVersion": "0.2.0-rc.2",
+    "exactLoadedDshBackendVersionVerified": false,
+    "rawModernCatalogAndPluginInventorySucceed": true,
+    "publicSourceTransportNeedsModernCompatibility": true,
+    "versionInferenceCorrection": "docs/HARNESS-BUILD-STORAGE.md"
   },
   "activated": false,
   "installedChanged": false,
@@ -127,5 +133,12 @@
     "harness-shared-embed-sealed-python-20261017.log": "12d1a504544f7ad60c035b02e93bb2a6355492a89f3d1aad9e3aa7bc45d3fd69",
     "harness-shared-embed-sealed-declared-python-20261017.log": "64d6c289b0964bbef44e6ab3469e2c59e4fcaa5bd22751ad948f60b60537a9d6",
     "harness-shared-embed-package-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "terminalCiFollowUp": {
+    "priorRuntimeRun": 39035553761,
+    "newRuntimeRun": 39036728003,
+    "bothConclusion": "failure",
+    "details": "docs/HARNESS-BUILD-STORAGE.md#resumed-ci-failure-correction",
+    "earlierInProgressObservationsAreHistorical": true
   }
 }

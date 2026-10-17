@@ -1,20 +1,32 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-New-code [validation 39036728003](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39036728003)
-is now active at published 5df1282a (runtime add7b891; only documentation/evidence
-follow it). It was dispatched once on the branch ref; the preceding 22103e61 PR
-run 39035553761 remains live after publication. Their concurrency refs differ.
-Neither has a verified conclusion here; do not restart solely on an observation
-timeout. Public Office packaging remains separately gated.
+[Storage cleanup and resumed MX work](HARNESS-BUILD-STORAGE.md): 75 unused app
+copies removed, 40.89 GiB recovered; root now about 99 GiB free (89% used).
+Required one-workspace/64 GiB reserve workflow replaces persistent checkpoint
+copies. Focused source 45 Node/91 Python and type checks pass; affected final DSH
+routes pass 3 Node/12 Python again. Direct/delegated opt-in DSH launch preserves
+service environment and guards idle readers; actual upstream backend/cold owner
+adoption remains open. Installed main/pilot, projects, histories and needed backups
+remain unchanged. [Aggregate record](../release/harness-build-storage-20261017.json).
+
+Terminal CI update: [39036728003](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39036728003)
+(5df1282a / runtime add7b891) ends with 2,141 root passes, two failures and 53 skips;
+[39035553761](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39035553761)
+(22103e61) ends with 2,143 passes, one failure and 53 skips. Both fail the changed-
+source Office case; the newer run also exposes the inspector callback fixture race.
+Source-boundary/Home/component jobs pass. Source corrections pass all 11 affected
+cases locally; a new hosted conclusion is pending. Neither run is restarted.
+The independent public Office packaging gate remains open.
 
 [Sealed embedding follow-up](HARNESS-SHARED-PROFILES.md#sealed-embedding-follow-up-and-existing-configuration--october-17)
 qualifies add7b891 / 20261017-152350-2c67edd7, artifact 112ec5c4…7dd53:
 24,761 inputs/1,143 compiled; source/ordinary/sealed each 42 Node/82 Python plus 12
 overlapping recorded-interpreter cases. Unselected; original reviews/owner stores/
-services unchanged. Actual DSH host is 0.1.5-rc.1; product integration 0.2.11 refuses
-candidate 0.2.13. Existing peerDependencies/composition edits require preservation
-before a matching upgrade; automatic replacement is not qualified. Retain prior
-live CI 39035553761; dispatch new code separately. [Record](../release/harness-shared-embed-package-20261017.json).
+services unchanged. The adapter-reported 0.1.5-rc.1 is synthesized, not a verified host version;
+CLI on disk is 0.2.0-rc.2 and modern live API routes succeed. Product integration
+0.2.11 refuses candidate 0.2.13. See the [correction and storage workflow](HARNESS-BUILD-STORAGE.md). Existing peerDependencies/composition edits require preservation
+before a matching upgrade; automatic replacement is not qualified. Earlier live-CI observations below are historical; the terminal update above
+supersedes them. [Record](../release/harness-shared-embed-package-20261017.json).
 
 [Embedded shared launch and production preflight](HARNESS-SHARED-PROFILES.md#embedded-entrypoint-and-actual-production-compatibility--october-17)
 adds the missing idle embedding-server reader/selected pair while retaining SDK

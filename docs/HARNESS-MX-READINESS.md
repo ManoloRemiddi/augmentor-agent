@@ -169,7 +169,7 @@ closes the missing idle-server launch route in source (42 Node/82 Python). Real
 22103e61 sealed preflight against the actual selected integration refuses its
 0.2.11 product version; candidate is 0.2.13 and home identity matches. This is a
 concrete version prerequisite, not permission to bypass the guard or change
-existing voice/model/preset configuration. The fresh sealed add7b891 follow-up now passes 42 Node/82 Python plus 12 overlapping binding cases. Actual host is DSH 0.1.5-rc.1; six-file ownership audit finds edited package peerDependencies and a changed composition insertion, so a deliberate preservation/matching integration/client update is required. Fresh cold backup/export/adoption remain; no owner app was updated.
+existing voice/model/preset configuration. The fresh sealed add7b891 follow-up now passes 42 Node/82 Python plus 12 overlapping binding cases. The installed adapter synthesizes legacy 0.1.5-rc.1; CLI on disk is 0.2.0-rc.2, modern live routes succeed, exact backend version remains unverified, and public transport still needs modern compatibility ([correction](HARNESS-BUILD-STORAGE.md)); six-file ownership audit finds edited package peerDependencies and a changed composition insertion, so a deliberate preservation/matching integration/client update is required. Fresh cold backup/export/adoption remain; no owner app was updated.
 
 ## Next priorities
 

@@ -39,10 +39,18 @@ try:
    entered.set();assert release.wait(3)
    try:return original(method,params,**kwargs)
    finally:finished.set()
-  with patch.object(controller.client,'call',side_effect=delayed):
-   window.open_inspector();until(entered.is_set,'pending inspection');controller.session='inspection-foreign';release.set();until(finished.is_set,'completed RPC');QTest.qWait(100);app.processEvents();assert len(opened)==1,'stale callback must not navigate';controller.session=sid
-  with patch.object(controller.client,'call',return_value={'url':'https://unrelated.invalid/#token=fixture','sessionId':sid,'mode':'read-only'}):
-   window.open_inspector();QTest.qWait(100);app.processEvents();assert len(opened)==1,'invalid destination must not navigate'
+  delivered=threading.Event();background=window.call_in_background
+  def tracked(fn,callback):
+   def complete(value):
+    try:callback(value)
+    finally:delivered.set()
+   return background(fn,complete)
+  with patch.object(window,'call_in_background',side_effect=tracked):
+   with patch.object(controller.client,'call',side_effect=delayed):
+    window.open_inspector();until(entered.is_set,'pending inspection');controller.session='inspection-foreign';release.set();until(finished.is_set,'completed RPC');until(delivered.is_set,'stale callback delivered');assert len(opened)==1,'stale callback must not navigate';controller.session=sid
+   delivered.clear()
+   with patch.object(controller.client,'call',return_value={'url':'https://unrelated.invalid/#token=fixture','sessionId':sid,'mode':'read-only'}):
+    window.open_inspector();until(delivered.is_set,'invalid destination callback delivered');assert len(opened)==1,'invalid destination must not navigate'
  assert client.call('session.history',{'sessionId':sid})==before
  image=Path(__file__).resolve().parents[2]/'outputs/harness-proof/native-inspection.png';image.parent.mkdir(parents=True,exist_ok=True);window.grab().save(str(image))
  assert not errors

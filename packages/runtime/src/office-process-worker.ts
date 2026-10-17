@@ -19,7 +19,13 @@ try{
  const sourceUnchanged=async()=>{try{if(JSON.stringify(await receipt(input,request.options.maxInputBytes!,undefined,request.request.input))===JSON.stringify(request.request.input))return;}catch{}throw Object.assign(Error('Office source identity changed.'),{code:'source-changed'});};
  await sourceUnchanged();
  if((await discoverRuntime()).backend!=='wasm')throw Error('Office process backend must be Wasm.');
- privateOutput=await mkdtemp(join(tmpdir(),'publication-'));converter=await createConverter(request.options);const result=await converter.render({inputPath:input,outputPath:join(privateOutput,'result.pdf')});
+ privateOutput=await mkdtemp(join(tmpdir(),'publication-'));converter=await createConverter(request.options);
+ // A concurrent source replacement can make the parser fail before it returns.
+ // Check the admitted receipt on that path too, preserving the real parser
+ // error when the original bytes are unchanged.
+ let result:Awaited<ReturnType<typeof converter.render>>;
+ try{result=await converter.render({inputPath:input,outputPath:join(privateOutput,'result.pdf')});}
+ catch(error){await sourceUnchanged();throw error;}
  await sourceUnchanged();
  const rendered=await processFileData(join(privateOutput,'result.pdf'),request.options.maxOutputBytes!);
  if(rendered.data.subarray(0,5).toString()!=='%PDF-'||publication().size!==0n)throw Error('Invalid Office publication.');

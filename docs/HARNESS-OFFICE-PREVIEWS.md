@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Storage-safe source follow-up](HARNESS-BUILD-STORAGE.md#resumed-ci-failure-correction):
+the Linux supervised worker now checks source identity after renderer errors as
+well as successful rendering. It reports a concurrent source change consistently
+without replacing an unchanged source's real parser error. Actual supervised Wasm
+source/publication refusal and recovery pass; no installed engine selection or
+sealed artifact changes. Hosted prior runs' failure is recorded, not waived.
+
 ## Stopped-cleaner private package — October 17
 
 The new helper now passes **304 Node checks each** in source, fresh ordinary and

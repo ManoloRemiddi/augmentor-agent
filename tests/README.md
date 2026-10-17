@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+MX build hygiene: use `python3 -B scripts/harness-build-workspace.py -- COMMAND ...`
+and place throwaway app mirrors in `AUGMENTOR_BUILD_WORKSPACE`. Keep logs externally;
+do not retain a new whole application per checkpoint. Nine authored storage cases
+cover cleanup, concurrency, reserve and reference retention. See
+[storage workflow and resumed qualification](../docs/HARNESS-BUILD-STORAGE.md).
+The Native Pi inspector fixture waits for actual GUI callback delivery before
+restoring its temporary session, rather than assuming a fixed delay is sufficient.
+
 [Sealed embedding qualification](../release/harness-shared-embed-package-20261017.json):
 source, ordinary and exact add7b891 private artifact each pass 42 Node/82 Python,
 plus 12 overlapping binding cases with recorded Python. All 24,761 sealed/1,143
