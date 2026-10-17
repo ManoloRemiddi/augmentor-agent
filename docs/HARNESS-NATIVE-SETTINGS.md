@@ -101,7 +101,10 @@ validation recipe: `npm ci --prefix apps/browser` and `apps/browser/test`, both 
 Python comprises 121 Native/settings/shared-preference
 cases, 28 Controller/readiness/remote cases and 12 cold-backup cases. The new
 Browser/Native stream-opening and late-reply tests use authored data; no owner
-model or microphone is used. Hosted final-source results are recorded separately.
+model or microphone is used. Full [Linux SDK 39063815081](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39063815081)
+**succeeds** at workflow **222ae6e9** / runtime **889ad6cb**, including the
+121-case Native group, 130 Browser units and four focused transport cases.
+[Portable qualification record](../release/harness-progress-cut-map-20261017.json).
 
 The current read-only caller map finds three original Native windows idle with no
 drafts at observation, 12 known client/companion processes and 35 launcher/registration
@@ -129,6 +132,13 @@ whole logical data trees and archive schema stay compatible. Bootstrap/registrat
 writes use the existing startup installer's small per-file snapshot/CAS mechanism;
 do not copy whole launcher folders or weaken their directory checks just to archive
 additional metadata. Exact affected bootstrap paths still need binding before use.
+
+Before a matching Native update, preserve the existing configured voice provider.
+Read-only selection metadata confirms that the working primary uses `openai-live`,
+while the candidate still lacks its provider-specific Window/Controller path.
+Verified public 51272530/c1b2279a compatibility source is available; carry forward
+existing behavior without changing credentials, provider, services or GPU placement.
+This preservation prerequisite does not reopen deferred voice expansion.
 
 No owner data, settings, service, selected app or project was changed. All local
 checks use the one-workspace helper and real 64 GiB reserve; no full app copy,

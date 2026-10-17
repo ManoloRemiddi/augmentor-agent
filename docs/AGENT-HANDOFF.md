@@ -5,7 +5,11 @@ restores verified public request stages, saved thinking and late-callback guards
 Local **161 Python / 24 Node / 130 Browser** pass; no owner change or app copy.
 Named-file archive roots cover both deployment selectors without duplicating
 program releases. Current 21-root/two-pair sizing is advisory only; matching
-client/bootstrap adoption, cold capture and finalization/reverse remain.
+client/bootstrap adoption, cold capture and finalization/reverse remain. Hosted
+Linux SDK **39063815081 succeeds** at workflow **222ae6e9** / runtime **889ad6cb**.
+[Qualification record](../release/harness-progress-cut-map-20261017.json). Preserve
+the currently configured Native provider before any matching client activation;
+voice expansion remains deferred.
 
 [Recovered existing Native settings](HARNESS-NATIVE-SETTINGS.md) restores the inline
 public interface and named-agent/model retention before shared-backend adoption.

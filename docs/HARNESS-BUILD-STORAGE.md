@@ -99,3 +99,15 @@ session or checking the next invalid URL; the production navigation guard is
 unchanged. All **11 affected Node cases** pass, including real Wasm rejection /
 recovery and actual Pi/Qt inspection. This count is separate from the earlier
 45-case launch/source focus. No owner inference, installation or app copy occurs.
+
+## Follow-up verification after resumed source work
+
+The exact-path deletion receipts were checked again: all original 34 and all 41
+additional removed roots remain absent. Free space is **98.5 GiB** and the managed
+scratch directory contains only its lease file. Subsequent progress/thinking and
+backup-coverage source qualification created no full application mirror or sealed
+release. The full Linux SDK succeeds at workflow 222ae6e9 / runtime 889ad6cb; see
+[the qualification record](../release/harness-progress-cut-map-20261017.json).
+Older unclassified output/release/cache trees are still retained pending exact
+provenance and reference checks; this verification does not claim all remaining
+large directories are needed or that all duplicate storage has been eliminated.
