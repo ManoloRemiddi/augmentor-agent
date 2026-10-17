@@ -1,5 +1,45 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## MX managed Office resource limits — October 17
+
+An additional explicit source candidate, `AUGMENTOR_OFFICE_BACKEND=linux-managed-wasm`,
+runs the same process converter in a fresh transient systemd **user scope**.
+The default remains `pinned-kit`; both installed reviews remain unchanged.
+MX's existing systemd 257.13 user manager and unified cgroup hierarchy are tested;
+this does not qualify other distributions or require a system service/root access.
+Missing manager, rejected properties, mismatched scope, missing effective limits
+or an unverifiable deadline refuse conversion without switching backends.
+
+Before admitting the renderer, the actual helper verifies its exact scope and
+kernel files: **3 GiB memory maximum, zero swap, 128 tasks, one CPU quota and
+whole-group OOM termination**. It independently checks manager identity/kill policy
+and raw D-Bus deadline values. The configured external runtime is the conversion
+timeout plus two seconds, with a two-second stop timeout and final group SIGKILL.
+This manager deadline still progresses while the actual Node owner, supervisor
+and renderer are all stopped. Existing kernel parent-death hooks, pidfds, bounded
+protocol, source/publication receipts and separate scratch ownership remain.
+
+Six actual user-manager tests pass: independent kernel-limit reads, wrong-scope/
+unbounded refusal before parser work, stopped supervisor/renderer deadline,
+all-three-stopped owner recovery and cleanup, lower-cap whole-group OOM, and
+actual Wasm active/queued disposal followed by fresh conversion recovery. The OOM
+control deliberately uses **64 MiB** and authored allocation; it is not a claim
+that a real Office document OOMs at the production 3 GiB cap. The original GUI/
+actual Host also passes unchanged PDF/font/zoom/reload/Retry/recovery/narrow-close
+assertions with both the managed default engine and the existing Thin engine.
+The broader **44-file / 19-Chromium source cohort passes 288 Node tests**,
+without skips or failures; focused source/notice/packaging checks pass **43 Python**.
+These are isolated authored profiles, with no owner inference or project transfer.
+
+This adds actual per-conversion resource controls to an opt-in MX source path;
+it remains **process/resource supervision, not a filesystem/network sandbox**.
+Pre-admission bootstrap and simultaneous loss of every cleanup owner, durable
+scratch recovery, exact package/seal/installed adoption, broader document/font/
+macro/security and complete preferred-source/public packaging qualification
+remain. The installed app/engine, model/GPU/voice state and owner data are preserved.
+[Reproduction and platform requirements](../release/office-rebuild/README.md#mx-managed-office-resource-limits--october-17)
+and [source/evidence record](../release/office-rebuild/linux-managed-seat-qualification-20261017.json).
+
 ## Opt-in Linux process converter — October 17
 
 The preceding diagnostic now has a source runtime implementation selected only

@@ -1,5 +1,61 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## MX managed Office resource limits — October 17
+
+`AUGMENTOR_OFFICE_BACKEND=linux-managed-wasm` selects an additional, uninstalled
+Linux x64 candidate. The earlier `linux-process-wasm` seat remains a separate
+diagnostic/source option; unset/default `pinned-kit` is unchanged. This candidate
+requires the existing MX systemd user manager, `/run/user/UID/bus`, cgroup v2,
+`systemd-run`, `systemctl` and `busctl`. Tested version: **257.13**. No packages
+are installed, no system service enabled and no model/speech setting changed.
+
+`office-process-scope.ts` starts a private random `augmentor-office-*.scope` with
+fixed arguments and a private local user bus. Scope execution preserves the
+supervisor PID, parent relationship and input/output descriptors. The effective
+limits are `MemoryMax=3221225472`, `MemorySwapMax=0`, `OOMPolicy=kill`,
+`TasksMax=128`, `CPUQuota=100%`, runtime `timeoutMs+2000` milliseconds and
+`TimeoutStopSec=2s`, group termination and final SIGKILL. Environment expansion is
+disabled. The Python helper checks its exact cgroup name/membership and reads
+effective kernel limits before renderer admission. It confirms manager identity,
+termination policy and raw microsecond deadlines over the local user bus.
+Rejected/absent/weaker controls refuse admission; there is no automatic fallback.
+
+With an actual MX user session, after `npm run build`:
+
+```sh
+AUGMENTOR_MANAGED_OFFICE_TEST=1 node --test --test-concurrency=1 \
+  tests/office-process-managed.test.mjs \
+  tests/harness-office-managed-chromium.test.mjs
+```
+
+Without explicit opt-in these platform tests skip, rather than impersonating a
+user manager in generic CI. An explicit opt-in requires the real manager; missing
+capabilities fail. Six process tests plus the original GUI pass. Kernel controls
+are independently read by the Node observer; fixtures use real scopes/helpers.
+The manager terminates work while owner/supervisor/renderer are stopped; after
+the owner resumes, cleanup completes. A 64 MiB authored allocation control
+produces manager `Result=oom-kill` and whole-group termination. It is separate
+from successful actual Wasm conversion at 3 GiB. Active and queued real-Wasm
+disposal and distinct fresh-converter recovery also pass. Initial fixture
+assertions incorrectly dereferenced an already-reaped identity and assumed the
+guard must exit nonzero on a manager SIGTERM; those failures remain recorded.
+The guard correctly returns failure metadata after graceful termination; only
+successful conversion metadata is prohibited in that case. Both default and
+existing Thin engines pass the actual managed Host/original-GUI proof, using
+identical assertions/deadlines. The final source cohort passes **288 Node** across
+44 files/19 Chromium files, plus **43 Python** source/notice/packaging/parser
+checks, with no skips or failures. [Exact source and evidence](linux-managed-seat-qualification-20261017.json).
+
+This is resource/process supervision, not filesystem/network isolation. Kernel
+limits and manager deadlines do not qualify durable recovery if every cleanup
+owner disappears. Pre-ready bootstrap windows, durable scratch recovery, exact
+ordinary/sealed/installed adoption and broader corpus/security/source/public
+packaging gates remain. Both owner reviews remain untouched. Official systemd
+[scope execution](https://github.com/systemd/systemd/blob/v257/man/systemd-run.xml),
+[scope deadlines](https://github.com/systemd/systemd/blob/v257/man/systemd.scope.xml)
+and [resource controls](https://github.com/systemd/systemd/blob/v257/man/systemd.resource-control.xml)
+describe the underlying platform; the actual checks above establish this MX evidence.
+
 ## Opt-in Linux process converter — October 17
 
 The runtime implementation in `packages/runtime/src/office-process-*` is an

@@ -226,9 +226,9 @@ if(process.env.AUGMENTOR_HARNESS_PROOF_MEMORY_START_DELAY){
  const executable=join(root,'authored-python');writeFileSync(executable,'#!/usr/bin/python3\nimport os,sys,time\nif any(arg.endswith("/services/memory/service.py") for arg in sys.argv[1:]):time.sleep('+String(value/1000)+')\nreal='+JSON.stringify(process.env.AUGMENTOR_PYTHON??'/usr/bin/python3')+'\nos.execv(real,[real,*sys.argv[1:]])\n',{mode:0o700});fixtureEnv.AUGMENTOR_PYTHON=executable;
 }
 if(process.env.AUGMENTOR_HARNESS_PROOF_NATIVE_OFFICE==='1')fixtureEnv.AUGMENTOR_OFFICE_BACKEND='linux-native';
-if(process.env.AUGMENTOR_HARNESS_PROOF_PROCESS_OFFICE==='1'){
+if(['1','managed'].includes(process.env.AUGMENTOR_HARNESS_PROOF_PROCESS_OFFICE)){
  if(process.env.AUGMENTOR_HARNESS_PROOF_NATIVE_OFFICE==='1')throw Error('Conflicting Office proof backends.');
- fixtureEnv.AUGMENTOR_OFFICE_BACKEND='linux-process-wasm';
+ fixtureEnv.AUGMENTOR_OFFICE_BACKEND=process.env.AUGMENTOR_HARNESS_PROOF_PROCESS_OFFICE==='managed'?'linux-managed-wasm':'linux-process-wasm';
 }
 if(process.env.AUGMENTOR_HARNESS_PROOF_NESTED_TOOLS==='1'){
  const extension=join(root,'nested-tools.mjs'),resourcePath=join(config,'resources.json');

@@ -18,6 +18,7 @@ import resource
 import select
 import signal
 import stat
+import subprocess
 import sys
 import time
 
@@ -138,6 +139,51 @@ def child_environment():
     return result
 
 
+def managed_scope(unit, timeout_ms):
+    """Refuse admission unless this exact scope has effective kernel controls.
+
+    The manager supplies an external runtime deadline even if all owned actors
+    are stopped. This does not isolate the user's filesystem or network.
+    """
+    if re.fullmatch(r'augmentor-office-[a-f0-9]{32}\.scope', unit) is None:
+        raise ValueError('Invalid Office scope identity')
+    membership = Path('/proc/self/cgroup').read_text().strip()
+    if not membership.startswith('0::/') or '\n' in membership:
+        raise ValueError('Office requires unified cgroup ownership')
+    relative = Path(membership[3:])
+    if relative.name != unit or '..' in relative.parts:
+        raise ValueError('Office scope ownership does not match')
+    group = Path('/sys/fs/cgroup') / str(relative).lstrip('/')
+    values = {name: (group / name).read_text().strip() for name in
+              ['memory.max', 'memory.swap.max', 'memory.oom.group', 'pids.max', 'cpu.max']}
+    quota, period = values['cpu.max'].split()
+    if not 1 <= int(values['memory.max']) <= 3*1024**3 or values['memory.swap.max'] != '0' or values['memory.oom.group'] != '1' or not 1 <= int(values['pids.max']) <= 128 or not 1 <= int(quota) <= int(period):
+        raise ValueError('Office kernel resource controls are unavailable')
+    env = {'PATH': '/usr/bin:/bin', 'XDG_RUNTIME_DIR': '/run/user/'+str(os.getuid()),
+           'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/'+str(os.getuid())+'/bus'}
+    result = subprocess.run(['/usr/bin/systemctl', '--user', 'show', unit,
+                             '--property=RuntimeMaxUSec', '--property=TimeoutStopUSec',
+                             '--property=KillMode', '--property=SendSIGKILL', '--property=OOMPolicy',
+                             '--property=ControlGroup'], capture_output=True, timeout=5, env=env)
+    if result.returncode != 0 or len(result.stdout) > 4096 or len(result.stderr) > 4096:
+        raise ValueError('Office manager deadline could not be confirmed')
+    properties = dict(line.split('=', 1) for line in result.stdout.decode().splitlines())
+    if properties.get('ControlGroup') != str(relative) or properties.get('KillMode') != 'control-group' or properties.get('SendSIGKILL') != 'yes' or properties.get('OOMPolicy') != 'kill':
+        raise ValueError('Office scope termination policy does not match')
+    # Raw D-Bus microseconds avoid parsing systemctl's human duration strings.
+    object_path = '/org/freedesktop/systemd1/unit/' + unit.replace('-', '_2d').replace('.', '_2e')
+    for name, maximum in [('RuntimeMaxUSec', (timeout_ms+2000)*1000), ('TimeoutStopUSec', 2000000)]:
+        result = subprocess.run(['/usr/bin/busctl', '--user', '--timeout=2', '--json=short',
+                                 'get-property', 'org.freedesktop.systemd1', object_path,
+                                 'org.freedesktop.systemd1.Scope', name],
+                                capture_output=True, timeout=3, env=env)
+        if result.returncode != 0 or len(result.stdout) > 4096 or len(result.stderr) > 4096:
+            raise ValueError('Office scope deadline could not be confirmed')
+        receipt = decode(result.stdout)
+        if not isinstance(receipt, dict) or receipt.get('type') != 't' or type(receipt.get('data')) is not int or not 1 <= receipt['data'] <= maximum:
+            raise ValueError('Office scope deadline exceeds its bound')
+
+
 def run():
     owner, root, dev, ino, node, worker = int(sys.argv[1]), Path(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4]), sys.argv[5], sys.argv[6]
     OWN.parent_death(owner, signal.SIGKILL)
@@ -152,6 +198,8 @@ def run():
     reaped = False
     try:
         packet = read_request(owner_fd)
+        if len(sys.argv) == 8:
+            managed_scope(sys.argv[7], packet['options'].get('timeoutMs', 60000))
         publication = os.fstat(4)
         if not stat.S_ISREG(publication.st_mode) or publication.st_uid != os.getuid() or stat.S_IMODE(publication.st_mode) != 0o600 or publication.st_size != 0 or (str(publication.st_dev), str(publication.st_ino)) != (packet['request']['publication']['dev'], packet['request']['publication']['ino']):
             raise ValueError('Unowned Office publication descriptor')
@@ -281,7 +329,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, interrupted)
     signal.signal(signal.SIGINT, interrupted)
     try:
-        if len(sys.argv) != 7:
+        if len(sys.argv) not in (7, 8):
             raise ValueError('Invalid Office supervisor arguments')
         reply = run()
     except TimeoutError:

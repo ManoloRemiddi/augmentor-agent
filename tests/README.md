@@ -2147,6 +2147,16 @@ Original PDF preview: `harness-pdf-chromium.test.mjs` uses authored PDF/JPX byte
 
 ## Original Office preview qualification
 
+`AUGMENTOR_MANAGED_OFFICE_TEST=1 node --test --test-concurrency=1 tests/office-process-managed.test.mjs tests/harness-office-managed-chromium.test.mjs`
+requires a real MX systemd user manager/cgroup v2; absent explicit opt-in, these
+six resource/lifecycle cases and one original-GUI case skip. An opted-in missing
+manager fails. These cover kernel limits independently read by Node, wrong/weaker
+scope refusal before actor work, frozen supervisor/renderer and frozen actual
+owner deadlines, a lower-cap authored whole-group OOM, actual Wasm active/queued
+disposal and recovery, and the original viewer assertions/deadlines. The OOM
+control uses 64 MiB; normal conversion uses the fixed 3 GiB production candidate
+cap. [Requirements, actual scope and remaining gates](../docs/HARNESS-OFFICE-PREVIEWS.md#mx-managed-office-resource-limits--october-17).
+
 The opt-in Linux x64 process backend is checked by
 `node --test tests/office-process-linux.test.mjs` after `npm run build`:
 ten bounded protocol/file, actual supervisor, stopped/dead owner/actor, deadline,

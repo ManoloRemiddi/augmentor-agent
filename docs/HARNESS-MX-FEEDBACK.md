@@ -28,9 +28,9 @@ Hosted `97d95d58` Linux SDK and root (2,106 pass/44 skip), Browser (128 pass),
 native (1,072 run/45 skip) and desktop checks pass. Debian validation terminates
 at the existing public Office source/rebuild packaging refusal. The SDK matrix
 has a macOS failure, outside this MX scope; no whole-CI pass is claimed.
-The [Office process-seat experiment](HARNESS-OFFICE-PREVIEWS.md#retained-memory-and-process-boundary-prototype--october-17)
-is unselected and leaves this working app/engine unchanged. Redistribution and owner pilot
-feedback still gates further migration. Voice and later-platform rollout remain
+The [managed Office resource candidate](HARNESS-OFFICE-PREVIEWS.md#mx-managed-office-resource-limits--october-17)
+is uninstalled and leaves this working app/engine unchanged. Public redistribution
+gates remain separate; owner pilot feedback gates further migration. Voice and later-platform rollout remain
 deferred. The existing main/pilot menu entries are ready for continued testing.
 
 ## Earlier MX queue-control checkpoint — October 17

@@ -4,6 +4,8 @@
 
 [Opt-in Linux Office process converter](HARNESS-OFFICE-PREVIEWS.md#opt-in-linux-process-converter--october-17) · bounded runtime protocol, kernel death/deadline supervision, owned publication, original GUI and twenty contained cases; package/adoption and resource/source gates remain.
 
+[MX managed Office limits](HARNESS-OFFICE-PREVIEWS.md#mx-managed-office-resource-limits--october-17) · real user scopes, verified kernel memory/task/CPU limits and external frozen-owner deadlines; opt-in source only, with durable recovery and package/adoption gates remaining.
+
 [Office retained memory/process prototype](HARNESS-OFFICE-PREVIEWS.md#retained-memory-and-process-boundary-prototype--october-17) · measured process-exit reclamation and twenty real-provider cases below the existing memory cap; production integration/fault/source gates remain.
 
 [Office boundary/resource diagnostic](HARNESS-OFFICE-PREVIEWS.md#contained-external-resources-and-memory-refusal--october-17) · ten current-engine cases, calibrated external-file/network controls and bounded cancellation/recovery; preceding same-process Thin OOM remains recorded.

@@ -13,6 +13,7 @@ import {OfficeToPdfError} from '../vendor/dsh-office/errors.js';
 import {createLinuxOfficeScratch,type LinuxOfficeScratch} from './office-scratch-linux.js';
 import {OFFICE_PROCESS_SCHEMA,OFFICE_PROCESS_REQUEST_BYTES,OFFICE_PROCESS_REPLY_BYTES,processObject,processOptions,processRequest,processReply,type ProcessReply} from './office-process-protocol.js';
 import {processFileReceipt} from './office-process-files.js';
+import {officeProcessScope} from './office-process-scope.js';
 
 interface Root {scratch:LinuxOfficeScratch;stop:AbortController;operations:Set<Promise<unknown>>;closing:boolean;release?:Promise<void>;}
 const helper=fileURLToPath(new URL('./office-process-linux.py',import.meta.url));
@@ -23,6 +24,15 @@ const unavailable=()=>new OfficeToPdfError('unavailable','Office process ownersh
  * remain intact. Kernel parent-death hooks and a separate scratch owner supervise
  * admitted work; this is process supervision, not an OS filesystem sandbox. */
 export async function createLinuxProcessOfficeConverter(options:ConverterOptions={}):Promise<OfficeConverter>{
+ return processConverter(options,false);
+}
+
+/** Explicit systemd-user/cgroup-v2 candidate; failure never selects an unbounded seat. */
+export async function createLinuxManagedOfficeConverter(options:ConverterOptions={}):Promise<OfficeConverter>{
+ return processConverter(options,true);
+}
+
+async function processConverter(options:ConverterOptions,managed:boolean):Promise<OfficeConverter>{
  if(process.platform!=='linux'||process.arch!=='x64')throw unavailable();
  const fontDirectories=options.fontDirectories??[...new Set([...(process.env.XDG_DATA_DIRS??'/usr/local/share:/usr/share').split(':').filter(Boolean).map(p=>join(p,'fonts')),join(homedir(),'.fonts'),join(process.env.XDG_DATA_HOME??join(homedir(),'.local/share'),'fonts')])];
  const resolved=processOptions({...options,fontDirectories});
@@ -45,9 +55,11 @@ export async function createLinuxProcessOfficeConverter(options:ConverterOptions
    const published=await publication.stat({bigint:true});publicationIdentity={dev:published.dev,ino:published.ino};
    const packet=processRequest({schema:OFFICE_PROCESS_SCHEMA,request:{extension:basename(request.inputPath).slice(7),input,publication:{dev:String(published.dev),ino:String(published.ino)}},options:resolved});
    const bytes=Buffer.from(JSON.stringify(packet)+'\n');if(bytes.length>OFFICE_PROCESS_REQUEST_BYTES)throw unavailable();
+   const scope=managed?await officeProcessScope(resolved.timeoutMs!):undefined;
    upstream.throwIfAborted();
    const reply=await new Promise<ProcessReply>((resolve,reject)=>{
-    const child=spawn('/usr/bin/python3',['-I','-B',helper,String(process.pid),root.scratch.directory,String(initial.dev),String(initial.ino),process.execPath,worker],{detached:true,env:{PATH:'/usr/bin:/bin',HOME:homedir(),LANG:process.env.LANG??'C.UTF-8',LC_ALL:process.env.LC_ALL??'C.UTF-8',TZ:process.env.TZ??'UTC'},stdio:['pipe','pipe','pipe',directory!.fd,publication!.fd]});
+    const args=['-I','-B',helper,String(process.pid),root.scratch.directory,String(initial.dev),String(initial.ino),process.execPath,worker,...(scope?[scope.unit]:[])];
+    const child=spawn(scope?.executable??'/usr/bin/python3',scope?[...scope.args,'/usr/bin/python3',...args]:args,{detached:true,env:{PATH:'/usr/bin:/bin',HOME:homedir(),LANG:process.env.LANG??'C.UTF-8',LC_ALL:process.env.LC_ALL??'C.UTF-8',TZ:process.env.TZ??'UTC',...scope?.env},stdio:['pipe','pipe','pipe',directory!.fd,publication!.fd]});
     let frame=Buffer.alloc(0),total=0,stderr=0,ready=false,terminal:ProcessReply|undefined,failure:unknown,timer:NodeJS.Timeout|undefined;
     const stop=()=>{if(timer||child.exitCode!==null||child.signalCode!==null)return;child.kill('SIGTERM');timer=setTimeout(()=>child.kill('SIGKILL'),2000);timer.unref();};
     const fail=(cause:unknown)=>{failure??=cause;stop();};
