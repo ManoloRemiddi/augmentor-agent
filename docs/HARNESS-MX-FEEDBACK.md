@@ -1,14 +1,26 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) now refuses an inactive
-local profile before prompt dispatch instead of trusting credential availability.
-The actual Qwen endpoint accepted an invented model name in the baseline probe;
-source now verifies advertised IDs per step and reported response IDs. The original
-GUI, SDK, Host, improvement and desktop checks pass; full source **576 Node /
-92 Python**, 74 files/nineteen Chromium/26 GUI cases, two workers/no skips.
-A bounded actual-Qwen probe confirms inactive-alias zero POSTs and matching-alias
-success. GPU/model settings and running reviews remain unchanged; package/adoption
-status is recorded separately. [Qualification](../release/harness-local-model-route-qualification-20261017.json).
+local profile before prompt dispatch and checks reported response IDs before SDK
+tool normalization. Source, fresh ordinary and exact sealed each pass **576 Node /
+92 Python** (74 files/nineteen Chromium/26 GUI cases), two workers/no skips;
+1,120 compiled files match, eight public-codec/native proof groups and the same
+five frozen historical preparations pass. A bounded actual-Qwen source probe
+confirms inactive-alias zero POSTs and matching raw response IDs.
+
+Both actual **main and pilot reviews now run e37d79b6 /
+20261017-055628-b9afa698** after verified pre-shutdown/shared SQLite/full cold
+backups (**416 files**) and guarded installed-opener startup. All four conversations,
+36 original authoritative prefixes, twelve prompts and nineteen captured memory
+records remain; only typed MCP close/new-connection metadata appends. Both actual
+Plugins pages expose On/Off and usable overview switches with zero console/HTTP
+errors. Original menu locations and all existing owned asset bytes verify after
+a caught registration-namespace correction; registry revision ten. All **24,686
+sealed inputs**, Qwen settings/PID and other GPU/voice states remain exact.
+No owner model request, additional migration, production update or public binary.
+[Code/package evidence](../release/harness-local-model-route-qualification-20261017.json),
+[actual review adoption](../release/harness-local-model-route-owner-review-20261017.json).
+Owner pilot feedback still gates wider migration; voice/later OS remain deferred.
 
 [Live recovered-history continuation](HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17)
 passes on exact sealed **20261017-045822-6b886151 / d157ffe1** with the actual

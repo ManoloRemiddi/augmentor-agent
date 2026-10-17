@@ -78,14 +78,29 @@ and forbids desktop work. These preliminary failures remain recorded separately.
 A fresh ordinary package independently passes the same **576 Node / 92 Python**
 cohort, all **1,120 compiled files**, eight shipped-code public-codec/native proof
 groups and the same five frozen historical preparations (42 parents, 35 archived
-children, 28 images). Its 23,555 unchanged baseline inputs verify. Exact sealed
-qualification remains a separate gate.
+children, 28 images). Its 23,555 unchanged baseline inputs verify. The exact separately sealed candidate independently passes
+that same cohort and both shipped-code/frozen-input checks; all **24,686 sealed
+inputs** verify after qualification and subsequent running-review checks.
 
 Package/owner adoption status and exact tested input hashes are in the
 [qualification record](../release/harness-local-model-route-qualification-20261017.json).
-The running reviews remain on their existing artifact until guarded adoption;
-this source correction does not update them or move any additional real project.
-MX Linux is the qualified target. Shared Node code uses public SDK APIs; later
-platform artifacts, virtual routes, every external provider and physical owner
-acceptance remain separate. The owner pilot-feedback gate still applies to
-wider DSH migration.
+Both actual review profiles now run **e37d79b6 / 20261017-055628-b9afa698**,
+artifact `6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477`.
+Guarded shutdown and the installed opener preserve four conversations and all
+36 authoritative file prefixes after verified shared SQLite and full cold
+backups (416 regular files). Only typed MCP connection metadata is appended;
+no old agent work is replayed. The actual original Plugins page passes read-only
+On/Off/switch checks in both owners with zero browser errors. Twelve prompts,
+nineteen captured memory records and all shared eligibility/job/settings rows
+remain exact. See [actual adoption](../release/harness-local-model-route-owner-review-20261017.json)
+for the caught menu-namespace correction, exact preservation and remaining scope.
+
+Open the current build with the existing **Augmentor Harness (MX)** menu entry
+or `augmentor-harness-review open main`; use `open pilot` for the migration pilot.
+Old browser links expire with their old process. Production Desktop selection
+and the earlier Preview entry remain unchanged. No additional real project is
+moved. MX Linux is the qualified target. Shared Node code uses public SDK APIs;
+later platform artifacts, virtual routes, every external provider and physical
+owner acceptance remain separate. The owner pilot-feedback gate still applies
+to wider DSH migration. Connected-tools detail-panel visual polish is separate
+from the working overview controls; voice remains deferred.

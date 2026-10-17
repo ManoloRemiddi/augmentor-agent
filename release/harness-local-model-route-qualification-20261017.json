@@ -161,9 +161,32 @@
     "First live driver expected normalized responseModel on a matching response; corrected proof checks raw stream model IDs"
   ],
   "exactSealed": {
-    "status": "Pending separate immutable staging and exact sealed qualification"
+    "applicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+    "releaseId": "20261017-055628-b9afa698",
+    "artifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+    "inventoryEntriesVerified": 24686,
+    "compiledFilesVerified": 1120,
+    "nodePass": 576,
+    "pythonPass": 92,
+    "nodeFiles": 74,
+    "chromiumFiles": 19,
+    "chromiumCases": 26,
+    "workers": 2,
+    "selectedConfigurationsUnchanged": true,
+    "ownerImports": 0,
+    "scope": "Qualified while separately staged and unselected; subsequent review adoption is recorded separately"
   },
-  "preservation": {
+  "limits": [
+    "API advertised/reported IDs do not attest model weights or make server switching atomic",
+    "Absent response ID provides metadata verification only",
+    "This source live proof is separate from the previous d157 full-answer recovered-history live proof",
+    "Later platform artifacts, virtual routes and every provider remain unqualified",
+    "Both review profiles subsequently adopt this exact build through backed-up guarded reopening; pilot feedback remains required before further real project migration; production Desktop, voice and later OS rollout remain unchanged"
+  ],
+  "applicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+  "releaseId": "20261017-055628-b9afa698",
+  "artifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+  "preservationBeforeOwnerAdoption": {
     "scope": "Read-only IPC peer/build, actual sealed owner files, complete protected regular path sets and contents, registry and selections; no owner restart, update, import or model work",
     "reviews": [
       {
@@ -190,11 +213,17 @@
     "ownerRestarts": 0,
     "candidateActivated": false
   },
-  "limits": [
-    "API advertised/reported IDs do not attest model weights or make server switching atomic",
-    "Absent response ID provides metadata verification only",
-    "This source live proof is separate from the previous d157 full-answer recovered-history live proof",
-    "Later platform artifacts, virtual routes and every provider remain unqualified",
-    "Owner reviews remain unchanged; pilot feedback remains required before further real project migration; voice deferred"
-  ]
+  "savedModelServicesPreservation": {
+    "scope": "Read-only saved model configuration/unit and actual service PID comparison",
+    "qwenSavedUnitUnchanged": true,
+    "qwenRestoredPidStillExact": true,
+    "otherGpuAndVoiceServicePidsAndStatesUnchanged": true,
+    "ownerModelConfigurationUnchanged": true
+  },
+  "ownerReviewAdoption": "harness-local-model-route-owner-review-20261017.json",
+  "publicationChecks": {
+    "privateBoundaryLicenceAndNoticeCasesPassed": 16,
+    "privateSourceIdentitiesChecked": 77,
+    "privateSourceIdentityMatches": 0
+  }
 }

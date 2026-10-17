@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) · selected versus advertised/reported IDs, authenticated bounded verification, original GUI errors and package/adoption scope.
+[Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) · selected versus advertised/reported IDs, authenticated bounded verification, original GUI errors, exact package qualification and actual MX review adoption.
 
 [Live recovered-history continuation](HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17) · actual Qwen, original GUI Send/Allow once, cold recall, owned file round trip and preserved owner profiles.
 
