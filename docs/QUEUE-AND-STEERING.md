@@ -1,5 +1,50 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Live Pi running-tool Stop and cold inspection — October 17
+
+On the existing sealed MX application **ee80c054 / 20261017-071945-90183f89**,
+actual local Qwen and the original GUI now qualify Stop while a native `bash`
+tool is executing. A fresh authored temporary project contains one journal.
+Its exact command appends a start line, sleeps 30 seconds, then would append a
+completion line. A test-only public SDK resource permits only that command and
+reads of the journal; this is not the default product OS sandbox. The isolated
+profile uses Full access; owner presets and model/GPU settings stay unchanged.
+
+Both the owned shell and its sleep child are identified while executing. One
+original GUI Stop settles the turn in **176 ms** in this sample; both exact
+process identities become terminal. The first journal line remains and the
+completion line is absent. Native history retains **Command aborted**, an error
+tool result and an aborted assistant. Execution records conservatively retain
+`effect: unknown / status: unknown`; cancellation proves neither rollback nor
+that no partial effect occurred.
+
+A second authored input is queued before Stop. Its identity stays paused through
+cold original-GUI reopen, with exact saved native/display/journal bytes and no
+new provider request. A deliberate **Resume waiting messages** delivers it once.
+Qwen reads the partial journal once and returns the requested inspection marker;
+no command is rerun. Three hash-verified captured requests show the interruption
+note absent initially and present before/after the resumed read, alongside the
+saved aborted command result. Four page mutations are observed: two Send/Queue,
+one Stop and one Resume; there are zero browser, HTTP or runtime errors.
+
+The runtime/queue check passes, but **the final model explanation is not fully
+accurate**: it says the sleep did not run, whereas the captured child process
+proves that it started and was interrupted. The journal alone cannot establish
+subcommand execution. The original answer is retained without another model call
+to polish it; model prose is not process evidence. This case qualifies one
+controlled native shell tree, not every program, external action or MCP service.
+
+Both test Hosts and browsers shut down; one exactly scoped companion is retired
+through its verified PID handle, with no matching actors remaining. Read-only
+postflight verifies both owner PIDs/all 36 protected file sets, shared settings/
+rows, registry fourteen, menus/selections, both seals and GPU/voice state. No
+owner request, additional migration, app update or runtime/GUI changes occur.
+[Aggregate evidence and limits](../release/harness-running-tool-stop-qualification-20261017.json)
+separate this live sample from the inherited source/ordinary/sealed suites.
+The documentation-only publication preserves the normal d531ba6c Linux CI run;
+new-head/whole-workflow acceptance, physical use and owner pilot feedback remain
+open. MX first; voice and other operating systems stay deferred.
+
 # Queued prompts and steering
 
 ## DSH

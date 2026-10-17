@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live running-tool Stop](QUEUE-AND-STEERING.md#live-pi-running-tool-stop-and-cold-inspection--october-17) · actual shell cancellation, partial effects, cold paused queue and explicit read-only continuation; runtime evidence versus model wording.
+
 [Linux CI qualification](../tests/README.md#linux-harness-ci-prerequisites-and-driver-qualification--october-17) · declared migration/launcher prerequisites, actual plugin navigation, safe input readiness and provider metadata; local versus hosted scope.
 
 [Live Wiki ingest](HARNESS-PLUGIN-PARITY.md#live-original-wiki-ingest-and-explicit-fallback--october-17) · actual GUI/Qwen/Allow once, two linked pages and bookkeeping, explicit refused-edit fallback, cold inspection and owner-vault preservation.

@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live running-tool Stop](QUEUE-AND-STEERING.md#live-pi-running-tool-stop-and-cold-inspection--october-17)
+now qualifies actual sealed ee80c054/original GUI/Qwen during a controlled native
+bash command: shell/sleep terminal after Stop, partial write preserved, native
+abort and unknown action status retained. Cold reopen leaves the queued input
+paused with exact history/journal and no inference; explicit Resume reads once,
+without bash replay. Two inputs/three captured requests/four page mutations,
+zero browser/HTTP/runtime errors. The final model prose incorrectly says sleep
+never ran; retained process evidence proves interruption after startup, so full
+semantic accuracy is not claimed. Both owner reviews/all 36 protected sets,
+shared state, seals and GPU/voice settings remain unchanged. One scoped test
+companion is retired. [Evidence](../release/harness-running-tool-stop-qualification-20261017.json).
+Docs/JSON only; normal d531ba6c CI continues, no new-head/full-workflow acceptance.
+
 [Linux CI correction](../tests/README.md#linux-harness-ci-prerequisites-and-driver-qualification--october-17)
 responds to the terminal d8f95b52 Debian failure (64 failures, 14 files): declare
 zstd/desktop-file-utils, fix MCP replacement-control readiness, target the actual
