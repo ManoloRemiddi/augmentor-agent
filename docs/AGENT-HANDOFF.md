@@ -1,16 +1,31 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Sealed legacy export](HARNESS-SHARED-PROFILES.md#sealed-export-candidate-and-deployment-boundary--october-17)
+qualifies unselected **aaf7af4c / 20261017-140650-7496bf2d**, artifact abba662e…d36ce,
+24,755 inputs/1,143 compiled. Source/ordinary/sealed 27 each; ordinary packaging 41,
+sealed Python 61 and seven overlapping declared-interpreter export cases pass.
+All owner state/selections/services remain exact; installed reviews still 97d95d58.
+Actual old packaged Browser 0.2.11 handshake is refused by sealed 0.2.13; matching
+handshake succeeds, no network/model/service call. Actual loaded-owner extension
+identity remains unknown. Existing Linux Desktop inherits shared env; all Native,
+Browser and review entrypoints still need explicit managed paired launch binding.
+Do not execute the source-only Browser registrar inside a sealed artifact.
+New-code normal CI 39031629464 uses branch dispatch, preserving prior live PR CI
+39030296212; no whole-suite pass or installed promotion. Fresh cold backups,
+actual export/adoption/busy veto/rollback and pilot feedback gates remain.
+[Record](../release/harness-legacy-shared-export-package-20261017.json).
+
 [Cold legacy shared export](HARNESS-SHARED-PROFILES.md#dedicated-legacy-store-preparation--october-17)
 adds inspect-legacy/export-legacy for known prompt/memory DBs and engine JSON
 from a stopped mixed app root into a new absent dedicated root. Source stays
 exact; no launcher/service/model work. Under-lease absent-destination enforcement,
 source-change/journal/schema/link/owner refusal and existing fenced recovery pass.
-Source/ordinary 27 each plus Python20; authored populated-cache Native recall,
+Source/ordinary 27 each plus Python 20; authored populated-cache Native recall,
 503 search outage and restart preserve identities/jobs/charges. Ordinary copy is
 unsealed/unselected (1,143 compiled/23,595 unchanged base inputs), not installed.
-No real store export, owner update or further transfer. Next qualify a sealed
-matched artifact and guarded cold cutover/rollback; prior online clones are not
-adoptable. [Record](../release/harness-legacy-shared-export-20261017.json).
+No real store export, owner update or further transfer. The sealed follow-up
+above supersedes this source-only package gap; guarded cold cutover/rollback
+remains, and prior online clones are not adoptable. [Record](../release/harness-legacy-shared-export-20261017.json).
 
 [Current MX readiness / Agent alignment](HARNESS-MX-READINESS.md) retains all P0/P1
 requirements and ten scenarios. Installed main/pilot stay 97d95d58. Actual Native,

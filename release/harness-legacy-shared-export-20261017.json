@@ -150,5 +150,6 @@
     "Inspect the same live preceding CI; new runtime source still needs its own normal CI qualification",
     "Owner pilot feedback before further project transfers; explicit exclusions remain in DSH",
     "Public distribution and complete accepted parity remain open; voice and later platforms deferred"
-  ]
+  ],
+  "followUpPackageQualification": "harness-legacy-shared-export-package-20261017.json"
 }

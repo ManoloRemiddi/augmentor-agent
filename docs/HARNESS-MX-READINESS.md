@@ -114,7 +114,10 @@ replacing application files, identities, engine settings or processing choices.
 Source/ordinary authored qualification covers exact export, races, interrupted
 publication and populated-cache Native recall through search outage/restart.
 It has not exported the real Agent store, changed launchers or updated the
-installed reviews. The unsealed ordinary assembly is not deployment evidence.
+installed reviews. The [sealed aaf7af4c candidate](HARNESS-SHARED-PROFILES.md#sealed-export-candidate-and-deployment-boundary--october-17)
+now passes the same 27 Node/61 Python plus seven overlapping declared-interpreter
+export cases. It is unselected; explicit Native/Browser/review launch binding,
+fresh full cold backups and actual deployment/rollback remain.
 
 ## Actual writing clients: isolated qualification
 
@@ -130,7 +133,7 @@ the repository. No owner window, profile or model is used.
 | Exact installed MX artifact | The same two checks pass against 97d95d58, including its Browser and companions. | Isolated execution of sealed files; selected/running owner reviews are unchanged. |
 | Actual older Native artifact with matched MX Browser/Harness/companions | Its real editor passes the same three-surface writing and managed-restart sequence. | A prestarted current companion is required. Warm compatibility does not qualify its own helper. |
 | Older Native cold auto-start | Traced actual client starts its own older helper; another current helper can own the same authored data through a different socket. | Explicit negative control: **unsafe for shared-store adoption**. Current cold startup refuses that duplicate. Both controls observe the local connection and zero IP network syscalls. |
-| Browser extension shipped beside that older Native artifact | The real extension stays at Connecting; its Prompt Library does not mount, including after supported Pi selection. | Unresolved compatibility failure. This is that artifact's extension, not proof of which extension the owner has loaded. No version/manifest is spoofed. |
+| Browser extension shipped beside that older Native artifact | The real extension stays at Connecting; its Prompt Library does not mount, including after supported Pi selection. | Its 0.2.11 manifest version is refused by the actual sealed 0.2.13 host; the matched handshake succeeds. Other behavior and the owner's loaded-extension identity remain unqualified. No version/manifest is spoofed. |
 
 The fixtures use real inactive Native task dispatch, without starting chat
 monitoring or voice. Browser controls bring their actual page to the foreground

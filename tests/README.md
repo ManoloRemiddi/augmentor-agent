@@ -2501,3 +2501,13 @@ The shared fixture uses the actual companion entrypoint's private 0077 file poli
 Source and separate ordinary assembly each pass27/no skips; Python lease3 and
 Hindsight17 pass. No sealed/installed/physical or other-platform adoption claim.
 [Contract and remaining cutover](../docs/HARNESS-SHARED-PROFILES.md#dedicated-legacy-store-preparation--october-17).
+
+
+The export focus also passes against exact sealed unselected aaf7af4c release
+20261017-140650-7496bf2d: 27 Node, 61 Python (41 packaging/3 lease/17 Hindsight),
+and 7 overlapping export cases with its declared interpreter. All 24,755 inputs
+and 1,143 compiled files remain exact. External authored fixtures/screenshots do
+not modify the artifact. A separate handshake-only control sends the actual old
+packaged extension's 0.2.11 version to the sealed 0.2.13 host: refused before service/
+harness work; matching 0.2.13 accepted, zero network connects. The owner loaded
+extension remains unidentified. [Package scope and remaining launch mapping](../docs/HARNESS-SHARED-PROFILES.md#sealed-export-candidate-and-deployment-boundary--october-17).

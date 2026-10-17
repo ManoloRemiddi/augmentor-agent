@@ -1,5 +1,49 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Sealed export candidate and deployment boundary — October 17
+
+The cold export now passes against exact separately sealed **aaf7af4c** release
+**20261017-140650-7496bf2d**, artifact
+**abba662e06ec8c711d89605fa969f39c9318f088436123ea6163729faecd36ce**.
+All **24,755 inventory entries / 1,143 compiled files** verify before/after tests.
+It is **unselected**; both installed MX reviews stay 97d95d58, with the same
+prompts, memory, native histories and original Office default.
+[Package evidence](../release/harness-legacy-shared-export-package-20261017.json).
+
+The same six-file focus passes **27 Node checks** in source, ordinary and this
+exact artifact. Ordinary packaging passes 41; sealed packaging/shared checks
+pass **61 Python** (41 packaging, three leases, seventeen Hindsight). Its declared
+interpreter separately passes all **seven export cases**; those overlap the
+27-case cohort, rather than adding another feature count. Tests/fixtures and
+screenshots stay outside the immutable artifact. No real export, model request,
+owner update or extra project transfer occurs. All 36 protected file sets,
+selected launchers/registry, prior seals, shared settings and GPU/voice services
+remain exact. The prior optional Office candidate remains separately retained.
+
+A direct handshake control also explains a sufficient blocker in the older
+packaged Browser extension: it sends its own **0.2.11** manifest version, which
+the actual **0.2.13** sealed Native Messaging host refuses before any harness or
+shared-service call. The matched 0.2.13 handshake succeeds. Both controls observe
+zero IP networking/companion connections; no version or manifest is spoofed.
+This does not identify the owner's currently loaded extension or qualify every
+older-extension behavior. Deploy/reload the matching extension and host together.
+
+The remaining launch mapping is concrete: Linux `desktop-launch.py` inherits
+shared-state/data environment variables, but does not currently read a persisted
+shared pair from `desktop.json`. A primary-service-only environment change would
+not configure secondary/menu or Browser entrypoints. The existing source
+`install-browser-host.py` writes a fixed-root launcher beside itself and is a
+source/developer helper; **do not run it inside a sealed release**. Prepare and
+qualify explicit managed external launch/registration settings for Native,
+Browser and the review registry before real cutover, retaining original bindings
+for rollback. No existing launcher has been rewritten by this qualification.
+
+Normal source validation for aaf7af4c is dispatched once as run
+[39031629464](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39031629464).
+It tests new code, not an unchanged-source rerun. Its branch-dispatch concurrency
+ref differs from the still-running preceding PR run 39030296212, which is preserved.
+No whole-workflow pass or installed promotion is inferred from these focused checks.
+
 ## Dedicated legacy-store preparation — October 17
 
 The source now provides **`inspect-legacy` / `export-legacy`** in
