@@ -2,6 +2,10 @@
 
 # Linux DSH integration installation
 
+[Native settings recovery](HARNESS-NATIVE-SETTINGS.md) restores the existing public
+UI before a matching-client transition. It is source-qualified separately from the
+backup/probe controllers below; installed clients and owner data remain unchanged.
+
 ## Cold data archive and current-cut binding — October 17
 
 Source **a0f1f16dac3e493201867863382bdf38b2f6b5b3** adds internal

@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native settings public recovery](HARNESS-NATIVE-SETTINGS.md#public-provenance) records
+the exact public body, recipe, registry, usage and identity selections and separates
+independently authored current-host integration. No private baseline is published.
+
 Linux controlled DSH preflight uses the OS-provided Bubblewrap executable,
 locally qualified at **0.12.0** on MX with user/PID namespaces, `--info-fd`, pidfds
 and basic device mounts. It is a process-lifetime dependency, not bundled

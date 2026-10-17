@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Recovered existing Native settings](HARNESS-NATIVE-SETTINGS.md) restores the inline
+public interface and named-agent/model retention before shared-backend adoption.
+Local **134 Python / 20 Node**, type checks and actual preview light/dark visual
+inspection pass. Public historical body/recipe provenance is recorded; private
+baseline source is not copied. Current Handy/Quit/appearance/Pi inspector and
+maintenance/dirty-draft controls are preserved. No installed change, full app copy
+or new artifact. Matching activation/finalization/reverse and owner continuation
+remain. Hosted qualification is recorded separately.
+
 [Cold data archive and current-cut binding](HARNESS-DSH-INSTALLATION.md#cold-data-archive-and-current-cut-binding--october-17)
 adds **a0f1f16d**. Source **143 Python / four Node** pass, including ten archive cases.
 Real public-profile archive/offline restore and backend/Native-adapter checks pass

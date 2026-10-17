@@ -125,7 +125,7 @@ class DshClient:
         workspaces = self.call('workspace.list')
         saved = {s for w in workspaces.get('items', []) for s in w.get('sessionIds', [])}
         archived = set(workspaces.get('archivedSessionIds', []))
-        return [dict({k:row.get(k) for k in ('sessionId','cwd','agentPreset','updatedAt','running','blank')},
+        return [dict({k:row.get(k) for k in ('sessionId','cwd','agentPreset','updatedAt','running','blank','origin')},
                      title=row.get('projections', {}).get('values', {}).get('title') or row['sessionId'],
                      saved=row['sessionId'] in saved, archived=row['sessionId'] in archived)
                 for row in sorted(sessions, key=lambda r: r.get('updatedAt', 0), reverse=True)]

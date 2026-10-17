@@ -16,6 +16,18 @@ def events():
 
 
 class DshBranchTests(unittest.TestCase):
+    def test_named_agent_branch_requires_both_registered_preset_and_folder(self):
+        params = {'sessionId':'source','newSessionId':'named-child','messageSeq':2,'mode':'reply'}
+        self.preset = 'synthetic-independent'
+        for presets, folder in [(('another-preset',), '/work'), ((self.preset,), '/elsewhere')]:
+            with self.assertRaises(BranchError):
+                branch(self.call, params, surface='linux', endpoint='http://127.0.0.1:3080',
+                       state=self.tmp.name, allowed_presets=presets, required_cwd=folder)
+        self.assertFalse(any(method in ('session.fork','session.create') for method, _ in self.calls))
+        result = branch(self.call, params, surface='linux', endpoint='http://127.0.0.1:3080',
+                        state=self.tmp.name, allowed_presets=(self.preset,), required_cwd='/work')
+        self.assertEqual(result['agentPreset'], self.preset)
+
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup)
         self.log=events();self.calls=[];self.running=False;self.preset='augmentor-linux';self.lose=False

@@ -9,6 +9,10 @@ from augmentor_linux.shortcuts import save_shortcut,COMPONENT
 
 class ShortcutTests(unittest.TestCase):
     def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        environment = patch.dict(os.environ, {'XDG_DATA_HOME': temporary.name})
+        environment.start(); self.addCleanup(environment.stop)
         # These tests exercise the KDE adapter even when run by the Mac matrix.
         platform = patch('augmentor_linux.shortcuts.sys.platform', 'linux')
         platform.start(); self.addCleanup(platform.stop)

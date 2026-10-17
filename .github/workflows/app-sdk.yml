@@ -62,6 +62,19 @@ jobs:
       - name: Prepare locked Linux profile-inspection dependencies
         if: runner.os == 'Linux'
         run: node -e "const cp=require('child_process');const r=cp.spawnSync('uv',['pip','install','--python',process.env.AUGMENTOR_PYTHON,'--require-hashes','--no-deps','--only-binary=:all:','-r','tests/fixtures/dsh-preservation-requirements.txt'],{stdio:'inherit'});process.exit(r.status??1);"
+      - name: Prepare locked Linux Native settings test dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes libopengl0
+          uv pip install --python "$AUGMENTOR_PYTHON" --require-hashes --no-deps --only-binary=:all: -r tests/fixtures/native-settings-linux-requirements.txt
+      - name: Verify recovered Native settings and current host behavior
+        if: runner.os == 'Linux'
+        env:
+          QT_QPA_PLATFORM: offscreen
+          PYTHONPATH: tests:apps/native
+        run: |
+          "$AUGMENTOR_PYTHON" -B -m unittest -v test_agent_settings test_agent_entries test_token_usage test_settings_host test_window test_ui_scale test_dsh_branch test_dsh_interactions test_shortcuts test_maintenance_reservations test_voice_settings test_dictation_settings
       - name: Prepare locked Windows companion test dependencies
         if: runner.os == 'Windows'
         run: >-

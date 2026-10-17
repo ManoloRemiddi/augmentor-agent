@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Recovered Native settings](../docs/HARNESS-NATIVE-SETTINGS.md#qualification-and-remaining-work--october-17-2026)
+records the 106-case Qt/Window/settings group, 28 Controller/remote cases and 20 Node
+usage/presentation/exact-fork/interaction cases. CI Linux SDK installs the same
+hash-locked Qt wheels and runs the Native group. Local tests use the managed
+workspace; GUI evidence is authored/offscreen, not installed owner acceptance.
+
 The [cold data archive](../docs/HARNESS-DSH-INSTALLATION.md#cold-data-archive-and-current-cut-binding--october-17)
 adds ten authored cases within **143 Python / four launcher Node** passes. Byte/mode,
 Unicode, hardlink/symlink and mixed-root coverage restore through GNU tar in a new
