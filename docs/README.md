@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Installed MX launch guards](HARNESS-CLIENT-PUBLICATION.md#installed-mx-launch-guards--october-18)
+now cover Native/Home/mobile/Browser helpers, preview and review opening, embedding
+and future DSH/one existing workspace service starts. **29 startup files / two
+preview files**, registry **20**, original entries/menus preserved. Six actual
+legacy compatibility and nine installed-command fence probes pass on authored
+isolated profiles. No app/service restart, build selection, migration, owner
+model call, full app copy or new release. Native/review PIDs, 36 protected files,
+shared rows/settings, selections and GPU/voice services verify unchanged.
+The current **28-root / three-pair** map passes live metadata bounds (~7.59 GiB);
+it is not a cold snapshot. Couple the Browser code-folder update/recovery to
+publication before the real cut; coordinate Chromium, quiesce all callers, capture
+once and verify ordinary continuation. [Record](../release/harness-bootstrap-preadoption-20261018.json).
+
+
 [Combined immutable MX qualification](HARNESS-CLIENT-PUBLICATION.md#combined-immutable-mx-qualification--october-18)
 now passes **411 Python / 66 Node in each ordinary and sealed tree**, plus **210
 core cases with the declared runtime**, six exact sealed SDK reopening cases and

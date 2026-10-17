@@ -43,7 +43,9 @@ The stable launcher requires the managed Desktop startup helpers. It holds the
 deployment reader before reading `desktop.json`, refuses pending maintenance and
 applies an explicit selected shared pair. Install Desktop helpers before Home;
 the normal startup renderer also publishes the current Home helper. This source
-change has authored gate/environment tests; installed Home adoption remains pending.
+change has authored gate/environment tests; its stable helper is now installed on
+MX without restarting the existing app or changing the selected release. Actual
+installed pending-fence probes pass; Home dashboard/NAS behavior is unchanged.
 See [the matching publication contract](HARNESS-CLIENT-PUBLICATION.md#registered-reviews-and-complete-launch-entrypoints--october-18).
 
 The stable launcher resolves `desktop.json` each time; it never hard-codes a

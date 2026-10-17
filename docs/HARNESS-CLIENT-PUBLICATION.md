@@ -296,3 +296,78 @@ verification, then one fresh three-pair cold archive and guarded publication.
 Actual ordinary reopen/owner continuation remain unperformed. Pilot feedback still
 gates more project transfers; VR-RasterStudio stays DSH. Voice expansion and later
 platforms remain deferred. [Portable qualification record](../release/harness-combined-client-package-20261018.json).
+
+
+## Installed MX launch guards — October 18
+
+The verified combined artifact now supplies the actual stable launch helpers,
+without selecting it or restarting any owner. The normal startup installer writes
+**29 files** (22 content changes), including Home, explicit legacy mobile/Browser
+aliases and existing-origin per-user native-host registrations. Preview receives
+the protected helper and opener. The review opener is installed with both original
+entry records, menu/icon bytes, session/provider paths and running artifacts exact.
+The registrar must use the existing menu's data home when updating an installed
+review; assuming the current process's default changes the recorded menu directory.
+An observed default-directory change was corrected through the owned registrar.
+No menu was removed; registry revision is now **20** (18 → 19 → 20). Future cold
+preparation must bind that current revision and hash, not a historical receipt.
+
+Two opt-in service overrides route the existing DSH web command and one registered
+DSH-consuming workspace command through the stable `desktop-dsh-launch.py` guard.
+Original argv tails, environment (including privacy preloads), cwd, service supplier
+files and running PIDs are verified exact. The user manager reloads configuration
+once; no service is restarted. This gates future starts for the complete consumer
+lifetime. Existing ungated processes must still be quiesced before a cold cut.
+The embedding service already follows its newly installed stable helper. The two
+old shared companions belong to the DSH service group; preserve their current data
+and verify the matching new owners after a controlled restart. Separate companion
+suppliers and GPU/model/speech configuration remain unchanged.
+
+Six read-only-host/network-isolated probes execute the original and managed
+mobile/Browser entrypoints against the actual selected legacy app **in place**,
+using only authored profiles; help/handshake compatibility and pending refusal
+pass. Nine additional probes execute the actual installed Native, mobile, Browser,
+Home, preview, review, DSH, workspace-consumer and embedding paths against authored
+pending markers. They refuse before app startup. The DSH wrapper intentionally
+uses its existing bounded private error rather than exposing command details.
+No real owner fence, stop, model request, full app copy or new artifact is involved.
+
+Private exact before-images and receipts are in persistent recovery storage.
+Four existing app/workspace/user-unit source directories were mode 0775 and failed
+the unchanged backup ownership check. Their original modes are recorded; only
+**group write** was removed (0755), retaining owner access and group read/execute.
+No other local account shared those directory groups. No data bytes changed.
+Do not weaken the archive's source-directory validation to bypass this prerequisite.
+
+The revised map covers **28 logical roots**, 23 additional roots, three guarded
+shared pairs and one explicit legacy partial source. Whole user-unit tree coverage
+preserves an existing unit symlink without dereferencing its private supplier.
+The live metadata scan fits the unchanged limits: **199,535 entries / ~7.59 GiB**,
+about 78 MB metadata allowance, no live special files. No file-content snapshot or
+large owner archive was made. A qualified clean-source controller outside the
+release store has 15 controlling code bodies matching the sealed supplier. This
+placement permits the named preview deployment metadata coverage while retaining
+the archiver's exclusion of its own program/source tree. Use the verified incoming
+renderer and immutable supplier; a live metadata map never authorizes a later cut.
+
+Final preservation verifies all Native/review PIDs and running builds, 36 protected
+review files, shared rows/engine settings, byte-identical build selectors, review
+menus/icons, six Native menu/shortcut actions and GPU/voice/unrelated services.
+The temporary workspace is empty; cleanup remains 79 copies / about 43.06 GiB,
+roughly 101 GiB free, with the latest two spare candidates retained.
+
+Browser code itself is still the existing **0.2.11**: a read-only plan maps its
+55 files to **67 files / 618,936 bytes** in the verified 0.2.13 supplier, with the
+same extension identity and permissions. These code files are payload, outside
+the bootstrap allowlist. Their exact forward/reverse recovery must be coupled to
+client publication before any real cut. Do not update the folder ad hoc, treat an
+on-disk manifest as loaded-version proof, or require another full app assembly for
+controller-only work. Current Chromium UI is unavailable to this session; owner
+shutdown/reload coordination is pending. It can remain open during preparation.
+
+Remaining: bind Browser code recovery; verify accepted work can be preserved and
+quiesce every current caller (including registered/embedded consumers and DSH-group
+companions); capture one fresh archive; prepare shared data before configuration;
+then publish/finalize, reopen ordinary clients and verify actual owner continuation.
+Further projects remain gated on pilot feedback; VR-RasterStudio stays DSH.
+[Portable record](../release/harness-bootstrap-preadoption-20261018.json).
