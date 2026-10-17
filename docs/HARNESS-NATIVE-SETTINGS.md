@@ -11,7 +11,7 @@ The panel retains identity/avatar and Agent Identity drafts, scoped memory,
 access revision checks, named DSH agents, shortcut rollback, model entry choices,
 Prompt Library, connection/setup, recorded token history, updates and support.
 Current host bindings retain Handy, shared appearance publication, normal Quit
-and the existing Pi Trajectory/Context inspector. Inspector availability follows
+and the existing Pi Trajectory/Context inspector, Reasoning and MCP controls. Inspector availability follows
 the current session/connection/capabilities. No new voice service or placement
 is introduced. Windows/macOS adapter code is retained, not newly qualified here.
 
@@ -42,7 +42,7 @@ into public source, tests or CI. The installed module was read only for comparis
 | `agent_settings.py`, `token_usage.py`, `services/usage/history.mjs` and their tests | [41e04412678f77e45c85f339161ba7572d6a843c](https://github.com/ManoloRemiddi/augmentor-agent/commit/41e04412678f77e45c85f339161ba7572d6a843c) | Existing settings body, layout, local token calendar/reader and regressions |
 | `scripts/stage-native-agents-overlay.py` | [98a961ae6cbad56358575e65f8f1b9668205fbc9](https://github.com/ManoloRemiddi/augmentor-agent/commit/98a961ae6cbad56358575e65f8f1b9668205fbc9) | Only its nine literal panel substitutions, evaluated against the public body |
 | `agent_entries.py` | [ef2d7f233d4fb4f567388d6c21c80bd20bb3fd66](https://github.com/ManoloRemiddi/augmentor-agent/commit/ef2d7f233d4fb4f567388d6c21c80bd20bb3fd66) | Registry/state retention/managed launch |
-| `agents_settings.py`, DSH adapter/controller additions, two shortcut helpers, `desktop-entries.mjs` and registry tests | [98a961ae6cbad56358575e65f8f1b9668205fbc9](https://github.com/ManoloRemiddi/augmentor-agent/commit/98a961ae6cbad56358575e65f8f1b9668205fbc9) | Named-agent UI and presentation boundary; selected public test only, unrelated preset-boundary test excluded |
+| `agents_settings.py`, DSH adapter/controller additions, two shortcut helpers, `desktop-entries.mjs` and registry tests | [98a961ae6cbad56358575e65f8f1b9668205fbc9](https://github.com/ManoloRemiddi/augmentor-agent/commit/98a961ae6cbad56358575e65f8f1b9668205fbc9) | Named-agent UI, label/preference/history bindings and presentation boundary; selected public test only, unrelated preset-boundary test excluded |
 | `services/identity/profile.py`; `paint_energy_ring` only | [eef21cf23866a21e5bfafd36adeffd1d82465388](https://github.com/ManoloRemiddi/augmentor-agent/commit/eef21cf23866a21e5bfafd36adeffd1d82465388) | Shared identity store and existing avatar painter; current VoiceButton remains |
 | Inline Window host methods | [41e04412678f77e45c85f339161ba7572d6a843c](https://github.com/ManoloRemiddi/augmentor-agent/commit/41e04412678f77e45c85f339161ba7572d6a843c) | Selected open/close settings methods, preserving current maintenance/setup/inspection and draft cancellation |
 
@@ -64,13 +64,14 @@ scope additions intersect the current workspace gate; they do not replace it.
 
 ## Qualification and remaining work — October 17, 2026
 
-Local **134 Python / 20 Node** cases pass, zero failures/skips, plus `npm run check`.
-The Python total is 106 settings/Window/scaling/branch/shortcut/maintenance/retained
-voice-control cases plus 28 Controller/readiness/remote cases. The seven host
+Local **137 Python / 20 Node** cases pass, zero failures/skips, plus `npm run check`.
+The Python total is 109 settings/Window/scaling/branch/shortcut/maintenance/retained
+voice-control cases plus 28 Controller/readiness/remote cases. The eight host
 cases include actual Qt widget interactions, dirty drafts, in-frame setup,
-maintenance refusal, live inspector state, light/dark readability and zoom.
-The initial 105-case group was green; after the zoom correction its affected
-45-case Window/scaling/host group passes again. These overlapping reruns are not
+maintenance refusal, live inspector state, light/dark readability, zoom and retained Pi Reasoning/MCP editors.
+The final 109-case group passes after restoring named label/preference/history
+bindings and the retained Pi controls. The preceding zoom correction also passed
+its affected 45-case Window/scaling/host group. These overlapping reruns are not
 added to the distinct total. Offscreen light/dark screenshots of the actual
 preview Window were inspected; they are **authored preview evidence**, not owner
 backend, physical desktop or installed adoption acceptance.
@@ -80,8 +81,12 @@ read-only host filesystem and separate network/PID namespaces. No full app mirro
 sealed artifact or owner-data copy was created. A concurrent scratch attempt was
 refused as designed and rerun after the active workspace had finished. The current
 CI Linux SDK installs the hash-locked same Qt 6.8.2.1 test wheels and runs the
-106-case Native group; hosted terminal results belong in the qualification record.
+109-case Native group; hosted terminal results belong in the qualification record.
 One legacy shortcut failure test now explicitly isolates its XDG data directory.
+Hosted run **39060564972** fails at Native test imports because the clean runner
+lacked `libEGL.so.1`; it is not a full SDK pass. The workflow now installs
+`libegl1` alongside OpenGL and locks the existing Pygments/NumPy requirements
+needed by the Native imports. Terminal final-source CI remains to be recorded.
 
 The installed Native client and main/pilot Harness remain unchanged. This is a
 source parity prerequisite, not a completed shared-backend cutover. Next: verify

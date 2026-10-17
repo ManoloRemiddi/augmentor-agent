@@ -577,7 +577,7 @@ class SettingsPanel(QWidget):
         layout.addWidget(QLabel('Agent engine')); engine=QComboBox()
         for text,value in [('DSH','dsh'),('Pi','pi'),('Codex (development)','codex')]: engine.addItem(text,value)
         engine.setCurrentIndex(engine.findData(getattr(self.owner.controller,'harness','dsh'))); engine.setAccessibleName('Agent engine')
-        engine.setEnabled(bool(self.owner.controller)); engine.activated.connect(lambda _:self.owner.switch_harness(engine.currentData())); layout.addWidget(engine)
+        engine.setEnabled(bool(self.owner.controller) and not getattr(getattr(self.owner.controller,'client',None),'custom',False)); engine.activated.connect(lambda _:self.owner.switch_harness(engine.currentData())); layout.addWidget(engine)
         self.action(layout,'Model connection && setup',self.open_setup)
         from .home_settings import HomeDialog
         self.action(layout,'Connect Home',lambda:self.open_editor('Home',lambda:HomeDialog(self.owner))); layout.addStretch(); return page

@@ -58,6 +58,9 @@ class Preferences:
         # Future primary changes must not become secondary defaults.
         if fresh_secondary and persistent:self.save()
 
+        from .agent_entries import get
+        if (get() or {}).get('preset'):self.values['harness']='dsh'
+
     def save(self):
         if not self.persistent:
             return

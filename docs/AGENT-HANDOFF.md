@@ -2,7 +2,7 @@
 
 [Recovered existing Native settings](HARNESS-NATIVE-SETTINGS.md) restores the inline
 public interface and named-agent/model retention before shared-backend adoption.
-Local **134 Python / 20 Node**, type checks and actual preview light/dark visual
+Local **137 Python / 20 Node**, type checks and actual preview light/dark visual
 inspection pass. Public historical body/recipe provenance is recorded; private
 baseline source is not copied. Current Handy/Quit/appearance/Pi inspector and
 maintenance/dirty-draft controls are preserved. No installed change, full app copy

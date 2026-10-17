@@ -27,6 +27,13 @@ def add_host_actions(panel,layout):
     controller=panel.owner.controller
     if getattr(controller,'harness',None)=='pi':
         panel.inspector_action=panel.action(layout,'Trajectory && Context    ›',panel.owner.open_inspector)
+        from .reasoning_settings import ReasoningDialog
+        from .mcp_settings import McpDialog
+        panel.pi_settings_actions={}
+        for title,capability,dialog in [('Reasoning','reasoning',ReasoningDialog),('MCP servers','mcpManagement',McpDialog)]:
+            def open_dialog(_=False,title=title,dialog=dialog):
+                panel.open_editor(title,lambda:dialog(panel.owner))
+            panel.pi_settings_actions[capability]=panel.action(layout,title+'    ›',open_dialog)
         refresh_host_actions(panel)
 
 
@@ -35,4 +42,7 @@ def refresh_host_actions(panel):
     if button is None:return
     controller=panel.owner.controller
     caps=getattr(controller,'capabilities',{})
-    button.setEnabled(bool(getattr(controller,'harness',None)=='pi' and controller.session and controller.online and caps.get('inspection')))
+    is_pi=getattr(controller,'harness',None)=='pi'
+    button.setEnabled(bool(is_pi and controller.session and controller.online and caps.get('inspection')))
+    for capability,action in getattr(panel,'pi_settings_actions',{}).items():
+        action.setEnabled(bool(is_pi and caps.get(capability) is True))

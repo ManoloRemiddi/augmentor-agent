@@ -1,5 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import os
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -15,6 +16,34 @@ from augmentor_linux.agents_settings import AgentsSettings
 from augmentor_linux.controller import Controller
 
 class EntriesTests(unittest.TestCase):
+    def test_registered_name_and_dsh_binding_override_an_inherited_pi_preference(self):
+        from augmentor_linux.preferences import Preferences
+        from augmentor_linux.instances import window_label
+        self.create()
+        Path(self.tmp.name, 'appearance.json').write_text(json.dumps({'harness':'pi'}))
+        with patch.dict(os.environ, {'AUGMENTOR_WINDOW_ID':'research','AUGMENTOR_PI_CONFIG':self.tmp.name}):
+            self.assertEqual(window_label(), 'Augmentor Agent · Research')
+            self.assertEqual(Preferences().values['harness'], 'dsh')
+
+    def test_history_defaults_to_the_registered_folder_and_allows_explicit_other_history(self):
+        from augmentor_linux.panels import HistoryDialog
+        self.create()
+        with patch.dict(os.environ, {'AUGMENTOR_WINDOW_ID':'research'}):
+            adapter = DshAdapter(base='http://127.0.0.1:3080',home=self.tmp.name)
+            controller = Controller(client=adapter)
+            rows = [{'sessionId':'owned','agentPreset':adapter.preset,'cwd':self.tmp.name},
+                    {'sessionId':'other-folder','agentPreset':adapter.preset,'cwd':'/elsewhere'}]
+            controller.list_sessions = lambda: controller.sessions.emit(rows)
+            owner = QWidget(); owner.controller = controller
+            dialog = HistoryDialog(owner)
+            try:
+                self.assertEqual(dialog.list.count(), 1)
+                self.assertFalse(dialog.all.isHidden())
+                dialog.all.setChecked(True)
+                self.assertEqual(dialog.list.count(), 2)
+            finally:
+                dialog.reject(); owner.deleteLater();controller.queue_executor.shutdown(wait=False)
+
     @classmethod
     def setUpClass(cls):cls.app=QApplication.instance() or QApplication([])
     def setUp(self):

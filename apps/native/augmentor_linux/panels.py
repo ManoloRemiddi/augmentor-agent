@@ -20,6 +20,8 @@ class HistoryDialog(QDialog):
         filters=QHBoxLayout()
         self.saved=QCheckBox('Saved only');self.all=QCheckBox('All agents');self.all.hide()
         filters.addWidget(self.saved);filters.addWidget(self.all);layout.addLayout(filters)
+        from .agent_entries import read
+        if getattr(getattr(window.controller,'client',None),'custom',False) or read()['retained']:self.all.show()
         self.list=QListWidget();layout.addWidget(self.list)
         self.note=QLabel('Loading history…');self.note.setWordWrap(True);layout.addWidget(self.note)
         buttons=QHBoxLayout()
@@ -43,7 +45,7 @@ class HistoryDialog(QDialog):
         self.list.clear();query=self.search.text().casefold()
         for row in self.rows:
             if row.get('archived') or row.get('blank'):continue
-            if not self.all.isChecked() and row.get('agentPreset')!=getattr(self.owner.controller,'preset','augmentor-linux-pi'):continue
+            if not self.all.isChecked() and not getattr(getattr(self.owner.controller,'client',None),'owns_session',lambda r:r.get('agentPreset')==getattr(self.owner.controller,'preset','augmentor-linux-pi'))(row):continue
             if self.saved.isChecked() and not row.get('saved'):continue
             title=str(row.get('title') or row['sessionId'])
             if query not in (title+' '+row['sessionId']).casefold():continue

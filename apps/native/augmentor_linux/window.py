@@ -193,6 +193,8 @@ class Window(QWidget):
         if self.maintenance.phase()!='ready':return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
         if harness not in ('pi','dsh','codex') or not self.controller:return
+        if getattr(getattr(self.controller,'client',None),'custom',False) and harness!='dsh':
+            self.set_status('This named entry uses its selected DSH agent. Choose another entry to use a different harness.');return
         if self.controller.harness==harness and not reconnect:return
         if self.controller.running or self.controller.navigating or self.editing or getattr(self.controller,'repairing',False):
             self.set_status('Finish the current action before switching harness.');return

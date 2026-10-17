@@ -153,6 +153,32 @@ class SettingsHostTests(unittest.TestCase):
         self.assertEqual(publish.call_count, 2)
         self.assertIs(window.settings_panel, panel)
 
+    def test_pi_reasoning_and_mcp_remain_accessible_inside_the_restored_panel(self):
+        window = self.window
+        window.controller = SimpleNamespace(harness='pi', client=SimpleNamespace(),
+            session=None, online=False, running=False, closed=False, task=lambda work: work(),
+            capabilities={'inspection': True, 'reasoning': True, 'mcpManagement': True})
+        reasoning, mcp = QDialog(window), QDialog(window)
+        usage = {'start':'2026-10-01','end':'2026-10-17','days':[], 'total':0,
+                 'records':0,'sources':[],'incomplete':0}
+        with patch('augmentor_linux.token_usage.read_usage', return_value=usage):
+            window.open_settings()
+        panel = window.settings_panel
+        with patch('augmentor_linux.reasoning_settings.ReasoningDialog', return_value=reasoning), \
+             patch('augmentor_linux.mcp_settings.McpDialog', return_value=mcp):
+            panel.show_page('all')
+        for capability, dialog in [('reasoning', reasoning), ('mcpManagement', mcp)]:
+            button = panel.pi_settings_actions[capability]
+            self.assertTrue(button.isEnabled())
+            button.click()
+            self.assertIs(panel.editor, dialog)
+            self.assertFalse(dialog.isWindow())
+            self.assertTrue(panel.leave_editor())
+            panel.show_page('all')
+        window.controller.capabilities = {}
+        panel.update_activity()
+        self.assertTrue(all(not b.isEnabled() for b in panel.pi_settings_actions.values()))
+
     def test_pending_maintenance_cannot_open_settings(self):
         token = uuid.uuid4().hex
         self.window.maintenance.control('host.maintenance.prepare', {'token': token})
