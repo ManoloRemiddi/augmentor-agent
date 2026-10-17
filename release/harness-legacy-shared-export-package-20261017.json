@@ -137,5 +137,30 @@
     "Actual existing-bank/person/settings/history and busy-work/rollback qualification during eventual immutable deployment",
     "Owner pilot feedback before any further real project transfer; excluded projects stay in DSH",
     "Full accepted migration/parity and public distribution remain open; voice/later OS deferred"
-  ]
+  ],
+  "precedingHostedTerminal": {
+    "ref": "6abfee80f8e6ada14780021d2724c4a176e60274",
+    "validateRun": 39030296212,
+    "debianJob": 117389472178,
+    "status": "completed",
+    "conclusion": "failure at existing Office public source/rebuild packaging gate",
+    "root": {
+      "tests": 2188,
+      "pass": 2135,
+      "fail": 0,
+      "skip": 53
+    },
+    "browser": {
+      "pass": 128,
+      "fail": 0,
+      "skip": 0
+    },
+    "publicPackagingStep": "Build Debian packages with binary notices",
+    "guardMessage": "Office public source/rebuild qualification remains open: the exact engine rebuild is not qualified. Private-preview identity is not public redistribution approval.",
+    "previousFleetFailureNotReproducedHere": true,
+    "previousFleetFailureCauseResolved": false,
+    "newExportSourceIncluded": false,
+    "wholeWorkflowPass": false,
+    "privateTerminalLogSha256": "2dd112809ecc0f684093dc4cd24a0123a597cfd3f16ee26cf1996c0e06045d67"
+  }
 }

@@ -41,8 +41,12 @@ for rollback. No existing launcher has been rewritten by this qualification.
 Normal source validation for aaf7af4c is dispatched once as run
 [39031629464](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39031629464).
 It tests new code, not an unchanged-source rerun. Its branch-dispatch concurrency
-ref differs from the still-running preceding PR run 39030296212, which is preserved.
-No whole-workflow pass or installed promotion is inferred from these focused checks.
+ref differs from the preceding PR run 39030296212, which was preserved. That
+6abfee80 run now ends with **2,135 root passes / zero failures / 53 skips**, plus
+**128 Browser passes**, then refuses public Debian packaging at the existing
+Office exact-source/rebuild gate. The older Fleet failure is not reproduced here;
+its cause is not established. The new aaf7af4c CI remains in progress. No whole-
+workflow pass, public redistribution or installed promotion is claimed.
 
 ## Dedicated legacy-store preparation — October 17
 

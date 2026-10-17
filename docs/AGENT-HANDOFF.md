@@ -10,8 +10,10 @@ handshake succeeds, no network/model/service call. Actual loaded-owner extension
 identity remains unknown. Existing Linux Desktop inherits shared env; all Native,
 Browser and review entrypoints still need explicit managed paired launch binding.
 Do not execute the source-only Browser registrar inside a sealed artifact.
-New-code normal CI 39031629464 uses branch dispatch, preserving prior live PR CI
-39030296212; no whole-suite pass or installed promotion. Fresh cold backups,
+New-code normal CI 39031629464 uses branch dispatch and remains live. Preserved
+6abfee80 PR CI 39030296212 ends with root 2,135/zero failures/53 skips, Browser 128,
+then the existing public Office source/rebuild packaging refusal. No whole-
+workflow pass or installed promotion. Fresh cold backups,
 actual export/adoption/busy veto/rollback and pilot feedback gates remain.
 [Record](../release/harness-legacy-shared-export-package-20261017.json).
 

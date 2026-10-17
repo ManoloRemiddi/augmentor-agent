@@ -171,11 +171,12 @@ more projects; explicitly excluded projects stay in DSH. Apply concrete reported
 workflow fixes before optional backend expansion. The managed Office candidate
 and public distribution have their own remaining gates.
 
-Normal **bfe8dc94** CI has completed: Linux SDK passes; Debian ends with
-**2,132 pass / one archived Fleet inspector failure / 53 skips**, before packaging.
-The failed v2 case does not observe its nested child's pinned inspector. All three
-Fleet cases pass in a focused local run without changes; that does not establish
-the CI failure's cause or make the suite green. Mac SDK fails and Windows is
-cancelled. No unchanged workflow was rerun or whole-workflow pass claimed. Physical
+Normal **6abfee80** CI has completed: **2,135 root passes / zero failures / 53
+skips**, plus **128 Browser passes**, followed by refusal at the existing Office
+exact-source/rebuild public Debian packaging gate. This does not reproduce the
+older bfe8dc94 archived Fleet failure; its cause remains unproven. Linux SDK passes;
+Mac SDK fails and the recorded Windows observation was pending. New export source
+**aaf7af4c** is running its own validation as 39031629464. No unchanged-source
+workflow is rerun or whole-workflow/public-packaging approval claimed. Physical
 owner acceptance, full service parity and DSH retirement remain unproven; the
 overall migration is active.
