@@ -94,6 +94,11 @@ class ModernSetupTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'composition entry was edited'):self.install()
         self.assertEqual(self.snapshot(),before)
 
+    def test_preserved_ownership_requires_deliberate_migration_not_standard_overwrite(self):
+        self.install();path=self.profile/'augmentor-product/ownership.json';value=json.loads(path.read_text());value['schema']='augmentor-dsh-preserved-ownership/1';path.write_text(json.dumps(value));before=self.snapshot()
+        with self.assertRaisesRegex(ValueError,'preserved integration requires a reviewed migration'):self.install()
+        self.assertEqual(self.snapshot(),before)
+
     def test_existing_prompt_library_is_not_duplicated(self):
         with patch.object(setup,'existing_prompt_plugin',return_value='authored-existing-library'):
             self.install()

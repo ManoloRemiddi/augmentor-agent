@@ -241,6 +241,7 @@ class Setup:
         previous=None;old_presets={};old_target=None
         if target.exists() and not target.is_symlink() and (target/'ownership.json').is_file():
             previous=json.loads((target/'ownership.json').read_text())
+            if previous.get('schema')=='augmentor-dsh-preserved-ownership/1':raise ValueError('This preserved integration requires a reviewed migration before updating.')
             expected={'browser/dist/index.js','browser/package.json'}
             if set(previous.get('files',{}))!=expected or set(previous.get('presets',{}))!=set(PRESETS.values()):raise ValueError('Integration ownership is incomplete. No files were replaced.')
             for name,checksum in previous['files'].items():
