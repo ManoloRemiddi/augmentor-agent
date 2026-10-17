@@ -236,3 +236,63 @@ action, then returns to the original conversation. Its real Pi/Qt case passes;
 no production UI change or wider timeout is used. The failed temporary application
 was removed without staging a release. This is the additional Node case in the
 18-case source total above; combined qualification remains separate.
+
+
+## Combined immutable MX qualification — October 18
+
+Private unselected release **20261018-003235-2d294c67** is built from clean public
+source **4f83b7e8497b6ea3e0f6f3acd033648f0abedf86**, with publication runtime
+**bc2d70167ca2d987a4afb2d175401f78e2db3f9c**. Its artifact SHA-256 is
+`535ad8e607de7fbd3f4aea707882a94a1ad8a2ba25ad7ebcd19f906137b4f1be`:
+**24,805 sealed inputs / 1,143 compiled files**. Bundled Node, dependencies,
+components and license bytes remain identical to the retained verified base.
+Source refs, compiled inventory and all final artifact bytes are checked.
+
+Ordinary and sealed views each pass **411 Python / 66 Node** cases. External public
+test views copy the exact candidate scripts/services so their fixture-relative
+paths resolve; Native and SDK application paths use the candidate. The declared
+runtime passes **210 core cases**. Its missing test-only `PySide6.QtTest` caused
+27 errors in an earlier attempted full GUI run; the successful GUI group uses
+the existing test environment. No runtime dependency or application code was
+changed to resolve that testing prerequisite. A separate earlier operator attempt
+used long fixture socket paths and refused; only the short authored workspace
+binding changed. Failed temporary app mirrors were removed. There was one staged
+artifact, with no per-attempt retained app clones.
+
+Six additional actual sealed SDK cases pass warm/cold reopening, native history,
+single-owner convergence, persistent fence refusal and owned menu collision/removal.
+The private fixture verifies and reuses this existing artifact, rather than making
+another assembly, and points only its authored registry `launchData` at an authored
+fence root. Two controlled authored model requests create history; reopening adds
+none. Owner model requests remain zero.
+
+Nine retained personal modules execute **in place**, with both original role
+definitions on authored private data in read-only-host/network-isolated namespaces.
+Cold role histories, current memory owner, retained frontend, common prompt
+instructions, template save/delete and non-submitting draft improvement pass with
+three controlled local model requests. No private implementation is copied into
+the artifact, public tests, archives or CI. Actual owner composition stages
+read-only with **48 bound inputs / ten module edits**; it is advisory, not a cold
+archive or applied update. Its configuration/recovery fixture remains protected
+in persistent private recovery storage, never disposable build scratch.
+
+The [Linux SDK job](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39075248056)
+succeeds at the same source. Mac fails an authored initial memory connection
+assertion (cause unqualified); Windows is still running at the recorded snapshot.
+No whole-workflow or later-platform approval is claimed. This source/doc checkpoint
+does not activate Native, Browser or the working main/pilot.
+
+Final read-only owner preservation verifies both original review PIDs, 36 protected
+files, registry18, shared rows/engine settings, menus/selections and GPU/voice
+configuration/PIDs. The single temporary workspace is empty after qualification.
+The superseded extra candidate is removed after exact seal/data-exclusion/live and
+persistent-reference checks, retaining the latest two extra candidates and every
+required selected/running/registered/rollback artifact. Cleanup totals **79 copies /
+about 43.06 GiB recovered**, with about **101 GiB free**. Older unclassified folders
+remain pending exact provenance, rather than an age-based prune.
+
+The next operation is exact gate-aware bootstrap pre-adoption and loaded-Browser
+verification, then one fresh three-pair cold archive and guarded publication.
+Actual ordinary reopen/owner continuation remain unperformed. Pilot feedback still
+gates more project transfers; VR-RasterStudio stays DSH. Voice expansion and later
+platforms remain deferred. [Portable qualification record](../release/harness-combined-client-package-20261018.json).

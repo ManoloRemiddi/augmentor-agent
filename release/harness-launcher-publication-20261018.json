@@ -53,7 +53,7 @@
     "windowsConclusion": "cancelled",
     "cancellationCauseUnqualified": true
   },
-  "hostedCurrentSourcePending": true,
+  "hostedCurrentSourcePending": false,
   "remaining": [
     "One combined immutable artifact qualification against retained integration",
     "Exact current bootstrap pre-adoption including review/preview openers",
@@ -79,5 +79,15 @@
     "fixtureCorrection": "Actual More / All settings / Trajectory and Context click, enabled-state wait and return to original conversation",
     "fixtureCorrectionSourceNodePass": 1,
     "productionUiChanged": false
-  }
+  },
+  "fixtureRef": "4f83b7e8497b6ea3e0f6f3acd033648f0abedf86",
+  "hostedCurrentSource": {
+    "run": 39075248056,
+    "sourceRef": "4f83b7e8497b6ea3e0f6f3acd033648f0abedf86",
+    "linuxConclusion": "success",
+    "wholeWorkflowPassClaimed": false,
+    "macConclusion": "failure",
+    "windowsStatusAtSnapshot": "in_progress"
+  },
+  "combinedQualificationRecord": "harness-combined-client-package-20261018.json"
 }

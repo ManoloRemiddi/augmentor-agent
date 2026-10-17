@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Combined immutable MX qualification](../docs/HARNESS-CLIENT-PUBLICATION.md#combined-immutable-mx-qualification--october-18)
+now passes **411 Python / 66 Node in each ordinary and sealed tree**, plus **210
+core cases with the declared runtime**, six exact sealed SDK reopening cases and
+retained-role/Prompt Library/Improve checks. Source **4f83b7e8**, private unselected
+**20261018-003235-2d294c67**, artifact **535ad8e6…7b4f1be**, **24,805 inputs / 1,143
+compiled files**. Linux SDK **39075248056 succeeds**; Mac fails an authored initial
+memory-status assertion and Windows is pending at the snapshot; no whole-matrix
+pass. One superseded candidate removed: **79 copies / ~43.06 GiB recovered**, about
+**101 GiB free**, scratch empty and two latest extra candidates retained. Owner
+apps, 36 protected files, shared data, registry18 and services verify unchanged.
+No owner cutover or migration; exact bootstrap/loaded Browser/fresh cold cut and
+owner continuation remain. [Record](../release/harness-combined-client-package-20261018.json).
+
+
 [Registered reviews and complete managed launch entrypoints](../docs/HARNESS-CLIENT-PUBLICATION.md#registered-reviews-and-complete-launch-entrypoints--october-18)
 now bind selected reviews to the same verified artifact/common store with exact
 registry/opener reverse and crash recovery. Home reads selection under the gate;

@@ -2,8 +2,13 @@
 
 # MX build storage and cleanup — October 17, 2026
 
-The latest verified total is **78 unused copies removed / 42.51 GiB recovered**,
-with about **100 GiB free**. The original cleanup below accounts for 75 copies.
+The latest verified total is **79 unused copies removed / about 43.06 GiB recovered**,
+with about **101 GiB free**. The October 18 follow-up retired one exact superseded
+extra candidate after combined-artifact qualification, keeping the latest two
+extras and all required apps/rollbacks. Scratch is empty. See [the current record](../release/harness-combined-client-package-20261018.json).
+
+The October 17 checkpoint was **78 copies / 42.51 GiB**. The original cleanup below
+accounts for 75 copies.
 A follow-up removed three more unsealed app mirrors after checking their complete
 inventories against retained, intact sealed releases. Two mirrors also contained
 12 source files each; every extra byte matched the recorded Git commit before
