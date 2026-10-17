@@ -95,8 +95,9 @@ installed artifact. This is not a production adoption or new full-suite claim.
 
 The concrete adoption path still requires:
 
-1. Qualify the actual installed Agent/Browser UI as clients of a matched companion
-   build using authored data, including edits, conflicts, recall/outage and restart.
+1. The matched writing editors now pass the authored-data qualification below.
+   Finish actual installed-surface deployment and existing-bank memory recall,
+   outage and restart checks; old auto-start helpers are not eligible for adoption.
 2. Prepare a dedicated shared-data layout and paired launcher settings. Preserve
    production identity, engine configuration/volumes, prompt identities, budgets
    and capture/processing choices. Do not point either app at an evidence copy or
@@ -106,6 +107,33 @@ The concrete adoption path still requires:
    Install a qualified immutable artifact through the existing deployment lifecycle.
 4. Verify one common service, actual cross-surface edits and existing memory banks,
    native histories, busy-work veto and rollback before declaring alignment complete.
+
+## Actual writing clients: isolated qualification
+
+The new [writing-client record](../release/harness-writing-client-qualification-20261017.json)
+uses the real Qt editor/task dispatcher, a genuinely loaded Browser extension,
+the Native Messaging host and the original Harness page against one real prompt
+service. All records are independently authored; no private source is copied into
+the repository. No owner window, profile or model is used.
+
+| Client set | Observed result | Qualification boundary |
+| --- | --- | --- |
+| Current source Native/Browser/Harness | Prompt edits in all three directions, rename with stable ID, improvement instructions, stale-save refusal, explicit reload, unchanged composer/history and managed cold reopening pass. | Authored data, no inference; this does not connect the installed Agent. |
+| Exact installed MX artifact | The same two checks pass against 97d95d58, including its Browser and companions. | Isolated execution of sealed files; selected/running owner reviews are unchanged. |
+| Actual older Native artifact with matched MX Browser/Harness/companions | Its real editor passes the same three-surface writing and managed-restart sequence. | A prestarted current companion is required. Warm compatibility does not qualify its own helper. |
+| Older Native cold auto-start | Traced actual client starts its own older helper; another current helper can own the same authored data through a different socket. | Explicit negative control: **unsafe for shared-store adoption**. Current cold startup refuses that duplicate. Both controls observe the local connection and zero IP network syscalls. |
+| Browser extension shipped beside that older Native artifact | The real extension stays at Connecting; its Prompt Library does not mount, including after supported Pi selection. | Unresolved compatibility failure. This is that artifact's extension, not proof of which extension the owner has loaded. No version/manifest is spoofed. |
+
+The fixtures use real inactive Native task dispatch, without starting chat
+monitoring or voice. Browser controls bring their actual page to the foreground
+before pointer preparation. The earlier timeout occurred inside frame-based
+preparation after switching tabs; explicit foreground selection passes. Extension storage/runtime readiness is observed before
+one supported harness selection. No timed-out mutation is repeated or error hidden.
+
+These results close the matched writing-editor fixture gap, not existing-bank
+memory recall/outage or live adoption. Deploy matching Browser, Native and companion
+builds, stop older callers at cutover, and retain the dedicated-layout/cold-backup
+and rollback requirements above. Voice and later-platform qualification stay deferred.
 
 ## Required scenario ledger
 
@@ -132,9 +160,11 @@ more projects; explicitly excluded projects stay in DSH. Apply concrete reported
 workflow fixes before optional backend expansion. The managed Office candidate
 and public distribution have their own remaining gates.
 
-The preceding **c351558f** Linux SDK passes. Its full Debian root ends with
-**2,130 pass / one historical Branch driver failure / 53 skips**, before packaging;
-that run predates the Fetch-lifetime correction and the additional cold HTTP-drain
-check. No whole-workflow pass is claimed. A new normal source run must qualify the
-corrected test set. Physical owner acceptance, full service parity and DSH
-retirement remain unproven; the overall migration is active.
+Normal **bfe8dc94** CI has completed: Linux SDK passes; Debian ends with
+**2,132 pass / one archived Fleet inspector failure / 53 skips**, before packaging.
+The failed v2 case does not observe its nested child's pinned inspector. All three
+Fleet cases pass in a focused local run without changes; that does not establish
+the CI failure's cause or make the suite green. Mac SDK fails and Windows is
+cancelled. No unchanged workflow was rerun or whole-workflow pass claimed. Physical
+owner acceptance, full service parity and DSH retirement remain unproven; the
+overall migration is active.

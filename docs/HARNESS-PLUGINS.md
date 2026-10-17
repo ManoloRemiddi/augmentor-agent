@@ -11,7 +11,10 @@ confirms that the two reviews share a library/memory pair, while the installed
 Agent still uses a separate store. Twelve prompt texts match today; edits are not
 live-synchronised. The nonempty production-bank merge rehearses successfully on
 private snapshots, but no live roots/services or processing choices are changed.
-Actual Agent client compatibility and guarded cold adoption remain required.
+[Actual writing-client tests](HARNESS-MX-READINESS.md#actual-writing-clients-isolated-qualification)
+now qualify current and older Native editors with matched Browser/companions on
+authored data. Older cold helper ownership and its packaged Browser remain
+unqualified. Live alignment and guarded cold adoption remain required.
 
 # Plugins and shared writing tools
 

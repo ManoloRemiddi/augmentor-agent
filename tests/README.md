@@ -2465,3 +2465,22 @@ the SDK runtime case remains MX qualification. Source, ordinary and exact sealed
 each pass the same 190 Node / 47 Python focus. All 24,631 sealed / 1,108 compiled
 inputs verify; the private unselected candidate is 20261017-005619-4a45cc63.
 [Contract and deployment limits](../docs/HARNESS-DSH-MIGRATION-PILOT.md#legacy-child-settlement-reasoning--october-17).
+
+
+### Actual shared writing-client qualification (MX Linux)
+
+Run `node --test tests/harness-writing-peers-chromium.test.mjs` with Qt-capable
+`AUGMENTOR_PYTHON`, Chromium and strace/self-child ptrace. Two authored-data checks
+exercise the real Native task dispatcher/widgets, loaded Browser/Native Messaging,
+original Harness prompt editor, shared revisions/instructions/conflicts, managed
+cold reopening and actual helper same-data ownership. No inference, chat monitor or voice starts.
+`AUGMENTOR_PI_TEST_ROOT` selects a sealed runtime; optional
+`AUGMENTOR_WRITING_CLIENT_ROOT` supplies executable client files in place, with
+`AUGMENTOR_WRITING_NATIVE_ROOT` / `AUGMENTOR_WRITING_BROWSER_ROOT` selecting each
+surface separately. Never copy private artifact source into public fixtures.
+`AUGMENTOR_WRITING_PROOF_DIR` saves authored screenshots/cold metadata locally.
+A passing old-helper negative control reports `qualifiedForMatchedSharedStore:false`;
+it is not adoption approval. The older packaged Browser's Connecting failure is
+retained, not skipped or spoofed. [Results and limits](../docs/HARNESS-MX-READINESS.md#actual-writing-clients-isolated-qualification).
+This is Linux-only test instrumentation; no common UI/runtime behavior changes or
+later-platform parity claim are made.

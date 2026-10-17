@@ -1,19 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Current MX readiness / Agent alignment](HARNESS-MX-READINESS.md) audits the full
-accepted P0/P1 scope and all ten scenarios. Installed main/pilot stay 97d95d58;
-Agent still has a distinct shared store/identity, older companion contracts and
-a mixed app/data root. Twelve prompt texts match without live sync. Offline per-database online-
-snapshot rehearsal preserves production records/banks/jobs/charges/configuration
-and nineteen review captures; pending admissions remain archived, with zero
-network/model/service work. All copies are frozen archive evidence, not adoptable
-cold backups. Source/exact installed 14 cases and archive guards pass. Next qualify
-actual old Agent/Browser clients against matched companions, prepare a dedicated
-layout and fresh cold cutover/rollback; no production update or extra transfer.
-Prior c351558f Linux SDK passes; Debian ends 2,130/one old Branch driver failure/53
-skips before packaging. Fetch lifetime plus cold HTTP-drain test fixes are local
-qualified; new normal CI is required. Pilot feedback still gates more transfers;
-voice/later OS/DSH retirement remain deferred/open. [Evidence](../release/harness-mx-readiness-agent-alignment-20261017.json).
+[Current MX readiness / Agent alignment](HARNESS-MX-READINESS.md) retains all P0/P1
+requirements and ten scenarios. Installed main/pilot stay 97d95d58. Actual Native,
+loaded Browser and original Harness writing editors now pass shared edits,
+instructions, conflict/draft preservation and managed cold reopening on authored
+data: source/exact installed two each. The actual older Native UI passes with
+matched current services/Browser, but its cold helper admits a duplicate data owner
+(negative control); its packaged Browser stays Connecting. No actual loaded-owner
+Browser qualification, live shared-store adoption or extra project transfer is
+claimed. [Writing evidence](../release/harness-writing-client-qualification-20261017.json).
+Agent still has a separate store/person, old helpers and a mixed app/data root.
+The frozen offline snapshots remain archive evidence, not adoptable cold backups.
+Next prepare matching clients/companions, dedicated paths and fresh cold
+backups; qualify existing-bank recall/outage and guarded immutable cutover/rollback.
+Pilot feedback gates further transfers; excluded projects remain in DSH.
+Normal bfe8dc94 Linux SDK passes; Debian ends 2,132/one archived Fleet inspector
+failure/53 skips before packaging. Focused local Fleet three pass without changes;
+cause unresolved, no whole-suite approval. Mac fails/Windows cancelled.
+Voice/later OS/DSH retirement remain deferred/open.
 
 [Current MX app and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17)
 remain **97d95d58 / 20261017-095821-fb78d6df**, with the original DSH GUI and
