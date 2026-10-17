@@ -387,6 +387,10 @@ A browser watch is tied to its conversation and client identity. Approvals/quest
 
 The live ring caps at 4,096 frames and 16 MiB, and each response stays within the 1 MiB transport limit. Loss is identified for the affected conversation; clients refresh durable history and recent observations without replaying actions. Stable display sequences suppress overlap between snapshots and live frames. The chat projection retains partial text and reasoning after Stop/restart, reports missing tool outcomes honestly, and periodically reconciles active status. Idle runtime shutdown has its own observation rather than impersonating a user Stop. The ledger renders a bounded visible row range, preserves visible button identities while scrolling and pairs tools by request/tool identity. Metadata pages use a derived byte-offset index. The search field scans retained metadata beyond the initial page and states that payload bodies are excluded. Native history indexing, payload/full-history search, owner-restart connection discovery and longer performance qualification remain required. Display paging has its own qualification below. See [indexed metadata qualification](#indexed-trajectory-metadata-and-search).
 
+[Current MX readiness](HARNESS-MX-READINESS.md) supersedes the dated candidate-state
+matrix below for current status. Full accepted scope remains binding; installed
+review evidence, production Agent alignment and DSH retirement are distinct.
+
 ## Delivery gates
 
 | Migration area | Candidate state | Remaining before its DSH workflow can move |

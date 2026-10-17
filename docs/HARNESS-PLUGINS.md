@@ -6,6 +6,13 @@
 
 The [qualified shared-profile review](HARNESS-SHARED-PROFILES.md#running-mx-reviews) now runs both MX reviews on one library/memory pair: 12 prompts, 19 captured records, preserved native conversations and no gateway conflict. This supersedes their older isolated-copy/port-conflict status below; installed Agent service adoption remains separate.
 
+[Current Agent alignment audit](HARNESS-MX-READINESS.md#installed-agent-alignment-rehearsal)
+confirms that the two reviews share a library/memory pair, while the installed
+Agent still uses a separate store. Twelve prompt texts match today; edits are not
+live-synchronised. The nonempty production-bank merge rehearses successfully on
+private snapshots, but no live roots/services or processing choices are changed.
+Actual Agent client compatibility and guarded cold adoption remain required.
+
 # Plugins and shared writing tools
 
 [Cold shared-profile consolidation](HARNESS-SHARED-PROFILES.md) now provides an explicit backed-up transfer and one prompt/memory owner per data root. Adoption evidence there supersedes the historical separate-copy status below only when explicitly recorded. Source support alone does not connect the installed Agent or older reviews.

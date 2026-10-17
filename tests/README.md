@@ -125,6 +125,14 @@ prevents queued continuation/domain-disable races without filtering errors.
 Both original v1/v2 GUI cases pass unchanged child/draft/cold/send/history checks.
 [Hosted failure and corrected evidence](../docs/HARNESS-BRANCH-CONTROLS.md#historical-branch-test-interception-lifecycle--october-17).
 
+Current MX alignment adds an unprocessed-source/populated-target shared merge
+case preserving target banks/jobs/budgets/choices/original projections, plus a
+mixed application-root refusal without moving product data. Source and exact
+installed artifact 97d95d58 each pass 14 across shared import/runtime and original
+historical Branch v1/v2. That GUI test retires old HTTP reads before intentional
+cold Host stop, retaining all CDP/browser errors. [Readiness and private rehearsal
+scope](../docs/HARNESS-MX-READINESS.md).
+
 Historical admission coverage: `dsh-deferred-settlement.test.mjs` checks the
 private complete-v3 catalogue capability, exact quoted child proposals, source
 cuts and forged/foreign/opaque refusals. `dsh-inherited-settlement.test.mjs`

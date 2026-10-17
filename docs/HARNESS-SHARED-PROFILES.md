@@ -1,5 +1,32 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Installed Agent alignment rehearsal — October 17
+
+The [current MX readiness audit](HARNESS-MX-READINESS.md) confirms a remaining
+cross-product gap: the review pair shares one store, but the installed Agent uses
+another. The twelve prompt texts match today, without live sync. Production has
+populated memory under another person identity, older companion code without the
+new ownership guard, and databases mixed with application files. The dedicated
+importer must not replace that whole product-data root.
+
+An offline rehearsal on private **online per-database snapshots** preserves the
+production person/settings, original prompt/memory records, banks/caches/jobs/
+charges and projections while retaining the review's nineteen captured records.
+Seventeen pending admissions and the old activity window are archived, not run.
+No service/engine/model or IPv4/IPv6 network syscall occurs. All evidence copies
+are frozen at reserved archive paths; this is not a cold backup, deployable
+candidate, existing-bank migration or live store adoption. The initial postflight's
+whole-projection-table equality error is retained; read-only verification proves
+all original rows plus only two expected new scopes, without remerging.
+
+Two new synthetic cases qualify this merge direction into a populated target and
+refuse direct use of a mixed application root. Fourteen cases pass in source and
+against exact installed97d95d58, without skips, including existing service/peer/
+interruption/SDK and historical Branch v1/v2 checks. Importer/guard code stays
+unchanged. Actual installed Agent/Browser client acceptance, dedicated layout,
+matched companion deployment, fresh full cold backups and guarded cutover/rollback
+remain. [Aggregate evidence](../release/harness-mx-readiness-agent-alignment-20261017.json).
+
 ## Shared prompt CI startup prerequisites — October 17
 
 Hosted source **45088675** exposes two test-setup failures. Home’s final image

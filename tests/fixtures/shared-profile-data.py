@@ -32,15 +32,15 @@ for name in ['source','target']:
    db.execute('INSERT INTO memory_eligible VALUES (1,NULL)')
    db.execute("INSERT INTO memory_windows VALUES ('old-window',?,999999999,0,'old-boot')",(sid,))
  if name=='target':memory.call('memory.dual.configure',{'enabled':False});memory.call('memory.dual.processing',{'paused':True})
- if mode=='processed':
+ if mode in ('processed','target-processed'):
   config={'endpoint':'http://127.0.0.1:9','apiKey':'authored-not-a-secret'};(data/'hindsight.json').write_text(json.dumps(config));os.chmod(data/'hindsight.json',0o600)
   with memory.connect() as db:db.execute('INSERT OR IGNORE INTO hindsight_destination VALUES (1,?)',(config['endpoint'],))
-  if name=='source':
+  if name==('target' if mode=='target-processed' else 'source'):
    with memory.connect() as db:
     banks=memory.banks(db)
     for bank in banks:db.execute('UPDATE hindsight_banks SET ready=1,cursor=1,snapshot=?,updated=5 WHERE bank=?',(json.dumps({'summary':'Authored cached '+bank['kind'],'pages':[],'items':[{'text':'Authored cached fact.','document_id':'transcript-1-original'}]}),bank['bank']))
     values={'summary':'Authored old projection.','items':[{'text':'Authored old fact.','state':'uncertain','sources':[1]}]}
-    for kind,scope in DualMemory.scopes(None,{'person':'source-person','project':'/authored/source-project'}):
+    for kind,scope in DualMemory.scopes(None,{'person':name+'-person','project':'/authored/'+name+'-project'}):
      db.execute('UPDATE projections SET revision=1,cursor=1,value=? WHERE kind=? AND scope=?',(json.dumps(values),kind,scope));db.execute('INSERT INTO revisions VALUES (?,?,1,1,?,5)',(kind,scope,json.dumps(values)))
     events=[dict(r) for r in db.execute('SELECT * FROM events WHERE seq=1')];stages=[{'stage':'retain','bank':banks[0]['bank']},{'stage':'consolidate','bank':banks[0]['bank']}]
     db.execute("INSERT INTO memory_jobs VALUES ('authored-job',?,?,?,1,'pending','',0)",(sid,json.dumps(events),json.dumps(stages)));db.execute("INSERT INTO memory_budgets VALUES ('authored-job',19,17,3,1,'pending')");db.execute("UPDATE memory_eligible SET job='authored-job'")

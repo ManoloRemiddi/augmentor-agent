@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX readiness and Agent alignment](HARNESS-MX-READINESS.md) · all P0/P1 requirements and ten scenarios, installed vs remaining scope, private shared-store rehearsal and the guarded adoption path.
+
 [Current MX review and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17) · installed queue-control correction, main/pilot menu entries, available core features, verified preservation and current CI/public-packaging limits.
 
 [Opt-in Linux Office process converter](HARNESS-OFFICE-PREVIEWS.md#opt-in-linux-process-converter--october-17) · bounded runtime protocol, kernel death/deadline supervision, owned publication, original GUI and twenty contained cases; package/adoption and resource/source gates remain.

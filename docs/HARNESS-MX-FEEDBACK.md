@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX requirements and next priorities](HARNESS-MX-READINESS.md) distinguish the installed review, remaining Agent shared-service alignment, pilot feedback and full migration/public-release gates.
+
 ## Current MX review — October 17
 
 Both reviews now run **97d95d58 / 20261017-095821-fb78d6df**. Open

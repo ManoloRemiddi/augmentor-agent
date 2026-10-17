@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX readiness audit](HARNESS-MX-READINESS.md) maps every P0/P1 requirement and all ten qualification scenarios to current evidence and remaining work. It preserves this full scope; voice/later-platform rollout are explicitly deferred by the owner.
+
 [Current MX review and acceptance scope](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
 records private **20261016-083019-0c2b4855**, public artifact **f073d195** /
 application **ae951211**, retaining the original GUI, adopted Apache-2.0 Context

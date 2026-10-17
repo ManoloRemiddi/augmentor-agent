@@ -1,5 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX readiness / Agent alignment](HARNESS-MX-READINESS.md) audits the full
+accepted P0/P1 scope and all ten scenarios. Installed main/pilot stay 97d95d58;
+Agent still has a distinct shared store/identity, older companion contracts and
+a mixed app/data root. Twelve prompt texts match without live sync. Offline per-database online-
+snapshot rehearsal preserves production records/banks/jobs/charges/configuration
+and nineteen review captures; pending admissions remain archived, with zero
+network/model/service work. All copies are frozen archive evidence, not adoptable
+cold backups. Source/exact installed 14 cases and archive guards pass. Next qualify
+actual old Agent/Browser clients against matched companions, prepare a dedicated
+layout and fresh cold cutover/rollback; no production update or extra transfer.
+Prior c351558f Linux SDK passes; Debian ends 2,130/one old Branch driver failure/53
+skips before packaging. Fetch lifetime plus cold HTTP-drain test fixes are local
+qualified; new normal CI is required. Pilot feedback still gates more transfers;
+voice/later OS/DSH retirement remain deferred/open. [Evidence](../release/harness-mx-readiness-agent-alignment-20261017.json).
+
 [Current MX app and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17)
 remain **97d95d58 / 20261017-095821-fb78d6df**, with the original DSH GUI and
 default Office engine. No additional owner project transfer is authorized before
