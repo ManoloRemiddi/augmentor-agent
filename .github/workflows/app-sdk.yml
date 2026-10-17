@@ -51,9 +51,12 @@ jobs:
       - name: Verify Linux DSH setup family, preservation and rollback
         if: runner.os == 'Linux'
         run: node -e "const cp=require('child_process');const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-B','-m','unittest','discover','-s','tests','-p','test_dsh*setup.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"
-      - name: Verify private Linux DSH preservation staging and stale refusal
+      - name: Verify private Linux DSH preservation staging, transaction and stale refusal
         if: runner.os == 'Linux'
-        run: node -e "const cp=require('child_process');const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-B','-m','unittest','discover','-s','tests','-p','test_dsh_preservation.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"
+        run: node -e "const cp=require('child_process');const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-B','-m','unittest','discover','-s','tests','-p','test_dsh_preservation*.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"
+      - name: Verify Linux managed DSH profile lifetime and startup fence
+        if: runner.os == 'Linux'
+        run: node --test tests/dsh-shared-launch.test.mjs
       - name: Verify interruption context and bounded response recovery
         run: node --test tests/pi-execution.test.mjs
       - name: Verify recognition-only Pi transport and operator gateway

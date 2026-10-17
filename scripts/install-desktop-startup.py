@@ -78,6 +78,7 @@ def _install(root, python, node, dsh_service=None, enable=True, register_browser
         data/'augmentor/shared-launch-profile.py':(ROOT/'scripts/shared-launch-profile.py').read_text(),
         data/'augmentor/desktop-browser-launch.py':(ROOT/'scripts/desktop-browser-launch.py').read_text(),
         data/'augmentor/desktop-dsh-launch.py':(ROOT/'scripts/desktop-dsh-launch.py').read_text(),
+        data/'augmentor/dsh-profile-gate.py':(ROOT/'scripts/dsh-profile-gate.py').read_text(),
         data/'augmentor/embed-launch.py':(ROOT/'scripts/embed-launch.py').read_text(),
         launch:(ROOT/'scripts/desktop-launch.py').read_text(),
         data/'augmentor/desktop-deployment.py':(ROOT/'scripts/desktop-deployment.py').read_text(),

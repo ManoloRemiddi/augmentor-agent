@@ -45,7 +45,7 @@ class SharedLaunchTests(unittest.TestCase):
         mobile=source/'apps/mobile/start.py';mobile.parent.mkdir(parents=True);mobile.write_text('# Independently authored supervisor\n')
         manifest=source/'apps/browser/extension/manifest.json';manifest.parent.mkdir(parents=True);manifest.write_text('{"key":"YXV0aG9yZWQta2V5"}')
         server=source/'apps/browser/embed/server.mjs';server.parent.mkdir(parents=True);server.write_text('// Independently authored embedding marker\n')
-        for name in ('shared-launch-profile.py','desktop-launch.py','desktop-browser-launch.py','desktop-dsh-launch.py','embed-launch.py'):
+        for name in ('shared-launch-profile.py','desktop-launch.py','desktop-browser-launch.py','desktop-dsh-launch.py','dsh-profile-gate.py','embed-launch.py'):
             path=source/'scripts'/name;path.parent.mkdir(exist_ok=True);shutil.copy2(ROOT/'scripts'/name,path)
         (source/'scripts/app-sdk-launch.py').write_text('# Independently authored SDK adapter marker\n')
         for name in ('companion_import.py','memory/dual.py'):

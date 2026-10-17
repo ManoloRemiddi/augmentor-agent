@@ -18,7 +18,7 @@ def sha(data):return hashlib.sha256(data).hexdigest()
 
 
 @unittest.skipUnless(sys.platform=='linux','MX preservation stage')
-class DshPreservationTests(unittest.TestCase):
+class PreservationFixture(unittest.TestCase):
     def setUp(self):
         temporary=tempfile.TemporaryDirectory(prefix='authored-dsh-preserve-',dir=os.environ.get('AUGMENTOR_BUILD_WORKSPACE'))
         self.addCleanup(temporary.cleanup);self.base=Path(temporary.name)
@@ -61,6 +61,18 @@ class DshPreservationTests(unittest.TestCase):
     def stage(self):return migration.stage(self.home,self.incoming,self.output,self.cli)
     def inputs(self):return {str(p.relative_to(self.base)):p.read_bytes() for p in self.base.rglob('*') if p.is_file() and not p.is_relative_to(self.output)}
 
+    def legacy_bundle(self,version='0.2.0'):
+        supplier=self.base/'legacy-library';self.write(supplier/'package.json',{'name':'dsh-prompt-library','version':version})
+        self.write(supplier/'cordis.patch.yml',b'- insert:\n  - id: prompt-library\n    name: dsh-prompt-library\n')
+        self.write(supplier/'lib/index.js',b'// AUTHORED legacy backend only.\n');self.write(supplier/'lib/client.js',b'// AUTHORED retained frontend.\n')
+        alias=self.profile/'node_modules/dsh-prompt-library';alias.parent.mkdir(parents=True,exist_ok=True);alias.symlink_to(supplier,target_is_directory=True)
+        self.write(self.profile/'package.json',{'dsh':{'profile':{'bundles':['authored-other','dsh-prompt-library']}}})
+        self.write(self.incoming/'adapters/dsh-prompt-library/lib/index.js',b'// AUTHORED new shared-instructions backend.\n')
+        return supplier,alias
+
+
+
+class DshPreservationTests(PreservationFixture):
     def test_stage_changes_only_owned_module_scalars_and_preserves_peers(self):
         before=self.inputs();receipt=self.stage();self.assertFalse(receipt['activated']);self.assertEqual(receipt['rewrittenModuleReferences'],6)
         self.assertEqual(self.inputs(),before)
@@ -70,15 +82,6 @@ class DshPreservationTests(unittest.TestCase):
         owner=json.loads((self.output/'integration/ownership.json').read_text());self.assertEqual(owner['schema'],migration.OWNERSHIP);self.assertNotIn('patchEntry',owner)
         plan=json.loads((self.output/'plan.json').read_text());self.assertEqual(plan['retainedOldRootModules'],['adapters/voice/index.mjs']);self.assertTrue(plan['requiresColdBackupAndImmutableIncomingForActivation']);self.assertEqual(len(plan['moduleEdits']),6)
         self.assertTrue(migration.verify(self.output,receipt['planSha256'])['valid'])
-
-    def legacy_bundle(self,version='0.2.0'):
-        supplier=self.base/'legacy-library';self.write(supplier/'package.json',{'name':'dsh-prompt-library','version':version})
-        self.write(supplier/'cordis.patch.yml',b'- insert:\n  - id: prompt-library\n    name: dsh-prompt-library\n')
-        self.write(supplier/'lib/index.js',b'// AUTHORED legacy backend only.\n');self.write(supplier/'lib/client.js',b'// AUTHORED retained frontend.\n')
-        alias=self.profile/'node_modules/dsh-prompt-library';alias.parent.mkdir(parents=True,exist_ok=True);alias.symlink_to(supplier,target_is_directory=True)
-        self.write(self.profile/'package.json',{'dsh':{'profile':{'bundles':['authored-other','dsh-prompt-library']}}})
-        self.write(self.incoming/'adapters/dsh-prompt-library/lib/index.js',b'// AUTHORED new shared-instructions backend.\n')
-        return supplier,alias
 
     def test_legacy_library_frontend_is_retained_with_one_new_backend_override(self):
         supplier,alias=self.legacy_bundle();before=self.inputs();receipt=self.stage();self.assertEqual(self.inputs(),before)

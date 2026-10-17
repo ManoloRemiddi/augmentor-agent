@@ -17,7 +17,9 @@ def main(args):
     if not args or not Path(args[0]).is_absolute() or not Path(args[0]).is_file():
         raise ValueError('Supply the existing absolute DSH executable and its original arguments.')
     launch=load('dsh_selected_launch',Path(__file__).with_name('desktop-launch.py'))
-    with launch.launch_guard():
+    profile=load('dsh_profile_gate',Path(__file__).with_name('dsh-profile-gate.py'))
+    home=Path(os.environ.get('DSH_HOME',Path.home()/'.dsh')).absolute()
+    with launch.launch_guard(),profile.lease(home):
         selected=launch.configuration();root=Path(selected['root'])
         env={**os.environ,'AUGMENTOR_PYTHON':selected['python'],'AUGMENTOR_PI_NODE':selected['node'],
              'PYTHONDONTWRITEBYTECODE':'1','PI_TELEMETRY':'0','PI_SKIP_VERSION_CHECK':'1'}

@@ -58,3 +58,14 @@ test('invalid managed DSH commands fail without echoing private argv or changing
  }
  assert.deepEqual(await readFile(join(f.data,'augmentor/desktop.json')),selected);assert.deepEqual(await f.fingerprints(),before);
 });
+
+test('managed DSH lifetime blocks profile maintenance after exec and refuses an unfinished configuration fence',{skip:process.platform!=='linux',timeout:15000},async t=>{
+ const f=await fixture(t),peer=await f.start(true),before=await f.fingerprints();
+ const code="import importlib.util,sys;from pathlib import Path;s=importlib.util.spec_from_file_location('authored_profile_gate',Path(sys.argv[1])/'dsh-profile-gate.py');m=importlib.util.module_from_spec(s);s.loader.exec_module(m);\nwith m.lease(Path(sys.argv[2]),exclusive=True):print('AUTHORED_WRITER_READY')";
+ const gate=()=>exec(py,['-I','-B','-c',code,join(f.data,'augmentor'),f.env.DSH_HOME],{env:f.env});
+ await assert.rejects(gate,e=>e.stderr.includes('managed DSH host or configuration maintenance is active'));
+ await peer.stop();assert.equal((await gate()).stdout.trim(),'AUTHORED_WRITER_READY');
+ await writeFile(join(f.env.DSH_HOME,'.augmentor-preservation.json'),'{"authored":"UNFINISHED_PRIVATE_TRANSACTION"}',{mode:0o600});
+ await assert.rejects(()=>f.start(true),e=>e.message.includes('Augmentor DSH launch failed')&&!e.message.includes('UNFINISHED_PRIVATE_TRANSACTION'));
+ assert.deepEqual(await f.fingerprints(),before);
+});
