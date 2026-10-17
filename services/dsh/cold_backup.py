@@ -55,17 +55,27 @@ def coverage(guard,additional):
            {'id':'deployment','path':str(guard.data),'members':['desktop.json'],'optional':['desktop.previous.json']}]
     roots.extend({'id':'shared-'+str(i),'path':pair['data'],'members':list(tx.shared.DATABASES),'optional':list(OPTIONAL)}
                  for i,pair in enumerate(guard.pairs))
-    if not isinstance(additional,list) or len(additional)>32:raise ValueError('Choose at most 32 explicit additional data trees.')
+    if not isinstance(additional,list) or len(additional)>32:raise ValueError('Choose at most 32 explicit additional data roots.')
     ids={root['id'] for root in roots};trees=[guard.home]
     for row in additional:
-        if not isinstance(row,dict) or set(row)!={'id','path'} or not isinstance(row['id'],str) or not re.fullmatch('[a-z][a-z0-9-]{0,31}',row['id']) or row['id'] in ids:
+        if not isinstance(row,dict) or set(row) not in ({'id','path'},{'id','path','members'}) or not isinstance(row['id'],str) or not re.fullmatch('[a-z][a-z0-9-]{0,31}',row['id']) or row['id'] in ids:
             raise ValueError('Choose unique named additional data roots.')
+        members=row.get('members')
+        if 'members' in row and (not isinstance(members,list) or not 1<=len(members)<=64 or
+                any(not isinstance(name,str) or not name or len(os.fsencode(name))>255 or
+                    name in ('.','..') or '/' in name or '\\' in name or any(ord(c)<32 for c in name) for name in members) or
+                len(set(members))!=len(members)):
+            raise ValueError('Choose a unique bounded list of direct member filenames.')
         path=tx.gate.directory(row['path'])
         selected=Path(tx.preserve.document(guard.selection)['root'])
-        forbidden=[*trees,tx.ROOT,selected,guard.data/'releases']
-        if path==guard.data or guard.data.is_relative_to(path) or any(path.is_relative_to(p) or p.is_relative_to(path) for p in forbidden):
+        forbidden=[tx.ROOT,selected,guard.data/'releases']
+        tree_overlap=any(path.is_relative_to(p) or members is None and p.is_relative_to(path) for p in trees)
+        if path==guard.data or guard.data.is_relative_to(path) or tree_overlap or any(path.is_relative_to(p) or p.is_relative_to(path) for p in forbidden):
             raise ValueError('Additional data trees cannot overlap DSH, the checkout, app releases or whole mixed deployment storage.')
-        roots.append({**row,'path':str(path),'members':None});ids.add(row['id']);trees.append(path)
+        if members is None and (path/'desktop.json').is_file() and (path/'releases').is_dir():
+            raise ValueError('Select named metadata files from another mixed deployment root, not its application builds.')
+        roots.append({**row,'path':str(path),'members':members});ids.add(row['id'])
+        if members is None:trees.append(path)
     return roots
 
 

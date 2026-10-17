@@ -62,7 +62,78 @@ bindings, preview null handling, dynamic inspector state and zoom/maintenance
 integration are distinguished from the historical selections above. DSH branch
 scope additions intersect the current workspace gate; they do not replace it.
 
-## Qualification and remaining work — October 17, 2026
+## Retained progress, thinking and current cold-cut map — October 17
+
+The next source checkpoint retains the working clients' observed request stages
+and saved thinking preference. It is source work, not an installed update. Public
+[request-stage source d943ad2](https://github.com/ManoloRemiddi/augmentor-agent/commit/d943ad299883dad458f854ae7db815cf1eb06348),
+[thinking preference d4ab5fd](https://github.com/ManoloRemiddi/augmentor-agent/commit/d4ab5fd739e33e7fe3c6b1c270b863ced54d84dd)
+and the public 41e0441 callback dispatcher supply selected Native/Browser behavior.
+Their public commit/tree identities were verified. Private installed methods were
+compared in memory, not copied; request observation and thinking completion match
+the known public implementations. Voice-provider expansion remains deferred.
+
+Native labels identify actual validation/create/model/subscribe/send/accept work,
+then observed turn/request/stream openings. First reasoning/text replaces the
+waiting label; completion, failure, idle and the originating handled-input receipt
+clear it. Old generations cannot restore a later label. These transient labels
+are not conversation history, inferred queue positions or model internals.
+Current branch identity, queue, cancellation, permission and submitted-content
+safeguards remain. Open is the retained default while reasoning streams; the saved
+per-window choice and manual controls work, and completed thinking collapses.
+The existing inline Conversation control now persists that choice.
+
+The Browser restores the same public progress presentation and primary Native
+thinking preference, while keeping SDK workspace storage isolated. Acceptance is
+bound to its original pending draft so a late acknowledgement cannot mark a new
+conversation accepted. Handled-input receipts clear only their own wait without
+inventing a user/model message. Current scoped submitted-content and unknown-outcome
+behavior remains. A source regression asserting the old standalone completion
+behavior was updated to assert completion collapse **and** subsequent manual reopen;
+code-copy and workspace controls remain tested.
+
+Local **161 Python / 24 focused Node / 130 Browser unit** cases pass, zero failures
+or skips, plus type checks. Python comprises 121 Native/settings/shared-preference
+cases, 28 Controller/readiness/remote cases and 12 cold-backup cases. The new
+Browser/Native stream-opening and late-reply tests use authored data; no owner
+model or microphone is used. Hosted final-source results are recorded separately.
+
+The current read-only caller map finds three original Native windows idle with no
+drafts at observation, 12 known client/companion processes and 35 launcher/registration
+files. One active Native Messaging origin resolves to a Chromium extension source
+whose **on-disk** manifest is 0.2.11; its loaded runtime version is still unverified.
+Do not spoof that manifest to pass the matched 0.2.13 host. A matching extension
+adoption/reload must be part of the eventual client transition.
+
+The proposed data coverage contains **21 logical roots / two shared pairs**, about
+**7.59 GiB** across **199,279 metadata entries**, largest file 295,408,944 bytes,
+with no observed special files. This reads deployment/profile metadata and file
+metadata, not database/conversation bodies. It is live sizing, **not a cold cut,
+backup or activation authority**. It covers Native settings/session state, both
+registered review profiles and registry, shared component files, and both deployment
+selectors. Existing program releases, project folders and whole browser profiles
+are not duplicated by this plan. External retained modules and engine services
+still require their existing preservation rules.
+
+The archive API now accepts explicit `members` for additional roots: 1–64 unique
+direct regular filenames. This captures the second deployment's JSON without its
+`releases/` or unrelated profiles. It can accompany separately selected nested
+profile trees regardless of ordering. Traversal, duplicates, directories and
+symlink members refuse; whole recognised mixed deployment roots refuse. Existing
+whole logical data trees and archive schema stay compatible. Bootstrap/registration
+writes use the existing startup installer's small per-file snapshot/CAS mechanism;
+do not copy whole launcher folders or weaken their directory checks just to archive
+additional metadata. Exact affected bootstrap paths still need binding before use.
+
+No owner data, settings, service, selected app or project was changed. All local
+checks use the one-workspace helper and real 64 GiB reserve; no full app copy,
+sealed release or owner archive was made. Next complete matching selection and
+durable finalization/reverse, bind actual caller/bootstrap adoption, then qualify
+one combined immutable candidate. Pilot feedback still gates further projects;
+VR-RasterStudio stays in DSH. Existing voice services/placement remain, with voice
+and later OS rollout deferred.
+
+## Settings checkpoint qualification — October 17, 2026
 
 Local **137 Python / 20 Node** cases pass, zero failures/skips, plus `npm run check`.
 The Python total is 109 settings/Window/scaling/branch/shortcut/maintenance/retained

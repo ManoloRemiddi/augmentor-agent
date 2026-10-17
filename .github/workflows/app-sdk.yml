@@ -74,7 +74,7 @@ jobs:
           QT_QPA_PLATFORM: offscreen
           PYTHONPATH: tests:apps/native
         run: |
-          "$AUGMENTOR_PYTHON" -B -m unittest -v test_agent_settings test_agent_entries test_token_usage test_settings_host test_window test_ui_scale test_dsh_branch test_dsh_interactions test_shortcuts test_maintenance_reservations test_voice_settings test_dictation_settings
+          "$AUGMENTOR_PYTHON" -B -m unittest -v test_response_progress test_live_thinking test_surface_preferences test_agent_settings test_agent_entries test_token_usage test_settings_host test_window test_ui_scale test_dsh_branch test_dsh_interactions test_shortcuts test_maintenance_reservations test_voice_settings test_dictation_settings
       - name: Prepare locked Windows companion test dependencies
         if: runner.os == 'Windows'
         run: >-
@@ -85,6 +85,10 @@ jobs:
       - name: Verify original GUI dependency resolution on this platform
         run: node --test tests/harness-build-resolution.test.mjs
       - run: npm run build
+      - name: Verify DSH browser stream progress and scoped transport
+        run: node --test tests/dsh-status.test.mjs tests/dsh-boundary.test.mjs
+      - name: Verify Browser client progress and shared preferences
+        run: node --test --test-concurrency=2 apps/browser/test/*.test.mjs
       - name: Verify Linux DSH setup family, preservation and rollback
         if: runner.os == 'Linux'
         run: node -e "const cp=require('child_process');const r=cp.spawnSync(process.env.AUGMENTOR_PYTHON,['-B','-m','unittest','discover','-s','tests','-p','test_dsh*setup.py','-v'],{stdio:'inherit'});process.exit(r.status??1);"

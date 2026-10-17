@@ -15,6 +15,44 @@ from dsh import preservation_transaction as tx
 
 
 class ColdBackupTests(PreservationTransactionFixture):
+    def test_other_deployment_metadata_is_captured_without_its_apps_or_profiles(self):
+        other=self.base/'other-deployment'
+        self.write(other/'desktop.json',{'root':'/authored/other/current'})
+        self.write(other/'desktop.previous.json',{'root':'/authored/other/previous'})
+        self.write(other/'releases/app.bin',b'AUTHORED APPLICATION DO NOT DUPLICATE')
+        self.write(other/'profiles/history.txt',b'AUTHORED OTHER TREE NOT SELECTED HERE')
+        with self.guard() as guard:
+            with self.assertRaisesRegex(ValueError,'mixed deployment'):
+                self.capture(guard,[{'id':'other','path':str(other)}])
+            self.assertFalse(self.destination.exists())
+            result=self.capture(guard,[{'id':'other-history','path':str(other/'profiles')},
+                {'id':'other','path':str(other),
+                'members':['desktop.json','desktop.previous.json']}])
+            self.assertTrue(backup.verify_for_guard(self.destination,result['backupSha256'],guard)['matchesCurrentCoveredData'])
+            with tarfile.open(self.destination/'data.tar') as archive:
+                names=archive.getnames()
+                self.assertIn('other/desktop.json',names)
+                self.assertIn('other/desktop.previous.json',names)
+                self.assertFalse(any(n.startswith(('other/releases','other/profiles')) for n in names))
+                self.assertIn('other-history/history.txt',names)
+            self.write(other/'desktop.json',{'root':'/authored/concurrently/changed'})
+            self.assertTrue(backup.verify(self.destination,result['backupSha256'])['valid'])
+            with self.assertRaisesRegex(ValueError,'no longer matches'):
+                backup.verify_for_guard(self.destination,result['backupSha256'],guard)
+
+    def test_explicit_members_cannot_traverse_duplicate_or_capture_directories_or_links(self):
+        extra=self.base/'metadata'
+        self.write(extra/'settings.json',b'AUTHORED SETTINGS')
+        (extra/'directory').mkdir(mode=0o700)
+        (extra/'link').symlink_to(extra/'settings.json')
+        with self.guard() as guard:
+            for members in [None,[],['../settings.json'],['sub/settings.json'],['.'],
+                            ['settings.json','settings.json'],['bad\\name'],['bad\x00name'],
+                            ['directory'],['link'],'settings.json',[[1]]]:
+                with self.subTest(members=members),self.assertRaises((ValueError,OSError)):
+                    self.capture(guard,[{'id':'metadata','path':str(extra),'members':members}])
+                self.assertFalse(self.destination.exists())
+
     def setUp(self):
         super().setUp()
         self.destination=self.base/'cold-data'

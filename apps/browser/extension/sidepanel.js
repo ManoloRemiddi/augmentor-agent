@@ -69,10 +69,11 @@ const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:()
 const queue=createQueue({container:document.getElementById('prompt-queue'),input:document.getElementById('input'),send})
 const voice=attachVoice({send,onError:message=>ui.sendFail(message),isHistory:()=>!!viewSessionId})
 attachPromptLibrary({input:document.getElementById('input'),send})
-import {watchAppearance,refreshDesktopAppearance} from './appearance.mjs'
-watchAppearance(value=>{if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)ui.setThinkingPreference(value.expandThinking)})
-void refreshDesktopAppearance().catch(()=>{})
-const appearanceTimer=setInterval(()=>{if(!maintenance.paused)void refreshDesktopAppearance().catch(()=>{})},15000)
+import {watchAppearance,refreshDesktopAppearance,readAppearance} from './appearance.mjs'
+watchAppearance(value=>ui.setThinkingPreference(value.expandThinking))
+const refreshThinking=()=>refreshDesktopAppearance().then(()=>ui.setThinkingPreference(readAppearance().expandThinking)).catch(()=>{})
+void refreshThinking()
+const appearanceTimer=setInterval(()=>{if(!maintenance.paused)void refreshThinking()},15000)
 window.addEventListener('pagehide',()=>clearInterval(appearanceTimer),{once:true})
 const openSettings=async(section)=>{
   try { const r=await send('settings/open',{section});if(!r?.ok)throw Error(r?.error||'Could not open Settings') }

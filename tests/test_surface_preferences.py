@@ -5,6 +5,17 @@ from unittest.mock import patch
 from augmentor_linux.preferences import Preferences
 spec=importlib.util.spec_from_file_location('surface',Path(__file__).resolve().parents[1]/'services/surface/browser.py');surface=importlib.util.module_from_spec(spec);spec.loader.exec_module(surface)
 class SurfacePreferences(unittest.TestCase):
+    def test_shared_thinking_choice_roundtrips_and_rejects_non_boolean_values(self):
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':temp,'AUGMENTOR_WINDOW_ID':'main'}),patch('augmentor_linux.dictation.request'):
+            original=surface.appearance()['values']
+            self.assertIs(original['expandThinking'],True)
+            self.assertIs(surface.appearance({**original,'expandThinking':False})['values']['expandThinking'],False)
+            self.assertIs(Preferences().values['expand_thinking'],False)
+            preferences=Preferences();preferences.values['expand_thinking']=True;preferences.save()
+            self.assertIs(surface.appearance()['values']['expandThinking'],True)
+            for invalid in ('false',0,None):
+                with self.subTest(invalid=invalid),self.assertRaises(ValueError):surface.appearance({**original,'expandThinking':invalid})
+                self.assertIs(Preferences().values['expand_thinking'],True)
     def test_shared_colours_preserve_model_voice_and_placement(self):
         with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':temp,'AUGMENTOR_WINDOW_ID':'main','AUGMENTOR_DICTATION_STATE':temp+'/dictation'}):
             prefs=Preferences();prefs.values.update(harness='pi',voice_pause_ms=1100,placement={'sentinel':True});prefs.save()

@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Retained request stages and cold-cut planning](../docs/HARNESS-NATIVE-SETTINGS.md#retained-progress-thinking-and-current-cold-cut-map--october-17)
+qualifies 121 Native/shared-preference + 28 Controller/remote + 12 archive cases,
+24 focused Node and 130 Browser unit cases. Source stages remain distinct from
+installed/physical/owner acceptance; no actual cold backup or activation is implied.
+
 [Recovered Native settings](../docs/HARNESS-NATIVE-SETTINGS.md#qualification-and-remaining-work--october-17-2026)
 records the 109-case Qt/Window/settings group, 28 Controller/remote cases and 20 Node
 usage/presentation/exact-fork/interaction cases. CI Linux SDK installs the same

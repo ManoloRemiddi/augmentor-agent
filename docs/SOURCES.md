@@ -1,5 +1,9 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Retained request stages and thinking](HARNESS-NATIVE-SETTINGS.md#retained-progress-thinking-and-current-cold-cut-map--october-17)
+adds selected public d943ad2/d4ab5fd behavior and 41e0441 callback dispatch, adapted
+to current scoped drafts/workspaces and maintenance/cancellation controls.
+
 [Native settings public recovery](HARNESS-NATIVE-SETTINGS.md#public-provenance) records
 the exact public body, recipe, registry, usage and identity selections and separates
 independently authored current-host integration. No private baseline is published.

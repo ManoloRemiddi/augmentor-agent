@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Retained Native/Browser progress and cold-cut planning](HARNESS-NATIVE-SETTINGS.md#retained-progress-thinking-and-current-cold-cut-map--october-17)
+restores verified public request stages, saved thinking and late-callback guards.
+Local **161 Python / 24 Node / 130 Browser** pass; no owner change or app copy.
+Named-file archive roots cover both deployment selectors without duplicating
+program releases. Current 21-root/two-pair sizing is advisory only; matching
+client/bootstrap adoption, cold capture and finalization/reverse remain.
+
 [Recovered existing Native settings](HARNESS-NATIVE-SETTINGS.md) restores the inline
 public interface and named-agent/model retention before shared-backend adoption.
 Local **137 Python / 20 Node**, type checks and actual preview light/dark visual

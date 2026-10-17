@@ -6,6 +6,24 @@
 UI before a matching-client transition. It is source-qualified separately from the
 backup/probe controllers below; installed clients and owner data remain unchanged.
 
+## Explicit files for the second deployment — October 17
+
+[The current-cut map](HARNESS-NATIVE-SETTINGS.md#retained-progress-thinking-and-current-cold-cut-map--october-17)
+identifies separate Native/Harness selectors and registered profiles. Additional
+archive roots may now specify `members`: a bounded list of unique direct regular
+filenames. The second deployment's JSON can be backed up beside independently
+selected profile subtrees without copying its application releases. Directory,
+symlink, traversal and duplicate members refuse; whole recognised mixed deployment
+roots refuse. The original whole-tree form remains supported. Twelve authored
+archive cases pass, including current-cut invalidation after a selector edit.
+
+Live metadata maps 21 roots/two pairs, about 7.59 GiB. No owner archive or cutover
+was performed. It is not a globally consistent cold checkpoint and does not prove
+quiescence or authorize activation. Bootstrap/registration changes must bind the
+existing startup installer's per-file snapshots/CAS, while preserving original
+service environment and external dependencies. Selection/finalization/reverse
+and actual matching-client adoption remain. Keep the 64 GiB reserve.
+
 ## Cold data archive and current-cut binding — October 17
 
 Source **a0f1f16dac3e493201867863382bdf38b2f6b5b3** adds internal

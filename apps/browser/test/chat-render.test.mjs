@@ -80,6 +80,21 @@ test('workspace thinking preference applies to live reasoning, preserves manual 
  assert.equal(log.querySelector('.md').textContent.trim(),'Saved answer')
 })
 
+test('an old prompt acknowledgement cannot label a new conversation as accepted',t=>{
+ const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+ globalThis.window=dom.window;globalThis.document=dom.window.document
+ globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window)
+ globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+ const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+ const old=ui.pendingPrompt('Old conversation draft')
+ ui.clear()
+ const current=ui.pendingPrompt('Current conversation draft')
+ ui.promptAccepted(old)
+ assert.equal(log.querySelector('.response-progress').textContent,'Submitting message…')
+ ui.promptAccepted(current)
+ assert.equal(log.querySelector('.response-progress').textContent,'Message accepted; waiting for agent…')
+})
+
 for (const delivery of ['live', 'reopen']) {
   test(`${delivery}: unsequenced DSH chunks paint before completion and replay once`, async t => {
     const dom = new JSDOM('<div id="log"></div>', {pretendToBeVisual:true})
@@ -192,7 +207,7 @@ for(const parserVersion of ['shipped','test']) test(`${parserVersion}: report sp
   assert.ok(log.querySelector('code').textContent.includes('<span style="color:#8BC34A">Literal</span>'))
 })
 
-test('thinking remains expandable and each code copy excludes prose',async t=>{
+test('completed thinking collapses, remains expandable and each code copy excludes prose',async t=>{
   const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true});globalThis.window=dom.window;globalThis.document=dom.window.document
   globalThis.requestAnimationFrame=dom.window.requestAnimationFrame.bind(dom.window);globalThis.cancelAnimationFrame=dom.window.cancelAnimationFrame.bind(dom.window);window.marked=marked
   let copied;const descriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator')
@@ -203,7 +218,8 @@ test('thinking remains expandable and each code copy excludes prose',async t=>{
   const thinking=log.querySelector('details.think');assert.ok(thinking);thinking.open=true
   assert.match(thinking.textContent,/Checking details/)
   ui.applyLog([{kind:'event',event:{seq:2,type:'assistant/message',data:{message:{content:[{type:'reasoning',text:'Checking details.'},{type:'text',text:'Explanation\n\n```python\nprint("🌞")\n```\n\nNext\n\n```sh\necho done\n```'}]}}}}])
-  assert.ok(thinking.open);assert.equal(log.querySelectorAll('details.think').length,1)
+  assert.equal(thinking.open,false);assert.equal(log.querySelectorAll('details.think').length,1)
+  thinking.open=true;assert.ok(thinking.open)
   thinking.querySelector('.think-collapse').click();assert.equal(thinking.open,false)
   assert.equal(document.activeElement,thinking.querySelector('summary'))
   const buttons=log.querySelectorAll('.code-actions button');assert.equal(buttons.length,2)
@@ -280,4 +296,36 @@ test('Pi recovery notices remain status records across live delivery and replay'
  assert.equal(log.querySelectorAll('.status .who')[0].textContent,'Status')
  assert.match(log.textContent,/Task incomplete/)
  ui.clear();ui.applyLog(rows);assert.equal(log.querySelectorAll('.status').length,2)
+})
+
+test('observed request stages replace waiting with thinking and ignore late acceptance',async t=>{
+  const dom=new JSDOM('<div id="log"></div>',{pretendToBeVisual:true})
+  globalThis.window=dom.window;globalThis.document=dom.window.document
+  globalThis.requestAnimationFrame=window.requestAnimationFrame.bind(window)
+  globalThis.cancelAnimationFrame=window.cancelAnimationFrame.bind(window);window.marked=marked
+  const log=document.querySelector('#log'),ui=createChatUI({log});t.after(()=>{ui.clear();dom.window.close()})
+  let seq=0
+  const event=(type,data={})=>ui.applyLog([{kind:'event',event:{seq:seq++,type,data}}])
+  const pending=ui.pendingPrompt('Fixture prompt');ui.promptAccepted(pending)
+  assert.match(log.querySelector('.response-progress').textContent,/Message accepted/)
+  event('turn/start');event('step/start')
+  assert.equal(log.querySelector('.response-progress').textContent,'Building model request…')
+  event('user/message',{source:{kind:'user'},content:[{type:'text',text:'Fixture prompt'}]})
+  assert.equal(log.lastElementChild.classList.contains('response-progress'),true)
+  event('assistant/start')
+  assert.equal(log.querySelector('.response-progress').textContent,'Waiting for the model’s first output…')
+  ui.promptAccepted(pending)
+  assert.match(log.querySelector('.response-progress').textContent,/first output/)
+  event('assistant/chunk',{chunk:{type:'reasoning-delta',text:'Live thought'}})
+  await new Promise(resolve=>setTimeout(resolve,40))
+  assert.equal(log.querySelector('.response-progress'),null)
+  assert.equal(log.querySelector('.think').open,true)
+  ui.promptAccepted(pending);assert.equal(log.querySelector('.response-progress'),null)
+  event('assistant/chunk',{chunk:{type:'text-delta',text:'Answer'}})
+  assert.equal(log.querySelector('.think').open,false)
+  event('assistant/message',{message:{content:[{type:'text',text:'Answer'}]}})
+  event('step/start');assert.ok(log.querySelector('.response-progress'))
+  event('turn/end');assert.equal(log.querySelector('.response-progress'),null)
+  ui.clear();event('step/start');event('assistant/message',{message:{content:[{type:'text',text:'History answer'}]}})
+  assert.equal(log.querySelector('.response-progress'),null)
 })
