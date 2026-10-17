@@ -6,7 +6,8 @@ Real public-profile archive/offline restore and backend/Native-adapter checks pa
 on authored data with the real 64 GiB reserve. Explicit coverage avoids whole mixed
 app roots; old backups do not become current automatically. No owner snapshot,
 installed change or app copy. Real caller/root map and matching activation/reverse
-remain. Hosted qualification pending. [Record](../release/harness-cold-backup-20261017.json).
+remain. Linux SDK **39057936198 succeeds** at c3a6adae / runtime a0f1f16d.
+[Record](../release/harness-cold-backup-20261017.json).
 
 [Managed-client maintenance fence](HARNESS-DSH-INSTALLATION.md#managed-client-maintenance-fence--october-17)
 adds **e58a72b9**, transaction v2 and deployment/profile markers. Source **133 Python /

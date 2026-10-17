@@ -6,7 +6,8 @@ Unicode, hardlink/symlink and mixed-root coverage restore through GNU tar in a n
 private fixture; stale cuts, corrupt archives, failed/foreign outputs and quotas
 are tested. Tiny unit fixtures simulate disk capacity. A separate real public DSH
 profile archive/restore checks the actual 64 GiB reserve and both DB sets without
-owner data. Runtime a0f1f16d; the Linux SDK now explicitly runs the new file.
+owner data. Runtime a0f1f16d; full Linux SDK **39057936198 succeeds** at c3a6adae,
+including all ten new archive cases.
 
 The [managed-client fence](../docs/HARNESS-DSH-INSTALLATION.md#managed-client-maintenance-fence--october-17)
 adds seven cases within **133 Python / four launcher Node** passes. Eleven real

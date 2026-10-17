@@ -98,7 +98,12 @@
     "filesOver2GiB": 0,
     "observationErrors": [],
     "coldSnapshot": false,
-    "ownerDataCopied": false
+    "ownerDataCopied": false,
+    "liveHomeInventoryFitsBounds": true,
+    "inventoryEntriesIncludingRoot": 198115,
+    "logicalBytesIncludingHardlinks": 8030948652,
+    "conservativeMetadataBytes": 77500142,
+    "readSourceBodies": false
   },
   "ownerPreservation": {
     "bothReviewPidsAnd36ProtectedSetsExact": true,
@@ -114,7 +119,13 @@
   "rootFreeGiB": 98.52,
   "previousQualifiedArtifactDoesNotContainThisChange": true,
   "previousQualifiedArtifactSha256": "a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93",
-  "linuxSdk": "Pending dispatch",
+  "linuxSdk": {
+    "run": 39057936198,
+    "head": "c3a6adae35c98d0f49095980652f8e01fa03379e",
+    "runtime": "a0f1f16dac3e493201867863382bdf38b2f6b5b3",
+    "status": "completed",
+    "conclusion": "success"
+  },
   "previousLinuxSdk": {
     "run": 39055975304,
     "head": "beaa1b2f17d0b306e7d09ec804f3f416d83fccf0",
@@ -133,5 +144,10 @@
     "harness-cold-backup-source-node-20261017.log": "46703c4c55727ab1505e0e43b9dd1846b86b59d187e5bac72badf7d820696d2c",
     "harness-cold-backup-real-summary-20261017.log": "aadfc5a3cf56e59f4c92131a4027af7a83669220ff1a6723fcddaa908c83e2b1",
     "harness-cold-backup-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "nativePublicProvenanceFollowUp": {
+    "canonicalRepoPublicVerified": true,
+    "twoHistoricalDependencyBlobsMatchInstalledAndAreGithubVerified": true,
+    "privateSettingsBaselineNotCopiedOrClassifiedAsPublic": true
   }
 }

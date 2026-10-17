@@ -66,7 +66,9 @@ checks the actual inventory rather than guessing that path. Same-cut verificatio
 replacement-backend/Native-adapter preflight, exact config reverse and unchanged
 DBs/incoming seal all pass, with zero owner profile/model use. Python **3.13.5** and
 GNU tar **1.35** are tested locally. No new application mirror or immutable artifact
-is created. Hosted qualification is pending.
+is created. Full Linux SDK **39057936198** is a terminal **success** at
+**c3a6adae35c98d0f49095980652f8e01fa03379e** / runtime a0f1f16d, including all ten
+new archive cases and the existing preservation/selection/backend checks.
 
 The owner’s full cold backup and all required Native/Harness roots still need the
 real caller/data map and quiescence. Next couple this verified data receipt to
@@ -74,6 +76,16 @@ matching-client selection and durable finalization/reverse, then qualify one
 combined immutable update and actual owner continuation. Pilot feedback still
 gates further project transfers; voice, later OS and public Office packaging
 remain separate.
+
+A live **metadata-only** pass of the real DSH home also fits current limits:
+198,115 inventory entries including its root, 8,030,948,652 logical bytes including
+hardlinks and 77,500,142 conservatively estimated metadata bytes. No unsupported
+special mode, foreign owner or over-two-GiB file is observed. This reads no data
+bodies and is not a cold checkpoint or proof of every additional profile root.
+A separate Native provenance follow-up verifies two exact historical dependency
+blobs through the canonical public GitHub repository. The missing settings UI
+baseline is not supplied by its public overlay script; no private baseline is
+copied or declared public. This narrows the next client-parity review.
 
 [Portable qualification record](../release/harness-cold-backup-20261017.json).
 
