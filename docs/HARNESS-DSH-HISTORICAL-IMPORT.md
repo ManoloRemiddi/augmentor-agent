@@ -139,11 +139,20 @@ separately establish SDK behavior with an independent local synthetic provider.
 
 ## Packaged qualification and owner preservation
 
-Source and a fresh ordinary package each pass **490 Node / 92 Python** with
-1,117 compiled inputs matching. The ordinary package also runs the six-group
-public-codec/native operator proof from its own shipped code. Dependencies,
-Node/native bytes and unchanged baseline files match the preceding sealed
-`0a7b15f7` application. Exact separately sealed qualification is pending.
+Source, a fresh ordinary package and the exact separately sealed candidate each
+pass **490 Node / 92 Python**, with **1,117 compiled inputs** matching. Ordinary
+and exact sealed packages also run the six-group public-codec/native operator
+proof from their own shipped code. Dependencies, Node/native bytes and unchanged
+baseline files match the preceding sealed `0a7b15f7` application.
+
+Private unselected **20261017-041731-e0f51dd5**, application **9cf713a8**,
+artifact SHA-256 **4455a5e8dd932f920097e5257c08f4358f8c37c15b827b19ab5be12af131c5ba**, verifies all **24,678 sealed inputs**
+after tests. The same five frozen real v3 envelopes reproduce their explicit
+preparation refusals in source, ordinary and sealed readers. They remain local
+assessment data, not artifact contents or owner transfers. Completed temporary
+ordinary/test copies were removed after process-reference and seal checks; the
+exact sealed candidate, frozen inputs and proof records remain. Dedicated v3 cold
+native-profile relocation acceptance remains to be checked before owner migration.
 
 Both current owner PIDs, all 36 protected regular paths and contents, registry,
 selected configurations and all 24,615 running sealed inputs remain exact. No

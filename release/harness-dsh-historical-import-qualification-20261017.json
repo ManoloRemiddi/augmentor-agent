@@ -69,8 +69,16 @@
     "fullSourceBuildPass": true,
     "sameFrozenRealFirstRefusalsReproducedInOrdinaryPackage": true,
     "dependenciesAndUnchangedBaselineFilesVerified": true,
-    "exactSealedQualificationPending": true,
-    "ownerAdoption": false
+    "exactSealedQualificationPending": false,
+    "ownerAdoption": false,
+    "sealedNodePass": 490,
+    "sealedPythonPass": 92,
+    "sealedPublicCodecNativePipelinePass": true,
+    "allSealedInputsVerified": 24678,
+    "sourceCodeAndCompiledInputsMatchExactSealed": true,
+    "sameFrozenRealFirstRefusalsReproducedInExactSealed": true,
+    "completedTemporaryQualificationCopiesRemoved": 3,
+    "exactSealedCandidateAndFrozenInputsRetained": true
   },
   "realFamilies": {
     "projects": 5,
@@ -158,11 +166,21 @@
     "ownerPilotFeedbackStillRequiredBeforeFurtherTransfers": true
   },
   "remaining": [
-    "Exact separately sealed package qualification before adoption",
+    "Guarded owner adoption remains separate; current running app is unchanged",
     "Historical settlement notices with catalogue appended by public v3-to-v4 finish, including unavailable/inherited sender evidence",
     "Compaction/turn lifecycle correlation with exact public producer evidence; no invented completion",
     "Same-frozen real preparation after each explicitly qualified history fix",
     "Owner pilot feedback before further real transfers; physical source GUI browsing not added",
-    "MX Linux first; voice and other operating systems deferred"
-  ]
+    "MX Linux first; voice and other operating systems deferred",
+    "Dedicated v3 cold native-profile relocation acceptance remains to be checked before owner migration"
+  ],
+  "applicationRef": "9cf713a86bdec0fc680c46b860a57b32220adcad",
+  "candidate": {
+    "releaseId": "20261017-041731-e0f51dd5",
+    "applicationRef": "9cf713a86bdec0fc680c46b860a57b32220adcad",
+    "artifactSha256": "4455a5e8dd932f920097e5257c08f4358f8c37c15b827b19ab5be12af131c5ba",
+    "inventoryEntries": 24678,
+    "compiledFiles": 1117,
+    "activated": false
+  }
 }
