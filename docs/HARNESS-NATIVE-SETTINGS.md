@@ -2,6 +2,48 @@
 
 # Native settings recovery for the MX Harness transition
 
+
+## Retain the existing provider during the client update — October 17
+
+The matching Native client now carries forward the existing provider selector,
+configuration/vault handling and provider-specific session implementation. This
+restores behavior required by the working client; voice expansion remains deferred.
+The four complete modules come from verified public
+[51272530](https://github.com/ManoloRemiddi/augmentor-agent/commit/512725304a16a62a3f24acb0e3bfbdd1f8b16235)
+and [c1b2279a](https://github.com/ManoloRemiddi/augmentor-agent/commit/c1b2279a2267850e6c52be72e632479ac916a031).
+Their exact blobs and hashes are recorded in the qualification receipt. Selected
+public Window/Controller/button hooks retain current Pi close/cancellation,
+conversation, submitted-content and maintenance behavior; private installed source
+is not copied. The existing Voice settings entry opens the retained provider hub,
+while local voice controls stay available inside it. No additional UI redesign.
+
+Cloud preparation keeps the chosen model and existing session and never requests
+or closes a Pi local speech ticket. A pending Pi retirement still blocks opening.
+Cancellation before/after ticket creation is checked. Spoken submissions keep their
+provider prefix and emit one acceptance/uncertainty receipt; typed lookalike IDs
+remain typed. No automatic retry is introduced. Local Pi opening identity, buffered
+manual input, close joins and typed/spoken distinction retain their current tests.
+Provider polling waits during maintenance; an admission race resets the polling
+flag, and settings jobs keep the window busy until their callbacks settle.
+
+The focused combined **201 Python cases pass**, zero failures/skips, including eight
+new adaptation cases and selected public provider/audio/vault/settings tests.
+An isolated repeat with the product's hash-locked **websocket-client 1.8.0** passes
+all 201; the initial development-environment run used 1.9.0. Qt is 6.8.2.1.
+Sockets, audio streams, vaults and provider replies are synthetic. The test process
+has a read-only host filesystem and isolated network; no microphone, real vault,
+external API, owner model or service is used. This is existing-protocol retention,
+not new verification of an external API or physical speech. The Linux SDK Native
+step now includes this group using its existing locked dependencies.
+
+No installed app, launcher, saved provider, credential or GPU/service placement was
+changed. Tests use one managed scratch and the actual 64 GiB reserve; no full app
+copy or immutable release was created. Next bind real bootstrap/all-client adoption,
+matching selection and durable finalization/reverse to one cold checkpoint, then
+qualify one combined candidate and actual continuation. Pilot feedback still gates
+further projects; VR-RasterStudio remains in DSH.
+
+
 The replacement Native client must keep the owner's existing settings interface
 before it can participate in the shared DSH/Pi transition. The feature branch
 previously had an older flat modal dialog. This source restores the existing
@@ -133,8 +175,8 @@ writes use the existing startup installer's small per-file snapshot/CAS mechanis
 do not copy whole launcher folders or weaken their directory checks just to archive
 additional metadata. Exact affected bootstrap paths still need binding before use.
 
-Before a matching Native update, preserve configured voice-provider behavior.
-The candidate still lacks the existing alternate-provider Window/Controller path.
+At this preceding checkpoint, the candidate lacked the existing alternate-provider
+Window/Controller path. The provider-retention checkpoint above now restores it.
 Verified public 51272530/c1b2279a compatibility source is available; carry forward
 existing behavior without changing credentials, provider, services or GPU placement.
 Exact owner selections remain in private operator evidence.

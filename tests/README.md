@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Existing Native provider retention](../docs/HARNESS-NATIVE-SETTINGS.md#retain-the-existing-provider-during-the-client-update--october-17)
+restores verified public provider/session/settings code while retaining newer Pi
+cancellation, request identity and maintenance guards. **201 focused Python** pass,
+including a repeat with locked transport 1.8.0. Synthetic/offscreen only; no owner
+service, setting or installed change, no app copy. Actual cold activation,
+matching clients and owner continuation remain; voice expansion stays deferred.
+
 [Retained request stages and cold-cut planning](../docs/HARNESS-NATIVE-SETTINGS.md#retained-progress-thinking-and-current-cold-cut-map--october-17)
 qualifies 121 Native/shared-preference + 28 Controller/remote + 12 archive cases,
 24 focused Node and 130 Browser unit cases. Source stages remain distinct from

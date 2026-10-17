@@ -981,3 +981,12 @@ and fork-prefix schemas, using an independently authored converter. The original
 supplier CompactionNodeView is reused from the existing selected GUI; no supplier
 source, dependency version or licence selection changes. [Migration scope and
 qualification](HARNESS-DSH-MIGRATION-PILOT.md#source-replacements-compaction-and-inherited-history--october-16).
+
+
+Native provider retention reuses exact public `voice_settings.py`, `voice_live.py`
+and `live_dialogue.py` from 512725304a16a62a3f24acb0e3bfbdd1f8b16235, and
+`voice_provider.py` with the existing local health correction from
+c1b2279a2267850e6c52be72e632479ac916a031. Public copyright/licence headers stay
+intact. Selected public Window/Controller/button hooks are adapted for current Pi
+cancellation, receipt identity and maintenance; no private repository source is
+copied. [Scope and synthetic qualification](HARNESS-NATIVE-SETTINGS.md#retain-the-existing-provider-during-the-client-update--october-17).

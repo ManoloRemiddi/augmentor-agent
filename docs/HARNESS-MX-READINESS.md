@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Existing Native provider retention](HARNESS-NATIVE-SETTINGS.md#retain-the-existing-provider-during-the-client-update--october-17)
+restores verified public provider/session/settings code while retaining newer Pi
+cancellation, request identity and maintenance guards. **201 focused Python** pass,
+including a repeat with locked transport 1.8.0. Synthetic/offscreen only; no owner
+service, setting or installed change, no app copy. Actual cold activation,
+matching clients and owner continuation remain; voice expansion stays deferred.
+
 [Retained Native/Browser progress and cold-cut planning](HARNESS-NATIVE-SETTINGS.md#retained-progress-thinking-and-current-cold-cut-map--october-17)
 restores verified public request stages, saved thinking and late-callback guards.
 Local **161 Python / 24 Node / 130 Browser** pass; no owner change or app copy.
