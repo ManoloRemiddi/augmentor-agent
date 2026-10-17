@@ -2,6 +2,11 @@
 
 # Linux DSH integration installation
 
+[Matching client publication and recovery](HARNESS-CLIENT-PUBLICATION.md) now couples
+a verified cold cut, schema-3 configuration ownership, reviewed bootstrap files
+and matching selections. Source qualification is distinct from actual owner
+activation; pre-adopt the real managed entrypoints before any cold cut.
+
 [Native settings recovery](HARNESS-NATIVE-SETTINGS.md) restores the existing public
 UI before a matching-client transition. It is source-qualified separately from the
 backup/probe controllers below; installed clients and owner data remain unchanged.

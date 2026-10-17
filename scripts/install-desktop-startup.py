@@ -30,7 +30,12 @@ def install(root, python, node, dsh_service=None, enable=True, register_browser=
             return _install(root, python, node, dsh_service, enable, register_browser, expected_hosts)
 
 
-def _install(root, python, node, dsh_service=None, enable=True, register_browser=False, expected_hosts=None):
+def startup_plan(root, python, node, dsh_service=None, register_browser=False, expected_hosts=None, *, selection=None):
+    """Render exact startup bytes without writing or authorizing selection.
+
+    A prospective selection supports cold publication planning. Ordinary install
+    never accepts that override and retains its managed-selection check.
+    """
     root = Path(root).resolve()
     # A venv interpreter is often a symlink; resolving it loses that environment.
     python, node = (Path(p).absolute() for p in (python, node))
@@ -60,8 +65,8 @@ def _install(root, python, node, dsh_service=None, enable=True, register_browser
         'services/recovery/__init__.py', 'services/recovery/decode-zstd.mjs',
         'services/recovery/repair-telemetry.mjs', 'services/recovery/zstd-frames.mjs') if (root/name).is_file()}
     descriptor = data/'augmentor/desktop.json'
-    if descriptor.exists():
-        selected = json.loads(descriptor.read_text())
+    if selection is not None or descriptor.exists():
+        selected = dict(selection) if selection is not None else json.loads(descriptor.read_text())
         if selected.get('releaseId'):
             if any(selected[key] != manifest[key] for key in ('root', 'python', 'node', 'dshService')):
                 raise ValueError('A managed release is selected. Use augmentor-update stage/activate to change it.')
@@ -125,6 +130,12 @@ def _install(root, python, node, dsh_service=None, enable=True, register_browser
     if global_entry.exists(): files[global_entry] = files[old]
     global_secondary = data/'kglobalaccel/com.augmentor.Agent.secondary.desktop'
     if global_secondary.exists(): files[global_secondary] = files[secondary]
+    return {'manifest':manifest,'files':files,'expectations':expectations,'binary':binary,'state':state}
+
+
+def _install(root, python, node, dsh_service=None, enable=True, register_browser=False, expected_hosts=None):
+    plan=startup_plan(root,python,node,dsh_service,register_browser,expected_hosts)
+    manifest,files,binary,state,expectations=(plan[key] for key in ('manifest','files','binary','state','expectations'))
     backup = Path(tempfile.mkdtemp(prefix='startup-'+time.strftime('%Y%m%d-') , dir=_directory(state/'augmentor-recovery')))
     write_startup_files(files,backup,binary,expectations)
     if enable:

@@ -22,7 +22,7 @@ import uuid
 from . import preserve
 
 ROOT=Path(__file__).resolve().parents[2]
-SCHEMA='augmentor-dsh-configuration-transaction/2'
+SCHEMA='augmentor-dsh-configuration-transaction/3'
 ASSETS=('integration/browser/dist/index.js','integration/browser/package.json',
         'integration/ownership.json','cordis.patch.yml')
 
@@ -140,7 +140,7 @@ def incoming_seal(root,digest):
     return value
 
 
-def prepare(stage,stage_sha,output,artifact_sha,guard):
+def prepare(stage,stage_sha,output,artifact_sha,guard,*,cold_backup=None):
     stage=Path(stage);output=Path(output);home=guard.home;require(guard,home)
     preserve.verify(stage,stage_sha);plan=preserve.document(preserve.read(stage/'plan.json',private=True))
     if Path(plan['home'])!=home:raise ValueError('Stage and maintenance home differ.')
@@ -152,6 +152,14 @@ def prepare(stage,stage_sha,output,artifact_sha,guard):
         raise ValueError('Keep transaction backups outside application/profile/deployment/stage/checkout roots.')
     if any(p.exists() or p.is_symlink() for p in fence_paths(guard)):
         raise ValueError('Recover the existing configuration transaction first.')
+    if cold_backup is not None:
+        from . import cold_backup as archives
+        if not isinstance(cold_backup,dict) or set(cold_backup)!={'root','sha256'}:
+            raise ValueError('Bind the exact cold archive before preparing client publication.')
+        archives.verify_for_guard(Path(cold_backup['root']),cold_backup['sha256'],guard)
+        archive=Path(cold_backup['root'])
+        if output.is_relative_to(archive) or archive.is_relative_to(output):
+            raise ValueError('Keep configuration recovery storage separate from its cold archive.')
     rows=[];originals=[];candidates=[]
     for asset,path in zip(ASSETS,destinations(home)):
         original=preserve.read(path);candidate=preserve.read(stage/asset,private=True);mode=path.stat().st_mode&0o777
@@ -163,6 +171,7 @@ def prepare(stage,stage_sha,output,artifact_sha,guard):
     value={'schema':SCHEMA,'home':str(home),'incoming':str(incoming),'artifactSha256':artifact_sha,
            'deploymentData':str(guard.data),'selectionSha256':preserve.sha(guard.selection),
            'stagePlanSha256':stage_sha,'files':rows}
+    if cold_backup is not None:value['coldBackup']=dict(cold_backup)
     output.mkdir(mode=0o700)
     for name in ('before','after'):(output/name).mkdir(mode=0o700)
     for index,(before,after) in enumerate(zip(originals,candidates)):
@@ -231,9 +240,18 @@ def targets(value):
     return result
 
 
+def require_publication_owner(output,guard):
+    """Once linked, configuration mutations belong to the full client journal."""
+    marker=Path(output)/'client-publication.json'
+    if marker.exists() or marker.is_symlink():
+        owner=preserve.document(preserve.read(marker,private=True))
+        if not isinstance(owner,dict) or getattr(guard,'client_publication',None)!=owner:
+            raise ValueError('Use the bound client publication to change this linked configuration.')
+
+
 def commit(output,digest,guard):
     """Apply/resume configuration only; retain the fence for client orchestration."""
-    output=Path(output);value,status=inspect(output,digest,guard)
+    output=Path(output);require_publication_owner(output,guard);value,status=inspect(output,digest,guard)
     if status['phase'] not in ('prepared','applying','applied'):raise ValueError('A reversing transaction cannot be applied.')
     validate_suppliers(output,value,guard)
     targets(value);atomic(output/'status.json',encoded({'phase':'applying'}))
@@ -261,7 +279,7 @@ def validate_suppliers(output,value,guard):
 
 def rollback(output,digest,guard):
     """Restore exact config bytes/modes; never restore databases or replay writes."""
-    output=Path(output);value,status=inspect(output,digest,guard,recovery=True);targets(value)
+    output=Path(output);require_publication_owner(output,guard);value,status=inspect(output,digest,guard,recovery=True);targets(value)
     if status['phase']=='reversed' and not any(inspect_fences(output,digest,guard,allow_missing=True)):
         if targets(value)!=[row['beforeSha256'] for row in value['files']]:raise ValueError('Reversed configuration changed.')
         return {'configurationRestored':True,'startupFenced':False}

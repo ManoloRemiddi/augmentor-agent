@@ -193,6 +193,29 @@ class SharedLaunchTests(unittest.TestCase):
         self.assertFalse((self.release/'scripts/augmentor-browser-host').exists());self.assertTrue((self.deploy.DATA/'shared-launch-profile.py').is_file())
         self.assertEqual(self.deploy.verify(self.release),seal)
 
+    def test_startup_plan_renders_without_backups_file_writes_or_service_commands(self):
+        installer=load('authored_pure_startup_plan',ROOT/'scripts/install-desktop-startup.py')
+        before={str(p):p.read_bytes() for p in self.home.rglob('*') if p.is_file()}
+        with patch.object(Path,'home',return_value=self.home),patch.object(installer,'_directory',side_effect=AssertionError('directory write')),patch.object(installer.subprocess,'run',side_effect=AssertionError('service command')):
+            plan=installer.startup_plan(self.release,Path(sys.executable),Path(self.selection['node']))
+        self.assertEqual(plan['manifest'],self.selection)
+        self.assertIn(self.deploy.DATA/'desktop-launch.py',plan['files'])
+        self.assertEqual({str(p):p.read_bytes() for p in self.home.rglob('*') if p.is_file()},before)
+
+    def test_future_startup_plan_does_not_bypass_normal_installer_selection_guard(self):
+        installer=load('authored_future_startup_plan',ROOT/'scripts/install-desktop-startup.py')
+        descriptor=self.deploy.DATA/'desktop.json';before=descriptor.read_bytes()
+        prospective={**self.selection,'root':str(self.home/'next-candidate'),'releaseId':'authored-next'}
+        native=Path(prospective['root'])/'apps/native/augmentor_linux';native.mkdir(parents=True)
+        (native/'window.py').write_text('# AUTHORED --ensure-running\n')
+        product=Path(prospective['root'])/'release/product.json';product.parent.mkdir();product.write_text('{"version":"authored"}')
+        with patch.object(Path,'home',return_value=self.home):
+            plan=installer.startup_plan(Path(prospective['root']),Path(sys.executable),Path(self.selection['node']),selection=prospective)
+            self.assertEqual(plan['manifest'],prospective)
+            with self.assertRaisesRegex(ValueError,'managed release is selected'):
+                installer.install(Path(prospective['root']),Path(sys.executable),Path(self.selection['node']),enable=False)
+        self.assertEqual(descriptor.read_bytes(),before)
+
     def test_late_target_edit_and_binding_selection_race_preserve_the_current_selection(self):
         original=(self.deploy.DATA/'desktop.json').read_bytes();binding=self.binding()
         def edit_target(*_args,**_kwargs):Path(self.after['data'],'hindsight.json').write_text('{"authoredConcurrentEdit":true}')

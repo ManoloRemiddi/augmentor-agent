@@ -2,7 +2,7 @@
 // Independently authored profiles; actual sealed Host/SDK and desktop validation.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFile,writeFile,mkdir,rename,stat} from 'node:fs/promises';
+import {readFile,writeFile,mkdir,rename,stat,rm} from 'node:fs/promises';
 import {join} from 'node:path';
 import {once} from 'node:events';
 import {managedReviewFixture} from './fixtures/harness-review.mjs';
@@ -21,6 +21,13 @@ test('MX registered review reopens the actual profile warm/cold without replay, 
   const bin=join(f.root,'fake-bin');await mkdir(bin,{mode:0o700});const captured=join(f.root,'opened-url');await writeFile(join(bin,'xdg-open'),'#!/bin/sh\nprintf "%s" "$1" > "$HARNESS_AUTHORED_URL"\nprintf "%s" "$1"\nprintf "%s" "$1" >&2\n',{mode:0o700});
   const opened=await f.run(['open','main'],{PATH:bin+':'+process.env.PATH,HARNESS_AUTHORED_URL:captured});assert.equal(opened.stdout,'');assert.equal(opened.stderr,'');assert.equal(await readFile(captured,'utf8'),stdout.trim());assert(!JSON.stringify(JSON.parse(await readFile(join(f.registry,'reviews.json')))).includes('token='));
   assert((await f.native(sid)).bytes.equals(before.bytes));assert.deepEqual(await f.call('session.history',{sessionId:sid,maxMessages:100}),history);assert.equal(f.requests.length,2);
+ });
+ await t.test('a pending managed deployment blocks warm private-link opening without disturbing the actual owner',async()=>{
+  const fence=join(f.base,'dsh-preservation.json');await writeFile(fence,'AUTHORED PENDING PUBLICATION',{mode:0o600});
+  try{await assert.rejects(f.run(['open','main','--print-url']),error=>/requires recovery/.test(error.stderr)&&error.stdout==='');}
+  finally{await rm(fence);}
+  assert.equal((await f.call('host.describe')).pid,initial.pid);assert.equal(f.requests.length,2);
+  assert((await f.native(sid)).bytes.equals(before.bytes));
  });
  await t.test('a conflicting profile or missing socket with a live exact owner cannot start a replacement',async()=>{
   const foreign=join(f.root,'foreign-config');await mkdir(foreign,{mode:0o700});const other=join(f.root,'foreign.json');await writeFile(other,JSON.stringify({...f.profile,config:foreign}),{mode:0o600});const bad=args('foreign',1);bad[bad.indexOf('--profile')+1]=other;

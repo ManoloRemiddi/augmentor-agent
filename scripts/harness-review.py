@@ -179,7 +179,38 @@ def private_link(value,profile):
         return value['url']
     except (ValueError,TypeError):raise ValueError('The review returned an unexpected private link scope.') from None
 
+@contextmanager
+def managed_launch(entry):
+    """Guard managed review opening, including legacy registered release roots.
+
+    Running Pi/shared owners keep their existing data leases. This reader covers
+    the opener/startup gap and honors the persistent deployment fence after an
+    interrupted controller. Standalone non-deployment reviews remain standalone.
+    """
+    root=canonical(entry['deployment']['root'])
+    configured=entry.get('launchData')
+    data=canonical(configured) if configured is not None else root.parent.parent if root.parent.name=='releases' else None
+    if data is None:
+        yield;return
+    directory(data)
+    lock=data/'shared-launch.lock';fd=os.open(lock,os.O_RDWR|os.O_CREAT|os.O_NOFOLLOW,0o600)
+    try:
+        a,b=os.fstat(fd),lock.lstat()
+        if not stat.S_ISREG(a.st_mode) or a.st_uid!=os.getuid() or a.st_nlink!=1 or a.st_mode&0o077 or (a.st_dev,a.st_ino)!=(b.st_dev,b.st_ino):
+            raise ValueError('The managed review launch gate must be private and owned.')
+        try:fcntl.flock(fd,fcntl.LOCK_SH|fcntl.LOCK_NB)
+        except BlockingIOError as error:raise ValueError('Managed review maintenance is in progress. No review was opened.') from error
+        fence=data/'dsh-preservation.json'
+        if fence.exists() or fence.is_symlink():raise ValueError('Unfinished DSH configuration maintenance requires recovery before opening this review.')
+        yield
+    finally:os.close(fd)
+
+
 def open_review(entry,print_url=False):
+    with managed_launch(entry):return _open_review(entry,print_url)
+
+
+def _open_review(entry,print_url=False):
     profile=profile_record(entry['profile']);selected,files=sealed_release(entry['deployment']['root'])
     if selected!=entry['deployment']:raise ValueError('Review selection changed. Register its verified release again.')
     try:owner=Owner(profile)

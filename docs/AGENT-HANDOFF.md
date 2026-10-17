@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cold-backed matching client publication](HARNESS-CLIENT-PUBLICATION.md) now links
+configuration schema 3, reviewed bootstrap images and both build selectors. Exact
+pre-finalization reverse and interrupted forward finalization are covered; linked
+configuration cannot be changed through its configuration-only API. Local **92
+Python / 10 Node** pass, including real SDK warm/cold review reopening. One temporary
+assembly was removed; no owner archive, activation or new retained release. Exact
+bootstrap pre-adoption and one combined immutable qualification remain.
+
 [Existing Native provider retention](HARNESS-NATIVE-SETTINGS.md#retain-the-existing-provider-during-the-client-update--october-17)
 restores verified public provider/session/settings code while retaining newer Pi
 cancellation, request identity and maintenance guards. **201 focused Python** pass,
