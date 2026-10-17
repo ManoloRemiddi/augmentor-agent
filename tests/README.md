@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Legacy format proof: `dsh-legacy-descriptor.test.mjs` validates the historical
+schema without mutating metadata or exposing supplied values; `test_dsh_legacy_source_fetch.py`
+checks bad/incomplete/checksum/traversal/symlink archives, preserved destinations
+and compressed bounds. The source-pinned proof recipe additionally checks the
+actual public codecs, v2/v3 preservation and invalid inputs. It uses authored data
+by default; private input is never a CI prerequisite. See [the experimental scope](../docs/HARNESS-DSH-MIGRATION-PILOT.md#legacy-descriptor-v2-offline-format-proof--october-17).
+
 DSH retained recovery IDs: `dsh-project-recovery-identity.test.mjs` covers both
 causes/start states, retained ordinals, current reference authority, malformed and
 foreign identities, replacement counts, source cuts and archived children.

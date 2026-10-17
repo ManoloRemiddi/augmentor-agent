@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Legacy descriptor-v2 offline proof](HARNESS-DSH-MIGRATION-PILOT.md#legacy-descriptor-v2-offline-format-proof--october-17)
+reuses 51 pinned public MIT format modules without a Host/agent loop. An authored
+validator preserves the known old descriptor; its August schema reference is
+BSD-3-Clause and correctly attributed. Live/archive fetches verify 52 inputs;
+14 format groups, 30 Node / 24 Python cases and app type-check pass. The same
+frozen log refuses baseline and passes the historical profile, with original
+bytes/descriptor preserved. Complete family/provenance and project integration
+remain; readiness stays 23 projects/64 conversations. No app update/transfer;
+both owners/all 36 protected files and selections remain exact.
+[Evidence](../release/harness-dsh-legacy-format-qualification-20261017.json).
+
 [Full DSH readiness refresh](HARNESS-DSH-MIGRATION-PILOT.md#full-migration-readiness-refresh--october-17)
 checks all **30 projects / 107 parent conversations** against the qualified sealed
 converter: **23 projects / 64 conversations** pass preparation, with 13 archived

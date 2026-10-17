@@ -1479,3 +1479,82 @@ Publication checks pass sixteen private-source/licence/notice Python cases; an
 additional comparison verifies that actual private workspace identity strings
 are absent from the new public changes. Only aggregate evidence and owning
 documentation are published; runtime/artifact code remains unchanged.
+
+## Legacy descriptor v2 offline format proof — October 17
+
+The legacy source-reader failures have a public historical schema. DSH
+[`3d70889a`](https://github.com/deepseek-ai/deepseek-harness/blob/3d70889a8d7f19de7c4dc2ede606fe1c8bc618d9/packages/subagent/subagent/src/descriptor.ts)
+defines descriptor v2; the current released-v0 reader explicitly refuses versions
+other than v3. The older descriptor is model-hidden composition metadata. Its
+version/fields must remain historical data, not a reconstructed live child.
+
+**Licence distinction:** that August reference is
+[BSD-3-Clause](https://github.com/deepseek-ai/deepseek-harness/blob/3d70889a8d7f19de7c4dc2ede606fe1c8bc618d9/LICENSE).
+The actual reused migration/codec modules are from current public
+[`d7432673`, MIT](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/LICENSE).
+An authored validator implements the referenced v2 field contract. No August
+implementation is compiled/copied; its correct historical notice is still
+included. [Pinned source ledger](../release/dsh-legacy-format/SOURCES.json)
+distinguishes both. Do not relabel the older source as MIT.
+
+The experimental tools fetch **52 checksum-pinned public inputs** (51 parser/
+migration modules plus the MIT licence), verify their SHA-256 and Git blob IDs,
+and build the original baseline alongside an explicit historical compatibility
+profile. Supplier files stay unchanged. Two virtual build overlays admit the
+known v2 descriptor and invoke the authored validator; v3 and other format
+validation remain. Unknown keys, unsupported versions/modes and invalid nested
+tool filters refuse. Original v2 optional-string/filter semantics are retained;
+metadata does not acquire a current model route, tool grant or job.
+
+The dependency graph contains only the pinned public format/stream-value code,
+the authored assembly/validator, and `node:path`, `node:crypto`, `node:util`.
+There is no Host, active agent loop, provider transport or Pi/DSH session owner.
+The existing Pi SDK application runtime and original GUI are untouched.
+
+Reproduce from a normal repository development checkout (existing Node/esbuild
+and Python prerequisites apply):
+
+```sh
+python3 -B scripts/fetch-dsh-legacy-format-source.py outputs/public-dsh-format
+node scripts/proof-dsh-legacy-format.mjs outputs/public-dsh-format outputs/legacy-format-proof
+```
+
+Both output locations must be new; public source fetch can instead verify an
+existing public archive with `--archive`. The proof defaults to authored data.
+For an explicitly private, previously backed-up Linux log, optional `--input`
+reads a regular non-symlink zstd file into a bounded stable byte snapshot, then
+decodes that exact snapshot through zstd stdin. Its private proof report stays in
+the new private output. The current experiment bounds compressed input at 64 MiB,
+decoded input at 128 MiB, physical rows at 400,000 and one row at 16 MiB. These are
+experiment bounds, not a claim of production capacity for every legacy project.
+It does not overwrite sources or existing outputs.
+
+**Qualification:** live public fetch and existing-public-archive fetch both verify
+all 52 inputs. Fourteen format check groups pass, including unchanged v3 output
+and malformed-v2 refusals. Thirty Node validator cases and 24 Python fetch/
+private-source/licence/notice cases pass, no skips; app type-check also passes.
+One identical frozen private v0 log refuses baseline conversion and passes the
+historical profile, keeping its descriptor at v2 with identical fields and
+unchanged compressed source bytes. [Portable evidence](../release/harness-dsh-legacy-format-qualification-20261017.json).
+
+**This is not yet a project migration path.** The isolated experiment explicitly
+supplies empty child facts and marks complete-family evidence unverified. It
+publishes proof metadata/bundles of the parser, not a converted import artifact.
+Full original/descendant inventory, cut and parent-address binding, retained
+compressed source provenance, offline project export and Pi continuation must
+qualify before it can unblock the five projects. The readiness snapshot remains
+**23 projects / 64 conversations**, not an increased ready count.
+
+Both actual review PIDs, all 36 protected regular path sets/hashes, registry,
+selections and running 24,615-input seal stay exact. There is no running DSH/app
+patch, new candidate/adoption, model work or further project transfer. Owner pilot
+feedback still gates further transfers. Shared schema/tool code is tested on MX;
+private zstd proof and source-adapter rollout on later platforms remain unqualified.
+Voice and later OS rollout stay deferred.
+
+The wrapper detaches headers, child facts and each physical row before passing
+them to upstream code: packed-stream processing may reuse its input arrays. An
+authored packed-run regression preserves exact combined text, and repeated whole-
+view conversion remains equal without changing input records. The same repeated-
+view/input-detachment checks pass on the private frozen log. Both the authored-
+data default command and explicit private-input command pass independently.

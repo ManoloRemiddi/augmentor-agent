@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Experimental offline format tools use the [checksum-pinned public ledger](../release/dsh-legacy-format/SOURCES.json):
+51 current DSH `d7432673` MIT parser/migration modules are fetched externally,
+not added to the active app dependency graph. The older descriptor-v2 schema
+reference at `3d70889a` is BSD-3-Clause; no old implementation is compiled, and
+its notice is included separately. [Scope, reproduction and qualification](HARNESS-DSH-MIGRATION-PILOT.md#legacy-descriptor-v2-offline-format-proof--october-17).
+
 [Framed DSH checkpoint recognition](HARNESS-DSH-MIGRATION-PILOT.md#standard-checkpoint-framing--october-16) follows public MIT `compaction-basic/src/summarizer.ts` at **d7432673**, Git blob **2d258fa410a7a87258f8d3a45c548cde0d383014** / SHA-256 **03ef6eb0b6a011530829820e30ff709c2c1b34cfa37a98c19c0037432b9d2f55**. The authored matcher uses exact protocol-block fingerprints and unmodified summary bodies; no supplier implementation or private code is copied. Public protocol literals in synthetic tests retain DeepSeek attribution and the existing full [MIT notice](../apps/harness/vendor/dsh/LICENSE). Dependencies/supplier GUI selections remain unchanged. Source/ordinary/exact sealed pass 104 Node/35 Python cases each. Private unselected **20261016-230037-48cf9df1 / 51f6e3e6** verifies 24,619 sealed/1,102 compiled inputs; owner runtime adoption and broader migration remain separate. [Evidence](../release/harness-dsh-checkpoint-frame-qualification-20261016.json).
 
 [Audio processor cleanup and POSIX qualification](PI-VOICE.md#audio-processor-lifecycle-and-hosted-posix-qualification--october-16-2026)

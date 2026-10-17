@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Legacy descriptor-v2 format proof](HARNESS-DSH-MIGRATION-PILOT.md#legacy-descriptor-v2-offline-format-proof--october-17) · pinned MIT parser reuse, historical BSD schema reference, read-only reproduction and remaining family/export work.
+
 [Full DSH migration readiness](HARNESS-DSH-MIGRATION-PILOT.md#full-migration-readiness-refresh--october-17) · 30-project snapshot, accepted preparation, source-reader/folder blockers and transfer gates.
 
 [Recovery identities after DSH migration](HARNESS-DSH-MIGRATION-PILOT.md#recovery-identities-after-dsh-migration--october-17) · retained message IDs, verified current references and real preparation status.

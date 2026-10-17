@@ -1,0 +1,87 @@
+{
+  "schema": "augmentor-dsh-legacy-format-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Experimental isolated historical log proof and reproducible source tools; not a Harness project exporter/importer or running app change",
+  "sourceBaseRef": "46fb24a3d0d7ba21a130c7bdf1d39dcd37f8dfa6",
+  "supplier": {
+    "revision": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+    "compiledModuleLicense": "MIT",
+    "compiledPublicModules": 51,
+    "verifiedSourceAndLicenseInputs": 52,
+    "historicalV2SchemaReferenceLicense": "BSD-3-Clause",
+    "historicalV2ImplementationCompiledOrCopied": false,
+    "historicalNoticeIncluded": true,
+    "supplierFilesModified": false,
+    "virtualBuildOverlays": 2,
+    "overlays": "Known descriptor-v2 admission and authored exact-v2 validation; current v3 and all other migration checks retained"
+  },
+  "qualification": {
+    "nodeUnitPass": 30,
+    "pythonFetchAndPublicationPass": 24,
+    "formatCheckGroupsPass": 14,
+    "realPublicNetworkFetchInputsVerified": 52,
+    "existingPublicArchiveFetchAlsoPassed": true,
+    "skips": 0,
+    "appTypeCheckPass": true,
+    "newRuntimeCandidateStaged": false,
+    "environment": {
+      "platform": "MX Linux 25.3 KDE x64",
+      "node": "24.19.0",
+      "python": "3.13.5"
+    },
+    "testedInputsSha256": {
+      "adapters/dsh-legacy-format/restore.ts": "c1e28edc3638c9bdcb88f862db4244512203ecac0c91c8b8266d823d7b06f6c6",
+      "adapters/dsh-legacy-format/descriptor-v2.mjs": "e6e72c2d49bfde9edcfcf260285c6e0d61f693eaa2477138f09b6b5da55cca22",
+      "scripts/fetch-dsh-legacy-format-source.py": "b6c87b21059e4c5d78c77700bd13bb14b2667cafed578a82fc88fba298e3316a",
+      "scripts/proof-dsh-legacy-format.mjs": "64aa7390bdb9be5d21d8c730595722647da845da809ae94df3fb8e6adebc0db1",
+      "release/dsh-legacy-format/SOURCES.json": "7f5e4848410e307dc7e5c990ecf37f0cc67e3b3a1688c0c6e77785b39aa08ce1",
+      "release/dsh-legacy-format/LICENSE": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be",
+      "release/dsh-legacy-format/SCHEMA-REFERENCE-LICENSE": "016b90d00affcf71474b7b279100cdee80564014f57482f56d55ca0608219c99",
+      "tests/dsh-legacy-descriptor.test.mjs": "c13ff9652b5a2c1bc0e6065cec15d7d7532027c8358d2e5aa151ef68a5f565eb",
+      "tests/test_dsh_legacy_source_fetch.py": "cead649b0f377b2252ac4abfcdb71d9bcb2886682bca72fba3355471f95a861d"
+    },
+    "authoredDefaultProofWithoutPrivateInputPassed": true,
+    "authoredPackedRunDetachmentRegressionPassed": true
+  },
+  "sameFrozenPrivateLog": {
+    "baselineRefusesKnownDescriptorV2": true,
+    "compatibilityProfileAccepts": true,
+    "targetViewVersion": 4,
+    "originalDescriptorVersionAndDataRetained": true,
+    "originalCompressedBytesUnchanged": true,
+    "completeChildFamilyEvidenceVerified": false,
+    "convertedArtifactPublished": false,
+    "projectImportOrExport": false,
+    "agentOrHostCreated": false,
+    "modelRequests": 0,
+    "entireViewRepeatDeterministic": true,
+    "inputRowsUnchanged": true
+  },
+  "moduleBoundary": {
+    "activeAgentLoopOrHostIncluded": false,
+    "onlyExternalImports": [
+      "node:path",
+      "node:crypto",
+      "node:util"
+    ],
+    "privateInputCompiledIntoBundle": false,
+    "physicalInputDetachment": "Header, child facts and every physical row are cloned before upstream migration; canonical original bytes retained outside the experiment"
+  },
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "protectedOwnerFilesExact": 36,
+    "completeProtectedPathSetsAndHashesExact": true,
+    "registryAndSelectedConfigurationsExact": true,
+    "runningOwnerSealInputsVerified": 24615,
+    "ownerTransfers": 0,
+    "ownerRestarts": 0,
+    "newAppActivation": false
+  },
+  "remaining": [
+    "Complete original-source and descendant inventory/cut binding before using the profile for project export",
+    "Retain original compressed records and a clearly declared derived-view provenance contract",
+    "Integrate and qualify offline project export, archived inspection, historical cuts and Pi continuation before new readiness claims",
+    "Existing 23-project/64-conversation readiness snapshot remains unchanged",
+    "Owner pilot feedback before further real transfers; voice and later OS deferred"
+  ]
+}
