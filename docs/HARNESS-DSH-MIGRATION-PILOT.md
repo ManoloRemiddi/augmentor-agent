@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Later live candidate checks](HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17)
+now qualify authored recovered-history continuation on the actual saved Qwen
+route, original GUI Send/Allow once, cold recall and an owned file round trip.
+Both real review profiles and the further-transfer gate remain unchanged. Current
+source readiness below is distinct from these isolated live fixture checks.
+
 [Native recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) provide v3 import for verified families/assets, with authored GUI/SDK proofs. All five frozen families now pass complete historical preparation after the separately qualified settlement/seed fixes. The later current-source assessment below supersedes earlier readiness counts; owner pilot feedback still gates extra transfers.
 
 [Historical DSH source families](HARNESS-DSH-LEGACY-FAMILIES.md) records the newer complete-family offline stage. Five source-reader-blocked projects now decode and recompute with original compressed logs retained; this intermediate schema remains refused by native import. The intermediate schema alone remains refused; native v3 envelopes and historical admission now qualify separately. Earlier readiness counts below are historical; the owner pilot-feedback gate remains.

@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live recovered-history continuation](HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17)
+passes on exact sealed **20261017-045822-6b886151 / d157ffe1** with the actual
+saved local Qwen route: historical reply cuts, original GUI Send/Allow once,
+cold recall and one owned file round trip. Five positive turns plus one preserved
+unanswered-approval refusal yield four successful reads/one successful write.
+Qwen is restored through the existing GPU manager with saved tuning unchanged;
+other GPU/voice service PIDs/states stay exact. All 24,679 candidate inputs and
+both reviews/all 36 protected files, PIDs, registry and selections verify.
+No owner app update or additional real migration; source code stays unchanged.
+[Live evidence](../release/harness-dsh-live-continuation-qualification-20261017.json).
+
 # MX review feedback: model picker and composer
 
 The October 16 owner feedback takes priority over voice, other operating systems,

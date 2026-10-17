@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Exact-candidate live Qwen checks](../docs/HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17)
+now exercise the existing authored settlement/inherited/interrupted fixtures,
+historical reply cuts, original GUI Send/Allow once, cold recall and file bytes
+against the saved local model. A preserved unanswered approval is a refusal, not
+a passing write. Live evidence is separate from the 525/92 code cohort and the
+actual public-codec derivation proof; no real owner history is used.
+
 Historical admission coverage: `dsh-deferred-settlement.test.mjs` checks the
 private complete-v3 catalogue capability, exact quoted child proposals, source
 cuts and forged/foreign/opaque refusals. `dsh-inherited-settlement.test.mjs`

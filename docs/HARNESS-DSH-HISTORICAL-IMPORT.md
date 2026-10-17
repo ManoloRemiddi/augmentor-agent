@@ -263,3 +263,58 @@ assessment and owner pilot feedback still precede wider migration.
 MX Linux is the qualified target. Voice, other operating systems, owner transfers
 and selected/running adoption remain separate. Both current owner reviews and
 protected data stay unchanged during this checkpoint.
+
+## Live Qwen continuation on the sealed MX candidate — October 17
+
+The exact **20261017-045822-6b886151 / d157ffe1** candidate now passes live local
+Qwen continuation with independently authored recovered-history data. The model
+route is explicitly matched to the saved running alias on the RTX 5090, retaining
+its **262,144 declared context / 32,768 declared output limit**. The previously
+inactive Qwen unit is restored through the existing GPU manager's saved-unit start
+API. Its unit/drop-ins, precision/context/concurrency, owner model configuration
+and the other GPU/voice service states/PIDs remain unchanged. Qwen stays online.
+
+A temporary native profile imports an authored v3 envelope built from the public
+settlement, inherited-fork and interrupted-compaction fixtures. It copies only the
+current Qwen provider configuration. Its Home, model/session state, prompt and
+memory namespaces are isolated from both actual reviews. The live data use these
+native-envelope fixtures; the separate eight-group pipeline remains the evidence
+for actual pinned public-codec derivation.
+
+Five positive fresh human turns qualify:
+
+- Deferred-catalogue and inherited-child historical reply cuts each retain the
+  saved marker and use exactly one fresh read. Both source parents remain byte
+  exact, with no future child seat or old job resumed.
+- The interrupted-compaction conversation uses the original GUI's Send control,
+  reads a private probe and recalls its saved source marker.
+- A real cold Host restart preserves native bytes before a new tool-free request
+  recalls the preceding unique probe token and historical marker.
+- The original GUI's Ask before actions card exposes the exact new file/path
+  content. One **Allow once** click authorizes write/read back inside the owned
+  project. File bytes match exactly, the GUI returns to idle, Read Only is
+  restored, and a page reload retains the completed result.
+
+The first write driver left the approval unanswered and failed its expected-file
+assertion. The runtime refused the write, a read confirmed the absent file, and
+Qwen reported that the round trip had failed without retrying it. That negative
+record remains retained. The successful approval case is a distinct request and
+file, not a replay or relabelled pass. Across all six explicit test turns, exact
+native result counts are **four successful reads / one successful write / two
+refused-or-missing-file results**. GUI console and HTTP checks report zero errors.
+
+All **24,679 sealed inputs** verify after live use. Both existing reviews retain
+their PIDs, all 36 protected file sets/hashes, registry, selections and 24,615-input
+running seal. All temporary proof Hosts/browsers exit; its one remaining private
+prompt companion is retired through an exact process handle. Browser scratch
+copies are removed, while synthetic native/source and negative evidence remain
+private. No real owner project, prompt, Wiki knowledge or conversation is copied
+into the test profile, and no additional owner transfer or app adoption occurs.
+[Portable live evidence](../release/harness-dsh-live-continuation-qualification-20261017.json).
+
+This qualifies one explicitly matched running model route. Other configured
+models/providers, local model switching, physical browser use and owner pilot
+acceptance remain separate. The earlier 525 Node / 92 Python code cohort remains
+its own qualification; these live checks do not relabel or rerun that cohort.
+Guarded owner adoption and pilot feedback still precede wider transfer. MX first;
+voice and later OS rollout stay deferred.
