@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux CI qualification](../tests/README.md#linux-harness-ci-prerequisites-and-driver-qualification--october-17) · declared migration/launcher prerequisites, actual plugin navigation, safe input readiness and provider metadata; local versus hosted scope.
+
 [Live Wiki ingest](HARNESS-PLUGIN-PARITY.md#live-original-wiki-ingest-and-explicit-fallback--october-17) · actual GUI/Qwen/Allow once, two linked pages and bookkeeping, explicit refused-edit fallback, cold inspection and owner-vault preservation.
 
 [Interrupted-response context](AUGMENTOR-HARNESS.md#model-context-after-an-interrupted-response--october-17) · actual original-GUI failure, typed native boundary and per-turn SDK note; candidate qualification and deployment scope.

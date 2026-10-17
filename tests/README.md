@@ -1,5 +1,34 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Linux Harness CI prerequisites and driver qualification — October 17
+
+The [terminal Debian job](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39006303358/job/117319648472)
+on `d8f95b52` failed with 64 failures in 14 files (2,145 total, 2,037 passed,
+44 skipped); later Debian stages were not reached. The clean image omitted `zstd`
+for physical historical source compression/decompression and
+`desktop-file-validate` for the stable review launcher. The workflow now declares
+`zstd` and `desktop-file-utils` and checks both executables before qualification.
+Historical codecs, source integrity rules and desktop validation stay unchanged.
+
+Three independently reproduced test failures also have corrected authored drivers:
+MCP waits for its replacement control before reading `disabled`; Metafolders uses
+the real **Workspace folders** overview switch; and the metrics provider advertises
+its exact model using the existing local-route fixture. Probe counts verify each
+step and distinguish the undeclared adapter. The hosted disabled Send failure did
+not reproduce locally. Its former presence-only composer test now waits for actual
+editability, focus and the exact persisted draft before one Send. No timeout,
+security expectation or outcome assertion was weakened; no click is replayed.
+
+The four corrected files pass **14/14**. All 14 hosted failure files plus six
+related plugin/route files pass **133/133**, two workers, no skips. The initial
+local reproduction remains recorded as **11 pass / 3 fail**. This is a targeted
+source/installed-tool qualification, not a fresh local Debian image or the full
+repository suite. The correction commit uses normal hosted CI; whole-workflow
+acceptance remains pending. [Aggregate evidence](../release/harness-linux-ci-qualification-20261017.json)
+records exact inputs and scope. No runtime/GUI/dependency pin, installed review,
+owner model request or additional real migration changes. Both reviews continue
+on `ee80c054 / 20261017-071945-90183f89`; MX owner feedback remains the migration gate.
+
 The SDK matrix’s clean Python interpreter now installs
 [`shared-companion-requirements.txt`](fixtures/shared-companion-requirements.txt)
 with hashes/no dependencies before importing the real prompt service. The existing

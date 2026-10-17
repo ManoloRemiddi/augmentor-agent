@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Linux CI correction](../tests/README.md#linux-harness-ci-prerequisites-and-driver-qualification--october-17)
+responds to the terminal d8f95b52 Debian failure (64 failures, 14 files): declare
+zstd/desktop-file-utils, fix MCP replacement-control readiness, target the actual
+Plugins overview folder switch, advertise the metrics fixture model and wait for
+an editable/focused/saved composer draft. Three failures reproduce locally; the
+hosted disabled Send timing does not. Corrected four files pass 14/14; all prior
+failure files plus six related plugin/route files pass **133/133**, two workers/no
+skips. Normal hosted qualification remains separate. Runtime and both installed
+MX reviews remain **ee80c054 / 20261017-071945-90183f89**; no owner inference or
+further transfer. [Evidence](../release/harness-linux-ci-qualification-20261017.json).
+
 [Live original Wiki ingest](HARNESS-PLUGIN-PARITY.md#live-original-wiki-ingest-and-explicit-fallback--october-17)
 now verifies actual sealed ee80c054/original GUI/Qwen: one approved skill input,
 three exact Allow once approvals, two linked source/concept pages, native
