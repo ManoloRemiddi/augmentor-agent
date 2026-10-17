@@ -107,3 +107,18 @@ integration; bind and pre-adopt the exact current bootstrap/client graph; verify
 the matching loaded Browser; capture one actual cold backup; apply/finalize and
 reopen/verify real owner continuation. No more project transfers before pilot
 feedback; VR-RasterStudio stays DSH. Voice expansion and later OS remain deferred.
+
+
+Full [Linux SDK 39067753095](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39067753095)
+**succeeds** at runtime **eca4c7faebd7dc0f4e7e9ddbc4489218d329045e**,
+including all 22 publication cases and actual registered-review reopening.
+[Portable qualification record](../release/harness-client-publication-20261017.json).
+
+The real bootstrap review also found a legacy preview opener that compares its
+entire immutable deployment record to mutable selection metadata. Before switching
+that selection, adopt a fence-aware opener that accepts a qualified shared binding
+and retains its current profile paths. Direct Browser/mobile launchers and the
+stable Home helper still need exact adoption review. Preserve separately selected
+companion suppliers and the current interpreter contract. The approved Native/
+Harness prompt/capture merge or target receipt must be bound before a real store
+switch; this publication layer does not migrate databases or establish that merge.

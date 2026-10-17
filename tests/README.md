@@ -6,7 +6,11 @@ pre-finalization reverse and interrupted forward finalization are covered; linke
 configuration cannot be changed through its configuration-only API. Local **92
 Python / 10 Node** pass, including real SDK warm/cold review reopening. One temporary
 assembly was removed; no owner archive, activation or new retained release. Exact
-bootstrap pre-adoption and one combined immutable qualification remain.
+bootstrap pre-adoption and one combined immutable qualification remain. Full Linux
+SDK **39067753095 succeeds** at **eca4c7fa**, including all 22 publication cases.
+[Record](../release/harness-client-publication-20261017.json). Bind the approved
+shared-data merge/target receipt and fix the legacy preview selector comparison
+before any real store switch; owner activation remains unperformed.
 
 [Existing Native provider retention](../docs/HARNESS-NATIVE-SETTINGS.md#retain-the-existing-provider-during-the-client-update--october-17)
 restores verified public provider/session/settings code while retaining newer Pi
