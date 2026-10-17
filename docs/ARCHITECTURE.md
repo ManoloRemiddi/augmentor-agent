@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Compacted file relocation paths](HARNESS-DSH-MIGRATION-PILOT.md#compacted-file-relocation-paths--october-17)
+correct the preceding missing-hint case. Verified, scoped former locations survive
+several moves and post-move branches while saved summaries stay unchanged.
+Source/ordinary each pass **315 Node / 55 Python** checks; the same frozen authored
+profile gains its current path without resurrecting compacted media. Exact sealed
+qualification and adoption remain pending. [Evidence](../release/harness-dsh-file-hints-qualification-20261017.json).
+
 [Historical DSH files](HARNESS-DSH-MIGRATION-PILOT.md#historical-file-attachments--october-17)
 now retain verbatim bodies, original cards/names, scoped current-profile paths,
 Edit drafts and cold reply/relocation without old work. Source/ordinary/exact

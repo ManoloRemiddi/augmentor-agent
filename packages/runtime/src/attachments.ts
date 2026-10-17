@@ -68,10 +68,10 @@ export class PiAttachments {
   const original=await saveFileVerbatim(this.root,{data,name}),attachment={...normalized,originalAttachmentId:original.attachmentId};const receipt=this.commit(sid,{type:'image',attachment},original);return {receiptId:receipt.receiptId,attachment};
  }
  async upload(sid:string,data:Uint8Array,name:string){this.writable();if(data.byteLength>FILE_LIMIT)throw Error('File exceeds the twenty MiB limit.');const file=await saveFileVerbatim(this.root,{data,name});const receipt=this.commit(sid,{type:'file',attachment:file});return {receiptId:receipt.receiptId,file};}
- private authorize(sid:string,part:PromptAttachment){
-  promptAttachments([part]);
-  if(!this.receipts(sid).some(row=>JSON.stringify(row.part)===JSON.stringify(part))&&!this.inherited(sid,part))throw Error('Attachment does not belong to this conversation.');
+ hasReference(sid:string,part:PromptAttachment){
+  promptAttachments([part]);return this.receipts(sid).some(row=>JSON.stringify(row.part)===JSON.stringify(part))||this.inherited(sid,part);
  }
+ private authorize(sid:string,part:PromptAttachment){if(!this.hasReference(sid,part))throw Error('Attachment does not belong to this conversation.');}
  async admit(sid:string,content:unknown):Promise<{input:string;attachments:PromptAttachment[]}>{
   this.writable();if(!Array.isArray(content)||content.length>32)throw Error('Invalid prompt content.');
   let bytes=0,count=0;const attachments:PromptAttachment[]=[],texts:string[]=[];

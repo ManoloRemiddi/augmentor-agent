@@ -1,0 +1,92 @@
+{
+  "schema": "augmentor-dsh-file-hints-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX compacted historical file relocation; source and private package qualification; no owner update or transfer",
+  "sourceBaseRef": "7150135043406046d0b31357dcf8e218932be407",
+  "contract": {
+    "bindingSchema": "augmentor-native-relocation-bindings/1",
+    "newRuleKind": "dsh-file",
+    "identity": "Domain-separated SHA-256 of exact file identity, original sanitized name and bytes; separate from native content digests",
+    "formerPaths": "Canonical absolute attachment paths with exact digest/name suffix",
+    "formerLocationsPerFile": 128,
+    "catalogueRulesLimitUnchanged": 10000,
+    "catalogueBytesLimitUnchanged": 1048576,
+    "contextMappingsLimitUnchanged": 256,
+    "contextHintBytesLimitUnchanged": 32768,
+    "selectedNativeAndDshArchiveProvenanceRequired": true,
+    "verbatimFileBytesVerified": true,
+    "nativeAndSummaryBodiesRewritten": false,
+    "compactedMediaResurrected": false,
+    "historicalActionsReplayed": false,
+    "foreignAncestorHints": "Skipped without new authority or blocking reasoning about the original quote",
+    "ownedCorruptFiles": "Refuse before provider submission",
+    "severalMoves": "Merge former locations; complete saved ancestry retains canonical archive/file bindings",
+    "stop": "Checked after file verification, before later request transforms",
+    "sdk": "Public current-format SessionManager on the private verified source copy; no extra AgentSession",
+    "sdkManagerCache": "Only current source conversation retained",
+    "oldReaders": "Unknown new rule variant needs corrected runtime; original source and verified snapshot remain",
+    "supplierGuiAndImplementationChanged": false
+  },
+  "qualification": {
+    "phase": "source and ordinary passed; exact separately sealed pending",
+    "sourceCheckBuildPass": true,
+    "sourceNodePass": 315,
+    "sourcePythonPass": 55,
+    "nodeFiles": 47,
+    "chromiumFiles": 14,
+    "chromiumCases": 18,
+    "newUnitCases": 21,
+    "newSdkCases": 6,
+    "workers": 2,
+    "skips": 0,
+    "deadlinesChanged": false,
+    "environment": {
+      "distribution": "MX 25.3 Infinity KDE x64 (Debian 13)",
+      "node": "24.19.0",
+      "python": "3.13.5",
+      "piCodingAgent": "1.1.0",
+      "product": "0.2.13"
+    },
+    "testedInputsSha256": {
+      "packages/runtime/src/attachments.ts": "1e2313f60477d98f70762258b85e05fa412069cd30b5d439421a9dff615570d2",
+      "packages/runtime/src/native-profile-import.ts": "89d840fbfe95ffc7df1ae162f7d5f2da0dcd68c2c7a1c9f66ad7d0e031c9c299",
+      "packages/runtime/src/native-relocation-context.ts": "f4fdb5a5097d3af43891f42a8a2963bb259df571c93cf77a241d1775bcd30a27",
+      "tests/native-dsh-file-hints.test.mjs": "f3352befc15de0e0845cc119576799f047cbe6280f46967651dc38f1c7e5f8e6",
+      "tests/native-dsh-file-hints-runtime.test.mjs": "110822ddec379395433cf84dd92d6743c19ba63c219e4f0fa2b802f08c545ce6",
+      "tests/fixtures/dsh-file-relocation.mjs": "7f5e7790e64a9f86a695fef61ac85ff8b03ce1fbc924a6cc51de594bbf93cd2c"
+    },
+    "ordinaryNodePass": 315,
+    "ordinaryPythonPass": 55,
+    "compiledFilesVerified": 1111,
+    "ordinaryUnchangedBaselineInputsVerified": 23522,
+    "sameFrozenAuthoredProfileAcceptedByOrdinary": true,
+    "sameFrozenRealPreparationRegressionAcceptedByOrdinary": true
+  },
+  "sameFrozenAuthoredProfile": {
+    "precedingApplicationRef": "afef0e54d53e0c834881bb118ef55e516ab94bdb",
+    "sameSourceSnapshot": true,
+    "sourceUnchangedAfterBothTransfers": true,
+    "oldStateUnavailableDuringContextReads": true,
+    "precedingCurrentPathHints": 0,
+    "correctedCurrentPathHints": 1,
+    "summaryQuotePreservedBoth": true,
+    "activeMediaEntriesBoth": 0,
+    "correctedFileBytesExact": true,
+    "canonicalTargetsUnchangedDuringProjection": true,
+    "precedingSealEntriesUnchanged": 24637,
+    "ownerTransfers": 0,
+    "modelRequests": 0,
+    "privateOwnerDataUsed": false
+  },
+  "remaining": [
+    "Guarded adoption of qualified candidate before wider migration",
+    "Owner pilot feedback before additional real projects",
+    "Malformed tool arguments, independent source formats and two source-observation failures",
+    "Voice and later OS rollout deferred"
+  ],
+  "realReadOnlyRegression": {
+    "alreadyAcceptedTwoParentFileProjectStillPrepares": true,
+    "ownerImports": 0,
+    "modelRequests": 0
+  }
+}

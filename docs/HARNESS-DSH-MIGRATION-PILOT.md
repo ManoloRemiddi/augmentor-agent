@@ -1185,3 +1185,70 @@ context, its saved summary quote remains intact, and no current-file hint appear
 after the old state is removed. That diagnostic is excluded from the passing
 qualification claim; the path-hint fix remains required before treating compacted
 historical-file relocation as ready. No owner data or model request is involved.
+
+
+## Compacted file relocation paths — October 17
+
+This corrects the missing-hint case recorded at the preceding `afef0e54`
+checkpoint. A native compaction can remove the original historical file entry
+from active context while its summary still quotes a request-time managed path.
+A cold profile move now retains a verified path hint for that file and supplies
+its current path when the quote occurs in a later request. Canonical summaries,
+native bodies, source/display history and raw archive bytes stay unchanged.
+The original historical message is not reintroduced into active context.
+
+Cold relocation uses the existing public SDK `SessionManager` to inspect the
+selected, current-format native ancestry in the verified private source copy.
+It validates each historical file against its exact DSH parent/archive provenance
+and existing receipt/inherited authority, then verifies the copied bytes. It
+creates no `AgentSession`, provider request, queued action, file grant or alternate
+agent loop. Parsed SDK managers are retained only while processing their source
+conversation. Historical references are checked individually so older messages
+can exceed the new-upload picker's count without accumulating image encodings.
+
+The existing `augmentor-native-relocation-bindings/1` catalogue gains tagged
+`dsh-file` rules: `identitySha256`, one exact file reference and `formerPaths`.
+The identity hashes a versioned domain plus the complete content identity,
+original sanitized name and byte length. Its map key has a distinct namespace
+from native message-content digests. Former paths must be canonical absolute
+attachment paths with the same digest/name suffix. Multiple moves merge and
+retain locations rather than replacing the oldest path. The catalogue retains its existing 10,000-rule / 1 MiB bound. Each file keeps
+at most 128 former locations; an active hint retains its existing 256-mapping /
+32 KiB bound. Overflow, malformed metadata and conflicting bindings refuse; old
+readers that do not recognize the new variant require the corrected runtime.
+The original source and full source snapshot remain available for recovery.
+
+At request time the existing Agent context transform looks only for paths quoted
+in active context. It checks the **current descendant's** file authority and
+reverifies bytes before supplying a transient current-path map. Unquoted files
+stay out of the map. An ancestor's hints cannot grant a later/foreign file to an
+earlier branch; unavailable ancestor hints are skipped without blocking ordinary
+reasoning about the literal quote. Required owned files with damaged bytes fail
+before provider submission. Stop is checked after verification; maps stop growing
+at the existing count bound. No historical quote or executable tool is rewritten.
+
+Source profile relocation also carries verified existing bindings through the
+complete saved branch ancestry. This lets a branch created **after** the first
+move preserve its older canonical archive boundary and file references during
+another move. Cyclic or excessive ancestry refuses before destination publication.
+Current-profile paths remain resolved dynamically; neither former state needs to
+remain on disk. The original Chat/Trajectory/Context components and layout stay.
+
+[The portable path-hint evidence](../release/harness-dsh-file-hints-qualification-20261017.json)
+records the exact tested candidate and deployment boundary. Independently authored
+fixtures cover compacted user/assistant/tool files, several former locations,
+seventeen references, cold SDK reads, branches created after moving, earlier Edit
+cuts, Stop, corrupt bytes, scope, bounds and atomic refusals. A single identical
+frozen authored source profile is compared through the preceding sealed and
+corrected implementations: the former quote remains, no media entry becomes
+active again, and only the corrected context supplies the verified current path.
+This is separate from real-owner continuation and pilot acceptance.
+
+Source check/build and the fresh ordinary package each pass **315 Node / 55 Python**
+checks, with two workers/no skips/unchanged deadlines across 47 Node files,
+fourteen Chromium files/eighteen GUI cases. The new scope has 21 unit and six
+actual SDK cases. All **1,111 compiled files** match. Both implementations also
+run the identical frozen authored-profile comparison against the preceding seal,
+and retain the same two-parent real-file preparation regression. Existing source
+snapshots, raw exports and model assignments remain unchanged. Exact sealed
+qualification and owner adoption remain pending.

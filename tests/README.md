@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Compacted DSH file relocation: `native-dsh-file-hints.test.mjs` verifies exact
+source/target snapshots, immutable summaries, conditional path maps, several
+moves, metadata/scope/Stop/bounds and atomic refusal. Its runtime companion uses
+actual SDK reads and exercises a branch created after moving, another full move,
+cold reopening, corrupted data and an earlier Edit branch without later-file
+hints. Run both with the existing native-profile, DSH file/branch, Pi attachment,
+draft and original GUI cohorts. These tests use authored files/providers and do
+not transfer owner projects or demonstrate owner pilot acceptance.
+
 DSH files: `test_dsh_project_files.py` checks exact descriptor-relative export,
 20 MiB chunking, empty bodies, source changes and refusal paths.
 `dsh-project-files.test.mjs` checks v1/v2 complete bodies, references, guards,

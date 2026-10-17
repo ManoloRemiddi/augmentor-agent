@@ -3,13 +3,14 @@ import {readFileSync,writeFileSync,lstatSync,readdirSync,mkdirSync,cpSync,chmodS
 import {join,dirname,relative,isAbsolute,resolve} from 'node:path';
 import {createHash} from 'node:crypto';
 import {loadDshProjectArchive,copyDshProjectArchive} from './dsh-project-archive.js';
-import {CURRENT_SESSION_VERSION} from '@earendil-works/pi-coding-agent';
+import {CURRENT_SESSION_VERSION,SessionManager} from '@earendil-works/pi-coding-agent';
 import {acquireProfileLease} from './profile-lease.js';
 import {stateTransaction,stateInventory,requireColdState,present} from './profile-transaction.js';
 import {WorkspaceRegistry} from './workspace-registry.js';
 import {SessionOrganization} from './session-organization.js';
 import {PiAttachments,promptAttachments,type PromptAttachment} from './attachments.js';
-import {contentDigest,readRelocationBindings,relocationBindings,type RelocationRule} from './native-relocation-context.js';
+import {contentDigest,readRelocationBindings,relocationBindings,mergeRelocationRule,historicalFilePart,historicalFileIdentity,FILE_FOOTER_PREFIX,type RelocationRule} from './native-relocation-context.js';
+import {inheritedDshAttachment} from './dsh-branch-history.js';
 import {identifier,type Data,type DisplayEvent} from '../../protocol/src/index.js';
 import {atomicJson,privateDir} from './storage.js';
 const hash=(bytes:Buffer|string)=>createHash('sha256').update(bytes).digest('hex');
@@ -74,14 +75,26 @@ export async function importNativeProfile(sourceState:string,targetState:string,
    const copied:string[]=[];
    for(const prefix of ['sessions','attachments','observations','harness-drafts','jobs','desktop-runs']){const path=join(archive,prefix);if(present(path)){copyTree(path,join(stage,prefix),key=>{if(!key)return true;const receipt=prefix==='attachments'?/^v1\/([^/]+)\.json$/.exec(key):prefix==='harness-drafts'?/^v1\/(?:records|edit-origins)\/([^/]+)\.json$/.exec(key):null;if(receipt)return sourceMetas.has(receipt[1]);if(prefix==='observations')return sourceMetas.has(key.split('/')[0]);if(prefix==='sessions')return [...sourceMetas.keys()].some(id=>key===id||key.startsWith(id+'/')||key.startsWith(id+'.'));return true;});copied.push(prefix);}}
    const imports=join(archive,'dsh-imports');if(present(imports))for(const name of readdirSync(imports)){if(/^[a-f0-9]{64}\.json$/.test(name)){const source=loadDshProjectArchive(join(imports,name),name.slice(0,-5),undefined,true);copyDshProjectArchive(source,join(stage,'dsh-imports'));}else if(name==='batches')copyTree(join(imports,name),join(stage,'dsh-imports','batches'));}
-   const attachments=present(join(archive,'attachments','v1'))?new PiAttachments(archive,(sid,part)=>(events.get(sid)??[]).some(e=>e.type==='user/message'&&e.data.source?.sessionId!==sid&&(e.data.submittedContent??e.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))),true):undefined;
+   const managers=new Map<string,SessionManager>();
+   const sourceManager=(sid:string)=>{const meta=originalMetas.get(sid);if(!meta?.file)return undefined;if(!managers.has(sid))managers.set(sid,SessionManager.open(join(archive,relative(sourceState,meta.file))));return managers.get(sid);};
+   const attachments=present(join(archive,'attachments','v1'))?new PiAttachments(archive,(sid,part)=>{
+    if((events.get(sid)??[]).some(e=>e.type==='user/message'&&e.data.source?.sessionId!==sid&&(e.data.submittedContent??e.data.content??[]).some((p:Data)=>JSON.stringify(p)===JSON.stringify(part))))return true;
+    const manager=sourceManager(sid);return !!manager&&inheritedDshAttachment(manager,archive,part);
+   },true):undefined;
    const relocated=[];
    for(const [sid,m] of sourceMetas){
-    const rules=new Map<string,RelocationRule>();for(const rule of readRelocationBindings(archive,sid)?.rules??[])rules.set(rule.contentSha256,rule);
+    const rules=new Map<string,RelocationRule>(),ancestry=new Set<string>();let ancestor:string|undefined=sid;
+    while(ancestor){if(ancestry.has(ancestor)||ancestry.size>=128)throw Error('Native source branch ancestry is invalid.');ancestry.add(ancestor);for(const rule of readRelocationBindings(archive,ancestor)?.rules??[])mergeRelocationRule(rules,rule);ancestor=sourceMetas.get(ancestor)?.fork?.sessionId;}
     const footers=new Map<string,PromptAttachment[]>();
     for(const e of events.get(sid)??[])if(e.type==='user/message'){
-     const refs=promptAttachments((e.data.submittedContent??e.data.content??[]).filter((p:Data)=>p.type==='file'||p.type==='image'&&p.attachment).map((p:Data)=>({type:p.type,attachment:p.attachment})));const files=refs.filter(p=>p.type==='file');
-     if(refs.length){if(!attachments)throw Error('Source attachment receipts are missing.');const resolved=await attachments.resolve(sid,'',refs);if(files.length){const oldFooter=resolved.text.replaceAll(join(archive,'attachments','v1'),join(sourceState,'attachments','v1'));footers.set(oldFooter,files);}}
+     const refs:PromptAttachment[]=(e.data.submittedContent??e.data.content??[]).filter((p:Data)=>p.type==='file'||p.type==='image'&&p.attachment).map((p:Data)=>promptAttachments([{type:p.type,attachment:p.attachment}])[0]),files=refs.filter(p=>p.type==='file');
+     if(refs.length){
+      if(!attachments)throw Error('Source attachment receipts are missing.');let footer='';
+      // Historical messages can exceed the new-upload picker count. Verify one
+      // reference at a time and do not accumulate encoded image payloads here.
+      for(const ref of refs){const resolved=await attachments.resolve(sid,'',[ref]);if(ref.type==='file')footer+=footer?'\n'+resolved.text.slice(FILE_FOOTER_PREFIX.length):resolved.text;}
+      if(files.length)footers.set(footer.replaceAll(join(archive,'attachments','v1'),join(sourceState,'attachments','v1')),files);
+     }
     }
     for(const [oldPath,native] of nativeFiles)if(native.sid===sid){
      for(const row of native.rows.slice(1)){
@@ -94,8 +107,19 @@ export async function importNativeProfile(sourceState:string,targetState:string,
      }
      const header=native.rows[0];if(header.parentSession!==undefined){if(!nativeFiles.has(header.parentSession))throw Error('Native parent header points outside the complete source family.');const rebound={...header,parentSession:join(targetState,relative(sourceState,header.parentSession))},path=join(stage,relative(sourceState,oldPath));writeFileSync(path,Buffer.concat([Buffer.from(JSON.stringify(rebound)+'\n'),native.bytes.subarray(native.end+1)]),{mode:0o600});}
     }
+    const selected=sourceManager(sid);
+    if(selected){const seen=new Set<string>();for(const entry of selected.getBranch()){
+     if(entry.type!=='custom_message'||entry.customType!=='augmentor.dsh-media.v1')continue;const details=entry.details as Data|undefined;
+     if(details?.files===undefined)continue;if(details.schema!=='augmentor-dsh-media/1'||!Array.isArray(details.files))throw Error('Source historical file metadata is invalid.');
+     for(const raw of details.files){
+      const file=historicalFilePart(raw),identitySha256=historicalFileIdentity(file);if(seen.has(identitySha256))continue;seen.add(identitySha256);
+      if(!attachments||!inheritedDshAttachment(selected,archive,file))throw Error('Source historical file binding lacks its exact selected archive provenance.');
+      const resolved=await attachments.resolve(sid,'',[file]),former=JSON.parse(resolved.text.slice(FILE_FOOTER_PREFIX.length)).path.replace(join(archive,'attachments','v1'),join(sourceState,'attachments','v1'));
+      mergeRelocationRule(rules,{kind:'dsh-file',identitySha256,file,formerPaths:[former]});
+     }
+    }}
     const bindings=relocationBindings({schema:'augmentor-native-relocation-bindings/1',sourceStateSha256:before.sha256,rules:[...rules.values()]});if(Buffer.byteLength(JSON.stringify(bindings))>1024*1024)throw Error('Relocation bindings exceed their bound.');atomicJson(join(stage,'native-relocations',sid+'.json'),bindings);
-    const through=events.get(sid)?.at(-1)?.seq??0;m.importedHistoryThroughSeq=through;if(m.file)m.file=join(targetState,relative(sourceState,m.file));atomicJson(join(stage,'sessions',sid+'.meta.json'),m);relocated.push({sessionId:sid,nativeFiles:[...nativeFiles.values()].filter(r=>r.sid===sid).length,bindings:rules.size,sourceDisplayThroughSeq:through});
+    const through=events.get(sid)?.at(-1)?.seq??0;m.importedHistoryThroughSeq=through;if(m.file)m.file=join(targetState,relative(sourceState,m.file));atomicJson(join(stage,'sessions',sid+'.meta.json'),m);relocated.push({sessionId:sid,nativeFiles:[...nativeFiles.values()].filter(r=>r.sid===sid).length,bindings:rules.size,sourceDisplayThroughSeq:through});managers.delete(sid);
    }
    // Configuration/login/MCP controls belong to the destination configuration;
    // conversation-bound compaction and prompt receipts keep their duplicate guards.
