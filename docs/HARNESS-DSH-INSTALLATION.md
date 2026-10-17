@@ -36,7 +36,11 @@ independently authored modern cases cover fresh install/reinstall, exact custom
 text/token preservation, legacy-to-modern owned upgrade, changed/missing SDKs,
 edited package/composition refusal, existing Prompt Library, rollback and platform
 refusal. The SDK workflow now runs setup qualification on Linux before later Office
-checks; this does not waive the public Office packaging gate.
+checks; this does not waive the public Office packaging gate. Manual SDK dispatch can use `platform=linux` for the
+current MX scope; default/pull-request dispatch still tests the full platform matrix.
+This Linux result cannot establish macOS/Windows readiness. Earlier f640ce8c SDK
+run 39041187982 passes Linux, fails macOS on the existing unsupported import/export
+path, and cancels Windows; those platform gaps are retained rather than waived.
 
 A separate actual installed upstream **0.2.0-rc.2** CLI/base/tools/web-app test uses
 current public source against a new authored profile. It installs, restarts,
