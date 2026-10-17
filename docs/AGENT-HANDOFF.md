@@ -1,5 +1,21 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Live original Wiki ingest](HARNESS-PLUGIN-PARITY.md#live-original-wiki-ingest-and-explicit-fallback--october-17)
+now verifies actual sealed ee80c054/original GUI/Qwen: one approved skill input,
+three exact Allow once approvals, two linked source/concept pages, native
+frontmatter/index/log/manifest and one hot-cache write, with immutable raw source.
+Two native Wiki receipts complete; cold native/display/observation/vault bytes
+remain exact without inference. The fixture refuses an `edit` before effect;
+the model re-reads the unchanged cache, uses approved `write` and discloses the
+fallback. The blanket no-tool-errors driver remains failed; a separate read-only
+postflight verifies target state without replay. Earlier driver failures remain.
+No product code/update or owner data changes: both PIDs/all 36 protected sets,
+sixteen recorded owner Wiki files, shared rows, registry fourteen, menus/selections
+and GPU/voice settings verify. All eight audited authored profiles have no remaining
+actors; private evidence is retained. [Record](../release/harness-wiki-ingest-live-qualification-20261017.json).
+This evidence-only documentation commit preserves ongoing validation with GitHub's
+skip instruction; no new-head/whole-workflow/merge acceptance is claimed.
+
 [Interrupted-response context](AUGMENTOR-HARNESS.md#model-context-after-an-interrupted-response--october-17)
 addresses an actual b1 original-GUI/Qwen failure: Resume reads the new file, then
 the model restarts the old numbered task. The effective provider request omits

@@ -1,5 +1,64 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Live original Wiki ingest and explicit fallback — October 17
+
+The current sealed MX application **ee80c054 / 20261017-071945-90183f89** now
+has actual-Qwen evidence beyond the earlier query-only sample. In a fresh,
+independently authored vault, the original GUI invokes the approved `/wiki-ingest`
+skill and retains its exact source fingerprint. All nine original skills are
+available; this case exercises one skill. A generic scaffold is fixture setup,
+outside the agent turn. No owner knowledge or conversations enter the prompt.
+One existing provider definition is copied into the separate private profile;
+saved owner model/GPU settings remain unchanged.
+
+One authored input requests a source page and a mutually linked concept page,
+native frontmatter/index/log/manifest bookkeeping, and an updated hot cache.
+The Ask-before-actions GUI supplies **three Allow once approvals**, each matched
+to the exact saved native proposal arguments. A test-only public SDK guard limits
+the producer to those two named native Wiki pages, ordinary `write` to its exact
+hot-cache file and reads in the temporary vault/approved skill resources. Shell/network
+tools and unrelated writes are unavailable within this fixture. This is a test
+scope boundary, not an OS sandbox claim for the default product.
+
+Both `wiki_write` operations complete with two durable completed receipts and no
+uncertain vault lock. Independent reads verify source/concept frontmatter, both
+folder indexes, master index, log, hot cache and manifest source hash. The two
+pages preserve the authored facts and marker, link to each other, and keep
+unresolved outcomes explicitly unverified. Only the two requested pages are
+added; original raw source bytes remain exact.
+
+The model also proposes `edit` for the hot cache. The fixture permits only
+ordinary `write` there and refuses `edit` before effect. The model then reads the
+unchanged original cache, requests a separate approved `write`, verifies its
+result and discloses the refusal/fallback in its final answer. This is **one
+fixture tool refusal**, not a native Wiki mutation failure or unknown outcome.
+The driver's blanket no-tool-errors assertion therefore remains **failed**.
+Read-only postflight qualifies the completed ingest and explicit fallback without
+repeating a producer, input or completed mutation. It verifies the denied edit
+left the old hot-cache hash intact before the write; the final file matches the
+successful write's exact content. Native hot-cache `edit` itself is not qualified.
+
+Cold inspection of that same profile leaves native/display/observation and vault
+bytes unchanged and submits no inference or agent dispatch. Earlier driver
+history-file creation and approval-card shape errors are retained separately;
+neither approved a mutation. Their actual outcomes are inspected before further
+testing. All known actors in eight recorded authored live-test profiles are now
+terminal; an earlier observed private memory companion exited without requiring
+termination. Profiles, raw histories, observations, receipts and failures remain
+private; [aggregate qualification](../release/harness-wiki-ingest-live-qualification-20261017.json)
+publishes counts/hashes and the precise acceptance limits.
+
+Both actual reviews remain on **ee80c054**, with the same owner PIDs, all 36
+protected file sets/hashes, twelve prompts/nineteen captured records, engine and
+processing settings, registry fourteen, menus/selections and GPU/voice states.
+The sixteen previously recorded **owner Wiki subtree files** retain their exact
+set/hashes; the surrounding personal archive is outside that inventory. No owner
+model request, personal-vault mutation, app update or extra project transfer occurs.
+Source/ordinary/sealed **229 Node / 41 Python** evidence is inherited from the
+preceding deployment, not rerun for this evidence-only change. Broader corpora,
+concurrent editors, other skills, optional CLIs/git/transport/DragonScale, physical
+use and further migration remain separate; voice/later OS remain deferred.
+
 [Original skill controls](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15)
 now expose approved skills through the unchanged MIT DSH slash source, editable
 `/name` links and current-source sidebar previews. Pi remains the sole owner;
@@ -111,8 +170,8 @@ No saved owner key or profile is imported by this choice.
 | Context, reference 0.48.0 | Copied dsh-context 0.68.1 Apache-2.0 composition/browser/trends/Insights/sidebar/Fleet and original Trajectory, including timing and nested arguments; [GUI qualification](DSH-GUI-ON-PI.md). | Complete causal/provenance/skill attribution, representative large histories, wider live provider formats and physical entry points. |
 | Shared Augmentor persona and response metrics | [Native persona snapshots](PI-INSTRUCTIONS.md) retain the approved common source through public Pi loader/session APIs; [response metrics](PI-RESPONSE-METRICS.md) preserve the public MIT DSH adapter's preview workflow with exact native reply matching and distinct observed/server timings. The [current unselected MX review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16) passes source/ordinary/sealed qualification and actual Qwen persona/context/Edit/metrics checks in separate synthetic profiles. | Physical owner acceptance, other provider timing formats, broader instruction/resource/opaque-handler provenance and installed adoption. Selected-source presence does not prove global causal attribution; missing metrics remain unavailable. |
 | Adaptive Reasoning, reference 0.2.0 | Selected public policy and supported Pi hooks, saved/effective effort and shared forms; [reasoning scope](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls). | Representative configured real/virtual model acceptance. Stored effort does not prove a backend honors it. |
-| Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model. The original Plugins form enables/disables the suite through public resource discovery on the same owners. [Original skill menu/source links](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15) now bind approved resources; managed authored invocations retain exact fingerprints. | [Current MX owner reviews](#existing-owner-wiki-vault-in-the-mx-reviews--october-16) now have the original vault/nine skills and applied UI status; installed Agent, representative other skill workflows and companion CLIs/services remain separate. |
-| Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | [Current MX owner reviews](#existing-owner-wiki-vault-in-the-mx-reviews--october-16) now pass actual existing-vault quick/standard reads without writes; installed Agent, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification remain. |
+| Wiki Skills 0.2.1 | [Copied MIT suite and source Pi binding](#wiki-core-source-binding--october-13); all nine skill bodies and references retained, with actual approved wiki-query expansion reaching the model and [one original-GUI live ingest](#live-original-wiki-ingest-and-explicit-fallback--october-17) verified through a disclosed fixture refusal/write fallback. The original Plugins form enables/disables the suite through public resource discovery on the same owners. [Original skill menu/source links](DSH-GUI-ON-PI.md#original-skill-controls-and-source-fingerprints--october-15) now bind approved resources; managed authored invocations retain exact fingerprints. | [Current MX owner reviews](#existing-owner-wiki-vault-in-the-mx-reviews--october-16) now have the original vault/nine skills and applied UI status; installed Agent, representative other skill workflows and companion CLIs/services remain separate. |
+| Wiki Tools 0.14.0 | [Copied original six operation bodies](#wiki-core-source-binding--october-13) execute through the actual Pi owner; [original Plugins settings](#wiki-settings-in-the-original-plugins-page--october-13) configure and reload that same owner. [Actual original-GUI/Qwen ingest](#live-original-wiki-ingest-and-explicit-fallback--october-17) now verifies two linked pages, native bookkeeping and an approved hot-cache write after a disclosed fixture edit refusal. Routing, read-only, Browser exclusion and unknown-outcome fences qualify; [explicit action review](#wiki-action-inspection-and-explicit-review--october-13) retains uncertain originals and permits new intent. | [Current MX owner reviews](#existing-owner-wiki-vault-in-the-mx-reviews--october-16) now pass actual existing-vault quick/standard reads without writes; installed Agent, wider corpora/concurrent editors, optional git automation, mid-operation crash repair and standalone add-on/platform qualification remain. |
 | Metafolder 1.2.1 | [Copied original UI and qualified navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate); pointer/group/pin/archive/Fork/cold-origin, directory navigation, keyboard/rail Search focus and view controls qualify in isolated profiles. Installed preview is unchanged. | Guarded installed adoption and owner feedback; broader corpus search, manual pointer ordering, complete accessibility and optional physical-move workflows. |
 | Free Web Search, historical 0.1.0 reference | [Original API card and keyless controls](#keyless-and-api-modes-in-the-original-plugins-page--october-14) bind both workflows through existing Native owners, retaining separate keys/settings/drafts, same-owner mode reload, collision/pending recovery, scope boundaries and actual Light/Dark GUI qualification. Source/ordinary managed Qwen search and public fetch qualify. The owner chooses these tested MIT alternatives. | Historical identity/360 parity remain unconfirmed; identity does not block the accepted source choice. Representative credentialed engines/outage/quota, standalone add-ons, guarded installed owner acceptance and other OS qualification remain. No owner keys are migrated. |
 | Playwright MCP | Managed-core synthetic contracts plus [actual local-Qwen/Playwright 0.0.79](#live-playwright-workflow-and-retained-inspection--october-14): one owned navigation/click/receipt/close, approved effects, snapshot reads, held navigation Stop and original cold Trajectory inspection with no replay. | Owner configuration/installed adoption, broader browser workflows, external sites/credentials and physical/platform acceptance. |
