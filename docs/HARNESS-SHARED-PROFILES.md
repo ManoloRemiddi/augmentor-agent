@@ -1,5 +1,40 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Sealed embedding follow-up and existing configuration — October 17
+
+Fresh unselected **add7b891 / 20261017-152350-2c67edd7**, artifact
+**112ec5c4bbf146f03994dd1b6a0996d52d776c7f037914e0f4d33b6b2117dd53**,
+passes **42 Node / 82 Python** in source, ordinary copy and exact sealed target.
+Its recorded interpreter also passes all **12 binding cases**, overlapping the 82.
+All **24,761 inventory entries / 1,143 compiled files** verify after tests, with
+unchanged Node/dependency/component/notices. Tests/fixtures remain external.
+This closes the preceding source-only embedding package gap.
+[Package record](../release/harness-shared-embed-package-20261017.json).
+
+The actual selected installed adapter, executed in place without copying its
+source, successfully describes the existing **DSH 0.1.5-rc.1** host. This differs
+from Augmentor's product integration version: that remains **0.2.11**, and the
+new 0.2.13 candidate correctly refuses it. The ownership audit finds **five of six**
+tracked integration files exact. The plugin package's `peerDependencies` metadata
+differs; the recorded composition insertion occurs **zero** times in the current
+custom configuration. Four tracked preset files and plugin JavaScript remain exact.
+A non-executing YAML-node inspection locates owned IDs without evaluating `!!js`
+expressions. This is observation, not permission to overwrite or reinterpret them.
+Normal automatic integration replacement is not qualified: preserve these custom
+composition/metadata changes in a deliberate, backed-up matching upgrade, then
+repeat actual production preflight. No ownership checksum is rewritten just to
+silence an edit guard. The recorded live idle status is not a reserved window.
+
+Both original MX reviews remain 97d95d58; PIDs/all 36 protected sets, shared rows/
+engine configuration, registry 18, menus/selections and Qwen/GPU/voice services
+verify unchanged. No actual client, DSH profile or shared store is changed, no
+model request or project transfer occurs. The earlier 22103e61 PR CI 39035553761
+was confirmed live and is retained; new code will receive a separate branch-ref
+validation so its publication does not discard that running evidence. No full-
+workflow success, owner cutover or public redistribution is claimed. Matching
+custom integration/client adoption, fresh full cold backups, real banks/history/
+budgets, busy-work/restart/reverse acceptance and pilot feedback remain open.
+
 ## Embedded entrypoint and actual production compatibility — October 17
 
 Linux's stable `embed-launch.py` now reads the same selected state/data pair as

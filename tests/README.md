@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Sealed embedding qualification](../release/harness-shared-embed-package-20261017.json):
+source, ordinary and exact add7b891 private artifact each pass 42 Node/82 Python,
+plus 12 overlapping binding cases with recorded Python. All 24,761 sealed/1,143
+compiled inputs verify after actual embed/SDK/host and existing workspace checks.
+Actual production product mismatch and edited ownership/composition remain separate
+cutover prerequisites; no installed update or full-CI approval is claimed.
+
 [Embedded shared-launch qualification](../release/harness-shared-embed-20261017.json):
 42 Node/82 Python source cases include actual generated embedding launcher, SDK
 adapter, server and Native host. Idle reader/process guards, selected prompt reads,

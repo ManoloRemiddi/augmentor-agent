@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Sealed embedding follow-up](HARNESS-SHARED-PROFILES.md#sealed-embedding-follow-up-and-existing-configuration--october-17)
+qualifies add7b891 / 20261017-152350-2c67edd7, artifact 112ec5c4…7dd53:
+24,761 inputs/1,143 compiled; source/ordinary/sealed each 42 Node/82 Python plus 12
+overlapping recorded-interpreter cases. Unselected; original reviews/owner stores/
+services unchanged. Actual DSH host is 0.1.5-rc.1; product integration 0.2.11 refuses
+candidate 0.2.13. Existing peerDependencies/composition edits require preservation
+before a matching upgrade; automatic replacement is not qualified. Retain prior
+live CI 39035553761; dispatch new code separately. [Record](../release/harness-shared-embed-package-20261017.json).
+
 [Embedded shared launch and production preflight](HARNESS-SHARED-PROFILES.md#embedded-entrypoint-and-actual-production-compatibility--october-17)
 adds the missing idle embedding-server reader/selected pair while retaining SDK
 proxy and write restrictions. Source 42 Node/82 Python pass. Actual sealed 22103e61
