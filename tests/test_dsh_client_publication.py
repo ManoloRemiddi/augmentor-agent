@@ -41,7 +41,9 @@ class ClientPublicationFixture(PreservationTransactionFixture):
         self.other_pair={'state':str(self.base/'other-state'),'data':str(self.base/'other-data')}
         for name in self.other_pair.values():Path(name).mkdir(mode=0o700)
         for name in tx.shared.DATABASES:self.write(Path(self.other_pair['data'])/name,b'AUTHORED OTHER STORE\n')
-        self.write(self.other/'desktop.json',{'root':str(self.old),'sharedProfile':self.other_pair,'dshService':'authored-keep','dshEndpoint':'http://127.0.0.1:19001','dshHome':str(self.home)})
+        # Metadata-only publication fixtures already share the authoritative
+        # pair. A cross-store selection now requires the real adoption fixture.
+        self.write(self.other/'desktop.json',{'root':str(self.old),'sharedProfile':self.pair,'dshService':'authored-keep','dshEndpoint':'http://127.0.0.1:19001','dshHome':str(self.home)})
         self.write(self.other/'desktop.previous.json',{'authoredOlderRollback':'KEEP'})
         self.bin=self.base/'launchers';self.bin.mkdir(mode=0o700)
         self.existing=self.bin/'agent';self.write(self.existing,b'#!/bin/sh\n# AUTHORED BEFORE\n');self.existing.chmod(0o755)

@@ -255,9 +255,17 @@ def manual(source,target):
     finally:a.close();b.close()
 
 
-def merge(source,target,cut,map_default):
+def merge(source,target,cut,map_default,*,allow_missing_source=False):
     source,target=Path(source),Path(target)
-    result={'schema':'augmentor-shared-profile-merge/1','prompts':prompts(source,target,cut),'memory':memory(source,target,map_default),'manualMemory':manual(source,target)}
+    if allow_missing_source:validate(source,allow_missing=True)
+    missing=lambda name:allow_missing_source and not (source/name).exists()
+    prompt_result={'sourceComponentAbsent':True,'imported':0,'aliases':{},'targetImprovementPreserved':True,'sourceCommittedRequestsRetired':0}
+    memory_result={'sourceComponentAbsent':True,'importedEvents':0,'sequences':{},'activityWindowsArchived':0,'unassignedEligibilityArchived':0,'processingJobs':0,'targetCaptureAndProcessingSettingsPreserved':True}
+    manual_result={'sourceComponentAbsent':True,'sourceOperations':0,'targetConfigurationPreserved':True}
+    result={'schema':'augmentor-shared-profile-merge/1',
+            'prompts':prompt_result if missing('prompts.sqlite3') else prompts(source,target,cut),
+            'memory':memory_result if missing('dual-memory.sqlite3') else memory(source,target,map_default),
+            'manualMemory':manual_result if missing('memory.sqlite3') else manual(source,target)}
     for name,schema in [('prompts.sqlite3',PROMPT),('dual-memory.sqlite3',DUAL),('memory.sqlite3',MANUAL)]:
         check=database(target/name,schema);check.close()
     maps=target/'shared-imports'/cut/'memory-sequences.json'
@@ -265,16 +273,19 @@ def merge(source,target,cut,map_default):
     return result
 
 
-def validate(data):
+def validate(data,*,allow_missing=False):
     """Read-only schema/integrity qualification, without constructing services."""
     data=Path(data)
+    count=0
     for name,schema in [('prompts.sqlite3',PROMPT),('dual-memory.sqlite3',DUAL),('memory.sqlite3',MANUAL)]:
+        if allow_missing and not (data/name).exists() and not (data/name).is_symlink():continue
         check=database(data/name,schema)
-        check.close()
+        check.close();count+=1
+    if not count:raise ValueError('A partial shared source must contain an existing companion database.')
     for name in ['hindsight.json','hindsight-installation.json']:
         if (data/name).exists() and not isinstance(json.loads((data/name).read_text()),dict):
             raise ValueError('Engine configuration must be a JSON object.')
-    return {'schema':'augmentor-shared-databases-validation/1','databases':3,'readOnly':True}
+    return {'schema':'augmentor-shared-databases-validation/1','databases':count,'readOnly':True}
 
 
 if __name__=='__main__':

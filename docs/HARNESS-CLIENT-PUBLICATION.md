@@ -4,12 +4,19 @@
 
 `services/dsh/client_publication.py` connects a verified cold archive to the
 configuration, startup files and matching build selections. It is an internal
-Linux API. It does not discover or stop owner processes, install a Browser
-extension, restart ordinary clients, restore databases or establish owner
-acceptance. The installed main/pilot and Native app have not been updated by
+Linux API. Version 2 can bind [component-only shared-data adoption](HARNESS-SHARED-DATA-ADOPTION.md). It does not discover or stop owner processes, install a Browser
+extension, restart ordinary clients or establish owner acceptance. The installed main/pilot and Native app have not been updated by
 this source checkpoint.
 
 ## Prepare one reviewed cut
+
+Client publication **schema 2** now owns a bound shared-data journal as well as
+configuration schema 3. Cold archive schema 2 records explicit partial secondary
+sources. A shared-pair switch requires its source in the adoption receipt; legacy
+additional selectors need their actual `previous_pairs`. The primary canonical
+store remains complete. Prepare data images before configuration fences; see
+[the complete pipeline and recovery rules](HARNESS-SHARED-DATA-ADOPTION.md).
+
 
 The public `scripts/harness-preview.py` now holds the deployment reader before
 configuration, status, Native or Browser startup. It refuses pending maintenance.
@@ -35,7 +42,10 @@ publication health replies remain synthetic. No full app mirror, installed
 candidate, owner model request or owner-data migration was created by these checks.
 Runtime **c0bf300075cde11d0a51f81e7ce0dbb5f32c652d**;
 [Linux SDK 39070128857](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39070128857)
-is still running, with no hosted pass claimed.
+ended with Linux fixture-permission and macOS temporary-alias fixture failures;
+Windows was cancelled by the matrix. Those fixture corrections now pass locally
+under umask 0022 and an aliased temporary directory. No hosted pass is claimed
+for that predecessor run.
 See [the source qualification record](../release/harness-preview-binding-20261017.json).
 
 Inventory and adopt every real launcher first. In particular, the installed
@@ -91,21 +101,23 @@ not another application build or another copy of project data.
 `apply` resumes only known before/after bytes. Under all cold guards, recovery first
 restores its own exact original selectors and explicitly rebinds that verified
 guard value; the configuration API's original-selection invariant stays intact.
-It applies configuration and reviewed bootstrap images, runs the fixed controlled
+It applies configuration, any bound shared DB components, and reviewed bootstrap images, runs the fixed controlled
 backend and actual candidate Native-adapter preflights, rechecks suppliers, then
 publishes matching selectors. It keeps all startup fences. No model call is
 requested by these preflights.
 
 `finalize` requires the matching after-images, immutable supplier identity and a
-still-valid archive. A new guard reruns preflight rather than trusting an old
-success flag. Durable finalizing intent precedes marker removal; primary deployment
+still-valid archive. A new guard reruns preflight while the phase is still applied. Once finalizing
+intent is durable, recovery finishes forward without replaying configuration or
+data application; released data verification permits new ordinary work. Durable finalizing intent precedes marker removal; primary deployment
 startup opens last. Interrupted finalization can complete forward. The result says
 `clientPublicationComplete`, with `activationComplete`, ordinary-client startup
 and owner continuation still **false**. Those remaining steps need actual evidence.
 
 Before finalizing, `rollback` restores exact selector/bootstrap/configuration bytes
-and modes, including removing its newly created bootstrap files. It never restores
-databases, overwrites an unknown edit or replays a user action. After finalizing
+and modes, including removing its newly created bootstrap files. Bound adoption
+reverses only its known component exchanges and archive moves. It never overwrites
+an unknown edit or replays a user action. After finalizing
 intent, startup may have reopened: automatic old-cut reversal is refused. A fresh
 reviewed cold reverse cut must account for any new user work. Keep the original
 archive, journals and needed rollback app; do not silently restore old data.
@@ -147,4 +159,5 @@ needs adoption before switching that selection. Direct Browser/mobile launchers 
 stable Home helper still need exact adoption review. Preserve separately selected
 companion suppliers and the current interpreter contract. The approved Native/
 Harness prompt/capture merge or target receipt must be bound before a real store
-switch; this publication layer does not migrate databases or establish that merge.
+switch. The source layer now binds that exact component merge; real owner adoption
+and the complete three-pair launcher graph are still unperformed.

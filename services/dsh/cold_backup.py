@@ -19,7 +19,7 @@ import time
 
 from . import preservation_transaction as tx
 
-SCHEMA='augmentor-cold-data-backup/1'
+SCHEMA='augmentor-cold-data-backup/2'
 GIB=1024**3
 RESERVE=64*GIB
 MAX_FILE=2*GIB
@@ -53,8 +53,11 @@ class Budget:
 def coverage(guard,additional):
     roots=[{'id':'dsh','path':str(guard.home),'members':None},
            {'id':'deployment','path':str(guard.data),'members':['desktop.json'],'optional':['desktop.previous.json']}]
-    roots.extend({'id':'shared-'+str(i),'path':pair['data'],'members':list(tx.shared.DATABASES),'optional':list(OPTIONAL)}
-                 for i,pair in enumerate(guard.pairs))
+    for i,pair in enumerate(guard.pairs):
+        partial=pair in guard.partial_pairs
+        required=[name for name in tx.shared.DATABASES if not partial or (Path(pair['data'])/name).exists()]
+        roots.append({'id':'shared-'+str(i),'path':pair['data'],'members':required,
+                      'optional':list(OPTIONAL)+[n for n in tx.shared.DATABASES if n not in required]})
     if not isinstance(additional,list) or len(additional)>32:raise ValueError('Choose at most 32 explicit additional data roots.')
     ids={root['id'] for root in roots};trees=[guard.home]
     for row in additional:
@@ -247,7 +250,8 @@ def verify_for_guard(output,digest,guard):
     if tx.preserve.sha(raw)!=digest:raise ValueError('Cold backup receipt changed before guard binding.')
     receipt=tx.preserve.document(raw)
     if (receipt['home']!=str(guard.home) or receipt['deploymentData']!=str(guard.data) or
-            receipt['selectionSha256']!=tx.preserve.sha(guard.selection) or receipt['sharedProfiles']!=guard.pairs):
+            receipt['selectionSha256']!=tx.preserve.sha(guard.selection) or receipt['sharedProfiles']!=guard.pairs or
+            receipt.get('partialSharedProfiles')!=guard.partial_pairs):
         raise ValueError('Cold backup belongs to another configuration or shared-store selection.')
     manifest=read_manifest(output,receipt['manifestSha256']);descriptors=[]
     try:
@@ -258,7 +262,7 @@ def verify_for_guard(output,digest,guard):
         current,total=scan(manifest['coverage'],descriptors)
         original=[{k:v for k,v in row.items() if k not in ('sha256','archiveKind','target')} for row in manifest['entries']]
         if current!=original or total!=receipt['bytes']:raise ValueError('Cold backup no longer matches the original covered data.')
-        for pair in guard.pairs:tx.shared.component_fingerprint(pair)  # Refuse any new SQLite journal.
+        for pair in guard.pairs:tx.shared.component_fingerprint(pair,allow_missing=pair in guard.partial_pairs)
         tx.require(guard,guard.home)
         return {'valid':True,'matchesCurrentCoveredData':True,'backupSha256':digest,'activationComplete':False}
     finally:
@@ -278,7 +282,7 @@ def capture(output,guard,additional=None):
         raise ValueError('Keep cold data backups outside source, profiles and deployment/shared storage.')
     descriptors=[];identity=None;created={};budget=Budget(output.parent)
     try:
-        fingerprints=[tx.shared.component_fingerprint(pair) for pair in guard.pairs]
+        fingerprints=[tx.shared.component_fingerprint(pair,allow_missing=pair in guard.partial_pairs) for pair in guard.pairs]
         for root in roots:
             path=tx.gate.directory(root['path']);descriptors.append(os.open(path,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW))
         rows,total=scan(roots,descriptors)
@@ -318,12 +322,13 @@ def capture(output,guard,additional=None):
         original=[{k:v for k,v in row.items() if k not in ('sha256','archiveKind','target')} for row in rows]
         if after!=original or after_total!=total:raise ValueError('Cold data tree changed before backup completion.')
         tx.require(guard,guard.home)
-        if fingerprints!=[tx.shared.component_fingerprint(pair) for pair in guard.pairs]:raise ValueError('Shared stores changed before backup completion.')
+        if fingerprints!=[tx.shared.component_fingerprint(pair,allow_missing=pair in guard.partial_pairs) for pair in guard.pairs]:raise ValueError('Shared stores changed before backup completion.')
         if any(stamp(os.stat(root['path'],follow_symlinks=False))[:2]!=stamp(os.fstat(fd))[:2] for root,fd in zip(roots,descriptors)):
             raise ValueError('Cold source root identity changed.')
         reserve(output.parent)
         receipt={'schema':SCHEMA,'home':str(guard.home),'deploymentData':str(guard.data),
                  'selectionSha256':tx.preserve.sha(guard.selection),'sharedProfiles':guard.pairs,
+                 'partialSharedProfiles':guard.partial_pairs,
                  'entries':len(rows),'bytes':total,'manifestSha256':tx.preserve.sha(raw),'archiveSha256':archive_sha}
         complete=encoded(receipt);tx.atomic(output/'complete.json',complete,exclusive=True)
         parent=os.open(output.parent,os.O_RDONLY|os.O_DIRECTORY|os.O_NOFOLLOW)

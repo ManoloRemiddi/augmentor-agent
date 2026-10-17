@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared-data adoption into the existing canonical store](../docs/HARNESS-SHARED-DATA-ADOPTION.md)
+now binds multiple full/explicitly partial sources to client publication schema 2,
+with cold archive schema 2. Local **121 Python / 57 Node** pass: 21 real SQLite
+adoption cases, multi-source/partial-source recovery, exact component reverse and
+post-reopen work preservation. No full app copy, owner migration or installed
+change. A read-only advisory audit identifies a third legacy Native shared pair
+containing only automatic memory; include it in the real cold graph. Actual
+combined-artifact/bootstrap/Browser qualification and owner continuation remain.
+[Record](../release/harness-shared-data-adoption-20261017.json).
+
 [Protected preview shared binding](../docs/HARNESS-CLIENT-PUBLICATION.md) now preserves existing preview config/state/socket/provider paths while applying only an explicit shared pair. Native/Browser/status startup refuses pending maintenance; protected helpers are required. Reviewed Home helper publication reverses exactly. Local **51 Python** pass (seven new preview / 23 publication cases); no full app copy, installed change or owner data migration. The original 75-copy cleanup plus three verified duplicates now totals **78 copies / 42.51 GiB recovered**, with about **100 GiB free**. Ambiguous old output/profile trees remain. Qualify one combined artifact and bind shared-data adoption before the real cold cut.
 
 [Cold-backed matching client publication](../docs/HARNESS-CLIENT-PUBLICATION.md) now links

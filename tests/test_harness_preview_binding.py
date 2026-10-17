@@ -22,7 +22,10 @@ class PreviewBindingTests(unittest.TestCase):
         environment=patch.dict(os.environ,{key:str(self.base/name) for key,name in [('HOME','home'),('XDG_DATA_HOME','data'),('XDG_CONFIG_HOME','config'),('XDG_STATE_HOME','state'),('XDG_RUNTIME_DIR','run')]})
         environment.start();self.addCleanup(environment.stop)
         for path in (self.base/'data',self.base/'config',self.base/'state',self.base/'run'):path.mkdir(mode=0o700)
-        self.data=self.base/'data/augmentor-harness-preview/augmentor';self.data.mkdir(parents=True,mode=0o700)
+        self.data=self.base/'data/augmentor-harness-preview/augmentor'
+        # Intermediate mkdir modes follow the caller's umask, including 0022
+        # on hosted runners. Construct the actual private installed profile.
+        self.data.parent.mkdir(mode=0o700);self.data.mkdir(mode=0o700)
         self.root=self.data/'releases/authored';(self.root/'node/bin').mkdir(parents=True,mode=0o700)
         (self.root/'node/bin/node').write_bytes(b'AUTHORED NODE');(self.root/'node/bin/node').chmod(0o700)
         files={'node/bin/node':hashlib.sha256(b'AUTHORED NODE').hexdigest()}

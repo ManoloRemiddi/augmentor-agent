@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {mkdtemp,mkdir,writeFile,readFile,stat,readdir,rm,symlink,readlink} from 'node:fs/promises';
+import {mkdtemp,mkdir,writeFile,readFile,stat,readdir,rm,symlink,readlink,realpath} from 'node:fs/promises';
 import {existsSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
@@ -20,7 +20,7 @@ import {toolOwnership} from '../apps/harness/dsh-call-identity.mjs';
 import {projectChat} from '../apps/harness/chat-projection.js';
 const hash=b=>createHash('sha256').update(b).digest('hex');
 async function fixture(t){
- const root=await mkdtemp(join(tmpdir(),'augmentor-dsh-import-'));t.after(()=>rm(root,{recursive:true,force:true}));
+ const root=await realpath(await mkdtemp(join(tmpdir(),'augmentor-dsh-import-')));t.after(()=>rm(root,{recursive:true,force:true}));
  const cwd=join(root,'project');await mkdir(cwd);await writeFile(join(cwd,'original.txt'),'Original authored bytes\n');
  const event=(type,data)=>({type:'event',event:{type,data,seq:0,time:1700000000000}});
  const rows=[event('turn/start',{turn:1}),event('system/message',{message:{content:[{type:'text',text:'Historical SYSTEM MUST NOT become active.'}]}}),event('user/message',{role:'user',source:{kind:'agent-instructions'},content:[{type:'text',text:'Historical bootstrap MUST NOT become active.'}]}),event('user/message',{role:'user',source:{kind:'user'},content:[{type:'text',text:'Inspect the authored project.'}]}),event('assistant/message',{turn:1,step:1,message:{role:'assistant',content:[{type:'tool-call',id:'old-call',name:'read',arguments:'{"path":"original.txt"}'}]}}),event('tool/call',{turn:1,step:1,callId:'old-call',name:'read',arguments:'{"path":"original.txt"}'}),event('tool/result',{turn:1,step:1,message:{role:'tool',toolCallId:'old-call',isError:false,content:[{type:'text',text:'Original authored bytes\n'}]}}),event('assistant/message',{turn:1,step:2,message:{role:'assistant',content:[{type:'text',text:'I inspected the original; no action remains.'}]}}),event('turn/end',{turn:1,reason:{kind:'completed'}})];rows.forEach((r,i)=>r.event.seq=i);

@@ -1,0 +1,72 @@
+{
+  "schema": "augmentor-harness-shared-data-adoption-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Source-only cold component adoption, complete/explicit partial secondary sources and client publication ownership",
+  "schemas": {
+    "clientPublication": "augmentor-dsh-client-publication/2",
+    "coldArchive": "augmentor-cold-data-backup/2",
+    "configurationTransaction": "augmentor-dsh-configuration-transaction/3",
+    "sharedAdoption": "augmentor-shared-data-adoption/1"
+  },
+  "qualification": {
+    "pythonPass": 121,
+    "sharedAdoptionCases": 21,
+    "publicationCases": 23,
+    "previewCases": 7,
+    "nodePass": 57,
+    "nodeSharedProfilesAndDsh": 17,
+    "nodeOfflineImportsWithAliasedTemp": 40,
+    "fail": 0,
+    "skip": 0,
+    "hostReadOnly": true,
+    "networkIsolated": true,
+    "umask": "0022",
+    "reserveGiB": 64,
+    "authoredFixturesOnly": true,
+    "publicationBackendRepliesSynthetic": true,
+    "ownerModelRequests": 0,
+    "fullAppCopiesCreated": 0,
+    "newInstalledArtifacts": 0
+  },
+  "sourceScope": [
+    "One canonical complete target and up to four full or explicitly partial source pairs",
+    "Exact full source inventories and nested import history preserved",
+    "Three known DB component exchanges; mixed application root never replaced",
+    "Pending unassigned captures archived without activation; target engine/configuration authority retained",
+    "Publication-owned data/configuration commit and exact pre-finalizing reverse",
+    "Forward finalization preserves new ordinary work after startup can reopen",
+    "Legacy selectors require explicit previous pairs and a matching adoption receipt"
+  ],
+  "priorSdk": {
+    "run": 39070128857,
+    "runtimeRef": "c0bf300075cde11d0a51f81e7ce0dbb5f32c652d",
+    "status": "completed",
+    "conclusion": "failure",
+    "linuxFixtureUmaskFailure": true,
+    "macFixtureTemporaryAliasFailure": true,
+    "windowsCancelledByMatrix": true,
+    "localCorrectionsQualified": true,
+    "wholeWorkflowPassClaimed": false
+  },
+  "ownerDataMigrated": false,
+  "installedOwnerAppChanged": false,
+  "advisoryLegacyNativePartialSchemaReadOnly": true,
+  "oldTwoPairMapIncomplete": true,
+  "requiredColdPairs": 3,
+  "cleanupCopiesRemoved": 78,
+  "cleanupObservedGiBRecovered": 42.51,
+  "rootFreeGiBApprox": 100.08,
+  "remaining": [
+    "One combined immutable qualification against retained integration",
+    "Exact complete launcher/bootstrap/registration pre-adoption",
+    "Fresh real three-pair cold archive including every dedicated source and nested history",
+    "Matching loaded Browser and controlled publication",
+    "Actual owner continuation; pilot feedback before further project transfers"
+  ],
+  "privateEvidenceSha256": {
+    "harness-shared-adoption-final-20261017.log": "779ce1ca17c5f64be8939ebe043d31582af2812f17fca81c03114f3f90356bb3",
+    "harness-shared-adoption-node-20261017.log": "254217ac551de37c01170a44e20eccdccda67fefa4c9472c8c780387cfb0015f",
+    "harness-shared-adoption-legacy-preview-schema-private-20261017.json": "3d65b91f274ab9c678cac692df751bfdb328cbabaaa6f6456eb88261a5a0266e"
+  },
+  "hostedQualificationPending": true
+}

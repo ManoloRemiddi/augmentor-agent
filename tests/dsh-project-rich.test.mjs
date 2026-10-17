@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mkdtemp,mkdir,readFile,writeFile,rm,readdir,chmod} from 'node:fs/promises';import {existsSync} from 'node:fs';import {tmpdir} from 'node:os';import {resolve,join} from 'node:path';import {pathToFileURL} from 'node:url';import {createHash} from 'node:crypto';
+import {mkdtemp,mkdir,readFile,writeFile,rm,readdir,chmod,realpath} from 'node:fs/promises';import {existsSync} from 'node:fs';import {tmpdir} from 'node:os';import {resolve,join} from 'node:path';import {pathToFileURL} from 'node:url';import {createHash} from 'node:crypto';
 import {authoredRichDshProject} from './fixtures/dsh-rich-project.mjs';
 const root=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.');
 const {importDshProject}=await import(pathToFileURL(join(root,'dist/runtime/src/dsh-project-import.js')));
@@ -10,7 +10,7 @@ const sdk=JSON.parse(await readFile(join(root,'node_modules/@earendil-works/pi-c
 const {SessionManager}=await import(pathToFileURL(join(root,'node_modules/@earendil-works/pi-coding-agent',sdk.exports['.'].import)));
 const sha=b=>createHash('sha256').update(b).digest('hex');
 async function fixture(t){
- const base=await mkdtemp(join(tmpdir(),'augmentor-rich-import-'));t.after(()=>rm(base,{recursive:true,force:true}));const cwd=join(base,'project');await mkdir(cwd);
+ const base=await realpath(await mkdtemp(join(tmpdir(),'augmentor-rich-import-')));t.after(()=>rm(base,{recursive:true,force:true}));const cwd=join(base,'project');await mkdir(cwd);
  const rich=await authoredRichDshProject(cwd),source=join(base,'source.json'),state=join(base,'state');
  const save=async()=>{const data=JSON.stringify(rich.value);await writeFile(source,data,{mode:0o600});return {sourceSha256:sha(data),selection:{provider:'fixture',model:'fixture-vision'}};};
  return {base,cwd,source,state,...rich,save};

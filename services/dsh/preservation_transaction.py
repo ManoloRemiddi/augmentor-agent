@@ -96,12 +96,15 @@ class _Guard:
 
 
 @contextmanager
-def maintenance(home,data,pairs):
+def maintenance(home,data,pairs,*,partial_pairs=()):
     """Hold DSH/profile, managed-client and shared companion gates together."""
     if sys.platform!='linux':raise ValueError('Configuration maintenance is qualified only on Linux.')
     home=gate.directory(home);data=private_directory(data)
     if not isinstance(pairs,list) or not pairs:raise ValueError('Identify the selected shared pair before maintenance.')
-    pairs=[shared.profile(pair,dedicated=False) for pair in pairs]
+    if not isinstance(partial_pairs,(tuple,list)) or any(p not in pairs[1:] or p==pairs[0] for p in partial_pairs):
+        raise ValueError('Only explicit secondary source pairs may have missing databases.')
+    partial_pairs=list(partial_pairs)
+    pairs=[shared.profile(pair,dedicated=False,allow_missing=pair in partial_pairs) for pair in pairs]
     raw=preserve.read(data/'desktop.json',private=True);selected=preserve.document(raw)
     expected=selected.get('sharedProfile') or {
         'state':str(Path(os.environ.get('AUGMENTOR_SHARED_STATE',Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor')).resolve()),
@@ -111,6 +114,7 @@ def maintenance(home,data,pairs):
         assert_no_dsh(home)
         if preserve.read(data/'desktop.json',private=True)!=raw:raise ValueError('The desktop selection changed before maintenance.')
         guard=_Guard(home,data,raw,pairs,launch_fd)
+        guard.partial_pairs=partial_pairs
         try:yield guard
         finally:
             try:

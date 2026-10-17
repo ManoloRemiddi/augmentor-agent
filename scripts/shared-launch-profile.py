@@ -31,7 +31,7 @@ def directory(value):
     return path
 
 
-def profile(value, dedicated=True):
+def profile(value, dedicated=True, *, allow_missing=False):
     if sys.platform!='linux':
         raise ValueError('Selected shared-store launch binding is qualified only on Linux.')
     if not isinstance(value, dict) or set(value)!={'state','data'}:
@@ -50,10 +50,16 @@ def profile(value, dedicated=True):
     if dedicated:
         if any(child.name not in KNOWN for child in data.iterdir()):
             raise ValueError('Select dedicated shared data, not a mixed application root.')
+    present=0
     for name in DATABASES:
-        info=(data/name).lstat()
+        try:info=(data/name).lstat()
+        except FileNotFoundError:
+            if allow_missing:continue
+            raise
         if not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_nlink!=1 or info.st_mode&0o077:
             raise ValueError('Selected shared databases must be private owned regular files.')
+        present+=1
+    if not present:raise ValueError('A partial shared source must contain at least one existing database.')
     return dict(value)
 
 
@@ -184,7 +190,7 @@ def cold(pairs):
         while descriptors:os.close(descriptors.pop())
 
 
-def component_fingerprint(pair):
+def component_fingerprint(pair, *, allow_missing=False):
     data=Path(pair['data']);rows=[];total=0
     for name in DATABASES:
         if any((data/(name+tail)).exists() for tail in ('-wal','-shm','-journal')):
@@ -193,7 +199,7 @@ def component_fingerprint(pair):
         path=data/name
         try:fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
         except FileNotFoundError:
-            if name in DATABASES:raise
+            if name in DATABASES and not allow_missing:raise
             continue
         try:
             before=os.fstat(fd)

@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared-data adoption into the existing canonical store](HARNESS-SHARED-DATA-ADOPTION.md)
+now binds multiple full/explicitly partial sources to client publication schema 2,
+with cold archive schema 2. Local **121 Python / 57 Node** pass: 21 real SQLite
+adoption cases, multi-source/partial-source recovery, exact component reverse and
+post-reopen work preservation. No full app copy, owner migration or installed
+change. A read-only advisory audit identifies a third legacy Native shared pair
+containing only automatic memory; include it in the real cold graph. Actual
+combined-artifact/bootstrap/Browser qualification and owner continuation remain.
+[Record](../release/harness-shared-data-adoption-20261017.json).
+
 [Cold-backed matching client publication](HARNESS-CLIENT-PUBLICATION.md) now links
 configuration schema 3, reviewed bootstrap images and both build selectors. Exact
 pre-finalization reverse and interrupted forward finalization are covered; linked
