@@ -7,18 +7,18 @@ const node=(tag,text)=>{const element=document.createElement(tag);if(text!==unde
 export function attachNativeHistory(container,{rpc,sessionId,alive,native,lineage,archived=false}){
  const section=node('section'),list=node('div'),status=node('p'),viewer=node('div'),load=node('button',archived?'Read archived DSH records':'Read saved Pi entries'),recent=node('button','Recent entries'),older=node('button','Earlier entries');
  section.className='native-history';list.className='native-entry-page';viewer.className='native-entry-viewer';
- section.append(node('h3','Saved conversation originals'),node('p',archived?'Serialized source records from a checksum-verified DSH archive. Original whitespace stays in the raw archive. These records do not establish effective provider input.':'These originals come from saved conversation history, including when context capture was off. Edits and added instructions can change what reaches the model.'),load,recent,older,status,list,viewer);container.append(section);recent.hidden=true;older.hidden=true;
+ section.append(node('h3','Saved conversation originals'),node('p',archived?'Saved records from a checksum-verified DSH archive. Each record identifies recorded or derived coordinates; exact retained sources stay in the archive. These records do not establish effective provider input.':'These originals come from saved conversation history, including when context capture was off. Edits and added instructions can change what reaches the model.'),load,recent,older,status,list,viewer);container.append(section);recent.hidden=true;older.hidden=true;
  let pageEpoch=0,readEpoch=0,cursor,selectedId,selectedSource='pi',reading=false,displayed;
  const identity={...(native?.sessionId?{nativeSessionId:native.sessionId}:{}),...(native?.leafId!==undefined?{leafId:native.leafId}:{})};
  const mark=()=>section.querySelectorAll('button[data-entry-id]').forEach(button=>button.classList.toggle('selected',button.dataset.entryId===selectedId&&(button.dataset.source||'pi')===selectedSource));
  const render=record=>{
-  const {id,at,result,original,offsets}=record,text=node('pre',result.text),copy=node('button',result.hasMore||at>0?'Copy entry excerpt':'Copy original entry'),next=node('button','Next excerpt'),previous=node('button','Previous excerpt');
+  const {id,at,result,original,offsets}=record,text=node('pre',result.text),copy=node('button',result.hasMore||at>0?'Copy entry excerpt':archived?'Copy saved DSH record':'Copy original entry'),next=node('button','Next excerpt'),previous=node('button','Previous excerpt');
   copy.onclick=()=>navigator.clipboard.writeText(result.text).catch(error=>{if(alive())status.textContent=error.message;});
   next.disabled=!result.hasMore;previous.disabled=!offsets.length;
   const current=()=>alive()&&!reading&&displayed===record;
   next.onclick=()=>{if(current())void read(id,result.pathHash,result.entryHash,result.nextOffset,original,[...offsets,at]);};
   previous.onclick=()=>{if(current())void read(id,result.pathHash,result.entryHash,offsets.at(-1),original,offsets.slice(0,-1));};
-  viewer.replaceChildren(node('h4',(original?.source==='display'?'Original display event ':'Original entry ')+id),...(original?[node('p',result.boundary)]:[]),node('p','Bytes '+at.toLocaleString()+'–'+result.nextOffset.toLocaleString()+' of '+result.length.toLocaleString()+(result.hasMore?' · excerpt; more bytes remain':'')),text,copy,previous,next);mark();
+  viewer.replaceChildren(node('h4',(archived?'Saved DSH record ':original?.source==='display'?'Original display event ':'Original entry ')+id),...(original||archived?[node('p',result.boundary)]:[]),node('p','Bytes '+at.toLocaleString()+'–'+result.nextOffset.toLocaleString()+' of '+result.length.toLocaleString()+(result.hasMore?' · excerpt; more bytes remain':'')),text,copy,previous,next);mark();
  };
  const read=async(id,pathHash,entryHash,at=0,original,offsets=[])=>{
   const epoch=++readEpoch;reading=true;selectedId=id;selectedSource=original?.source||'pi';const params={sessionId,entryId:id,offset:at,...(original?original:identity.nativeSessionId?{nativeSessionId:identity.nativeSessionId}:{}),...(pathHash?{pathHash}:{}),...(entryHash?{entryHash}:{})};

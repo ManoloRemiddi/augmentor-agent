@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) · original/derived provenance, bounded v3 import, authored GUI/SDK tests and explicit remaining real-history refusals.
+
 [Recovered-history assets](HARNESS-DSH-LEGACY-ASSETS.md) · exact referenced images/files, immutable companions, five real families checked; bounded native integration still pending.
 
 [Historical DSH source families](HARNESS-DSH-LEGACY-FAMILIES.md) · complete original-log capture, pinned offline derivation/recomputation, five formerly reader-blocked families; native import still pending.

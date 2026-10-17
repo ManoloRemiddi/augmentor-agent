@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Recovered native archive coverage: `dsh-historical-project.test.mjs` checks v3
+closure reuse, original compressed hashes, derived coordinates and rehashed
+malformed family/catalogue/assets; its runtime companion exercises the real Pi
+Host and cold/historical-reply continuation. The original Fleet Chromium suite
+now covers v1/v2/v3, including a visible derived-record boundary. The explicit
+public-codec operator proof is `scripts/proof-dsh-historical-project.mjs`; it
+uses authored source data and verifies actual migration/native import. Native
+unit envelopes are separately authored fixtures. Keep all older bundle/branch/
+image/file/relocation/draft/GUI regressions. [Recipe and limits](../docs/HARNESS-DSH-HISTORICAL-IMPORT.md).
+
 Historical asset coverage: `dsh-legacy-assets.test.mjs` verifies exact occurrence
 ownership, whole-content checksums, complete named closures and malformed data;
 `test_dsh_legacy_assets.py` covers preflight-before-read, binary/empty content and

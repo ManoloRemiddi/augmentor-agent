@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Native v3 recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) now complement this v2 tier. They reuse verified derived segments and retain compressed originals/assets without duplicate histories; the five real legacy projects still fail later history checks and are not ready for transfer.
+
 # Complete DSH project bundles
 
 October 17 source and ordinary packaged qualification adds `augmentor-dsh-project-export/2` alongside

@@ -2,6 +2,7 @@
 import {openSync,closeSync,fstatSync,readSync,lstatSync,realpathSync,writeFileSync,fsyncSync,constants} from 'node:fs';
 import {dirname,join,resolve} from 'node:path';
 import {createHash} from 'node:crypto';
+import {historicalProject} from './dsh-historical-project.js';
 import {privateDir} from './storage.js';
 import {type Data} from '../../protocol/src/index.js';
 export const DSH_MANIFEST_BYTES=32*1024*1024,DSH_OBJECT_BYTES=16*1024*1024,DSH_BUNDLE_BYTES=256*1024*1024,DSH_BUNDLE_OBJECTS=16384;
@@ -36,12 +37,15 @@ export function loadDshProjectArchive(sourceFile:string,sha256:string,objectDir=
  const document=JSON.parse(bytes.toString('utf8')) as Data,objects=new Map<string,Ref>();let expandedBytes=bytes.length;
  const readObject=(ref:Ref)=>{const known=objects.get(ref.sha256);if(!known||known.bytes!==ref.bytes)fail();return boundedFile(join(objectDir,ref.sha256),DSH_OBJECT_BYTES,ref,objectDir);};
  if(document.schema==='augmentor-dsh-project-export/1')return {source:document,bytes,sha256,expandedBytes,objects,readObject};
- if(document.schema!=='augmentor-dsh-project-export/2'||!Array.isArray(document.sessions)||document.sessions.length>128||!Array.isArray(document.relatedSessions)||document.relatedSessions.length>32)fail();
+ if(!['augmentor-dsh-project-export/2','augmentor-dsh-project-export/3'].includes(document.schema))fail();
+ /* v3 registers its original/derived closure once, without storing wrappers. */
+ if(document.schema==='augmentor-dsh-project-export/2'&&(!Array.isArray(document.sessions)||document.sessions.length>128||!Array.isArray(document.relatedSessions)||document.relatedSessions.length>32))fail();
  const reference=(value:Data):Ref=>{
   if(!keys(value,'bytes,sha256')||typeof value.sha256!=='string'||!/^[a-f0-9]{64}$/.test(value.sha256)||!integer(value.bytes,1,DSH_OBJECT_BYTES))fail();
   const ref={sha256:value.sha256,bytes:value.bytes},previous=objects.get(ref.sha256);if(previous&&previous.bytes!==ref.bytes)fail();
   objects.set(ref.sha256,ref);expandedBytes+=ref.bytes;if(objects.size>DSH_BUNDLE_OBJECTS||expandedBytes>DSH_BUNDLE_BYTES)fail();return ref;
  };
+ if(document.schema==='augmentor-dsh-project-export/3'){const source=historicalProject(document,reference,readObject),result={source,bytes,sha256,expandedBytes,objects,readObject};bundled.set(source,result);return result;}
  let cachedRecords:Data|undefined,cachedRows:Data[]=[],cachedOpening:Data|undefined,cachedSnapshot:Data;
  const session=(descriptor:Data)=>{
   if(!keys(descriptor,'address,opening,segments')||!Array.isArray(descriptor.segments))fail();
@@ -72,7 +76,7 @@ export function loadDshProjectArchive(sourceFile:string,sha256:string,objectDir=
  const result={source,bytes,sha256,expandedBytes,objects,readObject};bundled.set(source,result);return result;
 }
 export function dshAttachmentBytes(source:Data,row:Data):Buffer{
- const bundle=bundled.get(source);if(bundle){if(!bundle.objects.has(row.sha256)||row.attachmentId!=='sha256:'+row.sha256)fail();return bundle.readObject({sha256:row.sha256,bytes:row.bytes});}
+ const bundle=bundled.get(source);if(bundle){if(source.schema==='augmentor-dsh-project-export/3'){const raw=dshFileBytes(source,row);if(raw.length<1||raw.length>10*1024*1024)fail();return raw;}if(!bundle.objects.has(row.sha256)||row.attachmentId!=='sha256:'+row.sha256)fail();return bundle.readObject({sha256:row.sha256,bytes:row.bytes});}
  return Buffer.from(row.data,'base64');
 }
 /** Files retain their complete verbatim digest across bounded object chunks. */
@@ -102,3 +106,11 @@ export function copyDshProjectArchive(archive:DshProjectArchive,archiveDir:strin
 }
 /** Equivalent to the old JSON-array digest without building a whole-history string. */
 export function dshRecordsDigest(rows:readonly Data[]){const h=createHash('sha256');h.update('[');for(let i=0;i<rows.length;i++){if(i)h.update(',');h.update(JSON.stringify(rows[i]));}return h.update(']').digest('hex');}
+
+/** Operator/archive consumers can recover exact compressed originals. No row
+ * mapping is invented and no executable parser is loaded from the archive. */
+export function dshCompressedSource(source:Data,sourceId:string){
+ const bundle=bundled.get(source),row=[...(source.sessions??[]),...(source.relatedSessions??[])].find((r:Data)=>r.opening.header.id===sourceId),original=row?.historicalOriginal;
+ if(!bundle||source.schema!=='augmentor-dsh-project-export/3'||!original||!Array.isArray(original.chunks)||original.chunks.length>8)fail();
+ const bytes=Buffer.concat(original.chunks.map((ref:Ref)=>bundle!.readObject(ref)));if(bytes.length!==original.compressedBytes||bytes.length>64*1024*1024||hash(bytes)!==original.sourceSha256)fail();return {sourceId,format:original.sourceFormat,sha256:original.sourceSha256,bytes};
+}
