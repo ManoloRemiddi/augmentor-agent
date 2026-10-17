@@ -26,9 +26,14 @@ normal native import path. A separate actual Node prompt-client cold start passe
 under a new private parent; a writable-parent control refuses before creating data.
 Only its own temporary prompt service is retired; no model or owner data is used.
 
+[Hosted Home container](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39004033147/job/117312749734)
+and the [full Linux SDK contract job](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39004033075/job/117312707985)
+both pass on exact correction source **802ed9b32920ef030bb248479794d8979cada06b**.
 [Qualification](../release/harness-shared-prompt-ci-qualification-20261017.json)
-records input hashes, failing hosted jobs and correction status. Full new-head
-Home-container/SDK matrix results remain distinct from local source/client checks.
+records their results separately from local checks and later documentation commits.
+This is not whole-workflow or matrix acceptance: Validate Debian and Windows SDK
+remain in progress at observation; macOS fails offline import/cold continuation,
+whose cause is not diagnosed by this MX-scoped checkpoint.
 Both current MX review PIDs/all 36 protected paths/hashes, shared rows, registry,
 menus/selections and GPU/voice states still match the preceding checkpoint.
 No new app deployment, owner project transfer or NAS change follows.

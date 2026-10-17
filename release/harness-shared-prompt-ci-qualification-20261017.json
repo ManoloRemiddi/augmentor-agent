@@ -56,7 +56,7 @@
     "ownPromptCompanionsRetired": 1,
     "productionCompanionsRetired": 0
   },
-  "hostedCorrectionStatus": "Awaiting a new published-head Home/SDK run; local evidence is not a passing container or hosted job",
+  "hostedCorrectionStatus": "Home container and full Linux SDK contract jobs pass on the exact correction commit; broader workflow/matrix acceptance is separate.",
   "preservation": {
     "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
     "seals": [
@@ -99,13 +99,39 @@
   },
   "limits": [
     "These are fixture/prerequisite corrections; they do not change the prompt-service security policy or shipping dependency graph",
-    "Local direct-client/source tests do not substitute for the complete new-head Home container and SDK matrix jobs",
-    "Other hosted failures can surface after these prerequisites are corrected; no full CI or platform acceptance is claimed",
+    "Hosted Home container and full Linux SDK jobs pass on 802ed9b3; later documentation commits and whole workflow/matrix acceptance are separate",
+    "macOS offline import/cold continuation failed; Validate Debian and Windows SDK remained in progress at observation. These jobs are not claimed passing.",
     "Owner reviews remain on b1edf4d2, no further real migration; owner pilot feedback, voice and later OS rollout remain separate"
   ],
   "publicationChecks": {
     "privateBoundaryLicenceAndNoticeCasesPassed": 16,
     "privateSourceIdentitiesChecked": 77,
     "privateSourceIdentityMatches": 0
+  },
+  "hostedQualification": {
+    "testedSourceRef": "802ed9b32920ef030bb248479794d8979cada06b",
+    "observedAtUtc": "2026-10-17T04:59:25.764843+00:00",
+    "jobs": [
+      {
+        "name": "home-runtime",
+        "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39004033147/job/117312749734",
+        "status": "completed",
+        "conclusion": "success",
+        "stepsCompletedSuccessfully": 14
+      },
+      {
+        "name": "contracts (ubuntu-24.04)",
+        "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39004033075/job/117312707985",
+        "status": "completed",
+        "conclusion": "success",
+        "stepsCompletedSuccessfully": 44
+      }
+    ],
+    "wholeWorkflowAcceptanceClaimed": false,
+    "otherJobsAtObservation": {
+      "validateDebian": "in_progress",
+      "sdkWindows": "in_progress",
+      "sdkMacos": "failure in offline project import/cold continuation; cause not diagnosed in this MX-scoped checkpoint"
+    }
   }
 }

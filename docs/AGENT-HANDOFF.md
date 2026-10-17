@@ -5,7 +5,12 @@ correct the Home smoke profile’s unprotected parent and install the existing l
 websocket prerequisite in clean SDK interpreters. Fresh Python 3.13.5 passes ten
 Node consolidation/reopen cases; 23 prepared Python cases and an actual cold
 prompt-client/writable-parent control pass. Runtime/security policy and both MX
-reviews remain unchanged. Hosted new-head results are tracked separately.
+reviews remain unchanged. Hosted **Home container and full Linux SDK jobs pass
+on 802ed9b3**. Broader workflow/matrix acceptance remains separate: Debian and
+Windows SDK are still running at observation; macOS fails offline import/cold
+continuation, cause not diagnosed in this MX checkpoint. Final read-only checks
+retain both review PIDs/all 36 protected file sets, shared rows, registry twelve,
+menus/selections, both seals and Qwen/GPU/voice settings.
 [Evidence](../release/harness-shared-prompt-ci-qualification-20261017.json).
 
 [Packaged privacy lifecycle](PI-PRIVACY.md#packaged-mx-lifecycle-network-qualification--october-17)
