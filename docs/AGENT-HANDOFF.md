@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+New-code [validation 39036728003](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39036728003)
+is now active at published 5df1282a (runtime add7b891; only documentation/evidence
+follow it). It was dispatched once on the branch ref; the preceding 22103e61 PR
+run 39035553761 remains live after publication. Their concurrency refs differ.
+Neither has a verified conclusion here; do not restart solely on an observation
+timeout. Public Office packaging remains separately gated.
+
 [Sealed embedding follow-up](HARNESS-SHARED-PROFILES.md#sealed-embedding-follow-up-and-existing-configuration--october-17)
 qualifies add7b891 / 20261017-152350-2c67edd7, artifact 112ec5c4…7dd53:
 24,761 inputs/1,143 compiled; source/ordinary/sealed each 42 Node/82 Python plus 12

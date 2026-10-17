@@ -99,7 +99,20 @@
     "conclusionUnproven": true,
     "noRestart": true
   },
-  "newRuntimeCi": "Dispatch separately after publication; do not cancel the preceding live PR run",
+  "newRuntimeCi": {
+    "run": 39036728003,
+    "head": "5df1282ae351bce945854231f15a5d8927cb9cc2",
+    "applicationRef": "add7b8915e45c2bb28b748db7a52c7d33713e97f",
+    "onlyDocumentationAndEvidenceAfterApplicationRef": true,
+    "event": "workflow_dispatch",
+    "statusObserved": "in_progress",
+    "conclusionUnproven": true,
+    "precedingPrRunPreserved": 39035553761,
+    "precedingPrRuntime": "22103e61915b18e49926c463f8348a7fd9735509",
+    "precedingConfirmedInProgressAfterPush": true,
+    "concurrencyRefsDistinct": true,
+    "notUnchangedRuntimeRerun": true
+  },
   "remaining": [
     "Prepare backed-up deliberate preservation/upgrade of actual custom DSH composition and peer dependency metadata",
     "Matching installed Native/Browser/product client versions and explicit mobile/custom/review mapping",

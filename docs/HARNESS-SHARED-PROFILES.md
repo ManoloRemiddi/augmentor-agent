@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+New-code [validation 39036728003](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39036728003)
+is now active at published 5df1282a (runtime add7b891; only documentation/evidence
+follow it). It was dispatched once on the branch ref; the preceding 22103e61 PR
+run 39035553761 remains live after publication. Their concurrency refs differ.
+Neither has a verified conclusion here; do not restart solely on an observation
+timeout. Public Office packaging remains separately gated.
+
 ## Sealed embedding follow-up and existing configuration — October 17
 
 Fresh unselected **add7b891 / 20261017-152350-2c67edd7**, artifact
