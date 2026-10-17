@@ -24,9 +24,12 @@ append; no owner inference or additional transfer. Both actual review GUIs verif
 usable Plugins On/Off, applied Search/Wiki and two On/three Off connections without
 settings or agent actions. [Installed evidence](../release/harness-file-reference-freshness-qualification-20261017.json).
 
-Normal hosted validation for `97d95d58` remains in progress at this checkpoint;
-the SDK matrix has a macOS failure, outside this MX adoption scope. No whole-CI
-pass is claimed. Public Office redistribution remains gated, and owner pilot
+Hosted `97d95d58` Linux SDK and root (2,106 pass/44 skip), Browser (128 pass),
+native (1,072 run/45 skip) and desktop checks pass. Debian validation terminates
+at the existing public Office source/rebuild packaging refusal. The SDK matrix
+has a macOS failure, outside this MX scope; no whole-CI pass is claimed.
+The [Office process-seat experiment](HARNESS-OFFICE-PREVIEWS.md#retained-memory-and-process-boundary-prototype--october-17)
+is unselected and leaves this working app/engine unchanged. Redistribution and owner pilot
 feedback still gates further migration. Voice and later-platform rollout remain
 deferred. The existing main/pilot menu entries are ready for continued testing.
 

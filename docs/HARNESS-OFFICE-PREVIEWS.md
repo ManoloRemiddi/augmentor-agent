@@ -1,5 +1,52 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Retained memory and process-boundary prototype — October 17
+
+The [memory diagnostic and explicit process converter seat](../release/office-rebuild/README.md#retained-memory-and-process-boundary-prototype--october-17)
+advance the earlier ThinLTO OOM investigation without changing the installed app.
+Four bounded profiles render two distinct documents with each engine, in one
+process and in fresh processes. Eight PDFs verify. Both engines return to their
+starting 11-thread count; main-thread heaps stay about 14 MiB while anonymous
+memory remains much larger. Thin's anonymous memory after two documents is
+1,494,536 KiB; after idle/forced diagnostic GC it is 1,522,120/1,582,596 KiB.
+GC does not solve this observation. The exact native allocator/Wasm JIT cause
+remains unproven. Exiting the renderer reclaims the memory; Thin's coordinating
+process stays at 21,400/21,700/21,928 KiB anonymous memory across two children.
+
+An opt-in diagnostic uses the original provider's existing converter-factory
+extension point. One original entry conversion runs per child process. The parent
+waits for process close before returning metadata/releasing capacity. Nested
+entry scratch is confined to the provider-owned input directory and removed
+after confirmed child close. Original entry source, provider, queue/cache, reader,
+engine bytes and GUI stay unchanged.
+
+Both engines now pass the same **ten contained cases each** at the existing
+**3 GiB / zero-swap / one-CPU / 128-PID** cap, with **14 verified PDFs**, eight
+actual Wasm opens and ten closed renderers each. Baseline/Thin peaks are
+**1,418,690,560 / 1,948,413,952 bytes**; PID peaks are 31. This full case set uses
+no forced GC. Calibrated HTTP/file canaries, archive limits, actual startup
+cancellation, distinct recovery and all outer/nested scratch-prefix checks pass.
+Only the driver IP positive control connects. Failed NSS lookups, if present,
+are attributed only to the driver/known closed renderers; they grant no file/IP
+exemption. The observed prototype traces have zero NSS connects. Six parser cases
+and the focused source/notice/packaging cohort pass **42 Python**, no skips.
+
+The first prototype's normal disconnect incorrectly invoked its parent-loss
+guard; its exit70 failure remains. The second baseline completed ten cases but
+its postflight rejected zero NSS lookups, and review found the old scratch check
+omitted the entry's real prefix. These attempts do not count as acceptance. The
+corrected run checks the real prefix and confines scratch before execution.
+
+This is an unselected process-seat prototype, not promotion or a production
+sandbox. Bounded IPC/options, real owner/parent/crash/hung/stopped/output/source/
+deadline/disposal faults, original GUI/Host integration and exact package/adoption
+tests remain. Broader font/corpus/macro, complete source/notice/third-party and
+public packaging gates remain. Both owner reviews/services verify unchanged.
+Installed `97d95d58` Linux SDK passes; hosted root (2,106 pass/44 skip), Browser
+(128 pass), native (1,072 run) and desktop stages precede the terminal public
+Office packaging refusal. No whole-workflow acceptance is claimed.
+[Evidence](../release/office-rebuild/process-memory-qualification-20261017.json).
+
 ## Contained external resources and memory refusal — October 17
 
 The [contained original-provider diagnostic](../release/office-rebuild/README.md#contained-external-resources-and-memory-refusal--october-17)

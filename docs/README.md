@@ -2,7 +2,9 @@
 
 [Current MX review and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17) · installed queue-control correction, main/pilot menu entries, available core features, verified preservation and current CI/public-packaging limits.
 
-[Office boundary/resource diagnostic](HARNESS-OFFICE-PREVIEWS.md#contained-external-resources-and-memory-refusal--october-17) · ten current-engine cases, calibrated external-file/network controls and bounded cancellation/recovery; source-built candidate OOM refusal remains unresolved.
+[Office retained memory/process prototype](HARNESS-OFFICE-PREVIEWS.md#retained-memory-and-process-boundary-prototype--october-17) · measured process-exit reclamation and twenty real-provider cases below the existing memory cap; production integration/fault/source gates remain.
+
+[Office boundary/resource diagnostic](HARNESS-OFFICE-PREVIEWS.md#contained-external-resources-and-memory-refusal--october-17) · ten current-engine cases, calibrated external-file/network controls and bounded cancellation/recovery; preceding same-process Thin OOM remains recorded.
 
 [Rich Office comparison](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17) · six authored formats/16 matching pages, original-GUI rich DOCX, exact source/cache/history and actual source-built engine evidence.
 

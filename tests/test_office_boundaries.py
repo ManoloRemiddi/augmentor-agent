@@ -69,6 +69,25 @@ class OfficeBoundaryTraceTests(unittest.TestCase):
             with self.subTest(omitted=omitted), self.assertRaises(AssertionError):
                 self.evidence(self.lines[:omitted] + self.lines[omitted+1:])
 
+    def test_owned_closed_renderer_nss_attribution_does_not_allow_its_file_or_ip_access(self):
+        self.result.update(diagnosticProcessBoundary=True, rendererProcesses=[{'pid': 40, 'closed': True}])
+        lines = [*self.lines, self.nss.replace('9     ', '40    ')]
+        result = self.evidence(lines)
+        self.assertEqual(result['ownedRendererProcessesConfirmedClosed'], 1)
+        self.assertEqual(result['failedParentContainerNssSocketCalls'], 3)
+        without_nss = [line for line in self.lines if '/var/run/nscd/socket' not in line]
+        self.assertEqual(self.evidence(without_nss)['failedParentContainerNssSocketCalls'], 0)
+        for access in [
+            '40    openat(AT_FDCWD, "/work/outside/only-on-host.txt", O_RDONLY) = 33',
+            '40    connect(19, {sa_family=AF_INET, sin_port=htons(31337), sin_addr=inet_addr("127.0.0.1")}, 16) = -1 EINPROGRESS (Operation now in progress)',
+            self.nss.replace('9     ', '41    '),
+        ]:
+            with self.subTest(access=access), self.assertRaises(AssertionError):
+                self.evidence([*lines, access])
+        self.result['rendererProcesses'][0]['closed'] = False
+        with self.assertRaises(AssertionError):
+            self.evidence(lines)
+
 
 if __name__ == '__main__':
     unittest.main()

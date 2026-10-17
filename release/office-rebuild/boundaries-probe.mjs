@@ -32,8 +32,8 @@ const server=createServer((request,response)=>{requests++;response.writeHead(200
 server.listen(0,'127.0.0.1');await once(server,'listening');
 const origin='http://127.0.0.1:'+server.address().port;
 assert.equal(await fetch(origin+'/calibration').then(r=>r.text()),networkMarker);assert.equal(requests,1);requests=0;
-const reader=new PiFilePreview(),reads=[];
-const provider=new PiOfficePreview((scope,kind,params,signal)=>{reads.push({kind,path:params.path});return reader.read(scope.workspaceRoot,kind,params,signal);});
+const reader=new PiFilePreview(),reads=[],processSeat=process.env.PROBE_PROCESS_BOUNDARY==='1'?await import('./process-converter.mjs'):undefined;
+const provider=new PiOfficePreview((scope,kind,params,signal)=>{reads.push({kind,path:params.path});return reader.read(scope.workspaceRoot,kind,params,signal);},processSeat?.createProcessConverter);
 const scope={sessionId:'contained-office-boundaries',workspaceRoot:'/work/fixtures'};
 const results=[];const watchdog=setTimeout(()=>{console.error('Contained diagnostic watchdog expired');process.exit(2);},180_000);
 const text=part=>strFromU8(part),xml=s=>strToU8(s),zip=parts=>Buffer.from(zipSync(parts,{level:6}));
@@ -111,6 +111,7 @@ try {
  const cgroup={};for(const name of ['memory.max','memory.peak','memory.swap.max','memory.events','cpu.max','pids.max','pids.peak'])cgroup[name]=(await readFile('/sys/fs/cgroup/'+name,'utf8')).trim();
  assert.equal(cgroup['memory.max'],'3221225472');assert.equal(cgroup['memory.swap.max'],'0');assert.equal(cgroup['cpu.max'],'100000 100000');assert.equal(cgroup['pids.max'],'128');
  assert(Number(cgroup['memory.peak'])<=Number(cgroup['memory.max']));assert.match(cgroup['memory.events'],/oom_kill 0(?:\n|$)/);
- const temporary=await readdir('/tmp');assert(!temporary.some(name=>name.startsWith('dsh-office-to-pdf-')||name.startsWith('libreoffice-convert-')));
- await writeFile('/work/result.json',JSON.stringify({schema:'augmentor-office-contained-boundaries/1',probeSha256:sha(readFileSync(new URL(import.meta.url))),engine:enginePackage.name+'@'+enginePackage.version,driverPid:process.pid,canaryPort:server.address().port,positiveHttpCalibrationRequests:1,documentHttpCanaryRequests:requests,canaryImageAndTextUnchanged:true,expectedDriverCanaryReadsEach:2,authorizedReaderCalls:reads.length,cases:results,cgroup,providerIdleAfterClose:true,conversionScratchAbsent:true,installedSandboxQualified:false,publicRedistributionQualified:false},null,2)+'\n',{flag:'wx',mode:0o600});
+ const temporary=await readdir('/tmp');assert(!temporary.some(name=>name.startsWith('dsh-office-to-pdf-')||name.startsWith('libreoffice-kit-')||name.startsWith('libreoffice-convert-')));
+ const renderers=processSeat?.rendererProcesses??[];assert(renderers.every(row=>row.closed));
+ await writeFile('/work/result.json',JSON.stringify({schema:'augmentor-office-contained-boundaries/1',probeSha256:sha(readFileSync(new URL(import.meta.url))),engine:enginePackage.name+'@'+enginePackage.version,driverPid:process.pid,canaryPort:server.address().port,positiveHttpCalibrationRequests:1,documentHttpCanaryRequests:requests,canaryImageAndTextUnchanged:true,expectedDriverCanaryReadsEach:2,authorizedReaderCalls:reads.length,cases:results,cgroup,providerIdleAfterClose:true,conversionScratchAbsent:true,diagnosticProcessBoundary:!!processSeat,rendererProcesses:renderers,installedSandboxQualified:false,publicRedistributionQualified:false},null,2)+'\n',{flag:'wx',mode:0o600});
 }finally{clearTimeout(watchdog);await provider.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}

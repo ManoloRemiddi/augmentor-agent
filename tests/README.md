@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Office memory/process prototype](../release/office-rebuild/README.md#retained-memory-and-process-boundary-prototype--october-17):
+four memory profiles/eight PDFs show process-exit reclamation; the explicit
+converter extension seat passes twenty contained cases/fourteen PDF checks under
+the same 3 GiB cap. The focused cohort passes 42 Python/six trace-parser cases.
+No compiled/installed runtime change; full fault, GUI/package/adoption and source
+gates remain. The preceding same-process failure below is preserved.
+
 [Contained Office boundary/resource checks](../release/office-rebuild/README.md#contained-external-resources-and-memory-refusal--october-17):
 five automatic parser controls in `test_office_boundaries.py` distinguish actual
 IP/NSS attribution, pair interleaved syscalls and reject extra/missing evidence.

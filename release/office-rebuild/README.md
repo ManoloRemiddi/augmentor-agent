@@ -1,5 +1,65 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Retained memory and process-boundary prototype — October 17
+
+[`retention-diagnostic.py`](retention-diagnostic.py) and
+[`retention-probe.mjs`](retention-probe.mjs) compare two distinct real-provider
+conversions in one process and two fresh processes, using the existing apps,
+fixtures and the same bounded container profile below:
+
+```sh
+python3 -B release/office-rebuild/retention-diagnostic.py \
+  --app "$UNSELECTED_DEFAULT_APP" --thin-app "$EXISTING_PREPARED_THIN_APP" \
+  --fixtures "$AUTHORED_RICH_FIXTURES" \
+  --output "$PWD/outputs/office-new-retention"
+```
+
+All four profiles/eight PDFs pass. `/proc` anonymous/RSS, main-thread JS/V8
+statistics, thread counts and cgroup anonymous/file/kernel/current/peak usage are
+retained. Closing/idle and forced GC are separately labelled; forced GC is a
+diagnostic observation, not application behavior. Thin's native/anonymous memory
+remains high with an approximately 14 MiB main-thread heap and the same 11 threads.
+Its two fresh-process parent observations stay around 22 MiB anonymous memory.
+Exact native allocator/JIT attribution is not proven by these samples.
+
+[`process-converter.mjs`](process-converter.mjs) and
+[`process-renderer.mjs`](process-renderer.mjs) form an explicit diagnostic seat
+for the original provider; neither is an installed backend. Each child executes
+the unchanged original entry once. Metadata is returned only after process close.
+The child has the provider-owned nested `TMPDIR`; the parent removes it after
+close, including cancellation. The IPC disconnect guard distinguishes normal
+terminal completion from parent loss; a kernel-level production death guard and
+full bounded/fault protocol remain separate requirements.
+
+Run the full original contained case set with that seat explicitly enabled:
+
+```sh
+python3 -B release/office-rebuild/contained-boundaries.py \
+  --app "$UNSELECTED_DEFAULT_APP" --thin-app "$EXISTING_PREPARED_THIN_APP" \
+  --fixtures "$AUTHORED_RICH_FIXTURES" --process-boundary \
+  --output "$PWD/outputs/office-new-process-boundaries"
+```
+
+Both engines pass ten cases each, with 14 PDF text/image checks, actual Wasm
+startup cancellation and distinct uncached recovery, all temporary prefixes
+absent, eight Wasm opens and ten closed renderers per engine. Peaks are
+**1,418,690,560 / 1,948,413,952 bytes** at **3 GiB / zero swap / one CPU / 128 PIDs**;
+PID peaks are 31. The full case set uses no forced GC. External-file/network
+canaries remain untouched; only the calibrated driver IP call connects. This
+prototype observes no NSS connects, while the preceding same-process run observed
+two failed parent NSS calls. Known closed renderer attribution remains explicit
+and does not permit converter IP/file reads. Six parser controls and the focused
+source/notice/packaging cohort pass 42 Python tests.
+
+The initial normal-disconnect exit70 and later NSS/scratch-validator issues are
+retained. The corrected scratch check includes `libreoffice-kit-`; no attempt
+passes merely by ignoring that directory. The original same-process Thin OOM
+below remains valid. No cap increase or engine rebuild occurs. Current app,
+compiled files, dependencies, GUI and owner services/data remain unchanged.
+Production IPC/ownership/death/hang/timeouts/disposal, GUI/package/adoption,
+font/corpus/macro and distribution qualification remain open.
+[Evidence](process-memory-qualification-20261017.json).
+
 ## Contained external resources and memory refusal — October 17
 
 [`contained-boundaries.py`](contained-boundaries.py) runs

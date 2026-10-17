@@ -1,0 +1,1204 @@
+{
+  "schema": "augmentor-office-process-memory-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Contained original-provider diagnostic extension seat; process-per-conversion remains unselected and is not an installed sandbox",
+  "sourceEvidenceBaseRef": "1a6d98ddbf11ccc7ff608299206d184ba546eb60",
+  "installedApplicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+  "sourceFilesSha256": {
+    "release/office-rebuild/retention-diagnostic.py": "ea1a2c68f0fcd150608e01db0a876279c86adfd1c2c779968a54f6175ce3a6d5",
+    "release/office-rebuild/retention-probe.mjs": "e35984b0f7756f6936b5a759e2e4dc8f45ce16bead0d102174fd60140f5f0975",
+    "release/office-rebuild/process-converter.mjs": "1c53cb1c76de47389ad934e4f56dd5c504ebbf73f9be7a439a10d26b1b86d5c0",
+    "release/office-rebuild/process-renderer.mjs": "06127f28dd438877897c1297828e0f31aae18b554e9988fdb49fdcf2282a6772",
+    "release/office-rebuild/boundaries-probe.mjs": "8a839de0101d37a23046a78d74dc7f49c69fa7b006ae3ea9ea4be0f4a8ce6834",
+    "release/office-rebuild/contained-boundaries.py": "274709c09277bf850c66f1103382ee805a53cbebca1c863e2c86f9752ab23d00",
+    "tests/test_office_boundaries.py": "62738341e652998c6b734ab876eddea1433d6646856d8eaf7d6a168d559de862"
+  },
+  "retentionAttribution": {
+    "profiles": [
+      {
+        "engine": "baseline",
+        "style": "same",
+        "cgroup": {
+          "memory.max": "3221225472",
+          "memory.peak": "1593212928",
+          "memory.swap.max": "0",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "cpu.max": "100000 100000",
+          "pids.max": "128",
+          "pids.peak": "19"
+        },
+        "runs": [
+          {
+            "samples": [
+              {
+                "label": "before",
+                "anonymousKiB": 25496,
+                "rssKiB": 72712,
+                "heapUsedBytes": 6892016,
+                "externalBytes": 2971397,
+                "threads": 11,
+                "cgroupCurrentBytes": 86966272
+              },
+              {
+                "label": "after-0",
+                "anonymousKiB": 734456,
+                "rssKiB": 788932,
+                "heapUsedBytes": 14706376,
+                "externalBytes": 4136848,
+                "threads": 11,
+                "cgroupCurrentBytes": 844283904
+              },
+              {
+                "label": "after-1",
+                "anonymousKiB": 1023600,
+                "rssKiB": 1078076,
+                "heapUsedBytes": 13818672,
+                "externalBytes": 3875055,
+                "threads": 11,
+                "cgroupCurrentBytes": 1140756480
+              },
+              {
+                "label": "closed",
+                "anonymousKiB": 1027100,
+                "rssKiB": 1081576,
+                "heapUsedBytes": 13951040,
+                "externalBytes": 4140763,
+                "threads": 11,
+                "cgroupCurrentBytes": 1140498432
+              },
+              {
+                "label": "idle",
+                "anonymousKiB": 894596,
+                "rssKiB": 949072,
+                "heapUsedBytes": 14060608,
+                "externalBytes": 4406471,
+                "threads": 11,
+                "cgroupCurrentBytes": 1004060672
+              },
+              {
+                "label": "forced-gc-diagnostic-only",
+                "anonymousKiB": 773056,
+                "rssKiB": 827532,
+                "heapUsedBytes": 11920072,
+                "externalBytes": 3623125,
+                "threads": 11,
+                "cgroupCurrentBytes": 879681536
+              }
+            ],
+            "documents": [
+              {
+                "index": 0,
+                "inputSha256": "9bcfcd8b393fb6c71e81bb32e2aff574edcf15eb592e4cdd1248d1dfd8a0836a",
+                "pdf": "pdfs/0.pdf",
+                "pdfSha256": "fe3b910eb7d4de31bea86a46ed7c3464b1f55ad75ecce99f2f4fc51a50c16262",
+                "sourceBytesUnchanged": true,
+                "actualPdfTextVerified": true
+              },
+              {
+                "index": 1,
+                "inputSha256": "2a55aa595517cb54a9c424240de8849515a7e41a556e298350dd092685ffed6c",
+                "pdf": "pdfs/1.pdf",
+                "pdfSha256": "bbf8c3686ecc06eb585967861417f778068b425a130f7fbe3c740f6a762049b1",
+                "sourceBytesUnchanged": true,
+                "actualPdfTextVerified": true
+              }
+            ],
+            "childExitObserved": false,
+            "providerIdleAfterClose": true
+          }
+        ],
+        "parentSamples": [
+          {
+            "label": "parent-before",
+            "anonymousKiB": 23476,
+            "rssKiB": 70392,
+            "heapUsedBytes": 7380584,
+            "externalBytes": 7937003,
+            "threads": 11,
+            "cgroupCurrentBytes": 86024192
+          }
+        ]
+      },
+      {
+        "engine": "thin",
+        "style": "same",
+        "cgroup": {
+          "memory.max": "3221225472",
+          "memory.peak": "2234744832",
+          "memory.swap.max": "0",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "cpu.max": "100000 100000",
+          "pids.max": "128",
+          "pids.peak": "19"
+        },
+        "runs": [
+          {
+            "samples": [
+              {
+                "label": "before",
+                "anonymousKiB": 22052,
+                "rssKiB": 70300,
+                "heapUsedBytes": 6874744,
+                "externalBytes": 2971397,
+                "threads": 11,
+                "cgroupCurrentBytes": 26791936
+              },
+              {
+                "label": "after-0",
+                "anonymousKiB": 1218280,
+                "rssKiB": 1273400,
+                "heapUsedBytes": 14679256,
+                "externalBytes": 4134522,
+                "threads": 11,
+                "cgroupCurrentBytes": 1278078976
+              },
+              {
+                "label": "after-1",
+                "anonymousKiB": 1494536,
+                "rssKiB": 1549656,
+                "heapUsedBytes": 13756424,
+                "externalBytes": 3875055,
+                "threads": 11,
+                "cgroupCurrentBytes": 1546706944
+              },
+              {
+                "label": "closed",
+                "anonymousKiB": 1497172,
+                "rssKiB": 1552292,
+                "heapUsedBytes": 13889376,
+                "externalBytes": 4140763,
+                "threads": 11,
+                "cgroupCurrentBytes": 1549848576
+              },
+              {
+                "label": "idle",
+                "anonymousKiB": 1522120,
+                "rssKiB": 1577240,
+                "heapUsedBytes": 13999208,
+                "externalBytes": 4406471,
+                "threads": 11,
+                "cgroupCurrentBytes": 1574182912
+              },
+              {
+                "label": "forced-gc-diagnostic-only",
+                "anonymousKiB": 1582596,
+                "rssKiB": 1637716,
+                "heapUsedBytes": 11919784,
+                "externalBytes": 3623125,
+                "threads": 11,
+                "cgroupCurrentBytes": 1636728832
+              }
+            ],
+            "documents": [
+              {
+                "index": 0,
+                "inputSha256": "45b75c34ee2293fcabccf90e1341b60c9476e3f5f921a0654df3633677ff6a71",
+                "pdf": "pdfs/0.pdf",
+                "pdfSha256": "80df06914dc12c2a886c009a0d72d107f6a1d406d90942b071c8ef6458834d97",
+                "sourceBytesUnchanged": true,
+                "actualPdfTextVerified": true
+              },
+              {
+                "index": 1,
+                "inputSha256": "81f441952eb4b40180a7e1d6d6b364586cad3f390fbcc307085f528dc669dec4",
+                "pdf": "pdfs/1.pdf",
+                "pdfSha256": "76cc140514c4235a3236fe8248ae56743b4f049cfd4786b1cde8ab3674e3286d",
+                "sourceBytesUnchanged": true,
+                "actualPdfTextVerified": true
+              }
+            ],
+            "childExitObserved": false,
+            "providerIdleAfterClose": true
+          }
+        ],
+        "parentSamples": [
+          {
+            "label": "parent-before",
+            "anonymousKiB": 21136,
+            "rssKiB": 69132,
+            "heapUsedBytes": 7363176,
+            "externalBytes": 7937003,
+            "threads": 11,
+            "cgroupCurrentBytes": 26079232
+          }
+        ]
+      },
+      {
+        "engine": "baseline",
+        "style": "fresh",
+        "cgroup": {
+          "memory.max": "3221225472",
+          "memory.peak": "1258934272",
+          "memory.swap.max": "0",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "cpu.max": "100000 100000",
+          "pids.max": "128",
+          "pids.peak": "30"
+        },
+        "runs": [
+          {
+            "samples": [
+              {
+                "label": "before",
+                "anonymousKiB": 12800,
+                "rssKiB": 53896,
+                "heapUsedBytes": 5845728,
+                "externalBytes": 2623573,
+                "threads": 11,
+                "cgroupCurrentBytes": 39260160
+              },
+              {
+                "label": "after-0",
+                "anonymousKiB": 644740,
+                "rssKiB": 699864,
+                "heapUsedBytes": 13323792,
+                "externalBytes": 3711888,
+                "threads": 11,
+                "cgroupCurrentBytes": 706793472
+              },
+              {
+                "label": "closed",
+                "anonymousKiB": 648260,
+                "rssKiB": 703384,
+                "heapUsedBytes": 13455432,
+                "externalBytes": 3977596,
+                "threads": 11,
+                "cgroupCurrentBytes": 706883584
+              },
+              {
+                "label": "idle",
+                "anonymousKiB": 578824,
+                "rssKiB": 633948,
+                "heapUsedBytes": 13564920,
+                "externalBytes": 4243304,
+                "threads": 11,
+                "cgroupCurrentBytes": 634818560
+              },
+              {
+                "label": "forced-gc-diagnostic-only",
+                "anonymousKiB": 577856,
+                "rssKiB": 632980,
+                "heapUsedBytes": 11438632,
+                "externalBytes": 3335620,
+                "threads": 11,
+                "cgroupCurrentBytes": 633556992
+              }
+            ],
+            "documents": [
+              {
+                "index": 0,
+                "inputSha256": "6995586b77560c2ce69f38fe3bdf466f449302f60473bfac3d1249b1807bf5b2",
+                "pdf": "pdfs/0.pdf",
+                "pdfSha256": "f7316482aa73afe5090e7ecdbc6bb64dff6ebda077175ea9a326554781d96ddc",
+                "sourceBytesUnchanged": true,
+                "actualPdfTextVerified": true
+              }
+            ],
+            "childExitObserved": true,
+            "providerIdleAfterClose": true
+          },
+          {
+            "samples": [
+              {
+                "label": "before",
+                "anonymousKiB": 14744,
+                "rssKiB": 56036,
+                "heapUsedBytes": 5852112,
+                "externalBytes": 2623573,
+                "threads": 11,
+                "cgroupCurrentBytes": 51044352
+              },
+              {
+                "label": "after-1",
+                "anonymousKiB": 695116,
+                "rssKiB": 750352,
+                "heapUsedBytes": 13303896,
+                "externalBytes": 3711819,
+                "threads": 11,
+                "cgroupCurrentBytes": 761286656
+              },
+              {
+                "label": "closed",
+                "anonymousKiB": 699544,
+                "rssKiB": 754780,
+                "heapUsedBytes": 13435552,
+                "externalBytes": 3977527,
+                "threads": 11,
+                "cgroupCurrentBytes": 763416576
+              },
+              {
+                "label": "idle",
+                "anonymousKiB": 514220,
+                "rssKiB": 569456,
+                "heapUsedBytes": 13545288,
+                "externalBytes": 4243235,
+                "threads": 11,
+                "cgroupCurrentBytes": 569872384
+              },
+              {
+                "label": "forced-gc-diagnostic-only",
+                "anonymousKiB": 512264,
+                "rssKiB": 567500,
+                "heapUsedBytes": 11439000,
+                "externalBytes": 3335597,
+                "threads": 11,
+                "cgroupCurrentBytes": 568643584
+              }
+            ],
+            "documents": [
+              {
+                "index": 1,
+                "inputSha256": "58e247df1fce63c94fe8110fbde5b60d1f8b8b30638190194d3dbc8d5eac856c",
+                "pdf": "pdfs/1.pdf",
+                "pdfSha256": "41a98acfff623f75cdccabc115c7bbed0f64507cef36bec3d583bf5541aebab4",
+                "sourceBytesUnchanged": true,
+                "actualPdfTextVerified": true
+              }
+            ],
+            "childExitObserved": true,
+            "providerIdleAfterClose": true
+          }
+        ],
+        "parentSamples": [
+          {
+            "label": "parent-before",
+            "anonymousKiB": 21432,
+            "rssKiB": 69464,
+            "heapUsedBytes": 7363176,
+            "externalBytes": 7937003,
+            "threads": 11,
+            "cgroupCurrentBytes": 26558464
+          },
+          {
+            "label": "parent-after-child-0",
+            "anonymousKiB": 21408,
+            "rssKiB": 69680,
+            "heapUsedBytes": 7725656,
+            "externalBytes": 8214519,
+            "threads": 11,
+            "cgroupCurrentBytes": 34832384
+          },
+          {
+            "label": "parent-after-child-1",
+            "anonymousKiB": 21636,
+            "rssKiB": 69908,
+            "heapUsedBytes": 7915224,
+            "externalBytes": 8485256,
+            "threads": 11,
+            "cgroupCurrentBytes": 35020800
+          }
+        ]
+      },
+      {
+        "engine": "thin",
+        "style": "fresh",
+        "cgroup": {
+          "memory.max": "3221225472",
+          "memory.peak": "1766367232",
+          "memory.swap.max": "0",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "cpu.max": "100000 100000",
+          "pids.max": "128",
+          "pids.peak": "30"
+        },
+        "runs": [
+          {
+            "samples": [
+              {
+                "label": "before",
+                "anonymousKiB": 12796,
+                "rssKiB": 54008,
+                "heapUsedBytes": 5875992,
+                "externalBytes": 2623573,
+                "threads": 11,
+                "cgroupCurrentBytes": 39403520
+              },
+              {
+                "label": "after-0",
+                "anonymousKiB": 1241424,
+                "rssKiB": 1296672,
+                "heapUsedBytes": 13331488,
+                "externalBytes": 3709562,
+                "threads": 11,
+                "cgroupCurrentBytes": 1316995072
+              },
+              {
+                "label": "closed",
+                "anonymousKiB": 1244748,
+                "rssKiB": 1299996,
+                "heapUsedBytes": 13463096,
+                "externalBytes": 3975270,
+                "threads": 11,
+                "cgroupCurrentBytes": 1319354368
+              },
+              {
+                "label": "idle",
+                "anonymousKiB": 1268072,
+                "rssKiB": 1323320,
+                "heapUsedBytes": 13572664,
+                "externalBytes": 4240978,
+                "threads": 11,
+                "cgroupCurrentBytes": 1341263872
+              },
+              {
+                "label": "forced-gc-diagnostic-only",
+                "anonymousKiB": 1288328,
+                "rssKiB": 1343576,
+                "heapUsedBytes": 11439256,
+                "externalBytes": 3335620,
+                "threads": 11,
+                "cgroupCurrentBytes": 1363042304
+              }
+            ],
+            "documents": [
+              {
+                "index": 0,
+                "inputSha256": "2fde296a29e54cbc14f752506971ec530ab84274b2beade33da39c6a9c82a01a",
+                "pdf": "pdfs/0.pdf",
+                "pdfSha256": "fc7ce6d5c24cddcb7c4f826b3a22138535a4b6540f1dd1e0da7c0a1fac005893",
+                "sourceBytesUnchanged": true,
+                "actualPdfTextVerified": true
+              }
+            ],
+            "childExitObserved": true,
+            "providerIdleAfterClose": true
+          },
+          {
+            "samples": [
+              {
+                "label": "before",
+                "anonymousKiB": 14728,
+                "rssKiB": 55956,
+                "heapUsedBytes": 5838832,
+                "externalBytes": 2623365,
+                "threads": 11,
+                "cgroupCurrentBytes": 48881664
+              },
+              {
+                "label": "after-1",
+                "anonymousKiB": 1272676,
+                "rssKiB": 1327912,
+                "heapUsedBytes": 13314568,
+                "externalBytes": 3709493,
+                "threads": 11,
+                "cgroupCurrentBytes": 1352855552
+              },
+              {
+                "label": "closed",
+                "anonymousKiB": 1277780,
+                "rssKiB": 1333016,
+                "heapUsedBytes": 13446272,
+                "externalBytes": 3975201,
+                "threads": 11,
+                "cgroupCurrentBytes": 1370935296
+              },
+              {
+                "label": "idle",
+                "anonymousKiB": 1301948,
+                "rssKiB": 1357184,
+                "heapUsedBytes": 13555848,
+                "externalBytes": 4240909,
+                "threads": 11,
+                "cgroupCurrentBytes": 1377894400
+              },
+              {
+                "label": "forced-gc-diagnostic-only",
+                "anonymousKiB": 1362468,
+                "rssKiB": 1417704,
+                "heapUsedBytes": 11439368,
+                "externalBytes": 3335597,
+                "threads": 11,
+                "cgroupCurrentBytes": 1440518144
+              }
+            ],
+            "documents": [
+              {
+                "index": 1,
+                "inputSha256": "21c0ca92ed9d5f39198a6ec9dcf8303b2b463862ab05cbea3de06c88d1e6b205",
+                "pdf": "pdfs/1.pdf",
+                "pdfSha256": "4a5b0bfa6a0a8603010ae55a1e724f9ab7099e50b88c342f21c0f8fbba56f338",
+                "sourceBytesUnchanged": true,
+                "actualPdfTextVerified": true
+              }
+            ],
+            "childExitObserved": true,
+            "providerIdleAfterClose": true
+          }
+        ],
+        "parentSamples": [
+          {
+            "label": "parent-before",
+            "anonymousKiB": 21400,
+            "rssKiB": 69532,
+            "heapUsedBytes": 7366080,
+            "externalBytes": 7937003,
+            "threads": 11,
+            "cgroupCurrentBytes": 25448448
+          },
+          {
+            "label": "parent-after-child-0",
+            "anonymousKiB": 21700,
+            "rssKiB": 70084,
+            "heapUsedBytes": 7728664,
+            "externalBytes": 8214547,
+            "threads": 11,
+            "cgroupCurrentBytes": 32063488
+          },
+          {
+            "label": "parent-after-child-1",
+            "anonymousKiB": 21928,
+            "rssKiB": 70312,
+            "heapUsedBytes": 7918384,
+            "externalBytes": 8485305,
+            "threads": 11,
+            "cgroupCurrentBytes": 33710080
+          }
+        ]
+      }
+    ],
+    "eightPdfTextChecks": true,
+    "sameProcessMainThreadHeapStayedAbout14MiB": true,
+    "sameProcessThreadCountBeforeAndAfter": 11,
+    "thinAfterTwoAnonKiB": 1494536,
+    "thinAfterIdleAnonKiB": 1522120,
+    "thinAfterForcedGcAnonKiB": 1582596,
+    "forcedGcIsDiagnosticOnly": true,
+    "nativeAllocatorOrWasmJitRootCauseProven": false,
+    "processExitReclaimsRetention": true,
+    "freshThinParentAnonKiB": [
+      21400,
+      21700,
+      21928
+    ],
+    "sharedHelperBaseRef": "1a6d98ddbf11ccc7ff608299206d184ba546eb60"
+  },
+  "fullBoundaryPrototype": {
+    "profiles": [
+      {
+        "schema": "augmentor-office-contained-boundaries/1",
+        "probeSha256": "8a839de0101d37a23046a78d74dc7f49c69fa7b006ae3ea9ea4be0f4a8ce6834",
+        "engine": "@deepseek-ai/libreoffice-kit-wasm@0.1.5",
+        "positiveHttpCalibrationRequests": 1,
+        "documentHttpCanaryRequests": 0,
+        "canaryImageAndTextUnchanged": true,
+        "expectedDriverCanaryReadsEach": 2,
+        "authorizedReaderCalls": 30,
+        "cases": [
+          {
+            "name": "embedded-control.docx",
+            "accepted": true,
+            "pdf": "pdfs/embedded-control.docx.pdf",
+            "pdfSha256": "30d12b1db0c1548d6410abf66c0a4cb80e53ab8c92d883e305557cb033083390",
+            "required": "AUGMENTOR_AUTHORED_NATIVE",
+            "images": 3,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "43b094b327ace4ffb4eae8f178e59befed9771dd8649d0a260356a082e9a4704",
+            "sourceBytesUnchanged": true,
+            "observedMs": 3873.939879,
+            "memoryCurrentBytes": 42323968,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 3
+          },
+          {
+            "name": "http-image.docx",
+            "accepted": true,
+            "pdf": "pdfs/http-image.docx.pdf",
+            "pdfSha256": "ffaf8a8612814028c19d283b0dfeddabc3f1b494b4ddc679e8297fddb3a56911",
+            "required": "AUGMENTOR_AUTHORED_NATIVE",
+            "images": 0,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "627873770765a6aab93f83dd123716d6989442828dbf9d4d7669e35854098af4",
+            "sourceBytesUnchanged": true,
+            "observedMs": 3670.376928,
+            "memoryCurrentBytes": 45101056,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 0
+          },
+          {
+            "name": "file-image.docx",
+            "accepted": true,
+            "pdf": "pdfs/file-image.docx.pdf",
+            "pdfSha256": "8fef9726b70d2d113b0c566bfbdce2d24b1823624f289d8bb6f41c18f67a003b",
+            "required": "AUGMENTOR_AUTHORED_NATIVE",
+            "images": 0,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "8cee3ae321248214c186386c9662f680a70815c0f7e868ab91de8aabf07dcb61",
+            "sourceBytesUnchanged": true,
+            "observedMs": 3711.0886600000003,
+            "memoryCurrentBytes": 52105216,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 0
+          },
+          {
+            "name": "file-field.docx",
+            "accepted": true,
+            "pdf": "pdfs/file-field.docx.pdf",
+            "pdfSha256": "8f767c301d9176d9d9a22c94c44aa5f202225a07d3f98607459aa00d67c91384",
+            "required": "CACHED_FIELD_VALUE",
+            "images": 3,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "730845768015e762fc93d0550234b09720ce0cb7012f42e827310d944f8c40a2",
+            "sourceBytesUnchanged": true,
+            "observedMs": 3776.6520760000003,
+            "memoryCurrentBytes": 55468032,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 3
+          },
+          {
+            "name": "http-field.docx",
+            "accepted": true,
+            "pdf": "pdfs/http-field.docx.pdf",
+            "pdfSha256": "ef7579d70db7b1b7d868435e8510447127afb59314180fa8bfc380e08b84ccec",
+            "required": "CACHED_FIELD_VALUE",
+            "images": 3,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "3bb10afa467d98498b16ab8753b80b2e5fe891b0a26d66c584dae0075d91ca7a",
+            "sourceBytesUnchanged": true,
+            "observedMs": 3799.408959000002,
+            "memoryCurrentBytes": 56750080,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 3
+          },
+          {
+            "name": "webservice.xlsx",
+            "accepted": true,
+            "pdf": "pdfs/webservice.xlsx.pdf",
+            "pdfSha256": "fad012cb5df955ef18bdecbb3651655e471ed1c58c37521342c002f571a38260",
+            "required": "RICH_SECOND_SHEET",
+            "images": 0,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "d53009e1d1efb450fc29f2cbf793046af482c5267085c416756ed589c9f6626a",
+            "sourceBytesUnchanged": true,
+            "observedMs": 3388.632587,
+            "memoryCurrentBytes": 58523648,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 0
+          },
+          {
+            "name": "declared-oversize.docx",
+            "accepted": false,
+            "reason": "invalid-document",
+            "inputSha256": "eba1ff56c6a935ac2aaa2d62250d7a24aa25b8dcd005a067dacc038b44459bf8",
+            "sourceBytesUnchanged": true,
+            "observedMs": 282.7276380000003,
+            "memoryCurrentBytes": 64741376
+          },
+          {
+            "name": "too-many-entries.docx",
+            "accepted": false,
+            "reason": "invalid-document",
+            "inputSha256": "296bde9679ff896754f57f7e12d1402cd05aa2bfe1c6b1e8d18cbee823caf900",
+            "sourceBytesUnchanged": true,
+            "observedMs": 329.564234999998,
+            "memoryCurrentBytes": 193392640
+          },
+          {
+            "name": "cancel-startup.docx",
+            "realConverterWasmOpenObserved": true,
+            "reason": "gateway/cancelled",
+            "teardownSettled": true,
+            "sourceBytesUnchanged": true
+          },
+          {
+            "name": "after-cancel.docx",
+            "accepted": true,
+            "pdf": "pdfs/after-cancel.docx.pdf",
+            "pdfSha256": "de283c8aa99f6465e14e0aa696b530cac3d438a337cd04229bbb51cf613c8646",
+            "required": "RECOVERY_AFTER_REAL_CANCEL",
+            "images": 3,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "5b5a342345652b6b464765dc2d09e15baf88358043064e99920d1b47ac49b64f",
+            "sourceBytesUnchanged": true,
+            "observedMs": 3691.1865480000015,
+            "memoryCurrentBytes": 198696960,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 3
+          }
+        ],
+        "cgroup": {
+          "memory.max": "3221225472",
+          "memory.peak": "1418690560",
+          "memory.swap.max": "0",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "cpu.max": "100000 100000",
+          "pids.max": "128",
+          "pids.peak": "31"
+        },
+        "providerIdleAfterClose": true,
+        "conversionScratchAbsent": true,
+        "diagnosticProcessBoundary": true,
+        "rendererProcesses": [
+          {
+            "pid": 21,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 41,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 61,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 81,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 101,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 121,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 141,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 154,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 167,
+            "closed": true,
+            "exitCode": null,
+            "signal": "SIGTERM"
+          },
+          {
+            "pid": 187,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          }
+        ],
+        "installedSandboxQualified": false,
+        "publicRedistributionQualified": false,
+        "trace": {
+          "successfulWasmOpens": 8,
+          "outsideCanaryReads": {
+            "only-on-host.png": {
+              "driver": 2,
+              "other": 0
+            },
+            "only-on-host.txt": {
+              "driver": 2,
+              "other": 0
+            }
+          },
+          "connectCalls": 1,
+          "failedParentContainerNssSocketCalls": 0,
+          "ownedRendererProcessesConfirmedClosed": 10,
+          "ipConnectCalls": 1,
+          "soleIpConnectIsDriverHttpPositiveControl": true,
+          "unresolvedCalls": 0,
+          "traceSha256": "8832b74308d0f43d6e8479eefea110207454621aeed3ba2a04dfc871d00e8811",
+          "scope": "All traced processes/threads within this diagnostic container only"
+        },
+        "containerId": "b4bf26a906f7230533863193ca1d53dbe28c2dce8dbe4742fb3a20865172ae3f",
+        "containerImageId": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924"
+      },
+      {
+        "schema": "augmentor-office-contained-boundaries/1",
+        "probeSha256": "8a839de0101d37a23046a78d74dc7f49c69fa7b006ae3ea9ea4be0f4a8ce6834",
+        "engine": "@augmentor/office-engine-wasm@0.1.5-augmentor.thin.1",
+        "positiveHttpCalibrationRequests": 1,
+        "documentHttpCanaryRequests": 0,
+        "canaryImageAndTextUnchanged": true,
+        "expectedDriverCanaryReadsEach": 2,
+        "authorizedReaderCalls": 30,
+        "cases": [
+          {
+            "name": "embedded-control.docx",
+            "accepted": true,
+            "pdf": "pdfs/embedded-control.docx.pdf",
+            "pdfSha256": "72b9a13a36e89e1ad3d0d7a9ef365fcd8c02def6cf972be95addb737d70a19ef",
+            "required": "AUGMENTOR_AUTHORED_NATIVE",
+            "images": 3,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "43b094b327ace4ffb4eae8f178e59befed9771dd8649d0a260356a082e9a4704",
+            "sourceBytesUnchanged": true,
+            "observedMs": 4839.86872,
+            "memoryCurrentBytes": 67338240,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 3
+          },
+          {
+            "name": "http-image.docx",
+            "accepted": true,
+            "pdf": "pdfs/http-image.docx.pdf",
+            "pdfSha256": "6b7e107675257dd4f0310fbea355db6a62ab5aefaf61c505c843d267c1c37dba",
+            "required": "AUGMENTOR_AUTHORED_NATIVE",
+            "images": 0,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "4e3bdf7a00cd89ceeca3d05006bd04dbec5970cfce6c0d215607ae0fba3b815f",
+            "sourceBytesUnchanged": true,
+            "observedMs": 4870.108846,
+            "memoryCurrentBytes": 72159232,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 0
+          },
+          {
+            "name": "file-image.docx",
+            "accepted": true,
+            "pdf": "pdfs/file-image.docx.pdf",
+            "pdfSha256": "aaffe02f81454735e3dd9694abbe1ea49fb50342b1a42eb508df70a88391cdca",
+            "required": "AUGMENTOR_AUTHORED_NATIVE",
+            "images": 0,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "1c18023658dc688ca10446aa676c24c90db33f9e0374e85b16806ce51398cbc5",
+            "sourceBytesUnchanged": true,
+            "observedMs": 4801.242708,
+            "memoryCurrentBytes": 76017664,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 0
+          },
+          {
+            "name": "file-field.docx",
+            "accepted": true,
+            "pdf": "pdfs/file-field.docx.pdf",
+            "pdfSha256": "32eabf87a7154b54b91ccdd836de8069cfd39edf65c2b058947fa31165b9a6f0",
+            "required": "CACHED_FIELD_VALUE",
+            "images": 3,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "fd06737c70e02ff1b7e85f3dca7ccf17f08e0c81dc72c790dd09af5a6dd3459c",
+            "sourceBytesUnchanged": true,
+            "observedMs": 4786.584971999999,
+            "memoryCurrentBytes": 84918272,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 3
+          },
+          {
+            "name": "http-field.docx",
+            "accepted": true,
+            "pdf": "pdfs/http-field.docx.pdf",
+            "pdfSha256": "9a8fcc8b057f619b6c2b0ec27cbdcf2f6fe77d1efd0157323b0ea860112a6123",
+            "required": "CACHED_FIELD_VALUE",
+            "images": 3,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "8c3251de16bbe393884e5f118b546a7587be8336cefff1a9fb567bff71bc07ac",
+            "sourceBytesUnchanged": true,
+            "observedMs": 4885.545641999997,
+            "memoryCurrentBytes": 92831744,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 3
+          },
+          {
+            "name": "webservice.xlsx",
+            "accepted": true,
+            "pdf": "pdfs/webservice.xlsx.pdf",
+            "pdfSha256": "3566d2ff7e3917fdae9e6a96649aead64eb91a8cda71b884bfef20bb41a15692",
+            "required": "RICH_SECOND_SHEET",
+            "images": 0,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "f2121b12983f26f238d7d860fe1cd7c5342bd4670c126bddecffec45e3e2d846",
+            "sourceBytesUnchanged": true,
+            "observedMs": 3864.669758,
+            "memoryCurrentBytes": 105353216,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 0
+          },
+          {
+            "name": "declared-oversize.docx",
+            "accepted": false,
+            "reason": "invalid-document",
+            "inputSha256": "3ca2f3cfd181bcc1990ef854e8f6f8663ae5f652177a438f7c66d7bed61a54b9",
+            "sourceBytesUnchanged": true,
+            "observedMs": 294.22881699999925,
+            "memoryCurrentBytes": 106864640
+          },
+          {
+            "name": "too-many-entries.docx",
+            "accepted": false,
+            "reason": "invalid-document",
+            "inputSha256": "41c8510b10b0b54235ff4b2ea5d24ddd2627c3d63937a4ce6225d2e749494cbf",
+            "sourceBytesUnchanged": true,
+            "observedMs": 387.1271009999982,
+            "memoryCurrentBytes": 269168640
+          },
+          {
+            "name": "cancel-startup.docx",
+            "realConverterWasmOpenObserved": true,
+            "reason": "gateway/cancelled",
+            "teardownSettled": true,
+            "sourceBytesUnchanged": true
+          },
+          {
+            "name": "after-cancel.docx",
+            "accepted": true,
+            "pdf": "pdfs/after-cancel.docx.pdf",
+            "pdfSha256": "4f7abcf96ab72f8440aaa3ec1113435ac8cb89a9e73cdedece7e90fd59f4ac1b",
+            "required": "RECOVERY_AFTER_REAL_CANCEL",
+            "images": 3,
+            "forbidden": [
+              "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+              "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+            ],
+            "inputSha256": "ef548ece0546faff26a8f1cd56103370aabaf71c170c354501f39131cb3e2d9e",
+            "sourceBytesUnchanged": true,
+            "observedMs": 4760.019003999998,
+            "memoryCurrentBytes": 276230144,
+            "requiredAndExcludedPdfTextVerified": true,
+            "actualPdfImageCount": 3
+          }
+        ],
+        "cgroup": {
+          "memory.max": "3221225472",
+          "memory.peak": "1948413952",
+          "memory.swap.max": "0",
+          "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+          "cpu.max": "100000 100000",
+          "pids.max": "128",
+          "pids.peak": "31"
+        },
+        "providerIdleAfterClose": true,
+        "conversionScratchAbsent": true,
+        "diagnosticProcessBoundary": true,
+        "rendererProcesses": [
+          {
+            "pid": 21,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 41,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 61,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 81,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 101,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 121,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 141,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 154,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "pid": 167,
+            "closed": true,
+            "exitCode": null,
+            "signal": "SIGTERM"
+          },
+          {
+            "pid": 187,
+            "closed": true,
+            "exitCode": 0,
+            "signal": null
+          }
+        ],
+        "installedSandboxQualified": false,
+        "publicRedistributionQualified": false,
+        "trace": {
+          "successfulWasmOpens": 8,
+          "outsideCanaryReads": {
+            "only-on-host.png": {
+              "driver": 2,
+              "other": 0
+            },
+            "only-on-host.txt": {
+              "driver": 2,
+              "other": 0
+            }
+          },
+          "connectCalls": 1,
+          "failedParentContainerNssSocketCalls": 0,
+          "ownedRendererProcessesConfirmedClosed": 10,
+          "ipConnectCalls": 1,
+          "soleIpConnectIsDriverHttpPositiveControl": true,
+          "unresolvedCalls": 0,
+          "traceSha256": "fea7796c69ee1f5355cd99a328a6927ca08f97eff29802279a21740209c147f0",
+          "scope": "All traced processes/threads within this diagnostic container only"
+        },
+        "containerId": "da93e19ddc1ac9b1327425ba62afe08dc7f4778efc5d11ad1297f64300ccde46",
+        "containerImageId": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924"
+      }
+    ],
+    "casesPerEngine": 10,
+    "pdfOutputsVerified": 14,
+    "actualWasmOpensPerEngine": 8,
+    "closedRendererProcessesPerEngine": 10,
+    "baselineMemoryPeakBytes": 1418690560,
+    "thinMemoryPeakBytes": 1948413952,
+    "memoryMaxBytes": 3221225472,
+    "swapMaxBytes": 0,
+    "cpuMax": "100000 100000",
+    "pidsMax": 128,
+    "pidsPeakPerEngine": 31,
+    "forcedGcUsed": false,
+    "originalProviderQueueCacheReaderAndEntryPreserved": true,
+    "innerScratchContainedInProviderOwnedDirectory": true,
+    "allOriginalAndNestedScratchPrefixesChecked": true,
+    "sameProcessThinOomEvidencePreserved": "contained-boundaries-qualification-20261017.json"
+  },
+  "qualification": {
+    "pythonTests": 42,
+    "newAndExistingTraceParserTests": 6,
+    "fail": 0,
+    "skip": 0,
+    "compiledAppChanged": false,
+    "wholeNewHeadCiPassClaimed": false,
+    "compiledSourceAndSelectedFilesExact": 1120
+  },
+  "retainedFailedPrototypeAttempts": [
+    {
+      "attempt": 1,
+      "reason": "Normal IPC disconnect incorrectly triggered the parent-loss exit70 guard; corrected with explicit terminal-reply state."
+    },
+    {
+      "attempt": 2,
+      "reason": "Baseline ten cases finished, but postflight rejected absent NSS lookups; prototype records zero or two driver lookups and attributes only known closed renderers. Review also found an incomplete scratch-prefix check; nested scratch now belongs to the provider and all actual prefixes are checked."
+    }
+  ],
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "hostedInstalledImplementation": {
+    "sourceRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+    "validateRun": 39015618932,
+    "debianJob": 117347258389,
+    "status": "completed",
+    "conclusion": "failure at public Office source/rebuild packaging gate",
+    "precedingRootPass": 2106,
+    "precedingRootFail": 0,
+    "precedingRootSkip": 44,
+    "precedingBrowserPass": 128,
+    "precedingNativeTestsRun": 1072,
+    "linuxSdkRun": 39015618971,
+    "linuxSdkJob": 117347023269,
+    "linuxSdkConclusion": "success",
+    "wholeWorkflowPassClaimed": false,
+    "precedingNativeSkip": 45
+  },
+  "remaining": [
+    "Promotable process seat needs bounded IPC/options validation and real crash, parent loss, hung/stopped renderer, output/source ownership, timeout/disposal and recovery qualification.",
+    "Original GUI/Host integration and exact ordinary/sealed/installed acceptance of any production process seat.",
+    "Representative fonts/corpus/macros, complete source/notice/third-party and public packaging qualification.",
+    "Owner pilot feedback before further transfer; deferred project remains in DSH."
+  ],
+  "engineBuildsStarted": 0,
+  "installedChanges": 0,
+  "publicRedistributionQualified": false
+}

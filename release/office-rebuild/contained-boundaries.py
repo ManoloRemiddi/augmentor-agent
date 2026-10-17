@@ -70,14 +70,22 @@ def trace_evidence(path, result):
     # glibc's parent-thread passwd lookup probes an absent container-local NSS
     # socket twice. Keep these failed Unix calls explicit, not IP traffic or an
     # unexplained ignore rule; any other destination/thread still fails.
-    nss = [(pid, call) for pid, call in connects if pid == result['driverPid'] and
+    renderers = result.get('rendererProcesses', [])
+    assert not renderers or result.get('diagnosticProcessBoundary') is True
+    assert len(renderers) <= 20 and all(isinstance(r.get('pid'), int) and r['pid'] > 0 and r.get('closed') is True for r in renderers)
+    renderer_pids = {row['pid'] for row in renderers}
+    assert len(renderer_pids) == len(renderers) and result['driverPid'] not in renderer_pids
+    nss = [(pid, call) for pid, call in connects if pid in {result['driverPid'], *renderer_pids} and
            re.fullmatch(r'connect\(\d+, \{sa_family=AF_UNIX, sun_path="/var/run/nscd/socket"\}, 110\) = -1 ENOENT \(No such file or directory\)', call)]
     ip = [(pid, call) for pid, call in connects if (pid, call) not in nss]
-    assert len(nss) == 2 and len(ip) == 1, connects
+    driver_nss = sum(pid == result['driverPid'] for pid, _ in nss)
+    assert (driver_nss in {0, 2} if result.get('diagnosticProcessBoundary') else driver_nss == 2) and len(ip) == 1, connects
+    assert all(sum(pid == renderer for pid, _ in nss) <= 4 for renderer in renderer_pids)
     pid, call = ip[0]
     assert pid == result['driverPid'] and '127.0.0.1' in call and f'htons({result["canaryPort"]})' in call, connects
     return {'successfulWasmOpens': wasm, 'outsideCanaryReads': canaries,
             'connectCalls': len(connects), 'failedParentContainerNssSocketCalls': len(nss),
+            'ownedRendererProcessesConfirmedClosed': len(renderers),
             'ipConnectCalls': 1, 'soleIpConnectIsDriverHttpPositiveControl': True,
             'unresolvedCalls': 0, 'traceSha256': sha(path),
             'scope': 'All traced processes/threads within this diagnostic container only'}
@@ -89,6 +97,7 @@ def main():
     parser.add_argument('--thin-app', required=True)
     parser.add_argument('--fixtures', required=True)
     parser.add_argument('--output', required=True)
+    parser.add_argument('--process-boundary', action='store_true', help='Explicit contained prototype; not installed/default behavior')
     args = parser.parse_args()
     os.umask(0o077)
     app, thin, fixtures = map(private_input, [args.app, args.thin_app, args.fixtures])
@@ -118,6 +127,9 @@ def main():
     probe = output / 'probe'
     probe.mkdir()
     shutil.copy2(ROOT / 'release/office-rebuild/boundaries-probe.mjs', probe / 'boundaries-probe.mjs')
+    if args.process_boundary:
+        for name in ['process-converter.mjs', 'process-renderer.mjs']:
+            shutil.copy2(ROOT / 'release/office-rebuild' / name, probe / name)
     operator_sha = sha(Path(__file__))
     trace_tools = output / 'trace-tools'
     trace_tools.mkdir()
@@ -144,6 +156,7 @@ def main():
                   '--memory', '3g', '--memory-swap', '3g', '--cpus', '1', '--pids-limit', '128',
                   '--user', f'{os.getuid()}:{os.getgid()}', '--workdir', '/work',
                   '--env', 'HOME=/work/home', '--env', 'PROBE_ENGINE=' + mode,
+                  '--env', 'PROBE_PROCESS_BOUNDARY=' + ('1' if args.process_boundary else '0'),
                   '--tmpfs', '/tmp:rw,nosuid,nodev,noexec,size=256m']
         for source, target in mounts:
             create += ['--mount', f'type=bind,src={source},dst={target},readonly']
@@ -190,6 +203,8 @@ def main():
               'tracingToolFiles': tools, 'operatorSha256': operator_sha,
               'engineIdentities': engine_identities,
               'probeSha256': sha(probe / 'boundaries-probe.mjs'),
+              'processBoundaryPrototype': args.process_boundary,
+              'processPrototypeFilesSha256': {p.name: sha(p) for p in probe.iterdir() if p.name.startswith('process-')},
               'engineBuildsStarted': 0, 'installedChanges': 0,
               'ownerProfilesOrDocumentsUsed': False, 'installedSandboxQualified': False,
               'macroExecutionQualified': False, 'publicRedistributionQualified': False}
