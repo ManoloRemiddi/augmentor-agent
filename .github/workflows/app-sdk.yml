@@ -39,6 +39,8 @@ jobs:
       - name: Verify original GUI dependency resolution on this platform
         run: node --test tests/harness-build-resolution.test.mjs
       - run: npm run build
+      - name: Verify interruption context and bounded response recovery
+        run: node --test tests/pi-execution.test.mjs
       - name: Verify recognition-only Pi transport and operator gateway
         run: node --test tests/harness-dictation.test.mjs tests/harness-dictation-host.test.mjs
       - name: Verify shared memory settings, stale choices and inspector boundaries

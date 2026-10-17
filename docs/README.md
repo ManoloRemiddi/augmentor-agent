@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Interrupted-response context](AUGMENTOR-HARNESS.md#model-context-after-an-interrupted-response--october-17) · actual original-GUI failure, typed native boundary and per-turn SDK note; candidate qualification and deployment scope.
+
 [Live MX queue controls](AUGMENTOR-HARNESS.md#live-qwen-queue-steering-and-stop--october-17) · actual Qwen steering, Stop, paused cold reopen and explicit resume; isolated data, API versus physical limits.
 
 [Shared prompt CI prerequisites](HARNESS-SHARED-PROFILES.md#shared-prompt-ci-startup-prerequisites--october-17) · private smoke-profile parent, locked clean-interpreter dependency and local/hosted evidence.

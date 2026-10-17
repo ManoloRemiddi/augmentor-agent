@@ -471,6 +471,50 @@ Remaining full-migration gates include queues/steering, adaptive settings/routin
 The inspection follow-up is implementation source `42201ce3e8981b1fae6be34388bc21227f77a4c5` and removes inherited request IDs from turn-scoped `execution/*` records. Each `model/request.policies.execution.requestLimit` now carries its own post-transform cap, fields and coverage; the actual-SDK fixture checks both association and omitted stale IDs. Hook disposal follows reverse composition order, restoring the observer before the execution wrapper. This changes correlation/lifecycle metadata and leaves the recovery bounds, UI and dependencies intact. Build/type/version/whitespace and source-boundary checks pass; the full Node suite again has 560 cases, 558 pass and 2 platform skips, and all 39 staged runtime cases pass. Native/Browser implementation and dependency files are unchanged, so their preceding scoped evidence remains applicable. Fresh matching-head hosted gates remain required.
 
 
+## Model context after an interrupted response — October 17
+
+An actual original-GUI/Qwen probe of sealed **b1edf4d2** exposes a semantic
+continuation gap. Send, Queue, expand, Steer and Stop work; cold reopening keeps
+the waiting input paused. Explicit Resume delivers the new request once and its
+read succeeds. The model then returns to the earlier interrupted numbered-list
+task instead of answering the new request. Captured effective provider bodies
+contain the new user input and correct tool result, but omit the aborted
+assistant response and carry no interruption explanation. An additional actual
+GUI Stop bounds that response. This is a retained failing live case, distinct
+from the preceding passing API sample below.
+
+The candidate adds a per-turn context note through Pi's public
+`before_agent_start` hook. Before admission, execution reads the **selected native
+ancestry**, skipping non-message entries and trailing tool results. Only a most
+recent assistant with typed `stopReason: aborted` enables the note. A later user
+or completed/error/truncated/tool-use assistant boundary does not. Quoted prose
+and arbitrary custom entries cannot manufacture interruption evidence.
+
+The note preserves the existing system prompt and explains that the interrupted
+task is historical, and the newest accepted request controls what to do next.
+An explicit request to continue remains allowed. Confirmed tool results remain
+evidence; interruption does not establish failure, rollback or permission to
+repeat uncertain changes. It neither removes old input nor edits native history.
+The SDK retains the turn-specific system prompt across tool steps and resets it
+at the next prompt. `execution/interrupted-context` records the observed source
+boundary and limited authority without private prompt text or identifiers.
+This note improves context; it does not enforce semantic model compliance or
+replace existing tool/permission/recovery guards.
+
+The shared implementation adds no OS adapter, dependency, model setting or GUI
+change. Unit controls cover typed evidence, trailing results, later boundaries,
+explicit continuation wording and lifecycle/reset. The actual Host/SDK case
+stops a streamed response, cold-opens without inference, checks the next provider
+body before/after a real tool result, then verifies the note is absent from a
+later completed turn and original native bytes remain a prefix. The common
+Linux/macOS/Windows SDK workflow now runs execution tests directly; hosted and
+physical platform acceptance remain separate.
+
+[Candidate qualification](../release/harness-interrupted-context-qualification-20261017.json)
+records exact inputs, source/package evidence and the remaining sealed/live and
+owner-adoption gates. Current reviews stay on b1edf4d2 until guarded qualification
+and adoption. Voice, later OS rollout and further real migration remain deferred.
+
 ## Live Qwen queue, steering and Stop — October 17
 
 The exact sealed MX application **b1edf4d2 / 20261017-061143-d0c0fc29** now

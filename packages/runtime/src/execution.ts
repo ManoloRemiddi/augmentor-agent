@@ -7,6 +7,7 @@ import {saveToolOriginal} from './tool-originals.js';
 import type {McpAgentCall} from './mcp-call-context.js';
 
 export const EXECUTION_POLICY={maxRecoveries:2,recoveryMaxTokens:8192,recoveryMaxSteps:64,recoveryMaxMs:600000,warningMs:90000};
+export const INTERRUPTED_RESPONSE_CONTEXT='Previous response interrupted: the preceding assistant response was aborted. Its unfinished task is historical context, not an instruction to resume automatically. Follow the newest accepted user request; continue an interrupted task only when that request asks to continue it. Preserve confirmed tool results. Interruption does not prove that earlier actions failed or were undone; inspect any uncertain outcome before repeating a change.';
 type Effect='read'|'change'|'external'|'unknown';
 type Outcome='completed'|'failed'|'failed-before-dispatch'|'unknown'|'running'|'waiting';
 type Action={effect:Effect;status:Outcome;jobId?:string};
@@ -54,6 +55,7 @@ export class PiExecution {
  private calls=new Map<string,string>();
  private terminated=new Set<string>();
  private historicalPending=0;
+ private previousResponseInterrupted=false;
  private lastStop?:string;
  private settled='idle';
  private handoff=false;
@@ -69,12 +71,21 @@ export class PiExecution {
  get incomplete(){return this.incompleteReason;}
  describe(){return {policy:{...this.policy},automaticRecovery:this.recovering,steeringPending:this.superseding,steeredContinuation:this.steered,recoveries:this.recoveries,recoverySteps:this.steps,
   outcome:this.cancelled?(this.active?'cancelling':'cancelled'):this.blocked?'incomplete':this.active?'running':this.settled,incompleteReason:this.incompleteReason??null,
-  historicalPending:this.historicalPending,requestLimit:this.requestLimit??null,actions:[...this.actions.values()].map(({effect,status})=>({effect,status}))};}
+  historicalPending:this.historicalPending,previousResponseInterrupted:this.previousResponseInterrupted,requestLimit:this.requestLimit??null,actions:[...this.actions.values()].map(({effect,status})=>({effect,status}))};}
  begin(manager:Pick<SessionManager,'getBranch'>){
   this.clearTimer();this.active=true;this.cancelled=false;this.recovering=false;this.superseding=false;this.steered=false;this.started=0;this.recoveries=0;this.steps=0;this.requestCap=undefined;this.requestLimit=undefined;this.guardDenials=0;
   this.blocked=false;this.incompleteReason=undefined;this.settled='idle';this.handoff=false;this.actions.clear();this.calls.clear();this.terminated.clear();this.lastStop=undefined;
-  const pending=new Set<string>();
-  for(const entry of manager.getBranch()){
+  const pending=new Set<string>(),branch=manager.getBranch();
+  this.previousResponseInterrupted=false;
+  // Read only this selected native ancestry, before the next input is admitted.
+  // Tool results may follow an aborted response; a later user/assistant message
+  // establishes a newer boundary. Do not infer interruption from prose or errors.
+  for(let i=branch.length-1;i>=0;i--){
+   const entry=branch[i]!;if(entry.type!=='message')continue;
+   if(entry.message.role==='user')break;
+   if(entry.message.role==='assistant'){this.previousResponseInterrupted=entry.message.stopReason==='aborted';break;}
+  }
+  for(const entry of branch){
    if(entry.type!=='message')continue;
    const message=entry.message;
    if(message.role==='assistant'&&!['length','error','aborted'].includes(message.stopReason))for(const part of message.content)if(part.type==='toolCall')pending.add(part.id);
@@ -125,6 +136,11 @@ export class PiExecution {
   // The SDK skips its public emitters when there are no matching handlers.
   // Keep these boundaries present independently of other feature extensions.
   pi.on('tool_call',()=>undefined);pi.on('tool_result',()=>undefined);
+  pi.on('before_agent_start',event=>{
+   if(!this.active||this.cancelled||!this.previousResponseInterrupted)return;
+   this.emit('execution/interrupted-context',{boundary:'selected-native-ancestry; preceding-assistant-aborted',authority:'newest-accepted-user-request',priorActionOutcomes:'not-inferred'});
+   return {systemPrompt:event.systemPrompt+'\n\n'+INTERRUPTED_RESPONSE_CONTEXT};
+  });
   pi.on('turn_end',(event,ctx)=>this.boundary(event,ctx));
   pi.on('session_before_compact',event=>{
    if(!event.willRetry)return;

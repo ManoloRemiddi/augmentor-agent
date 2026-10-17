@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PiExecution,executionKey,recoveryDenial} from '../dist/runtime/src/execution.js';
+import {PiExecution,executionKey,recoveryDenial,INTERRUPTED_RESPONSE_CONTEXT} from '../dist/runtime/src/execution.js';
 
 const text=value=>[{type:'text',text:value}];
 function fixture({policy={},branch=[],contract=()=>undefined,before,after,finish}={}){
@@ -91,6 +91,23 @@ test('cold unresolved history disables recovery while truncated proposals and re
  const unresolved=fixture({branch:[entry('assistant',{content:[call],stopReason:'toolUse'})]});assert.equal(unresolved.boundary(),undefined);assert.equal(unresolved.controller.describe().historicalPending,1);assert(unresolved.controller.incomplete);assert.equal(unresolved.requests.length,0);unresolved.controller.dispose();
  for(const branch of [[entry('assistant',{content:[call],stopReason:'length'})],[entry('assistant',{content:[call],stopReason:'toolUse'}),entry('toolResult',{toolCallId:'pending'})]]){
   const f=fixture({branch});assert.equal(f.boundary().continue,true);assert.equal(f.controller.describe().historicalPending,0);f.controller.dispose();
+ }
+});
+
+test('a saved aborted response informs the next turn without rewriting history or claiming rollback',()=>{
+ const branch=[{type:'message',message:{role:'user',content:text('Earlier unfinished task')}},{type:'message',message:{role:'assistant',stopReason:'aborted',content:text('Partial')}},{type:'message',message:{role:'toolResult',toolCallId:'settled',content:text('Actual result')}}],before=structuredClone(branch),f=fixture({branch});
+ const hook=f.handlers.get('before_agent_start'),event={systemPrompt:'Existing product and provider instructions',prompt:'A different request'};
+ assert.equal(hook(event).systemPrompt,event.systemPrompt+'\n\n'+INTERRUPTED_RESPONSE_CONTEXT);
+ assert.equal(f.controller.describe().previousResponseInterrupted,true);assert.deepEqual(branch,before);
+ assert.match(INTERRUPTED_RESPONSE_CONTEXT,/only when that request asks to continue/);assert.match(INTERRUPTED_RESPONSE_CONTEXT,/does not prove.*undone/);
+ assert.equal(f.events.filter(e=>e.kind==='execution/interrupted-context').length,1);
+ f.controller.cancel();assert.equal(hook(event),undefined);f.controller.end('aborted');assert.equal(hook(event),undefined);
+ f.controller.begin({getBranch:()=>[...branch,{type:'message',message:{role:'assistant',stopReason:'stop',content:text('New completed answer')}}]});assert.equal(hook(event),undefined);assert.equal(f.controller.describe().previousResponseInterrupted,false);f.controller.dispose();
+});
+
+test('completed, failed, truncated or superseded native boundaries do not invent an interruption note',()=>{
+ for(const branch of [[],...['stop','error','length','toolUse'].map(stopReason=>[{type:'message',message:{role:'assistant',stopReason,content:text('aborted in quoted prose')}}]),[{type:'custom',customType:'untrusted',data:{stopReason:'aborted'}}],[{type:'message',message:{role:'assistant',stopReason:'aborted',content:[]}},{type:'message',message:{role:'user',content:text('A newer accepted input')}}]]){
+  const f=fixture({branch});assert.equal(f.handlers.get('before_agent_start')({systemPrompt:'Unchanged'}),undefined);assert.equal(f.controller.describe().previousResponseInterrupted,false);f.controller.dispose();
  }
 });
 

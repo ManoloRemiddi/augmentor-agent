@@ -184,6 +184,20 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const history=(await client.call('session.history',{sessionId:'queue'})).events.map(row=>row.event).filter(event=>event.type==='user/message');assert.deepEqual(history.map(event=>event.data.source.rpcId),[ids[0],ids[2]]);
   assert.equal(received.filter(body=>JSON.stringify(body.messages.at(-1)).includes('Queued identical')).length,1);
  });
+ await t.test('cold continuation carries an aborted-response boundary through the actual SDK and tool result',async()=>{
+  const sid='interrupted-context';await create(sid,'read-only');const before=requests;await prompt(sid,'SLOW earlier unfinished task');
+  await until(async()=>(await client.call('session.history',{sessionId:sid})).events.some(row=>row.event.type==='assistant/chunk'));
+  await client.call('session.cancel',{sessionId:sid});await idle(sid);
+  const file=JSON.parse(readFileSync(join(state,'sessions',sid+'.meta.json'),'utf8')).file,original=readFileSync(file);client.close();await stop();await start();client=await Client.open(join(state,'runtime.sock'));
+  await client.call('session.history',{sessionId:sid});assert.equal(requests,before+1);assert.deepEqual(readFileSync(file),original);
+  writeFileSync(join(cwd,'native-branch-note.txt'),'Authored interrupted-context note.\n');
+  const current=requests;await prompt(sid,'NATIVE_BRANCH a different accepted read request');await idle(sid);assert.equal(requests,current+2);
+  for(const body of received.slice(current))assert(body.messages.some(message=>message.role==='system'&&JSON.stringify(message.content).includes('Previous response interrupted:')));
+  assert(received[current+1].messages.some(message=>message.role==='tool'&&JSON.stringify(message.content).includes('Authored interrupted-context note.')));
+  const observations=await client.call('observation.list',{sessionId:sid,limit:200});assert(observations.records.some(row=>row.kind==='execution/interrupted-context'));
+  await prompt(sid,'QUEUE_FAST a later clean turn');await idle(sid);assert(!received.at(-1).messages.some(message=>message.role==='system'&&JSON.stringify(message.content).includes('Previous response interrupted:')));
+  assert(readFileSync(file).subarray(0,original.length).equals(original),'Existing native history must not be rewritten to explain interruption.');
+ });
  await t.test('responsive Pi steering replaces obsolete generation in the same SDK turn before normal follow-ups',async()=>{
   await create('steer-generation','read-only');const ids=[randomUUID(),randomUUID(),randomUUID()];
   await client.call('session.prompt',{sessionId:'steer-generation',requestId:ids[0],content:[{type:'text',text:'SLOW steering generation'}]});await until(()=>received.some(body=>JSON.stringify(body.messages.at(-1)).includes('SLOW steering generation')));const obsolete=requests;
