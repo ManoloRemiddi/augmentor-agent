@@ -1,0 +1,45 @@
+{
+  "schema": "augmentor-harness-dsh-catalog-contract/1",
+  "date": "2026-10-17",
+  "sourceRef": "c6653b757e2a03625dccce9a1ef6bb117381bcf1",
+  "scope": "Source/developer qualification only; no owner deployment",
+  "pythonPass": 53,
+  "fail": 0,
+  "skip": 0,
+  "backendVersionNoLongerFabricated": true,
+  "catalogueContractChecked": true,
+  "actualProductionReadContracts": [
+    "session/modelCatalog",
+    "pluginInventory/list",
+    "agentPresets/list",
+    "settings/describe"
+  ],
+  "actualProductionProductMismatchStillRefused": true,
+  "freshActualBackend": {
+    "cliBaseToolsWebAppVersion": "0.2.0-rc.2",
+    "upstreamInstalledPackageExecutedInPlace": true,
+    "independentEmptyProfile": true,
+    "publicTransportUsed": true,
+    "idleReaderAndKnownProcessColdVeto": true,
+    "guardsReleasedOnExit": true,
+    "tracedInetConnectCalls": 0,
+    "modelRequests": 0,
+    "ownerProfileUsed": false,
+    "workspaceRemoved": true
+  },
+  "standardInstallerPin": "0.1.5-rc.1",
+  "privateSourceCopied": false,
+  "installedOwnerChanged": false,
+  "remaining": [
+    "Modern CLI/dependency/install and custom composition preservation qualification",
+    "Matching product/extension clients and guarded fresh cold adoption/rollback",
+    "Owner pilot feedback before more project transfers"
+  ],
+  "privateEvidenceSha256": {
+    "harness-dsh-catalog-contract-expanded-python-20261017.log": "c2ecfff24ea8b9787d977ca396c103e663b00dec2ad013f90a37e91928264d5d",
+    "harness-public-dsh-raw-api-private-20261017.json": "16343e8be6278066351f2874e573efb6f6822781b25c8d1e319843fa48ec1e6e",
+    "harness-dsh-catalog-production-refusal-private-20261017.json": "582f709ff09ec8b35343f8c05619d591646f46fe1d55a6e6291563ee8bda0048",
+    "harness-dsh-modern-actual-backend-summary-20261017.log": "9275a0557a609e6e882cb358ac07a7a8175ddcadab0cbb05c39191f70a7b6401",
+    "harness-dsh-cutover-actual-backend-network-private-20261017.log": "21330ee2ff4b034c53e392cb72ee05bbc3541c84ff1dafd51a7feef82a7ea0ee"
+  }
+}

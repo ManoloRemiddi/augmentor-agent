@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+DSH catalogue contract: `test_dsh_remote` refuses unknown catalogue shapes and
+prevents model defaults from forging backend identity. `test_dsh_setup` admits the
+catalogue contract with an explicitly unknown backend version, rejects the former
+version-only response, and makes no profile/configuration writes. Focused 53 Python
+cases plus actual external empty-profile DSH 0.2 launch evidence are recorded in
+[shared profiles](../docs/HARNESS-SHARED-PROFILES.md#public-dsh-catalogue-contract-and-actual-managed-backend--october-17).
+
 MX build hygiene: use `python3 -B scripts/harness-build-workspace.py -- COMMAND ...`
 and place throwaway app mirrors in `AUGMENTOR_BUILD_WORKSPACE`. Keep logs externally;
 do not retain a new whole application per checkpoint. Nine authored storage cases

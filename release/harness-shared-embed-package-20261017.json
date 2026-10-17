@@ -50,8 +50,15 @@
     "installedCliOnDiskVersion": "0.2.0-rc.2",
     "exactLoadedDshBackendVersionVerified": false,
     "rawModernCatalogAndPluginInventorySucceed": true,
-    "publicSourceTransportNeedsModernCompatibility": true,
-    "versionInferenceCorrection": "docs/HARNESS-BUILD-STORAGE.md"
+    "publicSourceTransportNeedsModernCompatibility": false,
+    "versionInferenceCorrection": "docs/HARNESS-SHARED-PROFILES.md#public-dsh-catalogue-contract-and-actual-managed-backend--october-17",
+    "publicSourceReadContractsVerified": [
+      "session/modelCatalog",
+      "pluginInventory/list",
+      "agentPresets/list",
+      "settings/describe"
+    ],
+    "modernInstallerAndCustomCompositionQualificationStillRequired": true
   },
   "activated": false,
   "installedChanged": false,

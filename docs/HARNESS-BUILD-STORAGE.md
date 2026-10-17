@@ -73,8 +73,9 @@ it did **not** prove the loaded DSH backend version. The CLI on disk is
 `0.2.0-rc.2`; the live modern `session/modelCatalog` and `pluginInventory/list`
 routes succeed without a backend version field. The exact loaded backend version
 remains unverified. Actual product integration **0.2.11** still refuses candidate
-**0.2.13**. Public source transport remains legacy, so modern transport support and
-preservation of custom composition/metadata are required before any owner cutover.
+**0.2.13**. Subsequent current-source probes verify the catalogue/inventory/preset/settings
+read contracts. Modern installer/CLI pins and preservation of custom composition/
+metadata remain prerequisites before any owner cutover.
 See [shared profiles](HARNESS-SHARED-PROFILES.md) and the
 [aggregate record](../release/harness-build-storage-20261017.json).
 

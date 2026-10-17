@@ -1,5 +1,50 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Public DSH catalogue contract and actual managed backend — October 17
+
+Source **c6653b757e2a03625dccce9a1ef6bb117381bcf1** removes the fabricated backend version from `host.describe`.
+The existing `session/modelCatalog` route exposes no backend version; the adapter
+now returns `version: null`, `versionVerified: false` and an explicit catalogue
+contract. Setup checks that contract after its existing CLI/dependency pin checks,
+instead of treating an adapter constant as proof of server identity. Malformed
+catalogues refuse; model defaults cannot overwrite the identity metadata.
+
+Direct current public-source reads of the existing live catalogue, plugin inventory,
+presets and settings all succeed. This corrects the earlier blanket assertion that
+modern wire transport was missing: these four read contracts already work. This
+does not prove every DSH 0.2 operation or authorize installing into a custom profile.
+The standard installer/CLI/module pins still support 0.1.5-rc.1 only. Modern
+installation must preserve declarative presets, custom composition and metadata;
+its new family is not admitted just by widening a version comparison.
+
+A separate actual **DSH CLI/base/tools/web-app 0.2.0-rc.2** instance now passes the
+managed launcher proof. The already-installed upstream package executes in place
+against a new independently authored empty profile inside the managed scratch
+workspace; no installed private adapter source or owner profile is copied.
+It reads catalogue/inventory through the current public transport, reports backend
+identity as unknown, holds the inherited reader while idle, blocks cold adoption,
+and releases both guards on exit. Its traced process tree makes **zero INET connect
+calls** during that bounded proof, with telemetry disabled. No model request occurs.
+The workspace is then removed; only small external logs/receipts remain.
+
+The earlier attempt used an overlong disposable Unix-socket path and was refused
+before DSH started. Shortening the fixture's nested path resolved it; the actual
+103-byte shared-socket guard stays intact. These are source/developer lifecycle
+checks, not sealed-package or owner-bank cutover acceptance.
+
+Focused Python **53/53** pass, including catalogue identity/shape, setup/readiness,
+managed DSH, session leases, complete setup and shared/desktop launch. The narrower
+26-case set overlaps those 53. An actual current-source read-only production check
+also confirms the **0.2.11 integration versus 0.2.13 candidate** refusal is intact.
+No version guard, ownership guard or edited-file preservation check is bypassed.
+Original main/pilot, registry, source histories, settings and model/voice services
+remain unchanged. [Portable evidence](../release/harness-dsh-catalog-contract-20261017.json).
+
+Remaining: preserve/migrate custom modern composition and dependencies, qualify
+matching product/extension clients, then fresh cold backups/shared adoption and
+real existing-bank/history/busy/restart/reverse acceptance. Pilot feedback still
+gates further project transfers. Voice and other platforms remain deferred.
+
 [Storage cleanup and resumed MX work](HARNESS-BUILD-STORAGE.md): 75 unused app
 copies removed, 40.89 GiB recovered; root now about 99 GiB free (89% used).
 Required one-workspace/64 GiB reserve workflow replaces persistent checkpoint
@@ -33,8 +78,8 @@ Correction: the actual installed adapter, executed in place without copying its
 source, synthesizes **0.1.5-rc.1** in its legacy description. That response does
 not establish the backend version. The CLI on disk is **0.2.0-rc.2**; direct live
 modern `session/modelCatalog` and `pluginInventory/list` routes succeed but expose
-no backend version. Exact loaded server version remains unverified. Public source
-transport is still legacy and needs modern compatibility before adoption. This
+no backend version. Exact loaded server version remains unverified. Subsequent direct public-source probes above verify four modern read contracts;
+modern CLI/install migration remains required before adoption. This
 is distinct from the directly observed product integration **0.2.11**, which the
 new 0.2.13 candidate correctly refuses. The ownership audit finds **five of six**
 tracked integration files exact. The plugin package's `peerDependencies` metadata

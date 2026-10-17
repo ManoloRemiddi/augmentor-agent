@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Current public Harness follow-up: [catalogue and managed backend qualification](HARNESS-SHARED-PROFILES.md#public-dsh-catalogue-contract-and-actual-managed-backend--october-17)
+uses current public source against live read contracts and a fresh actual 0.2.0-rc.2
+backend. Catalogue compatibility is distinct from backend version identity and
+from modern installer/custom composition adoption. The complete-install pin below
+remains unchanged; no owner update or broad 0.2 feature parity is inferred.
+
 # DSH 0.2 compatibility — October 3, 2026
 
 The qualified target is `@deepseek-ai/dsh@0.2.0-rc.2`, Cordis 4.0.4 and

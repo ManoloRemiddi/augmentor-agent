@@ -43,7 +43,7 @@
     "actualUpstreamDshBackendQualified": false
   },
   "remaining": [
-    "Modern public DSH transport compatibility and custom configuration preservation",
+    "Modern DSH installer/CLI pins and custom configuration preservation; four public wire read contracts verified",
     "Matching installed client/product integration and guarded cold adoption/rollback",
     "Pilot feedback before further project migration"
   ],

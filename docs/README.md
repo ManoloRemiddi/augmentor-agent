@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Public DSH contract correction and real managed backend](HARNESS-SHARED-PROFILES.md#public-dsh-catalogue-contract-and-actual-managed-backend--october-17)
+qualifies c6653b75: truthful unknown backend identity, four current-source live read
+routes and actual disposable DSH 0.2 idle-reader/release proof; Python 53/53 pass.
+The public wire already supports those reads. Modern setup/install pins and
+preservation of custom composition still need qualification; actual product
+0.2.11/0.2.13 refusal remains. No installed owner change or extra app copy.
+[Evidence](../release/harness-dsh-catalog-contract-20261017.json).
+
 [Storage cleanup and resumed MX work](HARNESS-BUILD-STORAGE.md): 75 unused app
 copies removed, 40.89 GiB recovered; root now about 99 GiB free (89% used).
 Required one-workspace/64 GiB reserve workflow replaces persistent checkpoint

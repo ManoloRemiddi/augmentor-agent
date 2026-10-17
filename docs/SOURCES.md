@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+DSH source follow-up (October 17): existing installed upstream CLI/base/tools/web-app
+0.2.0-rc.2 execute in place with an authored empty profile for managed idle launch /
+reader / shutdown qualification. Current public-source catalogue, plugin inventory,
+preset and settings reads also pass against the live service. No backend version
+is obtained from those APIs. Installer pins remain 0.1.5-rc.1; no private source
+was copied. See [scope/evidence](HARNESS-SHARED-PROFILES.md#public-dsh-catalogue-contract-and-actual-managed-backend--october-17).
+
 Experimental offline format tools use the [checksum-pinned public ledger](../release/dsh-legacy-format/SOURCES.json):
 51 current DSH `d7432673` MIT parser/migration modules are fetched externally,
 not added to the active app dependency graph. The older descriptor-v2 schema
