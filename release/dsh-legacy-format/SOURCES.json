@@ -4,7 +4,7 @@
   "revision": "d743267388641bc76f17c45ce8b4c231aed1d32c",
   "license": "MIT",
   "copyright": "Copyright (c) 2026 DeepSeek",
-  "scope": "Experimental offline historical format proof; not an active DSH runtime or Harness import format",
+  "scope": "Offline historical codecs and source-family view tools; not an active DSH runtime or a current Harness import schema",
   "legacyDescriptorSchema": {
     "revision": "3d70889a8d7f19de7c4dc2ede606fe1c8bc618d9",
     "path": "packages/subagent/subagent/src/descriptor.ts",

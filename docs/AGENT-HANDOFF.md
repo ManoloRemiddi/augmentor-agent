@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Historical DSH source families](HARNESS-DSH-LEGACY-FAMILIES.md) now capture/recompute all five formerly reader-blocked projects: **42 roots / 35 descendants / 80,992 derived records**. Retained originals and direct-child facts pass; no assets/native import or ready-count increase. **65 Node / 20 family Python / 8 fetch / 16 licence-boundary-notice cases**, 16 parser and 7 pipeline groups plus app type-check pass. Both reviews/all 36 protected files, PIDs, seals and selections remain exact; no transfer/update/model work. Continue with assets, archive coordinates and synthetic native continuation; retain owner pilot-feedback gate. [Evidence](../release/harness-dsh-legacy-family-qualification-20261017.json).
+
 [Legacy descriptor-v2 offline proof](HARNESS-DSH-MIGRATION-PILOT.md#legacy-descriptor-v2-offline-format-proof--october-17)
 reuses 51 pinned public MIT format modules without a Host/agent loop. An authored
 validator preserves the known old descriptor; its August schema reference is

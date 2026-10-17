@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Historical family coverage: `dsh-legacy-family.test.mjs` binds direct parentage,
+organization, complete catalogue membership and checksummed source objects;
+`test_dsh_legacy_family.py` checks source selection, stable cuts, lossless
+physical identities, source changes, symlinks/FIFOs and no-replace publication.
+The pinned-source parser proof has 16 authored groups; the family pipeline has
+7 groups including recomputation, forged derived records and refusal by the
+native importer. Both are explicit operator commands, not private-data CI
+prerequisites. See [recipe and limits](../docs/HARNESS-DSH-LEGACY-FAMILIES.md).
+
 Legacy format proof: `dsh-legacy-descriptor.test.mjs` validates the historical
 schema without mutating metadata or exposing supplied values; `test_dsh_legacy_source_fetch.py`
 checks bad/incomplete/checksum/traversal/symlink archives, preserved destinations
