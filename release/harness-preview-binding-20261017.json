@@ -38,5 +38,13 @@
   "privateEvidenceSha256": {
     "harness-preview-binding-final-20261017.log": "d89bbca22da333377faf939bf46217141f68705b786e3cc0506c664d62685f1d"
   },
-  "hostedQualificationPending": true
+  "hostedQualificationPending": true,
+  "runtimeRef": "c0bf300075cde11d0a51f81e7ce0dbb5f32c652d",
+  "linuxSdk": {
+    "conclusion": "",
+    "databaseId": 39070128857,
+    "headSha": "c0bf300075cde11d0a51f81e7ce0dbb5f32c652d",
+    "status": "in_progress",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39070128857"
+  }
 }

@@ -33,6 +33,9 @@ opening cases, 16 shared-launch cases and 23 publication cases. These use author
 profiles, a read-only host and isolated network under the actual 64 GiB reserve;
 publication health replies remain synthetic. No full app mirror, installed
 candidate, owner model request or owner-data migration was created by these checks.
+Runtime **c0bf300075cde11d0a51f81e7ce0dbb5f32c652d**;
+[Linux SDK 39070128857](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39070128857)
+is still running, with no hosted pass claimed.
 See [the source qualification record](../release/harness-preview-binding-20261017.json).
 
 Inventory and adopt every real launcher first. In particular, the installed
