@@ -1,5 +1,36 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Sealed shared-launch candidate — October 17
+
+Source **22103e61** now has a fresh **unselected** immutable MX candidate:
+**20261017-151405-6c6b7080**, artifact
+**63ea2dd8c66ec8f6d521aa3a57616ca456fd781b17618ca259a9ec9d50da5c08**.
+All **24,759 inventory entries / 1,143 compiled files** verify after tests;
+Node/dependency/component and notice bytes match the preceding aaf7af4c candidate.
+Source, ordinary copy and exact sealed target each pass **29 Node / 77 Python**,
+zero failures/skips. The sealed artifact's declared Python additionally passes
+all **11 binding cases**, overlapping the 77 rather than adding more features.
+Tests/fixtures stay external. [Exact package record](../release/harness-shared-launch-package-20261017.json).
+
+This supersedes the new-helper packaging gap in the source checkpoint below.
+Actual generated Browser host/handshake/writes/busy lock/reopen and cold transaction
+contracts are qualified on authored data. The CLI fixture uses authored preflight
+import/lifetime stubs; Native/mobile dispatch mocks exec. It is not installed
+physical UI, real-owner store migration or end-to-end production compatibility.
+Both actual reviews remain **97d95d58 / 20261017-095821-fb78d6df**; PIDs, all
+36 protected sets, shared data/settings, registry 18, menus/selections and GPU/voice
+services verify unchanged. No bootstrap, owner export, model request or extra
+project transfer occurs.
+
+Normal runtime validation [39035553761](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39035553761)
+is in progress at this checkpoint; source-boundary, Home and all Handy jobs pass.
+No duplicate run or whole-workflow approval is claimed. Public Office packaging
+remains separately gated. Next adopt matching owner clients and explicitly map
+fixed-source/mobile/custom/review entrypoints, take fresh full cold backups, then
+qualify actual existing-bank/person/settings/history, busy-work/restart/reboot and
+reverse rollback during guarded cutover. Pilot feedback still gates further
+project transfers; excluded projects stay in DSH. Voice/later OS remain deferred.
+
 ## Managed shared launch binding — October 17
 
 Linux source now supports an optional `sharedProfile: {state, data}` in the

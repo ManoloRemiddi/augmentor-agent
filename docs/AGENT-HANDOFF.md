@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Sealed shared-launch candidate](HARNESS-SHARED-PROFILES.md#sealed-shared-launch-candidate--october-17)
+qualifies **22103e61 / 20261017-151405-6c6b7080**, artifact 63ea2dd8…da5c08:
+24,759 inputs/1,143 compiled; source/ordinary/sealed each 29 Node/77 Python,
+plus 11 overlapping declared-interpreter binding cases. Unselected; actual MX
+reviews remain 97d95d58 with unchanged owner data/launchers/services. Matching
+installed clients, explicit mobile/custom/review mapping, fresh full cold backups
+and real existing-bank/busy/restart/rollback acceptance remain. CI 39035553761
+is live, no whole-workflow approval. [Record](../release/harness-shared-launch-package-20261017.json).
+
 [Managed shared launch binding](HARNESS-SHARED-PROFILES.md#managed-shared-launch-binding--october-17)
 adds source-only selected state/data for Native/managed Browser/mobile, guarded
 cold activate/reverse and opt-in backed-up Browser registration. Source focus

@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Exact shared-launch package](../release/harness-shared-launch-package-20261017.json):
+fresh unselected 22103e61 artifact passes the same 29 Node/77 Python checks as source
+and ordinary copy. Recorded Python additionally passes 11 overlapping binding cases.
+Tests/fixtures stay external; 24,759 sealed and 1,143 compiled inputs verify unchanged.
+This closes the package gap below; actual installed owner adoption remains open.
+
 [Shared launch source qualification](../release/harness-shared-launch-20261017.json):
 `shared-launch-integration.test.mjs` exercises the actual generated managed Browser
 host and companions on authored data, with target-only writes, handshake, inherited
@@ -2206,7 +2212,7 @@ live and foreign-current owner refusal, authored PID/start/boot controls,
 outside-symlink preservation, replaced/unknown/linked/duplicate/partial metadata,
 held kernel lease refusal/release and deleting-phase restart interpretation.
 The deleting-phase receipts are authored controls, not power-loss evidence.
-Current 45-file/19-Chromium source cohort passes298, Python43 and separate changed
+Current 45-file/19-Chromium source cohort passes 298, Python43 and separate changed
 shared-helper actual native compatibility24, without skips/failures. Default
 backends/owner installs are unchanged. [Data and recovery contract](../docs/HARNESS-OFFICE-PREVIEWS.md#managed-office-scratch-recovery--october-17).
 
