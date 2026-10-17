@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Historical capture decoder preflight](HARNESS-DSH-LEGACY-FAMILIES.md#decoder-prerequisite--october-17)
+declares `zstd` in the Debian runtime dependencies and checks it before DSH client
+creation/source capture. Missing decoder produces a clear operator error, zero
+DSH connections/source changes/output. Corrected source passes **52 Python /
+90 Node**, no skips; two preceding negative cases fail on the old source. Actual
+control metadata includes the dependency; Office public packaging remains refused.
+No compiled runtime/GUI or installed owner update, model inference or further
+project transfer. Both reviews stay fcf9d32a / 20261017-081210-48ea82e1, with all
+36 protected file sets/shared state/seals/services preserved. Normal new-source
+CI remains separate from the completed fcf9d32a Linux qualification.
+[Evidence](../release/harness-dsh-decoder-preflight-qualification-20261017.json).
+
 [Current source-built Office GUI diagnostic](HARNESS-OFFICE-PREVIEWS.md#current-original-gui-with-the-source-built-engine--october-17)
 passes five unchanged Office cases plus two neighbouring PDF/spreadsheet GUI
 cases in an unselected fcf9d32a-based copy. Actual final-rule producer/assets/

@@ -93,6 +93,29 @@ receipts to match newer processing code.
 
 ## Bounds and reproduction
 
+### Decoder prerequisite — October 17
+
+Historical capture requires the `zstd` system executable. The Debian runtime
+package now declares it. The capture command checks availability before creating
+the DSH client; direct family capture checks before reading source logs or creating
+an output. If unavailable, it asks the operator to install the `zstd` system
+package and exits without a traceback, source changes or a partial snapshot.
+The command does not install software or change the existing decoder/format.
+
+Two new negative cases reproduce the previous missing-preflight behaviour;
+the corrected suite passes **52 Python / 90 Node** with no skips. A real CLI
+subprocess with an empty executable search path makes zero connections to an
+authored loopback listener, while successful family capture and archive/asset
+checks still pass. Actual generated runtime control metadata includes `zstd`.
+The Office public packaging refusal remains tested and intact.
+[Qualification](../release/harness-dsh-decoder-preflight-qualification-20261017.json).
+
+This is a source/operator-tool correction. Both installed MX reviews remain
+**fcf9d32a / 20261017-081210-48ea82e1**; their histories/settings/services are
+unchanged. No additional real project is captured or transferred. Existing
+frozen views and source notices are retained; the normalized-format producer
+fingerprint is unchanged. A new Debian installer is not built or released.
+
 Linux, Node 24.19.0, Python 3.13.5, `zstd` and the repository's locked esbuild are
 the qualified environment. macOS/Windows capture and atomic publication adapters
 remain deferred. Existing bounds stay in place: 128 roots, 32 descendants,

@@ -6,6 +6,10 @@ from dsh_project_bundle import ProjectBundle,publish,encoded,MAX_BUNDLE_BYTES,SE
 MAX_SOURCE_BYTES=64*1024*1024
 NAME=re.compile(r'session(?:\.v([1-9][0-9]*))?\.jsonl\.zstd')
 OPPOSITE=re.compile(r'session(?:\.v([1-9][0-9]*))?\.jsonl')
+def require_decoder():
+ decoder=shutil.which('zstd')
+ if decoder is None:raise ValueError('Historical DSH capture requires zstd. Install the zstd system package before retrying; no capture was started.')
+ return decoder
 def identity(info):return {k:(getattr(info,'st_'+k) if k=='size' else str(getattr(info,'st_'+k))) for k in ['dev','ino','size','mtime_ns','ctime_ns']}
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def selected_sources(root):
@@ -32,11 +36,12 @@ def selected_sources(root):
  return selected
 
 def header_of(path,version):
+ decoder=require_decoder()
  fd=os.open(path,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
  try:
   before=os.fstat(fd)
   if not stat.S_ISREG(before.st_mode):raise ValueError('Source log is not regular.')
-  process=subprocess.Popen(['zstd','-dc'],stdin=fd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+  process=subprocess.Popen([decoder,'-dc'],stdin=fd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
   try:
    line=bytearray();deadline=time.monotonic()+20
    with selectors.DefaultSelector() as ready:
@@ -106,6 +111,7 @@ def capture_bytes(path,expected):
 
 def freeze_family(dsh_home,workspace,destination,validate_workspace,organization):
  if not sys.platform.startswith('linux'):raise ValueError('Source-family capture currently requires Linux.')
+ require_decoder()
  home=Path(dsh_home).resolve();root=home/'sessions';destination=Path(destination).absolute();canonical=destination.parent.resolve()/destination.name
  if canonical==home or home in canonical.parents:raise ValueError('Snapshot output must stay outside the original DSH home.')
  if destination.exists() or destination.is_symlink():raise ValueError('Snapshot output already exists.')

@@ -2,6 +2,8 @@
 
 [Current MX review and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17) · installed queue-control correction, main/pilot menu entries, available core features, verified preservation and current CI/public-packaging limits.
 
+[Historical capture prerequisite](HARNESS-DSH-LEGACY-FAMILIES.md#decoder-prerequisite--october-17) · declared `zstd` runtime dependency and an actionable preflight before DSH contact or source capture; current installed reviews stay unchanged.
+
 [Source-built Office/current GUI](HARNESS-OFFICE-PREVIEWS.md#current-original-gui-with-the-source-built-engine--october-17) · existing completed engine reused, seven private functional/compatibility cases, actual Wasm file evidence and current Linux CI result; public packaging gate stays intact.
 
 [Queue Resume correction and live steering](QUEUE-AND-STEERING.md#empty-queue-resume-control-and-live-tool-steering--october-17) · real waiting work versus empty cold queues; executing tools settle before corrections, with explicit lifecycle evidence.

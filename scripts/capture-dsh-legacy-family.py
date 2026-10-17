@@ -5,10 +5,13 @@ import argparse,json,os,sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'services'))
 from dsh.remote import Remote
-from dsh_legacy_family import freeze_family
+from dsh_legacy_family import freeze_family,require_decoder
 
 def main():
- p=argparse.ArgumentParser(description=__doc__);p.add_argument('--project',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--dsh-home',type=Path,required=True);p.add_argument('--base',default='http://127.0.0.1:3080');args=p.parse_args();os.umask(0o077);remote=Remote(args.base,args.dsh_home)
+ p=argparse.ArgumentParser(description=__doc__);p.add_argument('--project',required=True);p.add_argument('--output',type=Path,required=True);p.add_argument('--dsh-home',type=Path,required=True);p.add_argument('--base',default='http://127.0.0.1:3080');args=p.parse_args()
+ try:require_decoder()
+ except ValueError as error:p.error(str(error))
+ os.umask(0o077);remote=Remote(args.base,args.dsh_home)
  before=remote.call('workspace.list');matches=[r for r in before['items'] if args.project in (r['workspaceId'],r['path'])]
  if len(matches)!=1:raise ValueError('Choose one exact workspace.')
  workspace=matches[0];organization={k:[s for s in before[k] if s in workspace['sessionIds']] for k in ['archivedSessionIds','pinnedSessionIds']}

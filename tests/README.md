@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Historical decoder preflight](../docs/HARNESS-DSH-LEGACY-FAMILIES.md#decoder-prerequisite--october-17):
+source **52 Python / 90 Node**, no skips, including a real missing-decoder CLI
+subprocess with zero loopback connections/no source or output changes. The
+old source fails two preceding negative cases. Generated Debian control metadata
+includes `zstd`; public Office packaging refusal stays intact. No new installed,
+ordinary/sealed or new-head hosted qualification is claimed for this tool fix.
+
 [Hosted Linux correction result](../release/harness-linux-ci-qualification-20261017.json):
 d531ba6c passes full root **2,101/0 failures/44 skips**, Browser **128/0/0**,
 native **1,052 run/45 skips/OK**, and setup/recovery/desktop stages. Debian packaging

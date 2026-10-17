@@ -1,5 +1,6 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import importlib.util,json,os,subprocess,sys,tempfile,unittest
+import importlib.util,json,os,socket,subprocess,sys,tempfile,unittest
+from unittest.mock import patch
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 import dsh_legacy_family as family
@@ -31,6 +32,22 @@ class FamilyCapture(unittest.TestCase):
   raw=(json.dumps(header)+'\n'+json.dumps({'type':'session/end-seed','seq':0,'time':1,'data':{}})+'\n').encode();path=directory/('session'+('.v'+str(physical) if physical else '')+'.jsonl.zstd');run=subprocess.run(['zstd','-q','-c'],input=raw,capture_output=True,check=True);path.write_bytes(run.stdout);return path
  def setup(self,temp):
   home=Path(temp)/'dsh';(home/'project').mkdir(parents=True);a=self.log(home,'root');b=self.log(home,'child','root');workspace={'workspaceId':'authored','path':str(home/'project'),'title':'Authored','sessionIds':['root']};return home,a,b,workspace
+ def test_missing_decoder_refuses_before_source_read_or_output(self):
+  with tempfile.TemporaryDirectory() as temp:
+   home,a,b,w=self.setup(temp);before=[a.read_bytes(),b.read_bytes()];out=Path(temp)/'snapshot';empty=Path(temp)/'empty-path';empty.mkdir()
+   with patch.dict(os.environ,{'PATH':str(empty)}),patch.object(family,'index_sources',side_effect=AssertionError('Source must not be read')):
+    with self.assertRaisesRegex(ValueError,'requires zstd.*Install the zstd system package'):
+     family.freeze_family(home,w,out,lambda:self.fail('Workspace callback must not run'),{'archivedSessionIds':[],'pinnedSessionIds':[]})
+   self.assertFalse(out.exists());self.assertFalse(list(Path(temp).glob('.dsh-source-family-*')));self.assertEqual(before,[a.read_bytes(),b.read_bytes()])
+ def test_cli_missing_decoder_stops_before_contacting_dsh(self):
+  with tempfile.TemporaryDirectory() as temp:
+   home,a,b,w=self.setup(temp);before=[a.read_bytes(),b.read_bytes()];out=Path(temp)/'snapshot';empty=Path(temp)/'empty-path';empty.mkdir()
+   with socket.socket() as listener:
+    listener.bind(('127.0.0.1',0));listener.listen();listener.setblocking(False)
+    base='http://127.0.0.1:'+str(listener.getsockname()[1])
+    run=subprocess.run([sys.executable,'-B',str(ROOT/'scripts/capture-dsh-legacy-family.py'),'--project','root','--output',str(out),'--dsh-home',str(home),'--base',base],env={**os.environ,'PATH':str(empty)},capture_output=True,text=True,timeout=10)
+    with self.assertRaises(BlockingIOError):listener.accept()
+   self.assertEqual(run.returncode,2);self.assertIn('requires zstd',run.stderr);self.assertIn('Install the zstd system package',run.stderr);self.assertNotIn('Traceback',run.stderr);self.assertEqual(run.stdout,'');self.assertFalse(out.exists());self.assertFalse(list(Path(temp).glob('.dsh-source-family-*')));self.assertEqual(before,[a.read_bytes(),b.read_bytes()])
  def test_whole_family_and_original_bytes_preserved(self):
   with tempfile.TemporaryDirectory() as temp:
    home,a,b,w=self.setup(temp);before=[a.read_bytes(),b.read_bytes()];out=Path(temp)/'snapshot';calls=[];result=family.freeze_family(home,w,out,lambda:calls.append(True),{'archivedSessionIds':[],'pinnedSessionIds':['root']});self.assertEqual(result['descendants'],1);manifest=json.loads((out/'family.json').read_bytes());self.assertEqual(manifest['organization']['pinnedSessionIds'],['root']);self.assertEqual(len(manifest['nodes']),2);self.assertEqual(before,[a.read_bytes(),b.read_bytes()]);self.assertEqual(calls,[True]);self.assertFalse(list(Path(temp).glob('.dsh-source-family-*')))
