@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed shared launch binding](HARNESS-SHARED-PROFILES.md#managed-shared-launch-binding--october-17)
+adds source-only selected state/data for Native/managed Browser/mobile, guarded
+cold activate/reverse and opt-in backed-up Browser registration. Source focus
+29 Node/77 Python passes; generated real host handshake/writes/restart and busy
+reader refusal pass. No installed bootstrap/selection changed; aaf7af4c sealed
+export candidate lacks these new changes. Existing custom/mobile and Harness
+review entrypoints still need adoption, fresh sealed qualification/cold backups
+and actual cutover/rollback. Installed main/pilot remain 97d95d58; no extra transfer.
+Aaf7af4c CI ends 2,140 root passes/zero failures/53 skips, Browser128 and native
+1,079 cases/45 skips, then existing public Office source/rebuild packaging refusal.
+[Source record](../release/harness-shared-launch-20261017.json).
+
 [Sealed shared-export candidate](HARNESS-SHARED-PROFILES.md#sealed-export-candidate-and-deployment-boundary--october-17) · exact private package qualification and the remaining managed launch/cold-cutover boundary.
 
 [Cold mixed-store export](HARNESS-SHARED-PROFILES.md#dedicated-legacy-store-preparation--october-17) · source/ordinary preparation for a new dedicated shared store; no live adoption.

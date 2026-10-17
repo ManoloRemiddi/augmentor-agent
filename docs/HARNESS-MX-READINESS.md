@@ -116,8 +116,7 @@ publication and populated-cache Native recall through search outage/restart.
 It has not exported the real Agent store, changed launchers or updated the
 installed reviews. The [sealed aaf7af4c candidate](HARNESS-SHARED-PROFILES.md#sealed-export-candidate-and-deployment-boundary--october-17)
 now passes the same 27 Node/61 Python plus seven overlapping declared-interpreter
-export cases. It is unselected; explicit Native/Browser/review launch binding,
-fresh full cold backups and actual deployment/rollback remain.
+export cases. It is unselected. [Managed launch binding](HARNESS-SHARED-PROFILES.md#managed-shared-launch-binding--october-17) now passes source-only 29 Node/77 Python checks; it is absent from that sealed candidate. Fresh sealed qualification, actual Native/Browser/review entrypoint adoption, full cold backups and deployment/rollback remain.
 
 ## Actual writing clients: isolated qualification
 

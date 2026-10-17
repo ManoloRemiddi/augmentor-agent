@@ -1,5 +1,116 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Managed shared launch binding — October 17
+
+Linux source now supports an optional `sharedProfile: {state, data}` in the
+mutable per-user `desktop.json`. Primary/service, secondary/menu and the managed
+mobile entrypoint derive their pair from this selection. The opt-in generated
+Browser Native Messaging launcher follows the same selection and recorded Node/
+Python, retaining the product-version handshake. Existing bindings override stale
+inherited environment variables. Build-only updates retain the currently selected
+pair, even when staged metadata contains an older choice.
+
+This is **source qualification**, not an installed cutover or qualification of a
+new sealed package. Both actual MX reviews remain **97d95d58**. The preceding
+sealed aaf7af4c export candidate does not contain these new launcher changes.
+[Portable source evidence](../release/harness-shared-launch-20261017.json).
+
+### Explicit cold selection and reverse rollback
+
+Before selecting a different pair, identify and stop all Native, Browser, review,
+mobile and companion callers; take fresh verified full backups and complete the
+separate export/import. Never select the earlier online rehearsal or import
+archives. Canonical private state/data directories must already exist, must not
+overlap and must contain the three supported private SQLite files. A new target
+must be dedicated shared data, with only supported components/archive inventory.
+Migration evidence/staging paths and their descendants are refused for both roots.
+A later legitimate engine TAR backup does not prevent reopening an existing binding.
+
+Create a private, owned, single-link, at-most-16-KiB JSON pair file, then inspect:
+
+```sh
+python3 -B scripts/shared-launch-profile.py inspect /private/pair.json
+```
+
+Its `sha256` fingerprints the same selected components as the legacy export; it
+is not the checksum of every file in a mixed application directory. Prepare a
+separate private binding manifest with exactly these fields (paths/checksums are
+placeholders, not owner configuration):
+
+```json
+{
+  "schema": "augmentor-shared-launch-binding/1",
+  "previous": {"state": "/private/old-state", "data": "/private/old-data"},
+  "next": {"state": "/private/new-state", "data": "/private/new-data"},
+  "selectionSha256": "SHA256_OF_EXACT_CURRENT_DESKTOP_JSON_BYTES",
+  "targetSha256": "COMPONENT_INSPECTION_SHA256_OF_NEXT_PAIR"
+}
+```
+
+Using the newly qualified stable deployment helper, activate a **separately
+staged supporting release**, without editing its sealed bytes:
+
+```sh
+augmentor-update activate /private/new-release --shared-profile /private/binding.json
+```
+
+The helper holds the deployment lock, an exclusive managed-launch gate and both
+pairs' data/state maintenance locks. It checks known Linux process identities,
+current selection bytes, component checksum, actual read-only database schemas,
+normal deployment compatibility and the seal before publishing. It neither
+stops services nor starts a memory/model worker. Arbitrary custom legacy callers
+cannot all be discovered; the operator must stop/adopt their entrypoints too.
+The previous unbound pair is explicitly supplied by the operator and must match
+the launch environment when reversing to an unbound selection.
+
+Rollback across different pairs requires a newly inspected reverse manifest,
+with previous/next reversed and checksums of the current selection and retained
+old data. Run `augmentor-update rollback --shared-profile /private/reverse.json`.
+This restores the retained selection; it does not merge new writes back or delete
+either store. Selection publication is atomic; the existing two selection pointers
+are not a new crash-atomic multi-file journal. An interrupted bootstrap file write
+restores its own bytes and preserves concurrent edits for manual review.
+
+### Stable helpers and remaining adoption
+
+A qualified `install-desktop-startup.py` installs external shared/Browser helpers
+before the dependent desktop launcher. Refreshing an existing managed selection
+must retain its exact root, Python, Node and DSH service. It preserves the chosen
+shared pair and refuses an active managed reader; backups and per-file comparisons
+protect existing startup/registration bytes. Installation does not restart windows.
+`augmentor-mobile-managed` is a stable mobile alias. Existing fixed-source mobile
+services, custom launchers and the separate Harness review registry still require
+explicit inventory and adoption during the real cutover.
+
+`--register-browser` opts into four per-user Chromium/Chrome/Brave Native Messaging
+registrations, using the selected artifact's extension key. Replacing an existing
+host additionally requires `--expected-browser-hosts PRIVATE_JSON`: exact SHA-256
+by `chromium`, `google-chrome`, `google-chrome-beta`, `BraveSoftware/Brave-Browser`,
+with null for absent files. Registration writes a version-independent managed
+entrypoint outside the release. Do not use the older fixed-source Browser registrar
+inside a sealed artifact. Reload the matching extension separately; this does not
+establish the owner's currently loaded extension identity.
+
+Source focus passes **29 Node / 77 Python**, zero failures/skips. Two real Node
+integration cases exercise generated registration/host, actual version handshake,
+target-only prompt write, inherited reader lock, managed close/restart and known
+same-data/different-state companion refusal. Eleven authored Python cases include
+actual CLI inspect/activate/reverse against authored import/lifetime stubs, real
+read-only schema validation, unchanged DB hashes, stale edits, busy locks, failed
+startup restoration and archive guards. That CLI trace observes zero IP syscalls
+and no companion connection; six unsuccessful local NSCD lookups are present.
+Native/mobile dispatch assertions mock exec and do not establish physical UI or
+mobile acceptance. No private old source is copied into these public fixtures.
+
+The aaf7af4c validation run [39031629464](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39031629464)
+now ends with **2,140 root passes / zero failures / 53 skips**, **128 Browser
+passes** and native **1,079 cases / 45 skips**, then refuses public Debian packaging
+at the preserved Office exact-source/rebuild gate. No whole-workflow success or
+public redistribution is claimed. Fresh sealed qualification of these new helpers,
+version-matched owner clients, full cold backup/export, review mapping and real
+busy-work/restart/rollback acceptance remain. Further project transfers wait for
+owner pilot feedback; the excluded project stays in DSH. Voice/later OS remain deferred.
+
 ## Sealed export candidate and deployment boundary — October 17
 
 The cold export now passes against exact separately sealed **aaf7af4c** release
@@ -28,7 +139,7 @@ zero IP networking/companion connections; no version or manifest is spoofed.
 This does not identify the owner's currently loaded extension or qualify every
 older-extension behavior. Deploy/reload the matching extension and host together.
 
-The remaining launch mapping is concrete: Linux `desktop-launch.py` inherits
+At this preceding artifact, the remaining launch mapping is concrete: Linux `desktop-launch.py` inherits
 shared-state/data environment variables, but does not currently read a persisted
 shared pair from `desktop.json`. A primary-service-only environment change would
 not configure secondary/menu or Browser entrypoints. The existing source
@@ -45,7 +156,7 @@ ref differs from the preceding PR run 39030296212, which was preserved. That
 6abfee80 run now ends with **2,135 root passes / zero failures / 53 skips**, plus
 **128 Browser passes**, then refuses public Debian packaging at the existing
 Office exact-source/rebuild gate. The older Fleet failure is not reproduced here;
-its cause is not established. The new aaf7af4c CI remains in progress. No whole-
+its cause is not established. The later managed-binding section above records its terminal result. No whole-
 workflow pass, public redistribution or installed promotion is claimed.
 
 ## Dedicated legacy-store preparation — October 17

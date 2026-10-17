@@ -80,6 +80,12 @@ def check(config, connected=False):
     env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'),
            'PYTHONDONTWRITEBYTECODE':'1', 'QT_QPA_PLATFORM':'offscreen',
            'AUGMENTOR_PI_NODE':config['node']}
+    if 'sharedProfile' in config:
+        if not (root/'scripts/shared-launch-profile.py').is_file():
+            raise ValueError('The selected candidate does not support shared launch bindings.')
+        spec=importlib.util.spec_from_file_location('preflight_shared_launch',root/'scripts/shared-launch-profile.py')
+        shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)
+        env=shared.environment(config['sharedProfile'],env)
     code = 'from augmentor_linux import window, controller\n'
     code += ('import sys\nsys.path.insert(0, '+repr(str(root/'services/lifecycle'))+')\n'
              'from lease import hold\nhold("desktop")\n')
@@ -142,16 +148,37 @@ def stage(source, source_ref, python=None, node=None):
         if temporary.exists(): shutil.rmtree(temporary)
 
 
-def activate(root):
+def activate(root, shared_binding=None):
     root = Path(root).resolve()
     release = verify(root)
-    config = release['deployment']
+    config = dict(release['deployment'])
     if Path(config['root']) != root:
         raise ValueError('Release moved after staging; stage it again at its final location.')
+    raw=(DATA/'desktop.json').read_bytes();previous=json.loads(raw)
+    # A staged artifact does not own mutable per-user shared-store selection.
+    if 'sharedProfile' in previous:config['sharedProfile']=previous['sharedProfile']
+    else:config.pop('sharedProfile',None)
+    if shared_binding is not None:
+        helper=root/'scripts/shared-launch-profile.py'
+        if not helper.is_file():raise ValueError('Stage a release supporting shared launch bindings first.')
+        spec=importlib.util.spec_from_file_location('deployment_shared_launch',helper)
+        shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)
+        value=shared.binding(shared_binding,raw,previous)
+        with shared.launch_lease(DATA,exclusive=True),shared.cold([value['previous'],value['next']]):
+            shared.verify_target(config,value)
+            if (DATA/'desktop.json').read_bytes()!=raw:raise ValueError('Desktop selection changed during binding validation.')
+            config['sharedProfile']=value['next']
+            return _activate_checked(root,config,previous,raw,lambda:shared.assert_target(value))
+    return _activate_checked(root,config,previous,raw)
+
+
+def _activate_checked(root,config,previous,expected_bytes,final_check=lambda:None):
     check(config, connected=True)
     # Preflight is allowed to import modules but cannot alter staged files.
     verify(root)
-    previous = read(DATA/'desktop.json')
+    if (DATA/'desktop.json').read_bytes()!=expected_bytes:
+        raise ValueError('Desktop selection changed during promotion; no selection was replaced.')
+    final_check()
     if previous == config: return config
     atomic(DATA/'desktop.previous.json', previous)
     # The only commit point: interruption before this keeps the old selection;
@@ -160,11 +187,30 @@ def activate(root):
     return config
 
 
-def rollback():
+def rollback(shared_binding=None):
     previous = read(DATA/'desktop.previous.json')
     if (Path(previous['root'])/MANIFEST).exists(): verify(Path(previous['root']))
+    raw=(DATA/'desktop.json').read_bytes();current=json.loads(raw)
+    if previous.get('sharedProfile')!=current.get('sharedProfile'):
+        if shared_binding is None:raise ValueError('Shared-store rollback needs an explicit cold reverse binding manifest.')
+        root=Path(current['root']);spec=importlib.util.spec_from_file_location('rollback_shared_launch',root/'scripts/shared-launch-profile.py')
+        shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)
+        value=shared.binding(shared_binding,raw,current,dedicated_next='sharedProfile' in previous)
+        target=previous.get('sharedProfile') or {
+            'state':str(Path(os.environ.get('AUGMENTOR_SHARED_STATE',Path(os.environ.get('XDG_STATE_HOME',Path.home()/'.local/state'))/'augmentor'))),
+            'data':str(Path(os.environ.get('AUGMENTOR_SHARED_DATA',Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor')))}
+        if value['next']!=target:raise ValueError('Reverse binding differs from the retained deployment paths; restore its original launch environment first.')
+        with shared.launch_lease(DATA,exclusive=True),shared.cold([value['previous'],value['next']]):
+            shared.verify_target(current,value)
+            return _rollback_checked(previous,current,raw,lambda:shared.assert_target(value))
+    if shared_binding is not None:raise ValueError('This rollback does not change shared-store paths.')
+    return _rollback_checked(previous,current,raw)
+
+
+def _rollback_checked(previous,current,expected_bytes,final_check=lambda:None):
     check(previous, connected=True)
-    current = read(DATA/'desktop.json')
+    if (DATA/'desktop.json').read_bytes()!=expected_bytes:raise ValueError('Desktop selection changed during rollback.')
+    final_check()
     atomic(DATA/'desktop.json', previous)
     atomic(DATA/'desktop.previous.json', current)
     return previous
@@ -189,13 +235,15 @@ def main():
     staging.add_argument('--source-ref', required=True, help='Tested commit or explicit mixed-artifact provenance.')
     staging.add_argument('--python', type=Path); staging.add_argument('--node', type=Path)
     activation = commands.add_parser('activate'); activation.add_argument('root', type=Path)
-    commands.add_parser('rollback'); commands.add_parser('status')
+    activation.add_argument('--shared-profile',type=Path,help='Private cold binding manifest; all old callers must already be stopped.')
+    rollback_parser=commands.add_parser('rollback');rollback_parser.add_argument('--shared-profile',type=Path,help='Private cold reverse binding manifest when restoring different shared paths.')
+    commands.add_parser('status')
     args = parser.parse_args()
     if args.command == 'status': print(json.dumps(status(), indent=2)); return
     with locked():
         if args.command == 'stage':
             print(stage(args.root, args.source_ref, args.python, args.node)); return
-        result = activate(args.root) if args.command == 'activate' else rollback()
+        result = activate(args.root,args.shared_profile) if args.command == 'activate' else rollback(args.shared_profile)
         print('Selected '+result['root']+'\nExisting windows keep their current build until closed or the next login.')
 
 

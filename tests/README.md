@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Shared launch source qualification](../release/harness-shared-launch-20261017.json):
+`shared-launch-integration.test.mjs` exercises the actual generated managed Browser
+host and companions on authored data, with target-only writes, handshake, inherited
+busy gate and reopen. `test_shared_launch.py` covers cold CLI/selection/reverse,
+strict paths, stale checksums, schema refusal and bootstrap write recovery. CLI
+preflight uses authored import/lifetime stubs; Native/mobile dispatch mocks exec.
+Source cohort: 29 Node/77 Python; no new sealed/installed qualification. Earlier
+export-candidate results remain scoped to aaf7af4c.
+
 [Office memory/process prototype](../release/office-rebuild/README.md#retained-memory-and-process-boundary-prototype--october-17):
 four memory profiles/eight PDFs show process-exit reclamation; the explicit
 converter extension seat passes twenty contained cases/fourteen PDF checks under

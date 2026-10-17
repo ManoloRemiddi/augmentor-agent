@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed shared launch binding](HARNESS-SHARED-PROFILES.md#managed-shared-launch-binding--october-17)
+adds source-only selected state/data for Native/managed Browser/mobile, guarded
+cold activate/reverse and opt-in backed-up Browser registration. Source focus
+29 Node/77 Python passes; generated real host handshake/writes/restart and busy
+reader refusal pass. No installed bootstrap/selection changed; aaf7af4c sealed
+export candidate lacks these new changes. Existing custom/mobile and Harness
+review entrypoints still need adoption, fresh sealed qualification/cold backups
+and actual cutover/rollback. Installed main/pilot remain 97d95d58; no extra transfer.
+Aaf7af4c CI ends 2,140 root passes/zero failures/53 skips, Browser128 and native
+1,079 cases/45 skips, then existing public Office source/rebuild packaging refusal.
+[Source record](../release/harness-shared-launch-20261017.json).
+
 [Stable MX review launch](HARNESS-MX-FEEDBACK.md#stable-mx-review-launch-and-recovery--october-16) uses a separately staged tool and explicit review registry. Menu/CLI paths are version-independent and never point at a source checkout. The current reviews retain their qualified running artifact; installing the opener does not activate a new Desktop build or repoint the earlier Preview entry. Changed seals or mismatched live owners refuse replacement. Separate tool **20261016-212908-9907b5b0 / f5751a33** is installed as the stable opener with two review entries; existing owners stay on **deea778d / 20261016-204440-a6f079ca**. Source and sealed focus each pass 11 Node/41 Python; actual link checks preserve two PIDs/four conversations/32 protected inputs and selections. Physical menu/browser feedback remains. [Portable evidence](../release/harness-review-opener-20261016.json).
 
 [Current persona/metrics MX review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)

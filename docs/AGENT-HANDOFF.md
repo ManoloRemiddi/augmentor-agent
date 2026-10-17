@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed shared launch binding](HARNESS-SHARED-PROFILES.md#managed-shared-launch-binding--october-17)
+adds source-only selected state/data for Native/managed Browser/mobile, guarded
+cold activate/reverse and opt-in backed-up Browser registration. Source focus
+29 Node/77 Python passes; generated real host handshake/writes/restart and busy
+reader refusal pass. No installed bootstrap/selection changed; aaf7af4c sealed
+export candidate lacks these new changes. Existing custom/mobile and Harness
+review entrypoints still need adoption, fresh sealed qualification/cold backups
+and actual cutover/rollback. Installed main/pilot remain 97d95d58; no extra transfer.
+Aaf7af4c CI ends 2,140 root passes/zero failures/53 skips, Browser128 and native
+1,079 cases/45 skips, then existing public Office source/rebuild packaging refusal.
+[Source record](../release/harness-shared-launch-20261017.json).
+
 [Sealed legacy export](HARNESS-SHARED-PROFILES.md#sealed-export-candidate-and-deployment-boundary--october-17)
 qualifies unselected **aaf7af4c / 20261017-140650-7496bf2d**, artifact abba662e…d36ce,
 24,755 inputs/1,143 compiled. Source/ordinary/sealed 27 each; ordinary packaging 41,
@@ -10,7 +22,7 @@ handshake succeeds, no network/model/service call. Actual loaded-owner extension
 identity remains unknown. Existing Linux Desktop inherits shared env; all Native,
 Browser and review entrypoints still need explicit managed paired launch binding.
 Do not execute the source-only Browser registrar inside a sealed artifact.
-New-code normal CI 39031629464 uses branch dispatch and remains live. Preserved
+New-code normal CI 39031629464 used branch dispatch; its terminal result is above. Preserved
 6abfee80 PR CI 39030296212 ends with root 2,135/zero failures/53 skips, Browser 128,
 then the existing public Office source/rebuild packaging refusal. No whole-
 workflow pass or installed promotion. Fresh cold backups,
