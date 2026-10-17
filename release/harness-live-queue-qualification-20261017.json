@@ -1,0 +1,146 @@
+{
+  "schema": "augmentor-harness-live-queue-qualification/1",
+  "date": "2026-10-17",
+  "observedAtUtc": "2026-10-17T05:04:14.773490+00:00",
+  "scope": "Actual sealed MX Host and local Qwen; authored temporary read-only project; API controls, not physical GUI acceptance",
+  "sourceDocumentationBase": "d688b0c433e3aade988bdec6169d17669ab36f12",
+  "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+  "releaseId": "20261017-061143-d0c0fc29",
+  "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+  "applicationCodeChanged": false,
+  "model": "Actual saved local Qwen route; matching advertised model enforced by the sealed Host",
+  "ownerProviderConfigurationCopied": "One provider definition into an otherwise fresh private profile; no conversation, prompt-library, memory or project data copied",
+  "inputsSha256": {
+    "packages/runtime/src/host.ts": "b225032cc89e741ffd6dfdf564d560c14f57dcb8cb9e981ec58e2f79e453faa5",
+    "packages/runtime/src/steering.ts": "c8087189fa0531f78884f5f135e892b76c10e8382a41d135011cdaf64efba8e6",
+    "packages/runtime/src/queue.ts": "13d4e653fbbb4081a102d2c6ca1dc8d361f85520371ec5922f4acd737d428c51",
+    "tests/runtime.test.mjs": "e572ef3ddb99accdaa3710dd2ab6791bf5680a31c1e0097a9cb7e571a5e930c4"
+  },
+  "sealedCompiledInputsSha256": {
+    "dist/runtime/src/host.js": "a6b5f18f3ee258ee2fcec289766496289f2d5d574ea17abe81f4e28008c4ac95",
+    "dist/runtime/src/steering.js": "53cd5b8f696f0f247a354bff37f1b478cd185275f090024ce49264a8fdcb99d9",
+    "dist/runtime/src/queue.js": "dab63f9bc8374ed527c683660af06990bd1374a69624801272e22b05a990c2ce"
+  },
+  "liveDriverSha256": "1fc353a3bcdaef5ad5bc6a2a336431469c1f99d0a91bcfcf73c3dd995e825acb",
+  "liveQualification": {
+    "passed": true,
+    "cases": 2,
+    "humanInputsAdmitted": 5,
+    "hostStarts": 2,
+    "coldReopens": 1,
+    "successfulReadCalls": 2,
+    "fileMutationsByAgent": 0,
+    "runtimeErrors": 0,
+    "correctionDeliveryObservationMs": 29,
+    "stopSettlementObservationMs": 48,
+    "timingMeaning": "One observed client-to-saved-user-message delivery and Stop-to-idle interval; not a performance guarantee or full corrected-answer latency",
+    "checks": {
+      "staleSteerRefusedWithoutMutation": true,
+      "liveGenerationInterrupted": true,
+      "correctionSameTurnAndFollowupNextTurn": true,
+      "eachHumanIdentityDeliveredOnce": true,
+      "oneSuccessfulReadNoMutation": true,
+      "completedCorrectionRetryNoReplay": true,
+      "stopSettlesAndKeepsUndispatchedFollowupPaused": true,
+      "coldOpenRetainsPauseAndDoesNotReplay": true,
+      "explicitResumeDeliversOnceWithSuccessfulRead": true,
+      "gracefulTestHostShutdown": true,
+      "ownerModelConfigurationUnchanged": true,
+      "onlyAuthoredProbeFilesPresent": true
+    },
+    "retainedHistoryStats": [
+      {
+        "case": "generation-steering-followup",
+        "eventCounts": {
+          "turn/start": 2,
+          "turn/end": 2,
+          "user/message": 3,
+          "assistant/message": 4,
+          "tool/call": 1,
+          "tool/result": 1,
+          "runtime/error": 0
+        },
+        "assistantStopReasons": [
+          "aborted",
+          "stop",
+          "toolUse",
+          "stop"
+        ],
+        "eventsSha256": "764fa5c0a89e00b9f2307995e7d880cc5deb58ae2ae63ec9a3cc9cc0d4b65be0",
+        "nativeSha256": "ce1b08e5535869a7e0d9b24f8ed9d74560cb6aa8e5fbb482d783ac021925e3fd"
+      },
+      {
+        "case": "stop-cold-resume",
+        "eventCounts": {
+          "turn/start": 2,
+          "turn/end": 2,
+          "user/message": 2,
+          "assistant/message": 3,
+          "tool/call": 1,
+          "tool/result": 1,
+          "runtime/error": 0
+        },
+        "assistantStopReasons": [
+          "aborted",
+          "toolUse",
+          "stop"
+        ],
+        "eventsSha256": "8549116fdc89c5cdc1f891302729dfcc5d1f99f87a7552b663eb8705efdec043",
+        "nativeSha256": "cae150dfce0b0b823a343e0213d2eb3fde756726c7453a91e02b69f2b08f5104"
+      }
+    ]
+  },
+  "cleanup": {
+    "testHostsGracefullyClosed": true,
+    "retiredCompanions": 0,
+    "retiredBrowserHelpers": 0,
+    "privateAuthoredProfilesAndLogsRetained": true
+  },
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-055628-b9afa698",
+        "applicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+        "artifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+        "sealedInputsVerified": 24686
+      },
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-061143-d0c0fc29",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-061143-d0c0fc29",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 12,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "limits": [
+    "Control actions use actual private Host RPCs, not physical keyboard/mouse or loaded Browser extension controls",
+    "Live interruptions occur during provider generation; executing-tool steering/Stop boundaries remain controlled-provider evidence",
+    "No shell, external MCP, desktop, job/delegation, live memory or additional real project migration is exercised",
+    "The local model and saved tuning remain unchanged; this single pair of cases does not qualify every provider or a future SDK pin",
+    "Existing MX review deployments remain b1edf4d2. Owner pilot feedback, ordinary physical use, further backed-up migration, voice and later OS rollout remain separate"
+  ]
+}

@@ -1,0 +1,133 @@
+.lc-stat { background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l2); border-radius: 8px; padding: 6px 6px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lc-stat-label { color: var(--dsw-alias-label-secondary); font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-stat-value { color: var(--dsw-alias-label-primary); font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.lc-stat-sub { color: var(--dsw-alias-label-secondary); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* A DOM bubble, not `title`: native tooltips cannot hold the multi-row price breakdown. Hovering anywhere on the cell reveals it. */
+.lc-stat-tipped { position: relative; }
+.lc-stat-q { display: inline-block; margin-left: 4px; width: 11px; height: 11px; line-height: 11px; border-radius: 50%; text-align: center; font-size: 9px; font-weight: 700; font-style: normal; color: var(--dsw-alias-label-secondary); background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l2); cursor: help; transition: color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), border-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-stat-tip { top: calc(100% + 6px); left: 0; max-width: 280px; line-height: 1.5; font-weight: 400; }
+.lc-stat-tip-prices { display: block; margin-top: 5px; border-top: 1px dashed var(--dsw-alias-border-l1); padding-top: 5px; }
+.lc-stat-tip-head { display: block; font-weight: 600; }
+/* Plain text pinned to the title row's right end, regular weight against the 600 title; the native `title` explains it. */
+.lc-card-rate { flex: none; margin-left: auto; font-weight: 400; font-size: 12px; line-height: 18px; font-variant-numeric: tabular-nums; cursor: default; }
+.lc-stat-tip-row { display: block; margin-top: 2px; }
+.lc-stat-tip-band { display: flex; justify-content: space-between; gap: 2rem; }
+.lc-stat-tip-band i { font-style: normal; }
+.lc-stat-tip-by { display: block; margin-top: 3px; color: var(--dsw-alias-label-secondary); }
+.lc-card-sub { font-weight: 400; color: var(--dsw-alias-label-secondary); font-size: 12px; margin-left: auto; }
+/* The one-decimal percent is wider than the integer it replaced; the row wraps so the percent block drops to its own line instead of spilling past the card edge. */
+.lc-overview-num { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.lc-overview-num > b { font-size: 20px; }
+.lc-overview-num span { color: var(--dsw-alias-label-secondary); }
+.lc-overview-pct { margin-left: auto; font-size: 11px; }
+.lc-overview-pct b { font-size: 20px; color: var(--dsw-alias-label-primary); margin-right: 4px; }
+.lc-col-donut { display: flex; flex-direction: column; }
+.lc-col-donut .lc-donut-row { flex: 1; }
+.lc-donut { position: relative; flex: none; }
+.lc-donut svg { display: block; }
+.lc-donut-track { stroke: color-mix(in srgb, var(--color-neutral-500) 18%, transparent); }
+/* Legend-row ↔ segment hover link: hovering either side dims the other slices to 0.35 while the active one stays solid. */
+.lc-donut-seg { transition: opacity var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+/* The entrance sweep rides `animate-lc-donut-in`. */
+.lc-donut-dim .lc-donut-seg { opacity: 0.35; }
+.lc-donut-dim .lc-donut-seg-on { opacity: 1; }
+.lc-donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; pointer-events: none; text-align: center; padding: 0 7px; box-sizing: border-box; }
+.lc-donut-center b { line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.lc-donut-center span { color: var(--dsw-alias-label-secondary); white-space: nowrap; }
+/* Two tiers per row: the primary line pairs dot + name with the share, the secondary drops the absolute quantity under the name. The name ellipsizes only as a last resort (full text on the row's `title`); a zero-figure row dims because the ring already carries the share. auto-fill holds the share column readable down to the container width. */
+.lc-sl { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 4px 8px; min-width: 0; overflow: hidden; }
+/* The pill tint spreads 6px past the text column (negative margins) without shifting the columns. */
+.lc-sl-row { display: flex; flex-direction: column; gap: 1px; font-size: 12px; min-width: 0; border-radius: 6px; padding: 1px 6px; margin: 0 -6px; transition: background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-sl-row-on { background: var(--dsw-alias-interactive-bg-hover); }
+.lc-sl-row-dim { opacity: 0.55; }
+.lc-sl-main { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.lc-sl-dot { flex: none; width: 8px; height: 8px; border-radius: 2px; }
+.lc-sl-label { flex: 1 1 auto; min-width: 0; line-height: 1.25; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-sl-pct { flex: none; min-width: 30px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.lc-sl-sub { margin-left: 14px; color: var(--dsw-alias-label-secondary); font-size: 11px; line-height: 1.3; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-pi-grid { display: grid; grid-template-columns: 1fr; gap: 8px; }
+/* A button wearing the link-row chrome. */
+.lc-pi-row-btn { appearance: none; border: 0; background: none; font: inherit; color: inherit; text-align: left; padding: 0; cursor: pointer; width: 100%; }
+.lc-pi-row { display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; gap: 12px; min-width: 0; text-decoration: none; color: inherit; }
+.lc-pi-hint { text-decoration: none; }
+/* A block-level chip drops below the version instead of trailing it: sharing the line overflowed the value box at the card's 240px floor, and the ellipsis ate the notice first. */
+.lc-pi-update { display: block; color: var(--dsw-alias-state-warn-primary); font-size: 11px; margin-top: 1px; white-space: nowrap; }
+.lc-pi-label { flex: none; color: var(--dsw-alias-label-secondary); font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-pi-labelicon { display: inline-block; vertical-align: -2px; margin-right: 4px; }
+/* min-width: 0 lets the value shrink and ellipsize inside the flex row; without it a narrow card pushes it over the label. */
+.lc-pi-value { min-width: 0; color: var(--dsw-alias-label-primary); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; }
+.lc-flow { position: relative; display: flex; align-items: stretch; }
+.lc-flow-svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+/* Two layers per link: a wide near-transparent ribbon carries the mass, and a dashed hairline travels along it so the direction reads without arrowheads. */
+.lc-flow-ribbon { fill: none; stroke-width: 14px; stroke-opacity: 0.13; stroke-linecap: round; }
+.lc-flow-dash { fill: none; stroke-width: 1.5px; stroke-opacity: 0.55; stroke-linecap: round; stroke-dasharray: 2 7; }
+/* The zones sit above the connector overlay; the mid zone's side margins are the ribbons' gutters. */
+.lc-flow-col { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: center; gap: 8px; flex: 1 1 0; min-width: 0; }
+.lc-flow-mid { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; margin: 0 30px; }
+.lc-flow-node { background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l2); border-radius: 8px; padding: 6px 10px; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+/* Tabular figures so a ticking count never jiggles the row. */
+.lc-flow-head { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+/* Link chrome reset so the clickable cost header reads as the text it visually is. */
+a.lc-flow-head { color: inherit; text-decoration: none; cursor: pointer; }
+a.lc-flow-head:hover .lc-flow-label { color: var(--dsw-alias-label-primary); }
+.lc-flow-label { color: var(--dsw-alias-label-secondary); font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-flow-total { margin-left: auto; flex: none; color: var(--dsw-alias-label-primary); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+/* A zero pill dims; a tinted pill keeps its tally on the tint's own hue. */
+.lc-flow-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+/* The tools row stays ONE line: `ToolPills` renders only the pills that fit and folds the tail into the "+N" chip, so
+   nothing is clipped or overlapped and the node's height depends on the card's width alone. The gauge carries the full
+   tally at its natural widths, off-flow, purely so the fit can measure the tail the row is not showing. */
+.lc-flow-pills-tools { flex-wrap: nowrap; }
+.lc-flow-pill-gauge { display: block; position: relative; height: 0; overflow: hidden; visibility: hidden; pointer-events: none; }
+.lc-flow-pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border-radius: 999px; background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l1); color: var(--dsw-alias-label-secondary); font-size: 11px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lc-flow-pill-label { min-width: 0; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+.lc-flow-pill b { font-weight: 700; color: var(--dsw-alias-label-primary); }
+.lc-flow-pill-tint b { color: inherit; }
+.lc-flow-pill-dim { opacity: 0.45; }
+.lc-flow-rows { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+.lc-flow-row { display: flex; align-items: baseline; gap: 6px; font-size: 11px; color: var(--dsw-alias-label-secondary); min-width: 0; }
+.lc-flow-row-label { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lc-flow-pair { margin-left: auto; flex: none; display: inline-flex; align-items: baseline; gap: 5px; font-variant-numeric: tabular-nums; }
+.lc-flow-pair b { font-weight: 700; color: var(--dsw-alias-label-primary); }
+.lc-flow-pair i { font-style: normal; opacity: 0.55; }
+/* Doubles as a jump to the Fleet tab, where the Agent Network card lives; the price link inside keeps its own behavior. */
+.lc-flow-team { cursor: pointer; }
+.lc-flow-team:hover { border-color: var(--dsw-alias-label-secondary); }
+.lc-flow-self { background: var(--dsw-alias-bg-layer-1); border-color: color-mix(in srgb, var(--dsw-alias-brand-primary) 40%, transparent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--dsw-alias-brand-primary) 8%, transparent); padding: 8px 14px; align-items: center; gap: 6px; }
+.lc-flow-self-stats { display: flex; align-self: stretch; gap: 16px; }
+/* Each figure cell takes half its row and centers within, so both rows share one column pair however wide a label runs in either locale. */
+.lc-flow-kv { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+/* Second-row figures jump into the Context Browser. */
+.lc-flow-kv-btn { cursor: pointer; border-radius: 6px; }
+.lc-flow-kv-btn:hover { background: var(--dsw-alias-bg-layer-2); }
+.lc-flow-kv-btn:hover i { color: var(--dsw-alias-label-primary); }
+.lc-flow-kv-btn:focus-visible { outline: 2px solid var(--dsw-alias-brand-primary); outline-offset: 1px; }
+.lc-flow-kv b { font-size: 17px; font-weight: 700; line-height: 1.2; color: var(--dsw-alias-label-primary); font-variant-numeric: tabular-nums; }
+.lc-flow-kv i { font-style: normal; font-size: 11px; color: var(--dsw-alias-label-secondary); }
+.lc-flow .lc-flow-col-r .lc-stat-tip { left: auto; right: 0; }
+/* The fold width is mirrored as the component's FLOW_FOLD_PX. */
+@container lc-card (max-width: 559px) {
+  .lc-flow { flex-direction: column; }
+  .lc-flow-col { flex-direction: row; align-items: stretch; }
+  .lc-flow-col > .lc-flow-node { flex: 1 1 0; }
+  .lc-flow-mid { margin: 26px 0; }
+}
+/** The bands sit absolutely at their cumulative percent offsets; the neutral track reads only through sub-pixel seams and during the grow-in.
+ * The grow-in rides ONE scaled wrapper around the bands, so a long session's thousands of bands cost a single composited transform instead of one animation and layer each.
+ */
+.lc-tstrip { margin-top: 10px; }
+.lc-tstrip-wrap { position: relative; }
+.lc-tstrip-bar { position: relative; width: 100%; height: 12px; border-radius: 4px; overflow: hidden; background: color-mix(in srgb, var(--color-neutral-500) 18%, transparent); }
+.lc-tstrip-fill { position: absolute; inset: 0; transform-origin: 0 50%; }
+.lc-tstrip-seg { position: absolute; top: 0; height: 100%; transition: opacity var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), filter var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-tstrip-seg-on { filter: brightness(1.18); }
+.lc-tstrip-dim .lc-tstrip-seg { opacity: 0.35; }
+.lc-tstrip-dim .lc-tstrip-seg-on { opacity: 1; }
+/* The ends pin outward — first hugs the left edge, last the right — so width pressure squeezes the interior labels instead of the endpoints. */
+.lc-tstrip-axis { position: relative; height: 13px; margin-top: 5px; font-size: 10px; line-height: 13px; color: var(--dsw-alias-label-secondary); font-variant-numeric: tabular-nums; }
+.lc-tstrip-tick { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.lc-tstrip-tick::before { content: ''; position: absolute; left: 50%; top: -4px; width: 1px; height: 3px; background: var(--dsw-alias-border-l1); }
+.lc-tstrip-tick-first { transform: none; }
+.lc-tstrip-tick-first::before { left: 0; }
+.lc-tstrip-tick-last { transform: translateX(-100%); }
+.lc-tstrip-tick-last::before { left: auto; right: 0; }

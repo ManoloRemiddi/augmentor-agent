@@ -1,0 +1,53 @@
+{
+  "name": "dsh-plugin-wiki-tools",
+  "version": "0.14.0",
+  "description": "Native DeepSeek Harness tools for an Obsidian wiki vault: wiki_query, wiki_write, and wiki_lint implement the mechanical core (path routing, delta tracking, index/log bookkeeping, health checks) of the wiki skill suite.",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./lib/vault.js": "./lib/vault.js",
+    "./lib/search.js": "./lib/search.js",
+    "./lib/lint.js": "./lib/lint.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "lib/",
+    "cordis.patch.yml"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "obsidian",
+    "knowledge-base",
+    "wiki"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lion-1209/dsh-plugin-wiki-tools.git"
+  },
+  "dependencies": {
+    "yaml": "^2.8.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*",
+    "@deepseek-ai/dsh-tools": "*",
+    "@deepseek-ai/schemastery": "*"
+  },
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": "^0.0.1-rc.1",
+    "@deepseek-ai/schemastery": "^3.18.1"
+  }
+}

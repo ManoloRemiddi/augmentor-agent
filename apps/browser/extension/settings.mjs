@@ -15,6 +15,7 @@ import {supportDialog} from './support.mjs'
 import {attachPageMaintenance, registerMaintenanceState} from './maintenance-page.mjs'
 import {dictationSettings} from './dictation-settings.mjs'
 import {settingsSections} from './workspace-settings.mjs'
+import {attachReasoning} from './pi-reasoning.mjs'
 
 const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:()=>checking||mounting>0})
 const send=(type,payload={})=>maintenance.work(()=>chrome.runtime.sendMessage({type,...payload}))
@@ -99,11 +100,19 @@ function showModels(container){
   button(dsh,'Open DSH model settings',async()=>{const r=await send('promptSettings');if(!r.ok)throw Error(r.error)})
   const codex=make('div');codex.id='codex-model-settings'
   container.append(pi,dsh,codex)
-  const mountPi=()=>{const body=advanced(pi,'Connect another model');if(!state.model?.model)body.parentElement.open=true;const dialog=modelSetupDialog(document,send,body);dialog?.addEventListener('close',()=>{if(closed)return;const note=make('p','Model saved. Use the chat model picker to choose an existing model, or connect another below.');note.className='saved-note';pi.replaceChildren(note);mountPi()},{once:true})}
+  const reasoningButton=make('button','Reasoning');reasoningButton.type='button';reasoningButton.id='pi-reasoning-settings';pi.append(reasoningButton)
+  const inspectorButton=button(pi,'Trajectory & Context',async()=>{const sid=state.sessionId;state=await send('connect');container.update();if(closed||sid!==state.sessionId)throw Error('The conversation changed. Reopen the inspector.');const response=await send('inspection/open',{sourceSession:sid});if(!response?.ok)throw Error(response?.error||'Conversation inspector unavailable.');});inspectorButton.id='pi-inspector';
+  const current=()=>({sessionId:state.sessionId,epoch:JSON.stringify([state.harness,state.sessionId,state.model?.provider,state.model?.model]),ready:!closed&&state.harness==='pi'&&state.capabilities?.reasoning===true&&state.phase==='ready'&&!state.running});
+  const methods={'session.reasoning':'session','session.selectReasoning':'select','reasoning.describe':'describe','reasoning.configure':'configure','models.list':'models'};
+  const reasoning=attachReasoning({button:reasoningButton,current,beforeOpen:async()=>{state=await send('connect');container.update()},notice:message=>fail(Error(message)),rpc:async(method,params)=>{const response=await send('reasoning',{action:methods[method],sourceSession:current().sessionId,params});if(!response?.ok)throw Error(response?.error||'Reasoning settings unavailable.');return response.result}})
+  registerMaintenanceState(pi,()=>reasoning.dirty())
+  const mountPi=()=>{const body=advanced(pi,'Connect another model');if(!state.model?.model)body.parentElement.open=true;const dialog=modelSetupDialog(document,send,body);dialog?.addEventListener('close',()=>{if(closed)return;const note=make('p','Model saved. Use the chat model picker to choose an existing model, or connect another below.');note.className='saved-note';pi.replaceChildren(note,reasoningButton,inspectorButton);mountPi()},{once:true})}
   container.update=()=>{
     pi.hidden=state.harness!=='pi';dsh.hidden=state.harness!=='dsh';codex.hidden=state.harness!=='codex'
     if(state.harness==='codex'&&!codex.querySelector('.codex-setup'))codexSetupDialog(document,send,codex)
     active.textContent='Current model: '+(state.model?.model||'Not connected')
+    reasoningButton.disabled=!current().ready;reasoning.changed()
+    inspectorButton.disabled=closed||state.harness!=='pi'||state.capabilities?.inspection!==true||state.phase!=='ready'||!state.sessionId;
     if(state.harness==='pi'&&!pi.querySelector('.model-setup'))mountPi()
   };container.update()
 }

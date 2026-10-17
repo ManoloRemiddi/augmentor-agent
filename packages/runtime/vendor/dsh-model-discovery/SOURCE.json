@@ -1,0 +1,28 @@
+{
+  "schema": "augmentor-dsh-model-discovery-source/1",
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "ref": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+  "license": "MIT",
+  "scope": "Pure original endpoint discovery/parsing and credential/error helpers; no DSH service or AgentSession.",
+  "files": [
+    {
+      "path": "discovery.ts",
+      "upstreamPath": "packages/llm/llm-pi-ai/src/discovery.ts",
+      "upstreamSha256": "6f6a249dce322bebb48e72c35c5113225de187aa2b09cde91d15ecba371aa966",
+      "sha256": "8b8115b64fbcf7f9092990c99d40852059ddf0a79c1d4a779cb33acd0b959b2d",
+      "adaptation": "Local pure dependencies/types replace the aggregate DSH package; Pi owns installed catalogs and injects fetch lifetime. Supplier attribution is omitted, redirects are refused and provider page coverage is exposed. Original listing path/body/parser behavior is preserved. The same public coded HarnessError base seats the discovery error instead of importing DSH service types."
+    },
+    {
+      "path": "api-key.ts",
+      "upstreamPath": "packages/llm/llm/src/api-key.ts",
+      "upstreamSha256": "16bf926a82b0c0c1d4adbee78e2a1eebe260f100285795edb8330f3fe46141a4",
+      "sha256": "16bf926a82b0c0c1d4adbee78e2a1eebe260f100285795edb8330f3fe46141a4"
+    },
+    {
+      "path": "error.ts",
+      "upstreamPath": "packages/llm/llm/src/error.ts",
+      "upstreamSha256": "cd8657420bb84060ee45b1e72fa668df26b090532afd8afd2a96da983a74f792",
+      "sha256": "cd8657420bb84060ee45b1e72fa668df26b090532afd8afd2a96da983a74f792"
+    }
+  ]
+}

@@ -82,6 +82,19 @@ class ReplyCompletionTests(unittest.TestCase):
             self.assertEqual(self.window.messages.count(('DSH',text)),1)
             self.assertFalse(any(role=='Augmentor' for role,_ in self.window.messages))
 
+    def test_pi_recovery_status_survives_live_completion_and_reopen(self):
+        self.controller.harness = 'pi'
+        text = 'Task incomplete. The bounded response-recovery budget was exhausted.'
+        events = [USER, {'seq':2,'type':'runtime/notice','data':{'message':text,'incomplete':True}},
+                  {'seq':3,'type':'turn/end','data':{'reason':{'kind':'error'}}}]
+        for event in events:self.window.on_event(event)
+        for reopen in (False,True):
+            if reopen:self.window.restore_history(events)
+            QTest.qWait(70)
+            self.assertEqual(self.window.messages.count(('Status',text)),1)
+            self.assertIn(text,self.window.transcript.toPlainText())
+            self.assertFalse(any(role=='Augmentor' for role,_ in self.window.messages))
+
     def test_effective_reasoning_policy_is_visible_live_and_on_reopen(self):
         from copy import deepcopy
         routine='Harness: Saved reasoning: minimal; requested reasoning: xhigh (request policy). Backend enforcement is provider-dependent.'

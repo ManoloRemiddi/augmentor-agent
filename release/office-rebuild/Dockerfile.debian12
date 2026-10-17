@@ -1,0 +1,4 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+FROM debian@sha256:7c7b2c966bc9ee8cedfeef67e0e279108992c77681fa595db4a9d65c06ccc587
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential autoconf automake libtool pkg-config python3 python3-setuptools perl curl ca-certificates git wget zip unzip xz-utils bison flex gperf gawk gettext nasm libfontconfig1-dev libfreetype6-dev libxml2-utils xsltproc libssl-dev file rsync ccache cmake ninja-build && rm -rf /var/lib/apt/lists/*
+ENV LANG=C.UTF-8 LC_ALL=C.UTF-8

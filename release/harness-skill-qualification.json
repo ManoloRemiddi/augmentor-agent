@@ -1,0 +1,383 @@
+{
+  "schema": "augmentor-skill-qualification/1",
+  "date": "2026-10-15",
+  "scope": "Original DSH skill controls and managed approved-resource fingerprints on Pi; Linux source and fresh ordinary copy; no sealed owner adoption",
+  "implementationAndTestedSourceRef": "9d9ac567a2e2d2204eb2f4fb16b09caab4dc2577",
+  "piSdk": "1.1.0",
+  "supplier": {
+    "repository": "https://github.com/deepseek-ai/deepseek-harness",
+    "ref": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+    "license": "MIT",
+    "newVerbatimFiles": 7,
+    "totalSelectedFiles": 608,
+    "priorSelectedFilesAndRecordsUnchanged": 601,
+    "publicGitBlobAndSha256Verified": true,
+    "priorCssAndNoticesUnchanged": true,
+    "newDependencies": 0,
+    "dshHostLoaded": false,
+    "syntheticSkillToolRowMounted": false
+  },
+  "behavior": [
+    "Original cached/ranked skill slash menu, user-only marker, literal insertion, editable word-like /name tokens and current-source sidebar preview use Pi approved resources",
+    "Catalog reads confirmed loaded SDK metadata only; no new SDK owner, body scan or model request; Browser/delegation excluded and inspectors denied",
+    "Managed Native input uses one public extension on the existing AgentSession; product commands, registered extension commands and templates retain bare-name priority; explicit /skill:name remains available",
+    "One-MiB regular UTF-8 source read verifies descriptor/path identity, size and change times; raw source, normalized instruction and expanded-input fingerprints remain distinct",
+    "A receipt joins only exact actual delivered SDK user text, with managed-input-read; delivered-sdk-user-message boundary; it does not attest later provider consumption or complete causal provenance",
+    "New explicit invocation uses current file bytes; historical branches and cold native/display reopening retain old expansion and receipt; current-source preview does not rewrite history",
+    "Thrown SDK input-handler errors can fall through; managed source/control failures use handled and owned-turn failure, with zero provider dispatch; late retired reads cannot affect a newer input"
+  ],
+  "limits": {
+    "catalogRows": 2048,
+    "catalogSerializedBytes": 1048576,
+    "skillSourceBytes": 1048576,
+    "instructionCharacterUnits": "unicode-code-points",
+    "globalFullSourceProvenance": false,
+    "colonFallbackGetsOriginalDraftDecoration": false
+  },
+  "focused": {
+    "tests": 66,
+    "pass": 66,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "logSha256": "970f603ded40f1c432a52df8e9a3fee4456319aaeb336774e5f62e767abdc88b"
+  },
+  "focusedCases": {
+    "pureSkillContracts": 8,
+    "actualHostSkillFlows": 12,
+    "commonAuthoredServiceFaceCases": 9,
+    "actualOriginalSkillGui": 1,
+    "existingPermissionAndFileGuiCases": 36
+  },
+  "controlledBeforeAndIntermediate": {
+    "oldCatalogUnavailable": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "b41e661c9bb67109dd585f55348fabf43a37c44184bf5523a8e132b92ee595a3"
+    },
+    "oldMenuUnavailable": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "a51eaf2350b7c6ce8553aae71fa145a069d89c6e4a43ae294c04eb00c548f50e"
+    },
+    "initialNewGuiMissingOriginalEditorBinding": {
+      "tests": 1,
+      "pass": 0,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "fbc01dc72058b1a08541635ecce24def4e3b351e0bbf4653eb5b7d8a7c0e65f4"
+    },
+    "sdkThrownHandlerFallsThrough": {
+      "tests": 61,
+      "pass": 60,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "471adc2571f85895af57bf6a931af8359754b6c710c0f19f6fba05cd3c1460bb"
+    }
+  },
+  "firstFullCohorts": {
+    "ref": "b7fe4048b0b9f28463b1aa033ee0e85d6986f842",
+    "source": {
+      "tests": 543,
+      "pass": 539,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 2,
+      "logSha256": "4a2510aaa81ccdd1ecb9a86df0541845a99c346885815e41009bcee9ff450e22"
+    },
+    "ordinary": {
+      "tests": 543,
+      "pass": 539,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 2,
+      "logSha256": "ecda64fce7984554483094bb8248d94186a17b45fc14c5b31800c04c89820097"
+    },
+    "cause": "One existing nested steering assertion lost its skill name after earlier managed expansion; the enclosing runtime case also fails. Production diagnostic now takes the name from its owned prepared receipt; assertion unchanged."
+  },
+  "intermediateMalformedTransformRuntime": {
+    "result": {
+      "tests": 56,
+      "pass": 54,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "6c4df9fb4c08c802a77ef0baafae4b53a7d0ac56307da7c177c2ae26f876faa5"
+    },
+    "cause": "The managed failure handler converted an invalid non-string extension transform into handled; early non-string guards preserve the existing SDK/steering rejected outcome. Existing assertion unchanged."
+  },
+  "finalExistingRuntime": {
+    "tests": 56,
+    "pass": 56,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "logSha256": "a262d0949ada0fe714f0bb4fca544e1bd10cff76ff0e09ff444e15ba891e73f6"
+  },
+  "negativeInterpretation": {
+    "oldCatalogUnavailable": "Prior ordinary runtime has no session.skills method",
+    "oldMenuUnavailable": "Prior app does not offer the authored approved skill option",
+    "initialNewGuiMissingOriginalEditorBinding": "Initial new candidate lacked the original editable text-reference binding; the first rich-chip assertion was also corrected to the upstream editable token",
+    "sdkThrownHandlerFallsThrough": "Missing source caused two fixture model requests when the input handler threw; the final managed handled path passes with zero requests"
+  },
+  "independentSdkFormatParity": {
+    "sdk": "1.1.0",
+    "officialAndManagedExpansionEqual": true,
+    "cases": [
+      {
+        "case": "lf",
+        "sourceSha256": "1f2662742b45581a8d0901dede2334d438d1f70af5a7a0299279de5132f61d97",
+        "normalizedExpandedSha256": "b7cbea3e67e01618e2b87391b3a1d74276ac9ff88ffb959c89c57c30431e4800",
+        "nativeDisplayProviderTextEqual": true,
+        "requests": 2,
+        "managedReceipt": true
+      },
+      {
+        "case": "bom-crlf-unicode",
+        "sourceSha256": "b3722b314ddc77c9eaf881cba375104a95b14d9f439c0d5492773a05b7a116ca",
+        "normalizedExpandedSha256": "cb44200b6366ce464ebe7e19d838188d05a02861a835f3c7f58b2f215d0b3acb",
+        "nativeDisplayProviderTextEqual": true,
+        "requests": 2,
+        "managedReceipt": true
+      },
+      {
+        "case": "empty-body",
+        "sourceSha256": "74fe88eb646330eeeccd33fa0416e6859030e8198c1ffbd35fd8a82ba31f28e0",
+        "normalizedExpandedSha256": "65c622d40560ecfa4ffe7243334181784d6b7cadf579f4259e42a9d278227b0f",
+        "nativeDisplayProviderTextEqual": true,
+        "requests": 2,
+        "managedReceipt": true
+      }
+    ],
+    "source": "independently authored LF, BOM/CRLF/Unicode and empty-body sources; actual Native, display and fixture-provider text compared"
+  },
+  "visualQa": {
+    "separateFinalOriginalGuiCase": {
+      "tests": 1,
+      "pass": 1,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "logSha256": "4e1a0255f483af3a8e27bf3f7030c91978aef53408bf86470745198e73df8730"
+    },
+    "compiledGuiSha256": "ab4e99ba1708dc7f6942b9cd9fe88b7deb84727577939eff33b8d686d75b5cbf",
+    "originalSkillSourceAndSidebar": true,
+    "lightAndDark": true,
+    "currentV2SourceAndRetainedV1Receipt": true,
+    "screenshotsSha256": {
+      "light": "0a78b021b4c971aaddbff6fd707d85347208ab12e9498b33be47ae09dd576c25",
+      "dark": "1055deff3dc804f69c3eef72a06412c6bd1fd4510f1a77ecb9e3a9f46bd20810"
+    },
+    "fixture": "independently authored skill sources and loopback model; not owner files or live Wiki workflow"
+  },
+  "qualification": {
+    "files": 102,
+    "testFiles": [
+      "apps/browser/test/jobs-refresh.test.mjs",
+      "apps/browser/test/prompt-editor-ordering.test.mjs",
+      "apps/browser/test/prompts.test.mjs",
+      "tests/codex-browser-chromium.test.mjs",
+      "tests/codex-external-runtime.test.mjs",
+      "tests/codex-memory-runtime.test.mjs",
+      "tests/harness-account-login-chromium.test.mjs",
+      "tests/harness-account-scope.test.mjs",
+      "tests/harness-appearance-chromium.test.mjs",
+      "tests/harness-branch-chromium.test.mjs",
+      "tests/harness-branch-controls-chromium.test.mjs",
+      "tests/harness-branch-controls.test.mjs",
+      "tests/harness-brand-chromium.test.mjs",
+      "tests/harness-build-resolution.test.mjs",
+      "tests/harness-context-chromium.test.mjs",
+      "tests/harness-context-insights-chromium.test.mjs",
+      "tests/harness-context-insights.test.mjs",
+      "tests/harness-context-modal-chromium.test.mjs",
+      "tests/harness-context-preferences-chromium.test.mjs",
+      "tests/harness-context-providers-chromium.test.mjs",
+      "tests/harness-context-sidebar-chromium.test.mjs",
+      "tests/harness-disabled-pointer-chromium.test.mjs",
+      "tests/harness-drafts-chromium.test.mjs",
+      "tests/harness-drafts.test.mjs",
+      "tests/harness-dsh-attachments-chromium.test.mjs",
+      "tests/harness-dsh-chromium.test.mjs",
+      "tests/harness-dsh-interactions-chromium.test.mjs",
+      "tests/harness-dsh-question-batches-chromium.test.mjs",
+      "tests/harness-dsh-questions-chromium.test.mjs",
+      "tests/harness-dsh-settings-chromium.test.mjs",
+      "tests/harness-dsh.test.mjs",
+      "tests/harness-file-preview-chromium.test.mjs",
+      "tests/harness-file-references-chromium.test.mjs",
+      "tests/harness-fleet-chromium.test.mjs",
+      "tests/harness-goals-chromium.test.mjs",
+      "tests/harness-html-chromium.test.mjs",
+      "tests/harness-index-chromium.test.mjs",
+      "tests/harness-jobs-chromium.test.mjs",
+      "tests/harness-mcp-chromium.test.mjs",
+      "tests/harness-metafolder-navigation-chromium.test.mjs",
+      "tests/harness-metafolders-chromium.test.mjs",
+      "tests/harness-model-invalidation.test.mjs",
+      "tests/harness-models-chromium.test.mjs",
+      "tests/harness-navigation-chromium.test.mjs",
+      "tests/harness-nested-tools-chromium.test.mjs",
+      "tests/harness-office-chromium.test.mjs",
+      "tests/harness-office-preview.test.mjs",
+      "tests/harness-pdf-chromium.test.mjs",
+      "tests/harness-plan-mode-chromium.test.mjs",
+      "tests/harness-plans-chromium.test.mjs",
+      "tests/harness-pointer-chromium.test.mjs",
+      "tests/harness-prompts-chromium.test.mjs",
+      "tests/harness-reasoning-chromium.test.mjs",
+      "tests/harness-search-settings-chromium.test.mjs",
+      "tests/harness-session-create-chromium.test.mjs",
+      "tests/harness-session-create.test.mjs",
+      "tests/harness-shortcuts-chromium.test.mjs",
+      "tests/harness-spreadsheet-chromium.test.mjs",
+      "tests/harness-tool-arguments-chromium.test.mjs",
+      "tests/harness-wiki-review-chromium.test.mjs",
+      "tests/harness-wiki-settings-chromium.test.mjs",
+      "tests/harness-workspace-ordering-chromium.test.mjs",
+      "tests/harness-workspace-ordering.test.mjs",
+      "tests/mcp-connection.test.mjs",
+      "tests/mcp-transport.test.mjs",
+      "tests/model-account-login.test.mjs",
+      "tests/model-accounts.test.mjs",
+      "tests/model-discovery.test.mjs",
+      "tests/model-settings.test.mjs",
+      "tests/office-native-linux.test.mjs",
+      "tests/pi-mcp-authorization.test.mjs",
+      "tests/pi-mcp-connection-gap.test.mjs",
+      "tests/pi-mcp-connection.test.mjs",
+      "tests/pi-mcp-parallel.test.mjs",
+      "tests/pi-mcp-token-provider.test.mjs",
+      "tests/pi-model-configuration.test.mjs",
+      "tests/pi-plan-mode.test.mjs",
+      "tests/pi-privacy.test.mjs",
+      "tests/pi-prompt-queue.test.mjs",
+      "tests/pi-question-batches.test.mjs",
+      "tests/pi-question-contracts.test.mjs",
+      "tests/pi-session-organization.test.mjs",
+      "tests/pi-workspaces.test.mjs",
+      "tests/plan-mode-contracts.test.mjs",
+      "tests/runtime.test.mjs",
+      "tests/tool-argument-snapshots.test.mjs",
+      "tests/harness-question-drafts.test.mjs",
+      "tests/harness-question-drafts-chromium.test.mjs",
+      "tests/pi-interactions.test.mjs",
+      "tests/pi-compaction.test.mjs",
+      "tests/harness-local-plan-proof.test.mjs",
+      "tests/pi-permission-defaults.test.mjs",
+      "tests/harness-permission-defaults.test.mjs",
+      "tests/harness-permission-defaults-chromium.test.mjs",
+      "tests/session-permission-contracts.test.mjs",
+      "tests/pi-session-permissions.test.mjs",
+      "tests/harness-session-permissions.test.mjs",
+      "tests/harness-session-permissions-chromium.test.mjs",
+      "tests/session-skills.test.mjs",
+      "tests/pi-skill-workflows.test.mjs",
+      "tests/harness-skills.test.mjs",
+      "tests/harness-skills-chromium.test.mjs"
+    ],
+    "runnerArguments": [
+      "--test",
+      "--test-concurrency=2"
+    ],
+    "allHarnessChromiumFiles": 51,
+    "workersPerCohort": 2,
+    "boundsOrDeadlinesIncreased": false,
+    "source": {
+      "tests": 543,
+      "pass": 541,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "logSha256": "ffd0329bc04f25b283164b1dd32f471240677ec78cedf24d8b3419e04391e026"
+    },
+    "freshOrdinary": {
+      "tests": 543,
+      "pass": 541,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "logSha256": "b7970b8206798bbaca64f5ddc1428b4e7fdb00d6abe790df4e6ad6d893e66614"
+    },
+    "optionalSkips": "existing optional cases; no added Linux skips",
+    "strictCheck": true,
+    "build": true,
+    "noticeAssemblyCases": 7,
+    "packagingCases": 9,
+    "sourceBoundaryCases": 2,
+    "actualTrackedAndAvailableHistoryBoundary": true
+  },
+  "parity": {
+    "trackedFiles": 3315,
+    "compiledFiles": 1025,
+    "executableInputs": 2196,
+    "dependencies": {
+      "node": 1,
+      "node_modules": 20702,
+      "apps/browser/test/node_modules": 1932
+    },
+    "productionNpmInstances": 151,
+    "nodeSha256": "bc17c508ffeed0ec622934f9b7fa72f8e78da65350e63c3eceb56fa688aa5e12",
+    "supplierInputsVerified": 608,
+    "priorSupplierInputsUnchanged": 601,
+    "newVerbatimSupplierInputs": 7,
+    "newSupplierGitBlobHashesVerified": true,
+    "priorSupplierCssAndLicencesUnchanged": true,
+    "sourceAndOrdinaryInputsSha256": "d456ff79bbef3d2d777c2fbd765cb090f0fcb52868d85ebb6ad6a022805f424b"
+  },
+  "preservation": {
+    "sevenSealedInventoriesVerified": true,
+    "eightPriorReviewProcessesPresent": true,
+    "selectedConfigurationSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalExistingChanges": 38,
+    "currentSeparateReviewArtifactSha256": "501614e41c0f03a87463059efba9c3f21d87cd7b9317692192e7029b679b6ff5",
+    "currentSeparateReviewEntries": 24418,
+    "currentReviewHttp200": true,
+    "currentReviewContainsThisIncrement": false,
+    "priorExactSealedQwenProofStillMatchesItsOwnArtifact": true,
+    "qwenCatalogHttp200": true,
+    "modelSpeechGpuConfigurationBytesPreserved": true,
+    "breezeAttemptTerminal": true,
+    "breezeState": "failed",
+    "voiceState": "inactive",
+    "serviceMutations": false,
+    "ownerDataImported": false,
+    "ownerOrInstalledArtifactsChanged": false
+  },
+  "precedingHosted": {
+    "ref": "29d144f1f4726b15ee7bf6402b3e39b4df54be5a",
+    "runUrl": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38753949219",
+    "conclusion": "failure",
+    "jobs": [
+      {
+        "name": "contracts (macos-14)",
+        "conclusion": "success"
+      },
+      {
+        "name": "contracts (ubuntu-24.04)",
+        "conclusion": "success"
+      },
+      {
+        "name": "contracts (windows-2025)",
+        "conclusion": "failure"
+      }
+    ]
+  },
+  "currentHeadHosted": "pending after source publication",
+  "remaining": [
+    "Consolidated sealed review and physical MX feedback; installed adoption remains guarded",
+    "Representative remaining Wiki skill/companion workflows and approved resource composition",
+    "Full source/causal provenance and Context consumption attribution, memory/privacy and complete P0/P1 migration",
+    "Speech/live providers and OAuth/MCP/Office distribution qualification",
+    "Windows shared-contract failures and actual Mac/Windows/other Linux artifact/physical acceptance; MX-first rollout",
+    "No DSH retirement, merge, public binaries or experimental Office default promotion"
+  ]
+}

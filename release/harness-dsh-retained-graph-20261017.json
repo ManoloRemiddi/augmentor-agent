@@ -1,0 +1,67 @@
+{
+  "schema": "augmentor-harness-dsh-retained-graph/1",
+  "date": "2026-10-17",
+  "sourceRef": "e07e5db623d2b777eeb4e25ece5646da858b8b90",
+  "scope": "Source and isolated operator fixture; no owner activation",
+  "pythonPass": 90,
+  "preservationCases": 16,
+  "preservationCountOverlaps90": true,
+  "fail": 0,
+  "skip": 0,
+  "actualOwnerStage": {
+    "boundInputs": 46,
+    "moduleChanges": 10,
+    "identicalPublicRoleChanges": 8,
+    "remainingLiteralModulePaths": 20,
+    "peerSettingsExact": true,
+    "frontendBundleKept": true,
+    "legacyBackendDisabledInCandidate": true,
+    "standardProductBackendInserted": true,
+    "ownerFilesChanged": false,
+    "activated": false
+  },
+  "isolatedRuntime": {
+    "hostFilesystemReadOnly": true,
+    "separateNetworkAndPidNamespaces": true,
+    "userRuntimeSocketsHidden": true,
+    "privateModulesExecutedInPlace": true,
+    "privateModuleSourceCopied": false,
+    "originalPersonalModules": 9,
+    "bothRolesCreatedAndColdReopened": true,
+    "authorIdentitySnapshotsAndModelInput": true,
+    "prestartedCompanionsStoppedBeforeColdContinuation": true,
+    "currentMemoryOwnerAfterColdStart": true,
+    "legacyInstructionSaveNegativeControl": true,
+    "newSharedInstructionSaveAndReadback": true,
+    "newTemplateSaveDelete": true,
+    "draftUsesSharedInstructionsWithoutSubmission": true,
+    "authoredModelRequests": 3,
+    "ownerModelRequests": 0,
+    "existingCachedBankRowsExact": true,
+    "personAndDisabledSettingsExact": true,
+    "staleSourceDatabaseBytesExact": true,
+    "namespaceAndScratchRetired": true,
+    "realOwnerHistoricalToolModelUiAcceptance": false
+  },
+  "priorSdk": {
+    "run": 39043965407,
+    "head": "b3cbb4e7",
+    "runtime": "3777cc92",
+    "scope": "linux",
+    "conclusion": "success"
+  },
+  "remaining": [
+    "Immutable incoming build and matching installed clients",
+    "Fresh full cold backups and activation/reverse transaction",
+    "Real owner bank/history/budget/busy/restart/model/tool/UI acceptance and other retained paths",
+    "Pilot feedback before further projects; voice/later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-dsh-retained-graph-source-python-20261017.log": "3dc4afa46e6396a0cf34a83c3007acdf001bc9a4b1b71bf3b60307d3b6163d07",
+    "harness-dsh-retained-graph-actual-stage-summary-20261017.log": "22a9556d1023329d3089e4bce3ecdc3f4ab0711139100d705c885146b1cd5832",
+    "harness-dsh-preservation-actual-plan-private-20261017.json": "a4a12dd4d9d15f96ff6011040950a522c5dc81f9c70574ad543d54385a1f25eb",
+    "harness-retained-graph-actual-summary-20261017.log": "ef42f3b1d5c4dca149050b2ce055332068d850fa9f537cf33554fd41c1d4bcc2",
+    "harness-dsh-retained-graph-owner-preservation-private-20261017.json": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5",
+    "retained-role-fixture-result": "b06cb339cbe7b9340bae583cbdf3894553a02b3c1d02cfb104328220632c6f4f"
+  }
+}

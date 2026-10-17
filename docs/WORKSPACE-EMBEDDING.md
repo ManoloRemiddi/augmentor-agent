@@ -1,6 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 # Embedded Browser and specialist workspaces
 
+The [fresh sealed MX embedding candidate](HARNESS-SHARED-PROFILES.md#sealed-embedding-follow-up-and-existing-configuration--october-17)
+passes the actual generated SDK/embedding/host selected-library and authority
+checks. It is unselected; actual installed custom integration migration remains
+open. No owner workspace, proxy registration or service has been changed.
+
+[MX shared launch binding](HARNESS-SHARED-PROFILES.md#embedded-entrypoint-and-actual-production-compatibility--october-17)
+now covers the idle embedding service through the selected pair and inherited
+reader lease. The Linux desktop bootstrap refreshes its stable external launcher;
+this does not change proxy authentication, registered roles, tool grants or SDK
+shared-setting restrictions. Actual generated server/host reads the authored target
+library; prompt writes and memory administration remain denied. Source qualification
+is separate from the owner's installed integration and service adoption.
+
 Augmentor can host its existing Browser surface inside an application. The
 product serves the same extension HTML, renderer, composer, history, branching,
 voice, prompts and settings modules. `apps/browser/embed` supplies web hosting

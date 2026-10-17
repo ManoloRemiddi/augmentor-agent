@@ -1,0 +1,394 @@
+{
+  "schema": "augmentor-harness-interrupted-context-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Preserve typed interruption context for the next accepted request; unchanged original GUI and history",
+  "baseSourceRef": "afe37bacb35ed058ef47d623a09b7ccc28b97f04",
+  "baseApplicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+  "inputsSha256": {
+    "packages/runtime/src/execution.ts": "962927f218c75cedeb8d359bed6921e861fd86be2fdae073f018b95ab5fd3580",
+    "tests/pi-execution.test.mjs": "40505bac3509b792651151b3757f2cc11dcfb74090860acfb0dfa46d08b9c4d1",
+    "tests/runtime.test.mjs": "b5bde14f2b2d797367c64d167752d1f18dc8f05c9e87fb312a05cc6f3f36cd4e",
+    ".github/workflows/app-sdk.yml": "a1b8ab2a5102d728dba6ee1917cfa80d085da30663ec7d69506bb1acb9237a63"
+  },
+  "oldLiveFailure": {
+    "case": "unchanged b1 original GUI; explicit resume reads the new file, then model restarts old numbered output; an additional real GUI Stop bounds the run",
+    "runtimeErrorCount": 0,
+    "successfulReadResults": 1,
+    "modelRequests": [
+      {
+        "seq": 9,
+        "payloadSha256": "b7a3802fa5188ff5523e6f2947eac025dfd4cb3944a6ffecdba380337ca6b66c",
+        "roles": [
+          "system",
+          "user"
+        ],
+        "latestRequestPresent": false,
+        "readResultPresent": false,
+        "interruptionNotePresent": false
+      },
+      {
+        "seq": 29,
+        "payloadSha256": "660af212ad46ff5b7b287719ddaf0fa230a2173c06ee235e7bce5c3f336cde67",
+        "roles": [
+          "system",
+          "user",
+          "user"
+        ],
+        "latestRequestPresent": true,
+        "readResultPresent": false,
+        "interruptionNotePresent": false
+      },
+      {
+        "seq": 44,
+        "payloadSha256": "0af928062a88701606bd9d348a4c0ffcfa1d41ac4767dc132faf3efacc81c722",
+        "roles": [
+          "system",
+          "user",
+          "user",
+          "assistant",
+          "tool"
+        ],
+        "latestRequestPresent": true,
+        "readResultPresent": true,
+        "interruptionNotePresent": false
+      }
+    ],
+    "userMessages": 2,
+    "lastAssistantStopReason": "aborted",
+    "initialControlsPass": {
+      "originalGuiSendQueueExpandAndSteer": true,
+      "sameTurnCorrectionAndNextTurnFollowupOnce": true,
+      "firstLiveReadVisibleInGui": true,
+      "originalGuiStopLeavesVisiblePausedQueue": true,
+      "originalGuiColdOpenDoesNotResumeOrReplay": true
+    },
+    "modelCompletionPassed": false
+  },
+  "implementation": {
+    "evidence": "Selected native ancestry; most recent assistant has typed aborted stop reason; later user or assistant boundaries supersede it",
+    "hook": "Public before_agent_start per-turn systemPrompt composition",
+    "rewritesHistory": false,
+    "changesGui": false,
+    "changesModelsOrGpuTuning": false,
+    "newDependencies": false,
+    "semanticComplianceGuaranteed": false
+  },
+  "sourceQualification": {
+    "checkPassed": true,
+    "buildPassed": true,
+    "nodeCasesPassed": 229,
+    "nodeFiles": 23,
+    "nodeSkipped": 0,
+    "workers": 2,
+    "pythonCasesPassed": 41,
+    "pythonFiles": 5,
+    "coldSdkAndToolBodyVerified": true,
+    "normalCompletedTurnClearsNote": true,
+    "historyPrefixPreserved": true
+  },
+  "ordinaryQualification": {
+    "scope": "Fresh ordinary interrupted-response context candidate; existing dependencies/native bytes; external tests; no owner update or migration",
+    "baseApplicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+    "baseArtifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+    "baselineUnchangedInputsVerified": 23557,
+    "compiledFilesVerified": 1120,
+    "testFiles": 23,
+    "chromiumFiles": 5,
+    "workers": 2,
+    "nodePass": 229,
+    "pythonPass": 41,
+    "ownerImports": 0,
+    "externalStaticPublicSourceFixture": {
+      "path": "packages/runtime/vendor/dsh-goal/fold.ts",
+      "sha256": "193b598b16fe6310623237fb7daa37fb07ce0d505b3719f2ae8e4418f02e3215",
+      "shippedApplicationChanged": false
+    },
+    "initialFailure": "External test wrapper aliased packages to compiled dist; static MIT-source check needed its independently copied public TS input. Full unchanged cohort rerun after wrapper repair."
+  },
+  "sealedQualification": {
+    "scope": "Exact separately sealed unselected MX candidate; tests/dev resources and owner assessment input external; no owner update or transfer",
+    "releaseId": "20261017-071945-90183f89",
+    "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+    "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+    "inventoryEntriesVerified": 24693,
+    "compiledFilesVerified": 1120,
+    "nodePass": 229,
+    "pythonPass": 41,
+    "nodeFiles": 23,
+    "chromiumFiles": 5,
+    "workers": 2,
+    "activated": true,
+    "selectedConfigurationsUnchanged": true,
+    "ownerImports": 0,
+    "inventoryEntriesVerifiedAfterLiveAndOwnerChecks": 24693,
+    "activationScope": "Both private main/pilot MX reviews only; production Desktop and earlier Preview selections unchanged"
+  },
+  "liveCorrectionQualification": {
+    "scope": "Exact sealed MX Host, original GUI pointer/key events and actual local Qwen; authored temporary read-only project; headless Chromium, not physical desktop acceptance",
+    "passed": true,
+    "authoredInputsAdmitted": 5,
+    "cases": 2,
+    "successfulReadCalls": 2,
+    "agentFileChanges": 0,
+    "modelSettingChanges": 0,
+    "hostStarts": 2,
+    "pageMutations": {
+      "session.prompt": 5,
+      "session.updateQueue": 1,
+      "session.cancel": 1,
+      "session.continueQueue": 1
+    },
+    "pageErrors": 0,
+    "pageHttpFailures": 0,
+    "checks": {
+      "originalGuiSendQueueExpandAndSteer": true,
+      "sameTurnCorrectionAndNextTurnFollowupOnce": true,
+      "firstLiveReadVisibleInGui": true,
+      "originalGuiStopLeavesVisiblePausedQueue": true,
+      "originalGuiColdOpenDoesNotResumeOrReplay": true,
+      "originalGuiExplicitResumeDeliversOnce": true,
+      "interruptionNotePresentBeforeAndAfterRead": true,
+      "allEightControlMutationsObservedFromPage": true,
+      "gracefulTestHostAndBrowserShutdown": true,
+      "ownerModelConfigurationUnchanged": true,
+      "onlyAuthoredProbeFilesPresent": true
+    },
+    "providerPayloadHashesBeforeAndAfterRead": [
+      "60ed21a7af8d11f79eea3cc602a111592e737a8b1442f838f42ef953da02b9d1",
+      "2085f4f0afb9bb4159a2ec4a86583e47102d2f66bca6fbe07e8cb69976bcf0c8"
+    ],
+    "driverSha256": "08dae40c743895aca42b8cd383f1b4142942ede0b9f7b3dd0523bc900e413af5",
+    "cleanup": {
+      "retiredCompanions": 0,
+      "retiredBrowserHelpers": 0
+    },
+    "proofLimit": "One actual Qwen/original-GUI correction sample on these sealed bytes; no general provider-semantic guarantee"
+  },
+  "ownerAdoption": {
+    "phase": "final-verified",
+    "releaseId": "20261017-071945-90183f89",
+    "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+    "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+    "reviews": 2,
+    "sessionsPreserved": 4,
+    "backupFilesVerified": 418,
+    "protectedOriginalPrefixesVerified": 36,
+    "typedShutdownMetadataAppends": 8,
+    "typedStartupMetadataAppends": 36,
+    "registryRevision": 14,
+    "sharedPromptRows": 12,
+    "sharedMemoryRows": 19,
+    "sharedRowsAndEngineConfigurationExact": true,
+    "originalAuthoritativePrefixesExact": true,
+    "originalMenusAndSelectionsExact": true,
+    "qwenUnitConfigAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "installedWarmOpenerRetainsBothNewOwners": true,
+    "actualGuiChecks": [
+      {
+        "review": "main",
+        "overviewOn": true,
+        "overviewSwitchEnabled": true,
+        "keylessPanelVisible": true,
+        "apiPanelHidden": true,
+        "wikiOn": true,
+        "mcpServers": 5,
+        "mcpOn": 2,
+        "mcpOff": 3,
+        "appliedSessions": 1,
+        "loadedSessions": 1,
+        "settingsOrAgentActions": 0,
+        "privateProfileReads": 0,
+        "advancedClosed": true,
+        "technicalClosed": true,
+        "footerVisible": true,
+        "consoleErrors": 0,
+        "httpFailures": 0
+      },
+      {
+        "review": "pilot",
+        "overviewOn": true,
+        "overviewSwitchEnabled": true,
+        "keylessPanelVisible": true,
+        "apiPanelHidden": true,
+        "wikiOn": true,
+        "mcpServers": 5,
+        "mcpOn": 2,
+        "mcpOff": 3,
+        "appliedSessions": 1,
+        "loadedSessions": 1,
+        "settingsOrAgentActions": 0,
+        "privateProfileReads": 0,
+        "advancedClosed": true,
+        "technicalClosed": true,
+        "footerVisible": true,
+        "consoleErrors": 0,
+        "httpFailures": 0
+      }
+    ],
+    "ownerModelRequestsSubmitted": 0,
+    "additionalRealProjectsTransferred": 0
+  },
+  "preliminaryDriverFailures": [
+    "Original row-local Paused label expectation was unsupported: copied DSH uses a separate Resume waiting messages control; unchanged layout retained",
+    "A selector quoting error interrupted the next GUI attempt; state selectors were syntax checked before the genuine failing model case",
+    "First new SDK test used items instead of records for the observation page after provider-body checks passed; corrected response assertion and complete cohort pass",
+    "External test wrapper aliased packages to compiled dist; static MIT-source check needed its independently copied public TS input. Full unchanged cohort rerun after wrapper repair."
+  ],
+  "limits": [
+    "A context note informs the provider; it is not deterministic task verification, action reconciliation or a permission grant",
+    "Typed aborted native boundaries only; no interruption inferred from missing responses, errors, prose or untrusted custom metadata",
+    "Headless Chromium controls are distinct from physical user input and loaded Browser extension acceptance",
+    "Voice, later operating systems, owner pilot feedback and further real migration remain separate"
+  ],
+  "implementationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+  "guiAttempts": [
+    {
+      "kind": "unsupported row-local Paused label expectation",
+      "inputsAdmitted": 5,
+      "passed": false
+    },
+    {
+      "kind": "driver selector syntax error",
+      "inputsAdmitted": 5,
+      "passed": false
+    },
+    {
+      "kind": "actual old-build resumed-answer failure, bounded by a second GUI Stop",
+      "inputsAdmitted": 5,
+      "passed": false
+    },
+    {
+      "kind": "corrected sealed candidate, unchanged prompts and original controls",
+      "inputsAdmitted": 5,
+      "passed": true
+    }
+  ],
+  "compiledDeltaFromPreviousReview": {
+    "oldCount": 1120,
+    "newCount": 1120,
+    "added": [
+      "harness-web/excel-RNV2SMX4.js"
+    ],
+    "removed": [
+      "harness-web/excel-LVFPTL3E.js"
+    ],
+    "changed": [
+      "harness-web/assets.json",
+      "harness-web/build-inputs.json",
+      "harness-web/dsh-gui.js",
+      "harness-web/excel-worker-inputs.json",
+      "runtime/src/execution.d.ts",
+      "runtime/src/execution.js",
+      "runtime/src/execution.js.map"
+    ]
+  },
+  "guiBuildDelta": {
+    "scope": "Read-only bundle comparison; actual sealed bytes remain untouched and separately qualified",
+    "mappings": [
+      "Temporary spreadsheet overlay directory in generated source comments",
+      "Derived spreadsheet chunk filename in module imports"
+    ],
+    "bundles": [
+      {
+        "oldPath": "harness-web/excel-LVFPTL3E.js",
+        "newPath": "harness-web/excel-RNV2SMX4.js",
+        "rawHashesDiffer": true,
+        "equalAfterOnlyBuildOverlayCommentAndDerivedChunkNameMapping": true
+      },
+      {
+        "oldPath": "harness-web/dsh-gui.js",
+        "newPath": "harness-web/dsh-gui.js",
+        "rawHashesDiffer": true,
+        "equalAfterOnlyBuildOverlayCommentAndDerivedChunkNameMapping": true
+      }
+    ]
+  },
+  "preservationAtSourceCheckpoint": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-055628-b9afa698",
+        "applicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+        "artifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+        "sealedInputsVerified": 24686
+      },
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-061143-d0c0fc29",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-061143-d0c0fc29",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 12,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "postAdoptionPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      },
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 14,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "hostedQualification": "Correction-head hosted jobs are separate; no new-head whole workflow or platform acceptance is claimed",
+  "cleanup": {
+    "completedTemporaryCopiesRemoved": 3,
+    "sealedReleaseAndPriorRollbackReleasesRetained": true,
+    "backupsPrivateLiveProfilesAndEvidenceRetained": true,
+    "registeredOrLiveRootsRemoved": 0
+  }
+}

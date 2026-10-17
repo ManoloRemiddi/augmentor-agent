@@ -1,0 +1,83 @@
+{
+  "schema": "augmentor-harness-build-storage/1",
+  "date": "2026-10-17",
+  "scope": "Owner-authorized unused app copies only; source-only build hygiene and DSH launch continuation",
+  "cleanup": {
+    "originalOrdinaryCopies": 34,
+    "additionalOrdinaryCopies": 6,
+    "obsoleteStagedCopies": 35,
+    "totalCopies": 75,
+    "observedGiBRecovered": 40.89,
+    "rootAvailableGiBApproxBefore": 58,
+    "rootAvailableGiBApproxAfter": 99,
+    "rootUsedPercentBefore": 94,
+    "rootUsedPercentAfter": 89,
+    "exactRootPrivateReceiptsKept": true,
+    "ambiguousRootsRetained": true,
+    "ownerPreservationBeforeAndAfter": true,
+    "ownerDataDeleted": false
+  },
+  "retention": {
+    "scratchConcurrentLimit": 1,
+    "defaultReserveGiB": 64,
+    "automaticOwnScratchCleanup": true,
+    "unknownLeftoverBlocksNext": true,
+    "unselectedAdditionalCandidateLimit": 2,
+    "requiredAndReferencedArtifactsExcepted": true,
+    "cooperativeWorkflowNotSandbox": true,
+    "installedAppChanged": false
+  },
+  "sourceQualification": {
+    "nodePass": 45,
+    "pythonPass": 91,
+    "fail": 0,
+    "skip": 0,
+    "typeCheckPass": true,
+    "retentionTestsIncluded": 9,
+    "finalAffectedNodePass": 3,
+    "finalAffectedPythonPass": 12,
+    "affectedCountsOverlapTotals": true,
+    "realDefaultReserveWrapperUsed": true,
+    "persistentApplicationCopiesCreated": 0,
+    "authoredDshProcessesOnly": true,
+    "actualUpstreamDshBackendQualified": false
+  },
+  "remaining": [
+    "Modern DSH installer/CLI pins and custom configuration preservation; four public wire read contracts verified",
+    "Matching installed client/product integration and guarded cold adoption/rollback",
+    "Pilot feedback before further project migration"
+  ],
+  "privateEvidenceSha256": {
+    "augmentor-harness-cleanup-receipt-20261017.json": "67fae7f2a51fa07872d9954381c6dcc991a3e6f44fece83392a75e3c0862edce",
+    "augmentor-harness-additional-cleanup-receipt-20261017.json": "495239438da2d3b27c7f22d99b2bf406fa2a940489fdad4afc5fb6d5afda0790",
+    "augmentor-harness-after-full-cleanup-20261017.json": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5",
+    "harness-disk-retention-resumed-node-20261017.log": "d9ddc6e30d919e1b3b90ddf01beebd3f64239ace8bd001584b39dbaba0e60d51",
+    "harness-disk-retention-resumed-python-20261017.log": "8f420e316c42189001107045db0cf9b53eb06a844759f5e1b7226f4e0bd62d89",
+    "harness-disk-retention-resumed-check-20261017.log": "fdb848896bbc76bd3619da963b85a271eca6a558e166148427f89863f005e81c",
+    "harness-storage-resumed-ci-fixes-20261017.log": "4d5dfce1e9c0a7eee5929f172bbe2b04360942c4f49a7f5ece6ffd6717731118"
+  },
+  "resumedCiCorrection": {
+    "priorRuns": [
+      {
+        "run": 39035553761,
+        "rootPass": 2143,
+        "fail": 1,
+        "skip": 53
+      },
+      {
+        "run": 39036728003,
+        "rootPass": 2141,
+        "fail": 2,
+        "skip": 53
+      }
+    ],
+    "terminalConclusion": "failure",
+    "newSourceAffectedNodePass": 11,
+    "newSourceFail": 0,
+    "newSourceSkip": 0,
+    "actualWasmAndPiQtCases": true,
+    "unchangedSourceParserErrorPreserved": true,
+    "inspectorProductionGuardUnchanged": true,
+    "newHostedConclusionPending": true
+  }
+}

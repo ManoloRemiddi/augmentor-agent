@@ -1,0 +1,209 @@
+{
+  "schema": "augmentor-public-office-entry-source/1",
+  "componentName": "@augmentor/office-entry",
+  "version": "0.1.3-augmentor.1",
+  "license": "MPL-2.0",
+  "repository": "https://github.com/deepseek-ai/dsh-libreoffice-kit",
+  "commit": "b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+  "archiveUrl": "https://codeload.github.com/deepseek-ai/dsh-libreoffice-kit/tar.gz/b19bb73c74ed893b8a5d1716d32df32a113ed31b",
+  "archiveSha256": "33839347e44b8df44c59115b566e9664e7db04a612a8f37ee2b220d7e501c036",
+  "sourceVersion": "0.1.3",
+  "modifications": [
+    "Explicit Augmentor source-fork version; Linux Wasm compatibility pin 0.1.5. Original native 0.1.3 mappings remain and need platform qualification.",
+    "Root runtime uses already pinned fflate 0.8.3 with fontkit 2.0.4 and saxes 6.0.0; build toolchain is recorded separately."
+  ],
+  "files": [
+    {
+      "path": "preferred-source/cli.ts",
+      "upstreamPath": "packages/entry/src/cli.ts",
+      "upstreamSha256": "aed03b83d1af2f348ec7f9df763ef095fe039f75cc0d24ec0c684d715f0ed885",
+      "sha256": "aed03b83d1af2f348ec7f9df763ef095fe039f75cc0d24ec0c684d715f0ed885"
+    },
+    {
+      "path": "preferred-source/document.ts",
+      "upstreamPath": "packages/entry/src/document.ts",
+      "upstreamSha256": "9daacde417dc6ad2b912f4981088cee465674b86f35e9278ea6c9bfecd2c6611",
+      "sha256": "9daacde417dc6ad2b912f4981088cee465674b86f35e9278ea6c9bfecd2c6611"
+    },
+    {
+      "path": "preferred-source/engine-rendering.ts",
+      "upstreamPath": "packages/entry/src/engine-rendering.ts",
+      "upstreamSha256": "ce4018fd61b10c662b8a3a756d18ddc0860761f7be42f0a802d02e6879e11f2d",
+      "sha256": "ce4018fd61b10c662b8a3a756d18ddc0860761f7be42f0a802d02e6879e11f2d"
+    },
+    {
+      "path": "preferred-source/engine.ts",
+      "upstreamPath": "packages/entry/src/engine.ts",
+      "upstreamSha256": "a44c9c6bc6509446c88bca067bd3cfeb0a0c057bddb599f0c681a4bb7f11df5c",
+      "sha256": "79f72e03aae27a6f06d31a04eba1d824e782175f6c9a6234bdceda2a057d2915"
+    },
+    {
+      "path": "preferred-source/errors.ts",
+      "upstreamPath": "packages/entry/src/errors.ts",
+      "upstreamSha256": "8e68b9e15eb662f28f9b811d9a135d439cf0bb725fb872021983e13e7987f383",
+      "sha256": "8e68b9e15eb662f28f9b811d9a135d439cf0bb725fb872021983e13e7987f383"
+    },
+    {
+      "path": "preferred-source/font-file-identity.ts",
+      "upstreamPath": "packages/entry/src/font-file-identity.ts",
+      "upstreamSha256": "1ffcd12adb6f2ea47492f3277d383fe99ebbe4bc1c1775d479887e6f469c22a1",
+      "sha256": "1ffcd12adb6f2ea47492f3277d383fe99ebbe4bc1c1775d479887e6f469c22a1"
+    },
+    {
+      "path": "preferred-source/font-full.ts",
+      "upstreamPath": "packages/entry/src/font-full.ts",
+      "upstreamSha256": "20c71137d23d0a57d7f0765dfc3dd03357f1233dbab0c08b69e79d7921743e9b",
+      "sha256": "20c71137d23d0a57d7f0765dfc3dd03357f1233dbab0c08b69e79d7921743e9b"
+    },
+    {
+      "path": "preferred-source/font-loader.ts",
+      "upstreamPath": "packages/entry/src/font-loader.ts",
+      "upstreamSha256": "23814f1f927a78dc61384067511170a3430d0c114f9365d0230f2cab1992585f",
+      "sha256": "23814f1f927a78dc61384067511170a3430d0c114f9365d0230f2cab1992585f"
+    },
+    {
+      "path": "preferred-source/font-metadata-cache.ts",
+      "upstreamPath": "packages/entry/src/font-metadata-cache.ts",
+      "upstreamSha256": "9d338e8586fe4c4be2be0cb2abea4ebb81c7fbb6656055aa60b0a6cbad42262d",
+      "sha256": "9d338e8586fe4c4be2be0cb2abea4ebb81c7fbb6656055aa60b0a6cbad42262d"
+    },
+    {
+      "path": "preferred-source/font-snapshot-state.ts",
+      "upstreamPath": "packages/entry/src/font-snapshot-state.ts",
+      "upstreamSha256": "9ccaf031442250d20236358ac0ddc1ec1e51589148b0e822ef51077cb9cf02dd",
+      "sha256": "9ccaf031442250d20236358ac0ddc1ec1e51589148b0e822ef51077cb9cf02dd"
+    },
+    {
+      "path": "preferred-source/font-snapshot-validation.ts",
+      "upstreamPath": "packages/entry/src/font-snapshot-validation.ts",
+      "upstreamSha256": "57ae842ed70fea593f97f1fc0518fc171536e9f1b19941da92723b612349f144",
+      "sha256": "57ae842ed70fea593f97f1fc0518fc171536e9f1b19941da92723b612349f144"
+    },
+    {
+      "path": "preferred-source/font-snapshot-worker.ts",
+      "upstreamPath": "packages/entry/src/font-snapshot-worker.ts",
+      "upstreamSha256": "9aa965d8ff7ff5c8c350b22415bb626a24abedc9f7e3cbee29f53690e7841a29",
+      "sha256": "9aa965d8ff7ff5c8c350b22415bb626a24abedc9f7e3cbee29f53690e7841a29"
+    },
+    {
+      "path": "preferred-source/font-snapshot.ts",
+      "upstreamPath": "packages/entry/src/font-snapshot.ts",
+      "upstreamSha256": "97ca1eafce66019cea7f1a3177602d077e236852ba6bb0cf70557612217a603a",
+      "sha256": "97ca1eafce66019cea7f1a3177602d077e236852ba6bb0cf70557612217a603a"
+    },
+    {
+      "path": "preferred-source/fontkit.d.ts",
+      "upstreamPath": "packages/entry/src/fontkit.d.ts",
+      "upstreamSha256": "75aee897673e6bef8d8591e47055668bc1834ce96285906a53f309875e328dbf",
+      "sha256": "75aee897673e6bef8d8591e47055668bc1834ce96285906a53f309875e328dbf"
+    },
+    {
+      "path": "preferred-source/fonts.ts",
+      "upstreamPath": "packages/entry/src/fonts.ts",
+      "upstreamSha256": "cbcfd79560001c475981cff95b6c5afb65890477a8d1c28c1113a6bdf3b32d6d",
+      "sha256": "cbcfd79560001c475981cff95b6c5afb65890477a8d1c28c1113a6bdf3b32d6d"
+    },
+    {
+      "path": "preferred-source/image-operations.ts",
+      "upstreamPath": "packages/entry/src/image-operations.ts",
+      "upstreamSha256": "c6f7fd8637c49c88b1927d84ddf93c91c6c4863375b730f32ab3a24f4c7e7f8b",
+      "sha256": "c6f7fd8637c49c88b1927d84ddf93c91c6c4863375b730f32ab3a24f4c7e7f8b"
+    },
+    {
+      "path": "preferred-source/image-renderer.ts",
+      "upstreamPath": "packages/entry/src/image-renderer.ts",
+      "upstreamSha256": "a5f56586a985990acfcb23f6563f9f7ee1875fad42ef881b389f36ab99f2af7c",
+      "sha256": "a5f56586a985990acfcb23f6563f9f7ee1875fad42ef881b389f36ab99f2af7c"
+    },
+    {
+      "path": "preferred-source/index.ts",
+      "upstreamPath": "packages/entry/src/index.ts",
+      "upstreamSha256": "254257a52d822c52259240eea5c32eb8cf4aef445dd4ee3fdfb983d51c3ec05c",
+      "sha256": "254257a52d822c52259240eea5c32eb8cf4aef445dd4ee3fdfb983d51c3ec05c"
+    },
+    {
+      "path": "preferred-source/native-font-names.ts",
+      "upstreamPath": "packages/entry/src/native-font-names.ts",
+      "upstreamSha256": "130f9f597482039362f416de8d2ca5d2aa0d03c144b5c9a607c56f6e14eec013",
+      "sha256": "130f9f597482039362f416de8d2ca5d2aa0d03c144b5c9a607c56f6e14eec013"
+    },
+    {
+      "path": "preferred-source/native-image-renderer.ts",
+      "upstreamPath": "packages/entry/src/native-image-renderer.ts",
+      "upstreamSha256": "e387485156f2d6a805b4b7eb28c3f31c57bd2f5274132978bcf8b9343f8e3ee3",
+      "sha256": "e387485156f2d6a805b4b7eb28c3f31c57bd2f5274132978bcf8b9343f8e3ee3"
+    },
+    {
+      "path": "preferred-source/native.ts",
+      "upstreamPath": "packages/entry/src/native.ts",
+      "upstreamSha256": "77c2203ffabcfb5af175edade8deb91971a8050889d3cb3e0898fdaaf8690e03",
+      "sha256": "77c2203ffabcfb5af175edade8deb91971a8050889d3cb3e0898fdaaf8690e03"
+    },
+    {
+      "path": "preferred-source/office-fonts.ts",
+      "upstreamPath": "packages/entry/src/office-fonts.ts",
+      "upstreamSha256": "d19326bbde3e22436ca2becda66784e820a02b6ec8a18b97ac31856e03f5d741",
+      "sha256": "d19326bbde3e22436ca2becda66784e820a02b6ec8a18b97ac31856e03f5d741"
+    },
+    {
+      "path": "preferred-source/ooxml.ts",
+      "upstreamPath": "packages/entry/src/ooxml.ts",
+      "upstreamSha256": "5886a1a929d77f29d599953d149408e80da0a5e4fed3b40308eaaf97d48fa6b2",
+      "sha256": "5886a1a929d77f29d599953d149408e80da0a5e4fed3b40308eaaf97d48fa6b2"
+    },
+    {
+      "path": "preferred-source/operations.ts",
+      "upstreamPath": "packages/entry/src/operations.ts",
+      "upstreamSha256": "b6af0a1c22393c4640f597f6d41788a71d49d1437c7f826a66fa078785f4f173",
+      "sha256": "b6af0a1c22393c4640f597f6d41788a71d49d1437c7f826a66fa078785f4f173"
+    },
+    {
+      "path": "preferred-source/options.ts",
+      "upstreamPath": "packages/entry/src/options.ts",
+      "upstreamSha256": "e9e84945d08dd3f052aa80cc2d91c50d19be0fb4d47a00f1befe27f5b4f97f06",
+      "sha256": "e9e84945d08dd3f052aa80cc2d91c50d19be0fb4d47a00f1befe27f5b4f97f06"
+    },
+    {
+      "path": "preferred-source/png.ts",
+      "upstreamPath": "packages/entry/src/png.ts",
+      "upstreamSha256": "43d779c9aa7fed52a159db29f1e1a35ed6189291c76bf1829a54dc872fc76c98",
+      "sha256": "43d779c9aa7fed52a159db29f1e1a35ed6189291c76bf1829a54dc872fc76c98"
+    },
+    {
+      "path": "preferred-source/profile.ts",
+      "upstreamPath": "packages/entry/src/profile.ts",
+      "upstreamSha256": "0d7da0d311c8cba01e990f80bf103d0dbf1440335af901c95728dbf0a07dbf34",
+      "sha256": "0d7da0d311c8cba01e990f80bf103d0dbf1440335af901c95728dbf0a07dbf34"
+    },
+    {
+      "path": "preferred-source/rendering.ts",
+      "upstreamPath": "packages/entry/src/rendering.ts",
+      "upstreamSha256": "3fad0c060644a3101ab7eaf4ff3c4d7567f986171341bd98537e09987fdc8323",
+      "sha256": "3fad0c060644a3101ab7eaf4ff3c4d7567f986171341bd98537e09987fdc8323"
+    },
+    {
+      "path": "preferred-source/runtime.ts",
+      "upstreamPath": "packages/entry/src/runtime.ts",
+      "upstreamSha256": "b32e6f396e1dd4b7608909d911e7bbc9c7d0c7dfc8a5fe82c50dfa67296dfbc0",
+      "sha256": "b32e6f396e1dd4b7608909d911e7bbc9c7d0c7dfc8a5fe82c50dfa67296dfbc0"
+    },
+    {
+      "path": "preferred-source/sheet-geometry.ts",
+      "upstreamPath": "packages/entry/src/sheet-geometry.ts",
+      "upstreamSha256": "7fcadf997635905dc15b6fea4890e8ac3dd3fd04e23247cd3e357b394a17e69a",
+      "sha256": "7fcadf997635905dc15b6fea4890e8ac3dd3fd04e23247cd3e357b394a17e69a"
+    },
+    {
+      "path": "preferred-source/wasm.ts",
+      "upstreamPath": "packages/entry/src/wasm.ts",
+      "upstreamSha256": "cc1226647f364d3ae6e01ae4854c9e31ca296fa122a9e8951d3482b03f383b5b",
+      "sha256": "cc1226647f364d3ae6e01ae4854c9e31ca296fa122a9e8951d3482b03f383b5b"
+    },
+    {
+      "path": "preferred-source/worker.ts",
+      "upstreamPath": "packages/entry/src/worker.ts",
+      "upstreamSha256": "234fa9cfaecc95dd30c19102d93e84d98ab6d9ffd35dbd10ad22da7833615bf1",
+      "sha256": "234fa9cfaecc95dd30c19102d93e84d98ab6d9ffd35dbd10ad22da7833615bf1"
+    }
+  ]
+}

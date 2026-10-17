@@ -2,6 +2,10 @@
 
 # Licensing and distribution decision
 
+## October 11 dsh-context supplier
+
+The owner-requested dashboard is **Apache-2.0**, not MIT. Original Copyright 2025 bowenliang123, full licence, original/adapted file hashes and prominent notices on three modified files are preserved. The inspected upstream commit includes no separate NOTICE. Build-only pinned Tailwind generates CSS with its own MIT text in the browser notice bundle. Neither supplier is relabelled under Augmentor’s resale restriction. [The source manifest](../apps/harness/vendor/dsh-context/SOURCE.md) and [qualification guide](DSH-GUI-ON-PI.md#original-context-dashboard--october-11-follow-up) record precise scope; existing Sharp/LGPL linked-source/rebuild and public-binary gates remain open.
+
 ## Augmentor source license — 23 September 2026
 
 Augmentor-authored Desktop and Browser code uses **[MIT with Augmentor Resale
@@ -119,6 +123,21 @@ image-processing algorithms. New dependency expressions or missing notices stop
 the rebuild. Ordinary release builds verify the recorded artifacts and do not
 silently re-resolve Rust dependencies.
 
+The required Pi codemode engine has a separate [QuickJS source-build and notice
+record](QUICKJS-ENGINE.md). A retained QuickJS-WASI 3.6.2 rebuild replaces the
+published npm WASM with an explicitly different hash. Full pinned engine/NG/libc
+sources, the LLVM builtins subtree, original static-library notices and normalized
+link evidence accompany it. SDK libraries are pinned release inputs, not
+independently rebuilt here. The package's MIT text alone does not cover that
+static dependency inventory.
+
+All platform packagers verify the paired engine/source/notice hashes and exclude
+five separately unqualified optional WASM extensions. Debian's strict native
+inventory requires the active engine and still rejects unknown executables.
+Third-party notices and source headers retain their original licenses. Packaged
+fixture execution does not replace physical platform, installed/update or
+complete distribution acceptance.
+
 ## Authorship and repository
 
 Preserve copyright attribution and the complete combined license on Augmentor-authored
@@ -149,3 +168,10 @@ including the shader compiler, are removed before signing. See [current packagin
 and qualification](MACOS-RECOVERY-2026-09-26.md). DSH adds reviewed BSD-2-Clause
 and Python-2.0 dependencies and a version-bound LGPL libvips exception to the
 npm notice collector. Native source/notices are reviewed separately.
+
+## October 11 private MX attachment candidate
+
+The copied DSH attachment GUI and pure storage/codec modules retain the original MIT notice and provenance. Sharp 0.35.5/native Linux wrapper retains Apache-2.0; the libvips Linux x64 1.3.4 package declares LGPL-3.0-or-later. The existing reviewed LGPL notice is now bound to this exact npm wrapper version in the catalog. Production notice collection inventories 131 instances. `release/attachment-native-linux-x64.json` records exact native objects and upstream reported linked versions; this package-level record does not establish full linked source/notices/rebuild coverage. Those remain public-binary release gates. The private MX preview and published source do not relabel the dependency closure MIT. See [attachment qualification](DSH-GUI-ON-PI.md#original-attachments--october-11-follow-up).
+
+
+The [original command menu follow-up](DSH-GUI-ON-PI.md#original-command-menu--october-11-follow-up) adds 28 unchanged MIT files from the already pinned public DSH source. SOURCE.json retains their exact upstream paths/hashes, the root MIT notice remains in the compiled notices, and existing supplier visual source/CSS is unchanged. Authored Pi action bindings keep Augmentor’s own licence. No new production or build dependency is added by this selection.

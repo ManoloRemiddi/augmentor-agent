@@ -1,0 +1,156 @@
+{
+  "schema": "augmentor-pi-response-metrics-qualification/1",
+  "implementationSourceRef": "582fb579177464dc822eaf219e6a60b84801eeea",
+  "testedSourceRef": "ae9512116ae53e872682d82b88768be656ff12e1",
+  "productVersion": "0.2.13",
+  "piVersion": "1.1.0",
+  "scope": "MX Linux source and fresh ordinary production assembly; running owner review and installed selection unchanged",
+  "implementation": {
+    "publicMitDshAdapter": "adapters/dsh-response-metrics/index.mjs",
+    "piBindingIndependentlyAuthored": true,
+    "publicSdkExtensionAndSessionApisOnly": true,
+    "soleSdkOwnerPreserved": true,
+    "newNetworkRequestOrService": false,
+    "newActionPermission": false,
+    "nativeAndBrowserReadOnly": true,
+    "workerRequiresExplicitGrant": true,
+    "supplierGuiChanges": 0
+  },
+  "contract": {
+    "nativeCorrelation": "unique credential-field-redacted SDK assistant JSON hash plus parent ID observed before assistant persistence, on the selected ancestry",
+    "sameRetainedRequestRequired": true,
+    "olderOrMissingAmbiguousDataUnavailable": true,
+    "parentObservationMetricsInherited": false,
+    "payloadBodiesRead": false,
+    "numericMetadataAndResponseHashIndependentOfPayloadCapture": true,
+    "preview": "exact matched native assistant text only; no reasoning/tool arguments",
+    "clientTiming": "final provider-payload hook to SDK assistant message_end; includes first-delta latency and reported reasoning/tool-call output; excludes prompt preparation, later tools and other steps",
+    "firstDelta": "parsed text, thinking or tool argument delta; not network first byte",
+    "serverTiming": "separate already received terminal numeric llama.cpp fields on a declared adapter; exact response ID match; otherwise unavailable",
+    "zeroNormalizedOutput": "unknown-or-zero; no speed estimate",
+    "partialOrErrorMayBeIncomplete": true,
+    "metricsHaveNoExecutionOrReplayAuthority": true,
+    "limits": {
+      "responses": 5,
+      "defaultResponses": 3,
+      "observationRows": 500,
+      "nativeAncestryEntriesExamined": 4096,
+      "publicSdkBranchArrayConstructionBounded": false,
+      "messageConservativeJsonBytes": 1048576,
+      "messageNodes": 8192,
+      "previewUnicodeCodePoints": 160
+    }
+  },
+  "qualification": {
+    "source": {
+      "tests": 795,
+      "pass": 793,
+      "existingOptionalSkips": 2,
+      "failures": 0,
+      "cancellations": 0
+    },
+    "freshOrdinary": {
+      "tests": 795,
+      "pass": 793,
+      "existingOptionalSkips": 2,
+      "failures": 0,
+      "cancellations": 0
+    },
+    "testFiles": 140,
+    "harnessChromiumFiles": 58,
+    "workers": 2,
+    "boundsOrSkipsRelaxed": false,
+    "newFocusedCases": 12,
+    "combinedFocusedAndObservationCases": 26,
+    "licencePrivateBoundaryPythonCases": 19,
+    "precedingSealedControl": "expected failure: actual provider lacks response_metrics tool",
+    "initialFailuresRetained": [
+      "original JSON tree was collapsed; browser driver now expands existing controls",
+      "five minimal observation peers lacked the newly used public session-manager interface; real in-memory SDK managers now supply it with original assertions preserved",
+      "external duplicate-tool control initially expected a product error rather than the SDK existing collision refusal"
+    ],
+    "actualQwen": {
+      "passed": true,
+      "sourceRef": "ae9512116ae53e872682d82b88768be656ff12e1",
+      "freshOrdinary": true,
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "contextWindow": 262144,
+      "maxTokens": 8192,
+      "payloadCapture": false,
+      "nativeResponseMatched": true,
+      "nativeParentMatched": true,
+      "responsePreviewMatched": true,
+      "requests": 2,
+      "tools": 1,
+      "observed": {
+        "durationMs": 5122.555856000001,
+        "firstObservedDeltaMs": 2192.000741,
+        "outputTokens": 343,
+        "outputTokensPerSecond": 66.95876231359144,
+        "boundary": "final provider-payload hook to SDK assistant message_end; includes first-delta latency and reported reasoning/tool-call output; excludes prompt preparation, later tool execution and other steps",
+        "tokenBoundary": "SDK-normalized output; zero is unknown-or-zero and produces no rate; partial/error responses may have partial counters"
+      },
+      "serverDecode": {
+        "state": "reported",
+        "boundary": "llama.cpp terminal provider chunk timings",
+        "predictedTokens": 343,
+        "predictedMs": 2927.468,
+        "reportedTokensPerSecond": 117.16609711873879
+      },
+      "coldReopenWithoutReplay": true,
+      "ownerDataImported": false,
+      "modelSpeechGpuSettingsChanged": false
+    }
+  },
+  "inputs": {
+    "tracked": 3429,
+    "compiled": 1069,
+    "regularSourceDependencyFiles": 37629,
+    "allFrozenInputsUnchanged": true,
+    "ordinaryCompiledExact": true,
+    "productionNpmInstances": 151,
+    "productionDependencyFiles": 20702,
+    "productionNodeDependenciesComponentsUnchanged": true,
+    "guiAppAndSupplierSourceFilesExact": 834,
+    "mitDshSupplierFiles": 625,
+    "cssSourceUnchanged": true,
+    "newPrivateSourceOrFixturesPublished": false
+  },
+  "preservation": {
+    "sealedInventories": 13,
+    "reviewOwnerProcesses": 14,
+    "recognitionOwnerPresent": true,
+    "canonicalPreexistingChanges": 38,
+    "privateSpeechPreexistingDirtyFiles": 4,
+    "modelSpeechGpuConfigurationFilesPreserved": 6,
+    "qwenCatalogStatus": 200,
+    "breeze": "failed below unchanged GPU prerequisite; no retry/tuning/eviction",
+    "modelSpeechGpuSettingsChanged": false,
+    "currentOwnerReview": "20261016-065534-c8cdf03c",
+    "currentOwnerApplicationSourceRef": "dfe855f3c862c7651b82b5f921257cbf134b17ff",
+    "currentOwnerReviewIncludesThisIncrement": false,
+    "installedSelectionChanged": false,
+    "newReviewStaged": false,
+    "activated": false,
+    "merged": false,
+    "publicBinaryPublished": false
+  },
+  "precedingHosted": {
+    "sourceRef": "5b1f15492b5d12239c1e9f19cb899153c7564bc8",
+    "sdkLinux": "success",
+    "sdkMacos": "success",
+    "sdkWindows": "cancelled",
+    "debian": "Node/Qt/setup checks passed; packaging refused by existing Office exact source/rebuild public redistribution gate",
+    "earlierCodexBranchFailure": "not reproduced in later hosted run; original cause remains unproven",
+    "windowsJobsAndNative": "failures retained",
+    "macosPackaging": "failures retained",
+    "newHeadHostedAcceptance": "not implied by local qualification"
+  },
+  "remaining": [
+    "next owner review and physical MX feedback",
+    "representative other-provider metrics formats and broader instruction/opaque-handler provenance",
+    "full voice and existing-data adoption/migration",
+    "remaining plugin/Home/Office workflows and public redistribution gates",
+    "later-platform qualification and adoption"
+  ]
+}

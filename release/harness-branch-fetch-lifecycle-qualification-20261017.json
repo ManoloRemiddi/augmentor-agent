@@ -1,0 +1,42 @@
+{
+  "schema": "augmentor-harness-branch-fetch-lifecycle/1",
+  "date": "2026-10-17",
+  "runtimeRef": "c351558fdd7e0a0ca110d49718d2726c31bdbc39",
+  "changedTest": "tests/harness-dsh-branch-chromium.test.mjs",
+  "testSha256": "3889455974d8e64518632585ec6e513e49330aaef244192d439fad2fb538903b",
+  "previousHostedRun": 39025006420,
+  "previousHostedJob": 117374544915,
+  "previousHostedRef": "1417db628f90cf770ac7c7cedef95feee51d86f3",
+  "previousHostedRoot": {
+    "tests": 2180,
+    "pass": 2127,
+    "fail": 1,
+    "skip": 52,
+    "failedCase": "Imported historical Branch v1 JSON: final CDP errors contains Fetch domain is not enabled; preceding child/draft/cold-reopen phases succeeded",
+    "publicPackagingReached": false
+  },
+  "correction": "Keep Fetch enabled for the authored CDP/Chrome lifetime; after fulfilling held acknowledgement, clear selected paused methods so all later requests continue. A queued automatic continuation can no longer race domain disable. No CDP/browser error is filtered or ignored.",
+  "qualified": {
+    "originalGuiCases": 2,
+    "fail": 0,
+    "skip": 0,
+    "formats": [
+      "v1 JSON",
+      "v2 bundle"
+    ],
+    "assertions": [
+      "Exactly one child from selected historical reply",
+      "Lost acknowledgement does not infer or replace newer parent draft",
+      "Cold original Branch control reconciles same child",
+      "Explicit Send uses only selected source prefix",
+      "Exact parent history/draft/archive bytes unchanged",
+      "No CDP/page/response/runtime errors"
+    ],
+    "fixtureProvider": true,
+    "ownerInference": false,
+    "ownerTransfer": false
+  },
+  "logSha256": "e54cce585b9d0c4630186d23a0c717b6b35d7317e4c403eae68c01fe5fc4bcd9",
+  "productCodeChanged": false,
+  "remaining": "Normal full hosted CI and Office public redistribution gates remain distinct; current c351558f CI retains its original test revision"
+}

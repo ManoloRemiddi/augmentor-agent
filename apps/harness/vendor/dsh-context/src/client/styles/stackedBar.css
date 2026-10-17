@@ -1,0 +1,31 @@
+.lc-stacked-wrap { position: relative; width: 100%; }
+.lc-stacked { display: flex; width: 100%; border-radius: 5px; overflow: hidden; background: color-mix(in srgb, var(--color-neutral-500) 18%, transparent); position: relative; }
+/* Boxes the used/window boundary the legend's "share of used" percentages refer to; `pointer-events: none` keeps hover on the segments. */
+.lc-occupied-box { position: absolute; top: 0; bottom: 0; left: 0; border: 2px solid var(--dsw-alias-label-tertiary); border-radius: 5px; box-sizing: border-box; pointer-events: none; opacity: 0; box-shadow: 0 0 0 1px var(--dsw-alias-bg-layer-2); transition: opacity var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-occupied-box-on { opacity: 1; }
+.lc-bar-tip { bottom: calc(100% + 6px); transform: translateX(-50%); z-index: 5; white-space: nowrap; padding: 3px 8px; }
+.lc-bar-tip-on { opacity: 1; }
+.lc-stacked > div { height: 100%; }
+.lc-stacked-seg-pick { cursor: pointer; }
+.lc-stacked-seg { transition: filter var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), opacity var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-stacked-free { box-sizing: border-box; transition: box-shadow var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out), opacity var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+/* Entrance grow: transform, not width, so the layout never thrashes; runs once on mount, so live hover and width updates never replay it. The reserve band stays unanimated — as an overlay its growth would smear the stripes. */
+.lc-stacked-seg, .lc-stacked-free { transform-origin: 0 50%; }
+/* The sweep rides `animate-lc-stacked-in`, staggered by each element's `--lc-i` and disabled under `motion-reduce`. */
+.lc-stacked-seg-on { filter: brightness(1.18); }
+/* Dashed border, not box-shadow: a shadow cannot dash. The reserve band owns the pointer so its own hover explanation shows. */
+.lc-reserve { position: absolute; top: 0; bottom: 0; z-index: 1; pointer-events: auto; cursor: help; background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--dsw-alias-state-warn-primary) 24%, transparent) 0 5px, transparent 5px 10px); }
+.lc-stacked-free-on { border: 2px dashed var(--dsw-alias-label-secondary); border-radius: 3px; }
+.lc-stacked-dim .lc-stacked-seg { opacity: 0.35; }
+.lc-stacked-dim .lc-stacked-seg-on { opacity: 1; }
+.lc-stacked-dim .lc-stacked-free { opacity: 0.35; }
+.lc-stacked-dim .lc-stacked-free-on { opacity: 1; }
+.lc-legend { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px 14px; margin-top: 10px; }
+.lc-chip { display: flex; align-items: center; gap: 5px; min-width: 0; color: var(--dsw-alias-label-primary); padding: 1px 6px; border-radius: 6px; cursor: pointer; transition: background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-chip-label { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.lc-chip-nums { margin-left: auto; flex: none; display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.lc-chip i, .lc-detail-row i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; }
+.lc-chip i { transition: box-shadow var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-chip em { font-style: normal; color: var(--dsw-alias-label-secondary); }
+.lc-chip-on { font-weight: 600; background: var(--dsw-alias-interactive-bg-hover); }
+.lc-chip-on i { box-shadow: 0 0 0 1px var(--dsw-alias-brand-primary); }

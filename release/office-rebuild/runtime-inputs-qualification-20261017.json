@@ -1,0 +1,157 @@
+{
+  "schema": "augmentor-office-runtime-inputs-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Private Linux source-input/notice companion for the existing completed ThinLTO engine; no default or installed update",
+  "sourceEvidenceBaseRef": "48f3d51ec07bb68a0e1454405e83eb28d88b2e84",
+  "sourceHashes": {
+    "release/office-rebuild/collect-runtime-inputs.py": "024a9d6f4f40742d4ad44ae5f39668b14f85c95ee72c33287ccf1978be7649b4",
+    "release/office-rebuild/emscripten-runtime-inputs.json": "179545b29e9eb80aa5a037d855a6949eea36b23439aede30cfe56863e58b97cf",
+    "tests/test_office_runtime_inputs.py": "6a49e2b594186dab3ebdfaba5f57928769a126cd63dbfd2d41c9f1f7c79835ab"
+  },
+  "sourceIdentity": {
+    "emscriptenVersion": "4.0.10",
+    "emscriptenRevision": "b7dc6e5747465580df5984e723b9d1f10d8e804b",
+    "sdkReleaseCommit": "8103ffedfb0c42d231c6af6859a5a1a832260b43",
+    "publicSourceArchive": {
+      "url": "https://codeload.github.com/emscripten-core/emscripten/tar.gz/b7dc6e5747465580df5984e723b9d1f10d8e804b",
+      "sha256": "901c1881daf528523b848ea596588e7d21c41b4a279d20250d2d56168d24ef9f",
+      "bytes": 33438299
+    },
+    "selectedSourceGroups": [
+      "system",
+      "src",
+      "tools",
+      "third_party"
+    ],
+    "rootSourcesCompared": 66,
+    "selectedSourceFilesMatched": 4890,
+    "sourceMismatchesOrMissing": 0,
+    "releaseOverlay": "The installed SDK has a release-version label and revision stamp. The public commit retains 4.0.10-git; pinned emsdk.py rewrites the label to quoted 4.0.10. Both exact installed overlay files are retained separately; runtime/build source bodies otherwise match.",
+    "publicGitVersionBytes": {
+      "bytes": "4.0.10-git\n",
+      "sha256": "0155f2fbb8025df1ab9e00649e6e1b1cf521c2b5861b74a94b6f6703098e750e"
+    },
+    "installedReleaseOverlaysRetained": [
+      "emscripten-version.txt",
+      "emscripten-revision.txt"
+    ]
+  },
+  "export": {
+    "companionFiles": 16,
+    "companionBytes": 33604823,
+    "companionManifestSha256": "5bb20118b5754c4b3144cf21b3e28a648098ec77744912152acb07a59e2e2908",
+    "baseSourceManifestSha256": "e57aac45ba485cbefa144172539bd36602bc3ab8890303eb72bef15ef6ef4f94",
+    "totalBaseAndCompanionFilesVerified": 139,
+    "totalBaseAndCompanionBytes": 694891760,
+    "standaloneOriginalNoticesVerified": 11,
+    "standaloneNotices": [
+      "LICENSE",
+      "AUTHORS",
+      "system/lib/libc/musl/COPYRIGHT",
+      "system/lib/compiler-rt/LICENSE.TXT",
+      "system/lib/libcxx/LICENSE.TXT",
+      "system/lib/libcxxabi/LICENSE.TXT",
+      "system/lib/libunwind/LICENSE.TXT",
+      "system/lib/llvm-libc/LICENSE.TXT",
+      "third_party/terser/LICENSE",
+      "third_party/leb128/LICENSE",
+      "third_party/closure-compiler/node-externs/LICENSE"
+    ],
+    "fullPublicPreferredSourceArchiveCopied": true,
+    "networkRequestsByExporter": 0,
+    "engineBuildsStarted": 0,
+    "installedChanges": 0
+  },
+  "linkInputs": {
+    "finalResponseSha256": "3371e42fbe11a1b579bb50bc55a589f2f4af9e911d4688760a0f60022b313dfe",
+    "systemLibrariesInResponseAndBytesVerified": 15,
+    "startupObjectsVerified": 1,
+    "scope": "Inputs named in the final linker response; not per-symbol output provenance",
+    "perSymbolFinalOutputProvenanceClaimed": false
+  },
+  "submoduleScope": {
+    "emptySubmodules": [
+      "dictionaries",
+      "helpcontent2",
+      "translations"
+    ],
+    "dictionaryAndHelpBuildTypesAbsent": true,
+    "bundledDictionaries": false,
+    "translationLanguages": "en-US",
+    "scope": "These source directories are empty in the successful producer; no submodule sources were inputs."
+  },
+  "qualification": {
+    "pythonTests": 34,
+    "pythonPass": 34,
+    "pythonFailures": 0,
+    "pythonSkip": 0,
+    "newRuntimeSourceCases": 10,
+    "testFiles": [
+      "test_office_runtime_inputs.py",
+      "test_office_source_inputs.py",
+      "test_office_engine_packaging.py",
+      "test_nested_package_notices.py",
+      "test_codex_packaging.py"
+    ],
+    "coverage": [
+      "Actual archive size/hash/revision and installed selected-source equality.",
+      "Version-label difference explicitly checked/exported, without authorizing changed source bodies.",
+      "Changed/extra/linked/missing/duplicate/traversal sources refused without extraction.",
+      "Exact final response/output/library/object bindings; ambiguous or changed inputs refused.",
+      "New Core submodule inputs or additional resource languages refused.",
+      "Public Office packaging refusal and existing source/notice/native boundaries retained."
+    ],
+    "precedingLinuxSdk": {
+      "sourceRef": "48f3d51ec07bb68a0e1454405e83eb28d88b2e84",
+      "run": 39013167990,
+      "job": 117339794380,
+      "conclusion": "success"
+    },
+    "newSourceHostedAcceptanceClaimed": false
+  },
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      },
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-081210-48ea82e1",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 16,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "remaining": [
+    "Complete source delivery/rebuild and third-party coverage review.",
+    "Representative document/font/resource/security and installed promotion/rollback."
+  ],
+  "publicRedistributionQualified": false
+}

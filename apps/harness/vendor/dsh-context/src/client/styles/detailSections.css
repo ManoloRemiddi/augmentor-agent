@@ -1,0 +1,57 @@
+/* An open element body frames everything as a Section; the raw-schema JSON sits below as a collapsed toggle, without card chrome. */
+.lc-ts-card { background: var(--dsw-alias-bg-layer-2); border: 1px solid var(--dsw-alias-border-l2); border-radius: 6px; overflow: hidden; min-width: 0; }
+.lc-ts-card-head { display: flex; align-items: center; gap: 8px; padding: 6px 10px; font-size: 11px; font-weight: 600; color: var(--dsw-alias-label-secondary); border-bottom: 1px solid var(--dsw-alias-border-l1); }
+/* The call-name head must stay one-line (it ellipsizes instead of wrapping), so the wrap is scoped to rich-text heads. */
+.lc-ts-card-head-wrap { flex-wrap: wrap; }
+.lc-ts-card-head b { color: var(--dsw-alias-label-primary); }
+/* MCP tool names have no break points, so a long name must ellipsize instead of pushing the head's status group out of the card. */
+.lc-ts-call-name { font-size: 13px; font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-ts-card-count { margin-left: auto; }
+.lc-ts-card-right { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; }
+.lc-ts-card-meta { color: var(--dsw-alias-label-secondary); font-size: 11px; font-weight: 400; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lc-ts-call-state { flex: none; display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; line-height: 1; padding: 2px 7px; border-radius: 999px; white-space: nowrap; font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); }
+.lc-ts-call-state i { flex: none; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.lc-ts-call-ok { color: var(--dsw-alias-state-success-primary); background: color-mix(in srgb, var(--dsw-alias-state-success-primary) 12%, transparent); }
+.lc-ts-call-err { color: var(--dsw-alias-state-error-primary); background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 12%, transparent); }
+.lc-ts-desc-body { margin: 0; padding: 8px 10px; color: var(--dsw-alias-label-primary); font-size: 12px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; max-height: 320px; overflow-y: auto; scrollbar-width: thin; }
+.lc-ts-lines { counter-reset: lc-line; }
+.lc-ts-line { display: block; position: relative; padding-left: 26px; }
+.lc-ts-line::before { content: counter(lc-line); counter-increment: lc-line; position: absolute; left: 0; width: 20px; padding-right: 6px; text-align: right; color: var(--dsw-alias-label-tertiary); font-size: 11px; user-select: none; }
+.lc-ts-line:empty::after { content: '\200B'; }
+/* minmax tracks so the columns squeeze; fixed px tracks bottom out at 316px and spill the nested card. */
+.lc-ts-param-row { display: grid; grid-template-columns: minmax(0, 140px) minmax(0, 90px) 56px minmax(0, 1fr); column-gap: 10px; row-gap: 2px; padding: 6px 10px; border-top: 1px solid var(--dsw-alias-border-l1); font-size: 12px; align-items: baseline; }
+.lc-ts-param-row:first-of-type { border-top: 0; }
+.lc-ts-param-name { font-weight: 600; color: var(--dsw-alias-label-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-ts-param-type { color: var(--dsw-alias-label-secondary); font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lc-ts-param-req { color: var(--dsw-alias-state-warn-primary); font-size: 11px; font-weight: 600; }
+.lc-ts-param-req-off { color: var(--dsw-alias-label-secondary); font-size: 11px; }
+.lc-ts-param-desc { grid-column: 1 / -1; color: var(--dsw-alias-label-secondary); line-height: 1.5; overflow-wrap: anywhere; }
+.lc-ts-params-empty { padding: 8px 10px; color: var(--dsw-alias-label-secondary); font-size: 12px; }
+/* The height cap keeps one huge payload (a full file write) from blowing the card open. */
+.lc-ts-arg-row { display: grid; grid-template-columns: minmax(0, 96px) 1fr; column-gap: 12px; padding: 6px 10px; border-top: 1px solid var(--dsw-alias-border-l1); font-size: 12px; align-items: start; }
+.lc-ts-arg-row:first-of-type { border-top: 0; }
+/* Overrides the shared name cell: arg names wrap instead of ellipsizing (the schema table keeps its one-line form). */
+.lc-ts-arg-row .lc-ts-param-name { overflow: visible; text-overflow: unset; white-space: normal; overflow-wrap: anywhere; }
+.lc-ts-arg-val { color: var(--dsw-alias-label-primary); font-family: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace); font-size: 12px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; max-height: 200px; overflow-y: auto; scrollbar-width: thin; }
+.lc-ts-json { display: flex; flex-direction: column; gap: 4px; }
+.lc-ts-json-toggle { align-self: flex-start; border: 0; background: transparent; color: var(--dsw-alias-label-secondary); font: inherit; font-size: 11px; padding: 0; cursor: pointer; transition: color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-rich-copy, .lc-find-btn { display: inline-flex; align-items: center; border: 0; background: transparent; color: var(--dsw-alias-label-secondary); padding: 2px; border-radius: 5px; cursor: pointer; transition: color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-rich-copy:hover, .lc-find-btn:hover { color: var(--dsw-alias-label-primary); }
+.lc-rich-copy-on, .lc-rich-copy-on:hover { color: var(--dsw-alias-state-success-primary); }
+.lc-find-btn:disabled { opacity: 0.4; cursor: default; }
+.lc-find-btn:disabled:hover { color: var(--dsw-alias-label-secondary); }
+.lc-find-btn-on, .lc-find-btn-on:hover { color: var(--dsw-alias-label-primary); }
+.lc-find { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--dsw-alias-border-l1); }
+.lc-find-count { color: var(--dsw-alias-label-secondary); font-size: 11px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lc-find-mark { background: color-mix(in srgb, var(--dsw-alias-state-warn-primary) 25%, transparent); color: inherit; border-radius: 2px; }
+.lc-find-mark-on { background: color-mix(in srgb, var(--dsw-alias-state-warn-primary) 65%, transparent); }
+.lc-ts-desc-md { padding: 4px 10px; color: var(--dsw-alias-label-primary); font-size: 12px; line-height: 1.55; word-break: break-word; overflow-wrap: anywhere; min-width: 0; max-height: 320px; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+/* The shared renderer sizes for chat bubbles: inside a card the base sits one step ABOVE the raw text (13px proportional ≈ 12px mono) and headings collapse to a weight-only bump. Inline code keeps the full size too, because the renderer shrinks it to 0.875em and its `font` shorthand would drag in a line-height taller than the paragraph. */
+.lc-ts-desc-md > div { font-size: 13px; line-height: 1.55; }
+.lc-ts-desc-md div :is(h1, h2, h3, h4, h5, h6) { font-size: 13px; font-weight: 600; margin: 10px 0 4px; }
+/* The renderer bakes soft breaks into paragraph text and pairs every hard break's `<br>` with a '\n'; `pre-line` shows each newline once and hides the redundant `<br>`. */
+.lc-ts-desc-md div p { margin: 6px 0; white-space: pre-line; }
+.lc-ts-desc-md div p br { display: none; }
+.lc-ts-desc-md div pre { margin: 6px 0; white-space: pre-wrap; overflow-wrap: anywhere; word-break: break-word; }
+.lc-ts-desc-md div :not(pre) > code { font-size: 1em !important; line-height: 1.3; padding: 1px 5px; box-decoration-break: clone; }
+.lc-ts-desc-md div table code { font-size: inherit; }

@@ -9,29 +9,36 @@ const parts=(text:string)=>text.split(/\n\s*\n|\n(?=[-*•] )/).map(s=>s.trim())
 export function selectContinuity(value:any,query:string){
   const terms=words(query), selected:any[]=[];
   for(const kind of ['relationship','work']){
-    const memory=value[kind]||{};
-    const pages=[...(memory.pages?.length?memory.pages:[{name:'Legacy summary',content:memory.summary||''}]),
-      ...(memory.items||[]).map((item:any)=>({name:kind==='relationship'?'Preferences and boundaries':'Project facts',content:item.text,source:item.document_id||item.id}))];
+    const memory=value[kind]||{}, candidates:any[]=[];
+    const pages=[...(memory.pages?.length?memory.pages:[{name:'Legacy summary',content:memory.summary||''}]).map((page:any)=>({...page,extracted:false})),
+      ...(memory.items||[]).map((item:any)=>({name:kind==='relationship'?'Preferences and boundaries':'Project facts',content:item.text,source:item.document_id||item.id,extracted:true}))];
     for(const page of pages){
       // Past assistant offers are available through explicit recall, not part
       // of every interaction's default context.
       if(/shared moments|commitments|our relationship/i.test(page.name))continue;
       for(const content of parts(page.content||'')){
+        // Knowledge-page navigation is not a recalled claim. Heading-only
+        // fragments otherwise outrank short preferences and consume fact slots.
+        if(content.split('\n').filter(line=>line.trim()).every(line=>/^\s{0,3}#{1,6}(?:\s|$)/.test(line)))continue;
         if(content.length>1000)continue; // no misleading first-N-character excerpt
         const termsHere=words(content);
         const score=[...terms].filter(term=>termsHere.has(term)).length;
         const stablePreference=kind==='relationship'&&page.name==='Preferences and boundaries'&&content.length<=600;
         if(!score&&!stablePreference)continue;
-        selected.push({kind,page:page.name,source:page.source,content,score:score+(stablePreference ? 0.5 : 0),stale:memory.stale!==false,
+        candidates.push({kind,page:page.name,source:page.source,content,extracted:page.extracted,score:score+(stablePreference ? 0.5 : 0),stale:memory.stale!==false,
           provenance:'derived claim; authorization and verification not established'});
       }
     }
+    // A synthesized page can report an empty bank while independently cached
+    // extracted claims are present. Prefer eligible claims for this scope;
+    // pages remain a fallback and are available through explicit recall.
+    selected.push(...(candidates.some(item=>item.extracted)?candidates.filter(item=>item.extracted):candidates));
   }
   const seen=new Set<string>();let size=0;
   return selected.sort((a,b)=>b.score-a.score).filter(item=>{
     if(seen.has(item.content)||size+item.content.length>1800)return false;
     seen.add(item.content);size+=item.content.length;return true;
-  }).slice(0,4).map(({score,...item})=>item);
+  }).slice(0,4).map(({score,extracted,...item})=>item);
 }
 
 export function memoryContext(value:any,mode:'voice'|'text',query=''){

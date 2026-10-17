@@ -108,7 +108,12 @@ def build(out):
         subprocess.run([str(cli), str(cache / 'target/wasm32-unknown-unknown/release/photon_rs.wasm'), '--target', 'nodejs', '--out-name', 'photon_rs', '--out-dir', str(stage)], check=True)
         for file in stage.glob('*.js'):
             file.write_text('// Photon by Silvia O\'Dwyer, Apache-2.0; see LICENSE.md.\n// Rebuilt by Augmentor; source, changes and dependencies are recorded in BUILD.json.\n' + file.read_text())
-        upstream = ROOT / 'node_modules/@earendil-works/pi-coding-agent/node_modules/@silvia-odwyer/photon-node'
+        upstream = Path(subprocess.check_output(['node', '--input-type=module', '-e',
+            'import {createRequire} from "node:module"; import {dirname} from "node:path"; '
+            'console.log(dirname(createRequire(process.argv[1]).resolve("@silvia-odwyer/photon-node/package.json")))',
+            str(ROOT / 'node_modules/@earendil-works/pi-coding-agent/package.json')], text=True).strip())
+        if json.loads((upstream / 'package.json').read_text())['version'] != config['npmVersion']:
+            raise ValueError('Pi Photon version changed; review the paired source build.')
         for name in ('package.json', 'LICENSE.md'): shutil.copyfile(upstream / name, stage / name)
         count = collect_licenses(metadata, source, sysroot, stage, config)
         record = {**config, 'compiler': compiler, 'cargoLockSha256': sha(source / 'Cargo.lock'),

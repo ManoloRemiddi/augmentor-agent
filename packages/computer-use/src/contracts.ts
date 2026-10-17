@@ -8,6 +8,8 @@ export interface DesktopBrief {
 }
 export type DesktopStatus = 'completed' | 'blocked' | 'unknown' | 'cancelled' | 'budget_exceeded' | 'failed';
 export interface DesktopResult {
+  jobId?:string;
+  childId?:string;
   version: typeof COMPUTER_USE_VERSION;
   runId: string;
   status: DesktopStatus;

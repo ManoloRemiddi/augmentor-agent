@@ -22,6 +22,7 @@ export function createQueue({container,input,send}) {
       label.textContent=(status==='Queued'?'':status+' · ')+row.text;label.title=status+'\n'+row.text;element.append(label)
       function button(text,action,allowed){const b=container.ownerDocument.createElement('button');b.type='button';b.textContent=text;b.disabled=!allowed;b.setAttribute('aria-label',text==='×'?'Remove queued prompt':text+' queued prompt');b.addEventListener('click',action);element.append(b)}
       if(row.item){
+        if(row.item.canResolve===true)button('Keep interrupted',()=>act(row.id,'acknowledge'),online&&!running&&!state.changing.has(row.id))
         button('Steer',()=>act(row.id,'steer'),online&&running&&Boolean(activeTurnId)&&row.item.canSteer===true&&!state.changing.has(row.id))
         button('×',()=>act(row.id,'remove'),online&&row.item.canRemove===true&&!state.changing.has(row.id))
       }else if(row.failed){
@@ -33,19 +34,19 @@ export function createQueue({container,input,send}) {
   }
   function update(message,viewing=false){
     if(message.sessionId&&message.sessionId!==sessionId){sessionId=message.sessionId;activeTurnId=null}
-    enabled=message.harness==='codex'&&message.capabilities?.queue===true&&!viewing
+    enabled=['pi','codex'].includes(message.harness)&&message.capabilities?.queue===true&&!viewing
     online=message.phase==='ready';running=message.running===true
     const state=current()
-    if(message.queue?.sessionId===sessionId&&Number.isSafeInteger(message.queue.revision)&&message.queue.revision>=state.revision){
+    if(message.queue&&message.queue.sessionId===sessionId&&Number.isSafeInteger(message.queue.revision)&&message.queue.revision>=state.revision){
       state.revision=message.queue.revision
       activeTurnId=message.queue.activeTurnId
-      state.items=message.queue.items.filter(item=>!state.delivered.has(item.rpcId))
+      state.items=message.queue.items.filter(item=>item.canResolve===true||!state.delivered.has(item.rpcId))
       for(const item of state.items)state.pending.delete(item.rpcId)
     }
     const entries=message.log??(message.entry?[message.entry]:[])
     for(const entry of entries){
       const event=entry.event,id=event?.data?.source?.rpcId
-      if(entry.sessionId===sessionId&&event?.type==='user/message'&&event.data.source.kind==='user'&&id){state.delivered.add(id);state.pending.delete(id);state.items=state.items.filter(item=>item.rpcId!==id)}
+      if(entry.sessionId===sessionId&&event?.type==='user/message'&&event.data.source.kind==='user'&&(!event.data.source.sessionId||event.data.source.sessionId===sessionId)&&id){state.delivered.add(id);state.pending.delete(id);state.items=state.items.filter(item=>item.canResolve===true||item.rpcId!==id)}
     }
     if(state.delivered.size>2048)state.delivered=new Set([...state.delivered].slice(-1024))
     render()
@@ -53,7 +54,8 @@ export function createQueue({container,input,send}) {
   async function act(itemId,action){
     const state=current(),target=sessionId,expectedTurnId=activeTurnId
     const item=state.items.find(item=>item.id===itemId)
-    if(!enabled||!online||!item||state.changing.has(itemId)||!(action==='steer'?running&&expectedTurnId&&item.canSteer:item.canRemove))return
+    const allowed=action==='steer'?running&&expectedTurnId&&item?.canSteer:action==='remove'?item?.canRemove:action==='acknowledge'?!running&&item?.canResolve:false
+    if(!enabled||!online||!item||state.changing.has(itemId)||!allowed)return
     state.changing.add(itemId);render()
     const task=tail.then(async()=>{
       try{

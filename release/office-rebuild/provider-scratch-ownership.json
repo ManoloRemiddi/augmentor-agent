@@ -1,0 +1,136 @@
+{
+  "schema": "augmentor-original-office-scratch-ownership/1",
+  "date": "2026-10-15",
+  "qualificationTimezone": "Europe/Rome",
+  "testedSourceRef": "fc342300c57582de674bfcf3cc5a4b0c8477c493",
+  "scope": "Linux x64 opt-in native backend and common optional provider scratch seat; fresh unselected ordinary development tree",
+  "fullyQualified": false,
+  "promotionAllowed": false,
+  "defaultBackendChanged": false,
+  "before": {
+    "sourceRef": "04613ad09786c0ed6eb764cc304d09e40bb9ccb6",
+    "realOriginalProviderCrashCases": 1,
+    "failures": 1,
+    "failure": "Native actors exit but original provider outer scratch retains its authorized source copy"
+  },
+  "ownership": {
+    "scratchGuardReadyBeforeDocumentCopy": true,
+    "independentOwnerProcessDescriptor": true,
+    "privateBoundedMetadataAndReleaseControlOnly": true,
+    "nativeSupervisorAndBrokerSharedDirectoryLease": true,
+    "guardExclusiveCleanupLease": true,
+    "originalQueueCacheAuthorizedReaderRetained": true,
+    "capacityHeldThroughScratchRelease": true,
+    "liveProviderGuardLossAbortsConversion": true,
+    "liveProviderExactRootFallback": true,
+    "stoppedScratchGuardForcedReleaseMs": 2000,
+    "replacementOrMovedRootRefused": true,
+    "documentOrModelInputSentToScratchGuard": false,
+    "directoryScanOrActionReplay": false
+  },
+  "focused": {
+    "cases": 19,
+    "passes": 19,
+    "failures": 0,
+    "newScratchOwnershipCases": 6
+  },
+  "cohort": {
+    "sourceCases": 282,
+    "sourcePasses": 281,
+    "sourceFailures": 1,
+    "ordinaryCases": 282,
+    "ordinaryPasses": 282,
+    "ordinaryFailures": 0,
+    "testFiles": 65,
+    "harnessChromiumFiles": 44,
+    "sharedPromptDomCases": 15,
+    "workers": 2,
+    "existingDeadlineChanges": false,
+    "skips": 0,
+    "cancellations": 0,
+    "sourceDurationMs": 159086.1353,
+    "ordinaryDurationMs": 160237.510211
+  },
+  "retainedSourceFailure": {
+    "test": "live native owner settles when its cleanup guard is killed",
+    "observedActorsAtSettlement": [
+      "python3",
+      "bwrap",
+      "bwrap"
+    ],
+    "exactProcessStatesCaptured": false,
+    "soleCauseProven": false,
+    "assertionOrDeadlineRelaxed": false,
+    "independentDiagnosticCases": 12,
+    "independentDiagnosticPasses": 12,
+    "passingProbesSupersedeFailure": false
+  },
+  "viewers": {
+    "sourceNativeOriginalPasses": 1,
+    "ordinaryNativeOriginalPasses": 1,
+    "fontNoticesPdfZoomReloadRetryAndNativeEvidence": true
+  },
+  "artifact": {
+    "compiledFiles": 925,
+    "compiledSetAndBytesMatch": true,
+    "sourceOrdinaryExecutableFilesMatch": 2051,
+    "nativeHelperCopiesMatchSource": true,
+    "nativeHelperSourceSha256": "d337b88052a9d20af89355df5cbe886780cac5528feb92c1d193b972ec2be3c3",
+    "scratchHelperSourceSha256": "9f01b0cdefbd5b583de993c78418786bfbf43eb55ef34a043fd01d2cc34df4e4",
+    "originalGuiCssAndNormalizedBodiesUnchanged": true,
+    "productionDependencyEntries": 20847,
+    "dependenciesAndNodeBytesUnchanged": true,
+    "productionNpmInstances": 155,
+    "bundledNode": "24.19.0",
+    "browserTestDependencyEntries": 1932,
+    "browserTestDependenciesMatch": true,
+    "supplierOfficeProviderInputs": 7,
+    "supplierUpstreamHashesUnchanged": true,
+    "adaptedProviderIndexAndModificationRecordChanged": true
+  },
+  "packagingAndSourceBoundaryCases": 11,
+  "officePublicSourceGateChanged": false,
+  "preservation": {
+    "currentReviewInventoryVerified": 24305,
+    "priorReviewInventoryVerified": 24288,
+    "allFourReviewProcessesPreserved": true,
+    "canonicalPreexistingChanges": 38,
+    "qwenReadOnlyModelsStatus": 200,
+    "ownerProfilesHistoryCredentialsRead": false,
+    "ownerOrSelectedArtifactsUpdated": false,
+    "modelSpeechGpuSettingsChanged": false
+  },
+  "precedingHosted": {
+    "sourceRef": "04613ad09786c0ed6eb764cc304d09e40bb9ccb6",
+    "sdkRun": 38653941416,
+    "sdkThreePlatforms": "success",
+    "windowsDesktopRun": 38653941396,
+    "windowsDesktop": "success",
+    "validateRun": 38653941476,
+    "mainNodePasses": 1202,
+    "mainNodeIdentifiedSkips": 34,
+    "mainNodeFailures": 0,
+    "browserPasses": 121,
+    "nativePasses": 878,
+    "nativeIdentifiedSkips": 45,
+    "bothStrengthenedTenPhaseX11ProofsPass": true,
+    "terminalRefusal": "Office exact preferred-source/rebuild gate"
+  },
+  "newHeadHostedAcceptance": false,
+  "publicBinaryOrInstalledActivation": false,
+  "preparationFailuresRetained": [
+    "TypeScript path narrowing",
+    "stale authored adaptation receipt before its explicit update"
+  ],
+  "remaining": [
+    "forced guard-loss actor completion barrier and broader source qualification",
+    "all cleanup owners lost and power loss",
+    "durable owned-root recovery index",
+    "empty allocation before readiness",
+    "direct caller-PDF publication recovery",
+    "concurrent adversarial same-user directory replacement",
+    "font/layout/security/native-source-notice/distribution and other OS adapters",
+    "full provider/plugin/voice/privacy/migration/installed rollout acceptance"
+  ],
+  "checkedAtUtc": "2026-10-14T23:49:44.576224+00:00"
+}

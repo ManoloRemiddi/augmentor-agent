@@ -1,5 +1,367 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Cold configuration journal and profile gate](HARNESS-DSH-INSTALLATION.md#cold-configuration-journal-and-managed-startup-fence--october-17)
+adds b78996eb: source 117 Python/four Node pass; exact SDK discovery 27 overlaps.
+Real upstream DSH retains/releases its profile reader and refuses a pending fence
+on an authored isolated profile. Apply/reverse survive per-file process death;
+completed config remains fenced pending client orchestration. No installed apply
+command, owner change or new app copy. Full backups, client selection/finalization
+and real owner acceptance remain. Linux SDK 39049376766 has passed its changed
+preservation/profile-gate steps; the overall run is still in progress.
+[Record](../release/harness-dsh-configuration-transaction-20261017.json).
+
+[Immutable preservation candidate](HARNESS-DSH-INSTALLATION.md#immutable-preserved-integration-candidate--october-17)
+qualifies 73675d62 / 20261017-180443-c8315564 (a4dc0eb2…6ef93): ordinary/sealed
+42 Node/90 Python, recorded Python repeats 90, plus 11 sealed Office/inspection
+cases. Actual retained-role cold replies/shared prompts pass against sealed code;
+actual configuration stages read-only with 46 inputs/10 edits. Linux SDK
+39047120454 succeeds. One scratch app removed and the superseded unreferenced
+candidate retired; owner main/pilot and data unchanged. Cold-backed-up integration
+activation/reverse, matching clients and real owner acceptance remain.
+[Record](../release/harness-dsh-preserved-package-20261017.json).
+
+[Retained role and library qualification](HARNESS-DSH-INSTALLATION.md#retained-roles-cold-ownership-and-prompt-library-bridge--october-17)
+adds e07e5db6: source Python 90 pass. Actual retained personal modules run in place
+inside a read-only filesystem/isolated-network fixture. Cold saved-role replies,
+current memory ownership, identity, shared instructions/templates and non-submitting
+draft improvement pass with three controlled local model calls. The stage keeps
+the frontend, replaces its limited backend, and rebinds identical public entries:
+46 inputs/10 module changes; 20 remaining literal paths stay protected. Actual
+owner app/data remain unchanged; immutable cold activation/reverse and full real
+owner acceptance remain. Prior Linux SDK 39043965407 succeeds; new code CI pending.
+[Record](../release/harness-dsh-retained-graph-20261017.json).
+
+[Custom DSH preservation stage](HARNESS-DSH-INSTALLATION.md#preserved-custom-integration-stage--october-17)
+adds source-only private staging/verification at 3777cc92. Python 85 pass. Actual
+profile staging binds 28 inputs, keeps peer edits and proposes two module changes;
+21 retained module paths still need graph qualification. No owner execution/write
+or activation, no full app copy. Immutable incoming/cold backup/matching-client
+transaction and reverse acceptance remain. [Record](../release/harness-dsh-preservation-20261017.json).
+
+Terminal CI: prior Linux SDK 39042645605 succeeds. Full validations 39041187997
+and 39041724378 pass application checks then refuse the existing public Office
+source/rebuild packaging gate. Earlier live observations below are historical;
+no whole-workflow/package or later-platform approval is claimed.
+
+[Linux DSH 0.2 installer qualification](HARNESS-DSH-INSTALLATION.md) adds exact
+family checks, declarative presets and modern workflow composition at 6a82cf82.
+Source Python 73 pass; exact SDK setup command 18 overlapping cases pass. Actual
+upstream 0.2 install/restart/both roles/selected shared library/cold histories pass
+on authored data, with only the upstream zero-depth header default. All three
+traced trees make zero INET connects; no owner model/profile/service change.
+Actual edited owner composition/metadata still requires deliberate preservation;
+normal automatic replacement remains refused. No new sealed application copy.
+
+[Public DSH contract correction and real managed backend](HARNESS-SHARED-PROFILES.md#public-dsh-catalogue-contract-and-actual-managed-backend--october-17)
+qualifies c6653b75: truthful unknown backend identity, four current-source live read
+routes and actual disposable DSH 0.2 idle-reader/release proof; Python 53/53 pass.
+The public wire already supports those reads. Modern setup/install pins and
+preservation of custom composition still need qualification; actual product
+0.2.11/0.2.13 refusal remains. No installed owner change or extra app copy.
+[Evidence](../release/harness-dsh-catalog-contract-20261017.json).
+
+[Storage cleanup and resumed MX work](HARNESS-BUILD-STORAGE.md): 75 unused app
+copies removed, 40.89 GiB recovered; root now about 99 GiB free (89% used).
+Required one-workspace/64 GiB reserve workflow replaces persistent checkpoint
+copies. Focused source 45 Node/91 Python and type checks pass; affected final DSH
+routes pass 3 Node/12 Python again. Direct/delegated opt-in DSH launch preserves
+service environment and guards idle readers; actual upstream backend/cold owner
+adoption remains open. Installed main/pilot, projects, histories and needed backups
+remain unchanged. [Aggregate record](../release/harness-build-storage-20261017.json).
+
+[Sealed embedding follow-up](HARNESS-SHARED-PROFILES.md#sealed-embedding-follow-up-and-existing-configuration--october-17)
+qualifies add7b891 / 20261017-152350-2c67edd7, artifact 112ec5c4…7dd53:
+24,761 inputs/1,143 compiled; source/ordinary/sealed each 42 Node/82 Python plus 12
+overlapping recorded-interpreter cases. Unselected; original reviews/owner stores/
+services unchanged. The adapter-reported 0.1.5-rc.1 is synthesized, not a verified host version;
+CLI on disk is 0.2.0-rc.2 and modern live API routes succeed. Product integration
+0.2.11 refuses candidate 0.2.13. See the [correction and storage workflow](HARNESS-BUILD-STORAGE.md). Existing peerDependencies/composition edits require preservation
+before a matching upgrade; automatic replacement is not qualified. Earlier live-CI observations below are historical; the terminal update above
+supersedes them. [Record](../release/harness-shared-embed-package-20261017.json).
+
+[Embedded shared launch and production preflight](HARNESS-SHARED-PROFILES.md#embedded-entrypoint-and-actual-production-compatibility--october-17)
+adds the missing idle embedding-server reader/selected pair while retaining SDK
+proxy and write restrictions. Source 42 Node/82 Python pass. Actual sealed 22103e61
+preflight refuses the real 0.2.11 DSH integration (candidate 0.2.13), before catalogue;
+home identity matches. No owner update/restart/export, version bypass or extra
+project transfer. Matching integration/extension and normal guarded cold cutover
+remain. [Record](../release/harness-shared-embed-20261017.json).
+
+[Sealed shared-launch candidate](HARNESS-SHARED-PROFILES.md#sealed-shared-launch-candidate--october-17)
+qualifies **22103e61 / 20261017-151405-6c6b7080**, artifact 63ea2dd8…da5c08:
+24,759 inputs/1,143 compiled; source/ordinary/sealed each 29 Node/77 Python,
+plus 11 overlapping declared-interpreter binding cases. Unselected; actual MX
+reviews remain 97d95d58 with unchanged owner data/launchers/services. Matching
+installed clients, explicit mobile/custom/review mapping, fresh full cold backups
+and real existing-bank/busy/restart/rollback acceptance remain. CI 39035553761
+is live, no whole-workflow approval. [Record](../release/harness-shared-launch-package-20261017.json).
+
+[Managed shared launch binding](HARNESS-SHARED-PROFILES.md#managed-shared-launch-binding--october-17)
+adds source-only selected state/data for Native/managed Browser/mobile, guarded
+cold activate/reverse and opt-in backed-up Browser registration. Source focus
+29 Node/77 Python passes; generated real host handshake/writes/restart and busy
+reader refusal pass. No installed bootstrap/selection changed; aaf7af4c sealed
+export candidate lacks these new changes. Existing custom/mobile and Harness
+review entrypoints still need adoption, fresh sealed qualification/cold backups
+and actual cutover/rollback. Installed main/pilot remain 97d95d58; no extra transfer.
+Aaf7af4c CI ends 2,140 root passes/zero failures/53 skips, Browser128 and native
+1,079 cases/45 skips, then existing public Office source/rebuild packaging refusal.
+[Source record](../release/harness-shared-launch-20261017.json).
+
+[Stable MX review launch](HARNESS-MX-FEEDBACK.md#stable-mx-review-launch-and-recovery--october-16) uses a separately staged tool and explicit review registry. Menu/CLI paths are version-independent and never point at a source checkout. The current reviews retain their qualified running artifact; installing the opener does not activate a new Desktop build or repoint the earlier Preview entry. Changed seals or mismatched live owners refuse replacement. Separate tool **20261016-212908-9907b5b0 / f5751a33** is installed as the stable opener with two review entries; existing owners stay on **deea778d / 20261016-204440-a6f079ca**. Source and sealed focus each pass 11 Node/41 Python; actual link checks preserve two PIDs/four conversations/32 protected inputs and selections. Physical menu/browser feedback remains. [Portable evidence](../release/harness-review-opener-20261016.json).
+
+[Current persona/metrics MX review](HARNESS-MX-REVIEW.md#shared-persona-and-response-metrics-review--october-16)
+**20261016-083019-0c2b4855**, public artifact **f073d195** / application **ae951211**,
+runs as a separate unselected browser owner. Source/fresh ordinary/exact sealed
+target each pass 793/two existing optional skips, 140 files/all 58 Harness Chromium
+files, unchanged two workers/bounds. All 24,540 sealed/1,069 compiled inputs verify
+after exact-sealed Qwen persona/metrics proofs and initial original-GUI owner QA.
+Both themes, expanded/collapsed/welcome marks, 84 visible Settings text rows and
+limited browser network scope pass; no initial owner model/audio/session work.
+Its fresh empty memory engine/volume uses explicit memory-only off/backport;
+cached CPU recognition 0.1.22 is reused with 70 package inputs verified. Fourteen
+seals/fifteen reviews plus recognition, selection, canonical/private changes and
+model/service hashes remain preserved. This stages a private review; installed
+activation, merge, public redistribution and owner acceptance remain separate.
+The broader hosted HTML dependency-reload CDP timeout remains unresolved; this
+private review qualification does not authorize installed promotion.
+[Portable evidence](../release/harness-persona-metrics-review-20261016.json).
+
+[Earlier guarded-memory MX review](HARNESS-MX-REVIEW.md#guarded-automatic-memory-review--october-16)
+**20261016-050949-2145f2db** / application **b7e0afaa** runs unselected, with an
+independent empty memory profile/engine and explicit memory-only off. Source/
+ordinary/sealed-target each pass 761/two existing optional skips, unchanged bounds;
+all 24,524 sealed entries/1,063 compiled inputs verify after owner browser QA.
+Earlier reviews/recognition and installed selection remain preserved. This does
+not adopt the experimental backport into the production installer or migrate
+existing banks; full platform, physical voice and release gates remain open.
+
+[Current MX Context review](HARNESS-MX-REVIEW.md#managed-context-review--october-15)
+**20261015-192847-cfb956a7** runs public **a0db6ea/application 1b467d3**, unselected.
+It includes managed skill links in original Raw Pi Context and the large-JSON
+viewer correction, alongside the original DSH skill/Permission/Trajectory UI and
+themed Augmentor marks. Source/fresh ordinary/sealed target each pass **594/two
+existing optional skips/zero failures**, 109 files/all 51 Harness Chromium files.
+All **24,440 sealed entries/1,031 compiled/812 Harness source files** verify;
+151 production npm instances, Node, components and 608 supplier inputs stay unchanged.
+Exact-sealed Light/Dark skill/Context/large-request checks and isolated actual-Qwen
+plan/cold-history proof pass. Initial owner QA has zero sessions/turns/drafts/logins;
+nine sealed inventories/ten review owners, selection, canonical changes and model/
+service settings verify preserved. Physical MX feedback, installed adoption, live
+arrival/long-history Context inspection, complete causal provenance, remaining
+plugin/memory/speech workflows and full migration/platform gates remain open.
+[Portable review evidence](../release/harness-managed-context-review-20261015.json).
+
+[Current MX skill review](HARNESS-MX-REVIEW.md#skill-controls-review--october-15)
+**20261015-180926-4e7b027e** runs public **4eede33/application 9d9ac56**, unselected,
+with the original DSH skill menu/editable links/current-source preview and both
+Permission controls. Source/ordinary/sealed target each pass **541/two optional
+skips/zero failures**, 102 files/all 51 Harness Chromium files. All **24,431 sealed
+entries/1,025 compiled/812 Harness source files** verify; supplier selection is 608.
+Exact-sealed authored skill GUI and actual-Qwen plan/cold-history proof pass;
+initial owner Light/Dark/logo/Permission/account QA has zero sessions/logins/drafts.
+Eight sealed inventories/nine review owners, selection and model/service settings
+verify preserved. Linux/macOS SDK pass at 4eede33; Windows is unqualified at the
+recorded snapshot. Physical MX feedback, guarded adoption, full provenance/plugin/
+migration, speech and other OS artifacts remain open. [Portable record](../release/harness-skill-review-20261015.json).
+
+[Fresh drafts / cold-history MX review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
+**20261015-144829-1de182ad** runs public 6ef121d/runtime 6bc2b0d, unselected,
+with scoped question drafts and exact cold-title loading in the original GUI.
+Source/ordinary/sealed-target each pass **450/two optional skips/zero failures**,
+91 files/all 48 Harness Chromium files, unchanged workers/bounds. All **24,400
+entries/1,019 compiled files** verify after original Light/Dark/account QA with
+zero owner-profile sessions/inference/tools/logins/drafts. A separate actual-Qwen
+sealed-target flow passes full plan/read/mode-off/cold reopening: three requests/
+two tools, exact history, unchanged read-only file/catalog/output and all five
+proof actors terminal. Prior five artifacts/six owners, selection and settings
+verify preserved. Physical MX/installed/Windows/speech/Office/full migration gates
+remain open. [Portable record](../release/harness-draft-title-review-20261015.json).
+
+[The October 15 MX review](HARNESS-MX-REVIEW.md#current-separate-review--october-15)
+is a new unselected browser owner, release **20261015-103820-b0d02caa** / product
+0.2.13, public source f0d241a and tested runtime ea3775b. Source/ordinary/sealed-target
+each pass 401/two optional skips; all 24,381 entries verify after startup/browser
+QA. Its profile is fresh/read-only/keyless with the earlier Qwen declaration;
+no credential/history import or initial inference/login occurs. Current selected
+preview and four earlier reviews/drafts stay preserved. This does not activate an
+installed desktop or qualify public Office redistribution.
+
+[The refreshed MX review instance](HARNESS-MX-REVIEW.md) runs source **9f5bc70**
+in managed, unselected release **20261014-145102-22cbe428**, artifact
+**f55e256e80c1c5345b17a65b24e3d01694fdbc99799e4325dd558173e3357e35**.
+All **24,288 entries** verify after 179/179/51-file candidate qualification and
+actual runtime/browser startup. Its new read-only profile imports no owner history
+or credentials. Installed 97897cf/draft and older review processes/profiles remain
+preserved; no launcher/global selection changes. Private preparation failures and
+mixed provenance are recorded in the guide. This browser instance is not an installed
+activation or public distribution approval; platform/licence/rebuild gates remain.
+
+[Qualified unselected search MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-search-mx-candidate--october-14),
+source **454db9d9915724b53998e187c30c2943a0d7d3b2**, product **0.2.13**,
+release **20261014-032413-b4cd8c8b**, artifact
+**964d1cdef122aab51fd46510f897a35d1bd391e97d4f7ae1f52983160569f3e5**, passes source/ordinary/
+complete candidate **491/491 across 98 MX files**, two workers, matching Node/QtTest,
+unchanged deadlines/no skips. All 24,279 entries/902 compiled files/52 search
+records verify; 155 npm instances, nine unchanged dependency/Node native bytes,
+846 notices retaining the preceding 833 and original bodies qualify. Separate
+managed Qwen source/ordinary/candidate owners each switch mode on the same
+AgentSession and perform two official Debian search-turn reads with exact cold
+history and no saved synthetic key in model events. The initial candidate fetch
+failure remains WEB_PROVIDER_ERROR with transport cause unresolved; later success
+does not close outage/quota acceptance. Current 97897cf remains selected/running
+with Native busy/draft flags, so no shutdown/activation occurs. Guarded installed
+owner acceptance and the wider migration/live/privacy/distribution/platform gates
+remain open; no merge/public binary/DSH retirement occurs.
+
+[Current qualified unselected Wiki MX candidate](HARNESS-PLUGIN-PARITY.md#qualified-unselected-wiki-mx-candidate--october-13):
+source 12b403f / release 20261013-232107-a7bb6ab7 combines Wiki with the earlier
+Metafolder/privacy/branch work. Candidate-backed 471/471 and all 24,045 entries
+pass, with one isolated real Qwen Wiki query. It is unselected; Native retains its
+busy/unsent draft. Current 97897cf stays selected/running. Fresh idle comparison,
+guarded adoption and installed acceptance remain required.
+
+For a private assembly retaining the same reviewed native dependencies, run
+`python3 scripts/assemble-harness-notices.py --app /path/to/unselected-assembly --baseline /path/to/verified-release`
+If that verified private baseline lacks `licenses/node.txt`, pass
+`--node-notice-baseline /path/to/verified-node-notice-release` explicitly. The
+supplementary artifact must verify and contain the identical bundled Node binary
+and its regular original notice. It supplies only that notice; dependency/native
+identity checks and public redistribution gates remain unchanged. A missing,
+tampered, unsealed or wrong-binary supplementary source refuses before writing.
+before normal staging. The assembly must include built GUI/runtime, public
+preferred supplier source, locked production dependencies and bundled Node.
+This completes generated supplier/Node/PDF/Wiki and API/keyless search notice
+records omitted by a fresh npm-only tree. It verifies the immutable baseline, all
+52 search selection records in preferred/compiled inputs and the client selection
+against compiled GUI provenance, rejecting native/source drift, missing notices,
+stale provenance and staged/linked or escaping destinations before publication. The helper is
+Linux-only and never grants public Office/font/native redistribution approval.
+The owning candidate record retains the initial incomplete-assembly failure.
+
+[Preceding qualified unselected Metafolder navigation candidate](HARNESS-METAFOLDERS.md#qualified-navigation-candidate):
+runtime dfcdfb9 / private MX 20261013-190500-3bf1e21f has source/ordinary 454/454,
+five packaging and seven licence cases each, 204 sealed checks and 23,940 verified
+entries. It fixes rail Search and verifies directory/keyboard/view navigation.
+Current 97897cf Native retains a busy/unsent draft; no shutdown or activation occurs.
+Require a fresh comparator, guarded startup and installed acceptance. The Debian
+Office Wasm notice policy and wider migration/platform gates remain open.
+
+[Preceding qualified unselected Metafolder candidate](HARNESS-METAFOLDERS.md#qualified-ordinary-and-immutable-candidate):
+runtime 207aed2 / private MX 20261013-183219-4621b4e3 has source/ordinary 453/453,
+five packaging and seven licence cases each, 203 sealed checks and 23,940 verified
+entries. It includes the inspector cue, privacy guard and Linux branch recovery.
+Current 97897cf Native is online with an unsent draft; no shutdown/activation occurs.
+Require a new idle comparator including Metafolder profile presence/bytes and
+normal guarded updater/startup/installed acceptance. Full migration and further
+platform gates stay open. Older unselected artifacts below remain checkpoints.
+
+[Preceding qualified unselected combined candidate](HARNESS-BRANCH-PUBLICATION.md#qualified-ordinary-and-immutable-candidate):
+runtime 2c4ca0b / private MX 20261013-160540-d88ebd3c has source/ordinary 443/443,
+five packaging cases each, 192 sealed checks and 23,922 verified entries. It retains
+the privacy guard below and adds Linux attested branch publication. Current
+appearance selection remains online/ready with a Native draft/busy flag. No
+shutdown/activation is attempted; later adoption requires a new idle comparator
+and guarded updater/startup/installed checks. Other platform/full migration gates
+remain open. The preceding privacy-only artifact below is a retained checkpoint.
+
+[Qualified unselected privacy candidate](PI-PRIVACY.md#qualified-ordinary-and-immutable-candidate):
+runtime 4f017bf / private MX 20261013-145220-9a44aaaa has source/ordinary 432/432,
+five packaging cases each, 181 sealed checks and 23,918 verified entries. Current
+appearance selection below remains running, with Native busy/draft flags. No
+shutdown/activation is attempted; normal launch already opts out. Use a fresh idle
+comparator and normal guarded updater for later adoption. Live/fresh-user/public
+distribution/platform/CI and full migration qualification remain separate.
+
+[Current installed Harness appearance](HARNESS-APPEARANCE.md#ordinary-and-installed-mx-qualification):
+runtime **97897cf**, private MX **20261013-142001-1f7f7f96**, product **0.2.13**,
+artifact **05c20ef7bfb07c926cacc8d548a0dc734e77c4c68c9a57aab9efa551327f7ada**,
+selected and running. Original Light/Dark/System choices persist across origins;
+System and live peer hints work without creating agent work or a conversation.
+Source/ordinary each pass **415/415 across 79 files** plus five packaging cases;
+**163 sealed checks** pass. All **23,914** entries verify, with twelve histories,
+drafts/profiles/router state preserved and all 247 saved files identical at adoption. Supplier
+sources/CSS/licences/dependencies remain unchanged. A fresh private HTTP link is
+provided for manual owner opening; browser policy prevents reading the old error
+tab. Stable address/authentication/reconnect/placement, partial publication repair,
+full migration/live/privacy/public distribution/platform/CI gates remain open.
+Further OS implementation awaits owner MX feedback. Earlier selections below
+are dated checkpoints superseded by this installed qualification.
+
+
+[Preceding installed MX ancestry recovery](HARNESS-BRANCH-CONTROLS.md#ordinary-and-installed-pre-input-ancestry-qualification--october-13): runtime **d79e476**,
+release **20261013-124421-a8c9d4c5**, product **0.2.13**, selected and running.
+Artifact **ca3a937eb4ec8cd286b62032accf1cbffdf8efe2b064eb03b699989438493266**.
+First-input Edit persists earlier custom/goal ancestry before returning creation,
+without a synthetic message, extra inference or child AgentSession at publication.
+Source/ordinary each pass **402/402 across 77 files** plus five packaging cases;
+**149 sealed checks** pass. All **23,909** entries, twelve histories/queues, drafts,
+profiles and model processes verify. The installed e0c60f1 logo/theme GUI remains
+byte-exact, with identical dependencies, licence bodies and 580 MIT/108 Apache
+records. Browser automation is blocked on the old error tab; manual opening uses
+the current private HTTP link. Partial publication repair, browser origin/theme
+persistence and full migration/custom-plugin/live/privacy/distribution/platform/CI
+gates stay open. Further OS implementation awaits MX feedback.
+
+
+
+The dated selection statements below are historical checkpoints, superseded by
+the current qualification above.
+
+[Installed original Context timing](CONTEXT-TIMING.md#ordinary-and-installed-mx-qualification--october-13): runtime **008ef29551406fa08f21508d548603a6f9200f81**, private MX **20261013-030020-abfa89ec**, product **0.2.13**, artifact **5d6596b90da90856cfa1b670bf5be6f6c58c52e0ea3b08786bbc22ae6a19253e**, selected and running. Source and ordinary each pass **349/349 across 68 files** plus five packaging cases; thirteen immutable tests and actual original Context/Insights acceptance pass. All **23,885** entries and twelve histories/queues, drafts, profile/auth/model and production/router state are preserved. Apache-2.0 dashboard layout/CSS/card/strip and all 580 MIT GUI records remain intact; one already-marked timing seat changes. Older logs stay explicit. Full migration/live/privacy/public distribution/platform and known CI gaps remain open; prior selection statements below are historical checkpoints.
+
+[Installed MX model lifecycle](HARNESS-MODELS.md#ordinary-and-installed-lifecycle-qualification--october-13): runtime **79ee4ff4c3b7e205833f20f936843ce37886b1cd**, release **20261013-013249-f43fa0d0**, product **0.2.13**, artifact **ac0a3fad21de2808a9cb37a7ec7748668234991335aea08b436fb37810144663**, selected and running. Source and ordinary each pass **342/342 across 66 files** plus five notice/workspace cases. Six immutable candidate lifecycle cases and final byte/inventory/owner GUI proofs pass; all **23,880** entries, twelve histories/queues, draft/attachment/profile/auth bytes and production/router state are preserved. Original GUI/CSS/580 MIT/108 Apache records remain unchanged. Full migration/model-management/live/privacy/public distribution/platform gates stay open; prior installed selections below are historical checkpoints.
+
+[Installed MX Models qualification](HARNESS-MODELS.md#ordinary-and-installed-mx-qualification--october-13): runtime **340327d6a554094d9ce9d54dcdd0810c08e5b245**, release **20261013-002217-5b1307b9**, product **0.2.13**, artifact **91c9df4354d38dca589be0a231b0c6dd2e4b9559af5c7c923eff0268eedced05**, selected and running. Source and ordinary each pass **334/334** across 65 files, plus five notice/workspace cases. Guarded immutable adoption, actual installed GUI acceptance and all **23,880** entries pass, preserving all twelve histories/queues and owner profile/model/router state. Full migration/live/OAuth/virtual/advanced/privacy/public distribution/platform gates remain open; earlier source-only selection statements below are historical checkpoints.
+
+[Installed original keyboard shortcuts](HARNESS-SHORTCUTS.md#ordinary-and-installed-mx-qualification--october-12): runtime 95e0fb240bb000653ff5b122ac737b59c05ee2b8, private MX 20261012-222001-6b609cae, product 0.2.13, artifact 3a469a23bcb0e07524b96952ee637e73e70d148bf9c565a6d500ef140ed73238, selected and running. Source and ordinary Node 24.19.0 each pass 315/315 across 62 files plus five notice/workspace cases. Copied registry/reference/recorder/General row, key hints, accepted private preferences and existing action owners qualify through actual two-client/SDK/HTTP tests and installed keyboard recording/reload/restore/search acceptance with no subsequent inference. All twelve owner histories/queues, draft/attachment bytes, profile values/revision and router arguments remain preserved; all 23,844 installed entries pass. MIT GUI is 563 files; Apache dsh-context remains 108. Original Insights is left open. Full migration/privacy/live/public distribution/platform/fixed-input/native/physical gates remain open; earlier selection statements below are historical checkpoints.
+
+[Shortcut candidate](HARNESS-SHORTCUTS.md) must qualify fresh source and ordinary bytes before guarded separate private MX staging/activation. The preceding HTML release stays preserved for rollback; separate shortcut qualification and current selection are recorded above. No selected release is patched.
+
+[Installed original HTML previews](HARNESS-HTML-PREVIEWS.md#ordinary-and-installed-mx-qualification--october-12): runtime e4c8663b2a5e57a676837e0892505fbe8b237af7, private MX 20261012-210709-6242b91f, product 0.2.13, artifact c02dc8cfd35bf77b9d0741412a76c1bfdc4a06d6a9989bb9124237f14dd30335, selected and running. Source and ordinary Node 24.19.0 each pass 307/307 across 60 files plus five notice/workspace cases. Actual installed static/interactive HTML, original General switch, local assets, pointer action, resource/root reload, mode retirement/tab close and sandbox observations preserve fixture originals with zero subsequent inference. All twelve owner histories/queues, drafts/attachments, settings values/revision and router arguments remain preserved; all 23,813 installed entries pass after GUI use. MIT GUI is 541 files; Apache dsh-context remains 108. Original Insights is left open. Full migration/live/privacy/public distribution/platform gates remain open; earlier selection statements below are historical checkpoints.
+
+[Original HTML candidate](HARNESS-HTML-PREVIEWS.md) must pass a separate fresh ordinary assembly before guarded private MX staging/activation and exact selected/running verification. The preceding spreadsheet release remains preserved for rollback; the separate HTML candidate is now qualified and selected as recorded above. No selected artifact is patched.
+
+[Installed original spreadsheet previews](HARNESS-SPREADSHEET-PREVIEWS.md#ordinary-and-installed-mx-qualification--october-12): runtime 64d52917684307cb2a29c75e908209c83d4f06de, private MX 20261012-190657-be20be18, product 0.2.13, artifact 231dd41c550624399cea35a3c6e2d7244d938fb751c83d80373643f2b290e676, selected and running. Source and ordinary Node 24.19.0 each pass 301/301 across 58 files plus five notice/workspace cases. Actual installed original grid/warnings/sheets/readonly/scroll/reload/tab acceptance preserves native history with zero subsequent inference. Eleven prior histories, drafts/attachments, profile values/revision and model-router arguments are preserved; one additional empty Linux placeholder has no history or request. All 23,790 installed entries pass. MIT GUI is 527 files; Apache dsh-context remains 108. Full migration/live/privacy/public distribution/platform gates remain open; preceding selections below are historical checkpoints.
+
+[Installed original Office previews](HARNESS-OFFICE-PREVIEWS.md#installed-mx-qualification--october-12): runtime d0642d58f3edfbf9211e61ef60ffbe636141e301, private MX 20261012-084425-89e511a9, product 0.2.13, artifact 731357a72f03ac54deb57973b9d51b3c140f9f5ada6c29f0c0220d153165e983, selected and running. Source and ordinary Node 24.19.0 each pass 300/300 across 57 files, plus five notice/workspace cases. Original Office/PDF/font/zoom/Retry widgets and bounded MIT provider/queue use Pi authorized bytes; actual installed DOCX pages/font/zoom/reload pass in an isolated profile without subsequent inference. Owner Context/Insights reads preserve eleven histories/queues, drafts/attachments and profile values/revision; all 23,764 installed entries pass. MIT GUI is 507 files plus seven runtime helpers; MPL kit/Wasm and Apache dsh-context retain separate notices. Broader format, three MIT declaration notice-sufficiency, source/rebuild/public distribution and full migration/platform gates remain open; preceding selections below are historical checkpoints.
+
+[Installed original PDF previews](HARNESS-PDF-PREVIEWS.md#installed-mx-qualification--october-12): runtime 096e34fd3c0e69b420273b454931c3156af1f9c6, private MX 20261012-073915-27a8dcfc, product 0.2.13, artifact f6ca00d4b977689b48f1bfd97724ab12c7c67ad9385641726d9a4a5e2ab84e38, selected and running. Source and ordinary Node 24.19.0 each pass 295/295 across 55 files; two ordinary packaging cases pass. Original PDF page/text/zoom/tab widgets use the existing authorized byte reader and a reviewed local worker; real Chromium text selection and JPX/Wasm pass. Separate installed-profile original @file/chip/page/zoom/reload acceptance passes without subsequent inference; owner Context/Insights reads preserve eleven histories/queues, drafts/attachments, profile values and revision. All 22,776 installed entries pass. MIT DSH is 496 files; Apache-2.0 dsh-context remains 108 (92 verbatim/16 marked). PDF.js/font/decoder notices remain separate; the Liberation GPL/font-source/rebuild gate joins existing public distribution gates. Full viewer/migration/live/platform gates remain open; preceding selected/running statements below are historical checkpoints.
+
+[Installed original literal prompt wrapping](CONTEXT-PROMPT-WRAPPING.md#installed-mx-qualification--october-12): runtime 15e8b9e596100298ce1cb59775cf79a8a889d2a0, private MX 20261012-061621-f54f9969, product 0.2.13, artifact 2728f73bad451ccfb4f23886a6fa1637ecf78940a95620dcc766bf2a7a02c169, selected and running. Source and ordinary Node 24.19.0 each pass 294/294 across 54 files; two ordinary packaging cases pass. The original two text controls and verbatim Apache-2.0 section registration use Pi's request-time hook with per-request revisions and preserved native/tool state. Eleven histories/queues and all 22,665 installed entries pass. Profile values and revision remain unchanged; Insights stays open. MIT DSH is 483 files; Apache-2.0 dsh-context is 108 (92 verbatim/16 marked). Complete migration/live/public packaging/platform gates remain open; earlier selected/running and unconnected-wrapping statements below are historical checkpoints.
+
+[Installed original Fleet on Pi](CONTEXT-FLEET.md#installed-mx-qualification--october-12): corrected runtime a449d28b90e0d20877daae51a7075b765ce3ad12, private MX 20261012-052408-d60add65, product 0.2.13, artifact 3638106b09b6fcd4d15b39fedbd807e7a88e14c92a5eab20cf9ecf92920c4200, selected and running. Source and ordinary Node 24.19.0 each pass 283/283 across 52 files; two ordinary packaging cases pass. The copied graph/inspector/roster/comms widgets, ninth display preference and scoped read-only child links use exact-parent retained Pi records. All 22,657 installed inventory entries and eleven preserved histories/queues pass. Fleet Hide and the viewport are restored; Insights stays open. MIT DSH selection is 483 files; Apache-2.0 dsh-context is 107 (91 verbatim/16 marked). Coordinated Teams/mailbox, prompt wrapping and complete migration/live/public packaging/platform gates remain open. Preceding selected/running statements below describe their historical checkpoints.
+
+[Installed original Context sidebar and placement](CONTEXT-SIDEBAR.md#installed-mx-qualification--october-12): corrected runtime 65188080085323335a7c290dd5d43f5c851c0a0c, private MX 20261012-031413-3c3b8dc9, product 0.2.13, artifact 64ab34e468f045ab5e6d580366507750d8753a0c93c77b043e8c82e41576e139, selected/running. Source and ordinary Node 24.19.0 each pass 278/278 across 48 files; two ordinary packaging cases pass. Original Tab/Sidebar/All, guide capsule, independent scrolls and File Activity previews use Pi retained-data/IO with the original slow-read loading indicator. Actual installed narrow/wide/reload/file acceptance and 22,645 inventory entries pass. Eleven histories/queues, original prefixes, drafts/attachments and settings values are preserved; the temporary placement and viewport are restored. MIT DSH selection is 483 files; Apache-2.0 dsh-context is 100 (87 verbatim/13 marked). Pinned MIT picomatch 4.0.7 has reviewed notices. Complete migration/Fleet/prompt/live/privacy/public packaging/platform gates remain open; preceding qualifications below are historical checkpoints.
+
+[Installed original Harness file previews](HARNESS-FILE-PREVIEWS.md#installed-mx-qualification--october-12): corrected runtime dacba8c341e56a3265b51d36bf6a2620c3e87de7, private MX 20261012-015903-110d1bc4, product 0.2.13, artifact 24f77f8e70136a4e32d74af7e1b47a1eb1ab044d4ab65f8bc6419ab4a0a99a5a, selected/running. Source and ordinary Node 24.19.0 each pass 277/277 across 47 files; two packaging cases pass in each tree. Original chip/sidebar/context/Insights, actual file reload, cold tab/draft restoration, maintenance veto and clearing pass with 22,630 verified inventory entries. Eleven histories/queues, old original prefixes, attachment bytes and settings remain preserved. MIT supplier selection is 482 files; Apache-2.0 dsh-context remains unchanged. Pinned MIT Zod 4.4.3 and original ISC YAML frontmatter have reviewed notices. Full viewers/shortcuts/migration/privacy/public packaging/platform gates remain open.
+
+[Installed original Harness file references](HARNESS-FILE-REFERENCES.md#installed-mx-qualification--october-12): runtime debe8040c7a02ea958c9d5aabbf07cacff757a89, private MX 20261012-002708-3571d021, product 0.2.13, artifact 1b08c0220f3e5760e905f60430bca530645878aaaeb7412d7e1c149813da853a, selected/running. Source and ordinary Node 24.19.0 each pass 272/272 across 45 files; guarded adoption, exact roots and all 21,821 inventory entries pass. Original @file completion/chips restore exact rich drafts; installed reload/veto/clear and retained Insights reads pass without owner inference. Eleven histories/queues, prior original prefixes, attachment bytes, profile/model/speech settings remain preserved; only owned fixture draft metadata changes. Session references, click previews, full migration/privacy/public packaging/platform gates stay open.
+
+[Preceding installed original Harness drafts](HARNESS-DRAFTS.md#installed-mx-qualification--october-11): runtime 6f6bf39071839d1e023a648247bb9ff89892b5ce, private MX 20261011-235335-2d8c7e8f, product 0.2.13, artifact 5cfd01bb69668bc52a2a5801cd1b9c7540f1fb1c6c28c9604007c38d0809f8d2, selected/running. Source and ordinary Node 24.19.0 each pass 266/266 across 43 files; guarded adoption, exact roots and all 21,792 inventory entries pass. The original composer restores unsent text/real bytes/exact receipts; dirty drafts and receiving operator requests veto shutdown. Installed reload/veto/clear and original Context/Insights reads pass. Eleven histories/queues and preceding private files/settings are preserved with classified lifecycle/title/index appends and one owned fixture receipt. Supplier/CSS/licences/dependencies/model/speech settings remain preserved; full migration/privacy/public packaging/platform gates stay open.
+
+[Preceding installed upload maintenance safety](UPLOAD-MAINTENANCE.md#installed-mx-qualification--october-11): runtime 71c8295331e3ef6f1a3fadecdee2b3e16dde75cf, private MX 20261011-230903-26a85087, product 0.2.13, artifact a4e02988958781788a17c4e78018cbc7219c6e510e4ed41f0793584d24c3c70c, selected/running. Source and ordinary bundled Node 24.19.0 each pass 256/256 across 40 files; guarded sequential adoption, exact running roots and all 21,787 inventory entries pass. Original GUI/licences/dependencies/profile settings, eleven histories/queues and old original prefixes are preserved with classified lifecycle/title/index appends. Insights stays open for feedback. Full draft/migration/privacy/public packaging/platform gates remain open.
+
+[Attachment upload maintenance safety](UPLOAD-MAINTENANCE.md) counts the full HTTP reception and immutable storage phase, so slow and concurrent transfers veto guarded shutdown. Source checks/build and 256/256 across 40 files pass; ordinary/installed qualification is recorded separately. Original DSH GUI, supplier licences and dependencies are unchanged; durable drafts and full migration/platform gates remain open.
+
+[Installed original Context preferences](CONTEXT-PREFERENCES.md#installed-mx-qualification--october-11): runtime 52a0368f1f3272c8c202879ffca894eca22bbe06, private MX 20261011-224436-af6876b9, product 0.2.13, artifact d15089e3b6545205c7c55a7ec98b4d69adb035ba089e0d0e7ce7ab4a47ab7175, selected/running. Source and ordinary Node 24.19.0 each pass 251/251 across 38 files. Guarded adoption, matching Host/Native roots and the full 21,786-entry inventory pass. The original card persists seven display defaults; installed Turn/reload/chart acceptance restores Step. Eleven histories/queues and old original prefixes are preserved with classified title/lifecycle/index changes and exactly two display-only settings writes. Dependencies/native/supplier licence bodies/CSS/model/speech settings remain preserved; full Harness/migration/live/privacy/public packaging/platform gates stay open.
+
+[Installed original Context dialog](DSH-GUI-ON-PI.md#installed-original-context-dialog--october-11): runtime 3a112af4633d6259c1866650044a423459d45997, private MX 20261011-212056-aeaf1a5c, product 0.2.13, artifact e933bb08a2128614d8136dc35ced23a5f482609f955eb6487f2a6910bb0c19d7, selected/running. Source and ordinary Node 24.19.0 each pass 232/232 across 34 files; guarded update and 21,767 installed inventory entries pass. Original `/context` preserves Chat, recorded arguments and scoped deferred text consumption. All eleven histories/queue identities and prior original prefixes are preserved with six classified title/lifecycle appends and their index/counter updates. Supplier licences/CSS/dependencies/native/model/speech settings remain preserved; full migration/live/privacy/public packaging/platform gates stay open.
+
+October 11 [Original Context slash dialog](DSH-GUI-ON-PI.md#original-context-slash-dialog--october-11-follow-up) candidate must be adopted through a fresh tested ordinary artifact and guarded preview updater; the selected preceding recorded-format release is never patched. Production selection, saved originals and model/speech placement are preserved.
+
+[Installed recorded-format qualification](DSH-GUI-ON-PI.md#installed-recorded-format-qualification--october-11) maps Anthropic, Responses and Gemini snapshots into the unchanged original Context dashboard, with exact request-local IDs, ordered fragments and explicit unavailable/opaque data. Runtime f5ff7be4d346213ef0b8dc463072261196b8c440 is selected/running in private MX release 20261011-205518-9903c1a4, product 0.2.13, artifact c6727cc06f6119aa6dc633df97b1371e191559616c33d3a3a1604b483ecd2803. Source and ordinary bundled Node 24.19.0 each pass 227/227 across 32 files; guarded immutable adoption and 21,763 inventory entries pass after GUI reads. Eleven displayed histories/queue identities and all prior original bytes are preserved, with six explicitly classified lifecycle/title appends and their counter/index updates. Synthetic new-API execution and retained installed Qwen inspection remain separate; no new owner inference/tool action occurs. Supplier/CSS/licence/dependency and model/speech settings are unchanged. Complete migration/live-provider/privacy/public packaging/platform gates stay open.
+
+[Earlier-request qualification](DSH-GUI-ON-PI.md#installed-earlier-request-qualification--october-11) connects the original dropdown to explicit metadata paging and a bounded older-body read without fake chart bars or borrowed contents. Runtime dd478b51c7bf4f145051185b4cc3f00d11f1d258 is selected/running in private MX release 20261011-203308-c2b28497, product 0.2.13, artifact e25b512f420703de41951e7fcb60d1c4700f84f49b6c8379aaee7d1a78cbafa1. Source and ordinary bundled Node 24.19.0 each pass 217/217 across 30 files; guarded immutable adoption and 21,761 inventory entries pass after GUI reads. All eleven histories and queue identities are preserved with no new admissions/provider requests/tools. Synthetic saved-data paging and installed retained Qwen-record inspection are separate evidence. Apache-2.0 originals/CSS/licences remain preserved with five marked adaptations; DSH MIT sources/dependencies and model/speech configuration are unchanged. Full migration/privacy/public packaging/platform gates remain open.
+
+[Context argument qualification](DSH-GUI-ON-PI.md#installed-context-argument-qualification--october-11) restores exact provider-call arguments in the original dashboard. Source/ordinary 210/210 and private MX selection 1bc4560 / 20261011-195826-1738f137 are qualified separately from full migration/platform acceptance; all eleven histories are preserved. Synthetic fresh-Host execution and installed retained Qwen-record reads start no replay. Supplier/CSS/licences/dependencies and the single Pi owner are unchanged; all remaining context/migration/public packaging gates stay open.
+
+October 11 private MX [original Settings qualification](DSH-GUI-ON-PI.md#final-installed-settings-qualification--october-11): runtime 3d77cdb8412a3b3750565f1c517d06a3c6c12c4c is selected/running as 20261011-193147-eb68a2a1, product 0.2.13, artifact 8668ec430afc78782fd9c215b087911ac48f13f4a0c25bedf27fd97d7f5348b3. Source/ordinary each pass 206/206. Guarded immutable update/stable launch and 21,761 inventory entries pass; all eleven histories and queue identities are preserved. The first installed empty-MCP Escape failure and corrected adoption are retained in the owning guide. Selected releases are never patched. Only byte-verified redundant ordinary copies/own public download cache are retired for staging capacity; source, immutable candidates and proofs remain. All full migration/privacy/public packaging/platform gates remain open.
+
+[Current private MX question-controls preview](PI-QUESTIONS.md#installed-mx-qualification--october-11): source/ordinary runtime 65b0a49, release 20261011-184609-8cac1bd0, normal guarded adoption/stable launch, matching roots/full inventory and eleven unchanged histories. Selected/runtime bytes remain immutable; this is not a public binary or complete migration/platform qualification.
+
+October 11 private MX [original Compact qualification](PI-COMPACTION.md#final-installed-qualification--october-11): 64d0d4b15cd0cde2c04dfec197b702b7e2a169f1 is selected/running as 20261011-180640-ae7c817e, product 0.2.13, artifact 99cb8a756ba55024840b73a1e54451daa95bb6d34aaa3c354d9f14640b2c3306. Normal guarded immutable update/stable launch and complete inventory pass; production is preserved. A disk-capacity staging refusal is resolved by retiring only verified redundant current-turn ordinary copies, preserving immutable candidates/source/logs and retrying the unchanged candidate. No selected artifact or guard is patched. Complete public packaging/migration/platform gates remain open.
+
 # Consistent installed desktop releases
 
 ## October 3: bounded companion lifetimes
@@ -461,3 +823,6 @@ source `85034ac`. Both windows closed only while idle; the primary launcher was
 invoked after its old service had exited. Desktop/Mobile report online and no
 pending update. This supersedes the preceding installed root without altering
 its preserved product, DSH or speech contract.
+
+
+The October 11 [private MX original-command-menu adoption](DSH-GUI-ON-PI.md#installed-original-command-menu-qualification--october-11) selects/runs d6010d0 in 20261011-170722-5dfb555f through normal guarded immutable maintenance. Source/final ordinary qualification each pass 139/139; all ten histories/queue item identities, production selection and existing native executable bytes remain preserved. Fresh npm hoists same-byte jiti/graceful-fs files without changing versions/content; licence tree paths are regenerated. General public Debian native collection still refuses the pre-existing Sharp binary and remains an open release gate. This is private MX preview evidence, not a public package or further-platform qualification.

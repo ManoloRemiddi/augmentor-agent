@@ -1,0 +1,267 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# Original plan mode on Pi
+
+The Harness retains the original MIT DSH plan chip, full review panel, plan cards
+and sidebar. Its root conversation's existing Pi AgentSession owns the mode,
+request guidance and `exit_plan_mode` tool. The separate [reported plan/todo
+registry](PI-PLANNING.md)
+continues to store progress; reviewing a plan does not update its steps or create
+a persistent goal.
+
+The pinned [original contract](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/plan/plan-mode/README.md)
+uses advisory guidance, a persistent per-conversation state and human review of
+the exact submitted Markdown. Tool availability and action permissions remain
+independent. The port uses supported Pi extension tools/input handlers, public
+Agent context hooks and custom SessionManager entries; it mounts no DSH agent or
+plan backend.
+
+## Use the controls
+
+Type `/plan` to enter, `/plan <message>` to enter with the next instruction, or
+`/plan off` to leave. Message and attachment admission retain the existing durable
+queue and identified steering path. A queued command takes effect when dispatched;
+an active-turn selection waits for the next model request. `/plan off` with
+attachments is rejected before a mode change or queue admission. Bare mode
+commands perform no inference and leave a new conversation's title available for
+its first actual instruction. Their notices report the selected mode directly.
+
+The plan-mode capability is explicit: older and other backend adapters retain
+their existing reported-plan command when it is absent.
+
+The original command-menu Plan action enters the mode after confirmed admission;
+late replies cannot consume an edited draft or another conversation's selection.
+The original chip occupies its original input-bar slot, shows the effective target
+and lets an operator leave the mode. The existing Plan tab still opens reported
+steps. Both upstream chip files/CSS are verbatim, pinned in the supplier receipt;
+the MIT selection is **593 files**.
+
+The model can call `exit_plan_mode` with complete Markdown beginning with a
+same-line `#` heading. The validated document is at most 65,536 characters and
+must fit the common 128 KiB question envelope. The original sidebar shows the full
+submitted plan, including code. Its renderer retains the image-fetch opt-out.
+
+**Approve** records the exact offered choice and selects an exit for the next
+request boundary. The current tool batch retains its previous mode. **Keep
+planning**, including custom feedback through the shared question contract,
+returns that feedback with planning guidance still active. The original GUI's
+**Request changes** closes this mode review and concludes the agent turn so the
+human can write the next request. An armed persistent goal's automatic continuation
+is disarmed; its objective and active phase remain intact. A saved plan card
+reopens the submitted document without inference or filesystem reads. Generic
+`ask_user` plan reviews keep their existing hide/reopen dismissal behavior.
+
+Plan reviews start in the existing `waiting` phase, with no foreground deadline,
+so reading a long plan does not silently time out. Operator liveness is checked
+at the existing one-second interval. SDK abort, Stop, owner settlement and loss
+of the interactive connection still end the review without an invented answer.
+Action approvals retain their separate hard timeout and cannot select this
+question-only waiting policy. Settled reviews do not accept late answers.
+
+## State, ownership and observation
+
+`augmentor/plan-mode-v1` is a private native custom entry containing a revision,
+logged `active` value and optional pending human target. Whole-value replacements
+use the selected native ancestry. Idle selections commit immediately; selections
+during work commit their effective value at the next accepted request-context
+boundary. Selecting the logged value cancels an opposite pending target. The tool
+catalog remains stable while entering/leaving; every changing tool keeps its
+existing role, sandbox and approval checks.
+
+Pi creates a native file after its first user or assistant message. Before that,
+the mode uses a private metadata bootstrap record. Loading restores that record
+to the new native manager; the first real conversation message flushes the native
+entry, and the metadata fallback is then removed. Existing native files remain
+authoritative. No new model request is used to materialize an empty session.
+
+Explicit human pending targets survive restart. A reviewed exit stays transient
+until its request boundary; extension reload discards that uncommitted approval.
+A superseded selection, cancelled signal or changed extension generation cannot
+apply an old answer. Missing/invalid state fails explicitly and preserves its
+original. Loaded reads identify native-session memory; cold reads distinguish
+saved native entries from the pre-conversation metadata bootstrap. No failed RPC
+or uncertain append is automatically replayed.
+
+The request-only guidance is applied after Pi's forced-prompt projection, through
+the public Agent context hook. This preserves both memory-supplied prompt text and
+the selected planning section, without changing the tool declarations. Compaction
+and other non-admitted contexts do not consume a pending selection. Local
+`planning/mode` observations record mode/revision metadata; complete plan bodies
+and decisions retain the existing private tool-history and payload-capture scope.
+
+`session.planMode` reads loaded or cold state. `session.setPlanMode` requires an
+operator, a current revision and an eligible root conversation. Read-only
+inspectors can read their scoped state and cannot mutate it. Archived/delegated,
+compaction, model-account and resource-reload guards remain effective. The GUI
+retires stale reads across newer refreshes, selection and reconnect, and updates
+from peer mode notifications.
+
+## Cold owner titles and actual manual compaction — October 15
+
+Live Qwen testing reached the original full review, Request changes, explicit mode
+off and its next real reply, then exposed an extra native `session_info` title
+entry on cold reopening. The original file was preserved as an exact prefix;
+loading reasoning settings called the public SDK's unconditional title setter
+again. A separate authored actual-SDK control reproduces that duplicate without
+another model request. The loader now compares the saved name using the SDK's
+CR/LF/trim normalization before setting it. A changed metadata title still receives
+one native update; matching normalized names leave the complete file unchanged.
+Reasoning inspection still loads the one existing SDK owner, without inference.
+
+A new actual manual-compaction case supplies bounded authored history through the
+normal queue, selects mode off while work is active, stops that work, then compacts
+through the public SDK. The summary request omits request-only planning guidance
+and does not consume the pending human target. The native append preserves the
+original file, the same mode revision survives restart, duplicate compaction does
+not replay, and only the next admitted chat commits the selected mode off.
+The first fixture exceeded the existing prompt bound and was refused; four bounded
+messages replace it without changing limits or product admission.
+
+Strict check/build and four focused files pass **28/28** on Linux. The cold-title
+case covers initial/normalized names and an intentionally changed authored metadata
+title. At **24b53b9** (runtime **6bc2b0d**), source and a fresh unsealed ordinary
+copy each pass **450/two existing optional skips/zero failures**, 91 files/all
+48 Harness Chromium files, two workers and unchanged deadlines. Eleven packaging/
+source-boundary cases pass. The final actual-Qwen original-GUI flow below preserves
+exact cold native/display history and reopens the retained plan without inference.
+All 1,019 compiled/3,277 tracked inputs match that copy; dependencies, 593 supplier
+inputs and CSS remain unchanged. Five generated spreadsheet/GUI metadata assets
+differ from the preceding build only in temporary overlay paths and derived chunk
+identity; normalized content matches. Runtime changes are the Host title guard
+and its source map. [Portable evidence](../release/harness-plan-native-title-qualification.json).
+At that source checkpoint no artifact changed; the preceding review retains bd03b15.
+The newer [drafts/cold-history review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
+now includes this fix and repeats the full sealed-target and actual-Qwen proof.
+
+## Repeat the local model / original GUI proof
+
+Run [`harness-local-plan-proof.mjs`](../scripts/harness-local-plan-proof.mjs) from
+a full source checkout, with Node 24.19.0, a separate QA application assembly,
+its qualified Python interpreter and installed Chromium. Supply a sanitized JSON
+declaration containing only `api`, loopback `baseUrl` and the single existing
+Qwen `models` entry; omit credential fields and preserve that model entry. The
+current proof is for its 262,144-token context declaration and 8,192-token output
+limit. It does not rewrite the served model, tuning, unit files or user profiles.
+
+```sh
+node scripts/harness-local-plan-proof.mjs \
+  --app "$AUGMENTOR_QA_APP" \
+  --python "$AUGMENTOR_PROOF_PYTHON" \
+  --provider-json "$AUGMENTOR_LOCAL_MODEL_JSON" \
+  --output-parent "$AUGMENTOR_PROOF_OUTPUT"
+```
+
+Every invocation creates a private output/profile and short owned runtime socket
+namespace. It starts only its own prompt/memory companions and Harness owner;
+no system service is started, stopped or restored by this optional command. The
+fresh read-only profile has no imported history, credentials, resources, memory
+inference gateway or voice/MCP configuration; child environment credentials are
+excluded. The actual provider must read the authored marker once and present its
+complete plan. Original Request changes concludes without approval; bare `/plan
+off` performs no inference, its next real response has no planning section, and
+cold original plan reopening preserves exact native/display history. All owned
+actors must terminate. The output captures native history, requests, provider SSE,
+logs and screenshots privately; it is not a support export or public artifact.
+
+The final public driver has passed one complete actual Qwen flow with three
+provider requests/two tools and verified output limit, local Page destinations,
+unchanged source file and cold history. Its five refusal/help cases pass without
+starting any actor. An earlier incomplete stream and subsequent service loss,
+setup-only Unix-path/navigation failures, premature reply observation and the
+actual duplicate-title failure remain retained. Passing this bounded flow does
+not establish their complete causes or broader reliability/provider/voice parity.
+
+The initial 90-file source/ordinary cohorts at 6bc2b0d each report **444 pass/one
+failure/two optional skips**. The only failure occurs in Codex Browser's initial
+work-tab lookup before its first model prompt; all native-title/mode/compaction
+cases pass. A held initial-document control reproduces that exact absent lookup;
+an explicit committed-document/extension-tab barrier passes while retaining the
+same permission checks, model/image assertions and 45-second case bound. The
+older unretained scheduling cause remains unproven. Both final 91-file cohorts
+above pass after this fixture correction. The first relative-path fresh-copy
+launcher failed before Node started; its corrected absolute launch and retained
+preparation log are separate from these test results.
+
+The existing manager restored the stopped Qwen service for the authorized live
+proof; saved unit/drop-in/voice-configuration hashes match before and after. Its
+Breeze startup failed, the failed attempt is terminal, and speech is unqualified.
+No GPU placement, context/concurrency/precision or output setting was changed.
+The diagnostic itself does not manage those services. This recovery necessarily
+reads existing manager configuration; it is separate from the fresh proof profile.
+The preceding **9b23644** hosted SDK run passes Linux/macOS and fails the Windows
+plan-mode step; the new source has not established Windows or installed parity.
+
+## Qualification and remaining work
+
+The [new separate Linux owner review](HARNESS-MX-REVIEW.md#drafts-and-cold-history-review--october-15)
+includes scoped question drafts and this cold-title fix on sealed runtime 6bc2b0d.
+Its sealed-target cohort passes 450/two optional skips; separate real-Qwen planning
+and exact cold reopening pass. The installed selection stays unchanged.
+
+The [separate Linux owner review](HARNESS-MX-REVIEW.md#separate-plan-mode-review--october-15)
+now includes this mode on sealed runtime bd03b15. Its full sealed-target cohort
+repeats 419/two optional skips/zero failures; the installed selection stays separate.
+
+The new contracts exercise revisions, cancellation/no-op, corrupt records, actual
+SDK compaction-entry ancestry, a refused append, forced prompt/tool preservation,
+cancelled/unadmitted contexts, old reviews after reload and retired controller
+reads. Real isolated SDK/Host/provider cases cover pre-chat restart and native
+handover, saved native restart, exact branch ancestry, pending state after Stop,
+message/attachment refusal, approval without write permission, feedback,
+dismissal, Stop, inactive calls, an armed goal, Browser tool boundaries, queue and
+identified steering. Original Chromium controls exercise both themes, the chip,
+full review, Request changes, approval, saved reopening, reload and peer changes.
+
+The first private request-hook attempt lost guidance after a forced prompt; its
+failing test is retained. The post-projection hook preserves that prompt and the
+planning section. A Browser-surface probe also retained its actual policy refusal
+before the communication tool was added to the Browser allowlist; native tools
+remain excluded. Earlier fixture-only failures are recorded separately from
+product qualification. A separate retained command-menu control fails before the
+explicit capability check and passes after it.
+
+At **bd03b155f8478419a50bfb84edd9ac0e7cc42d78**, strict check/build and source/fresh
+ordinary each pass **419/two optional skips/zero failures**, across **86 files**,
+including all **47 Harness Chromium files**, with two workers per cohort and
+unchanged bounds. Each also passes five separate interaction-wait cases; thirteen
+shared offscreen dialog and eleven packaging/source-boundary cases pass. All
+**1,019 compiled files** and **3,268 tracked inputs** match after testing; the
+production dependencies remain 20,702 files/symlinks and 151 npm instances. All
+593 supplier inputs verify, including the two verbatim MIT chip files; the prior
+591 rows are unchanged. All four sealed inventories, five review processes,
+selection and 38 canonical pre-existing changes verify; Qwen catalog and the
+preceding review respond HTTP 200. That earlier review runs runtime ea3775b and
+does not contain this plan-mode implementation.
+[Portable qualification and exact cohort](../release/harness-plan-mode-qualification.json).
+
+The first hosted run at d7e6318 passes Linux/macOS but fails Windows while
+preparing the private companion, before any mode assertion. The source Windows
+supervisor requires Qt; that workflow installed only pywin32. Its qualification
+setup now uses the exact hash-locked Qt/shiboken/pywin32 subset of the existing
+Windows x64 product lock. No runtime, test deadline or platform assertion changes.
+The retained failure remains evidence; a passing new Windows run is still needed
+before claiming that platform or the failure's complete cause qualified.
+
+This is Harness/source integration, not installed adoption or complete migration.
+Physical MX feedback, representative live providers, live/alternate-provider compaction with
+active planning, hard-crash/write-fault coverage, complete attachment combinations,
+floating Native/browser-extension presentation and platform release artifacts
+still need acceptance. General late-answer continuation remains a separate gap. Generic Harness
+question drafts now [restore by conversation after reload](PI-QUESTIONS.md#conversation-scoped-saved-question-drafts--october-15);
+that later source fix is qualified separately from this mode/review checkpoint. The approved GUI, model/speech/GPU settings,
+installed selection, prior owner reviews and the Office distribution boundary
+remain preserved.
+
+The first dependency-setup commit (32e6435) retained an invalid YAML plain scalar
+containing `:all:`; its workflow did not start any jobs. The corrected folded
+command parses locally and preserves every locked-install argument. This is
+retained separately from the earlier actual Windows companion startup failure;
+new hosted qualification remains required.
+
+[SDK run 38725408842](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38725408842)
+at 0b39dd6 passes Linux/macOS. Windows now confirms private companion preparation
+and reaches mode execution, but that 17-case step reports nine pass, six fail and
+two timeouts. Review probes reach actual provider tool calls; their exact stalled
+boundary and the lifecycle timeout causes remain unproven. The Qt correction
+qualifies setup, not Windows mode acceptance. No timeout, assertion or platform
+case was relaxed or skipped to change that outcome.

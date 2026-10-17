@@ -241,10 +241,12 @@ export function createChatUI(els) {
   const $send = els.send
   const $top = els.top
 
+  const canMessageAction=action=>ui.state.phase==='ready'&&!ui.state.running&&!ui.state.submitting&&!!els.actionEnabled?.(action)
   function actionButton(action,seq,text){
     const button=el('button','msgaction msg-'+action);button.type='button';button.setAttribute('aria-label',ACTIONS.labels[action]);button.dataset.tooltip=ACTIONS.labels[action]
     button.innerHTML=action==='edit'?EDIT_ICON:BRANCH_ICON
-    button.addEventListener('click',()=>{if(els.actionEnabled?.(action))els.onMessageAction?.(action,seq,text)})
+    button.disabled=!canMessageAction(action)
+    button.addEventListener('click',()=>{if(canMessageAction(action))els.onMessageAction?.(action,seq,text)})
     return button
   }
   let assistantEl = null // block container: Think(s) + one .md text container
@@ -487,6 +489,15 @@ export function createChatUI(els) {
         const body=el('div','md');body.innerHTML=md(text);message.append(body);$log.append(message)
         break
       }
+      case 'runtime/notice':
+      case 'runtime/warning': {
+        if(data.disposition==='input-handled'&&data.source?.sessionId===entry.sessionId)confirmPrompt(blockText(data.submittedContent))
+        const message=el('div','msg status')
+        message.append(el('span','who','Status'))
+        const body=el('div','md');body.innerHTML=md(data.message??'Runtime status unavailable.')
+        message.append(body);$log.append(message)
+        break
+      }
       case 'session/title': {
         if (data.title && $title) $title.textContent = data.title
         break
@@ -519,8 +530,8 @@ export function createChatUI(els) {
         // Filter provenance, never the text the user may be asking about.
         if (data.source?.kind && data.source.kind !== 'user') break
         flushAssistant()
-        const text = blockText(data.content)
-        confirmPrompt(text)
+        const text = blockText(data.submittedContent ?? data.content)
+        if(!data.source?.sessionId||data.source.sessionId===entry.sessionId)confirmPrompt(text)
         const m = el('div', 'msg user')
         m.append(el('span', 'who', 'You'))
         const stack = el('div', 'userbody')
@@ -720,7 +731,8 @@ export function createChatUI(els) {
                 ? 'working…'
                 : 'disconnected'
     }
-    if ($send) $send.disabled = phase !== 'ready' || running || !!ui.state.submitting
+    if ($send) $send.disabled = phase !== 'ready' || (running && !ui.state.canQueue) || !!ui.state.submitting
+    $log.querySelectorAll('.msg-edit,.msg-branch').forEach(button=>{button.disabled=!canMessageAction(button.classList.contains('msg-edit')?'edit':'branch')})
   }
 
   function applyLog(log) {

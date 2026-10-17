@@ -1,0 +1,194 @@
+{
+  "schema": "augmentor-office-managed-scratch-recovery-qualification/1",
+  "date": "2026-10-17",
+  "sourceEvidenceBaseRef": "c17b4013051c2671d74ff06de04264621681bbba",
+  "scope": "Explicit uninstalled Linux x64 managed Office candidate; no ordinary/sealed/installed adoption or power-loss claim",
+  "sourceFilesSha256": {
+    "packages/runtime/src/host.ts": "6d83d8c2291ba9d754f8e47d8e435fdb523fd6a1fc09303ed7c9f6dfd25f6593",
+    "packages/runtime/src/office-process-linux.ts": "b30a50faac186eb910591fe8ad9ff19b1338a4ea508b60e71114afa979f2c3d8",
+    "packages/runtime/src/office-scratch-journal.py": "ed2e062df692f6ee959b067e3ca4ef977e31efd733146b855988c343a9972591",
+    "packages/runtime/src/office-scratch-linux.py": "9e3e39ebe25e1715e26548f6f8dcbeb8ea6d2973f5fe875a024950476e75c9bf",
+    "packages/runtime/src/office-scratch-linux.ts": "ea2fee630b224572aded4c1c9865d28779656092a58104ba9515a48186811d33",
+    "packages/runtime/src/office-scratch-state.ts": "4a06145e52c543d761588133fd1754d3561db6dbe3f75471d6b5e41d5c614167",
+    "scripts/copy-protocol.mjs": "9d3fc0b2f3e33e8de660537def8721422ed64b578fd5461fdb61907b7e617a5c",
+    "tests/fixtures/office-journal-owner.mjs": "eed6ffbab461febaadda7380a8e8ead8db5369ae09ea6adf181670163c06aaed",
+    "tests/office-process-managed.test.mjs": "2f299361070c8812d74fe507f8c30ef376430f5c1a2a455010379dcddbd3b00b",
+    "tests/office-scratch-recovery.test.mjs": "64cdd17578606045305fc1978c4f0971a3019d6230801b6b77a20ec285319d00"
+  },
+  "backend": "linux-managed-wasm",
+  "factory": "createLinuxManagedOfficeConverter(options, privateHostStateDirectory)",
+  "defaultUnchanged": "pinned-kit",
+  "storage": {
+    "data": "private Host state/office-scratch/v1/data",
+    "receipts": "private Host state/office-scratch/v1/records",
+    "metadata": [
+      "nonce name",
+      "device/inode",
+      "owner pid/start token/boot ID",
+      "ready/deleting phase"
+    ],
+    "noWorkspacePathsOrContentInReceipts": true,
+    "plaintextPrivateCopiesMaySurviveCrashUntilConverterInitialization": true,
+    "normalCleanup": "data and external receipt removed after settled work",
+    "recovery": "converter initialization, often first Office use after cold restart; no unrelated temp/workspace/profile scanning",
+    "unknownOrReplacedState": "preserve and refuse optional managed preview admission"
+  },
+  "qualification": {
+    "fullBuild": true,
+    "typeScriptCheck": true,
+    "sourceNode": {
+      "pass": 298,
+      "fail": 0,
+      "skip": 0,
+      "files": 45,
+      "chromiumFiles": 19,
+      "workers": 2,
+      "managedOptIn": true
+    },
+    "python": {
+      "pass": 43,
+      "skip": 0
+    },
+    "nativeCompatibility": {
+      "pass": 24,
+      "skip": 0,
+      "actualNativeOptIn": true,
+      "scope": "Full office-native-linux.test.mjs against changed shared scratch helper"
+    },
+    "recoveryTests": {
+      "pass": 10,
+      "includes": [
+        "receipt before copying bytes; normal data/receipt cleanup",
+        "actual Node and independent cleaner killed; cold managed converter recovery",
+        "admitted original entry startup stopped; renderer/supervisor/cleaner/Node dead; cold recovery with no inference/replay",
+        "live and foreign-current owner preservation",
+        "authored PID-reuse and prior-boot receipt controls",
+        "outside symlink target contents unchanged",
+        "replaced root preserved",
+        "actual kernel shared lease prevents recovery until release",
+        "unknown/link/future/duplicate/partial-write/unregistered allocation preservation",
+        "authored deleting-phase data-present/data-absent resume; missing-ready root preserved"
+      ],
+      "scopeLimit": "Admitted real entry startup is not independently traced as a Wasm-open/CPU parsing stage; deleting phases are authored receipts, not a killed deletion syscall or power-loss test"
+    },
+    "originalManagedGui": {
+      "defaultEnginePass": 1,
+      "thinEnginePass": 1,
+      "assertionsAndDeadlinesUnchanged": true,
+      "thinPackageVerifiedFiles": 53,
+      "scope": "Actual Host/original GUI, authored seed only, no subsequent inference"
+    },
+    "allTestScopesGone": true
+  },
+  "compiledDeltaVersusInstalled": {
+    "installedFiles": 1120,
+    "sourceFiles": 1140,
+    "unchanged": 1109,
+    "changedNames": [
+      "harness-web/assets.json",
+      "harness-web/build-inputs.json",
+      "harness-web/dsh-gui.js",
+      "harness-web/excel-worker-inputs.json",
+      "runtime/src/host.js",
+      "runtime/src/host.js.map",
+      "runtime/src/office-scratch-linux.d.ts",
+      "runtime/src/office-scratch-linux.js",
+      "runtime/src/office-scratch-linux.js.map",
+      "runtime/src/office-scratch-linux.py"
+    ],
+    "addedNames": [
+      "harness-web/excel-CHUACLYU.js",
+      "runtime/src/office-process-files.d.ts",
+      "runtime/src/office-process-files.js",
+      "runtime/src/office-process-files.js.map",
+      "runtime/src/office-process-linux.d.ts",
+      "runtime/src/office-process-linux.js",
+      "runtime/src/office-process-linux.js.map",
+      "runtime/src/office-process-linux.py",
+      "runtime/src/office-process-protocol.d.ts",
+      "runtime/src/office-process-protocol.js",
+      "runtime/src/office-process-protocol.js.map",
+      "runtime/src/office-process-scope.d.ts",
+      "runtime/src/office-process-scope.js",
+      "runtime/src/office-process-scope.js.map",
+      "runtime/src/office-process-worker.d.ts",
+      "runtime/src/office-process-worker.js",
+      "runtime/src/office-process-worker.js.map",
+      "runtime/src/office-scratch-journal.py",
+      "runtime/src/office-scratch-state.d.ts",
+      "runtime/src/office-scratch-state.js",
+      "runtime/src/office-scratch-state.js.map"
+    ],
+    "removedNames": [
+      "harness-web/excel-D6PHI2IL.js"
+    ],
+    "scope": "Current source build differs; GUI source unchanged while generated spreadsheet overlay nonce/chunk references may differ. No whole compiled-tree equality claim."
+  },
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "installedApplicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+  "ownerAppChanges": 0,
+  "engineRebuilds": 0,
+  "precedingCi": {
+    "ref": "c17b4013051c2671d74ff06de04264621681bbba",
+    "validateRun": 39021059197,
+    "debianJob": 117363076596,
+    "validateLastObserved": "in_progress",
+    "sdkRun": 39021059141,
+    "sdkConclusion": "failure",
+    "linuxSdkJob": 117362788044,
+    "linuxSdkConclusion": "success",
+    "macSdkJob": 117362787883,
+    "macSdkConclusion": "failure",
+    "windowsSdkJob": 117362787903,
+    "windowsSdkConclusion": "cancelled",
+    "wholeWorkflowQualified": false,
+    "macFailureScope": "Historical import fixtures require Linux publication/private destinations; this is outside the current MX rollout. Terminal job log retained privately."
+  },
+  "remaining": [
+    "Pre-readiness allocation/publication and broader bootstrap/actor windows; unknown partial state remains preserved",
+    "Power-loss/filesystem durability and killed real deletion boundary qualification",
+    "Exact ordinary/sealed/package/installed adoption and rollback",
+    "Broader documents/fonts/macros/security and full source/rebuild/third-party/public packaging qualification"
+  ],
+  "publicRedistributionQualified": false,
+  "installedBackendChanged": false
+}

@@ -16,7 +16,7 @@ from urllib.parse import urlsplit, parse_qs, urlunsplit
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from remote import client as remote_client
+from remote import client as remote_client, CATALOG_CONTRACT
 from platform_adapters.paths import link_directory
 import uuid
 
@@ -24,11 +24,18 @@ ROOT=Path(__file__).resolve().parents[2]
 VERSION=json.loads((ROOT/'release/product.json').read_text())['version']
 PRESETS={'linux':'augmentor-linux-product','browser':'augmentor-browser-product'}
 HEADER='# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
+LEGACY_DSH='0.1.5-rc.1'
+MODERN_DSH='0.2.0-rc.2'
 
-def personal_agent_entries():
+def personal_agent_entries(family=LEGACY_DSH):
     """Both legacy preset IDs are aliases for one maintained personal agent."""
     persona=(ROOT/'config/agent-persona.md').read_text()+'\n\n'+(ROOT/'config/browser-recovery.md').read_text()
     capabilities=json.loads((ROOT/'release/dsh/desktop-capabilities.json').read_text())
+    if family==MODERN_DSH:
+        delegation=next(row for row in capabilities if row['id']=='delegation')
+        worker=next(row for row in delegation['config'] if row['id']=='workflow-worker-thread')
+        worker.update(id='workflow-ptc',name='@deepseek-ai/dsh-workflow-ptc')
+    elif family!=LEGACY_DSH:raise ValueError('Unqualified DSH preset family.')
     compaction=next(row for row in capabilities if row['id']=='compaction')
     compaction['config'].append({'id':'augmentor-context-budget','name':str(ROOT/'adapters/dsh-context-budget/index.mjs')})
     return [
@@ -106,19 +113,36 @@ def product_token(path, *, create=False):
         return value
 def describe():
     saved=current()
-    return {'endpoint':saved.get('endpoint','http://127.0.0.1:3080'),'home':saved.get('home',os.environ.get('DSH_HOME',str(Path.home()/'.dsh'))),'configured':bool(saved),'supportedDsh':'0.1.5-rc.1','version':VERSION}
+    supported=LEGACY_DSH+' / '+MODERN_DSH if sys.platform=='linux' else LEGACY_DSH
+    return {'endpoint':saved.get('endpoint','http://127.0.0.1:3080'),'home':saved.get('home',os.environ.get('DSH_HOME',str(Path.home()/'.dsh'))),'configured':bool(saved),'supportedDsh':supported,'version':VERSION}
+
+
+def cli_family(cli):
+    """Read an installed CLI manifest without executing a shell shim."""
+    cli=Path(cli).resolve(strict=True)
+    for parent in (cli,*cli.parents):
+        try:meta=json.loads((parent/'package.json').read_text())
+        except (OSError,ValueError):continue
+        if meta.get('name')!='@deepseek-ai/dsh':continue
+        version=meta.get('version')
+        if version==LEGACY_DSH or version==MODERN_DSH and sys.platform=='linux':return version
+        break
+    raise ValueError('Use the supported Node DSH CLI installation; modern setup is qualified only on Linux.')
 
 
 def modules_directory(cli):
     """Support both global CLI installs and npm's project-level hoisting."""
-    required={'@deepseek-ai/dsh-base':'0.1.5-rc.1','@deepseek-ai/dsh-tools':'0.1.5-rc.1','@deepseek-ai/schemastery':'3.18.2'}
+    family=cli_family(cli)
+    required={'@deepseek-ai/dsh-base':family,'@deepseek-ai/dsh-tools':family,'@deepseek-ai/schemastery':'3.18.4' if family==MODERN_DSH else '3.18.2'}
+    if family==MODERN_DSH:
+        required.update({'@deepseek-ai/cordis':'4.0.4','@deepseek-ai/dsh-agent-preset':family,'@deepseek-ai/dsh-agent-preset-registry':family})
     for parent in (cli,*cli.parents):
         modules=parent/'node_modules'
         try:
             if all(json.loads((modules/name/'package.json').read_text()).get('version')==version for name,version in required.items()):
                 return modules,required
         except (OSError,ValueError):pass
-    raise ValueError('Install the supported DSH 0.1.5-rc.1 CLI before connecting it.')
+    raise ValueError('The selected DSH CLI needs its exact supported dependency family before connecting it.')
 
 
 def cli_directory():
@@ -143,9 +167,10 @@ def cli_directory():
             meta = json.loads(manifest.read_text(encoding='utf-8'))
         except (OSError, ValueError):
             continue
-        if meta.get('name') == '@deepseek-ai/dsh' and meta.get('version') == '0.1.5-rc.1':
+        if meta.get('name') == '@deepseek-ai/dsh':
+            cli_family(candidate)
             return candidate
-    raise ValueError('Use the supported Node DSH 0.1.5-rc.1 CLI installation.')
+    raise ValueError('Use a supported Node DSH CLI installation.')
 
 def existing_prompt_plugin(remote,base):
     rows=remote.invoke('pluginInventory/list').get('entries',[])
@@ -178,10 +203,11 @@ class Setup:
         # user's profile node_modules. Reuse that checked SDK; do not install
         # or copy a second DSH runtime into the profile.
         cli=cli_directory()
+        family=cli_family(cli)
         modules,packages=modules_directory(cli)
         remote=remote_client(base,home,query.get('token',[None])[0]);remote.authorize()
         host=remote.call('host.describe')
-        if host.get('version')!='0.1.5-rc.1':raise ValueError('This DSH API version has not been verified for this preview.')
+        if host.get('catalogContract')!=CATALOG_CONTRACT:raise ValueError('This DSH catalogue API contract has not been verified for this preview.')
         prompt_plugin=existing_prompt_plugin(remote,base)
         installed=False
         try:
@@ -191,7 +217,7 @@ class Setup:
             installed=installed and all(v in available for v in PRESETS.values())
         except (OSError,ValueError,KeyError):pass
         path=configuration();token=uuid.uuid4().hex
-        self.pending={'token':token,'expires':time.monotonic()+600,'endpoint':base,'home':str(home),'modules':str(modules),'configurationHash':digest(path),'patchHash':digest(profile/'cordis.patch.yml'),'installed':installed,'existingPromptPlugin':prompt_plugin}
+        self.pending={'token':token,'expires':time.monotonic()+600,'endpoint':base,'home':str(home),'cli':str(cli),'dshVersion':family,'modules':str(modules),'packages':packages,'configurationHash':digest(path),'patchHash':digest(profile/'cordis.patch.yml'),'installed':installed,'existingPromptPlugin':prompt_plugin}
         return {'token':token,'installed':installed,'packages':packages,'message':'Integration checked. Save to use DSH.' if installed else 'Install the Augmentor integration, restart DSH, then check this connection again.'}
     def checked(self,token):
         p=self.pending
@@ -199,6 +225,9 @@ class Setup:
         return p
     def install(self,token):
         p=self.checked(token);base=p['endpoint'];home=Path(p['home']);profile=home/'profiles/web';patch=profile/'cordis.patch.yml'
+        modules,packages=modules_directory(Path(p['cli']))
+        if cli_family(p['cli'])!=p['dshVersion'] or str(modules)!=p['modules'] or packages!=p['packages']:
+            raise ValueError('DSH dependency selection changed. Check the connection again before installing.')
         if digest(patch)!=p['patchHash']:raise ValueError('DSH composition changed. Check again before installing.')
         if any(row.get('running') for row in remote_client(base,home).call('session.list')['items']):raise ValueError('Finish DSH tasks before installing the integration. Nothing was cancelled.')
         if existing_prompt_plugin(remote_client(base,home),base)!=p.get('existingPromptPlugin'):
@@ -212,6 +241,7 @@ class Setup:
         previous=None;old_presets={};old_target=None
         if target.exists() and not target.is_symlink() and (target/'ownership.json').is_file():
             previous=json.loads((target/'ownership.json').read_text())
+            if previous.get('schema')=='augmentor-dsh-preserved-ownership/1':raise ValueError('This preserved integration requires a reviewed migration before updating.')
             expected={'browser/dist/index.js','browser/package.json'}
             if set(previous.get('files',{}))!=expected or set(previous.get('presets',{}))!=set(PRESETS.values()):raise ValueError('Integration ownership is incomplete. No files were replaced.')
             for name,checksum in previous['files'].items():
@@ -250,7 +280,7 @@ class Setup:
             for surface,name in PRESETS.items():
                 directory=presets/name;directory.mkdir(parents=True,mode=0o700,exist_ok=bool(previous))
                 if not previous:made.append(directory)
-                entries=personal_agent_entries()
+                entries=personal_agent_entries(p['dshVersion'])
                 # JSON is a YAML subset and preserves arbitrary paths without
                 # shell expansion, YAML tags or manual quoting.
                 atomic(directory/'preset.yml',HEADER+json.dumps({'name':'Augmentor '+surface.title(),'description':'Augmentor product integration '+VERSION})+'\n')
@@ -261,6 +291,10 @@ class Setup:
             backup=profile/('cordis.patch.yml.before-augmentor-'+uuid.uuid4().hex)
             if patch.exists():shutil.copy2(patch,backup)
             additions=[{'id':'augmentor-product','name':str(ROOT/'adapters/dsh-product/index.mjs')},{'id':'augmentor-product-browser','name':str(target/'browser/dist/index.js'),'config':{'agentPreset':PRESETS['browser'],'chatDir':str(Path(os.environ.get('AUGMENTOR_DSH_WORKSPACE_ROOT',Path.home()))/'Augmentor Browser DSH'),'deleteAfterDays':0}},{'id':'augmentor-product-prompts','name':str(ROOT/'adapters/dsh-prompt-library/lib/index.js')}]
+            if p['dshVersion']==MODERN_DSH:
+                for surface,name in PRESETS.items():
+                    additions.append({'id':'augmentor-preset-'+surface,'name':str(modules/'@deepseek-ai/dsh-agent-preset/lib/index.js'),
+                                      'config':{'id':name,'name':'Augmentor '+surface.title(),'description':'Augmentor product integration '+VERSION,'plugins':personal_agent_entries(MODERN_DSH)}})
             if p.get('existingPromptPlugin'):additions=[row for row in additions if row['id']!='augmentor-product-prompts']
             # Append one top-level patch without rewriting existing expressions.
             if digest(patch)!=p['patchHash']:raise ValueError('DSH composition changed during installation. No existing configuration was replaced.')

@@ -1,0 +1,127 @@
+{
+  "schema": "augmentor-harness-dsh-live-continuation/1",
+  "date": "2026-10-17",
+  "scope": "Exact sealed MX application with actual local Qwen and authored recovered-history data; current model configuration only, no real owner conversations or knowledge copied; isolated original-GUI/SDK continuation, cold reopen and one approved file round trip",
+  "applicationRef": "d157ffe190bdd91c600b8f76c2a2e3c2bd6a0e52",
+  "releaseId": "20261017-045822-6b886151",
+  "artifactSha256": "02b597295bb93dd9764d3f34e3ddb5f431b055d83306af549cd36e1d0d616bbe",
+  "assessedSealedInputsVerifiedAfterLiveTests": 24679,
+  "codeQualificationInheritedFrom": "harness-dsh-historical-admission-qualification-20261017.json",
+  "sourceOrRuntimeCodeChanged": false,
+  "sourceQualificationRerunByThisLiveCheck": false,
+  "authoredFixtureAndBrowserDriverInputsSha256": {
+    "tests/fixtures/dsh-historical-project.mjs": "8f0ea93a0d6f49e3e587a678a801450defeb8652e9f751f8c964784d50045e62",
+    "tests/fixtures/dsh-inherited-settlement.mjs": "0b038b64cd67c78e3003b1ba80c3e732e6cab6ee4979bf493748946d99ae2054",
+    "tests/fixtures/dsh-deferred-settlement.mjs": "7db2bd3688dc17ef571ae73e52c1669935df7f33c423973c6c121be21adab999",
+    "tests/fixtures/dsh-settlement-project.mjs": "8d23493c8683401d07f4d059bcb2b3143bdd5173139db45736b3458691ade230",
+    "tests/fixtures/dsh-interrupted-compaction-project.mjs": "f05037296ccf2babbe06331403a794a551cf65c6a26b3db2d7ffe47038e5acdf",
+    "tests/fixtures/dsh-project.mjs": "ef5445f9f315142aa619bd80befd583660fd6abbffa24177303a7ebb890912ce",
+    "tests/fixtures/harness-cdp.mjs": "857cda64abbcce8ebc243954e9a82408c5c793fd056d5c381494d6af3a75a173",
+    "tests/fixtures/harness-pointer.mjs": "bf878337bd1079bd830b17fa69b227d4f6bed2e667385efcf431f9e27d008ecd"
+  },
+  "liveModel": {
+    "provider": "mx-qwen",
+    "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+    "gpu": "RTX 5090",
+    "declaredContextWindow": 262144,
+    "declaredMaxTokens": 32768,
+    "previouslyInactiveSavedServiceRestored": true,
+    "restoreMechanism": "Existing GPU manager saved-unit start API; no recipe rendering or voice startup",
+    "savedUnitAndDropinsUnchanged": true,
+    "restoredPidStableThroughLiveTests": true,
+    "currentOwnerModelConfigurationUnchanged": true,
+    "otherGpuSlotAndVoiceServicePidsAndStatesUnchanged": true
+  },
+  "liveChecks": {
+    "initialOpenNoReplay": true,
+    "originalGuiLiveSendAndAnswer": true,
+    "coldReopenNoReplayAndLiveRecall": true,
+    "sourceEnvelopeAndOwnerModelConfigurationUnchanged": true,
+    "onlyOwnedProbeFilesPresent": true,
+    "gracefulShutdown": true,
+    "exactOwnedFileApprovalCardVerified": true,
+    "originalAllowOnceClickedExactlyOnce": true,
+    "liveOriginalGuiWriteAndRead": true,
+    "actualFileBytesExact": true,
+    "originalGuiReturnedToIdle": true,
+    "permissionRestored": true,
+    "deferredCatalogueHistoricalReplyCutPassed": true,
+    "inheritedAncestorChildHistoricalReplyCutPassed": true,
+    "interruptedCompactionHistoricalContinuationPassed": true,
+    "successfulFreshReadCalls": 4,
+    "successfulFreshWriteCalls": 1,
+    "historicalCallsReplayed": 0,
+    "historicalJobsResumed": 0,
+    "positiveLiveHumanTurns": 5,
+    "unattendedApprovalNegativeTurns": 1,
+    "totalExplicitLiveHumanTurns": 6,
+    "currentModelRouteExplicitlyMatchedRunningAlias": true,
+    "guiConsoleAndHttpErrors": 0,
+    "twoHistoricalReplyParentsByteExact": true,
+    "originalAuthoredEnvelopeByteExact": true,
+    "totalFreshToolResultEvents": 7,
+    "successfulToolResults": 5,
+    "refusedOrMissingFileToolResults": 2
+  },
+  "unattendedWriteNegativeCase": {
+    "testResult": "Expected-file assertion failed after approval was left unanswered; retain as refusal evidence, not a passing write",
+    "fileCreated": false,
+    "modelReportedRefusalAndMissingFile": true,
+    "oldActionReplayedOrRetried": false,
+    "newApprovedRequestUsedDistinctFileAndRequest": true,
+    "refusalAndRawNativeEvidenceRetainedPrivately": true
+  },
+  "isolation": {
+    "ownerConversationsCopied": false,
+    "ownerWikiOrKnowledgeCopied": false,
+    "onlyCurrentQwenProviderConfigurationCopied": true,
+    "ownerProjectsImported": 0,
+    "authoredNativeTestProfileCreated": true,
+    "existingOwnerReviewsUpdated": false,
+    "existingOwnerModelRequestsSubmitted": 0,
+    "activePrivateTestHostsAfterChecks": 0,
+    "isolatedCompanionsRetired": 1,
+    "browserScratchDirectoriesRemoved": 3,
+    "syntheticNativeAndRawSourceEvidenceRetained": true,
+    "productionCompanionsRetired": 0
+  },
+  "preservation": {
+    "scope": "Read-only IPC peer/build, actual sealed owner files, complete protected regular path sets and contents, registry and selections; no owner restart, update, import or model work",
+    "reviews": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "registryAndSelectedConfigurationsExact": true,
+    "newOwnerTransfers": 0,
+    "ownerRestarts": 0,
+    "candidateActivated": false
+  },
+  "limits": [
+    "Live Qwen evidence uses independently authored native-envelope fixtures; actual public-codec derivation qualifies separately in the eight-group pipeline",
+    "This tests one exact running local model route, not every configured provider/profile or automatic local model switching",
+    "Original-GUI live Send and Allow once were automated through actual pointer input in isolated Chromium; physical owner/browser use remains separate",
+    "No additional real project transfer or owner review adoption; 28-project readiness remains a separate current-source assessment",
+    "Owner pilot feedback remains required before further real migration; voice and later OS rollout remain deferred"
+  ],
+  "publicationChecks": {
+    "privateBoundaryLicenseAndNoticeCasesPassed": 16,
+    "privateSourceIdentityAndContentFingerprintStringsChecked": 430,
+    "privateMatchesInStagedPublication": 0
+  }
+}

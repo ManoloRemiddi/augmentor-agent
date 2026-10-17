@@ -1,0 +1,73 @@
+{
+  "schema": "augmentor-harness-plugin-switches-review/1",
+  "date": "2026-10-16",
+  "implementationRef": "37a15691",
+  "applicationRef": "adf7e71985be22a8ee989c356d69c11661b76ca7",
+  "releaseId": "20261016-134148-602cfa22",
+  "artifactSha256": "62acac812aa3329b17522c9ca0e5448d4928b17bbb52f92d6bd13ce1a4ee00e6",
+  "sealedEntries": 24563,
+  "compiledFiles": 1072,
+  "scope": "Private unselected MX Linux review; actual saved plugin overview switches",
+  "qualification": {
+    "sourceCases": 18,
+    "sealedCases": 18,
+    "focusedFiles": 13,
+    "chromiumFiles": 11,
+    "controlCases": 7,
+    "workers": 2,
+    "failures": 0,
+    "skips": 0,
+    "licensePrivateBoundaryNoticeCases": 16,
+    "lightDarkSwitchContrastMinimum": 3,
+    "intermediateContrastFailureReproduced": true,
+    "cardGroupsHaveNoStrayText": true,
+    "actualSdkSavedSwitchingAndColdReload": true,
+    "keysRoutesAndUnsavedDetailEditsPreserved": true,
+    "staleAndLostWritesNotReplayed": true,
+    "inspectorDoesNotReadPrivilegedSettings": true,
+    "noModelOrAudioWorkForStatusOrSwitchTests": true,
+    "ownerReviewInstancesUpdated": 2,
+    "ownerConversationsPreserved": 4,
+    "backupRegularFilesVerified": 389,
+    "coldStartupProtectedInputsVerified": 32,
+    "postBrowserPersistentInputsVerified": 28,
+    "ownerSavedSettingsAnd12PromptsPerReviewUnchanged": true,
+    "ownerMemoryStatus": "Unconfirmed after explicit refresh; owner runtime reports automatic memory capture unavailable. Switch stays disabled; service health not qualified."
+  },
+  "controls": {
+    "savedSwitches": [
+      "Web search",
+      "Wiki tools & skills",
+      "Workspace folders",
+      "Adaptive reasoning",
+      "Automatic memory capture"
+    ],
+    "memory": "Capture off also pauses processing; capture on does not resume processing. Detail owns processing.",
+    "builtIn": [
+      "Prompt library",
+      "Improve prompt",
+      "Model picker",
+      "Context & insights"
+    ],
+    "connectedTools": "Per connection",
+    "voice": "On demand; no live service claim",
+    "unknownWrites": "Unconfirmed until explicit refresh; no automatic retry",
+    "onMeaning": "Saved setting; not external service health"
+  },
+  "preservation": {
+    "productionNodeDependenciesComponentsChanged": false,
+    "supplierSourcesLicensesChanged": false,
+    "installedSelectionChanged": false,
+    "originalDshSettingsChanged": false,
+    "gpuOrModelConfigurationChanged": false,
+    "realOwnerPluginFlagsToggledDuringQa": false
+  },
+  "remaining": [
+    "Owner Wiki vault and MCP setup",
+    "Full module unloading is not introduced",
+    "Review prompt copies remain isolated from installed Agent",
+    "Broader migration and native Qt prerequisites remain separate",
+    "Voice and other operating systems deferred",
+    "No installed activation, merge or public binary qualification"
+  ]
+}

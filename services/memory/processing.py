@@ -42,7 +42,9 @@ class Processing:
                 raise ValueError('Invalid lifecycle owner')
             return self.budget.activity(session['id'], owner, p.get('phase'))
         if action == 'processing':
-            return self.budget.pause(p['paused']) if 'paused' in p else self.status()
+            if 'expectedPaused' in p and type(p['expectedPaused']) is not bool:
+                raise ValueError('Invalid expected memory processing setting')
+            return self.budget.pause(p['paused'], p.get('expectedPaused')) if 'paused' in p else self.status()
         if action == 'jobs':
             with self.memory.connect() as db:
                 return {'jobs': [dict(r) for r in db.execute('''SELECT j.id,j.phase,j.status,j.reason,j.attempt,

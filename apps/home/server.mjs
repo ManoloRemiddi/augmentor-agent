@@ -13,8 +13,9 @@ import {Identity,digest,safeEqual} from './identity.mjs';
 const identity=x=>typeof x==='string'&&/^[a-zA-Z0-9_-]{1,100}$/.test(x);
 export function readConfig(env=process.env) {
   const secret=name=>{if(!env[name+'_FILE'])throw Error('Missing '+name+'_FILE');return readFileSync(env[name+'_FILE'],'utf8').trim();};
-  const config={model:env.MODEL_ID,modelUrl:env.MODEL_BASE_URL,mcpUrl:env.HA_MCP_URL,stateDir:env.HOME_STATE_DIR??'/state',haToken:secret('HA_TOKEN'),token:secret('HOME_AGENT_TOKEN'),publicOrigin:env.HOME_PUBLIC_ORIGIN,deviceMode:env.HOME_DEVICE_MODE??'selected'};
+  const config={model:env.MODEL_ID,modelUrl:env.MODEL_BASE_URL,mcpUrl:env.HA_MCP_URL,stateDir:env.HOME_STATE_DIR??'/state',haToken:secret('HA_TOKEN'),token:secret('HOME_AGENT_TOKEN'),publicOrigin:env.HOME_PUBLIC_ORIGIN,deviceMode:env.HOME_DEVICE_MODE??'selected',harness:env.HOME_HARNESS??'dsh'};
   if(!['selected','assist-preview'].includes(config.deviceMode))throw Error('Invalid Home device mode');
+  if(!['dsh','pi'].includes(config.harness))throw Error('Invalid Home harness');
   if(config.token.length<24)throw Error('Service token too short');
   for(const key of ['modelUrl','mcpUrl']) {
     const u=new URL(config[key]);
@@ -117,7 +118,7 @@ export function httpService(config,ledger,runtime,{readiness=async()=>{
         }finally{admitted=false;}
         return;
       }
-      if(req.method==='GET'&&req.url==='/health'){reply(200,{status:draining?'draining':'ok',runtime:'dsh',model:config.model,busy:admitted,memory:'household session history; long-term memory disabled'});return;}
+      if(req.method==='GET'&&req.url==='/health'){reply(200,{status:draining?'draining':'ok',runtime:runtime.harness??'dsh',model:config.model,busy:admitted,memory:'household session history; long-term memory disabled'});return;}
       if(req.method==='GET'&&req.url==='/ready'){
         let ready=false;try{ready=!draining&&await readiness();}catch{}
         reply(ready?200:503,{ready,model:config.model,providerProbe:'not performed; no billable health calls'});return;
@@ -206,7 +207,10 @@ export async function main(){
   const ledger=new Ledger(join(config.stateDir,'actions.sqlite3'));
   const runtime=await createRuntime(config,ledger),app=httpService(config,ledger,runtime);
   if(!app.identities.hasOwner()){const invite=app.identities.invite('owner');writeFileSync(join(config.stateDir,'pairing-code'),invite.code+'\n',{mode:0o600});}
-  app.server.listen(Number(process.env.PORT??8181),'127.0.0.1',()=>console.log('Augmentor Home ready on loopback; shared DSH runtime, HA Assist MCP'));
+  app.server.listen(Number(process.env.PORT??8181),'127.0.0.1',()=>{
+    console.log('Augmentor Home ready on loopback; shared '+(runtime.harness==='pi'?'Pi':'DSH')+' runtime, Home Assistant integration');
+    console.log(JSON.stringify({event:'home.listening',protocol:'augmentor-home/1',harness:runtime.harness??'dsh',host:'127.0.0.1',port:app.server.address().port}));
+  });
   let closing=false;
   const stop=async()=>{if(closing)return;closing=true;await app.close();ledger.close();process.exit(0);};
   process.on('SIGTERM',()=>void stop());process.on('SIGINT',()=>void stop());

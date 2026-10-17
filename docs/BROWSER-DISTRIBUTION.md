@@ -27,6 +27,18 @@ installs the downloaded runtime package and loads the downloaded ZIP as an ordin
 user in Chromium, with a deterministic local model and no developer configuration.
 Its result must pass for the candidate being handed to testers.
 
+### October 10 Pi Harness source qualification
+
+The [loaded Pi Chromium follow-up](AUGMENTOR-HARNESS.md#loaded-pi-chromium-extension) drives the actual MV3 extension, product native host and Pi 1.1.0 against an independently authored synthetic page/provider. It verifies snapshot/type/click/screenshot, identified template-expanded steering, original Chat text, Remove, reload restoration, Stop/paused FIFO resume and exact Branch/Edit without changing the parent. Streaming now preserves the negotiated queue Send button instead of disabling it during each rendered delta. Layout and control placement are unchanged.
+
+Trusted development/companion configuration may set `AUGMENTOR_PI_BROWSER_WORKSPACE` to an explicit Pi Browser working directory. The default remains `~/Augmentor Browser Pi`. This permits isolated profiles without changing the account home; it does not grant new tools or change surface authorization. The candidate's source and staged-tree tests are Linux evidence; a staged tree is not a complete installed package. Mac/Windows Browser, other Chromium distributions, live providers and installed acceptance remain separate qualification.
+
+The [Branch/Edit follow-up](AUGMENTOR-HARNESS.md#harness-branchedit-controls-and-steering-history) scopes Pi inherited delivery IDs to their originating conversation in queue and optimistic prompt reconciliation. Historical parent messages still render. Existing Branch/Edit buttons now reflect connected/idle/submitting and negotiated capability guards; queue Send remains available during supported active turns. This corrects an apparent-enabled action that previously returned without branching/editing. The loaded Codex/Pi fixtures wait for the actual action state instead of using Send as an idle signal. Layout and control placement are unchanged. Exact failed-run, source/staged checks and remaining platform acceptance are in the owning qualification record.
+
+The [ordinary Pi input checkpoint](AUGMENTOR-HARNESS.md#native-branchedit-and-ordinary-sdk-inputs) enables approved handler/skill/template expansion for ordinary/FIFO input as well as corrections. An extension-consumed input emits status with original submitted content and originating session identity; Browser removes only its matching own-origin optimistic submission. Inherited handled status cannot clear a child's pending input, and no human/assistant answer is invented. This shared renderer behavior has DOM plus source/staged loaded Pi evidence with synthetic inputs; installed/live/other-platform acceptance remains separate. Layout and control placement are unchanged.
+
+The [Harness shared prompt checkpoint](AUGMENTOR-HARNESS.md#shared-prompt-library-and-editor) reuses the public Browser picker/editor and stylesheet. The picker preserves an alias on Enter when its catalog fails; optional context guards prevent late clipboard success/failure from replacing a newer draft. Browser's editor labels/layout are unchanged. Shared DOM and actual Harness/private-browser clipboard fixtures pass; loaded Browser prompt CRUD/clipboard/conflict GUI and other-platform installation remain separately unqualified.
+
 The preview has actual Chromium 152 evidence. Google Chrome, Brave, other operating
 systems, and Snap/Flatpak browser isolation remain uncertified until their own
 installation and native-messaging tests pass. Do not advertise those combinations

@@ -1,0 +1,166 @@
+{
+  "schema": "augmentor-pi-memory-settlement-qualification/1",
+  "date": "2026-10-16",
+  "runtimeSourceRef": "934a280eb752347e28f01719968aa22520fdfd94",
+  "applicationVersion": "0.2.13",
+  "piSdkVersion": "1.1.0",
+  "hindsightVersion": "0.10.0",
+  "image": "ghcr.io/vectorize-io/hindsight@sha256:3edcb6165cefdeaa6721dd0fce43cfd13b7a9c346ce0d2c5f4b4bf7bc3c8ac0b",
+  "scope": "isolated Linux source and fresh ordinary application qualification; no selected or running owner artifact changed",
+  "sourceRuntimeFiles": {
+    "services/memory/gateway.py": "42ab674345d7b0acc870a3fdc084b5f8611cac983df6dd640cb8b6ad04a26955",
+    "services/memory/hindsight.py": "cc2bc3be209b2428a259d271540006c230b635c84a4d8fd57ad0f229ccbcebdd"
+  },
+  "ordinaryApplication": {
+    "trackedInputsVerified": 3395,
+    "copiedInputs": {
+      "dist": 1060,
+      "node": 1,
+      "node_modules": 20702
+    },
+    "copiedInventorySha256": {
+      "dist": "e772c7ae5cc6d6f26e44c7dac00a3d3ab576dbb2a80e92b5ac181ee47ac52ae1",
+      "node": "7cf49748be9dfbbd046a98a2769dfc8b8366eeb661a450827711c5094a9b5a24",
+      "node_modules": "0704a733803a7dabae4dd66e7726e15cd750c0b6d29d552c604ba7dd331b4bab"
+    },
+    "beforeAfterUnchanged": true,
+    "packageJsonInputs": 290
+  },
+  "tests": {
+    "sourceAndOrdinaryEach": {
+      "python": {
+        "pass": 41,
+        "fail": 0,
+        "skipped": 0
+      },
+      "node": {
+        "pass": 30,
+        "fail": 0,
+        "skipped": 0,
+        "workers": 2
+      }
+    },
+    "negativeControls": [
+      "Old gateway confirms success before held durable settlement finishes.",
+      "Old describe transaction blocks an independent budget settlement writer."
+    ],
+    "boundsWorkersSkipsChanged": false,
+    "publicSourceLicenseBoundary": {
+      "pass": 12,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "retainedLiveExperiments": [
+    {
+      "runtime": "prior sealed 159c99f2",
+      "pass": false,
+      "stoppedPhase": 3,
+      "observation": "Spurious sequential gateway 429 and durable budget settlement database lock; owned actors/engine terminal."
+    },
+    {
+      "runtime": "gateway-only 43b662f3",
+      "pass": false,
+      "stoppedPhase": 3,
+      "observation": "No spurious 429; stage stops with one failed call and 84.26 seconds remaining; owned actors/engine terminal."
+    },
+    {
+      "runtime": "934a280eb752347e28f01719968aa22520fdfd94",
+      "pass": false,
+      "jobPhasesCompleted": 6,
+      "jobStatus": "completed",
+      "modelCalls": 6,
+      "modelCallFailures": 0,
+      "remainingJobSeconds": 47.82019603799563,
+      "remainingJobTokens": 39078,
+      "claimAndPageChecks": [
+        {
+          "kind": "relationship",
+          "extractedClaims": 2,
+          "expectedFactInExtractedClaims": true,
+          "expectedFactInPage": false,
+          "pages": 1,
+          "allPagesNonempty": true,
+          "allPagesReportedFresh": true
+        },
+        {
+          "kind": "work",
+          "extractedClaims": 3,
+          "expectedFactInExtractedClaims": true,
+          "expectedFactInPage": false,
+          "pages": 1,
+          "allPagesNonempty": true,
+          "allPagesReportedFresh": true
+        }
+      ],
+      "failure": "Required page semantic assertions time out; recall/update/branch/restart/pause/outage assertions are not reached.",
+      "allOwnedActorsTerminal": true,
+      "separateEngineStopped": true,
+      "defaultThinkingPreserved": true
+    }
+  ],
+  "pinnedEngineInspection": {
+    "sourceSha256": {
+      "memory_engine.py": "770ea9011dec620c6c6584f8889ccf73740f9489586e5745fd0164fd636eafba",
+      "agent.py": "5ef0de0e783c0ca74898ef9c5021e58229661e4a66937e6e72c6807718876d5d"
+    },
+    "observed": "Page refresh calls Reflect without a budget override. LOW defaults to half of configured two iterations: one final synthesis, no retrieval tool. Actual logs confirm both pages use one forced iteration and zero tool calls.",
+    "settingsOrEngineSourceChanged": false
+  },
+  "privacyAndOwnership": {
+    "syntheticDataOnly": true,
+    "ownerBanksOrDatabasesCopied": false,
+    "privateSpeechSourceCopied": false,
+    "publicCacheInputs": 43,
+    "originalEngineIdentityAndHealthPreserved": true,
+    "selectedOrReviewArtifactChanged": false,
+    "gpuModelSettingsOrWorkloadsChanged": false,
+    "jobRetriesOrBudgetExtensions": false
+  },
+  "localEvidenceDigests": {
+    "harness-live-memory-gateway-before-20261016.log": {
+      "bytes": 1311,
+      "sha256": "2b1f5f6c4e59debbe4a1f766943a1b606912d64e1c273787eca3a162e0f927a6"
+    },
+    "harness-live-memory-status-before-20261016.log": {
+      "bytes": 2593,
+      "sha256": "54943e9effdd49ad2e94d19d29eee3776c586618f42e1b8f6468f32d47bd769c"
+    },
+    "harness-live-memory-status-focus-20261016.log": {
+      "bytes": 7236,
+      "sha256": "e203e4bef96d878c5a47c7cfe4aa18736544410756aa409031c0c4d3c15f6feb"
+    },
+    "harness-live-memory-status-python-ordinary-20261016.log": {
+      "bytes": 7236,
+      "sha256": "7ac27f138ccc05d872221cd038227b41c813a958d1b4a944697b00889dd67ba3"
+    },
+    "harness-live-memory-status-node-source-20261016.log": {
+      "bytes": 3404,
+      "sha256": "0004823604977de636bf168ee7abff1ae329027e1410e7a5da5f25efe7ff4c72"
+    },
+    "harness-live-memory-status-node-ordinary-20261016.log": {
+      "bytes": 3406,
+      "sha256": "57623bc2e7d2124eef18b2ac8a83d2f64887e085df2701ded4e6c576c6441537"
+    },
+    "harness-live-memory-boundary-20261016.log": {
+      "bytes": 2253,
+      "sha256": "e9238121cfd9f1a15af9a335a8a621645a73bd9ecdca9d60b79936cbb19dc98a"
+    },
+    "harness-live-memory-status-proof-20261016.log": {
+      "bytes": 1584,
+      "sha256": "196235073f15e7e099412471f1159048ea7366a322d47470bf51b60e92636052"
+    }
+  },
+  "privateEngineLog": {
+    "bytes": 44471,
+    "sha256": "861187cd60887fe550b9d9a3987880b287498c7f0e53d05d90a3d802021ef780",
+    "published": false
+  },
+  "remaining": [
+    "Evidence-bearing page synthesis within the unchanged policy",
+    "Fresh/current recall, corrections, historical branch, cold restart, pause and outage acceptance on this candidate",
+    "Physical MX feedback/full voice and distribution/adoption",
+    "Original broader migration and later OS release gates"
+  ],
+  "wholeHarnessGoalComplete": false
+}

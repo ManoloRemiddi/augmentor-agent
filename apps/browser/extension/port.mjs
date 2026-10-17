@@ -142,7 +142,7 @@ export function ensurePort() {
       return
     }
     if (msg.method === 'session.queue') {
-      if (state.harness==='codex' && msg.params?.sessionId===state.sessionId) {state.queue=msg.params;broadcast({kind:'queue',sessionId:state.sessionId})}
+      if (state.capabilities.queue===true && msg.params?.sessionId===state.sessionId && (!state.queue || state.queue.sessionId!==state.sessionId || msg.params.revision>=state.queue.revision)) {state.queue=msg.params;broadcast({kind:'queue',sessionId:state.sessionId})}
       return
     }
     if (msg.method === 'session.error') {
@@ -302,7 +302,7 @@ export function request(method, params) {
   // 0.1.18: 20s, not 60s — a lost response (dead port, dropped frame)
   // should fail the UI fast enough that the panel's retry can recover it.
   // F5: the timeout now lives in the canonical Pending table.
-  return state.pending.add(id, { timeoutMs: method==='augmentor/codex'?70000:method==='augmentor/surface'&&params?.action==='improve'?80000:method==='augmentor/onboarding'?40000:20000 })
+  return state.pending.add(id, { timeoutMs: method==='prompt.improve'?70000:method==='augmentor/codex'?70000:method==='augmentor/surface'&&params?.action==='improve'?80000:method==='augmentor/onboarding'?40000:20000 })
 }
 
 // 0.1.18: self-heal for user-initiated reads. The old path returned a stale

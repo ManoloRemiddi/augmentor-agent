@@ -4,12 +4,12 @@ import assert from 'node:assert/strict';
 import {copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
-import {pathToFileURL, fileURLToPath} from 'node:url';
+import {pathToFileURL} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import {installedRuntimeVersion, resolveCodexRuntime} from '../dist/codex-runtime/src/runtime.js';
 import {CodexRpc} from '../dist/codex-runtime/src/rpc.js';
+import {codexTestNpmEntry} from './fixtures/codex/prerequisite.mjs';
 
-const actual = fileURLToPath(new URL('../node_modules/@openai/codex/bin/codex.js', import.meta.url));
 function directory(t) {
   const root = mkdtempSync(join(tmpdir(), 'augmentor-external-codex-'));
   t.after(() => rmSync(root, {recursive: true, force: true})); return root;
@@ -35,6 +35,7 @@ test('a version probe uses private Codex state and a bounded credential-free env
 });
 
 test('a separately installed npm CLI can be selected without any bundled Codex package', async t => {
+  const actual=codexTestNpmEntry();
   const root = directory(t), project = join(root, 'app'), source = join(project, 'dist/codex-runtime/src');
   mkdirSync(source, {recursive: true}); writeFileSync(join(project, 'package.json'), '{"type":"module"}');
   for (const name of ['config.js', 'runtime.js']) copyFileSync(new URL(`../dist/codex-runtime/src/${name}`, import.meta.url), join(source, name));

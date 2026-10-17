@@ -1,0 +1,62 @@
+/* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
+.reasoning-dialog.mcp-dialog {
+ --mcp-bg:var(--dsw-alias-bg-layer-1,var(--panel,#171c28));
+ --mcp-text:var(--dsw-alias-label-primary,var(--text,#e7edf9));
+ --mcp-muted:var(--dsw-alias-label-secondary,var(--muted,#9ba6bd));
+ --mcp-border:var(--dsw-alias-border-l2,var(--line,#2a3142));
+ --mcp-hover:var(--dsw-alias-interactive-bg-hover,var(--bg,#10131b));
+ --mcp-focus:var(--dsw-alias-link,var(--accent,#a5bdff));
+ box-sizing:border-box;width:min(720px,calc(100vw - 32px));max-width:none;
+ max-height:calc(100dvh - 40px);margin:auto;padding:0;overflow:hidden;
+ color:var(--mcp-text);background:var(--mcp-bg);border:1px solid var(--mcp-border);
+ border-radius:16px;font:inherit;line-height:1.5;box-shadow:0 24px 80px #0003;
+}
+.mcp-dialog[open]{display:flex;flex-direction:column}
+.mcp-dialog::backdrop{background:#0006}
+.mcp-dialog *{box-sizing:border-box}
+.mcp-dialog [hidden]{display:none!important}
+.mcp-dialog .mcp-header,.mcp-dialog .mcp-footer{flex:none;padding:20px 24px;display:flex;align-items:center;gap:12px}
+.mcp-dialog .mcp-header{justify-content:space-between;border-bottom:1px solid var(--mcp-border)}
+.mcp-dialog h2{font-size:20px;line-height:1.3;font-weight:600;margin:0}
+.mcp-dialog p{margin:0;color:var(--mcp-muted);font-size:13px;overflow-wrap:anywhere}
+.mcp-dialog .mcp-header p{margin-top:4px}
+.mcp-dialog .mcp-body{min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:20px;padding:20px 24px}
+.mcp-dialog .mcp-feedback{border-radius:8px;padding:10px 12px;background:var(--mcp-hover);color:var(--mcp-text)}
+.reasoning-dialog.mcp-dialog fieldset{min-width:0;margin:0;border:1px solid var(--mcp-border);border-radius:12px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.mcp-dialog legend{font-size:14px;font-weight:600;padding:0 5px}
+.reasoning-dialog.mcp-dialog label{display:flex;flex-direction:column;align-items:stretch;justify-content:initial;font-size:13px;font-weight:500;gap:6px;margin:0;min-width:0}
+.reasoning-dialog.mcp-dialog :is(button,input,select,textarea){font:inherit;color:var(--mcp-text);background:var(--mcp-bg);border:1px solid var(--mcp-border);border-radius:8px;min-height:38px;max-width:100%;margin:0;padding:8px 12px}
+.reasoning-dialog.mcp-dialog :is(input,select,textarea){min-width:0;width:100%}
+.reasoning-dialog.mcp-dialog button{cursor:pointer;font-size:13px;font-weight:500;line-height:1.3;white-space:normal}
+.reasoning-dialog.mcp-dialog button:hover:not(:disabled){background:var(--mcp-hover)}
+.reasoning-dialog.mcp-dialog button:disabled{opacity:.5;cursor:default}
+.reasoning-dialog.mcp-dialog :is(button,input,select,textarea,summary,a):focus-visible{outline:2px solid var(--mcp-focus);outline-offset:3px}
+.mcp-dialog .mcp-connection-state{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.mcp-dialog .mcp-server-state{font-size:13px;font-weight:600;color:var(--mcp-muted)}
+.mcp-dialog .mcp-server-state[data-enabled=true]{color:var(--mcp-text)}
+.mcp-dialog .mcp-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mcp-dialog .mcp-access-row{display:flex;align-items:flex-end;gap:12px}
+.mcp-dialog .mcp-access-row label{flex:1}
+.mcp-dialog .mcp-access-row button{flex:none}
+.mcp-dialog summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--mcp-text);padding:4px 0}
+.mcp-dialog .mcp-advanced[open]>summary,.mcp-dialog .mcp-technical[open]>summary{margin-bottom:12px}
+.mcp-dialog .mcp-advanced>button{margin-top:12px}
+.mcp-dialog .mcp-profile-editor{display:flex;flex-direction:column;gap:12px;margin-top:16px}
+.reasoning-dialog.mcp-dialog textarea{min-height:160px;resize:vertical;font-family:ui-monospace,monospace;font-size:12px;line-height:1.6;overflow:auto}
+.mcp-dialog .mcp-technical p+p{margin-top:8px}
+.mcp-dialog .mcp-receipt{font-family:ui-monospace,monospace;font-size:12px}
+.mcp-dialog a{color:var(--mcp-focus);overflow-wrap:anywhere;align-self:flex-start}
+.mcp-dialog form{display:flex;flex-direction:column;gap:12px}
+.mcp-dialog form button{align-self:flex-start}
+.mcp-dialog .mcp-footer{justify-content:flex-end;border-top:1px solid var(--mcp-border)}
+.reasoning-dialog.mcp-dialog .mcp-done{background:var(--mcp-text);color:var(--mcp-bg);border-color:var(--mcp-text)}
+.reasoning-dialog.mcp-dialog .mcp-done:hover{background:var(--mcp-text);filter:brightness(.9)}
+.reasoning-dialog.mcp-dialog .mcp-dismiss{border-color:transparent;font-size:24px;font-weight:400;line-height:1;padding:4px;width:38px;flex:none}
+@media(max-width:520px){
+ .reasoning-dialog.mcp-dialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px);border-radius:12px}
+ .mcp-dialog .mcp-header,.mcp-dialog .mcp-footer{padding:16px}
+ .mcp-dialog .mcp-body{padding:16px;gap:16px}
+ .reasoning-dialog.mcp-dialog fieldset{padding:12px}
+ .mcp-dialog .mcp-access-row{align-items:stretch;flex-direction:column}
+ .mcp-dialog .mcp-access-row button{align-self:flex-start}
+}

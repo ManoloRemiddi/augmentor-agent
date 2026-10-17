@@ -1,0 +1,194 @@
+{
+  "schema": "augmentor-dsh-legacy-family-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX Linux source tools: complete physical log-family capture, derived historical views and retained-original recomputation; no native import or running GUI update",
+  "sourceBaseRef": "b273f065e984067608e94b2af31e3f2e8647a0db",
+  "testedInputsSha256": {
+    "adapters/dsh-legacy-format/restore.ts": "afe7994e39ce09834809376ddbe13916766db5f7b718fe66d117e870fb54fb22",
+    "adapters/dsh-legacy-format/descriptor-v2.mjs": "e6e72c2d49bfde9edcfcf260285c6e0d61f693eaa2477138f09b6b5da55cca22",
+    "adapters/dsh-legacy-format/build.mjs": "ecbfafa2dcc04afb6e86ded603718ce0c7a88e59bb0a00852fdf10379f60fe37",
+    "adapters/dsh-legacy-format/family.mjs": "f5cafebc26b6e05645a3002047a488821b4ab656f95e0ed6aa07fc17fd4c91b3",
+    "adapters/dsh-legacy-format/source.mjs": "f985801939b7fd3c36b2d444c947a826001800a122b00b3bb7df513ec7e4d733",
+    "scripts/capture-dsh-legacy-family.py": "ac6af8a7dbbcc726342d91a604984b516739853ef5d5711a072cf59b2464b154",
+    "scripts/dsh_legacy_family.py": "48d8ae5bbbdc3229352d6867d87a1b959b04a2c534842600599d1243185874ed",
+    "scripts/export-dsh-legacy-view.mjs": "65d346228efd9a7a4dc12056d731b3d992cae50282a8756ff659af2a57bad25d",
+    "scripts/verify-dsh-legacy-view.mjs": "90acfdd5fcca5cb54b1e036d9ea2ed783c8e3f9cebdb5d2d1ba3628a12b8b0f0",
+    "scripts/proof-dsh-legacy-family.mjs": "8d30206119cf6e05ad28975cafe4771a19f52ec758b2bdd9a95635ebcc32c014",
+    "scripts/proof-dsh-legacy-format.mjs": "519ed60e3989486fc5fa05d2c859e741429b540ac2bd9a14c3756dee93e018d2",
+    "tests/test_dsh_legacy_family.py": "c2f857326fd449120f160e30a8bfe1ddff8dab2657f84ed4149ec7604e5afccb",
+    "tests/dsh-legacy-family.test.mjs": "3495cea7416dc5e21422c46061b9439888798d39002af1d166edb7b864f0c584",
+    "tests/dsh-legacy-descriptor.test.mjs": "c13ff9652b5a2c1bc0e6065cec15d7d7532027c8358d2e5aa151ef68a5f565eb",
+    "release/dsh-legacy-format/SOURCES.json": "299052a8f7bf826de5fa02db81bfd8c1eb757850ef834f27d7fa8a4018389100"
+  },
+  "supplier": {
+    "revision": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+    "compiledModuleLicense": "MIT",
+    "publicModules": 51,
+    "sourceAndLicenseInputsVerified": 52,
+    "legacySchemaReferenceLicense": "BSD-3-Clause",
+    "historicalImplementationCompiledOrCopied": false,
+    "supplierFilesModified": false,
+    "virtualOverlays": 2,
+    "onlyExternalImports": [
+      "node:path",
+      "node:crypto",
+      "node:util"
+    ],
+    "compiledCompatibilityBundleSha256": "5414b8b1d5d18bde2da93e3af6c7658de1fbe3b4ee852e531af8a1c28d82101f"
+  },
+  "checks": {
+    "nodeFocusedPass": 65,
+    "pythonFamilyCapturePass": 20,
+    "pythonFetchPass": 8,
+    "pythonLicenseBoundaryNoticePass": 16,
+    "authoredParserGroupsPass": 16,
+    "authoredPipelineGroupsPass": 7,
+    "skips": 0,
+    "appTypeCheckPass": true,
+    "appRuntimeOrGuiCohortRerun": false,
+    "newAppCandidateStaged": false,
+    "environment": {
+      "platform": "MX Linux x64",
+      "node": "24.19.0",
+      "python": "3.13.5"
+    },
+    "pipeline": {
+      "schema": "augmentor-dsh-family-pipeline-proof/1",
+      "checks": 7,
+      "roots": 1,
+      "descendants": 2,
+      "allDerivedDataRecomputed": true,
+      "changedObjectsRefused": true,
+      "forgedDerivedDataWithMatchingHashRefused": true,
+      "originalSourcesUnchanged": true,
+      "existingOutputPreserved": true,
+      "inputDirectoriesNeverWritten": true,
+      "currentNativeImporterRefusesIntermediateView": true,
+      "nativeTargetCreated": false,
+      "agentOrHostCreated": false,
+      "modelRequests": 0,
+      "privateOwnerDataUsed": false
+    }
+  },
+  "sameFrozenRealFamilies": {
+    "projects": 5,
+    "roots": 42,
+    "descendants": 35,
+    "originalLogs": 77,
+    "originalCompressedBytes": 96663928,
+    "derivedRecords": 80992,
+    "sourceHeaderWitnessCountPerCapture": 1250,
+    "completeRecomputationFromRetainedOriginals": true,
+    "differentVerifiedPublicSourceLocations": true,
+    "allFrozenSourceFilesUnchanged": true,
+    "families": [
+      {
+        "roots": 5,
+        "descendants": 1,
+        "viewEvents": 3723,
+        "completePhysicalFamily": true,
+        "completeCatalogCoverage": true,
+        "originalCompressedSourcesRetained": true,
+        "currentHarnessImportCompatible": false,
+        "attachmentsCaptured": false
+      },
+      {
+        "roots": 1,
+        "descendants": 5,
+        "viewEvents": 1873,
+        "completePhysicalFamily": true,
+        "completeCatalogCoverage": true,
+        "originalCompressedSourcesRetained": true,
+        "currentHarnessImportCompatible": false,
+        "attachmentsCaptured": false
+      },
+      {
+        "roots": 5,
+        "descendants": 16,
+        "viewEvents": 9785,
+        "completePhysicalFamily": true,
+        "completeCatalogCoverage": true,
+        "originalCompressedSourcesRetained": true,
+        "currentHarnessImportCompatible": false,
+        "attachmentsCaptured": false
+      },
+      {
+        "roots": 5,
+        "descendants": 6,
+        "viewEvents": 12587,
+        "completePhysicalFamily": true,
+        "completeCatalogCoverage": true,
+        "originalCompressedSourcesRetained": true,
+        "currentHarnessImportCompatible": false,
+        "attachmentsCaptured": false
+      },
+      {
+        "roots": 26,
+        "descendants": 7,
+        "viewEvents": 53024,
+        "completePhysicalFamily": true,
+        "completeCatalogCoverage": true,
+        "originalCompressedSourcesRetained": true,
+        "currentHarnessImportCompatible": false,
+        "attachmentsCaptured": false
+      }
+    ],
+    "originalSourceStoreWritten": false,
+    "ownerTransfers": 0,
+    "nativeTargetsCreated": 0,
+    "modelRequests": 0
+  },
+  "intermediateContract": {
+    "sourceSchema": "augmentor-dsh-source-family/1",
+    "viewSchema": "augmentor-dsh-offline-project-view/1",
+    "profile": "augmentor-dsh-historical-family/1",
+    "currentHarnessImporterAccepts": false,
+    "attachmentsCaptured": false,
+    "workingFilesCaptured": false,
+    "sourceWitness": "Locally stable recorded generation/header family and selected full-byte revisions; only parent sessions API-checked idle",
+    "coordinates": "Derived current coordinates; original compressed physical records retained separately",
+    "noArchiveExecutableLoaded": true,
+    "processingFingerprintStrictlyRecomputed": true,
+    "ownerDataLicenseAssignedByFormatNotice": false
+  },
+  "preservation": {
+    "scope": "Read-only IPC peer/build, actual sealed owner files, complete protected regular path sets and contents, registry and selections; no owner restart, update, import or model work",
+    "reviews": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "registryAndSelectedConfigurationsExact": true,
+    "newOwnerTransfers": 0,
+    "ownerRestarts": 0,
+    "candidateActivated": false
+  },
+  "readinessUnchanged": {
+    "preparedProjects": 23,
+    "preparedParentConversations": 64,
+    "offlineFamilyDecodeIsNotNativeReadiness": true,
+    "ownerPilotFeedbackStillRequiredBeforeFurtherRealTransfers": true
+  },
+  "remaining": [
+    "Capture required assets and bind them to retained source records",
+    "Define and integrate original physical-record / derived-view archive coordinates in current native importer",
+    "Qualify original GUI archived inspection, historical cuts and Pi SDK continuation with authored complete families",
+    "Fresh real read-only preparation before changing readiness; owner pilot feedback before further transfers",
+    "MX Linux first; voice and Windows/macOS/other Linux distribution adoption deferred"
+  ]
+}

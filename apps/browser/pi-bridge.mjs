@@ -1,8 +1,8 @@
-import {surfaceRequest} from './shared/surface.mjs'
 // Augmentor — dsh-augmentor plugin, pipe, and Chromium extension
 // Copyright © 2026 Manolo Remiddi
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
+import {surfaceRequest} from './shared/surface.mjs'
 import {homeConnection} from './shared/home.mjs'
 import {PiConnection} from '../../dist/client/src/socket.js'
 import {promptLibrary} from './shared/prompts.mjs'
@@ -13,28 +13,41 @@ import {memoryRequest} from './shared/memory.mjs'
 import {homedir} from 'node:os'
 import {join} from 'node:path'
 import {AcceptedWork} from './shared/accepted-work.mjs'
+import {BrowserVoice,voicePreferences} from './shared/voice-client.mjs'
 if(process.env.AUGMENTOR_BROWSER_HARNESS && process.env.AUGMENTOR_BROWSER_HARNESS!=='pi')throw new Error('This bridge supports Pi only.')
 const harness='pi'
 const preset='augmentor-browser-'+harness
-const workspace=join(homedir(),'Augmentor Browser Pi')
+const workspace=process.env.AUGMENTOR_PI_BROWSER_WORKSPACE??join(homedir(),'Augmentor Browser Pi')
 const send=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value));if(b.length>1024*1024)throw new Error('Browser response exceeds frame limit');const h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
 let connection,opening,selection,currentSession;const interactions=new Map()
 const work=new AcceptedWork();let closing
+const voice=new BrowserVoice({
+  ticket:async(sessionId,openId)=>(await client()).call('voice.ticket',{sessionId,surface:'browser',openId}),
+  release:async(sessionId,openId)=>{if(connection&&!connection.closed)await connection.call('voice.close',{sessionId,openId})},
+  submit:async(sessionId,requestId,text)=>{
+    if(sessionId!==currentSession||work.closing)throw Error('The voice conversation changed.')
+    const c=await client(),queue=await c.call('session.queue',{sessionId})
+    if(queue.items.some(row=>row.canResolve))throw Error('Inspect the unconfirmed input before speaking again.')
+    return c.call('session.prompt',{sessionId,requestId,inputMode:'voice',content:[{type:'text',text}],
+      ...(queue.activeTurnId?{mode:'steer',expectedTurnId:queue.activeTurnId}:{mode:'queue',resumeQueue:true})})
+  },notify:send,
+})
 function cleanup(code=0){
   if(code)process.exitCode=code
   else process.exitCode??=0
   if(closing)return closing
-  work.close();process.stdin.destroy()
-  closing=(async()=>{await work.drained();connection?.close();process.stdout.end()})()
+  work.close();voice.close();process.stdin.destroy()
+  closing=(async()=>{await work.drained();await voice.settled();connection?.close();process.stdout.end()})()
   return closing
 }
 async function client(){if(connection&&!connection.closed)return connection;if(!opening)opening=PiConnection.open(frame=>{
   if(frame.method==='browser/execute'){send(frame.payload);return}
   if(['approval/requested','question/requested'].includes(frame.method)){interactions.set(frame.rpcId,frame.payload.sessionId);send({id:frame.rpcId,method:frame.method.replace('/','.'),params:frame.payload});return}
   if(frame.method==='interaction/resolved'){interactions.delete(frame.payload.rpcId);send({method:'interaction.resolved',params:frame.payload});return}
-  if(frame.method==='session/event'){send({method:'session.event',params:frame.payload});const type=frame.payload.event.type;if(type==='turn/start'||type==='turn/end')send({method:'session.status',params:{sessionId:frame.payload.sessionId,status:type==='turn/start'?'running':'idle'}})}
+  if(frame.method==='session/queue'){send({method:'session.queue',params:frame.payload});return}
+  if(frame.method==='session/event'){voice.observe(frame.payload.sessionId,frame.payload.event);send({method:'session.event',params:frame.payload});const type=frame.payload.event.type;if(type==='turn/start'||type==='turn/end')send({method:'session.status',params:{sessionId:frame.payload.sessionId,status:type==='turn/start'?'running':'idle'}})}
 },()=>{if(!work.closing)void cleanup(1)},harness).then(c=>{connection=c;return c}).finally(()=>opening=null);return opening}
-async function attach(sid){const c=await client();await c.call('events.subscribe',{sessionId:sid});await c.call('browser.attach',{sessionId:sid});currentSession=sid}
+async function attach(sid){if(currentSession!==sid){voice.close();await voice.settled()}const c=await client();await c.call('events.subscribe',{sessionId:sid});await c.call('browser.attach',{sessionId:sid});currentSession=sid}
 async function request(method,p={},id){
   if(method==='augmentor/dsh')return dshSetup(p)
   if(method==='augmentor/diagnostics')return supportReport()
@@ -43,6 +56,10 @@ async function request(method,p={},id){
   if(method==='augmentor/home')return homeConnection(p)
   if(method==='augmentor/memory')return memoryRequest(p)
   if(method==='augmentor/prompts')return promptLibrary(p)
+  if(method==='augmentor/voice/start'){if(p.sessionId!==currentSession)throw Error('Open the current Pi conversation first.');return voice.start(p)}
+  if(method==='augmentor/voice/control')return voice.control(p)
+  if(['session.attach','session.create','session.branch'].includes(method)&&(method==='session.branch'||p.sessionId!==currentSession)){voice.close();await voice.settled()}
+  if(method==='augmentor/voice/preferences'){if(p.action==='save'){voice.close();await voice.settled()}return voicePreferences(p)}
   if(method==='shutdown'){queueMicrotask(()=>void cleanup(0));return {ok:true}}
   const c=await client()
   if(['setup.test','setup.save','setup.cancel'].includes(method))return c.call(method,p,id)
@@ -52,10 +69,13 @@ async function request(method,p={},id){
     if(row&&row.agentPreset!==preset)throw new Error('This browser connection cannot access a Linux chat.')
     if(!row&&method!=='session.create')throw new Error('Browser conversation not found.')
   }
+  if(method==='inspection.open')return c.call(method,{sessionId:p.sessionId},id)
+  if(method==='prompt.improve'){const selected=await c.call('session.models',{sessionId:p.sessionId});const library=await promptLibrary({action:'list'});if(!library.ok)throw Error(library.error);return c.call(method,{...p,selection:selected.current,expectedInstructionsRevision:library.library.improvement.revision},id)}
+  if(['prompt.cancelImprovement','prompt.improvementStatus'].includes(method))return c.call(method,p,id)
   if(method==='augmentor/models')return c.call('models.list')
   if(method==='initialize'){
     selection={provider:p.provider,model:p.model};await c.call('models.validate',selection)
-    const saved=await c.call('chats.saved');return {serverInfo:{home:homedir(),harness,capabilities:{branch:true,edit:true},augmentor:{chatCwd:workspace,agentPreset:preset,saved:saved.saved}}}
+    const saved=await c.call('chats.saved'),description=await c.call('host.describe');return {serverInfo:{home:homedir(),harness,capabilities:{branch:true,edit:true,voice:description.capabilities?.voice===true,queue:description.capabilities?.queue===true,steering:description.capabilities?.steering===true,reasoning:description.capabilities?.reasoning===true,promptImprovement:description.capabilities?.promptImprovement===true,inspection:description.capabilities?.inspection===true},augmentor:{chatCwd:workspace,agentPreset:preset,saved:saved.saved}}}
   }
   if(method==='session.attach'){await attach(p.sessionId);const rows=await c.call('session.list');return {attached:true,running:rows.items.find(r=>r.sessionId===p.sessionId)?.running===true}}
   if(method==='session.create'){const row=await c.call(method,{...p,surface:'browser',selection,cwd:workspace},id);await attach(p.sessionId);return row}
@@ -65,7 +85,7 @@ async function request(method,p={},id){
   if(method==='session.branch'){const result=await c.call(method,p,id);await attach(result.sessionId);selection=result.selection;return result}
   if(method==='session.history'){const result=await c.call(method,{...p,maxMessages:Math.min(p.maxMessages??50,100)});result.events=result.events.filter(r=>r.event.type!=='assistant/chunk');while(Buffer.byteLength(JSON.stringify(result))>850000&&result.events.length>1){result.events.shift();result.hasMore=true}return result}
   if(['augmentor/save','augmentor/unsave','augmentor/state'].includes(method)){const action=method.split('/')[1];const result=await c.call('chats.saved',{action,sessionId:p.sessionId});return {ok:true,...result}}
-  if(['session.cancel','session.rename','session.models','settings.describe','settings.mutate','models.pin'].includes(method))return c.call(method,p,id)
+  if(['reasoning.describe','reasoning.configure','session.reasoning','session.selectReasoning','session.cancel','session.rename','session.models','session.queue','session.updateQueue','session.continueQueue','session.resolveQueue','settings.describe','settings.mutate','models.pin'].includes(method))return c.call(method,p,id)
   if(method.startsWith('updates/'))throw new Error('Update this unified installation with its installer.')
   throw new Error('Unsupported harness browser operation: '+method)
 }

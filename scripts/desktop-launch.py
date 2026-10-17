@@ -2,19 +2,46 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """One installed build for login, menu, shortcuts, secondary windows and recovery."""
 import json
+import importlib.util
 import os
 from pathlib import Path
 import socket
 import subprocess
 import sys
 import time
+from contextlib import contextmanager
 
 SERVICE = 'augmentor-desktop.service'
+
+
+def shared_helper(root=None):
+    path=Path(__file__).with_name('shared-launch-profile.py')
+    if not path.is_file() and root is not None:path=Path(root)/'scripts/shared-launch-profile.py'
+    if not path.is_file():raise RuntimeError('The installed launcher lacks shared-store binding support.')
+    spec=importlib.util.spec_from_file_location('selected_shared_launch',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+
+@contextmanager
+def launch_guard():
+    data=Path(os.environ.get('XDG_DATA_HOME',Path.home()/'.local/share'))/'augmentor'
+    with shared_helper().launch_lease(data):yield
 
 
 def configuration():
     data = Path(os.environ.get('XDG_DATA_HOME', Path.home()/'.local/share'))
     return json.loads((data/'augmentor/desktop.json').read_text())
+
+
+def launch_environment(config, initial=None):
+    root=Path(config['root'])
+    env={**(os.environ if initial is None else initial),'PYTHONPATH':str(root/'apps/native'),
+         'AUGMENTOR_PI_NODE':config['node'],'AUGMENTOR_PYTHON':config['python'],
+         'PYTHONDONTWRITEBYTECODE':'1','PI_TELEMETRY':'0','PI_SKIP_VERSION_CHECK':'1'}
+    if config.get('dshService'):env['AUGMENTOR_DSH_SERVICE']=config['dshService']
+    if 'sharedProfile' in config:
+        env=shared_helper(root).environment(config['sharedProfile'],env)
+    return env
 
 
 def exchange(command, suffix=''):
@@ -61,6 +88,24 @@ def recover():
 
 
 def main(args):
+    with launch_guard():return _main(args)
+
+
+def _main(args):
+    if args[:1]==['--dsh']:
+        config=configuration();script=Path(config['root'])/'scripts/desktop-dsh-launch.py'
+        if not script.is_file():raise RuntimeError('The selected deployment has no managed DSH launcher.')
+        # DSH keeps its original service environment; the delegate applies the
+        # selected pair/interpreters without replacing PATH or PYTHONPATH.
+        os.execve(config['python'],[config['python'],'-B',str(script),*args[1:]],dict(os.environ));return 0
+    if args[:1]==['--embed']:
+        config=configuration();script=Path(config['root'])/'scripts/embed-launch.py'
+        if not script.is_file():raise RuntimeError('The selected deployment has no embedding launcher.')
+        os.execve(config['python'],[config['python'],'-B',str(script),*args[1:]],launch_environment(config));return 0
+    if args[:1]==['--mobile']:
+        config=configuration();script=Path(config['root'])/'apps/mobile/start.py'
+        if not script.is_file():raise RuntimeError('The selected deployment has no mobile supervisor.')
+        os.execve(config['python'],[config['python'],'-B',str(script),*args[1:]],launch_environment(config));return 0
     if args == ['--autostart']:
         start_service(); return 0
     if args in (['--recover'], ['--recover-window']):
@@ -102,9 +147,7 @@ def main(args):
         root = Path(config['root'])
         if not (root/'apps/native/augmentor_linux/window.py').is_file():
             raise RuntimeError('The selected desktop release is missing.')
-    env = {**os.environ, 'PYTHONPATH':str(root/'apps/native'), 'AUGMENTOR_PI_NODE':config['node'],
-           'PI_TELEMETRY':'0', 'PI_SKIP_VERSION_CHECK':'1'}
-    if config.get('dshService'): env['AUGMENTOR_DSH_SERVICE'] = config['dshService']
+    env = launch_environment(config)
     if not env.get('QT_QPA_PLATFORM') and env.get('XDG_SESSION_TYPE') == 'wayland' and env.get('DISPLAY'):
         env['QT_QPA_PLATFORM'] = 'xcb'
     os.execve(config['python'], [config['python'], '-m', 'augmentor_linux', *(['--ensure-running'] if service_run else args)], env)

@@ -1,0 +1,63 @@
+{
+  "schema": "augmentor-dsh-original-web-voice-audit/1",
+  "date": "2026-10-16",
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "sourceRef": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+  "sourceArchiveSha256": "414db357dda081d11d531ea3e9969f48fa0502809ff579396c3c2bbf7e109253",
+  "scope": "read-only inspection of complete pinned public snapshot; no new supplier code selected or UI/runtime/pin changed",
+  "sourceFilesInFullSnapshotInventory": 14987,
+  "existingSelectedSupplierFilesVerifiedAgainstRecordedSourcePathsAndHashes": 615,
+  "rootMitLicenseSha256": "ebb4f09972aee8608be255debaf78451a68e95c290f55c240dec2ecfa16ea6be",
+  "package": {
+    "name": "@deepseek-ai/dsh-experimental-client-ui-voice-input",
+    "version": "0.2.1-alpha.2",
+    "path": "packages/experimental/client-ui-voice-input",
+    "license": "MIT"
+  },
+  "bundle": {
+    "name": "@deepseek-ai/dsh-experimental-voice-input-bundle",
+    "version": "0.2.1-alpha.2",
+    "license": "MIT"
+  },
+  "candidateFileSha256": {
+    "packages/experimental/client-ui-voice-input/package.json": "d2e60aaab7484056c57fd35402277f7c59520c7dbcd14f1f965840cf853a27a1",
+    "packages/experimental/client-ui-voice-input/README.md": "230fcba4b2eb2d3f1a967ae270ec903c5efa2949c673f85fb1ec9f3a87422f97",
+    "packages/experimental/client-ui-voice-input/src/client/index.ts": "f8a58f7750e89b8c0164d635d49af1113d628455aef855c551f10fb13e0558ab",
+    "packages/experimental/client-ui-voice-input/src/client/mount.ts": "f8f132071a0727219ed0e3e25bf2fb2289838fdb0769651d968786d4e0b5d94b",
+    "packages/experimental/client-ui-voice-input/src/client/VoiceInput.tsx": "07f865d164279a36fe53587c7dcd59afc36a16fd34bd981885222557b41d90c6",
+    "packages/experimental/client-ui-voice-input/src/client/audio.ts": "890d7cf703ad664fc9aeb763ff6cd8d9baafc90e9ebae08d354c3f9458bf1b27",
+    "packages/experimental/client-ui-voice-input/src/client/MicrophonePicker.tsx": "0ebc6f1253c45fda7bbbd0a605e68c00b63d6b221442e224a01048c65eae568b",
+    "packages/experimental/client-ui-voice-input/src/client/microphone-device.ts": "a8c9db72f4e259e00da74eed152c5a25f2701d9e65a38845e15906e94ca5e935",
+    "packages/experimental/client-ui-voice-input/src/client/Waveform.tsx": "c4c6adfa8b60dd5193de92a325d2ba07d670e5021cd7607e3501f843e3b767d3",
+    "packages/experimental/client-ui-voice-input/src/client/VoiceInput.module.css": "f881e77b0550417b02817385a78f70b194cbbc5aed881a61cf43fd3b8ed838ba",
+    "packages/experimental/client-ui-voice-input/src/client/readiness.ts": "d48196cd76e59e5e739aaa839458ec6a697c2b8499cb5d87a855571d3f9450ac"
+  },
+  "documentedOriginalBehavior": {
+    "placement": "conversation.input.activity between model selector and Send",
+    "controls": "outline microphone, original recording toolbar, waveform, Cancel/Stop and device picker",
+    "submission": "one editable draft insertion; no automatic send or Session event",
+    "staleDraft": "revision-bound selection; changed draft retains result for explicit insertion",
+    "cleanup": "cancel/Escape/page hide/session change/disposal retires capture/results and joins resources",
+    "limitations": [
+      "no speech synthesis",
+      "no always-on microphone or wake word",
+      "no streaming captions or automatic submit"
+    ]
+  },
+  "implementationDirection": {
+    "preserveOriginalUi": true,
+    "reuseOriginalPublicMitComponentsWithNotices": true,
+    "retainExistingCpuAsrVadAndSpeechService": true,
+    "doNotAutomaticallyInstallSenseVoiceBundle": true,
+    "privateHttpTicketAndCloseRemainDenied": true,
+    "requiredBeforeUse": [
+      "audited original GUI supplier selection and attribution",
+      "authenticated bounded cancellable recognition adapter through Pi owner",
+      "draft-only provenance distinct from explicit spoken submission/hands-free",
+      "original composer/settings/device/readiness integration and resource retirement",
+      "source/ordinary/original-GUI and later physical MX acceptance"
+    ]
+  },
+  "recordsWithAdaptationNotes": 64,
+  "selectedBodiesDifferentFromRecordedUpstreamHash": 20
+}

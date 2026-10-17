@@ -16,17 +16,17 @@ export function authority(name,args) {
 // HA can report partial intent failures inside a successful MCP envelope.
 // Accept only the observed HA intent acknowledgement contract, not arbitrary
 // model-visible prose or MCP transport success. Unknown schemas fail closed.
-const intentOutcome={augmentorExecution:{outcome(_args,value){
-  let response=value?.structuredContent;
-  if(!response){
-    const blocks=value?.content;
-    if(!Array.isArray(blocks)||blocks.length!==1||blocks[0].type!=='text')return {status:'unknown'};
-    response=JSON.parse(blocks[0].text);
-  }
-  return {status:response?.response_type==='action_done'&&
-    Array.isArray(response.data?.success)&&response.data.success.length>0&&
-    Array.isArray(response.data?.failed)&&response.data.failed.length===0?'completed':'unknown'};
-}}};
+export function homeIntentAcknowledged(value){
+ if(value?.isError===true)return false;
+ let response=value?.structuredContent;
+ if(!response){
+  const blocks=value?.content;
+  if(!Array.isArray(blocks)||blocks.length!==1||blocks[0].type!=='text')return false;
+  try{response=JSON.parse(blocks[0].text);}catch{return false;}
+ }
+ return response?.response_type==='action_done'&&Array.isArray(response.data?.success)&&response.data.success.length>0&&Array.isArray(response.data?.failed)&&response.data.failed.length===0;
+}
+const intentOutcome={augmentorExecution:{outcome:(_args,value)=>({status:homeIntentAcknowledged(value)?'completed':'unknown'})}};
 
 // This is policy around the existing DSH and upstream MCP bridge, not an agent
 // loop or a device driver. HA Assist owns entity exposure and intent execution.

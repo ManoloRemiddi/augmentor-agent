@@ -1,0 +1,208 @@
+{
+  "schema": "augmentor-office-corrected-package-qualification/1",
+  "date": "2026-10-17",
+  "applicationRef": "1417db628f90cf770ac7c7cedef95feee51d86f3",
+  "scope": "Private incremental MX preview; source, fresh ordinary and exact separate sealed package qualified; no owner activation or public redistribution approval",
+  "base": {
+    "baseApplicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+    "baseArtifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+    "baselineUnchangedInputsVerified": 23580
+  },
+  "packageMethod": "Fresh copy of independently verified installed base; reviewed public tracked overlay and exact compiled output; existing production dependencies, native binaries and Node unchanged; not a clean-room source installation",
+  "source": {
+    "nodePass": 300,
+    "nodeFail": 0,
+    "nodeSkip": 0,
+    "officePythonPass": 43,
+    "nodeFiles": 45,
+    "chromiumFiles": 19,
+    "workers": 2
+  },
+  "ordinary": {
+    "compiledFilesVerified": 1140,
+    "nodePass": 300,
+    "pythonPass": 41,
+    "officePythonPass": 43,
+    "testFiles": 45,
+    "chromiumFiles": 19,
+    "workers": 2,
+    "externalOutputRootPreconditionConfirmed": true,
+    "ownerImports": 0
+  },
+  "sealed": {
+    "releaseId": "20261017-123104-dba3acbf",
+    "artifactSha256": "bd72197a68841b6acac22f0e5c6b6d883243363e3edc327524dfe50140f874f5",
+    "applicationRef": "1417db628f90cf770ac7c7cedef95feee51d86f3",
+    "inventoryEntriesVerified": 24744,
+    "compiledFilesVerified": 1140,
+    "nodePass": 300,
+    "pythonPass": 41,
+    "officePythonPass": 43,
+    "nodeFiles": 45,
+    "chromiumFiles": 19,
+    "workers": 2,
+    "activated": false,
+    "selectedConfigurationsUnchanged": true,
+    "ownerImports": 0
+  },
+  "eachPackageFailureSkip": {
+    "nodeFail": 0,
+    "nodeSkip": 0,
+    "pythonFail": 0,
+    "pythonSkip": 0
+  },
+  "externalTestDrivers": "Tests/dev dependencies and static supplier fixture remain external. Actual runtime/GUI/engine come from exact SUT via dist and AUGMENTOR_PI_TEST_ROOT. Diagnostic Python operators are byte-identical verified external copies with their existing private outputs parent; no sealed application mutation. Packaging41 and Office43 Python groups overlap; do not sum them as unique cases.",
+  "thinGui": {
+    "pass": 1,
+    "fail": 0,
+    "skip": 0,
+    "engineFilesVerified": 53,
+    "candidate": "Separate unselected current-code derivative of ordinary package, existing Thin engine only",
+    "assertions": "Original actual Host/GUI document/PDF/font/zoom/reload/error/Retry/recovery/narrow-close test and existing deadlines unchanged",
+    "ownerInference": false,
+    "engineRebuilds": 0
+  },
+  "failedCarrierRetained": {
+    "releaseId": "20261017-115954-59433a62",
+    "artifactSha256": "7a370bf55be13bf62516baff8d074af884751f3b6c6695c8e90187e972333837",
+    "qualification": "failed; never activate; retained immutable as negative evidence",
+    "record": "packaged-cleanup-contention-qualification-20261017.json"
+  },
+  "precedingControls": {
+    "record": "packaged-cleanup-contention-qualification-20261017.json",
+    "isolatedProcessJournalPass": 21,
+    "isolatedActualManagerSkip": 1,
+    "containerInitAB": "Same failed sealed runtime: two unchanged orphan checks fail without init and pass with init. Separate from source300 and rich20 cases.",
+    "nativeCompatibility": "Prior24 shared-helper compatibility cases, not a fresh run"
+  },
+  "hostedSnapshot": {
+    "validate": {
+      "runId": 39025006420,
+      "statusAtSnapshot": "in_progress",
+      "conclusionAtSnapshot": "",
+      "jobs": [
+        {
+          "databaseId": 117374165374,
+          "name": "source-boundary",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117374327497,
+          "name": "home-runtime",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117374327580,
+          "name": "handy / component (windows-2022)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117374327590,
+          "name": "handy / component (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117374327592,
+          "name": "handy / component (macos-14)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117374544915,
+          "name": "debian",
+          "status": "in_progress",
+          "conclusion": ""
+        }
+      ]
+    },
+    "sdk": {
+      "runId": 39025006393,
+      "statusAtSnapshot": "in_progress",
+      "conclusionAtSnapshot": "",
+      "jobs": [
+        {
+          "databaseId": 117374165007,
+          "name": "contracts (ubuntu-24.04)",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "databaseId": 117374165248,
+          "name": "contracts (windows-2025)",
+          "status": "in_progress",
+          "conclusion": ""
+        },
+        {
+          "databaseId": 117374165282,
+          "name": "contracts (macos-14)",
+          "status": "completed",
+          "conclusion": "failure"
+        }
+      ]
+    }
+  },
+  "logSha256": {
+    "harness-office-fixed-ordinary-node-20261017.log": "5838f433cdde56609871d680cedfb590b6fbb1b1020ae8df6c0cf9f6b802629c",
+    "harness-office-fixed-ordinary-python-20261017.log": "ec20e271e3ca3a861dd2150116b16b36c476dffbe4cec5e36fdcb75255d26ab3",
+    "harness-office-fixed-ordinary-office-python-20261017.log": "b97d87b6edfd2d5ff757957940c8a9fc2562ff0e0343587d56c834f618a29197",
+    "harness-office-fixed-sealed-node-20261017.log": "beba5965674cdf1a0f998ab957f747872dab49e0cf62a63bf26f4423950ed41a",
+    "harness-office-fixed-sealed-python-20261017.log": "1d434bbd635fead34d3a0162f3636649c6f234c27e7d280c26aa19c12c17311b",
+    "harness-office-fixed-sealed-office-python-20261017.log": "d45d7d4f8cf36e9cdc11d170bf91363d3e3663264405921113ff1007c220e18c",
+    "harness-office-fixed-thin-gui-20261017.log": "d0c5b6e4b3171473f333c396f0b39d61c9763de58c009d977dc0920d47c5f122",
+    "harness-office-fixed-package-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "ownerUpdates": 0,
+  "furtherOwnerProjectTransfers": 0,
+  "publicRedistributionQualified": false,
+  "remaining": [
+    "Hosted Debian completion and full workflow acceptance; Linux SDK passes, Mac matrix failure is not MX acceptance",
+    "Deliberate backend selection/profile wiring and actual installed managed-backend adoption/rollback; installed default stays pinned-kit",
+    "Bootstrap/uncommitted allocation/publication/actor windows and power-loss/filesystem durability",
+    "Broader font/document/macro/security and complete preferred-source/rebuild/third-party/public packaging qualification",
+    "Owner pilot feedback before more transfers; excluded owner projects remain in DSH; voice/later OS deferred"
+  ]
+}

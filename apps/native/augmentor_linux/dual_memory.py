@@ -15,6 +15,8 @@ class DualMemoryPanel(QWidget):
         self.client = PromptClient()
         self.enabled = True
         self.busy = False
+        self.capture_confirmed = False
+        self.processing_confirmed = False
         self.completed.connect(self.loaded)
         layout = QVBoxLayout(self)
         info = QLabel('Augmentor automatically remembers your relationship and ongoing work separately. '
@@ -42,7 +44,7 @@ class DualMemoryPanel(QWidget):
         self.run()
 
     def run(self, enabled=None, processing=None):
-        if self.busy:
+        if self.busy or enabled is not None and not self.capture_confirmed or processing is not None and not self.processing_confirmed:
             return
         self.busy = True
         self.toggle.setEnabled(False)
@@ -52,12 +54,14 @@ class DualMemoryPanel(QWidget):
         sid = getattr(controller, 'session', None)
         harness = getattr(controller, 'harness', 'pi')
 
+        expected_enabled, expected_paused = self.enabled, self.processing_paused
+
         def work():
             try:
                 if enabled is not None:
-                    self.client.call('memory.dual.configure', {'enabled': enabled})
+                    self.client.call('memory.dual.configure', {'enabled': enabled, 'expectedEnabled': expected_enabled})
                 if processing is not None:
-                    self.client.call('memory.dual.processing', {'paused': processing})
+                    self.client.call('memory.dual.processing', {'paused': processing, 'expectedPaused': expected_paused})
                 value = self.client.call('memory.dual.describe')
                 if sid:
                     try:
@@ -75,20 +79,29 @@ class DualMemoryPanel(QWidget):
 
     def loaded(self, result):
         self.busy = False
-        self.toggle.setEnabled(True)
         self.refresh.setEnabled(True)
-        self.processing_toggle.setEnabled(True)
         value, error = result
-        if error:
-            self.status.setText(error)
+        valid = not error and isinstance(value, dict) and type(value.get('enabled')) in (bool, int) and value['enabled'] in (False, True)
+        valid = valid and all(type(value.get(key)) is int and value[key] >= 0 for key in ('events', 'pending'))
+        guards = value.get('configurationGuards') if valid else None
+        guards = guards if isinstance(guards, dict) else {}
+        processing = value.get('processing') if valid else None
+        processing = processing if isinstance(processing, dict) else {}
+        self.capture_confirmed = bool(valid and guards.get('capture') == 1)
+        self.processing_confirmed = bool(valid and guards.get('processing') == 1 and type(processing.get('paused')) is bool)
+        self.toggle.setEnabled(bool(self.capture_confirmed))
+        self.processing_toggle.setEnabled(bool(self.processing_confirmed))
+        if not valid:
+            self.status.setText('Memory status or change could not be confirmed. Refresh before choosing again.')
             return
         self.enabled = bool(value['enabled'])
-        self.processing_paused = bool(value.get('processing', {}).get('paused'))
+        self.processing_paused = bool(processing.get('paused'))
         self.processing_toggle.setText('Resume memory processing' if self.processing_paused else 'Pause memory processing')
         self.toggle.setText('Pause automatic memory' if self.enabled else 'Resume automatic memory')
         self.status.setText(('Automatic memory is on.' if self.enabled else 'Automatic memory is paused. Stored records are preserved.') +
                             f" {value['events']} transcript records; {value['pending']} memory items awaiting processing; {value.get('failures', 0)} stopped jobs." +
-                            (' ' + value.get('message', '')))
+                            (' ' + value.get('message', '')) +
+                            ' Configured memory request mode: ' + {'off': 'thinking off', 'default': 'server default', 'unconfigured': 'not configured'}.get(value.get('requestMode'), 'not reported') + '. Chat and voice settings are unchanged.')
         context = value.get('context') or {}
         if not context.get('enabled'):
             self.contents.setPlainText('Remembered context will appear after a conversation uses automatic memory.' if self.enabled else 'Recall and new capture are paused.')

@@ -11,6 +11,11 @@ semantic retrieval. Augmentor supplies transcript capture, identity routing,
 reliable delivery and context injection. It does not implement another memory
 reasoning engine or another conversational agent loop.
 
+The installer has an explicit [memory-only llama.cpp request mode](CONTROLLED-MEMORY.md#memory-only-llamacpp-request-mode--october-14).
+Its default preserves server behavior; a saved opt-in disables thinking on memory
+requests through the pinned engine's supported extra body. Chat/voice and model
+server settings are independent. It is not proof of reliable completion under load.
+
 For status, troubleshooting, RPC methods, backup/rollback and erase limitations,
 see [memory operations](MEMORY-OPERATIONS.md). For the current Git ref and
 continuation steps, see [agent handoff](AGENT-HANDOFF.md).

@@ -1,0 +1,164 @@
+{
+  "schema": "augmentor-harness-mx-readiness-and-agent-alignment/1",
+  "date": "2026-10-17",
+  "sourceEvidenceBaseRef": "72415fb538f4d6f7881025c20544bea3bdeed6dd",
+  "ownerInstalled": {
+    "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+    "releaseId": "20261017-095821-fb78d6df",
+    "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+    "reviews": 2,
+    "changed": false
+  },
+  "alignmentFinding": {
+    "reviewPairSharesStore": true,
+    "installedAgentSharesReviewStore": false,
+    "promptNamesAndBodiesCurrentlyMatch": true,
+    "matchingPrompts": 12,
+    "productionAndReviewPersonsDiffer": true,
+    "productionUsesMixedApplicationDataRoot": true,
+    "productionCompanionSourcesMatchHarness": false,
+    "productionNewSharedOwnershipGuardPresent": false,
+    "productionCompanionsFromSelectedArtifact": false,
+    "nativeProcessPairObserved": true,
+    "observedNativeClientsUsingDefaultStore": 2,
+    "observedNativeClientsUsingHarnessStore": 0,
+    "otherNativeProfilesPreserved": true
+  },
+  "privateOfflineRehearsal": {
+    "onlineSnapshotsAreNotAtomicGlobalColdBackup": true,
+    "adoptionPermitted": false,
+    "existingOfflineImporterUsedUnmodified": true,
+    "existingProductionPromptRecordsAndImprovementExact": true,
+    "existingProductionPersonAndAllOriginalMemoryRecordsExact": true,
+    "existingBanksCachesOutboxJobsBudgetsProcessingChoicesAndProjectionsExact": true,
+    "onlyExpectedIncomingWorkProjectionsAdded": 2,
+    "reviewCapturedRecordsRetainedInClone": 19,
+    "reviewPendingAdmissionsArchivedNotActivated": 17,
+    "reviewActivityWindowsArchived": 1,
+    "engineConfigurationFilesExact": true,
+    "modelWorkSubmitted": false,
+    "engineStartedOrMigrated": false,
+    "networkSyscallsAF_INET_AF_INET6": 0,
+    "frozenInventoriesVerified": 3,
+    "currentCompanionArchiveGuardRefusals": 6,
+    "currentNodeArchiveGuardRefusals": 3,
+    "notLegacyCompanionGuardAcceptance": true,
+    "initialPostflight": "Whole projections-table equality incorrectly rejected two permitted new work scopes. Read-only postflight confirms every old key/row exact and only two derived new scopes; no merge/model/action repeated."
+  },
+  "newSyntheticQualification": {
+    "files": [
+      "tests/shared-profile-import.test.mjs",
+      "tests/shared-profile-runtime.test.mjs",
+      "tests/harness-dsh-branch-chromium.test.mjs"
+    ],
+    "sourcePass": 14,
+    "installedExactArtifactPass": 14,
+    "eachFail": 0,
+    "eachSkip": 0,
+    "workers": 2,
+    "newCases": [
+      "Unprocessed source into populated processed target with original banks/jobs/budgets/choices/projections preserved",
+      "Mixed legacy application-data root refused as direct shared-store target with application/data unchanged"
+    ],
+    "existingCoverage": "Exact source/backup/archive, processed-source identity refusal, foreign-engine/schema refusal, prompt/Native/Node peers, real companion ownership, interrupted adoption fence, two real Pi owners and deliberate eligibility carryover",
+    "historicalBranch": "Original v1/v2 GUI now retires old HTTP reads before intentional cold Host stop; no CDP/browser errors filtered",
+    "privateOwnerDataInFixtures": false
+  },
+  "unchangedInstalledModules": {
+    "installedModulesUnchanged": {
+      "dist/runtime/src/shared-profile-import.js": true,
+      "dist/runtime/src/profile-lease.js": true,
+      "services/companion_import.py": true,
+      "services/lifecycle/shared_profile.py": true
+    },
+    "sourceSha256": {
+      "dist/runtime/src/shared-profile-import.js": "bf1f7de6aa7b660e0c1c19c8da0b2ec88ebcb6b64ce8d8c0b606fbe34cbd1778",
+      "dist/runtime/src/profile-lease.js": "da7359ea9f01f1cac80dd59a871722e5e95dc9d31e4074c64e6f38f8dcb04ef2",
+      "services/companion_import.py": "f6a4153b0ccac0a259dfe4d57ac4f4ace9b170f78b44110544f7ff103e4a5b1e",
+      "services/lifecycle/shared_profile.py": "aa77def5d8a65c5233d69d805eb061ea0123e618f9e3f3cf78387b36c4c4e8fe"
+    }
+  },
+  "sourceFilesSha256": {
+    "tests/fixtures/shared-profile-data.py": "b6a2e93debc86d551f2918a1b46da686bacfcbdc7587c981c3c5fcc9b6506f3e",
+    "tests/shared-profile-import.test.mjs": "0a33098858e4315545af2a6b28a4726c2cacd394755177ac5044608ce068bcaf",
+    "tests/harness-dsh-branch-chromium.test.mjs": "ea13f633b018ed774be0f118c68de62df705314d92d43c982280a4a7432e8b0d"
+  },
+  "evidenceLogSha256": {
+    "harness-shared-agent-readiness-source-tests-20261017.log": "c34579c3d24910c7e8a19993ed144fc319266d2c5d775552e1837474ffb71aa6",
+    "harness-shared-agent-readiness-installed-tests-20261017.log": "15b2d7866a910f723fc2d5898cc770dd132134dbaa2ae28af20d805c8189c01c"
+  },
+  "precedingHosted": {
+    "sourceRef": "c351558fdd7e0a0ca110d49718d2726c31bdbc39",
+    "validateRun": 39026214407,
+    "debianJob": 117377795467,
+    "status": "completed",
+    "conclusion": "failure before public packaging",
+    "root": {
+      "tests": 2184,
+      "pass": 2130,
+      "fail": 1,
+      "skip": 53
+    },
+    "failedCase": "Historical Branch v1 still used the old Fetch-disable driver: Fetch domain is not enabled. The reported error array also later contains an old event-stream connection refusal; its timing relative to assertion/cleanup is not independently established.",
+    "linuxSdk": {
+      "run": 39026214391,
+      "job": 117377598278,
+      "conclusion": "success"
+    },
+    "sdkMac": "failure",
+    "sdkWindows": "cancelled",
+    "wholeWorkflowPass": false
+  },
+  "realOwnerUpdates": 0,
+  "realOwnerProjectTransfers": 0,
+  "realOwnerModelRequests": 0,
+  "fullMigrationComplete": false,
+  "remaining": [
+    "Dedicated shared-data layout and fresh cold backups; do not transactionally replace the mixed application root",
+    "Matching deployed companion versions/leases and explicit paired launcher paths; not an in-place selected-release patch",
+    "Actual Agent/Browser/Harness library edit/conflict and existing-bank recall/restart/outage adoption checks before cutover",
+    "Owner pilot feedback before more project transfers; excluded projects remain in DSH",
+    "Complete context provenance, representative provider/plugin/service/quality acceptance and public distribution gates; voice/later OS deferred"
+  ],
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "followUpWritingClientQualification": "harness-writing-client-qualification-20261017.json"
+}

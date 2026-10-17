@@ -4,7 +4,7 @@
 
 In Desktop with the Augmentor DSH integration or a Codex API/local profile selected, type a draft and click **✦ Improve prompt** inside the input. The selected model rewrites it using the separate **Prompt library → Improve prompt** instructions. Letters roll while the request runs, then settle into the replacement in 700 ms. The result remains an editable draft; it is not sent to the conversation. After a rewrite, the same ✦ button becomes ↶ Undo; clicking it restores the previous wording. Editing the draft returns the button to ✦.
 
-Click **×** or press Escape to dismiss the pending improvement. Editing the draft also discards the pending result. Dismissing the preview does not necessarily stop the already-started model request. A failed rewrite or a request for clarification leaves the original intact and displays its explanation on the button. The rewrite uses a separate, tool-free model call and cannot execute the draft's instructions. Pi does not yet expose this model operation. Codex subscription profiles remain unavailable.
+Click **×** or press Escape to dismiss the pending improvement. Editing the draft also discards the pending result. Dismissing the preview does not necessarily stop the already-started model request. A failed rewrite or a request for clarification leaves the original intact and displays its explanation on the button. The rewrite uses a separate, tool-free model call and cannot execute the draft's instructions. Standalone Pi exposes this operation through its existing owner; see the Pi qualification below. Codex subscription profiles remain unavailable.
 
 The editor accepts drafts up to 6,000 characters, subject to the local request-size limit. Open **More → Prompt library → Improve prompt** to edit the instructions, preview their formatting, save changes, reload, or restore the default. The setting is shared with the browser library and DSH settings. Existing installations seed it once from `/prompt`; later edits or deletion of that shortcut do not change the setting. Concurrent saves are revision-checked. Only the approved improvement instructions ship as the default; personal saved prompts stay in the local database and are not bundled in source or releases.
 
@@ -56,3 +56,16 @@ The model operation is covered by `tests/codex-prompt-improvement.test.mjs`,
 including actual native/Browser bridges against a synthetic provider. Existing
 composer regression tests cover draft protection and Undo. See the
 [Codex evidence and limits](CODEX-INTEGRATION.md#apilocal-draft-improvement).
+
+## Pi controls and meaning-preservation limits — October 14
+
+Standalone Pi Native, Browser and the original Harness use one tool-free draft
+transaction and the same revision-checked shared instructions. A valid model
+`unchanged` response restores the exact original draft; ambiguity must not be
+silently completed. The response stays editable with Undo and is never submitted
+to chat automatically. The [live qualification](AUGMENTOR-HARNESS.md#live-prompt-improvement-and-ambiguity--october-14)
+records working controls, cancellation and preserved chat/native history alongside
+mixed rewrite meaning, a default-provider reasoning timeout and unqualified timing.
+The keep-original branch and stronger instructions are model guidance, not a
+semantic verifier. Explicit provider thinking capability/mapping is separate from
+the selected effort label. The current MX owner review predates this source change.

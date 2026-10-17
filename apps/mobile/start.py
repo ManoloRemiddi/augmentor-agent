@@ -11,6 +11,7 @@ import signal
 import socket
 import subprocess
 import time
+import importlib.util
 
 ROOT=Path(__file__).resolve().parents[2]
 
@@ -24,7 +25,16 @@ def desktop_config(explicit=None):
             return selected
     return {'root':str(Path(explicit or ROOT).resolve()),'python':str(ROOT/'.venv/bin/python')}
 
+def launch_adapter():
+    spec=importlib.util.spec_from_file_location('mobile_selected_launch',ROOT/'scripts/desktop-launch.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
+
+
 def main():
+    with launch_adapter().launch_guard():return run()
+
+
+def run():
     parser=argparse.ArgumentParser();parser.add_argument('--origin',action='append',default=[])
     parser.add_argument('--desktop-root',type=Path,default=None,help='Development override; normally use the shared desktop deployment.')
     parser.add_argument('--preview',action='store_true',help='Native UI fixture only; no agent connection.')
@@ -42,7 +52,8 @@ def main():
     if not Path(compositor).exists():raise SystemExit('Update the rootless runtime with apps/mobile/setup-runtime.sh; the Desktop activity halo requires xcompmgr.')
     display=next((f':{i}' for i in range(95,195) if not Path(f'/tmp/.X{i}-lock').exists() and not Path(f'/tmp/.X11-unix/X{i}').exists()),None)
     if display is None:raise SystemExit('No free isolated X display.')
-    env={**os.environ,'DISPLAY':display,'XAUTHORITY':str(state/'Xauthority'),'QT_QPA_PLATFORM':'xcb',
+    selected_env=launch_adapter().launch_environment(selected) if selected.get('node') else dict(os.environ)
+    env={**selected_env,'DISPLAY':display,'XAUTHORITY':str(state/'Xauthority'),'QT_QPA_PLATFORM':'xcb',
          'AUGMENTOR_TOUCH_VIEWPORT':str(state/'viewport.json'),'AUGMENTOR_REMOTE_STATE':str(state),
          'AUGMENTOR_X11VNC':binary,'LD_LIBRARY_PATH':str(runtime/'usr/lib/x86_64-linux-gnu')+(':'+os.environ['LD_LIBRARY_PATH'] if os.environ.get('LD_LIBRARY_PATH') else '')}
     env.pop('WAYLAND_DISPLAY',None)

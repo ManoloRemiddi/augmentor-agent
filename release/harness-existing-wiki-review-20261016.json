@@ -1,0 +1,61 @@
+{
+  "schema": "augmentor-harness-existing-wiki-review/1",
+  "date": "2026-10-16",
+  "qualificationRef": "7fc068eef937b0abac54e7b6a0c74f3b74d038e4",
+  "applicationRef": "d300543cc0332b55a62965f6538bd427adaa89a8",
+  "releaseId": "20261016-213718-135550f5",
+  "artifactSha256": "283eaff2ca07ccd5253cb8dbb6daf62c56e0eed9870ec334f8c49822017856db",
+  "sealedEntries": 24613,
+  "compiledFiles": 1102,
+  "scope": "Existing owner Wiki configuration and read-only vault query acceptance in both private MX reviews; test-navigation correction only",
+  "qualification": {
+    "sourceNodePass": 13,
+    "exactSealedNodePass": 13,
+    "nodeFiles": 6,
+    "chromiumFiles": 2,
+    "workers": 2,
+    "skips": 0,
+    "failures": 0,
+    "precedingRuns": {
+      "passEach": 12,
+      "failureEach": 1,
+      "cause": "Old receipt-review driver stopped at Plugins overview after the directory reorganization; it now opens the Wiki card."
+    },
+    "existingWikiTools": 6,
+    "approvedBundledSkills": 9,
+    "actualVaultQuickIndexAndHotQuery": true,
+    "actualVaultStandardQueryMatched": true,
+    "actualVaultWikiFilesUnchanged": 16,
+    "ownerPrivateKnowledgeSentToModel": false,
+    "allOwnerSkillAndWriteWorkflowsQualified": false,
+    "actualOverviewOnSwitchDetailAndAppliedStatus": true,
+    "actualOwnerGuiConsoleErrors": 0,
+    "actualOwnerGuiHttpFailures": 0,
+    "independentlyAuthoredMutationScopeAndUnknownReviewFixtures": true,
+    "samePublicOriginalLicenseAndSealRetained": true
+  },
+  "adoption": {
+    "configuredReviewProfiles": 2,
+    "loadedConversationsWithNineSkills": 2,
+    "totalNativeConversationsPreserved": 4,
+    "protectedOriginalFilesBackedUpAndVerifiedPostGui": 32,
+    "intentionalNewPrivateConfigurationFiles": 2,
+    "fullPersonalArchiveBackup": false,
+    "existingVaultContentMovedOrWritten": false,
+    "sourceDshConfigurationChanged": false,
+    "ownerPidsAndExecutionPoliciesUnchanged": true,
+    "runtimeRestarted": false,
+    "modelOrAudioRequestsSubmitted": false,
+    "sharedPromptMemoryEligibilityJobsSettingsAndEngineDataUnchanged": true,
+    "stableReviewRegistryRevision": 4,
+    "installedAgentOrSelectionChanged": false,
+    "additionalRealDshProjectTransfers": 0
+  },
+  "limits": [
+    "Actual vault validation is read-only Wiki quick/standard query plus SDK resource and original GUI configuration; it is not private-knowledge inference or all nine skill workflows",
+    "Only configuration/protected review inputs are backed up in this increment; the larger personal archive is not fully copied",
+    "Owner mutations/ingestion, companion CLIs, installed Agent and later-OS acceptance remain separate",
+    "MCP and other plugin owner configurations, broader migration and pilot feedback remain",
+    "No merged PR/public binary/DSH retirement is qualified"
+  ]
+}

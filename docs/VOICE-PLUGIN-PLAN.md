@@ -1,5 +1,24 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## MX service readiness — October 15
+
+A startup-journal check identifies the failed Breeze attempt as **Vulkan GPU
+out-of-device-memory during its first synthesis warmup**, after model load and
+listener startup. The first startup reported 2,572 MiB free on RTX 5090 and failed
+additional 209,879,040/220,267,440-byte allocations. A listening health endpoint
+therefore cannot qualify synthesis readiness. The failed attempt is terminal and
+Resonant Voice remains inactive.
+
+The initially higher headroom estimate subtracted used from total VRAM and omitted
+reserved memory. Direct queries show **2,502 MiB free/498 MiB reserved**. A single
+retry preflight declined before reaching the existing manager or any service
+action. Qwen's process/invocation and all six unit/voice configuration files are
+preserved, including context/concurrency/precision/output and CPU ASR/VAD. No
+competing GPU work is stopped and no model/GPU tuning is applied. This diagnoses
+a readiness gap; it does not qualify physical speech or all concurrent workloads.
+Harness work continues independently under the owner's existing instruction.
+[Portable readiness record](../release/harness-speech-readiness-20261015.json).
+
 # Local voice for Augmentor through DSH
 
 **Superseded planning baseline, 17 September 2026.** The project is now **Resonant Voice**, with its own local repository. The user selected Breeze, English, and single-5090 inference if it preserves quality and existing capabilities, with 5060 Ti fallback. The current [architecture and delivery plan](../../resonant-voice/docs/PLAN.md) and [hardware/latency qualification](../../resonant-voice/docs/QUALIFICATION.md) replace this document's model choice, deployment recommendation, component ownership and performance targets. Keep the following as the original video analysis and proposal, not a current deployment instruction. No implementation or service change has been made by this planning update.
