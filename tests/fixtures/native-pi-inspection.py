@@ -1,11 +1,11 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Actual production menu, Pi RPC and stale callback; disposable profile only."""
+"""Actual production settings, Pi RPC and stale callback; disposable profile only."""
 import json,os,time,threading
 from pathlib import Path
 from unittest.mock import patch
-from PySide6.QtCore import Qt,QTimer
+from PySide6.QtCore import Qt
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication,QMenu
+from PySide6.QtWidgets import QApplication
 from augmentor_linux.pi_client import PiClient
 from augmentor_linux.window import Window
 app=QApplication([]);client=PiClient();sid='inspection-parent';errors=[];opened=[]
@@ -23,16 +23,17 @@ try:
  until(lambda:window.controller.online and window.controller.connected,'connected')
  assert window.controller.capabilities['inspection'] is True
  before=client.call('session.history',{'sessionId':sid})
- def choose():
-  menu=app.activePopupWidget();assert isinstance(menu,QMenu)
-  action=next(action for action in menu.actions() if action.text()=='Trajectory && Context');assert action.isEnabled()
-  menu.setActiveAction(action)
-  image=Path(__file__).resolve().parents[2]/'outputs/harness-proof/native-inspection-menu.png';image.parent.mkdir(parents=True,exist_ok=True);menu.grab().save(str(image))
-  QTest.keyClick(menu,Qt.Key.Key_Return)
  def navigate(url):opened.append(url.toString());return True
  with patch('augmentor_linux.window.QDesktopServices.openUrl',side_effect=navigate),patch.object(window,'open_inspector',wraps=window.open_inspector) as trigger:
-  QTimer.singleShot(50,choose);QTest.mouseClick(window.more_button,Qt.MouseButton.LeftButton)
-  until(lambda:len(opened)==1,'actual menu navigation calls='+str(trigger.call_count))
+  QTest.mouseClick(window.more_button,Qt.MouseButton.LeftButton)
+  until(lambda:window.settings_panel is not None,'actual settings open')
+  panel=window.settings_panel;QTest.mouseClick(panel.nav['all'],Qt.MouseButton.LeftButton)
+  until(lambda:getattr(panel,'inspector_action',None) is not None and panel.inspector_action.isVisible() and panel.inspector_action.isEnabled(),'actual inspection action available')
+  image=Path(__file__).resolve().parents[2]/'outputs/harness-proof/native-inspection-settings.png';image.parent.mkdir(parents=True,exist_ok=True);panel.grab().save(str(image))
+  QTest.mouseClick(panel.inspector_action,Qt.MouseButton.LeftButton)
+  until(lambda:len(opened)==1,'actual settings navigation calls='+str(trigger.call_count))
+  assert trigger.call_count==1;assert panel.accept()
+  until(lambda:window.settings_panel is None,'return to original conversation')
   controller=window.controller;original=controller.client.call;entered=threading.Event();release=threading.Event();finished=threading.Event()
   def delayed(method,params=None,**kwargs):
    if method!='inspection.open':return original(method,params,**kwargs)

@@ -10,7 +10,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {PiConnection} from '../dist/client/src/socket.js';
 import {localConnect} from '../dist/platform/src/transport.js';
 async function until(fn){const end=Date.now()+15000;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Pi inspection fixture timeout');}
-test('actual Pi lazily opens scoped inspection and Native menu reads saved context without inference',{skip:process.platform!=='linux',timeout:45000},async t=>{
+test('actual Pi lazily opens scoped inspection and Native settings reads saved context without inference',{skip:process.platform!=='linux',timeout:45000},async t=>{
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];
  const child=spawn(process.execPath,['scripts/harness-ui-proof.mjs'],{env:{...env,AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_PROMPTS:'1',AUGMENTOR_HARNESS_PROOF_LAZY:'1'},stdio:['ignore','pipe','pipe']});let output='',stderr='',fixture;
  child.stdout.on('data',data=>output+=data);child.stderr.on('data',data=>stderr+=data);

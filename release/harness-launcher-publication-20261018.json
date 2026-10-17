@@ -5,7 +5,7 @@
   "clientPublicationSchema": "augmentor-dsh-client-publication/3",
   "qualification": {
     "pythonPass": 144,
-    "nodePass": 17,
+    "nodePass": 18,
     "fail": 0,
     "skip": 0,
     "registeredReviewCases": 12,
@@ -21,7 +21,8 @@
     "publicationBackendRepliesSynthetic": true,
     "realRegistryWriteBoundaryChildExits": true,
     "actualLegacyAliasSubprocesses": true,
-    "ownerModelRequests": 0
+    "ownerModelRequests": 0,
+    "inspectionCurrentSettingsCases": 1
   },
   "sourceScope": [
     "Registry lock, exact archived revision and explicit existing review names",
@@ -63,6 +64,20 @@
   ],
   "privateEvidenceSha256": {
     "harness-review-publication-final-20261018.log": "d8780dec2b21e66fa414f779ac9ff1c36ba04441c1eeb1147accf89a13624773",
-    "harness-launcher-publication-node-20261018.log": "c7e03b9b83ce29009c43466ee4e0c91debbd6077e6511feeb24b97067c377dca"
+    "harness-launcher-publication-node-20261018.log": "c7e03b9b83ce29009c43466ee4e0c91debbd6077e6511feeb24b97067c377dca",
+    "harness-native-inspection-settings-20261018.log": "d8d99a630ac18fdca4b946144b97e2d248606d5c12a26a5b5334172312257707",
+    "harness-combined-package-ordinary-node-20261018.log": "3f4161c9822fcf86ebf0ddce230a483da4c9a3f12d41de5eb2c0d5aea9594e0b",
+    "harness-launcher-publication-owner-preservation-private-20261018.json": "acf53d4011a65907df767aa48a21ec466940a61979f0c42523bf54c0322b4730"
+  },
+  "runtimeRef": "bc2d70167ca2d987a4afb2d175401f78e2db3f9c",
+  "combinedAttempt": {
+    "ordinaryNodePass": 65,
+    "ordinaryNodeFail": 1,
+    "failure": "Inspection fixture expected the old popup menu; production inspector is in recovered inline settings",
+    "newArtifactStaged": false,
+    "temporaryApplicationRemoved": true,
+    "fixtureCorrection": "Actual More / All settings / Trajectory and Context click, enabled-state wait and return to original conversation",
+    "fixtureCorrectionSourceNodePass": 1,
+    "productionUiChanged": false
   }
 }

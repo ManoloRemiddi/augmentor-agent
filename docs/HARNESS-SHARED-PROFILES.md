@@ -5,7 +5,7 @@ now bind selected reviews to the same verified artifact/common store with exact
 registry/opener reverse and crash recovery. Home reads selection under the gate;
 explicit legacy Browser/mobile alias adoption retains arguments, environment and
 selected Node PATH, and carries reviewed before-hashes into preparation.
-Publication schema **3**, local **144 Python / 17 Node** pass (authored isolated
+Publication schema **3**, local **144 Python / 18 Node** pass (authored isolated
 profiles; synthetic health replies). No full app copy, owner migration or installed
 change. Actual bootstrap pre-adoption, one combined immutable qualification,
 matching loaded Browser and the fresh three-pair owner cut remain.

@@ -210,7 +210,7 @@ paths and valid before-hashes are accepted. A later edit is preserved rather tha
 silently becoming the new before-image. Render and review the complete current
 real graph before any installation; a legacy command may have owner customizations.
 
-Local **144 Python / 17 Node** pass with no failures/skips. Twelve registry cases
+Local **144 Python / 18 Node** pass with no failures/skips. Twelve registry cases
 cover exact paired rebind/reverse, no-owner rendering, archive/source/ownership
 requirements, contention, late edits, lock-bound recovery and real child exit
 after each registry/opener forward and reverse write. The 24 publication, 21
@@ -226,3 +226,13 @@ The preceding [SDK 39072231157](https://github.com/ManoloRemiddi/augmentor-agent
 completed with **Linux success** at fixture ref `24bee26f`; the whole matrix was
 **cancelled** (Mac/Windows cancelled), cause unqualified. This is historical Linux
 evidence, not a hosted pass for the changes above or whole-platform approval.
+
+
+The first combined ordinary check then passed 65 Node cases and failed its old
+Native inspection fixture: that fixture still looked for a popup menu after the
+approved inline settings had been restored. The production inspector is present.
+The fixture now clicks More, All settings and the actual enabled Trajectory/Context
+action, then returns to the original conversation. Its real Pi/Qt case passes;
+no production UI change or wider timeout is used. The failed temporary application
+was removed without staging a release. This is the additional Node case in the
+18-case source total above; combined qualification remains separate.
