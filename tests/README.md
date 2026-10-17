@@ -6,6 +6,8 @@ cancellation, request identity and maintenance guards. **201 focused Python** pa
 including a repeat with locked transport 1.8.0. Synthetic/offscreen only; no owner
 service, setting or installed change, no app copy. Actual cold activation,
 matching clients and owner continuation remain; voice expansion stays deferred.
+Linux SDK **39065133516 succeeds** at runtime **2c7bb68b**, including all 201 Native
+cases. [Qualification record](../release/harness-native-provider-retention-20261017.json).
 
 [Retained request stages and cold-cut planning](../docs/HARNESS-NATIVE-SETTINGS.md#retained-progress-thinking-and-current-cold-cut-map--october-17)
 qualifies 121 Native/shared-preference + 28 Controller/remote + 12 archive cases,

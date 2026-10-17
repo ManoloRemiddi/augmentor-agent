@@ -28,8 +28,12 @@ flag, and settings jobs keep the window busy until their callbacks settle.
 
 The focused combined **201 Python cases pass**, zero failures/skips, including eight
 new adaptation cases and selected public provider/audio/vault/settings tests.
-An isolated repeat with the product's hash-locked **websocket-client 1.8.0** passes
-all 201; the initial development-environment run used 1.9.0. Qt is 6.8.2.1.
+The final isolated local run uses the product's hash-locked **websocket-client 1.8.0**;
+the earlier 200-case development group used 1.9.0. Qt is 6.8.2.1.
+Full [Linux SDK 39065133516](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39065133516)
+**succeeds** at runtime **2c7bb68b81c6c7503e61d868d78fe989b41ed2a9**,
+including an independent repeat of the complete 201-case Native group.
+[Portable qualification record](../release/harness-native-provider-retention-20261017.json).
 Sockets, audio streams, vaults and provider replies are synthetic. The test process
 has a read-only host filesystem and isolated network; no microphone, real vault,
 external API, owner model or service is used. This is existing-protocol retention,
