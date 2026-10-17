@@ -1,10 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 The [controlled backend preflight](../docs/HARNESS-DSH-INSTALLATION.md#controlled-replacement-backend-and-native-adapter-preflight--october-17)
-adds seven authored namespace/metadata cases, included in 124 source Python passes;
+adds nine authored namespace/metadata cases, included in 126 source Python passes;
 four launcher Node cases also pass. Actual upstream/product and candidate Native
 adapter checks run separately on authored isolated data. Linux SDK adds an explicit
-bubblewrap dependency/smoke check and these cases; its prior runtime run now passes.
+bubblewrap dependency/smoke check and these cases. Runtime 39a717c1 also tests the
+libc process-descriptor path and missing-facility refusal before spawning. Linux
+SDK **39054592182 succeeds** at 39a717c1, including all nine backend cases;
+the earlier runner/Python failures remain recorded.
 No private source or owner profile is copied/executed in the public tests.
 
 The [configuration transaction kernel](../docs/HARNESS-DSH-INSTALLATION.md#cold-configuration-journal-and-managed-startup-fence--october-17)

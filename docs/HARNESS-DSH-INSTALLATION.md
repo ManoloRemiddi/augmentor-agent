@@ -87,8 +87,8 @@ probe cases ran. The corrected workflow grants `userns` to a runner-local copy
 of the distribution executable using the exact-path AppArmor profile approach
 in [Ubuntu’s release notes](https://documentation.ubuntu.com/release-notes/24.04/#unprivileged-user-namespace-restrictions).
 This affects only the ephemeral CI runner when its restriction is enabled;
-it preserves the host-wide restriction and distribution profile. Corrected-head
-hosted qualification remains pending. The full owner main/
+it preserves the host-wide restriction and distribution profile. The follow-up
+below records its terminal result and portable-Python correction. The full owner main/
 pilot, 36 protected file sets/PIDs, registry 18, shared rows/configuration, menus
 and model/GPU/voice services remain unchanged; scratch is empty and root stays
 about 99 GiB free. Next finish full cold-backup/entrypoint evidence and matching
@@ -118,6 +118,22 @@ now nine backend cases. Final MX source checks pass **126 Python / four Node**,
 including all nine, and the real upstream/candidate-adapter preflight passes again.
 The feature remains Linux-only; this CI change does not
 qualify Ubuntu distribution support or modify the owner’s MX system.
+
+Final Linux SDK **39054592182** is a terminal **success** at runtime
+**39a717c18bda79fa102af1f632d1b1741acfd788**. Distribution bubblewrap 0.9.0,
+the exact-executable CI profile, standalone CPython 3.13.5, all nine backend cases,
+27 preservation cases and four managed-launch Node cases pass with the remaining
+SDK steps. This supersedes both failed attempts above without relabelling them.
+
+A new read-only client audit observes 12 known processes, 35 launcher/registration
+files and three Native instances, idle with no draft and model-ready at observation.
+Four installed Native file hashes lack an exact object in fetched public history;
+this does not by itself classify them as private source. The installed Browser
+remote has a public history object. The active Browser extension entry is reported
+by inventory without a semantic version, so its loaded version remains unverified.
+No source is copied or client restarted. Owner preservation again verifies both
+review PIDs/all 36 protected sets, registry 18, stores/settings, menus/selections
+and GPU/voice service state. Scratch is empty; no new app mirror or artifact exists.
 
 ## Cold configuration journal and managed startup fence — October 17
 

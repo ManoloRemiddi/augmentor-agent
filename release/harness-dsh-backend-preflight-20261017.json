@@ -1,11 +1,10 @@
 {
   "schema": "augmentor-harness-dsh-backend-preflight/1",
   "date": "2026-10-17",
-  "sourceRef": "517b71dbb0293aa78f306b127ae444e51ce09b95",
+  "sourceRef": "39a717c18bda79fa102af1f632d1b1741acfd788",
   "scope": "Internal Linux controlled backend and actual candidate Native-adapter preflight; no owner activation",
-  "sourcePythonPass": 124,
-  "backendProbeCases": 7,
-  "probeCasesOverlap124": true,
+  "sourcePythonPass": 126,
+  "backendProbeCases": 9,
   "sourceManagedLauncherNodePass": 4,
   "fail": 0,
   "skip": 0,
@@ -13,7 +12,8 @@
     "bubblewrapMxVersion": "0.12.0",
     "pidfdAndUserPidNamespacesRequired": true,
     "standardDeviceMountRequired": true,
-    "ciNamespaceSmokeAndProbeChecksAdded": true
+    "ciNamespaceSmokeAndProbeChecksAdded": true,
+    "bubblewrapCiVersion": "0.9.0"
   },
   "controlledPreflight": {
     "appliedReviewedConfigurationAndColdGuardRequired": true,
@@ -89,14 +89,10 @@
   "installedChanged": false,
   "ownerProjectsTransferred": 0,
   "newRuntimeSdk": {
-    "run": 39053669426,
-    "head": "b6bfaa2a1dee19d9d535457b4056e874df3bbc72",
-    "runtime": "517b71dbb0293aa78f306b127ae444e51ce09b95",
+    "run": 39054592182,
+    "head": "39a717c18bda79fa102af1f632d1b1741acfd788",
     "status": "completed",
-    "conclusion": "failure",
-    "failedStep": "Prepare Linux controlled-backend namespace dependency",
-    "observedError": "bwrap: setting up uid map: Permission denied",
-    "probeChecksExecuted": false
+    "conclusion": "success"
   },
   "previousRuntimeSdk": {
     "run": 39049376766,
@@ -113,9 +109,9 @@
     "Owner pilot feedback before more transfers; public Office distribution gate; voice/later OS deferred"
   ],
   "privateEvidenceSha256": {
-    "harness-backend-probe-source-python-20261017.log": "ccde88ad279bcb4e8658f1544f4dcdd131b270e42dba2f82e4a6b41344ff0b21",
-    "harness-backend-probe-source-node-20261017.log": "661730695e1abf9b15433b8b6bf3e0dee58566877b0d41399cb2a0227223617f",
-    "harness-backend-probe-real-summary-20261017.log": "2c4ba2430620342adc05b2303dde45c33c97edb073a9400f510201b20cb431f3",
+    "harness-backend-probe-source-python-20261017.log": "9121fae42ac1c6986070a6f74bfa88983fb4d33668f176a472f39cb35c50189d",
+    "harness-backend-probe-source-node-20261017.log": "0af7374666b0ded4eb5981e6d84884a364f2323a2e0819ccdddccc207a47d033",
+    "harness-backend-probe-real-summary-20261017.log": "b24a7077029f1bcede9dc12a2bfe139f04f97353668ca3e11a89c756a4e01d4a",
     "harness-backend-probe-owner-preservation-20261017.log": "b67e752f52292a87903b9ee701ce57d7c168c9dd9dcb644249ec86ba13e063b4"
   },
   "mixed0600And0644OriginalModesCovered": true,
@@ -124,6 +120,65 @@
     "scope": "Ephemeral GitHub Ubuntu runner only; no installed application changes",
     "approach": "Runner-local copy of distribution bwrap with an exact-executable AppArmor userns profile when the Ubuntu restriction is enabled; no global sysctl change or distribution profile replacement",
     "source": "https://documentation.ubuntu.com/release-notes/24.04/#unprivileged-user-namespace-restrictions",
-    "qualification": "Pending corrected-head Linux SDK"
-  }
+    "qualification": "Complete Linux SDK 39054592182 succeeds at 39a717c1; namespace smoke, preservation, all nine probe cases and managed launch gates pass"
+  },
+  "initialQualification": {
+    "sourceRef": "517b71dbb0293aa78f306b127ae444e51ce09b95",
+    "sourcePythonPass": 124,
+    "backendProbeCases": 7,
+    "evidenceSha256": {
+      "harness-backend-probe-source-python-20261017.log": "ccde88ad279bcb4e8658f1544f4dcdd131b270e42dba2f82e4a6b41344ff0b21",
+      "harness-backend-probe-source-node-20261017.log": "661730695e1abf9b15433b8b6bf3e0dee58566877b0d41399cb2a0227223617f",
+      "harness-backend-probe-real-summary-20261017.log": "2c4ba2430620342adc05b2303dde45c33c97edb073a9400f510201b20cb431f3",
+      "harness-backend-probe-owner-preservation-20261017.log": "b67e752f52292a87903b9ee701ce57d7c168c9dd9dcb644249ec86ba13e063b4"
+    }
+  },
+  "probeCasesOverlap126": true,
+  "failedHostedAttempts": [
+    {
+      "run": 39053669426,
+      "head": "b6bfaa2a1dee19d9d535457b4056e874df3bbc72",
+      "runtime": "517b71dbb0293aa78f306b127ae444e51ce09b95",
+      "status": "completed",
+      "conclusion": "failure",
+      "failedStep": "Prepare Linux controlled-backend namespace dependency",
+      "observedError": "bwrap: setting up uid map: Permission denied",
+      "probeChecksExecuted": false
+    },
+    {
+      "run": 39054331001,
+      "head": "0acb8beb0c663d1e4c5ea134811b8ade982ce429",
+      "status": "completed",
+      "conclusion": "failure",
+      "namespaceSmoke": "success",
+      "setupAndPreservationChecks": "success",
+      "failedStep": "Verify Linux controlled backend lifetime and matching preflight guards",
+      "observedError": "AttributeError: module 'os' has no attribute 'pidfd_open'",
+      "backendCasesRun": 7,
+      "backendErrors": 5
+    }
+  ],
+  "portablePython": {
+    "nativeWrappersPreferred": true,
+    "hostLibcNamedFunctionFallback": true,
+    "architectureSpecificSyscallNumbers": false,
+    "capabilityCheckedBeforeSpawning": true,
+    "missingFacilitiesRefusedWithoutProcessCreation": true,
+    "realNamespaceCleanupWithPythonWrappersHidden": true
+  },
+  "ownerReadOnlyClientAudit": {
+    "knownProcesses": 12,
+    "launcherRegistrationsInspected": 35,
+    "nativeInstancesObserved": 3,
+    "nativeBusy": false,
+    "nativeDraftPresent": false,
+    "nativeModelReady": true,
+    "installedNativeFilesWithNoExactObjectInFetchedPublicRepository": 4,
+    "installedBrowserSharedRemoteHasPublicHistoryObject": true,
+    "activeBrowserExtensionEntryObserved": true,
+    "activeBrowserExtensionVersionReported": false,
+    "sourceCopied": false,
+    "ownerSelectionChanged": false
+  },
+  "finalOwnerReadOnlyAuditAfterPidfdCorrection": true
 }

@@ -1,13 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Controlled backend and actual Native-adapter preflight](HARNESS-DSH-INSTALLATION.md#controlled-replacement-backend-and-native-adapter-preflight--october-17)
-adds 517b71db: source 124 Python/four Node pass. Real DSH/product 0.2.13 and the
-actual immutable candidate adapter match on authored data; isolated PID lifetimes,
-metadata/CLI bindings and stale inherited endpoint handling pass. Config writes
-stay blocked while probing, normal cleanup joins and successful checks keep the
-startup fence. Actual owner staging binds 48 inputs/10 edits, with 20 paths kept.
-No installed change/new app copy; full backups, real graph/client adoption and
-selection/finalization/reverse remain. Prior SDK 39049376766 succeeds; new CI pending.
+adds 517b71db and portable-Python follow-up **39a717c1**. Final source **126 Python /
+four Node** pass, including nine backend cases. Real DSH/product 0.2.13 and the
+actual sealed candidate adapter match on authored isolated data; namespace cleanup,
+CLI/launch bindings, stale endpoint and exact config reversal pass. Successful
+checks retain the startup fence. Owner staging binds 48 inputs/10 edits, keeps
+20 paths. No installed change/new app copy. Full backups, real graph/all-client
+adoption and selection/finalization/reverse remain. Linux SDK **39054592182 succeeds** at 39a717c1;
+prior failures and the CI-only AppArmor/libc corrections are recorded in the guide.
 [Record](../release/harness-dsh-backend-preflight-20261017.json).
 
 [Cold configuration journal and profile gate](HARNESS-DSH-INSTALLATION.md#cold-configuration-journal-and-managed-startup-fence--october-17)
@@ -16,8 +17,8 @@ Real upstream DSH retains/releases its profile reader and refuses a pending fenc
 on an authored isolated profile. Apply/reverse survive per-file process death;
 completed config remains fenced pending client orchestration. No installed apply
 command, owner change or new app copy. Full backups, client selection/finalization
-and real owner acceptance remain. Linux SDK 39049376766 has passed its changed
-preservation/profile-gate steps; the overall run is still in progress.
+and real owner acceptance remain. Linux SDK 39049376766 is a terminal success, including the changed
+preservation/profile-gate steps.
 [Record](../release/harness-dsh-configuration-transaction-20261017.json).
 
 [Retained role and library qualification](HARNESS-DSH-INSTALLATION.md#retained-roles-cold-ownership-and-prompt-library-bridge--october-17)
