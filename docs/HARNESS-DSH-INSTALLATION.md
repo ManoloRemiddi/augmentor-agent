@@ -33,8 +33,11 @@ service or archived action is executed by capture/verification.
 The fixed limits are 500,000 entries, two GiB per file, 16 GiB logical data,
 128 MiB metadata and a 20 GiB archive. Conservative planned space is checked before
 copying, followed by repeated **64 GiB free-space reserve** checks during copying
-and archive validation. An incomplete attempt publishes no success receipt and
+and archive validation. A caught failure publishes no success receipt and
 removes only its own unchanged-inode bulk files; a replaced foreign file is kept.
+Abrupt process death can leave an uncommitted private archive. Without a complete
+receipt it cannot qualify activation; outer orchestration must inspect/retire that
+attempt before another owner capture.
 A complete or unknown completion-publication outcome is preserved for inspection.
 Existing output directories are never reused or overwritten.
 

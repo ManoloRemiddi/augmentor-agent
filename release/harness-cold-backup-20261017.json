@@ -42,9 +42,11 @@
     "sourceAndLateTreeChangesRefused": true,
     "sqliteJournalsRefused": true,
     "incompleteDoesNotPublishSuccess": true,
-    "ownBulkFilesRemovedBeforeSuccess": true,
     "foreignReplacedFilesPreserved": true,
-    "completedOrUnknownCommitOutcomePreserved": true
+    "completedOrUnknownCommitOutcomePreserved": true,
+    "ownBulkFilesRemovedOnCaughtFailure": true,
+    "abruptDeathCanLeaveUncommittedArchive": true,
+    "outerRecoveryMustInspectPartialBeforeRetry": true
   },
   "authoredFixtureSpaceIsSimulated": true,
   "actualPublicProfile": {
