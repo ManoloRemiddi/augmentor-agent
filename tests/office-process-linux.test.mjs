@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Protocol/ownership fault fixtures use tiny authored actors; real Wasm is separate.
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mkdtemp,writeFile,readFile,rm,open,stat,mkdir,rename,symlink,readdir,unlink} from 'node:fs/promises';
+import {mkdtemp,writeFile,readFile,rm,open,stat,mkdir,rename,symlink,readdir,unlink,chmod} from 'node:fs/promises';
 import {spawn,fork} from 'node:child_process';import {once} from 'node:events';import {tmpdir} from 'node:os';import {join} from 'node:path';import {fileURLToPath} from 'node:url';
 import {processOptions,processReceipt,processRequest,processReply,OFFICE_PROCESS_SCHEMA as schema,OFFICE_PROCESS_REPLY_BYTES} from '../dist/runtime/src/office-process-protocol.js';
 import {processFileReceipt} from '../dist/runtime/src/office-process-files.js';
@@ -28,7 +28,7 @@ test('Office process packets preserve canonical identities and reject unknown, u
 test('private snapshot receipts refuse links, nonprivate files and over-limit reads',{skip},async t=>{
  const root=await temporary(t),file=join(root,'input');await writeFile(file,'AUTHORED',{mode:0o600});const a=await processFileReceipt(file,8);assert.equal(a.bytes,8);
  await assert.rejects(processFileReceipt(file,7));await writeFile(file,'CHANGED!',{mode:0o600});assert.notEqual((await processFileReceipt(file,8)).sha256,a.sha256);
- await symlink(file,join(root,'link'));await assert.rejects(processFileReceipt(join(root,'link'),8));await writeFile(join(root,'public'),'x',{mode:0o644});await assert.rejects(processFileReceipt(join(root,'public'),8));
+ await symlink(file,join(root,'link'));await assert.rejects(processFileReceipt(join(root,'link'),8));await writeFile(join(root,'public'),'x',{mode:0o600});await chmod(join(root,'public'),0o644);assert.equal((await stat(join(root,'public'))).mode&0o777,0o644);await assert.rejects(processFileReceipt(join(root,'public'),8));
 });
 async function fixture(t,mode='reply',timeoutMs=1000){
  const control=await temporary(t),scratch=await createLinuxOfficeScratch(),root=await open(scratch.directory,'r'),publication=await open(join(scratch.directory,'converted.pdf'),'wx+',0o600),pub=await publication.stat({bigint:true});let child,closed,output='';
