@@ -1,5 +1,42 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Packaged cleanup contention correction — October 17
+
+The first separately sealed managed-Office carrier, **20261017-115954-59433a62**,
+is **not qualified or activated**. Its 24,743-input seal remains exact after a
+297-pass/one-failure run: concurrent active/queued disposal sometimes refused a
+brief journal metadata lock. A separate held-lock control reproduces the refusal
+on the old runtime. The source now serializes cooperating metadata transactions
+instead of treating contention as corruption. Renderer root leases remain
+nonblocking; live/held/replaced/unknown roots are still preserved.
+
+The existing ten-second metadata-helper deadline now uses SIGKILL, so it also
+terminates a stopped helper. Two actual regressions pass: wait for a held metadata
+transaction, and hard-kill a stopped known helper at the configured deadline while
+preserving a recoverable copy. This deadline requires the Node caller's event loop
+to run; owner death separately has a kernel hook. It is not a new independent
+kernel deadline for metadata helpers with a stopped owner.
+
+The source cohort passes **300 Node / 43 Python**, 45 Node files/19 Chromium files,
+two workers, no skips or failures. A separate read-only/networkless container at
+3 GiB/zero-swap/one-CPU/128-PID passes **21 process/journal cases**, with the one
+actual-user-manager case explicitly skipped. No OOM occurs. The real MX manager
+cases remain included in the source cohort. The permission-negative fixture now
+explicitly chmods/asserts 0644, passing under both 022 and 077 masks; packaging's
+077 mask previously made that supposed nonprivate file private. Guards are not
+relaxed. The empty-missing-font recovery fixture selects already-declared DejaVu
+Sans, rather than assuming Liberation fonts are installed in CI.
+
+Hosted `4c86603d` Debian failed before packaging on orphan-reaping/font fixture
+assumptions. In a local control using the same failed sealed runtime, an authored
+non-reaping PID1 reproduces two process failures; changing only Docker `--init`
+passes both unchanged assertions. CI's pinned Debian containers now use init.
+Fresh hosted acceptance and a rebuilt ordinary/exact-sealed carrier remain
+separate requirements. Both installed reviews remain `97d95d58`; the failed
+carrier is retained and must not be selected. Original provider/GUI/engine/default,
+owner projects/settings/services and public packaging gates remain unchanged.
+[Source, failed-carrier and container evidence](../release/office-rebuild/packaged-cleanup-contention-qualification-20261017.json).
+
 ## Managed Office scratch recovery — October 17
 
 The opt-in `linux-managed-wasm` Host now places conversion copies in its own

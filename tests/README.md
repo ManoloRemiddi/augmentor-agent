@@ -2147,6 +2147,19 @@ Original PDF preview: `harness-pdf-chromium.test.mjs` uses authored PDF/JPX byte
 
 ## Original Office preview qualification
 
+Packaged qualification adds two real journal regressions: an independent held
+metadata lock must serialize instead of failing, and an actually stopped known
+helper is SIGKILLed at the existing ten-second exec deadline with a recoverable
+copy. These bring the source cohort to 300 (45 files/19 Chromium), plus 43 Python.
+One case in the 21-pass read-only container cohort explicitly requires the real
+user manager and skips there; the host cohort runs it. An authored non-reaping
+PID1 reproduces the hosted orphan checks; Docker `--init` passes those unchanged
+checks. The pinned Debian jobs now request init. Permission-negative setup uses
+explicit chmod/stat under either umask; zero-missing-font recovery selects the
+already-declared DejaVu Sans. The first sealed carrier fails one actual cleanup
+case and remains unactivated, not silently relabelled as acceptance.
+[Cause, exact scopes and remaining qualification](../docs/HARNESS-OFFICE-PREVIEWS.md#packaged-cleanup-contention-correction--october-17).
+
 `office-scratch-recovery.test.mjs` adds ten Linux x64 cases for the profile-bound
 managed scratch journal: receipt-before-bytes, actual owner/cleaner loss and cold
 recovery, admitted real-entry startup/all-owner death (explicit manager opt-in),

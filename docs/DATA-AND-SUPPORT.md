@@ -2,6 +2,13 @@
 
 ## Managed Office recovery copies — October 17
 
+The [packaged contention correction](HARNESS-OFFICE-PREVIEWS.md#packaged-cleanup-contention-correction--october-17)
+serializes cooperating journal metadata cleanup; held renderer/foreign roots
+remain preserved. A stopped metadata helper is killed at the existing ten-second
+Node exec deadline, with its private copy left recoverable. That deadline needs
+the caller event loop to run; owner death has a separate kernel hook. The first
+failed sealed carrier remains unactivated and unchanged.
+
 The uninstalled `linux-managed-wasm` candidate stores authorized document/PDF and
 nested entry copies under its private application state's `office-scratch/v1/data`.
 Private `records` contain only nonce root identity, device/inode, owner PID/start/

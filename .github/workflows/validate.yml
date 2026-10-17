@@ -50,7 +50,9 @@ jobs:
   debian:
     needs: [source-boundary, handy]
     runs-on: ubuntu-24.04
-    container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
+    container:
+      image: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
+      options: --init
     timeout-minutes: 45
     steps:
       - name: Install declared build and test dependencies
@@ -189,7 +191,9 @@ jobs:
   browser-package:
     needs: debian
     runs-on: ubuntu-24.04
-    container: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
+    container:
+      image: debian@sha256:abc9cb88a5587630d7f915f47b23b0668fe250fbfc6457aa4d52b534c1bbf73f
+      options: --init
     timeout-minutes: 20
     steps:
       - name: Prepare fixture directory

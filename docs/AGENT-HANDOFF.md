@@ -1,5 +1,23 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX app and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17)
+remain **97d95d58 / 20261017-095821-fb78d6df**, with the original DSH GUI and
+default Office engine. No additional owner project transfer is authorized before
+pilot feedback; voice and later OS work stay deferred.
+
+[Packaged Office cleanup correction](HARNESS-OFFICE-PREVIEWS.md#packaged-cleanup-contention-correction--october-17)
+is source-only: the first sealed carrier **20261017-115954-59433a62** fails one
+concurrent cleanup case and must not be activated; its seal is retained exact.
+Cooperating journal locks now serialize, and the existing ten-second exec bound
+SIGKILLs a stopped helper. Source300/43 Python and isolated21/one manager skip
+pass; exact test scopes and 4c86603d hosted failures are in the linked evidence.
+The permission-negative fixture explicitly establishes its mode, recovery uses
+CI's declared DejaVu font, and Debian containers request an init process rather
+than relaxing orphan/reap assertions. Rebuild and requalify ordinary/exact sealed
+carriers before adoption; source/third-party/public packaging, remaining startup/
+power-loss/corpus/security and fresh hosted gates remain. Installed reviews,
+owner state and model/GPU/voice settings are preserved.
+
 [Rich Office comparison](../release/office-rebuild/README.md#rich-document-and-original-gui-comparison--october-17)
 passes six authored formats/16 pages through both actual providers: required text/
 exclusions, page/image/font/cache/source and identical 96-DPI raw pixels. Actual

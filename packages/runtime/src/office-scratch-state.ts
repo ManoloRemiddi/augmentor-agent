@@ -8,7 +8,7 @@ const run=promisify(execFile),helper=fileURLToPath(new URL('./office-scratch-jou
 export interface LinuxOfficeScratchState {readonly stateDirectory:string;readonly parent:string;}
 async function journal(stateDirectory:string,selection:string[]=[]){
  try{
-  const {stdout}=await run('/usr/bin/python3',['-I','-B',helper,String(process.pid),stateDirectory,...selection],{timeout:10000,maxBuffer:16384,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8'}});
+  const {stdout}=await run('/usr/bin/python3',['-I','-B',helper,String(process.pid),stateDirectory,...selection],{timeout:10000,killSignal:'SIGKILL',maxBuffer:16384,env:{PATH:'/usr/bin:/bin',LANG:'C.UTF-8',LC_ALL:'C.UTF-8'}});
   const result=JSON.parse(stdout),parent=join(stateDirectory,'office-scratch','v1','data');
   if(result.parent!==parent||!Number.isSafeInteger(result.recovered)||result.recovered<0||result.recovered>128)throw Error('Invalid Office recovery receipt.');
   return {stateDirectory,parent};

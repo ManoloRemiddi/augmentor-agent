@@ -201,7 +201,11 @@ def recover(state, caller, selected=None):
     parent, records, data, handles = layout(state)
     recovered = 0
     try:
-        fcntl.flock(records, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        # Short metadata transactions from other cooperating cleanup owners must
+        # serialize, not turn ordinary concurrent disposal into a failure. The
+        # Node's existing exec deadline kills even a stopped helper. Delivery
+        # requires a running caller event loop; owner death has a kernel hook.
+        fcntl.flock(records, fcntl.LOCK_EX)
         with os.scandir(records) as scan:
             names = []
             for entry in scan:
@@ -255,6 +259,7 @@ if __name__ == '__main__':
     try:
         caller = int(sys.argv[1])
         OWN.parent_death(caller, signal.SIGKILL)
+        OWN.process_name(b'aug-office-jrn')
         if len(sys.argv) == 3:
             result = recover(sys.argv[2], caller)
         elif len(sys.argv) == 6 and re.fullmatch(NAME, sys.argv[3]):

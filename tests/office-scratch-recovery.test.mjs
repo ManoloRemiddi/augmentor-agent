@@ -6,10 +6,14 @@ import {join,basename} from 'node:path';import {tmpdir} from 'node:os';
 import {prepareLinuxOfficeScratchState,cleanupLinuxOfficeScratchState} from '../dist/runtime/src/office-scratch-state.js';
 import {createLinuxOfficeScratch} from '../dist/runtime/src/office-scratch-linux.js';
 import {createLinuxManagedOfficeConverter} from '../dist/runtime/src/office-process-linux.js';
-import {processIdentity,signalOwned,stillOwned} from './fixtures/native-office-processes.mjs';
+import {processIdentity,signalOwned,stillOwned,ownedProcesses} from './fixtures/native-office-processes.mjs';
 const skip=process.platform!=='linux'||process.arch!=='x64',pause=ms=>new Promise(r=>setTimeout(r,ms));
 async function until(fn,label){const end=Date.now()+5000;while(Date.now()<end){if(await fn())return;await pause(10);}throw Error(label);}
 async function state(t){const root=await mkdtemp(join(tmpdir(),'augmentor-office-recovery-'));t.after(()=>rm(root,{recursive:true,force:true}));return root;}
+async function heldJournal(root){
+ const child=spawn('/usr/bin/python3',['-I','-B','-c',"import os,fcntl,sys; fd=os.open(sys.argv[1],os.O_RDONLY|os.O_DIRECTORY); fcntl.flock(fd,fcntl.LOCK_EX); print('HELD',flush=True); sys.stdin.read(); os.close(fd)",join(root,'office-scratch/v1/records')],{stdio:['pipe','pipe','ignore']});let output='';child.stdout.on('data',b=>output+=b);const ended=once(child,'close');await until(()=>output.includes('HELD'),'journal transaction held');return {child,async close(){child.stdin.end();await ended;assert.equal(child.exitCode,0);}};
+}
+async function lostCleaner(t){const root=await state(t),location=await prepareLinuxOfficeScratchState(root),scratch=await createLinuxOfficeScratch(location);await writeFile(join(scratch.directory,'source.docx'),'AUTHORED_CONTENDED_COPY',{mode:0o600});const cleaner=(await ownedProcesses()).find(p=>p.name==='aug-office-temp'&&p.parent===process.pid);assert(cleaner);await signalOwned(cleaner,'SIGKILL');await until(()=>scratch.signal.aborted,'known cleaner loss');return {root,location,scratch};}
 async function orphan(t,mode='allocated'){
  const root=await state(t),owner=fork(new URL('./fixtures/office-journal-owner.mjs',import.meta.url),[root,mode],{stdio:['ignore','ignore','pipe','ipc']});let ready,stderr='';owner.stderr.on('data',b=>stderr+=b);owner.on('message',m=>ready=m);const ended=once(owner,'close');
  t.after(async()=>{if(owner.exitCode===null&&owner.signalCode===null){owner.kill('SIGCONT');owner.kill('SIGKILL');}await ended;});
@@ -21,6 +25,17 @@ test('managed allocation records identity durably before bytes and normal dispos
  const root=await state(t),location=await prepareLinuxOfficeScratchState(root),scratch=await createLinuxOfficeScratch(location),file=join(root,'office-scratch/v1/records',basename(scratch.directory)+'.json'),marker=JSON.parse(await readFile(file,'utf8')),info=await stat(scratch.directory,{bigint:true});
  assert.equal(marker.schema,'augmentor-office-scratch/1');assert.equal(marker.pid,process.pid);assert.equal(marker.start,(await processIdentity(process.pid)).start);assert.equal(marker.dev,String(info.dev));assert.equal(marker.ino,String(info.ino));assert.equal(marker.phase,'ready');
  await writeFile(join(scratch.directory,'source.docx'),'PRIVATE_AUTHORED',{mode:0o600});await scratch.dispose();assert.deepEqual(await readdir(location.parent),[]);assert.deepEqual(await readdir(join(root,'office-scratch/v1/records')),[]);
+});
+test('explicit fallback waits for another journal transaction instead of failing cleanup on transient lock contention',{skip,timeout:10000},async t=>{
+ const f=await lostCleaner(t),holder=await heldJournal(f.root);let settled=false;
+ try{const pending=cleanupLinuxOfficeScratchState(f.location,f.scratch.directory,f.scratch.identity).then(()=>({ok:true}),error=>({error})).finally(()=>settled=true);await pause(250);assert.equal(settled,false,'cleanup must wait for the owned metadata transaction');await holder.close();const result=await pending;assert(result.ok,result.error?.message);await assert.rejects(stat(f.scratch.directory),e=>e.code==='ENOENT');assert.deepEqual(await readdir(join(f.root,'office-scratch/v1/records')),[]);}finally{if(holder.child.exitCode===null)await holder.close();await f.scratch.dispose().catch(()=>{});}
+});
+test('a stopped journal helper is hard-killed at its existing deadline and leaves the private copy recoverable',{skip,timeout:20000},async t=>{
+ const f=await lostCleaner(t),holder=await heldJournal(f.root);let helper;
+ try{
+  const started=Date.now(),pending=cleanupLinuxOfficeScratchState(f.location,f.scratch.directory,f.scratch.identity).then(()=>({ok:true}),error=>({error}));
+  await until(async()=>{helper=(await ownedProcesses()).find(p=>p.name==='aug-office-jrn'&&p.parent===process.pid);return helper;},'owned blocked journal helper');await signalOwned(helper,'SIGSTOP');assert.equal((await processIdentity(helper.pid)).state,'T');const result=await pending;assert(result.error);assert(Date.now()-started>=9000,'the actual configured deadline elapsed');assert.equal(await stillOwned(helper),false,'known exec child was killed and reaped');assert.equal(await readFile(join(f.scratch.directory,'source.docx'),'utf8'),'AUTHORED_CONTENDED_COPY');await holder.close();await cleanupLinuxOfficeScratchState(f.location,f.scratch.directory,f.scratch.identity);await assert.rejects(stat(f.scratch.directory),e=>e.code==='ENOENT');
+ }finally{if(helper&&await stillOwned(helper)){await signalOwned(helper,'SIGCONT');await signalOwned(helper,'SIGKILL');}if(holder.child.exitCode===null)await holder.close();await f.scratch.dispose().catch(()=>{});}
 });
 test('cold managed converter reclaims verified private copies after the Node and independent cleanup owners are both killed',{skip,timeout:15000},async t=>{
  const f=await orphan(t);await f.killAll();assert.equal(JSON.parse(await readFile(f.record,'utf8')).phase,'ready');const converter=await createLinuxManagedOfficeConverter({},f.root);t.after(()=>converter.dispose());await assert.rejects(stat(f.ready.directory),e=>e.code==='ENOENT');await assert.rejects(stat(f.record),e=>e.code==='ENOENT');

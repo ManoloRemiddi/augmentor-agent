@@ -8,6 +8,8 @@
 
 [Managed Office scratch recovery](HARNESS-OFFICE-PREVIEWS.md#managed-office-scratch-recovery--october-17) · private profile receipts, exact dead-owner cleanup and live/held/replaced-root preservation; bootstrap/power-loss and package/adoption limits remain explicit.
 
+[Packaged Office cleanup correction](HARNESS-OFFICE-PREVIEWS.md#packaged-cleanup-contention-correction--october-17) · retained failed seal, reproduced metadata contention, stopped-helper bound and real container init controls; new package/hosted acceptance remains separate.
+
 [Office retained memory/process prototype](HARNESS-OFFICE-PREVIEWS.md#retained-memory-and-process-boundary-prototype--october-17) · measured process-exit reclamation and twenty real-provider cases below the existing memory cap; production integration/fault/source gates remain.
 
 [Office boundary/resource diagnostic](HARNESS-OFFICE-PREVIEWS.md#contained-external-resources-and-memory-refusal--october-17) · ten current-engine cases, calibrated external-file/network controls and bounded cancellation/recovery; preceding same-process Thin OOM remains recorded.

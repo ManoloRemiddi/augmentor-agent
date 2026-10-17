@@ -96,6 +96,6 @@ test('actual Wasm conversion rejects changed source and replaced publication, th
   if(fault==='source')assert.equal(result.error.code,'source-changed');else assert.equal(await readFile(outputPath,'utf8'),'FOREIGN_PUBLICATION_KEEP');
   await scratch.dispose();
  }
- const scratch=await converter.createScratch();t.after(()=>scratch.dispose().catch(()=>{}));await writeFile(join(scratch.directory,'source.docx'),previewDocx('SUPERVISED_RECOVERY','Liberation Sans'),{mode:0o600});
+ const scratch=await converter.createScratch();t.after(()=>scratch.dispose().catch(()=>{}));await writeFile(join(scratch.directory,'source.docx'),previewDocx('SUPERVISED_RECOVERY','DejaVu Sans'),{mode:0o600});
  const result=await converter.render({inputPath:join(scratch.directory,'source.docx'),outputPath:join(scratch.directory,'converted.pdf')});assert.deepEqual(result.missingFonts,[]);assert.equal((await readFile(join(scratch.directory,'converted.pdf'))).subarray(0,5).toString(),'%PDF-');await scratch.dispose();
 });

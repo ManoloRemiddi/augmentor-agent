@@ -1,5 +1,41 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Packaged cleanup contention correction — October 17
+
+The first 24,743-input sealed carrier **20261017-115954-59433a62**, application
+`76ace249`/runtime `4c86603d`, retains its exact inventory but fails managed
+active/queued disposal (297 pass/one failure). It is unactivated and not accepted.
+Normal concurrent helpers could hold the journal directory lock briefly; the
+fallback's nonblocking attempt turned that contention into `unavailable`.
+A real independently held metadata lock reproduces the old premature refusal.
+
+Journal metadata transactions now wait for cooperating writers. Root leases
+still use nonblocking exclusive acquisition, preserving held or foreign roots.
+Node's existing ten-second exec deadline now sends SIGKILL, including to a stopped
+helper. The helper's kernel parent-death hook remains. Deadline delivery needs
+a running Node event loop; do not infer metadata timeout progress while both
+caller and helper are stopped. New tests hold/release an actual directory flock
+and stop an actual named helper, verify termination at the deadline and recover
+the unchanged private copy afterwards. There is no conversion/action replay.
+
+The final source cohort passes 300 Node/43 Python (45 files/19 Chromium, no skips),
+and a read-only/networkless 3 GiB/zero-swap/one-CPU/128-PID container passes 21,
+with its actual-user-manager case explicitly skipped. The host cohort includes
+real manager checks. The 0644 negative file is explicitly chmodded/stat-checked,
+independent of packaging's 077 mask. Recovery uses DejaVu Sans from CI's declared
+`fonts-dejavu-core`; an absent Liberation font is a truthful diagnostic, not a
+renderer failure or reason to suppress missing-font metadata.
+
+The earlier hosted process failures also reproduce with an authored non-reaping
+PID1. Both unchanged cases pass when only Docker init is added. The workflow now
+requests [`container.options`](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idcontaineroptions)
+`--init`, whose [Docker purpose](https://docs.docker.com/reference/cli/docker/container/run/#init)
+includes signal forwarding and child reaping. No exit/reap assertion or existing
+timeout is relaxed. The previous hosted failure is retained; new full hosted,
+fresh ordinary/sealed/package and installed acceptance remain open. No old seal
+is patched, no owner app/data is changed and public Office packaging stays gated.
+[Exact source/control evidence](packaged-cleanup-contention-qualification-20261017.json).
+
 ## Managed Office scratch recovery — October 17
 
 The actual Host passes its private state directory to
