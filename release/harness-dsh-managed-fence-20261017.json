@@ -65,7 +65,13 @@
   "previousQualifiedArtifactSha256": "a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93",
   "previousQualifiedArtifactDoesNotContainThisChange": true,
   "rootFreeGiB": 98.53,
-  "newLinuxSdk": "Pending dispatch",
+  "newLinuxSdk": {
+    "run": 39055975304,
+    "head": "beaa1b2f17d0b306e7d09ec804f3f416d83fccf0",
+    "runtime": "e58a72b90aea23cbbc758da1680bf608e8ef58c3",
+    "status": "completed",
+    "conclusion": "success"
+  },
   "previousLinuxSdk": {
     "run": 39054592182,
     "head": "39a717c18bda79fa102af1f632d1b1741acfd788",
@@ -83,5 +89,16 @@
     "harness-managed-fence-source-node-20261017.log": "3d2486d64481f07babe2a35f0cb37ea3e87b54d9a29b5f6afdb61d5b0fbf31f8",
     "harness-managed-fence-real-summary-20261017.log": "fc305177fa843d6fa5e81fa567a11dfa680e84c6ba0af103abad32be38afa1e8",
     "harness-managed-fence-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "additionalReadOnlyAudits": {
+    "nativePythonFilesInspected": 78,
+    "identicalToCurrentPublic": 33,
+    "nativeFilesWithoutExactFetchedObject": 10,
+    "missingCurrentPublicNativeCounterpartCount": 1,
+    "privateSourceCopied": false,
+    "liveDshSizingEntries": 198114,
+    "sizingIsColdBackup": false,
+    "ownerDataCopied": false,
+    "olderOwnerDependencyTreesAndBackupsDeleted": false
   }
 }

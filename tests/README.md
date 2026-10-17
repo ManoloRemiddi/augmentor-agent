@@ -7,7 +7,8 @@ process death at both marker publication/removal boundaries reverses safely.
 Ordinary selection coexists with readers while refusing maintenance; normal
 selection/reverse/startup installation preserve pending markers. SDK explicitly
 runs 32 preservation cases plus 14 shared-launch and 12 deployment cases.
-No owner profile is used; runtime is e58a72b9, hosted qualification pending.
+No owner profile is used. Full Linux SDK **39055975304 succeeds** at beaa1b2f /
+runtime e58a72b9, including the new explicit shared-launch/deployment step.
 
 The [controlled backend preflight](../docs/HARNESS-DSH-INSTALLATION.md#controlled-replacement-backend-and-native-adapter-preflight--october-17)
 adds nine authored namespace/metadata cases, included in 126 source Python passes;

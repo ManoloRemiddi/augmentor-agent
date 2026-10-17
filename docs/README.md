@@ -6,7 +6,8 @@ four Node** pass; 11 actual managed launcher paths and interrupted marker recove
 are tested. Ordinary selection shares readers but refuses pending maintenance;
 normal startup installation is fenced too. Real backend/Native-adapter preflight
 and owner preservation pass again. No installed change/new app copy. Full backups,
-real caller adoption and matching selection/finalization/reverse remain; CI pending.
+real caller adoption and matching selection/finalization/reverse remain. Linux SDK
+**39055975304 succeeds** at beaa1b2f / runtime e58a72b9.
 [Record](../release/harness-dsh-managed-fence-20261017.json).
 
 [Controlled backend and actual Native-adapter preflight](HARNESS-DSH-INSTALLATION.md#controlled-replacement-backend-and-native-adapter-preflight--october-17)

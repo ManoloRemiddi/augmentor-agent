@@ -50,7 +50,9 @@ Python cases overlap the 133, not extra totals. The actual upstream DSH and seal
 candidate Native-adapter preflight/reverse also pass again on authored isolated
 data; that is separate from the authored launcher regression evidence. Linux SDK
 now explicitly runs the shared-launch and deployment files as well as the
-32 preservation-discovery and nine backend cases. Hosted qualification is pending.
+32 preservation-discovery and nine backend cases. Full Linux SDK
+**39055975304** is a terminal **success** at **beaa1b2f17d0b306e7d09ec804f3f416d83fccf0**,
+with runtime e58a72b9 unchanged by that qualification-record head.
 
 No installed app/bootstrap/service/selection changes, owner profile execution,
 model requests, project transfers or new app copy occur. Both reviews/all 36
@@ -59,6 +61,16 @@ Full cold backups, all real profile/client adoption, matching selection and dura
 finalization/reverse orchestration, one combined immutable qualification and owner
 continuation remain. Pilot feedback gates further project transfers; voice and
 later OS remain deferred.
+
+Additional read-only preparation inspects metadata for all 78 installed Native
+Python files: 33 match current public bytes and ten lack an exact fetched Git
+object. One of those, the settings module, has no current public counterpart.
+This expands the earlier spot check; it does not prove a private/public origin
+or authorize copying. Only hashes/AST symbol metadata are retained privately.
+Live DSH-home sizing inspects 198,114 entries without reading data bodies,
+following links, copying data or deleting dependency/backup trees. This advisory
+is not a cold checkpoint and cannot authorize activation. These findings scope
+the next backup/client-adoption work while preserving the working owner UI.
 
 [Portable qualification record](../release/harness-dsh-managed-fence-20261017.json).
 
