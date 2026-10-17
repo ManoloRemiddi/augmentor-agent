@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX review and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17) · installed queue-control correction, main/pilot menu entries, available core features, verified preservation and current CI/public-packaging limits.
+
 [Queue Resume correction and live steering](QUEUE-AND-STEERING.md#empty-queue-resume-control-and-live-tool-steering--october-17) · real waiting work versus empty cold queues; executing tools settle before corrections, with explicit lifecycle evidence.
 
 [Live running-tool Stop](QUEUE-AND-STEERING.md#live-pi-running-tool-stop-and-cold-inspection--october-17) · actual shell cancellation, partial effects, cold paused queue and explicit read-only continuation; runtime evidence versus model wording.

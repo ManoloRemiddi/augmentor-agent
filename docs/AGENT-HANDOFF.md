@@ -1,5 +1,22 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current MX review](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17) now runs
+**fcf9d32a / 20261017-081210-48ea82e1** in both actual main/pilot owners. The empty
+paused-queue Resume control is hidden; real waiting work retains its original
+controls. Source/ordinary/exact sealed each pass **238 Node / 41 Python**, 29 files/
+eleven Chromium, two workers/no skips; 1,120 compiled matches/24,697 sealed inputs.
+Guarded adoption verifies 418 backup files/four conversations/all 36 original
+prefixes; only eight close/36 startup MCP metadata records append. Shared state,
+menus/selections and GPU/voice settings remain; registry sixteen. Both actual
+Plugins GUIs and warm openers pass without owner inference/settings/extra migration.
+[Evidence](../release/harness-queue-controls-qualification-20261017.json).
+The prior d531ba6c full root (2,101 pass/0 fail/44 skip), Browser (128 pass) and
+native (1,052 run/45 skip/OK), setup/recovery/desktop stages pass. Its public Debian
+packaging correctly refuses unqualified Office exact-source/rebuild redistribution;
+that gate stays intact. Normal fcf9d32a CI runs; this docs/JSON-only checkpoint
+preserves it and claims no new-head/whole-workflow acceptance. Owner pilot feedback
+still gates more transfer; voice/later platforms stay deferred.
+
 [Queue control correction](QUEUE-AND-STEERING.md#empty-queue-resume-control-and-live-tool-steering--october-17)
 hides Resume for an empty paused queue while retaining real waiting-work controls.
 The actual GUI regression reproduces the old error; source/fresh ordinary each

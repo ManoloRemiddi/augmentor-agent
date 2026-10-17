@@ -107,11 +107,11 @@
     "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
     "change": "none"
   },
-  "hostedCorrectionStatus": "A normal CI run will evaluate this correction commit; local cohort success is not whole-workflow or merge acceptance. No skip instruction applies to this implementation/test correction.",
+  "hostedCorrectionStatus": "Correction validated on d531ba6c: full root/browser/native and desktop stages pass. Public Debian packaging refuses the pre-existing unqualified Office exact engine source/rebuild; no gate relaxation or whole-workflow acceptance.",
   "remaining": [
-    "Observe normal hosted Debian qualification on the correction commit.",
-    "Owner pilot feedback and ordinary MX use before further separately backed-up real project transfers.",
-    "Voice and later operating system rollout remain deferred."
+    "Observe normal validation on the newer queue-control implementation; see its separate installed qualification.",
+    "Public Office exact-source/rebuild qualification; no binary publishing or gate bypass.",
+    "Owner pilot feedback before further project transfers; voice/later OS deferred."
   ],
   "preservation": {
     "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
@@ -152,5 +152,35 @@
     "otherGpuAndVoiceServicesUnchanged": true,
     "ownerModelRequestsSubmitted": 0,
     "ownerProjectsTransferred": 0
+  },
+  "observedHostedCorrection": {
+    "sourceRef": "d531ba6cac125203aed79eb8751e5a761ca782d3",
+    "job": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39008117625/job/117324921621",
+    "jobConclusion": "failure",
+    "failingStep": "Build Debian packages with binary notices",
+    "root": {
+      "tests": 2145,
+      "pass": 2101,
+      "fail": 0,
+      "skip": 44
+    },
+    "browser": {
+      "tests": 128,
+      "pass": 128,
+      "fail": 0,
+      "skip": 0
+    },
+    "native": {
+      "tests": 1052,
+      "result": "OK",
+      "skip": 45
+    },
+    "declaredToolsPreflight": "success",
+    "dshSetupApprovalsBranching": "success",
+    "runtimeRecovery": "success",
+    "promptEditorAndX11DesktopFlows": "success",
+    "publicOfficeRebuildQualified": false,
+    "publicPackagingGatePreserved": true,
+    "installedPackageAndPackagedBrowserJobs": "skipped after packaging refusal"
   }
 }

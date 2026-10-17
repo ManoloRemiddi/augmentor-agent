@@ -1,5 +1,30 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Installed queue controls in both MX reviews — October 17
+
+The empty-queue Resume correction is now installed in both real main/pilot reviews
+at **fcf9d32a / 20261017-081210-48ea82e1**. Source/fresh ordinary/exact sealed each
+pass **238 Node / 41 Python**, 29 files/eleven Chromium, two workers/no skips.
+All 1,120 compiled inputs match and 24,697 sealed inputs verify. The new seal also
+opens the saved live-Qwen steering fixture without inference: its empty paused
+queue has no Resume button; native/display/journal/configuration remain exact,
+with only the expected typed observation load/close appends.
+
+Guarded installed-opener adoption verifies 418 backup files and retains all four
+owner conversations/all 36 original protected prefixes, shared rows/settings,
+menus/selections and GPU/voice state. Eight close and 36 startup MCP metadata
+records append; no owner request or extra project transfer occurs. Both actual
+Plugins GUIs retain On/Off switches, applied Search/Wiki and five connections
+(two On/three Off); the empty Resume control is absent. Registry revision sixteen;
+warm opens keep both new owners. [Complete current record](../release/harness-queue-controls-qualification-20261017.json).
+
+The prior d531ba6c full Linux tests/desktop stages pass, with public packaging
+refused by the existing Office exact-source/rebuild gate. Normal fcf9d32a CI is
+running; this evidence-only publication does not claim a new-head/full-workflow
+pass. Owner pilot feedback and public packaging qualification remain separate.
+The following source/ordinary checkpoint predates sealing and owner adoption;
+its pending statements are historical. Voice/later OS remain deferred.
+
 ## Empty-queue Resume control and live tool steering — October 17
 
 A cold original-GUI review exposed **Resume waiting messages** even when its

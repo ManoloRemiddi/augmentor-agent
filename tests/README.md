@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Hosted Linux correction result](../release/harness-linux-ci-qualification-20261017.json):
+d531ba6c passes full root **2,101/0 failures/44 skips**, Browser **128/0/0**,
+native **1,052 run/45 skips/OK**, and setup/recovery/desktop stages. Debian packaging
+then refuses the existing unqualified Office source/rebuild; its gate is unchanged
+and installed-package/browser jobs are skipped. [Current queue-control qualification](../release/harness-queue-controls-qualification-20261017.json)
+adds the real-GUI empty/paused/cold/explicit-Resume regression and source/ordinary/
+sealed **238 Node / 41 Python** each. The initial rendered failure remains recorded;
+normal CI for fcf9d32a is separate and running.
+
 ## Linux Harness CI prerequisites and driver qualification — October 17
 
 The [terminal Debian job](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39006303358/job/117319648472)

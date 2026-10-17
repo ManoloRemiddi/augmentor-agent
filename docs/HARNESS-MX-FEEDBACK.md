@@ -1,5 +1,34 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Current MX review — October 17
+
+Both reviews now run **fcf9d32a / 20261017-081210-48ea82e1**. Open
+**Augmentor Harness (MX)** for the main review, or **Augmentor Harness - Migration Pilot**
+for the transferred pilot, from the application menu. These entries obtain a fresh
+private connection; an older tab may hold a token from the previous process.
+The existing CLI equivalents are `augmentor-harness-review open main` and
+`augmentor-harness-review open pilot`.
+
+The original GUI, curated Models, shared Prompt library/Improve, Context/Insights,
+Trajectory, keyless Search, Wiki, folder controls and configured Connected tools
+remain available. **Settings → Plugins** exposes the overview On/Off controls;
+Connected tools retain per-connection status. Resume appears for real paused
+queue work and stays hidden for an empty cold queue. Use the pilot for continued
+project testing; further transfers remain on hold for owner feedback.
+
+The update verifies **418 backup files**, all four conversations/all 36 original
+protected file prefixes, shared prompts/memory/settings and unchanged model/GPU/
+voice configuration. Only typed MCP connection metadata append. Source, fresh
+ordinary and exact sealed each pass **238 Node / 41 Python**; both actual review
+GUIs pass with no settings/agent actions. [Current evidence](../release/harness-queue-controls-qualification-20261017.json).
+
+The preceding full hosted Linux root/browser/native and desktop checks pass.
+Public Debian packaging stops at the existing Office engine source/rebuild gate;
+its restriction is intact. The newer implementation's normal CI is running.
+This is a qualified private MX review, with owner physical/pilot feedback still
+open; it is not a public installer or whole-workflow acceptance. Voice, Windows,
+macOS and other Linux rollout stay deferred. Earlier dated checkpoints follow.
+
 [Interrupted-response context](AUGMENTOR-HARNESS.md#model-context-after-an-interrupted-response--october-17)
 now runs in both actual reviews at **ee80c054 / 20261017-071945-90183f89**.
 The original GUI/Qwen probe verifies Steer, Stop, paused cold open and explicit
