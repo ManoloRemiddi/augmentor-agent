@@ -19,8 +19,8 @@ Plugins GUIs retain On/Off switches, applied Search/Wiki and five connections
 warm opens keep both new owners. [Complete current record](../release/harness-queue-controls-qualification-20261017.json).
 
 The prior d531ba6c full Linux tests/desktop stages pass, with public packaging
-refused by the existing Office exact-source/rebuild gate. Normal fcf9d32a CI is
-running; this evidence-only publication does not claim a new-head/full-workflow
+refused by the existing Office exact-source/rebuild gate. The current fcf9d32a full test/desktop stages also pass; public packaging remains
+refused. This evidence-only publication does not claim a new-head/full-workflow
 pass. Owner pilot feedback and public packaging qualification remain separate.
 The following source/ordinary checkpoint predates sealing and owner adoption;
 its pending statements are historical. Voice/later OS remain deferred.

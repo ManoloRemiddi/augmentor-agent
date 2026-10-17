@@ -183,7 +183,34 @@
     },
     "publicPackagingFailure": "Existing Office engine exact-source/rebuild qualification gate; no public package or gate bypass.",
     "currentImplementationRun": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39009796321",
-    "currentImplementationStatus": "in_progress at publication"
+    "currentImplementationStatus": "completed/failure at unchanged public Office packaging gate; preceding test/desktop stages pass",
+    "currentImplementationQualification": {
+      "sourceRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+      "linuxSdk": "success",
+      "linuxSdkJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39009796340/job/117329692236",
+      "debianJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39009796321/job/117329966949",
+      "root": {
+        "tests": 2146,
+        "pass": 2102,
+        "fail": 0,
+        "skip": 44
+      },
+      "browser": {
+        "tests": 128,
+        "pass": 128,
+        "fail": 0,
+        "skip": 0
+      },
+      "native": {
+        "tests": 1052,
+        "result": "OK",
+        "skip": 45
+      },
+      "prePackagingTestAndDesktopStages": "success",
+      "debianConclusion": "failure at unchanged public Office source/rebuild gate",
+      "publicPackagingGateRelaxed": false,
+      "installedPackageAndPackagedBrowserJobs": "skipped"
+    }
   },
   "remaining": [
     "Observe normal hosted validation on fcf9d32a; prior d531ba6c full test stages pass but public packaging remains blocked.",

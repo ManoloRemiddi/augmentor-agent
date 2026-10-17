@@ -1,5 +1,55 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Current original GUI with the source-built engine — October 17
+
+The completed ThinLTO engine now passes a separate **current-GUI functional**
+diagnostic based on application **fcf9d32a**, with no installed engine update.
+Read-only inspection confirms the actual final-rule producer is terminal/code 0,
+its five runtime assets, Core/emsdk revisions and raw/trimmed source diffs still
+match. Earlier failed preparation containers remain separate; no engine build is
+restarted. Office entry/engine retain their **MPL-2.0** notices; the original GUI
+and provider remain MIT. This is not public redistribution qualification.
+
+An unselected private copy reuses the existing source-built entry/engine and the
+current GUI/runtime. All compiled paths/bytes outside the Office entry remain
+exact. The unchanged actual Office suites pass **5/5**, including original DOCX
+PDF pages/text, font details, zoom, reload, invalid-file Retry/recovery, queue/
+capacity/source/size/permission boundaries and canceled HTTP teardown. A scoped
+kernel file-open trace records five successful source-built Wasm opens and zero
+default-supplier Wasm opens, joining unfinished calls by traced thread identity.
+Thus the rendered workflow actually uses the experimental engine. The trace is
+not a whole-machine/network/security audit or performance benchmark.
+
+The two unchanged neighbouring PDF/spreadsheet original-GUI tests pass **2/2**
+in the same private copy: selectable PDF text/local assets/version reload/Worker
+cleanup, plus real isolated spreadsheet parsers, saved formulas, literal text,
+sheet controls, readonly values and limits. They are compatibility checks for
+separate viewers/parsers, not extra Office-engine format evidence. Authored data
+and a synthetic seed are used; previews add no model submissions and preserve
+native history/request logs. No owner content or real provider is used.
+
+The first GUI attempt remains recorded as failed before Host startup because
+its private wrapper omitted `scripts/fixtures/context-provider-http.mjs`. Copying
+the unchanged public fixture directory fixes that wrapper; product, engine and
+test sources/expectations/timeouts are unchanged. The corrected seven cases pass
+without skips. There is no new screenshot/pixel comparison. The largest reported
+child RSS is about **2.53 GiB**, not aggregate tree or resource acceptance.
+
+Three completed preceding queue-control test copies are removed after selection,
+symlink and actor checks, reclaiming about 0.6 GiB. Both sealed/rollback artifacts,
+418-file owner backups, logs, failures and Office build caches remain. Read-only
+postflight verifies both current owner PIDs/all 36 protected sets, shared data,
+registry sixteen, menus/selections and GPU/voice state. No owner update occurs.
+[Aggregate record](../release/office-rebuild/current-gui-qualification-20261017.json)
+identifies exact tests, source-built component versions and acceptance limits.
+
+The current implementation's hosted Linux SDK, full root (**2,102 pass/0 fail/44
+skip**), Browser (**128 pass**), native (**1,052 run/45 skip/OK**) and desktop stages
+pass. Public Debian packaging still refuses the unchanged Office exact-source/
+rebuild gate. Representative complex documents/fonts, source/third-party notice
+closure, broader resource/security acceptance, private promotion/rollback and
+public distribution remain open. The installed private MX engine stays unchanged.
+
 ## Cancellation fixture process-exit race — October 15
 
 The first current-permission source cohort fails in the optional native Office

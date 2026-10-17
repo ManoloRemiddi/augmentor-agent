@@ -22,9 +22,9 @@ voice configuration. Only typed MCP connection metadata append. Source, fresh
 ordinary and exact sealed each pass **238 Node / 41 Python**; both actual review
 GUIs pass with no settings/agent actions. [Current evidence](../release/harness-queue-controls-qualification-20261017.json).
 
-The preceding full hosted Linux root/browser/native and desktop checks pass.
-Public Debian packaging stops at the existing Office engine source/rebuild gate;
-its restriction is intact. The newer implementation's normal CI is running.
+The current implementation's hosted Linux SDK, full root/browser/native and
+desktop checks pass. Public Debian packaging stops at the existing Office engine
+source/rebuild gate; its restriction is intact.
 This is a qualified private MX review, with owner physical/pilot feedback still
 open; it is not a public installer or whole-workflow acceptance. Voice, Windows,
 macOS and other Linux rollout stay deferred. Earlier dated checkpoints follow.

@@ -7,7 +7,7 @@ then refuses the existing unqualified Office source/rebuild; its gate is unchang
 and installed-package/browser jobs are skipped. [Current queue-control qualification](../release/harness-queue-controls-qualification-20261017.json)
 adds the real-GUI empty/paused/cold/explicit-Resume regression and source/ordinary/
 sealed **238 Node / 41 Python** each. The initial rendered failure remains recorded;
-normal CI for fcf9d32a is separate and running.
+normal fcf9d32a Linux SDK/full test/desktop stages now pass (root 2,102/0/44); public Office packaging remains refused. The current unselected source-built Office experiment adds seven scoped checks, documented in [its separate record](../release/office-rebuild/current-gui-qualification-20261017.json).
 
 ## Linux Harness CI prerequisites and driver qualification — October 17
 

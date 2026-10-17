@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current source-built Office GUI diagnostic](HARNESS-OFFICE-PREVIEWS.md#current-original-gui-with-the-source-built-engine--october-17)
+passes five unchanged Office cases plus two neighbouring PDF/spreadsheet GUI
+cases in an unselected fcf9d32a-based copy. Actual final-rule producer/assets/
+source diffs verify; no engine build restarts. Kernel file opens confirm the
+source-built Wasm is used, with zero default Wasm opens. The initial missing
+fixture wrapper failure remains; unchanged fixtures fix it. No owner/default
+engine change or new visual/complex-document/source-notice/public approval.
+Three completed prior test copies are safely removed; both seals/backups/logs/
+failed caches and current owner state remain. [Evidence](../release/office-rebuild/current-gui-qualification-20261017.json).
+Current fcf9d32a Linux SDK and full test/desktop stages pass: root 2,102/0 fail/44
+skip, Browser 128/0/0, native 1,052 run/45 skip/OK. Public Debian packaging remains
+refused by the intact Office exact-source/rebuild gate; installed-package/browser
+artifact jobs are skipped. Both MX owners stay on fcf9d32a / 20261017-081210-48ea82e1.
+
 [Current MX review](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17) now runs
 **fcf9d32a / 20261017-081210-48ea82e1** in both actual main/pilot owners. The empty
 paused-queue Resume control is hidden; real waiting work retains its original

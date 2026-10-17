@@ -2,6 +2,8 @@
 
 [Current MX review and launch](HARNESS-MX-FEEDBACK.md#current-mx-review--october-17) · installed queue-control correction, main/pilot menu entries, available core features, verified preservation and current CI/public-packaging limits.
 
+[Source-built Office/current GUI](HARNESS-OFFICE-PREVIEWS.md#current-original-gui-with-the-source-built-engine--october-17) · existing completed engine reused, seven private functional/compatibility cases, actual Wasm file evidence and current Linux CI result; public packaging gate stays intact.
+
 [Queue Resume correction and live steering](QUEUE-AND-STEERING.md#empty-queue-resume-control-and-live-tool-steering--october-17) · real waiting work versus empty cold queues; executing tools settle before corrections, with explicit lifecycle evidence.
 
 [Live running-tool Stop](QUEUE-AND-STEERING.md#live-pi-running-tool-stop-and-cold-inspection--october-17) · actual shell cancellation, partial effects, cold paused queue and explicit read-only continuation; runtime evidence versus model wording.
