@@ -142,3 +142,11 @@ test('Harness watches bind interactions and live events to their selected sessio
   assert.equal((await rpc('interaction.respond',{sessionId:'a',clientId:'viewer',rpcId:'question',value:true})).status,200);
   assert.equal(calls.length,1);
 });
+
+test('inspection serves its reviewed module dependencies and shared MCP styles without broadening file access',async t=>{
+ const server=new HarnessServer({});const address=await server.start();t.after(()=>server.close());
+ for(const [path,type] of [['/dsh-source-arguments.mjs','text/javascript'],['/dsh-source-recovery.mjs','text/javascript'],['/mcp-management.css','text/css']]){
+  const response=await fetch(address.origin+path);assert.equal(response.status,200,path);assert.match(response.headers.get('content-type'),new RegExp('^'+type));assert((await response.text()).length>100);
+ }
+ for(const path of ['/mcp-profile.json','/config/agent/mcp.json','/not-a-reviewed-style.css'])assert.equal((await fetch(address.origin+path)).status,404,path);
+});

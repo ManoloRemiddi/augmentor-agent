@@ -1,5 +1,50 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Connected tools panel in the original Plugins page — October 17
+
+Settings → Plugins → Connected tools → MCP servers opens the same managed Pi
+operator controls with presentation suited to the original DSH GUI. The shared
+panel also works in the operator inspection interface. The main settings shell,
+plugin overview and supplier presentation source are retained.
+
+The panel groups connection selection/On or Off/registered-tool count separately
+from sign-in and reconnect. **On** means enabled in the saved configuration;
+the count is registered tools, not a live health check. Advanced settings holds
+server-default tool access and the private JSON editor. Individual tool overrides
+still apply; action permissions do not change. JSON and redirected URLs remain
+explicit operator inputs, and the existing revision, cancellation, credential,
+unknown-outcome and no-replay rules still apply. No new background credential or
+provider request is introduced by this presentation.
+
+A short human status describes the last management action. An interrupted,
+unknown or partially applied update never appears successful; a settled SDK
+command without a reported outcome is labelled accordingly. Technical details
+retain the exact receipt action/state/result and observed connection evidence.
+Those observations remain historical evidence rather than a new health probe.
+The shared stylesheet uses the original light/dark tokens, gives controls usable
+hit areas, and keeps the footer visible while the body scrolls. Keyboard focus
+returns to the launcher on close while that launcher remains available.
+
+The initial focused run passed four cases and failed one: inspection could not
+load the new stylesheet or two existing transitive projection modules. The fixed
+route list now serves these three reviewed assets with CSS/JavaScript MIME types;
+it still refuses arbitrary private/configuration paths. The corrected five-case
+focused proof and full relevant **129 Node / 41 Python** checks pass (36 files,
+nine Chromium files, two workers/no skips), with build/type-check. Real synthetic
+SDK/wire flows retain login, manual redirect, enable/disable, exposure, JSON save,
+refresh, logout and cancellation without model/tool dispatch. Original-GUI layout
+checks cover both themes at widths **1280/640/420/320**, visible footer, at least
+36-pixel controls, field contrast at least 4.5:1 and focus return. Server-authority,
+plugin switches, empty-modal Escape, memory settings, local model guard and
+review/deployment lifecycle regressions are included.
+
+The [qualification record](../release/harness-mcp-settings-qualification-20261017.json)
+contains exact inputs and separate package/adoption status. The preceding broad
+historical-import proof is inherited, not relabelled as rerun here. Actual owner
+account sign-in/credential changes, physical acceptance and later platforms remain
+separate. This does not transfer another real project; the pilot-feedback gate
+and MX-first/voice-deferred scope remain.
+
 ## Cold native snapshot follows observed close — October 15
 
 A new clean sealed-candidate run retains **360 passes/one failure/two optional

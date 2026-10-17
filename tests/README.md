@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Connected tools presentation](../docs/MCP-TRANSPORT.md#connected-tools-panel-in-the-original-plugins-page--october-17)
+uses the actual original/inspection GUI MCP flows plus partial/unknown receipt
+presentation checks. The GUI verifies both themes, four widths, footer visibility,
+36-pixel controls, contrast and focus restoration. The server regression verifies
+three fixed dependency routes and private-file refusal. Scope/counts, retained
+first inspection failure and package/adoption evidence are in the owning record.
+
 [Local model identity qualification](../docs/HARNESS-LOCAL-MODEL-ROUTES.md)
 adds `local-model-route` SDK/Host/worker suites and the original-GUI Chromium
 failure/new-request flow. Actual SDK transport tests verify zero POSTs for stale

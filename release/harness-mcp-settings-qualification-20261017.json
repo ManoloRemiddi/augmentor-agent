@@ -1,0 +1,120 @@
+{
+  "schema": "augmentor-harness-mcp-settings-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX original Plugins Connected tools detail panel and shared inspection panel; presentation and fixed asset routes, managed SDK ownership unchanged",
+  "baseSourceRef": "df0b2207e1999554f35e6a5801a9b92d0e6be29a",
+  "baseApplicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+  "baseArtifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+  "inputsSha256": {
+    "apps/harness/mcp-management.js": "8c7c6d887f7b1f0c37c2d3de779d24c2f92b396f4cd2d07c0df59fa990da23d5",
+    "apps/harness/mcp-management.css": "2084e67a64d928796852d48868dd1b2f9549bb462272e4bacb4089a44eb4c383",
+    "apps/harness/dsh-base.css": "6f94b2d1665fd296a23c0ccbb55ceea5bb68bbf64d7e2504639346be49f175e7",
+    "apps/harness/harness.css": "7345f168b34ac221703bbebe21c0d036c6423b6855d419d42a43bf460ae17337",
+    "packages/runtime/src/harness-server.ts": "fdfb8e8893c5013d5e438721ade07f2c44cf44ddb5e7f72bc2cb16a60e735ab4",
+    "tests/mcp-management-presentation.test.mjs": "fa5bd93429aaa8db0d2e6008d553c5cbd418b75a4b4a609536955ecad31e15cd",
+    "tests/harness-mcp-original-chromium.test.mjs": "ece093dc57353ad276917c4f7f1ea2810c98395d5c6036f513ca72defc98a6a9",
+    "tests/harness-mcp-chromium.test.mjs": "355d7e58526d0b39e31049da13f6c628c7f398bca6f7ce1de431447b5fa2fdd2",
+    "tests/harness-server.test.mjs": "eabb2cbc9b9d03125616463f4ee4b08bf025a8de8fa2b1ee46d1f1b108aeb6b9",
+    "tests/harness-review-runtime.test.mjs": "c247e599a3936c9b3d1d53b5f39fea7004703fc503311b0b19a90a700ddb89c6",
+    "tests/harness-chat.test.mjs": "b7fc67b772c73833ea54bb4ac9bb467ec5028ebecadad01c4540b5b88224d548",
+    "tests/harness-dsh-settings-chromium.test.mjs": "ae41335b43bfb5817f419f997afcbe053383f6acde309288d7a1788827711900",
+    "tests/harness-plugin-directory-chromium.test.mjs": "3b11ffb7f0dde0ade9e966ca385c6de5f564202a19f66e9912581e458cdf01d9",
+    "tests/harness-plugin-controls.test.mjs": "6a4bcc3e46ee9df51f0a00a8e259aa417dec980900c79c5005cda8a59bc7454b",
+    "tests/harness-plugin-switches-chromium.test.mjs": "ee2bb72e109c21bd66b4f59c2cbc284ddceeb061db4295ec766445756bef3055",
+    "tests/harness-memory-settings-chromium.test.mjs": "b9794696bf12a4698d1064c1770df8cb4af1086af2bb9aa2acc607c376bb076a",
+    "tests/harness-memory-gateway-chromium.test.mjs": "77ad97ce22f4392f589cbc13cc21685c435f15ecaf715bb6d07d117ab7a59bcd",
+    "tests/harness-model-picker-chromium.test.mjs": "e0b532da0b7c5d51a6c20da58b0aee08ead326a5f9621e0eeb1928bc019e01e4",
+    "tests/local-model-route.test.mjs": "8bb46e4b9a8fb0e5b9cd5dd942656aee48f6d6f5c6b7b0626ff7de41ce6742a8",
+    "tests/local-model-route-runtime.test.mjs": "22d24d409ad7b118b2fa00dc5a5472a394f80493a939b1902b94654b4a889e2b",
+    "tests/local-model-route-workers.test.mjs": "1bfa0e9192313d05b720135e8f3d6801d863d2bea73543e6e5ab6fb49cbc5f47",
+    "tests/harness-local-model-route-chromium.test.mjs": "a08e84c61a32b3f032b95fd57eed969dd619aa6171f72e738e4bcc9c774d27e7",
+    "tests/pi-mcp-options-memory.test.mjs": "505f79450f2d6485f6143bf134d7389adc15dd82da3b64e7ec6bc583a2e9dee4",
+    "tests/pi-mcp-session-options.test.mjs": "fb7f53bc66f56987533d08219f8b2f8a3c0d0f60bf15b331f260e2a2e42ac61c",
+    "tests/pi-mcp-configuration.test.mjs": "9ba72f863cd36ae9f39acd0ac729105e776692f8099105f4eb6939d95633b52b",
+    "tests/mcp-authorization.test.mjs": "b98eb9f3f6f924b77d6579cb601706a07e3aa0ee29587cef4a06ba664ed122c3",
+    "tests/pi-mcp.test.mjs": "170e4f3b39bfd948c6ccf9e0d806bdf1424596bea8441d6b164ad993e21f7d66",
+    "tests/pi-mcp-connection-gap.test.mjs": "8f64bc13f926a082b3989dc3bea0049441052e5f40216cbd85c360474edff38f",
+    "tests/pi-mcp-parallel.test.mjs": "93dbb83bbd9de62f3c5619e72850ae3f48e4d9f4906e43fdbf812ea61bf50a5d",
+    "tests/pi-mcp-management.test.mjs": "bca3a2b91285847e9c16de2b92598def35ad237b34d093df549591f9b45e98f0",
+    "tests/mcp-management.test.mjs": "beb46b6d08616be04347102d2ce9d11ceeb38a51cec2c60b3639a6ece693f323",
+    "tests/mcp-connection.test.mjs": "7def6637f28abbc1e7b6cc289174f1bee71db3d6ec95dfda5a7b950f87a05d14",
+    "tests/mcp-call-context.test.mjs": "83e77b6ed089d40eef4d466f174d4d95a211291fa0571908641d1f7db944c790",
+    "tests/mcp-profile.test.mjs": "1a827d52f3763b62766b72f26fc687abac793bde197102fe8b1a95862cbc2395",
+    "tests/pi-mcp-call-context.test.mjs": "ca1a1763a44aacf1b3440869104826319cc7be12d47395eb06b5287c7e98c851",
+    "tests/native-mcp.test.mjs": "76bd75c4b13492f353170cb4e0abc2a0ad368e9bee7577b3ff25e3fd330903eb",
+    "tests/pi-mcp-connection.test.mjs": "8df90cb33e27224cdd47c3b1d91d98fd05135c0968e88317e70364544e6d3c9a",
+    "tests/pi-mcp-loader-recovery.test.mjs": "d44459820b75369ac37ca39bc7cb4af9b7b2c5f0cd0d9bc380a206d14823e973",
+    "tests/pi-mcp-authorization.test.mjs": "19426ae362c1e3b128f1d868b179bc773a42c5e80e949cd55c4f45ec92a308ae",
+    "tests/mcp-transport.test.mjs": "4303d956a18fbe3b1afc3803604e2e7868aecb48dce08d17cee50834f03f5ed3",
+    "tests/pi-mcp-token-provider.test.mjs": "69f6b6285001e340516d858568cc32b33f9fc5845c93e0ef5f991c73f93cb334"
+  },
+  "source": {
+    "typeCheckAndBuildPassed": true,
+    "nodePass": 129,
+    "pythonPass": 41,
+    "nodeFiles": 36,
+    "chromiumFiles": 9,
+    "workers": 2,
+    "skipped": 0,
+    "compiledFiles": 1120
+  },
+  "presentation": {
+    "connectionEnabledStatusAndRegisteredToolCounts": true,
+    "signInReconnectAndEnableControlsGrouped": true,
+    "advancedToolAccessAndPrivateJsonDisclosedExplicitly": true,
+    "humanActionOutcomeStatus": true,
+    "rawTechnicalReceiptsPreservedSeparately": true,
+    "unknownAndPartialOutcomesNotReportedAsSuccess": true,
+    "settledWithoutReportedSuccessNotReportedAsSuccess": true,
+    "oldCredentialChangesNotClaimedRolledBackByCancellation": true,
+    "visibleFooterAndKeyboardFocusReturn": true,
+    "lightAndDarkViewportWidths": [
+      1280,
+      640,
+      420,
+      320
+    ],
+    "minimumVisibleControlHeightPx": 36,
+    "measuredFieldContrastMinimum": 4.5,
+    "readOnlyInspectionCannotManage": true
+  },
+  "inspectionAssets": {
+    "fixedReviewedRoutes": [
+      "/mcp-management.css",
+      "/dsh-source-arguments.mjs",
+      "/dsh-source-recovery.mjs"
+    ],
+    "typedCssAndJavascriptResponses": true,
+    "arbitraryPrivateFilesRemain404": true
+  },
+  "preliminaryFailure": {
+    "firstFocusedPass": 4,
+    "firstFocusedFail": 1,
+    "cause": "Shared inspection page could not load because the new CSS and two existing transitive modules were absent from the fixed asset routes",
+    "correctedFocusedPass": 5,
+    "correctedFocusedFail": 0,
+    "failedLogRetainedPrivately": true
+  },
+  "ordinary": {
+    "baselineUnchangedInputsVerified": 23557,
+    "compiledFilesVerified": 1120,
+    "testFiles": 36,
+    "chromiumFiles": 9,
+    "workers": 2,
+    "nodePass": 129,
+    "pythonPass": 41,
+    "ownerImports": 0
+  },
+  "exactSealed": {
+    "status": "Pending separate immutable stage and qualification"
+  },
+  "ownerReviews": {
+    "status": "Remain on the preceding e37d79b6 artifact until guarded adoption"
+  },
+  "limits": [
+    "This focused MCP/GUI/security/lifecycle cohort does not repeat the preceding 576 Node / 92 Python historical-import cohort",
+    "No live external-account sign-in or owner credential mutation is part of synthetic UI qualification",
+    "Shared browser code is exercised on MX Chromium; later OS artifacts and physical browser acceptance remain separate",
+    "No additional real project migration before owner pilot feedback; voice and production Desktop remain deferred or unchanged"
+  ]
+}

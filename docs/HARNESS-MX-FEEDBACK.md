@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Connected tools settings](MCP-TRANSPORT.md#connected-tools-panel-in-the-original-plugins-page--october-17)
+now groups On/Off, sign-in and reconnect, with advanced tool access/JSON and
+separate technical evidence. Both themes at 1280/640/420/320 widths pass footer,
+contrast, hit-area and focus checks. Inspection’s shared CSS and two missing
+transitive asset routes are fixed without exposing arbitrary files. Build/check
+and **129 Node / 41 Python** pass (36 files/nine Chromium, two workers/no skips);
+ordinary/sealed/actual adoption are tracked separately in the
+[qualification record](../release/harness-mcp-settings-qualification-20261017.json).
+The original GUI/overview remain; owner projects, voice and later OS are unchanged.
+
 [Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) now refuses an inactive
 local profile before prompt dispatch and checks reported response IDs before SDK
 tool normalization. Source, fresh ordinary and exact sealed each pass **576 Node /
