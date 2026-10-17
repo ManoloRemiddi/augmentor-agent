@@ -3,6 +3,7 @@ import {openSync,closeSync,fstatSync,readFileSync,constants,lstatSync,realpathSy
 import {join} from 'node:path';
 import {createHash} from 'node:crypto';
 import {identifier,MAX_FRAME,type Data,type DisplayEvent} from '../../protocol/src/index.js';
+import {dshArgumentErrorIndex} from './dsh-argument-errors.js';
 import {archivedDshToolRecoveries} from './dsh-tool-recovery.js';
 import {dshDisplayPreview} from './dsh-display-preview.js';
 import {loadDshProjectArchive,dshAttachmentBytes} from './dsh-project-archive.js';
@@ -52,20 +53,20 @@ export class DshArchivedFamily {
  seat(scope:DshArchiveScope){if(scope.ownerId!==this.ownerId||scope.sha256!==this.binding.sha256||this.seats.get(scope.sourceId)!==scope.sessionId)fail();return this.rows.get(scope.sourceId)!;}
  descendants(parentId:string){const found=new Set<string>([parentId]);for(let i=0;i<32;i++)for(const [source,parent] of this.parents)if(found.has(parent))found.add(this.seats.get(source)!);return found;}
  items(parentId=this.ownerId){const allowed=this.descendants(parentId);return [...this.rows].flatMap(([sourceId,row])=>{const sid=this.seats.get(sourceId)!;if(sid===parentId||!allowed.has(sid))return [];const title=row.opening.projections?.values?.title;return [{sessionId:sid,parentId:this.parents.get(sourceId),relation:'historical',archiveSha256:this.binding.sha256,sourceId,mode:row.address.mode,title:typeof title==='string'?title.slice(0,512):'Archived DSH child',running:false,updatedAt:row.records.at(-1)?.event.time??0,reportedState:'unknown',historical:true}];});}
- history(scope:DshArchiveScope,p:Data={}){const row=this.seat(scope),before=bounded(p.beforeSeq,30001,30001),limit=bounded(p.maxMessages,100,100);if(!limit)throw Error('Choose a nonzero archived history page.');const recoveries=archivedDshToolRecoveries(row.opening.header.version,row.records.map((r:Data)=>r.event)),eligible=row.records.filter((r:Data)=>r.event.seq+1<before),page:Data[]=[];let bytes=0;
-  for(const r of eligible.toReversed()){const raw=JSON.stringify(r),e=dshDisplayPreview(this.display(r.event,scope.sourceId,recoveries.get(r.event.seq)),{source:'dsh-archive',entryId:'dsh-'+r.event.seq,entryHash:hash(raw),bytes:Buffer.byteLength(raw),notice:'Preview of a large archived child record. The complete original is preserved in this inspector’s saved source entries.'});const size=Buffer.byteLength(JSON.stringify(e));if(bytes+size>MAX_FRAME-4096){if(!page.length)throw Error('Archived event exceeds the display limit; read bounded originals.');break;}page.unshift({event:e});bytes+=size;if(page.length>=limit)break;}
+ history(scope:DshArchiveScope,p:Data={}){const row=this.seat(scope),before=bounded(p.beforeSeq,30001,30001),limit=bounded(p.maxMessages,100,100);if(!limit)throw Error('Choose a nonzero archived history page.');const sourceEvents=row.records.map((r:Data)=>r.event),argumentErrors=dshArgumentErrorIndex(row.opening.header.version,sourceEvents),recoveries=archivedDshToolRecoveries(row.opening.header.version,sourceEvents),eligible=row.records.filter((r:Data)=>r.event.seq+1<before),page:Data[]=[];let bytes=0;
+  for(const r of eligible.toReversed()){const raw=JSON.stringify(r),e=dshDisplayPreview(this.display(r.event,scope.sourceId,recoveries.get(r.event.seq),argumentErrors.get(r.event.seq),row.opening.header.version),{source:'dsh-archive',entryId:'dsh-'+r.event.seq,entryHash:hash(raw),bytes:Buffer.byteLength(raw),notice:'Preview of a large archived child record. The complete original is preserved in this inspector’s saved source entries.'});const size=Buffer.byteLength(JSON.stringify(e));if(bytes+size>MAX_FRAME-4096){if(!page.length)throw Error('Archived event exceeds the display limit; read bounded originals.');break;}page.unshift({event:e});bytes+=size;if(page.length>=limit)break;}
   return {available:true,childId:scope.sessionId,events:page,hasMore:eligible.length>page.length,coverage:'verified stable archived cut; not a live Pi job or effective provider context'};
  }
- private display(e:Data,sourceSessionId:string,recovery?:{recovery:Data;name:string}){const d=structuredClone(e.data);let type=e.type,data=d;
+ private display(e:Data,sourceSessionId:string,recovery?:{recovery:Data;name:string},argumentErrors?:Map<string,Data>,version?:number){const d=structuredClone(e.data);let type=e.type,data=d;
   try{
    if(['user/message','assistant/message','tool/result'].includes(type)){
     const content=(type==='user/message'?d:d.message)?.content;
     if(!Array.isArray(content)||content.some((p:Data)=>!p||!['text','reasoning','image','file','tool-call'].includes(p.type)||['text','reasoning'].includes(p.type)&&typeof p.text!=='string'))throw Error('Unsupported historical message display.');
     for(const p of content)if(p.type==='image'||p.type==='file')promptAttachments([p]);
    }
-   if(type==='tool/call')data={toolCallId:d.callId,name:d.name,arguments:d.arguments};
-   else if(type==='tool/result')data={toolCallId:d.message.toolCallId,...(recovery?{sourceToolRecovery:recovery.recovery,name:recovery.name}:{}),isError:d.message.isError===true,result:{content:d.message.content}};
-   else if(type==='assistant/message')data={message:{content:d.message.content.map((p:Data)=>p.type==='tool-call'?{type:'toolCall',id:p.id,name:p.name,arguments:JSON.parse(p.arguments)}:p),timestamp:e.time,stopReason:'stop'}};
+   if(type==='tool/call')data={toolCallId:d.callId,name:d.name,arguments:d.arguments,...(argumentErrors?.has(d.callId)?{sourceArgumentError:argumentErrors.get(d.callId)}:{}),...(version===4&&d.arguments===''?{sourceEmptyArguments:true}:{})};
+   else if(type==='tool/result')data={toolCallId:d.message.toolCallId,...(argumentErrors?.has(d.message.toolCallId)?{sourceArgumentError:argumentErrors.get(d.message.toolCallId),name:argumentErrors.get(d.message.toolCallId)!.name}:{}),...(recovery?{sourceToolRecovery:recovery.recovery,name:recovery.name}:{}),isError:d.message.isError===true,result:{content:d.message.content}};
+   else if(type==='assistant/message')data={message:{content:d.message.content.map((p:Data)=>p.type==='tool-call'?{type:'toolCall',id:p.id,name:p.name,...(argumentErrors?.has(p.id)?{argumentsRaw:p.arguments,sourceArgumentError:argumentErrors.get(p.id)}:{arguments:version===4&&p.arguments===''?{}:JSON.parse(p.arguments),...(version===4&&p.arguments===''?{sourceEmptyArguments:true,argumentsRaw:''}:{})})}:p),timestamp:e.time,stopReason:'stop'}};
    else if(type==='user/message'&&d.source?.kind!=='user'){type='dsh/history';data={originalType:e.type,original:d};}
    else if(!['user/message','turn/start','turn/end','subagent/catalog'].includes(type)){type='dsh/history';data={originalType:e.type,original:d};}
   }catch{type='dsh/history';data={originalType:e.type,original:d};}

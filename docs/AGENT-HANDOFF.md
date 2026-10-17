@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Recorded DSH argument failures](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-argument-errors--october-17)
+preserve attested v4 validation errors as labelled history with exact argument
+text in the original Chat/Trajectory. No replay or fabricated argument object.
+The same four-parent real export passes the argument check but still refuses a
+separate recovery format; it is not ready for transfer. Source/ordinary checks each pass **345 Node / 55 Python** (fifty files/fifteen
+Chromium files), with 1,114 compiled files matching. Exact sealed qualification is pending; existing reviews and the pilot-feedback gate remain unchanged.
+[Evidence](../release/harness-dsh-arguments-qualification-20261017.json).
+
 [Legacy child settlement reasoning](HARNESS-DSH-MIGRATION-PILOT.md#legacy-child-settlement-reasoning--october-17) preserves documented older manager notices as attributed historical data, with no invented human/provider turn or live child. One identical real export/four parents now passes corrected preparation after refusing the preceding converter. Source/ordinary/exact sealed each pass **190 Node / 47 Python**; private unselected **20261017-005619-4a45cc63 / 335df05a** verifies 24,631 sealed/1,108 compiled inputs. Both owner PIDs/all 36 protected regular files, registry and selections stay exact; no adoption or further transfer. Owner pilot feedback still gates further transfers. [Evidence](../release/harness-dsh-settlement-qualification-20261017.json).
 
 [Complete segmented DSH bundles](HARNESS-DSH-PROJECT-BUNDLES.md) preserve large histories/images with checksummed objects, exact original lookup and historical branching. Source/ordinary/exact sealed each pass **174 Node / 47 Python**, including original v1/v2 GUI flows; 1,108 compiled inputs match. Private unselected **20261017-003712-3e22586d / 7372061b** verifies 24,630 sealed inputs. Five more real projects/seventeen parents/four children now export completely; two projects/five parents pass read-only preparation. Source formats and two source-observation failures remain. Both owner PIDs/all 36 protected regular files, registry and selections stay exact; no owner transfer or update. Adoption and pilot gates stay explicit. [Evidence](../release/harness-dsh-bundle-qualification-20261017.json).

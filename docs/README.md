@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Recorded tool argument errors](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-argument-errors--october-17) · exact failed argument text, no replay, current qualification and remaining real-project refusal.
+
 [Compacted file relocation paths](HARNESS-DSH-MIGRATION-PILOT.md#compacted-file-relocation-paths--october-17)
 correct the preceding missing-hint case. Verified, scoped former locations survive
 several moves and post-move branches while saved summaries stay unchanged.

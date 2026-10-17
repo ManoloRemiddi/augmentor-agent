@@ -1266,3 +1266,66 @@ The preceding 288-case file candidate's compacted-path gap is corrected by this
 qualification. Further guarded adoption, owner pilot acceptance, independent
 historical argument/source formats, two observation failures and later rollout
 remain separate gates. Voice and other OS work remain deferred.
+
+## Recorded tool argument errors — October 17
+
+The converter preserves completed **v4 `ToolArgsError / INVALID_ARGS`** records
+when the source proposal contains invalid JSON or JSON that is not an object.
+This is a historical validation failure. It does not make the recorded input
+valid or schedule a retry.
+
+Recognition requires the same active proposal, dispatch and terminal error:
+matching call id, tool name, exact argument string, numeric turn/step, ordered
+sequences, the dispatch citation, exact typed error fields, tool source identity
+and one plain error text block with the public validation prefix. Extra opaque
+proposal/error/source fields, unsupported versions, successful or unfinished
+malformed calls, ambiguous identities, and mismatching dispatch/results still
+refuse import before a destination is published. A source cut before the error
+cannot borrow its later completion. Valid replacements retain the original
+attestation and count it once.
+
+The public DSH producer explicitly maps an empty argument string to an empty
+object. Typed v4 empty arguments follow that rule, retaining the original empty
+string separately; untyped empty arguments remain unsupported.
+
+The original Chat disclosure and JSON block show **Recorded argument text** and
+the recorded result. The original Trajectory retains raw argument text. A short
+historical-error notice explains that the import started no retry. Large display
+and JSON previews keep their existing bounds and original-source lookup. Invalid
+text is never converted into a fabricated argument object or file-operation
+path. Archived children use the same scoped recognition for inspection only;
+unsupported child records retain the read-only original-record fallback.
+
+The native continuation contains labelled historical data and bounded result
+excerpts. It contains no executable assistant proposal/tool result, restores no
+old grant/job and starts no memory capture or model work on import/reopen. Exact
+exports and source provenance remain preserved. Current human work uses the
+existing Pi SDK session lifecycle and current permissions/model.
+
+Primary protocol inspected at public DSH
+[`d7432673`](https://github.com/deepseek-ai/deepseek-harness/tree/d743267388641bc76f17c45ce8b4c231aed1d32c):
+[`tool-calls.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/agent-loop/src/tool-calls.ts),
+[`tools/schema.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/tools/src/schema.ts)
+and [`tools/index.ts`](https://github.com/deepseek-ai/deepseek-harness/blob/d743267388641bc76f17c45ce8b4c231aed1d32c/packages/core/tools/src/index.ts).
+The new converter/fixtures are independently authored. Supplier MIT code/notices
+and original component layout remain unchanged.
+
+The same frozen private real export contains four parents and no children. The
+preceding sealed converter refuses malformed arguments. The corrected converter
+passes that check and reaches a **separate historical recovery-protocol
+mismatch**. Full preparation still refuses; this is not another ready project.
+There is no additional real transfer or model request. Owner pilot feedback
+continues to gate further transfers.
+
+Qualification is recorded in the [portable evidence](../release/harness-dsh-arguments-qualification-20261017.json).
+The converter and Pi SDK hooks are shared platform code; this checkpoint qualifies
+MX artifacts only. Windows/macOS adapters and artifacts were not exercised.
+Source check/build and **345 Node / 55 Python** pass, across fifty Node files,
+fifteen Chromium files/nineteen GUI cases, two workers/no skips/unchanged bounds.
+The new coverage includes twenty-eight converter/presentation cases, real SDK cold
+and reply continuation, and original Chat/Trajectory/reload checks. The fresh ordinary package passes the same **345 Node / 55 Python** checks,
+1,114 compiled inputs match and 23,517 unchanged baseline inputs verify. Both
+phases retain the existing two-parent real-file preparation regression and the
+same four-parent argument-check/next-refusal result. Exact sealed qualification
+is pending. Both existing MX reviews stay on their current build. Adoption is separate. MX first; voice,
+Windows, macOS and other Linux distribution rollout remain deferred.

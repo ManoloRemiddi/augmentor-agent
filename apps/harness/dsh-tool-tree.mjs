@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {sourceArgumentRaw} from './dsh-source-arguments.mjs';
 import {callScope,observedTool} from './dsh-call-identity.mjs';
 const boundary='public-sdk-tool-execution-start-before-validation';
 export function retainedToolArguments(data){
@@ -30,7 +31,7 @@ export function attachToolChildren(state,nodes,runningCalls,ownership){
  for(const event of state.events)if(event.type==='tool/call'){
   const binding=ownership.get(event.seq);if(!binding)continue;
   const proposal=bySeq.get(binding.proposalSeq),block=proposal?.blocks?.find(b=>b.kind==='tool-call'&&b.callId===binding.id);
-  const raw=block?.argsRaw??retainedToolArguments(event.data??{}),call=raw===undefined?null:{name:event.data.name,argsRaw:raw};
+  const raw=sourceArgumentRaw(event)??block?.argsRaw??retainedToolArguments(event.data??{}),call=raw===undefined?null:{name:event.data.name,argsRaw:raw};
   starts.set(event.seq,{event,binding,call});
   const observation=observedTool(state.records,'tool/start',event,binding);
   trees.set(event.seq,{callId:binding.id,sdkCallId:binding.rawId,name:event.data.name,phase:'start',time:observation?.time??null,argsRaw:raw??'',subCalls:[]});

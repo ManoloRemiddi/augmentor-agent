@@ -1,11 +1,12 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {sourceArgumentRaw} from './dsh-source-arguments.mjs';
 import {sourceToolRecovery} from './dsh-source-recovery.mjs';
 import {projectChat} from './chat-projection.js';
 import {invokedSkillNames} from './dsh-skills.mjs';
 import {trajectoryStream} from './dsh-trajectory-stream.mjs';
 import {callScope,callViewId,toolOwnership,observedTool} from './dsh-call-identity.mjs';
 import {attachToolChildren,retainedToolArguments} from './dsh-tool-tree.mjs';
-const blocks=(content,scope)=>(content||[]).flatMap(p=>p.type==='text'?[{kind:'text',text:p.text||''}]:p.type==='image'&&p.attachment?[{kind:'image',attachment:p.attachment}]:['thinking','reasoning'].includes(p.type)?[{kind:'reasoning',text:p.thinking??p.text??''}]:['toolCall','tool-call'].includes(p.type)?[{kind:'tool-call',callId:callViewId(scope,p.id??p.callId),sdkCallId:p.id??p.callId,name:p.name,argsRaw:JSON.stringify(p.arguments??p.args??{}),subCalls:[]}]:[]);
+const blocks=(content,scope,event)=>(content||[]).flatMap(p=>p.type==='text'?[{kind:'text',text:p.text||''}]:p.type==='image'&&p.attachment?[{kind:'image',attachment:p.attachment}]:['thinking','reasoning'].includes(p.type)?[{kind:'reasoning',text:p.thinking??p.text??''}]:['toolCall','tool-call'].includes(p.type)?[{kind:'tool-call',callId:callViewId(scope,p.id??p.callId),sdkCallId:p.id??p.callId,name:p.name,argsRaw:sourceArgumentRaw(event,p)??JSON.stringify(p.arguments??p.args??{}),subCalls:[]}]:[]);
 const usage=u=>u?{inputTokens:u.input,outputTokens:u.output,cacheReadTokens:u.cacheRead,cacheWriteTokens:u.cacheWrite}:undefined;
 /** Pure projection into DSH presentation contracts. Missing timestamps remain absent. */
 export function projectDsh(state){
@@ -22,7 +23,7 @@ export function projectDsh(state){
       const end=request?state.records.find(r=>r.kind==='model/complete'&&r.requestId===request.id):undefined,first=request?state.records.find(r=>r.kind==='model/firstToken'&&r.requestId===request.id):undefined;
       // SDK message timestamps can mark creation rather than completion.
       // Use the matching observed generation boundary, never an older request.
-      n={kind:'assistant',seq:e.seq,time:end?.time??null,turn:t,step,blocks:blocks(d.message?.content,callScope(d,e.turnId,e.seq)),usage:usage(d.message?.usage),...(request?{timing:{stepStartTime:request.time??null,firstTokenTime:first?.time??null,completedTime:end?.time??null}}:{}),...(['aborted','error','length'].includes(d.message?.stopReason)?{interrupted:true}:{})};
+      n={kind:'assistant',seq:e.seq,time:end?.time??null,turn:t,step,blocks:blocks(d.message?.content,callScope(d,e.turnId,e.seq),e),usage:usage(d.message?.usage),...(request?{timing:{stepStartTime:request.time??null,firstTokenTime:first?.time??null,completedTime:end?.time??null}}:{}),...(['aborted','error','length'].includes(d.message?.stopReason)?{interrupted:true}:{})};
     }
     if(e.type==='tool/result'){
       const binding=ownership.get(e.seq),start=observedTool(state.records,'tool/start',e,binding),end=observedTool(state.records,'tool/end',e,binding);
@@ -45,7 +46,7 @@ export function projectDsh(state){
     }
     if(item.kind==='compaction')n={kind:'compaction',data:item.marker};
     if(item.kind==='assistant')n={kind:'assistant-step',data:{blocks:[...(item.thinking?[{kind:'reasoning',text:item.thinking}]:[]),...(item.text?[{kind:'text',text:item.text}]:[]),...(item.images??[]).map(p=>({kind:'image',attachment:p.attachment}))],step:ordinal,status:item.status==='streaming'?'running':item.partial?'interrupted':'complete',...(item.seq?{finalNode:{seq:item.seq}}:{})}};
-    if(item.kind==='tool'){const binding=ownership.get(item.seq),proposal=state.events.find(e=>e.seq===binding?.proposalSeq),start=state.events.find(e=>e.seq===item.seq),raw=retainedToolArguments(start?.data??{}),call=proposal?.data.message?.content?.find(p=>(p.id??p.callId)===item.toolCallId)??(raw===undefined?undefined:{name:item.name,arguments:JSON.parse(raw)});n={kind:'pi-tool',data:{...item,call,result:state.events.find(e=>e.type==='tool/result'&&ownership.get(e.seq)?.id===binding?.id&&ownership.get(e.seq)?.startSeq===item.seq)?.data.result}};}
+    if(item.kind==='tool'){const binding=ownership.get(item.seq),proposal=state.events.find(e=>e.seq===binding?.proposalSeq),start=state.events.find(e=>e.seq===item.seq),raw=retainedToolArguments(start?.data??{}),call=proposal?.data.message?.content?.find(p=>(p.id??p.callId)===item.toolCallId)??(raw===undefined?undefined:{name:item.name,arguments:JSON.parse(raw)});n={kind:'pi-tool',data:{...item,call,...((sourceArgumentRaw(proposal,call)??sourceArgumentRaw(start))!==undefined?{sourceArgumentsText:sourceArgumentRaw(proposal,call)??sourceArgumentRaw(start)}:{}),result:state.events.find(e=>e.type==='tool/result'&&ownership.get(e.seq)?.id===binding?.id&&ownership.get(e.seq)?.startSeq===item.seq)?.data.result}};}
     if(['status','warning'].includes(item.kind))n={kind:'pi-notice',data:item};
     if(n)chatNodes.set(key,{...n,key,anchorSeq,location:{kind:'session'}});ordinal++;
   }

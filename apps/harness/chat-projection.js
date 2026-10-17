@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {sourceArgumentNotice} from './dsh-source-arguments.mjs';
 import {sourceToolRecovery,sourceRecoveryNotice} from './dsh-source-recovery.mjs';
 /** Read-only display projection. Native Pi history remains authoritative. */
 export function projectChat(events,{running=false,toolBindings}={}){
@@ -38,7 +39,7 @@ export function projectChat(events,{running=false,toolBindings}={}){
   }else if(event.type==='tool/result'){
    const id=toolBindings?.get(event.seq)?.id??data.toolCallId,tool=tools.get(id);
    if(tool){tool.status=sourceToolRecovery(event)?.code==='TOOL_OUTCOME_UNKNOWN'?'outcome unknown':data.isError?'error':'finished';tools.delete(id);}
-   const notice=sourceRecoveryNotice(event);if(notice){flush('partial');items.push({kind:'warning',text:notice,seq:event.seq});}
+   const notice=sourceRecoveryNotice(event)??sourceArgumentNotice(event);if(notice){flush('partial');items.push({kind:'warning',text:notice,seq:event.seq});}
   }else if(event.type==='turn/end'){
    const reason=data.reason?.kind||'interrupted';flush(reason);
    for(const tool of tools.values())tool.status='outcome unknown';tools.clear();

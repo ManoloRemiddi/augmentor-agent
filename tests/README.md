@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+DSH argument-error coverage: `dsh-project-argument-errors.test.mjs` covers typed
+proposal/dispatch/error correlation, exact large invalid strings, non-object and
+empty inputs, source cuts, replacement counting, archived children, file activity,
+forged markers and atomic refusals. `dsh-project-argument-errors-runtime.test.mjs`
+uses the public SDK with an authored provider for cold/reply continuation and no
+historical write replay. `harness-dsh-argument-errors-chromium.test.mjs` exercises
+the original Chat argument/result disclosures, Trajectory, Send and reload.
+See [the contract and package qualification](../docs/HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-argument-errors--october-17).
+
 Compacted DSH file relocation: `native-dsh-file-hints.test.mjs` verifies exact
 source/target snapshots, immutable summaries, conditional path maps, several
 moves, metadata/scope/Stop/bounds and atomic refusal. Its runtime companion uses
