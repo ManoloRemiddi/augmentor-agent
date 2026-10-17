@@ -1,0 +1,87 @@
+{
+  "schema": "augmentor-harness-dsh-managed-fence/1",
+  "date": "2026-10-17",
+  "sourceRef": "e58a72b90aea23cbbc758da1680bf608e8ef58c3",
+  "baseSourceRef": "84396fec1a13561d7eed9b57731a69bc14612d76",
+  "scope": "Linux source-managed persistent profile/deployment fencing and selection maintenance; no owner activation",
+  "transactionSchema": "augmentor-dsh-configuration-transaction/2",
+  "version1RecordsRequireTheirOriginalController": true,
+  "sourcePythonPass": 133,
+  "managedLauncherNodePass": 4,
+  "transactionCases": 16,
+  "sharedLaunchCases": 14,
+  "deploymentCases": 12,
+  "exactSdkPreservationDiscoveryCases": 32,
+  "backendProbeCases": 9,
+  "newPythonCases": 7,
+  "newCasesOverlap133": true,
+  "installerAssertionFollowUpPass": 1,
+  "followUpOverlaps133": true,
+  "fail": 0,
+  "skip": 0,
+  "managedLauncherCommandsRefused": 11,
+  "launcherPhasesCovered": [
+    "prepared",
+    "applied"
+  ],
+  "controllerExitedBeforeLauncherChecks": true,
+  "processDeathBoundaries": [
+    "after each of two marker publications",
+    "after each of two marker removals",
+    "after each of four forward config replacements",
+    "after each of four reverse config replacements"
+  ],
+  "publicationOrder": [
+    "deployment",
+    "profile"
+  ],
+  "removalOrder": [
+    "profile",
+    "deployment"
+  ],
+  "partialPublicationApplyRefused": true,
+  "partialPublicationAndRemovalReverseQualified": true,
+  "foreignAndDanglingMarkersPreserved": true,
+  "ordinaryBuildSelectionHoldsReader": true,
+  "ordinaryBuildSelectionCoexistsWithReaders": true,
+  "ordinaryBuildSelectionRefusesMaintenanceWriter": true,
+  "normalActivationReverseAndStartupInstallRefusePendingMarker": true,
+  "coldRecoveryBypassRequiresExclusiveWriter": true,
+  "actualPublicBackendAndCandidateNativeAdapterPreflightAndConfigReversePass": true,
+  "realPreflightOwnerDataUsed": false,
+  "ownerPreservation": {
+    "reviewPidsAnd36ProtectedFileSetsExact": true,
+    "registryRevision": 18,
+    "sharedRowsAndEngineSettingsExact": true,
+    "menusAndSelectionsExact": true,
+    "modelGpuAndVoiceServicesExact": true,
+    "ownerPendingPreservationMarkers": false
+  },
+  "installedChanged": false,
+  "ownerProjectsTransferred": 0,
+  "ownerModelRequests": 0,
+  "newApplicationCopies": 0,
+  "newImmutableArtifact": false,
+  "previousQualifiedArtifactSha256": "a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93",
+  "previousQualifiedArtifactDoesNotContainThisChange": true,
+  "rootFreeGiB": 98.53,
+  "newLinuxSdk": "Pending dispatch",
+  "previousLinuxSdk": {
+    "run": 39054592182,
+    "head": "39a717c18bda79fa102af1f632d1b1741acfd788",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "remaining": [
+    "Full cold store/configuration backups and all real profile/client entrypoint adoption",
+    "Matching client selection and durable finalization/reverse orchestration, then one combined immutable qualification",
+    "Actual owner continuation and required workflows; pilot feedback before further project transfers",
+    "Public Office source/rebuild distribution gate; voice and later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-managed-fence-source-python-20261017.log": "db2d8c5c7d21020b2eb9177f7827b1d85002367c9567d7c8c5845cf725cc2c0a",
+    "harness-managed-fence-source-node-20261017.log": "3d2486d64481f07babe2a35f0cb37ea3e87b54d9a29b5f6afdb61d5b0fbf31f8",
+    "harness-managed-fence-real-summary-20261017.log": "fc305177fa843d6fa5e81fa567a11dfa680e84c6ba0af103abad32be38afa1e8",
+    "harness-managed-fence-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  }
+}

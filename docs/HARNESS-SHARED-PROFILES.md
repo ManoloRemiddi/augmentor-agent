@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Managed-client maintenance fence](HARNESS-DSH-INSTALLATION.md#managed-client-maintenance-fence--october-17)
+adds **e58a72b9**, transaction v2 and deployment/profile markers. Source **133 Python /
+four Node** pass; 11 actual managed launcher paths and interrupted marker recovery
+are tested. Ordinary selection shares readers but refuses pending maintenance;
+normal startup installation is fenced too. Real backend/Native-adapter preflight
+and owner preservation pass again. No installed change/new app copy. Full backups,
+real caller adoption and matching selection/finalization/reverse remain; CI pending.
+[Record](../release/harness-dsh-managed-fence-20261017.json).
+
 [Controlled backend and actual Native-adapter preflight](HARNESS-DSH-INSTALLATION.md#controlled-replacement-backend-and-native-adapter-preflight--october-17)
 adds 517b71db and portable-Python follow-up **39a717c1**. Final source **126 Python /
 four Node** pass, including nine backend cases. Real DSH/product 0.2.13 and the

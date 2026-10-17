@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [managed-client fence](../docs/HARNESS-DSH-INSTALLATION.md#managed-client-maintenance-fence--october-17)
+adds seven cases within **133 Python / four launcher Node** passes. Eleven real
+managed command paths refuse prepared/applied transactions after writer exit;
+process death at both marker publication/removal boundaries reverses safely.
+Ordinary selection coexists with readers while refusing maintenance; normal
+selection/reverse/startup installation preserve pending markers. SDK explicitly
+runs 32 preservation cases plus 14 shared-launch and 12 deployment cases.
+No owner profile is used; runtime is e58a72b9, hosted qualification pending.
+
 The [controlled backend preflight](../docs/HARNESS-DSH-INSTALLATION.md#controlled-replacement-backend-and-native-adapter-preflight--october-17)
 adds nine authored namespace/metadata cases, included in 126 source Python passes;
 four launcher Node cases also pass. Actual upstream/product and candidate Native

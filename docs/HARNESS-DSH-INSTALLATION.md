@@ -10,7 +10,8 @@ could let Native, Browser, embedding or mobile launchers reopen before the
 configuration transaction had been recovered. The new source closes that gap
 before any installed activation is attempted.
 
-The configuration journal is now **`augmentor-dsh-configuration-transaction/2`**.
+Source **e58a72b90aea23cbbc758da1680bf608e8ef58c3** changes the journal to
+**`augmentor-dsh-configuration-transaction/2`**.
 It publishes a private deployment `dsh-preservation.json` first, followed by the
 existing profile marker, after durable recovery copies. Both markers bind the
 same transaction and digest. The common `launch_lease` refuses the deployment
@@ -26,8 +27,8 @@ Ordinary Desktop activation/reverse now take a **reader** through validation and
 selection, so they remain compatible with running readers but refuse a cold
 maintenance writer or unresolved marker. Shared-store selection still owns its
 exclusive writer and also checks the controller's current marker contract even
-when an older candidate supplies the binding helper. No generic updater can
-release the maintenance markers.
+when an older candidate supplies the binding helper. Normal startup installation inherits the same exclusive gate. No generic
+updater can release the maintenance markers.
 
 Apply requires both owned markers. Reverse may recover an interrupted partial
 marker publication, verifies all existing marker identities and exact config
@@ -58,6 +59,8 @@ Full cold backups, all real profile/client adoption, matching selection and dura
 finalization/reverse orchestration, one combined immutable qualification and owner
 continuation remain. Pilot feedback gates further project transfers; voice and
 later OS remain deferred.
+
+[Portable qualification record](../release/harness-dsh-managed-fence-20261017.json).
 
 ## Controlled replacement-backend and Native-adapter preflight — October 17
 
