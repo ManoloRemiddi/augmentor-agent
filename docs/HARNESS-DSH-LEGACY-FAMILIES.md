@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Referenced assets](HARNESS-DSH-LEGACY-ASSETS.md) now have a separately verified immutable companion. All five frozen families pass; the native original/derived archive contract and continuation remain pending. The source-family/view format described below stays unchanged.
+
 # Historical DSH source families — October 17
 
 The offline tools now capture complete physical parent/subagent families and

@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Historical asset coverage: `dsh-legacy-assets.test.mjs` verifies exact occurrence
+ownership, whole-content checksums, complete named closures and malformed data;
+`test_dsh_legacy_assets.py` covers preflight-before-read, binary/empty content and
+safe source object reads. `proof-dsh-legacy-assets.mjs` runs actual public codecs
+and the full capture/verifier pipeline with a child-only PNG and empty/20 MiB
+files, independent of owner data. Native admission remains an explicit refusal.
+See [recipe, byte bounds and next integration](../docs/HARNESS-DSH-LEGACY-ASSETS.md).
+
 Historical family coverage: `dsh-legacy-family.test.mjs` binds direct parentage,
 organization, complete catalogue membership and checksummed source objects;
 `test_dsh_legacy_family.py` checks source selection, stable cuts, lossless

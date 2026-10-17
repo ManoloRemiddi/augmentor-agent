@@ -1,0 +1,195 @@
+{
+  "schema": "augmentor-dsh-legacy-assets-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX Linux offline referenced-asset capture and immutable companion verification for recovered historical source families; no native import or app adoption",
+  "sourceBaseRef": "b4ba99732d98d1024adf7074e08b941084aaf62b",
+  "testedInputsSha256": {
+    "adapters/dsh-legacy-format/assets.mjs": "c438ea6ece92fe2444e9add23f225a888e328452d00ed90cff36ea519689cc79",
+    "adapters/dsh-legacy-format/source.mjs": "f985801939b7fd3c36b2d444c947a826001800a122b00b3bb7df513ec7e4d733",
+    "scripts/capture-dsh-legacy-assets.mjs": "e2bf4b3a55be2a30a3d9b063697aa6d16fbfc0cafd541da923922714550d03c8",
+    "scripts/capture-dsh-legacy-assets.py": "49abcc5d562c83a72b878340661bfca23491f099995423c3f10a3c7428e479e6",
+    "scripts/verify-dsh-legacy-assets.mjs": "9f6b2beb5d3148aa26fd25de3aec8208c3ea8b464adbd8896779858dd15d01be",
+    "scripts/proof-dsh-legacy-assets.mjs": "efe0e3c6b95843c44861f44ac5366009e2a28dd290da115430f66f7cb0fc3d02",
+    "scripts/export-dsh-project.py": "010b71c50504a04905b0d89afc150269f7670a603c8cb19aa92fd574416ed514",
+    "scripts/dsh_project_bundle.py": "1336d42edf492e07b5b3bfde287cd683bb278c974f0bee7d65ec603bbdf3f47f",
+    "scripts/export-dsh-legacy-view.mjs": "65d346228efd9a7a4dc12056d731b3d992cae50282a8756ff659af2a57bad25d",
+    "scripts/verify-dsh-legacy-view.mjs": "90acfdd5fcca5cb54b1e036d9ea2ed783c8e3f9cebdb5d2d1ba3628a12b8b0f0",
+    "adapters/dsh-legacy-format/build.mjs": "ecbfafa2dcc04afb6e86ded603718ce0c7a88e59bb0a00852fdf10379f60fe37",
+    "adapters/dsh-legacy-format/restore.ts": "afe7994e39ce09834809376ddbe13916766db5f7b718fe66d117e870fb54fb22",
+    "release/dsh-legacy-format/SOURCES.json": "299052a8f7bf826de5fa02db81bfd8c1eb757850ef834f27d7fa8a4018389100",
+    "tests/dsh-legacy-assets.test.mjs": "d261bd8b9838ab88c1f341ee6c4f66428a57e0b78b8b251a5bf0833e662d91a3",
+    "tests/test_dsh_legacy_assets.py": "bd353887fed2cad6748029d759fe76ca782b76ec030666d4c1bdda5022bc8214"
+  },
+  "contract": {
+    "schema": "augmentor-dsh-historical-assets/1",
+    "viewUnchanged": true,
+    "viewAndSourceFamilyExactSha256Bound": true,
+    "occurrences": "Exact source ID, derived sequence, content index, kind and attachment metadata",
+    "byteSource": "Only digest-named image/file objects in explicit DSH home; no paths supplied by history are opened",
+    "originalSourceServiceCalls": 0,
+    "workingFilesCaptured": false,
+    "currentHarnessImportCompatible": false,
+    "sourceViewRemainsRequired": true,
+    "combinedExpandedByteLimit": 268435456,
+    "largeProjectIntegrationConstraint": "Resolve existing verified segments once and hydrate native record wrappers on read; do not retain a second full derived history or discount repeated logical references"
+  },
+  "qualification": {
+    "nodePass": 90,
+    "newNodeAssetCases": 25,
+    "pythonAssetHelperPass": 9,
+    "pythonLicenseBoundaryNoticePass": 16,
+    "authoredPipelineGroupsPass": 9,
+    "pipeline": {
+      "schema": "augmentor-dsh-legacy-assets-proof/1",
+      "checks": 9,
+      "images": 1,
+      "files": 2,
+      "references": 4,
+      "twentyMiBFileChunkingExact": true,
+      "emptyFilePreserved": true,
+      "childOnlyOwnershipPreserved": true,
+      "verificationWithoutSourceHomePassed": true,
+      "changedAssetsAndForeignOwnershipRefused": true,
+      "missingAssetRefusesWholeCapture": true,
+      "existingOutputPreserved": true,
+      "sourceInputsUnchanged": true,
+      "currentHarnessImportCompatible": false,
+      "nativeImporterRefusesCompanion": true,
+      "nativeTargetsCreated": 0,
+      "modelRequests": 0,
+      "privateOwnerDataUsed": false
+    },
+    "appTypeCheckPass": true,
+    "skips": 0,
+    "privateOwnerDataRequiredByTestsOrCI": false,
+    "runtimeOrGuiCohortRerun": false,
+    "newAppCandidateStaged": false,
+    "environment": {
+      "platform": "MX Linux x64",
+      "node": "24.19.0",
+      "python": "3.13.5"
+    }
+  },
+  "sameFrozenRealFamilies": {
+    "projects": 5,
+    "roots": 42,
+    "descendants": 35,
+    "viewsRecomputedWithSecondVerifiedPublicSourceLocation": true,
+    "originalViewManifestsUnchanged": true,
+    "distinctImages": 28,
+    "distinctFiles": 0,
+    "historyAssetOccurrences": 34,
+    "storedAssetBytes": 3991330,
+    "maxCombinedExpandedBytes": 255268957,
+    "families": [
+      {
+        "captured": true,
+        "independentlyVerified": true,
+        "images": 0,
+        "files": 0,
+        "references": 0,
+        "assetBytes": 0,
+        "originalViewUnchanged": true,
+        "currentHarnessImportCompatible": false,
+        "nativeTargetsCreated": 0,
+        "modelRequests": 0,
+        "combinedExpandedBytes": 18715129
+      },
+      {
+        "captured": true,
+        "independentlyVerified": true,
+        "images": 0,
+        "files": 0,
+        "references": 0,
+        "assetBytes": 0,
+        "originalViewUnchanged": true,
+        "currentHarnessImportCompatible": false,
+        "nativeTargetsCreated": 0,
+        "modelRequests": 0,
+        "combinedExpandedBytes": 11257807
+      },
+      {
+        "captured": true,
+        "independentlyVerified": true,
+        "images": 0,
+        "files": 0,
+        "references": 0,
+        "assetBytes": 0,
+        "originalViewUnchanged": true,
+        "currentHarnessImportCompatible": false,
+        "nativeTargetsCreated": 0,
+        "modelRequests": 0,
+        "combinedExpandedBytes": 67714538
+      },
+      {
+        "captured": true,
+        "independentlyVerified": true,
+        "images": 0,
+        "files": 0,
+        "references": 0,
+        "assetBytes": 0,
+        "originalViewUnchanged": true,
+        "currentHarnessImportCompatible": false,
+        "nativeTargetsCreated": 0,
+        "modelRequests": 0,
+        "combinedExpandedBytes": 90088092
+      },
+      {
+        "captured": true,
+        "independentlyVerified": true,
+        "images": 28,
+        "files": 0,
+        "references": 34,
+        "assetBytes": 3991330,
+        "originalViewUnchanged": true,
+        "currentHarnessImportCompatible": false,
+        "nativeTargetsCreated": 0,
+        "modelRequests": 0,
+        "combinedExpandedBytes": 255268957
+      }
+    ],
+    "fileCoverage": "No real referenced files in these five families; authored empty and complete 20 MiB binary file proofs establish the tested file path",
+    "originalStoreWritten": false,
+    "nativeTargetsCreated": 0,
+    "modelRequests": 0
+  },
+  "preservation": {
+    "scope": "Read-only IPC peer/build, actual sealed owner files, complete protected regular path sets and contents, registry and selections; no owner restart, update, import or model work",
+    "reviews": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "registryAndSelectedConfigurationsExact": true,
+    "newOwnerTransfers": 0,
+    "ownerRestarts": 0,
+    "candidateActivated": false
+  },
+  "readinessUnchanged": {
+    "preparedProjects": 23,
+    "preparedParentConversations": 64,
+    "ownerPilotFeedbackRequiredBeforeFurtherRealTransfers": true
+  },
+  "remaining": [
+    "Native original-physical versus derived-coordinate archive contract and reader/importer integration",
+    "Bounded storage reuse to retain large complete histories and their compressed originals within existing limits",
+    "Authored original-GUI historical inspection, exact cuts and Pi SDK cold/new-turn continuation",
+    "Fresh read-only real preparation before changing readiness; pilot feedback before further transfers",
+    "MX Linux only; voice and other operating systems deferred"
+  ]
+}
