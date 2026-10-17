@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) now refuses an inactive
+local profile before prompt dispatch instead of trusting credential availability.
+The actual Qwen endpoint accepted an invented model name in the baseline probe;
+source now verifies advertised IDs per step and reported response IDs. The original
+GUI, SDK, Host, improvement and desktop checks pass; full source **576 Node /
+92 Python**, 74 files/nineteen Chromium/26 GUI cases, two workers/no skips.
+A bounded actual-Qwen probe confirms inactive-alias zero POSTs and matching-alias
+success. The fresh ordinary package passes the same cohort and shipped-code/frozen-input
+checks, with 1,120 compiled files matching. GPU/model settings and running reviews remain unchanged; sealed/adoption
+status is recorded separately. [Qualification](../release/harness-local-model-route-qualification-20261017.json).
+
 [Live recovered-history continuation](HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17)
 passes on exact sealed **20261017-045822-6b886151 / d157ffe1** with the actual
 saved local Qwen route: historical reply cuts, original GUI Send/Allow once,

@@ -2,6 +2,7 @@
 import {createHash} from 'node:crypto';
 import {createAgentSession,DefaultResourceLoader,SessionManager,type AgentSession,type ModelRuntime} from '@earendil-works/pi-coding-agent';
 import {managedPiSettings} from './pi-privacy.js';
+import {installLocalModelRouteGuard,localModelRouteFailure} from './local-model-route.js';
 import type {Model} from '@earendil-works/pi-ai';
 import {atomicJson,readJson} from './storage.js';
 import {identifier,type Data} from '../../protocol/src/index.js';
@@ -64,7 +65,7 @@ export class PiPromptImprovement {
       await resourceLoader.reload();abort.signal.throwIfAborted();options.accepting();
       stage='session-creation';
       const created=await createAgentSession({cwd:options.cwd,agentDir:options.agentDir,modelRuntime:options.modelRuntime,model:options.model,thinkingLevel:'off',settingsManager,resourceLoader,sessionManager:SessionManager.inMemory(options.cwd),tools:[],noTools:'all'});
-      session=created.session;
+      session=created.session;installLocalModelRouteGuard(session);
       if(created.modelFallbackMessage||session.model?.id!==options.model.id||session.model.provider!==options.model.provider)throw Error('Model substitution refused');
       // The coding SDK appends a cwd section even with context files disabled.
       // Project paths do not belong in a text-only draft transformation.
@@ -93,6 +94,7 @@ export class PiPromptImprovement {
       const answers=session.messages.filter(message=>message.role==='assistant');
       if(answers.length!==1)throw Error('Invalid answer count');
       const answer=answers[0];receipt.finishReason=answer.stopReason;
+      const routeIssue=localModelRouteFailure(answer);if(routeIssue){stage='model-route';throw Error(routeIssue);}
       if(answer.stopReason!=='stop'||answer.content.some(part=>part.type==='toolCall'))throw Error('Incomplete or tool output');
       const raw=answer.content.filter(part=>part.type==='text').map(part=>part.text).join('');
       if(raw.length>24000)throw Error('Oversized output');
@@ -102,8 +104,8 @@ export class PiPromptImprovement {
       receipt.status='completed';receipt.usage={};
       for(const key of ['input','output','cacheRead','cacheWrite','totalTokens'] as const)if(Number.isFinite(answer.usage?.[key]))receipt.usage[key]=answer.usage[key];
       return {ok:true,kind:'rewrite',text:unchanged?draft:value.text.trim(),unchanged,receipt:{...receipt,finishedAt:Date.now()},replayed:false};
-    }catch{
-      receipt.status=abort.signal.aborted?'cancelled':'failed';receipt.failureStage=stage;throw Error(abort.signal.aborted?interrupted:invalid);
+    }catch(error){
+      receipt.status=abort.signal.aborted?'cancelled':'failed';receipt.failureStage=stage;throw Error(abort.signal.aborted?interrupted:stage==='model-route'&&error instanceof Error?error.message+' Your draft is unchanged.':invalid);
     }finally{clearTimeout(timer);abort.signal.removeEventListener('abort',cancel);receipt.finishedAt=Date.now();try{this.persist();}finally{session?.dispose();}}
   }
 }

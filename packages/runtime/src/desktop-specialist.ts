@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {installLocalModelRouteGuard,localModelRouteFailure} from './local-model-route.js';
 import {Type} from 'typebox';
 import {createAgentSession, DefaultResourceLoader, SessionManager,
   type AgentSession, type ExtensionAPI, type ExtensionFactory, type ModelRuntime, type ToolDefinition} from '@earendil-works/pi-coding-agent';
@@ -178,7 +179,7 @@ export class DesktopSpecialist {
       const created = await createAgentSession({cwd: options.cwd, agentDir: options.agentDir,
         modelRuntime: options.modelRuntime, model: options.model, thinkingLevel: options.tracking?.thinkingLevel??'off', settingsManager, resourceLoader,
         sessionManager: manager, tools: customTools.map(tool => tool.name), customTools});
-      session = created.session;
+      session = created.session;installLocalModelRouteGuard(session);
       if (created.modelFallbackMessage || session.model?.id !== options.model.id || session.model?.provider !== options.model.provider)
         throw Error('Desktop worker refused model substitution.');
       session.agent.toolExecution = 'sequential';
@@ -204,6 +205,7 @@ export class DesktopSpecialist {
       };
       abort.signal.throwIfAborted();
       await session.prompt(JSON.stringify(brief), {expandPromptTemplates: false, source: 'rpc'});
+      const last=session.messages.findLast(message=>message.role==='assistant');const routeIssue=last?.role==='assistant'?localModelRouteFailure(last):undefined;if(routeIssue&&!finished&&!stopped&&!abort.signal.aborted)stop(result.actionAttempted?'unknown':'failed',routeIssue);
       if (!finished && !stopped && !abort.signal.aborted) stop(result.actionAttempted ? 'unknown' : 'failed', 'The worker ended without a structured finish. Inspect the evidence; no action was replayed.');
     } catch (error) {
       if (!stopped && !finished) stop(result.actionAttempted ? 'unknown' : 'failed', String(error));

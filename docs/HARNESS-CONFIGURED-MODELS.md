@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) now adds generation-time
+verification for explicitly named llama.cpp providers. The picker remains a
+configured/credential-available catalogue; it does not claim that all local
+profiles are loaded. Dormant selections/pins stay available, while a mismatch
+refuses prompt dispatch without loading or substituting a model.
+
 # Configured provider catalogue for MX review
 
 The owner's October 16 feedback identified a truthfulness gap: the previous

@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Local model identity qualification](../docs/HARNESS-LOCAL-MODEL-ROUTES.md)
+adds `local-model-route` SDK/Host/worker suites and the original-GUI Chromium
+failure/new-request flow. Actual SDK transport tests verify zero POSTs for stale
+aliases, final auth headers, response races, step changes without replay, bounded
+metadata/redirect refusal, Stop, reported usage and resource reload. Worker
+fixtures permit only the owned connection-release stop. The bounded actual-Qwen
+identity probe is separate from full-answer quality and owner acceptance.
+
 [Exact-candidate live Qwen checks](../docs/HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17)
 now exercise the existing authored settlement/inherited/interrupted fixtures,
 historical reply cuts, original GUI Send/Allow once, cold recall and file bytes

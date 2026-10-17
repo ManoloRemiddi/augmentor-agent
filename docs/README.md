@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) · selected versus advertised/reported IDs, authenticated bounded verification, original GUI errors and package/adoption scope.
+
 [Live recovered-history continuation](HARNESS-DSH-HISTORICAL-IMPORT.md#live-qwen-continuation-on-the-sealed-mx-candidate--october-17) · actual Qwen, original GUI Send/Allow once, cold recall, owned file round trip and preserved owner profiles.
 
 [Current full DSH migration readiness](HARNESS-DSH-MIGRATION-PILOT.md#current-full-catalogue-readiness-with-historical-archives--october-17) · 28 projects/106 conversations prepared against current sources; missing-folder, pilot-feedback and adoption gates.
