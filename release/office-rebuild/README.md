@@ -2,6 +2,40 @@
 
 ## Rich document and original-GUI comparison — October 17
 
+### Rich sheets/decks and newly saved files — subsequent checkpoint
+
+[`rich-sheet-deck-gui-probe.mjs`](rich-sheet-deck-gui-probe.mjs) extends the DOCX
+case below with XLSX/XLS and PPTX/PPT in the actual original GUI. Use a fresh
+unselected diagnostic app containing the
+[file-discovery correction](../../docs/HARNESS-FILE-REFERENCES.md#external-file-discovery-correction--october-17),
+the same existing Thin engine and a new output directory:
+
+```sh
+node release/office-rebuild/rich-sheet-deck-gui-probe.mjs \
+  "$UNSELECTED_THIN_APP" "$AUTHORED_RICH_FIXTURES" \
+  "$PWD/outputs/office-new-rich-sheet-deck-gui"
+```
+
+All four formats pass. Actual isolated spreadsheet Workers preserve saved
+formulas, cross-sheet values, literal formula-looking text, merged cells and
+hidden-row metadata. The original grid shows both worksheets and is read-only.
+Deck previews render three pages, exclude speaker notes and retain original zoom.
+Each file is added externally after the previous preview, selected through the
+original `@file` menu/chip, then closed in narrow fullscreen mode. Source bytes,
+native history and synthetic request logs remain exact. Six actual browser
+Workers terminate; Host preview/request counters return to zero. Screenshots
+were visually inspected. Scoped kernel tracing verifies two Thin converter
+opens plus one driver hash read, zero default Wasm opens or unresolved calls.
+
+The retained initial attempts found the genuine stale file-index gap and driver
+focus/async-cleanup timing assumptions; none counts as passing qualification.
+The original search/menu source is unchanged. The passing diagnostic has zero
+observed browser errors/unexpected HTTP destinations, no owner documents,
+inference, installed/default engine update or new engine build.
+[Qualification](rich-sheet-deck-qualification-20261017.json).
+
+The following DOCX/provider and hosted-CI statements retain their earlier scope.
+
 The [authored fixture generator](rich-office-fixtures.py) produces DOC/DOCX,
 XLS/XLSX and PPT/PPTX using the existing isolated native exporter. Writer files
 have three pages, headers/footers, tables, pictures, mixed fonts and accented/
@@ -49,7 +83,8 @@ no unresolved target calls. This is not a whole-machine/network audit; the GUI
 observer records zero errors/unexpected HTTP destinations. One authored seed is
 used, with no real provider inference or document content submitted to a model.
 
-The GUI case is DOCX only; rich Calc/Impress results above are provider comparisons.
+That earlier GUI case is DOCX only; rich Calc/Impress GUI qualifies separately
+in the subsequent checkpoint above.
 Full custom-font/large-corpus/resource/security, complete source delivery/rebuild/
 third-party coverage and promotion/rollback remain separate. Both installed MX
 reviews and their data/services stay unchanged; public packaging remains refused.

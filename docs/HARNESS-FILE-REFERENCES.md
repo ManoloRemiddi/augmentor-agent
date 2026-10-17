@@ -40,12 +40,50 @@ tools, excluding descendant symlinks and traversal outside that root.
 The original provider returns at most 20 candidates from a 50,000-entry bounded
 index, with its existing build-directory exclusions, hidden-file rules and fuzzy
 ranking. Directory queries read current metadata; bare queries reuse the index.
-Tool settlements invalidate the index, retaining supplier stale-while-refresh
-behaviour. The adapter keeps at most eight search instances, discarding an old
-workspace instance when its cwd changes. Queries are bounded to 4,096 UTF-16
+The October 17 adapter correction below supersedes the earlier stale-while-refresh
+behavior: known invalidation waits for a fresh index on that same lookup.
+The adapter keeps at most eight session namespaces, discarding an old
+workspace namespace when its cwd changes. Queries are bounded to 4,096 UTF-16
 units and exclude control characters. Abort/revocation/session changes cannot
 insert stale candidates. HTTP cancellation reaches the search caller; search
 disposal cancels its bounded background index. No file contents are prefetched.
+
+## External file discovery correction — October 17
+
+Rich spreadsheet/deck GUI qualification exposed a real adapter gap: a file saved
+externally after the first fuzzy lookup stayed absent until an agent tool
+invalidated the index. The unchanged supplier also answers the first invalidated
+lookup with old paths while rebuilding; a pasted complete filename need not
+trigger another GUI lookup. A direct reproduction returned no candidate for the
+newly created file before this correction.
+
+The Pi adapter now checks root identity, timestamps and a bounded fingerprint of
+root entry names/types on each bare query. Filenames are needed because rapid
+changes on MX Linux can share a directory timestamp. Root changes and agent-tool
+invalidation await a fresh supplier index. Nested external additions refresh on
+the first query after the index reaches ten seconds old; there is no idle timer
+or recursive polling. Root witnesses and indexes are bounded to 50,000 entries,
+with original 20-result ranking/exclusions. Paths beyond those bounds are not
+guaranteed discoverable. Directory drilling remains live.
+
+One pending traversal is shared per session. Cancelling a window cancels its
+wait, while another window can finish. Concurrent invalidation is rechecked
+after traversal; cwd changes, LRU eviction and close dispose the old namespace.
+Replacing an index does not dispose a generation still serving another reader.
+Root errors are surfaced rather than treating stale paths as current. Discovery
+still reads metadata only; original MIT search/menu modules and Host authority,
+maintenance and draft contracts remain unchanged.
+
+TypeScript/check and 27 focused Node checks pass without failures or skips,
+including actual Chromium file-menu, draft, PDF and spreadsheet lifecycle cases.
+New regressions cover first-lookup external add/rename/removal, missing roots,
+nested expiry, immediate tool invalidation, overlapping cancellation/invalidation
+and close/cwd/LRU cleanup. A separate actual rich XLS/XLSX/PPT/PPTX GUI diagnostic
+also passes with files added between previews. Source qualification does not
+establish installed adoption; the running MX reviews still use `fcf9d32a` at this
+checkpoint. [Rich GUI evidence](../release/office-rebuild/rich-sheet-deck-qualification-20261017.json).
+The broader source cohort passes 270 Node and 41 Python checks, including
+original queue/plugins, migration lifecycle and the default Office engine.
 
 `host.describe.activeFileReferences` counts waiting discovery calls, including
 the native RPC carrier. They veto guarded maintenance before quiescing. Operator
