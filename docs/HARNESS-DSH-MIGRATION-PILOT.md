@@ -1,8 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Native recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) provide v3 import for verified families/assets, with authored GUI/SDK proofs. Five real legacy families export/read successfully but still refuse settlement/compaction forms during complete preparation. Readiness and the owner pilot-feedback gate stay unchanged.
+[Native recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) provide v3 import for verified families/assets, with authored GUI/SDK proofs. All five frozen families now pass complete historical preparation after the separately qualified settlement/seed fixes. The later current-source assessment below supersedes earlier readiness counts; owner pilot feedback still gates extra transfers.
 
-[Historical DSH source families](HARNESS-DSH-LEGACY-FAMILIES.md) records the newer complete-family offline stage. Five source-reader-blocked projects now decode and recompute with original compressed logs retained; this intermediate schema remains refused by native import. The 23-project/64-parent readiness snapshot and owner pilot-feedback gate are unchanged.
+[Historical DSH source families](HARNESS-DSH-LEGACY-FAMILIES.md) records the newer complete-family offline stage. Five source-reader-blocked projects now decode and recompute with original compressed logs retained; this intermediate schema remains refused by native import. The intermediate schema alone remains refused; native v3 envelopes and historical admission now qualify separately. Earlier readiness counts below are historical; the owner pilot-feedback gate remains.
 
 [Complete segmented DSH bundles](HARNESS-DSH-PROJECT-BUNDLES.md) preserve large histories/images with checksummed objects, exact original lookup and historical branching. Source/ordinary/exact sealed each pass **174 Node / 47 Python**, including original v1/v2 GUI flows; 1,108 compiled inputs match. Private unselected **20261017-003712-3e22586d / 7372061b** verifies 24,630 sealed inputs. Five more real projects/seventeen parents/four children now export completely; two projects/five parents pass read-only preparation. Source formats and two source-observation failures remain. Both owner PIDs/all 36 protected regular files, registry and selections stay exact; no owner transfer or update. Adoption and pilot gates stay explicit. [Evidence](../release/harness-dsh-bundle-qualification-20261017.json).
 
@@ -1562,3 +1562,64 @@ authored packed-run regression preserves exact combined text, and repeated whole
 view conversion remains equal without changing input records. The same repeated-
 view/input-detachment checks pass on the private frozen log. Both the authored-
 data default command and explicit private-input command pass independently.
+
+## Current full-catalogue readiness with historical archives — October 17
+
+The current complete DSH catalogue is checked against the exact qualified,
+unselected **20261017-045822-6b886151 / d157ffe1** application. This supersedes the
+earlier 23-project/64-parent *readiness snapshot*, while preserving its dated
+code/test evidence. Runtime, GUI, dependency pins and running reviews do not change.
+
+| Current source result | Projects | Parent conversations |
+| --- | ---: | ---: |
+| Complete read-only preparation accepted | 28 | 106 |
+| Original working folder unavailable | 1 | 1 |
+| Empty workspace, no conversations to move | 1 | 0 |
+| Total catalogue | 30 | 107 |
+
+Accepted archives retain **48 child logs** as historical data, without live Pi
+jobs. These are source-catalogue counts, not a list of additional transfers; DSH
+originals remain after the existing pilot. There are no new real imports or
+native destination files. The unavailable folder requires the owner's intended
+location or exclusion choice; no empty substitute or inferred move is applied.
+
+The standard route exports one project at a time into private temporary v2
+bundles. Every object/hash, parent/child record count and cut is checked by the
+sealed reader. All **78 captured standard source cuts** are read again at the
+end of the scan and remain exact. Temporary standard exports are removed after
+each assessment; this scan is not the backup set for a future transfer.
+
+The five legacy projects use their retained v3 archives only after a fresh source
+witness proves current workspace membership/organization, the complete current
+physical family graph, highest selected generations, headers and full compressed
+bytes. All **77 physical logs** still match, as do all **28 stored images** through
+the safe descriptor reader. Global header membership is independently indexed
+before/after; selected physical revisions, all workspace entries/organization
+and every source root's idle state remain stable. The native reader rechecks the
+whole retained closure and unchanged manifest/parent/descendant identities.
+Neither originals nor old views are rewritten. A changed witness would refuse
+this reuse and require a new capture/export, not silently reuse stale history.
+
+Read-only IPC checks of both actual owner reviews find the same configured
+**10 providers / 431 models**, with **430 credential-available entries** and a
+present credential-available default. No model fallback or per-conversation route
+is assigned. Availability here is SDK/configuration metadata: it does not prove
+provider reachability, successful generation or continuation of every project.
+No provider inference request is submitted by this assessment.
+
+Both actual owner PIDs, all 36 protected regular path sets/hashes, registry and
+selected configurations remain exact. Their existing **24,615 sealed inputs**
+verify. All **24,679 assessed candidate inputs** verify before/after the scan.
+The preceding **525 Node / 92 Python** source/ordinary/exact-sealed qualification
+remains the code evidence; it is not rerun or relabelled by this data-only scan.
+[Portable aggregate record](../release/harness-dsh-current-readiness-20261017.json)
+publishes no private project names, IDs, paths, source-data hashes or content.
+
+Next gates remain owner pilot feedback, guarded candidate adoption, representative
+ordinary project/model work and fresh transfer-specific backups/cuts/folder/model
+checks. Current readiness does not authorize more real transfers. MX Linux remains
+first; voice and other operating systems stay deferred.
+
+Publication checks pass sixteen private-boundary/licence/notice cases. A separate
+staged-diff check excludes 428 private project/session identities, paths, names
+and source-content fingerprints. Only aggregate evidence is published.

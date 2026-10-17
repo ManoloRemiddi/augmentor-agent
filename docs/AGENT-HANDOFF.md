@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current full-catalogue readiness](HARNESS-DSH-MIGRATION-PILOT.md#current-full-catalogue-readiness-with-historical-archives--october-17)
+now verifies **28 projects / 106 parent conversations / 48 archived child logs**
+against sealed **20261017-045822-6b886151 / d157ffe1**. Fresh standard cuts and all
+77 legacy physical logs/current assets match; catalogue organization and source
+witnesses stay stable. One project/one conversation has an unavailable folder;
+one workspace is empty. Both owner catalogues contain a credential-ready default;
+this is configuration metadata, not live inference proof. No transfer, target, restart, runtime or GUI
+change; both reviews/all 36 protected files, PIDs, registry, selections and seals
+remain exact. Owner pilot feedback and guarded adoption remain required.
+[Aggregate evidence](../release/harness-dsh-current-readiness-20261017.json).
+
 [Historical admission](HARNESS-DSH-HISTORICAL-IMPORT.md#historical-settlement-and-interrupted-seed-admission)
 now prepares all five same-frozen recovered projects: **42 parents / 35 archived
 descendants / 28 images**. The preceding sealed `9cf713a8` reproduces all five

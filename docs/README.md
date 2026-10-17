@@ -1,10 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current full DSH migration readiness](HARNESS-DSH-MIGRATION-PILOT.md#current-full-catalogue-readiness-with-historical-archives--october-17) · 28 projects/106 conversations prepared against current sources; missing-folder, pilot-feedback and adoption gates.
+
 [Native recovered-history archives](HARNESS-DSH-HISTORICAL-IMPORT.md) · original/derived provenance, bounded v3 import, verified historical settlement/seed admission, cold relocation and original GUI/SDK tests; owner migration/adoption gates remain separate.
 
-[Recovered-history assets](HARNESS-DSH-LEGACY-ASSETS.md) · exact referenced images/files, immutable companions, five real families checked; bounded native integration still pending.
+[Recovered-history assets](HARNESS-DSH-LEGACY-ASSETS.md) · exact referenced images/files, immutable companions, five real families checked; native v3 integration qualified, owner transfer gates remain.
 
-[Historical DSH source families](HARNESS-DSH-LEGACY-FAMILIES.md) · complete original-log capture, pinned offline derivation/recomputation, five formerly reader-blocked families; native import still pending.
+[Historical DSH source families](HARNESS-DSH-LEGACY-FAMILIES.md) · complete original-log capture, pinned offline derivation/recomputation, five formerly reader-blocked families; native v3 import/admission qualified.
 
 [Legacy descriptor-v2 format proof](HARNESS-DSH-MIGRATION-PILOT.md#legacy-descriptor-v2-offline-format-proof--october-17) · pinned MIT parser reuse, historical BSD schema reference, read-only reproduction and remaining family/export work.
 

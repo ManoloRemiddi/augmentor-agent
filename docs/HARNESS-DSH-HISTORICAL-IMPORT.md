@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+A later [full current-catalogue check](HARNESS-DSH-MIGRATION-PILOT.md#current-full-catalogue-readiness-with-historical-archives--october-17)
+now prepares **28 projects / 106 conversations**, including these five recovered
+families after refreshing their physical-source and asset witnesses. The current
+model-catalogue checks are configuration metadata, not real inference acceptance.
+The archive/admission qualification below remains the exact code evidence.
+
 # Native archives for recovered DSH histories — October 17
 
 `augmentor-dsh-project-export/3` connects verified [historical source families](HARNESS-DSH-LEGACY-FAMILIES.md)
