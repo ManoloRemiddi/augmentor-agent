@@ -36,6 +36,7 @@ class PreservationTransactionFixture(PreservationFixture):
 
 class PreservationTransactionTests(PreservationTransactionFixture):
     def test_apply_is_fenced_then_exact_reverse_preserves_modes_and_shared_bytes(self):
+        tx.destinations(self.home)[0].chmod(0o644)  # Existing owner assets need not all be 0600.
         modes={str(p):p.stat().st_mode&0o777 for p in tx.destinations(self.home)}
         data={p:p.read_bytes() for p in Path(self.pair['data']).iterdir()}
         with self.guard() as guard:

@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+Linux controlled DSH preflight uses the OS-provided Bubblewrap executable,
+locally qualified at **0.12.0** on MX with user/PID namespaces, `--info-fd`, pidfds
+and basic device mounts. It is a process-lifetime dependency, not bundled
+application source or a claim of filesystem/network isolation. CI installs/tests
+the distro dependency explicitly. [Evidence and limits](HARNESS-DSH-INSTALLATION.md#controlled-replacement-backend-and-native-adapter-preflight--october-17).
+
 Preserved DSH staging uses the already-present PyYAML node parser without
 constructing custom tags or serializing owner configuration. Linux CPython 3.13
 CI inspection pins the PyPI 6.0.2 wheel and SHA-256 in

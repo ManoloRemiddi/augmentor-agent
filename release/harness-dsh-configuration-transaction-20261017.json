@@ -62,11 +62,13 @@
     "run": 39049376766,
     "head": "e018c8c941db00fde6d9906996e00542eb4200ce",
     "runtime": "b78996ebc0e06b1f0bb27e27231ee36cc3006196",
-    "statusObserved": "in_progress",
-    "conclusionUnproven": true,
+    "statusObserved": "completed",
+    "conclusionUnproven": false,
     "setupPreservationAndProfileGateStepsPassed": true,
     "notAnUnchangedRuntimeRerun": true,
-    "previousSdk39047120454AppliesToEarlierSource": true
+    "previousSdk39047120454AppliesToEarlierSource": true,
+    "firstObservedStatus": "in_progress",
+    "conclusion": "success"
   },
   "remaining": [
     "Full owner-store cold backups and explicit all-entrypoint inventory/adoption",

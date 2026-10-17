@@ -2,6 +2,93 @@
 
 # Linux DSH integration installation
 
+## Controlled replacement-backend and Native-adapter preflight — October 17
+
+Source **517b71dbb0293aa78f306b127ae444e51ce09b95** adds the internal
+`services/dsh/backend_probe.py` next step after the configuration journal. It can
+start a temporary replacement while the cold maintenance guard and durable DSH
+startup fence remain active. No installed apply/finalize command or automatic
+owner upgrade is exposed. No new full app copy or immutable release is created;
+the existing a4dc0eb2 candidate supplies immutable incoming bytes but does not
+contain this new controller.
+
+Only an applied, reviewed four-file configuration qualifies. The stage now also
+binds the exact installed CLI entry and the incoming `desktop-release.json` when
+present. Launch metadata is excluded from the artifact file-inventory hash, so
+that extra binding is necessary before executing its recorded Python. A changed
+manifest cannot redirect the adapter check to another interpreter, even when the
+file inventory alone still verifies. Old stages missing those bindings cannot
+start this probe; prepare a fresh immutable-input stage. The actual owner's
+read-only stage now binds **48 inputs / 10 edits**, retaining 20 literal module
+paths. No owner profile execution or write occurs in that staging check.
+
+The temporary web command uses the incoming bundled Node, the bound CLI entry,
+its existing working directory and supplied service environment, with the checked
+home/shared pair and telemetry opt-outs. It listens on a temporary numeric
+loopback port with `--no-open`. The normal managed launch gate remains exclusive.
+Bubblewrap supplies a separate user/PID namespace with the backend as PID 1,
+parent-death handling, fresh proc/basic devices and a retained launch descriptor.
+Detached children remain in that PID namespace. The controller uses pidfds for
+identity/signals and waits for normal teardown before config operations resume.
+Private backend output stays in a **512 KiB memory buffer**, not unbounded disk
+logs. Readiness failure or an exception closes the temporary tree; the durable
+configuration fence remains for recovery.
+
+This is process-lifetime containment, **not a filesystem/network permission
+sandbox**. Full cold-store backups and review/quiescence of the real retained
+profile graph and every legacy caller remain outer prerequisites. The requested
+probe operations only read product identity, catalogue and presets; those reads
+do not prove arbitrary plugin startup side effects safe. The real owner full
+profile is not executed or adopted by this checkpoint.
+
+The product check enforces the actual protocol, candidate version, home-token
+identity, required personal roles and catalogue shape. The actual incoming Native
+adapter then imports and calls `host.describe` in its own temporary PID namespace,
+using a private connection registry. A stale inherited `DSH_AUGMENTOR_URL` is
+overridden **only for this check** to reach the temporary backend; real settings
+are not rewritten and product-version guards are not bypassed. That temporary
+registry is removed. A successful check leaves startup fenced; matching loaded
+clients, selection publication and fence finalization remain separate work.
+
+### Qualification
+
+**124 source Python / four source launcher Node cases pass**, zero failures or
+skips. Seven new probe cases cover cold/applied admission, held launch gates,
+configuration-write refusal while probing, normal cleanup of detached children,
+controller death with both namespace actors stopped, missing tools/changed CLI,
+changed launch metadata, bounded private logs/readiness failure and wrong product
+identity. The metadata negative control confirms that inventory verification
+alone still succeeds while the new exact metadata check refuses execution.
+
+A separate isolated operator test uses the **actual installed DSH 0.2.0-rc.2**,
+a fresh public integration and the existing **a4dc0eb2** immutable incoming build.
+The real replacement reports product 0.2.13, matching home identity and both valid
+personal roles; the **actual candidate Native adapter** connects successfully,
+including with a deliberately stale inherited server address. Configuration
+mutation is refused while the probe runs. Both backend/client namespaces retire,
+startup remains fenced after success, exact original config bytes/modes are
+restored through the journal (including mixed 0600/0644 original modes), both
+authored shared DB sets stay exact and the
+incoming seal re-verifies. Zero owner profiles/models are used. This is not
+physical GUI, real owner-bank, or live task acceptance.
+
+The experiment exposed two concrete setup/probe defects before acceptance:
+source `copy2` permissions could leave newly installed files group-writable, and
+a namespace without basic `/dev` caused the real runtime-lease spawn to fail with
+EACCES. Fresh setup now protects only its new copied integration assets; existing
+owner permissions remain untouched. The probe mounts basic devices, and its
+actor tests open `/dev/null`. Product/version failures are still refused.
+
+Previous Linux SDK **39049376766** is now a terminal success at e018c8c9 / runtime
+b78996eb. New-source hosted qualification remains pending. The full owner main/
+pilot, 36 protected file sets/PIDs, registry 18, shared rows/configuration, menus
+and model/GPU/voice services remain unchanged; scratch is empty and root stays
+about 99 GiB free. Next finish full cold-backup/entrypoint evidence and matching
+client selection/finalization/reverse orchestration, then qualify one combined
+immutable update and real owner continuation. Pilot feedback still gates more
+project transfers. Voice/later OS and the public Office distribution gate remain
+separate. [Record](../release/harness-dsh-backend-preflight-20261017.json).
+
 ## Cold configuration journal and managed startup fence — October 17
 
 Source **b78996ebc0e06b1f0bb27e27231ee36cc3006196** adds the internal

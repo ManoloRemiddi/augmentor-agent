@@ -1,0 +1,114 @@
+{
+  "schema": "augmentor-harness-dsh-backend-preflight/1",
+  "date": "2026-10-17",
+  "sourceRef": "517b71dbb0293aa78f306b127ae444e51ce09b95",
+  "scope": "Internal Linux controlled backend and actual candidate Native-adapter preflight; no owner activation",
+  "sourcePythonPass": 124,
+  "backendProbeCases": 7,
+  "probeCasesOverlap124": true,
+  "sourceManagedLauncherNodePass": 4,
+  "fail": 0,
+  "skip": 0,
+  "dependency": {
+    "bubblewrapMxVersion": "0.12.0",
+    "pidfdAndUserPidNamespacesRequired": true,
+    "standardDeviceMountRequired": true,
+    "ciNamespaceSmokeAndProbeChecksAdded": true
+  },
+  "controlledPreflight": {
+    "appliedReviewedConfigurationAndColdGuardRequired": true,
+    "incomingBundledNodeAndBoundCliEntry": true,
+    "incomingLaunchMetadataBoundSeparatelyFromFileInventory": true,
+    "fixedTemporaryNumericLoopbackPort": true,
+    "normalLaunchGateRemainsExclusive": true,
+    "wholePidNamespaceIncludingDetachedChildren": true,
+    "stoppedActorAndChildDieAfterControllerDeath": true,
+    "boundedBackendLogBytes": 524288,
+    "configurationMutationWhileProbingRefused": true,
+    "actualCandidateNativeAdapterInSeparatePidNamespace": true,
+    "temporaryPrivateConnectionRegistryRemoved": true,
+    "staleInheritedNativeEndpointOverriddenOnlyForProbe": true,
+    "normalTeardownJoinedBeforeConfigChanges": true,
+    "startupFenceNotClearedOnSuccess": true,
+    "filesystemAndNetworkPermissionSandbox": false,
+    "fullOwnerBackupAndProfileGraphPrerequisitesStillRequired": true
+  },
+  "actualPublicProfileFixture": {
+    "scope": "Real public fresh integration, immutable incoming artifact and actual candidate Native adapter on authored isolated data",
+    "ownerProfileUsed": false,
+    "ownerModelRequests": 0,
+    "incomingArtifactSha256": "a4dc0eb2edda6c245bd7e6dd23d32309c3e79215db6bf78ca802ad479896ef93",
+    "initialPublicInstall": true,
+    "entryBoundInStage": true,
+    "replacement": {
+      "productVersion": "0.2.13",
+      "homeIdentityMatches": true,
+      "personalPresetsRegistered": true,
+      "catalogGroups": 1,
+      "modelRequests": 0
+    },
+    "candidateClient": {
+      "candidateNativeAdapterMatched": true,
+      "candidateClientPidNamespace": true,
+      "physicalGuiAcceptance": false,
+      "modelRequests": 0
+    },
+    "staleInheritedNativeEndpointOverriddenOnlyForProbe": true,
+    "configurationMutationWhileProbingRefused": true,
+    "normalNamespaceTeardownJoined": true,
+    "successfulPreflightDoesNotClearFence": true,
+    "mixedOriginalModesExact": true,
+    "originalConfigurationRestored": true,
+    "bothSharedDatabaseSetsExact": true,
+    "immutableIncomingStillVerified": true
+  },
+  "actualOwnerReadOnlyStage": {
+    "boundInputs": 48,
+    "moduleEdits": 10,
+    "retainedLiteralPaths": 20,
+    "cliEntryBound": true,
+    "incomingLaunchMetadataBound": true,
+    "planSha256": "fab8e1f45142d06a9f1cc03b3bcc57c91795520a47459639a4f88dc1ef9d2b3d",
+    "ownerFilesChanged": false,
+    "actualOwnerProfileExecuted": false
+  },
+  "ownerPreservation": {
+    "protectedFileSets": 36,
+    "mainAndPilotPidsAndFilesExact": true,
+    "registryRevision": 18,
+    "sharedRowsAndEngineConfigurationExact": true,
+    "menusAndSelectionsExact": true,
+    "qwenAndVoiceUnchanged": true
+  },
+  "freshSetupCopiedAssetsPrivateMode": true,
+  "existingOwnerPermissionsChanged": false,
+  "applicationCopiesCreated": 0,
+  "newImmutableArtifactCreated": false,
+  "previousQualifiedReleaseId": "20261017-180443-c8315564",
+  "previousArtifactDoesNotContainThisController": true,
+  "installedChanged": false,
+  "ownerProjectsTransferred": 0,
+  "newRuntimeSdk": "Pending",
+  "previousRuntimeSdk": {
+    "run": 39049376766,
+    "head": "e018c8c941db00fde6d9906996e00542eb4200ce",
+    "runtime": "b78996ebc0e06b1f0bb27e27231ee36cc3006196",
+    "status": "completed",
+    "conclusion": "success"
+  },
+  "remaining": [
+    "Full cold backup evidence and review/adoption of all real entrypoints and retained global profile paths",
+    "Matched client selection and durable finalization/reverse orchestration; no installed apply/finalize command yet",
+    "One new combined immutable candidate when that orchestration is ready",
+    "Real owner shared-bank/history/settings/budget/busy/restart/model/tool/loaded-GUI acceptance",
+    "Owner pilot feedback before more transfers; public Office distribution gate; voice/later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-backend-probe-source-python-20261017.log": "ccde88ad279bcb4e8658f1544f4dcdd131b270e42dba2f82e4a6b41344ff0b21",
+    "harness-backend-probe-source-node-20261017.log": "661730695e1abf9b15433b8b6bf3e0dee58566877b0d41399cb2a0227223617f",
+    "harness-backend-probe-real-summary-20261017.log": "2c4ba2430620342adc05b2303dde45c33c97edb073a9400f510201b20cb431f3",
+    "harness-backend-probe-owner-preservation-20261017.log": "b67e752f52292a87903b9ee701ce57d7c168c9dd9dcb644249ec86ba13e063b4"
+  },
+  "mixed0600And0644OriginalModesCovered": true,
+  "testFixtureFollowUpAfterRuntimeRef": "One original asset is explicitly 0644 in the transaction regression; runtime remains 517b71db."
+}

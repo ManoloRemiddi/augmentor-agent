@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Controlled backend and actual Native-adapter preflight](HARNESS-DSH-INSTALLATION.md#controlled-replacement-backend-and-native-adapter-preflight--october-17)
+adds 517b71db: source 124 Python/four Node pass. Real DSH/product 0.2.13 and the
+actual immutable candidate adapter match on authored data; isolated PID lifetimes,
+metadata/CLI bindings and stale inherited endpoint handling pass. Config writes
+stay blocked while probing, normal cleanup joins and successful checks keep the
+startup fence. Actual owner staging binds 48 inputs/10 edits, with 20 paths kept.
+No installed change/new app copy; full backups, real graph/client adoption and
+selection/finalization/reverse remain. Prior SDK 39049376766 succeeds; new CI pending.
+[Record](../release/harness-dsh-backend-preflight-20261017.json).
+
 [Cold configuration journal and profile gate](HARNESS-DSH-INSTALLATION.md#cold-configuration-journal-and-managed-startup-fence--october-17)
 adds b78996eb: source 117 Python/four Node pass; exact SDK discovery 27 overlaps.
 Real upstream DSH retains/releases its profile reader and refuses a pending fence
