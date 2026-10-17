@@ -4,7 +4,7 @@
 
 `services/dsh/browser_code_publication.py` binds the existing unpacked extension
 code folder to [client publication](HARNESS-CLIENT-PUBLICATION.md) **schema 4**.
-This internal Linux controller changes no UI. It does not stop Chromium, reload
+Runtime/controller **5d67a8bfe45dd2d632a716b7854fd9860e08dd0b**. This internal Linux controller changes no UI. It does not stop Chromium, reload
 an extension, move browser profile/storage, start clients or prove owner acceptance.
 The installed Browser remains 0.2.11 until an actual coordinated cut and reload.
 macOS and Windows adapters remain unqualified and deferred under the MX-first plan.
