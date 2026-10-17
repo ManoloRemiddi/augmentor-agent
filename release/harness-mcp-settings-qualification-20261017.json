@@ -106,15 +106,102 @@
     "ownerImports": 0
   },
   "exactSealed": {
-    "status": "Pending separate immutable stage and qualification"
+    "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+    "releaseId": "20261017-061143-d0c0fc29",
+    "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+    "inventoryEntriesVerified": 24689,
+    "compiledFilesVerified": 1120,
+    "nodePass": 129,
+    "pythonPass": 41,
+    "nodeFiles": 36,
+    "chromiumFiles": 9,
+    "chromiumCases": 9,
+    "workers": 2,
+    "selectedConfigurationsUnchanged": true,
+    "ownerImports": 0,
+    "scope": "Qualified separately staged and unselected; later actual review adoption below"
   },
   "ownerReviews": {
-    "status": "Remain on the preceding e37d79b6 artifact until guarded adoption"
+    "status": "Both actual MX reviews running this exact qualified artifact",
+    "actualIdleAndEmptyQueueGuardsPassed": true,
+    "preShutdownProtectedBackupsVerified": 36,
+    "consistentSharedSqliteBackupsVerified": true,
+    "fullColdProfileBackupFilesVerified": 418,
+    "guardedShutdowns": 2,
+    "exactOldProcessExitConfirmedByPidfd": true,
+    "installedEnsureRuntimeOpenerStarts": 2,
+    "sameNewOwnerPidsAfterWarmOpens": true,
+    "registryRevision": 12,
+    "originalMenuLocationsAndOwnedAssetBytesExact": true,
+    "mainConversationsPreserved": 1,
+    "pilotConversationsPreserved": 3,
+    "protectedOriginalAuthoritativePrefixesExact": 36,
+    "typedShutdownConnectionMetadataAppended": 8,
+    "typedNewConnectionMetadataAppended": 36,
+    "sharedPromptEntries": 12,
+    "capturedMemoryRecords": 19,
+    "sharedPromptMemoryEligibilityJobsSettingsAndEngineRowsExact": true,
+    "qwenUnitConfigurationAndPidUnchangedDuringAdoption": true,
+    "otherGpuAndVoiceServiceStatesAndPidsUnchanged": true,
+    "productionAndEarlierPreviewSelectionsUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "additionalRealProjectImports": 0,
+    "gui": [
+      {
+        "review": "main",
+        "overviewOn": true,
+        "overviewSwitchEnabled": true,
+        "keylessPanelVisible": true,
+        "apiPanelHidden": true,
+        "wikiOn": true,
+        "mcpServers": 5,
+        "mcpOn": 2,
+        "mcpOff": 3,
+        "appliedSessions": 1,
+        "loadedSessions": 1,
+        "settingsOrAgentActions": 0,
+        "privateProfileReads": 0,
+        "advancedClosed": true,
+        "technicalClosed": true,
+        "footerVisible": true,
+        "consoleErrors": 0,
+        "httpFailures": 0
+      },
+      {
+        "review": "pilot",
+        "overviewOn": true,
+        "overviewSwitchEnabled": true,
+        "keylessPanelVisible": true,
+        "apiPanelHidden": true,
+        "wikiOn": true,
+        "mcpServers": 5,
+        "mcpOn": 2,
+        "mcpOff": 3,
+        "appliedSessions": 1,
+        "loadedSessions": 1,
+        "settingsOrAgentActions": 0,
+        "privateProfileReads": 0,
+        "advancedClosed": true,
+        "technicalClosed": true,
+        "footerVisible": true,
+        "consoleErrors": 0,
+        "httpFailures": 0
+      }
+    ],
+    "finalSealedInputsVerified": 24689
   },
   "limits": [
     "This focused MCP/GUI/security/lifecycle cohort does not repeat the preceding 576 Node / 92 Python historical-import cohort",
     "No live external-account sign-in or owner credential mutation is part of synthetic UI qualification",
     "Shared browser code is exercised on MX Chromium; later OS artifacts and physical browser acceptance remain separate",
     "No additional real project migration before owner pilot feedback; voice and production Desktop remain deferred or unchanged"
-  ]
+  ],
+  "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+  "releaseId": "20261017-061143-d0c0fc29",
+  "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+  "publicationChecks": {
+    "privateBoundaryLicenceAndNoticeCasesPassed": 16,
+    "privateSourceIdentitiesChecked": 77,
+    "privateSourceIdentityMatches": 0
+  }
 }

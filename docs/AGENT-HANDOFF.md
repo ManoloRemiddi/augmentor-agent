@@ -4,11 +4,24 @@
 now groups On/Off, sign-in and reconnect, with advanced tool access/JSON and
 separate technical evidence. Both themes at 1280/640/420/320 widths pass footer,
 contrast, hit-area and focus checks. Inspection’s shared CSS and two missing
-transitive asset routes are fixed without exposing arbitrary files. Build/check
-and **129 Node / 41 Python** pass (36 files/nine Chromium, two workers/no skips);
-ordinary/sealed/actual adoption are tracked separately in the
-[qualification record](../release/harness-mcp-settings-qualification-20261017.json).
-The original GUI/overview remain; owner projects, voice and later OS are unchanged.
+transitive asset routes are fixed without exposing arbitrary files. Source,
+fresh ordinary and exact sealed each pass **129 Node / 41 Python** (36 files,
+nine Chromium cases, two workers/no skips); all **1,120 compiled files** match.
+
+Both actual MX reviews now run **b1edf4d2 / 20261017-061143-d0c0fc29** after guarded
+shutdown, verified shared/pre-shutdown/full cold backups (**418 regular files**)
+and installed-opener startup. All four conversations, 36 authoritative prefixes,
+12 prompts and 19 captured memory records remain; only typed connection metadata
+appends. Actual Plugins overview and new default detail panel pass in both owners
+with zero browser errors, private profile reads, settings or agent actions.
+Advanced/technical sections start collapsed and the footer stays visible. All
+**24,689 sealed inputs**, original menu assets/locations, Qwen/GPU/voice states
+and production/earlier Preview selections verify; registry revision twelve.
+[Exact evidence](../release/harness-mcp-settings-qualification-20261017.json).
+No further real migration; owner pilot feedback, physical use and later platforms
+remain separate. Voice stays deferred.
+
+### Preceding local-model identity checkpoint
 
 [Local model identity](HARNESS-LOCAL-MODEL-ROUTES.md) now refuses an inactive
 local profile before prompt dispatch and checks reported response IDs before SDK

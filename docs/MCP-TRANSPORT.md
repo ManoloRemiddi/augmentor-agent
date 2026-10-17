@@ -38,8 +38,29 @@ checks cover both themes at widths **1280/640/420/320**, visible footer, at leas
 plugin switches, empty-modal Escape, memory settings, local model guard and
 review/deployment lifecycle regressions are included.
 
+Source, fresh ordinary and exact sealed each pass that same **129 Node / 41
+Python** cohort. All **1,120 compiled files** match; **23,557 unchanged baseline
+inputs** verify in the ordinary copy. Exact application **b1edf4d2** in release
+**20261017-061143-d0c0fc29**, artifact
+`387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9`,
+verifies all **24,689 sealed inputs** after qualification and actual review use.
+
+Both owner reviews adopt it through atomic idle/queue shutdown guards, exact
+process-exit checks and the installed opener. Pre-shutdown protected copies,
+consistent shared SQLite backups and full cold archives verify **418 files**.
+Four conversations and all 36 authoritative prefixes remain. Eight close and
+36 new-connection typed metadata observations append; no old agent work replays.
+Twelve prompts, nineteen captured memory records and all shared eligibility,
+job/settings/engine rows remain exact. Both actual GUIs confirm the existing
+plugin switches, two On/three Off MCP connections, collapsed advanced/technical
+sections, empty private editor and visible footer. Opening these panels performs
+no private-profile read, setting/action submission or model request; console and
+HTTP error counts are zero. Registered menu locations/all existing owned assets
+are exact at revision twelve. Qwen configuration/PID, other GPU/voice services,
+production Desktop and earlier Preview selections remain unchanged.
+
 The [qualification record](../release/harness-mcp-settings-qualification-20261017.json)
-contains exact inputs and separate package/adoption status. The preceding broad
+contains exact inputs, package checks and actual adoption evidence. The preceding broad
 historical-import proof is inherited, not relabelled as rerun here. Actual owner
 account sign-in/credential changes, physical acceptance and later platforms remain
 separate. This does not transfer another real project; the pilot-feedback gate

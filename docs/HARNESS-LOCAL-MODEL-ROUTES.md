@@ -84,7 +84,7 @@ inputs** verify after qualification and subsequent running-review checks.
 
 Package/owner adoption status and exact tested input hashes are in the
 [qualification record](../release/harness-local-model-route-qualification-20261017.json).
-Both actual review profiles now run **e37d79b6 / 20261017-055628-b9afa698**,
+The guard was first adopted in **e37d79b6 / 20261017-055628-b9afa698**,
 artifact `6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477`.
 Guarded shutdown and the installed opener preserve four conversations and all
 36 authoritative file prefixes after verified shared SQLite and full cold
@@ -94,6 +94,11 @@ On/Off/switch checks in both owners with zero browser errors. Twelve prompts,
 nineteen captured memory records and all shared eligibility/job/settings rows
 remain exact. See [actual adoption](../release/harness-local-model-route-owner-review-20261017.json)
 for the caught menu-namespace correction, exact preservation and remaining scope.
+
+Both actual reviews now run the subsequent **b1edf4d2 /
+20261017-061143-d0c0fc29** Connected tools presentation update. The guard code is
+unchanged; its SDK/Host/worker/original-GUI cases are included in that update’s
+129-case focused cohort. See [current package/adoption evidence](../release/harness-mcp-settings-qualification-20261017.json).
 
 Open the current build with the existing **Augmentor Harness (MX)** menu entry
 or `augmentor-harness-review open main`; use `open pilot` for the migration pilot.
