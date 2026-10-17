@@ -58,7 +58,16 @@
   "applicationCopiesCreated": 0,
   "previousSealedCandidateDoesNotContainThisChange": true,
   "previousQualifiedReleaseId": "20261017-180443-c8315564",
-  "linuxSdkQualification": "New runtime pending; previous 39047120454 success covers earlier source only",
+  "linuxSdkQualification": {
+    "run": 39049376766,
+    "head": "e018c8c941db00fde6d9906996e00542eb4200ce",
+    "runtime": "b78996ebc0e06b1f0bb27e27231ee36cc3006196",
+    "statusObserved": "in_progress",
+    "conclusionUnproven": true,
+    "setupPreservationAndProfileGateStepsPassed": true,
+    "notAnUnchangedRuntimeRerun": true,
+    "previousSdk39047120454AppliesToEarlierSource": true
+  },
   "remaining": [
     "Full owner-store cold backups and explicit all-entrypoint inventory/adoption",
     "Controlled startup/preflight and matching-client selection/fence finalization orchestration",

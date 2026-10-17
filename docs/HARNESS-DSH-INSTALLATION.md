@@ -72,7 +72,9 @@ owner-profile execution, a full integration upgrade or matching-GUI acceptance.
 
 The owner main/pilot, all 36 protected file sets/PIDs, registry revision 18, shared
 rows/configuration, menus and model/GPU/voice services remain exact. New-runtime
-hosted qualification is pending; prior SDK 39047120454 success covers earlier code.
+[Linux SDK 39049376766](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39049376766)
+has passed its setup, preservation transaction and managed profile-gate steps; the
+overall run remains in progress. Prior SDK 39047120454 covers earlier code.
 Next integrate full cold-backup evidence, explicit entrypoint adoption, controlled
 backend startup/preflight and matching-client selection/fence finalization into
 one guarded operation, then qualify full installed activation/reverse and owner

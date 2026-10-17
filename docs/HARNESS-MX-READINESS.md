@@ -6,7 +6,8 @@ Real upstream DSH retains/releases its profile reader and refuses a pending fenc
 on an authored isolated profile. Apply/reverse survive per-file process death;
 completed config remains fenced pending client orchestration. No installed apply
 command, owner change or new app copy. Full backups, client selection/finalization
-and real owner acceptance remain; new-runtime CI pending.
+and real owner acceptance remain. Linux SDK 39049376766 has passed its changed
+preservation/profile-gate steps; the overall run is still in progress.
 [Record](../release/harness-dsh-configuration-transaction-20261017.json).
 
 [Immutable preservation candidate](HARNESS-DSH-INSTALLATION.md#immutable-preserved-integration-candidate--october-17)
