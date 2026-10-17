@@ -1418,3 +1418,64 @@ remain exact; their 24,615-input seal verifies. There is no owner restart/update
 additional real transfer or real model work. Further guarded adoption and owner
 pilot acceptance remain separate; other source formats/observation failures and
 voice/later OS rollout stay open.
+
+## Full migration readiness refresh — October 17
+
+A fresh scan of the complete current DSH catalogue uses the exact qualified,
+unselected **20261017-025154-ba9a5767 / 0a7b15f7** exporter/converter. Each project
+is exported alone into a private temporary v2 bundle, all object hashes/cuts and
+record counts are checked, and `prepareDshProject` validates it without an import
+destination or provider. Temporary exports are removed after each assessment;
+this is not the backup set for a later transfer.
+
+| Current result | Projects | Parent conversations |
+| --- | ---: | ---: |
+| Complete read-only preparation accepted | 23 | 64 |
+| DSH source reader refuses legacy descriptor v2 | 5 | 42 |
+| Original working folder unavailable | 1 | 1 |
+| Empty workspace, no conversations to move | 1 | 0 |
+| Total catalogue | 30 | 107 |
+
+Twenty-five complete exports succeed; twenty-three pass preparation. The accepted
+projects also contain **13 archived child logs**. Captured parent records total
+**63,217**, including the successfully exported missing-folder project. These
+counts supersede earlier partial/readiness snapshots, not their dated test runs.
+All 30 workspace entries, membership, pins and archive organization remain equal
+before/after the scan. There are no real imports, model requests or native target
+files. [Portable aggregate evidence](../release/harness-dsh-readiness-20261017.json)
+contains no private names, source IDs, paths or log content.
+
+The five source failures come from DSH's own v0 observation/migration layer,
+before Harness can obtain a complete export. Each observed refusal identifies
+an unsupported `subagent/descriptor` version 2. The 42 conversations are members
+of those five blocked projects; the scan does not establish that all 42 raw logs
+are unreadable. A representative compressed source was privately copied with
+stable-byte/hash checks, then only the first three record shapes inspected. It
+has a v0 header and a v2 descriptor. No normalization or edit of the source was
+attempted. Next investigate the public legacy producer/schema and preserve that
+source data through an offline path; do not silently drop a descriptor or change
+the working DSH installation to make the count pass.
+
+The missing-folder project exports successfully but cannot continue in its
+recorded working directory. The owner must identify the intended folder before
+transfer; do not create an empty substitute or infer a relocation. The empty
+workspace contains no conversations and is not a history-format refusal.
+
+Both actual review PIDs, complete path sets/hashes of all 36 protected regular
+files, registry and selected configurations remain exact; their 24,615-input
+running seal verifies. The assessed 24,644-input candidate verifies before and
+after the scan. Source/runtime/GUI and model settings are unchanged. The earlier
+**376 Node / 55 Python** source/ordinary/sealed qualification remains the code
+qualification; this data-only scan does not pretend to rerun it.
+
+Preparation acceptance does not prove each real conversation's provider/tool
+continuation or every archived-child behavior. Counts are a dated snapshot;
+fresh exports, complete backups, idle/cut revalidation and appropriate configured
+models are required at transfer. Owner pilot feedback still gates additional
+real projects, and guarded candidate adoption is separate. Continue MX testing
+first; voice and other OS rollout remain deferred.
+
+Publication checks pass sixteen private-source/licence/notice Python cases; an
+additional comparison verifies that actual private workspace identity strings
+are absent from the new public changes. Only aggregate evidence and owning
+documentation are published; runtime/artifact code remains unchanged.

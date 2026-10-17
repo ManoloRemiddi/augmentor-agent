@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Full DSH migration readiness](HARNESS-DSH-MIGRATION-PILOT.md#full-migration-readiness-refresh--october-17) · 30-project snapshot, accepted preparation, source-reader/folder blockers and transfer gates.
+
 [Recovery identities after DSH migration](HARNESS-DSH-MIGRATION-PILOT.md#recovery-identities-after-dsh-migration--october-17) · retained message IDs, verified current references and real preparation status.
 
 [Recorded tool argument errors](HARNESS-DSH-MIGRATION-PILOT.md#recorded-tool-argument-errors--october-17) · exact failed argument text, no replay, current qualification and remaining real-project refusal.

@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Full DSH readiness refresh](HARNESS-DSH-MIGRATION-PILOT.md#full-migration-readiness-refresh--october-17)
+checks all **30 projects / 107 parent conversations** against the qualified sealed
+converter: **23 projects / 64 conversations** pass preparation, with 13 archived
+child logs captured. Five projects/42 conversations are gated by DSH's legacy
+reader, one folder is unavailable, and one workspace is empty. No real transfer,
+model work or runtime/GUI update; both owners/all 36 protected files, registry,
+selections and seals remain exact. Pilot feedback/adoption gates remain.
+[Aggregate evidence](../release/harness-dsh-readiness-20261017.json).
+
 [Retained recovery identities](HARNESS-DSH-MIGRATION-PILOT.md#recovery-identities-after-dsh-migration--october-17)
 separate a synthetic message ID's ordinal from current event/citation coordinates,
 following public DSH migration behavior. The same frozen four-parent real export

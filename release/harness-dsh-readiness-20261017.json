@@ -1,0 +1,82 @@
+{
+  "schema": "augmentor-harness-dsh-readiness/1",
+  "date": "2026-10-17",
+  "scope": "Complete current workspace catalogue; one-at-a-time temporary segmented exports and exact sealed converter preparation; no destination/transfer/model work",
+  "applicationRef": "0a7b15f721b89c84e8433d335647621ef1a3027e",
+  "releaseId": "20261017-025154-ba9a5767",
+  "artifactSha256": "74f4fdcbd1311557d5c88d327ec97e273d0295599b83f1fb2fe7c10dc89f71d5",
+  "summary": {
+    "projects": 30,
+    "parentConversations": 107,
+    "exportsAccepted": 25,
+    "preparationAcceptedProjects": 23,
+    "preparationAcceptedConversations": 64,
+    "workspaceMembershipStable": true,
+    "imports": 0,
+    "modelRequests": 0,
+    "childInspectionQualifiedByThisScan": false,
+    "sealedInputsVerified": 24644
+  },
+  "categories": {
+    "working-folder-unavailable": {
+      "projects": 1,
+      "parentConversations": 1
+    },
+    "preparation-accepted": {
+      "projects": 23,
+      "parentConversations": 64
+    },
+    "source-legacy-descriptor-v2": {
+      "projects": 5,
+      "parentConversations": 42
+    },
+    "empty-workspace": {
+      "projects": 1,
+      "parentConversations": 0
+    }
+  },
+  "readyArchivedChildLogsCaptured": 13,
+  "capturedParentRecords": 63217,
+  "readOnlyRequestCounts": {
+    "workspace.list": 57,
+    "session.list": 55,
+    "session/follow": 323,
+    "session/page": 207
+  },
+  "exporterBytesSha256": "010b71c50504a04905b0d89afc150269f7670a603c8cb19aa92fd574416ed514",
+  "preparationCountsCutsAndObjectHashesVerified": true,
+  "temporaryExportsRetained": false,
+  "targetOrNativeDestinationCreated": false,
+  "runtimeOrGuiChanged": false,
+  "qualificationInheritedFrom": "harness-dsh-recovery-identity-qualification-20261017.json",
+  "qualificationRerunForThisDataOnlyScan": false,
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "protectedOwnerFilesExact": 36,
+    "completeProtectedRegularFileSetsAndHashesExact": true,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "assessedSealedInputsVerifiedBeforeAndAfter": 24644,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
+  },
+  "limits": [
+    "Read-only preparation, not owner acceptance or verified continuation of every real conversation",
+    "Counts are a dated snapshot; fresh export/backup/idle and model validation required for transfer",
+    "42 conversations belong to five blocked projects; this does not assert all 42 logs are unreadable",
+    "Captured archived child bodies are retained and checked as bundle members; this scan does not qualify every child renderer/behavior",
+    "Original missing folder is not recreated or substituted",
+    "No private workspace names, ids, paths, source-body hashes, logs or credentials published"
+  ],
+  "remaining": [
+    "Offline interpretation of legacy descriptor version 2 using private copies and public licensed contracts",
+    "Locate the unavailable working folder when the owner chooses its intended location",
+    "Owner pilot feedback and guarded candidate adoption before further transfers",
+    "Voice and later OS rollout deferred"
+  ],
+  "publicationChecks": {
+    "privateSourceLicenseAndNoticePythonPass": 16,
+    "workspaceIdentityStringsAbsentFromPublicChanges": true,
+    "runtimeQualificationRerun": false
+  }
+}
