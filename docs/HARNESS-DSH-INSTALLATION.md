@@ -97,6 +97,28 @@ immutable update and real owner continuation. Pilot feedback still gates more
 project transfers. Voice/later OS and the public Office distribution gate remain
 separate. [Record](../release/harness-dsh-backend-preflight-20261017.json).
 
+### Portable Python process handles — October 17 follow-up
+
+The executable-specific CI profile passes the namespace smoke on Linux SDK
+39054331001 (0acb8beb). Setup and the 27 preservation cases also pass. Its seven
+backend cases then fail five times because the standalone CPython 3.13.5 build
+omits `os.pidfd_open`; this is a terminal failed run, not a skipped qualification.
+The MX system interpreter exposes that function, explaining the earlier local
+success.
+
+The follow-up retains process-descriptor identity and signalling. It uses Python’s
+wrappers when available, otherwise the host libc’s named `pidfd_open` and
+`pidfd_send_signal` functions through ctypes. No numeric-PID signal fallback or
+architecture-specific syscall numbers are introduced. Both required operations
+are checked against the controller itself **before any actor starts**; absent
+facilities refuse with the startup fence retained. Two additional authored
+regressions force the libc path against the real namespace/detached child and
+verify refusal without spawning when both implementations are absent. There are
+now nine backend cases. Final MX source checks pass **126 Python / four Node**,
+including all nine, and the real upstream/candidate-adapter preflight passes again.
+The feature remains Linux-only; this CI change does not
+qualify Ubuntu distribution support or modify the owner’s MX system.
+
 ## Cold configuration journal and managed startup fence — October 17
 
 Source **b78996ebc0e06b1f0bb27e27231ee36cc3006196** adds the internal

@@ -52,7 +52,7 @@ class BackendProbeTests(PreservationTransactionFixture):
             with probes.backend_probe(self.backup,digest,guard,os.environ,self.base) as (handle,_):
                 self.ready(handle);self.assertTrue(handle.alive())
                 children=Path('/proc',str(handle.actor_pid),'task',str(handle.actor_pid),'children').read_text().split();self.assertEqual(len(children),1)
-                child_fd=os.pidfd_open(int(children[0]))
+                child_fd=probes.pidfd_open(int(children[0]))
                 try:
                     with self.assertRaisesRegex(ValueError,'managed client'):
                         with tx.shared.launch_lease(self.deployment,exclusive=True):pass
@@ -80,8 +80,8 @@ with tx.maintenance(home,data,[pair]) as guard:
         try:
             self.assertTrue(select.select([owner.stdout],[],[],8)[0]);identity=json.loads(owner.stdout.readline())
             children=Path('/proc',str(identity['actor']),'task',str(identity['actor']),'children').read_text().split();self.assertEqual(len(children),1)
-            fds=[os.pidfd_open(pid) for pid in (identity['actor'],int(children[0]))]
-            for fd in fds:signal.pidfd_send_signal(fd,signal.SIGSTOP)
+            fds=[probes.pidfd_open(pid) for pid in (identity['actor'],int(children[0]))]
+            for fd in fds:probes.pidfd_send_signal(fd,signal.SIGSTOP)
             owner.kill();owner.communicate(timeout=5)
             for fd in fds:self.assertTrue(select.select([fd],[],[],5)[0],'Namespace child survived its controller')
             deadline=time.monotonic()+5
@@ -107,6 +107,23 @@ with tx.maintenance(home,data,[pair]) as guard:
             self.write(self.cli/'lib/bin.js',b'AUTHORED CLI CHANGED')
             with self.assertRaisesRegex(ValueError,'supplier input changed'):
                 with probes.backend_probe(self.backup,digest,guard,os.environ,self.base):pass
+            tx.rollback(self.backup,digest,guard)
+        self.assert_before()
+
+    def test_missing_python_wrappers_use_host_libc_for_the_real_namespace(self):
+        # Standalone CPython can be built against headers lacking these APIs,
+        # even when the current Linux kernel/libc provide them.
+        with patch.object(os,'pidfd_open',None,create=True),patch.object(signal,'pidfd_send_signal',None,create=True):
+            self.test_controlled_namespace_keeps_gate_and_fence_then_reaps_detached_children()
+
+    def test_missing_pidfd_facility_refuses_before_creating_a_process(self):
+        with self.guard() as guard:
+            digest=self.applied(guard)
+            with patch.object(os,'pidfd_open',None,create=True),patch.object(probes.ctypes,'CDLL',return_value=object()),patch.object(probes.subprocess,'Popen') as spawn:
+                with self.assertRaisesRegex(ValueError,'requires Linux pidfd support'):
+                    with probes.backend_probe(self.backup,digest,guard,os.environ,self.base):pass
+                spawn.assert_not_called()
+            self.assertIsNone(guard.probe);self.assertTrue((self.home/tx.gate.FENCE).exists())
             tx.rollback(self.backup,digest,guard)
         self.assert_before()
 

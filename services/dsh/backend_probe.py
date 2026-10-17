@@ -6,6 +6,7 @@ This is lifetime isolation, not a filesystem/network permission boundary. Owner
 use still requires the outer cold backups and reviewed entrypoint/profile graph.
 """
 from contextlib import contextmanager
+import ctypes
 import hashlib
 import json
 import os
@@ -26,6 +27,38 @@ from .remote import Remote
 MAX_LOG=512*1024
 
 
+def libc_pidfd(name,arguments,types):
+    """Portable CPython builds may omit wrappers exposed by the host libc.
+
+    Use its named functions, never architecture-specific syscall numbers or
+    numeric-PID signalling. A missing facility refuses before actor startup.
+    """
+    function=getattr(ctypes.CDLL(None,use_errno=True),name,None)
+    if function is None:raise ValueError('Backend preflight requires Linux pidfd support in Python or the host libc.')
+    function.argtypes=types;function.restype=ctypes.c_int
+    result=function(*arguments)
+    if result<0:
+        error=ctypes.get_errno();raise OSError(error,os.strerror(error))
+    return result
+
+
+def pidfd_open(pid):
+    function=getattr(os,'pidfd_open',None)
+    return function(pid) if callable(function) else libc_pidfd('pidfd_open',(pid,0),(ctypes.c_int,ctypes.c_uint))
+
+
+def pidfd_send_signal(fd,value):
+    function=getattr(signal,'pidfd_send_signal',None)
+    if callable(function):return function(fd,value)
+    libc_pidfd('pidfd_send_signal',(fd,value,None,0),(ctypes.c_int,ctypes.c_int,ctypes.c_void_p,ctypes.c_uint))
+
+
+def require_pidfds():
+    fd=pidfd_open(os.getpid())
+    try:pidfd_send_signal(fd,0)
+    finally:os.close(fd)
+
+
 def namespace_command(command,cwd,launch_fd,info_fd=None):
     binary=shutil.which('bwrap')
     if binary is None:raise ValueError('Install the qualified Linux bubblewrap dependency before backend preflight.')
@@ -37,6 +70,7 @@ def namespace_command(command,cwd,launch_fd,info_fd=None):
 
 class BackendProbe:
     def __init__(self,command,environment,cwd,launch_fd,home,version,endpoint):
+        require_pidfds()  # Refuse unsupported interpreters/kernels before spawning.
         self.launch_fd=launch_fd
         self.home=home;self.version=version;self.endpoint=endpoint;self.closed=False
         self.buffer=b'';self.buffer_lock=threading.Lock();self.process=None;self.monitor_fd=None;self.actor_fd=None;self.thread=None
@@ -45,7 +79,7 @@ class BackendProbe:
             args=namespace_command(command,cwd,launch_fd,writer)
             self.process=subprocess.Popen(args,env=environment,stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
                                           pass_fds=(launch_fd,writer),start_new_session=True)
-            self.monitor_fd=os.pidfd_open(self.process.pid)
+            self.monitor_fd=pidfd_open(self.process.pid)
             self.thread=threading.Thread(target=self._drain,daemon=True);self.thread.start()
             os.close(writer);writer=None
             data=b'';deadline=time.monotonic()+5;identity=None
@@ -62,7 +96,7 @@ class BackendProbe:
             if type(pid) is not int or pid<=0 or os.readlink('/proc/'+str(pid)+'/ns/pid')==os.readlink('/proc/self/ns/pid'):
                 raise ValueError('Temporary backend has no distinct PID namespace identity.')
             path=Path('/proc')/str(pid)/'stat';before=path.read_text().rsplit(')',1)[1].split()
-            self.actor_fd=os.pidfd_open(pid);after=path.read_text().rsplit(')',1)[1].split()
+            self.actor_fd=pidfd_open(pid);after=path.read_text().rsplit(')',1)[1].split()
             if before[1]!=str(self.process.pid) or after[1]!=before[1] or after[19]!=before[19] or self.process.poll() is not None:
                 raise ValueError('Temporary backend process ownership changed.')
             self.actor_pid=pid
@@ -138,12 +172,12 @@ class BackendProbe:
         try:
             if self.process is not None:
                 if self.actor_fd is not None and not select.select([self.actor_fd],[],[],0)[0]:
-                    try:signal.pidfd_send_signal(self.actor_fd,signal.SIGTERM)
+                    try:pidfd_send_signal(self.actor_fd,signal.SIGTERM)
                     except ProcessLookupError:pass
                 try:self.process.wait(timeout=2)
                 except subprocess.TimeoutExpired:
                     if self.monitor_fd is None:self.process.kill()
-                    else:signal.pidfd_send_signal(self.monitor_fd,signal.SIGKILL)
+                    else:pidfd_send_signal(self.monitor_fd,signal.SIGKILL)
                     self.process.wait(timeout=5)
                 if self.actor_fd is not None and not select.select([self.actor_fd],[],[],5)[0]:
                     raise ValueError('Temporary backend teardown is unfinished; keep the update fenced.')
