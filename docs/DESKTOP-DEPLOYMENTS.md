@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Registered reviews and complete managed launch entrypoints](HARNESS-CLIENT-PUBLICATION.md#registered-reviews-and-complete-launch-entrypoints--october-18)
+now bind selected reviews to the same verified artifact/common store with exact
+registry/opener reverse and crash recovery. Home reads selection under the gate;
+explicit legacy Browser/mobile alias adoption retains arguments, environment and
+selected Node PATH, and carries reviewed before-hashes into preparation.
+Publication schema **3**, local **144 Python / 17 Node** pass (authored isolated
+profiles; synthetic health replies). No full app copy, owner migration or installed
+change. Actual bootstrap pre-adoption, one combined immutable qualification,
+matching loaded Browser and the fresh three-pair owner cut remain.
+[Record](../release/harness-launcher-publication-20261018.json).
+
+
 [Cold data archive and current-cut binding](HARNESS-DSH-INSTALLATION.md#cold-data-archive-and-current-cut-binding--october-17)
 adds **a0f1f16d**. Source **143 Python / four Node** pass, including ten archive cases.
 Real public-profile archive/offline restore and backend/Native-adapter checks pass

@@ -116,6 +116,18 @@ with p.maintenance(home,data,pairs,[other]) as guard:
 
 
 class ClientPublicationTests(ClientPublicationFixture):
+    def test_planned_bootstrap_hash_must_still_match_at_publication_preparation(self):
+        original=self.existing.read_bytes();expected=tx.preserve.sha(original)
+        with self.full_guard() as guard:
+            backup=archives.capture(self.archive,guard.configuration,[{'id':'other','path':str(self.other),'members':['desktop.json','desktop.previous.json']}])
+            cfg=tx.prepare(self.output,self.stage_sha,self.backup,self.artifact,guard.configuration,cold_backup={'root':str(self.archive),'sha256':backup['backupSha256']})
+            self.existing.write_bytes(b'AUTHORED NEW ALIAS EDIT KEEP')
+            with self.assertRaisesRegex(ValueError,'planned bootstrap before-image changed'):
+                publication.prepare(self.backup,cfg['transactionSha256'],self.publication,guard,self.bootstrap,bootstrap_expectations={self.existing:expected})
+            self.assertEqual(self.existing.read_bytes(),b'AUTHORED NEW ALIAS EDIT KEEP');self.assertFalse(self.publication.exists())
+            self.existing.write_bytes(original);tx.rollback(self.backup,cfg['transactionSha256'],guard.configuration)
+        self.assert_original()
+
     def test_reviewed_home_launcher_helper_can_be_updated_and_reversed(self):
         home_helper=self.deployment/'home-launch.py'
         self.write(home_helper,b'# AUTHORED EXISTING HOME HELPER\n')

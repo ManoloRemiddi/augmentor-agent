@@ -121,6 +121,56 @@ def registry_read(root):
     if value.get('schema')!=SCHEMA or type(value.get('revision')) is not int or value['revision']<0 or not isinstance(value.get('entries'),dict) or len(value['entries'])>16 or not isinstance(value.get('ownedFiles'),dict):raise ValueError('Unsupported review registry. Preserve its backup.')
     return value
 
+
+def registry_plan(root,selected,shared_pair,names,expected_revision,opener,launch_data):
+    """Pure cold-publication renderer; no owner, registration or file mutation.
+
+    The controller supplies its verified immutable deployment and opener bytes,
+    holds this registry lock, and binds every previous shared pair to adoption.
+    Configuration/state/socket/workspace, model routes, titles and menus remain.
+    """
+    root=directory(root);old=registry_read(root)
+    if type(expected_revision) is not int or old['revision']!=expected_revision:
+        raise ValueError('Review registration changed; preserve it and prepare its current revision.')
+    if (not isinstance(names,(list,tuple)) or not names or len(names)>16 or
+            any(not isinstance(n,str) or n not in old['entries'] for n in names) or len(set(names))!=len(names)):
+        raise ValueError('Choose explicit existing reviews for common-store adoption.')
+    if not isinstance(selected,dict) or not isinstance(selected.get('root'),str):
+        raise ValueError('Supply the verified immutable review deployment.')
+    if not isinstance(shared_pair,dict) or set(shared_pair)!={'state','data'}:
+        raise ValueError('Use the canonical shared state/data pair.')
+    for path in shared_pair.values():directory(path)
+    launch_data=directory(launch_data)
+    if not isinstance(opener,bytes) or not opener or len(opener)>2*1024**2:
+        raise ValueError('Use bounded opener bytes from the verified artifact.')
+    binary=canonical(str(Path.home()/'.local/bin/augmentor-harness-review'));directory(binary.parent,private=False)
+    # The existing opener must still be the registered owned file. The ordinary
+    # installer is the pre-adoption path; this renderer never steals an alias.
+    fd=os.open(binary,os.O_RDONLY|os.O_NOFOLLOW|os.O_NONBLOCK)
+    try:
+        info=os.fstat(fd)
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid!=os.getuid() or info.st_nlink!=1 or
+                info.st_mode&0o7022 or info.st_size>2*1024**2):
+            raise ValueError('The existing review opener is not a protected owned regular file.')
+        raw=os.read(fd,2*1024**2+1)
+        after=os.fstat(fd)
+        current=binary.lstat()
+        stamp=lambda s:(s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns,s.st_ctime_ns,s.st_mode)
+        if len(raw)!=info.st_size or stamp(info)!=stamp(after) or stamp(info)!=stamp(current):
+            raise ValueError('The existing review opener changed during planning.')
+    finally:os.close(fd)
+    if old['ownedFiles'].get(str(binary))!=digest(raw):raise ValueError('The review opener was edited or is unowned; preserve it.')
+    new=json.loads(json.dumps(old));new['revision']+=1;previous={}
+    for name in names:
+        original=old['entries'][name]['profile'];profile_record(original)
+        previous[name]={'state':original['sharedState'],'data':original['sharedData']}
+        profile=dict(original,sharedState=shared_pair['state'],sharedData=shared_pair['data']);profile_record(profile)
+        new['entries'][name].update(deployment=dict(selected),profile=profile,launchData=str(launch_data))
+    new['ownedFiles'][str(binary)]=digest(opener)
+    return {'files':[(root/'reviews.json',(json.dumps(new,indent=2)+'\n').encode(),0o600),(binary,opener,0o700)],
+            'previousPairs':previous,'revisionBefore':old['revision'],'revisionAfter':new['revision'],
+            'openerBeforeSha256':digest(raw),'openerBeforeMode':stat.S_IMODE(info.st_mode)}
+
 def live_profile(profile):
     found=[]
     for proc in Path('/proc').iterdir():

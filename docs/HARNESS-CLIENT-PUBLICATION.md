@@ -4,13 +4,13 @@
 
 `services/dsh/client_publication.py` connects a verified cold archive to the
 configuration, startup files and matching build selections. It is an internal
-Linux API. Version 2 can bind [component-only shared-data adoption](HARNESS-SHARED-DATA-ADOPTION.md). It does not discover or stop owner processes, install a Browser
+Linux API. Version 3 binds selected review registrations and can bind [component-only shared-data adoption](HARNESS-SHARED-DATA-ADOPTION.md). It does not discover or stop owner processes, install a Browser
 extension, restart ordinary clients or establish owner acceptance. The installed main/pilot and Native app have not been updated by
 this source checkpoint.
 
 ## Prepare one reviewed cut
 
-Client publication **schema 2** now owns a bound shared-data journal as well as
+Client publication **schema 3** now owns a bound shared-data journal as well as
 configuration schema 3. Cold archive schema 2 records explicit partial secondary
 sources. A shared-pair switch requires its source in the adoption receipt; legacy
 additional selectors need their actual `previous_pairs`. The primary canonical
@@ -57,7 +57,8 @@ managed deployment location. Non-deployment standalone reviews remain standalone
 Running SDK/shared owners still use their existing data leases; this opener
 reader closes the startup gap and is not their lifetime ownership mechanism.
 
-Use `client_publication.maintenance(home, primary_data, pairs, additional_data)`
+Use `client_publication.maintenance(home, primary_data, pairs, additional_data,
+review_registry=registry_root)` when including registered reviews
 only after all real callers are idle and stopped. It holds the declared deployment
 writers plus the existing DSH and shared-store cold gates. Current process/launcher
 maps are advisory; they cannot authorize a later cut. Preserve the current service
@@ -155,9 +156,73 @@ including all 22 publication cases and actual registered-review reopening.
 
 The real bootstrap review found a legacy preview opener whose full-record
 comparison prevented mutable shared selection. The source correction above still
-needs adoption before switching that selection. Direct Browser/mobile launchers and the
-stable Home helper still need exact adoption review. Preserve separately selected
+needs adoption before switching that selection. Direct Browser/mobile aliases and the
+stable Home helper now have reviewed source adoption paths below; actual installed
+pre-adoption is still required. Preserve separately selected
 companion suppliers and the current interpreter contract. The approved Native/
 Harness prompt/capture merge or target receipt must be bound before a real store
 switch. The source layer now binds that exact component merge; real owner adoption
 and the complete three-pair launcher graph are still unperformed.
+
+
+## Registered reviews and complete launch entrypoints — October 18
+
+Schema **3** binds the registry root and its lock to preparation and recovery.
+Hold `review_registry=...` with the same declared deployment/shared-store guards.
+The lock is acquired before deployment readers/writers, matching the ordinary
+review CLI. Archive the exact `reviews.json` bytes and mode as named cold coverage.
+Use `prepare(..., reviews={"revision": expected_revision, "names": [...]})` to
+choose existing reviews explicitly. Unknown, duplicate or stale registrations
+refuse before publication.
+
+The pure `harness-review.registry_plan` preserves each review's config, state,
+socket, runtime, workspace, session, provider routing, title, menus and additional
+metadata. Only its immutable deployment record, explicit common shared pair and
+managed `launchData` change. The deployment comes from the verified artifact
+manifest, not the mutable desktop selection. `launchData` identifies the primary
+managed deployment directory, so review startup observes the same durable fence.
+Each prior review shared pair must already be guarded and, when changing, included
+in the same adoption receipt. The owned opener is supplied by the verified
+artifact. Foreign/unowned opener edits refuse. Registry/opener bytes and modes
+participate in ordinary publication CAS, crash recovery and exact reverse; icon
+and menu ownership entries and unrelated reviews remain unchanged.
+
+The registry lock alone is not a persistent startup fence after process death.
+Pre-adopt gate-aware review/preview/stable helpers before the actual cold interval.
+The source API does not perform that owner step or stop running clients. Older
+publication journals require their matching qualified operator; never edit their
+schema or drive them through this schema-3 implementation.
+
+The startup renderer now includes the gated Home helper after its Desktop helper.
+Home acquires the shared deployment reader before reading the selection, preserves
+the recorded Python/arguments/environment and applies an explicitly selected
+shared pair. The NAS supplier, Home dashboard/UI and model authority are unchanged.
+The mobile path preserves the selected Node directory at the head of inherited
+PATH because its web bridge invokes `node` by name.
+
+`startup_plan(..., adopt_aliases={name: before_sha_or_null})` optionally renders
+only the explicitly reviewed `augmentor-mobile` and `augmentor-browser-host`
+legacy aliases through stable managed helpers. Defaults do not adopt these aliases.
+A changed before-hash refuses. Pass the renderer's `expectations` into
+`client_publication.prepare(..., bootstrap_expectations=plan['expectations'])` to
+bind those alias/native-host checks to actual preparation. Only intended output
+paths and valid before-hashes are accepted. A later edit is preserved rather than
+silently becoming the new before-image. Render and review the complete current
+real graph before any installation; a legacy command may have owner customizations.
+
+Local **144 Python / 17 Node** pass with no failures/skips. Twelve registry cases
+cover exact paired rebind/reverse, no-owner rendering, archive/source/ownership
+requirements, contention, late edits, lock-bound recovery and real child exit
+after each registry/opener forward and reverse write. The 24 publication, 21
+shared-data, 20 shared-launch and six Home cases overlap this total. Actual
+installed-alias subprocess fixtures verify arguments, environment, selected Node
+PATH and pending-fence refusal before either fake application starts. The host is
+read-only, network isolated and real managed reserve 64 GiB; profiles/model replies
+are authored. No owner model request, installed change, data migration, full app
+copy or new candidate was made for these source checks.
+[Qualification record](../release/harness-launcher-publication-20261018.json).
+
+The preceding [SDK 39072231157](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39072231157)
+completed with **Linux success** at fixture ref `24bee26f`; the whole matrix was
+**cancelled** (Mac/Windows cancelled), cause unqualified. This is historical Linux
+evidence, not a hosted pass for the changes above or whole-platform approval.

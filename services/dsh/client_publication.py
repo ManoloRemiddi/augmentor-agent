@@ -12,6 +12,7 @@ required. Missing/foreign recovery bytes are never guessed or overwritten.
 """
 from contextlib import contextmanager, ExitStack
 import os
+import re
 from pathlib import Path
 import stat
 import sys
@@ -21,23 +22,25 @@ from . import cold_backup as archives
 from . import backend_probe as probes
 from . import shared_data_adoption as shared_data
 
-SCHEMA='augmentor-dsh-client-publication/2'
+SCHEMA='augmentor-dsh-client-publication/3'
 MAX_FILES=128
 MAX_BYTES=64*1024**2
 BOOTSTRAP_NAMES=frozenset(('shared-launch-profile.py','desktop-browser-launch.py','desktop-dsh-launch.py',
     'dsh-profile-gate.py','embed-launch.py','desktop-launch.py','desktop-deployment.py','home-launch.py','autostart.py'))
 startup=tx.load('publication_startup_files',tx.ROOT/'scripts/install-desktop-startup.py') if sys.platform=='linux' else None
+review=tx.load('publication_review_registry',tx.ROOT/'scripts/harness-review.py') if sys.platform=='linux' else None
 
 
 class _Guard:
-    def __init__(self,configuration,deployments):
+    def __init__(self,configuration,deployments,registry_root=None):
         self.configuration=configuration
         self.deployments=deployments
         self.qualified=None
+        self.registry_root=registry_root
 
 
 @contextmanager
-def maintenance(home,data,pairs,additional_deployments=(),*,partial_pairs=()):
+def maintenance(home,data,pairs,additional_deployments=(),*,partial_pairs=(),review_registry=None):
     """All declared managed entrypoints share one cold configuration interval."""
     if sys.platform!='linux':raise ValueError('Client publication is qualified only on Linux.')
     data=Path(data)
@@ -50,11 +53,15 @@ def maintenance(home,data,pairs,additional_deployments=(),*,partial_pairs=()):
     if any(a!=b and (a.is_relative_to(b) or b.is_relative_to(a)) for a in roots for b in roots):
         raise ValueError('Deployment roots cannot overlap.')
     with ExitStack() as stack:
+        registry_root=None if review_registry is None else tx.private_directory(Path(review_registry))
+        # The normal review CLI takes this lock before its deployment reader.
+        # Keep the same ordering and exclude registration edits through release.
+        if registry_root is not None:stack.enter_context(review.registry_lock(registry_root))
         for root in sorted(additional):
             stack.enter_context(tx.shared.launch_lease(root,exclusive=True,preservation_recovery=True))
         configuration=stack.enter_context(tx.maintenance(home,data,pairs,partial_pairs=partial_pairs))
         selections={str(root):tx.preserve.read(root/'desktop.json',private=True) for root in roots}
-        yield _Guard(configuration,selections)
+        yield _Guard(configuration,selections,registry_root)
 
 
 def require(guard):
@@ -141,6 +148,8 @@ def inspect(output,digest,guard):
     value=tx.preserve.document(raw)
     if value.get('schema')!=SCHEMA or value.get('deployments')!=list(guard.deployments):
         raise ValueError('Hold the exact declared deployment guards.')
+    if value.get('reviewRegistry') is not None and value['reviewRegistry']['root']!=str(guard.registry_root):
+        raise ValueError('Hold the exact bound review registry lock through publication recovery.')
     rows=value.get('files')
     if (not isinstance(rows,list) or not 1<=len(rows)<=MAX_FILES or
             [r.get('index') for r in rows]!=list(range(len(rows))) or
@@ -228,7 +237,7 @@ def adoption(value,guard):
     return record,status
 
 
-def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),target_pair=None,*,shared_adoption=None,previous_pairs=None):
+def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),target_pair=None,*,shared_adoption=None,previous_pairs=None,reviews=None,bootstrap_expectations=None):
     """Bind immutable client bytes to an already cold-backed, prepared config cut.
 
     bootstrap is an exact operator-reviewed list of (path, bytes, ordinary mode).
@@ -287,8 +296,26 @@ def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),targe
         selected=selections[root]
         writes.extend([(Path(root)/'desktop.previous.json',raw,0o600,True),
                        (path,tx.encoded(selected),0o600,True)])
+    registry_record=None;registry_files=[]
+    if reviews is not None:
+        if (guard.registry_root is None or not isinstance(reviews,dict) or set(reviews)!={'revision','names'}):
+            raise ValueError('Hold the review registry lock and select its exact revision/named reviews.')
+        registry_path=guard.registry_root/'reviews.json';original_registry=snapshot(registry_path)
+        if original_registry is None or hashes.get(str(registry_path))!=(tx.preserve.sha(original_registry[0]),original_registry[1]):
+            raise ValueError('The bound cold archive must contain the exact review registry.')
+        opener=tx.preserve.read(Path(cfg['incoming'])/'scripts/harness-review.py')
+        rendered=review.registry_plan(guard.registry_root,release['deployment'],pair,reviews['names'],reviews['revision'],opener,base.data)
+        for previous in rendered['previousPairs'].values():
+            if previous not in base.pairs or previous!=pair and (linked is None or previous not in linked[0]['sources']):
+                raise ValueError('Bind every review previous shared pair to the same guarded data adoption.')
+        binary=rendered['files'][1][0];before_opener=snapshot(binary)
+        if before_opener is None or (tx.preserve.sha(before_opener[0]),before_opener[1])!=(rendered['openerBeforeSha256'],rendered['openerBeforeMode']):
+            raise ValueError('The owned review opener changed during planning; preserve it.')
+        registry_record={'root':str(guard.registry_root),'revisionBefore':rendered['revisionBefore'],
+                         'revisionAfter':rendered['revisionAfter'],'previousPairs':rendered['previousPairs'],'targetPair':pair}
+        registry_files=rendered['files']
     if not isinstance(bootstrap,(list,tuple)):raise ValueError('Use explicit reviewed bootstrap files.')
-    for entry in bootstrap:
+    for entry in [*bootstrap,*registry_files]:
         if not isinstance(entry,(list,tuple)) or len(entry)!=3:raise ValueError('Use path, bytes and mode for each bootstrap file.')
         path,raw,mode=entry;path=Path(path)
         helper=any(path.parent==Path(root) and path.name in BOOTSTRAP_NAMES for root in guard.deployments)
@@ -298,11 +325,19 @@ def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),targe
         writes.append((path,raw,mode,False))
     if not 1<=len(writes)<=MAX_FILES or len({p for p,_,_,_ in writes})!=len(writes):
         raise ValueError('Bootstrap/selector paths must be unique and bounded.')
+    bootstrap_expectations={} if bootstrap_expectations is None else bootstrap_expectations
+    if not isinstance(bootstrap_expectations,dict):raise ValueError('Use explicit planned bootstrap before-hashes.')
+    expectations={str(Path(p)):h for p,h in bootstrap_expectations.items()}
+    if len(expectations)!=len(bootstrap_expectations) or set(expectations)-{str(p) for p,_,_,_ in writes} or any(h is not None and (not isinstance(h,str) or not re.fullmatch('[a-f0-9]{64}',h)) for h in expectations.values()):
+        raise ValueError('Bind exact before-hashes only for this publication inventory.')
     images=[];total=0
     for path,raw,mode,selector in writes:
         if not isinstance(raw,bytes) or len(raw)>4*1024**2 or type(mode) is not int or mode not in (0o600,0o644,0o700,0o755):
             raise ValueError('Bootstrap images must be bounded bytes with ordinary protected modes.')
-        before=snapshot(path);total+=len(raw)+(len(before[0]) if before else 0)
+        before=snapshot(path)
+        if str(path) in expectations and (tx.preserve.sha(before[0]) if before else None)!=expectations[str(path)]:
+            raise ValueError('A planned bootstrap before-image changed; preserve it and prepare a fresh plan.')
+        total+=len(raw)+(len(before[0]) if before else 0)
         if total>MAX_BYTES:raise ValueError('Client backup bytes exceed their bound.')
         images.append((path,before,(raw,mode),selector))
     archives.reserve(output.parent,planned=total)
@@ -321,6 +356,8 @@ def prepare(configuration_root,configuration_sha,output,guard,bootstrap=(),targe
            'originalSelectionSha256':cfg['selectionSha256'],'coldBackup':cfg['coldBackup'],
            'incoming':cfg['incoming'],'artifactSha256':cfg['artifactSha256'],
            'deployments':list(guard.deployments),'files':rows,'sharedAdoption':shared_adoption,
+           'reviewRegistry':registry_record,
+           'bootstrapExpectations':expectations,
            'previousPairs':{root:tx.preserve.document(raw).get('sharedProfile') or previous_pairs.get(root,base.pairs[0]) for root,raw in guard.deployments.items()}}
     raw=tx.encoded(value);digest=tx.preserve.sha(raw)
     tx.atomic(output/'publication.json',raw,exclusive=True)

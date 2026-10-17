@@ -105,7 +105,11 @@ def _main(args):
     if args[:1]==['--mobile']:
         config=configuration();script=Path(config['root'])/'apps/mobile/start.py'
         if not script.is_file():raise RuntimeError('The selected deployment has no mobile supervisor.')
-        os.execve(config['python'],[config['python'],'-B',str(script),*args[1:]],launch_environment(config));return 0
+        env=launch_environment(config)
+        # The supervisor's web bridge invokes `node` by name. Preserve the
+        # original stable mobile wrapper's recorded-interpreter PATH contract.
+        env['PATH']=str(Path(config['node']).parent)+os.pathsep+env.get('PATH','')
+        os.execve(config['python'],[config['python'],'-B',str(script),*args[1:]],env);return 0
     if args == ['--autostart']:
         start_service(); return 0
     if args in (['--recover'], ['--recover-window']):

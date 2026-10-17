@@ -42,10 +42,14 @@ class SharedLaunchTests(unittest.TestCase):
         lifetime=source/'services/lifecycle/lease.py';lifetime.parent.mkdir(parents=True)
         lifetime.write_text('# Independently authored preflight fixture\ndef hold(_kind): pass\n')
         (source/'release').mkdir();(source/'release/product.json').write_text('{"version":"authored"}')
-        mobile=source/'apps/mobile/start.py';mobile.parent.mkdir(parents=True);mobile.write_text('# Independently authored supervisor\n')
+        mobile=source/'apps/mobile/start.py';mobile.parent.mkdir(parents=True)
+        mobile.write_text("# Independently authored supervisor\nimport os,json,sys,shutil\nprint(json.dumps({'argv':sys.argv[1:],'node':shutil.which('node'),'shared':os.environ.get('AUGMENTOR_SHARED_DATA'),'voice':os.environ.get('AUTHORED_VOICE_KEEP')}))\n")
         manifest=source/'apps/browser/extension/manifest.json';manifest.parent.mkdir(parents=True);manifest.write_text('{"key":"YXV0aG9yZWQta2V5"}')
         server=source/'apps/browser/embed/server.mjs';server.parent.mkdir(parents=True);server.write_text('// Independently authored embedding marker\n')
-        for name in ('shared-launch-profile.py','desktop-launch.py','desktop-browser-launch.py','desktop-dsh-launch.py','dsh-profile-gate.py','embed-launch.py'):
+        host=source/'apps/browser/native-host.mjs'
+        host.write_text("// Independently authored native peer\nconsole.log(JSON.stringify({argv:process.argv.slice(2),shared:process.env.AUGMENTOR_SHARED_DATA,state:process.env.AUGMENTOR_SHARED_STATE,telemetry:process.env.PI_TELEMETRY,options:process.env.NODE_OPTIONS??null}));\n")
+        (native/'home_tray.py').write_text('# Independently authored Home entry\n')
+        for name in ('shared-launch-profile.py','desktop-launch.py','desktop-browser-launch.py','desktop-dsh-launch.py','dsh-profile-gate.py','embed-launch.py','home-launch.py'):
             path=source/'scripts'/name;path.parent.mkdir(exist_ok=True);shutil.copy2(ROOT/'scripts'/name,path)
         (source/'scripts/app-sdk-launch.py').write_text('# Independently authored SDK adapter marker\n')
         for name in ('companion_import.py','memory/dual.py'):
@@ -73,6 +77,68 @@ class SharedLaunchTests(unittest.TestCase):
                 self.assertEqual(env['AUGMENTOR_SHARED_STATE'],self.after['state']);self.assertEqual(env['AUGMENTOR_SHARED_DATA'],self.after['data'])
                 self.assertEqual(env['RESONANT_VOICE_HOME'],'/authored/unchanged-speech');self.assertEqual(env['AUGMENTOR_PYTHON'],sys.executable)
                 self.assertEqual(env['AUGMENTOR_PI_NODE'],self.selection['node']);self.assertEqual(env['PI_TELEMETRY'],'0')
+                if args[0]=='--mobile':
+                    self.assertEqual(env['PATH'].split(os.pathsep)[0],str(Path(self.selection['node']).parent))
+                    self.assertEqual(env['PATH'].split(os.pathsep,1)[1],os.environ.get('PATH',''))
+
+    def test_home_gate_preserves_arguments_environment_and_selected_shared_pair(self):
+        selected={**self.selection,'sharedProfile':self.after};self.deploy.atomic(self.deploy.DATA/'desktop.json',selected)
+        home=load('authored_managed_home',ROOT/'scripts/home-launch.py')
+        with patch.dict(os.environ,{'RESONANT_VOICE_HOME':'/authored/keep-voice','AUTHORED_HOME_OPTION':'keep'}),patch.object(home.os,'execve') as execute:
+            home.main(['--background'])
+        command=execute.call_args.args
+        self.assertEqual(command[0],selected['python']);self.assertEqual(command[1][-3:],['-m','augmentor_linux.home_tray','--background'])
+        self.assertEqual(command[2]['AUGMENTOR_SHARED_STATE'],self.after['state']);self.assertEqual(command[2]['AUGMENTOR_SHARED_DATA'],self.after['data'])
+        self.assertEqual(command[2]['RESONANT_VOICE_HOME'],'/authored/keep-voice');self.assertEqual(command[2]['AUTHORED_HOME_OPTION'],'keep')
+        self.assertEqual(command[2]['PYTHONPATH'],str(Path(selected['root'])/'apps/native'))
+        (self.deploy.DATA/'dsh-preservation.json').write_text('AUTHORED PENDING')
+        with patch.object(home,'run') as run:
+            with self.assertRaisesRegex(ValueError,'requires recovery'):home.main(['--background'])
+        run.assert_not_called()
+
+    def test_explicit_legacy_alias_adoption_uses_stable_gated_helpers(self):
+        startup=load('authored_alias_startup',ROOT/'scripts/install-desktop-startup.py')
+        binary=self.home/'.local/bin';binary.mkdir(parents=True,mode=0o700)
+        aliases={}
+        for name in ('augmentor-mobile','augmentor-browser-host'):
+            path=binary/name;path.write_text('# AUTHORED OLD '+name+'\n');path.chmod(0o700);aliases[name]=hashlib.sha256(path.read_bytes()).hexdigest()
+        before={p:p.read_bytes() for p in binary.iterdir()}
+        plan=startup.startup_plan(self.release,self.selection['python'],self.selection['node'],adopt_aliases=aliases)
+        self.assertEqual({p:p.read_bytes() for p in binary.iterdir()},before)
+        self.assertEqual(plan['files'][binary/'augmentor-mobile'],plan['files'][binary/'augmentor-mobile-managed'])
+        self.assertIn(str(self.deploy.DATA/'desktop-browser-launch.py'),plan['files'][binary/'augmentor-browser-host'])
+        self.assertTrue(all(plan['expectations'][binary/n]==h for n,h in aliases.items()))
+        self.assertIn(self.deploy.DATA/'home-launch.py',plan['files'])
+        ordinary=startup.startup_plan(self.release,self.selection['python'],self.selection['node'])
+        self.assertNotIn(binary/'augmentor-mobile',ordinary['files']);self.assertNotIn(binary/'augmentor-browser-host',ordinary['files'])
+
+    def test_legacy_alias_hashes_refuse_foreign_edits_before_any_install(self):
+        startup=load('authored_stale_alias_startup',ROOT/'scripts/install-desktop-startup.py')
+        binary=self.home/'.local/bin';binary.mkdir(parents=True,mode=0o700)
+        path=binary/'augmentor-mobile';path.write_text('AUTHORED CURRENT KEEP');path.chmod(0o700)
+        with self.assertRaisesRegex(ValueError,'alias changed'):
+            startup.startup_plan(self.release,self.selection['python'],self.selection['node'],adopt_aliases={'augmentor-mobile':'0'*64})
+        self.assertEqual(path.read_text(),'AUTHORED CURRENT KEEP')
+        with self.assertRaisesRegex(ValueError,'only explicitly reviewed'):
+            startup.startup_plan(self.release,self.selection['python'],self.selection['node'],adopt_aliases={'augmentor-stack':None})
+
+    def test_actual_legacy_aliases_keep_arguments_node_path_and_refuse_a_pending_cut(self):
+        startup=load('authored_real_alias_startup',ROOT/'scripts/install-desktop-startup.py')
+        selected={**self.selection,'sharedProfile':self.after};self.deploy.atomic(self.deploy.DATA/'desktop.json',selected)
+        startup.install(self.release,selected['python'],selected['node'],enable=False,
+                        adopt_aliases={'augmentor-mobile':None,'augmentor-browser-host':None})
+        binary=self.home/'.local/bin'
+        env={**os.environ,'AUTHORED_VOICE_KEEP':'keep','NODE_OPTIONS':'--require /authored-never-load','NODE_PATH':'/authored-never-load'}
+        run=subprocess.run([str(binary/'augmentor-browser-host'),'chrome-extension://authored/','--authored'],env=env,capture_output=True,text=True,check=True)
+        value=json.loads(run.stdout);self.assertEqual(value['argv'],['chrome-extension://authored/','--authored'])
+        self.assertEqual(value['shared'],self.after['data']);self.assertEqual(value['state'],self.after['state']);self.assertEqual(value['telemetry'],'0');self.assertIsNone(value['options'])
+        run=subprocess.run([str(binary/'augmentor-mobile'),'--origin','https://authored.invalid','--preview'],env=env,capture_output=True,text=True,check=True)
+        value=json.loads(run.stdout);self.assertEqual(value['argv'],['--origin','https://authored.invalid','--preview'])
+        self.assertEqual(value['node'],selected['node']);self.assertEqual(value['shared'],self.after['data']);self.assertEqual(value['voice'],'keep')
+        (self.deploy.DATA/'dsh-preservation.json').write_text('AUTHORED PENDING CUT')
+        for name in ('augmentor-mobile','augmentor-browser-host'):
+            run=subprocess.run([str(binary/name)],env=env,capture_output=True,text=True)
+            self.assertNotEqual(run.returncode,0);self.assertEqual(run.stdout,'');self.assertIn('requires recovery',run.stderr)
 
     def test_embedding_rechecks_selected_pair_and_preserves_sdk_adapter_and_clean_node_environment(self):
         selected={**self.selection,'sharedProfile':self.after};self.deploy.atomic(self.deploy.DATA/'desktop.json',selected)

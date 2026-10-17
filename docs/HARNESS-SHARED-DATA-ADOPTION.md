@@ -46,6 +46,8 @@ Prepare in this order under the same cold guard:
 4. Prepare client publication with `shared_adoption={root, sha256}`. A deployment
    changing shared pairs must have its previous source in this bound adoption.
    Legacy additional selectors without `sharedProfile` require `previous_pairs`.
+   Registered reviews additionally require their exact cold registry coverage,
+   lock/revision/names and prior source pairs; see [schema-3 publication](HARNESS-CLIENT-PUBLICATION.md#registered-reviews-and-complete-launch-entrypoints--october-18).
 
 Use protected, persistent recovery storage on the target filesystem for actual
 owner images; never disposable build scratch. Authored test profiles use the
@@ -66,7 +68,7 @@ engine files, merge receipts and the canonical root's device/inode. Source
 inventory hashes agree with the existing runtime `stateInventory`, including
 UTF-16 filename ordering, Unicode and nested history.
 
-Client publication **schema 2** owns both configuration and data journals. The
+Client publication **schema 3** owns both configuration and data journals. The
 data API refuses standalone mutations. Configuration is applied, the three
 database slots are exchanged with Linux `renameat2(RENAME_EXCHANGE)`, source
 archives are published without replacement, then bootstrap/preflight/selections

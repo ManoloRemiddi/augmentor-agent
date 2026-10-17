@@ -39,6 +39,13 @@ desktop menu entry, and XDG login autostart entry. `--no-autostart` skips creati
 the login entry. It backs up any entries it replaces. Existing desktop windows
 and conversations are not restarted.
 
+The stable launcher requires the managed Desktop startup helpers. It holds the
+deployment reader before reading `desktop.json`, refuses pending maintenance and
+applies an explicit selected shared pair. Install Desktop helpers before Home;
+the normal startup renderer also publishes the current Home helper. This source
+change has authored gate/environment tests; installed Home adoption remains pending.
+See [the matching publication contract](HARNESS-CLIENT-PUBLICATION.md#registered-reviews-and-complete-launch-entrypoints--october-18).
+
 The stable launcher resolves `desktop.json` each time; it never hard-codes a
 versioned release or checkout path. Existing running tray code stays on its
 loaded release until restarted. A selected release without Home support reports

@@ -1,0 +1,68 @@
+{
+  "schema": "augmentor-harness-launcher-publication-qualification/1",
+  "date": "2026-10-18",
+  "scope": "Linux source-only review registry publication and complete managed launcher paths",
+  "clientPublicationSchema": "augmentor-dsh-client-publication/3",
+  "qualification": {
+    "pythonPass": 144,
+    "nodePass": 17,
+    "fail": 0,
+    "skip": 0,
+    "registeredReviewCases": 12,
+    "publicationCases": 24,
+    "sharedDataCases": 21,
+    "sharedLaunchCases": 20,
+    "homeCases": 6,
+    "caseGroupsOverlapTotals": true,
+    "hostReadOnly": true,
+    "networkIsolated": true,
+    "reserveGiB": 64,
+    "authoredProfilesOnly": true,
+    "publicationBackendRepliesSynthetic": true,
+    "realRegistryWriteBoundaryChildExits": true,
+    "actualLegacyAliasSubprocesses": true,
+    "ownerModelRequests": 0
+  },
+  "sourceScope": [
+    "Registry lock, exact archived revision and explicit existing review names",
+    "Immutable incoming manifest/common pair/primary launch fence with other review metadata preserved",
+    "Every prior review shared pair bound to guarded data adoption",
+    "Exact registry and owned opener CAS/reverse/process-death recovery",
+    "Gated Home helper; selected mobile Node PATH retained",
+    "Explicit legacy Browser/mobile aliases and renderer before-hashes bound into publication"
+  ],
+  "ownerDataMigrated": false,
+  "installedOwnerAppChanged": false,
+  "fullAppCopiesCreated": 0,
+  "newInstalledArtifacts": 0,
+  "cleanup": {
+    "copiesRemoved": 78,
+    "observedGiBRecovered": 42.51,
+    "freeGiBApprox": 101,
+    "reserveGiB": 64,
+    "extraUnselectedCandidatesLimit": 2
+  },
+  "precedingHostedQualification": {
+    "run": 39072231157,
+    "sourceRef": "24bee26f7ed56fd1a31fa77cdfb9ed7356eed2fc",
+    "status": "completed",
+    "linuxConclusion": "success",
+    "wholeMatrixConclusion": "cancelled",
+    "macConclusion": "cancelled",
+    "windowsConclusion": "cancelled",
+    "cancellationCauseUnqualified": true
+  },
+  "hostedCurrentSourcePending": true,
+  "remaining": [
+    "One combined immutable artifact qualification against retained integration",
+    "Exact current bootstrap pre-adoption including review/preview openers",
+    "Matching loaded Browser",
+    "Fresh actual three-pair cold archive and guarded publication",
+    "Ordinary client reopen and owner continuation",
+    "Pilot feedback before further project transfers; VR-RasterStudio stays DSH"
+  ],
+  "privateEvidenceSha256": {
+    "harness-review-publication-final-20261018.log": "d8780dec2b21e66fa414f779ac9ff1c36ba04441c1eeb1147accf89a13624773",
+    "harness-launcher-publication-node-20261018.log": "c7e03b9b83ce29009c43466ee4e0c91debbd6077e6511feeb24b97067c377dca"
+  }
+}

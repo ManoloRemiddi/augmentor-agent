@@ -15,11 +15,12 @@ import time
 import base64
 import importlib.util
 import stat
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def install(root, python, node, dsh_service=None, enable=True, register_browser=False, expected_hosts=None):
+def install(root, python, node, dsh_service=None, enable=True, register_browser=False, expected_hosts=None, *, adopt_aliases=None):
     data = Path(os.environ.get('XDG_DATA_HOME', Path.home()/'.local/share'))/'augmentor'
     data.mkdir(parents=True, exist_ok=True, mode=0o700)
     with (data/'deployment.lock').open('a') as lock:
@@ -27,10 +28,10 @@ def install(root, python, node, dsh_service=None, enable=True, register_browser=
         spec=importlib.util.spec_from_file_location('startup_shared_launch',ROOT/'scripts/shared-launch-profile.py')
         shared=importlib.util.module_from_spec(spec);spec.loader.exec_module(shared)
         with shared.launch_lease(data,exclusive=True):
-            return _install(root, python, node, dsh_service, enable, register_browser, expected_hosts)
+            return _install(root, python, node, dsh_service, enable, register_browser, expected_hosts,adopt_aliases=adopt_aliases)
 
 
-def startup_plan(root, python, node, dsh_service=None, register_browser=False, expected_hosts=None, *, selection=None):
+def startup_plan(root, python, node, dsh_service=None, register_browser=False, expected_hosts=None, *, selection=None,adopt_aliases=None):
     """Render exact startup bytes without writing or authorizing selection.
 
     A prospective selection supports cold publication planning. Ordinary install
@@ -86,6 +87,7 @@ def startup_plan(root, python, node, dsh_service=None, register_browser=False, e
         data/'augmentor/dsh-profile-gate.py':(ROOT/'scripts/dsh-profile-gate.py').read_text(),
         data/'augmentor/embed-launch.py':(ROOT/'scripts/embed-launch.py').read_text(),
         launch:(ROOT/'scripts/desktop-launch.py').read_text(),
+        data/'augmentor/home-launch.py':(ROOT/'scripts/home-launch.py').read_text(),
         data/'augmentor/desktop-deployment.py':(ROOT/'scripts/desktop-deployment.py').read_text(),
         data/'augmentor/desktop.json':json.dumps(manifest, indent=2)+'\n',
         entry:'#!/bin/sh\nexec /usr/bin/python3 '+shlex.quote(str(launch))+' "$@"\n',
@@ -102,6 +104,18 @@ def startup_plan(root, python, node, dsh_service=None, register_browser=False, e
             '[Install]\nWantedBy=graphical-session.target\n',
     }
     expectations={}
+    aliases={'augmentor-mobile':files[binary/'augmentor-mobile-managed'],
+             'augmentor-browser-host':'#!/bin/sh\nexec /usr/bin/python3 '+shlex.quote(str(data/'augmentor/desktop-browser-launch.py'))+' "$@"\n'}
+    if adopt_aliases is not None:
+        if not isinstance(adopt_aliases,dict) or not adopt_aliases or set(adopt_aliases)-set(aliases):
+            raise ValueError('Choose only explicitly reviewed legacy mobile/Browser aliases.')
+        for name,expected in adopt_aliases.items():
+            if expected is not None and (not isinstance(expected,str) or not re.fullmatch('[a-f0-9]{64}',expected)):
+                raise ValueError('Record exact current alias hashes, or null for absent aliases.')
+            path=binary/name;before=snapshot(path)
+            if (hashlib.sha256(before[0]).hexdigest() if before else None)!=expected:
+                raise ValueError('A legacy launch alias changed; preserve it and review its current bytes.')
+            files[path]=aliases[name];expectations[path]=expected
     if register_browser:
         browsers=('chromium','google-chrome','google-chrome-beta','BraveSoftware/Brave-Browser')
         if expected_hosts is not None and (not isinstance(expected_hosts,dict) or set(expected_hosts)!=set(browsers)):
@@ -133,8 +147,8 @@ def startup_plan(root, python, node, dsh_service=None, register_browser=False, e
     return {'manifest':manifest,'files':files,'expectations':expectations,'binary':binary,'state':state}
 
 
-def _install(root, python, node, dsh_service=None, enable=True, register_browser=False, expected_hosts=None):
-    plan=startup_plan(root,python,node,dsh_service,register_browser,expected_hosts)
+def _install(root, python, node, dsh_service=None, enable=True, register_browser=False, expected_hosts=None,*,adopt_aliases=None):
+    plan=startup_plan(root,python,node,dsh_service,register_browser,expected_hosts,adopt_aliases=adopt_aliases)
     manifest,files,binary,state,expectations=(plan[key] for key in ('manifest','files','binary','state','expectations'))
     backup = Path(tempfile.mkdtemp(prefix='startup-'+time.strftime('%Y%m%d-') , dir=_directory(state/'augmentor-recovery')))
     write_startup_files(files,backup,binary,expectations)
