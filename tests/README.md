@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [cold data archive](../docs/HARNESS-DSH-INSTALLATION.md#cold-data-archive-and-current-cut-binding--october-17)
+adds ten authored cases within **143 Python / four launcher Node** passes. Byte/mode,
+Unicode, hardlink/symlink and mixed-root coverage restore through GNU tar in a new
+private fixture; stale cuts, corrupt archives, failed/foreign outputs and quotas
+are tested. Tiny unit fixtures simulate disk capacity. A separate real public DSH
+profile archive/restore checks the actual 64 GiB reserve and both DB sets without
+owner data. Runtime a0f1f16d; the Linux SDK now explicitly runs the new file.
+
 The [managed-client fence](../docs/HARNESS-DSH-INSTALLATION.md#managed-client-maintenance-fence--october-17)
 adds seven cases within **133 Python / four launcher Node** passes. Eleven real
 managed command paths refuse prepared/applied transactions after writer exit;

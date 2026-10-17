@@ -4,7 +4,8 @@
 
 ## Cold data archive and current-cut binding — October 17
 
-The new internal `services/dsh/cold_backup.py` fills the data-backup prerequisite
+Source **a0f1f16dac3e493201867863382bdf38b2f6b5b3** adds internal
+`services/dsh/cold_backup.py` for the data-backup prerequisite
 before configuration preparation. This is capture/verification source, **not an
 installed owner backup, activation command or automatic data restore**. Existing
 review/Agent data, services, selections and bootstrap files remain untouched.
@@ -73,6 +74,8 @@ matching-client selection and durable finalization/reverse, then qualify one
 combined immutable update and actual owner continuation. Pilot feedback still
 gates further project transfers; voice, later OS and public Office packaging
 remain separate.
+
+[Portable qualification record](../release/harness-cold-backup-20261017.json).
 
 ## Managed-client maintenance fence — October 17
 
