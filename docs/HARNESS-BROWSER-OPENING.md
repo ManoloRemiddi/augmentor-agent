@@ -60,3 +60,10 @@ the selected app or create repeated retained build mirrors. Fresh caller
 quiescence, one complete backup, matching publication, ordinary reopening and
 actual owner continuation remain required. Preserve DSH projects/history and the
 legacy compatibility dependencies until replacement clients verify.
+
+The registered-review cold-opening check now expects the intentional stable
+bookmark, while still requiring a different confirmed owner PID, exact state and
+configuration, caller-key exclusion, unchanged history and no additional model
+request. It additionally checks that the restarted HTTP endpoint rejects anonymous
+access and accepts the retained private credential. The former URL-rotation
+assertion described the previous behavior and is superseded by this contract.
