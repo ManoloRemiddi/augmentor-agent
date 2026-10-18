@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[The browser-opening replacement is qualified](HARNESS-BROWSER-OPENING.md#exact-replacement-package-and-remaining-switch--october-18):
+application **576975c0**, artifact **2a3b1c41…1b4c89**, **434 Python / 88 Node**
+in each ordinary/sealed tree, declared-runtime core **233**, six exact sealed
+SDK reopen cases and nine retained roles in place. The old preview and idle Host
+are closed with explicit owner approval; saved data remain. Registrar **20→22**
+pins existing main/pilot origins and registers normal Applications entries while
+keeping both current owners. **Selected/running apps are still old.** Chromium
+exit, fresh full cold backup, coupled switch, loaded Browser/host and owner pilot
+continuation remain. One new package; no owner migration or inference. This
+supersedes the earlier draft blocker and 4f83 pending supplier below.
+[Evidence](../release/harness-browser-opening-qualification-20261018.json).
+
 [Independent browser opening](HARNESS-BROWSER-OPENING.md) now remembers a verified
 operator login and the profile's private local address across tabs/browser/Host
 restarts; inspectors stay scoped. **22 Node** pass with original Chromium GUI and
