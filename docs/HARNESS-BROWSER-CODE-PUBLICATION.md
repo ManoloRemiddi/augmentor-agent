@@ -165,3 +165,12 @@ or prepare repeated owner snapshots while waiting. All remaining installation
 work needs this client quiesced, a fresh complete cold cut, ordinary reopening and
 owner continuation. No completion is claimed. More project transfers, voice
 expansion and later operating systems remain deferred.
+
+## Owner resumes swap and requests normal browser opening
+
+The owner explicitly authorized closing the old preview despite its draft and
+proceeding with the swap. That historical blocker is resolved. The new
+[browser opening correction](HARNESS-BROWSER-OPENING.md) changes runtime/GUI bytes
+and needs one newly qualified immutable candidate; the previous 4f83 supplier is
+retained as recovery until that candidate qualifies. Recompute the actual cold
+plan with the new artifact rather than reusing the earlier supplier receipt.

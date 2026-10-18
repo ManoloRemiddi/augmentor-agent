@@ -35,7 +35,7 @@ const LIVE_BYTES = 16 * 1024 * 1024;
 
 /** A local client of the existing Host. It never creates a second session owner. */
 export class HarnessServer {
-  readonly token = randomBytes(32).toString('hex');
+  readonly token:string;
   readonly watches = new Map<string, Watch>();
   private frames: (LiveFrame & {bytes: number})[] = [];
   private frameBytes = 0;
@@ -44,7 +44,10 @@ export class HarnessServer {
   private base = '';
   private inspections=new Map<string,Extract<Access,{mode:'read-only'}>>();
   private server = createServer((req, res) => void this.handle(req, res));
-  constructor(readonly host: Host, readonly assets = fileURLToPath(new URL('../../../apps/harness/', import.meta.url))) {}
+  constructor(readonly host: Host, readonly assets = fileURLToPath(new URL('../../../apps/harness/', import.meta.url)), token=randomBytes(32).toString('hex')) {
+    if(!/^[a-f0-9]{64}$/.test(token))throw Error('Use an exact private Harness operator credential.');
+    this.token=token;
+  }
   async start(port = 0) {
     if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('Invalid Harness port');
     await new Promise<void>((resolve, reject) => {
@@ -171,7 +174,7 @@ export class HarnessServer {
       }
       if (url.pathname.startsWith('/api/')) {
         const access=this.access(req);
-        if (!access) {this.send(res, 401, {error: {message: 'Open a fresh private Harness link to connect'}}); return;}
+        if (!access) {this.send(res, 401, {error: {message: 'Open Augmentor Harness from your Applications menu to reconnect this browser'}}); return;}
         if(url.pathname==='/api/session.export'){
           if(req.method!=='HEAD'||access.mode!=='operator')throw Error('Only an operator can prepare a conversation download.');
           if(url.searchParams.get('includeDescendants')!=='true'||[...url.searchParams.keys()].some(key=>!['sessionId','includeDescendants'].includes(key))||url.searchParams.getAll('sessionId').length!==1||url.searchParams.getAll('includeDescendants').length!==1)throw Error('Choose an exact conversation export including verified descendants.');
@@ -313,6 +316,7 @@ export class HarnessServer {
       const staticFiles = new Map([
         ['/', {path: join(this.assets, 'index.html'), type: 'text/html'}],
         ['/inspection', {path: join(this.assets, 'inspection.html'), type:'text/html'}],
+        ['/browser-access.js', {path: join(this.assets, 'browser-access.js'), type: 'text/javascript'}],
         ['/app.js', {path: join(this.assets, 'app.js'), type: 'text/javascript'}],
         ['/plans.js', {path: join(this.assets, 'plans.js'), type: 'text/javascript'}],
         ['/jobs.js', {path: join(this.assets, 'jobs.js'), type: 'text/javascript'}],

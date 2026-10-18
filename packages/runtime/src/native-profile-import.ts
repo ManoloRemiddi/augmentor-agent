@@ -40,7 +40,7 @@ function copyTree(source:string,target:string,allow:(key:string)=>boolean=()=>tr
  else throw Error('Native transfer refuses linked or unsupported objects.');
 }
 function validateSource(state:string){
- const known=new Set(['sessions','attachments','observations','harness-drafts','jobs','desktop-runs','dsh-imports','native-relocations','native-imports','native-index','session-exports','harness.json','workspaces.json','session-organization.json','branch-intents.json','branch-publications','compactions.json','prompt-improvements.json','model-account-logins.json','mcp-management.json']);
+ const known=new Set(['sessions','attachments','observations','harness-drafts','jobs','desktop-runs','dsh-imports','native-relocations','native-imports','native-index','session-exports','harness.json','harness-browser-access.json','workspaces.json','session-organization.json','branch-intents.json','branch-publications','compactions.json','prompt-improvements.json','model-account-logins.json','mcp-management.json']);
  for(const name of readdirSync(state))if(!known.has(name))throw Error('Source state component needs an explicit relocation adapter: '+name);
  const desktop=join(state,'desktop-runs');if(present(desktop)&&readdirSync(desktop).length)throw Error('Desktop artifact references need an explicit relocation adapter.');
  const rows=metas(state);if(!rows.size)throw Error('Choose a source with saved Harness conversations.');

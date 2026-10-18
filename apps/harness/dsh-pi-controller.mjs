@@ -9,7 +9,7 @@ export class DshPiController {
   branchFlight=null; branchIntents=new Map();createFlight=null;
   catalogRevision=0;catalogRead=0;permissionReceipts=null;
   state={skillsRevision:0,familyRevision:0,phase:'connecting',sessionId:null,readOnly:false,capabilities:{},sessions:[],events:[],records:[],payloads:{},contextRequestId:null,contextRead:null,contextPage:null,queue:null,interactions:[],catalog:{groups:[]},selection:null,reasoning:null,permission:null,permissionBusy:false,permissionError:null,planMode:null,goal:null,workspace:'',error:null,hasMore:false};
-  constructor(token,fetcher=fetch){this.token=token;this.fetcher=(...args)=>fetcher(...args);}
+  constructor(token,fetcher=fetch,onAccess=()=>{}){this.onAccess=onAccess;this.token=token;this.fetcher=(...args)=>fetcher(...args);}
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn);};
   getSnapshot=()=>this.state;
   update(patch){if(Object.hasOwn(patch,'workspaces'))this.catalogRevision++;this.state={...this.state,...patch};for(const [id,scope] of this.hiddenQuestions)if(this.state.readOnly||this.state.phase!=='ready'||scope.epoch!==this.epoch||scope.sessionId!==this.state.sessionId||!this.state.interactions.some(f=>f.rpcId===id))this.hiddenQuestions.delete(id);for(const fn of this.listeners)fn();}
@@ -19,6 +19,7 @@ export class DshPiController {
   }
   async start(requestedSession){
     const access=await this.fetcher('/api/access',{headers:{Authorization:'Bearer '+this.token}}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error?.message||'Open a fresh Harness link.');return v;});
+    this.onAccess(access);
     const [host,catalog,list]=await Promise.all([this.rpc('host.describe'),this.rpc('models.list'),this.rpc('session.list')]);
     const workspaces=access.mode==='read-only'?null:await this.rpc('workspace.list');
     this.update({modelsRevision:undefined,readOnly:access.mode==='read-only',catalog,workspace:host.workspace,workspaces,sessions:list.items,phase:'ready',attachmentLimits:host.attachmentLimits,capabilities:host.capabilities??{}});

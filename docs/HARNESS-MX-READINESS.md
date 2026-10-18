@@ -1,5 +1,12 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Independent browser opening](HARNESS-BROWSER-OPENING.md) now remembers a verified
+operator login and the profile's private local address across tabs/browser/Host
+restarts; inspectors stay scoped. **22 Node** pass with original Chromium GUI and
+native relocation, zero provider requests; TypeScript/GUI build pass. Source only:
+one new immutable candidate and the backed-up swap remain. The owner explicitly
+authorized closing the old preview and DSH, resolving the prior draft blocker.
+
 [Final independent MX prerequisites](HARNESS-BROWSER-CODE-PUBLICATION.md#protected-parent-and-full-linux-results--october-18)
 are complete: Browser parent protected with original mode retained and code
 unchanged; full Linux SDK **39079128742 / 39079523341** succeed. No new app copy

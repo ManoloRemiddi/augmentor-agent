@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {browserAccess} from './browser-access.js';
 import {deriveTrajectoryTimeline,trajectoryTimelineFocusIndexes} from './timeline.js';
 import {projectChat,appendDisplay,messageTargets} from './chat-projection.js';
 import {createMessageActions} from './message-actions.js';
@@ -13,8 +14,8 @@ import {attachGoals} from './goals.js';
 import {attachJobs} from './jobs.js';
 const $=id=>document.getElementById(id);
 const hash=new URLSearchParams(location.hash.slice(1));
-const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
-if(token)sessionStorage.setItem('augmentor-harness-token',token);
+let browserStore;try{browserStore=localStorage;}catch{}
+const accessCredential=browserAccess(hash,sessionStorage,browserStore),token=accessCredential.token;
 history.replaceState(null,'',location.pathname);
 const state={readOnly:false,boundSession:null,sessionId:null,sessions:[],observations:new Map(),interactions:new Map(),history:[],cursor:0,clientId:crypto.randomUUID(),selected:null,hasMore:false,view:'chat',focus:null,epoch:0,queue:null,ready:false,selecting:false,selectionReady:false,creating:false};
 const search={query:'',scope:'metadata',cursor:null,matches:new Map(),payloadBytes:0,unavailable:0,uncaptured:0,records:new Map(),epoch:0,before:null,hasMore:false,scanned:0,loading:false,error:false};let searchTimer;
@@ -338,8 +339,8 @@ $('timeline').onpointerup=event=>{if(drag===null||!timelineModel)return;const bo
 $('timeline').oncontextmenu=event=>{event.preventDefault();state.focus=null;drag=null;renderObservations();};
 addEventListener('resize',()=>{if(state.view==='trajectory')renderTimeline();});
 async function start(){
-  if(!token){notice('Open Augmentor Harness using its private local link.',true);return;}
-  const accessResponse=await fetch('/api/access',{headers:{Authorization:'Bearer '+token}}),access=await accessResponse.json();if(!accessResponse.ok)throw Error(access.error?.message||'Open a fresh private inspector link.');state.readOnly=access.mode==='read-only';state.boundSession=access.sessionId??null;
+  if(!token){notice('Open Augmentor Harness from your Applications menu to connect this browser.',true);return;}
+  const accessResponse=await fetch('/api/access',{headers:{Authorization:'Bearer '+token}}),access=await accessResponse.json();if(!accessResponse.ok)throw Error(access.error?.message||'Open a fresh private inspector link.');accessCredential.confirm(access);state.readOnly=access.mode==='read-only';state.boundSession=access.sessionId??null;
   if(state.readOnly){document.querySelector('.local').textContent='Read-only conversation inspector';document.title='Conversation inspector · Augmentor Harness';}
   const [host,catalog,capture]=await Promise.all([rpc('host.describe'),rpc('models.list'),rpc('observation.describe')]);
   $('runtime').textContent='Pi '+host.piVersion+' · Augmentor '+host.version+(state.readOnly?' · Read-only':'');$('workspace').value=host.workspace||'';

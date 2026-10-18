@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {browserAccess} from './browser-access.js';
 import {bindContextSidebar} from './dsh-context-sidebar.jsx';
 import {OriginalDictation,bindDictation} from './dsh-dictation.jsx';
 import {dictationInsertion} from './dsh-dictation.mjs';
@@ -111,13 +112,13 @@ import {MetafolderSidebar} from './dsh-metafolder.jsx';
 import './dsh-base.css';
 
 const hash=new URLSearchParams(location.hash.slice(1));
-const token=hash.get('token')||sessionStorage.getItem('augmentor-harness-token');
-if(token)sessionStorage.setItem('augmentor-harness-token',token);
+let browserStore;try{browserStore=localStorage;}catch{}
+const accessCredential=browserAccess(hash,sessionStorage,browserStore),token=accessCredential.token;
 history.replaceState(null,'',location.pathname);
 // A fresh private link can arrive as same-document navigation. Reinitialize
 // the controller so a scoped inspector never retains the previous authority.
 addEventListener('hashchange',()=>{if(new URLSearchParams(location.hash.slice(1)).has('token'))location.reload();});
-const controller=new DshPiController(token);
+const controller=new DshPiController(token,fetch,access=>accessCredential.confirm(access));
 bindDictation(controller);
 const appearanceProfile=connectAppearance(controller);
 const metafolders=new DshMetafolderProfile(controller);

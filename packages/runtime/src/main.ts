@@ -4,6 +4,7 @@ import {chmodSync,existsSync,lstatSync,unlinkSync} from 'node:fs';
 import {join} from 'node:path';
 import {Host} from './host.js';
 import {HarnessServer} from './harness-server.js';
+import {savedHarnessAccess} from './harness-access.js';
 import {atomicJson,readJson,paths,statePath} from './storage.js';
 import {MAX_FRAME,PROTOCOL,request,type Data} from '../../protocol/src/index.js';
 import {localServer} from '../../platform/src/server.js';
@@ -27,9 +28,13 @@ const connected=(sid:string)=>[...clients.values()].includes(sid)||harness?.conn
 async function openHarness(){
   if(openingHarness)return openingHarness;
   openingHarness=(async()=>{
-    const server=new HarnessServer(host);
+    const browserFile=join(host.dirs.state,'harness-browser-access.json');
+    const saved=savedHarnessAccess(browserFile)??savedHarnessAccess(join(host.dirs.state,'harness.json'));
+    const server=new HarnessServer(host,undefined,saved?.token);
     try{
-      const link=await server.start(Number(process.env.AUGMENTOR_HARNESS_PORT??0));
+      const requestedPort=Number(process.env.AUGMENTOR_HARNESS_PORT??0);
+      const link=await server.start(requestedPort===0?(saved?.port??0):requestedPort);
+      atomicJson(browserFile,{schema:'augmentor-harness-browser-access/1',token:server.token,port:Number(new URL(link.origin).port)});
       harness=server;atomicJson(join(host.dirs.state,'harness.json'),{...link,pid:process.pid});
       return link;
     }catch(error){await server.close();openingHarness=undefined;throw error;}
