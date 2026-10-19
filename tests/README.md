@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Registered DSH projects are now imported and grouped](../docs/HARNESS-PROJECTS-MIGRATED-2026-10-19.md):
+**29 workspaces / nine Metafolders / 106 source conversations represented** in the
+actual pilot, 105 newly added and the earlier import/continuation preserved.
+VR-RasterStudio stays in DSH as requested. The already-shipped MIT plugin is
+now enabled. Source/cold-profile backups and all installed archive checks pass;
+actual UI verifies group reassignment, imported-chat opening and fresh-tab
+persistence. No original data removed, owner inference or new app build.
+This supersedes the earlier pilot-only transfer gate; production consolidation
+and later platforms remain separate. [Evidence](../release/harness-projects-metafolders-migration-20261019.json).
+
 [Pilot browser opening is now installed and verified](../docs/HARNESS-BROWSER-OPENING.md#installed-pilot--october-19).
 The existing pilot keeps its fixed address, credential, three conversations,
 settings and shared pair on qualified artifact **2a3b1c41…1b4c89**. Actual CUA
