@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Pilot browser opening is now installed and verified](HARNESS-BROWSER-OPENING.md#installed-pilot--october-19).
+The existing pilot keeps its fixed address, credential, three conversations,
+settings and shared pair on qualified artifact **2a3b1c41…1b4c89**. Actual CUA
+checks show Connected and an available composer in new plain-address tabs, on
+reload and after an actual pilot restart. **363 backup files** verify; all 21
+original protected prefixes and shared rows remain. Registry **22→23** changes
+only the pilot deployment; main/production selections stay old. Default Chromium
+was opened through the owned launcher; its UI was not directly inspected. No new
+app build, owner inference or project transfer. The larger cold migration remains
+separate; prior registry 22 plans are stale. [Evidence](../release/harness-pilot-browser-opening-installed-20261019.json).
+
 [The browser-opening replacement is qualified](HARNESS-BROWSER-OPENING.md#exact-replacement-package-and-remaining-switch--october-18):
 application **576975c0**, artifact **2a3b1c41…1b4c89**, **434 Python / 88 Node**
 in each ordinary/sealed tree, declared-runtime core **233**, six exact sealed

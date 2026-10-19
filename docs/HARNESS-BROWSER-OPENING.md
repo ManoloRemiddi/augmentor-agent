@@ -2,6 +2,52 @@
 
 # Open Harness normally on MX Linux
 
+## Installed pilot — October 19
+
+Bookmark **http://127.0.0.1:41789/** in the browser profile used for the pilot.
+The pilot now runs the corrected immutable package; this is an installed update,
+not a source-only claim. An authenticated opening has also been sent to the
+normal default Chromium browser. After an authorized initial login, plain-address
+new tabs use the remembered operator credential. Fresh/private browser profiles
+and cleared website storage still require their own authorized first login;
+anonymous API access remains refused.
+
+The prior combined-migration prerequisite delayed this independent review fix
+unnecessarily. Targeted adoption changes only the pilot's registered application,
+retaining its configuration/state/workspace/shared pair, existing credential and
+port. The original GUI and settings remain. Main still uses the older application;
+Native/DSH/shared-store/loaded-extension consolidation remains separate. A Chromium
+exit was not required for this isolated pilot update.
+
+The idle, draft-free old owner acknowledged shutdown and its exact pidfd confirmed
+exit. A persistent private backup verifies **363 profile files**, consistent shared
+SQLite snapshots and the original registration. The owned registrar advanced
+**22→23**. Three saved conversations and their paused/empty queues remain; all
+**21 original protected prefixes** survive, with only typed MCP connection metadata
+appended. Shared prompt/memory rows, engine configuration and both production
+selectors are exact. No owner model request, new project import or new full app
+build occurred; the existing qualified seal was reused.
+
+Actual CUA inspection first reproduced the reported plain-address error. After
+updating, an authorized login was followed by a **new tab at the plain address**:
+Connected, no authentication error and an available composer. The pilot was then
+gracefully stopped and reopened once more; its credential, port and private link
+remained exact, authenticated HTTP returned 200 and anonymous access 401. A reload
+and another fresh plain-address tab again showed Connected and an available
+composer. These GUI checks used IAB against the actual installed pilot, not a
+synthetic Host. The normal default Chromium launcher succeeded too; its UI is
+not exposed to this session, so direct regular-browser UI acceptance is not claimed.
+
+The existing package also has its earlier isolated whole-browser restart proof.
+Full Linux SDK now succeeds at **ed603cec**
+([Linux SDK job](https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39108195214/job/117618496431));
+Mac's shared-memory fixture failed and Windows was cancelled, so this is no
+whole-matrix or later-platform acceptance. Recompute any future combined cold
+plan from registry 23 and the distinct main/pilot builds; registry 22 plans below
+are historical. [Installed evidence](../release/harness-pilot-browser-opening-installed-20261019.json).
+
+## Opening other profiles and historical qualification
+
 Use **Augmentor Harness (MX)** in the Applications menu. Its stable launcher is
 `augmentor-harness-review open main`; it asks the verified current owner for its
 private connection and opens the regular default browser. You do not need an
