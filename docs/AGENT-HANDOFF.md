@@ -1,10 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Harness Improve prompt](PROMPT-IMPROVEMENT.md#harness-input-box--october-19)
-is now inside the input at the upper right, sharing Agent's instructions and
-paint-only rolling preview, Cancel/Escape and revision-bound Undo. Source
-qualification and installed pilot update are in progress; preserve all migrated
-projects and group assignments. No new model pipeline or plugin store.
+is installed inside the input at the upper right on **c0c7b6d9 /
+6fa33389…5d265e0**. Source 28 Node/four Native; ordinary/sealed each 32 Node/nine
+Python; exact registered SDK six. Actual local-Qwen unchanged/rewrite/Undo and
+fresh bare-tab opening pass, zero chat submissions; test draft cleared. Registry
+23→24 preserves the current 110 conversations and Metafolder revision 26;
+4,791 cold-backup files verify, explicit empty-queue/export/MCP housekeeping
+checked. One seal, scratch removed, prior pilot rollback kept; main/production
+unchanged. Hosted new Linux SDK pending, Mac failed, Windows pending at this
+snapshot; later OS/voice/full coupled consolidation remain separate.
+[Evidence](../release/harness-improve-prompt-20261019.json).
 
 [Registered DSH projects are now imported and grouped](HARNESS-PROJECTS-MIGRATED-2026-10-19.md):
 **29 workspaces / nine Metafolders / 106 source conversations represented** in the

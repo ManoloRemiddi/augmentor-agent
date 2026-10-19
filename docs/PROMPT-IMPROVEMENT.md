@@ -41,9 +41,34 @@ runtime, Native, Browser and thin-Harness improvement suites.
 Source checks pass **28 Node / four Native Python tests**, including the actual
 original GUI at 513 and 1280 pixels, pending/settling, Escape, typing, chat changes,
 Undo, unchanged replies, shared instructions and zero chat submission.
-At source qualification, the installed pilot still uses the prior artifact;
-the packaged/installed result is recorded below after verification. Existing
-projects, conversations and Metafolders are preserved during the update.
+The MX pilot is now **installed and running** on source **c0c7b6d9**,
+artifact **6fa33389…5d265e0**, with 24,822 sealed inputs and 1,146 compiled files.
+Ordinary/sealed checks each pass **32 Node / nine Python**, plus **six** exact-seal
+registered warm/cold SDK cases. Runtime/dependency bytes match the qualified
+previous artifact; its broader historical totals are not new runs here.
+One new immutable candidate was staged, its ordinary mirror removed, and the
+previous pilot artifact retained for rollback. No release was patched in place.
+
+The actual pilot remains at its fixed address and private identity. Registration
+**23→24** preserves its profile/shared pair, **110 conversations** and Metafolder
+**revision 26**, including owner work since the bulk migration. A fresh cold
+backup verifies **4,791 files**, with consistent shared database backups. Shutdown
+persists four previously unsaved empty queues as paused and removes one idle
+export control file; those typed changes were checked explicitly, alongside
+append-only MCP closure metadata. Main/production selections remain unchanged.
+
+Actual installed UI verifies the button in the input and a ready fresh bare-address
+tab. Two harmless auxiliary requests against the configured local Qwen model
+complete: a clear draft stays unchanged, and a rough draft becomes editable
+corrected wording. Undo restores the exact original. The test draft is cleared;
+**zero chat messages** are sent. Existing native prefixes are byte-preserved;
+reopening appends 18 MCP lifecycle records and reserves a file path for one
+existing empty session without creating a chat message. These are distinct from
+synthetic results. No voice/platform expansion or wider shared-store consolidation.
+
+[Packaged and installed evidence](../release/harness-improve-prompt-20261019.json)
+records scope and limits. At this checkpoint the new hosted Linux SDK job is
+running, Mac has failed, and Windows is running; no whole-matrix pass is claimed.
 
 ## DSH composer
 

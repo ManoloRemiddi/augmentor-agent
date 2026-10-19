@@ -1521,7 +1521,7 @@ Windows mechanisms: [desktop and background shortcut ownership](WINDOWS-SHELL.md
 - [Memory processing and energy review — 21 September 2026](MEMORY-ENERGY-DESIGN-REVIEW.md) (investigated; replacement lifecycle proposed)
 - [Automatic memory: operations and developer contract](MEMORY-OPERATIONS.md)
 - [Optional manual memory library](MEMORY.md)
-- [Improve a draft](PROMPT-IMPROVEMENT.md)
+- [Improve a draft](PROMPT-IMPROVEMENT.md) — Agent controls inside the Harness input; [MX installed evidence](../release/harness-improve-prompt-20261019.json).
 - [Saved prompts and DSH commands](SLASH-COMMANDS.md)
 - [Queued prompts and steering (DSH native and Codex Desktop/Browser)](QUEUE-AND-STEERING.md)
 - [Linux reply completion](REPLY-COMPLETION.md)

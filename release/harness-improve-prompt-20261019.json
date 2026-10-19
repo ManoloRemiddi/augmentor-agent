@@ -1,0 +1,122 @@
+{
+  "schema": "augmentor-harness-improve-prompt-qualification/1",
+  "date": "2026-10-19",
+  "sourceRef": "c0c7b6d95abb4fde0d112d0ec03ab5d8a09074e3",
+  "scope": "MX Linux original Harness GUI; no wider desktop/shared-store cutover or later-OS approval",
+  "behavior": {
+    "placement": "inside input, upper right",
+    "sharedAgentInstructions": true,
+    "selectedModelOnly": true,
+    "paintOnlyLetterRoll": true,
+    "settlingMs": 700,
+    "reducedMotion": true,
+    "cancelEscapeAndUndo": true,
+    "sessionModelAndRevisionGuards": true,
+    "pendingAndSettlingBlockSubmission": true,
+    "referenceChipsPreserved": true,
+    "automaticSend": false
+  },
+  "tests": {
+    "sourceNode": 28,
+    "sourceNativePython": 4,
+    "ordinaryNode": 32,
+    "ordinaryPython": 9,
+    "sealedNode": 32,
+    "sealedPython": 9,
+    "exactSealedRegisteredReviewSdk": 6,
+    "fixtureScope": "Authored profiles, synthetic providers, actual original GUI in Chromium at 513/1280px and light/dark; Native/Browser shared instructions and cold reopen",
+    "typecheck": true,
+    "guiBuild": true,
+    "baseQualificationNotAddedToNewTotals": true
+  },
+  "artifact": {
+    "sha256": "6fa333896c860bf1d5d8b994f718aedf66ce5c0b8f3dd42eaa118e4ff5d265e0",
+    "baseArtifactSha256": "2a3b1c41c87fbd70f88868a79b6239876ea77031085089df87908da5d01b4c89",
+    "inventoryEntries": 24822,
+    "compiledFiles": 1146,
+    "version": "0.2.13",
+    "newSealedCandidates": 1,
+    "dependencyAndRuntimeBytesUnchanged": true,
+    "privateMxOnly": true
+  },
+  "installed": {
+    "registeredReview": "pilot",
+    "registryBefore": 23,
+    "registryAfter": 24,
+    "selectedEqualsRunning": true,
+    "sessionsPreserved": 110,
+    "metafoldersRevisionPreserved": 26,
+    "allProjectAssignmentsPreserved": true,
+    "profileAndSharedPairUnchanged": true,
+    "fixedAddressAndPrivateIdentityPreserved": true,
+    "backupFilesVerified": 4791,
+    "backupArchiveBytes": 988636376,
+    "sharedRowsAndProductionSelectionsPreserved": true,
+    "shutdownHousekeeping": {
+      "newEmptyQueuesPersistedPaused": 4,
+      "idleExportControlRemoved": 1,
+      "mcpClosureMetadataAppendOnly": true
+    },
+    "liveUi": {
+      "buttonInsideInput": true,
+      "liveUnchangedPreserved": true,
+      "liveRewriteEditable": true,
+      "exactUndo": true,
+      "testDraftCleared": true,
+      "newBareAddressTabReady": true,
+      "nativePrefixesBytePreserved": true,
+      "reopenedMcpLifecycleRecords": 18,
+      "emptyExistingSessionFileReservedWithoutChat": true,
+      "liveAuxiliaryRequests": 2,
+      "automaticChatSubmissions": 0,
+      "metafoldersPreserved": true,
+      "ownerDraftsAfter": 0,
+      "modelReceiptStatuses": [
+        "completed",
+        "completed"
+      ],
+      "screenshotsPrivate": true
+    }
+  },
+  "storage": {
+    "managedReserveGiB": 64,
+    "ordinaryMirrorRemoved": true,
+    "ownerBackupsRetained": true,
+    "oldPilotArtifactRetainedForRollback": true,
+    "noReleasePatched": true
+  },
+  "publication": {
+    "publicBinaries": false,
+    "merge": false,
+    "reviewPr": 45
+  },
+  "hostedSdk": {
+    "sourceRef": "c0c7b6d95abb4fde0d112d0ec03ab5d8a09074e3",
+    "run": 39221936055,
+    "snapshot": {
+      "conclusion": "",
+      "jobs": [
+        {
+          "conclusion": "",
+          "databaseId": 117959027490,
+          "name": "contracts (ubuntu-24.04)",
+          "status": "in_progress"
+        },
+        {
+          "conclusion": "",
+          "databaseId": 117959027937,
+          "name": "contracts (windows-2025)",
+          "status": "in_progress"
+        },
+        {
+          "conclusion": "failure",
+          "databaseId": 117959027994,
+          "name": "contracts (macos-14)",
+          "status": "completed"
+        }
+      ],
+      "status": "in_progress"
+    },
+    "wholeMatrixPass": false
+  }
+}
