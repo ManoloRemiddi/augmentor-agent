@@ -42,8 +42,9 @@ import { observeControlRow } from './control-row-layout.ts'
 import css from './InputBar.module.css'
 
 // Augmentor opt-in: keep the original meter in the composer controls instead
-// of a detached footer. The upstream/default placement remains available.
-export type InputBarProps = ComposerBarProps & { contextMeterPlacement?: 'dock' | 'toolbar' }
+// of a detached footer. submissionBlocked gates Send while a draft-only
+// rewrite is pending; the text editor stays available so typing can cancel. The upstream/default placement remains available.
+export type InputBarProps = ComposerBarProps & { contextMeterPlacement?: 'dock' | 'toolbar'; submissionBlocked?: boolean }
 
 export const InputBar = memo(function InputBar({
   useSession, useInput, inputActions, keyboard, addFiles, removeAttachment, resolveDraftAttachments,
@@ -52,7 +53,7 @@ export const InputBar = memo(function InputBar({
   renderSlot, useBusyEnter, useFileUploads, useNotices, useLexicon, useMenuLauncher, useStopShortcut,
   useProjection, sessionId, variant, disabled: inert = false, blocked,
   workspacePickerOpen = false, onRequestWorkspace,
-  placeholder, accessory, contextMeterPlacement = 'dock',
+  placeholder, accessory, contextMeterPlacement = 'dock', submissionBlocked = false,
 }: InputBarProps) {
   const input = useInput(s => s)
   const notice = useNotices(s => s)
@@ -324,7 +325,7 @@ export const InputBar = memo(function InputBar({
   // exposes Stop independently.
   const primaryStops = running && subagent === null && (empty || blocked !== undefined)
   // Disabled native buttons may omit mouseleave; their tooltip must close from state.
-  const primaryDisabled = primaryStops ? stop === undefined : empty || disabled || machineBusy || uploadsPending
+  const primaryDisabled = primaryStops ? stop === undefined : empty || disabled || machineBusy || uploadsPending || submissionBlocked
   const interruptible = running && continuable
   const primarySubmitMode = resolveSubmitMode(busyEnter, running, 'enter', steeringAvailable)
   const plainMessageDraft = !empty && input?.phase === 'plain' && !draft.trimStart().startsWith('/')
@@ -340,7 +341,7 @@ export const InputBar = memo(function InputBar({
     }
     if (keyboard === undefined) return // absent machine: the button is disabled
     /* v8 ignore next -- defensive: the primary button is disabled for empty, disabled, and pending-upload states. */
-    if (!empty && !disabled && !machineBusy && !uploadsPending) keyboard.submit(primarySubmitMode, 'click')
+    if (!empty && !disabled && !machineBusy && !uploadsPending && !submissionBlocked) keyboard.submit(primarySubmitMode, 'click')
   }
 
   // Claim ghost hint: rendered by CSS as generated content after the last

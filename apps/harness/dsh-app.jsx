@@ -1,4 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {DshPromptImprovement} from './dsh-improve-draft.mjs';
+import {startLetterRoll} from '../browser/extension/prompt-animation.mjs';
+import './dsh-improve-draft.css';
 import {browserAccess} from './browser-access.js';
 import {bindContextSidebar} from './dsh-context-sidebar.jsx';
 import {OriginalDictation,bindDictation} from './dsh-dictation.jsx';
@@ -156,7 +159,7 @@ const editor=createEditor({namespace:'augmentor-dsh-composer',nodes:[ReferenceCh
 registerPlainText(editor);registerHistory(editor,createEmptyHistoryState(),300);
 registerTextRefDecoration(editor,()=>commandMenu?.lexicon.getSnapshot()??new Map(),()=>null);
 registerReferenceActivation(editor,(source,reference)=>commandMenu?.openReference(source,reference)===true);
-editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const previous=composerProjection;composerProjection=$projectComposer(key=>{if(!occurrenceIds.has(key))occurrenceIds.set(key,++nextOccurrenceId);return occurrenceIds.get(key);});const value=composerProjection.clipboardText;if(value!==draft.getSnapshot()||previous.detectText!==composerProjection.detectText||JSON.stringify(previous.occurrences)!==JSON.stringify(composerProjection.occurrences))draftRev++;draft.set(value);if(activeDraft)draftArchive.edit(value,references());commandMenu?.track();}));
+editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const previous=composerProjection;composerProjection=$projectComposer(key=>{if(!occurrenceIds.has(key))occurrenceIds.set(key,++nextOccurrenceId);return occurrenceIds.get(key);});const value=composerProjection.clipboardText;if(value!==draft.getSnapshot()||previous.detectText!==composerProjection.detectText||JSON.stringify(previous.occurrences)!==JSON.stringify(composerProjection.occurrences))draftRev++;draft.set(value);if(activeDraft)draftArchive.edit(value,references());commandMenu?.track();promptImprovement.sync();}));
 function setDraft(value){const text=typeof value==='string'?value:value.text,refs=typeof value==='string'?[]:value.references??[];editor.update(()=>{const paragraph=$createParagraphNode();let offset=0;for(const ref of refs){if(ref.offset>offset)paragraph.append($createTextNode(text.slice(offset,ref.offset)));const chip=$createReferenceChipNode(ref);if(ref.invalid)chip.setInvalid(true);paragraph.append(chip);offset=ref.offset+ref.length;}if(offset<text.length)paragraph.append($createTextNode(text.slice(offset)));$getRoot().clear().append(paragraph);},{discrete:true});}
 const draftArchive=new DshDrafts(controller,{restore:(sid,text,references)=>{activeDraft=sid;setDraft({text,references});},attachments:attachmentDrafts});
 const dictationActions=dictationInsertion({scope:()=>JSON.stringify([activeDraft,controller.epoch]),revision:()=>draftRev,span:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},replace:(span,text)=>{let applied=false;editor.update(()=>{applied=$replaceDetectSpanWithText(span,text);},{discrete:true});return applied;}});
@@ -184,7 +187,16 @@ commandMenu=new DshCommandMenu({InputTriggerController,PopupSelectController,sto
 controller.subscribe(()=>commandMenu.sync());draftArchive.subscribe(()=>commandMenu.sync());
 const useLexicon=bind(commandMenu.lexicon),useMenuLauncher=bind(commandMenu.launcher);
 commandMenu.lexicon.subscribe(()=>rescanTextRefs(editor));
+const improvementScope=()=>{const s=controller.state;return JSON.stringify([s.sessionId,controller.epoch,s.selection,s.phase,s.readOnly,s.sessions.find(x=>x.sessionId===s.sessionId)?.running===true]);};
+const promptImprovement=new DshPromptImprovement({
+  read:()=>{const s=controller.state;return {text:draft.getSnapshot(),revision:draftRev,scope:improvementScope(),sessionId:s.sessionId,selection:s.selection,references:references().length,available:!s.readOnly&&s.phase==='ready'&&!!s.sessionId&&draftArchive.getSnapshot().ready&&!s.sessions.find(x=>x.sessionId===s.sessionId)?.running&&!attachmentDrafts.busy&&!s.unconfirmed&&!s.compactionPending&&!s.compaction?.blocked};},
+  rpc:(method,params)=>controller.rpc(method,params),replace:setDraft,focus:()=>editor.focus(),notice:message=>controller.update({error:message}),
+  animate:text=>{const input=editor.getRootElement();if(!input)throw Error('The draft editor is unavailable.');return startLetterRoll(input,{text});},
+});
+controller.subscribe(()=>promptImprovement.sync());
+window.addEventListener('pagehide',()=>promptImprovement.cancel());
 const keyboard={editor,arbitrate:(key,composing)=>commandMenu.arbitrate(key,composing),space:()=>commandMenu.engine?.onSpace()??false,dismissPopup:()=>commandMenu.popup.dismiss(),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>void control.run(async()=>{
+  if(promptImprovement.getSnapshot().busy)return;
   const text=draft.getSnapshot(),sid=controller.state.sessionId,items=[...attachmentDrafts.draft(sid).items],epoch=controller.epoch;if(attachmentDrafts.busy||!text.trim()&&!items.length)return;
   if(await commandMenu.adjudicate(text)!==undefined)return;
   if(sid!==controller.state.sessionId||draft.getSnapshot()!==text)throw Error('The conversation or draft changed; nothing was submitted.');
@@ -281,26 +293,13 @@ function QueueStatus({state}){
   return <>{state.unconfirmed&&<DisclosureRow open expandable={false} title="Submission unconfirmed; inspect history before continuing"><JsonBlock label={state.unconfirmed.kind==='compaction'?'Unconfirmed compaction':'Unconfirmed prompt'} payload={state.unconfirmed}/><Button onClick={()=>controller.clearUnconfirmed()}>Acknowledge; do not retry</Button></DisclosureRow>}{(unknown||compact?.available===false)&&<DisclosureRow open expandable={false} title={unknown?'Compaction outcome unknown; inspect native history':'Compaction receipt storage unavailable'}><JsonBlock label="Compaction receipt" payload={compact}/>{unknown&&<Button disabled={state.readOnly||compact.busy} onClick={()=>void control.run(async()=>{const result=await controller.rpc('session.acknowledgeCompaction',{sessionId:state.sessionId,requestId:compact.lastReceipt.requestId,acknowledgeUnknownOutcome:true});controller.update({compaction:result});})}>Acknowledge unknown; do not retry</Button>}</DisclosureRow>}{queue.paused&&queue.items?.length>0&&<Button disabled={state.readOnly||!!uncertain.length||compact?.blocked} onClick={()=>void control.run(()=>controller.rpc('session.continueQueue',{sessionId:state.sessionId}))}>Resume waiting messages</Button>}{uncertain.map(item=><DisclosureRow key={item.id} open expandable={false} title={item.stateLabel||'Interrupted action: outcome unknown'}><JsonBlock label="Prompt" payload={item.message}/><Button disabled={state.readOnly} onClick={()=>void control.run(()=>controller.rpc('session.resolveQueue',{sessionId:state.sessionId,itemId:item.id,acknowledgeUnknownOutcome:true}))}>Keep interrupted; do not retry</Button></DisclosureRow>)}</>;
 }
 
-function ImproveDraft({state}){
-  const [job,setJob]=useState(null),[undo,setUndo]=useState(null),text=useDraft(x=>x),active=useRef(null);
-  const cancel=()=>{const value=active.current;active.current=null;setJob(null);if(value)void controller.rpc('prompt.cancelImprovement',{requestId:value.id,scopeId:value.id}).catch(()=>{});};
-  useEffect(()=>{if(active.current&&(active.current.sessionId!==state.sessionId||active.current.original!==text))cancel();},[state.sessionId,text]);
-  useEffect(()=>()=>{const value=active.current;if(value)void controller.rpc('prompt.cancelImprovement',{requestId:value.id,scopeId:value.id}).catch(()=>{});},[]);
-  const improve=async()=>{
-    if(job){cancel();return;}
-    if(undo&&undo.sessionId===state.sessionId&&undo.text===text){setDraft(undo.original);setUndo(null);return;}
-    const value={id:crypto.randomUUID(),sessionId:state.sessionId,original:text};active.current=value;setJob(value);
-    try{const instructions=(await controller.rpc('prompts.list')).improvement;
-      if(active.current!==value)return;
-      const result=await controller.rpc('prompt.improve',{sessionId:value.sessionId,selection:state.selection,text:value.original,requestId:value.id,scopeId:value.id,expectedInstructionsRevision:instructions.revision});
-      if(active.current!==value||controller.state.sessionId!==value.sessionId||draft.getSnapshot()!==value.original)return;
-      if(result.kind!=='rewrite'||!result.text?.trim())throw Error('Invalid prompt improvement; the original draft is preserved.');
-      active.current=null;setJob(null);setUndo({...value,text:result.text});setDraft(result.text);
-    }catch(error){if(active.current===value)controller.update({error:error.message});}
-    finally{if(active.current===value){active.current=null;setJob(null);}}
-  };
-  const label=job?'Cancel prompt improvement':undo?.sessionId===state.sessionId&&undo.text===text?'Undo prompt improvement':'Improve prompt';
-  return <Button variant="ghost" aria-label={label} title={label} disabled={state.readOnly||state.draftReady===false||!state.sessionId||!text.trim()||state.phase!=='ready'} onClick={()=>void improve()}>{job?'×':label.startsWith('Undo')?'↶':'✦'}</Button>;
+function ImproveDraft(){
+  const value=useSyncExternalStore(promptImprovement.subscribe,promptImprovement.getSnapshot),text=useDraft(x=>x),button=useRef(null);
+  useEffect(()=>()=>promptImprovement.cancel(),[]);
+  useEffect(()=>{if(!value.busy)return;const card=button.current?.closest('[data-composer-card]');const key=e=>{if(e.isComposing)return;if(e.key==='Enter'||e.key==='Escape'){e.preventDefault();e.stopPropagation();if(e.key==='Escape')promptImprovement.cancel();}};card?.addEventListener('keydown',key,true);return()=>card?.removeEventListener('keydown',key,true);},[value.busy]);
+  const current=promptImprovement.deps.read(),label=value.busy?'Cancel prompt improvement':value.canUndo?'Undo prompt improvement':'Improve prompt';
+  const help=current.references?'Improve the text before adding reference chips.':text.length>6000?'Improve supports drafts up to 6,000 characters.':label;
+  return <><button ref={button} type="button" className="augmentor-improve-draft" aria-label={label} title={help} disabled={!value.busy&&!value.canUndo&&(!current.available||!text.trim()||text.length>6000||!!current.references)} onMouseDown={e=>e.preventDefault()} onClick={()=>void promptImprovement.run()}>{value.busy?'×':value.canUndo?'↶':'✦'}</button><span className="augmentor-improve-status" role="status">{value.note}</span></>;
 }
 
 const SessionBridge=React.createContext(null);
@@ -329,6 +328,7 @@ function App(){
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
   const liveDraft=useDraft(x=>x);useSyncExternalStore(attachmentDrafts.subscribe,attachmentDrafts.snapshot);const attached=attachmentDrafts.draft(state.sessionId);const loadImage=attachmentDrafts.loader(state.sessionId);
   const draftState=useSyncExternalStore(draftArchive.subscribe,draftArchive.getSnapshot);
+  const improvementState=useSyncExternalStore(promptImprovement.subscribe,promptImprovement.getSnapshot);
   useEffect(()=>{const key=e=>{if(e.key==='Escape'&&!e.defaultPrevented&&!e.isComposing&&!dialog&&!settingsState.open&&!commandMenu.menu.getSnapshot().open&&!commandMenu.popup.state.getSnapshot().open&&!controller.visibleInteraction()&&state.sessions.find(x=>x.sessionId===state.sessionId)?.running){e.preventDefault();void control.run(()=>controller.stop());}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[state,dialog,settingsState.open]);
   const current=state.sessions.find(x=>x.sessionId===state.sessionId);
   const workspaces=useMemo(()=>{
@@ -400,15 +400,15 @@ function App(){
         return <p role="status">{owner.node.data.text}</p>;
       case 'conversation.chat.reasoning.body':return <MarkdownText text={owner.text} streaming={owner.running}/>;
       case 'conversation.input.dock':return <><QueueStatus state={state}/><QueueDock {...p} useSession={selectorFace({...composed.session,subagent:state.readOnly?{address:{mode:'read-only'}}:null})} updateQueue={(itemId,action)=>controller.updateQueue(itemId,action)} notify={(_,text)=>controller.update({error:text})} loadImage={loadImage}/>{!state.readOnly&&<GoalBar goal={state.goal?.goal} activation={state.goal?.activation} t={t.goal} onPause={()=>goalAction('pause')} onResume={()=>goalAction('resume')} onClear={()=>goalAction('clear')} onEdit={objective=>goalAction('edit',{objective,maxGoalRounds:state.goal?.goal?.maxGoalRounds})}/>}</>;
-      case 'conversation.composer.bar':return <InputBar {...p} contextMeterPlacement="toolbar" placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!draftState.ready||!!state.unconfirmed||state.compactionPending||state.compaction?.blocked||attachmentDrafts.busy||owner.disabled} keyboard={keyboard} addFiles={attachmentDrafts.add} removeAttachment={attachmentDrafts.remove} retryFileUpload={attachmentDrafts.retry} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace(attached.uploads)} useNotices={selectorFace(undefined)} useLexicon={useLexicon} useMenuLauncher={useMenuLauncher} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={ids=>attached.items.filter(x=>ids.includes(x.id))} toggleCommandMenu={span=>commandMenu.toggle(span)}/>;
+      case 'conversation.composer.bar':return <InputBar {...p} submissionBlocked={improvementState.busy} contextMeterPlacement="toolbar" placeholder={state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task'} disabled={state.readOnly||state.phase!=='ready'||!draftState.ready||!!state.unconfirmed||state.compactionPending||state.compaction?.blocked||attachmentDrafts.busy||owner.disabled} keyboard={keyboard} addFiles={attachmentDrafts.add} removeAttachment={attachmentDrafts.remove} retryFileUpload={attachmentDrafts.retry} stop={()=>void control.run(()=>controller.stop())} useBusyEnter={selectorFace('queue')} useFileUploads={selectorFace(attached.uploads)} useNotices={selectorFace(undefined)} useLexicon={useLexicon} useMenuLauncher={useMenuLauncher} useStopShortcut={selectorFace(['Escape'])} resolveDraftAttachments={ids=>attached.items.filter(x=>ids.includes(x.id))} toggleCommandMenu={span=>commandMenu.toggle(span)}/>;
       case 'conversation.input.activity':return state.readOnly||state.phase!=='ready'?null:<OriginalDictation {...p} openSettings={()=>settingsShell.actions.openSection('plugins')}/>;
       case 'conversation.input.attachments':return <ComposerAttachments {...owner} t={t.conversation}/>;
       case 'conversation.message.images':return <MessageImages {...owner} loadImage={loadImage} t={t.conversation}/>;
       case 'conversation.input.permission':return <CurrentPermissionControl state={state} controller={controller} locked={owner.locked}/>;
       case 'conversation.input.plan':return <PlanModeControl state={state} controller={controller} locked={owner.locked}/>;
-      case 'conversation.input.right':return <ImproveDraft state={{...state,draftReady:draftState.ready}}/>;
+      case 'conversation.input.right':return null;
       case 'conversation.input.model':return <ModelSelect {...p} openAtTop curation={pickerCuration} t={t.model} locked={owner.locked||state.readOnly||current?.running===true} available={!state.readOnly} directory={modelDirectory} load={async()=>modelDirectory.getSnapshot()} select={async selection=>{modelDirectory.update(s=>({...s,status:'selecting',pending:selection}));try{await controller.choose(selection);return {ok:true,value:undefined};}catch(e){modelDirectory.update(s=>({...s,status:'error',pending:null,error:e.message}));return {ok:false,error:{code:'models/selection-failed',message:e.message}};}}}/>;
-      case 'conversation.input.overlay':return <><CommandOverlays/><DshContextOverlay key={state.sessionId} state={state} controller={controller} binding={contextModal}/></>;
+      case 'conversation.input.overlay':return <><ImproveDraft/><CommandOverlays/><DshContextOverlay key={state.sessionId} state={state} controller={controller} binding={contextModal}/></>;
       default:return options.fallback??null;
     }
   };

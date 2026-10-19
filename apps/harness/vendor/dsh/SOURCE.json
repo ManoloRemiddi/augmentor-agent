@@ -791,10 +791,10 @@
     },
     {
       "path": "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx",
-      "sha256": "d146bed31371cd161df9ba1dbf0c6aff977c4dab5dde653489da2b1bfd632177",
+      "sha256": "8943edb96facf0385c773079dfa2668e105aca1abab7a7ab38c9770597e50843",
       "upstreamPath": "packages/client/ui-conversation/src/client/skeleton/InputBar.tsx",
       "upstreamSha256": "0ad3522921b4ba58346e052fa6ec10e64b514a64d51d8a85d5ac748f5ea8065d",
-      "adaptation": "Presentation-only media predicate plus optional toolbar ContextMeter placement; original meter and default dock placement retained."
+      "adaptation": "Presentation-only media predicate plus optional toolbar ContextMeter placement; original meter and default dock placement retained. Augmentor opt-in submissionBlocked gates Send without disabling the editable draft during prompt improvement."
     },
     {
       "path": "packages/client/ui-conversation/src/client/skeleton/control-row-layout.ts",

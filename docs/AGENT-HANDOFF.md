@@ -1,5 +1,11 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Harness Improve prompt](PROMPT-IMPROVEMENT.md#harness-input-box--october-19)
+is now inside the input at the upper right, sharing Agent's instructions and
+paint-only rolling preview, Cancel/Escape and revision-bound Undo. Source
+qualification and installed pilot update are in progress; preserve all migrated
+projects and group assignments. No new model pipeline or plugin store.
+
 [Registered DSH projects are now imported and grouped](HARNESS-PROJECTS-MIGRATED-2026-10-19.md):
 **29 workspaces / nine Metafolders / 106 source conversations represented** in the
 actual pilot, 105 newly added and the earlier import/continuation preserved.

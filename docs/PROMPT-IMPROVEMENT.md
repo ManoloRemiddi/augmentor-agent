@@ -10,6 +10,41 @@ The editor accepts drafts up to 6,000 characters, subject to the local request-s
 
 Regression checks: `tests/improve-prompt.test.mjs` and `tests/test_prompt_improvement.py`.
 
+## Harness input box — October 19
+
+The original Harness GUI now places **✦ Improve prompt** inside the upper-right
+corner of the input, matching Agent. Type a draft first, then click ✦. The current
+chat's selected model uses the same shared improvement instructions. The
+paint-only rolling preview keeps the original editable text underneath, then
+settles for 700 ms; reduced motion skips that interval. The result stays in the
+input for review. **× / Escape** cancels, and **↶ Undo** restores the original.
+Typing, changing chats/models or disconnecting discards pending results. Enter
+and Send wait during both pending and settling phases. New wording invalidates
+Undo even if the user later types the replacement again. Attachments stay in
+place; structured reference chips disable improvement with an explanatory
+hover label. Improve plain text before adding those chips. Drafts up to 6,000
+characters are supported; empty drafts and running chats disable the button.
+
+Settings → Plugins → Improve prompt opens the existing shared instructions
+editor. This is the existing tool-free Pi operation, with no new prompt store,
+chat turn, tool execution, automatic send, fallback model or retry. An unchanged
+answer keeps the original without a misleading Undo. Failure keeps the draft
+and reports the error. No new plugin installation is required.
+
+The implementation is shared across browser-hosted Harness surfaces. MX Linux
+is the installation target; macOS/Windows/other distributions are not qualified
+by this change. Regression coverage lives in
+`tests/harness-improve-draft.test.mjs` and the actual original GUI's
+`tests/harness-plugin-directory-chromium.test.mjs`, alongside the existing
+runtime, Native, Browser and thin-Harness improvement suites.
+
+Source checks pass **28 Node / four Native Python tests**, including the actual
+original GUI at 513 and 1280 pixels, pending/settling, Escape, typing, chat changes,
+Undo, unchanged replies, shared instructions and zero chat submission.
+At source qualification, the installed pilot still uses the prior artifact;
+the packaged/installed result is recorded below after verification. Existing
+projects, conversations and Metafolders are preserved during the update.
+
 ## DSH composer
 
 The DSH web UI also exposes ✦ at the top-right of its composer through the public `conversation.input.overlay` slot. It uses DSH’s selected model and the same shared instructions, with rolling letters, Cancel, and an Undo arrow in the same icon position. Refresh the DSH page after updating the plugin. Draft revisions guard late results; attachments remain intact. Improve plain text before adding structured reference chips, which are deliberately not flattened by a rewrite.
