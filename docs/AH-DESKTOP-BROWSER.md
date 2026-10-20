@@ -191,3 +191,11 @@ The macOS headless companion payload also retains the AH resolver and shared
 platform transport module. Its restricted packaged Python subset is exercised
 without importing Qt. Desktop can alternatively host the Browser extension
 itself, using its bundled native-messaging executable and one shared install.
+
+The Mac resolver also reads the newer installer's private `bin/environment.sh`
+when the owned LaunchAgent selects its standard `bin/start-harness` wrapper.
+It parses only the declared connection paths and known HOME/uid variables,
+including the installer's literal uid expression; it never sources the file or
+executes shell substitutions. Unexpected launchers, writable metadata and dynamic
+path expressions fail closed. The original EnvironmentVariables format remains
+supported, and live owner directory/version attestation still precedes actions.

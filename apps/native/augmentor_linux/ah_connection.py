@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import plistlib
 import re
+import shlex
 import stat
 import subprocess
 import sys
@@ -31,6 +32,45 @@ def absolute(value):
     if not path.is_absolute() or str(path) != value or path.resolve() != path:
         raise ValueError('Harness connection paths cannot contain aliases or symbolic links.')
     return path
+
+
+def macos_launch_environment(home, agent):
+    """Read either supported installer format without evaluating shell code."""
+    if agent.get('Label') != 'com.augmentor.Harness':
+        raise ValueError('The installed Harness LaunchAgent has an unexpected identity.')
+    if isinstance(agent.get('EnvironmentVariables'), dict):
+        return agent['EnvironmentVariables']
+    base=home/'Library/Application Support/Augmentor Harness'
+    wrapper=base/'bin/start-harness'
+    if agent.get('ProgramArguments') != [str(wrapper)]:
+        raise ValueError('The installed Harness launcher format is unsupported.')
+    private_record(wrapper,raw=True)
+    text=private_record(base/'bin/environment.sh',raw=True).decode('utf-8')
+    wanted={'AUGMENTOR_HARNESS_HOME','XDG_RUNTIME_DIR','AUGMENTOR_PI_CONFIG','AUGMENTOR_PI_STATE',
+            'AUGMENTOR_PI_SOCKET','AUGMENTOR_PI_WORKSPACE','AUGMENTOR_SHARED_STATE','AUGMENTOR_SHARED_DATA'}
+    values={'HOME':str(home),'UID':str(os.getuid())};seen=set()
+    for line in text.splitlines():
+        match=re.fullmatch(r'export ([A-Z_]+)=(.*)',line.strip())
+        if not match or match[1] not in wanted:continue
+        key=match[1]
+        if key in seen:raise ValueError('Duplicate Harness environment path declaration.')
+        words=shlex.split(match[2])
+        if len(words)!=1:raise ValueError('Unsupported Harness environment path declaration.')
+        # The installer uses this literal user-id expression. Replace it with
+        # the known uid; never run a shell, substitution, or arbitrary command.
+        value=words[0].replace('$(id -u)',str(os.getuid()))
+        def expand(m):
+            name=m[1] or m[2]
+            if name not in values:raise ValueError('Unknown Harness environment path variable.')
+            return values[name]
+        value=re.sub(r'\$(?:\{([A-Z_]+)\}|([A-Z_]+))',expand,value)
+        if '$' in value or '`' in value or any(ord(c)<32 for c in value):
+            raise ValueError('Dynamic Harness environment paths are unsupported.')
+        values[key]=value;seen.add(key)
+    if wanted-seen:raise ValueError('The installed Harness environment lacks required connection paths.')
+    if values['AUGMENTOR_HARNESS_HOME']!=str(base):
+        raise ValueError('The installed Harness environment belongs to another installation.')
+    return values
 
 
 def selection():
@@ -63,7 +103,7 @@ def selection():
         info = path.lstat()
         if not stat.S_ISREG(info.st_mode) or info.st_uid != os.getuid() or info.st_mode & 0o022:
             raise ValueError('The installed Harness LaunchAgent is unsafe.')
-        agent = plistlib.loads(path.read_bytes()); env = agent['EnvironmentVariables']
+        agent = plistlib.loads(path.read_bytes()); env = macos_launch_environment(Path.home(),agent)
         root = str((Path.home()/'Library/Application Support/Augmentor Harness/current').resolve(strict=True))
         version = json.loads((Path(root)/'package.json').read_text())['version']
         profile = dict(config=env['AUGMENTOR_PI_CONFIG'], state=env['AUGMENTOR_PI_STATE'], socket=env['AUGMENTOR_PI_SOCKET'],

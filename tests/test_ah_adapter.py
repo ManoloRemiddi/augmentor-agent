@@ -107,11 +107,41 @@ class AhAdapterTests(unittest.TestCase):
         home=self.root/'home';launch=home/'Library/LaunchAgents';launch.mkdir(parents=True)
         current=home/'Library/Application Support/Augmentor Harness/current';current.parent.mkdir(parents=True);current.symlink_to(app,target_is_directory=True)
         env=dict(AUGMENTOR_PI_CONFIG=self.profile['config'],AUGMENTOR_PI_STATE=self.profile['state'],AUGMENTOR_PI_SOCKET=self.profile['socket'],AUGMENTOR_PI_WORKSPACE=self.profile['workspace'],AUGMENTOR_SHARED_STATE=self.profile['sharedState'],AUGMENTOR_SHARED_DATA=self.profile['sharedData'])
-        plist=launch/'com.augmentor.Harness.plist';plist.write_bytes(plistlib.dumps({'EnvironmentVariables':env}));plist.chmod(0o644)
+        plist=launch/'com.augmentor.Harness.plist';plist.write_bytes(plistlib.dumps({'Label':'com.augmentor.Harness','EnvironmentVariables':env}));plist.chmod(0o644)
         with patch.dict(os.environ,{'AUGMENTOR_AH_CONNECTION':''}),patch('augmentor_linux.ah_connection.sys.platform','darwin'),patch('augmentor_linux.ah_connection.Path.home',return_value=home):
             result=selection()
         self.assertEqual(result['root'],str(app));self.assertEqual(result['profile'],self.profile)
         self.assertEqual(result['start'][0],'launchctl')
+
+    def shell_installation(self):
+        home=self.root/'shell-home';base=home/'Library/Application Support/Augmentor Harness';bin=base/'bin';bin.mkdir(parents=True,mode=0o700)
+        app=self.root/'shell-app';app.mkdir();(app/'package.json').write_text('{"version":"authored-test"}');(base/'current').symlink_to(app,target_is_directory=True)
+        wrapper=bin/'start-harness';wrapper.write_text('#!/bin/sh\n');wrapper.chmod(0o700)
+        profile=dict(self.profile);profile['socket']=str(self.root/'host.sock')
+        text='export AUGMENTOR_HARNESS_HOME="$HOME/Library/Application Support/Augmentor Harness"\nexport XDG_RUNTIME_DIR="'+str(self.root)+'"\n'
+        names={'config':'AUGMENTOR_PI_CONFIG','state':'AUGMENTOR_PI_STATE','socket':'AUGMENTOR_PI_SOCKET','workspace':'AUGMENTOR_PI_WORKSPACE','sharedState':'AUGMENTOR_SHARED_STATE','sharedData':'AUGMENTOR_SHARED_DATA'}
+        text+=''.join('export '+name+'="'+profile[key]+'"\n' for key,name in names.items())
+        env=bin/'environment.sh';env.write_text(text);env.chmod(0o700)
+        job=home/'Library/LaunchAgents/com.augmentor.Harness.plist';job.parent.mkdir(parents=True);job.write_bytes(plistlib.dumps({'Label':'com.augmentor.Harness','ProgramArguments':[str(wrapper)]}));job.chmod(0o600)
+        return home,profile,env,job
+
+    def test_macos_reads_private_shell_installer_without_executing_it(self):
+        home,profile,env,_=self.shell_installation()
+        text=env.read_text().replace('export XDG_RUNTIME_DIR="'+str(self.root)+'"','export XDG_RUNTIME_DIR="/tmp/authored-$(id -u)"')
+        env.write_text(text)
+        with patch.dict(os.environ,{'AUGMENTOR_AH_CONNECTION':''}),patch('augmentor_linux.ah_connection.sys.platform','darwin'),patch('augmentor_linux.ah_connection.Path.home',return_value=home),patch('augmentor_linux.ah_connection.subprocess.run') as run:
+            value=selection()
+        run.assert_not_called();self.assertEqual(value['profile'],profile)
+        self.assertEqual(value['start'],['launchctl','kickstart','gui/'+str(os.getuid())+'/com.augmentor.Harness'])
+
+    def test_macos_refuses_dynamic_or_unowned_environment_instead_of_running_shell(self):
+        home,profile,env,_=self.shell_installation();original=env.read_text();canary=self.root/'must-not-exist'
+        with patch.dict(os.environ,{'AUGMENTOR_AH_CONNECTION':''}),patch('augmentor_linux.ah_connection.sys.platform','darwin'),patch('augmentor_linux.ah_connection.Path.home',return_value=home):
+            env.write_text(original.replace(profile['state'],'$(touch '+str(canary)+')'))
+            with self.assertRaisesRegex(ValueError,'Dynamic'):selection()
+            self.assertFalse(canary.exists())
+            env.write_text(original);env.chmod(0o644)
+            with self.assertRaisesRegex(ValueError,'private'):selection()
 
 
 if __name__=='__main__':unittest.main()
