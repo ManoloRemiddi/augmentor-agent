@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Harness installation defaults](HARNESS-INSTALLATION-DEFAULTS.md) specifies the
+standard components, preserves saved choices and qualifies macOS Web Search/Fetch
+separately from the Linux-only Wiki adapter. Private local-model setup and actual
+owner activation remain distinct from application defaults.
+
 [Registered DSH projects are now imported and grouped](HARNESS-PROJECTS-MIGRATED-2026-10-19.md):
 **29 workspaces / nine Metafolders / 106 source conversations represented** in the
 actual pilot, 105 newly added and the earlier import/continuation preserved.
