@@ -1,5 +1,5 @@
-import {realpathSync as wikiRealpathSync} from 'node:fs';
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {realpathSync as wikiRealpathSync} from 'node:fs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtempSync,writeFileSync,readFileSync,existsSync,chmodSync,statSync,symlinkSync,rmSync} from 'node:fs';import {join} from 'node:path';import {tmpdir} from 'node:os';import {fileURLToPath,pathToFileURL} from 'node:url';
 import {DshWikiProfile} from '../apps/harness/dsh-wiki-profile.mjs';

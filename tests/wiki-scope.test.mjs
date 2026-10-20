@@ -1,5 +1,5 @@
-import {realpathSync as wikiRealpathSync} from 'node:fs';
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {realpathSync as wikiRealpathSync} from 'node:fs';
 import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtemp,mkdir,writeFile,readFile,chmod,symlink,link,rm,readdir} from 'node:fs/promises';
 import {join} from 'node:path';import {tmpdir} from 'node:os';
