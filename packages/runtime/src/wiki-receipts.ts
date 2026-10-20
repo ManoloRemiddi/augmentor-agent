@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {darwinWikiIdentity} from './wiki-darwin.js';
 import {constants,existsSync,lstatSync,realpathSync,mkdirSync,readdirSync,openSync,fstatSync,readSync,readFileSync,writeFileSync,fsyncSync,closeSync,renameSync,unlinkSync,type Stats} from 'node:fs';
 import {createHash,randomUUID} from 'node:crypto';
 import {dirname,join,resolve} from 'node:path';
@@ -10,7 +11,7 @@ type Review={schema:'augmentor-wiki-review/1';key:string;sha256:string;decision:
 const keyPattern=/^[a-f0-9]{64}$/,tools=['wiki_write','wiki_rename','wiki_scaffold','wiki_archive','wiki_lint'];
 function owned(info:Stats){if(!info.isFile()||info.nlink!==1||info.uid!==process.getuid!()||(info.mode&0o077)!==0||info.size>16384)throw Error('Wiki receipt/lock is not a private bounded file; preserve its original.');}
 function read(path:string){const before=lstatSync(path);owned(before);const fd=openSync(path,constants.O_RDONLY|constants.O_NOFOLLOW|constants.O_NONBLOCK);try{const now=fstatSync(fd);owned(now);if(now.ino!==before.ino||now.dev!==before.dev)throw Error('Wiki receipt changed during inspection.');const buffer=Buffer.alloc(16385),n=readSync(fd,buffer,0,buffer.length,0);if(n>16384)throw Error('Wiki receipt exceeds its bound.');const bytes=buffer.subarray(0,n);return {bytes,sha256:wikiDigest(bytes),ino:now.ino,dev:now.dev};}finally{closeSync(fd);}}
-function processIdentity(pid:number){const info=lstatSync('/proc/'+pid);if(info.uid!==process.getuid!())throw Error('Wiki lock process ownership cannot be verified.');const stat=readFileSync('/proc/'+pid+'/stat','utf8'),start=stat.slice(stat.lastIndexOf(')')+2).trim().split(/\s+/)[19];if(!/^\d+$/.test(start))throw Error('Wiki process identity is unavailable.');return {processStart:start,bootId:readFileSync('/proc/sys/kernel/random/boot_id','utf8').trim()};}
+function processIdentity(pid:number){if(process.platform==='darwin')return darwinWikiIdentity(pid);const info=lstatSync('/proc/'+pid);if(info.uid!==process.getuid!())throw Error('Wiki lock process ownership cannot be verified.');const stat=readFileSync('/proc/'+pid+'/stat','utf8'),start=stat.slice(stat.lastIndexOf(')')+2).trim().split(/\s+/)[19];if(!/^\d+$/.test(start))throw Error('Wiki process identity is unavailable.');return {processStart:start,bootId:readFileSync('/proc/sys/kernel/random/boot_id','utf8').trim()};}
 function lockState(bytes:Buffer):'live'|'orphaned'|'unattested'{
  let row:Lock;try{row=JSON.parse(bytes.toString('utf8'));}catch{return 'unattested';}
  if(!row||Object.keys(row).some(k=>!['schema','pid','processStart','bootId','nonce','kind'].includes(k))||row.schema!=='augmentor-wiki-lock/1'||!Number.isSafeInteger(row.pid)||row.pid<1||typeof row.processStart!=='string'||!/^\d+$/.test(row.processStart)||typeof row.bootId!=='string'||!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(row.bootId)||typeof row.nonce!=='string'||!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(row.nonce)||!['action','review'].includes(row.kind))return 'unattested';
@@ -21,7 +22,7 @@ export class WikiReceipts {
  readonly root:string;
  constructor(stateDir:string,readonly vaultPath:string){this.root=join(stateDir,'wiki-actions',wikiDigest(vaultPath));}
  private directory(create=false){
-  if(process.platform!=='linux')throw Error('Wiki receipt review currently requires Linux.');
+  if(!['linux','darwin'].includes(process.platform))throw Error('Wiki receipt review requires Linux or macOS.');
   let path=this.root;const missing:string[]=[];while(!existsSync(path)){try{lstatSync(path);throw Error('Linked Wiki receipt parent is unsafe.');}catch(error){if((error as NodeJS.ErrnoException).code!=='ENOENT')throw error;}missing.unshift(path);path=dirname(path);}
   if(realpathSync(path)!==resolve(path))throw Error('Linked Wiki receipt parent is unsafe.');if(missing.length&&!create)return false;for(const next of missing)mkdirSync(next,{mode:0o700});
   const info=lstatSync(this.root);if(!info.isDirectory()||info.uid!==process.getuid!()||(info.mode&0o077)!==0||realpathSync(this.root)!==resolve(this.root))throw Error('Wiki receipt directory is unsafe.');return true;

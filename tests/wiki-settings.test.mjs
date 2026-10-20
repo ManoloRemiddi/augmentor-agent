@@ -1,10 +1,11 @@
+import {realpathSync as wikiRealpathSync} from 'node:fs';
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
 import {mkdtempSync,writeFileSync,readFileSync,existsSync,chmodSync,statSync,symlinkSync,rmSync} from 'node:fs';import {join} from 'node:path';import {tmpdir} from 'node:os';import {fileURLToPath,pathToFileURL} from 'node:url';
 import {DshWikiProfile} from '../apps/harness/dsh-wiki-profile.mjs';
 const root=process.env.AUGMENTOR_PI_TEST_ROOT??fileURLToPath(new URL('..',import.meta.url)),{WikiPreferences}=await import(pathToFileURL(join(root,'dist/runtime/src/wiki-preferences.js')));
-test('Wiki profile reads create nothing, explicit saves stay private, stale edits and unsafe originals are preserved',{skip:process.platform!=='linux'},t=>{
- const dir=mkdtempSync(join(tmpdir(),'wiki-profile-'));t.after(()=>rmSync(dir,{recursive:true,force:true}));const file=join(dir,'wiki.json'),vault=join(dir,'operator-vault'),store=new WikiPreferences(file);
+test('Wiki profile reads create nothing, explicit saves stay private, stale edits and unsafe originals are preserved',{skip:!['linux','darwin'].includes(process.platform)},t=>{
+ const dir=mkdtempSync(join(wikiRealpathSync(tmpdir()),'wiki-profile-'));t.after(()=>rmSync(dir,{recursive:true,force:true}));const file=join(dir,'wiki.json'),vault=join(dir,'operator-vault'),store=new WikiPreferences(file);
  const empty=store.describe();assert.equal(empty.revision,'missing');assert.equal(existsSync(file),false);
  const value={enabled:true,vaultPath:vault,maxQueryResults:17,typeFolders:{concept:'wiki/areas'}};const saved=store.set(value,'missing');assert.deepEqual(saved.value,value);assert.equal(statSync(file).mode&0o777,0o600);assert.equal(existsSync(vault),false,'configuration never creates the vault');const bytes=readFileSync(file);
  assert.throws(()=>store.set({...value,maxQueryResults:99},'missing'),/changed/);assert.deepEqual(readFileSync(file),bytes);

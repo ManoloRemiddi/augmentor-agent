@@ -17,7 +17,7 @@ export function checkedWikiProfile(value:any):WikiProfile {
  const vaultPath=value.vaultPath??'',maxQueryResults=value.maxQueryResults??10,typeFolders=value.typeFolders??{};
  if(typeof vaultPath!=='string'||vaultPath.length>4096||vaultPath.includes('\0')||vaultPath&&(vaultPath==='/'||!isAbsolute(vaultPath)||resolve(vaultPath)!==vaultPath)||value.enabled&&!vaultPath)throw Error('Wiki vaultPath must be an explicit absolute normalized directory.');
  if(!Number.isSafeInteger(maxQueryResults)||maxQueryResults<1||maxQueryResults>100||!typeFolders||typeof typeFolders!=='object'||Array.isArray(typeFolders)||Object.values(typeFolders).some(v=>typeof v!=='string'))throw Error('Invalid Wiki query/routing configuration.');
- if(value.enabled&&process.platform!=='linux')throw Error('The Wiki binding currently requires Linux qualification.');
+ if(value.enabled&&!['linux','darwin'].includes(process.platform))throw Error('The Wiki binding currently requires Linux or macOS.');
  if(vaultPath)new Vault(vaultPath,{typeFolders});
  return {enabled:value.enabled,vaultPath,maxQueryResults,typeFolders:structuredClone(typeFolders)};
 }

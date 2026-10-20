@@ -6,7 +6,7 @@ import {readFile,readdir,stat} from 'node:fs/promises';import {join} from 'node:
 import {fileURLToPath} from 'node:url';import {setTimeout as delay} from 'node:timers/promises';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label){const end=Date.now()+15000;while(Date.now()<end){if(await fn())return;await delay(30);}throw Error('Wiki fixture timeout: '+label);}
-test('original six Wiki tools and bundled skill execute through one Pi owner, preserve archive bytes and refuse read-only writes',{skip:process.platform!=='linux',timeout:60000},async t=>{
+test('original six Wiki tools and bundled skill execute through one Pi owner, preserve archive bytes and refuse read-only writes',{skip:!['linux','darwin'].includes(process.platform),timeout:60000},async t=>{
  let fixture,output='',stderr='',link;
  t.after(async()=>{if(fixture?.pid&&fixture.exitCode===null){const end=once(fixture,'exit');fixture.kill('SIGTERM');await end;}});
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));
@@ -38,7 +38,7 @@ test('original six Wiki tools and bundled skill execute through one Pi owner, pr
  const browserRequests=(await readFile(link.requestLog,'utf8')).trim().split('\n').map(JSON.parse).slice(12);assert.equal(browserRequests.length,1);assert(!browserRequests[0].tools.some(tool=>tool.function.name.startsWith('wiki_')),'the native vault is not granted to a browser session');
 });
 
-test('an uncertain real Wiki archive stops its Pi owner before another request and preserves both source versions',{skip:process.platform!=='linux',timeout:30000},async t=>{
+test('an uncertain real Wiki archive stops its Pi owner before another request and preserves both source versions',{skip:!['linux','darwin'].includes(process.platform),timeout:30000},async t=>{
  let fixture,output='',stderr='',link;t.after(async()=>{if(fixture?.pid&&fixture.exitCode===null){const end=once(fixture,'exit');fixture.kill('SIGTERM');await end;}});
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));
  fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_WIKI:'1',AUGMENTOR_HARNESS_PROOF_WIKI_FAILURE:'1',AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1'},stdio:['ignore','pipe','pipe']});fixture.stdout.on('data',d=>output+=d);fixture.stderr.on('data',d=>stderr+=d);

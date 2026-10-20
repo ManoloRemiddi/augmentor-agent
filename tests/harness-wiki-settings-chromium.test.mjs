@@ -1,3 +1,4 @@
+import {realpathSync as wikiRealpathSync} from 'node:fs';
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';import {spawn} from 'node:child_process';import {once} from 'node:events';
 import {mkdtemp,readFile,writeFile,stat,rm,readdir} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';import {fileURLToPath} from 'node:url';import {setTimeout as delay} from 'node:timers/promises';
@@ -5,8 +6,8 @@ import {chromiumPort} from './fixtures/chromium-ready.mjs';import {harnessCdp} f
 import {PiConnection} from '../dist/client/src/socket.js';import {localConnect} from '../dist/platform/src/transport.js';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label){const end=Date.now()+15000;while(Date.now()<end){if(await fn())return;await delay(30);}throw Error('Wiki settings timeout: '+label);}
-test('original Plugins form saves and reloads Wiki on the same owners, preserves stale drafts/data, repairs failed application and cold-reopens',{skip:process.platform!=='linux',timeout:90000},async t=>{
- const profile=await mkdtemp(join(tmpdir(),'wiki-settings-chrome-'));let fixture,chrome,panel,link,output='',stderr='';
+test('original Plugins form saves and reloads Wiki on the same owners, preserves stale drafts/data, repairs failed application and cold-reopens',{skip:!['linux','darwin'].includes(process.platform),timeout:90000},async t=>{
+ const profile=await mkdtemp(join(wikiRealpathSync(tmpdir()),'wiki-settings-chrome-'));let fixture,chrome,panel,link,output='',stderr='';
  t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  const env=Object.fromEntries(Object.entries(process.env).filter(([k])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(k)));for(const k of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[k])env[k]=process.env[k];
  fixture=spawn(process.execPath,[join(source,'scripts/harness-ui-proof.mjs')],{cwd:source,env:{...env,AUGMENTOR_HARNESS_PROOF_WIKI:'1',AUGMENTOR_HARNESS_PROOF_WIKI_SETTINGS:'1',AUGMENTOR_HARNESS_PROOF_RECORD_REQUESTS:'1',AUGMENTOR_HARNESS_PROOF_REOPEN:'1'},stdio:['ignore','pipe','pipe','ipc']});fixture.stdout.on('data',d=>output+=d);fixture.stderr.on('data',d=>stderr+=d);
