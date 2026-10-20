@@ -186,3 +186,8 @@ was removed. The custom Chromium extension changed only `state.mjs`, after
 exact-folder tests and a private file backup; reload the already-loaded extension
 once to use its new default. Explicit saved DSH choices remain selectable.
 [Qualification record](../release/ah-surfaces-navigation-20261020.json).
+
+The macOS headless companion payload also retains the AH resolver and shared
+platform transport module. Its restricted packaged Python subset is exercised
+without importing Qt. Desktop can alternatively host the Browser extension
+itself, using its bundled native-messaging executable and one shared install.

@@ -24,6 +24,8 @@ import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 HEADER = '# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0\n'
+COMPANION_NATIVE_MODULES = ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py',
+                            'preferences.py','dictation.py','ah_connection.py','platform_runtime.py')
 COMPANION_PYTHON_PACKAGES = ('PyYAML', 'websocket-client', 'keyring',
                             'jaraco.classes', 'jaraco.context', 'jaraco.functools', 'more-itertools')
 
@@ -211,7 +213,7 @@ def main():
         shutil.rmtree(project/'apps/native')
         # Pure socket clients also serve CLI integrations and acceptance tools;
         # retain them without any Qt presentation modules or desktop entrypoint.
-        for name in ('__init__.py','pi_client.py','prompt_client.py','runtime_start.py','preferences.py','dictation.py'):
+        for name in COMPANION_NATIVE_MODULES:
             relative=Path('apps/native/augmentor_linux')/name
             copy(ROOT/relative,project/relative)
         shutil.rmtree(project/'services/desktop')
