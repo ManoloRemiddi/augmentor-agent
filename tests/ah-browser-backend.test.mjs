@@ -1,12 +1,12 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mkdtemp,mkdir,writeFile,rm} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';
+import {mkdtemp,mkdir,writeFile,rm,realpath} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join,resolve} from 'node:path';import {pathToFileURL} from 'node:url';
 import {createServer} from 'node:net';import {spawn} from 'node:child_process';import {once,EventEmitter} from 'node:events';
 const applicationRoot=resolve(process.env.AUGMENTOR_SURFACES_TEST_ROOT??'.');
 const {RELEASE}=await import(pathToFileURL(join(applicationRoot,'dist/contracts/src/release.js')));
 
 async function fixture(t,wrong=false){
- const root=await mkdtemp(join(tmpdir(),'ag-ah-browser-'));t.after(()=>rm(root,{recursive:true,force:true}));
+ const root=await realpath(await mkdtemp(join(tmpdir(),'ag-ah-browser-')));t.after(()=>rm(root,{recursive:true,force:true}));
  const profile={};for(const key of ['config','state','workspace','sharedState','sharedData']){profile[key]=join(root,key);await mkdir(profile[key],{mode:0o700})}
  profile.socket=join(root,'host.sock');const calls=[],sockets=new Set();
  const server=createServer(s=>{sockets.add(s);s.on('close',()=>sockets.delete(s));let buffer='';s.on('data',chunk=>{

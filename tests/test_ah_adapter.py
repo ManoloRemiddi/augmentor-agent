@@ -18,7 +18,7 @@ from augmentor_linux.preferences import Preferences
 class AhAdapterTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory(prefix='ag-ah-');self.addCleanup(self.temp.cleanup)
-        self.root=Path(self.temp.name);self.profile={}
+        self.root=Path(self.temp.name).resolve();self.profile={}
         for key in ('config','state','workspace','sharedState','sharedData'):
             p=self.root/key;p.mkdir(mode=0o700);self.profile[key]=str(p)
         self.profile['socket']=str(self.root/'host.sock');self.record=self.root/'connection.json'
