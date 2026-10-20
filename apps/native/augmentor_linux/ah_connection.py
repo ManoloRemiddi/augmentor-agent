@@ -111,6 +111,7 @@ def selection():
         # /tmp and /var are system aliases on macOS. Canonicalize the socket
         # from the owned LaunchAgent, while keeping the reported profile paths.
         profile['socket'] = str(Path(profile['socket']).resolve())
+        profile['sharedState'] = str(Path(profile['sharedState']).resolve())
         start = ['launchctl', 'kickstart', 'gui/'+str(os.getuid())+'/com.augmentor.Harness']
     else:
         raise ValueError('Connect an installed Harness using AUGMENTOR_AH_CONNECTION on this platform.')
