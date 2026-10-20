@@ -1,5 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Effort picker labels are corrected in source](HARNESS-CONFIGURED-MODELS.md#effort-menu-labels--october-20-follow-up):
+the adaptation passed `label` where the original DSH UI requires `name`, rendering
+blank effort rows. Red Chromium reproduction and **20 passing checks** cover
+visible options, actual Manual/high save, reload/checkmark, Off restoration and
+no inference from settings, plus the existing picker and Adaptive policy checks.
+Air read-only inspection confirms the bug and an enabled but unmapped Adaptive
+policy: saved Off is not Auto. Two local profiles advertise only Off. No owner
+settings, selected app or running process changed; target confirmation and an
+installed update/owner UI verification remain. Managed scratch removed.
+
 [Agent Desktop is installed on the personal MacBook Air](MACBOOK-AIR-AGENT-INSTALLATION.md):
 **dc87d48e / 7b7c1bb0…11cab2**, AH default, actual native Send/reply and normal
 reopen/restoration pass. The newer private shell-launch environment is supported

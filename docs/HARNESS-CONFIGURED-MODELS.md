@@ -8,6 +8,44 @@ refuses prompt dispatch without loading or substituting a model.
 
 # Configured provider catalogue for MX review
 
+## Effort menu labels — October 20 follow-up
+
+The Harness adaptation supplied each reasoning choice as `{id, label}`, while
+the original DSH `ModelSelect` consumes `{id, name}`. The result was real,
+clickable choices with blank visible/accessibility labels, even though the Host
+advertised supported effort levels. The source fix changes that adaptation to
+`{id, name}`; the original supplier UI and the runtime reasoning policy remain
+unchanged. It applies to the shared Harness web UI on Linux and macOS, not the
+separate Agent Desktop/Browser effort controls.
+
+**Off is the saved effort, not an Auto indicator.** Adaptive reasoning is a
+separate per-conversation mode and profile policy. It changes request effort only
+when enabled for the conversation preset and explicitly mapped for the exact
+model. Without a mapping it retains the saved effort. A model profile advertising
+only `off` cannot offer adjustable effort; that metadata alone does not establish
+whether the remote model performs reasoning internally. See [reasoning
+controls](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls).
+
+Read-only inspection of the installed Air confirmed the same defective
+projection, two configured DeepSeek models with multiple advertised effort levels,
+two local Qwen profiles with only `off`, and an enabled Adaptive policy with no
+model mappings. No owner model, endpoint or reasoning preference was changed.
+
+A rendered regression first fails with five blank labels instead of the five
+advertised levels. After the fix, **20 checks pass** across the real Chromium
+picker, reasoning controls/provider-request test and public-hook policy tests.
+The picker test selects `high` through the actual menu, verifies Manual mode and
+saved effort, reloads and verifies the checked `high` row, then selects `off`.
+These setting changes dispatch no provider requests or history edits. Existing
+pin/order/search/credential-refusal and responsive-meter checks still pass. The
+previous credential-refusal assertion was updated to the current reconnect
+message; rejection remains required. Builds/tests used managed disposable
+storage, and completed unreferenced scratch was removed after inspection.
+
+This is a tested **source correction**. No selected release or running owner was
+changed in this follow-up; an installed update and owner-browser verification
+must be recorded separately for the confirmed target installation.
+
 The owner's October 16 feedback identified a truthfulness gap: the previous
 review's picker listed Pi's complete installed catalogue (42 providers/1,564
 models) despite its private profile configuring one provider. Pin/scroll tests

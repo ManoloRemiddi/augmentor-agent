@@ -14,7 +14,7 @@ import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label){const end=Date.now()+12000;let last;while(Date.now()<end){try{if(await fn())return;}catch(e){last=e;}await new Promise(resolve=>setTimeout(resolve,30));}throw Error(label+(last?' '+last.message:''));}
 
-test('MX picker opens at the top, saves ordered pins without duplicates, hides models and keeps the context meter inside the composer',{skip:process.platform!=='linux',timeout:60000},async t=>{
+test('MX picker shows and saves effort, opens at the top, saves ordered pins, hides models and contains the context meter',{skip:process.platform!=='linux',timeout:60000},async t=>{
  const profile=await mkdtemp(join(tmpdir(),'augmentor-picker-'));let fixture,chrome,panel,link,output='',stderr='';
  t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));
@@ -57,7 +57,23 @@ test('MX picker opens at the top, saves ordered pins without duplicates, hides m
  await visible(q('[aria-label^="Select model"]'));await openPicker();
  assert.equal(await panel.evaluate(menu+'.scrollTop'),0,'un-pinned current model near the catalog tail must not move opening scroll');
  assert(await panel.evaluate(menu+'.scrollHeight>'+menu+'.clientHeight*3'));
- await closePicker();await click(q('[aria-label="Settings"]'));await click(button('Model Picker Augmented'));
+ await closePicker();
+ // The real DSH selector consumes effort.name, not effort.label. Check visible
+ // options and actual saved changes so blank-but-clickable rows cannot pass.
+ const openEffort=async()=>{await click(q('[aria-label^="Select model"]'));await click('Array.from(document.querySelectorAll("[role=menuitem]")).find(e=>e.textContent.startsWith("Effort"))');await visible(q('[role=menuitemradio]'));};
+ const availableLevels=initial.groups.find(g=>g.provider===selection.provider).models.find(m=>m.model===selection.model).thinkingLevels;
+ await openEffort();
+ assert.deepEqual(await panel.evaluate('Array.from(document.querySelectorAll("[role=menuitemradio]")).map(e=>e.textContent.trim())'),availableLevels,'every supported effort must have a visible label');
+ await click('Array.from(document.querySelectorAll("[role=menuitemradio]")).find(e=>e.textContent.trim()==="high")');
+ await visible(q('[aria-label^="Select model"]')+'.textContent.includes("high")');
+ let reasoning=await rpc('session.reasoning',{sessionId:'picker-parent'});assert.equal(reasoning.thinkingLevel,'high');assert.equal(reasoning.mode,'manual');
+ await panel.reload();await visible(q('[aria-label^="Select model"]')+'.textContent.includes("high")');await openEffort();
+ assert.equal(await panel.evaluate('document.querySelector("[role=menuitemradio][aria-checked=true]").textContent.trim()'),'high');
+ await click('Array.from(document.querySelectorAll("[role=menuitemradio]")).find(e=>e.textContent.trim()==="off")');
+ await visible(q('[aria-label^="Select model"]')+'.textContent.includes("off")');
+ reasoning=await rpc('session.reasoning',{sessionId:'picker-parent'});assert.equal(reasoning.thinkingLevel,'off');
+ assert.equal(await readFile(link.requestLog,'utf8'),initialRequests,'changing/reloading effort must not dispatch a provider request');
+ await click(q('[aria-label="Settings"]'));await click(button('Model Picker Augmented'));
  const settings=q('section[aria-label="Model Picker Augmented"]');await visible(settings);
  const setQuery=async value=>{await click(q('[aria-label="Search picker settings"]'));await panel.call('Input.dispatchKeyEvent',{type:'keyDown',key:'a',code:'KeyA',modifiers:2});await panel.call('Input.dispatchKeyEvent',{type:'keyUp',key:'a',code:'KeyA',modifiers:2});await panel.call('Input.insertText',{text:value});};
  await setQuery('fixture');
@@ -98,7 +114,7 @@ test('MX picker opens at the top, saves ordered pins without duplicates, hides m
  assert.equal((await rpc('session.models',{sessionId:'picker-parent'})).current.provider,'fixture-twin');
  assert.equal([...panel.requests.values()].filter(row=>row.method==='session.selectModel').length,selectsBefore+1,'failed selection never replays');
  await closePicker();
- await assert.rejects(rpc('models.curate',{provider:'fixture',model:selection.model,action:'hide',revision:saved.revision},'missing'),/private Harness link/);
+ await assert.rejects(rpc('models.curate',{provider:'fixture',model:selection.model,action:'hide',revision:saved.revision},'missing'),/Open Augmentor Harness from your Applications menu to reconnect this browser/);
  assert.equal((await rpc('session.list')).items.length,1);assert.deepEqual(await rpc('session.history',{sessionId:'picker-parent'}),initialHistory);
  assert.equal(await readFile(link.requestLog,'utf8'),initialRequests);
  assert.equal(panel.failedResponses.length,1);const rejectedResponse=panel.failedResponses[0];
