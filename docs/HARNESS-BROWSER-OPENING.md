@@ -2,6 +2,95 @@
 
 # Open Harness normally on MX Linux
 
+## Login startup and recovery — October 20
+
+The October 19 browser change preserved the address and login, but did **not**
+arrange server startup after reboot. The owner reproduced the gap after a real
+reboot: no listener at the saved address, no Harness login entry/service. The
+existing verified launcher restored the registered pilot successfully without
+changing its build or browser identity. A browser bookmark cannot start a local
+server by itself.
+
+Use **Augmentor Harness** in Applications, or run `augmentor-harness`. It opens
+this explicitly configured registration in the default browser, starting it when
+necessary. The existing bookmark remains **http://127.0.0.1:41789/**. After login,
+`augmentor-harness.service` starts the server quietly, with an XDG Autostart entry
+as a second activation route. Login startup does not open browser tabs. Repeated
+login/menu requests and concurrent opens converge on one existing owner.
+
+The separate startup controller is content-addressed and its stable launcher
+verifies its checksum. It follows the existing private review registration;
+updates do not pin the launcher to a source checkout or a particular app release.
+It uses the original sealed opener for profile, full artifact, IPC peer, startup
+lock and maintenance checks. It never chooses another registration or creates an
+empty replacement when configuration is missing. The controller has its own
+small installation/selection manifest and control-file backups; it does not
+modify an immutable app or copy the whole application/profile.
+
+The user service is enabled for `graphical-session.target`. XDG login activation
+imports only current graphical session variables before starting it, supporting
+MX session activation order. The normal launcher still uses the verified opener
+if the user service manager is temporarily unavailable. Startup is for the
+current MX Linux systemd session; SysV-only MX, other Linux distributions and
+later OS startup adapters are not qualified here.
+
+Every five seconds the controller checks the known same-user owner and its
+fixed browser listener. It uses the IPC peer's actual listening socket inode
+and an anonymous access-boundary probe; health checks never send a bearer to a
+foreign listener. Full release verification occurs on startup, recovery and
+registration changes, rather than scanning the full app on every healthy poll.
+The address stays bound to loopback. Login links never appear in service output,
+menus or status files.
+
+| Case | Behavior |
+| --- | --- |
+| Reboot removes `/run/user` sockets/directories | Original launcher recreates the registered runtime directories and starts the same profile. |
+| Browser closes | Backend stays available; reopening the bookmark works in an authenticated browser profile. |
+| Runtime exits/crashes | Controller reopens the registered profile; saved unknown-outcome work is not replayed. |
+| Controller exits | User service restarts it; it adopts the existing owner without restarting that owner. |
+| Login and menu open together | Startup/registry locks and the controller lock prevent duplicate owners. The menu waits through a busy startup registration. |
+| Fixed port occupied | Startup remains waiting; it does not change the bookmark or displace another listener. It retries when the port is free. |
+| Maintenance lock/fence | Startup waits and preserves the current owner/work until the reviewed maintenance/recovery completes. |
+| Live owner has missing/unresponsive IPC | No second owner and no forced kill. Status reports waiting; inspect the private runtime log. |
+| Missing/edited registration, build or controller | Fail visibly and preserve existing data; no fallback to an older/empty profile. |
+| New browser/profile or cleared storage | Launch Augmentor Harness once to authenticate that browser, then use its normal bookmark. |
+| Model endpoint unavailable | Server startup does not issue a generation or wait for a model response. Model availability remains a separate app concern. |
+
+Status and recovery controls:
+
+```sh
+augmentor-harness --status
+systemctl --user status augmentor-harness.service
+journalctl --user -u augmentor-harness.service
+```
+
+A manual `systemctl --user restart augmentor-harness.service` restarts the
+controller and preserves the running owner. `KillMode=process` deliberately
+prevents service-manager recovery from killing that owner's work. A slow or
+unconfirmed owner is reported instead of being forcibly replaced. Profile
+shutdown/update continues through the existing guarded maintenance procedure.
+
+To install the controller against an existing, explicit registration:
+
+```sh
+python3 -B scripts/harness-startup.py --install --registry "$HOME/.config/augmentor-harness/reviews" --review pilot
+systemctl --user daemon-reload
+systemctl --user enable --now augmentor-harness.service
+```
+
+Source checks pass **32 Python cases** covering startup/review guards, protected
+installation, rollback, tampered files, diagnostics, lock races and private output.
+The existing exact sealed app passes **six Node cases** for real SDK startup,
+missing reboot runtime directories, concurrent opens, crash recovery, controller
+restart, maintenance and fixed-port collision/recovery. Native history and browser
+identity stay exact; only the authored fixture's two initial model requests occur,
+with **zero additional generation requests during startup/recovery**. The tests
+use authored profiles and the current sealed app in place; no new full app copy
+or replacement app seal is required. Actual installed service/login and UI proof
+are recorded below after activation. A second physical reboot is not performed
+by the assistant; that full graphical-login check remains distinct from the
+current post-reboot restoration and isolated cold-start tests.
+
 ## Installed pilot — October 19
 
 Bookmark **http://127.0.0.1:41789/** in the browser profile used for the pilot.

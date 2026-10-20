@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Harness reboot startup](HARNESS-BROWSER-OPENING.md#login-startup-and-recovery--october-20)
+adds a separate verified startup controller and normal Augmentor Harness launcher.
+The previous bookmark fix did not start a server after reboot. Existing pilot
+restoration passes; 32 Python and six exact-seal SDK cases cover cold startup,
+concurrent opens, crash/controller recovery, maintenance and port collision.
+No new full app copy or app seal; installed login/service adoption is underway.
+Preserve the registered pilot, browser identity and all newer owner work.
+
 [Harness Improve prompt](PROMPT-IMPROVEMENT.md#harness-input-box--october-19)
 is installed inside the input at the upper right on **c0c7b6d9 /
 6fa33389…5d265e0**. Source 28 Node/four Native; ordinary/sealed each 32 Node/nine
