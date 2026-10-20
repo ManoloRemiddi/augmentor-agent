@@ -22,6 +22,9 @@ class Owner(QWidget):
     def call(self, method, params):
         self.calls.append((method,params)); self.policy={'ns':'permission','revision':5,'value':{'defaultPreset':params['ops'][0]['value']}}; return {}
     def call_in_background(self, work, callback): callback(work())
+    def prompt_client(self):
+        from augmentor_linux.prompt_client import PromptClient
+        return PromptClient()
     def open_harness(self): pass
     def open_prompt_library(self): pass
     def set_voice_enabled(self, enabled): pass
