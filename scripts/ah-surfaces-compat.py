@@ -16,6 +16,33 @@ import sys
 BASE='90bc1347822bb3af6e4e96d6b6d00708d4631f9a9fbd68351a11c494c9d9669f'
 
 
+def engines(s):
+    for a,b in [("('pi','dsh','codex')","('pi','ah','dsh','codex')"),("['pi','dsh','codex']","['pi','ah','dsh','codex']"),("('pi','codex')","('pi','ah','codex')"),("['pi','codex']","['pi','ah','codex']")]:s=s.replace(a,b)
+    for obj in ['self.harness','self.controller.harness','controller.harness','c.harness']:
+        s=s.replace(obj+"=='pi'",obj+" in ('pi','ah')").replace(obj+"!='pi'",obj+" not in ('pi','ah')")
+    s=s.replace("getattr(window.controller,'harness',None)=='pi'","getattr(window.controller,'harness',None) in ('pi','ah')")
+    for obj in ['state.harness','harness']:
+        s=s.replace(obj+"==='pi'","['pi','ah'].includes("+obj+")").replace(obj+"!=='pi'","!['pi','ah'].includes("+obj+")")
+    return s.replace('Choose DSH, Pi or Codex','Choose Augmentor Harness, DSH, Pi or Codex')
+
+
+def browser_updates(root):
+    """Only AH-related edits; preserve custom/unrelated extension source."""
+    changes={}
+    for name in ['state.mjs','port.mjs','settings.mjs','panel-api.mjs','surface.mjs','voice.mjs']:
+        p=root/name;before=p.read_text();after=engines(before)
+        after=after.replace("['pi','dsh']","['pi','ah','dsh']").replace('Choose DSH or Pi','Choose Augmentor Harness, DSH or Pi')
+        if name=='state.mjs':
+            after=after.replace("if(saved['augmentor-harness']==='pi')return 'pi'","if(['pi','ah'].includes(saved['augmentor-harness']))return saved['augmentor-harness']")
+        if name=='settings.mjs':
+            after=after.replace("['pi','Pi'],['dsh'","['ah','Augmentor Harness'],['pi','Pi (legacy profile)'],['dsh'").replace("{dsh:'DSH',pi:'Pi',codex:'Codex'}","{dsh:'DSH',ah:'Augmentor Harness',pi:'Pi',codex:'Codex'}").replace("session:state.harness+':'+state.sessionId","session:(state.harness==='ah'?'pi':state.harness)+':'+state.sessionId")
+            after=after.replace("{dsh:'DSH',pi:'Pi'}","{dsh:'DSH',ah:'Augmentor Harness',pi:'Pi'}")
+        if name=='panel-api.mjs':
+            after=after.replace("msg.type==='prompt/improve'&&(!['dsh','codex'].includes(state.harness)","msg.type==='prompt/improve'&&(!['dsh','ah','codex'].includes(state.harness)")
+            after=after.replace("msg.type==='prompt/improve'&&(state.harness!=='dsh'", "msg.type==='prompt/improve'&&(!['dsh','ah'].includes(state.harness)")
+        if after!=before:changes[name]=after.encode()
+    return changes
+
 def prepare(base, source, out):
     from importlib.util import spec_from_file_location, module_from_spec
     spec=spec_from_file_location('deployment',source/'scripts/desktop-deployment.py');d=module_from_spec(spec);spec.loader.exec_module(d)
@@ -31,14 +58,6 @@ def prepare(base, source, out):
         if not p.exists():return
         old=p.read_text();new=fn(old)
         if new!=old:p.write_text(new)
-    def engines(s):
-        for a,b in [("('pi','dsh','codex')","('pi','ah','dsh','codex')"),("['pi','dsh','codex']","['pi','ah','dsh','codex']"),("('pi','codex')","('pi','ah','codex')"),("['pi','codex']","['pi','ah','codex']")]:s=s.replace(a,b)
-        for obj in ['self.harness','self.controller.harness','controller.harness','c.harness']:
-            s=s.replace(obj+"=='pi'",obj+" in ('pi','ah')").replace(obj+"!='pi'",obj+" not in ('pi','ah')")
-        s=s.replace("getattr(window.controller,'harness',None)=='pi'","getattr(window.controller,'harness',None) in ('pi','ah')")
-        for obj in ['state.harness','harness']:
-            s=s.replace(obj+"==='pi'","['pi','ah'].includes("+obj+")").replace(obj+"!=='pi'","!['pi','ah'].includes("+obj+")")
-        return s.replace('Choose DSH, Pi or Codex','Choose Augmentor Harness, DSH, Pi or Codex')
     for name in ['controller.py','window.py','preferences.py','panels.py','agent_settings.py']:
         edit('apps/native/augmentor_linux/'+name,engines)
     for name in ['state.mjs','port.mjs','settings.mjs','panel-api.mjs','surface.mjs','voice.mjs']:
@@ -75,7 +94,7 @@ def prepare(base, source, out):
     edit('apps/browser/pi-bridge.mjs',bridge)
     # Keep both original release/extension versions and the legacy Pi runtime.
     edit('dist/contracts/src/index.js',lambda s:s.replace('pi: {','ah: { branch: true, edit: true, memory: true }, pi: {',1))
-    copies=['apps/native/augmentor_linux/pi_client.py','apps/native/augmentor_linux/prompt_client.py','apps/native/augmentor_linux/ah_connection.py','apps/native/augmentor_linux/adapters/ah.py','scripts/ah-connection.py','dist/client/src/socket.js','dist/client/src/socket.js.map','dist/client/src/socket.d.ts']
+    copies=['apps/native/augmentor_linux/pi_client.py','apps/native/augmentor_linux/prompt_client.py','apps/native/augmentor_linux/ah_connection.py','apps/native/augmentor_linux/adapters/ah.py','apps/native/augmentor_linux/platform_runtime.py','services/platform_adapters/__init__.py','services/platform_adapters/paths.py','services/platform_adapters/transport.py','scripts/ah-connection.py','dist/client/src/socket.js','dist/client/src/socket.js.map','dist/client/src/socket.d.ts','dist/platform/src/transport.js','dist/platform/src/transport.js.map','dist/platform/src/transport.d.ts']
     for name in copies:
         target=out/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source/name,target)
     # Recovery must use AH's existing launcher, never the legacy Pi starter.

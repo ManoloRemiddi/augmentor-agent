@@ -23,11 +23,11 @@ w=Window(preview=True);w.preferences.values['harness']='ah'
 w.controller=Controller(w,harness='ah');w.bind_controller();w.show()
 try:
     until(lambda:w.controller.online and bool(w.model_picker.currentData()),'AH connected with its model catalog')
-    dialog=SettingsDialog(w);dialog.show_page('connections')
+    w.open_settings();until(lambda:w.settings_panel is not None,'actual settings panel opens');dialog=w.settings_panel;dialog.show_page('connections')
     engine=next(c for c in dialog.findChildren(QComboBox) if c.accessibleName()=='Agent engine')
     assert engine.currentData()=='ah'
     assert {'ah','dsh','pi'}.issubset({engine.itemData(i) for i in range(engine.count())})
-    dialog.close()
+    dialog.accept()
     w.composer.setPlainText(json.dumps({'kind':'read'}));w.send()
     until(lambda:w.controller.session and not w.controller.running,'actual AH reply finished')
     sid=w.controller.session

@@ -43,7 +43,7 @@ test('Browser refuses an unrelated owner before model discovery or prompt dispat
 });
 test('AH, DSH and legacy Pi retain distinct Browser conversation and model keys',async()=>{
  const saved={};globalThis.chrome={storage:{local:{get:(keys,cb)=>cb(saved),set:(value,cb)=>{Object.assign(saved,value);cb?.()} }},runtime:{}};
- const s=await import(pathToFileURL(join(applicationRoot,'apps/browser/extension/state.mjs')));
+ const s=await import(pathToFileURL(join(process.env.AUGMENTOR_BROWSER_EXTENSION_ROOT??join(applicationRoot,'apps/browser/extension'),'state.mjs')));
  for(const harness of ['dsh','pi','ah']){s.state.harness=harness;s.saveSessionId(harness+'-chat');s.saveSelection({provider:harness,model:'fixture'})}
  for(const harness of ['ah','dsh','pi']){s.state.harness=harness;assert.equal(await s.loadStoredSessionId(),harness+'-chat');assert.equal((await s.loadStoredSelection()).provider,harness);assert.equal(s.storedHarness({'augmentor-harness':harness}),harness)}
  delete globalThis.chrome;

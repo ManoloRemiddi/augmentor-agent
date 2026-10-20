@@ -1,0 +1,62 @@
+{
+  "schema": "augmentor-ah-surfaces-qualification/1",
+  "date": "2026-10-20",
+  "clientImplementation": "c3a5f24f",
+  "sourceProductVersion": "0.2.13",
+  "installedProductVersion": "0.2.11",
+  "compatibleBaseArtifactSha256": "90bc1347822bb3af6e4e96d6b6d00708d4631f9a9fbd68351a11c494c9d9669f",
+  "selectedReleaseId": "20261020-115207-13c2cdc3",
+  "selectedArtifactSha256": "0bae0f1bfe3758ff06527c65564fe62fb29fc3bcd6e7d8fb344249836be4142b",
+  "sealedInputs": 29033,
+  "changedApplicationPaths": 30,
+  "newSealedArtifacts": 1,
+  "scratchApplicationMirrorsRetained": 0,
+  "primaryDesktop": {
+    "adopted": true,
+    "online": true,
+    "modelReady": true,
+    "restoreError": false,
+    "previousEngineChoicePreserved": true,
+    "guardedCloseAcceptedWithoutDraftOrWork": true
+  },
+  "actualInstalledAhMetadata": {
+    "desktopOnlineAndModelReady": true,
+    "browserNativeHostHandshakeAndInitialization": true,
+    "promptSubmissions": 0,
+    "conversationsCreated": 0
+  },
+  "browserExtension": {
+    "existingCustomCodePreserved": true,
+    "changedFiles": ["state.mjs", "port.mjs", "settings.mjs", "panel-api.mjs", "voice.mjs"],
+    "otherFilesPreserved": 50,
+    "manifestIdentityAndVersionPreserved": true,
+    "originalFolderBackupRetained": true,
+    "actualPatchedSettingsDomPassed": true,
+    "actualStateRestorationPassed": true,
+    "ownerLoadedExtensionReloadObserved": false
+  },
+  "checks": {
+    "strictTypeScript": true,
+    "sourcePythonAdapter": 8,
+    "sourcePythonController": 12,
+    "sourceQtSettings": 10,
+    "promptCompanionStartup": 1,
+    "sharedBrowserComposerQueueSettings": 34,
+    "newSettingsDom": 1,
+    "privateBrowserBackend": 3,
+    "existingNativeHostCompatibility": 1,
+    "actualSdkQtBrowserIntegration": 1,
+    "compatibleCandidatePython": 8,
+    "compatibleCandidateNode": 4,
+    "installedNormalSettingsSdkIntegration": true,
+    "authenticatedDshPromotionPreflight": true,
+    "finalSealVerified": true
+  },
+  "retainedLimits": [
+    "The actual owner Browser service worker needs a reload if already running; visible loaded Browser adoption is not claimed.",
+    "Mobile keeps its previous compatible running build until a normal reopen.",
+    "macOS discovery has authored metadata-fixture coverage; installed Mac surface adoption is separate.",
+    "Windows Harness installation discovery is not implemented.",
+    "Real provider inference, physical voice and a whole hosted-CI pass are not qualified here."
+  ]
+}

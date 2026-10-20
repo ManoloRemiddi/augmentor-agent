@@ -2,8 +2,10 @@
 
 [Selectable AH backend in Desktop and Browser](AH-DESKTOP-BROWSER.md) adds an
 explicit installed-Harness connection alongside DSH and legacy Pi, with separate
-conversation keys and no empty-profile fallback. Source and synthetic SDK/Qt
-qualification are separate from the recorded compatible MX deployment.
+conversation keys and no empty-profile fallback. Compatible MX Desktop is
+selected/running on **0bae0f1b**; actual AH metadata and synthetic SDK/Qt replies
+pass. The custom Browser folder is updated; its loaded extension needs one reload
+if already open. DSH, Handy, histories and rollback are preserved.
 
 [Personal Mac Harness installations](HARNESS-MACOS-INSTALLATION.md) record the
 verified existing macOS artifact on the Air and Mini, login/automatic service
