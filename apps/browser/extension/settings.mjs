@@ -20,10 +20,11 @@ const button=(parent,label,fn)=>{const b=make('button',label);b.type='button';b.
 let state={},checking=false,closed=false
 const sections=new Map()
 const definitions=[
+  ['conversation','Conversation','Choose how responses appear.','M4 4h16v12H9l-5 4z'],
   ['voice','Voice','Shared with the floating Augmentor window.','M9 3h6v10H9zM5 10v3a7 7 0 0 0 14 0v-3M12 20v3'],
-  ['appearance','Colours','Changes apply immediately.','M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h2a4 4 0 0 0 4-4c0-3-4-6-9-6ZM7 10h.01M10 6h.01M15 6h.01'],
+  ['appearance','Appearance','Changes apply immediately.','M12 3a9 9 0 1 0 0 18h1a2 2 0 0 0 1-4 2 2 0 0 1 1-4h2a4 4 0 0 0 4-4c0-3-4-6-9-6ZM7 10h.01M10 6h.01M15 6h.01'],
   ['models','Models','Choose the model Augmentor uses.','M9 3v6m6-6v6M6 9h12v2a6 6 0 0 1-12 0ZM12 17v4'],
-  ['harnesses','Harnesses','Choose what powers your browser agent.','M4 7h16M4 17h16M8 4v6m8 4v6'],
+  ['harnesses','Connections','Choose what powers your browser agent.','M4 7h16M4 17h16M8 4v6m8 4v6'],
   ['prompts','Prompt library','Reusable prompts, shared with Augmentor Agent and both harnesses. Type / in chat to use one.','M5 3h14v18H5zM8 8h8M8 12h8M8 16h4'],
   ['home','Home','Connect your NAS and use Home in your Augmentor conversations.','M3 10l9-7 9 7v11H3z'],
   ['memory','Memories','Shared across your browser and Linux agents.','M4 5c0-4 16-4 16 0s-16 4-16 0v14c0 4 16 4 16 0V5M4 12c0 4 16 4 16 0'],
@@ -39,6 +40,22 @@ for(const [id,label,description,path] of definitions){
   sections.set(id,{section,body,link,mounted:false})
 }
 document.querySelector('#version').textContent='Version '+chrome.runtime.getManifest().version
+async function showConversation(container){
+  await refreshDesktopAppearance()
+  const card=make('div');card.className='card'
+  card.append(make('h2','Thinking display'),make('p','Choose what you see while the agent is thinking. Thinking always collapses when finished, and you can still expand or collapse it manually.'))
+  const label=make('label','While thinking'),select=make('select');select.setAttribute('aria-label','While thinking')
+  for(const [value,text] of [['open','Open — show live thinking'],['collapsed','Collapsed']]){const option=make('option',text);option.value=value;select.append(option)}
+  select.value=readAppearance().expandThinking===false?'collapsed':'open'
+  const note=make('p','Saves immediately. Shared with the primary floating window.');note.className='help';note.setAttribute('role','status')
+  select.onchange=async()=>{
+    select.disabled=true
+    try{await saveAppearance({...readAppearance(),expandThinking:select.value==='open'});note.textContent='Saved. Shared with the primary floating window.'}
+    catch(error){select.value=readAppearance().expandThinking===false?'collapsed':'open';fail(error)}
+    finally{select.disabled=false}
+  }
+  label.append(select);card.append(label,note);container.append(card)
+}
 async function appearance(container){
   await refreshDesktopAppearance()
   const theme=make('div');theme.className='card';theme.append(make('h2','Theme'));const choices=make('div');choices.className='theme-choices';theme.append(choices)
@@ -126,6 +143,7 @@ function mount(id){
     return
   }
   row.body.replaceChildren();row.mounted=true
+  if(id==='conversation')void showConversation(row.body).catch(fail)
   if(id==='appearance')void appearance(row.body).catch(fail)
   if(id==='models')showModels(row.body)
   if(id==='harnesses')showHarnesses(row.body)
@@ -139,7 +157,7 @@ function mount(id){
   }
 }
 function navigate(){
-  const id=sections.has(location.hash.slice(1))?location.hash.slice(1):'appearance'
+  const id=sections.has(location.hash.slice(1))?location.hash.slice(1):'conversation'
   for(const [key,row] of sections){row.section.hidden=key!==id;if(key===id)row.link.setAttribute('aria-current','page');else row.link.removeAttribute('aria-current')}
   mount(id)
 }

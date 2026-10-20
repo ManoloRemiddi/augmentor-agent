@@ -28,7 +28,7 @@ export function formattingDefaults(theme='dark'){
   return Object.fromEntries(formattingFields.map(([key],i)=>[key,i===2?(theme==='light'?'#152b2c':'#edf3f3'):i<2?(theme==='light'?'#4176e6':'#5686fe'):code[i-3]]))
 }
 export function readAppearance() {
-  const values = {theme:localStorage.getItem('augmentor-theme') === 'light' ? 'light' : 'dark'}
+  const values = {theme:localStorage.getItem('augmentor-theme') === 'light' ? 'light' : 'dark',expandThinking:localStorage.getItem('augmentor-expand-thinking') !== 'false'}
   for(const [key,storage,,min,max] of appearanceFields){
     const raw=localStorage.getItem(storage),value=raw===null?T.DEFAULTS[key]:Number(raw)
     values[key]=Number.isFinite(value)?Math.max(min,Math.min(max,value)):T.DEFAULTS[key]
@@ -53,7 +53,7 @@ export async function saveAppearance(value) {
   const reply=await chrome.runtime.sendMessage({type:'surface/appearance',settings:value})
   if(!reply?.ok)throw Error(reply?.error||'Could not save shared appearance')
   desktopAppearance=reply.result
-  const stored={'augmentor-theme':value.theme,'augmentor-format-colours':JSON.stringify(value.formatColours||{})}
+  const stored={'augmentor-theme':value.theme,'augmentor-format-colours':JSON.stringify(value.formatColours||{}),'augmentor-expand-thinking':String(reply.result.values.expandThinking!==false)}
   for(const [key,storage] of appearanceFields)stored[storage]=value[key]
   for(const [key,v] of Object.entries(stored))localStorage.setItem(key,String(v))
   applyAppearance()

@@ -2,6 +2,37 @@
 
 # Consistent installed desktop releases
 
+## September 28: organized Settings and thinking choice
+
+Settings implementation `d4ab5fd` over `20260927-234746-0c414bcb` passed 62
+candidate checks and authenticated promotion. Release `20260928-000201-bcc8c6e5`
+is selected, with primary/mobile restarted and online/model-ready. Secondary was
+running a task; a one-shot guarded restart operation is waiting for its idle
+state (`augmentor-settings-secondary-adoption.service`). [Settings evidence](SETTINGS.md)
+records exact hashes, preference scope and visual checks. Existing connection,
+model, voice and named-window preferences are retained.
+
+## September 27: observed request progress
+
+Native patch `d943ad2` over `20260927-231730-d033f759` is staged, selected and
+running as `20260927-234746-0c414bcb`. The candidate passed 64 focused native
+checks and authenticated promotion. All three idle windows were gracefully
+closed and restarted through their canonical launchers/supervisors; all report
+online/model-ready, voice available and no pending update or restoration error.
+The main window was raised. [Progress evidence](SHARED-SURFACES-2026-09-24.md#request-progress-before-thinking--september-27)
+records exact hashes, label semantics and remaining Browser/Mac adoption.
+
+## September 27: live thinking box
+
+Native implementation `6934677` is selected in `20260927-231730-d033f759`.
+[Shared-surface evidence](SHARED-SURFACES-2026-09-24.md#live-thinking-visibility--september-27)
+records the original artifact, patch, resulting SHA-256 and Qt/activation checks.
+After the owner explicitly requested restarting, all three windows accepted
+graceful close and reopened through their canonical launchers/supervisors.
+Primary, secondary and mobile now run the selected build, online/model-ready
+with voice available and no session-restore error. The main window was raised. Browser source is implemented/tested but the
+loaded extension has not been updated.
+
 ## September 25: immediate composer feedback
 
 [Composer correction and installed evidence](COMPOSER-SEND-FEEDBACK.md) records

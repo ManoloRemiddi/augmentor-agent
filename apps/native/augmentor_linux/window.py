@@ -56,7 +56,8 @@ class Window(QWidget):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
         self.setup_dialog=None;self.appearance_dialog=None;self.setup_offered=False
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.editing=None
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set();self.editing=None
+        self.response_progress=None;self.response_progress_rank=0;self.response_progress_active=False
         self.rendered_messages=None;self.rendered_partial=''
         self.pending_prompt=None;self.submitted_draft=None;self.morphing=False;self.compact=False;self.close_pending=False;self.read_only=False;self.is_saved=False
         self.expanded_size=self.size();self.follow_tail=True;self.rendering=False
@@ -184,13 +185,15 @@ class Window(QWidget):
             self.set_status('Finish the current action before switching harness.');return
         if self.composer.improving:self.composer.cancel_improvement()
         old=self.controller;old.close()
-        for signal_name in ('status','models','selection_changed','session_info','busy','event','problem','interaction','sent','page','recovered','connection'):
+        for signal_name in ('status','models','selection_changed','session_info','busy','event','problem','interaction','sent','submission_progress','page','recovered','connection'):
             try:getattr(old,signal_name).disconnect()
             except TypeError:pass
         self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=Controller(self,harness=harness)
         self.messages=[];self.message_events={};self.partial='';self.rendered_messages=None;self.copied_message=None;self.copied_code=None
+        self.clear_response_progress()
         self.read_only=False;self.seen_events=set();self.follow_tail=True
+        self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         self.render_messages();self.set_models({'groups':[]});self.bind_controller()
 
     def bind_controller(self):
@@ -198,6 +201,7 @@ class Window(QWidget):
         self.controller.selection_changed.connect(self.set_selection);self.controller.session_info.connect(self.session_changed)
         self.controller.busy.connect(self.set_busy);self.controller.event.connect(self.on_event)
         self.controller.problem.connect(self.on_problem);self.controller.interaction.connect(self.on_interaction)
+        self.controller.submission_progress.connect(self.submission_progress)
         self.controller.sent.connect(self.message_sent)
         self.controller.submission_failed.connect(self.message_not_sent)
         self.controller.queue_changed.connect(self.queue_panel.replace)
@@ -210,6 +214,10 @@ class Window(QWidget):
 
     def connection_changed(self,online):
         self.update_controls()
+        if getattr(self,'response_progress_active',False):
+            if not online:self.response_progress='Connection lost; reconnecting…'
+            elif self.response_progress=='Connection lost; reconnecting…':self.response_progress='Reconnected; waiting for agent output…'
+            self.render_timer.start()
         if not self.setup_offered and self.controller and self.controller.harness=='dsh' and not self.controller.session and not getattr(self.controller.client,'product',False):
             self.setup_offered=True
             QTimer.singleShot(0,self.open_setup)
@@ -225,9 +233,18 @@ class Window(QWidget):
         if self.setup_dialog and self.setup_dialog.isVisible():self.setup_dialog.raise_();return
         from .setup import SetupDialog
         from .dsh_setup import DshSetupDialog
-        from .macos_setup import MacSetupDialog, available as mac_setup_available
-        dialog=SetupDialog if self.controller.harness=='pi' else MacSetupDialog if mac_setup_available() else DshSetupDialog
-        self.setup_dialog=dialog(self);self.setup_dialog.show()
+        from .macos_setup import (MacRuntimeIncompleteDialog, MacSetupDialog,
+                                  available as mac_setup_available,
+                                  runtime_problem)
+        # Order matters. An incomplete app copy is told about itself; otherwise
+        # it would silently fall through to the external-DSH form and read as a
+        # demand for a DSH the user does not have.
+        problem=runtime_problem()
+        if self.controller.harness=='pi':self.setup_dialog=SetupDialog(self)
+        elif problem:self.setup_dialog=MacRuntimeIncompleteDialog(self,problem)
+        elif mac_setup_available():self.setup_dialog=MacSetupDialog(self)
+        else:self.setup_dialog=DshSetupDialog(self)
+        self.setup_dialog.show()
     def icon_button(self,text,tooltip,callback,checkable=False):
         button=QPushButton(text);button.setFixedSize(SURFACE['iconSize'],SURFACE['iconSize']);button.setStyleSheet('QPushButton {padding:0;font-size:15px;border:0;background:transparent;} QPushButton:hover {background:rgba(127,150,150,55);color:palette(window-text);}')
         button.setToolTip(tooltip);button.setAccessibleName(tooltip);button.setCheckable(checkable);button.clicked.connect(callback);return button
@@ -460,6 +477,7 @@ class Window(QWidget):
         self.sync_orb()
 
     def set_busy(self,busy):
+        if not busy:self.finish_thinking();self.clear_response_progress()
         self.activity.configure(busy=busy)
         self.update_controls();self.set_status('Working…' if busy else ('History view' if self.read_only else 'Ready'))
         self.cancel_edit_button.setEnabled(not busy)
@@ -468,7 +486,7 @@ class Window(QWidget):
 
     def new_chat(self):
         if self.controller and not self.controller.running and not self.controller.navigating and not self.controller.recovery_lock.locked():
-            self.cancel_edit();self.controller.new_chat();self.rendered_messages=None;self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set();self.transcript.clear();self.composer.clear();self.follow_tail=True;self.set_status('New conversation')
+            self.clear_response_progress();self.cancel_edit();self.controller.new_chat();self.rendered_messages=None;self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set();self.transcript.clear();self.composer.clear();self.follow_tail=True;self.set_status('New conversation')
 
     def improve_prompt(self):
         if not self.controller or self.composer.improving:return
@@ -499,13 +517,14 @@ class Window(QWidget):
                 if not self.controller.queue_prompt(text,request_id):
                     self.queue_panel.consumed(request_id);self.composer.setPlainText(text)
                 return
+            self.begin_response_progress('Submitting message…')
             self.submitted_draft=self.composer.toPlainText()
             self.composer.clear()
             self.pending_prompt=text;self.render_messages();self.jump_latest()
             if self.editing and not self.editing.get('prepared'):accepted=self.controller.send(text,self.model_picker.currentData(),edit_from=dict(self.editing))
             else:accepted=self.controller.send(text,self.model_picker.currentData())
             if accepted is False:
-                self.restore_unaccepted_prompt();self.pending_prompt=None;self.rendered_messages=None;self.render_messages()
+                self.clear_response_progress();self.restore_unaccepted_prompt();self.pending_prompt=None;self.rendered_messages=None;self.render_messages()
 
     def restore_unaccepted_prompt(self):
         if self.submitted_draft is None:return
@@ -517,6 +536,7 @@ class Window(QWidget):
         # Idle/history/errors are independent of this particular submission.
         # Only its own failed/cancelled result can restore the submitted draft.
         if self.pending_prompt!=text:return
+        self.clear_response_progress()
         self.restore_unaccepted_prompt()
         self.pending_prompt=None;self.render_timer.start()
 
@@ -652,6 +672,8 @@ class Window(QWidget):
             tail.removeSelectedText()
         if self.pending_prompt:
             tail.insertHtml(f'<table width="86%" align="right" border="0" cellspacing="0" cellpadding="10"><tr><td><p align="right" style="color:{accent}"><b>You</b> · Sending…</p><p>'+html.escape(self.pending_prompt).replace('\n','<br>')+'</p></td></tr></table>')
+        if self.response_progress:
+            tail.insertHtml('<p style="color:'+accent+'">'+html.escape(self.response_progress)+'</p>')
         if self.partial:
             tail.insertHtml(f'<p style="color:{accent}"><b>Augmentor</b></p>'+render_markdown(self.partial,self.preferences.values['theme'],accent,tuple(sorted(self.preferences.values.get('format_colours',{}).items())),str(len(self.messages)),self.copied_code[1] if self.copied_code and self.copied_code[0]==self.message_key(len(self.messages)) else None))
         self.rendered_messages=list(self.messages);self.rendered_partial=self.partial
@@ -665,7 +687,7 @@ class Window(QWidget):
     def restore_recovery(self,events,has_more):
         follow=self.follow_tail
         self.render_timer.stop()
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set()
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         for event in events:self.fold_event(event)
         self.follow_tail=follow;self.render_messages()
 
@@ -673,6 +695,7 @@ class Window(QWidget):
         self.restore_page(events,False,False)
 
     def restore_page(self,events,has_more,older):
+        if not self.controller or not self.controller.running:self.clear_response_progress()
         self.render_timer.stop();bar=self.transcript.verticalScrollBar()
         if bar.isSliderDown():
             controller=self.controller;sid=getattr(controller,'session',None)
@@ -687,7 +710,7 @@ class Window(QWidget):
         anchor=self.transcript.cursorForPosition(QPoint(2,2))
         old_y=self.transcript.cursorRect(anchor).top()
         old_text=self.transcript.toPlainText()
-        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.expanded_thinking=set()
+        self.messages=[];self.partial='';self.seen_events=set();self.message_events={};self.reasoning_index=None;self.active_thinking=None;self.expanded_thinking=set()
         for event in events:self.fold_event(event)
         self.follow_tail=not older;self.render_messages()
         if older:
@@ -711,6 +734,26 @@ class Window(QWidget):
             previous=self.messages[self.reasoning_index][1]
             self.messages[self.reasoning_index]=('Thinking',text if replace else previous+text)
 
+        if not replace and self.active_thinking!=self.reasoning_index:
+            self.active_thinking=self.reasoning_index
+            if self.preferences.values.get('expand_thinking',True):self.expanded_thinking.add(self.reasoning_index)
+            self.rendered_messages=None
+
+    def set_thinking_visibility(self,expanded):
+        self.preferences.values['expand_thinking']=bool(expanded)
+        self.preferences.save()
+        if self.active_thinking is not None:
+            if expanded:self.expanded_thinking.add(self.active_thinking)
+            else:self.expanded_thinking.discard(self.active_thinking)
+            self.rendered_messages=None;self.render_messages()
+
+    def finish_thinking(self):
+        if self.active_thinking is None:return False
+        self.expanded_thinking.discard(self.active_thinking)
+        self.active_thinking=None
+        self.rendered_messages=None
+        return True
+
     def fold_event(self,event):
         seq=event.get('seq')
         if seq is not None:
@@ -722,7 +765,7 @@ class Window(QWidget):
             blocks=data.get('message',{}).get('content',[])
             failed=any(b.get('isError') for b in blocks if isinstance(b,dict))
             if isinstance(reply,dict) and reply.get('version')==1 and isinstance(reply.get('text'),str) and not failed:
-                self.reasoning_index=None;self.partial=''
+                self.finish_thinking();self.reasoning_index=None;self.partial=''
                 self.messages.append(('Augmentor',reply['text']))
                 return True
         if kind=='user/message':
@@ -749,10 +792,14 @@ class Window(QWidget):
             return True
         if kind=='assistant/chunk':
             chunk=data.get('chunk',{})
-            if chunk.get('type')=='text-delta':self.partial+=chunk.get('text','');return True
+            if chunk.get('type')=='text-delta':
+                self.finish_thinking();self.partial+=chunk.get('text','');return True
+            if chunk.get('type') in ('reasoning-end','tool-call-start','tool-call-delta'):
+                return self.finish_thinking()
             if chunk.get('type')=='reasoning-delta':
                 self.add_reasoning(chunk.get('text',''));self.set_status('Thinking…');return True
         elif kind=='assistant/message':
+            self.finish_thinking()
             if any(p.get('type')=='tool-call' and p.get('name') in ('resonant_voice_reply','resonant_voice_demo') for p in data.get('message',{}).get('content',[])):
                 self.partial='';return True
             reasoning='\n'.join(p.get('text','') for p in data.get('message',{}).get('content',[]) if p.get('type')=='reasoning')
@@ -763,8 +810,11 @@ class Window(QWidget):
                 self.message_events[len(self.messages)]=event
                 self.messages.append(('Augmentor',text))
             self.partial='';return True
-        elif kind=='tool/call':self.set_status('Using '+str(data.get('name','a tool'))[:60])
+        elif kind=='tool/call':
+            self.set_status('Using '+str(data.get('name','a tool'))[:60])
+            return self.finish_thinking()
         elif kind=='turn/end':
+            collapsed=self.finish_thinking()
             self.reasoning_index=None
             reason=data.get('reason',{}).get('kind')
             if reason=='max-tokens':
@@ -773,16 +823,58 @@ class Window(QWidget):
                 return True
             self.set_status('Stopped' if reason=='aborted' else 'Interrupted' if reason=='interrupted' else 'Ready')
             if reason=='interrupted':self.messages.append(('Status',data.get('message','Runtime interrupted.')));return True
+            return collapsed
         elif kind=='session/title':
             title=data.get('title')
             if title:self.title_text=title;self.title.setText(title)
         return False
 
+    def begin_response_progress(self,text):
+        self.response_progress_active=True;self.response_progress_rank=0
+        self.response_progress=text
+        if not self.render_timer.isActive():self.render_timer.start()
+
+    def clear_response_progress(self):
+        self.response_progress_active=False;self.response_progress=None
+        if not self.render_timer.isActive():self.render_timer.start()
+
+    def submission_progress(self,generation,text,rank):
+        # RPC acknowledgements can arrive after thinking or even completion.
+        if not self.controller or generation is not self.controller.generation:return
+        if not self.response_progress_active or rank<self.response_progress_rank:return
+        self.response_progress=text;self.response_progress_rank=rank
+        if not self.render_timer.isActive():self.render_timer.start()
+
+    def observe_response_progress(self,event):
+        kind=event.get('type');data=event.get('data',{})
+        if kind=='turn/start':
+            self.begin_response_progress('Agent started; waiting for next step…')
+            self.response_progress_rank=7
+        elif kind=='step/start':
+            self.begin_response_progress('Building model request…')
+            self.response_progress_rank=8
+        elif kind=='assistant/start':
+            self.begin_response_progress('Waiting for the model’s first output…')
+            self.response_progress_rank=9
+        elif kind=='assistant/chunk':
+            chunk=data.get('chunk',{})
+            if chunk.get('type') in ('text-delta','reasoning-delta') and chunk.get('text'):
+                self.clear_response_progress()
+            elif chunk.get('type') in ('tool-call-start','tool-call-delta','tool-call'):
+                self.begin_response_progress('Receiving a tool request from the model…')
+                self.response_progress_rank=10
+        elif kind in ('assistant/message','tool/call','step/end','turn/end','runtime/error'):
+            self.clear_response_progress()
+
     def on_event(self,event):
+        if event.get('seq') is None or event['seq'] not in self.seen_events:
+            self.observe_response_progress(event)
         if self.voice_dialog and event.get('seq') not in self.seen_events:self.voice_dialog.observe(event)
         if self.fold_event(event) and not self.render_timer.isActive():self.render_timer.start()
 
     def on_problem(self,message):
+        self.clear_response_progress()
+        self.finish_thinking()
         self.update_controls()
         self.rendered_messages=None
         self.set_status('Needs attention');self.messages.append(('Status',message));self.render_messages()
@@ -862,6 +954,8 @@ class Window(QWidget):
         # Shared colour changes never replace per-window placement, model or draft.
         if self.preferences_timer.isActive() or (self.appearance_dialog and self.appearance_dialog.isVisible()):return
         latest=Preferences().values
+        if latest['expand_thinking']!=self.preferences.values['expand_thinking']:
+            self.set_thinking_visibility(latest['expand_thinking'])
         keys=('theme','hue','brightness','accent_hue','accent_brightness','format_colours')
         changed={key:latest[key] for key in keys if latest[key]!=self.preferences.values[key]}
         if changed:self.apply_appearance(changed)
@@ -887,7 +981,7 @@ class Window(QWidget):
 
         self.setStyleSheet(f"""
           QWidget {{ color:{text};font-family:'DejaVu Sans';font-size:13px; }}
-          QDialog,QMenu,QScrollArea,QWidget#appearanceControls {{ background:{solid.name()}; }}
+          QDialog,QMenu,QScrollArea,QWidget#appearanceControls,QWidget#settingsPage {{ background:{solid.name()}; }}
           QLabel,QFrame {{ background:transparent; }}
           QPushButton {{ background:rgba(127,150,150,24);border:1px solid rgba(127,160,155,70);border-radius:8px;padding:7px 10px; }}
           QPushButton:hover,QPushButton:checked {{ background:{self.accent.name()};color:{solid.name()}; }}
@@ -899,6 +993,7 @@ class Window(QWidget):
           QTabBar::tab:selected {{ background:{self.accent.name()};color:{solid.name()}; }}
           QListWidget::item {{ padding:8px 5px; }}
           QListWidget::item:selected {{ background:{self.accent.name()};color:{solid.name()};border-radius:6px; }}
+          QListWidget#settingsNavigation::item:selected {{ background:rgba(127,160,155,35);color:{text};border-left:2px solid {self.accent.name()}; }}
           QSlider::groove:horizontal {{ height:4px;background:{field.name()};border-radius:2px; }}
           QSlider::handle:horizontal {{ width:14px;margin:-5px 0;background:{self.accent.name()};border-radius:7px; }}
           QScrollBar:vertical {{ background:transparent;width:10px; }}

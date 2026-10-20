@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import tempfile
 
-DEFAULTS = {'resonant_voice': True, 'voice_mode': 'manual', 'voice_pause_ms': 800, 'theme': 'dark', 'hue': 190, 'brightness': 0, 'accent_hue': 160,
+DEFAULTS = {'expand_thinking': True, 'resonant_voice': True, 'voice_mode': 'manual', 'voice_pause_ms': 800, 'theme': 'dark', 'hue': 190, 'brightness': 0, 'accent_hue': 160,
             'accent_brightness': 0, 'saturation': 48, 'opacity': 85, 'animation': True, 'effect': 'plasma', 'background': 'none', 'background_image': '', 'skin_name': 'Custom', 'custom_skins': [], 'flares': True, 'pinned': True, 'placement': {}, 'harness':'dsh','format_colours':{}}
 
 

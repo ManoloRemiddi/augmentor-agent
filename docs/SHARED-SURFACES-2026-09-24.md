@@ -24,6 +24,116 @@ pending decisions. Browser claims that lease before submitting a task. A lost
 answer acknowledgement is never retried automatically; disconnect releases or
 expires the lease without granting permission.
 
+## Live thinking visibility · September 27
+
+[Settings](SETTINGS.md) now exposes Open/Collapsed while thinking, with Open as
+the default. The completion/manual-control behavior below is retained.
+
+Desktop and Browser default to expanding the current thinking box when reasoning
+text starts streaming. It collapses when answer text starts, reasoning explicitly
+ends, a tool call starts, the assistant message completes, or the turn stops.
+The native error/idle path and Browser idle state also collapse active thinking.
+Completed history remains collapsed; readers can still expand/collapse it manually.
+A manual collapse during streaming lasts for that thinking phase, and manually
+reopening completed thinking is preserved during subsequent answer chunks.
+
+This is presentation state only. Response streaming, model settings, harness
+execution, speech, saved messages and scroll-follow preferences keep their existing
+behavior. Visibility depends on reasoning text already supplied by the harness;
+this change does not expose additional model data or alter Pi's reasoning policy.
+
+Validation uses real offscreen Qt widgets and Browser DOM fixtures with synthetic
+reasoning/answer, tool, completion, stop and idle events. Source base: `f353c52`;
+implementation `6934677` contains the exact patch. The Browser suite passed
+50 tests. The full native workspace suite ran 500 tests successfully (two macOS-only
+checks skipped) using the existing Linux Qt test environment. The 23 focused Qt Markdown/thinking checks also passed in the isolated source
+checkout and in the compatible installed candidate.
+
+Desktop release `20260927-231730-d033f759` is staged and selected through
+`augmentor-update`, artifact SHA-256
+`70a1ed52e61e414f887089f1fb2a5ae4c31e0135b33d98ae8c182a077e27d2fb`.
+It applies only the native `6934677` patch over selected artifact
+`20260927-230918-6154af34`, SHA-256
+`daf1c9830a660b8b27ea24e181b92ae383a7f4907bf24370d990f1a7cde7c34e`.
+Existing DSH/product, model, speech and Home contracts are retained. Stage/import
+and authenticated activation checks passed without a model request.
+
+The primary/mobile windows still report `20260924-125423-63307454`, and secondary
+reports `20260926-083736-5d6b65f6`; all are online with voice available and
+`updatePending: true`. No windows were restarted. Closing/reopening or the next
+login adopts the selected build. The loaded Browser extension is unchanged;
+Browser source adoption requires a separate extension update/reload. No public
+release or Mac installed update is claimed.
+
+The owner then explicitly requested quitting/restarting Augmentor to finish
+adoption. All three idle windows accepted `maintenance.close`; the desktop and
+mobile supervisors and canonical secondary launcher reopened them. Primary,
+secondary and mobile now report `20260927-231730-d033f759`, online/model-ready,
+voice available and no session-restore error. The main window was raised for use.
+This verifies installed build adoption/readiness; thinking behavior was qualified
+by the Qt/DOM fixtures above. Browser extension and Mac rollout remain separate.
+
+
+## Request progress before thinking · September 27
+
+The transient line under a submitted prompt reports observed stages, then is
+removed as thinking or answer text arrives. It is not saved as conversation text.
+Native submission operations report checking the selected model, creating a new
+or edited conversation when needed, applying the selection, connecting the event
+stream when needed, sending the prompt, and confirmed acceptance. Generation and
+stage guards prevent a late acknowledgement from replacing current output.
+
+| Signal | Visible label | What it establishes |
+| --- | --- | --- |
+| Local submission | Submitting message… | The UI has started submission; no backend acceptance claimed |
+| Model validation call | Checking selected model… | Validation is in progress |
+| Session creation/branch call | Creating conversation… / Creating edited conversation… | That operation is in progress |
+| Model selection call | Applying selected model… | Session selection is being applied |
+| Event subscription | Connecting to conversation… | The UI is opening its event connection |
+| Prompt RPC | Sending message to agent… | Submission is in progress |
+| Accepted RPC result | Message accepted; waiting for agent… | Agent acceptance is confirmed |
+| Live `turn/start` | Agent started; waiting for next step… | A turn started; pre-step work is not individually reported |
+| Live `step/start` | Building model request… | DSH has entered its request-building step |
+| Assistant stream `start` | Waiting for the model’s first output… | The harness has opened a model attempt; no content has arrived |
+| Tool call chunk | Receiving a tool request from the model… | Tool-request output has arrived |
+
+Both DSH transports now forward the existing process-local assistant stream
+opening as unsequenced `assistant/start`. It does not mutate DSH history or change
+requests, model settings, memory work or reasoning. The provider does **not**
+report queueing versus prompt prefill here, so neither is claimed. No elapsed-time
+heuristics or invented percentages advance the labels. Request/context/header
+records describe configuration and are not treated as proof of provider activity.
+Pi retains its available submission/turn signals; no extra reasoning is exposed.
+
+Browser uses its observed submit/accept, turn, step and stream events. The more
+detailed local native setup labels are not inferred for Browser. Completed history
+has no pending row; output, tool handoff, terminal events, idle/error and navigation
+clear it. Desktop connection loss reports reconnecting while waiting. Existing
+manual thinking controls, scrolling, message text and voice behavior are retained.
+
+Qualification: full native workspace suite, focused real Qt tests, Browser DOM
+fixtures and a loopback WebSocket transport test. The latter verifies that the
+start marker reaches Browser before a reasoning chunk; native transport fixtures
+verify the same ordering. No real-provider queue/prefill telemetry is claimed.
+The full native workspace suite ran 505 tests successfully (two macOS-only
+skips). Final focused native checks passed 41 tests, including window/controller
+regressions; Browser plus transport checks passed 53 tests.
+
+Implementation `d943ad2` is applied as a native-only patch over selected artifact
+`20260927-231730-d033f759` (SHA-256
+`70a1ed52e61e414f887089f1fb2a5ae4c31e0135b33d98ae8c182a077e27d2fb`).
+The compatible candidate passed 64 focused Qt/controller/transport tests, stage
+validation and authenticated activation. Managed release
+`20260927-234746-0c414bcb`, artifact SHA-256
+`7f43ebcdbf87f24709a59563583dbb4c97726345ed9313dcd7fa275045bd3a72`,
+is selected. All three idle windows accepted graceful close and were restarted
+through the canonical launchers/supervisors as the owner requested. Primary,
+secondary and mobile now run that release, online/model-ready with voice available,
+no session-restore error and `updatePending: false`. The main window is open.
+This is installed build/readiness evidence plus synthetic progress fixtures;
+no user conversation was submitted for testing. Browser extension adoption and
+Mac installed rollout remain pending.
+
 ## Speech
 
 The sidebar's `voice.mjs` is a presentation/controller binding. The native host

@@ -19,6 +19,9 @@ def appearance(settings=None):
         import re
         colours=settings.get('formatColours',{})
         if not isinstance(colours,dict) or any(not isinstance(v,str) or not re.fullmatch('#[0-9a-fA-F]{6}',v) for v in colours.values()):raise ValueError('Invalid formatting colour')
+        if 'expandThinking' in settings:
+            if type(settings['expandThinking']) is not bool:raise ValueError('Invalid thinking display preference')
+            updates['expand_thinking']=settings['expandThinking']
         updates.update(theme=settings['theme'],format_colours=colours)
         preferences.values.update(updates);preferences.save()
     v=preferences.values;dark=v['theme']=='dark'
@@ -28,7 +31,7 @@ def appearance(settings=None):
     bubble=QColor.fromHslF(v['hue']/360,saturation*(.23/.48),min(.995,max(.025,light)+(.09 if dark else .045)))
     accent=QColor.fromHslF(v['accent_hue']/360,saturation,max(.15,min(.9,(.73 if dark else .30)+v['accent_brightness']/150)))
     field=bg.lighter(125) if dark else bg.darker(105)
-    return {'theme':v['theme'],'animation':v['animation'],'values':{'theme':v['theme'],'neutHue':v['hue'],'neutBright':v['brightness'],'accentHue':v['accent_hue'],'accentBright':v['accent_brightness'],'formatColours':v['format_colours']},'tokens':{'--bg':bg.name(),'--field':field.name(),'--layer1':field.name(),'--layer2':field.name(),'--text':'#edf3f3' if dark else '#152b2c','--brand':accent.name(),'--accent':accent.name(),'--user-bubble':bubble.name(),'--format-heading':v['format_colours'].get('heading',accent.name()),'--format-link':v['format_colours'].get('link',accent.name())}}
+    return {'theme':v['theme'],'animation':v['animation'],'values':{'theme':v['theme'],'neutHue':v['hue'],'neutBright':v['brightness'],'accentHue':v['accent_hue'],'accentBright':v['accent_brightness'],'formatColours':v['format_colours'],'expandThinking':v['expand_thinking']},'tokens':{'--bg':bg.name(),'--field':field.name(),'--layer1':field.name(),'--layer2':field.name(),'--text':'#edf3f3' if dark else '#152b2c','--brand':accent.name(),'--accent':accent.name(),'--user-bubble':bubble.name(),'--format-heading':v['format_colours'].get('heading',accent.name()),'--format-link':v['format_colours'].get('link',accent.name())}}
 
 def request(value):
     if value.get('action')=='appearance':return appearance(value.get('settings'))

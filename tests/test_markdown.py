@@ -86,16 +86,60 @@ class MarkdownTests(unittest.TestCase):
         w.fold_event({'type':'assistant/chunk','data':{'chunk':{'type':'reasoning-delta','text':'Checking the supplied details.'}}})
         w.render_messages()
         self.assertIn('Thinking',w.transcript.toPlainText())
-        self.assertNotIn('Checking the supplied',w.transcript.toPlainText())
-        w.message_action(QUrl('augmentor-think:0'))
         self.assertIn('Checking the supplied details.',w.transcript.toPlainText())
         w.fold_event({'type':'assistant/chunk','data':{'chunk':{'type':'reasoning-delta','text':' Comparing results.'}}});w.render_messages()
         self.assertIn('Comparing results.',w.transcript.toPlainText())
         event={'type':'assistant/message','data':{'message':{'content':[{'type':'reasoning','text':'Checking the supplied details. Comparing results.'},{'type':'text','text':'Done.'}]}}}
         w.fold_event(event);w.render_messages()
         self.assertEqual(len([r for r,t in w.messages if r=='Thinking']),1)
-        w.restore_history([event]);w.message_action(QUrl('augmentor-think:0'))
+        self.assertNotIn('Comparing results.',w.transcript.toPlainText())
+        self.assertIn('Done.',w.transcript.toPlainText())
+        w.restore_history([event])
+        self.assertNotIn('Comparing results.',w.transcript.toPlainText())
+        w.message_action(QUrl('augmentor-think:0'))
         self.assertIn('Comparing results.',w.transcript.toPlainText());w.close()
+
+    def test_thinking_collapses_at_response_tool_stop_and_error_boundaries(self):
+        from PySide6.QtCore import QUrl
+        boundaries=[
+            {'type':'assistant/chunk','data':{'chunk':{'type':'text-delta','text':'Answer'}}},
+            {'type':'assistant/chunk','data':{'chunk':{'type':'reasoning-end'}}},
+            {'type':'tool/call','data':{'name':'fixture'}},
+            {'type':'turn/end','data':{'reason':{'kind':'aborted'}}},
+            {'type':'assistant/message','data':{'message':{'content':[{'type':'tool-call','name':'resonant_voice_reply'}]}}},
+        ]
+        for boundary in boundaries+['idle','error']:
+            with self.subTest(boundary=boundary):
+                w=Window();self.addCleanup(w.close)
+                w.fold_event({'type':'assistant/chunk','data':{'chunk':{'type':'reasoning-delta','text':'Live thought'}}})
+                w.render_messages()
+                self.assertIn('Live thought',w.transcript.toPlainText())
+                self.assertTrue(w.follow_tail)
+                if boundary=='idle':w.set_busy(False)
+                elif boundary=='error':w.on_problem('Fixture failure')
+                else:self.assertTrue(w.fold_event(boundary))
+                w.render_messages()
+                self.assertNotIn('Live thought',w.transcript.toPlainText())
+                # Manual reopening remains available after automatic collapse.
+                w.message_action(QUrl('augmentor-think:0'))
+                self.assertIn('Live thought',w.transcript.toPlainText())
+                if isinstance(boundary,dict) and boundary['type']=='assistant/chunk':
+                    w.fold_event({'type':'assistant/chunk','data':{'chunk':{'type':'text-delta','text':' more'}}})
+                    w.render_messages()
+                    self.assertIn('Live thought',w.transcript.toPlainText())
+
+    def test_streaming_thinking_respects_manual_collapse_and_next_step_opens(self):
+        from PySide6.QtCore import QUrl
+        w=Window();self.addCleanup(w.close)
+        chunk=lambda text:{'type':'assistant/chunk','data':{'chunk':{'type':'reasoning-delta','text':text}}}
+        w.fold_event(chunk('First thought'));w.render_messages()
+        w.message_action(QUrl('augmentor-think:0'))
+        w.fold_event(chunk(' continued'));w.render_messages()
+        self.assertNotIn('First thought',w.transcript.toPlainText())
+        w.fold_event({'type':'assistant/message','data':{'message':{'content':[{'type':'reasoning','text':'First thought continued'}]}}})
+        w.fold_event(chunk('Next thought'));w.render_messages()
+        self.assertNotIn('First thought',w.transcript.toPlainText())
+        self.assertIn('Next thought',w.transcript.toPlainText())
 
     def test_copy_each_code_block_excludes_surrounding_prose(self):
         from PySide6.QtCore import QUrl

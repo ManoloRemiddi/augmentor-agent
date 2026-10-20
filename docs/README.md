@@ -4,6 +4,8 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+- [Update research and implementation strategy](UPDATE-STRATEGY.md): release discovery, notifications, platform installation adapters, trust, compatibility and recovery risks.
+
 Licensing and publication: [combined Augmentor license](LICENSING.md),
 [public source and privacy review](PUBLIC-SOURCE.md),
 [canonical repository, archives and preserved work](REPOSITORIES.md).
@@ -23,6 +25,7 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 - [Start here: agent handoff](AGENT-HANDOFF.md)
 - [Current architecture](ARCHITECTURE.md)
+- [Augmentor Harness migration to Pi](AUGMENTOR-HARNESS-MIGRATION.md) (accepted direction; design specification, not implemented)
 - [One personal agent, two presentations](SHARED-SURFACES-2026-09-24.md)
 
 - [Home runtime, existing-device integration and qualification](HOME.md)
@@ -46,7 +49,10 @@ of this repository; include reproducible commands and sanitized evidence summari
 
 ## Voice and desktop experience
 
+- [Settings organization and thinking display](SETTINGS.md)
+
 - [Resonant Voice single-button desktop interaction](VOICE-SINGLE-BUTTON.md)
+- [Handy system dictation integration plan](HANDY-INTEGRATION-PLAN.md) (proposal; not implemented)
 - [Hands-free native implementation](HANDS-FREE-IMPLEMENTATION.md)
 - [Desktop colors and skins](SKINS.md)
 - [Independent second window](SECOND-WINDOW.md)

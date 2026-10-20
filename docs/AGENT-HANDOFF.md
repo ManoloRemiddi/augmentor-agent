@@ -2,6 +2,58 @@
 
 # Start here: agent handoff
 
+## October 10 Augmentor Harness migration direction
+
+The owner accepted moving the primary harness toward Pi while retaining useful
+DSH features through extensions and selected public MIT source reuse. The
+[migration specification](AUGMENTOR-HARNESS-MIGRATION.md) records feature ratings,
+parity requirements, observation/context contracts, component candidates,
+privacy and licensing boundaries, and staged qualification/rollback gates.
+This step changes documentation only; runtime pins, installed applications and
+conversations have not been changed. DSH remains available until its required
+workflows qualify on Pi.
+
+The inspected local checkout is `f353c52` with existing modifications; its recorded
+`origin/main` is `79784a5`, 331 commits ahead. Newer remote architecture, DSH 0.2
+compatibility, tool-budget and reliability records were inspected without merging
+or resetting this checkout. Reconcile preserved local work with current canonical
+source before implementation; inspected upstream packages are candidates, not
+tested integration pins. Preserve Home, embedded profiles, other harness adapters,
+existing voice/model placement and the owner's approved UI.
+
+## September 28 settings organization and thinking preference
+
+[Settings](SETTINGS.md) now groups native controls into six categories and exposes
+Open/Collapsed while thinking, defaulting to the currently working Open behavior.
+The preference persists per native window; Browser source shares the primary
+choice through the existing preference service. Implementation `d4ab5fd` is
+selected in release `20260928-000201-bcc8c6e5`. Primary/mobile have restarted and
+are online/model-ready on that build; secondary was working. The one-shot
+`augmentor-settings-secondary-adoption.service` is waiting for idle and will
+gracefully restart it through the canonical launcher, then verify readiness. The guide records exact hashes, tests and visual checks. Browser/Mac
+installed rollout remains separate.
+
+## September 27 observed progress before thinking
+
+Implementation `d943ad2` adds transient, event-backed submission/request labels
+before the first thinking or answer text. The existing DSH stream-opening marker
+is forwarded to both surfaces; queueing and prompt prefill are not inferred.
+See [label meanings, tests and installation evidence](SHARED-SURFACES-2026-09-24.md#request-progress-before-thinking--september-27).
+Release `20260927-234746-0c414bcb` is selected and running in primary, secondary
+and mobile after the owner-authorized graceful restart. All are online/model-ready
+with voice available and no pending update or session-restore error. Browser
+source is tested; its loaded extension and installed Mac remain unchanged.
+
+## September 27 live thinking visibility
+
+Desktop and Browser now open the current thinking box as reasoning streams and
+collapse it when thinking finishes. Answer streaming and manual history controls
+are preserved. See [behavior, tests and deployment boundary](SHARED-SURFACES-2026-09-24.md#live-thinking-visibility--september-27).
+Implementation `6934677` is selected in desktop release
+`20260927-231730-d033f759`. The owner-requested graceful restart is complete: primary, secondary and mobile
+report that build, online/model-ready with voice available and no restoration
+error. Browser extension adoption remains pending.
+
 ## September 26 public Apple-independent macOS preview
 
 The owner approved publishing a clearly labelled macOS preview without Developer
@@ -479,3 +531,11 @@ Preserve dated evidence rather than relabelling old tests as new qualification.
 Publish a reviewed commit and update the PR with scope and validation. A local-only
 note or an unpublished branch is not a completed handoff. Merge/release status
 must remain explicit; documentation publication does not itself merge a draft PR.
+
+## October 2 browser control audit — source and private candidate
+
+[Desktop control](DESKTOP-CONTROL.md#october-2-browser-capability-discovery-and-input-dispatch)
+records capability/task-ownership guidance and a framework-managed input fix.
+Four input regressions, 23 related browser checks and sidebar boot passed.
+The running Forms task was preserved. Installed adoption and a live-browser
+proof remain pending; source instructions do not imply unrestricted app control.

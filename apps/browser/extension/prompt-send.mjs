@@ -17,6 +17,7 @@ export async function submitDraft({input, ui, send, prepare, onAccepted}) {
     const result = await send('prompt', {text})
     if (!result?.accepted && !pending.confirmed)
       throw Error(result?.error ?? 'Message was not accepted.')
+    ui.promptAccepted?.()
     onAccepted?.()
   } catch (error) {
     // A durable message can arrive before a lost/late RPC acknowledgment.

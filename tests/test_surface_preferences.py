@@ -20,3 +20,14 @@ class SurfacePreferences(unittest.TestCase):
             self.assertEqual(surface.request({'action':'improve','text':'Draft','selection':{'provider':'fixture','model':'model'}})['text'],'Better')
             adapter.return_value.improve_prompt.assert_called_once_with('Draft','Shared template',{'provider':'fixture','model':'model'})
             adapter.return_value.call.assert_not_called()
+
+    def test_thinking_choice_is_shared_validated_and_preserved_by_colour_only_updates(self):
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':temp,'AUGMENTOR_WINDOW_ID':'main'}):
+            current=surface.appearance()['values'];self.assertIs(current['expandThinking'],True)
+            saved=surface.appearance({**current,'expandThinking':False})
+            self.assertIs(saved['values']['expandThinking'],False)
+            self.assertIs(Preferences().values['expand_thinking'],False)
+            current.pop('expandThinking');surface.appearance(current)
+            self.assertIs(Preferences().values['expand_thinking'],False)
+            with self.assertRaises(ValueError):surface.appearance({**current,'expandThinking':'false'})
+            self.assertIs(Preferences().values['expand_thinking'],False)

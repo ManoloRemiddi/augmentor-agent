@@ -63,3 +63,37 @@ Independent hardware/users and model quality remain beta gates. The VM uses a
 consistent Nehalem CPU model: `release/vm-avx-mask-proof.c` reproduces a masked
 AVX2 load fault in QEMU 10.0.11 TCG that also crashed Qt/Breeze. The test avoids
 that emulator defect without changing Qt or the user's system.
+
+## October 2: browser capability discovery and input dispatch
+
+The local Desktop chat audit confirmed browser navigation, snapshots, clicks and
+text input were available and used. The agent nevertheless handed routine form
+creation back to the user and asserted a background-tab limitation without tool
+evidence. Later native input dispatch acknowledgements did not establish saved
+values. Private conversation content and document identifiers are excluded here.
+
+`config/browser-recovery.md` now explicitly maps browser and Linux discovery
+routes, requires checking real tool availability before claiming inability,
+distinguishes screenshot visibility from DOM input, and forbids arbitrary test
+text in live user documents. The persona adds ownership through completion.
+These instructions do not grant tools or override OS consent. Existing identity
+snapshots preserve historical persona text; the installed identity adapter reads
+browser recovery separately. Adoption must update the actual adapter's referenced
+immutable artifact/configuration, rather than assuming the selected UI release
+also owns its running DSH plugins.
+
+Browser input uses the native input/textarea value setter before an input event,
+so an application-owned instance setter cannot prematurely update its value
+tracker. Disabled, read-only and noneditable controls fail explicitly. An action
+acknowledgement still requires fresh observation of the saved result; synthetic
+input is not guaranteed to work in every web application.
+
+Validation: four input regression tests exercise the actual injected handler,
+including a framework-style value tracker and saved-state listener; 23 related
+browser tests and the complete sidebar entrypoint passed. These are local DOM
+and surface tests, not live Google Forms or unrestricted computer-control proof.
+A private candidate was copied from the installed 0.2.11 extension with only the
+input-handler patch. Installed extension, DSH preset references and running
+conversations remain unchanged while the observed task is active. Reload and
+coordinated harness adoption, followed by a harmless live browser proof, remain
+required. No public release or repository push was performed.

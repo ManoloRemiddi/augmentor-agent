@@ -210,6 +210,8 @@ class EventStream:
                 event=None
                 if frame.get('type')=='event' and frame['event']['seq']>cursor:
                     event=frame['event'];cursor=event['seq']
+                elif frame.get('type')=='assistant-stream' and frame['frame']['type']=='start':
+                    event={'type':'assistant/start','time':frame['frame']['time'],'data':{}}
                 elif frame.get('type')=='assistant-stream' and frame['frame']['type']=='chunk':
                     event={'type':'assistant/chunk','time':frame['frame']['time'],'data':{'chunk':frame['frame']['chunk']}}
                 if event:

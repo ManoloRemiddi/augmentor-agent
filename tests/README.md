@@ -88,3 +88,14 @@ checks its rendered reply. Normal app launches reject the test operations.
 `test_ui_testing.py` verifies default denial, draft/dialog protection and
 non-overwriting screenshot output. See the
 [installed native acceptance](../docs/MACOS-DISTRIBUTION.md#september-26-follow-up-corrected-primary-mac-app-activated).
+
+`test_response_progress.py` covers observed submission stages, transport start,
+late acknowledgements, thinking replacement and history/terminal cleanup. Browser
+coverage is in `chat-render.test.mjs`, `prompt-send.test.mjs` and
+`tests/dsh-status.test.mjs` (loopback WebSocket). See the
+[progress-label contract](../docs/SHARED-SURFACES-2026-09-24.md#request-progress-before-thinking--september-27).
+
+Settings organization and thinking preference: `test_settings_navigation.py`,
+`test_surface_preferences.py`, `test_voice_settings.py`, Browser
+`settings-conversation.test.mjs` and `chat-render.test.mjs`. See
+[scope and visual qualification](../docs/SETTINGS.md).

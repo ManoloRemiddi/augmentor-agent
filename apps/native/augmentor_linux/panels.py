@@ -5,7 +5,7 @@ from pathlib import Path
 import sys
 from PySide6.QtCore import Qt,QTimer
 from PySide6.QtWidgets import (QDialog,QVBoxLayout,QHBoxLayout,QLabel,QLineEdit,
-    QListWidget,QListWidgetItem,QPushButton,QCheckBox,QComboBox,QMessageBox,QTextEdit,QWidget,QTabWidget,QTextBrowser,QScrollArea)
+    QListWidget,QListWidgetItem,QPushButton,QCheckBox,QComboBox,QMessageBox,QTextEdit,QWidget,QTabWidget,QTextBrowser,QScrollArea,QStackedWidget,QFrame)
 from . import __version__
 
 
@@ -142,43 +142,111 @@ class LicensesDialog(QDialog):
 
 
 class SettingsDialog(QDialog):
+    """A small settings home with one independently scrollable category at a time."""
     def __init__(self,window):
         from .instances import current_name
-        super().__init__(window);self.owner=window
-        self.setWindowTitle('Settings · '+('First agent' if current_name()=='main' else 'Second agent'));self.setMinimumWidth(400)
-        outer=QVBoxLayout(self);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setFrameShape(QScrollArea.Shape.NoFrame)
-        content=QWidget();layout=QVBoxLayout(content);scroll.setWidget(content);content.setAutoFillBackground(False);outer.addWidget(scroll)
-        self.resize(460,min(820,self.screen().availableGeometry().height()-80))
-        from .settings_icons import settings_icon,settings_label
+        from .settings_icons import settings_icon
         from .voice_settings import VoiceSettingsDialog
-        voice=QPushButton('Resonant Voice')
-        voice.clicked.connect(lambda:VoiceSettingsDialog(window).exec())
-        layout.addWidget(voice)
-        layout.addWidget(settings_label('Harness','harness',window.accent))
-        engine=QComboBox();engine.addItem('Pi','pi');engine.addItem('DSH','dsh')
-        engine.setCurrentIndex(engine.findData(getattr(window.controller,'harness','pi')))
-        engine.setAccessibleName('Harness')
-        engine.activated.connect(lambda _:window.switch_harness(engine.currentData()))
-        layout.addWidget(engine)
         from .dsh_setup import DshSetupDialog
-        dsh=QPushButton('Connect DSH');dsh.clicked.connect(lambda:DshSetupDialog(window).exec());layout.addWidget(dsh)
         from .home_settings import HomeDialog
-        home=QPushButton('Connect Home');home.clicked.connect(lambda:HomeDialog(window).exec());layout.addWidget(home)
         from .recovery import RecoveryDialog
-        recovery=QPushButton('Recover connection');recovery.clicked.connect(lambda:RecoveryDialog(window).exec());layout.addWidget(recovery)
         from .shortcut_settings import ShortcutSettings
-        layout.addWidget(settings_label('Window shortcuts','keyboard',window.accent))
-        self.shortcuts=ShortcutSettings(window);layout.addWidget(self.shortcuts)
-        note=QLabel('Appearance, skins and voice settings are saved for this agent window. The second agent starts with a copy of the first agent’s settings.');note.setWordWrap(True);layout.addWidget(note)
-        appearance=QPushButton('Colours && visual effects');appearance.clicked.connect(window.open_appearance);layout.addWidget(appearance)
-        prompts=QPushButton('Prompt library');prompts.clicked.connect(window.open_prompt_library);layout.addWidget(prompts)
         from .memory import MemoryDialog
-        memory=QPushButton('Memory');memory.clicked.connect(lambda:MemoryDialog(window).exec());layout.addWidget(memory)
         from .support import SupportDialog
-        support=QPushButton('Support report');support.clicked.connect(lambda:SupportDialog(window).exec());layout.addWidget(support)
-        done=QPushButton('Done');done.clicked.connect(self.accept);outer.addWidget(done)
-        for button,name in [(voice,'voice'),(dsh,'connect'),(recovery,'recover'),(appearance,'appearance'),(prompts,'prompts'),(memory,'memory'),(support,'support'),(done,'done')]:
-            button.setIcon(settings_icon(name,window.accent))
+        super().__init__(window);self.owner=window
+        self.setWindowTitle('Settings');self.setMinimumSize(360,400)
+        size=self.screen().availableGeometry()
+        self.resize(min(760,size.width()-40),min(660,size.height()-60))
+        outer=QVBoxLayout(self);outer.setContentsMargins(20,20,20,16);outer.setSpacing(16)
+        title=QLabel('Settings');title.setStyleSheet('font-size:22px;font-weight:600;');outer.addWidget(title)
+        scope=QLabel('Choose a category to personalize your agent.')
+        scope.setWordWrap(True);outer.addWidget(scope)
+        self.category=QComboBox();self.category.setAccessibleName('Settings category');outer.addWidget(self.category)
+        body=QHBoxLayout();body.setSpacing(20);outer.addLayout(body,1)
+        self.navigation=QListWidget();self.navigation.setObjectName('settingsNavigation');self.navigation.setAccessibleName('Settings categories');self.navigation.setFixedWidth(166)
+        self.navigation.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.navigation.setStyleSheet('QListWidget {border:0;background:transparent;padding:0;outline:0;} QListWidget::item {padding:12px 8px;}')
+        body.addWidget(self.navigation)
+        self.pages=QStackedWidget();body.addWidget(self.pages,1)
+        self.sections={}
+        def page(key,label,icon,description):
+            item=QListWidgetItem(settings_icon(icon,window.accent),label);self.navigation.addItem(item)
+            self.category.addItem(label,key)
+            scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+            scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+            content=QWidget();content.setObjectName('settingsPage');content.setAutoFillBackground(False)
+            layout=QVBoxLayout(content);layout.setContentsMargins(0,0,10,0);layout.setSpacing(14)
+            heading=QLabel(label);heading.setStyleSheet('font-size:18px;font-weight:600;');layout.addWidget(heading)
+            note=QLabel(description);note.setWordWrap(True);layout.addWidget(note)
+            layout.addStretch();scroll.setWidget(content);self.pages.addWidget(scroll);self.sections[key]=scroll
+            return layout
+        def card(layout,title,description):
+            box=QFrame();box.setObjectName('settingsCard')
+            box.setStyleSheet('QFrame#settingsCard {border:1px solid rgba(127,160,155,70);border-radius:10px;}')
+            row=QVBoxLayout(box);row.setContentsMargins(16,14,16,14);row.setSpacing(10)
+            heading=QLabel(title);heading.setStyleSheet('font-weight:600;');row.addWidget(heading)
+            text=QLabel(description);text.setWordWrap(True);row.addWidget(text)
+            layout.insertWidget(layout.count()-1,box)
+            return row
+        def action(layout,title,description,label,icon,callback):
+            row=card(layout,title,description)
+            button=QPushButton(label);button.setIcon(settings_icon(icon,window.accent));button.clicked.connect(callback)
+            row.addWidget(button);return button
+
+        conversation=page('conversation','Conversation','prompts','Choose how responses appear and manage reusable prompts.')
+        thinking=card(conversation,'Thinking display','Choose what you see while the agent is thinking. It always collapses when finished, and you can expand or collapse it manually. This choice saves immediately.')
+        label=QLabel('While thinking');thinking.addWidget(label)
+        self.thinking=QComboBox();self.thinking.setObjectName('thinking-visibility');self.thinking.setAccessibleName('While thinking')
+        self.thinking.addItem('Open — show live thinking',True);self.thinking.addItem('Collapsed',False)
+        self.thinking.setCurrentIndex(self.thinking.findData(window.preferences.values.get('expand_thinking',True)))
+        label.setBuddy(self.thinking);thinking.addWidget(self.thinking)
+        self.thinking.currentIndexChanged.connect(lambda _:window.set_thinking_visibility(self.thinking.currentData()))
+        action(conversation,'Reusable prompts','Create and edit prompts you can insert into a conversation.','Prompt library','prompts',window.open_prompt_library)
+
+        appearance=page('appearance','Appearance','appearance','Adjust the look of this agent window.')
+        action(appearance,'Theme and visuals','Choose colours, skins, backgrounds and activity effects.','Colours && visual effects','appearance',window.open_appearance)
+
+        voice=page('voice','Voice','voice','Choose a speaking voice and how voice conversations work.')
+        action(voice,'Resonant Voice','Manage the voice, speed, volume, recording and hands-free controls.','Resonant Voice','voice',lambda:VoiceSettingsDialog(window).exec())
+
+        connections=page('connections','Connections','connect','Manage the agent engine, connected services and connection recovery.')
+        engine_card=card(connections,'Agent engine','Choose the engine for this window. Finish any current task before switching.')
+        engine=QComboBox();engine.addItem('DeepSeek Harness (DSH)','dsh');engine.addItem('Pi','pi')
+        engine.setCurrentIndex(engine.findData(getattr(window.controller,'harness','pi')));engine.setAccessibleName('Harness')
+        engine.activated.connect(lambda _:window.switch_harness(engine.currentData()));engine_card.addWidget(engine)
+        action(connections,'DSH connection','Connect this window to a DeepSeek Harness runtime.','Connect DSH','connect',lambda:DshSetupDialog(window).exec())
+        action(connections,'Home','Connect your Home service for use in Augmentor conversations.','Connect Home','connect',lambda:HomeDialog(window).exec())
+        action(connections,'Connection recovery','Check the runtime and reconnect to the saved conversation.','Recover connection','recover',lambda:RecoveryDialog(window).exec())
+
+        shortcuts=page('shortcuts','Shortcuts','keyboard','Set the keyboard shortcuts that open or hide your agent windows.')
+        self.shortcuts=ShortcutSettings(window);shortcuts.insertWidget(shortcuts.count()-1,self.shortcuts)
+
+        data=page('data','Data & support','support','Manage memory and get help with the app.')
+        action(data,'Memory','Review stored memories and manage memory settings.','Memory','memory',lambda:MemoryDialog(window).exec())
+        action(data,'Support report','Create a diagnostic report you can review before sharing.','Support report','support',lambda:SupportDialog(window).exec())
+        footer=QHBoxLayout()
+        name='Primary window' if current_name()=='main' else 'Window: '+current_name()
+        footer.addWidget(QLabel(name));footer.addStretch()
+        done=QPushButton('Done');done.setIcon(settings_icon('done',window.accent));done.clicked.connect(self.accept);footer.addWidget(done)
+        outer.addLayout(footer)
+        self.navigation.currentRowChanged.connect(self.select_category)
+        self.category.currentIndexChanged.connect(self.select_category)
+        self.navigation.setCurrentRow(0);self.update_navigation()
+
+    def select_category(self,index):
+        if index<0:return
+        self.pages.setCurrentIndex(index)
+        for control in (self.navigation,self.category):control.blockSignals(True)
+        self.navigation.setCurrentRow(index);self.category.setCurrentIndex(index)
+        for control in (self.navigation,self.category):control.blockSignals(False)
+
+    def update_navigation(self):
+        compact=self.width()<620
+        self.navigation.setVisible(not compact);self.category.setVisible(compact)
+
+    def resizeEvent(self,event):
+        super().resizeEvent(event)
+        if hasattr(self,'navigation'):self.update_navigation()
 
     def capture_current(self):
         return self.shortcuts.capture_current()
