@@ -155,3 +155,34 @@ Qt widgets, AH owner, SDK, IPC and browser URL issuance are real. Browser tests
 also verify AH as the no-saved-choice default while retaining explicit DSH.
 These fixes share the native UI across OSes; installed MX qualification is
 recorded below, with physical macOS/Windows adoption still outside this rollout.
+
+### Installed follow-up
+
+Compatible **0.2.11** Desktop **20261020-122504-89090cd7 / bd7a2cb2…cd357e7**
+is selected and running with AH saved, online/model-ready and no restore error.
+This is the 91118ebf navigation client with the **724bc94d** bounded compatibility
+follow-up, qualified on the exact artifact. Candidate **25 Python/four Node**,
+sealed real-SDK Desktop/Browser reply-and-restore, custom Browser **four**,
+source Controller **12** and Browser composer/settings/queue **34** pass.
+
+The exact installed interpreter additionally connected to the actual AH and
+received a real local-Qwen reply in one labelled verification conversation. Its
+conversation/model restored through an isolated desktop cursor. The actual
+owner primary window was then tested with physical X11 clicks and screenshots:
+More → Connections & Home showed AH, Connect Home opened, Back returned to chat,
+Settings reopened, the renamed browser action was clicked, and Back returned
+to an idle online composer again. Issued AH GUI URLs returned HTTP 200. The
+external browser contents were not directly inspected. Private GUI screenshots,
+tokens, machine bindings and owner data are excluded from this repository.
+
+The old primary had no generation or composer draft. Its Home exception blocked
+ordinary maintenance close, so only that unusable primary was stopped through
+its user service after preserving appearance settings, then reopened through the
+normal managed launcher. DSH integration, Handy, original histories, AH's own
+runtime, previous compatible rollback and the older base still used by Mobile
+remain. One small labelled verification conversation is retained; no owner
+history was removed. One new sealed release was retained and managed scratch
+was removed. The custom Chromium extension changed only `state.mjs`, after
+exact-folder tests and a private file backup; reload the already-loaded extension
+once to use its new default. Explicit saved DSH choices remain selectable.
+[Qualification record](../release/ah-surfaces-navigation-20261020.json).

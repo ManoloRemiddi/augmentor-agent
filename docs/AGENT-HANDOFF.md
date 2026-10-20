@@ -1,5 +1,17 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Settings trap and AH default are fixed on installed MX](AH-DESKTOP-BROWSER.md#settings-navigation-and-selected-browser-opening--october-20-follow-up):
+**724bc94d** compatible client / **bd7a2cb2…cd357e7** is selected/running online.
+Actual primary Home → Back and Settings reopening pass with physical clicks;
+real local-Qwen reply/restoration and selected AH browser-page issuance pass.
+More now says **Open harness in browser**; AH is the new-selection default,
+DSH remains selectable. Candidate 25 Python/four Node and common 12/34 regressions
+pass. One sealed release and one labelled verification chat; scratch removed,
+projects/history/Handy/rollback/live Mobile preserved. Custom Browser default is
+updated/tested but its loaded extension still needs one reload. This supersedes
+the prior surface adoption's default/navigation behavior.
+
+
 [Selectable AH backend in Desktop and Browser](AH-DESKTOP-BROWSER.md) adds an
 explicit installed-Harness connection alongside DSH and legacy Pi, with separate
 conversation keys and no empty-profile fallback. Compatible MX Desktop is
