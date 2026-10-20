@@ -74,7 +74,7 @@ References: [Search API](https://docs.tavily.com/documentation/api-reference/end
 
 ## Installed acceptance — 20 October 2026
 
-This supersedes the initial source-only qualification. AH runtime source
+This supersedes the initial source-only qualification. The MacBook Air follow-up is recorded below. AH runtime source
 `44ae92b31db900cee2c08704b6ccbc1e49b93ae1` is installed on MX and the 32 GB Mac
 mini. Both contain the existing macOS Search/defaults and Wiki compatibility
 commits, preserving the Mac update that arrived during research qualification.
@@ -121,3 +121,38 @@ and finished scratch copies were removed; no unused research build is retained.
 Login services remain enabled and current owners are running. A physical reboot
 and a separate new live Wiki acceptance were not part of this research update.
 Private receipts, paths, account counters, keys and transcripts stay outside Git.
+
+## MacBook Air acceptance — 20 October 2026
+
+The 16 GB Apple-silicon Air now selects the same research application as the
+Mini: source `44ae92b31db900cee2c08704b6ccbc1e49b93ae1`, artifact
+`41629b727335b9be87c675d245e314b4383144c39eaf8274f3723646b1544134`.
+All 47,140 inventory entries verify against the Mini's existing seal. Only the
+immutable application was streamed between the Macs; no complete application
+copy or build was created on MX, and no Mini profile, conversation, model
+credential, OAuth token or browser identity was transferred. Archive extraction
+initially applied a restrictive umask; content/links were unchanged, exact recorded
+file modes were restored, and the full inventory verified before activation.
+
+The same 70 focused checks pass on the Air itself. Authenticated client testing
+finds both projects and extracts two primary pages. The real installed DeepSeek
+conversation received the same fixed question as the other installations, used
+Search/Fetch successfully, and honestly reported incomplete Pi evidence in its
+first answer. An explicit follow-up located and read the Pi Compaction Reference;
+the resulting answer links both primary projects. The recovery's network tools
+have no errors. This is evidence of working research and source access, not an
+audit of every generated interpretation.
+
+A guarded idle switch, verified 57-file cold backup and retained prior Wiki build
+protect the independent Air profile. All three original conversations, six
+history-file prefixes, model choices, Metafolders and browser address/access
+identity verify preserved; the additional conversation is the clearly titled
+research validation. Tavily alone was configured privately through Search using
+the owner's existing key; no further key entry or billing change is needed.
+All four installations share that account's allowance.
+
+The ordinary Applications launcher still follows `current`; login/recovery and
+launch-at-login jobs remain configured, and the live owner uses the new artifact.
+The existing AC-only awake helper is still running; power preferences were not
+changed. A new physical reboot or lid/sleep/wake test was not performed. Exact
+private acceptance and cold-backup receipts remain on the Air outside Git.

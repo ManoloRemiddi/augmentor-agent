@@ -1,15 +1,15 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Shared Tavily research](WEB-RESEARCH.md#installed-acceptance--20-october-2026) is installed on MX AH, Mac mini AH and original MX DSH. AH source **44ae92b3**, DSH fetch-body adapter **1ea13f31**; full builds and 70 focused cases pass on Linux/Mac, eight adapter cases pass before/after sealing. Actual installed models search, fetch and cite both primary projects; failed links are explicit and recovery is recorded. Private keys/configuration, histories, models, Metafolders, cold backups and login startup are preserved. Existing Mac Wiki compatibility is carried forward. No new dependencies, paid plan, supplier source, physical reboot or new Wiki live qualification.
+[Shared Tavily research](WEB-RESEARCH.md#installed-acceptance--20-october-2026) is installed on MX AH, original MX DSH, Mac mini AH and MacBook Air AH. AH source **44ae92b3**, DSH fetch-body adapter **1ea13f31**; full builds and 70 focused cases pass on Linux/Mac, eight adapter cases pass before/after sealing. Actual installed models search, fetch and cite both primary projects; failed links are explicit and recovery is recorded. Private keys/configuration, histories, models, Metafolders, cold backups and login startup are preserved. Existing Mac Wiki compatibility is carried forward. No new dependencies, paid plan, supplier source, physical reboot or new Wiki live qualification.
 
-[Personal Mac Harness installations](HARNESS-MACOS-INSTALLATION.md): the Air and
-Mini run the existing **38fabc4d / 7e16b745…c9a299** macOS artifact from PR #51.
-Air inventory 6,122 files and focused 17/17; real DeepSeek/GX10/Olares replies
-and default AH READY verified. Both actual launchd recoveries preserve browser
-link/model/history; OpenAI sign-ins cancelled/reconciled at owner's deferral.
-Air AC-only awake LaunchAgent retains battery/display sleep. No MX build/copy,
-Linux activation, new physical reboot or Wiki macOS qualification. This is an
-installed deployment record, not an implementation merge or new release seal.
+[Personal Mac Harness installations](HARNESS-MACOS-INSTALLATION.md) retain the
+historical **38fabc4d** baseline; both personal Macs now use the qualified
+**44ae92b3 / 41629b72…54134** research artifact. The [Air acceptance](WEB-RESEARCH.md#macbook-air-acceptance--20-october-2026) verifies all 47,140 entries, 70 focused
+checks, live client and actual model research/citations, a 57-file cold backup,
+three original conversations/six history prefixes, models, Metafolders and browser
+identity. Only the app and intended Tavily key were transferred; personal profiles
+remain independent. No new MX build/copy, physical reboot, sleep/wake or live Wiki
+qualification. Login/recovery and the existing Air AC-only awake helper remain.
 
 [Harness reboot startup](HARNESS-BROWSER-OPENING.md#login-startup-and-recovery--october-20)
 is installed: controller **c48d647c / 97e77042…6b7d86c**, normal **Augmentor Harness**

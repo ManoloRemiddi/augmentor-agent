@@ -2,15 +2,15 @@
 
 # Harness on personal Apple-silicon Macs — October 20, 2026
 
-## Installed artifact and scope
+## Original installation baseline (superseded)
 
-The 16 GiB MacBook Air and 32 GiB Mac Mini select the existing macOS artifact
+The original 16 GiB MacBook Air and 32 GiB Mac Mini installations selected the macOS artifact
 built from `38fabc4d8643a12994151c9f60b1406baaaa0809`, product 0.2.13,
 Pi 1.1.0, Node 24.19.0 and Python 3.12.13. Its application inventory SHA-256 is
 `7e16b745b1e2ba8d88452431406db8dbff212a65f3c3b5d16370984463c9a299`.
 The macOS defaults/Search implementation is tracked in
 [PR #51](https://github.com/ManoloRemiddi/augmentor-agent/pull/51).
-This documentation does not merge that branch or qualify a new application build.
+The later [authenticated research installation](WEB-RESEARCH.md#installed-acceptance--20-october-2026) supersedes that selection. The original installation evidence below remains historical; it does not merge the implementation branches.
 
 The Air received one existing arm64 application artifact over authenticated SSH;
 all 6,122 inventory files verified before activation. It has an independent,
