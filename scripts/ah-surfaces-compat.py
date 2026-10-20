@@ -33,6 +33,7 @@ def browser_updates(root):
         p=root/name;before=p.read_text();after=engines(before)
         after=after.replace("['pi','dsh']","['pi','ah','dsh']").replace('Choose DSH or Pi','Choose Augmentor Harness, DSH or Pi')
         if name=='state.mjs':
+            after=after.replace("return 'dsh'","return saved['augmentor-harness']==='dsh'?'dsh':'ah'").replace("harness:'dsh'","harness:'ah'")
             after=after.replace("if(saved['augmentor-harness']==='pi')return 'pi'","if(['pi','ah'].includes(saved['augmentor-harness']))return saved['augmentor-harness']")
         if name=='settings.mjs':
             after=after.replace("['pi','Pi'],['dsh'","['ah','Augmentor Harness'],['pi','Pi (legacy profile)'],['dsh'").replace("{dsh:'DSH',pi:'Pi',codex:'Codex'}","{dsh:'DSH',ah:'Augmentor Harness',pi:'Pi',codex:'Codex'}").replace("session:state.harness+':'+state.sessionId","session:(state.harness==='ah'?'pi':state.harness)+':'+state.sessionId")
@@ -99,6 +100,23 @@ def prepare(base, source, out):
         target=out/name;target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source/name,target)
     # Recovery must use AH's existing launcher, never the legacy Pi starter.
     edit('services/recovery/__init__.py',lambda s:s.replace("elif harness == 'pi':","elif harness == 'ah':\n            client.ensure_running()\n            client.call('host.describe')\n        elif harness == 'pi':"))
+    # Navigation/default follow-up: bounded edits on the same compatible base.
+    edit('apps/native/augmentor_linux/home_settings.py',lambda s:s.replace('self.connect','self.connect_button').replace('self.disconnect','self.disconnect_button'))
+    edit('apps/native/augmentor_linux/preferences.py',lambda s:s.replace("'harness':'dsh'","'harness':'ah'").replace("self.values['harness']='dsh'\n        if self.values['theme']","self.values['harness']='ah'\n        if self.values['theme']"))
+    def method(text,name,next_name):
+        return text[text.index('    def '+name+'('):text.index('    def '+next_name+'(')]
+    native=(source/'apps/native/augmentor_linux/window.py').read_text()
+    edit('apps/native/augmentor_linux/window.py',lambda s:s[:s.index('    def open_pi(')]+method(native,'open_pi','rename_chat')+s[s.index('    def rename_chat('):])
+    settings=(source/'apps/native/augmentor_linux/agent_settings.py').read_text()
+    def navigation(s):
+        s=s.replace("('Open DSH in browser' if getattr(self.owner.controller,'harness','dsh')=='dsh' else 'Models && providers',self.open_models)","('Open harness in browser',self.owner.open_harness)")
+        s=s.replace("                 ('Connections && Home',lambda:self.show_page('connections')),","                 *([('Models && providers',self.open_models)] if self.owner.controller.harness in ('ah','pi') else []),\n                 ('Connections && Home',lambda:self.show_page('connections')),")
+        s=s.replace("engine.activated.connect(lambda _:self.owner.switch_harness(engine.currentData()))","engine.activated.connect(lambda _:self.select_harness(engine))")
+        s=s.replace('    def open_memory_settings(',method(settings,'select_harness','open_memory_settings')+'    def open_memory_settings(')
+        s=s.replace("        self.editor=dialog; self.editor_page=page; self.editor_return=back\n        dialog.finished.connect(self.editor_finished)","        dialog.finished.connect(self.editor_finished)\n        self.editor=dialog; self.editor_page=page; self.editor_return=back")
+        return s
+    edit('apps/native/augmentor_linux/agent_settings.py',navigation)
+    for name,data in browser_updates(out/'apps/browser/extension').items():(out/'apps/browser/extension'/name).write_bytes(data)
     changed={}
     for p in out.rglob('*'):
         if p.is_file() and not p.is_symlink():

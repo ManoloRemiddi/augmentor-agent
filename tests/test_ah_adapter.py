@@ -71,6 +71,12 @@ class AhAdapterTests(unittest.TestCase):
         self.save();self.record.chmod(0o644)
         with self.assertRaisesRegex(ValueError,'private'):selection()
 
+    def test_ah_is_default_but_saved_dsh_choice_is_retained(self):
+        with patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':self.profile['config']}):
+            self.assertEqual(Preferences().values['harness'],'ah')
+            p=Preferences();p.values['harness']='dsh';p.save()
+            self.assertEqual(Preferences().values['harness'],'dsh')
+
     def test_preferences_and_controller_resume_the_ah_identity_only(self):
         self.server()
         with patch.dict(os.environ,{'AUGMENTOR_PI_CONFIG':self.profile['config']}):

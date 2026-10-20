@@ -403,7 +403,8 @@ class SettingsPanel(QWidget):
         from .panels import UpdatesDialog, LicensesDialog
         entries=[('Agents · named windows',lambda:self.show_page('agents')),('Prompt library',self.open_prompts),('Conversation',lambda:self.show_page('conversation')),
                  ('Agent setup' if getattr(self.owner.controller,'harness','dsh')=='dsh' else 'Connect a model',self.open_setup),
-                 ('Open DSH in browser' if getattr(self.owner.controller,'harness','dsh')=='dsh' else 'Models && providers',self.open_models),
+                 ('Open harness in browser',self.owner.open_harness),
+                 *([('Models && providers',self.open_models)] if self.owner.controller.harness in ('ah','pi') else []),
                  ('Connections && Home',lambda:self.show_page('connections')),
                  ('Versions && updates',lambda:self.open_editor('Versions & updates',lambda:UpdatesDialog(self.owner))),
                  ('Advanced',lambda:self.show_page('advanced')),
@@ -455,8 +456,8 @@ class SettingsPanel(QWidget):
         self.prepare_editor(dialog);dialog.installEventFilter(self)
         scaled(dialog).setMinimumSize(0,0)
         layout.addWidget(dialog,1)
-        self.editor=dialog; self.editor_page=page; self.editor_return=back
         dialog.finished.connect(self.editor_finished)
+        self.editor=dialog; self.editor_page=page; self.editor_return=back
         self.stack.addWidget(page); self.stack.setCurrentWidget(page); dialog.show()
         self.feedback.clear()
         for key,button in self.nav.items():button.setChecked(key==('appearance' if title=='Appearance' else 'voice' if title=='Voice' else 'all'))
@@ -577,10 +578,21 @@ class SettingsPanel(QWidget):
         layout.addWidget(QLabel('Agent engine')); engine=QComboBox()
         for text,value in [('Augmentor Harness','ah'),('DSH','dsh'),('Pi (legacy profile)','pi'),('Codex (development)','codex')]: engine.addItem(text,value)
         engine.setCurrentIndex(engine.findData(getattr(self.owner.controller,'harness','dsh'))); engine.setAccessibleName('Agent engine')
-        engine.setEnabled(bool(self.owner.controller) and not getattr(getattr(self.owner.controller,'client',None),'custom',False)); engine.activated.connect(lambda _:self.owner.switch_harness(engine.currentData())); layout.addWidget(engine)
+        engine.setEnabled(bool(self.owner.controller) and not getattr(getattr(self.owner.controller,'client',None),'custom',False)); engine.activated.connect(lambda _:self.select_harness(engine)); layout.addWidget(engine)
         self.action(layout,'Model connection && setup',self.open_setup)
         from .home_settings import HomeDialog
         self.action(layout,'Connect Home',lambda:self.open_editor('Home',lambda:HomeDialog(self.owner))); layout.addStretch(); return page
+
+    def select_harness(self, engine):
+        self.owner.switch_harness(engine.currentData())
+        # A refused switch must not leave a misleading selected engine.
+        engine.setCurrentIndex(engine.findData(self.owner.controller.harness))
+        # Rebuild the index so setup wording follows the selected engine.
+        page=self.pages.pop('all',None)
+        if page is not None:self.stack.removeWidget(page);page.deleteLater()
+        if hasattr(self,'access'):
+            self.access.setEnabled(False)
+            self.background(self.read_access,self.receive_access)
 
     def open_memory_settings(self):
         if getattr(getattr(self.owner.controller,'client',None),'custom',False):self.feedback.setText('Personal memory is unavailable for independent DSH agents.');return

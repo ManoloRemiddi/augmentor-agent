@@ -22,6 +22,7 @@ class Owner(QWidget):
     def call(self, method, params):
         self.calls.append((method,params)); self.policy={'ns':'permission','revision':5,'value':{'defaultPreset':params['ops'][0]['value']}}; return {}
     def call_in_background(self, work, callback): callback(work())
+    def open_harness(self): pass
     def open_prompt_library(self): pass
     def set_voice_enabled(self, enabled): pass
     def apply_appearance(self, values): self.preferences.values.update(values)
@@ -89,3 +90,23 @@ class AgentSettingsTests(unittest.TestCase):
         for text in ['', ' ', 'x'*32769, '\0invalid']:
             with self.assertRaises(ValueError): store.save_soul(text,revision)
         self.assertFalse((Path(self.temp.name)/'soul.md').exists())
+
+    def test_home_editor_can_return_to_chat_and_reopen_settings(self):
+        from augmentor_linux.home_settings import HomeDialog
+        closed=[];self.dialog.closed.connect(lambda:closed.append(True))
+        with patch('augmentor_linux.prompt_client.PromptClient.call',return_value={'connected':False}):
+            self.dialog.open_editor('Home',lambda:HomeDialog(self.owner))
+        self.assertIsNotNone(self.dialog.editor)
+        self.assertTrue(callable(self.dialog.editor.connect))
+        self.assertTrue(callable(self.dialog.editor.disconnect))
+        self.assertTrue(self.dialog.accept())
+        self.assertEqual(closed,[True])
+
+    def test_home_editor_can_return_to_more(self):
+        from augmentor_linux.home_settings import HomeDialog
+        with patch('augmentor_linux.prompt_client.PromptClient.call',return_value={'connected':False}):
+            self.dialog.open_editor('Home',lambda:HomeDialog(self.owner))
+        self.dialog.show_page('all')
+        self.assertIsNone(self.dialog.editor)
+        self.assertIs(self.dialog.stack.currentWidget(),self.dialog.pages['all'])
+        self.assertTrue(any('Open harness in browser' in b.text() for b in self.dialog.findChildren(QPushButton)))

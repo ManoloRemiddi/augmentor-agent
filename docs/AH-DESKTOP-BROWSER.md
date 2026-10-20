@@ -2,11 +2,11 @@
 
 # Select Augmentor Harness in Desktop and Browser
 
-Desktop **Settings → More → Connections & Home → Agent engine** (the newer
-source UI calls More “All”) and Browser
+Desktop **Settings → More → Connections & Home → Agent engine** and Browser
 **Settings → Harnesses → Browser harness** offer **Augmentor Harness** (`ah`),
 **DSH**, the retained **Pi (legacy profile)** and Codex development integration.
-The previous choice remains selected until the user changes it. A busy or
+AH is the default when there is no saved engine choice. Explicit saved choices
+(including DSH and named DSH entries) remain available. A busy or
 mutating conversation cannot switch owners. Workspace-embedded Browser profiles
 keep their registered engine and do not acquire standalone harness switching.
 
@@ -128,3 +128,30 @@ stronger normal-Settings SDK proof. No real provider inference, physical voice,
 Mac/Windows deployment or whole hosted-CI pass is inferred from these checks.
 
 [Portable deployment evidence](../release/ah-desktop-browser-20261020.json).
+
+## Settings navigation and selected browser opening — October 20 follow-up
+
+The installed Settings trap was reproduced from its service traceback and with
+an exact-artifact Qt regression: `HomeDialog.connect` and `.disconnect` buttons
+shadowed QObject methods. Connecting the embedded dialog's `finished` signal
+raised a TypeError, leaving the settings editor attached and every exit failing.
+The buttons now use distinct names. Editor attachment happens after its signal
+connection succeeds, avoiding that partial lifecycle state.
+
+**More → Open harness in browser** follows the current controller. AH and legacy
+Pi request `harness.open` from their attested owner and validate the returned
+loopback credential link; DSH retains its registered browser-opening route.
+An asynchronous result from a previously selected controller cannot open the
+wrong backend. Models & providers remains separately available for AH/Pi.
+The engine picker resets to the actual selection when switching is refused and
+refreshes backend-dependent menu/access settings after a switch.
+
+Common Qt tests cover Home → More and Home → Back. The real SDK/Qt fixture now
+uses the actual engine picker to switch an authored initial DSH client to the
+real AH adapter, opens Home and leaves via More/Back, requests a real runtime
+browser link, reopens Settings, sends a composer prompt, and restores the AH
+conversation. The initial DSH client and provider response are synthetic; the
+Qt widgets, AH owner, SDK, IPC and browser URL issuance are real. Browser tests
+also verify AH as the no-saved-choice default while retaining explicit DSH.
+These fixes share the native UI across OSes; installed MX qualification is
+recorded below, with physical macOS/Windows adoption still outside this rollout.

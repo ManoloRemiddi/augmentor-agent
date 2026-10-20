@@ -1021,6 +1021,28 @@ class Window(QWidget):
         if self.controller:HistoryDialog(self).exec()
 
     def open_pi(self):
+        # Retain callers of the original menu action.
+        self.open_harness()
+
+    def open_harness(self):
+        controller=self.controller
+        if not controller:return
+        if controller.harness in ('ah','pi'):
+            if self.opening_dsh:return
+            self.opening_dsh=True
+            def work():
+                try:return controller.client.call('harness.open'),None
+                except Exception as error:return None,str(error)
+            def opened(value):
+                self.opening_dsh=False
+                if self.controller is not controller:return
+                result,error=value
+                if error:self.set_status('Could not open the selected harness: '+error);return
+                url=QUrl(result.get('url',''))
+                if url.scheme()!='http' or url.host()!='127.0.0.1' or not url.fragment().startswith('token='):
+                    self.set_status('The selected harness returned an invalid browser link.');return
+                if not QDesktopServices.openUrl(url):self.set_status('The default browser could not open. Check your default browser settings.')
+            self.call_in_background(work,opened);return
         if self.controller and getattr(self.controller,'harness','pi')=='dsh':
             from .managed_setup import needed, available, runtime_state
             if needed():self.open_setup();return
@@ -1034,6 +1056,7 @@ class Window(QWidget):
                 except Exception:return {'ok':False}
             def opened(result):
                 self.opening_dsh=False
+                if self.controller is not controller:return
                 if result.get('ok') and result.get('browserUrl'):
                     if not QDesktopServices.openUrl(QUrl(result['browserUrl'])):
                         self.set_status('The default browser could not open. Check your default browser settings.')
@@ -1041,7 +1064,7 @@ class Window(QWidget):
                     self.set_status('DSH could not connect. Open Agent setup to start it.')
                     self.open_setup()
             self.call_in_background(launch_url,opened);return
-        if self.controller:ModelsDialog(self).exec()
+        self.set_status('This connection does not provide a harness browser page.')
 
     def rename_chat(self):
         if not self.controller or not self.controller.session:return
