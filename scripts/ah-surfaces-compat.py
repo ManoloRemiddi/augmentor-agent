@@ -106,7 +106,13 @@ def prepare(base, source, out):
     def method(text,name,next_name):
         return text[text.index('    def '+name+'('):text.index('    def '+next_name+'(')]
     native=(source/'apps/native/augmentor_linux/window.py').read_text()
-    edit('apps/native/augmentor_linux/window.py',lambda s:s[:s.index('    def open_pi(')]+method(native,'open_pi','rename_chat')+s[s.index('    def rename_chat('):])
+    def opening(s):
+        # Keep the original 0.2.11 DSH browser route and its dependency contract.
+        prefix=method(native,'open_pi','rename_chat').split("        if self.controller and getattr(self.controller,'harness','pi')=='dsh':")[0]
+        old=method(s,'open_pi','rename_chat').split('\n',1)[1]
+        old=old.replace('        if self.controller:ModelsDialog(self).exec()',"        self.set_status('This connection does not provide a harness browser page.')")
+        return s[:s.index('    def open_pi(')]+prefix+old+s[s.index('    def rename_chat('):]
+    edit('apps/native/augmentor_linux/window.py',opening)
     settings=(source/'apps/native/augmentor_linux/agent_settings.py').read_text()
     def navigation(s):
         s=s.replace("('Open DSH in browser' if getattr(self.owner.controller,'harness','dsh')=='dsh' else 'Models && providers',self.open_models)","('Open harness in browser',self.owner.open_harness)")

@@ -1028,7 +1028,7 @@ class Window(QWidget):
         controller=self.controller
         if not controller:return
         if controller.harness in ('ah','pi'):
-            if self.opening_dsh:return
+            if getattr(self,'opening_dsh',False):return
             self.opening_dsh=True
             def work():
                 try:return controller.client.call('harness.open'),None
@@ -1046,7 +1046,7 @@ class Window(QWidget):
         if self.controller and getattr(self.controller,'harness','pi')=='dsh':
             from .managed_setup import needed, available, runtime_state
             if needed():self.open_setup();return
-            if self.opening_dsh:return
+            if getattr(self,'opening_dsh',False):return
             self.opening_dsh=True
             client=self.controller.client
             managed=available()
