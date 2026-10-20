@@ -1658,3 +1658,5 @@ files available only in a developer's working directory.
 - [Original DSH Harness microphone](HARNESS-DICTATION.md): editable draft dictation, private recognition contract, original GUI ownership and qualification limits.
 
 - [Actual Pi memory and gateway settlement](PI-MEMORY-LIVE.md): isolated controlled engine/Host proof, joined confirmation and retained live failures.
+
+- [Harness installation defaults](HARNESS-INSTALLATION-DEFAULTS.md) — existing macOS Search support and initial feature defaults.

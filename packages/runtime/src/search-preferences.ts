@@ -11,7 +11,7 @@ export interface SearchProfile {revision:string;enabled:boolean;mode:'configured
 export class SearchPreferences {
  constructor(readonly file:string){}
  describe():SearchProfile {
-  if(process.platform!=='linux')throw Error('Search settings currently require Linux qualification.');
+  if(!['linux','darwin'].includes(process.platform))throw Error('Search settings currently require Linux or macOS.');
   const parent=dirname(this.file),info=lstatSync(parent);if(!info.isDirectory()||info.uid!==process.getuid!()||(info.mode&0o077)!==0||realpathSync(parent)!==resolve(parent))throw Error('Search settings require the private profile directory.');
   let before;try{before=lstatSync(this.file);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return this.profile('missing',false,{});throw Error('Search configuration could not be inspected.');}
   if(!before.isFile()||before.isSymbolicLink()||before.nlink!==1||before.uid!==process.getuid!()||(before.mode&0o077)!==0||before.size>MAX)throw Error('Search configuration is not a private bounded file; its original is preserved.');
