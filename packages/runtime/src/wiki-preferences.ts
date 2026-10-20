@@ -8,7 +8,7 @@ const hash=(value:Uint8Array)=>createHash('sha256').update(value).digest('hex'),
 export class WikiPreferences {
  constructor(readonly file:string){}
  describe():{revision:string;value:WikiProfile}{
-  if(process.platform!=='linux')throw Error('Wiki settings currently require Linux qualification.');
+  if(!['linux','darwin'].includes(process.platform))throw Error('Wiki settings currently require Linux or macOS.');
   const parent=dirname(this.file),info=lstatSync(parent);if(!info.isDirectory()||info.uid!==process.getuid!()||(info.mode&0o077)!==0||realpathSync(parent)!==resolve(parent))throw Error('Wiki settings require the private profile directory.');
   let before;try{before=lstatSync(this.file);}catch(error){if((error as NodeJS.ErrnoException).code==='ENOENT')return {revision:'missing',value:{enabled:false,vaultPath:'',maxQueryResults:10,typeFolders:{}}};throw error;}
   if(!before.isFile()||before.isSymbolicLink()||before.nlink!==1||before.uid!==process.getuid!()||(before.mode&0o077)!==0||before.size>MAX)throw Error('Wiki configuration is not a private bounded file; its original is preserved.');

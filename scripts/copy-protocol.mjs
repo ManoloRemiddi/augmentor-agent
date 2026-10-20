@@ -6,6 +6,7 @@ const fontPreferenceRoot='packages/runtime/vendor/office-font-fallbacks';
 const fontPreferenceSelection=JSON.parse(readFileSync(fontPreferenceRoot+'/SOURCE.json','utf8'));
 for(const row of fontPreferenceSelection.files)if(createHash('sha256').update(readFileSync(fontPreferenceRoot+'/'+row.path)).digest('hex')!==row.sha256)throw Error('Native Office font preferences differ from public source: '+row.path);
 cpSync(fontPreferenceRoot,'dist/runtime/vendor/office-font-fallbacks',{recursive:true});
+copyFileSync('packages/runtime/src/wiki-native.py','dist/runtime/src/wiki-native.py');
 copyFileSync('packages/runtime/src/office-native-linux.py','dist/runtime/src/office-native-linux.py');
 copyFileSync('packages/runtime/src/office-scratch-linux.py','dist/runtime/src/office-scratch-linux.py');
 copyFileSync('packages/runtime/src/office-process-linux.py','dist/runtime/src/office-process-linux.py');
