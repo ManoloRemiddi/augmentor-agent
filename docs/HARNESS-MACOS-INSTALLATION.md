@@ -61,10 +61,11 @@ models are pinned. Their private LAN endpoints require the relevant home network
 or an independently working remote route; installation does not create a public
 gateway.
 
-Wiki Tools/Skills remain disabled on macOS: their descriptor-relative filesystem
-and operation-receipt adapter still requires Linux qualification. Do not remove
-that platform guard merely to display an enabled plugin. Voice expansion and
-broader desktop/browser-extension adapter acceptance are separate work.
+Historical at the earlier Search/defaults installation: Wiki Tools/Skills were
+disabled on macOS pending a descriptor-relative adapter. The subsequent Wiki
+compatibility update is preserved by the [installed research update](WEB-RESEARCH.md#installed-acceptance--20-october-2026). That update does not constitute a new
+live Wiki qualification. Voice expansion and broader desktop/browser-extension
+adapter acceptance remain separate work.
 
 The owner explicitly deferred OpenAI/Codex subscription setup on both machines.
 Both pending SDK sign-ins were cancelled and model settings reconciled; neither

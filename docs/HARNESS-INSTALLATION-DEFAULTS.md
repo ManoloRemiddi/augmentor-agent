@@ -28,7 +28,7 @@ Never edit a selected application artifact in place.
 | Improve prompt | Built in; the **✦** control inside the input. Enabled for an eligible non-empty draft in an idle connected conversation. Its result stays a draft; Undo restores the original wording. Instructions are in the library's **Improve prompt** tab. |
 | Web Search/Fetch | Keyless mode enabled in new Linux/macOS profiles. Original provider forms, revision checks, same-owner reload, cancellation, public-address checks and pinned DNS remain. Optional API credentials are configured separately. |
 | Models | Existing provider configuration and model choices are preserved. Machine-specific local endpoints and credentials are private installation state, never release defaults. Adding local providers does not select a new conversation model. |
-| Wiki Tools/Skills | Retained in the application; their descriptor-relative filesystem and operation-receipt adapter remains Linux-only. macOS Search support does not enable or qualify Wiki operations. |
+| Wiki Tools/Skills | The earlier defaults update left these Linux-only. The subsequent macOS filesystem/receipt adapter is now carried forward in the [research installation](WEB-RESEARCH.md#installed-acceptance--20-october-2026); research acceptance does not replace live Wiki qualification. |
 
 The web Harness is an interface to the existing Pi owner. Its native-workspace
 conversations can use Search on Linux and macOS. Browser-extension conversations

@@ -1,6 +1,6 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Shared Tavily research](WEB-RESEARCH.md) is in source qualification. The first full Linux build and 30 focused cases pass, and the bounded real client proof finds both primary projects and extracts their Markdown. Mac and installed model/session acceptance remain pending; this is not an installed replacement. No new dependencies or supplier source are added.
+[Shared Tavily research](WEB-RESEARCH.md#installed-acceptance--20-october-2026) is installed on MX AH, Mac mini AH and original MX DSH. AH source **44ae92b3**, DSH fetch-body adapter **1ea13f31**; full builds and 70 focused cases pass on Linux/Mac, eight adapter cases pass before/after sealing. Actual installed models search, fetch and cite both primary projects; failed links are explicit and recovery is recorded. Private keys/configuration, histories, models, Metafolders, cold backups and login startup are preserved. Existing Mac Wiki compatibility is carried forward. No new dependencies, paid plan, supplier source, physical reboot or new Wiki live qualification.
 
 [Personal Mac Harness installations](HARNESS-MACOS-INSTALLATION.md): the Air and
 Mini run the existing **38fabc4d / 7e16b745…c9a299** macOS artifact from PR #51.
