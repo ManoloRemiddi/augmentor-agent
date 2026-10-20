@@ -2,6 +2,12 @@
 
 # Harness on personal Apple-silicon Macs — October 20, 2026
 
+The later [effort picker update](HARNESS-CONFIGURED-MODELS.md#installed-on-mx-air-and-mini--october-20)
+supersedes the selections below on both personal Macs. It applies source fix
+**63004ee6** to their existing research/Wiki **44ae92b3** package, preserving the
+runtime and private profiles. Exact Comet tests and actual installed menu/reload
+checks pass on each machine. The original installation evidence remains historical.
+
 ## Installed artifact and scope
 
 The 16 GiB MacBook Air and 32 GiB Mac Mini select the existing macOS artifact

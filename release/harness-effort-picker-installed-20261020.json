@@ -1,0 +1,75 @@
+{
+  "schema": "augmentor-harness-effort-installed/1",
+  "date": "2026-10-20",
+  "sourceFix": "63004ee64c5e54cf72d9d0b6ccc5a65565d49cfb",
+  "scope": "bounded reasoning option-name adaptation; runtime, dependencies, suppliers and private reasoning policies preserved",
+  "changedExistingApplicationFiles": [
+    "apps/harness/dsh-app.jsx",
+    "dist/harness-web/dsh-gui.js",
+    "dist/harness-web/build-inputs.json"
+  ],
+  "addedApplicationReceipt": "release/effort-picker-overlay.json",
+  "sourceChecks": {
+    "cases": 20,
+    "redChromiumReproducedFiveBlankLabels": true,
+    "actualEffortSelectionAndReload": true,
+    "adaptiveProviderRequestAndPolicyChecks": true
+  },
+  "exactCandidateChecks": {
+    "mxMainRenderedPicker": true,
+    "mxPilotRenderedPicker": true,
+    "airCometRenderedPicker": true,
+    "miniCometRenderedPicker": true,
+    "fixtureAdaptations": [
+      "macOS private canonical short temporary paths",
+      "explicit owned Comet test tab",
+      "Command+A on macOS",
+      "exact old/new authentication refusal messages for historical bases"
+    ],
+    "noDeadlinesIncreased": true,
+    "noSkips": true
+  },
+  "installations": {
+    "mxMain": {
+      "artifactSha256": "acc26f87c7f31f0edc43f0a18b054d72975c3b1e1e42efd86f9a84f73a679232",
+      "registered": true,
+      "wasInactiveAndRemainsInactive": true
+    },
+    "mxPilot": {
+      "artifactSha256": "0ce06166c4c9d56c6670d9219e12e17a7ea52eb9e08cf0f358bb0641e8fbd500",
+      "selectedAndRunning": true,
+      "installedServedBundleAndReloadedMenuVerified": true
+    },
+    "macBookAir": {
+      "artifactSha256": "a3be9f2e690df090d0b3b0dd3aaf5535cf0d5ff843ba96f6459b4d64981c54a9",
+      "baseArtifactSha256": "41629b727335b9be87c675d245e314b4383144c39eaf8274f3723646b1544134",
+      "selectedAndRunning": true,
+      "inventoryEntries": 47141,
+      "installedServedBundleAndReloadedMenuVerified": true,
+      "agentDesktopReopenedOnline": true
+    },
+    "macMini": {
+      "artifactSha256": "f3b8eec96e59667b5ec36434a3e1147c29252e6fa8db317ed644b3be7d69f3af",
+      "baseArtifactSha256": "41629b727335b9be87c675d245e314b4383144c39eaf8274f3723646b1544134",
+      "selectedAndRunning": true,
+      "inventoryEntries": 47141,
+      "installedServedBundleAndReloadedMenuVerified": true
+    }
+  },
+  "preservation": {
+    "privateConfigurationHashesUnchanged": true,
+    "oldHistoryPrefixesUnchanged": true,
+    "liveUiCheckSessionCountsAndReasoningPreferencesUnchanged": true,
+    "liveUiCheckChatPromptsSubmitted": 0,
+    "runtimeAndNativeDependencyFilesUnchanged": true,
+    "oldReleasesRetainedForRollback": true,
+    "managedMxScratchRemoved": true,
+    "macDisposableApplicationCopiesRemoved": true
+  },
+  "limits": [
+    "Reload already-open Harness tabs to replace their in-memory GUI",
+    "Profiles advertising only off still offer only off; adaptive model mappings were not invented",
+    "Separate MX Agent Desktop has an unsent draft and a stale selected-root binding; preserved open, awaiting safe reopen",
+    "No physical reboot or provider-specific reasoning payload change is qualified by this UI update"
+  ]
+}

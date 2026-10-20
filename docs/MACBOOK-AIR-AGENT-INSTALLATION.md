@@ -6,8 +6,12 @@ The MacBook Air now runs **Applications → Augmentor Agent Desktop**, product
 **0.2.13**, source **dc87d48e**, with **Augmentor Harness** as its default.
 The application hosts the Browser extension too; a second large companion
 application is unnecessary for this installation. The separately installed AH
-runtime remains **44ae92b3 / 41629b72…64134**, including its existing Wiki/research
-components and private profile. No Mac Mini or MX application was changed.
+runtime at that installation was **44ae92b3 / 41629b72…64134**, including its
+existing Wiki/research components and private profile. The later [shared effort
+picker update](HARNESS-CONFIGURED-MODELS.md#installed-on-mx-air-and-mini--october-20)
+changes only the Harness GUI and keeps this Agent Desktop package unchanged;
+its normal reopening verifies online/model-ready. No Mac Mini or MX application
+was changed by the original Agent installation described here.
 
 The signed development package is **7b7c1bb0…11cab2**; application inventory
 **7e2b7475…115fca** verifies all **2,845** listed inputs. Source strict check/build,

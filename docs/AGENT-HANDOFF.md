@@ -1,14 +1,20 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
-[Effort picker labels are corrected in source](HARNESS-CONFIGURED-MODELS.md#effort-menu-labels--october-20-follow-up):
+[Effort picker labels are installed on MX, Air and Mini](HARNESS-CONFIGURED-MODELS.md#installed-on-mx-air-and-mini--october-20):
 the adaptation passed `label` where the original DSH UI requires `name`, rendering
 blank effort rows. Red Chromium reproduction and **20 passing checks** cover
 visible options, actual Manual/high save, reload/checkmark, Off restoration and
 no inference from settings, plus the existing picker and Adaptive policy checks.
-Air read-only inspection confirms the bug and an enabled but unmapped Adaptive
-policy: saved Off is not Auto. Two local profiles advertise only Off. No owner
-settings, selected app or running process changed; target confirmation and an
-installed update/owner UI verification remain. Managed scratch removed.
+Source **63004ee6** is backported to four registered packages; current MX and both
+Mac owners run it, while the older MX review stays inactive. Each exact package
+passes the rendered picker test; all three running owners pass served-bundle hash,
+actual labels and reload checks without prompts or changed reasoning preferences.
+Config hashes/history prefixes and unchanged runtime/dependency files verify.
+Managed scratch and Mac temporary app copies removed; rollback retained. Reload
+open Harness tabs. Off is not Auto; no Adaptive mappings were added. Air Desktop
+reopened online. The separate MX Agent Desktop remains open with an unsent draft
+and stale binding, awaiting safe reopening after the owner handles that draft.
+[Installed record](../release/harness-effort-picker-installed-20261020.json).
 
 [Agent Desktop is installed on the personal MacBook Air](MACBOOK-AIR-AGENT-INSTALLATION.md):
 **dc87d48e / 7b7c1bb0…11cab2**, AH default, actual native Send/reply and normal
