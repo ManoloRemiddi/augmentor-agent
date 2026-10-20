@@ -10,4 +10,7 @@ else:
     from augmentor_linux.preferences import Preferences
     harness=Preferences().values['harness']
 if harness in ('pi','codex'):ensure_running(harness)
-elif harness!='dsh':raise SystemExit('Choose DSH, Pi or Codex.')
+elif harness=='ah':
+    from augmentor_linux.ah_connection import selection,ensure_running as ensure_harness
+    ensure_harness(selection())
+elif harness!='dsh':raise SystemExit('Choose Augmentor Harness, DSH, Pi or Codex.')

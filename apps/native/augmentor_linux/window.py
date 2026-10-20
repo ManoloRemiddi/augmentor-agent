@@ -74,7 +74,7 @@ class Window(QWidget):
             def initialize_voice_profile():
                 try:voice_request('preferences')
                 except Exception:pass  # Optional offline voice must not prevent chat.
-        if harness in ('pi','dsh','codex'):
+        if harness in ('pi','ah','dsh','codex'):
             self.preferences.values['harness']=harness;self.preferences.save()
         self.controller=None if preview else Controller(self,harness=self.preferences.values['harness'])
         self.maintenance = WindowMaintenance(self)
@@ -211,7 +211,7 @@ class Window(QWidget):
     def switch_harness(self,harness,reconnect=False):
         if self.maintenance.phase()!='ready':return
         if self.voice_dialog or self.voice_input or self.voice_opening:self.close_voice_panel()
-        if harness not in ('pi','dsh','codex') or not self.controller:return
+        if harness not in ('pi','ah','dsh','codex') or not self.controller:return
         if getattr(getattr(self.controller,'client',None),'custom',False) and harness!='dsh':
             self.set_status('This named entry uses its selected DSH agent. Choose another entry to use a different harness.');return
         if self.controller.harness==harness and not reconnect:return
@@ -231,6 +231,9 @@ class Window(QWidget):
         self.render_messages();self.set_models({'groups':[]});self.bind_controller()
 
     def bind_controller(self):
+        catalog=self.composer.prompt_menu.catalog
+        catalog.generation+=1;catalog.pending=False;catalog.prompts=[];catalog.loaded=False;catalog.last_read=0
+        catalog.client=self.prompt_client()
         self.controller.status.connect(self.set_status);self.controller.models.connect(self.set_models)
         self.controller.selection_changed.connect(self.set_selection);self.controller.session_info.connect(self.session_changed)
         self.controller.busy.connect(self.set_busy);self.controller.event.connect(self.on_event)
@@ -245,6 +248,11 @@ class Window(QWidget):
         self.controller.recovered.connect(self.restore_recovery)
         self.controller.connection.connect(self.connection_changed)
         self.start_connection()
+
+    def prompt_client(self):
+        from .prompt_client import PromptClient
+        client=getattr(self.controller,'client',None)
+        return client.prompt_client() if hasattr(client,'prompt_client') else PromptClient()
 
     def start_connection(self):
         from .managed_setup import needed as managed_setup_needed
@@ -263,7 +271,7 @@ class Window(QWidget):
         if not self.setup_offered and self.controller and self.controller.harness=='dsh' and not self.controller.session and not getattr(self.controller.client,'product',False):
             self.setup_offered=True
             QTimer.singleShot(0,self.open_setup)
-        if online and not self.setup_offered and self.controller and self.controller.harness in ('pi','codex'):
+        if online and not self.setup_offered and self.controller and self.controller.harness in ('pi','ah','codex'):
             self.setup_offered=True
             available=any(model.get('available') for group in self.model_picker.catalog.get('groups',[]) for model in group.get('models',[]))
             if not available and not self.controller.session:QTimer.singleShot(0,self.open_setup)
@@ -290,7 +298,7 @@ class Window(QWidget):
         # it would silently fall through to the external-DSH form and read as a
         # demand for a DSH the user does not have.
         problem=runtime_problem() if managed_setup_needed() else ''
-        if self.controller.harness=='pi':dialog=SetupDialog(self)
+        if self.controller.harness in ('pi','ah'):dialog=SetupDialog(self)
         elif self.controller.harness=='codex':
             from .codex_setup import CodexSetupDialog
             dialog=CodexSetupDialog(self)
@@ -557,7 +565,7 @@ class Window(QWidget):
         can_queue=bool(self.controller and getattr(getattr(self.controller,'client',None),'supports_queue',False))
         self.send_button.setEnabled(bool(self.controller and self.model_picker.currentData()) and (not running or can_queue) and not getattr(self.controller,'navigating',False) and not self.read_only and getattr(self.controller,'online',True))
         if self.composer.improving or getattr(self.controller,'repairing',False):self.send_button.setEnabled(False)
-        self.composer.improvement_available=bool(self.controller and hasattr(getattr(self.controller,'client',None),'improve_prompt') and (self.controller.harness!='pi' or self.controller.client.capabilities.get('promptImprovement') is True) and self.model_picker.currentData() and not self.read_only and getattr(self.controller,'online',False))
+        self.composer.improvement_available=bool(self.controller and hasattr(getattr(self.controller,'client',None),'improve_prompt') and (self.controller.harness not in ('pi','ah') or self.controller.client.capabilities.get('promptImprovement') is True) and self.model_picker.currentData() and not self.read_only and getattr(self.controller,'online',False))
         self.composer.refresh_improve_button()
         self.model_picker.setEnabled(not running and not self.read_only)
         self.new_button.setEnabled(bool(self.controller) and not running)
@@ -591,22 +599,22 @@ class Window(QWidget):
         identity=self.composer.begin_improvement()
         controller=self.controller;session=controller.session;connected=controller.connected
         self.prompt_improvement_context=(controller,session,selection)
-        if controller.harness=='pi':self.prompt_improvement_owners[identity]=adapter
+        if controller.harness in ('pi','ah'):self.prompt_improvement_owners[identity]=adapter
         def finished(value):
             if self.composer.improvement_id!=identity:return
             if self.controller is controller and controller.session==session and self.model_picker.currentData()==selection and controller.online and not self.read_only and not controller.running:
                 self.composer.improvement_result.emit(identity,*value)
-                if controller.harness=='pi' and value[0] and value[0].get('receipt'):
+                if controller.harness in ('pi','ah') and value[0] and value[0].get('receipt'):
                     receipt=value[0]['receipt'];self.set_status('Prompt improved with '+receipt['provider']+'/'+receipt['model']+'. Output tokens: '+str(receipt.get('usage',{}).get('output','unavailable'))+'.')
             else:self.composer.cancel_improvement()
         def work():
             result=None;error=''
             try:
                 from .prompt_client import PromptClient
-                settings=PromptClient().call('prompts.list').get('improvement')
+                settings=self.prompt_client().call('prompts.list').get('improvement')
                 if not settings:raise ValueError('Restart the prompt service to load Improve prompt settings.')
                 template=settings['content']
-                if controller.harness=='pi':
+                if controller.harness in ('pi','ah'):
                     result=adapter.improve_prompt(original,template,selection,request_id=identity,expected_revision=settings['revision'],session_id=session if connected else None)
                 else:result=adapter.improve_prompt(original,template,selection)
             except Exception as exc:error=str(exc)
@@ -1101,7 +1109,7 @@ class Window(QWidget):
 
     def open_inspector(self):
         controller=self.controller
-        if not controller or controller.harness!='pi' or not controller.online or not controller.session or not controller.capabilities.get('inspection'):return
+        if not controller or controller.harness not in ('pi','ah') or not controller.online or not controller.session or not controller.capabilities.get('inspection'):return
         sid=controller.session
         def work():
             try:return controller.client.call('inspection.open',{'sessionId':sid}),None
@@ -1623,7 +1631,7 @@ def _main(startup=None):
     parser.add_argument('--preview', action='store_true', help='Open without connecting to a harness.')
     parser.add_argument('--onboarding-host', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--ui-test-control', action='store_true', help=argparse.SUPPRESS)
-    parser.add_argument('--harness', choices=['pi','dsh','codex'], help='Open the shared UI with this harness.')
+    parser.add_argument('--harness', choices=['pi','ah','dsh','codex'], help='Open the shared UI with this harness.')
     parser.add_argument('--instance', type=validate_name, default=current_name(), help='Named independent window (for example secondary); repeated launches toggle that window.')
     args = parser.parse_args()
     configure(args.instance)

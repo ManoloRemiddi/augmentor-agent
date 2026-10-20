@@ -176,7 +176,7 @@ export function ensurePort() {
     if(hello.protocol!=='augmentor/1'||hello.version!==chrome.runtime.getManifest().version)throw Error('Update the Augmentor extension and companion together, then reconnect.')
     const savedHarness=await new Promise(resolve=>chrome.storage.local.get(['augmentor-harness','augmentor-session-id','augmentor-model-selection'],resolve))
     state.harness=storedHarness(savedHarness)
-    if(!state.harness)throw new Error('The previously selected harness is no longer supported. Choose DSH, Pi or Codex in Settings. Saved conversations and model settings are retained.')
+    if(!state.harness)throw new Error('The previously selected harness is no longer supported. Choose Augmentor Harness, DSH, Pi or Codex in Settings. Saved conversations and model settings are retained.')
     const adapter=await request('harness.select',{harness:state.harness})
     if(adapter.protocol!=='augmentor/1')throw new Error('Incompatible Augmentor bridge. Update the extension and host together.')
     const stored = await loadStoredSelection()

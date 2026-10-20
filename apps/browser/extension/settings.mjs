@@ -102,23 +102,23 @@ function showModels(container){
   container.append(pi,dsh,codex)
   const reasoningButton=make('button','Reasoning');reasoningButton.type='button';reasoningButton.id='pi-reasoning-settings';pi.append(reasoningButton)
   const inspectorButton=button(pi,'Trajectory & Context',async()=>{const sid=state.sessionId;state=await send('connect');container.update();if(closed||sid!==state.sessionId)throw Error('The conversation changed. Reopen the inspector.');const response=await send('inspection/open',{sourceSession:sid});if(!response?.ok)throw Error(response?.error||'Conversation inspector unavailable.');});inspectorButton.id='pi-inspector';
-  const current=()=>({sessionId:state.sessionId,epoch:JSON.stringify([state.harness,state.sessionId,state.model?.provider,state.model?.model]),ready:!closed&&state.harness==='pi'&&state.capabilities?.reasoning===true&&state.phase==='ready'&&!state.running});
+  const current=()=>({sessionId:state.sessionId,epoch:JSON.stringify([state.harness,state.sessionId,state.model?.provider,state.model?.model]),ready:!closed&&['pi','ah'].includes(state.harness)&&state.capabilities?.reasoning===true&&state.phase==='ready'&&!state.running});
   const methods={'session.reasoning':'session','session.selectReasoning':'select','reasoning.describe':'describe','reasoning.configure':'configure','models.list':'models'};
   const reasoning=attachReasoning({button:reasoningButton,current,beforeOpen:async()=>{state=await send('connect');container.update()},notice:message=>fail(Error(message)),rpc:async(method,params)=>{const response=await send('reasoning',{action:methods[method],sourceSession:current().sessionId,params});if(!response?.ok)throw Error(response?.error||'Reasoning settings unavailable.');return response.result}})
   registerMaintenanceState(pi,()=>reasoning.dirty())
   const mountPi=()=>{const body=advanced(pi,'Connect another model');if(!state.model?.model)body.parentElement.open=true;const dialog=modelSetupDialog(document,send,body);dialog?.addEventListener('close',()=>{if(closed)return;const note=make('p','Model saved. Use the chat model picker to choose an existing model, or connect another below.');note.className='saved-note';pi.replaceChildren(note,reasoningButton,inspectorButton);mountPi()},{once:true})}
   container.update=()=>{
-    pi.hidden=state.harness!=='pi';dsh.hidden=state.harness!=='dsh';codex.hidden=state.harness!=='codex'
+    pi.hidden=!['pi','ah'].includes(state.harness);dsh.hidden=state.harness!=='dsh';codex.hidden=state.harness!=='codex'
     if(state.harness==='codex'&&!codex.querySelector('.codex-setup'))codexSetupDialog(document,send,codex)
     active.textContent='Current model: '+(state.model?.model||'Not connected')
     reasoningButton.disabled=!current().ready;reasoning.changed()
-    inspectorButton.disabled=closed||state.harness!=='pi'||state.capabilities?.inspection!==true||state.phase!=='ready'||!state.sessionId;
-    if(state.harness==='pi'&&!pi.querySelector('.model-setup'))mountPi()
+    inspectorButton.disabled=closed||!['pi','ah'].includes(state.harness)||state.capabilities?.inspection!==true||state.phase!=='ready'||!state.sessionId;
+    if(['pi','ah'].includes(state.harness)&&!pi.querySelector('.model-setup'))mountPi()
   };container.update()
 }
 function showHarnesses(container){
   const card=make('div');card.className='card';card.append(make('h2','Browser harness'))
-  const select=make('select');select.setAttribute('aria-label','Browser harness');for(const [value,label] of [['','Choose a harness'],['pi','Pi'],['dsh','DeepSeek Harness'],['codex','Codex (development)']]){const opt=make('option',label);opt.value=value;opt.disabled=!value;select.append(opt)}
+  const select=make('select');select.setAttribute('aria-label','Browser harness');for(const [value,label] of [['','Choose a harness'],['ah','Augmentor Harness'],['pi','Pi (legacy profile)'],['dsh','DeepSeek Harness'],['codex','Codex (development)']]){const opt=make('option',label);opt.value=value;opt.disabled=!value;select.append(opt)}
   select.onchange=async()=>{select.disabled=true;try{const r=await send('harness/select',{harness:select.value});if(!r.ok)throw Error(r.error);await refresh()}catch(e){fail(e)}finally{select.disabled=!!state.running}}
   card.append(select);container.append(card)
   const connection=advanced(container,'DSH connection settings')
@@ -130,7 +130,7 @@ function showMemory(container){
     container.append(make('p','Memory belongs to this application workspace. Configure the shared memory service in standalone Augmentor.'))
     const context=make('pre');context.style.whiteSpace='pre-wrap';container.append(context)
     if(!state.sessionId){context.textContent='Open an application conversation to inspect its remembered context.';return}
-    void send('memory',{request:{action:'dual.recall',session:state.harness+':'+state.sessionId}}).then(reply=>{
+    void send('memory',{request:{action:'dual.recall',session:(state.harness==='ah'?'pi':state.harness)+':'+state.sessionId}}).then(reply=>{
       if(!reply?.ok)throw Error(reply?.error||'Remembered context is unavailable')
       context.textContent=['relationship','work'].map(kind=>kind+': '+(reply.result?.[kind]?.summary||'No distilled picture yet.')).join('\n\n')
     }).catch(error=>{context.textContent=error.message})
@@ -211,7 +211,7 @@ async function refresh(){
   if(checking||closed||maintenance.paused)return;checking=true
   try{
     state=await send('connect')
-    document.querySelector('#connection').textContent=({dsh:'DSH',pi:'Pi',codex:'Codex'}[state.harness]||'Harness')+' · '+({ready:'Connected','needs-setup':'Setup needed',connecting:'Connecting…'}[state.phase]||state.phase||'Connecting…')
+    document.querySelector('#connection').textContent=({dsh:'DSH',ah:'Augmentor Harness',pi:'Pi',codex:'Codex'}[state.harness]||'Harness')+' · '+({ready:'Connected','needs-setup':'Setup needed',connecting:'Connecting…'}[state.phase]||state.phase||'Connecting…')
     for(const row of sections.values())row.body.update?.()
     navigate()
   }catch(e){document.querySelector('#connection').textContent='Companion unavailable';fail(e)}finally{checking=false}

@@ -1,12 +1,14 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import {localConnect as connect,type LocalConnection} from '../../platform/src/transport.js';
 import {randomUUID} from 'node:crypto';
-import {spawn} from 'node:child_process';
+import {spawn,execFile} from 'node:child_process';
+import {promisify} from 'node:util';
 import {fileURLToPath} from 'node:url';
 import {join} from 'node:path';
 import {homedir} from 'node:os';
 import {pythonExecutable,componentEnvironment} from '../../platform/src/index.js';
 export class PiConnection {
+  ah?:{profile:{socket:string;state:string;config:string;workspace:string;sharedState:string;sharedData:string};root:string;version:string;binding:string};
   pending=new Map<string,{resolve:(value:any)=>void;reject:(error:Error)=>void;timer:NodeJS.Timeout}>();
   buffer=Buffer.alloc(0);closed=false;
   constructor(readonly socket:LocalConnection,readonly event:(frame:any)=>void=()=>{},readonly disconnected:(error:Error)=>void=()=>{}){
@@ -22,23 +24,38 @@ export class PiConnection {
     return new Promise((resolve,reject)=>{const timer=setTimeout(()=>{this.pending.delete(id);reject(new Error('Request timed out; verify the outcome before retrying.'));},method==='tools.execute'?130000:(method.startsWith('profiles.')||method==='prompt.improve')?65000:30000);this.pending.set(id,{resolve,reject,timer});this.socket.write(JSON.stringify({id,method,params})+'\n');});
   }
   close(){this.socket.destroy();}
-  static async open(event?:(frame:any)=>void,disconnected?:(error:Error)=>void,harness:'pi'|'codex'='pi'){
-    if(!['pi','codex'].includes(harness))throw new Error('This harness does not use the shared runtime connection.');
+  static async open(event?:(frame:any)=>void,disconnected?:(error:Error)=>void,harness:'pi'|'ah'|'codex'='pi'){
+    if(!['pi','ah','codex'].includes(harness))throw new Error('This harness does not use the shared runtime connection.');
     const prefix='AUGMENTOR_'+harness.toUpperCase();
     const env=componentEnvironment();
-    const state=env[prefix+'_STATE']??join(env.XDG_STATE_HOME??join(homedir(),'.local/state'),'augmentor-'+harness);const path=env[prefix+'_SOCKET']??join(state,'runtime.sock');
+    const resolveAh=async(start=false)=>{
+      try{const {stdout}=await promisify(execFile)(pythonExecutable(),['-B',fileURLToPath(new URL('../../../scripts/ah-connection.py',import.meta.url)),...(start?['--start']:[])],{env,timeout:100000,maxBuffer:65536});return JSON.parse(stdout) as NonNullable<PiConnection['ah']>;}
+      catch{throw new Error('Augmentor Harness is not connected. Open its installed launcher, then reconnect. No alternate Pi profile was created.');}
+    };
+    const ah=harness==='ah'?await resolveAh():undefined;
+    const state=env[prefix+'_STATE']??join(env.XDG_STATE_HOME??join(homedir(),'.local/state'),'augmentor-'+harness);const path=ah?.profile.socket??env[prefix+'_SOCKET']??join(state,'runtime.sock');
     const dial=()=>new Promise<LocalConnection>((resolve,reject)=>{const s=connect(path);s.once('connect',()=>resolve(s));s.once('error',reject);});
     let socket:LocalConnection;
     try{socket=await dial();}catch(error:any){
       if(!['ENOENT','ECONNREFUSED'].includes(error.code))throw error;
       // Both surfaces share the same startup lock and cold-start allowance.
       // This helper performs health checks only; it never replays an action.
-      await new Promise<void>((resolve,reject)=>{
+      if(ah){const current=await resolveAh(true);if(JSON.stringify(current)!==JSON.stringify(ah))throw new Error('The selected Harness changed. Reconnect before continuing.');}
+      else await new Promise<void>((resolve,reject)=>{
         const child=spawn(pythonExecutable(),[fileURLToPath(new URL('../../../scripts/ensure-runtime.py',import.meta.url)),'--harness',harness],{stdio:'ignore',env:{...env,AUGMENTOR_PI_NODE:env.AUGMENTOR_PI_NODE??process.execPath}});
         child.once('error',reject);child.once('close',code=>code===0?resolve():reject(new Error(harness+' could not finish starting. Reconnect to check its status.')));
       });
       socket=await dial();
     }
-    const client=new PiConnection(socket,event,disconnected);await client.call('host.hello',{protocol:'augmentor-'+harness+'/1'});return client;
+    const client=new PiConnection(socket,event,disconnected);
+    try{
+      await client.call('host.hello',{protocol:'augmentor-'+(harness==='ah'?'pi':harness)+'/1'});
+      if(ah){
+        const description=await client.call('host.describe');
+        if(description.protocol!=='augmentor-pi/1'||description.stateDir!==ah.profile.state||description.configDir!==ah.profile.config||description.version!==ah.version)throw new Error('The runtime does not match the selected Augmentor Harness. No action was sent.');
+        client.ah=ah;
+      }
+      return client;
+    }catch(error){client.close();throw error;}
   }
 }

@@ -17,7 +17,7 @@ export function attachSurface({send,openSettings,onError,approval,state}){
     shape.setAttribute('d',path);svg.append(shape);$(id).replaceChildren(svg)
   }
   let improving=false,epoch=0,undo=null,roll=null,requestId=null,selectionKey=null,harness='dsh'
-  const cancelImprovement=()=>{const pending=requestId;requestId=null;epoch++;improving=false;roll?.stop();roll=null;if(pending&&harness==='pi')void send('prompt/cancelImprovement',{requestId:pending}).catch(()=>{})}
+  const cancelImprovement=()=>{const pending=requestId;requestId=null;epoch++;improving=false;roll?.stop();roll=null;if(pending&&['pi','ah'].includes(harness))void send('prompt/cancelImprovement',{requestId:pending}).catch(()=>{})}
   const announce=text=>{$('surface-status').textContent=text}
   const fail=error=>{announce(error.message);onError(error.message)}
   const closeMenu=()=>{menu.hidden=true;more.setAttribute('aria-expanded','false')}

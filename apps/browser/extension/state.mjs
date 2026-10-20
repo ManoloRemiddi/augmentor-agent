@@ -23,8 +23,8 @@ export const HOST = 'com.augmentor.agent'
 export function storedHarness(saved){
   // Preserve a retired selection until the user chooses a supported engine.
   // Never interpret an old engine's session/model keys as another engine's data.
-  if(saved['augmentor-harness']&&!['pi','dsh','codex'].includes(saved['augmentor-harness']))return null
-  if(['pi','codex'].includes(saved['augmentor-harness']))return saved['augmentor-harness']
+  if(saved['augmentor-harness']&&!['pi','ah','dsh','codex'].includes(saved['augmentor-harness']))return null
+  if(['pi','ah','codex'].includes(saved['augmentor-harness']))return saved['augmentor-harness']
   return 'dsh'
 }
 

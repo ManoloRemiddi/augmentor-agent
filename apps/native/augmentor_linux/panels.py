@@ -166,12 +166,12 @@ class SettingsDialog(QDialog):
         dictation.clicked.connect(lambda:DictationSettingsDialog(window).exec())
         layout.addWidget(dictation)
         layout.addWidget(settings_label('Harness','harness',window.accent))
-        engine=QComboBox();engine.addItem('Pi','pi');engine.addItem('DSH','dsh');engine.addItem('Codex (development)','codex')
+        engine=QComboBox();engine.addItem('Augmentor Harness','ah');engine.addItem('Pi (legacy profile)','pi');engine.addItem('DSH','dsh');engine.addItem('Codex (development)','codex')
         engine.setCurrentIndex(engine.findData(getattr(window.controller,'harness','pi')))
         engine.setAccessibleName('Harness')
         engine.activated.connect(lambda _:window.switch_harness(engine.currentData()))
         layout.addWidget(engine)
-        if getattr(window.controller,'harness',None)=='pi':
+        if getattr(window.controller,'harness',None) in ('pi','ah'):
             from .reasoning_settings import ReasoningDialog
             reasoning=QPushButton('Reasoning');reasoning.setAccessibleName('Pi reasoning settings')
             reasoning.setEnabled(getattr(window.controller,'capabilities',{}).get('reasoning') is True)
@@ -180,7 +180,7 @@ class SettingsDialog(QDialog):
             mcp=QPushButton('MCP servers');mcp.setAccessibleName('Pi MCP server management')
             mcp.setEnabled(getattr(window.controller,'capabilities',{}).get('mcpManagement') is True)
             mcp.clicked.connect(lambda:McpDialog(window).exec());layout.addWidget(mcp)
-        dsh=QPushButton('Connect Codex model' if getattr(window.controller,'harness',None)=='codex' else 'Connect DSH')
+        dsh=QPushButton('Connect Codex model' if getattr(window.controller,'harness',None)=='codex' else 'Connect a model' if getattr(window.controller,'harness',None) in ('pi','ah') else 'Connect DSH')
         def connect_dsh():
             self.accept()
             window.open_setup()

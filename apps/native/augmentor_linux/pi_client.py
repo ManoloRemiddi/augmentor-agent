@@ -66,15 +66,21 @@ class PiClient:
         self.capabilities = {'branch': True, 'edit': True, 'voice':False,'queue': False, 'steering': False, 'reasoning': False,'promptImprovement': False,'inspection':False,'mcpManagement':False,'mcpConfiguration':False}
         self.supports_queue = False
 
+    def connection(self):
+        return Connection(self.base)
+
+    def ensure_running(self):
+        from .runtime_start import ensure_running
+        ensure_running()
+
     def call(self, method, payload=None):
         connection=None
         try:
-            try:connection=Connection(self.base)
+            try:connection=self.connection()
             except (FileNotFoundError,ConnectionRefusedError):
                 if method != 'host.describe' or os.environ.get('AUGMENTOR_PI_NO_AUTOSTART') == '1':raise
-                from .runtime_start import ensure_running
-                ensure_running()
-                connection=Connection(self.base)
+                self.ensure_running()
+                connection=self.connection()
             result=connection.call(method,payload)
             if method == 'host.describe':
                 self.supports_queue = result.get('capabilities', {}).get('queue') is True
@@ -88,7 +94,7 @@ class PiClient:
                 self.capabilities['mcpConfiguration'] = result.get('capabilities', {}).get('mcpConfiguration') is True
             return result
         except (OSError,ValueError) as exc:
-            raise ContractError('Cannot reach the Pi runtime: '+str(exc)) from exc
+            raise ContractError('Cannot reach '+('Augmentor Harness' if getattr(self,'harness',None)=='ah' else 'the Pi runtime')+': '+str(exc)) from exc
         finally:
             if connection:connection.close()
 

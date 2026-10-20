@@ -372,7 +372,7 @@ class SettingsPanel(QWidget):
             try:
                 if not sid: return None,'Open a conversation to see its remembered knowledge.'
                 from .prompt_client import PromptClient
-                return PromptClient().call('memory.dual.recall',{'session':harness+':'+sid}),None
+                return (self.owner.prompt_client() if hasattr(self.owner,'prompt_client') else PromptClient()).call('memory.dual.recall',{'session':('pi' if harness=='ah' else harness)+':'+sid}),None
             except Exception as error: return None,str(error)
         def done(result):
             self.memory_refresh.setEnabled(True); value,error=result
@@ -575,7 +575,7 @@ class SettingsPanel(QWidget):
     def page_connections(self):
         page,layout=self.make_page('Connections','Choose the models and services your agent uses.')
         layout.addWidget(QLabel('Agent engine')); engine=QComboBox()
-        for text,value in [('DSH','dsh'),('Pi','pi'),('Codex (development)','codex')]: engine.addItem(text,value)
+        for text,value in [('Augmentor Harness','ah'),('DSH','dsh'),('Pi (legacy profile)','pi'),('Codex (development)','codex')]: engine.addItem(text,value)
         engine.setCurrentIndex(engine.findData(getattr(self.owner.controller,'harness','dsh'))); engine.setAccessibleName('Agent engine')
         engine.setEnabled(bool(self.owner.controller) and not getattr(getattr(self.owner.controller,'client',None),'custom',False)); engine.activated.connect(lambda _:self.owner.switch_harness(engine.currentData())); layout.addWidget(engine)
         self.action(layout,'Model connection && setup',self.open_setup)

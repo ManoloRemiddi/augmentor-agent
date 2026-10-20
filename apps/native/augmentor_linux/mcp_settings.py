@@ -42,7 +42,7 @@ class McpDialog(QDialog):
 
     def live(self):
         c=self.owner.controller
-        return (not self.closed and c is not None and c is self.controller and c.harness=='pi' and c.session==self.session_id
+        return (not self.closed and c is not None and c is self.controller and c.harness in ('pi','ah') and c.session==self.session_id
                 and c.online and c.connected and getattr(c,'capabilities',{}).get('mcpManagement') is True
                 and not any(getattr(c,key,False) for key in ('closed','running','navigating','preparing')))
 

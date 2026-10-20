@@ -29,7 +29,7 @@ class ReasoningDialog(QDialog):
 
     def live(self):
         c=self.owner.controller
-        return (not self.closed and c is self.controller and c is not None and c.harness=='pi'
+        return (not self.closed and c is self.controller and c is not None and c.harness in ('pi','ah')
                 and c.session==self.session_id and c.selection==self.selection and c.online and c.connected
                 and getattr(c,'capabilities',{}).get('reasoning') is True
                 and not any(getattr(c,key,False) for key in ('closed','running','navigating','preparing')))

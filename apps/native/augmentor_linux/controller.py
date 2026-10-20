@@ -40,9 +40,12 @@ class Controller(QObject):
 
     def __init__(self, parent=None, client=None, harness="pi"):
         super().__init__(parent)
-        if harness not in ('pi','dsh','codex'):
-            raise ValueError('Choose DSH, Pi or Codex. OpenCode support has been retired; its saved data is retained.')
-        if client is None and harness=='dsh':
+        if harness not in ('pi','ah','dsh','codex'):
+            raise ValueError('Choose Augmentor Harness, DSH, Pi or Codex. OpenCode support has been retired; its saved data is retained.')
+        if client is None and harness=='ah':
+            from .adapters.ah import AhAdapter
+            self.client=AhAdapter()
+        elif client is None and harness=='dsh':
             from .adapters.dsh import DshAdapter
             self.client=DshAdapter()
         elif client is None and harness=='codex':
@@ -509,7 +512,7 @@ class Controller(QObject):
                 raise ContractError('Open an idle, connected conversation first.')
             if provider not in ('local','openai-live'):raise ContractError('Choose a voice provider.')
             if provider=='local' and not hasattr(self.client,'voice_ticket'):raise ContractError('Local Voice is unavailable with this harness. Choose OpenAI GPT-Live.')
-            if self.harness=='pi':
+            if self.harness in ('pi','ah'):
                 with self.voice_lock:
                     if self.voice_pending or self.voice_session or self.voice_closing:raise ContractError('Voice is open or still closing.')
                     if provider=='local':
@@ -545,7 +548,7 @@ class Controller(QObject):
                         check_cancelled();self.voice_session={'session':ticket['sessionId'],'openId':pending['openId']}
                 else:check_cancelled()
             except Exception:
-                if self.harness=='pi':self.client.voice_close(ticket['sessionId'],pending['openId'])
+                if self.harness in ('pi','ah'):self.client.voice_close(ticket['sessionId'],pending['openId'])
                 raise
             return ticket
         finally:
@@ -556,7 +559,7 @@ class Controller(QObject):
             self.navigating=False
 
     def close_voice(self):
-        if self.harness!='pi' or not hasattr(self.client,'voice_close'):return
+        if self.harness not in ('pi','ah') or not hasattr(self.client,'voice_close'):return
         with self.voice_lock:
             pending=self.voice_pending;owner=self.voice_session or pending
             if not owner:return
@@ -580,7 +583,7 @@ class Controller(QObject):
     @admitted
     def send(self, text, selection, edit_from=None, request_id=None, *, input_mode='text'):
         if input_mode not in ('text','voice'):raise ContractError('Invalid input mode.')
-        spoken=self.harness=='pi' and input_mode=='voice'
+        spoken=self.harness in ('pi','ah') and input_mode=='voice'
         if spoken and not isinstance(request_id,str):raise ContractError('Spoken input requires its request identity.')
         alternate_spoken=input_mode=='voice' and isinstance(request_id,str) and request_id.startswith('augmentor-voice:')
         with self.lock:
@@ -626,7 +629,7 @@ class Controller(QObject):
                 if cancelled.is_set():
                     return
                 self.submission_progress.emit(generation, 'Sending message to agent…', 5)
-                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', **({'resumeQueue':True} if self.harness in ('pi','codex') else {}), **({'inputMode':'voice'} if self.harness=='pi' and input_mode=='voice' else {}), 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
+                response = self.client.call('session.prompt', {'sessionId': self.session, 'mode': 'queue', **({'resumeQueue':True} if self.harness in ('pi','ah','codex') else {}), **({'inputMode':'voice'} if self.harness in ('pi','ah') and input_mode=='voice' else {}), 'requestId': request_id or str(uuid.uuid4()), 'content': [{'type': 'text', 'text': text}]})
                 if response.get('accepted') is not True:
                     raise ContractError('The harness did not accept the message.')
                 accepted = True
@@ -665,7 +668,7 @@ class Controller(QObject):
                     time.sleep(.03)
                 target=sid or self.session
                 if self.closed or self.generation is not generation or target!=self.session or not target or self.cancel_requested.is_set():raise ContractError('Prompt was not queued; the active response stopped or changed.')
-                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'inputMode':'voice'} if self.harness=='pi' and input_mode=='voice' else {}),**({'expectedTurnId':turn_id} if self.harness in ('pi','codex') and mode=='steer' else {})})
+                result=self.client.call('session.prompt',{'sessionId':target,'requestId':request_id,'mode':mode,'content':[{'type':'text','text':text}],**({'inputMode':'voice'} if self.harness in ('pi','ah') and input_mode=='voice' else {}),**({'expectedTurnId':turn_id} if self.harness in ('pi','ah','codex') and mode=='steer' else {})})
                 self.queue_result.emit({'id':request_id,'accepted':result.get('accepted') is True,'command':bool(result.get('command'))})
             except Exception as exc:
                 self.queue_result.emit({'id':request_id,'accepted':False,'error':str(exc)})
@@ -675,11 +678,11 @@ class Controller(QObject):
     def update_queue(self, item_id, action):
         sid=self.session
         if not sid or self.read_only or not self.online or action not in ('steer','remove','acknowledge'):return
-        if action=='acknowledge' and (self.harness!='pi' or self.running):return
+        if action=='acknowledge' and (self.harness not in ('pi','ah') or self.running):return
         turn_id=getattr(self,'queue_turn_id',None)
         def work():
             try:
-                result=self.client.call('session.resolveQueue',{'sessionId':sid,'itemId':item_id,'acknowledgeUnknownOutcome':True}) if action=='acknowledge' else self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action},**({'expectedTurnId':turn_id} if self.harness in ('pi','codex') and action=='steer' else {})})
+                result=self.client.call('session.resolveQueue',{'sessionId':sid,'itemId':item_id,'acknowledgeUnknownOutcome':True}) if action=='acknowledge' else self.client.call('session.updateQueue',{'sessionId':sid,'itemId':item_id,'action':{'kind':action},**({'expectedTurnId':turn_id} if self.harness in ('pi','ah','codex') and action=='steer' else {})})
                 self.queue_action_result.emit({'id':item_id,'accepted':result.get('accepted') is True})
             except Exception as exc:
                 self.queue_action_result.emit({'id':item_id,'error':str(exc)})

@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Selectable AH backend in Desktop and Browser](AH-DESKTOP-BROWSER.md) adds an
+explicit installed-Harness connection alongside DSH and legacy Pi, with separate
+conversation keys and no empty-profile fallback. Source and synthetic SDK/Qt
+qualification are separate from the recorded compatible MX deployment.
+
 [Personal Mac Harness installations](HARNESS-MACOS-INSTALLATION.md): the Air and
 Mini run the existing **38fabc4d / 7e16b745…c9a299** macOS artifact from PR #51.
 Air inventory 6,122 files and focused 17/17; real DeepSeek/GX10/Olares replies

@@ -14,10 +14,10 @@ import {homedir} from 'node:os'
 import {join} from 'node:path'
 import {AcceptedWork} from './shared/accepted-work.mjs'
 import {BrowserVoice,voicePreferences} from './shared/voice-client.mjs'
-if(process.env.AUGMENTOR_BROWSER_HARNESS && process.env.AUGMENTOR_BROWSER_HARNESS!=='pi')throw new Error('This bridge supports Pi only.')
-const harness='pi'
-const preset='augmentor-browser-'+harness
-const workspace=process.env.AUGMENTOR_PI_BROWSER_WORKSPACE??join(homedir(),'Augmentor Browser Pi')
+if(process.env.AUGMENTOR_BROWSER_HARNESS && !['pi','ah'].includes(process.env.AUGMENTOR_BROWSER_HARNESS))throw new Error('This bridge supports Augmentor Harness and Pi only.')
+const harness=process.env.AUGMENTOR_BROWSER_HARNESS??'pi'
+const preset='augmentor-browser-pi'
+let workspace=process.env.AUGMENTOR_PI_BROWSER_WORKSPACE??join(homedir(),'Augmentor Browser Pi')
 const send=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value));if(b.length>1024*1024)throw new Error('Browser response exceeds frame limit');const h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
 let connection,opening,selection,currentSession;const interactions=new Map()
 const work=new AcceptedWork();let closing
@@ -46,15 +46,25 @@ async function client(){if(connection&&!connection.closed)return connection;if(!
   if(frame.method==='interaction/resolved'){interactions.delete(frame.payload.rpcId);send({method:'interaction.resolved',params:frame.payload});return}
   if(frame.method==='session/queue'){send({method:'session.queue',params:frame.payload});return}
   if(frame.method==='session/event'){voice.observe(frame.payload.sessionId,frame.payload.event);send({method:'session.event',params:frame.payload});const type=frame.payload.event.type;if(type==='turn/start'||type==='turn/end')send({method:'session.status',params:{sessionId:frame.payload.sessionId,status:type==='turn/start'?'running':'idle'}})}
-},()=>{if(!work.closing)void cleanup(1)},harness).then(c=>{connection=c;return c}).finally(()=>opening=null);return opening}
+},()=>{if(!work.closing)void cleanup(1)},harness).then(c=>{
+  if(c.ah){
+    workspace=c.ah.profile.workspace;
+    process.env.AUGMENTOR_SHARED_STATE=c.ah.profile.sharedState;process.env.AUGMENTOR_SHARED_DATA=c.ah.profile.sharedData;
+    process.env.AUGMENTOR_PI_CONFIG=c.ah.profile.config;process.env.AUGMENTOR_PI_STATE=c.ah.profile.state;
+  }
+  connection=c;return c
+}).finally(()=>opening=null);return opening}
 async function attach(sid){if(currentSession!==sid){voice.close();await voice.settled()}const c=await client();await c.call('events.subscribe',{sessionId:sid});await c.call('browser.attach',{sessionId:sid});currentSession=sid}
 async function request(method,p={},id){
+  // Bind shared stores before any AH library/memory request; never fall back
+  // to the legacy Pi/DSH profile when the installed AH is unavailable.
+  if(harness==='ah'&&method!=='shutdown')await client()
   if(method==='augmentor/dsh')return dshSetup(p)
   if(method==='augmentor/diagnostics')return supportReport()
   if(method==='augmentor/onboarding')return startOnboarding(p)
   if(method==='augmentor/surface'){if(!['appearance','dictation'].includes(p.action))throw Error('Prompt improvement requires DSH');return surfaceRequest(p)}
   if(method==='augmentor/home')return homeConnection(p)
-  if(method==='augmentor/memory')return memoryRequest(p)
+  if(method==='augmentor/memory')return memoryRequest({...p,...(harness==='ah'&&p.action==='dual.recall'?{session:p.session?.replace(/^ah:/,'pi:')}:{})})
   if(method==='augmentor/prompts')return promptLibrary(p)
   if(method==='augmentor/voice/start'){if(p.sessionId!==currentSession)throw Error('Open the current Pi conversation first.');return voice.start(p)}
   if(method==='augmentor/voice/control')return voice.control(p)

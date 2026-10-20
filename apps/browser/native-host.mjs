@@ -91,8 +91,8 @@ readFrames(process.stdin,first=>{
       shared(first.id,()=>promptLibrary(first.params??{}));return
     }
     if(workspaceProfile&&first.method==='harness.select'&&first.params?.harness!==(workspaceProfile.harness??'dsh')){reply({id:first.id,error:{code:'PERMISSION_DENIED',message:'This workspace uses its registered harness.'}});return}
-    if(first.method!=='harness.select'||!['pi','dsh','codex'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose DSH, Pi or Codex. Other harnesses are no longer supported; saved data is retained.'}});return}
-    const bridge={dsh:'./pipe.mjs',pi:'./pi-bridge.mjs',codex:'./codex-bridge.mjs'}[first.params.harness]
+    if(first.method!=='harness.select'||!['pi','ah','dsh','codex'].includes(first.params?.harness)){reply({id:first.id,error:{message:'Choose Augmentor Harness, DSH, Pi or Codex. Other harnesses are no longer supported; saved data is retained.'}});return}
+    const bridge={dsh:'./pipe.mjs',pi:'./pi-bridge.mjs',ah:'./pi-bridge.mjs',codex:'./codex-bridge.mjs'}[first.params.harness]
     child=spawn(process.execPath,[fileURLToPath(new URL(bridge,import.meta.url))],{stdio:['pipe','pipe','inherit'],windowsHide:true,env:{...process.env,AUGMENTOR_UNIFIED:'1',AUGMENTOR_BROWSER_HARNESS:first.params.harness}})
     readFrames(child.stdout,frame=>{
       if(frame.id!==undefined){

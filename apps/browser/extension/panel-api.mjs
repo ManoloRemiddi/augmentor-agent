@@ -68,12 +68,12 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
     request('augmentor/surface',{action:'dictation',method:msg.method,params:msg.params}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
   if(msg?.type==='prompt/cancelImprovement'){
-    if(state.harness!=='pi'||msg.requestId!==state.promptImprovement?.requestId){sendResponse({ok:false,error:'The Pi prompt editor scope changed.'});return}
+    if(!['pi','ah'].includes(state.harness)||msg.requestId!==state.promptImprovement?.requestId){sendResponse({ok:false,error:'The Pi prompt editor scope changed.'});return}
     request('prompt.cancelImprovement',{requestId:msg.requestId,scopeId:msg.requestId}).then(result=>sendResponse({ok:true,result}),error=>sendResponse({ok:false,error:error.message}));return true
   }
   if(msg?.type==='inspection/open'){
     const sid=msg.sourceSession;
-    const valid=()=>sid===state.sessionId&&state.harness==='pi'&&state.capabilities.inspection===true&&state.phase==='ready'&&!state.panelViewSession&&!chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol;
+    const valid=()=>sid===state.sessionId&&['pi','ah'].includes(state.harness)&&state.capabilities.inspection===true&&state.phase==='ready'&&!state.panelViewSession&&!chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol;
     if(!valid()||state.mutating){sendResponse({ok:false,error:'Select a ready standalone Pi conversation to inspect.'});return}
     const creating=!state.sessionReady;if(creating)state.mutating=true;
     ;(async()=>{
@@ -84,9 +84,9 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
       const tab=await chrome.tabs.create({url:result.url});sendResponse({ok:true,result:{opened:true,sessionId:sid,mode:'read-only',tabId:tab.id}});
     })().catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>{if(creating)state.mutating=false});return true
   }
-  if(msg?.type==='prompt/improve'&&state.harness==='pi'){
+  if(msg?.type==='prompt/improve'&&['pi','ah'].includes(state.harness)){
     const sid=state.sessionId,selection=JSON.stringify(state.selection),requestId=msg.requestId;
-    const valid=()=>sid===state.sessionId&&selection===JSON.stringify(state.selection)&&state.harness==='pi'&&state.phase==='ready'&&!state.panelViewSession;
+    const valid=()=>sid===state.sessionId&&selection===JSON.stringify(state.selection)&&['pi','ah'].includes(state.harness)&&state.phase==='ready'&&!state.panelViewSession;
     if(!valid()||state.running||state.mutating||state.capabilities.promptImprovement!==true||chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol){sendResponse({ok:false,error:'Open an idle standalone Pi conversation first.'});return}
     state.mutating=true;state.promptImprovement={requestId,sid};
     ;(async()=>{
@@ -102,14 +102,14 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
       .then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
   if (msg?.type==='queue/prompt' || msg?.type==='queue/action') {
-    if (!['pi','codex'].includes(state.harness) || state.capabilities.queue!==true || state.phase!=='ready' || !state.sessionReady || state.panelViewSession || msg.sessionId!==state.sessionId || state.mutating) {
+    if (!['pi','ah','codex'].includes(state.harness) || state.capabilities.queue!==true || state.phase!=='ready' || !state.sessionReady || state.panelViewSession || msg.sessionId!==state.sessionId || state.mutating) {
       sendResponse({ok:false,error:'The queue is unavailable or the conversation changed.'});return
     }
     const sessionId=state.sessionId
     state.mutating=true
     ;(async()=>{
       if(msg.type==='queue/prompt')return request('session.prompt',{sessionId,requestId:msg.requestId,mode:'queue',content:[{type:'text',text:String(msg.text??'')}]})
-      if(msg.action==='acknowledge'&&state.harness==='pi'&&!state.running)return request('session.resolveQueue',{sessionId,itemId:msg.itemId,acknowledgeUnknownOutcome:true})
+      if(msg.action==='acknowledge'&&['pi','ah'].includes(state.harness)&&!state.running)return request('session.resolveQueue',{sessionId,itemId:msg.itemId,acknowledgeUnknownOutcome:true})
       if(!['steer','remove'].includes(msg.action))throw Error('Unsupported queue action.')
       return request('session.updateQueue',{sessionId,itemId:msg.itemId,expectedTurnId:msg.expectedTurnId,action:{kind:msg.action}})
     })().then(result=>sendResponse({ok:true,...result}),error=>sendResponse({ok:false,error:error.message})).finally(()=>{state.mutating=false})
@@ -155,7 +155,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
   }
   if(msg?.type==='harness/select'){
     if(state.running||state.mutating){sendResponse({ok:false,error:'Finish the current action before switching harness.'});return}
-    if(!['pi','dsh','codex'].includes(msg.harness)){sendResponse({ok:false,error:'Choose DSH, Pi or Codex.'});return}
+    if(!['pi','ah','dsh','codex'].includes(msg.harness)){sendResponse({ok:false,error:'Choose Augmentor Harness, DSH, Pi or Codex.'});return}
     chrome.storage.local.set({'augmentor-harness':msg.harness}).then(()=>{resetHarnessPort();sendResponse({ok:true})});return true
   }
   if(msg?.type==='interaction/claim'){
@@ -221,7 +221,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
     request('augmentor/codex',msg.request??{action:'profiles'}).then(result=>sendResponse({ok:true,result})).catch(error=>sendResponse({ok:false,error:error.message}));return true
   }
   if(msg?.type==='modelSetup'){
-    if(state.harness!=='pi'){sendResponse({ok:false,error:'Select Pi to use this model setup form.'});return}
+    if(!['pi','ah'].includes(state.harness)){sendResponse({ok:false,error:'Select Augmentor Harness or Pi to use this model setup form.'});return}
     if(!['test','save','cancel'].includes(msg.action)){sendResponse({ok:false,error:'Unknown setup action.'});return}
     if(state.running||state.mutating){sendResponse({ok:false,error:'Finish the current action before changing model settings.'});return}
     ensurePort()
@@ -234,7 +234,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
     const methods={describe:'reasoning.describe',configure:'reasoning.configure',session:'session.reasoning',select:'session.selectReasoning',models:'augmentor/models'};
     const method=Object.hasOwn(methods,msg.action)?methods[msg.action]:undefined,sid=msg.sourceSession;
     if(!method){sendResponse({ok:false,error:'Unknown reasoning action.'});return}
-    const valid=()=>state.harness==='pi'&&state.capabilities.reasoning===true&&state.phase==='ready'&&!state.panelViewSession&&sid===state.sessionId&&!chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol;
+    const valid=()=>['pi','ah'].includes(state.harness)&&state.capabilities.reasoning===true&&state.phase==='ready'&&!state.panelViewSession&&sid===state.sessionId&&!chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol;
     if(!valid()){sendResponse({ok:false,error:'Select a ready standalone Pi conversation before changing reasoning.'});return}
     const writing=['configure','select'].includes(msg.action),creating=msg.action==='session'&&!state.sessionReady;
     if((writing||creating)&&(state.running||state.mutating)){sendResponse({ok:false,error:'Finish the current action before changing reasoning.'});return}
@@ -372,7 +372,7 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
         const res = await request('session.prompt', {
           sessionId: state.sessionId,
           mode: 'queue',
-          ...(['pi','codex'].includes(state.harness) ? {resumeQueue: true,requestId:crypto.randomUUID()} : {}),
+          ...(['pi','ah','codex'].includes(state.harness) ? {resumeQueue: true,requestId:crypto.randomUUID()} : {}),
           content: [{ type: 'text', text }],
         })
         if (res?.accepted === true && !res.command) {

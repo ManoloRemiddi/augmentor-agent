@@ -12,7 +12,7 @@ class DualMemoryPanel(QWidget):
     def __init__(self, owner):
         super().__init__(owner)
         self.owner = owner
-        self.client = PromptClient()
+        self.client = owner.prompt_client() if hasattr(owner,'prompt_client') else PromptClient()
         self.enabled = True
         self.busy = False
         self.capture_confirmed = False
