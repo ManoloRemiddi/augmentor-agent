@@ -5,9 +5,14 @@
 reopen/restoration pass. The newer private shell-launch environment is supported
 without shell evaluation. Exact sealed 27 Python/five Node and strict signatures
 pass; existing research/Wiki AH, histories/model/link are preserved. Temporary
-builds and superseded offline bundle removed. Comet's host is registered and
-real-AH initialized; owner extension loading remains manual because macOS denied
-remote assistive access. Current work is pushed; 38 older dirty files are saved
+builds and superseded offline bundle removed. Comet's extension is now loaded
+and pinned through its actual UI after assistive access became available. The
+visible **Desktop → Augmentor Browser Extension** folder is its live source;
+retain it and explicitly update/reload that copy on later upgrades. Its 67 files
+match the installed signed app. Actual sidebar Send returns **AH BROWSER READY**;
+Settings confirms AH Connected, and hide/toolbar reopen restores the reply and
+usable composer. No browser restart/reboot or screenshot acceptance is claimed.
+Current work is pushed; 38 older dirty files are saved
 separately on archive/local-application-work-20261020, preserving the checkout.
 
 

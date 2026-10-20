@@ -40,9 +40,21 @@
     "nativeHostRegistered": true,
     "realNativeHostSelectedAhAndInitialized": true,
     "standaloneDefault": "ah",
-    "loadedInOwnerBrowserVerified": false,
-    "manualLoadRequired": true,
-    "remoteUiBlock": "macOS denied osascript assistive access"
+    "loadedInOwnerBrowserVerified": true,
+    "manualLoadRequired": false,
+    "initialRemoteUiBlock": "macOS initially denied osascript assistive access; later permission was available",
+    "installationUsedOrdinaryBrowserUi": true,
+    "visibleLiveFolder": "Desktop/Augmentor Browser Extension",
+    "liveFolderFilesMatchSignedInstalledExtension": 67,
+    "pinnedInToolbar": true,
+    "actualSettingsShowsAhConnected": true,
+    "actualComposerAndSendButton": true,
+    "realConfiguredProviderReply": "AH BROWSER READY",
+    "hideAndToolbarReopenRestoresReply": true,
+    "reopenedConnectedAndEmptyUsableComposer": true,
+    "browserSecurityDatabaseModified": false,
+    "browserRestartTested": false,
+    "screenshotInspection": false
   },
   "preservation": {
     "existingAhRuntimeUnchanged": true,
@@ -62,7 +74,8 @@
     "mainMergePerformed": false
   },
   "limits": [
-    "Owner Comet extension must be loaded manually before its sidebar UI is accepted",
+    "Retain the visible live extension folder; future upgrades must update/reload that loaded copy",
+    "Actual Browser UI verified through accessibility controls; screenshot inspection and full browser restart were not performed",
     "Personal ad-hoc development installation; no new public download or notarization claim",
     "Physical reboot, voice and broader desktop-control consent are not qualified by this check",
     "Historical snapshot is preservation, not qualified deployment source"

@@ -37,7 +37,7 @@ and broader desktop-control permission flows were not tested here. This is a
 personal ad-hoc development install; it publishes no new public download and
 makes no notarization claim. Mac supplier notices remain separately attributed.
 
-## Comet: prepared and backend-tested, manual loading pending
+## Comet: installed and tested in the owner's browser
 
 Comet's native messaging registration targets the installed Applications bundle,
 including its existing Chrome-compatibility registration location. The actual
@@ -45,12 +45,30 @@ signed browser-host executable selects AH and initializes against its real
 model catalog without a new Browser prompt or conversation. The installed
 extension defaults to AH while retaining explicit saved choices.
 
-macOS denied remote assistive access, so the owner's actual Comet sidebar is
-not claimed loaded or visually accepted. Its Extensions page and prepared
-folder were opened. Complete the ordinary preview flow: Developer mode →
-Load unpacked → select the prepared Augmentor folder, then open the sidebar.
-The local private setup receipt records the exact folder; no user browser profile
-or security database was modified to bypass that step.
+The first attempt stopped at macOS's assistive-access restriction. Once that
+permission was available, the ordinary Comet installation was completed through
+its actual Extensions page and folder chooser. The hidden hashed Library path
+was unnecessarily difficult for the owner to find. This installation instead
+loads from the clearly named **Desktop → Augmentor Browser Extension** folder.
+Its 67 files match the extension in the signed installed application. This is
+the live extension source, so retain that folder; future updates must explicitly
+update/reload the loaded copy rather than only prepare another hidden folder.
+
+**Augmentor Agent** is loaded, enabled and pinned in Comet. Actual sidebar
+accessibility controls show Connected and the configured model; Settings shows
+**Augmentor Harness · Connected**. A prompt entered in the real sidebar composer
+and submitted through its Send button returns **AH BROWSER READY** from the
+configured provider. Hiding the sidebar and reopening it with the pinned toolbar
+icon restores that reply, Connected status and an empty, usable composer. One
+marked Browser verification conversation remains alongside the earlier native
+installation check. Desktop remains online and model-ready.
+
+Private receipts record the loaded profile/path, matching file hashes and actual
+UI results. The browser's own metadata confirms the visible folder is loaded.
+No browser security database or signed application was edited to bypass approval.
+This qualification uses actual accessibility controls; a screen capture was
+unavailable and no screenshot inspection is claimed. Full browser restart and a
+physical reboot were not performed in this follow-up.
 
 ## Repository synchronization
 
