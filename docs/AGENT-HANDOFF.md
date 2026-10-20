@@ -12,8 +12,10 @@ actual labels and reload checks without prompts or changed reasoning preferences
 Config hashes/history prefixes and unchanged runtime/dependency files verify.
 Managed scratch and Mac temporary app copies removed; rollback retained. Reload
 open Harness tabs. Off is not Auto; no Adaptive mappings were added. Air Desktop
-reopened online. The separate MX Agent Desktop remains open with an unsent draft
-and stale binding, awaiting safe reopening after the owner handles that draft.
+reopened online. After the owner confirmed the MX draft was saved and the window
+closed, its remaining tray process was restarted. MX Agent Desktop now verifies
+online/model-ready without connection or session-restoration errors; its selected
+application package is unchanged.
 [Installed record](../release/harness-effort-picker-installed-20261020.json).
 
 [Agent Desktop is installed on the personal MacBook Air](MACBOOK-AIR-AGENT-INSTALLATION.md):

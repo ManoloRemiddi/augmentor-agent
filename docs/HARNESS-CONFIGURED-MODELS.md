@@ -100,10 +100,13 @@ roots remain.
 
 Already-open Harness tabs need a reload to replace their in-memory GUI. The Air's
 idle Agent Desktop was closed through its guard, reopened normally and verifies
-online/model-ready. The separate MX Agent Desktop has an unsent draft and an old
-selected-root binding; it is preserved open rather than force-closed. Its safe
-reopen is awaiting the owner's draft handling. This does not block using the
-updated Harness in the browser. No adaptive mappings or provider capabilities
+online/model-ready. MX Agent Desktop initially retained its unsent draft and old
+selected-root binding. After the owner explicitly confirmed saving the draft and
+closing the window, inspection showed that closing had hidden the application
+in the tray. The identified, idle background Desktop process was stopped with
+SIGTERM and reopened through the normal installed launcher. It now verifies
+online/model-ready, with empty connection/session-restoration errors and the
+same selected Desktop package. No adaptive mappings or provider capabilities
 were changed, and no physical reboot is claimed.
 
 [Portable installed record](../release/harness-effort-picker-installed-20261020.json).

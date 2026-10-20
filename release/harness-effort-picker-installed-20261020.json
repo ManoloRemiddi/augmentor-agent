@@ -38,7 +38,11 @@
     "mxPilot": {
       "artifactSha256": "0ce06166c4c9d56c6670d9219e12e17a7ea52eb9e08cf0f358bb0641e8fbd500",
       "selectedAndRunning": true,
-      "installedServedBundleAndReloadedMenuVerified": true
+      "installedServedBundleAndReloadedMenuVerified": true,
+      "agentDesktopReopenedOnline": true,
+      "agentDesktopModelReady": true,
+      "agentDesktopRestoreError": "",
+      "agentDesktopPackageUnchanged": true
     },
     "macBookAir": {
       "artifactSha256": "a3be9f2e690df090d0b3b0dd3aaf5535cf0d5ff843ba96f6459b4d64981c54a9",
@@ -64,12 +68,12 @@
     "runtimeAndNativeDependencyFilesUnchanged": true,
     "oldReleasesRetainedForRollback": true,
     "managedMxScratchRemoved": true,
-    "macDisposableApplicationCopiesRemoved": true
+    "macDisposableApplicationCopiesRemoved": true,
+    "ownerConfirmedMxDesktopDraftSavedBeforeRestart": true
   },
   "limits": [
     "Reload already-open Harness tabs to replace their in-memory GUI",
     "Profiles advertising only off still offer only off; adaptive model mappings were not invented",
-    "Separate MX Agent Desktop has an unsent draft and a stale selected-root binding; preserved open, awaiting safe reopen",
     "No physical reboot or provider-specific reasoning payload change is qualified by this UI update"
   ]
 }
