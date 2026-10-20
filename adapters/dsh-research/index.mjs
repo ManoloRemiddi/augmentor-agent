@@ -44,7 +44,12 @@ export function apply(ctx, config) {
         return false;
     } };
     const register = () => { const searchDispose = ctx.web.registerSearchProvider({ id: name, available, search: async (request, signal) => client.search(request.query, {}, signal) }); let fetchDispose; try {
-        fetchDispose = ctx.web.registerFetchProvider({ id: name, available, fetch: async (request, signal) => client.fetch(request.url, signal) });
+        fetchDispose = ctx.web.registerFetchProvider({ id: name, available, fetch: async (request, signal) => {
+            const result = await client.fetch(request.url, signal);
+            // DSH's fetch seam requires a text body and a numeric status. This is
+            // a successful extraction service response, not a measured origin status.
+            return { url: result.url, statusCode: 200, body: { kind: 'text', content: 'Tavily extraction succeeded (service HTTP 200; origin HTTP status is not reported).\n\n' + result.content }, truncated: result.truncated };
+        } });
     }
     catch (e) {
         searchDispose?.();
