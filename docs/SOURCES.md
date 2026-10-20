@@ -990,3 +990,13 @@ c1b2279a2267850e6c52be72e632479ac916a031. Public copyright/licence headers stay
 intact. Selected public Window/Controller/button hooks are adapted for current Pi
 cancellation, receipt identity and maintenance; no private repository source is
 copied. [Scope and synthetic qualification](HARNESS-NATIVE-SETTINGS.md#retain-the-existing-provider-during-the-client-update--october-17).
+
+October 20 personal Air packaging: the existing root lock selects
+`@img/sharp-libvips-darwin-arm64@1.3.4` (LGPL-3.0-or-later) and
+`@deepseek-ai/libreoffice-kit-darwin-arm64@0.1.3` (MPL-2.0). These are separately
+licensed runtime suppliers, not MIT DSH GUI code. The catalog now scopes those
+exact versions, uses the already-reviewed full LGPL text for libvips, and hashes
+all five original native-kit MIT/MPL/third-party/combined LICENSE/NOTICE texts.
+The package retains its source/change/rebuild records. This fixes the Mac
+notice-inventory refusal; it does not waive static-native dependency review or
+claim a new public distribution, notarization, or complete upstream source audit.
