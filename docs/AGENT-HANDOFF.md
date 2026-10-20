@@ -1,5 +1,16 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Agent Desktop is installed on the personal MacBook Air](MACBOOK-AIR-AGENT-INSTALLATION.md):
+**dc87d48e / 7b7c1bb0…11cab2**, AH default, actual native Send/reply and normal
+reopen/restoration pass. The newer private shell-launch environment is supported
+without shell evaluation. Exact sealed 27 Python/five Node and strict signatures
+pass; existing research/Wiki AH, histories/model/link are preserved. Temporary
+builds and superseded offline bundle removed. Comet's host is registered and
+real-AH initialized; owner extension loading remains manual because macOS denied
+remote assistive access. Current work is pushed; 38 older dirty files are saved
+separately on archive/local-application-work-20261020, preserving the checkout.
+
+
 [Settings trap and AH default are fixed on installed MX](AH-DESKTOP-BROWSER.md#settings-navigation-and-selected-browser-opening--october-20-follow-up):
 **724bc94d** compatible client / **bd7a2cb2…cd357e7** is selected/running online.
 Actual primary Home → Back and Settings reopening pass with physical clicks;
