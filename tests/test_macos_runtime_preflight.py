@@ -187,7 +187,7 @@ class SetupDialogChoiceTests(unittest.TestCase):
              patch.object(managed_setup, 'ManagedSetupDialog', factory('managed')), \
              patch.object(dsh_setup, 'DshSetupDialog', factory('external')), \
              patch.object(setup_module, 'SetupDialog', factory('pi')):
-            window.Window.open_setup(owner)
+            window.Window.make_setup_dialog(owner)
         return made.get('name')
 
     def test_missing_runtime_is_explained_not_redirected_to_external_dsh(self):
@@ -207,6 +207,9 @@ class SetupDialogChoiceTests(unittest.TestCase):
     def test_pi_harness_is_untouched(self):
         self.assertEqual(self._chosen('pi', 'missing its own built-in runtime', True),
                          'pi')
+
+    def test_ah_uses_its_existing_harness_model_setup(self):
+        self.assertEqual(self._chosen('ah', 'missing its own built-in runtime', True), 'pi')
 
 
 @unittest.skipUnless(HAVE_QT, 'PySide6 is required for the first-run dialog')
