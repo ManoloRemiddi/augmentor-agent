@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Installed Harness login startup and recovery](HARNESS-BROWSER-OPENING.md#login-startup-and-recovery--october-20)
+adds the normal **Augmentor Harness** launcher, an enabled graphical user service
+and XDG login activation. The real reboot gap is restored; actual supervisor
+crash recovery preserves the same owner, 111 chats, Metafolder29 and registry24.
+32 Python/six exact-seal SDK cases; no new full app copy/seal or owner inference.
+The new setup's second physical reboot remains unobserved.
+[Evidence](../release/harness-startup-20261020.json).
+
 [Registered DSH projects are now imported and grouped](HARNESS-PROJECTS-MIGRATED-2026-10-19.md):
 **29 workspaces / nine Metafolders / 106 source conversations represented** in the
 actual pilot, 105 newly added and the earlier import/continuation preserved.

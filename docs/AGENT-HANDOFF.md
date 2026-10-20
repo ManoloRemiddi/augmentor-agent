@@ -1,12 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
 [Harness reboot startup](HARNESS-BROWSER-OPENING.md#login-startup-and-recovery--october-20)
-adds a separate verified startup controller and normal Augmentor Harness launcher.
-The previous bookmark fix did not start a server after reboot. Existing pilot
-restoration passes; 32 Python and six exact-seal SDK cases cover cold startup,
-concurrent opens, crash/controller recovery, maintenance and port collision.
-No new full app copy or app seal; installed login/service adoption is underway.
-Preserve the registered pilot, browser identity and all newer owner work.
+is installed: controller **c48d647c / 97e77042…6b7d86c**, normal **Augmentor Harness**
+menu/`augmentor-harness`, enabled graphical user service plus XDG login action.
+Actual supervisor crash auto-recovers while the same owner stays online; normal
+browser launch and a fresh bare-address IAB tab pass. **111 chats / Metafolder29**,
+registry24, private identity/config and app **6fa33389…5d265e0** stay unchanged.
+Source **32 Python / six exact-seal SDK cases** cover cold startup, concurrent
+opens, runtime crash, controller recovery, maintenance and port collision. Zero
+owner generation/new full app copies/seals. The old fix persisted identity but
+missed login server startup; the real reboot gap is reproduced and restored.
+A second physical reboot with this setup is not performed. Wider coupled
+consolidation, voice and other OS startup adapters remain separate.
+[Evidence](../release/harness-startup-20261020.json).
 
 [Harness Improve prompt](PROMPT-IMPROVEMENT.md#harness-input-box--october-19)
 is installed inside the input at the upper right on **c0c7b6d9 /

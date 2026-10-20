@@ -86,10 +86,23 @@ restart, maintenance and fixed-port collision/recovery. Native history and brows
 identity stay exact; only the authored fixture's two initial model requests occur,
 with **zero additional generation requests during startup/recovery**. The tests
 use authored profiles and the current sealed app in place; no new full app copy
-or replacement app seal is required. Actual installed service/login and UI proof
-are recorded below after activation. A second physical reboot is not performed
-by the assistant; that full graphical-login check remains distinct from the
-current post-reboot restoration and isolated cold-start tests.
+or replacement app seal is required. Actual installation is complete against the same registered **6fa33389…5d265e0**
+app. Controller source **c48d647c**, code checksum
+**97e77042…6b7d86c**, is installed through its private selection/owned-file manifest.
+The user service is **enabled and active**. The exact installed login action
+passes twice. Crashing only its verified supervisor causes an automatic service
+restart while the same owner PID stays online. Registry **24**, the persistent
+credential, current configuration, **111 conversations** and Metafolder revision
+**29** are unchanged. The ordinary default-browser launcher succeeds, and a new
+IAB tab at the bare address shows the real app with an editable composer and saved
+groups, without a new private link. No owner generation or app restart occurs
+during controller installation/testing. Small control-file recovery is retained;
+no profile or full application copy and no new app seal were made.
+
+A second physical reboot is not performed by the assistant; that full graphical
+login check remains distinct from the observed post-reboot restoration, installed
+activation action and isolated cold-start/recovery tests.
+[Portable evidence](../release/harness-startup-20261020.json).
 
 ## Installed pilot — October 19
 

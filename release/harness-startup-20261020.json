@@ -1,0 +1,69 @@
+{
+  "schema": "augmentor-harness-startup-qualification/1",
+  "date": "2026-10-20",
+  "controllerSourceRef": "c48d647c9c4d5186302cb6df68ab1820d3316ba1",
+  "controllerSha256": "97e77042a1375a7119d5e3ef23a278a2876e9320628af0f58a13a2d1d6b7d86c",
+  "cause": "The persistent browser identity/address fix did not install server startup after reboot. No listener or AH login activation was present.",
+  "observedAfterActualReboot": true,
+  "tests": {
+    "python": 32,
+    "realSealedSdkNode": 6,
+    "authoredProfilesOnly": true,
+    "cases": [
+      "missing reboot runtime directories",
+      "duplicate/concurrent opens",
+      "idle runtime crash and recovery",
+      "controller restart preserves owner",
+      "maintenance fence",
+      "fixed-port collision and recovery",
+      "private output",
+      "tampered controller/opener",
+      "protected installer rollback",
+      "foreign listener refusal"
+    ],
+    "seedRequests": 2,
+    "additionalModelRequestsDuringRecovery": 0,
+    "nativeHistoryAndBrowserIdentityPreserved": true
+  },
+  "installed": {
+    "review": "pilot",
+    "registryRevisionUnchanged": 24,
+    "runtimeArtifactSha256Unchanged": "6fa333896c860bf1d5d8b994f718aedf66ce5c0b8f3dd42eaa118e4ff5d265e0",
+    "serviceEnabledAndActive": true,
+    "graphicalSessionActivation": true,
+    "xdgLoginActivation": true,
+    "loginActionRepeated": true,
+    "normalMenuName": "Augmentor Harness",
+    "stableCommand": "augmentor-harness",
+    "sameOwnerPidThroughControllerInstallation": true,
+    "actualSupervisorCrashAutoRecovered": true,
+    "actualSupervisorRestartsObserved": 1,
+    "sessionsPreserved": 111,
+    "metafoldersRevisionPreserved": 29,
+    "registryBrowserIdentityAndConfigPreserved": true,
+    "defaultBrowserLaunchSucceeded": true,
+    "freshBareAddressIabReady": true,
+    "bareAddress": "http://127.0.0.1:41789/",
+    "ownerGenerationRequests": 0,
+    "secondPhysicalRebootPerformed": false
+  },
+  "storage": {
+    "newFullAppBuilds": 0,
+    "ownerProfilesCopied": false,
+    "existingSealedAppReused": true,
+    "managedScratchRemoved": true,
+    "smallControllerRecoveryBackupsRetained": true
+  },
+  "limits": [
+    "MX Linux systemd graphical session only",
+    "Second physical reboot with new login setup remains unobserved",
+    "Slow/unconfirmed owners are preserved, never forcibly killed",
+    "New or cleared browser profiles need one normal launcher login",
+    "Wider desktop/shared-store consolidation and later OS adapters remain separate"
+  ],
+  "publication": {
+    "reviewPr": 45,
+    "merge": false,
+    "publicBinaries": false
+  }
+}
