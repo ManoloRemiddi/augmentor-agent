@@ -63,6 +63,25 @@ the preceding installed application; this change does not qualify those adapters
 Installed activation and owner-state preservation must be recorded independently
 of candidate tests.
 
+## Installed Mac adoption
+
+Runtime `38fabc4d8643a12994151c9f60b1406baaaa0809` is selected and running on the
+32 GiB Apple-silicon Mac. Its application inventory hash is
+`7e16b745b1e2ba8d88452431406db8dbff212a65f3c3b5d16370984463c9a299`.
+The ordinary shutdown guard first refused an unsent draft; activation proceeded
+only after the owner cleared it. A cold private configuration/history snapshot,
+SQLite backups and the preceding release are retained. Both conversations,
+25 project files, the browser's address and operator login, current model and
+groupings verify preserved. No project material is included in public evidence.
+
+The live interface of that same owner shows Web search On in keyless mode,
+Workspace folders On, built-in Prompt library/Improve prompt and both added local
+models in the pinned picker. The current cloud model remains selected. Both
+graphical-login LaunchAgents validate; the Harness service is running with
+RunAtLoad/KeepAlive. This is a guarded process restart, not a new physical-reboot
+test. The Linux owner's selected application and profiles are unchanged.
+[Portable receipt](../release/harness-macos-defaults-20261020.json).
+
 Session review also identified excessive source-code discovery and an overstated
 memory-isolation claim. A workspace-local knowledge base and a globally registered
 skill are not an OS access boundary. Future agent guidance should distinguish

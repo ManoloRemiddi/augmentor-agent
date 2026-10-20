@@ -6,9 +6,15 @@ binds the existing public Search/Fetch implementation to native-workspace macOS
 sessions. Linux/macOS full source check/build and 40 focused cases each pass;
 live Mac search/fetch and two existing local-model connections pass. Metafolder
 is enabled and Prompt library/Improve controls are present in the owner's Mac UI.
-The new application remains a candidate until the guarded idle/draft-free switch;
-Wiki's Linux-only IO/receipt adapter is unchanged. Credentials and owner transcripts
-stay private. The guide records the session-audit lessons and qualification scope.
+Runtime **38fabc4d** is now selected and running on the 32 GiB Apple-silicon Mac,
+artifact **7e16b745…3c9a299**. Guarded idle/draft-free activation and a cold backup
+preserve both conversations, 25 project files, the browser address and current
+model; graphical login/recovery jobs remain loaded. Actual UI verifies enabled
+Search/Metafolder, both pinned local providers and the built-in writing controls.
+Expanded focused checks pass **53 Mac / 52 Linux**; the guide records existing
+adapter failures and the missing Linux QtTest proof. Wiki's Linux-only IO/receipt
+adapter is unchanged. Credentials and owner transcripts stay private.
+[Installation receipt](../release/harness-macos-defaults-20261020.json).
 
 [Harness reboot startup](HARNESS-BROWSER-OPENING.md#login-startup-and-recovery--october-20)
 adds a separate verified startup controller and normal Augmentor Harness launcher.
