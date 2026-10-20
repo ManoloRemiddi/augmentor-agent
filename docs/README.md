@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Personal Mac Harness installations](HARNESS-MACOS-INSTALLATION.md) record the
+verified existing macOS artifact on the Air and Mini, login/automatic service
+recovery, enabled supported components and real Air model replies. OpenAI is
+explicitly deferred; Wiki and physical reboot/lid-wake qualification remain open.
+
 [Installed Harness login startup and recovery](HARNESS-BROWSER-OPENING.md#login-startup-and-recovery--october-20)
 adds the normal **Augmentor Harness** launcher, an enabled graphical user service
 and XDG login activation. The real reboot gap is restored; actual supervisor

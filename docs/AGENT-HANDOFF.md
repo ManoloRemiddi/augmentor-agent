@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Personal Mac Harness installations](HARNESS-MACOS-INSTALLATION.md): the Air and
+Mini run the existing **38fabc4d / 7e16b745…c9a299** macOS artifact from PR #51.
+Air inventory 6,122 files and focused 17/17; real DeepSeek/GX10/Olares replies
+and default AH READY verified. Both actual launchd recoveries preserve browser
+link/model/history; OpenAI sign-ins cancelled/reconciled at owner's deferral.
+Air AC-only awake LaunchAgent retains battery/display sleep. No MX build/copy,
+Linux activation, new physical reboot or Wiki macOS qualification. This is an
+installed deployment record, not an implementation merge or new release seal.
+
 [Harness reboot startup](HARNESS-BROWSER-OPENING.md#login-startup-and-recovery--october-20)
 is installed: controller **c48d647c / 97e77042…6b7d86c**, normal **Augmentor Harness**
 menu/`augmentor-harness`, enabled graphical user service plus XDG login action.
