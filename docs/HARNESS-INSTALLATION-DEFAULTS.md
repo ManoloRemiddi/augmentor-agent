@@ -28,7 +28,7 @@ Never edit a selected application artifact in place.
 | Improve prompt | Built in; the **✦** control inside the input. Enabled for an eligible non-empty draft in an idle connected conversation. Its result stays a draft; Undo restores the original wording. Instructions are in the library's **Improve prompt** tab. |
 | Web Search/Fetch | Keyless mode enabled in new Linux/macOS profiles. Original provider forms, revision checks, same-owner reload, cancellation, public-address checks and pinned DNS remain. Optional API credentials are configured separately. |
 | Models | Existing provider configuration and model choices are preserved. Machine-specific local endpoints and credentials are private installation state, never release defaults. Adding local providers does not select a new conversation model. |
-| Wiki Tools/Skills | Retained in the application; their descriptor-relative filesystem and operation-receipt adapter remains Linux-only. macOS Search support does not enable or qualify Wiki operations. |
+| Wiki Tools/Skills | Supported on Linux and macOS native-workspace sessions; configure an explicit vault in Plugins. See [macOS Wiki qualification](HARNESS-WIKI-MACOS.md) for the six tools, nine skills and installed acceptance. |
 
 The web Harness is an interface to the existing Pi owner. Its native-workspace
 conversations can use Search on Linux and macOS. Browser-extension conversations
@@ -53,8 +53,9 @@ Prompt library and Improve prompt controls were inspected in that same interface
 
 Mac test fixtures now resolve the operating system's temporary-directory alias
 before using the private configuration store. Runtime path checks were not
-weakened. Broader packaging, Windows, physical voice and Wiki qualification remain
-separate. An expanded focused run passes **53/53 on macOS** and **52/52 on
+weakened. Broader packaging, Windows and physical voice remain separate. The
+[later Wiki port](HARNESS-WIKI-MACOS.md) now qualifies the macOS Wiki adapter
+independently. An expanded focused run passes **53/53 on macOS** and **52/52 on
 Linux**, including cold grouping retention and input rewrite/Undo. The additional
 Mac SDK/native prompt-improvement proof passes; the available Linux Python lacks
 QtTest, so that one native proof is not counted as a Linux pass. Three broader
@@ -64,6 +65,10 @@ Installed activation and owner-state preservation must be recorded independently
 of candidate tests.
 
 ## Installed Mac adoption
+
+This section records the earlier `38fabc4d` adoption. The later
+[Wiki activation](HARNESS-WIKI-MACOS.md) supersedes both Macs' selected runtime
+with `fda0cc3b`, retaining the preceding release for rollback.
 
 Runtime `38fabc4d8643a12994151c9f60b1406baaaa0809` is selected and running on the
 32 GiB Apple-silicon Mac. Its application inventory hash is

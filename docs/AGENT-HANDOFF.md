@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Wiki on macOS](HARNESS-WIKI-MACOS.md) is now installed and enabled on both
+owner Macs: six original tools, nine approved skills and independent home-level
+vaults. Live model scaffold/write/query/lint, actual Plugins UI and automatic
+process recovery pass on each. Runtime **fda0cc3b**, full artifact
+**698b9581…e3083b**, **47,129** inputs; existing histories/models/browser addresses
+and verified private backups are preserved. Linux/macOS focused checks pass;
+protected Documents access, physical reboot and AH Codex sign-in are not claimed.
+[Portable evidence](../release/harness-wiki-macos-20261020.json).
+
 [Harness installation defaults](HARNESS-INSTALLATION-DEFAULTS.md) adds fresh-profile
 Metafolder/keyless Search provisioning without overwriting saved choices, and
 binds the existing public Search/Fetch implementation to native-workspace macOS
@@ -12,8 +21,8 @@ preserve both conversations, 25 project files, the browser address and current
 model; graphical login/recovery jobs remain loaded. Actual UI verifies enabled
 Search/Metafolder, both pinned local providers and the built-in writing controls.
 Expanded focused checks pass **53 Mac / 52 Linux**; the guide records existing
-adapter failures and the missing Linux QtTest proof. Wiki's Linux-only IO/receipt
-adapter is unchanged. Credentials and owner transcripts stay private.
+adapter failures and the missing Linux QtTest proof. At that earlier snapshot Wiki remained Linux-only; the
+[macOS Wiki port](HARNESS-WIKI-MACOS.md) above supersedes that limitation. Credentials and owner transcripts stay private.
 [Installation receipt](../release/harness-macos-defaults-20261020.json).
 
 [Harness reboot startup](HARNESS-BROWSER-OPENING.md#login-startup-and-recovery--october-20)

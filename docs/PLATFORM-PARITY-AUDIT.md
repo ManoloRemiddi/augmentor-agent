@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Wiki on macOS](HARNESS-WIKI-MACOS.md) is now installed and enabled on both
+owner Macs: six original tools, nine approved skills and independent home-level
+vaults. Live model scaffold/write/query/lint, actual Plugins UI and automatic
+process recovery pass on each. Runtime **fda0cc3b**, full artifact
+**698b9581…e3083b**, **47,129** inputs; existing histories/models/browser addresses
+and verified private backups are preserved. Linux/macOS focused checks pass;
+protected Documents access, physical reboot and AH Codex sign-in are not claimed.
+[Portable evidence](../release/harness-wiki-macos-20261020.json).
+
 [Existing MCP connections](MCP-TRANSPORT.md#existing-dsh-mcp-configuration-in-mx-reviews--october-16) now appear in both MX reviews: Playwright/Blender enabled with 24/26 discovered tools, two Comfy endpoints/Unreal stored disabled after unreachable checks. Private unselected **20261016-220504-b91df2e4 / 1633e00f** verifies **24,615 sealed/1,102 compiled** inputs; source/exact packaged each pass **28/28 Node** (twelve files/three Chromium/one Qt) and **41 Python** cases. Explicit Playwright isolated mode passes two-client localhost/cookie/private-temp checks; implicit defaults reproduce a shared-profile collision. Guarded adoption verifies **410 cold backup files/34 protected inputs**; subsequent one-write-per-profile configuration preserves original native/display prefixes, with 38 new typed metadata/notice entries and four verified cache updates. Four conversations, Wiki/shared data/permissions/installed selection survive; registry six. [Portable evidence](../release/harness-owner-mcp-review-20261016.json). No owner project/model work or further real project transfer; service/application/physical/later-OS and pilot gates remain.
 
 [Existing Wiki vault adoption](HARNESS-PLUGIN-PARITY.md#existing-owner-wiki-vault-in-the-mx-reviews--october-16) connects both MX reviews through revisioned configuration/SDK reload, preserving their PIDs, four conversations and permissions. Six tools/nine approved skills and both read modes over 16 unchanged Wiki files are verified; 32 existing review inputs have verified private backups. Source and exact packaged Wiki focus each pass 13/13 (six files/two Chromium). No runtime/seal, DSH, model/GPU/audio or additional project transfer changes; full owner skill/write/installed-Agent parity remains open. [Portable evidence](../release/harness-existing-wiki-review-20261016.json); qualification **7fc068ee**, existing application **d300543c / 20261016-213718-135550f5**, all **24,613 sealed/1,102 compiled** inputs verify unchanged. Post-GUI checks retain the 32 original files, two intended Wiki profiles and shared prompt/memory/engine rows.

@@ -1,5 +1,14 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Wiki on macOS](HARNESS-WIKI-MACOS.md) is now installed and enabled on both
+owner Macs: six original tools, nine approved skills and independent home-level
+vaults. Live model scaffold/write/query/lint, actual Plugins UI and automatic
+process recovery pass on each. Runtime **fda0cc3b**, full artifact
+**698b9581…e3083b**, **47,129** inputs; existing histories/models/browser addresses
+and verified private backups are preserved. Linux/macOS focused checks pass;
+protected Documents access, physical reboot and AH Codex sign-in are not claimed.
+[Portable evidence](../release/harness-wiki-macos-20261020.json).
+
 ## Live original Wiki ingest and explicit fallback — October 17
 
 The current sealed MX application **ee80c054 / 20261017-071945-90183f89** now

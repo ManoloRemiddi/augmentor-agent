@@ -1,0 +1,148 @@
+{
+  "schema": "augmentor-harness-wiki-macos-evidence/1",
+  "date": "2026-10-20",
+  "runtimeSourceRef": "fda0cc3bc2be7b2bbf53893ae4e97c28a5125678",
+  "implementationRef": "d9a546df9e70df53fc5de0cfebfc2831bd5a8bcb",
+  "productVersion": "0.2.13",
+  "piVersion": "1.1.0",
+  "nodeVersion": "24.19.0",
+  "pythonVersion": "3.12.13",
+  "artifact": {
+    "sha256": "698b95813eaaba8136146faff4b5d2e8f52f7c3950a7d20baebe8d2850e3083b",
+    "inventoriedFilesAndSymlinks": 47129,
+    "inventoryIncludes": "source, compiled application, dependencies and bundled runtimes; generated outputs/bytecode excluded",
+    "sourceRegularFilesCompared": 3831,
+    "contentsModesAndSymlinksVerifiedOnBothMacs": true
+  },
+  "supplier": {
+    "wikiTools": "0.14.0",
+    "wikiSkills": "0.2.1",
+    "licenses": "existing MIT source notices retained",
+    "sourceSelectionsUnchanged": true,
+    "dependencyLocksUnchanged": true
+  },
+  "qualification": {
+    "strictCheckAndFullBuild": [
+      "linux",
+      "darwin-arm64"
+    ],
+    "macMini": {
+      "wikiPass": 14,
+      "regressionPass": 30,
+      "browserPass": 2,
+      "skip": 0
+    },
+    "macBookAirIdenticalArtifact": {
+      "wikiPass": 14,
+      "regressionPass": 30,
+      "skip": 0
+    },
+    "linuxDisposableWorkspaces": {
+      "wikiPass": 14,
+      "browserAndRegressionPass": 32,
+      "skip": 0,
+      "scratchRemovedAfterReferenceInspection": true
+    },
+    "actualPiFixture": [
+      "all six original Wiki tools",
+      "approved bundled skill delivery",
+      "rename/backlinks/routing",
+      "raw archive bytes/manifest",
+      "read-only and native-resource exclusions",
+      "linked/hardlinked/oversized refusal",
+      "pinned admitted root",
+      "unknown mutation no replay",
+      "killed lock-owner review"
+    ],
+    "browserFixture": [
+      "original Plugins form",
+      "stale configuration and failed application",
+      "dark contrast",
+      "receipt/Trajectory/risk review",
+      "cold reopening"
+    ],
+    "hostedCurrentHeadResult": "not claimed; POSIX Wiki suite added to existing Linux/macOS SDK workflow",
+    "windowsWiki": "unsupported; native helper tests explicitly skipped"
+  },
+  "installed": [
+    {
+      "target": "Mac Mini",
+      "platform": "darwin-arm64",
+      "selectedAndRunning": true,
+      "enabledWiki": true,
+      "vault": "new independent home-level Markdown vault",
+      "coldConfigStateDataWorkspaceBackupVerified": true,
+      "previousReleaseRetained": true,
+      "initialVaultSnapshotVerified": true,
+      "preExistingHistoriesPreserved": 4,
+      "selectedModelAndBrowserAddressPreserved": true,
+      "actualPluginsUi": {
+        "enabled": true,
+        "configuredVaultVisible": true,
+        "approvedSkills": 9,
+        "consoleErrors": 0
+      },
+      "liveSelectedModelTools": [
+        "wiki_scaffold",
+        "wiki_write",
+        "wiki_query",
+        "wiki_lint"
+      ],
+      "independentPageAndReceiptVerification": true,
+      "automaticProcessRecovery": true,
+      "wikiSettingsAndHistoriesSurviveRecovery": true,
+      "livePostRestartQuery": true,
+      "temporaryTestPermissionRestored": true,
+      "runAtLoadKeepAliveAndLoginOpenerVerified": true,
+      "physicalRebootTest": false
+    },
+    {
+      "target": "MacBook Air",
+      "platform": "darwin-arm64",
+      "selectedAndRunning": true,
+      "enabledWiki": true,
+      "vault": "new independent home-level Markdown vault",
+      "coldConfigStateDataWorkspaceBackupVerified": true,
+      "previousReleaseRetained": true,
+      "initialVaultSnapshotVerified": true,
+      "preExistingHistoriesPreserved": 2,
+      "selectedModelAndBrowserAddressPreserved": true,
+      "actualPluginsUi": {
+        "enabled": true,
+        "configuredVaultVisible": true,
+        "approvedSkills": 9,
+        "consoleErrors": 0
+      },
+      "liveSelectedModelTools": [
+        "wiki_scaffold",
+        "wiki_write",
+        "wiki_query",
+        "wiki_lint"
+      ],
+      "independentPageAndReceiptVerification": true,
+      "automaticProcessRecovery": true,
+      "wikiSettingsAndHistoriesSurviveRecovery": true,
+      "livePostRestartQuery": true,
+      "temporaryTestPermissionRestored": true,
+      "runAtLoadKeepAliveAndLoginOpenerVerified": true,
+      "physicalRebootTest": false
+    }
+  ],
+  "retainedNegativeEvidence": [
+    "Comet onboarding selected before an owned page; later Comet-injected font blocked by unchanged CSP; corrected owned-page fixture passes in clean Brave",
+    "Air transfer mode differences corrected to frozen inventory before activation; file contents already identical",
+    "Initial live mutation refused without approval UI; only authorised installation conversation temporarily changed, then restored",
+    "Documents admission timed out before a mutation-attempt notification on both background owners; no vault created, refused receipts retained; final home-level vault passes",
+    "Linux build helper retained completed scratch while transient references existed; removed after references cleared"
+  ],
+  "limits": [
+    "No physical reboot in this qualification",
+    "No vault synchronisation or MX knowledge-base migration",
+    "Protected Documents access remains unqualified; no privacy grants changed",
+    "All six tools have Pi fixture evidence; live owner checks cover scaffold/write/query/lint and post-restart query",
+    "Every bundled skill workflow and optional external tools are not independently qualified",
+    "Existing broader native desktop/browser adapter gaps remain separate",
+    "Native Mini Codex CLI login confirmed; separate AH Pi account connection not completed"
+  ],
+  "privacy": "No credentials, private endpoints, owner transcripts, knowledge content, filesystem paths, bearer links or process identifiers are published."
+}
