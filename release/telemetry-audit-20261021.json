@@ -1,0 +1,58 @@
+{
+  "date": "2026-10-21",
+  "platform": "linux",
+  "sourceRef": "2305425af1cee77b368d6c0da870daedeebabf38",
+  "runningHarnessRelease": "20261021-103715-4720d0ad",
+  "applicationBytesChanged": false,
+  "coreAudit": {"checksPassed": 4, "inventoryEntriesVerified": 7670, "inventoryMismatches": 0},
+  "memory": {
+    "sameImageMountsHostConfigAndModelSettings": true,
+    "privacyEnvironment": {
+      "HF_HUB_DISABLE_TELEMETRY": "1", "DO_NOT_TRACK": "1",
+      "OTEL_SDK_DISABLED": "true", "HINDSIGHT_API_OTEL_TRACES_ENABLED": "false",
+      "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1", "PYTHONDONTWRITEBYTECODE": "1"
+    },
+    "privateStoppedDatabaseBackupVerified": true,
+    "rollbackContainerStoppedRestartDisabled": true,
+    "healthReady": true, "existingBanksAccessible": true, "readOnlySyntheticRecallPassed": true,
+    "processingPreferenceRestored": true,
+    "observedIpCalls": 62, "externalDestinations": 0,
+    "coverage": "Attached immediately after container start; service descendants through health and recall"
+  },
+  "playwright": {
+    "mcpVersion": "0.0.79", "playwrightVersion": "1.63.0-alpha-2026-08-05",
+    "browserRevision": 1228, "browserVersion": "149.0.7827.55",
+    "baselineFullChromeUnexpectedIpAttempts": 64,
+    "baselineNetlogConfirmedUnrequestedGoogleServices": true,
+    "qualifiedExecutable": "matching installed chromium headless shell",
+    "freshInitializationTools": 24, "localNavigationAndSnapshotPassed": true,
+    "idleObservationSeconds": 15, "traceTaskFiles": 81,
+    "qualifiedNetworkCalls": 2, "qualifiedUnexpectedDestinations": 0,
+    "separatelyVerifiedUdpRouteProbesSendingNoBytes": 1,
+    "managedConfigurationReceipt": "completed", "appliedLoadedSessions": 10
+  },
+  "blender": {
+    "package": "blender-mcp", "version": "1.0.3", "pythonModule": "blmcp",
+    "tools": 26, "bundledDocumentationSearchPassed": true,
+    "syntheticReadOnlySocketCallPassed": true,
+    "observedIpCalls": 1, "unexpectedDestinations": 0, "ownerSceneUsed": false
+  },
+  "legacyDsh": {
+    "independentTrackingPluginDisabled": "web-ui-update",
+    "playwrightUsesQualifiedHeadlessShell": true,
+    "runningSessionsBeforeRestart": 0, "savedSessionInventoryRetained": true,
+    "updaterNamespaceAbsentAfterRestart": true,
+    "coreTelemetryDisabled": true, "deepseekSessionLogEnabled": false
+  },
+  "passiveLiveIntegrations": {
+    "requestedProcesses": 24, "traceTaskFiles": 181, "seconds": 30,
+    "attachErrors": false, "observedIpCalls": 0, "audioActivated": false
+  },
+  "limitations": [
+    "Bounded Linux workflows; not a firewall or full-machine packet audit",
+    "Separate preview memory endpoint was already unavailable and was not migrated",
+    "No arbitrary website, provider retention, remote speech or user-script guarantee",
+    "Other OS installations unchanged; version/configuration changes require requalification",
+    "Private inspect files, credentials, traces, host paths and raw memory data excluded"
+  ]
+}

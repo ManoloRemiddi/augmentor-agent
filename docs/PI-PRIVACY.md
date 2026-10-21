@@ -1,5 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[October 21 integration audit and installed safeguards](TELEMETRY-AUDIT-2026-10-21.md)
+qualifies the running Linux memory container with telemetry/offline opt-outs,
+replaces the configured MCP full Chrome with matching Headless Shell after
+observing Google background requests, and disables the legacy community
+updater's independent daily tracker. Core opt-outs did not cover those separate
+components. Existing memory/model data and Harness application bytes are retained;
+the guide distinguishes actual service, synthetic MCP and passive speech evidence.
+
 ## Exact Host shutdown observation — October 17
 
 The private package qualification retains an initial 303-pass/one-failure run:

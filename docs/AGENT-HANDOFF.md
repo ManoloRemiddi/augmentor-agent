@@ -1,5 +1,18 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[October 21 telemetry safeguards](TELEMETRY-AUDIT-2026-10-21.md): the running Linux
+memory container now disables Hugging Face/OTel reporting and loads cached models
+offline, retaining its image/data/model/resource contract and stopped rollback.
+Actual startup/recall trace stays local. Playwright's full Chrome made unsolicited
+Google requests; matching installed Headless Shell passes local MCP qualification
+and is applied through the managed profile to ten loaded owners and legacy DSH.
+The still-enabled legacy community updater had an independent daily tracker and
+is now disabled; its UI is consequently absent. DSH restarted idle and remains
+online with saved sessions retained. Blender synthetic and idle speech/MCP checks
+show no external destinations. The separate preview memory endpoint was already
+unavailable and was not migrated. No application seal, model placement or other
+OS installation changed. Private inspect/config/traces remain unpublished.
+
 [Browser current-chat permissions](BROWSER-CHAT-PERMISSIONS.md) now show/change the open AH/Pi chat from More → Approval mode, with future defaults separate and full access confirmed. Single-document approval claims also cover AH/Pi, preventing duplicate prompts across panels. Source **31 regressions** and actual AH/Pi Chromium actions pass; compatible and exact sealed MX checks plus the actual installed code-folder/native-host action test pass on isolated synthetic data. MX client is selected and its unpacked extension files updated; **the owner must reload the already loaded extension once**. No owner permission/default, chat/history, runtime or speech changes. Small rollback retained; managed scratch removed, immutable unchanged files share storage. Mac source is common; installed Mac rollout is not claimed.
 
 [Effort picker labels are installed on MX, Air and Mini](HARNESS-CONFIGURED-MODELS.md#installed-on-mx-air-and-mini--october-20):
