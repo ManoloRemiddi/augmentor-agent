@@ -1,0 +1,112 @@
+{
+  "schema": "augmentor-dsh-arguments-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Completed typed DSH argument-validation history; MX source and private package qualification; no owner update or transfer",
+  "sourceBaseRef": "154597e1801d14b8e46b0ff75cd21d56a95f5561",
+  "contract": {
+    "sourceVersion": 4,
+    "errorName": "ToolArgsError",
+    "errorCode": "INVALID_ARGS",
+    "argumentKinds": [
+      "invalid-json",
+      "non-object-json"
+    ],
+    "rawArgumentsPreserved": true,
+    "proposalDispatchResultCorrelationRequired": true,
+    "typedEmptyArgumentProtocol": "Empty raw string maps to object; raw empty text retained separately",
+    "historicalActionsReplayed": false,
+    "fabricatedArgumentObjectForInvalidText": false,
+    "childScope": "Verified archived inspection only",
+    "nativeContext": "Labelled historical data, bounded result excerpts; no native executable assistant proposal or tool result",
+    "supplierGuiSourceChanged": false,
+    "supplierMITNoticesPreserved": true
+  },
+  "qualification": {
+    "phase": "source, ordinary and exact separately sealed passed; no owner adoption",
+    "sourceCheckBuildPass": true,
+    "focusedUnitAndSdkPass": 29,
+    "focusedChromiumPass": 1,
+    "workers": 2,
+    "deadlinesChanged": false,
+    "testedInputsSha256": {
+      "packages/runtime/src/dsh-argument-errors.ts": "0933eaf73c6d6b59a8a1aaf730f54881919883b9d2f954c2c522274fd7eabb47",
+      "packages/runtime/src/dsh-project-import.ts": "94868339765bdc5c4590b5e5b31e381d12f034f305ebe0dd68e0e800103f9e43",
+      "packages/runtime/src/dsh-archived-family.ts": "e95907002b3b199f5479a1dd5d4fc80531d257dc69818b864661a8f2c928f41c",
+      "apps/harness/dsh-source-arguments.mjs": "f01679ac1f25dbd4dd31e17b729ffd40fca62d85efd5af86500012762c9790a7",
+      "apps/harness/chat-projection.js": "b8564c8e33948a78422c315643c56dcf142996769005ad414a0c4f31efd372b3",
+      "apps/harness/dsh-app.jsx": "a98c96d10d849a0e2bfa10d1a23e37f04249e74275c5f4a1c30a2b8f1a6019ca",
+      "apps/harness/dsh-pi-projection.mjs": "a17038ab33551c224e8741d468dabf60b9af1ceab604249abbdc01012fe7ad2f",
+      "apps/harness/dsh-tool-tree.mjs": "4106fae9872d78a720d81416d11c9fb2e2446d5d34dc27bed148d5ae72569422",
+      "tests/fixtures/dsh-argument-error-project.mjs": "bbe79596a604f5e8a1bd69268ce0ccd2da9c9589f277dbd5f58f1b69ebf52c91",
+      "tests/dsh-project-argument-errors.test.mjs": "90d671c526b482e587dd98890736e18c022572dff8c9fd10f56a69f693297812",
+      "tests/dsh-project-argument-errors-runtime.test.mjs": "ace97eac43b412dfd2c122d62336d955e63d4ee4a46a7e154d7539acfcaf1f9b",
+      "tests/harness-dsh-argument-errors-chromium.test.mjs": "b21f22a8c8ce4659bf2bd3a29033373c08d4e310b69b4a8878f5db69c7428d4c"
+    },
+    "sourceNodePass": 345,
+    "sourcePythonPass": 55,
+    "nodeFiles": 50,
+    "chromiumFiles": 15,
+    "chromiumCases": 19,
+    "newUnitCases": 28,
+    "newSdkCases": 1,
+    "newChromiumCases": 1,
+    "skips": 0,
+    "environment": {
+      "distribution": "MX 25.3 Infinity KDE x64 (Debian 13)",
+      "node": "24.19.0",
+      "python": "3.13.5",
+      "piCodingAgent": "1.1.0",
+      "product": "0.2.13"
+    },
+    "ordinaryNodePass": 345,
+    "ordinaryPythonPass": 55,
+    "ordinaryUnchangedBaselineInputsVerified": 23517,
+    "compiledFilesVerified": 1114,
+    "sameFrozenRealArgumentCheckPassedByOrdinary": true,
+    "existingTwoParentFileProjectStillPrepares": true,
+    "exactSealedNodePass": 345,
+    "exactSealedPythonPass": 55,
+    "sameFrozenRealArgumentCheckPassedBySeal": true,
+    "sealedEntriesVerified": 24643,
+    "ownerAdoption": false
+  },
+  "sameFrozenRealExport": {
+    "parents": 4,
+    "children": 0,
+    "sameSourceCutAndBytes": true,
+    "precedingRefusal": "malformed tool arguments",
+    "correctedPassesArgumentCheck": true,
+    "nextRefusal": "historical tool recovery does not match its exact source protocol",
+    "completePreparationAccepted": false,
+    "ownerImports": 0,
+    "modelRequests": 0,
+    "attestedArgumentErrors": 2
+  },
+  "remaining": [
+    "Separate real-project recovery format mismatch and independent source formats/observation failures",
+    "Guarded owner adoption of a qualified candidate",
+    "Owner pilot feedback before further real transfers",
+    "Voice and later OS rollout deferred"
+  ],
+  "applicationRef": "016f44cebc9c1cbe0c2254ba85cf4e5a92c5ac0a",
+  "implementationRef": "016f44cebc9c1cbe0c2254ba85cf4e5a92c5ac0a",
+  "separatelySealedCandidate": {
+    "releaseId": "20261017-024110-584cc337",
+    "applicationRef": "016f44cebc9c1cbe0c2254ba85cf4e5a92c5ac0a",
+    "artifactSha256": "eeae2a2df7a7ff7e2bd52eedf774808729f2f60c865649581659408b403005b1",
+    "activated": false,
+    "inventoryEntriesVerified": 24643,
+    "compiledFilesVerified": 1114,
+    "runningReviewsAdopted": false,
+    "ownerDataCopied": false
+  },
+  "preservation": {
+    "runningOwnerPidsUnchanged": 2,
+    "protectedOwnerFilesExact": 36,
+    "completeProtectedRegularFileSetsAndHashesExact": true,
+    "registryAndSelectedConfigurationsExact": true,
+    "existingRunningSealedInputsVerified": 24615,
+    "ownerRestarts": 0,
+    "ownerTransfers": 0
+  }
+}

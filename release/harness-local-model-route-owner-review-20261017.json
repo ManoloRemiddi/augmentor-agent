@@ -1,0 +1,94 @@
+{
+  "schema": "augmentor-harness-local-model-route-owner-review/1",
+  "date": "2026-10-17",
+  "scope": "Actual MX main and pilot review adoption of the qualified private artifact; no additional real project migration or owner model request",
+  "applicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+  "releaseId": "20261017-055628-b9afa698",
+  "artifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+  "sealedInputsVerified": 24686,
+  "qualification": "harness-local-model-route-qualification-20261017.json",
+  "procedure": {
+    "actualIdleAndEmptyQueueGuardsPassed": true,
+    "protectedBeforeShutdownBackupsVerified": 36,
+    "sharedConsistentSqliteBackupsVerified": true,
+    "fullColdProfileBackupFilesVerified": 416,
+    "guardedShutdownsAccepted": 2,
+    "actualOldProcessExitConfirmedByPidfd": true,
+    "coldProfileAbsenceVerifiedBeforeStartup": true,
+    "existingEnsureRuntimeViaInstalledOpenerUsed": true,
+    "openerStartInvocations": 2,
+    "newActualPeerBuildAndProfileVerified": true,
+    "warmOpensRetainSameNewOwners": true,
+    "registryRevision": 10,
+    "originalMenuLocationsAndAllExistingOwnedAssetHashesExact": true
+  },
+  "preservation": {
+    "mainConversations": 1,
+    "pilotConversations": 3,
+    "protectedFiles": 36,
+    "originalAuthoritativePrefixesExact": true,
+    "typedShutdownConnectionMetadataAppended": 8,
+    "typedNewConnectionMetadataAppended": 36,
+    "agentToolCallsOrOldWorkReplayed": 0,
+    "sharedPromptEntries": 12,
+    "capturedMemoryRecords": 19,
+    "sharedPromptMemoryEligibilityJobsSettingsAndEngineRowsExact": true,
+    "qwenUnitConfigurationAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "productionAndEarlierPreviewSelectionUnchanged": true
+  },
+  "runningGui": [
+    {
+      "review": "main",
+      "overviewOn": true,
+      "overviewSwitchEnabled": true,
+      "keylessPanelVisible": true,
+      "apiPanelHidden": true,
+      "wikiOn": true,
+      "mcpServers": 5,
+      "mcpOn": 2,
+      "mcpOff": 3,
+      "appliedSessions": 1,
+      "loadedSessions": 1,
+      "settingsOrAgentActions": 0,
+      "consoleErrors": 0,
+      "httpFailures": 0
+    },
+    {
+      "review": "pilot",
+      "overviewOn": true,
+      "overviewSwitchEnabled": true,
+      "keylessPanelVisible": true,
+      "apiPanelHidden": true,
+      "wikiOn": true,
+      "mcpServers": 5,
+      "mcpOn": 2,
+      "mcpOff": 3,
+      "appliedSessions": 1,
+      "loadedSessions": 1,
+      "settingsOrAgentActions": 0,
+      "consoleErrors": 0,
+      "httpFailures": 0
+    }
+  ],
+  "runningPrivacyEnvironment": {
+    "telemetryOff": true,
+    "versionCheckOff": true,
+    "fullNetworkEgressAuditClaimed": false
+  },
+  "operatorCorrection": "Final verifier caught menuFiles using the default XDG namespace. Inspection established that all alternative menu assets already existed and retained their original hashes; the removal safety guard refused before mutation. Re-registering in the original namespace restored both recorded paths and preserved every existing asset byte and running PID; no menu removal or second startup.",
+  "additionalRealProjectImports": 0,
+  "ownerModelRequestsSubmitted": 0,
+  "publicBinaryPublished": false,
+  "remaining": [
+    "Owner migration-pilot feedback before further real project transfers",
+    "Physical browser/menu and ordinary owner project acceptance",
+    "Connected-tools detail-panel visual polish remains separate from the working overview switches",
+    "Other providers, voice, macOS, Windows and other Linux distributions remain outside this MX checkpoint"
+  ],
+  "publicationChecks": {
+    "privateBoundaryLicenceAndNoticeCasesPassed": 16,
+    "privateSourceIdentitiesChecked": 77,
+    "privateSourceIdentityMatches": 0
+  }
+}

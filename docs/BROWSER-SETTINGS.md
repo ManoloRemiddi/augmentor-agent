@@ -1,6 +1,13 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+The [shared prompt editor](AUGMENTOR-HARNESS.md#prompt-editor-catalog-ordering--october-14) now rejects retired catalog replies/errors and allows one automatic read at a time. Saved prompts, edited fields and existing Cancel/Confirm behavior remain service-owned; the source-qualified correction is not installed into running Browser or Harness profiles.
+
+Standalone Pi: Models → Reasoning opens the shared Harness/Browser form. It refreshes the selected conversation before opening, supports Manual/Adaptive mode and supported saved effort, and administers profile enable/text-only/preset/exact model-tier mappings. Neutral defaults have no mappings. Opening can create the selected blank Pi conversation without inference. Stale saves preserve drafts; Reload explicitly replaces them. Working/context changes invalidate the dialog, and open settings prevent unsafe maintenance. These installation controls are excluded from SDK workspace settings; embedded effort controls remain required. See [Native and Browser reasoning qualification](AUGMENTOR-HARNESS.md#native-and-browser-reasoning-controls).
+
+
 # Browser Settings
+
+The October 10 Harness candidate adds profile-owned Adaptive Reasoning mappings and per-Pi-conversation saved effort/mode through the authenticated Host. This is distinct from the Open/Collapsed thinking display preference described below. The Harness Reasoning dialog administers both Desktop/Harness and Browser preset inclusion; Native/Browser effort controls remain a migration gate. Unmapped models retain their request effort, and no provider is selected automatically. See [Adaptive Reasoning qualification](AUGMENTOR-HARNESS.md#adaptive-reasoning-and-effective-thinking-controls) for persistence, conflicts and qualification.
 
 SDK workspaces use the [scoped settings contract](SDK-ALIGNMENT.md#capability-and-settings-ownership).
 Their Conversation page offers the approved Open/Collapsed thinking preference,

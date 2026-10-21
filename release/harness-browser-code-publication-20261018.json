@@ -1,0 +1,113 @@
+{
+  "schema": "augmentor-harness-browser-code-publication-qualification/1",
+  "date": "2026-10-18",
+  "scope": "Reviewed source Linux controller only; no installed Browser update or owner cutover",
+  "runtimeRef": "5d67a8bfe45dd2d632a716b7854fd9860e08dd0b",
+  "applicationRef": "4f83b7e8497b6ea3e0f6f3acd033648f0abedf86",
+  "artifactSha256": "535ad8e607de7fbd3f4aea707882a94a1ad8a2ba25ad7ebcd19f906137b4f1be",
+  "controllerOutsideReleaseStore": true,
+  "clientPublicationSchema": 4,
+  "browserComponentSchema": 1,
+  "sourceFileSha256": {
+    "services/dsh/browser_code_publication.py": "1a4952601c885a080b40b0bdb33c207a7026ff1bc415b03116e2e93c80a7d6b1",
+    "services/dsh/client_publication.py": "d6769cefb2f9b6dbee79e0889a579aaa2092491af19c8b587de143b0f46b99a4",
+    "tests/test_dsh_browser_publication.py": "0f1d687d1b71c5451739262d16b85ed160a9f07c66fce100c0308b4ef0283d8b",
+    ".github/workflows/app-sdk.yml": "631a215d667482a73cc0b7c417b5afacf85cd65e73b71b10ecffff1587d5fad8"
+  },
+  "qualification": {
+    "pythonCases": 167,
+    "newBrowserCases": 23,
+    "failures": 0,
+    "skips": 0,
+    "elapsedSeconds": 119.796,
+    "precedingOverlappingPassingRuns": [
+      77,
+      165
+    ],
+    "firstFocusedRun": {
+      "cases": 16,
+      "passes": 15,
+      "errors": 1,
+      "cause": "Missing ownership marker surfaced as FileNotFoundError; corrected to explicit matching-publication refusal before passing runs"
+    },
+    "actualChildDeathsForwardAndReverse": true,
+    "finalizingAndFenceRemovalRecovery": true,
+    "realSqliteSharedDataAndReviewBinding": true,
+    "explicitPartialThirdSource": true,
+    "postReopenOrdinaryWorkPreserved": true,
+    "backendHealthReplies": "synthetic",
+    "publicFixtures": "independently authored; no private source or owner data copied",
+    "managedScratch": true,
+    "reserveGiB": 64,
+    "hostReadOnly": true,
+    "networkIsolated": true,
+    "hostedNewController": "pending"
+  },
+  "browserContract": {
+    "maxEntries": 2048,
+    "maxTotalBytes": 33554432,
+    "maxFileBytes": 8388608,
+    "wholeFolderColdCoverageRequired": true,
+    "sameKeyAndPermissionSetsRequired": true,
+    "explicitArchivedCodeCannotBeOmitted": true,
+    "sameFilesystemAtomicDirectoryExchange": true,
+    "exactOriginalInodeBytesModesReverse": true,
+    "newForeignWriteBitsRemoved": true,
+    "knownDisposableScratchRefusesOwnerRecovery": true,
+    "durableFinalizationForwardOnly": true,
+    "oldCodeSlotRetained": true,
+    "browserProfileDataMoved": false,
+    "browserReloadedByController": false
+  },
+  "actualReadOnlyEligibility": {
+    "oldVersion": "0.2.11",
+    "incomingVersion": "0.2.13",
+    "oldFiles": 55,
+    "incomingFiles": 67,
+    "oldBytes": 527093,
+    "incomingBytes": 618936,
+    "sameIdentityAndPermissions": true,
+    "parentMode": "0775",
+    "parentStillNeedsMinimalGroupWriteRemoval": true,
+    "ownerPreparationOrCodeWrite": false,
+    "loadedCodeVersionProven": false
+  },
+  "ownerPreservation": {
+    "registryRevision": 20,
+    "nativeReviewPidsAndBuildsExact": true,
+    "protectedReviewFiles": 36,
+    "sharedRowsEngineSelectorsMenusShortcutsExact": true,
+    "servicesGpuVoicePidsConfigurationsExact": true,
+    "actualOwnerFencesWritten": false,
+    "serviceStopsOrRestarts": 0,
+    "ownerModelRequests": 0,
+    "ownerProjectsTransferred": 0,
+    "ownerDataMigrated": false,
+    "browserReloaded": false
+  },
+  "storage": {
+    "cleanupCopiesRemovedTotal": 79,
+    "observedGiBRecoveredTotal": 43.06,
+    "freeGiBApprox": 100.93,
+    "singleManagedScratchEmpty": true,
+    "newFullAppCopies": 0,
+    "newReleaseArtifacts": 0,
+    "newOwnerArchives": 0,
+    "extraCandidatesRetained": 2
+  },
+  "remaining": [
+    "Coordinate actual Chromium exit/reload and verify all clients can preserve accepted work before stopping",
+    "Protect the existing Browser parent with original mode recorded; freshly inventory and quiesce all current callers",
+    "One complete fresh three-pair cold archive; shared-data and Browser preparation before configuration fences",
+    "Schema-4 coupled publication/finalization; ordinary reopening, actual loaded client handshake and owner continuation",
+    "Pilot feedback before more projects; VR-RasterStudio remains in DSH; voice expansion and later OS deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-browser-publication-first-20261018.log": "960ea18c87110580cd646b16932361da8f60eef489b341ee475b564b53bbc101",
+    "harness-browser-publication-coupled-20261018.log": "d5d15da03cd39d8198ca8ead0139a9727d7d859bfeff884e79adc8364c6bbe93",
+    "harness-browser-publication-final-20261018.log": "dfe643621313f6ba44b6978cb04488f036582905cf57c9ba9a76fffacf239452",
+    "harness-browser-publication-qualified-20261018.log": "0518d6306231b08fe861bb7b5406341de187205fb53b6a06e85ba568ed116056",
+    "harness-browser-publication-real-eligibility-private-20261018.json": "9b24a70b9add52fd947ac72e77c6064bfaa92f463bc8ae0e4e53c46f6f4247aa",
+    "harness-browser-publication-owner-preservation-private-20261018.json": "61693aca081d2925b579ab7c6b2558b07dbc806a77ee0ae1be4987b0f9355db5"
+  }
+}

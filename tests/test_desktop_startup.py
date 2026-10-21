@@ -13,6 +13,11 @@ def load(name):
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module);return module
 
 class DesktopStartupTests(unittest.TestCase):
+    def setUp(self):
+        temporary=tempfile.TemporaryDirectory(prefix='authored-desktop-launch-');self.addCleanup(temporary.cleanup)
+        home=Path(temporary.name)
+        env=patch.dict(os.environ,{'HOME':str(home),'XDG_DATA_HOME':str(home/'data'),'XDG_STATE_HOME':str(home/'state'),'XDG_CONFIG_HOME':str(home/'config')})
+        env.start();self.addCleanup(env.stop)
     def test_all_entrypoints_select_same_deployment_and_keep_venv(self):
         installer=load('install-desktop-startup')
         with tempfile.TemporaryDirectory(prefix='desktop space ') as folder:

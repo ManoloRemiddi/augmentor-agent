@@ -1,0 +1,51 @@
+/*
+ * Tailwind entry: tsdown.config.ts compiles the utilities carried by the plugin's JSX class lists.
+ * The sibling sheets keep what the variants cannot own here: the harness's `--dsw-*` chrome, the
+ * JS-state class systems (several of which double as test anchors), their contextual overrides, and
+ * the element transitions, which follow the harness motion tokens over exact per-element property
+ * lists — Tailwind's preset durations would freeze those values.
+ *
+ * Deliberate deviations from a stock Tailwind setup, all for cohabitation with the harness host page:
+ * - No preflight and no theme import: a reset would re-skin host chrome.
+ * - `--spacing: 4px` instead of 0.25rem, so utilities keep their designed px sizes regardless of the
+ *   host's root font size.
+ * - Utilities compile UNLAYERED: a layered utility would lose to ANY unlayered host rule. The sheet
+ *   imports FIRST in client/index.ts, so the sibling sheets still win same-specificity ties.
+ * - dsh styles itself through CSS modules and `--ds-*`/`--dsw-*` tokens, so generic names like
+ *   `flex`/`gap-2` cannot collide; the flat `lc-*` namespace is the plugin's own chrome.
+ *
+ * tailwindcss / @tailwindcss/node / @tailwindcss/oxide are pinned to one exact version (as is
+ * lightningcss): the config process loads this compiler alongside lightningcss's native binding, and
+ * two copies of any native set in that realm break the napi calls.
+ */
+@theme static {
+  --spacing: 4px;
+  /* `static` is load-bearing: the sibling sheets and the TS color fields consume these via plain var(), which Tailwind's used-only emission would otherwise drop. dsh defines no `--color-*`, so the canonical names stay collision-free. */
+  --color-red-500: oklch(63.7% 0.237 25.331);
+  --color-orange-500: oklch(70.5% 0.213 47.604);
+  --color-amber-500: oklch(76.9% 0.188 70.08);
+  --color-green-500: oklch(72.3% 0.219 149.579);
+  --color-teal-500: oklch(70.4% 0.14 182.503);
+  --color-blue-500: oklch(62.3% 0.214 259.815);
+  --color-indigo-500: oklch(58.5% 0.233 277.117);
+  --color-violet-500: oklch(60.6% 0.25 292.717);
+  --color-purple-500: oklch(62.7% 0.265 303.9);
+  --color-pink-500: oklch(65.6% 0.241 354.308);
+  --color-slate-400: oklch(70.4% 0.04 256.788);
+  --color-neutral-500: oklch(55.6% 0 none);
+  /* Keyframes emit only when their animate-* utility is used. The donut sweep omits its 100% keyframe so CSS lands on the element's own stroke-dasharray, and runs once on mount. */
+  --animate-lc-donut-in: lc-donut-in 0.45s cubic-bezier(0.4, 0, 0.2, 1) calc(var(--lc-i, 0) * 50ms) backwards;
+  --animate-lc-stacked-in: lc-stacked-in 0.4s cubic-bezier(0.4, 0, 0.2, 1) calc(var(--lc-i, 0) * 40ms) backwards;
+  --animate-lc-bar-in: lc-bar-in 0.35s cubic-bezier(0.4, 0, 0.2, 1) calc(var(--lc-i, 0) * 15ms) backwards;
+  --animate-lc-agent-flow: lc-agent-flow 0.9s linear infinite;
+  --animate-lc-agent-in: lc-agent-in 0.35s cubic-bezier(0.4, 0, 0.2, 1) calc(var(--lc-i, 0) * 35ms) backwards;
+  @keyframes lc-donut-in { from { stroke-dasharray: 0 100; } }
+  @keyframes lc-stacked-in { from { transform: scaleX(0); } }
+  @keyframes lc-bar-in { from { transform: scaleY(0); } }
+  @keyframes lc-agent-flow { to { stroke-dashoffset: -9; } }
+  @keyframes lc-agent-in { from { opacity: 0; transform: translateY(6px); } }
+}
+
+@source "../";
+
+@tailwind utilities;

@@ -25,7 +25,5 @@ export function linuxPackage(backend:string) {
   return (pi:ExtensionAPI)=>{
     for(const d of linuxDefinitions)pi.registerTool({name:d.name,label:d.name,description:d.description,parameters:d.parameters,
       async execute(_id,args,signal){const value=await runDesktop(backend,{action:d.action,...args},signal);return {content:[{type:'text',text:JSON.stringify(value)}],details:{}};}});
-    pi.registerTool({name:'ask_user',label:'Ask user',description:'Ask the user for required missing information. Use for choices or clarification that cannot be inferred.',parameters:Type.Object({question:Type.String(),options:Type.Optional(Type.Array(Type.String()))}),
-      async execute(_id,args,_signal,_update,ctx){const answer=args.options?.length?await ctx.ui.select(args.question,args.options):await ctx.ui.input(args.question);return {content:[{type:'text',text:answer===undefined?'User did not answer.':answer}],details:{}};}});
   };
 }

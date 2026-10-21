@@ -1,0 +1,590 @@
+{
+  "schema": "augmentor-office-linux-process-seat-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Opt-in Linux x64 source runtime; not selected or installed; process supervision, not a filesystem/network sandbox",
+  "sourceEvidenceBaseRef": "201ace30f43289aabdfbdcfa5b3e046e9346535b",
+  "backend": "linux-process-wasm",
+  "defaultBackendUnchanged": "pinned-kit",
+  "installedApplicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+  "sourceFilesSha256": {
+    "packages/runtime/src/host.ts": "c143a90769d0f658608b627524d795c4ebf0d298e0d84b436e5d240ab0e47f53",
+    "packages/runtime/src/office-process-files.ts": "57d62ac4814e806fb949158c087c2be3929af2122fe5ca74800ca9c7ba6cedd0",
+    "packages/runtime/src/office-process-linux.py": "0f68233ab5848197d15b23bdd0d847527bfb30f68e0a20347dd1eb0ccc490b6d",
+    "packages/runtime/src/office-process-linux.ts": "b6af18a16db28906fdeb16acee95793ecbb3ac392cbb5f93bf43a326ac0c42e7",
+    "packages/runtime/src/office-process-protocol.ts": "19df4132c31a1f450e9daeb8fdf74030944c1ad096311a19ed18b348b32c59c3",
+    "packages/runtime/src/office-process-worker.ts": "ab3628033f958417e5131a0437414cfa6c7557ebbf0ccb8277b9cba97cd2f097",
+    "packages/runtime/src/office-scratch-linux.ts": "915d7508b538e30e8363025a174dd010a883e50e980b0281a0c17a9b13d5ccc8",
+    "release/office-rebuild/boundaries-probe.mjs": "96e73b5753016db87e804bdec2fba3967ac8d985e4cf9d822044853a7e8da732",
+    "release/office-rebuild/contained-boundaries.py": "8af3df52525d1e657afe9c31f220fa58a234144e3ea4d433ef182c7cad7e9fa8",
+    "release/office-rebuild/supervised-observer.mjs": "721f30cf7ab5942d927b5c272bd2443bf4641f2ebe8128485fa645522009a8a4",
+    "scripts/copy-protocol.mjs": "852739007c306458ed938b85f07a5cf844856fef235f2edc6c1bc82816d89be2",
+    "scripts/harness-ui-proof.mjs": "9670c326dbfd9204c9118702b60893a70f97a2f622fa25567abefeead1991fce",
+    "tests/fixtures/office-process-owner.mjs": "2421540f48acfb0814c0688d28ce83d0d003adfe07b59b92e6dbf2ab5a819618",
+    "tests/harness-office-chromium.test.mjs": "bd7622e5d8d356321625e60bd609c66cf6b09eca101d7307dac3e6c154b8b80b",
+    "tests/harness-office-process-chromium.test.mjs": "021e84a8ca34206242c5f70c57e2a92cf2d5b2db4ffa3fe6993961c7164d9a7b",
+    "tests/office-process-linux.test.mjs": "eb5e6456e7211adde5769ad43456ddd7c1376e9c44448a15af1edab80f9e55ad",
+    "tests/test_office_boundaries.py": "b69fc104daa5b9d641778efaef7e191daf3416e2acccd74b198680d2408af2a3"
+  },
+  "compiledDelta": {
+    "installedCompiledFiles": 1120,
+    "sourceCompiledFiles": 1133,
+    "unchangedFiles": 1110,
+    "changedFiles": {
+      "harness-web/assets.json": {
+        "installedSha256": "28d3902ceef79312008cb3968ea2619264ca015245b9497728a8e2597f694852",
+        "sourceSha256": "a7f133247df2aa26380d0149b41dce20d344866a9370d33362c9b971377f27e9"
+      },
+      "harness-web/build-inputs.json": {
+        "installedSha256": "0766f1f685bde4f42624392006f5407acbf3b880301e9f9c3eb658b4164a1c44",
+        "sourceSha256": "ff13d8cc4ef5309516080783cfb066303dd296f1cb7e9b80814e7cab1f287f35"
+      },
+      "harness-web/dsh-gui.js": {
+        "installedSha256": "3effee1e28ab85d734e5f0564c70e0796c9fcdb3ca4f037d5a703cecfc5fc431",
+        "sourceSha256": "35b0e3871ead01bcf3142170cfbb1fac0f100d155b08227883d74e6ca702bbff"
+      },
+      "harness-web/excel-worker-inputs.json": {
+        "installedSha256": "b68672005f7ad5e75ac6c0966536575f2342f4157156c5c09d9019e335f7c102",
+        "sourceSha256": "a4876366f0a4087644578068838f703abde9a8f5dba86b15772fbfcf006c5cbd"
+      },
+      "runtime/src/host.js": {
+        "installedSha256": "a6b5f18f3ee258ee2fcec289766496289f2d5d574ea17abe81f4e28008c4ac95",
+        "sourceSha256": "a9c86eec0fafb913d38a649d62fd0a2016b5553c9cecc124f0fd4201ea005809"
+      },
+      "runtime/src/host.js.map": {
+        "installedSha256": "fb5eafdad2b0fce2a5c84d92ea677ca25f349413745c11ca4cb2e9a0e73906fd",
+        "sourceSha256": "a017bd0e1395914488db420fb050ceca82b42c5192be6a76a779800fbdead81c"
+      },
+      "runtime/src/office-scratch-linux.d.ts": {
+        "installedSha256": "5db6e9c7d5e394819189766f38d875aeb826f23c4c91b809263ce1f022ad5e8b",
+        "sourceSha256": "ed20bb7500dad90487b3675bd89109bbc19bdce4c0acc8f5a00720f079c0fbed"
+      },
+      "runtime/src/office-scratch-linux.js": {
+        "installedSha256": "9a23820f1eba829e870edaba1483b7c8ac3c3fd336db95453839d52f655fef65",
+        "sourceSha256": "bef4621137d78d66e217579e4f12825e957675c5ec81a19b2fe7bbd05882a9e6"
+      },
+      "runtime/src/office-scratch-linux.js.map": {
+        "installedSha256": "f4e9b678d31d5a31be04f141e1c20c7125d03a645a7b4d1ec18e35b92c67b9aa",
+        "sourceSha256": "293240b9d8421d0625291ca3687cbb087f60eec2bdf884738a3d8700a20560a8"
+      }
+    },
+    "newFiles": {
+      "harness-web/excel-NN5DW2W7.js": "7eaa94b99b9659fc052a6380638c4f448d6c6befba96b7632fcafffe918eab88",
+      "runtime/src/office-process-files.d.ts": "a27d0492f238cd33319d8fc51c4bb2779608552f8a124ba350ece19aa36707e7",
+      "runtime/src/office-process-files.js": "a45be1775d87854cc5cfd613b6bb3a90590b317345d1983bb0f4b5bde9a95df1",
+      "runtime/src/office-process-files.js.map": "56601fcb4b1281b9f4e16eb85c782d0d70989fa18e08525bce39213710eb5763",
+      "runtime/src/office-process-linux.d.ts": "a8762b7629eb49692607c1dabff6f95d243e5396b29955938424ee4a9ebff598",
+      "runtime/src/office-process-linux.js": "bc02cdbac9b6888523c6fcc840dce99c9e0d67c03613daea690623098e0ff6e5",
+      "runtime/src/office-process-linux.js.map": "14b7aa4867824d0a4330e2c23784e3e2a932e8b7b2931dd2b8098b3db152777c",
+      "runtime/src/office-process-linux.py": "0f68233ab5848197d15b23bdd0d847527bfb30f68e0a20347dd1eb0ccc490b6d",
+      "runtime/src/office-process-protocol.d.ts": "fbce79862c54599990c3410f509d2ff481d2d1c5edf9086a8aa609bfc97f4a1f",
+      "runtime/src/office-process-protocol.js": "0baee1a2027bdf42bac98e78f4bced187e2358a79d1768a6033d6177420a493a",
+      "runtime/src/office-process-protocol.js.map": "2a3034206d1a48744a77da599c5cf5da6bcd5952a2f08e10acda550422d8e7a8",
+      "runtime/src/office-process-worker.d.ts": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881",
+      "runtime/src/office-process-worker.js": "4c5a635550712b451b3ae4ebed89a969e55d8dbaeb3d7e38c92a5e57fc5ceefc",
+      "runtime/src/office-process-worker.js.map": "26c02de9834d0cd1117a7530e7f819808b5a367dabc75181e5a3ef1fbfa8c2e2"
+    },
+    "removedFiles": [
+      "harness-web/excel-D6PHI2IL.js"
+    ],
+    "scope": "Actual source build differs from installed release; no claim of whole compiled-tree equality. GUI source is unchanged; regenerated spreadsheet overlay nonce changes chunk name, references and inventories."
+  },
+  "qualification": {
+    "fullBuild": true,
+    "sourceNode": {
+      "files": 42,
+      "chromiumFiles": 18,
+      "pass": 281,
+      "fail": 0,
+      "skip": 0
+    },
+    "python": {
+      "pass": 43,
+      "skip": 0,
+      "traceParserCases": 7
+    },
+    "faultSuite": {
+      "pass": 10,
+      "skip": 0,
+      "includes": [
+        "strict bounded versioned packets and file receipts",
+        "malformed admission before actor",
+        "independent deadline and bounded reply overflow with reap",
+        "kernel death hook for stopped supervisor and stopped admitted renderer",
+        "unallocated/replaced root refusal",
+        "stopped owner death and independent scratch cleanup",
+        "stopped Node owner with advancing supervisor deadline",
+        "real Wasm source rewrite, replaced publication preservation, distinct successful recovery"
+      ]
+    },
+    "nativeCompatibility": {
+      "pass": 37,
+      "skip": 0,
+      "scope": "Shared scratch identity implementation; preceding later Wasm-only publication refinement"
+    },
+    "originalGui": {
+      "defaultEnginePass": 1,
+      "thinEnginePass": 1,
+      "assertionsAndDeadlinesUnchanged": true,
+      "scope": "Original controls, actual Host and conversion, synthetic seed only; no subsequent inference"
+    },
+    "typeScriptCheck": true
+  },
+  "containedRuns": [
+    {
+      "engine": "@deepseek-ai/libreoffice-kit-wasm@0.1.5",
+      "cases": [
+        {
+          "name": "embedded-control.docx",
+          "accepted": true,
+          "pdf": "pdfs/embedded-control.docx.pdf",
+          "pdfSha256": "21f87a6042e7a105b20e9327388564c7aca0e9ad2f24ee2823e4d5df2afee206",
+          "required": "AUGMENTOR_AUTHORED_NATIVE",
+          "images": 3,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "43b094b327ace4ffb4eae8f178e59befed9771dd8649d0a260356a082e9a4704",
+          "sourceBytesUnchanged": true,
+          "observedMs": 4043.4623920000004,
+          "memoryCurrentBytes": 47841280,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 3
+        },
+        {
+          "name": "http-image.docx",
+          "accepted": true,
+          "pdf": "pdfs/http-image.docx.pdf",
+          "pdfSha256": "abbed0da200d1e8532492bf370d36b54470cdcd080b6f29172f1b54dfa7346cd",
+          "required": "AUGMENTOR_AUTHORED_NATIVE",
+          "images": 0,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "26ef054faa2c57f1ebf238014f7accd064cfac563e3f4f485955f9513d5ebbe7",
+          "sourceBytesUnchanged": true,
+          "observedMs": 3738.7340810000005,
+          "memoryCurrentBytes": 52310016,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 0
+        },
+        {
+          "name": "file-image.docx",
+          "accepted": true,
+          "pdf": "pdfs/file-image.docx.pdf",
+          "pdfSha256": "a755fac228bb3d0f8c08e59df308e7626924940507f15ce99661662e421ce684",
+          "required": "AUGMENTOR_AUTHORED_NATIVE",
+          "images": 0,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "b31eb5183e72805cb23ce30f8cc225aefcd4e3b42d8d1062c8f5c5b480426da2",
+          "sourceBytesUnchanged": true,
+          "observedMs": 3648.4811799999998,
+          "memoryCurrentBytes": 54390784,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 0
+        },
+        {
+          "name": "file-field.docx",
+          "accepted": true,
+          "pdf": "pdfs/file-field.docx.pdf",
+          "pdfSha256": "1b2d2a9f9388e274a315a7340912645432bdb6d3fb7cf767a6a7cdd1a42896ba",
+          "required": "CACHED_FIELD_VALUE",
+          "images": 3,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "780ceca327f83daab04162c798759460e23dd0e38e0daa000cd0c58484f8426c",
+          "sourceBytesUnchanged": true,
+          "observedMs": 3671.793125,
+          "memoryCurrentBytes": 57335808,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 3
+        },
+        {
+          "name": "http-field.docx",
+          "accepted": true,
+          "pdf": "pdfs/http-field.docx.pdf",
+          "pdfSha256": "40784a7ae72e1eaab1f6f2fc48ba20cd280c44deb703c2594b232f96123325c4",
+          "required": "CACHED_FIELD_VALUE",
+          "images": 3,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "512a6f68343e790a4915d8db411fcdd726a07aae9636cedfd2e94887492f602d",
+          "sourceBytesUnchanged": true,
+          "observedMs": 3746.375615000001,
+          "memoryCurrentBytes": 59502592,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 3
+        },
+        {
+          "name": "webservice.xlsx",
+          "accepted": true,
+          "pdf": "pdfs/webservice.xlsx.pdf",
+          "pdfSha256": "2288141889683346b1f3099ba43bd8ab11697a2119c5e1eb7004a06266dcbbd2",
+          "required": "RICH_SECOND_SHEET",
+          "images": 0,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "08fad68c62ee7850869f5f151e0c1f3f582e421a9804a151d0a3e63771ed156d",
+          "sourceBytesUnchanged": true,
+          "observedMs": 3391.5982010000007,
+          "memoryCurrentBytes": 61132800,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 0
+        },
+        {
+          "name": "declared-oversize.docx",
+          "accepted": false,
+          "reason": "invalid-document",
+          "inputSha256": "a7ace936777902b1a7225935a31bca452fe6d9630ef2135608ebd4ad3004eb46",
+          "sourceBytesUnchanged": true,
+          "observedMs": 383.84806800000297,
+          "memoryCurrentBytes": 63246336
+        },
+        {
+          "name": "too-many-entries.docx",
+          "accepted": false,
+          "reason": "invalid-document",
+          "inputSha256": "8692a6476d3e34f0a8167e724ac6b53fbf53b8da684f68576b16d1761fa090df",
+          "sourceBytesUnchanged": true,
+          "observedMs": 432.2771120000034,
+          "memoryCurrentBytes": 184393728
+        },
+        {
+          "name": "cancel-startup.docx",
+          "realConverterWasmOpenObserved": true,
+          "reason": "gateway/cancelled",
+          "teardownSettled": true,
+          "sourceBytesUnchanged": true
+        },
+        {
+          "name": "after-cancel.docx",
+          "accepted": true,
+          "pdf": "pdfs/after-cancel.docx.pdf",
+          "pdfSha256": "62b8a378a3d5cafc5bd40d9f1a04f4a263d9b58c964b8a5aa1074a4dd2aa9fa0",
+          "required": "RECOVERY_AFTER_REAL_CANCEL",
+          "images": 3,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "6da7369479488b91d7f6d55e554060d0ca277be9ba6e74193b1e8f9d59e7d12e",
+          "sourceBytesUnchanged": true,
+          "observedMs": 3855.569621999999,
+          "memoryCurrentBytes": 199098368,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 3
+        }
+      ],
+      "verifiedPdfs": 7,
+      "cgroup": {
+        "memory.max": "3221225472",
+        "memory.peak": "1441579008",
+        "memory.swap.max": "0",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cpu.max": "100000 100000",
+        "pids.max": "128",
+        "pids.peak": "33"
+      },
+      "trace": {
+        "successfulWasmOpens": 8,
+        "outsideCanaryReads": {
+          "only-on-host.png": {
+            "driver": 2,
+            "other": 0
+          },
+          "only-on-host.txt": {
+            "driver": 2,
+            "other": 0
+          }
+        },
+        "connectCalls": 21,
+        "failedParentContainerNssSocketCalls": 20,
+        "ownedRendererProcessesConfirmedClosed": 10,
+        "scratchOwnersConfirmedClosed": 10,
+        "failedScratchOwnerNssSocketCalls": 20,
+        "ipConnectCalls": 1,
+        "soleIpConnectIsDriverHttpPositiveControl": true,
+        "unresolvedCalls": 0,
+        "traceSha256": "970a5033b7ef1648d6ed5ec971aacf717e3ca9b7277d181a413ba8d09abbc78d",
+        "scope": "All traced processes/threads within this diagnostic container only"
+      },
+      "rendererProcessesConfirmedClosed": 10,
+      "scratchOwnersConfirmedClosed": 10,
+      "providerIdleAfterClose": true,
+      "conversionScratchAbsent": true,
+      "documentHttpCanaryRequests": 0,
+      "containerTerminal": {
+        "status": "exited",
+        "exitCode": 0,
+        "oomKilled": false,
+        "pid": 0
+      },
+      "containerImageId": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924"
+    },
+    {
+      "engine": "@augmentor/office-engine-wasm@0.1.5-augmentor.thin.1",
+      "cases": [
+        {
+          "name": "embedded-control.docx",
+          "accepted": true,
+          "pdf": "pdfs/embedded-control.docx.pdf",
+          "pdfSha256": "774263c2021a01d0d9df9d5cddb2a22147db99c6ee5cbaac4d95a839f90a84ce",
+          "required": "AUGMENTOR_AUTHORED_NATIVE",
+          "images": 3,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "43b094b327ace4ffb4eae8f178e59befed9771dd8649d0a260356a082e9a4704",
+          "sourceBytesUnchanged": true,
+          "observedMs": 4871.399939,
+          "memoryCurrentBytes": 40398848,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 3
+        },
+        {
+          "name": "http-image.docx",
+          "accepted": true,
+          "pdf": "pdfs/http-image.docx.pdf",
+          "pdfSha256": "eb8aa42867f7274455bc0e70a223358f43896a64523a3f7dfd9f4f40aee7a3ac",
+          "required": "AUGMENTOR_AUTHORED_NATIVE",
+          "images": 0,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "3727a5a9047477017085c494bb7d999fc7e2bb9d34d8badc6f421ab607bf3d0c",
+          "sourceBytesUnchanged": true,
+          "observedMs": 4760.939368000001,
+          "memoryCurrentBytes": 53227520,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 0
+        },
+        {
+          "name": "file-image.docx",
+          "accepted": true,
+          "pdf": "pdfs/file-image.docx.pdf",
+          "pdfSha256": "0adf4423c6f9f33f56de4c86cb87a533ba9118d28801012efd43d9e34e4b30ae",
+          "required": "AUGMENTOR_AUTHORED_NATIVE",
+          "images": 0,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "990d19ef8f57a0a58fe07cfddcfee5390e9f63f2c5eca475c5e9cd5a14104c56",
+          "sourceBytesUnchanged": true,
+          "observedMs": 4758.3728360000005,
+          "memoryCurrentBytes": 55218176,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 0
+        },
+        {
+          "name": "file-field.docx",
+          "accepted": true,
+          "pdf": "pdfs/file-field.docx.pdf",
+          "pdfSha256": "e5cb8f4f5a2b8c654006a5f33d25699f2a8e4156726c765b9156088a4fd45e3c",
+          "required": "CACHED_FIELD_VALUE",
+          "images": 3,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "9e8c4e0a179559c71e24767db4a2f47976639b74fdc6f34923537de9acb8aedc",
+          "sourceBytesUnchanged": true,
+          "observedMs": 4781.663490000001,
+          "memoryCurrentBytes": 57282560,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 3
+        },
+        {
+          "name": "http-field.docx",
+          "accepted": true,
+          "pdf": "pdfs/http-field.docx.pdf",
+          "pdfSha256": "a760f3838f340385ef4c146facb4572609e1fe13b579a1ea02ab44950fe41410",
+          "required": "CACHED_FIELD_VALUE",
+          "images": 3,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "04bbdc7b9d47649f89c38b6813a4811701cfeab435edf969f8049ad2d798d03c",
+          "sourceBytesUnchanged": true,
+          "observedMs": 4755.465656,
+          "memoryCurrentBytes": 60899328,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 3
+        },
+        {
+          "name": "webservice.xlsx",
+          "accepted": true,
+          "pdf": "pdfs/webservice.xlsx.pdf",
+          "pdfSha256": "dd3eab52a42eb1459800afd36a83ac96cf037c146553e66a37bcc7c34c58b913",
+          "required": "RICH_SECOND_SHEET",
+          "images": 0,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "ce4b576ac332b5237f67049c04eb567b065a2d91a2c4bd0c77802f3cd35773c4",
+          "sourceBytesUnchanged": true,
+          "observedMs": 4011.4133589999983,
+          "memoryCurrentBytes": 63262720,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 0
+        },
+        {
+          "name": "declared-oversize.docx",
+          "accepted": false,
+          "reason": "invalid-document",
+          "inputSha256": "3fc7a976e16b0c660ccd77dd02fe4fdeb23d2a5c3e8d59edc8437141c846a953",
+          "sourceBytesUnchanged": true,
+          "observedMs": 363.26199500000075,
+          "memoryCurrentBytes": 65998848
+        },
+        {
+          "name": "too-many-entries.docx",
+          "accepted": false,
+          "reason": "invalid-document",
+          "inputSha256": "bf45a3ad3589767e6ab652b1c5b90fa35b3310a7828072ac447ca3d4fb982aef",
+          "sourceBytesUnchanged": true,
+          "observedMs": 418.5827939999981,
+          "memoryCurrentBytes": 234082304
+        },
+        {
+          "name": "cancel-startup.docx",
+          "realConverterWasmOpenObserved": true,
+          "reason": "gateway/cancelled",
+          "teardownSettled": true,
+          "sourceBytesUnchanged": true
+        },
+        {
+          "name": "after-cancel.docx",
+          "accepted": true,
+          "pdf": "pdfs/after-cancel.docx.pdf",
+          "pdfSha256": "68347ed4904539663d69a5e3209c545c79403f1c3b044667fdce49ad771baf10",
+          "required": "RECOVERY_AFTER_REAL_CANCEL",
+          "images": 3,
+          "forbidden": [
+            "HOST_FILE_CANARY_MUST_STAY_OUTSIDE",
+            "NETWORK_CANARY_MUST_STAY_OUTSIDE"
+          ],
+          "inputSha256": "be042c240d0ec558017cd2cc2758d7e4f3f631044709eb92528a44ce14d39415",
+          "sourceBytesUnchanged": true,
+          "observedMs": 4961.401974,
+          "memoryCurrentBytes": 240033792,
+          "requiredAndExcludedPdfTextVerified": true,
+          "actualPdfImageCount": 3
+        }
+      ],
+      "verifiedPdfs": 7,
+      "cgroup": {
+        "memory.max": "3221225472",
+        "memory.peak": "1923006464",
+        "memory.swap.max": "0",
+        "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0",
+        "cpu.max": "100000 100000",
+        "pids.max": "128",
+        "pids.peak": "33"
+      },
+      "trace": {
+        "successfulWasmOpens": 8,
+        "outsideCanaryReads": {
+          "only-on-host.png": {
+            "driver": 2,
+            "other": 0
+          },
+          "only-on-host.txt": {
+            "driver": 2,
+            "other": 0
+          }
+        },
+        "connectCalls": 21,
+        "failedParentContainerNssSocketCalls": 20,
+        "ownedRendererProcessesConfirmedClosed": 10,
+        "scratchOwnersConfirmedClosed": 10,
+        "failedScratchOwnerNssSocketCalls": 20,
+        "ipConnectCalls": 1,
+        "soleIpConnectIsDriverHttpPositiveControl": true,
+        "unresolvedCalls": 0,
+        "traceSha256": "7e6d0aa3906726d596d27064d6fd9ec90966725c7adf2a2e4e0899b7b057bc49",
+        "scope": "All traced processes/threads within this diagnostic container only"
+      },
+      "rendererProcessesConfirmedClosed": 10,
+      "scratchOwnersConfirmedClosed": 10,
+      "providerIdleAfterClose": true,
+      "conversionScratchAbsent": true,
+      "documentHttpCanaryRequests": 0,
+      "containerTerminal": {
+        "status": "exited",
+        "exitCode": 0,
+        "oomKilled": false,
+        "pid": 0
+      },
+      "containerImageId": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924"
+    }
+  ],
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "earlierFailuresRetained": [
+    "Thin same-process OOM137 under unchanged 3GiB diagnostic cap",
+    "First source-backend contained run completed cases but failed NSS attribution postflight; corrected observer classifies closed scratch owners without exempting their file/IP access"
+  ],
+  "remaining": [
+    "Pre-ready and simultaneous owner-loss windows; durable recovery; further lifecycle faults",
+    "Managed per-job kernel memory/resource limits; diagnostic container caps do not qualify installed controls",
+    "Exact ordinary/sealed/package/installed adoption and rollback",
+    "Broader document/font/macro corpus and security qualification",
+    "Complete preferred source/rebuild/third-party/public packaging qualification"
+  ],
+  "installedBackendChanged": false,
+  "publicRedistributionQualified": false,
+  "wholeHostedWorkflowQualified": false
+}

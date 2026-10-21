@@ -1,0 +1,51 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+# Private Linux qualification image; public redistribution has separate gates.
+ARG NODE_IMAGE=node:24.19.0-bookworm-slim@sha256:a9f5f7c91a432850b2a8a7797adf5eadb6c733ceed61167806cee7ea7fbc29df
+FROM ${NODE_IMAGE} AS build
+WORKDIR /app
+COPY package.json package-lock.json tsconfig.json ./
+COPY apps/harness/package.json apps/harness/package.json
+COPY scripts/prepare-ws.mjs scripts/prepare-ws.mjs
+RUN npm ci --ignore-scripts --no-audit --no-fund
+COPY packages packages
+COPY adapters/dsh-context-budget/evidence.mjs adapters/dsh-context-budget/evidence.d.mts adapters/dsh-context-budget/
+COPY adapters/dsh-compat/messages.mjs adapters/dsh-compat/
+COPY adapters/dsh-home adapters/dsh-home
+RUN ./node_modules/.bin/tsc -p tsconfig.json
+
+FROM ${NODE_IMAGE} AS dependencies
+WORKDIR /app
+COPY apps/home/pi/package.json apps/home/pi/package-lock.json ./
+RUN npm ci --ignore-scripts --omit=dev --no-audit --no-fund
+COPY scripts/prepare-ws.mjs scripts/prepare-ws.mjs
+COPY apps/home/pi/prepare.mjs apps/home/pi/prepare.mjs
+COPY vendor/photon-node vendor/photon-node
+COPY release/photon release/photon
+COPY --from=build /app/package-lock.json /app/family-package-lock.json
+RUN node scripts/prepare-ws.mjs /app && node apps/home/pi/prepare.mjs /app
+COPY scripts/third-party-notices.py scripts/third-party-notices.py
+COPY licenses licenses
+
+FROM ${NODE_IMAGE}
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-websocket util-linux && rm -rf /var/lib/apt/lists/*
+WORKDIR /app/apps/home
+COPY --from=dependencies /app/package.json /app/package-lock.json /app/
+COPY --from=dependencies /app/node_modules /app/node_modules
+COPY --from=dependencies /app/licenses /app/licenses
+COPY --from=dependencies /app/distribution-overrides.json /app/distribution-exclusions.json /app/
+COPY apps/home/*.mjs ./
+COPY apps/home/web ./web
+COPY adapters/dsh-home /app/adapters/dsh-home
+COPY adapters/dsh-execution /app/adapters/dsh-execution
+COPY adapters/dsh-context-budget/evidence.mjs /app/adapters/dsh-context-budget/evidence.mjs
+COPY adapters/dsh-compat/messages.mjs /app/adapters/dsh-compat/messages.mjs
+COPY services /app/services
+COPY release/product.json /app/release/product.json
+COPY --from=build /app/dist /app/dist
+COPY LICENSE /app/LICENSE
+COPY scripts/third-party-notices.py /app/scripts/third-party-notices.py
+RUN python3 /app/scripts/third-party-notices.py --tree /app --out /app/licenses/npm
+ENV NODE_ENV=production PYTHONDONTWRITEBYTECODE=1 HOME_STATE_DIR=/state HOME_HARNESS=pi
+USER node
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD ["node", "healthcheck.mjs"]
+CMD ["sh", "-c", "exec flock --nonblock --no-fork \"$HOME_STATE_DIR/runtime.lock\" node server.mjs"]

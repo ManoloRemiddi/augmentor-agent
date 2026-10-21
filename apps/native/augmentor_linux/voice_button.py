@@ -14,6 +14,7 @@ class VoiceButton(QPushButton):
     HOLD_MS = 230
     LOCK_DISTANCE = 24
     TIPS = {
+        'needs-setup': 'Voice needs setup · Click to configure local or cloud voice',
         'off': 'Hold to talk · ← Lock · → Hands-free',
         'connecting': 'Preparing voice…',
         'ready': 'Hold to talk · ← Lock · → Hands-free',
@@ -117,17 +118,17 @@ class VoiceButton(QPushButton):
 
     def refresh_tip(self):
         tip=self.TIPS[self.state]
-        if self.hands_free:
+        if self.hands_free and self.state!='needs-setup':
             tip='Tap to start conversation' if self.state=='off' else ('Hands-free unavailable · Tap to retry' if self.state in ('error','disconnected') else 'Hands-free · Tap or Esc to stop')
         if self.state=='listening' and not self.hands_free:
             tip=('Locked · Click to send · Esc to cancel' if self.locked else tip)
             remaining=max(0,math.ceil(self.max_seconds-self.elapsed))
             tip+=f' · {int(self.elapsed)//60}:{int(self.elapsed)%60:02d}'
             if remaining<=120:tip+=f' · {remaining//60}:{remaining%60:02d} left'
-        if self.hands_free and self.state not in ('off','error','disconnected'):
+        if self.hands_free and self.state not in ('off','error','disconnected','needs-setup'):
             tip=('Listening · Tap or Esc to stop' if self.recording_available else 'Please wait · Microphone not ready')
         self.setToolTip(tip)
-        self.setAccessibleName('Resonant Voice · '+tip)
+        self.setAccessibleName('Voice · '+tip)
 
     def set_recording_progress(self, elapsed, maximum, levels):
         self.elapsed=elapsed;self.max_seconds=maximum
@@ -135,6 +136,7 @@ class VoiceButton(QPushButton):
         self.refresh_tip();self.update()
 
     def recording_colour(self):
+        if self.state=='needs-setup':return QColor('#ff5964')
         if self.state=='listening':
             remaining=self.max_seconds-self.elapsed
             if remaining<=60:return QColor('#ff5964')
@@ -292,7 +294,7 @@ class VoiceButton(QPushButton):
         elif self.state=='speaking':painter.drawRoundedRect(-2.5,-2.5,5,5,1,1)
         elif self.state in ('connecting','recognizing','thinking'):
             for x in (-3.5,0,3.5):painter.drawEllipse(QPointF(x,0),.9,.9)
-        elif self.state in ('error','disconnected'):
+        elif self.state in ('error','disconnected','needs-setup'):
             painter.drawRoundedRect(-.7,-4,1.4,5,.5,.5);painter.drawEllipse(QPointF(0,3),.9,.9)
         if self.hands_free and self.state not in ('off','error','disconnected'):
             painter.setBrush(Qt.BrushStyle.NoBrush);painter.setPen(QPen(accent,1.2))
@@ -301,3 +303,23 @@ class VoiceButton(QPushButton):
         if self.hasFocus():
             painter.setBrush(Qt.BrushStyle.NoBrush);painter.setPen(QPen(accent,1,Qt.PenStyle.DotLine))
             painter.drawEllipse(QPointF(0,0),12,12)
+
+
+def paint_energy_ring(painter, accent, phase, active=False, listening=False):
+    radius = 8.8 + (.5 * math.sin(phase*2) if phase else 0)
+    path = QPainterPath()
+    for i in range(97):
+        angle = i*math.tau/96
+        r = radius*(1 + .065*math.sin(3*angle+phase*.85) + .035*math.cos(2*angle-phase))
+        point = QPointF(math.cos(angle)*r, math.sin(angle)*r)
+        if i == 0:path.moveTo(point)
+        else:path.lineTo(point)
+    path.closeSubpath()
+    glow = QRadialGradient(QPointF(-2, -2), 14)
+    soft = QColor(accent);soft.setAlpha(100 if active else 55)
+    clear = QColor(accent);clear.setAlpha(0)
+    glow.setColorAt(0, soft);glow.setColorAt(1, clear)
+    painter.setPen(Qt.PenStyle.NoPen);painter.setBrush(glow)
+    painter.drawEllipse(QPointF(0,0),14,14)
+    fill = QColor(accent);fill.setAlpha(75 if listening else 24)
+    painter.setBrush(fill);painter.setPen(QPen(accent,1.3));painter.drawPath(path)

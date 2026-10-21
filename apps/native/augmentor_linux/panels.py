@@ -20,6 +20,8 @@ class HistoryDialog(QDialog):
         filters=QHBoxLayout()
         self.saved=QCheckBox('Saved only');self.all=QCheckBox('All agents');self.all.hide()
         filters.addWidget(self.saved);filters.addWidget(self.all);layout.addLayout(filters)
+        from .agent_entries import read
+        if getattr(getattr(window.controller,'client',None),'custom',False) or read()['retained']:self.all.show()
         self.list=QListWidget();layout.addWidget(self.list)
         self.note=QLabel('Loading history…');self.note.setWordWrap(True);layout.addWidget(self.note)
         buttons=QHBoxLayout()
@@ -43,7 +45,7 @@ class HistoryDialog(QDialog):
         self.list.clear();query=self.search.text().casefold()
         for row in self.rows:
             if row.get('archived') or row.get('blank'):continue
-            if not self.all.isChecked() and row.get('agentPreset')!=getattr(self.owner.controller,'preset','augmentor-linux-pi'):continue
+            if not self.all.isChecked() and not getattr(getattr(self.owner.controller,'client',None),'owns_session',lambda r:r.get('agentPreset')==getattr(self.owner.controller,'preset','augmentor-linux-pi'))(row):continue
             if self.saved.isChecked() and not row.get('saved'):continue
             title=str(row.get('title') or row['sessionId'])
             if query not in (title+' '+row['sessionId']).casefold():continue
@@ -156,7 +158,7 @@ class SettingsDialog(QDialog):
         self.resize(px(self,460),min(820,self.screen().availableGeometry().height()-80))
         from .settings_icons import settings_icon,settings_label
         from .voice_settings import VoiceSettingsDialog
-        voice=QPushButton('Resonant Voice')
+        voice=QPushButton('Voice')
         voice.clicked.connect(lambda:VoiceSettingsDialog(window).exec())
         layout.addWidget(voice)
         from .dictation_settings import DictationSettingsDialog
@@ -164,12 +166,21 @@ class SettingsDialog(QDialog):
         dictation.clicked.connect(lambda:DictationSettingsDialog(window).exec())
         layout.addWidget(dictation)
         layout.addWidget(settings_label('Harness','harness',window.accent))
-        engine=QComboBox();engine.addItem('Pi','pi');engine.addItem('DSH','dsh');engine.addItem('Codex (development)','codex')
+        engine=QComboBox();engine.addItem('Augmentor Harness','ah');engine.addItem('Pi (legacy profile)','pi');engine.addItem('DSH','dsh');engine.addItem('Codex (development)','codex')
         engine.setCurrentIndex(engine.findData(getattr(window.controller,'harness','pi')))
         engine.setAccessibleName('Harness')
         engine.activated.connect(lambda _:window.switch_harness(engine.currentData()))
         layout.addWidget(engine)
-        dsh=QPushButton('Connect Codex model' if getattr(window.controller,'harness',None)=='codex' else 'Connect DSH')
+        if getattr(window.controller,'harness',None) in ('pi','ah'):
+            from .reasoning_settings import ReasoningDialog
+            reasoning=QPushButton('Reasoning');reasoning.setAccessibleName('Pi reasoning settings')
+            reasoning.setEnabled(getattr(window.controller,'capabilities',{}).get('reasoning') is True)
+            reasoning.clicked.connect(lambda:ReasoningDialog(window).exec());layout.addWidget(reasoning)
+            from .mcp_settings import McpDialog
+            mcp=QPushButton('MCP servers');mcp.setAccessibleName('Pi MCP server management')
+            mcp.setEnabled(getattr(window.controller,'capabilities',{}).get('mcpManagement') is True)
+            mcp.clicked.connect(lambda:McpDialog(window).exec());layout.addWidget(mcp)
+        dsh=QPushButton('Connect Codex model' if getattr(window.controller,'harness',None)=='codex' else 'Connect a model' if getattr(window.controller,'harness',None) in ('pi','ah') else 'Connect DSH')
         def connect_dsh():
             self.accept()
             window.open_setup()

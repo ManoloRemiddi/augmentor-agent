@@ -64,6 +64,7 @@ class HomeTrayTests(unittest.TestCase):
         spec = importlib.util.spec_from_file_location('home_launch', ROOT/'scripts/home-launch.py')
         launch = importlib.util.module_from_spec(spec); spec.loader.exec_module(launch)
         data = Path(self.folder.name)/'data'; (data/'augmentor').mkdir(parents=True)
+        (data/'augmentor').chmod(0o700)
         release = Path(self.folder.name)/'release with spaces'
         (release/'apps/native/augmentor_linux').mkdir(parents=True)
         (release/'apps/native/augmentor_linux/home_tray.py').touch()

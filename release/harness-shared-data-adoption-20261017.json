@@ -1,0 +1,107 @@
+{
+  "schema": "augmentor-harness-shared-data-adoption-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Source-only cold component adoption, complete/explicit partial secondary sources and client publication ownership",
+  "schemas": {
+    "clientPublication": "augmentor-dsh-client-publication/2",
+    "coldArchive": "augmentor-cold-data-backup/2",
+    "configurationTransaction": "augmentor-dsh-configuration-transaction/3",
+    "sharedAdoption": "augmentor-shared-data-adoption/1"
+  },
+  "qualification": {
+    "pythonPass": 121,
+    "sharedAdoptionCases": 21,
+    "publicationCases": 23,
+    "previewCases": 7,
+    "nodePass": 144,
+    "nodeSharedProfilesAndDsh": 17,
+    "nodeOfflineImportsWithAliasedTemp": 127,
+    "fail": 0,
+    "skip": 0,
+    "hostReadOnly": true,
+    "networkIsolated": true,
+    "umask": "0022",
+    "reserveGiB": 64,
+    "authoredFixturesOnly": true,
+    "publicationBackendRepliesSynthetic": true,
+    "ownerModelRequests": 0,
+    "fullAppCopiesCreated": 0,
+    "newInstalledArtifacts": 0,
+    "nodeOriginalFortyCaseSubsetOverlaps": true
+  },
+  "sourceScope": [
+    "One canonical complete target and up to four full or explicitly partial source pairs",
+    "Exact full source inventories and nested import history preserved",
+    "Three known DB component exchanges; mixed application root never replaced",
+    "Pending unassigned captures archived without activation; target engine/configuration authority retained",
+    "Publication-owned data/configuration commit and exact pre-finalizing reverse",
+    "Forward finalization preserves new ordinary work after startup can reopen",
+    "Legacy selectors require explicit previous pairs and a matching adoption receipt"
+  ],
+  "priorSdk": {
+    "run": 39070128857,
+    "runtimeRef": "c0bf300075cde11d0a51f81e7ce0dbb5f32c652d",
+    "status": "completed",
+    "conclusion": "failure",
+    "linuxFixtureUmaskFailure": true,
+    "macFixtureTemporaryAliasFailure": true,
+    "localCorrectionsQualified": true,
+    "wholeWorkflowPassClaimed": false,
+    "windowsCancelled": true,
+    "cancellationCauseUnqualified": true
+  },
+  "ownerDataMigrated": false,
+  "installedOwnerAppChanged": false,
+  "advisoryLegacyNativePartialSchemaReadOnly": true,
+  "oldTwoPairMapIncomplete": true,
+  "requiredColdPairs": 3,
+  "cleanupCopiesRemoved": 78,
+  "cleanupObservedGiBRecovered": 42.51,
+  "rootFreeGiBApprox": 100.08,
+  "remaining": [
+    "One combined immutable qualification against retained integration",
+    "Exact complete launcher/bootstrap/registration pre-adoption",
+    "Fresh real three-pair cold archive including every dedicated source and nested history",
+    "Matching loaded Browser and controlled publication",
+    "Actual owner continuation; pilot feedback before further project transfers"
+  ],
+  "privateEvidenceSha256": {
+    "harness-shared-adoption-final-20261017.log": "779ce1ca17c5f64be8939ebe043d31582af2812f17fca81c03114f3f90356bb3",
+    "harness-shared-adoption-node-20261017.log": "254217ac551de37c01170a44e20eccdccda67fefa4c9472c8c780387cfb0015f",
+    "harness-shared-adoption-legacy-preview-schema-private-20261017.json": "3d65b91f274ab9c678cac692df751bfdb328cbabaaa6f6456eb88261a5a0266e",
+    "harness-shared-adoption-import-matrix-final-20261017.log": "9c6282b8f542af03e35be9a104c2f2b79f852f057b73c95cdb16b90ca5e956b5"
+  },
+  "hostedQualificationPending": true,
+  "runtimeRef": "42d3e41eacfe3055a4e2a6a47dc466c33b36a7d9",
+  "fixtureFollowup": {
+    "scope": "Canonicalize every fixture root used by the offline import SDK step, including shared real-Host planning, batch, bundle and transaction fixtures",
+    "fullSdkOfflineImportNodePass": 127,
+    "fail": 0,
+    "skip": 0,
+    "aliasedTmpdir": true,
+    "umask": "0022",
+    "productionGuardsUnchanged": true,
+    "physicalMacNotQualified": true
+  },
+  "sourceRef": "24bee26f7ed56fd1a31fa77cdfb9ed7356eed2fc",
+  "fixtureRef": "24bee26f7ed56fd1a31fa77cdfb9ed7356eed2fc",
+  "linuxSdk": {
+    "run": 39072231157,
+    "sourceRef": "24bee26f7ed56fd1a31fa77cdfb9ed7356eed2fc",
+    "status": "in_progress",
+    "conclusion": "",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39072231157"
+  },
+  "precedingFeatureSdk": {
+    "run": 39071819986,
+    "sourceRef": "42d3e41eacfe3055a4e2a6a47dc466c33b36a7d9",
+    "linuxJobStatus": "in_progress",
+    "linuxJobConclusion": "",
+    "adoptionAndPublicationStep": "success",
+    "macOfflineImportPass": 93,
+    "macOfflineImportFail": 20,
+    "macOfflineImportSkip": 14,
+    "remainingFixtureAliasesNowQualifiedLocally": true,
+    "wholeWorkflowPassClaimed": false
+  }
+}

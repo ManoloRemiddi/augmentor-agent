@@ -241,10 +241,12 @@ export function createChatUI(els) {
   const $send = els.send
   const $top = els.top
 
+  const canMessageAction=action=>ui.state.phase==='ready'&&!ui.state.running&&!ui.state.submitting&&!!els.actionEnabled?.(action)
   function actionButton(action,seq,text){
     const button=el('button','msgaction msg-'+action);button.type='button';button.setAttribute('aria-label',ACTIONS.labels[action]);button.dataset.tooltip=ACTIONS.labels[action]
     button.innerHTML=action==='edit'?EDIT_ICON:BRANCH_ICON
-    button.addEventListener('click',()=>{if(els.actionEnabled?.(action))els.onMessageAction?.(action,seq,text)})
+    button.disabled=!canMessageAction(action)
+    button.addEventListener('click',()=>{if(canMessageAction(action))els.onMessageAction?.(action,seq,text)})
     return button
   }
   let assistantEl = null // block container: Think(s) + one .md text container
@@ -254,9 +256,11 @@ export function createChatUI(els) {
   let reasoningEl = null
   let reasoningRaw = ''
   let reasoningActive = false
-  // Standalone behavior remains unchanged until its own settings update lands.
-  let expandThinking = null
+  let expandThinking = true
   let reasoningTimer = null // frameOr() handle
+  let progressEl = null
+  let progressRank = 0
+  let progressPending = null
   let maxSeq = -1
   const pendingPrompts = new Set()
   function confirmPrompt(text) {
@@ -395,10 +399,27 @@ export function createChatUI(els) {
     })
   }
 
+  function showProgress(text, rank = 0) {
+    progressRank = rank
+    if (!progressEl) {
+      progressEl = el('div', 'msg assistant response-progress')
+      progressEl.setAttribute('role', 'status')
+      $log.appendChild(progressEl)
+    }
+    progressEl.textContent = text
+  }
+
+  function clearProgress() {
+    progressEl?.remove()
+    progressEl = null
+    progressRank = 0
+    progressPending = null
+  }
+
   function finishThinking() {
     if (!reasoningActive) return
     renderReasoningNow()
-    if (expandThinking !== null && reasoningEl) reasoningEl.open = false
+    if (reasoningEl) reasoningEl.open = false
     reasoningActive = false
   }
 
@@ -475,6 +496,13 @@ export function createChatUI(els) {
     const data = ev.data ?? {}
     const t = entry.t ?? Date.now()
 
+    if (ev.type === 'turn/start') showProgress('Agent started; waiting for next step…', 7)
+    else if (ev.type === 'step/start') showProgress('Building model request…', 8)
+    else if (ev.type === 'assistant/start') showProgress('Waiting for the model’s first output…', 9)
+    else if (ev.type === 'assistant/chunk' && ['text-delta','reasoning-delta'].includes(data.chunk?.type) && data.chunk.text) clearProgress()
+    else if (ev.type === 'assistant/chunk' && ['tool-call-start','tool-call-delta','tool-call'].includes(data.chunk?.type)) showProgress('Receiving a tool request from the model…', 10)
+    else if (['assistant/message','tool/call','step/end','turn/end','runtime/error','error','command/done'].includes(ev.type)) clearProgress()
+
     switch (ev.type) {
       case 'command/run':
       case 'command/done': {
@@ -485,6 +513,19 @@ export function createChatUI(els) {
         const message=el('div','msg '+(ev.type==='command/run'?'user':'assistant'))
         message.append(el('span','who',ev.type==='command/run'?'You':'DSH'))
         const body=el('div','md');body.innerHTML=md(text);message.append(body);$log.append(message)
+        break
+      }
+      case 'runtime/notice':
+      case 'runtime/warning': {
+        if(data.disposition==='input-handled'&&data.source?.sessionId===entry.sessionId){
+          const submitted=blockText(data.submittedContent)
+          confirmPrompt(submitted)
+          if(progressPending?.text===submitted)clearProgress()
+        }
+        const message=el('div','msg status')
+        message.append(el('span','who','Status'))
+        const body=el('div','md');body.innerHTML=md(data.message??'Runtime status unavailable.')
+        message.append(body);$log.append(message)
         break
       }
       case 'session/title': {
@@ -519,8 +560,8 @@ export function createChatUI(els) {
         // Filter provenance, never the text the user may be asking about.
         if (data.source?.kind && data.source.kind !== 'user') break
         flushAssistant()
-        const text = blockText(data.content)
-        confirmPrompt(text)
+        const text = blockText(data.submittedContent ?? data.content)
+        if(!data.source?.sessionId||data.source.sessionId===entry.sessionId)confirmPrompt(text)
         const m = el('div', 'msg user')
         m.append(el('span', 'who', 'You'))
         const stack = el('div', 'userbody')
@@ -536,6 +577,7 @@ export function createChatUI(els) {
         stack.appendChild(actions)
         m.appendChild(stack)
         $log.appendChild(m)
+        if (progressEl) $log.appendChild(progressEl)
         // The user just sent a prompt (or history is replaying): land at the
         // tail so the reply is visible.
         scroll(true)
@@ -550,7 +592,7 @@ export function createChatUI(els) {
           renderAssistant()
         } else if (c.type === 'reasoning-delta') {
           makeThinkBlock()
-          if (!reasoningActive && expandThinking !== null) reasoningEl.open = expandThinking
+          if (!reasoningActive) reasoningEl.open = expandThinking
           reasoningActive = true
           reasoningRaw += c.text
           renderReasoning()
@@ -720,7 +762,8 @@ export function createChatUI(els) {
                 ? 'working…'
                 : 'disconnected'
     }
-    if ($send) $send.disabled = phase !== 'ready' || running || !!ui.state.submitting
+    if ($send) $send.disabled = phase !== 'ready' || (running && !ui.state.canQueue) || !!ui.state.submitting
+    $log.querySelectorAll('.msg-edit,.msg-branch').forEach(button=>{button.disabled=!canMessageAction(button.classList.contains('msg-edit')?'edit':'branch')})
   }
 
   function applyLog(log) {
@@ -758,6 +801,7 @@ export function createChatUI(els) {
       return maxSeq
     },
     setState(state) {
+      if (state.phase === 'error' || state.phase === 'disconnected' || (ui.state.running && state.running === false)) clearProgress()
       if (state.running === false) finishThinking()
       ui.state = { ...ui.state, ...state }
       updateChrome()
@@ -773,17 +817,27 @@ export function createChatUI(els) {
       node.append(el('span', 'who', 'You · Sending…'), el('div', 'userbody', text))
       node.style.whiteSpace = 'pre-wrap'
       const pending = {text, node, confirmed:false}
-      pendingPrompts.add(pending); $log.append(node); scroll(true)
+      pendingPrompts.add(pending); $log.append(node)
+      progressPending = pending
+      showProgress('Submitting message…')
+      scroll(true)
       return pending
     },
+    promptAccepted(pending) {
+      if (pending !== progressPending) return
+      if (progressEl && progressRank < 7) showProgress('Message accepted; waiting for agent…', 6)
+    },
     removePending(pending) {
+      if (pending === progressPending) clearProgress()
       pending.node.remove(); pendingPrompts.delete(pending)
     },
     sendFail(text) {
+      clearProgress()
       $log.appendChild(el('div', 'toolresult err', `send failed: ${text}`))
       scroll(true)
     },
     clear({preservePending = false} = {}) {
+      clearProgress()
       $log.innerHTML = ''
       if (preservePending) for (const pending of pendingPrompts) $log.append(pending.node)
       else pendingPrompts.clear()

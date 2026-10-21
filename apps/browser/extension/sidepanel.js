@@ -18,8 +18,10 @@ import { submitDraft } from './prompt-send.mjs'
 import { attachVoice } from './voice.mjs'
 import { attachPromptLibrary } from './prompt-library.mjs'
 import { attachPageMaintenance } from './maintenance-page.mjs'
+import {createApprovalMode} from './approval-mode.mjs'
 import { createHostCommands } from './host-commands.mjs'
 
+let permissionControl
 let surfaceCapabilities={branch:false,edit:false},editingMessage=null
 const answeredInteractions=new Set()
 const activeCodexQuestions=new Map()
@@ -69,10 +71,11 @@ const maintenance=attachPageMaintenance({document,runtime:chrome.runtime,busy:()
 const queue=createQueue({container:document.getElementById('prompt-queue'),input:document.getElementById('input'),send})
 const voice=attachVoice({send,onError:message=>ui.sendFail(message),isHistory:()=>!!viewSessionId})
 attachPromptLibrary({input:document.getElementById('input'),send})
-import {watchAppearance,refreshDesktopAppearance} from './appearance.mjs'
-watchAppearance(value=>{if(chrome.runtime.getManifest?.().augmentorWorkspace?.sdkProtocol)ui.setThinkingPreference(value.expandThinking)})
-void refreshDesktopAppearance().catch(()=>{})
-const appearanceTimer=setInterval(()=>{if(!maintenance.paused)void refreshDesktopAppearance().catch(()=>{})},15000)
+import {watchAppearance,refreshDesktopAppearance,readAppearance} from './appearance.mjs'
+watchAppearance(value=>ui.setThinkingPreference(value.expandThinking))
+const refreshThinking=()=>refreshDesktopAppearance().then(()=>ui.setThinkingPreference(readAppearance().expandThinking)).catch(()=>{})
+void refreshThinking()
+const appearanceTimer=setInterval(()=>{if(!maintenance.paused)void refreshThinking()},15000)
 window.addEventListener('pagehide',()=>clearInterval(appearanceTimer),{once:true})
 const openSettings=async(section)=>{
   try { const r=await send('settings/open',{section});if(!r?.ok)throw Error(r?.error||'Could not open Settings') }
@@ -392,6 +395,7 @@ modelPopSearchInput.addEventListener('keydown', (e) => {
 // re-initializes it with the new selection, the session resumes from its
 // persisted log).
 async function chooseModel(sel) {
+  surface.cancelImprovement();
   closeModelPop()
   modelLabel.textContent = sel.name
   pickerSelection = { provider: sel.provider, model: sel.model }
@@ -445,13 +449,14 @@ async function refresh() {
     queue.update(res,!!viewSessionId)
     voice.update(res,!!viewSessionId)
     surface.update(res)
+    permissionControl?.update(res)
     surfaceCapabilities=res.capabilities??surfaceCapabilities
     setupNotice.hidden=res.phase!=='needs-setup';setupNotice.textContent=res.harness==='dsh'?'Connect DSH in Settings':'Connect a model in Settings'
 
     for(const [id,controller] of activeCodexQuestions)if(!(res.interactions??[]).some(row=>row.id===id))controller.abort()
     for(const row of res.interactions??[]){
       if(answeredInteractions.has(row.id))continue;answeredInteractions.add(row.id)
-      if(res.harness==='codex'){
+      if(['codex','ah','pi'].includes(res.harness)){
         const claim=await send('interaction/claim',{id:row.id})
         if(!claim?.ok){answeredInteractions.delete(row.id);continue}
       }
@@ -484,6 +489,7 @@ if (globalThis.chrome?.runtime?.onMessage) {
     queue.update(msg,!!viewSessionId)
     voice.update(msg,!!viewSessionId)
     surface.update(msg)
+    permissionControl?.update(msg)
     surfaceCapabilities=msg.capabilities??surfaceCapabilities
     if(msg.sessionId&&!viewSessionId)m3SessionId=msg.sessionId
     ui.setState({ phase: msg.phase, error: msg.error, running: msg.running })
@@ -654,7 +660,7 @@ async function loadSessionsList() {
 // switch restarts the runtime, which would cut the live turn.
 const _setState = ui.setState
 ui.setState = (s) => {
-  _setState(s)
+  _setState({...s,canQueue:queue.enabled&&!viewSessionId})
   const running = ui.state.running
   surface.update(ui.state)
   const canQueue=queue.enabled&&!viewSessionId
@@ -795,126 +801,12 @@ async function startNewChat() {
   return res?.ok === true
 }
 
-// ── Approval mode (long-press on New Chat, 0.1.18) ──────────────────────────
-// The DSH permission preset decides what the agent may do and whether it
-// asks first: read-only / workspace-write (manual approval for wider actions)
-// / danger-full-access (automatic, no prompts). It is a USER SETTING (ns
-// "permission", path defaultPreset) — the same knob the DSH GUI's own
-// settings row writes — and per DSH's settings-store contract it applies to
-// subsequently created sessions, not the one already running.
-// Scope (audit S2): the preset gates DSH's file/execution approvals — it does
-// not bind the agent model, and it does not gate the browser_* tools: the
-// browser is the user's own surface, driven from this panel.
-// First-run default (audit S2): Manual (workspace write) — the safer preset
-// is what a fresh install inherits. Written only when the setting has no
-// defaultPreset at all, so existing installs keep their saved choice; full
-// access stays one long-press away (behind its risk confirmation).
-const ACCESS_PRESETS = [
-  { value: 'read-only', label: 'Read only', desc: 'Nothing is written; attempts ask for approval.' },
-  { value: 'workspace-write', label: 'Manual (workspace write)', desc: 'Writes inside the workspace; wider actions ask you first.' },
-  { value: 'danger-full-access', label: 'Automatic (full access)', desc: 'Everything allowed automatically — no approval prompts.' },
-]
-const DEFAULT_ACCESS = 'workspace-write'
-let accessCurrent = null
-let accessRevision = null
-let accessMenu = null
-
-function accessLabel(value) {
-  const p = ACCESS_PRESETS.find((x) => x.value === value)
-  return p ? p.label : value ?? 'unknown'
-}
-
-function accessTitle() {
-  return `Approval mode: ${accessLabel(accessCurrent)} — applies to new chats. Hold New Chat to change.`
-}
-
-async function loadAccess() {
-  const res = await send('settings/describe', { ns: 'permission' })
-  if (!res?.ok) return
-  const view = (res.value?.namespaces ?? []).find((n) => n.ns === 'permission')
-  if (!view) return
-  accessCurrent = view.value?.defaultPreset ?? null
-  accessRevision = view.revision ?? null
-  if (accessCurrent === null) {
-    // No preset chosen yet (fresh install) → default to Manual
-    // (workspace write), once. An explicit user choice is never overridden.
-    const set = await send('settings/mutate', {
-      ns: 'permission',
-      ops: [{ op: 'set', path: ['defaultPreset'], value: DEFAULT_ACCESS }],
-      ...(accessRevision !== null ? { expectedRevision: accessRevision } : {}),
-    })
-    if (set?.ok) {
-      accessCurrent = set.value?.value?.defaultPreset ?? DEFAULT_ACCESS
-      accessRevision = set.value?.revision ?? accessRevision
-    }
-  }
-  $newchat.title = accessTitle()
-}
-loadAccess()
-// First paint may race the SW's auto-connect: one retry covers it.
-setTimeout(loadAccess, 3000)
-
-function closeAccessMenu() {
-  accessMenu?.remove()
-  accessMenu = null
-}
-
-function openAccessMenu() {
-  closeAccessMenu()
-  accessMenu = document.createElement('div')
-  accessMenu.id = 'access-menu'
-  const head = document.createElement('div')
-  head.className = 'access-head'
-  head.textContent = 'Approval mode — new chats'
-  accessMenu.appendChild(head)
-  for (const p of ACCESS_PRESETS) {
-    const opt = document.createElement('button')
-    opt.type = 'button'
-    opt.className = 'access-opt' + (p.value === accessCurrent ? ' current' : '')
-    const name = document.createElement('span')
-    name.className = 'a-name'
-    name.textContent = p.value === accessCurrent ? '✓ ' + p.label : p.label
-    const desc = document.createElement('span')
-    desc.className = 'a-desc'
-    desc.textContent = p.desc
-    opt.append(name, desc)
-    opt.addEventListener('click', (ev) => { ev.stopPropagation(); pickAccess(p.value) })
-    accessMenu.appendChild(opt)
-  }
-  document.body.appendChild(accessMenu)
-  // Anchor under the New Chat icon (fixed — the old pill seat is gone).
-  const r = $newchat.getBoundingClientRect()
-  const top = Math.min(r.bottom + 6, window.innerHeight - accessMenu.offsetHeight - 8)
-  const left = Math.max(8, Math.min(r.left, window.innerWidth - accessMenu.offsetWidth - 8))
-  accessMenu.style.top = `${top}px`
-  accessMenu.style.left = `${left}px`
-}
-document.addEventListener('click', closeAccessMenu)
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAccessMenu() })
-
-async function pickAccess(value) {
-  closeAccessMenu()
-  if (value === accessCurrent) return
-  // The DSH GUI gates the full-access preset behind an explicit risk
-  // confirmation; mirror that stance here.
-  if (value === 'danger-full-access' &&
-      !window.confirm('Switch to Automatic (full access)?\n\nNo approval prompts will appear — every action is allowed automatically. Applies to new chats.')) {
-    return
-  }
-  const res = await send('settings/mutate', {
-    ns: 'permission',
-    ops: [{ op: 'set', path: ['defaultPreset'], value }],
-    ...(accessRevision !== null ? { expectedRevision: accessRevision } : {}),
-  })
-  if (res?.ok === false) {
-    ui.sendFail('Switch approval mode: ' + (res.error ?? 'failed'))
-    return
-  }
-  const view = res.value
-  accessCurrent = view?.value?.defaultPreset ?? value
-  accessRevision = view?.revision ?? accessRevision
-  $newchat.title = accessTitle()
-}
+// Approval mode is scoped to the current chat; future defaults stay separate.
+permissionControl=createApprovalMode({send,document,window,anchor:$newchat,
+  entry:document.getElementById('approval-menu-item'),isHistory:()=>!!viewSessionId,
+  onError:message=>ui.sendFail(message)})
+function openAccessMenu(){permissionControl.open()}
+refresh()
 
 async function doSend() {
   if (viewSessionId || surface.improving) return

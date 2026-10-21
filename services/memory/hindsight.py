@@ -26,6 +26,16 @@ MISSIONS = {
 PAGES = {
     'relationship': [('Preferences and boundaries', 'What supported communication preferences, boundaries and relational feedback are useful in future conversations? Exclude assistant offers and project task lists.')],
     'work': [('Current project state', 'What are the current project facts, decisions and reasons, constraints, blockers and next steps? Distinguish plans from completed work and explicitly supersede outdated decisions.')]}
+PAGE_POLICY = 3
+PAGE_STYLE = ('Write a compact memory note of at most 120 words, using short factual bullets. '
+              'Include only supported claims; omit empty categories, generic advice and boilerplate. '
+              'Preserve corrections and uncertainty. ')
+
+
+def page_content(value):
+    # The engine may terminate its unfinished-page marker with a newline.
+    # Keep real page text byte-for-byte; only the whole marker is unavailable.
+    return '' if isinstance(value, str) and value.strip() == 'Generating content...' else (value or '')
 
 
 class HindsightMemory(DualMemory):
@@ -35,6 +45,7 @@ class HindsightMemory(DualMemory):
         self.guard = threading.RLock()
         self.last_error = None
         self.checked = False
+        self.processing_issue = None  # Transient local gateway failure; never a saved pause choice.
         self.configuration = configuration
         if configuration is None:
             config_path = self.path.parent / 'hindsight.json'
@@ -77,6 +88,8 @@ class HindsightMemory(DualMemory):
     def call(self, method, p):
         action = method.removeprefix('memory.dual.')
         if action in ('activity', 'processing', 'import', 'jobs', 'retry'):
+            if action == 'processing' and p.get('paused') is False and self.processing_issue:
+                raise ValueError('Memory processing gateway is unavailable. Resolve the conflict and restart the memory companion.')
             return self.processing.call(action, p)
         if action == 'append':
             result = super().call(method, p)
@@ -95,17 +108,28 @@ class HindsightMemory(DualMemory):
                 return result
         if action not in ('describe', 'recall', 'search', 'source'):
             return super().call(method, p)
+        if action == 'describe':
+            # Budget operations own their lock before opening the journal. Status
+            # must follow that order too; bank discovery writes to the journal.
+            processing = self.processing.status()
+            pending = processing['pendingRecords'] + processing['jobs'].get('pending', 0)
+            with self.connect() as db:
+                config = dict(db.execute('SELECT enabled,person FROM settings').fetchone())
+                events = db.execute('SELECT count(*) FROM events').fetchone()[0]
+            request_mode = self.processing.configuration.get('llamaCppThinking', 'default') if self.configuration else 'unconfigured'
+            if request_mode not in ('default', 'off', 'unconfigured'):
+                request_mode = 'unknown'
+            return {'protocol': PROTOCOL, 'pid': __import__('os').getpid(), **config, 'engine': 'hindsight', 'version': VERSION,
+                    'requestMode': request_mode, 'requestModeSource': 'configured-memory-engine',
+                    'configurationGuards': {'capture': 1, 'processing': int(not self.processing_issue)},
+                    'configured': bool(self.configuration), 'available': bool(self.checked and not self.last_error and not self.processing_issue),
+                    **({'processingIssue': self.processing_issue} if self.processing_issue else {}),
+                    'events': events, 'pending': pending,
+                    'failures': processing['jobs'].get('stopped', 0), 'processing': processing,
+                    'message': ('Memory processing gateway port is in use. Capture and cached recall remain available; resolve the conflict and restart the memory companion.' if self.processing_issue else self.last_error) or ('Capture and cached recall remain available. Memory inference is limited to active tool windows; stopped jobs require review.' if processing['configured'] else 'Memory inference is stopped until the controlled engine is installed. Transcripts and cached memory are preserved.')}
         with self.connect() as db:
             config = dict(db.execute('SELECT enabled,person FROM settings').fetchone())
             banks = self.banks(db)
-            if action == 'describe':
-                processing = self.processing.status()
-                pending = processing['pendingRecords'] + processing['jobs'].get('pending', 0)
-                return {'protocol': PROTOCOL, 'pid': __import__('os').getpid(), **config, 'engine': 'hindsight', 'version': VERSION,
-                        'configured': bool(self.configuration), 'available': self.checked and not self.last_error,
-                        'events': db.execute('SELECT count(*) FROM events').fetchone()[0], 'pending': pending,
-                        'failures': processing['jobs'].get('stopped', 0), 'processing': processing,
-                        'message': self.last_error or ('Capture and cached recall remain available. Memory inference is limited to active tool windows; stopped jobs require review.' if processing['configured'] else 'Memory inference is stopped until the controlled engine is installed. Transcripts and cached memory are preserved.')}
             session = self.session(db, p.get('session'))
             scopes = self.scopes(session)
             if not config['enabled']:
@@ -124,13 +148,18 @@ class HindsightMemory(DualMemory):
             if action == 'recall':
                 for kind, bank in selected.items():
                     cached = json.loads(bank['snapshot']) if bank else {}
-                    result[kind] = {'summary': cached.get('summary', ''), 'items': cached.get('items', []), 'pages': cached.get('pages', []),
+                    original_pages = cached.get('pages', [])
+                    pages = [{**page, 'content': page_content(page.get('content'))} for page in original_pages]
+                    # Also protect snapshots saved before marker normalization,
+                    # without rewriting the cache or requesting engine work.
+                    summary = cached.get('summary', '') if pages == original_pages else '\n\n'.join('## ' + p['name'] + '\n' + p['content'] for p in pages if p['content'])
+                    result[kind] = {'summary': summary, 'items': cached.get('items', []), 'pages': pages,
                                     'through': bank['cursor'] if bank else 0, 'updated': bank['updated'] if bank else 0,
                                     'stale': cached.get('stale', True)}
                 rows = db.execute("SELECT * FROM events WHERE session=? AND role='user' ORDER BY seq DESC LIMIT 24", (session['id'],)).fetchall()
                 result['userReceipts'] = [{k: r[k] for k in ('seq', 'session', 'event_id', 'role', 'mode', 'status', 'content')} for r in reversed(rows)]
                 result['recent'] = []  # Assistant-heavy project excerpts are no longer injected.
-                result['unavailable'] = not self.configuration or bool(self.last_error)
+                result['unavailable'] = not self.configuration or bool(self.last_error) or bool(self.processing_issue)
                 return result
         query = p.get('query')
         if not isinstance(query, str) or not query.strip() or len(query) > 4096:
@@ -154,7 +183,7 @@ class HindsightMemory(DualMemory):
 
     def ensure(self, bank):
         route = self.route(bank['bank'])
-        if bank['ready'] != 2:
+        if bank['ready'] != PAGE_POLICY:
             self.api('PUT', route, {'name': 'Augmentor ' + bank['kind'], 'retain_mission': MISSIONS[bank['kind']],
                                    'reflect_mission': MISSIONS[bank['kind']], 'enable_observations': True})
             tree = self.api('GET', route + '/knowledge-base/tree')['roots']
@@ -167,7 +196,7 @@ class HindsightMemory(DualMemory):
                              {'trigger': {'refresh_after_consolidation': False}})
             names = {p['name'] for p in tree}
             for name, question in PAGES[bank['kind']]:
-                options = {'source_query': question + ' ' + COMMON, 'max_tokens': 768,
+                options = {'source_query': question + ' ' + PAGE_STYLE + COMMON, 'max_tokens': 768,
                     'trigger': {'mode': 'full', 'refresh_after_consolidation': False,
                     'min_refresh_interval_seconds': 120, 'fact_types': ['observation'], 'exclude_mental_models': True}}
                 if name not in names:
@@ -176,10 +205,12 @@ class HindsightMemory(DualMemory):
                     node = next(p for p in tree if p['name'] == name and p['kind'] == 'page')
                     self.api('PATCH', route + '/knowledge-base/nodes/' + quote(node['id'], safe=''), options)
             with self.connect() as db:
-                db.execute('UPDATE hindsight_banks SET ready=2 WHERE bank=?', (bank['bank'],))
+                db.execute('UPDATE hindsight_banks SET ready=? WHERE bank=?', (PAGE_POLICY, bank['bank']))
 
     def step(self):
         """Admission-controlled maintenance; archive/backlog is never implicit."""
+        if self.processing_issue:
+            return  # Capture/cached recall remain available; never use another owner's gateway.
         try:
             self.processing.step()
             self.last_error = None
@@ -193,7 +224,7 @@ class HindsightMemory(DualMemory):
             if node['kind'] != 'page':
                 continue
             page = self.api('GET', self.route(bank['bank'], 'knowledge-base/pages/' + quote(node['id'], safe='')))
-            pages.append({'id': node['id'], 'name': page['name'], 'content': ('' if page.get('body') == 'Generating content...' else (page.get('body') or ''))[:4000], 'stale': node.get('is_stale', True)})
+            pages.append({'id': node['id'], 'name': page['name'], 'content': page_content(page.get('body'))[:4000], 'stale': node.get('is_stale', True)})
         facts = self.api('POST', self.route(bank['bank'], 'memories/recall'), {
             'query': 'Communication preferences, explicit boundaries and relational feedback.' if bank['kind'] == 'relationship' else 'Current project facts, constraints, decisions and verified outcomes.',
             'types': ['world', 'observation'], 'prefer_observations': True, 'budget': 'low', 'max_tokens': 1200, 'trace': False})

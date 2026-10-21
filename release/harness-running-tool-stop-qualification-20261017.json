@@ -1,0 +1,166 @@
+{
+  "schema": "augmentor-harness-running-tool-stop-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Actual sealed MX Host/public Pi SDK/original GUI/Qwen running-tool Stop, cold paused reopen and explicit inspection; authored temporary project, headless Chromium; no runtime code or installed update",
+  "baseSourceRef": "d531ba6cac125203aed79eb8751e5a761ca782d3",
+  "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+  "releaseId": "20261017-071945-90183f89",
+  "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+  "runtimeCodeChanged": false,
+  "installedApplicationChanged": false,
+  "privateDriverSha256": "48bfde140f9c0ac5af7f8e499ba281cd6c6fe2a22f9b848a1c8ad6f803a33051",
+  "fixture": {
+    "ownerDataUsed": false,
+    "ownerConversationsCopied": 0,
+    "ownerProjectsTransferred": 0,
+    "command": "Append an authored start line, sleep 30 seconds, then append a completion line.",
+    "restrictedBy": "Test-only public SDK tool_call resource permits only that exact command and reads of its one journal; other proposals are refused. This is not a default product OS sandbox.",
+    "permissionPreset": "danger-full-access in the isolated profile, with exact test guard; no change to owner presets.",
+    "liveModel": "Existing configured local Qwen route; saved model settings unchanged",
+    "liveUserInputs": 2,
+    "capturedProviderRequests": 3,
+    "guiMutationCounts": {
+      "session.prompt": 2,
+      "session.updateQueue": 0,
+      "session.cancel": 1,
+      "session.continueQueue": 1
+    },
+    "authoredWorkspaceFiles": 1
+  },
+  "qualification": {
+    "runtimeAndQueuePassed": true,
+    "checks": {
+      "guiStopDuringNativeBash": true,
+      "sameBashAndSleepTerminal": true,
+      "partialWritePreservedOutcomeUnknown": true,
+      "onlyInitialModelRequestBeforeExplicitResume": true,
+      "coldOriginalGuiNoReplay": true,
+      "explicitResumeReadsPartialEffectOnceWithoutBashReplay": true,
+      "gracefulTestHostAndBrowserShutdown": true,
+      "ownerConfigurationUnchanged": true
+    },
+    "sameOwnedBashAndSleepObservedExecuting": true,
+    "sameProcessIdentityTerminalAfterStop": true,
+    "stopClickThroughObservedSettlementMs": 176,
+    "initialJournal": "started\n",
+    "finalJournal": "started\n",
+    "completionLineWritten": false,
+    "nativeBashToolResult": {
+      "isError": true,
+      "text": "Command aborted"
+    },
+    "persistedExecutionAction": {
+      "effect": "unknown",
+      "status": "unknown"
+    },
+    "nativeAbortedAssistantSaved": true,
+    "coldOriginalGuiNativeAndDisplayBytesExact": true,
+    "coldJournalAndQueueIdentityExact": true,
+    "coldReopenAdditionalProviderRequests": 0,
+    "explicitResumeReadCalls": 1,
+    "bashCallsTotal": 1,
+    "automaticBashReplay": false,
+    "providerRequestCaptureAudit": [
+      {
+        "requestOrdinal": 1,
+        "hashVerified": true,
+        "messages": 2,
+        "interruptedBoundaryNote": false,
+        "bashToolResults": 0,
+        "capturedRequestBoundary": "provider-payload-after-hooks"
+      },
+      {
+        "requestOrdinal": 2,
+        "hashVerified": true,
+        "messages": 5,
+        "interruptedBoundaryNote": true,
+        "bashToolResults": 1,
+        "capturedRequestBoundary": "provider-payload-after-hooks"
+      },
+      {
+        "requestOrdinal": 3,
+        "hashVerified": true,
+        "messages": 7,
+        "interruptedBoundaryNote": true,
+        "bashToolResults": 1,
+        "capturedRequestBoundary": "provider-payload-after-hooks"
+      }
+    ],
+    "pageErrors": 0,
+    "pageHttpFailures": 0,
+    "runtimeErrors": 0,
+    "stoppedAndResumedScreenshotsVisuallyInspected": true
+  },
+  "semanticAssessment": {
+    "runtimeAndQueueContractPassed": true,
+    "readMarkerAndNoReplayConfirmed": true,
+    "finalProseFullyAccurate": false,
+    "inaccuracy": "Final Qwen prose says sleep 30 did not run. Actual owned process capture proves sleep had started and was interrupted. The journal alone cannot establish subcommand execution.",
+    "additionalModelCallsToPolishAnswer": 0
+  },
+  "cleanup": {
+    "retiredCompanions": 1,
+    "retiredBrowserHelpers": 0,
+    "authoredProfilesAudited": 1,
+    "remainingMatchingActors": 0,
+    "scope": "Same UID, exact temporary HOME/home and shared-state; original Hosts/browser already closed, only known scoped companions eligible for pidfd retirement."
+  },
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      },
+      {
+        "releaseId": "20261017-071945-90183f89",
+        "applicationRef": "ee80c054444cdc46c78544cb7ef927f3e3ef283f",
+        "artifactSha256": "cf4d535a32def99758efcee6a609551e0ecaf9410d49f9cbf6a53971b307a77c",
+        "sealedInputsVerified": 24693
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-071945-90183f89",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 14,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "inheritedEvidenceNotRerun": {
+    "sourceOrdinarySealedRuntimeCohort": "229 Node / 41 Python in the interrupted-context deployment record",
+    "linuxCiCorrection": "133 targeted source cases in the Linux CI qualification record; normal d531ba6c hosted validation still in progress at this checkpoint"
+  },
+  "publication": {
+    "files": "Documentation and aggregate JSON only",
+    "skipInstruction": "[skip ci]",
+    "reason": "Preserve the already running normal validation of d531ba6c; no product/test/workflow modification in this evidence commit",
+    "officialScope": "https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs",
+    "newHeadOrWholeWorkflowAcceptanceClaimed": false
+  },
+  "limits": [
+    "One controlled native bash subprocess tree is qualified; arbitrary programs, ignored cancellation, external effects and all MCP transports are not covered by this live case.",
+    "Final Qwen prose is not fully accurate about whether the sleep subcommand started; process evidence, not model prose, establishes that fact.",
+    "The run uses headless original GUI events, not physical keyboard/menu/default-browser acceptance.",
+    "Owner migration pilot feedback still gates any further real project transfer.",
+    "Voice and later operating system rollout remain deferred."
+  ]
+}

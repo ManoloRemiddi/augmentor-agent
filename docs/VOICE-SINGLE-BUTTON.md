@@ -2,6 +2,13 @@
 
 # Resonant Voice single-button desktop interaction
 
+[Pi Native/Browser source binding](PI-VOICE.md#native-and-browser-controls--october-16-2026)
+now reuses these controls and the shared audio engine with explicit input mode,
+scoped opening/close identities and joined cleanup. Existing gestures, layout,
+DSH/Codex behavior and installed versions remain unchanged. Independent synthetic
+speech/PCM proofs pass; the real Pi companion, physical audio, installed adoption,
+separate Harness voice UI and later platform qualification remain open.
+
 September 24: Browser now presents the same native VoiceSession through a private
 host worker, with matching hold/lock/hands-free controls. See [shared surfaces](SHARED-SURFACES-2026-09-24.md) for scope, settings, tests and actual deployment.
 

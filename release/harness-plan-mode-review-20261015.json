@@ -1,0 +1,119 @@
+{
+  "schema": "augmentor-plan-mode-review-qualification/1",
+  "date": "2026-10-15",
+  "scope": "Separate private unselected Linux browser review; no installed desktop activation or public binary",
+  "releaseId": "20261015-130013-ae5dfe06",
+  "publicSourceRef": "d7e6318f0ca61f9ddab67152a2fb34138a4f25e6",
+  "testedApplicationRef": "bd03b155f8478419a50bfb84edd9ac0e7cc42d78",
+  "artifactSha256": "9f764f9b9e8f2f43d8d2d4f4a5225792cef9e2c74d9e9c2702b6d7d3cefacd39",
+  "inventoryEntries": 24395,
+  "productVersion": "0.2.13",
+  "piSdk": "1.1.0",
+  "precedingSealedReview": "20261015-103820-b0d02caa",
+  "sourceAndOrdinaryCheckpoint": "harness-plan-mode-qualification.json",
+  "sealedTargetCohort": {
+    "tests": 421,
+    "pass": 419,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 2,
+    "durationMs": 188894.385596,
+    "logSha256": "ed024c14dc8be07b3caffdf52f73622cf89b947edc7ed9313f073df2e1dde71b"
+  },
+  "testFiles": 86,
+  "harnessChromiumFiles": 47,
+  "workers": 2,
+  "existingDeadlinesChanged": false,
+  "separateSealedInteractionWaitCases": 5,
+  "noticeGuards": 7,
+  "parity": {
+    "releaseId": "20261015-130013-ae5dfe06",
+    "artifactSha256": "9f764f9b9e8f2f43d8d2d4f4a5225792cef9e2c74d9e9c2702b6d7d3cefacd39",
+    "inventoryEntries": 24395,
+    "compiledFiles": 1019,
+    "compiledBytesMatchSource": true,
+    "unchangedBaselineEntries": {
+      "node/": 1,
+      "node_modules/": 20702,
+      "components/": 37
+    },
+    "noticeFiles": 909,
+    "selectionUnchanged": true,
+    "ownerStarted": false
+  },
+  "profile": {
+    "defaultPreset": "read-only",
+    "keylessSearchEnabled": true,
+    "localPayloadCapture": true,
+    "modelDeclarationPreserved": true,
+    "contextWindow": 262144,
+    "maxTokens": 8192,
+    "credentialsImported": false,
+    "conversationsImported": false,
+    "memoryVoiceMcpConfigurationImported": false
+  },
+  "initialQa": {
+    "exactRuntimeAndProfile": true,
+    "product": "0.2.13",
+    "piSdk": "1.1.0",
+    "sessions": 0,
+    "activeTurns": 0,
+    "unsentDrafts": 0,
+    "readOnly": true,
+    "keylessSearch": true,
+    "localCapture": true,
+    "originalStartPage": true,
+    "planModeCapability": true,
+    "twoAugmentorMarks": true,
+    "composerDisabledUntilNewSession": true,
+    "settingsAvailable": true,
+    "browserErrors": 0,
+    "failedResponses": 0,
+    "noModelOrToolWorkSubmitted": true,
+    "accountControls": {
+      "registeredProviders": 9,
+      "storedCredentials": 0,
+      "originalConfirmationOpenedAndClosed": true,
+      "sdkLoginAdmitted": false
+    },
+    "lightAndDarkInspected": true,
+    "marks": "2 px animated transparent outline; black Light smoke, retained Dark flare",
+    "laterOwnerActivityInferred": false
+  },
+  "preservation": {
+    "observedAtUtc": "2026-10-15T11:06:48.351876+00:00",
+    "priorFourSealedInventoriesVerified": true,
+    "fivePreviousAndOneNewOwnerProcessesPresent": true,
+    "selectedConfigurationSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "canonicalPreexistingChanges": 38,
+    "reviewHttpStatus": 200,
+    "qwenCatalogHttpStatus": 200,
+    "modelSpeechGpuSettingsChanged": false,
+    "selectedActivation": false,
+    "publicBinaryPublished": false,
+    "ownerProfilesHistoryCredentialsRead": false
+  },
+  "hosted": {
+    "sourceRef": "d7e6318f0ca61f9ddab67152a2fb34138a4f25e6",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38724081341",
+    "linux": "passed",
+    "macos": "passed",
+    "windows": "failed during private companion preparation before plan-mode assertions",
+    "windowsSetupCorrection": "Use the existing product-lock Qt/shiboken/pywin32 subset; new hosted result pending",
+    "failureSoleCauseProven": false
+  },
+  "office": {
+    "defaultPinnedEngineUnchanged": true,
+    "experimentalThinLtoEngineIncluded": false,
+    "publicDistributionQualified": false
+  },
+  "remainingGates": [
+    "Physical MX feedback and actual live model/workflow acceptance",
+    "New-head Windows/hosted and platform release artifacts",
+    "Actual manual compaction while planning, hard-crash/write-fault and complete attachment combinations",
+    "Floating Native/browser-extension presentation, general late answers and reload draft persistence",
+    "Representative Office/security/source-notice distribution and full P0/P1 migration/DSH retirement"
+  ],
+  "fullMigrationQualified": false,
+  "promotionAllowed": false
+}

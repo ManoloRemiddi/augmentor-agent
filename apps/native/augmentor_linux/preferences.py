@@ -6,8 +6,8 @@ import os
 from pathlib import Path
 import tempfile
 
-DEFAULTS = {'ui_scale': 100, 'resonant_voice': True, 'voice_mode': 'manual', 'voice_pause_ms': 800, 'theme': 'dark', 'hue': 190, 'brightness': 0, 'accent_hue': 160,
-            'accent_brightness': 0, 'saturation': 48, 'opacity': 85, 'animation': True, 'effect': 'plasma', 'background': 'none', 'background_image': '', 'skin_name': 'Custom', 'custom_skins': [], 'flares': True, 'pinned': True, 'placement': {}, 'harness':'dsh','format_colours':{}}
+DEFAULTS = {'expand_thinking': True, 'ui_scale': 100, 'resonant_voice': True, 'voice_mode': 'manual', 'voice_pause_ms': 800, 'theme': 'dark', 'hue': 190, 'brightness': 0, 'accent_hue': 160,
+            'accent_brightness': 0, 'saturation': 48, 'opacity': 85, 'animation': True, 'effect': 'plasma', 'background': 'none', 'background_image': '', 'skin_name': 'Custom', 'custom_skins': [], 'flares': True, 'pinned': True, 'placement': {}, 'harness':'ah','format_colours':{}}
 
 
 class Preferences:
@@ -51,12 +51,15 @@ class Preferences:
         if self.values['voice_mode'] not in ('manual','hands-free'):self.values['voice_mode']='manual'
         self.values['voice_pause_ms']=max(400,min(2000,self.values['voice_pause_ms']))
         self.retired_harness = self.values['harness'] == 'opencode'
-        if self.values['harness'] not in ('pi','dsh','codex'):self.values['harness']='dsh'
+        if self.values['harness'] not in ('pi','ah','dsh','codex'):self.values['harness']='ah'
         if self.values['theme'] not in ('light', 'dark'):
             self.values['theme'] = 'dark'
         # Persist the first clone now, even if the user never opens Settings.
         # Future primary changes must not become secondary defaults.
         if fresh_secondary and persistent:self.save()
+
+        from .agent_entries import get
+        if (get() or {}).get('preset'):self.values['harness']='dsh'
 
     def save(self):
         if not self.persistent:

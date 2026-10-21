@@ -4,27 +4,31 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import {once} from 'node:events';
 import {mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, statSync, rmSync} from 'node:fs';
-import {join} from 'node:path';
+import {join,resolve} from 'node:path';
 import {tmpdir} from 'node:os';
-import {createAgentSession, ModelRuntime, DefaultResourceLoader, SettingsManager, SessionManager} from '@earendil-works/pi-coding-agent';
-import {DesktopSpecialist, boundedDesktopContext} from '../dist/runtime/src/desktop-specialist.js';
-import {DesktopEvidence} from '../dist/computer-use/src/evidence.js';
-import {DEFAULT_DESKTOP_LIMITS} from '../dist/computer-use/src/contracts.js';
+import {pathToFileURL} from 'node:url';
+const productRoot=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.'),sdkRoot=join(productRoot,'node_modules/@earendil-works/pi-coding-agent');
+// Resolve the package's published ESM root, including the selected staged SDK.
+const sdkImport=JSON.parse(readFileSync(join(sdkRoot,'package.json'),'utf8')).exports['.'].import;
+const {createAgentSession,ModelRuntime,DefaultResourceLoader,SettingsManager,SessionManager}=await import(pathToFileURL(resolve(sdkRoot,sdkImport)).href);
+const {DesktopSpecialist,boundedDesktopContext}=await import(pathToFileURL(join(productRoot,'dist/runtime/src/desktop-specialist.js')).href);
+const {DesktopEvidence}=await import(pathToFileURL(join(productRoot,'dist/computer-use/src/evidence.js')).href);
+const {DEFAULT_DESKTOP_LIMITS}=await import(pathToFileURL(join(productRoot,'dist/computer-use/src/contracts.js')).href);
 
 const png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aJCkAAAAASUVORK5CYII=';
 const brief = {task: 'Click the test button once.', successCriteria: 'The desktop displays DONE.', constraints: 'Do not open other applications.'};
 const finish = {name: 'desktop_finish', args: {status: 'completed', summary: 'Clicked the button.', verification: 'The new screenshot displays DONE.'}};
 const steps = [{name: 'desktop_connect'}, {name: 'desktop_snapshot'}, {name: 'desktop_action', args: {token: 'fresh-2', kind: 'click', x: 10, y: 10}}, {name: 'desktop_snapshot'}, finish];
-async function fixture(t, script = (_body, index) => steps[index], limits = {}) {
+async function fixture(t, script = (_body, index) => steps[index], limits = {}, providerName = 'fixture') {
   const root = mkdtempSync(join(tmpdir(), 'augmentor-specialist-'));
   const agentDir = join(root, 'agent'), cwd = join(root, 'work'), evidenceRoot = join(root, 'evidence');
   mkdirSync(agentDir); mkdirSync(cwd);
   writeFileSync(join(cwd, 'AGENTS.md'), 'UNRELATED_PROJECT_CONTEXT');
   writeFileSync(join(agentDir, 'APPEND_SYSTEM.md'), 'UNRELATED_GLOBAL_CONTEXT');
-  const requests = [], calls = [], progress = [];
+  const requests = [], calls = [], progress = [], requestHeaders=[];
   const server = http.createServer(async (req, res) => {
     let raw = ''; for await (const chunk of req) raw += chunk;
-    const body = JSON.parse(raw); requests.push(body);
+    const body = JSON.parse(raw); requests.push(body);requestHeaders.push(req.headers);
     const step = script(body, requests.length - 1);
     if (step?.hang) {res.writeHead(200, {'content-type': 'text/event-stream'}); res.flushHeaders(); return;}
     res.writeHead(200, {'content-type': 'text/event-stream'});
@@ -38,7 +42,7 @@ async function fixture(t, script = (_body, index) => steps[index], limits = {}) 
   });
   server.listen(0, '127.0.0.1'); await once(server, 'listening');
   t.after(() => {server.closeAllConnections(); server.close(); rmSync(root, {recursive: true, force: true});});
-  writeFileSync(join(agentDir, 'models.json'), JSON.stringify({providers: {fixture: {baseUrl: `http://127.0.0.1:${server.address().port}/v1`, api: 'openai-completions', apiKey: 'dummy', models: [{id: 'vision', name: 'Fixture vision', reasoning: false, input: ['text', 'image'], contextWindow: 32768, maxTokens: 2048}]}}}));
+  writeFileSync(join(agentDir, 'models.json'), JSON.stringify({providers: {[providerName]: {baseUrl: `http://127.0.0.1:${server.address().port}/v1`, api: 'openai-completions', apiKey: 'dummy', ...(providerName==='openrouter'?{headers:{'X-Owner-Header':'keep-explicit-header'}}:{}),models: [{id: 'vision', name: 'Fixture vision', reasoning: false, input: ['text', 'image'], contextWindow: 32768, maxTokens: 2048}]}}}));
   const modelRuntime = await ModelRuntime.create({authPath: join(agentDir, 'auth.json'), modelsPath: join(agentDir, 'models.json'), modelsStorePath: join(agentDir, 'store.json'), allowModelNetwork: false});
   const executor = {id: 'fixture-desktop', domainInstructions: 'Fixture desktop; one test button.',
     async control(method, owner, args) {
@@ -52,9 +56,15 @@ async function fixture(t, script = (_body, index) => steps[index], limits = {}) 
     async observe() {return {applications: ['Fixture']};},
   };
   const worker = new DesktopSpecialist(evidenceRoot, executor, {...DEFAULT_DESKTOP_LIMITS, ...limits});
-  const options = {owner: 'pi:test', cwd, agentDir, modelRuntime, model: modelRuntime.getModel('fixture', 'vision'), policy: 'danger-full-access', approve: async () => true, cancelInteractions() {}, progress: value => progress.push(value)};
-  return {root, agentDir, cwd, evidenceRoot, worker, options, requests, calls, progress, executor};
+  const options = {owner: 'pi:test', cwd, agentDir, modelRuntime, model: modelRuntime.getModel(providerName, 'vision'), policy: 'danger-full-access', approve: async () => true, cancelInteractions() {}, progress: value => progress.push(value)};
+  return {root, agentDir, cwd, evidenceRoot, worker, options, requests, requestHeaders, calls, progress, executor};
 }
+
+test('standalone specialist opt-out precedes its first request and preserves explicit headers',async t=>{
+  const inherited=process.env.PI_TELEMETRY;t.after(()=>{if(inherited===undefined)delete process.env.PI_TELEMETRY;else process.env.PI_TELEMETRY=inherited;});
+  const f=await fixture(t,undefined,{},'openrouter');process.env.PI_TELEMETRY='true';const result=await f.worker.run(f.options,brief);assert.equal(result.status,'completed');assert.equal(f.requests.length,5);
+  for(const headers of f.requestHeaders){for(const name of ['http-referer','x-openrouter-title','x-openrouter-categories'])assert.equal(headers[name],undefined,name);assert.equal(headers['x-owner-header'],'keep-explicit-header');}
+});
 
 test('isolated Pi worker verifies a task, persists evidence and preserves selected model', async t => {
   const f = await fixture(t);
@@ -76,6 +86,8 @@ test('isolated Pi worker verifies a task, persists evidence and preserves select
   const record = DesktopEvidence.read(f.evidenceRoot, 'pi:test', result.runId);
   assert.equal(record.events.filter(event => event.image).length, 2);
   assert.equal(statSync(join(f.evidenceRoot, result.runId, 'record.json')).mode & 0o777, 0o600);
+  const nativeRoot=join(f.evidenceRoot,result.runId,'native'),nativeFiles=readdirSync(nativeRoot).filter(name=>name.endsWith('.jsonl'));assert.equal(nativeFiles.length,1);
+  const nativeFile=join(nativeRoot,nativeFiles[0]);assert.equal(statSync(nativeFile).mode&0o777,0o600);assert(readFileSync(nativeFile,'utf8').includes(png),'Standalone SDK originals also survive disposal');
   assert.throws(() => DesktopEvidence.read(f.evidenceRoot, 'pi:other', result.runId), /another conversation/);
   assert.throws(() => DesktopEvidence.read(f.evidenceRoot, 'pi:test', '../../etc/passwd'), /Invalid/);
 });

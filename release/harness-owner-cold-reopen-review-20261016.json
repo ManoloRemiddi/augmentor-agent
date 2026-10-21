@@ -1,0 +1,71 @@
+{
+  "schema": "augmentor-harness-owner-cold-reopen-review/1",
+  "date": "2026-10-16",
+  "applicationRef": "1633e00f75f43f9efb88ec73bfd4ea8f3246a91d",
+  "releaseId": "20261016-220504-b91df2e4",
+  "artifactSha256": "2164f1ec0e5f5bc0aa8b100ad24d322ba1bf83d8829e7de7f5ee80a474aa92b1",
+  "sealedEntriesVerified": 24615,
+  "scope": "Actual owner main MX review cold reopen through the installed stable CLI; migration pilot remains running",
+  "procedure": {
+    "actualIdleAndDraftGuardPassed": true,
+    "protectedPreShutdownFilesBackedUp": 15,
+    "shutdownAcceptedByHost": true,
+    "originalProcessExitConfirmedByPidfd": true,
+    "coldLiveProfileCheckPassed": true,
+    "completeColdProfileBackupFilesVerified": 53,
+    "installedColdOpenerInvocations": 1,
+    "existingEnsureRuntimeLifecycleUsed": true,
+    "newOwnerBuildProfileAndPrivatePeerVerified": true,
+    "freshScopedLinkObtained": true,
+    "oldMainLinkRejectedWith401": true,
+    "freshMainLinkAcceptedWith200": true,
+    "concurrentWarmOpens": 2,
+    "warmOpensRetainSameNewOwner": true
+  },
+  "preservation": {
+    "mainNativeConversations": 1,
+    "pilotNativeConversations": 3,
+    "mainProtectedFiles": 15,
+    "pilotProtectedFiles": 21,
+    "unchangedProtectedFiles": 35,
+    "nativeFileWithVerifiedAppendedConnectionMetadata": 1,
+    "shutdownConnectionMetadataEntries": 4,
+    "reopenedConnectionMetadataEntries": 18,
+    "allOriginalAuthoritativePrefixesExact": true,
+    "coldBackupMatchesPostShutdownFiles": true,
+    "promptLibraryEntries": 12,
+    "capturedMemoryRecords": 19,
+    "sharedPromptMemoryEligibilityJobsSettingsAndEngineConfigurationRowsExact": true,
+    "pilotProcessUnchanged": true,
+    "registryRevision": 6,
+    "registryUnchanged": true,
+    "productionAndEarlierPreviewSelectionUnchanged": true
+  },
+  "reopenedReadiness": {
+    "keylessSearchOnAndApplied": true,
+    "wikiOnAndApplied": true,
+    "wikiSkills": 9,
+    "savedMcpServers": 5,
+    "enabledMcpServers": 2,
+    "playwrightDiscoveredTools": 24,
+    "blenderDiscoveredTools": 26,
+    "comfyAndUnrealRemainOff": true,
+    "actualOriginalPluginsGuiPass": true,
+    "guiConsoleErrors": 0,
+    "guiHttpFailures": 0,
+    "guiSettingsOrAgentActions": 0,
+    "processTelemetryEnvironmentOff": true,
+    "processVersionCheckEnvironmentOff": true
+  },
+  "verificationCorrections": [
+    "The initial byte-exact shutdown comparison detected four legitimate MCP close observations. Read-only reconciliation validated exact original prefixes, existing connection identities, sequence increments, permitted close event types and absence of agent tool calls before continuing from the confirmed cold state.",
+    "The first post-start verifier expected Wiki enabled at the response root instead of value.enabled. Startup had succeeded once; read-only reconciliation verified the existing new owner and stored its fresh private link without repeating startup."
+  ],
+  "notClaimed": [
+    "Physical application-menu click or default-browser acceptance",
+    "Model turn or user project tool execution after this restart",
+    "Full network egress or provider reliability qualification",
+    "Owner migration-pilot acceptance or additional real project transfer",
+    "New source/runtime build, production activation, public binary, voice or later OS rollout"
+  ]
+}

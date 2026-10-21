@@ -1,0 +1,364 @@
+{
+  "schema": "augmentor-office-thin-engine-qualification/1",
+  "date": "2026-10-15",
+  "scope": "Linux x64 private diagnostic; source compile/package and six basic authored output comparisons, not default engine or public distribution approval",
+  "sourceBaseRef": "f3b2dd79b772c106c296f320b1fad958a5232f4e",
+  "runtimeImplementationRef": "ea3775bff3d520cfd4d6cba70ef946120beaeb32",
+  "sourceInputs": {
+    "prepare-thin-candidate.mjs": "52ebb7857d1917bee65ef3786ad12a06b9c405ee0c0351e3580493f6b34a3d07",
+    "compare-thin-candidate.mjs": "4f31a1dca2e9b9f08da8ddf30b400ffad3d056b873abe0313a6aec4b7acb6722",
+    "source-entry-probe.mjs": "1406455d526a84cf6e79c1abfe15167c25e2ef4e218a7d8c2f823bce6959c41a",
+    "run-thin-lto.sh": "144fd69a22c471f77054fc843f8b4ab49c15dcb2d5998aa0ed80dd7f7c0896e8",
+    "thin-linker-resources.patch": "f5f08e29918a8ad221316a918fa38f7de5436444399968a089155c88de22b653",
+    "environment.json": "8677e7b7fd27e4e066d0007a74ad50e161f770050b0fa3d2d022347b1cac9e5f"
+  },
+  "build": {
+    "engineVersion": "26.8.0.3",
+    "coreCommit": "bce0998afefdbc355585ca324285661a2170ba77",
+    "emsdkCommit": "5eb0bde7585670252e8ba05e9d361627bffd08b5",
+    "emscriptenVersion": "4.0.10",
+    "supplierBuildId": "f9aa16d07e9555626c15d2b49d59468fcba25ca27d97fd5e583ffc2a7c8d90cb",
+    "builderImageId": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924",
+    "startedAt": "2026-10-15T04:20:28.788644779Z",
+    "finishedAt": "2026-10-15T09:01:32.368319796Z",
+    "terminalExitCode": 0,
+    "oomKilled": false,
+    "compileComplete": true,
+    "packageComplete": true,
+    "memoryPeakBytes": 6951043072,
+    "memoryLimitBytes": 8589934592,
+    "swapMaxBytes": 0,
+    "nanoCpus": 2000000000,
+    "jobs": 1,
+    "nice": 15,
+    "network": "none",
+    "resourceProfileSha256": "97f01a1932f59d91bd78aa491367980d79102ba58751e45c101e179abd5166b6",
+    "supplierIdentityCapturesCompilerOverride": false,
+    "compilerControls": {
+      "EMCC_CORES": "1",
+      "BINARYEN_CORES": "1",
+      "EMCC_CFLAGS": "-flto=thin",
+      "CCACHE_DIR": "/office/thin-compiler-cache"
+    },
+    "ordinaryOzOptimizationRetained": true,
+    "runtimeMemoryThreadOrFeatureFlagsChanged": false,
+    "oldCoreObjectsReused": false,
+    "sourceDiffSha256SupplierTrimmedStdout": "7546d1b1b58f2b6eb96927a10eddef7336e1c0d53e4e4a586a98efcab9889897",
+    "rawSourceDiffSha256": "a3dcf71ba540d66f27dac80827fcad500af0f6de8c532ff33d949b5fe958ba2a",
+    "assets": {
+      "manifest.json": {
+        "bytes": 71547,
+        "sha256": "7c8119b974c83b11661bdc90bca83a1d3f8dd1d868f0a3db13395fb791696395"
+      },
+      "soffice.cjs": {
+        "bytes": 769334,
+        "sha256": "e53564a555f65009b6ab249fd05b75efac069003ac2e9bd93ee243b008f4c933"
+      },
+      "soffice.data": {
+        "bytes": 21084467,
+        "sha256": "3a0bd5f8f3410447eab8b73f2efc37a463d02f0b60bcd11638c5174ce6063736"
+      },
+      "soffice.data.js.metadata": {
+        "bytes": 142185,
+        "sha256": "2a311a0adf50efcc6328d6f59502a079e1d62d50a61c4e940048c724964c3b2b"
+      },
+      "soffice.wasm": {
+        "bytes": 131888969,
+        "sha256": "b6459203d1b9ca41ddf5945d6bfa02e5f1b9a9f8f33a438a9fd32b9a150c4c1d"
+      }
+    }
+  },
+  "candidate": {
+    "schema": "augmentor-thin-office-candidate/2",
+    "entryVersion": "0.1.3-augmentor.thin.1",
+    "engineName": "@augmentor/office-engine-wasm",
+    "engineVersion": "0.1.5-augmentor.thin.1",
+    "coreCommit": "bce0998afefdbc355585ca324285661a2170ba77",
+    "supplierBuildId": "f9aa16d07e9555626c15d2b49d59468fcba25ca27d97fd5e583ffc2a7c8d90cb",
+    "ownResourceProfileSha256": "97f01a1932f59d91bd78aa491367980d79102ba58751e45c101e179abd5166b6",
+    "sourceDiffSha256": "7546d1b1b58f2b6eb96927a10eddef7336e1c0d53e4e4a586a98efcab9889897",
+    "rawSourceDiffSha256": "a3dcf71ba540d66f27dac80827fcad500af0f6de8c532ff33d949b5fe958ba2a",
+    "engineAssets": {
+      "soffice.cjs": "e53564a555f65009b6ab249fd05b75efac069003ac2e9bd93ee243b008f4c933",
+      "soffice.wasm": "b6459203d1b9ca41ddf5945d6bfa02e5f1b9a9f8f33a438a9fd32b9a150c4c1d",
+      "soffice.data": "3a0bd5f8f3410447eab8b73f2efc37a463d02f0b60bcd11638c5174ce6063736",
+      "soffice.data.js.metadata": "2a311a0adf50efcc6328d6f59502a079e1d62d50a61c4e940048c724964c3b2b"
+    },
+    "originalEntryEngineTsSha256": "79f72e03aae27a6f06d31a04eba1d824e782175f6c9a6234bdceda2a057d2915",
+    "adaptedEntryEngineTsSha256": "69b6e61c0e0ed5210650c8837916ec09818fe2e84dd5be7fbf523d90e5731831",
+    "sourceEntryFiles": 32,
+    "sourceRecipeFiles": 39,
+    "additionalRecipePatches": 1,
+    "toolchain": {
+      "node": "v24.19.0",
+      "typescript": "5.9.3",
+      "esbuild": "0.28.2"
+    },
+    "conversionOrFontSourceChanged": false,
+    "productionOrInstalledArtifactsChanged": false,
+    "defaultDependenciesChanged": false,
+    "publicRedistributionQualified": false
+  },
+  "comparison": {
+    "schema": "augmentor-thin-office-authored-parity/1",
+    "thinEntry": "0.1.3-augmentor.thin.1",
+    "thinEngine": "@augmentor/office-engine-wasm@0.1.5-augmentor.thin.1",
+    "baselineEntry": "0.1.3-augmentor.1",
+    "baselineEngine": "@deepseek-ai/libreoffice-kit-wasm@0.1.5",
+    "coreCommit": "bce0998afefdbc355585ca324285661a2170ba77",
+    "originalProvider": true,
+    "formats": [
+      {
+        "extension": "doc",
+        "inputSha256": "39b5b6b7548d4968ae198703f6ceb85f10fe0af6e475de5a6487a304ec7a4772",
+        "pages": 2,
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "sourceBytesPreserved": true,
+        "cachedResultOwned": true,
+        "thinPdfSha256": "0faed7ab79d85485df00067a1fcca07ed7c7b388cbb0a4b72507a461f77b7f68",
+        "baselinePdfSha256": "8281473a294898e1c23b84200508ed3c528202c4c2a62cff7fc8a07b7edb3d72"
+      },
+      {
+        "extension": "docx",
+        "inputSha256": "dcfedeb2f1a15823627e868c74ae756a6233f09005e660f33aec23cd685d857b",
+        "pages": 2,
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "sourceBytesPreserved": true,
+        "cachedResultOwned": true,
+        "thinPdfSha256": "388339d10b180e5b8077ddc91235684bbfb73be61aff3f45ab05417723f63b1e",
+        "baselinePdfSha256": "9c47fcc6c076740ba398e8aaf895448e9159d4aa1bfc78792c6298d927999e2e"
+      },
+      {
+        "extension": "xls",
+        "inputSha256": "7ee6f2059bee73dfcee92eb1018ea0a89fcb66e03134cb460ca7368467a35941",
+        "pages": 1,
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "sourceBytesPreserved": true,
+        "cachedResultOwned": true,
+        "thinPdfSha256": "2fbef7be8ec2ad876aeb58ad46ef42bd5d10728f0120cf0906d68749041fba92",
+        "baselinePdfSha256": "735f2bee4219870fd60bc3b75960281de789f9bd1bc77d8133774272c734ae41"
+      },
+      {
+        "extension": "xlsx",
+        "inputSha256": "94bfaacc4f6712d8065aa4584aedd3de3fb2a4e3ec0e0d7c18bd4db05e67738c",
+        "pages": 1,
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "sourceBytesPreserved": true,
+        "cachedResultOwned": true,
+        "thinPdfSha256": "5d12ebadde992f2bb9a7aeee61ac6d6763bdcca8c8518ea577cde93bb289c79a",
+        "baselinePdfSha256": "86dafbb2afff57522d36bca5cba42ad0084fd3ecd2bcb76a73ca764623bd5b78"
+      },
+      {
+        "extension": "ppt",
+        "inputSha256": "3f37523494d28b21f9e91c3bb25cbe1330a2df4be1456d78fbe53394d9b7fddb",
+        "pages": 2,
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "sourceBytesPreserved": true,
+        "cachedResultOwned": true,
+        "thinPdfSha256": "bc187d16047d3607a9a701695f8b4dacaac2a0c9e9564406b3d92b7cad90e4bd",
+        "baselinePdfSha256": "ed823e9c66a33ec537c1c886b4452bae29e93fc6215d7922dc85690ee356f0ad"
+      },
+      {
+        "extension": "pptx",
+        "inputSha256": "24be360fdb6a095e1b2da7c25b0f082bfb350568d6e9651889103cf0313b0ef9",
+        "pages": 2,
+        "identicalText": true,
+        "identicalMissingFonts": true,
+        "sourceBytesPreserved": true,
+        "cachedResultOwned": true,
+        "thinPdfSha256": "ab4d8f88aee6370679b3fe3502cd8fed24c4a01c65712461c9c8887aae641f8e",
+        "baselinePdfSha256": "c808b70228fe76680429312c8924dbb8375b8903c0347f04844da4d7c41aecc2"
+      }
+    ],
+    "rasterDpi": 96,
+    "rasters": [
+      {
+        "name": "doc-1.png",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "rawPixelSha256": "325455836a2ba01e216e5d3bd993787fc82b22fb9c960fd3a543843331ae1157",
+        "identical": true
+      },
+      {
+        "name": "doc-2.png",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "rawPixelSha256": "47f267cebbb873b7beb3a68d4820008102c73a0130f28ce14b79b4eec9310502",
+        "identical": true
+      },
+      {
+        "name": "docx-1.png",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "rawPixelSha256": "325455836a2ba01e216e5d3bd993787fc82b22fb9c960fd3a543843331ae1157",
+        "identical": true
+      },
+      {
+        "name": "docx-2.png",
+        "width": 794,
+        "height": 1123,
+        "channels": 3,
+        "rawPixelSha256": "47f267cebbb873b7beb3a68d4820008102c73a0130f28ce14b79b4eec9310502",
+        "identical": true
+      },
+      {
+        "name": "xls-1.png",
+        "width": 816,
+        "height": 1056,
+        "channels": 3,
+        "rawPixelSha256": "553faea96c13e1865e68bd4d23016139ed1abca93e4ec64816556d9a20a1bca1",
+        "identical": true
+      },
+      {
+        "name": "xlsx-1.png",
+        "width": 816,
+        "height": 1056,
+        "channels": 3,
+        "rawPixelSha256": "a0a46e80d5fae0c06a36a8db5d295da37ffc04a7e8db0197b9df0219f9701c06",
+        "identical": true
+      },
+      {
+        "name": "ppt-1.png",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "rawPixelSha256": "9869614db20e2cc5df59e9db04907ffdbe2e8a7b98ed03f249352775e16e5065",
+        "identical": true
+      },
+      {
+        "name": "ppt-2.png",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "rawPixelSha256": "6d7466d2eb4218fe093146412ff54192e93d796a1f275fb7463c10ae87d988f1",
+        "identical": true
+      },
+      {
+        "name": "pptx-1.png",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "rawPixelSha256": "247e5b567696786db167b1f7794c2fc6719d449ae1fb17b853826bff8d2c8f3a",
+        "identical": true
+      },
+      {
+        "name": "pptx-2.png",
+        "width": 1059,
+        "height": 596,
+        "channels": 3,
+        "rawPixelSha256": "ef58a97b517bb9c47f8338a621c2110e384e9b5e21ab64c3e39a112e035059dd",
+        "identical": true
+      }
+    ],
+    "scope": "Six independently authored basic fixtures; equal pixels are not representative document, font, performance, security, platform or distribution acceptance.",
+    "productionOrInstalledArtifactsChanged": false,
+    "publicRedistributionQualified": false
+  },
+  "refusalChecks": [
+    {
+      "case": "prepare-existing",
+      "refused": true,
+      "beforeOutputWrites": true
+    },
+    {
+      "case": "prepare-sealed",
+      "refused": true,
+      "beforeOutputWrites": true
+    },
+    {
+      "case": "prepare-outside",
+      "refused": true,
+      "beforeOutputWrites": true
+    },
+    {
+      "case": "compare-existing",
+      "refused": true,
+      "beforeOutputWrites": true
+    },
+    {
+      "case": "compare-sealed",
+      "refused": true,
+      "beforeOutputWrites": true
+    },
+    {
+      "case": "probe-no-implicit-thin",
+      "refused": true,
+      "beforeOutputWrites": true
+    }
+  ],
+  "packagingAndSourceBoundary": {
+    "realSupplierPackagingCasesPassed": 9,
+    "privateSourceBoundaryCasesPassed": 2,
+    "publicEngineGateStillRefuses": true
+  },
+  "retainedFailures": [
+    {
+      "phase": "private candidate preparation",
+      "reason": "raw Core diff stdout compared with supplier trimmed-stdout hash; corrected without changing Core source"
+    },
+    {
+      "phase": "private timing preparation",
+      "reason": "timing executable unavailable; no conversion was started; successful invocation uses Python resource observation"
+    },
+    {
+      "phase": "engine build",
+      "reason": "preceding full-LTO OOMs and both failed ThinLTO preparations remain recorded in environment.json"
+    }
+  ],
+  "visualReview": {
+    "pagesInspected": 10,
+    "dpi": 96,
+    "publicDriverPixelsMatchInspectedPrototype": true
+  },
+  "qualificationLimits": [
+    "Only six independently authored basic documents; representative complex documents and complete font coverage remain.",
+    "One short diagnostic is not resource or performance acceptance.",
+    "Public corresponding-source, external-source archive, third-party notices and distribution closure remain unqualified.",
+    "Candidate original-GUI integration, physical MX acceptance, installed adoption and rollback remain unqualified.",
+    "macOS, Windows, other Linux architectures and distributions require their separate qualification."
+  ],
+  "defaultDependenciesChanged": false,
+  "productionOrInstalledArtifactsChanged": false,
+  "ownerConfigurationOrHistoryUsed": false,
+  "publicRedistributionQualified": false,
+  "fullMigrationQualified": false,
+  "preservation": {
+    "observedAtUtc": "2026-10-15T09:27:00.317200+00:00",
+    "sealedInventoriesVerified": [
+      {
+        "sha256": "8ae847bddca7523f405a3a920202161c90880b263018dfe508c82b8e26e76422",
+        "entries": 24307,
+        "verified": true
+      },
+      {
+        "sha256": "284285891fa618ff29cff2922f5689f0d1b892fa288f9ef451e6c4637c8b42ff",
+        "entries": 24305,
+        "verified": true
+      },
+      {
+        "sha256": "f55e256e80c1c5345b17a65b24e3d01694fdbc99799e4325dd558173e3357e35",
+        "entries": 24288,
+        "verified": true
+      },
+      {
+        "sha256": "deed88f71858ed773b5c8dbc026f4268e9c6204edfc32de312f1f769a58079fd",
+        "entries": 24381,
+        "verified": true
+      }
+    ],
+    "selectionUnchanged": true,
+    "fiveReviewProcessesStillPresent": true,
+    "canonicalPreexistingChanges": 38,
+    "defaultCompiledFilesMatchOrdinary": 1013,
+    "qwenCatalogHttpStatus": 200,
+    "modelSpeechGpuSettingsChanged": false
+  }
+}

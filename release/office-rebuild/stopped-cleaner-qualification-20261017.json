@@ -1,0 +1,141 @@
+{
+  "schema": "augmentor-office-stopped-cleaner-qualification/1",
+  "date": "2026-10-17",
+  "sourceEvidenceBaseRef": "1573345e24b44721e39a7cc7846c0853e25a79a1",
+  "sourceFilesSha256": {
+    "packages/runtime/src/office-scratch-linux.py": "95a2eb2119d8fed7a22fcf9475ac4806626e81a573ebded86f23dacbaaa7af27",
+    "tests/fixtures/office-journal-owner.mjs": "0338513b3abf493f5d6eaa6aeaa4117435817c34e54ec6853212be663547cbe4",
+    "tests/office-scratch-recovery.test.mjs": "7515dd0c29ef7840f3be34160a890175da587b9804917ecd543f5a61f0ed16d3",
+    "tests/README.md": "cbcdc9f052642fa0e4f6e7a6f52cf1874a8486f3f3a5790e9489aa6a0970ec35"
+  },
+  "oldRuntimeNegative": {
+    "pass": 0,
+    "fail": 1,
+    "cause": "Known SIGSTOPped admitted cleaner remains stopped after exact owner death; test cleanup subsequently resumes only its own fixture",
+    "testReadiness": "Post-admission; not a pre-hook or power-loss injection"
+  },
+  "correction": {
+    "hook": "PR_SET_PDEATHSIG=SIGCONT; PR_GET_PDEATHSIG readback before allocation/readiness; existing pidfd and parent race checks retained",
+    "authority": "Exact root identity and renderer lease still gate removal; wake does not grant authority or kill the cleanup owner",
+    "threadScope": "Linux signal follows spawning thread, not necessarily last process thread"
+  },
+  "newCases": [
+    "Managed stopped cleaner and owner death",
+    "Transient stopped cleaner and owner death",
+    "Owner death resumes cleaner while separate live renderer lease preserves exact private bytes until confirmed release",
+    "Admitted real-entry conversion with cleaner/supervisor/renderer stopped before owner death"
+  ],
+  "source": {
+    "nodePass": 304,
+    "nodeFail": 0,
+    "nodeSkip": 0,
+    "nodeFiles": 45,
+    "chromiumFiles": 19,
+    "workers": 2,
+    "pythonPass": 43,
+    "actualNativePass": 24,
+    "actualNativeSkip": 0,
+    "checkAndBuild": "pass"
+  },
+  "initialBroaderFailureRetained": {
+    "nodePass": 298,
+    "nodeFail": 6,
+    "nodeSkip": 0,
+    "causes": [
+      "Default Python lacks PySide6.QtTest in four actual Qt subtests; enclosing suite also fails",
+      "New active-renderer test observed R immediately after SIGSTOP delivery, before kernel stopped state"
+    ],
+    "correction": "Use existing qualified AUGMENTOR_PYTHON; wait for independently read kernel T state, preserving fault assertion/bound and no skip"
+  },
+  "container": {
+    "pass": 24,
+    "fail": 0,
+    "skip": 2,
+    "skipReason": "Actual managed user-scope fixtures require MX user manager; included in host source304",
+    "memoryBytes": 3221225472,
+    "swapBytes": 0,
+    "cpus": 1,
+    "pids": 128,
+    "init": true,
+    "readOnly": true,
+    "network": "none",
+    "oomKilled": false,
+    "exitCode": 0,
+    "image": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924",
+    "testedHelperSha256": "2d81fabb172996ecf4e8bc7ab2bda74c74482c47c26ff9f38da001a575ac3e67",
+    "finalHelperDifference": "Module docstring only; executable AST independently identical"
+  },
+  "thinGui": {
+    "pass": 1,
+    "fail": 0,
+    "entryVersion": "0.1.3-augmentor.thin.1",
+    "engineFilesVerified": 53,
+    "entryReceiptFilesVerified": 81,
+    "assertions": "Unchanged actual managed Host/original GUI and existing deadlines",
+    "priorDiagnosticNotThinEvidence": "Initial derivative accidentally overwrote Thin entry with default entry; passing default test retained, not used as Thin proof",
+    "engineRebuilds": 0
+  },
+  "logSha256": {
+    "harness-office-stopped-cleaner-negative-20261017.log": "91a51abe4dfaf284e1e82b1728981277a09ca44202b11861dd118c9db5289503",
+    "harness-office-stopped-cleaner-focused-20261017.log": "c2e23452761bd890a859737ad7fd1ff7e993887286ca50c9c64b41a587347703",
+    "harness-office-stopped-cleaner-source-node-20261017.log": "caaf578cd1bf1e853ff68d27878fe662062bef97d8cc2829676f19210bd32c6b",
+    "harness-office-stopped-cleaner-qualified-node-20261017.log": "ecf72345a1a7d691215cd9d6a756ee469f15d32433bdb011331ec998ba6f2ea3",
+    "harness-office-stopped-cleaner-native-actual-20261017.log": "3b2a4145aa0a411222c365ec3ebe32a263802b87c866b14b0bc563a7765c3475",
+    "harness-office-stopped-cleaner-python-20261017.log": "73eaddadae6f66b91cefccc45e4548cbd2e422be24e295887364e33585552a9e",
+    "harness-office-stopped-cleaner-container-20261017.log": "257a41bf38ab0e396dcded373950b25803316bad2142a538456734df5f645512",
+    "harness-office-stopped-cleaner-thin-qualified-20261017.log": "6487440b2d6d5c62f67ec7266c7fc1ada4b4beca51feebfc11bee2ea83997075",
+    "harness-office-stopped-cleaner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "ownerUpdates": 0,
+  "ownerInference": 0,
+  "ownerTransfers": 0,
+  "publicRedistributionQualified": false,
+  "remaining": [
+    "Fresh ordinary/exact sealed/explicit managed backend selection and installed adoption/rollback for changed helper",
+    "Pre-hook/bootstrap and uncommitted publication/allocation windows",
+    "Total cleanup-owner loss, power-loss/filesystem durability; existing journal cold recovery separate",
+    "Wider corpus/fonts/macro/security and full source/rebuild/third-party/public gates",
+    "Fresh hosted CI; prior1417db62 LinuxSDK passes, SDK matrix fails Mac/Windowscancelled, Debian39025006420 remains live at latest snapshot",
+    "Owner pilot feedback gates further transfers; excluded owner projects stay in DSH; voice/later OS deferred"
+  ]
+}

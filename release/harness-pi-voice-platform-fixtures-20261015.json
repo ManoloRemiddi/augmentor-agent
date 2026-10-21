@@ -1,0 +1,47 @@
+{
+  "schema": "augmentor-harness-pi-voice-platform-fixtures/1",
+  "observedAtUtc": "2026-10-15T21:00:44.801149+00:00",
+  "fixtureSourceRef": "760dd24235c5c2a6af86b32c3e3be1939e091b1b",
+  "runtimeApplicationRef": "999c1f5fb09b86da3f4ef66dc13be295f3a63a81",
+  "runtimeOrGuardCodeChanged": false,
+  "precedingRun": {
+    "id": 38804829700,
+    "head": "17b6f3f2a04ef8fa003318b3e7a3b45de2b8949a",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38804829700",
+    "linux": "passed",
+    "macosVoiceStep": {
+      "tests": 37,
+      "pass": 36,
+      "fail": 1,
+      "skipped": 0,
+      "actualHostCasesPassed": 12,
+      "failure": "Preview expected a temporary-directory alias instead of its canonical absolute namespace."
+    },
+    "windowsVoiceStep": {
+      "tests": 37,
+      "pass": 24,
+      "fail": 13,
+      "skipped": 0,
+      "actualHostCasesStarted": 0,
+      "failures": [
+        "Preview expected an 8.3 temporary-directory alias instead of the canonical path.",
+        "Twelve speech fixtures pre-created directories outside the Windows private creator; strict owner-ACL verification refused them before Host startup."
+      ]
+    }
+  },
+  "corrections": [
+    "Keep alias cwd/input coverage but compare absolutePath with realpath of the actual source file.",
+    "Create a fresh unpredictable Windows speech directory through the existing atomic private-directory helper; do not repair or weaken ACL checks."
+  ],
+  "localLinux": {
+    "command": "node --test tests/pi-voice.test.mjs tests/pi-voice-host.test.mjs tests/pi-upload-maintenance.test.mjs tests/harness-file-preview.test.mjs tests/harness-file-references.test.mjs",
+    "tests": 37,
+    "pass": 37,
+    "fail": 0,
+    "skipped": 0
+  },
+  "deadlinesRaised": false,
+  "newSkips": false,
+  "ownerOrInstalledOrServiceChanges": false,
+  "macosAndWindowsCorrectedHostedStatus": "pending; no claim that the original Windows export settlement failure is resolved"
+}

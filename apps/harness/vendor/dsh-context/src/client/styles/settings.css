@@ -1,0 +1,18 @@
+/* The Plugins page owns the card chrome; the rows organize into titled groups. Group heads
+   mirror the harness's Plugins-page .sectionTitle; separators reuse its row-separator token. */
+.lc-settings-prefs { padding: 4px 0; }
+.lc-settings-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
+/* Weight pinned so the title's 500 keeps its one-step lead over rows in any inherited context. */
+.lc-settings-label { flex: 1; min-width: 0; font-size: 14px; font-weight: 400; color: var(--dsw-alias-label-primary); }
+.lc-settings-select { display: inline-flex; align-items: center; gap: 12px; height: 36px; padding: 0 14px; border: none; border-radius: 18px; background: var(--dsw-alias-bg-module-platform); font: inherit; font-size: 14px; line-height: 22px; color: var(--dsw-alias-label-primary); cursor: pointer; transition: background-color var(--ds-transition-duration, 0.2s) var(--ds-ease-in-out, ease-in-out); }
+.lc-settings-note { color: var(--dsw-alias-label-tertiary); font-size: 12px; line-height: 1.5; margin: 12px 0 4px; }
+/* The in-group hint rides the group title's spacing; the top margin is the read-only notice's. */
+.lc-settings-group .lc-settings-note { margin: 4px 0 0; }
+.lc-settings-group + .lc-settings-group { margin-top: 12px; padding-top: 12px; border-top: 0.5px solid var(--dsw-alias-border-l2); }
+.lc-settings-group-title { font-size: 14px; font-weight: 500; line-height: 20px; color: var(--dsw-alias-label-primary); }
+/* The text rows fold the label above the control (a wide row would crush under pane-width pressure);
+   control styling mirrors the harness's own ConfigField textarea tokens. */
+.lc-settings-textrow { flex-direction: column; align-items: stretch; }
+.lc-settings-textarea { width: 100%; box-sizing: border-box; padding: 6px 12px; border: 0.5px solid var(--dsw-alias-border-l4); border-radius: var(--dsw-radius-md); background: var(--dsw-alias-bg-layer-3); color: var(--dsw-alias-label-primary); font: inherit; font-size: 13px; line-height: 1.5; resize: vertical; }
+.lc-settings-textarea:disabled { opacity: 0.5; cursor: default; }
+.lc-settings-textarea::placeholder { color: var(--dsw-alias-label-tertiary); }

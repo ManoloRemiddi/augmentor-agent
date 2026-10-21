@@ -1,0 +1,53 @@
+{
+  "schema": "augmentor-harness-preview-binding/1",
+  "date": "2026-10-17",
+  "scope": "Source-only protected preview launch binding and reviewed stable Home helper publication",
+  "qualification": {
+    "pythonPass": 51,
+    "previewCases": 7,
+    "reviewCases": 5,
+    "sharedLaunchCases": 16,
+    "publicationCases": 23,
+    "fail": 0,
+    "skip": 0,
+    "managedWorkspace": true,
+    "reserveGiB": 64,
+    "hostReadOnly": true,
+    "networkIsolated": true,
+    "authoredProfilesOnly": true,
+    "publicationBackendRepliesSynthetic": true,
+    "ownerModelRequests": 0,
+    "fullAppCopiesCreated": 0,
+    "newInstalledArtifacts": 0
+  },
+  "behavior": [
+    "Apply only an explicit selected sharedProfile while preserving all other preview paths and provider routing",
+    "Verify every immutable deployment field and complete application inventory",
+    "Acquire managed reader and refuse durable maintenance before any preview configuration, status, Native or Browser start",
+    "Require a protected sibling or stable installed shared-launch helper",
+    "Permit exact reviewed Home helper publication and pre-finalization reverse"
+  ],
+  "installedOwnerAppChanged": false,
+  "remaining": [
+    "Qualify and pre-adopt exact protected launcher/bootstrap files before the real cold cut",
+    "Bind the approved shared-data merge without replacing mixed application storage",
+    "Qualify one combined immutable matching artifact and loaded Browser",
+    "Actual cold backup, matching client adoption and owner continuation",
+    "Pilot feedback before any further project transfers"
+  ],
+  "privateEvidenceSha256": {
+    "harness-preview-binding-final-20261017.log": "d89bbca22da333377faf939bf46217141f68705b786e3cc0506c664d62685f1d"
+  },
+  "hostedQualificationPending": false,
+  "runtimeRef": "c0bf300075cde11d0a51f81e7ce0dbb5f32c652d",
+  "linuxSdk": {
+    "status": "completed",
+    "conclusion": "failure",
+    "headSha": "c0bf300075cde11d0a51f81e7ce0dbb5f32c652d",
+    "url": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/39070128857",
+    "databaseId": 39070128857
+  },
+  "hostedWholePass": false,
+  "supersededBy": "release/harness-shared-data-adoption-20261017.json",
+  "fixtureFailureCorrections": "Explicit private intermediate directory and canonical temporary fixture roots; production privacy guards unchanged"
+}

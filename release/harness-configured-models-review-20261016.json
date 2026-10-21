@@ -1,0 +1,71 @@
+{
+  "schema": "augmentor-mx-review/1",
+  "date": "2026-10-16",
+  "publicArtifactSourceRef": "1dd0fc0c6d700c7d58e46a85357aa90f3dcce50f",
+  "testedApplicationSourceRef": "1dd0fc0c6d700c7d58e46a85357aa90f3dcce50f",
+  "productVersion": "0.2.13",
+  "piVersion": "1.1.0",
+  "scope": "Private unselected MX configured-provider feedback review; no public binary redistribution",
+  "review": {
+    "releaseId": "20261016-105557-8890e8e5",
+    "artifactSha256": "0f3c82e4de5cab82b2e4ed99c57a1bebd800d227dde093c59e1ab76da58e9efb",
+    "inventoryEntries": 24548,
+    "compiledFiles": 1069,
+    "ownerQaPassed": true,
+    "selectedInstallationChanged": false,
+    "previousReviewsPreserved": true,
+    "conversationsImported": false
+  },
+  "configurationReference": {
+    "providers": 10,
+    "models": 431,
+    "orderedProviderNamesAndModelIdentitiesMatchDsh": true,
+    "pinsMatch": 10,
+    "hiddenMatch": 1,
+    "historicalReferencesPreservedInDsh": 2,
+    "credentialReadyProviderCount": 9,
+    "endpointHealthProbed": false,
+    "defaultPreserved": true,
+    "inferenceRequestsSubmitted": 0
+  },
+  "privacy": {
+    "privateModelSettingsAndKeysPublished": false,
+    "privateSourceOrFixturesCopied": false,
+    "dshConfigurationChanged": false,
+    "globalModelOrGpuSettingsChanged": false
+  },
+  "qualification": {
+    "source": {
+      "tests": 28,
+      "pass": 28,
+      "fail": 0,
+      "skip": 0,
+      "files": 7,
+      "workers": 2
+    },
+    "sealedTarget": {
+      "tests": 28,
+      "pass": 28,
+      "fail": 0,
+      "skip": 0,
+      "files": 7,
+      "workers": 2
+    },
+    "licenceAndPrivateBoundary": {
+      "tests": 16,
+      "pass": 16
+    },
+    "renderedModelsAfterHiddenFilter": 430,
+    "renderedPinnedModels": 10,
+    "initialScrollTop": 0,
+    "consoleWarningsOrErrors": 0,
+    "providerInferenceRequestsSubmitted": 0,
+    "sourceFixtureEvidence": "Authored model catalogues, bounded built-in profile, missing credential, exact provider order and subsets, pin/keyboard/selection/error and composer regressions"
+  },
+  "remaining": [
+    "Owner MX feedback",
+    "Broader provider transport/capability and endpoint health qualification",
+    "Existing MX workflow and migration acceptance",
+    "Voice, other platforms and public distribution deferred"
+  ]
+}

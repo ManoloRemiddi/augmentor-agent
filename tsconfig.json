@@ -13,5 +13,8 @@
   },
   "include": [
     "packages/**/*.ts"
+  ],
+  "exclude": [
+    "packages/runtime/vendor/office-entry/preferred-source"
   ]
 }

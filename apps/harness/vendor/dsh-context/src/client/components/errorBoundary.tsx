@@ -1,0 +1,36 @@
+/** A subtree render error degrades to this styled card with a working Retry; the harness's own slot boundary
+ * would leave an empty error placeholder instead. */
+
+import { Component, type ComponentType, type ReactNode } from 'react'
+import type { Translate } from '../i18n'
+
+export function makeErrorBoundary(t: Translate): ComponentType<{ children?: ReactNode }> {
+  return class ErrorBoundary extends Component<{ children?: ReactNode }, { error: Error | null }> {
+    constructor(props: { children?: ReactNode }) {
+      super(props)
+      this.state = { error: null }
+    }
+
+    static getDerivedStateFromError(error: unknown): { error: Error | null } {
+      return { error: error instanceof Error ? error : new Error(String(error)) }
+    }
+
+    render(): ReactNode {
+      const error = this.state.error
+      if (error === null) return this.props.children
+      return (
+        <div className="lc-root">
+          <div className="lc-empty lc-error">
+            <span>{t('error')}</span>
+            <code className="lc-error-msg">{error.message}</code>
+            <button
+              type="button"
+              className="lc-error-retry hover:border-(--dsw-alias-label-primary)"
+              onClick={() => { this.setState({ error: null }) }}
+            >{t('error.retry')}</button>
+          </div>
+        </div>
+      )
+    }
+  }
+}

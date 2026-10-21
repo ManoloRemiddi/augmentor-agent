@@ -1,0 +1,144 @@
+{
+  "source": "lib/index.js",
+  "commit": "6c3979202bcbda6dc52e0bd17cf34edad4bac5ed",
+  "selectedDeclarations": [
+    {
+      "name": "DDG_HTML_URL",
+      "startLine": 37,
+      "endLine": 39,
+      "sha256": "7dc659ad10c810afb5c8fab2d9544fdba953982d1f7a424f08a6115387bb8a2b"
+    },
+    {
+      "name": "DDG_LITE_URL",
+      "startLine": 39,
+      "endLine": 40,
+      "sha256": "0dbceb5ad7b71b71c075f63aca4abd5709ff331aa36e59f53fff23f82f885da5"
+    },
+    {
+      "name": "BING_URL",
+      "startLine": 40,
+      "endLine": 41,
+      "sha256": "a9e4ec34a9a3823e929e67d5a79a91640ee02d0b5aa74890a872c3481661822a"
+    },
+    {
+      "name": "USER_AGENT",
+      "startLine": 54,
+      "endLine": 56,
+      "sha256": "b53cf61a9c09ed065931e5f4374a420f148847ad4b136b13e81660ab7b2012a0"
+    },
+    {
+      "name": "ACCEPT_LANG",
+      "startLine": 56,
+      "endLine": 57,
+      "sha256": "68bbcd8e8d2b5504baaab2d748e04b479688347ce8fff4bbf142b864715e8c63"
+    },
+    {
+      "name": "LANG_PROFILES",
+      "startLine": 57,
+      "endLine": 71,
+      "sha256": "150614edfff669a2bb1b01392af72e15a14cd1dbcbd5e7b739e5624e948dca3a"
+    },
+    {
+      "name": "MARKET_TO_LANG",
+      "startLine": 71,
+      "endLine": 84,
+      "sha256": "4d12feaaf24be3f5c4dece2aad43ea574266d34fdec98b96789d1c767494004c"
+    },
+    {
+      "name": "SEARXNG_TIME",
+      "startLine": 309,
+      "endLine": 310,
+      "sha256": "14bd501bbb9c919497ed337847db00e33c6e0d34695bc328f0ffd30a5862a462"
+    },
+    {
+      "name": "approximateTimeRange",
+      "startLine": 340,
+      "endLine": 348,
+      "sha256": "773066b2a226a989802c65071401a01cc294617e0c4768a676290b158605930c"
+    },
+    {
+      "name": "decodeEntities",
+      "startLine": 348,
+      "endLine": 360,
+      "sha256": "60a237e31e70f314d80119bf55f9aacc4f0827c0fd767978f1ab2eb769665e09"
+    },
+    {
+      "name": "stripTags",
+      "startLine": 416,
+      "endLine": 420,
+      "sha256": "2351a1e0d2f2f9311b52d0053e5d34aea8dcd8daa501465cad70b55455f7621b"
+    },
+    {
+      "name": "extractDdgUrl",
+      "startLine": 420,
+      "endLine": 434,
+      "sha256": "ea89a8fe337b92f1f641f9574381840e062dbf6e76e7a1dcfaae83d0704efcc1"
+    },
+    {
+      "name": "uniqueSources",
+      "startLine": 434,
+      "endLine": 451,
+      "sha256": "af01a664c858538dc9aa464173a023cc739722c3cfa086259c39c0ea41ba34b0"
+    },
+    {
+      "name": "fetchHtml",
+      "startLine": 451,
+      "endLine": 481,
+      "sha256": "a08e7a3a8514594a4617cf12e9b7a6288d5ba6faf01438114ad27ea9b51aa8a8"
+    },
+    {
+      "name": "fetchHtmlWithRetry",
+      "startLine": 481,
+      "endLine": 497,
+      "sha256": "69a20e5a003f5a79ae31112622e6df047382f40e037fd31d3817d81bce557b0a"
+    },
+    {
+      "name": "searchDdgHtml",
+      "startLine": 497,
+      "endLine": 528,
+      "sha256": "64621658144c62c5753ef465cff7a61814215a6fb253df584ee1e2a0b2d169f8"
+    },
+    {
+      "name": "searchDdgLite",
+      "startLine": 528,
+      "endLine": 558,
+      "sha256": "7f515671fb4f42f6a97caf12480ebc55aac03b22698cda2fac2527c3c58e2690"
+    },
+    {
+      "name": "queryOverlapTokens",
+      "startLine": 558,
+      "endLine": 574,
+      "sha256": "3c221a29e816b2a846f345f7a827cdf9ab8c73c75043df64066c232a487ed8bd"
+    },
+    {
+      "name": "looksRelevant",
+      "startLine": 574,
+      "endLine": 583,
+      "sha256": "815a85f5fd861dd24a8defd389b06d2ca5d99ea8066557fcc512a3e786ebade8"
+    },
+    {
+      "name": "extractBingUrl",
+      "startLine": 583,
+      "endLine": 599,
+      "sha256": "6684614bc040b2ba12a4c2509a44670a4ddad49b6d3695d2d3dcf1be607db870"
+    },
+    {
+      "name": "searchBing",
+      "startLine": 599,
+      "endLine": 634,
+      "sha256": "abd6e727a6a103ed566c52bc0da04342a1ad0e92844b1b4a23121b787242fde9"
+    },
+    {
+      "name": "SEARXNG_INSTANCES",
+      "startLine": 634,
+      "endLine": 644,
+      "sha256": "f80cec95ddbc58c0585edcde1d384de4fc005c28fc4e265556779529b7b56635"
+    },
+    {
+      "name": "searchSearxng",
+      "startLine": 644,
+      "endLine": 699,
+      "sha256": "31126b11c40b60045d1810d1b7aa4f3c67aa5bb9f1f54b976425691cd189fb68"
+    }
+  ]
+}

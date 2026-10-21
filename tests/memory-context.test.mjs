@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {memoryContext,CONTEXT_LIMIT} from '../dist/memory/src/context.js';
+import {memoryContext,selectContinuity,CONTEXT_LIMIT} from '../dist/memory/src/context.js';
 
 test('unrelated assistant offers and old project excerpts do not become active context',()=>{
   const result=memoryContext({enabled:true,relationship:{pages:[{name:'Shared moments and commitments',content:'I offered a large game download.'}]},
@@ -27,4 +27,26 @@ test('context is bounded, related legacy claims remain unverified, long passages
     {seq:2,role:'user',content:'Check the SQLite database.'}]},'text','SQLite database');
   assert.ok(result.length<=CONTEXT_LIMIT);assert.match(result,/authorization and verification not established/);
   assert.match(result,/"omittedUserReceipts":1/);assert.doesNotMatch(result,/xxxx/);
+});
+test('page headings do not consume fact slots or displace personal reply preferences',()=>{
+ const value={enabled:true,relationship:{items:[{text:'I prefer concise replies.'},{text:'Do not start downloads.'}]},work:{pages:[{name:'Current project state',content:'# Current project state\n\n## Plans versus completed work\n\n## Current database\n\nAtlas uses SQLite.'}]}};
+ const selected=selectContinuity(value,'Current Atlas project state and database; plans versus completed work and preferred reply style?');
+ assert(selected.some(row=>row.content==='I prefer concise replies.'),'a stored personal preference remains available beside relevant project facts');
+ assert(selected.some(row=>row.content==='Atlas uses SQLite.'));assert(!selected.some(row=>/^#{1,6}\s/.test(row.content)),'heading-only blocks are navigation metadata, not fact excerpts');
+ assert(selected.length<=4);assert(memoryContext(value,'text','Current Atlas project state and database; plans versus completed work and preferred reply style?').length<=CONTEXT_LIMIT);
+});
+test('a page fragment containing a heading and factual text remains verbatim',()=>{
+ const content='## Atlas database\nAtlas uses SQLite.';const selected=selectContinuity({work:{pages:[{name:'Current project state',content}]}},'Atlas database');assert.equal(selected[0].content,content);
+});
+test('eligible extracted claims take precedence over synthesized pages in the same scope',()=>{
+ const value={relationship:{pages:[{name:'Preferences and boundaries',content:'No preferred reply style is recorded.\n\nNo concise reply preference is recorded.\n\nThere are no supported communication preferences.\n\nThe current preferred reply style is unknown.'}],items:[{id:'preference',text:'User prefers concise replies.'},{id:'boundary',text:'User asked Augmentor not to start downloads.'}]},work:{items:[{id:'database',text:'Atlas uses SQLite as its database.'}]}};
+ const selected=selectContinuity(value,'State the Atlas database and my preferred reply style using recalled memory.');
+ assert(selected.some(row=>row.source==='preference'),'synthesized page prose cannot crowd out the extracted preference');
+ assert(selected.some(row=>row.source==='boundary'));assert(selected.some(row=>row.source==='database'));
+ assert(!selected.some(row=>row.content.includes('is recorded')),'pages remain available through explicit recall rather than contradicting eligible extracted claims in the automatic brief');
+ assert(selected.every(row=>row.provenance==='derived claim; authorization and verification not established'));
+});
+test('pages remain a fallback when a scope has no eligible extracted claims',()=>{
+ const value={work:{pages:[{name:'Current project state',content:'Atlas uses SQLite as its database.'}],items:[{text:'The unrelated renderer uses Vulkan.'}]}};
+ const selected=selectContinuity(value,'Atlas database');assert.equal(selected.length,1);assert.equal(selected[0].content,'Atlas uses SQLite as its database.');
 });

@@ -75,7 +75,7 @@ def _spawn_owner(root):
     with os.fdopen(descriptor(owner/'supervisor.log', writable=True, create=True), 'a', encoding='utf-8') as log:
         process = subprocess.Popen([runtime_python(root), '-I', '-Xutf8', '-B',
             str(root/'services/windows_supervisor.py')], stdin=subprocess.DEVNULL,
-            stdout=log, stderr=log, close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
+            stdout=log, stderr=log, cwd=str(root), close_fds=True, creationflags=subprocess.CREATE_NO_WINDOW)
     deadline = time.monotonic()+15
     while time.monotonic() < deadline:
         try: return request('status', root=root)

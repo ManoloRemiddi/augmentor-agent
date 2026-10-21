@@ -1,0 +1,70 @@
+{
+  "schema": "augmentor-harness-memory-recovery-review/1",
+  "date": "2026-10-16",
+  "applicationRef": "8eaf167fcda9da1413f4b9787c965fe7e7471cd3",
+  "implementationRef": "35db2f294e7ad155a1b076a67c97f81b92930cc9",
+  "releaseId": "20261016-162216-9765db35",
+  "artifactSha256": "4328b1b86025a52d3bb25bc7dc7a58e8e8ab8c990182d3e2cef4d2bbc88fa372",
+  "sealedEntries": 24564,
+  "compiledFiles": 1072,
+  "scope": "Private unselected MX Linux review; occupied memory gateway recovery",
+  "qualification": {
+    "sourceNodeCases": 28,
+    "sealedTargetNodeCases": 28,
+    "nodeFiles": 18,
+    "actualChromiumFiles": 12,
+    "sourcePythonAndOffscreenNativeCases": 64,
+    "licensePrivateBoundaryNoticeCasesIncludedInPython": 16,
+    "workers": 2,
+    "nodeSkips": 0,
+    "failures": 0,
+    "controlledPriorSealedConnectedStatusFailure": true,
+    "realCompanionOccupiedPortAndRestart": true,
+    "capturedSourceAndCachedRelationshipWorkBanksPreserved": true,
+    "blockedGatewayReceivesNoEngineOrModelRequests": true,
+    "savedPauseNotChangedByConflictOrRecovery": true,
+    "actualOriginalGuiCaptureSwitchAndUnavailableProcessing": true,
+    "nativeProcessingGuardAndExplanation": true,
+    "samePublicFrontendModuleBytesAtSealedTarget": true,
+    "ownerReviewsUpdated": 2,
+    "conversationsPreserved": 4,
+    "backupRegularFilesVerified": 389,
+    "coldProtectedInputsVerified": 32,
+    "postBrowserPersistentInputsVerified": 28,
+    "existingJournalEventsPreserved": 19,
+    "existingSavedPluginChoicesAnd12PromptsEachPreserved": true,
+    "ownerQaModelOrAudioRequests": 0
+  },
+  "engineRestore": {
+    "sameExistingInstallerOwnedInstance": true,
+    "newContainerOrVolumeCreated": false,
+    "sameConfiguration": true,
+    "healthyAndAutonomousWorkersDisabled": true,
+    "stoppedDatabaseBackupBytes": 142538240,
+    "stoppedDatabaseBackupRegularFiles": 2864,
+    "restartPolicyChanged": false,
+    "modelGpuOrChatSettingsChanged": false
+  },
+  "ownerMemoryState": {
+    "configuredReview": "capture on; gateway available locally; engine health independently checked without memory inference",
+    "pilot": "capture on; shared processing port occupied; processing explicitly unavailable",
+    "oneSharedProcessingPortAcrossIsolatedProfiles": true,
+    "existingBanksMigrated": false,
+    "newLiveInferenceQualifiedByThisIncrement": false
+  },
+  "preservation": {
+    "installedSelectionChanged": false,
+    "originalDshChanged": false,
+    "productionDependenciesComponentsChanged": false,
+    "supplierSourcesLicensesChanged": false,
+    "realOwnerPluginFlagsToggledDuringQa": false
+  },
+  "remaining": [
+    "Consolidate review memory ownership or provision separate gateway/engine configurations before permanent simultaneous use",
+    "No existing-bank or bulk project migration performed",
+    "Owner acceptance of the representative migration pilot",
+    "Wiki vault/MCP configuration and wider everyday workflow acceptance",
+    "Permanent installation/launcher qualification remains separate",
+    "Voice and other operating systems deferred"
+  ]
+}

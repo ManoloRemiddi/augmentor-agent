@@ -1,0 +1,250 @@
+{
+  "schema": "augmentor-native-office-feasibility/1",
+  "testedSourceRef": "af60044882dd576d7a5a202791092d324b3bd383",
+  "probeSha256": "63d6a0e91c6ce65290df1978d50093d14440f531f2e66fa94abca4ddfceee72b",
+  "applicationBackendChanged": false,
+  "publicRedistributionQualified": false,
+  "scope": "authored Linux x64 standalone feasibility, not integrated Harness or production qualification",
+  "limits": {
+    "perProcessAddressSpaceBytes": 2147483648,
+    "perProcessCpuSeconds": 45,
+    "individualFileBytes": 20971520,
+    "hostDeadlineSeconds": 45,
+    "coreDumps": false,
+    "nice": 10,
+    "fontPayload": "bounded read-only system Liberation files only"
+  },
+  "formats": [
+    {
+      "extension": "doc",
+      "sourceSha256": "39b5b6b7548d4968ae198703f6ceb85f10fe0af6e475de5a6487a304ec7a4772",
+      "sourceBytes": 9216,
+      "pdfSha256": "c31c6a719ad2962183c76fae55c2627a4128c5a358aff6d6356246afe9f2180a",
+      "pdfBytes": 20736,
+      "actualPdfTextConfirmed": true,
+      "sourceUnchanged": true,
+      "maxImageResolutionRequested": 192,
+      "imageDpiMeasured": false
+    },
+    {
+      "extension": "docx",
+      "sourceSha256": "dcc5a8e287aacd7f9c6f692638bb06e869af9d234de3311ff43433c565e49ec4",
+      "sourceBytes": 5125,
+      "pdfSha256": "25348d0a6a2356737970312f9e6b6cb692eb2a59cd2129ef08248a8ebebae21c",
+      "pdfBytes": 13923,
+      "actualPdfTextConfirmed": true,
+      "sourceUnchanged": true,
+      "maxImageResolutionRequested": 192,
+      "imageDpiMeasured": false
+    },
+    {
+      "extension": "xls",
+      "sourceSha256": "7ee6f2059bee73dfcee92eb1018ea0a89fcb66e03134cb460ca7368467a35941",
+      "sourceBytes": 5632,
+      "pdfSha256": "f746b57b05190cb87465b2e9a8f01ff23869f4e027e463cb389ee63886acfbfc",
+      "pdfBytes": 21155,
+      "actualPdfTextConfirmed": true,
+      "sourceUnchanged": true,
+      "maxImageResolutionRequested": 192,
+      "imageDpiMeasured": false
+    },
+    {
+      "extension": "xlsx",
+      "sourceSha256": "a14755ebed71b0e6c5e03d40ac42a799cf0c84f0f68ed1a2919c2cb7f7e1d1c9",
+      "sourceBytes": 5507,
+      "pdfSha256": "0aab3c0c619c973d27a2dc3543f946b10e3b0d4c81944c7498fb780a29d3a268",
+      "pdfBytes": 21163,
+      "actualPdfTextConfirmed": true,
+      "sourceUnchanged": true,
+      "maxImageResolutionRequested": 192,
+      "imageDpiMeasured": false
+    },
+    {
+      "extension": "ppt",
+      "sourceSha256": "3f37523494d28b21f9e91c3bb25cbe1330a2df4be1456d78fbe53394d9b7fddb",
+      "sourceBytes": 461312,
+      "pdfSha256": "64894bf8ab035fdee067d8b4f4d5cfcc98d20c89e917718dfc67c44590eee3db",
+      "pdfBytes": 19581,
+      "actualPdfTextConfirmed": true,
+      "sourceUnchanged": true,
+      "maxImageResolutionRequested": 192,
+      "imageDpiMeasured": false
+    },
+    {
+      "extension": "pptx",
+      "sourceSha256": "5941c9116c9b72a6d54a6c616b6ed7d483f4be135453efc7f903c9e674845622",
+      "sourceBytes": 10383,
+      "pdfSha256": "b2a31ffc86d0168124f13e70021783c18d4f13fca0de0e919d6e4e1087a1690f",
+      "pdfBytes": 14783,
+      "actualPdfTextConfirmed": true,
+      "sourceUnchanged": true,
+      "maxImageResolutionRequested": 192,
+      "imageDpiMeasured": false
+    }
+  ],
+  "systemPackageInventorySha256": "bca33158894f1658a34be6cb4ba22c6a4887e58ef9e911e2c78eba0170c1bba7",
+  "privacy": {
+    "outsideFileAbsent": true,
+    "hostProcessEnvironmentAbsent": true,
+    "hostEnvironmentAbsent": true,
+    "hostLoopbackConnectionDenied": true,
+    "systemPayloadReadOnly": true,
+    "sourceInputReadOnly": true
+  },
+  "fontCatalog": {
+    "knownFamilyAvailable": true,
+    "authoredMissingFamilyUnavailable": true,
+    "scope": "bounded Liberation-only font payload; not original missingFonts integration or custom-root/fallback parity"
+  },
+  "raster": {
+    "sourcePixels": [
+      1200,
+      1200
+    ],
+    "physicalInches": [
+      2,
+      2
+    ],
+    "sourceDpi": 600,
+    "requestedDpi": 192,
+    "actualPdfPixels": [
+      384,
+      384
+    ],
+    "actualPdfDpi": [
+      192,
+      192
+    ],
+    "pdfSha256": "7e24ae0581d51a22dd48cb655ef25c4bf3b6c8d10f1df406876916e185b9dbb1",
+    "sourceUnchanged": true,
+    "scope": "single authored Writer image; not all format/image/layout parity"
+  },
+  "cancellation": [
+    {
+      "phase": "startup",
+      "actualOfficeChildObserved": true,
+      "exportDispatchObserved": false,
+      "ownedDescendantsExited": true,
+      "wrapperExitCode": -15,
+      "sourceUnchanged": true,
+      "scope": "owned native process cancellation/settlement; not Harness admission/queue/timeout or exact internal exporter timing acceptance"
+    },
+    {
+      "phase": "export-dispatch",
+      "actualOfficeChildObserved": true,
+      "exportDispatchObserved": true,
+      "ownedDescendantsExited": true,
+      "wrapperExitCode": -15,
+      "sourceUnchanged": true,
+      "scope": "owned native process cancellation/settlement; not Harness admission/queue/timeout or exact internal exporter timing acceptance"
+    }
+  ],
+  "terminal": "passed",
+  "date": "2026-10-14",
+  "systemPackages": [
+    {
+      "name": "bubblewrap",
+      "version": "0.12.0-1~deb13u1",
+      "sourcePackage": "bubblewrap",
+      "sourceVersion": "0.12.0-1~deb13u1"
+    },
+    {
+      "name": "fontconfig",
+      "version": "2.15.0-2.3",
+      "sourcePackage": "fontconfig",
+      "sourceVersion": "2.15.0-2.3"
+    },
+    {
+      "name": "liblangtag-common",
+      "version": "0.6.7-1",
+      "sourcePackage": "liblangtag",
+      "sourceVersion": "0.6.7-1"
+    },
+    {
+      "name": "libreoffice-calc",
+      "version": "4:25.2.3-2+deb13u8",
+      "sourcePackage": "libreoffice",
+      "sourceVersion": "4:25.2.3-2+deb13u8"
+    },
+    {
+      "name": "libreoffice-core",
+      "version": "4:25.2.3-2+deb13u8",
+      "sourcePackage": "libreoffice",
+      "sourceVersion": "4:25.2.3-2+deb13u8"
+    },
+    {
+      "name": "libreoffice-impress",
+      "version": "4:25.2.3-2+deb13u8",
+      "sourcePackage": "libreoffice",
+      "sourceVersion": "4:25.2.3-2+deb13u8"
+    },
+    {
+      "name": "libreoffice-writer",
+      "version": "4:25.2.3-2+deb13u8",
+      "sourcePackage": "libreoffice",
+      "sourceVersion": "4:25.2.3-2+deb13u8"
+    },
+    {
+      "name": "poppler-utils",
+      "version": "25.03.0-5+deb13u4",
+      "sourcePackage": "poppler",
+      "sourceVersion": "25.03.0-5+deb13u4"
+    },
+    {
+      "name": "python3.13",
+      "version": "3.13.5-2+deb13u5",
+      "sourcePackage": "python3.13",
+      "sourceVersion": "3.13.5-2+deb13u5"
+    }
+  ],
+  "nativeSourceAvailability": {
+    "url": "https://sources.debian.org/src/libreoffice/4:25.2.3-2%2Bdeb13u8",
+    "matchingSourceVersion": "4:25.2.3-2+deb13u8",
+    "publicSourceVersionObserved": true,
+    "nativeEngineRebuilt": false,
+    "completeLinkedClosureReviewed": false
+  },
+  "installedLibreOfficeCopyrightSha256": "cf9d0e2a977145750723bf71705e3fc829d5fc396376587ba546febbf9eebda3",
+  "redistributedSystemBinariesOrFonts": false,
+  "guiOrProviderQueueChanged": false,
+  "focusedPackagingAndBoundaryCases": 11,
+  "sourceBoundaryCheckPassed": true,
+  "existingOutputAndIncompleteRefAdmissionRefused": true,
+  "retainedFailures": [
+    {
+      "scope": "direct soffice.bin missing registry mount",
+      "result": "UNO RuntimeException / exit 134"
+    },
+    {
+      "scope": "direct soffice.bin with registry",
+      "result": "first-profile initialization exit 81; installed oosplash later used"
+    },
+    {
+      "scope": "two preliminary combined six-format runs",
+      "result": "all formats/negative isolation/font checks pass; main-thread-only cancellation observer fails"
+    },
+    {
+      "scope": "later all-checks preparation",
+      "result": "checks pass but incorrect abbreviated source-ref supplied; not exact-ref qualification"
+    }
+  ],
+  "preservation": {
+    "ownerReviewEntriesVerified": 24305,
+    "priorReviewEntriesVerified": 24288,
+    "reviewProcessesPreserved": true,
+    "selectedConfigurationUnchanged": true,
+    "canonicalPreexistingChanges": 38,
+    "qwenReadOnlyModelsStatus": 200,
+    "ownerCredentialsOrHistoriesRead": false,
+    "productionModelSpeechGpuSettingsChanged": false
+  },
+  "remainingQualification": [
+    "Harness authorized-read/error/cache/queue/maintenance/timeout/disposal integration",
+    "original missing-font metadata/custom roots/fallbacks and complete font budget parity",
+    "ZIP/malformed/password/output and aggregate scratch bounds",
+    "macro and external-resource negative tests",
+    "complex format/image/layout and original GUI qualification",
+    "ordinary and installed native dependency/source/notice closure",
+    "non-x64 Linux, macOS and Windows adapters"
+  ]
+}

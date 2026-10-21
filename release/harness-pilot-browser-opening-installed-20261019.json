@@ -1,0 +1,85 @@
+{
+  "schema": "augmentor-harness-pilot-browser-opening-installed/1",
+  "date": "2026-10-19",
+  "scope": "Existing MX pilot only; no complete production/shared-store migration",
+  "applicationRef": "576975c04cfb3e71657401ae9f33d50e1e0a88a9",
+  "qualificationTestRef": "ed603cec1a2991c94ed9f7af446da898e692a389",
+  "artifactSha256": "2a3b1c41c87fbd70f88868a79b6239876ea77031085089df87908da5d01b4c89",
+  "releaseId": "20261018-091849-33961e9a",
+  "inventoryEntries": 24816,
+  "compiledFiles": 1146,
+  "existingSealedCandidateReused": true,
+  "newFullAppBuilds": 0,
+  "installed": {
+    "review": "pilot",
+    "fixedLoopbackPort": 41789,
+    "registryBefore": 22,
+    "registryAfter": 23,
+    "oldOwnerAdmissionIdleAndDraftFree": true,
+    "gracefulShutdownConfirmedByPidfd": true,
+    "coldProfileBackupRegularFilesVerified": 363,
+    "consistentSharedSqliteBackupVerified": true,
+    "existingCredentialAndPortRetained": true,
+    "sameProfileAndSharedPair": true,
+    "sessionsPreserved": 3,
+    "queuesPreserved": true,
+    "mainRegistrationUnchanged": true,
+    "productionSelectionsUnchanged": true,
+    "ownerModelRequests": 0,
+    "newProjectImports": 0
+  },
+  "actualInstalledVerification": {
+    "initialBareAddressErrorReproducedInIab": true,
+    "afterExistingCredentialLoginFreshBareAddressTabConnected": true,
+    "afterActualPilotRestartBareAddressReloadConnected": true,
+    "secondNewBareAddressTabAfterRestartConnected": true,
+    "composerAvailable": true,
+    "authenticationErrorAbsent": true,
+    "regularDefaultBrowser": "chromium.desktop",
+    "normalDefaultBrowserOpenerSucceededAfterUpgrade": true,
+    "regularChromiumUiControlAvailable": false,
+    "scope": "Actual installed pilot observed with CUA in IAB; regular default Chromium opened through owned launcher, not directly inspected"
+  },
+  "restartVerification": {
+    "phase": "confirmed-reopened",
+    "modelRequestsSubmitted": 0,
+    "samePrivateIdentity": true,
+    "samePort": true,
+    "sameLink": true,
+    "sessionsAndQueuesPreserved": true,
+    "authenticatedAccess200": true,
+    "anonymousAccess401": true
+  },
+  "preservation": {
+    "originalProtectedFiles": 21,
+    "byteIdenticalOriginalFiles": 20,
+    "onlyMcpMetadataAppends": 44,
+    "sharedRowsAndEngineExact": true,
+    "productionSelectorsExact": true,
+    "mainRegistrationUnchanged": true,
+    "pilotRegistryRevision": 23,
+    "ownerModelRequests": 0
+  },
+  "hosted": {
+    "sourceRef": "ed603cec1a2991c94ed9f7af446da898e692a389",
+    "sdkRun": 39108195214,
+    "linuxJob": 117618496431,
+    "linuxConclusion": "success",
+    "wholeMatrixPass": false,
+    "macos": "Shared-memory fixture failed; outside current MX adoption",
+    "windows": "Cancelled; no acceptance claimed"
+  },
+  "limits": [
+    "A fresh browser profile/private window or cleared site storage still needs an authorized first login; anonymous API remains401",
+    "Regular default Chromium was opened through the owned launcher; its UI is unavailable to this session",
+    "Main review remains on its earlier artifact; full Native/DSH/shared-store/extension consolidation still needs a fresh coordinated cold cut",
+    "Earlier registry22 prospective cut is stale; recompute from registry23, distinct main/pilot artifacts and latest state",
+    "Further project imports await pilot feedback; voice expansion and later platforms deferred"
+  ],
+  "privateEvidenceSha256": {
+    "harness-pilot-browser-opening-preflight-private-20261019.json": "5a6c58c4d18ba2e43c153c9834df8ed57fb6df78376ba66794a60465a58a8f72",
+    "harness-pilot-browser-opening-adoption-private-20261019.json": "9a93f7755a56cdb8c663c3b6c0a78fe2c89b39d0a9df1b765b4abe6927201d21"
+  },
+  "publicBinaryPublished": false,
+  "draftPr": 45
+}

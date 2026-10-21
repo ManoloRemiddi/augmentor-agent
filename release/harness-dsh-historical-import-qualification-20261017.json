@@ -1,0 +1,186 @@
+{
+  "schema": "augmentor-dsh-historical-import-qualification/1",
+  "date": "2026-10-17",
+  "scope": "Native v3 archive closure, exact compressed originals and derived-coordinate provenance; authored current SDK/GUI import and continuation; real legacy projects remain refused at later history checks",
+  "sourceBaseRef": "157b286b00ceee3d5a5f778461ae4ad883059e48",
+  "testedInputsSha256": {
+    "packages/runtime/src/dsh-historical-project.ts": "ab3ed14f5ad54be131116e28ce17d779fa27704db02f037a96c79d5000defdb1",
+    "packages/runtime/src/dsh-project-archive.ts": "a1851fff00326c84feaaa60b3172aae439887c57ca28e47a17d809bab9f607a3",
+    "packages/runtime/src/dsh-project-import.ts": "777e1f56351bfc85c5199233792fa4edf50ed83b86ad2c25987d41b7dc116cc7",
+    "packages/runtime/src/dsh-archived-family.ts": "9beb61e6b4341d53cfe940df9d5b4b5fbdfb49d810ba3a9394ba46bbd71221e5",
+    "apps/harness/native-history.mjs": "cc5344def8eea7f3ddb32dff048937e5cae4dc528eda09f7e8e51fb8ef08bc77",
+    "scripts/export-dsh-historical-project.mjs": "03f8862ffcf3f04352782ba97fb0186c5f4e05082bf00582ab229d7eb569d67f",
+    "scripts/proof-dsh-historical-project.mjs": "8adf3a37b6f5b8ffca2ea8aa3126b72115ef0ce0a45b0f8589f4c00d0439d12b",
+    "scripts/proof-dsh-legacy-assets.mjs": "547ed8cc5d8799812d5e138d1c34a7d235161bd0b2fc0230ef6ae42b6969053a",
+    "adapters/dsh-legacy-format/authored-source.mjs": "cc785b695736829487b4f329f9ced112c83401217b7b39cdf40ff40b32986d4d",
+    "tests/dsh-historical-project.test.mjs": "0e382aadf7e6353e232d78dbc6257cc614f91973c826291a031910aabd12914f",
+    "tests/dsh-historical-project-runtime.test.mjs": "00f97ee2c65797dfd37cfcc0cfd33f419bca4c3a29a1f41b43486b475ada5638",
+    "tests/fixtures/dsh-historical-project.mjs": "49e4eeb35b4ddc07b4640b5d9466c93df22f3480268abbbde7b7cb4b5cbfd7fc",
+    "tests/fixtures/dsh-rich-runtime.mjs": "e1978fcb0fc1704b6b01aabb27fca3e362d0cc774cd7411e8a53fd725cf7543d",
+    "tests/fixtures/dsh-family-runtime.mjs": "5cbda18bae8b15c927966b5ce47a8dd07e283d602e57996ebcbb66b0ec25068b",
+    "tests/harness-dsh-family-chromium.test.mjs": "de1638087ac3ab7cb62c8fae6396e08a29eb4618ac10196651fd74f75df883b5"
+  },
+  "contract": {
+    "schema": "augmentor-dsh-project-export/3",
+    "profile": "augmentor-dsh-historical-family/1",
+    "coordinates": "derived-dsh-v4",
+    "originalCompressedLogsRetained": true,
+    "derivedEventSegmentsStoredOnce": true,
+    "logicalReferencesDiscountedByDeduplication": false,
+    "runtimeLoadsArchiveExecutable": false,
+    "trustedProducerRecomputesPublicCodecView": true,
+    "runtimeRole": "Expected envelope SHA-256, complete data closure and supported contracts; no upstream authentication or runtime codec re-execution",
+    "physicalRowMappingInvented": false,
+    "physicalSourceGUIBrowserAdded": false,
+    "priorV1AndV2Supported": true,
+    "perObjectBytes": 16777216,
+    "envelopeBytes": 33554432,
+    "expandedBundleBytes": 268435456
+  },
+  "qualification": {
+    "sourceNodePass": 490,
+    "sourcePythonPass": 92,
+    "ordinaryNodePass": 490,
+    "ordinaryPythonPass": 92,
+    "nodeFiles": 58,
+    "chromiumFiles": 16,
+    "chromiumCases": 21,
+    "workers": 2,
+    "skips": 0,
+    "compiledInputsVerified": 1117,
+    "publicCodecNativePipeline": {
+      "schema": "augmentor-dsh-historical-project-proof/1",
+      "checks": 6,
+      "publicCodecPipelinePassed": true,
+      "nativeV3ImportPassed": true,
+      "fullCompressedOriginalsExact": true,
+      "namedClosureExact": true,
+      "derivedCoordinateLabelsRetained": true,
+      "childOnlyImageInspectionPassed": true,
+      "emptyAndTwentyMiBFilesImported": true,
+      "historicalCutPassed": true,
+      "liveSdkContinuationTested": false,
+      "privateOwnerDataUsed": false,
+      "ownerTargetsCreated": 0,
+      "modelRequests": 0
+    },
+    "ordinaryShippedCodePublicCodecPipelinePass": true,
+    "sourceAssetPipelineRegressionPass": true,
+    "fullSourceBuildPass": true,
+    "sameFrozenRealFirstRefusalsReproducedInOrdinaryPackage": true,
+    "dependenciesAndUnchangedBaselineFilesVerified": true,
+    "exactSealedQualificationPending": false,
+    "ownerAdoption": false,
+    "sealedNodePass": 490,
+    "sealedPythonPass": 92,
+    "sealedPublicCodecNativePipelinePass": true,
+    "allSealedInputsVerified": 24678,
+    "sourceCodeAndCompiledInputsMatchExactSealed": true,
+    "sameFrozenRealFirstRefusalsReproducedInExactSealed": true,
+    "completedTemporaryQualificationCopiesRemoved": 3,
+    "exactSealedCandidateAndFrozenInputsRetained": true
+  },
+  "realFamilies": {
+    "projects": 5,
+    "parents": 42,
+    "descendants": 35,
+    "nativeV3EnvelopeExportAndClosureReadPass": true,
+    "completePreparationAcceptedProjects": 0,
+    "sameFrozenInputsUsed": true,
+    "families": [
+      {
+        "roots": 5,
+        "descendants": 1,
+        "expandedBytes": 18715952,
+        "closureAccepted": true,
+        "parentPreparationAccepted": false,
+        "firstRefusal": "older settlement reasoning before catalogue"
+      },
+      {
+        "roots": 1,
+        "descendants": 5,
+        "expandedBytes": 11258630,
+        "closureAccepted": true,
+        "parentPreparationAccepted": false,
+        "firstRefusal": "older settlement reasoning before catalogue"
+      },
+      {
+        "roots": 5,
+        "descendants": 16,
+        "expandedBytes": 67715363,
+        "closureAccepted": true,
+        "parentPreparationAccepted": false,
+        "firstRefusal": "older settlement reasoning before catalogue"
+      },
+      {
+        "roots": 5,
+        "descendants": 6,
+        "expandedBytes": 90088917,
+        "closureAccepted": true,
+        "parentPreparationAccepted": false,
+        "firstRefusal": "turn/compaction lifecycle"
+      },
+      {
+        "roots": 26,
+        "descendants": 7,
+        "expandedBytes": 255269784,
+        "closureAccepted": true,
+        "parentPreparationAccepted": false,
+        "firstRefusal": "older settlement reasoning before catalogue"
+      }
+    ],
+    "assessmentModelLabels": "assessment-only, not contacted; no model-route availability claim",
+    "ownerTransfers": 0,
+    "modelRequests": 0
+  },
+  "preservation": {
+    "scope": "Read-only IPC peer/build, actual sealed owner files, complete protected regular path sets and contents, registry and selections; no owner restart, update, import or model work",
+    "reviews": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261016-220504-b91df2e4",
+        "sealedInputsVerified": 24615,
+        "protectedRegularPathSetExact": true,
+        "protectedRegularHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "registryAndSelectedConfigurationsExact": true,
+    "newOwnerTransfers": 0,
+    "ownerRestarts": 0,
+    "candidateActivated": false
+  },
+  "readinessUnchanged": {
+    "preparedProjects": 23,
+    "preparedParentConversations": 64,
+    "ownerPilotFeedbackStillRequiredBeforeFurtherTransfers": true
+  },
+  "remaining": [
+    "Guarded owner adoption remains separate; current running app is unchanged",
+    "Historical settlement notices with catalogue appended by public v3-to-v4 finish, including unavailable/inherited sender evidence",
+    "Compaction/turn lifecycle correlation with exact public producer evidence; no invented completion",
+    "Same-frozen real preparation after each explicitly qualified history fix",
+    "Owner pilot feedback before further real transfers; physical source GUI browsing not added",
+    "MX Linux first; voice and other operating systems deferred",
+    "Dedicated v3 cold native-profile relocation acceptance remains to be checked before owner migration"
+  ],
+  "applicationRef": "9cf713a86bdec0fc680c46b860a57b32220adcad",
+  "candidate": {
+    "releaseId": "20261017-041731-e0f51dd5",
+    "applicationRef": "9cf713a86bdec0fc680c46b860a57b32220adcad",
+    "artifactSha256": "4455a5e8dd932f920097e5257c08f4358f8c37c15b827b19ab5be12af131c5ba",
+    "inventoryEntries": 24678,
+    "compiledFiles": 1117,
+    "activated": false
+  }
+}

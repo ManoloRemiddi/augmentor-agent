@@ -7,9 +7,9 @@ import {setTimeout as delay} from 'node:timers/promises'
 import {BrowserVoice} from '../apps/browser/shared/voice-client.mjs'
 import {BrowserInteractions} from '../apps/browser/shared/interactions.mjs'
 const id='11111111-1111-4111-8111-111111111111'
-function fixture(t,{submit=async()=>({accepted:true}),closeOnEnd=true,ticket=async sessionId=>({protocol:'resonant-voice/1',url:'ws://127.0.0.1:9999/voice',sessionId,ticket:'private'})}={}){
+function fixture(t,{submit=async()=>({accepted:true}),closeOnEnd=true,release,ticket=async sessionId=>({protocol:'resonant-voice/1',url:'ws://127.0.0.1:9999/voice',sessionId,ticket:'private'})}={}){
  const commands=[],events=[];let worker
- const voice=new BrowserVoice({ticket,submit,notify:e=>events.push(e),spawnWorker:()=>{
+ const voice=new BrowserVoice({ticket,submit,release,notify:e=>events.push(e),spawnWorker:()=>{
   worker=new EventEmitter();worker.stdout=new PassThrough();worker.stdin=new PassThrough();worker.kill=()=>assert.fail('Ordinary voice close must not kill a worker');
   worker.stdin.on('data',data=>commands.push(JSON.parse(data)));worker.stdin.on('end',()=>{if(closeOnEnd){worker.emit('exit');worker.emit('close')}});return worker
  }})
@@ -34,6 +34,26 @@ test('closing during ticket preparation discards late credentials and audio star
  resolve({protocol:'resonant-voice/1',url:'ws://127.0.0.1:9999/voice',sessionId:'personal',ticket:'private'});await delay(0)
  assert.equal(f.commands.some(c=>c.action==='start'),false)
  await assert.rejects(f.voice.start({id:'invalid',sessionId:'personal'}))
+})
+test('scoped browser close joins ticket preparation and final remote retirement before another lease',async t=>{
+ let ticketReady,retire;const releases=[]
+ const f=fixture(t,{ticket:()=>new Promise(resolve=>ticketReady=resolve),release:session=>{
+  releases.push(session);return releases.length===2?new Promise(resolve=>retire=resolve):Promise.resolve()
+ }})
+ await f.voice.start({id,sessionId:'personal'});await delay(0)
+ const active=f.voice.active,closing=f.voice.close()
+ assert.equal(f.voice.close(active),closing);assert.equal(f.voice.busy,true)
+ await assert.rejects(f.voice.start({id,sessionId:'personal'}),/still finishing/)
+ ticketReady({protocol:'resonant-voice/1',url:'ws://127.0.0.1:9999/voice',sessionId:'personal',ticket:'private'})
+ await delay(0);assert.deepEqual(releases,['personal','personal']);assert.equal(f.voice.busy,true)
+ assert(!f.commands.some(command=>command.action==='start'))
+ retire();await closing;await f.voice.settled();assert.equal(f.voice.busy,false)
+})
+test('a failed remote closure reports uncertainty and never starts late audio or reopens the transport',async t=>{
+ const f=fixture(t,{release:async()=>{throw Error('Synthetic lost close acknowledgment')}})
+ await f.voice.start({id,sessionId:'personal'});await delay(0);await f.voice.close();await f.voice.settled()
+ assert.equal(f.voice.busy,false);assert(f.events.some(event=>event.params.type==='error'&&event.params.message.includes('not confirmed')))
+ assert(!JSON.stringify(f.events).includes('Synthetic lost close acknowledgment'))
 })
 test('voice endpoint validation fails closed',async t=>{
  const f=fixture(t,{ticket:async sessionId=>({protocol:'resonant-voice/1',sessionId,url:'ws://example.com/voice'})})

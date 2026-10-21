@@ -1,0 +1,125 @@
+{
+  "schema": "augmentor-pi-application-instructions-qualification/1",
+  "applicationSourceRef": "4f4812cca949165ca279a2d7498c0329c5f65e96",
+  "productVersion": "0.2.13",
+  "piVersion": "1.1.0",
+  "scope": "Shared Pi root persona source/fresh ordinary qualification on MX Linux; existing owner review unchanged",
+  "persona": {
+    "source": "config/agent-persona.md",
+    "sourceSha256": "5c9c40fa21329b018f067297c47aadce38e6e07c82ef68446bbefce1c2f0ef2b",
+    "nativeType": "augmentor/application-instructions-v1",
+    "personaMaxBytes": 32768,
+    "capabilityGuidanceMaxBytes": 4096,
+    "nativeAndBootstrapIntegrityChecked": true,
+    "newRootSelectionAndColdReplay": true,
+    "existingRootFirstLoadAdoption": true,
+    "historicalBranchSelection": true,
+    "legacyBranchWithoutSnapshotExcluded": true,
+    "boundedWorkerRootPersonaExcluded": true,
+    "newToolOrPermissionGranted": false,
+    "sourceBodyChanged": false
+  },
+  "inspection": {
+    "originalContextPresentationUnchanged": true,
+    "nativeEntryAndCapturedRangeLinks": true,
+    "separateSdkAndProviderLiteralPresence": true,
+    "selectedSourceDoesNotImplyEffectiveDelivery": true,
+    "captureOptOutPreserved": true,
+    "nativeStateIndependentFromDiagnosticCapture": true,
+    "globalSourceProvenance": false,
+    "aggregateDiagnosticMaxBytes": 8388608,
+    "annotationMaxBytes": 131072,
+    "rangeCandidateLimit": 16,
+    "rangeUnits": "UTF-16 code units"
+  },
+  "qualification": {
+    "source": {
+      "tests": 783,
+      "pass": 781,
+      "existingOptionalSkips": 2,
+      "failures": 0
+    },
+    "freshOrdinary": {
+      "tests": 783,
+      "pass": 781,
+      "existingOptionalSkips": 2,
+      "failures": 0
+    },
+    "testFiles": 138,
+    "harnessChromiumFiles": 57,
+    "workers": 2,
+    "boundsOrSkipsRelaxed": false,
+    "focusedCases": 12,
+    "licencePrivateBoundaryPythonCases": 19,
+    "precedingBuildControl": "expected failure: real provider does not receive the shared persona",
+    "retainedInitialFailures": [
+      "corrupt-source fixture used an internal status field rather than the public Not sent label",
+      "browser fixture stopped its Host before retiring the document and generated connection-refused observations"
+    ],
+    "actualQwen": {
+      "passed": true,
+      "model": "Qwen3.8-27B-GSQ-RCO-IQ3_S-mtp-262k",
+      "contextWindow": 262144,
+      "maxTokens": 8192,
+      "sourceRef": "4f4812cca949165ca279a2d7498c0329c5f65e96",
+      "freshOrdinary": true,
+      "sharedPersonaNativeAndProviderPresence": true,
+      "observedInstructionSourceRequests": 4,
+      "sharedPersonaSourceSha256": "5c9c40fa21329b018f067297c47aadce38e6e07c82ef68446bbefce1c2f0ef2b",
+      "priorNativeReadRetained": true,
+      "parentDraftPreserved": true,
+      "parentNativeBytesPreserved": true,
+      "editProviderRequests": 0,
+      "childTools": 0,
+      "explicitSend": true,
+      "ownerDataImported": false,
+      "modelSpeechGpuSettingsChanged": false
+    }
+  },
+  "inputs": {
+    "tracked": 3424,
+    "compiled": 1066,
+    "sourceDependencyFiles": 37629,
+    "allFrozenInputsUnchanged": true,
+    "ordinaryCompiledExact": true,
+    "productionDependenciesNodeComponentsUnchangedFromBaseline": true,
+    "guiAppAndSupplierSourceFilesExact": 834,
+    "mitDshSupplierFiles": 625,
+    "supplierFilesChangedThisCheckpoint": 0,
+    "cssExact": true,
+    "generatedGuiDifference": "temporary spreadsheet-overlay paths change manifests and the Excel import chunk name; main GUI equals baseline after only that name is normalized; actual artifact freeze comparisons remain strict"
+  },
+  "preservation": {
+    "existingSealsVerified": 13,
+    "existingReviewOwnersPresent": 14,
+    "cpuRecognitionPreserved": true,
+    "canonicalPreexistingChanges": 38,
+    "privateSpeechPreexistingChanges": 4,
+    "modelSpeechConfigurationHashesPreserved": 6,
+    "selectedInstallationChanged": false,
+    "reviewApplicationUpdated": false,
+    "newReviewStarted": false,
+    "ownerDataImported": false,
+    "privateSpeechSourceCopiedIntoPublicAppOrCi": false,
+    "modelSpeechGpuSettingsChanged": false,
+    "publicBinaryPublished": false
+  },
+  "hosted": {
+    "precedingRef": "3aed0c64bb87065eacc7d47312f93d52b04791df",
+    "sdkLinux": "passed",
+    "sdkMacos": "passed",
+    "sdkWindows": "cancelled",
+    "debian": "failed at loaded Codex Browser Branch-selected-child assertion; cause not established; later qualification blocked",
+    "otherPlatformGates": "previous Windows jobs/native and macOS packaging failures retained",
+    "newHead": "pending after publication"
+  },
+  "remaining": [
+    "owner MX review/adoption of this source increment",
+    "complete instruction/resource/opaque-handler provenance",
+    "optional response_metrics tool binding",
+    "other embedded role/persona acceptance",
+    "representative behavioral/provider and physical speech acceptance",
+    "full memory/plugin/Home/Office/data migration and distribution",
+    "later Windows/macOS/distro and installed rollout qualification"
+  ]
+}

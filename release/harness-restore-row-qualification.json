@@ -1,0 +1,148 @@
+{
+  "schema": "augmentor-restore-row-qualification/1",
+  "date": "2026-10-15",
+  "applicationRef": "d8520d5fe6b7e8eaa232835be54ec0759b88c566",
+  "precedingFixtureRef": "e43d3d3cba9c1cf7e5204446b2a933c3abee53a5",
+  "scope": "Original GUI fixture waits for observed restore before explicit row opening; source/unselected ordinary only",
+  "fixturePath": "tests/harness-dsh-chromium.test.mjs",
+  "fixtureSha256": "4a79b6734c629f0c9f8ffe28e7b4c6e49e3a82e3bd2756e416379a41765b3e4f",
+  "controlledBefore": {
+    "logSha256": "58d1a1ae59cea9cdb3f8416513de59677021dfc5ef2693b7811d12fdb27cb9bb",
+    "tests": 1,
+    "pass": 0,
+    "fail": 1,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 21141.405541
+  },
+  "controlledAfter": {
+    "logSha256": "2d2ae7da78db5617564afa680a55d418b2bb3cefdcdba89d69651c5bfeeef016",
+    "tests": 1,
+    "pass": 1,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 10392.45706
+  },
+  "controlledCondition": "CDP holds the actual session.organize restore HTTP response after the Host commits. The original guard refuses an early archived-row click. Releasing and waiting for its original Archive action before an explicit open passes.",
+  "focusedSource": {
+    "logSha256": "d53cde3d0cbbb3f02dfc0f5ac649bc15930f7cadd5cc72d071d08b4e08390cba",
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 18421.178246
+  },
+  "focusedOrdinary": {
+    "logSha256": "2a737bffd4aae11c31176d9263be8c98bc8c1bdea7117c7af781ac5a3d576bf6",
+    "tests": 4,
+    "pass": 4,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 18863.252712
+  },
+  "deadlinesChanged": false,
+  "assertionsRelaxed": false,
+  "productionCodeChanged": false,
+  "supplierGuiOrCssChanged": false,
+  "workersPerCohort": 2,
+  "fullCohortsStatus": "passed",
+  "fullMigrationQualified": false,
+  "promotionAllowed": false,
+  "hostedOriginalCauseProven": false,
+  "retainedHostedFailure": {
+    "ref": "b1b1986ea516c67239cad837e0bfdc2a3a2b62be",
+    "job": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38699478189/job/116304409701",
+    "failure": "Post-Unarchive opening times out waiting for Partial fixture output; no test-controlled reply delay or inner timing evidence was retained"
+  },
+  "retainedPreparationFailure": "A private global fetch wrapper did not intercept the controller, which had already captured its fetch reference. Both initial controls timed out on the missing hold; corrected CDP response-stage controls are separate.",
+  "remainingGates": [
+    "Subsequent catalog-ordering product fix passes local cohorts; hosted/installed/live adoption remains",
+    "New-head hosted acceptance; earlier unrelated Context pointer failure remains historical",
+    "Physical MX, live/installed/provider/browser and complete P0/P1 migration",
+    "Office complete engine/output/font/performance/licence/distribution and other platforms"
+  ],
+  "fixtureRef": "42573b67425e17fde2d87e94b5cfeff2df4c53fc",
+  "fullCohortsPassed": true,
+  "sourceAndOrdinary": {
+    "source": {
+      "logSha256": "93bab1f3a9aa279ddd1c8a495381a33756910d7b61bd7b23625949da4d0a62c8",
+      "tests": 390,
+      "pass": 388,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "duration_ms": 194154.930327
+    },
+    "ordinary": {
+      "logSha256": "0dc2b727d72ea194a4e87244cbc9e926c566bb0eba8a66728ee63a54d003def4",
+      "tests": 390,
+      "pass": 388,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 2,
+      "duration_ms": 193068.913028
+    }
+  },
+  "testFileCount": 81,
+  "harnessChromiumFiles": 45,
+  "cohortsRanConcurrently": true,
+  "preservation": {
+    "observedAtUtc": "2026-10-15T08:07:11.049879+00:00",
+    "selectionSha256": "831f6bf27a0fddd7d923ebb6a217384888c5c208432da77cea15eb47ce365826",
+    "fourReviewProcessesStillPresent": true,
+    "qwenCatalogHttpStatus": 200,
+    "canonicalPreexistingChanges": 38,
+    "matchingCompiledFiles": 1013,
+    "fixtureSourceAndOrdinaryMatch": true,
+    "productionDiffPaths": [],
+    "threeSealedInventoriesVerified": true,
+    "installedOrReviewActivation": false,
+    "modelSpeechGpuSettingsChanged": false
+  },
+  "officeSnapshot": {
+    "observedAtUtc": "2026-10-15T08:07:11.049879+00:00",
+    "state": "running",
+    "stage": "final-link",
+    "oomKilled": false,
+    "outputQualified": false
+  },
+  "separateOpenProductFinding": {
+    "condition": "A workspace refresh captures organization revision 1 before restore; restore confirms revision 2; the delayed old refresh then replaces revision 2 with archived membership from revision 1.",
+    "observed": {
+      "observedAfterConfirmedRestoreAndLateOlderRefresh": {
+        "revision": 1,
+        "organizationRevision": 1,
+        "items": [],
+        "pinnedSessionIds": [],
+        "archivedSessionIds": [
+          "restored"
+        ]
+      },
+      "expectedOrganizationRevision": 2,
+      "staleRestoreProjection": true
+    },
+    "logSha256": "8f63fb4982634953b59cf96737fed741979b6ed71eec0a858781d1b40c4681e9",
+    "fixedByThisFixtureChange": false,
+    "liveOrHostedCauseProven": false
+  },
+  "precedingHosted": {
+    "ref": "e43d3d3cba9c1cf7e5204446b2a933c3abee53a5",
+    "sdkThreePlatforms": "passed",
+    "homeActualPiImageModes": "passed",
+    "windowsDesktopX64AndArm64": "passed",
+    "sdkRun": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38702318581",
+    "homeJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38702318726/job/116313267683",
+    "widerLinuxAtObservation": "running",
+    "linuxJob": "https://github.com/ManoloRemiddi/augmentor-agent/actions/runs/38702318726/job/116313720276",
+    "newFixtureHeadHosted": "pending"
+  },
+  "subsequentProductCorrection": {
+    "ref": "ea3775bff3d520cfd4d6cba70ef946120beaeb32",
+    "record": "release/harness-workspace-ordering.json",
+    "localCohortsPassed": true,
+    "installedActivation": false
+  }
+}

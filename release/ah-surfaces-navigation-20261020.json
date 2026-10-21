@@ -1,0 +1,57 @@
+{
+  "schema": "augmentor-ah-surfaces-navigation/1",
+  "date": "2026-10-20",
+  "sourceRef": "724bc94d",
+  "platform": "MX Linux",
+  "changes": [
+    "Fix Home dialog QObject method shadowing and trapped Settings lifecycle",
+    "Default new standalone Desktop and Browser selections to AH; retain saved choices and named DSH entries",
+    "Route Open harness in browser through selected backend; retain separate model configuration",
+    "Refresh menu/access settings and correct refused engine selections"
+  ],
+  "qualification": {
+    "oldInstalledExceptionReproduced": true,
+    "candidatePythonTests": 25,
+    "candidateNodeTests": 4,
+    "sealedSdkDesktopBrowserReplyAndRestore": true,
+    "customBrowserTests": 4,
+    "sourceControllerRegressions": 12,
+    "sourceBrowserRegressions": 34,
+    "realLocalQwenReply": true,
+    "realAhConversationRestored": true,
+    "actualPrimaryHomeBackClicksAndScreenshots": true,
+    "actualPrimaryBrowserActionClicked": true,
+    "externalBrowserContentsInspected": false,
+    "issuedAhBrowserPageHttpStatus": 200
+  },
+  "installed": {
+    "productVersion": "0.2.11",
+    "releaseId": "20261020-122504-89090cd7",
+    "artifactSha256": "bd7a2cb205353d6c2801ec4d3e414eed81ca448578b58383c89ab49accd357e7",
+    "selectedAndRunning": true,
+    "online": true,
+    "modelReady": true,
+    "sessionRestoreError": false,
+    "primaryEngine": "ah",
+    "browserExtensionVersion": "0.2.11",
+    "customBrowserChangedFiles": [
+      "state.mjs"
+    ],
+    "loadedBrowserExtensionReloadObserved": false,
+    "mobileUpdated": false
+  },
+  "preservation": {
+    "ownerProjectsAndHistoriesRetained": true,
+    "oneLabelledVerificationConversationAdded": true,
+    "dshAndHandyDependenciesRetained": true,
+    "previousCompatibleRollbackRetained": true,
+    "oldBaseRetainedForLiveMobile": true,
+    "oneNewSealedRelease": true,
+    "managedScratchRemoved": true
+  },
+  "limits": [
+    "Loaded Chromium extension requires reload for new default; explicit saved engine choices remain",
+    "Physical macOS and Windows adoption not qualified by MX tests",
+    "SourceRef in deployment identifies the initial 91118ebf navigation client; this record pins its qualified 724bc94d compatibility follow-up and exact artifact"
+  ]
+}

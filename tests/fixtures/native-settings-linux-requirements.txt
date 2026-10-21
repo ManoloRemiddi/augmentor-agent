@@ -1,0 +1,7 @@
+# Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+# Linux x86_64 abi3 wheels, same Qt version as requirements-dev.txt and local MX checks.
+# Hashes verified against PyPI's 6.8.2.1 release JSON for each named package.
+PySide6-Essentials==6.8.2.1 --hash=sha256:5ab31e5395a4724102edd6e8ff980fa3f7cde2aa79050763a1dcc30bb914195a
+shiboken6==6.8.2.1 --hash=sha256:c83e90056f13d0872cc4d2b7bf60b6d6e3b1b172f1f91910c0ba5b641af01758
+Pygments==2.18.0 --hash=sha256:b8e6aca0523f3ab76fee51799c488e38782ac06eafcf95e7ba832985c8e7b13a
+numpy==2.5.1 --hash=sha256:9726558e8db4a5bf7929a70ae50f63abda4daf0efe810e3bfbab95976f75fc1a

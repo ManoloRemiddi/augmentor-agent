@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Paint-only rolling letters, matching the native composer's pending/settling phases.
 // Never put animation characters into the draft or a model request.
-export function startLetterRoll(input){
+export function startLetterRoll(input,{text=input.value}={}){
   const doc=input.ownerDocument,win=doc.defaultView,preview=doc.createElement('div')
   preview.className='prompt-letter-preview';preview.setAttribute('aria-hidden','true')
   let timer=null,finish=null,stopped=false
@@ -38,7 +38,7 @@ export function startLetterRoll(input){
     preview.replaceChildren(fragment);sync()
   }
   input.after(preview);input.classList.add('prompt-improving');input.setAttribute('aria-busy','true')
-  render(input.value)
+  render(text)
   input.addEventListener('scroll',sync);win.addEventListener('resize',sync)
   const observer=win.ResizeObserver?new win.ResizeObserver(sync):null;observer?.observe(input)
   return {

@@ -1,5 +1,5 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Authenticated DSH 0.1.5 Typert transport shared by setup, desktop and branching.
+"""Authenticated DSH Typert transport shared by setup, desktop and branching.
 
 Only an explicit authentication refusal can retry a request. Network failures
 and server errors are never replayed. Session cookies remain in this process.
@@ -15,6 +15,8 @@ import urllib.request
 from urllib.parse import urlsplit, parse_qs, quote
 import uuid
 import websocket
+
+CATALOG_CONTRACT = 'dsh-session-model-catalog/1'
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs): return None
@@ -123,7 +125,12 @@ class Remote:
         p=payload or {}
         if method=='host.describe':
             catalog=self.invoke('session/modelCatalog')
-            return {'version':'0.1.5-rc.1','home':str(self.home),**(catalog.get('default') or {})}
+            if not isinstance(catalog,dict) or not isinstance(catalog.get('groups'),list) or (catalog.get('default') is not None and not isinstance(catalog['default'],dict)):
+                raise ValueError('DSH returned an unsupported model catalogue contract.')
+            # This route exposes a catalogue, not the running server's version.
+            # Keep identity unknown even when a model default includes that key.
+            return {**(catalog.get('default') or {}),'version':None,'versionVerified':False,
+                    'catalogContract':CATALOG_CONTRACT,'home':str(self.home)}
         if method=='llm.models':return self.invoke('session/modelCatalog')
         if method in ('settings.describe','agentPresets.list'):return self.invoke(method.replace('.','/'))
         if method=='settings.mutate':return self.invoke('settings/mutate',p)

@@ -1,0 +1,331 @@
+{
+  "schema": "augmentor-harness-packaged-privacy-qualification/1",
+  "date": "2026-10-17",
+  "scope": "MX Linux managed core and original GUI with independently authored local profiles/providers; actual sealed prior/current application roots, source fresh/cold, upgrade and rollback; no runtime code or owner configuration change",
+  "baseSourceRef": "39c3848e8ee7d305d2596938e8d4f2f6de9d80af",
+  "applicationCodeChanged": false,
+  "ownerAppUpdatedOrRestarted": false,
+  "piSdkVersion": "1.1.0",
+  "tools": {
+    "node": "24.19.0",
+    "strace": "6.13",
+    "chromium": "155.0.8059.79 on Debian 13"
+  },
+  "inputsSha256": {
+    "tests/fixtures/kernel-network-audit.mjs": "d9e1c1bad685932d9fdf8f23978e77c121ac97abaaee44875a2d02e54839e4c2",
+    "tests/fixtures/retire-privacy-services.py": "7ee43c7dda71a66c4b99ec0c5fa062d59bbbbc12f171446d8ab65e9367df468f",
+    "tests/kernel-network-audit.test.mjs": "83de7fc0e5908524e2d6be58d153da80b21faa143c7058fe31705d2e5c3755a3",
+    "tests/harness-privacy-upgrade-chromium.test.mjs": "e3df3c09e88b189849953a0dc23bafb40d3d4f6e91c30b84128959298297cefd",
+    ".github/workflows/validate.yml": "ba032eb19bdbc27d2d23c91ac00aeb10212254168dbdeed99819ca0cc29cf0de",
+    "tests/pi-privacy.test.mjs": "e3882212d6727e410c5980390a17b4f773d7e9aa9ab9075f228bfb00c70f3a65",
+    "tests/pi-prompt-improvement.test.mjs": "806b12ba2938910511c519c31b63f00e3142be2173e521c0df611d8a39899337",
+    "tests/desktop-specialist.test.mjs": "673afcc54f57687f65b1924cbe3f7913f80bd22bcda67c33621a53d357e6211a",
+    "packages/runtime/src/pi-privacy.ts": "f019f684706a437acd2adbc8aaa169446a73f80b359154a9b5f729a4d6a974bd",
+    "packages/runtime/src/host.ts": "b225032cc89e741ffd6dfdf564d560c14f57dcb8cb9e981ec58e2f79e453faa5",
+    "packages/runtime/src/prompt-improvement.ts": "9f2a8541f99e9bf4d881a046dcc548af593d6dd84671b48d777256d038c225f3",
+    "packages/runtime/src/desktop-specialist.ts": "03db29726bfbdd44090d4b8f1773b3581e4425ea4f313e56ee80670f6fc11ce3"
+  },
+  "artifacts": [
+    {
+      "releaseId": "20261017-055628-b9afa698",
+      "applicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+      "artifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+      "sealedInputsVerified": 24686
+    },
+    {
+      "releaseId": "20261017-061143-d0c0fc29",
+      "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+      "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+      "sealedInputsVerified": 24689
+    }
+  ],
+  "compiledSourceFilesStillExactWithCurrentArtifact": 1120,
+  "method": {
+    "kernel": "strace before Host imports; follow descendant tasks; connect/sendto/sendmsg/sendmmsg; no Node network monkeypatch in lifecycle cases",
+    "tracePayloadStringsSuppressed": true,
+    "networkBlockingOrOfflineFlagsUsedInLifecycleCases": false,
+    "inheritedPiTelemetry": "true",
+    "savedSdkOptIns": [
+      "enableInstallTelemetry",
+      "enableAnalytics",
+      "cacheWarming=full",
+      "trackingId",
+      "unapproved package entry"
+    ],
+    "negativeControl": "Actual descendant TCP and UDP loopback canaries outside an empty/partial allowlist are detected; child PID/ports and payload suppression checked",
+    "browser": "Actual original-GUI pointer Send, Trajectory, Context, Insights and Plugins; page HTTP resource requests remain at that phase\u2019s Harness origin",
+    "coldReadiness": "Controlled held draft.describe proves composer non-editable while restoring; type only after actual editable/focus state and assert inserted text before one Send",
+    "cleanup": "Retire only exact authored-profile prompt/memory service scripts after confirmed Host exit; browser helpers only after browser exit; never global or owner processes"
+  },
+  "matrices": [
+    {
+      "kind": "release-final",
+      "nodePass": 20,
+      "nodeFail": 0,
+      "skipped": 0,
+      "phases": [
+        {
+          "phase": "fresh",
+          "elapsedMs": 2136,
+          "explicitModelRequests": 1,
+          "providerAttributionHeadersAbsent": true,
+          "explicitOwnerHeaderRetained": true,
+          "savedSettingsExact": true,
+          "previousNativePrefixExact": true,
+          "browserRequests": 65,
+          "browserUnexpectedDestinations": 0,
+          "kernelIpAttempts": 1,
+          "kernelUnexpectedDestinations": 0,
+          "traceTaskFiles": 30,
+          "retiredCompanions": 1,
+          "originalGuiSendContextInsightsPlugins": true,
+          "noReplayOnStart": true,
+          "releaseId": "20261017-055628-b9afa698"
+        },
+        {
+          "phase": "cold",
+          "elapsedMs": 2030,
+          "explicitModelRequests": 1,
+          "providerAttributionHeadersAbsent": true,
+          "explicitOwnerHeaderRetained": true,
+          "savedSettingsExact": true,
+          "previousNativePrefixExact": true,
+          "browserRequests": 66,
+          "browserUnexpectedDestinations": 0,
+          "kernelIpAttempts": 1,
+          "kernelUnexpectedDestinations": 0,
+          "traceTaskFiles": 31,
+          "retiredCompanions": 1,
+          "originalGuiSendContextInsightsPlugins": true,
+          "noReplayOnStart": true,
+          "releaseId": "20261017-055628-b9afa698"
+        },
+        {
+          "phase": "upgrade",
+          "elapsedMs": 2065,
+          "explicitModelRequests": 1,
+          "providerAttributionHeadersAbsent": true,
+          "explicitOwnerHeaderRetained": true,
+          "savedSettingsExact": true,
+          "previousNativePrefixExact": true,
+          "browserRequests": 67,
+          "browserUnexpectedDestinations": 0,
+          "kernelIpAttempts": 1,
+          "kernelUnexpectedDestinations": 0,
+          "traceTaskFiles": 31,
+          "retiredCompanions": 1,
+          "originalGuiSendContextInsightsPlugins": true,
+          "noReplayOnStart": true,
+          "releaseId": "20261017-061143-d0c0fc29"
+        },
+        {
+          "phase": "rollback",
+          "elapsedMs": 2064,
+          "explicitModelRequests": 1,
+          "providerAttributionHeadersAbsent": true,
+          "explicitOwnerHeaderRetained": true,
+          "savedSettingsExact": true,
+          "previousNativePrefixExact": true,
+          "browserRequests": 68,
+          "browserUnexpectedDestinations": 0,
+          "kernelIpAttempts": 1,
+          "kernelUnexpectedDestinations": 0,
+          "traceTaskFiles": 31,
+          "retiredCompanions": 1,
+          "originalGuiSendContextInsightsPlugins": true,
+          "noReplayOnStart": true,
+          "releaseId": "20261017-055628-b9afa698"
+        }
+      ],
+      "modelRequests": 4,
+      "controlledColdDraftReadinessVerified": true,
+      "finalCleanup": {
+        "retiredCompanions": 0,
+        "retiredBrowserHelpers": 0
+      }
+    },
+    {
+      "kind": "current-final",
+      "nodePass": 1,
+      "nodeFail": 0,
+      "skipped": 0,
+      "phases": [
+        {
+          "phase": "current-fresh",
+          "elapsedMs": 2105,
+          "explicitModelRequests": 1,
+          "providerAttributionHeadersAbsent": true,
+          "explicitOwnerHeaderRetained": true,
+          "savedSettingsExact": true,
+          "previousNativePrefixExact": true,
+          "browserRequests": 65,
+          "browserUnexpectedDestinations": 0,
+          "kernelIpAttempts": 1,
+          "kernelUnexpectedDestinations": 0,
+          "traceTaskFiles": 30,
+          "retiredCompanions": 1,
+          "originalGuiSendContextInsightsPlugins": true,
+          "noReplayOnStart": true,
+          "releaseId": "20261017-061143-d0c0fc29"
+        },
+        {
+          "phase": "current-cold",
+          "elapsedMs": 2019,
+          "explicitModelRequests": 1,
+          "providerAttributionHeadersAbsent": true,
+          "explicitOwnerHeaderRetained": true,
+          "savedSettingsExact": true,
+          "previousNativePrefixExact": true,
+          "browserRequests": 66,
+          "browserUnexpectedDestinations": 0,
+          "kernelIpAttempts": 1,
+          "kernelUnexpectedDestinations": 0,
+          "traceTaskFiles": 31,
+          "retiredCompanions": 1,
+          "originalGuiSendContextInsightsPlugins": true,
+          "noReplayOnStart": true,
+          "releaseId": "20261017-061143-d0c0fc29"
+        }
+      ],
+      "modelRequests": 2,
+      "controlledColdDraftReadinessVerified": true,
+      "finalCleanup": {
+        "retiredCompanions": 0,
+        "retiredBrowserHelpers": 0
+      }
+    },
+    {
+      "kind": "source-default",
+      "nodePass": 1,
+      "nodeFail": 0,
+      "skipped": 0,
+      "phases": [
+        {
+          "phase": "current-fresh",
+          "elapsedMs": 2194,
+          "explicitModelRequests": 1,
+          "providerAttributionHeadersAbsent": true,
+          "explicitOwnerHeaderRetained": true,
+          "savedSettingsExact": true,
+          "previousNativePrefixExact": true,
+          "browserRequests": 65,
+          "browserUnexpectedDestinations": 0,
+          "kernelIpAttempts": 1,
+          "kernelUnexpectedDestinations": 0,
+          "traceTaskFiles": 30,
+          "retiredCompanions": 1,
+          "originalGuiSendContextInsightsPlugins": true,
+          "noReplayOnStart": true,
+          "releaseId": "source-default; compiled inputs match b1edf4d2"
+        },
+        {
+          "phase": "current-cold",
+          "elapsedMs": 2002,
+          "explicitModelRequests": 1,
+          "providerAttributionHeadersAbsent": true,
+          "explicitOwnerHeaderRetained": true,
+          "savedSettingsExact": true,
+          "previousNativePrefixExact": true,
+          "browserRequests": 66,
+          "browserUnexpectedDestinations": 0,
+          "kernelIpAttempts": 1,
+          "kernelUnexpectedDestinations": 0,
+          "traceTaskFiles": 31,
+          "retiredCompanions": 1,
+          "originalGuiSendContextInsightsPlugins": true,
+          "noReplayOnStart": true,
+          "releaseId": "source-default; compiled inputs match b1edf4d2"
+        }
+      ],
+      "modelRequests": 2,
+      "controlledColdDraftReadinessVerified": true,
+      "finalCleanup": {
+        "retiredCompanions": 0,
+        "retiredBrowserHelpers": 0
+      }
+    }
+  ],
+  "lifecycleTotals": {
+    "packagedPhases": 6,
+    "sourcePhases": 2,
+    "explicitSyntheticProviderRequests": 8,
+    "kernelIpAttempts": 8,
+    "unexpectedKernelDestinations": 0,
+    "browserPageRequests": 528,
+    "unexpectedBrowserPageDestinations": 0,
+    "savedCliModelAndProductSettingsUnchanged": true,
+    "oldNativePrefixesPreserved": true,
+    "unrequestedPiAttributionHeadersAbsent": true,
+    "explicitAuthoredHeaderRetained": true,
+    "trackingIdExcludedFromProviderRequests": true,
+    "testPromptCompanionsRetired": 8,
+    "ownerDataUsed": false,
+    "externalProviderAccountsUsed": false
+  },
+  "regressionGate": {
+    "normalLinuxSourceFreshColdMandatory": true,
+    "linuxValidationStracePrerequisiteAdded": true,
+    "packagedUpgradeRollbackRequiresExplicitArtifactRoots": true,
+    "newPinOrPackageMustBeQualifiedAgain": true,
+    "hostedNewHeadResultNotClaimed": true
+  },
+  "preliminaryEvidence": [
+    "First canary assertion assumed sendto; actual UDP send syscall variants are now accepted while retaining exact descendant PID/port checks",
+    "First four-phase cohort passed with operator retirement of its own lingering prompt services; later fixture owns that cleanup automatically",
+    "Two later GUI runs reached an unavailable Send control; their failed logs remain. A diagnostic capture initially had a quoting defect. The final driver waits for editable/focused composer and verifies inserted text; a controlled held draft read checks loading explicitly. This does not establish the exact cause of every earlier unavailable-control observation",
+    "The first controlled draft-read assertion incorrectly expected aria-disabled to be absent; the actual control correctly advertises disabled. The corrected assertion verifies non-editable plus disabled state, then releases the one held read"
+  ],
+  "preservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-055628-b9afa698",
+        "applicationRef": "e37d79b60d419e58cffb26a687cd69cbca6e72f9",
+        "artifactSha256": "6cb94165f70e191c99746500127a600a8e2ec2afaaf67994cc2653dd4c60b477",
+        "sealedInputsVerified": 24686
+      },
+      {
+        "releaseId": "20261017-061143-d0c0fc29",
+        "applicationRef": "b1edf4d2ec5ad11af3cb38ba5dd7a38f4af3cde4",
+        "artifactSha256": "387c9ce1145b05011bf72987ec5f72a1a952710d78cdf0703adef937b89e85a9",
+        "sealedInputsVerified": 24689
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-061143-d0c0fc29",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-061143-d0c0fc29",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 12,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "limits": [
+    "Bounded observations for these exact artifacts and Pi 1.1.0; no claim about a future dependency or arbitrary extension",
+    "Kernel evidence covers the traced Host/descendant IP connect/send syscalls; this is neither a firewall nor a whole-machine packet audit",
+    "Browser evidence covers observed application HTTP page/resource requests, not Chromium background traffic, every other browser transport protocol, or all Office/PDF/worker workflows",
+    "No configured live MCP, external account refresh, selected memory backend, voice or third-party service privacy audited",
+    "The version transition directly cold-reopens one authored profile on each app root; deployment/installed review-opener transactions qualify separately",
+    "Private current MX reviews remain on b1edf4d2 with unchanged PIDs/data; additional real migration still awaits owner pilot feedback; later OS/voice/public release remain separate"
+  ],
+  "publicationChecks": {
+    "privateBoundaryLicenceAndNoticeCasesPassed": 16,
+    "privateSourceIdentitiesChecked": 77,
+    "privateSourceIdentityMatches": 0
+  }
+}

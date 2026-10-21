@@ -1,0 +1,107 @@
+{
+  "schema": "augmentor-jobs-editor-refresh-qualification/1",
+  "date": "2026-10-15",
+  "testedApplicationRef": "6fd0b52fe5199fe599a7e3796d09800797024b6c",
+  "previousApplicationRef": "c393c945dd78fde89ffbf14916e8c60c23169698",
+  "scope": "Shared original DSH and inspection Jobs editor state; Linux x64 source and ordinary fixture qualification, no installed promotion",
+  "problem": "A legitimate fresh history/list commit closed an editor opened while that read was pending. The existing draft fields survived but their disclosure did not.",
+  "before": {
+    "sharedCommonCases": 6,
+    "failingCases": 1,
+    "originalDshGuiControlledHistoryFailure": true,
+    "oldHostedPointerSoleCauseProven": false
+  },
+  "behavior": {
+    "latestOpenOrClosedStateSampledAtCommit": true,
+    "unsavedTaskAndRequestIdentityRetained": true,
+    "confirmedAdmissionClosesAndClearsDraft": true,
+    "rejectedAdmissionKeepsDraftOpen": true,
+    "ownerEpochAndAccessChangesReset": true,
+    "staleReadsCannotRestoreOtherOwnerText": true,
+    "noLayoutCssControlPlacementOrSupplierChange": true,
+    "noProducerSdkLoopOrDependencyChange": true
+  },
+  "cohort": {
+    "sourceCases": 304,
+    "sourcePasses": 304,
+    "ordinaryCases": 304,
+    "ordinaryPasses": 304,
+    "testFiles": 67,
+    "harnessChromiumFiles": 44,
+    "workers": 2,
+    "existingDeadlineChanges": false,
+    "skips": 0,
+    "cancellations": 0,
+    "newCommonJobEditorCases": 6,
+    "existingSharedPromptDomCases": 15,
+    "realJobsChromiumCases": 3,
+    "commonNativeOfficeCases": 24,
+    "defaultQueueWasmCases": 4,
+    "sourceDurationMs": 157149.65059,
+    "ordinaryDurationMs": 158713.23117
+  },
+  "parity": {
+    "compiledFiles": 1007,
+    "executableInputs": 2122,
+    "node_modulesEntries": 20702,
+    "productionNpmInstances": 151,
+    "apps/browser/test/node_modulesEntries": 1932,
+    "supplierGuiSelectionsAndCssUnchanged": true,
+    "sourceBuiltOfficeEntry82FilesUnchanged": true,
+    "originalMitProviderUnchanged": true,
+    "ownerAndProducerRuntimeSourceUnchanged": true,
+    "currentReviewEntriesVerified": 24305,
+    "priorReviewEntriesVerified": 24288,
+    "allFourReviewProcessesPreserved": true,
+    "ownerOrSelectedArtifactsUpdated": false,
+    "modelSpeechGpuSettingsChanged": false,
+    "canonicalPreexistingStatusEntries": 38,
+    "qwenReadOnlyModelsStatus": 200
+  },
+  "packaging": {
+    "officeSourceNoticeAndTamperCases": 9,
+    "privateSourceBoundaryCases": 2,
+    "publicOfficeEngineGateStillClosed": true
+  },
+  "predecessorHosted": {
+    "head": "c393c945dd78fde89ffbf14916e8c60c23169698",
+    "sdk": {
+      "run": 38676599783,
+      "conclusion": "success",
+      "platforms": [
+        "Linux",
+        "macOS",
+        "Windows"
+      ]
+    },
+    "windowsDesktop": {
+      "run": 38676600185,
+      "conclusion": "success"
+    },
+    "validate": {
+      "run": 38676599824,
+      "conclusion": "failure",
+      "retainedFailure": "actual SDK retains MCP timeout authorization evidence and active receipts; already-admitted receipt assertion. Exact ordering remains unproven and is not covered by this Jobs correction."
+    },
+    "macos": {
+      "run": 38676599837,
+      "conclusion": "failure",
+      "retainedFailure": "unreviewed MPL-2.0 native Office 0.1.3 and LGPL-3.0-or-later darwin libvips 1.3.4 packages"
+    },
+    "windowsCommandJobs": {
+      "run": 38676599848,
+      "conclusion": "failure",
+      "retainedFailure": "eight command-job assertions/timeouts"
+    },
+    "newHeadHostedQualified": false
+  },
+  "installedArtifactsUpdated": false,
+  "publicRedistributionQualified": false,
+  "remainingGates": [
+    "New-head hosted and actual MX physical/installed acceptance",
+    "Separate MCP authorization active-receipt failure in wider Linux CI",
+    "Windows command-job and OS native adapters",
+    "Office engine source build, notice/font/licence and distribution qualification",
+    "Live provider/OAuth/search/MCP/voice, privacy, update/rollback and complete migration acceptance"
+  ]
+}

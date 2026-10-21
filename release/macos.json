@@ -31,5 +31,5 @@
     "jaraco.functools": "4.1.0",
     "more-itertools": "10.7.0"
   },
-  "pi": "0.85.1"
+  "pi": "1.1.0"
 }

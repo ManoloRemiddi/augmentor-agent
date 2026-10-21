@@ -1,0 +1,151 @@
+{
+  "schema": "augmentor-harness-shared-embed-package/1",
+  "date": "2026-10-17",
+  "applicationRef": "add7b8915e45c2bb28b748db7a52c7d33713e97f",
+  "releaseId": "20261017-152350-2c67edd7",
+  "artifactSha256": "112ec5c4bbf146f03994dd1b6a0996d52d776c7f037914e0f4d33b6b2117dd53",
+  "baseArtifactSha256": "63ea2dd8c66ec8f6d521aa3a57616ca456fd781b17618ca259a9ec9d50da5c08",
+  "inventoryEntriesVerified": 24761,
+  "compiledFilesVerified": 1143,
+  "scope": "Fresh unselected immutable MX embedding shared-store candidate; no owner cutover",
+  "qualification": {
+    "sourceNodePass": 42,
+    "ordinaryNodePass": 42,
+    "exactSealedNodePass": 42,
+    "sourcePythonPass": 82,
+    "ordinaryPythonPass": 82,
+    "exactSealedPythonPass": 82,
+    "declaredInterpreterBindingPass": 12,
+    "declaredInterpreterCasesOverlap82": true,
+    "fail": 0,
+    "skip": 0,
+    "nodeFiles": 10,
+    "workers": 2,
+    "actualGeneratedEmbedSdkServerNativeHostUsed": true,
+    "idleManagedReaderAndKnownProcessGuardRefuse": true,
+    "proxyAuthAndSdkMutationRestrictionsPreserved": true,
+    "targetLibraryRead": true,
+    "testsAndFixturesExternal": true,
+    "sealedBytesUnchangedAfterTests": true,
+    "productionDependenciesComponentsNoticesUnchanged": true,
+    "noPhysicalOwnerDesktopOrMobileAcceptance": true
+  },
+  "actualProductionPrerequisites": {
+    "installedProductIntegrationVersion": "0.2.11",
+    "candidateProductVersion": "0.2.13",
+    "actualCandidatePreflightRefusesProductMismatch": true,
+    "actualHomeTokenIdentityMatches": true,
+    "ownedTrackedFileCount": 6,
+    "matchingOwnedFiles": 5,
+    "editedPackageMetadataKeys": [
+      "peerDependencies"
+    ],
+    "recordedCompositionEntryOccurrences": 0,
+    "safeNonExecutingYamlNodeInspection": true,
+    "standardAutomaticUpdateNotQualified": true,
+    "deliberateCustomCompositionPreservationRequired": true,
+    "noVersionOrOwnershipGuardBypassed": true,
+    "installedAdapterReportedHostVersion": "0.1.5-rc.1",
+    "adapterVersionSynthesized": true,
+    "installedCliOnDiskVersion": "0.2.0-rc.2",
+    "exactLoadedDshBackendVersionVerified": false,
+    "rawModernCatalogAndPluginInventorySucceed": true,
+    "publicSourceTransportNeedsModernCompatibility": false,
+    "versionInferenceCorrection": "docs/HARNESS-SHARED-PROFILES.md#public-dsh-catalogue-contract-and-actual-managed-backend--october-17",
+    "publicSourceReadContractsVerified": [
+      "session/modelCatalog",
+      "pluginInventory/list",
+      "agentPresets/list",
+      "settings/describe"
+    ],
+    "modernInstallerAndCustomCompositionQualificationStillRequired": true
+  },
+  "activated": false,
+  "installedChanged": false,
+  "ownerModelRequests": 0,
+  "ownerProjectsTransferred": 0,
+  "ownerDataCopied": false,
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "precedingRuntimeCi": {
+    "run": 39035553761,
+    "head": "22103e61915b18e49926c463f8348a7fd9735509",
+    "observedStatus": "in_progress",
+    "conclusionUnproven": true,
+    "noRestart": true
+  },
+  "newRuntimeCi": {
+    "run": 39036728003,
+    "head": "5df1282ae351bce945854231f15a5d8927cb9cc2",
+    "applicationRef": "add7b8915e45c2bb28b748db7a52c7d33713e97f",
+    "onlyDocumentationAndEvidenceAfterApplicationRef": true,
+    "event": "workflow_dispatch",
+    "statusObserved": "in_progress",
+    "conclusionUnproven": true,
+    "precedingPrRunPreserved": 39035553761,
+    "precedingPrRuntime": "22103e61915b18e49926c463f8348a7fd9735509",
+    "precedingConfirmedInProgressAfterPush": true,
+    "concurrencyRefsDistinct": true,
+    "notUnchangedRuntimeRerun": true
+  },
+  "remaining": [
+    "Prepare backed-up deliberate preservation/upgrade of actual custom DSH composition and peer dependency metadata",
+    "Matching installed Native/Browser/product client versions and explicit mobile/custom/review mapping",
+    "Fresh full cold backups/export, actual existing-bank/history/settings/budgets and busy/restart/reboot/reverse acceptance",
+    "Owner pilot feedback before more project transfers; excluded project stays DSH",
+    "Full parity/public Office distribution remain open; voice/later OS deferred"
+  ],
+  "privateEvidenceLogSha256": {
+    "harness-shared-embed-ordinary-node-20261017.log": "feb9572cefa26333d50effb3ceb51cc12c0155cfea9d16c0e50f669cee2d4a01",
+    "harness-shared-embed-ordinary-python-20261017.log": "cd3fb2aed27600a0dd0d4065d91102da01a12d33dee700e07d26c861a35cf999",
+    "harness-shared-embed-sealed-node-20261017.log": "a046321db52da306db1b09815525520f808d12c3bbbf88688dbd979f74c2a043",
+    "harness-shared-embed-sealed-python-20261017.log": "12d1a504544f7ad60c035b02e93bb2a6355492a89f3d1aad9e3aa7bc45d3fd69",
+    "harness-shared-embed-sealed-declared-python-20261017.log": "64d6c289b0964bbef44e6ab3469e2c59e4fcaa5bd22751ad948f60b60537a9d6",
+    "harness-shared-embed-package-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5"
+  },
+  "terminalCiFollowUp": {
+    "priorRuntimeRun": 39035553761,
+    "newRuntimeRun": 39036728003,
+    "bothConclusion": "failure",
+    "details": "docs/HARNESS-BUILD-STORAGE.md#resumed-ci-failure-correction",
+    "earlierInProgressObservationsAreHistorical": true
+  }
+}

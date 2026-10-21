@@ -1,0 +1,178 @@
+{
+  "schema": "augmentor-mcp-cancellation-barrier-qualification/1",
+  "date": "2026-10-15",
+  "applicationBytesRef": "6fd0b52fe5199fe599a7e3796d09800797024b6c",
+  "mcpFixtureRef": "8ac2c40b83be21bcf26378a6a43db1a8ffe05146",
+  "prerequisiteFollowupFixtureRef": "140da43fdd861b99f19c856be86862c65ac6e70f",
+  "scope": "Synthetic public SDK cancellation/authorization and whole source/ordinary Node qualification; no product, installed or public binary promotion",
+  "before": {
+    "oldFixtureWith300msReadAdmissionDelay": "same missing-receipt assertion; both requests reached their own 1000ms deadlines",
+    "exactOlderHostedScheduleProven": false,
+    "negativeControlWithoutSiblingDrain": "revised test fails with closedResult=true before SDK write cancellation"
+  },
+  "fixture": {
+    "realSiblingReadAdmittedBeforeChallenge": true,
+    "receiptReleasedOnActualSdkCancellation": true,
+    "exactWireRequestIdsVerified": true,
+    "trace": [
+      "read-admitted",
+      "write-challenge",
+      "write-cancelled",
+      "read-released",
+      "read-received"
+    ],
+    "sdkRequestTimeoutMsUnchanged": 1000,
+    "outerTimeoutMsUnchanged": 15000,
+    "preparePhaseMsUnchanged": 400,
+    "timerAssumptionsRemovedMs": [
+      600,
+      800
+    ],
+    "newDelayedReadModeMs": 300,
+    "sdkModes": 6,
+    "focusedCases": 45,
+    "focusedFiles": 7,
+    "productionTransportChanged": false,
+    "syntheticSdkEventOrProviderResultUsed": false,
+    "unknownMutationNoReplayPrivacyAndColdNativeChecksRetained": true
+  },
+  "fullSource": {
+    "fixtureRef": "8ac2c40b83be21bcf26378a6a43db1a8ffe05146",
+    "cases": 1261,
+    "passes": 1255,
+    "failures": 0,
+    "skips": 6,
+    "cancellations": 0,
+    "durationMs": 257923.700221,
+    "skipNames": [
+      "real controlled engine admits Codex Browser windows and Stop closes its upstream model socket without replay (0.187327ms) # SKIP",
+      "real controlled engine completes both scoped memory pipelines inside a Codex Browser window (0.178768ms) # SKIP",
+      "actual parent and individual Stop drain detached Windows descendants (0.377756ms) # requires actual Windows Job objects",
+      "leader exit retains capacity and individual Stop drains its surviving Windows descendant (0.06543ms) # requires actual Windows Job objects",
+      "actual Host crash closes the producer lease and recovery never replays the command (0.04389ms) # requires actual Windows Job objects",
+      "read-only Windows parent refuses a command before starting a producer (0.039139ms) # requires actual Windows Job objects"
+    ]
+  },
+  "initialOrdinary": {
+    "fixtureRef": "8ac2c40b83be21bcf26378a6a43db1a8ffe05146",
+    "cases": 1261,
+    "passes": 1252,
+    "failures": 3,
+    "skips": 6,
+    "cancellations": 0,
+    "durationMs": 261927.380201,
+    "skipNames": [
+      "real controlled engine admits Codex Browser windows and Stop closes its upstream model socket without replay (0.206678ms) # SKIP",
+      "real controlled engine completes both scoped memory pipelines inside a Codex Browser window (0.214627ms) # SKIP",
+      "actual parent and individual Stop drain detached Windows descendants (0.391945ms) # requires actual Windows Job objects",
+      "leader exit retains capacity and individual Stop drains its surviving Windows descendant (0.06852ms) # requires actual Windows Job objects",
+      "actual Host crash closes the producer lease and recovery never replays the command (0.04816ms) # requires actual Windows Job objects",
+      "read-only Windows parent refuses a command before starting a producer (0.04111ms) # requires actual Windows Job objects"
+    ],
+    "retainedCauses": [
+      "missing external Codex prerequisite in external-package/standalone Qt fixtures",
+      "native-host shebang cannot name a Node interpreter containing spaces"
+    ]
+  },
+  "sourcePrerequisiteFollowup": {
+    "fixtureRef": "140da43fdd861b99f19c856be86862c65ac6e70f",
+    "cases": 12,
+    "passes": 10,
+    "existingOptionalSkips": 2,
+    "failures": 0
+  },
+  "fullOrdinary": {
+    "fixtureRef": "140da43fdd861b99f19c856be86862c65ac6e70f",
+    "cases": 1261,
+    "passes": 1255,
+    "failures": 0,
+    "skips": 6,
+    "cancellations": 0,
+    "durationMs": 256422.649621,
+    "skipNames": [
+      "real controlled engine admits Codex Browser windows and Stop closes its upstream model socket without replay (0.147658ms) # SKIP",
+      "real controlled engine completes both scoped memory pipelines inside a Codex Browser window (0.156578ms) # SKIP",
+      "actual parent and individual Stop drain detached Windows descendants (0.416125ms) # requires actual Windows Job objects",
+      "leader exit retains capacity and individual Stop drains its surviving Windows descendant (0.0681ms) # requires actual Windows Job objects",
+      "actual Host crash closes the producer lease and recovery never replays the command (0.04591ms) # requires actual Windows Job objects",
+      "read-only Windows parent refuses a command before starting a producer (0.04441ms) # requires actual Windows Job objects"
+    ]
+  },
+  "testExecution": {
+    "workersPerRun": 2,
+    "existingDeadlineChanges": false,
+    "sourceAndFirstOrdinaryRanConcurrently": true,
+    "finalOrdinaryRanSeparately": true,
+    "rootNodeTestGlobPlusCommonDomFiles": true,
+    "actualWindowsJobObjectSkips": 4,
+    "optionalControlledCodexBrowserSkips": 2
+  },
+  "prerequisite": {
+    "testOnlyEntrySelection": "AUGMENTOR_TEST_CODEX_NPM_ENTRY",
+    "package": "@openai/codex",
+    "version": "0.159.2",
+    "externalToProductionTree": true,
+    "nameVersionBinValidated": true,
+    "explicitSelectionReachesHostNativeHostAndQtLauncher": true,
+    "missingInvalidAndIncompatibleProductRefusalsRemain": true,
+    "privateShortInterpreterAliasUsesSameNodeBinary": true,
+    "originalShebangProbeErrorNumber": 13,
+    "nodeOrCliBinaryCopiedIntoApplication": false
+  },
+  "parity": {
+    "compiledFiles": 1007,
+    "compiledBytesUnchanged": true,
+    "executableInputs": 2123,
+    "node_modulesEntries": 20702,
+    "productionNpmInstances": 151,
+    "apps/browser/test/node_modulesEntries": 1932,
+    "externalCodexPrerequisiteBundled": false,
+    "currentReviewEntriesVerified": 24305,
+    "priorReviewEntriesVerified": 24288,
+    "allFourReviewProcessesPreserved": true,
+    "selectedConfigurationVerified": true,
+    "qwenReadOnlyModelsStatus": 200,
+    "canonicalPreexistingStatusEntries": 38,
+    "modelSpeechGpuSettingsChanged": false,
+    "ownerOrSelectedArtifactsUpdated": false
+  },
+  "sourceBoundaryAndOfficePackagingCases": 11,
+  "hostedAtMcpFixture": {
+    "head": "8ac2c40b83be21bcf26378a6a43db1a8ffe05146",
+    "sdkRun": 38680199098,
+    "sdkAllThreePlatforms": "success; all six MCP modes",
+    "windowsDesktopRun": 38680199372,
+    "windowsDesktop": "success",
+    "validateRun": 38680199462,
+    "validate": "failure at explicit Office public source/rebuild packaging refusal; preceding Node/SDK, DSH and Native stages pass",
+    "macosRun": 38680199292,
+    "macos": "unqualified native Office/libvips licensing/source packaging",
+    "windowsCommandJobsRun": 38680199050,
+    "windowsCommandJobs": "failure; adapter qualification remains open",
+    "newHeadFullyHostedQualified": false
+  },
+  "remainingGates": [
+    "Full ThinLTO engine compile/package/output comparison and source/notice/font/licence redistribution review",
+    "New-head hosted, Windows command-job/native engine and wider OS qualification",
+    "Physical MX/installed and live provider/OAuth/MCP/search/memory/voice acceptance",
+    "Complete migration, privacy erase, update/rollback and remaining parity requirements"
+  ],
+  "installedArtifactsUpdated": false,
+  "publicRedistributionQualified": false,
+  "hostedAtPrerequisiteFollowup": {
+    "head": "140da43fdd861b99f19c856be86862c65ac6e70f",
+    "sdkRun": 38681751869,
+    "sdkAllThreePlatforms": "success; all six actual MCP cancellation modes",
+    "windowsDesktopRun": 38681752114,
+    "windowsDesktop": "success",
+    "validateRun": 38681751959,
+    "validate": "in progress at observation; source boundary, Home runtime and three Handy platform jobs pass",
+    "macosRun": 38681752103,
+    "macos": "failure at unreviewed native Office MPL-2.0/libvips LGPL-3.0-or-later notice/source packaging",
+    "windowsCommandJobsRun": 38681751877,
+    "windowsCommandJobs": "failure; command-job adapter tests remain unqualified",
+    "windowsQualificationRun": 38681752065,
+    "windowsQualification": "pending at observation",
+    "fullyHostedQualified": false
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "schema": "augmentor-office-packaged-cleanup-contention/1",
+  "date": "2026-10-17",
+  "sourceEvidenceBaseRef": "76ace249a30d7942f981602fb7460fdee665027e",
+  "runtimePredecessor": "4c86603df7c5537b2637d610fcb4805d63b7b015",
+  "sourceFilesSha256": {
+    ".github/workflows/validate.yml": "85884fa3b901bb3be876bf8be36a3f6ae89e914baa52425d1d2e181762de78e7",
+    "packages/runtime/src/office-scratch-journal.py": "ee61e377e4c5915ca23d034b04f427d2178e21f1c29ba1bb06846622289950cd",
+    "packages/runtime/src/office-scratch-state.ts": "4efc9a22cbd5e8b9c16ca57e88cdaacb16c9d72cfebf608d884cb1f04fb011a9",
+    "tests/README.md": "c04ac7d99bd3b1fb98f3f6bed13f8b48ca07e08d90855672acacc0ee2102db43",
+    "tests/office-process-linux.test.mjs": "049c471eb3970ac75372d70c7e6285dac2cbf26d4109b8b2412f3a49e69b9d50",
+    "tests/office-process-managed.test.mjs": "113f10c31c864e75b3a89b0ceb82eb3046da18f5f25a4c0c2924238ffb1dc2e8",
+    "tests/office-scratch-recovery.test.mjs": "d7229370a63d9ccd3177cbf7ab8866c4f9f45418298eff471e990903b214d19c"
+  },
+  "failedCarrier": {
+    "releaseId": "20261017-115954-59433a62",
+    "artifactSha256": "7a370bf55be13bf62516baff8d074af884751f3b6c6695c8e90187e972333837",
+    "inventoryEntriesVerified": 24743,
+    "applicationRef": "76ace249a30d7942f981602fb7460fdee665027e",
+    "runtimeRef": "4c86603df7c5537b2637d610fcb4805d63b7b015",
+    "qualification": "failed: actual concurrent managed cleanup returned unavailable; metadata lock nonblocking refusal reproduced separately",
+    "nodePass": 297,
+    "nodeFail": 1,
+    "nodeSkip": 0,
+    "ownerActivated": false,
+    "artifactInputsUnchangedAfterFailure": true,
+    "neverActivateThisCandidate": true
+  },
+  "cause": "Cooperating metadata cleanup used a nonblocking journal lock; an independent held-lock case reproduces premature failure on the old runtime",
+  "correction": {
+    "metadataLock": "serialize cooperating journal transactions",
+    "rootLeases": "remain nonblocking; held/unknown/foreign roots preserved",
+    "execTimeoutMs": 10000,
+    "execKillSignal": "SIGKILL",
+    "deadlineScope": "Node exec timer requires caller event-loop progress; stopped helper is killed, owner death has a separate kernel hook",
+    "newProcessName": "aug-office-jrn"
+  },
+  "focusedRegressions": {
+    "oldHeldLockControl": "failed expected pending assertion",
+    "currentHeldLockControl": "pass; wait then remove verified copy after release",
+    "currentStoppedHelper": "pass; actual existing deadline kills/reaps known helper and preserves recoverable copy"
+  },
+  "qualification": {
+    "fullBuild": true,
+    "typeScriptCheck": true,
+    "sourceNode": {
+      "pass": 300,
+      "fail": 0,
+      "skip": 0,
+      "files": 45,
+      "chromiumFiles": 19,
+      "workers": 2,
+      "actualManagerOptIn": true
+    },
+    "pythonPass": 43,
+    "container": {
+      "pass": 21,
+      "fail": 0,
+      "skip": 1,
+      "skipScope": "requires actual MX user manager; this case runs in source cohort",
+      "memoryMaxBytes": 3221225472,
+      "swapMaxBytes": 0,
+      "cpuCount": 1,
+      "pidsMax": 128,
+      "readOnlyRootAndApplication": true,
+      "network": "none",
+      "init": true,
+      "terminal": {
+        "exitCode": 0,
+        "oomKilled": false,
+        "pid": 0
+      },
+      "image": "sha256:e5431b048e23385ae592a3a813e3b23d6ad3d8c6c0ee6b0028d9edaba88c2924"
+    }
+  },
+  "permissionFixture": {
+    "ref": "76ace249a30d7942f981602fb7460fdee665027e",
+    "fault": "packaging077 umask masked intended0644 to0600",
+    "fix": "explicit chmod plus stat precondition; no guard relaxation",
+    "actual022And077Controls": "pass"
+  },
+  "hostedPredecessor": {
+    "validateRun": 39022353974,
+    "debianJob": 117366804619,
+    "jobConclusion": "failure before packaging",
+    "root": {
+      "tests": 2178,
+      "pass": 2117,
+      "fail": 9,
+      "skip": 52
+    },
+    "failures": "orphan absence under non-reaping container PID1; recovery fixture requested undeclared Liberation Sans",
+    "newWorkflow": "same pinned Debian images; add container --init, retain all exit/reap assertions and timeouts",
+    "fontFixture": "DejaVu Sans from already-declared fonts-dejavu-core; missing-font notices remain truthful",
+    "freshHostedQualification": false
+  },
+  "containerPid1Control": {
+    "sameImmutableFailedApplication": true,
+    "sameTestsAndBounds": true,
+    "changedOnlyInit": true,
+    "noInitExpectedFailures": 2,
+    "withInitPass": 2,
+    "terminalRuns": [
+      {
+        "mode": "no-init",
+        "exitCode": 1,
+        "oomKilled": false,
+        "status": "exited",
+        "pid": 0
+      },
+      {
+        "mode": "init",
+        "exitCode": 0,
+        "oomKilled": false,
+        "status": "exited",
+        "pid": 0
+      }
+    ]
+  },
+  "ownerInstalledApplicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+  "ownerUpdates": 0,
+  "engineRebuilds": 0,
+  "publicRedistributionQualified": false,
+  "remaining": [
+    "Fresh ordinary and exact sealed qualification of corrected runtime; failed carrier must not activate",
+    "Fresh hosted full workflow and public packaging gates",
+    "Bootstrap/uncommitted allocation/publication/power-loss and wider security/corpus qualification",
+    "Owner pilot feedback before further project transfers; voice/later OS and production Desktop remain deferred"
+  ],
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  }
+}

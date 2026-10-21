@@ -1,0 +1,58 @@
+{
+  "schema": "augmentor-dsh-office-source/1",
+  "repository": "https://github.com/deepseek-ai/deepseek-harness",
+  "ref": "d743267388641bc76f17c45ce8b4c231aed1d32c",
+  "license": "MIT",
+  "scope": "Original bounded Office provider/queue/output and branded primitives; Pi lifecycle and authorized byte-reader seat. LibreOffice kit retains its separate MPL-2.0 licence. No Cordis service or agent owner.",
+  "files": [
+    {
+      "path": "index.ts",
+      "upstreamPath": "packages/document/office-to-pdf/src/index.ts",
+      "upstreamSha256": "5e7030469a5ec1f432c6a2e8a2de10b5fb3b02d76bf27d3c8c59da00e913fbfb",
+      "sha256": "5bb7e4a65df0fee46e0549276dbc2dc9ad53cc0170f5af39d449b0ceca425168",
+      "adaptation": "Pi lifecycle/authorized byte-reader seat replaces Cordis, schema defaults and Typert decorators; original converter/queue/scratch/error logic retained. Active teardown is exposed for maintenance; engine font disk cache is disabled. An explicit converter factory seat retains the original queue and lazy pinned default while allowing an independently authored native adapter. An optional backend-owned scratch seat acquires cleanup authority before writing source bytes and waits for its release before slot reuse; backends without it retain the original temporary-directory behavior. The default factory and option types use the separately licensed, public-source Augmentor Office entry component; queue, cache and scratch behavior are unchanged."
+    },
+    {
+      "path": "errors.ts",
+      "upstreamPath": "packages/document/office-to-pdf/src/errors.ts",
+      "upstreamSha256": "6331e834e5682cefc82b35941a7e441aa3fb32381467ec0926813fa7cabfde6c",
+      "sha256": "9ac188e7ba837dbca3af2616b6eb47ad7dfb25ce5128c92d6573526fcc8b9e0d",
+      "adaptation": "NodeNext relative imports; the original branded primitives are selected locally."
+    },
+    {
+      "path": "identity.ts",
+      "upstreamPath": "packages/document/office-to-pdf/src/identity.ts",
+      "upstreamSha256": "dce6a64cbfde995c36b1c56288e17d804d63a1bfd1e68fabdea62cc512c2dd13",
+      "sha256": "e686c4857f461dc1463d194fb73a6181d3493da8599594c06c2aed9ac3260023",
+      "adaptation": "NodeNext relative imports; the original branded primitives are selected locally."
+    },
+    {
+      "path": "output.ts",
+      "upstreamPath": "packages/document/office-to-pdf/src/output.ts",
+      "upstreamSha256": "9d77f76b9419838f7e223035647cd06546505bdd0747558cc5bb643398f7238b",
+      "sha256": "0487d7de08ee93329f62df6fb1429476f53af8e5055c0a0231b995b8bb28b9d6",
+      "adaptation": "NodeNext relative imports; the original branded primitives are selected locally."
+    },
+    {
+      "path": "queue.ts",
+      "upstreamPath": "packages/document/office-to-pdf/src/queue.ts",
+      "upstreamSha256": "aea7f8a7e81efef2a118b1bde6f1a6add7f446d2371731af10d9102f05dca1c9",
+      "sha256": "73ab78379b6975e9bc3e7fdfa8ac2309e81087e8af841bb0616997f110143667",
+      "adaptation": "NodeNext relative imports; the original branded primitives are selected locally. Expose queued/read/cleanup lifetime for Pi maintenance; internal failure factory renamed to avoid property collision."
+    },
+    {
+      "path": "types.ts",
+      "upstreamPath": "packages/document/office-to-pdf/src/types.ts",
+      "upstreamSha256": "08789e3cea45aa65f955da06ee04bc380377dfea0eed90cf6bdd422ca4116802",
+      "sha256": "1a29b825e4f69d2ccb05b5f1daf5e166917be2b68c94ddca77b65f0ea6f907cc",
+      "adaptation": "NodeNext relative imports; the original branded primitives are selected locally. Pi byte-result type replaces type-only remote declaration."
+    },
+    {
+      "path": "brand.ts",
+      "upstreamPath": "packages/util/brand/src/index.ts",
+      "upstreamSha256": "f9d6da858d7308117227dcc2306ce7246b7309b2ae22d413d289cbae51e83e98",
+      "sha256": "f9d6da858d7308117227dcc2306ce7246b7309b2ae22d413d289cbae51e83e98",
+      "adaptation": "verbatim"
+    }
+  ]
+}

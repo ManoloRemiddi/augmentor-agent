@@ -1,0 +1,138 @@
+{
+  "schema": "augmentor-rich-sheet-deck-qualification/1",
+  "cases": [
+    {
+      "extension": "xlsx",
+      "inputSha256": "9f6e8786e0253552fbf5aac6d6d25f880a6e7bb8d0491c45d1d0f90cc473c38d",
+      "savedFormulaAndLiteralChecks": true,
+      "mergeHiddenRowsAndSheetControls": true,
+      "readOnlyFormulaBar": true,
+      "threeSlidePagesAndNotesExcluded": false,
+      "originalZoom": false,
+      "narrowFullscreenClose": true,
+      "sourceAndNativeEvidenceUnchanged": true
+    },
+    {
+      "extension": "xls",
+      "inputSha256": "b21380eb055919260012af432b6b706fb9a2c2cbee5503a7fc4d730b453a72fc",
+      "savedFormulaAndLiteralChecks": true,
+      "mergeHiddenRowsAndSheetControls": true,
+      "readOnlyFormulaBar": true,
+      "threeSlidePagesAndNotesExcluded": false,
+      "originalZoom": false,
+      "narrowFullscreenClose": true,
+      "sourceAndNativeEvidenceUnchanged": true
+    },
+    {
+      "extension": "pptx",
+      "inputSha256": "a12daf04419c2fc976df157eda93a97dda8854aa9d6a49befd47c415e41eb585",
+      "savedFormulaAndLiteralChecks": false,
+      "mergeHiddenRowsAndSheetControls": false,
+      "readOnlyFormulaBar": false,
+      "threeSlidePagesAndNotesExcluded": true,
+      "originalZoom": true,
+      "narrowFullscreenClose": true,
+      "sourceAndNativeEvidenceUnchanged": true
+    },
+    {
+      "extension": "ppt",
+      "inputSha256": "5996cb6440b1cf0d1ba682e97bf88007339e1b501f7c116aba653aacf0696c8d",
+      "savedFormulaAndLiteralChecks": false,
+      "mergeHiddenRowsAndSheetControls": false,
+      "readOnlyFormulaBar": false,
+      "threeSlidePagesAndNotesExcluded": true,
+      "originalZoom": true,
+      "narrowFullscreenClose": true,
+      "sourceAndNativeEvidenceUnchanged": true
+    }
+  ],
+  "syntheticSeedUsed": true,
+  "realProviderInference": false,
+  "officeContentSentToModel": false,
+  "nativeHistoryAndRequestLogUnchanged": true,
+  "observedBrowserErrors": 0,
+  "unexpectedObservedHttpDestinations": 0,
+  "actualWorkerRetirement": true,
+  "workerCount": 6,
+  "engineBuildsStarted": 0,
+  "installedChanges": 0,
+  "publicRedistributionQualified": false,
+  "date": "2026-10-17",
+  "scope": "Private MX Linux original GUI/Host plus adapter freshness correction; original supplier search/menu unchanged; no installed update",
+  "sourceEvidenceBaseRef": "2ba52a067860001d2e616ff3b20133d904e64538",
+  "currentInstalledApplicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+  "sourceFilesSha256": {
+    "packages/runtime/src/file-references.ts": "310b9f33736177b216b6956a3dfa321aec6bfb4c5fea0dc633b7191ce58b9244",
+    "tests/harness-file-references.test.mjs": "6ee8b0f45964f110458605d6d5c8b0afa8c12f31ead455c8a4445649cc8d212a",
+    "release/office-rebuild/rich-sheet-deck-gui-probe.mjs": "a6d6ed3efe186489e3820d897145e02faf5fc5670f3615d2373ae2f9d59a52e8"
+  },
+  "compiledFileReferencesSha256": "e1728da1cf97649b8bc76f4d626d729c518e33697a1fc345a022276af37e6e01",
+  "kernelEngineEvidence": {
+    "scope": "Scoped operator descendants only; same-TID unfinished/resumed openat calls paired",
+    "thinSuccessfulOpens": 3,
+    "driverIdentityHashReads": 1,
+    "converterDescendantOrThreadOpens": 2,
+    "defaultSuccessfulOpens": 0,
+    "unresolvedTargetCalls": 0,
+    "traceSha256": "441eb6fda34512247219a2a0389197d567ca5d84f54bc24cd805d0ea22e0b50c",
+    "wholeMachineOrNetworkAudit": false
+  },
+  "originalProviderRasterComparison": "rich-documents-qualification-20261017.json",
+  "focusedChecks": {
+    "nodePass": 27,
+    "fail": 0,
+    "skip": 0,
+    "typeScriptAndCheck": true
+  },
+  "dimensions": [
+    {
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "width": 513,
+      "height": 715
+    }
+  ],
+  "screenshots": {
+    "xlsx.png": "cd20dd4b9f96eb154edd46f5550d3ab53209edfc090bf90cf5e679cea2548167",
+    "xls.png": "fffefbc9a07d97d12cd92b9f47b72671f4636273448e152154709be012d71f56",
+    "pptx.png": "ccb2da8247c3d139679c225298a1c3042856c3fd0eaffeab82118251e46b5197",
+    "ppt.png": "650521ae43b924290b8ab7529a86f7f7c61610e0d8fb954c179dca9a55c179ef"
+  },
+  "visualInspection": [
+    "Original XLSX grid: merged header, saved values, two worksheet controls",
+    "Original PPTX preview at selected 100% zoom"
+  ],
+  "rootDiscovery": "Bounded names/types and identity/timestamp witness per fuzzy lookup; root additions and tool invalidation wait for a fresh index",
+  "nestedDiscovery": "Fresh traversal on first query at age >=10 seconds; no idle polling",
+  "remaining": [
+    "Exact ordinary/sealed default-engine package qualification and MX adoption of the adapter correction.",
+    "Wider/custom-font corpus and resource/security qualification.",
+    "Complete source-delivery/rebuild/third-party coverage and public packaging review.",
+    "Owner pilot feedback before more real migration."
+  ],
+  "sourceCohort": {
+    "nodePass": 270,
+    "nodeFiles": 40,
+    "pythonPass": 41,
+    "fail": 0,
+    "skip": 0,
+    "workers": 2,
+    "defaultOfficeEngineIncluded": true
+  },
+  "precedingHosted": {
+    "sourceRef": "90dd25ef4ca427d9e6b9e2f78d9f7523767a94c3",
+    "debianRun": 39013782461,
+    "debianJob": 117341843619,
+    "status": "completed",
+    "conclusion": "failure",
+    "failedStep": "Build Debian packages with binary notices",
+    "reason": "Office public source/rebuild qualification remains open; exact engine rebuild is not qualified",
+    "rootPass": 2102,
+    "rootFail": 0,
+    "browserPass": 128,
+    "nativeTestsRun": 1072,
+    "newSourceHeadPassClaimed": false
+  }
+}

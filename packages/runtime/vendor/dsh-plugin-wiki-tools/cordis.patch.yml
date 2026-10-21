@@ -1,0 +1,13 @@
+# The dsh-plugin-wiki-tools bundle patch: one insert over the profile root.
+# vaultPath is REQUIRED: replace this row's config from your own profile
+# cordis.patch.yml, e.g.
+#
+#   - id: wiki-tools
+#     config:
+#       vaultPath: /absolute/path/to/vault
+#
+# A boot without vaultPath fails loud with these instructions.
+
+- insert:
+    - id: wiki-tools
+      name: 'dsh-plugin-wiki-tools'

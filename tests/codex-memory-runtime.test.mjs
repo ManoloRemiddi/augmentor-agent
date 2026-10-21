@@ -11,6 +11,7 @@ import {ProfileStore} from '../dist/codex-runtime/src/profiles.js';
 import {tmpdir} from 'node:os';
 import {CodexHost} from '../dist/codex-runtime/src/host.js';
 import {memoryServices} from './fixtures/codex/memory-services.mjs';
+import {codexTestNpmEntry} from './fixtures/codex/prerequisite.mjs';
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function until(fn, label) {for (let n = 0; n < 300; n++) {if (await fn()) return; await delay(20);} throw Error('Memory runtime fixture timeout: ' + label);}
@@ -218,7 +219,7 @@ test('standalone launcher and actual native Qt memory controls pause capture and
   const env = {PATH:process.env.PATH, LANG:process.env.LANG ?? 'C.UTF-8', HOME:home,
     XDG_CONFIG_HOME:join(home,'config'), XDG_STATE_HOME:join(home,'state'), XDG_DATA_HOME:join(home,'data'),
     AUGMENTOR_SHARED_STATE:f.services.state, AUGMENTOR_SHARED_DATA:f.services.data,
-    AUGMENTOR_CODEX_STATE:f.options.root, AUGMENTOR_CODEX_SOCKET:join(f.root,'ui.sock'), AUGMENTOR_CODEX_NO_AUTOSTART:'1',
+    AUGMENTOR_CODEX_STATE:f.options.root, AUGMENTOR_CODEX_SOCKET:join(f.root,'ui.sock'), AUGMENTOR_CODEX_NO_AUTOSTART:'1', AUGMENTOR_CODEX_CLI:codexTestNpmEntry(),
     AUGMENTOR_CODEX_WORKSPACE:f.root,
     AUGMENTOR_WORKSPACE_PROFILE:'', PYTHONPATH:resolve('apps/native'), QT_QPA_PLATFORM:'offscreen'};
   const child = spawn(process.execPath, ['dist/codex-runtime/src/main.js'], {env,stdio:['ignore','pipe','pipe']});

@@ -1,0 +1,148 @@
+{
+  "schema": "augmentor-harness-shared-launch-source/1",
+  "date": "2026-10-17",
+  "sourceBase": "36782e7634355fc601f7ca81837461042b986436",
+  "scope": "MX Linux source only; selected-pair launch helpers, explicit cold activation/reverse and opt-in managed Browser registration",
+  "node": {
+    "pass": 29,
+    "fail": 0,
+    "skip": 0,
+    "files": [
+      "shared-profile-export.test.mjs",
+      "shared-profile-import.test.mjs",
+      "shared-profile-runtime.test.mjs",
+      "profile-transaction.test.mjs",
+      "harness-writing-peers-chromium.test.mjs",
+      "harness-shared-profile-chromium.test.mjs",
+      "shared-launch-integration.test.mjs"
+    ],
+    "workers": 2
+  },
+  "python": {
+    "pass": 77,
+    "fail": 0,
+    "skip": 0,
+    "modules": [
+      "test_shared_launch",
+      "test_desktop_startup",
+      "test_desktop_deployment",
+      "test_harness_review",
+      "test_shared_profile_lease",
+      "test_hindsight_memory",
+      "test_harness_notice_assembly",
+      "test_license_inventory",
+      "test_private_source_boundary"
+    ],
+    "newBindingCases": 11
+  },
+  "npmCheck": true,
+  "cliTrace": {
+    "ipNetworkSyscalls": 0,
+    "companionConnections": 0,
+    "unsuccessfulLocalNscdConnects": 6,
+    "actualCliInspectActivateReverse": true,
+    "authoredPreflightImportAndLifetimeStubs": true
+  },
+  "actualBrowserHost": {
+    "generatedExternalLauncher": true,
+    "actualMatchingHandshakeAndPromptRpc": true,
+    "targetOnlyWrite": true,
+    "inheritedReaderRefusesSwitch": true,
+    "closeReleasesReader": true,
+    "companionAndHostReopen": true,
+    "noHarnessSelectionOrModelWork": true
+  },
+  "nativeAndMobileDispatch": "Exec mocked; no physical UI/mobile acceptance",
+  "installedChanged": false,
+  "ownerPreservation": {
+    "scope": "Read-only comparison against the prior actual MX adoption checkpoint; no owner restart, update, inference or transfer",
+    "seals": [
+      {
+        "releaseId": "20261017-081210-48ea82e1",
+        "applicationRef": "fcf9d32a708d2b8539193e47cdcd249511b722cf",
+        "artifactSha256": "066735a3e6c33f16f0d97de76374b903dab1727d5811012d627ed976723bf8fa",
+        "sealedInputsVerified": 24697
+      },
+      {
+        "releaseId": "20261017-095821-fb78d6df",
+        "applicationRef": "97d95d586bbee7270f0e4ee39c749374990dfd97",
+        "artifactSha256": "1d004a08ac3e8a33b480b1c22c1087fab22ec953935247bde7beded33f81388d",
+        "sealedInputsVerified": 24710
+      }
+    ],
+    "owners": [
+      {
+        "review": "main",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 15
+      },
+      {
+        "review": "pilot",
+        "pidUnchanged": true,
+        "releaseId": "20261017-095821-fb78d6df",
+        "protectedFileSetAndHashesExact": true,
+        "protectedFiles": 21
+      }
+    ],
+    "sharedRowsAndEngineConfigurationExact": true,
+    "registryRevision": 18,
+    "originalMenuAssetsAndSelectionsExact": true,
+    "qwenConfigurationUnitAndPidUnchanged": true,
+    "otherGpuAndVoiceServicesUnchanged": true,
+    "ownerModelRequestsSubmitted": 0,
+    "ownerProjectsTransferred": 0
+  },
+  "newSealedArtifactQualified": false,
+  "precedingExportCandidateContainsNewBinding": false,
+  "precedingExportCi": {
+    "ref": "aaf7af4ca30f26c7e0038eab355830cc30408a20",
+    "run": 39031629464,
+    "job": 117393356217,
+    "conclusion": "failure at preserved public Office exact-source/rebuild packaging gate",
+    "root": {
+      "pass": 2140,
+      "fail": 0,
+      "skip": 53
+    },
+    "browser": {
+      "pass": 128,
+      "fail": 0,
+      "skip": 0
+    },
+    "native": {
+      "cases": 1079,
+      "skip": 45
+    },
+    "wholeWorkflowPass": false
+  },
+  "remaining": [
+    "Fresh separate immutable qualification of new helpers",
+    "Version-matched owner Native/Browser adoption and explicit fixed-source/mobile/review entrypoint mapping",
+    "Fresh full cold backups, actual export/adoption and existing banks/settings/charges acceptance",
+    "Actual busy-work/restart/reboot/reverse rollback acceptance",
+    "Owner pilot feedback before any further real project transfer; excluded project stays DSH",
+    "Voice/later OS deferred; public Office redistribution remains gated"
+  ],
+  "privateLogSha256": {
+    "harness-shared-launch-source-node-20261017.log": "bcd0782ff9ed6bcef178b105f4d14b3460dcfefc4e575a1bddf627d82771569e",
+    "harness-shared-launch-python-final-cohort-20261017.log": "08fae6d569e9a8544cffb8acf31f8e102128690a8a249dd40d423ba520c1a0bb",
+    "harness-shared-launch-check-20261017.log": "fdb848896bbc76bd3619da963b85a271eca6a558e166148427f89863f005e81c",
+    "harness-shared-launch-cli-trace-test-20261017.log": "72a17203359751337ea85b993b502634f8ceba1c38faeefcc4a8b2b5ab8ef356",
+    "harness-shared-launch-cli-network-private-20261017.log": "ed308a620f79b9736b2a2a1f3522d83a7275887fe0681e1e3567439e684eff3e",
+    "harness-shared-launch-owner-preservation-20261017.log": "a0cdc11f412dc57f73526028bf93f9c6c608142042254c5fc6c6be91c9e955a5",
+    "harness-shared-launch-export-ci-terminal-private-20261017.log": "dc80e6b5c26a0121aace6e8f158beebfe86e742d9a5268af6afa5d16321e87e3"
+  },
+  "implementationFileSha256": {
+    "scripts/shared-launch-profile.py": "df862bb7d53aa1b53fec333931bd139be4beba17d394c7b24608612b2860c7b4",
+    "scripts/desktop-browser-launch.py": "fe9926d8575e9007b2f2bee62b7409a3e804b297291346c16ed90e2efebd52ef",
+    "scripts/desktop-launch.py": "438c6386769d2c82586241429fa5686dafafb734a65819df17752e5a2f0c2895",
+    "scripts/desktop-deployment.py": "50777558c986f043c571812c509bc2e34c0dc8e8840cc6cad4d32d7e7b45d069",
+    "scripts/install-desktop-startup.py": "66b54fda0247648bc4a843f20c1a21ec82972259e764c6eab98a61a1767cc1a5",
+    "apps/mobile/start.py": "3f035a35ffb883a028ef981fea9f8c4e32ff2fa77a193e67d46cc5575e957759",
+    "tests/test_shared_launch.py": "de7f077c456d9e2652c6d804cab4a75d35d2eda171cfb6e7bbf34b0dad1be636",
+    "tests/shared-launch-integration.test.mjs": "b8faded62910dff99878724bb71d22b458f4b7820a054a3095a186d6fe7a59c4",
+    "tests/test_desktop_startup.py": "7e31a59f76acda1e651391cb5a798829404a587e183ae19bf416b955ffcfe0c1"
+  }
+}

@@ -1,0 +1,27 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Qualified source view + asset companion -> native v3 project archive. No import.
+import {resolve,join,dirname,basename,sep} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {realpath,lstat,mkdtemp,mkdir,open,rm,readdir} from 'node:fs/promises';
+import {constants} from 'node:fs';import {spawnSync} from 'node:child_process';
+import assert from 'node:assert/strict';
+import {readRegular,hash} from '../adapters/dsh-legacy-format/source.mjs';
+import {verifyAssets} from '../adapters/dsh-legacy-format/assets.mjs';
+const [sourceArg,viewArg,assetArg,outputArg,...extra]=process.argv.slice(2);if(!sourceArg||!viewArg||!assetArg||!outputArg||extra.length)throw Error('Usage: node scripts/export-dsh-historical-project.mjs PINNED_PUBLIC_SOURCE PRIVATE_VIEW PRIVATE_ASSETS NEW_PRIVATE_PROJECT_BUNDLE');if(process.platform!=='linux')throw Error('Atomic historical project publication currently requires Linux');process.umask(0o077);
+const repo=fileURLToPath(new URL('../',import.meta.url)),source=await realpath(resolve(sourceArg)),view=await realpath(resolve(viewArg)),assets=await realpath(resolve(assetArg)),output=resolve(outputArg),canonical=join(await realpath(dirname(output)),basename(output));if([source,view,assets].some(root=>canonical===root||canonical.startsWith(root+sep)))throw Error('Historical project output must stay outside inputs');try{await lstat(output);throw Error('Output exists; never overwrite it');}catch(e){if(e.code!=='ENOENT')throw e;}
+const verify=()=>{const run=spawnSync(process.execPath,[join(repo,'scripts/verify-dsh-legacy-assets.mjs'),source,view,assets],{encoding:'utf8',timeout:180000,maxBuffer:1024*1024});if(run.status!==0)throw Error('Complete retained-source and asset verification refused');};verify();
+const checked=await verifyAssets(view,assets),stage=await mkdtemp(join(dirname(output),'.dsh-historical-project-')),objects=join(stage,'objects');
+try{
+ await mkdir(objects,{mode:0o700});const seen=new Set(),put=async raw=>{if(!raw.length||raw.length>16*1024*1024)throw Error('Historical project object exceeds its 16 MiB bound');const sha256=hash(raw);if(!seen.has(sha256)){if(seen.size>=16384)throw Error('Object count exceeded');const fd=await open(join(objects,sha256),'wx',0o600);try{await fd.writeFile(raw);await fd.sync();}finally{await fd.close();}seen.add(sha256);}return {sha256,bytes:raw.length};};
+ const viewRaw=await readRegular(join(view,'view.json'),32*1024*1024),familyRaw=await readRegular(join(view,'source-family.json'),32*1024*1024);assert.equal(hash(viewRaw),checked.manifest.inventory.viewSha256);assert.equal(hash(familyRaw),checked.manifest.inventory.sourceFamilySha256);
+ for(const root of [view,assets])for(const name of await readdir(join(root,'objects'))){if(!/^[a-f0-9]{64}$/.test(name))throw Error('Unexpected data object');const bytes=await readRegular(join(root,'objects',name),16*1024*1024);if(hash(bytes)!==name)throw Error('Source object changed');await put(bytes);}
+ const manifest={schema:'augmentor-dsh-project-export/3',profile:'augmentor-dsh-historical-family/1',coordinates:'derived-dsh-v4',view:await put(viewRaw),sourceFamily:await put(familyRaw),assets:await put(checked.raw),notices:[]};for(const name of ['FORMAT-LICENSE','SCHEMA-REFERENCE-LICENSE','SOURCES.json'])manifest.notices.push({name,object:await put(await readRegular(join(view,name),1024*1024))});
+ const raw=Buffer.from(JSON.stringify(manifest)+'\n');if(raw.length>32*1024*1024||raw.length+checked.combinedExpandedBytes>256*1024*1024)throw Error('Historical project exceeds existing combined bound');const fd=await open(join(stage,'project.json'),'wx',0o600);try{await fd.writeFile(raw);await fd.sync();}finally{await fd.close();}
+ // Source verification alone does not establish current importer support. Load
+ // the complete staged closure through the same reader used by native import.
+ const {loadDshProjectArchive}=await import(new URL('../dist/runtime/src/dsh-project-archive.js',import.meta.url));const loaded=loadDshProjectArchive(join(stage,'project.json'),hash(raw));assert.equal(loaded.expandedBytes,raw.length+checked.combinedExpandedBytes);assert.deepEqual([...loaded.objects.keys()].sort(),[...seen].sort());for(const ref of loaded.objects.values())loaded.readObject(ref);
+ verify();assert.deepEqual((await verifyAssets(view,assets)).raw,checked.raw);assert.deepEqual(await readRegular(join(view,'view.json'),32*1024*1024),viewRaw);
+ for(const path of [objects,stage]){const fd=await open(path,constants.O_RDONLY|constants.O_DIRECTORY|constants.O_NOFOLLOW);try{await fd.sync();}finally{await fd.close();}}
+ const published=spawnSync(process.env.AUGMENTOR_PYTHON??'python3',['-B','-c','import sys;sys.path.insert(0,sys.argv[1]);from dsh_project_bundle import publish;publish(sys.argv[2],sys.argv[3])',join(repo,'scripts'),stage,output],{encoding:'utf8',timeout:10000});if(published.status!==0)throw Error('No-replace historical project publication failed');
+ console.log(JSON.stringify({schema:manifest.schema,manifestSha256:hash(raw),parents:loaded.source.sessions.length,descendants:loaded.source.relatedSessions.length,objects:seen.size,expandedBytes:loaded.expandedBytes,originalCompressedSourcesRetained:true,coordinates:manifest.coordinates,nativeTargetsCreated:0,modelRequests:0}));
+}finally{await rm(stage,{recursive:true,force:true});}

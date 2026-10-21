@@ -9,6 +9,46 @@ without declaring its supplier binaries reviewed. The Debian unknown-native-file
 gate remains enabled. The audit below is historical and still applies before any
 future bundled Codex release; this change does not complete C8 or C0–C9.
 
+## Production qualification uses an explicit prerequisite — October 15
+
+The first complete ordinary-tree run after MCP fixture qualification retains
+three failures: two missing Codex prerequisite errors and a Browser connection
+stuck before ready. Source tests had the locked development CLI available, while
+production correctly omits it. The original Browser fixture also wrote a Linux
+shebang containing the bundled Node path, which includes spaces in the ordinary
+tree. A controlled existing script fails with EACCES (its truncated interpreter
+prefix is a directory); the same Node binary through a private short alias runs.
+This is a fixture launch error, not evidence that the app discarded Browser work.
+
+`tests/fixtures/codex/prerequisite.mjs` now selects the real external npm entry
+through test-only `AUGMENTOR_TEST_CODEX_NPM_ENTRY`, or the existing source-test
+development entry. It validates package name/version/bin metadata. The positive
+Browser fixture explicitly supplies that entry to its Host and native-host child;
+the standalone Qt fixture supplies it to its launcher. The external-package test
+uses the same selected npm wrapper. The ordinary app still contains **no Codex
+supplier package**, and production selection/version probes and missing/invalid
+prerequisite refusals are unchanged. No source supplier bytes are copied into
+this production tree.
+
+The Linux Browser test uses a private `/tmp` symlink to its exact selected Node
+binary for the native-host shebang. Executable/argv/environment values remain
+structured; no shell parsing, fallback binary or changed product launcher is
+introduced. Its alias is removed after owned Chrome/bridge teardown. Actual
+Browser typing/clicking/screenshots, queue/Stop, standalone Qt Enter/Send/memory,
+external initialization and existing refusal checks remain at their old bounds.
+
+The three whole affected files pass **10/10 with two existing optional controlled-
+Browser skips** on both source and the ordinary production tree. Earlier probes
+that supplied only part of the prerequisite still retain the Browser failure.
+The original bad-interpreter probe expected ENOENT but observed EACCES; the final
+negative/positive probe records that actual result. At fixture **140da43fdd861b99f19c856be86862c65ac6e70f**, a complete corrected ordinary run
+passes **1,255 cases with six identified skips**, zero failures/cancellations,
+two workers and unchanged deadlines. This follows the exact failed three-case
+full run; it is not reported as an unchanged-dependency fix to product code.
+Source's preceding full run is 8ac2c40, with the affected-file follow-up above.
+[Combined qualification](../release/harness-mcp-cancellation-barrier.json) keeps
+those refs distinct. Live accounts, physical use and release gates remain open.
+
 ## Separately installed runtime — October 1
 
 The maintained [prerequisite record](../release/codex/runtime-prerequisite.json)
