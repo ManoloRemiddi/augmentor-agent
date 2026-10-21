@@ -1,5 +1,15 @@
 /* Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 */
 @import './vendor/augmentor-brand/brand-orb.css';
+/* Product stage belongs beside the persistent name, outside the welcome hero. */
+[class*="HeroShell_previewBadge"] {
+  display:none;
+}
+.augmentor-alpha-label {
+  font-size:10px;
+  font-weight:500;
+  color:var(--dsw-alias-label-secondary);
+  vertical-align:middle;
+}
 /* Keep the exact website motion; the existing sidebar owns spacing and actions. */
 .augmentor-brand {
   display:inline-flex;

@@ -1,5 +1,32 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+## Alpha label — October 21
+
+The welcome screen no longer displays the supplier Preview badge. The existing
+sidebar name now reads **Augmentor Harness Alpha**, with a small secondary Alpha
+label. The authored brand stylesheet hides only the welcome badge; supplier
+source, file previews, headline, composer and sidebar actions are preserved.
+This shared GUI applies to Linux and macOS builds.
+
+Validation against base **e4d133af** plus the two authored branding changes:
+the GUI build and existing Chromium branding case pass, as does that same case
+against the exact installed candidate. Actual browser inspection verifies the
+Light source screen and Dark installed screen, including Alpha beside the name
+and no centered Preview badge. No model request is needed for these checks.
+
+The current MX Harness registration selects and runs immutable release
+**20261021-103715-4720d0ad**, artifact SHA-256
+**640f28b87cca94ccb5eefceb9eb1f1cf159dccf7846ab6ad87d2f9af8514ea36**.
+Its bounded overlay changes the two authored sources, the matching GUI JS/CSS
+and build-input byte counts, plus an explicit overlay receipt. Full inventory
+comparison verifies every other application file unchanged. The prior release
+is retained for rollback. The owner was idle with no voice connection or unsent
+Harness draft; its guarded maintenance preparation preceded graceful restart.
+The normal launcher and existing private profile are preserved. Refresh open
+Harness tabs to load the new GUI. Other registered profiles and Mac installations
+remain on their preceding artifacts; this update makes no separate installed
+macOS qualification claim.
+
 ## Running-turn branding — October 16
 
 The owner reported the remaining whale-tail icon and “Deep diving” label while
