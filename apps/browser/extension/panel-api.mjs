@@ -159,11 +159,11 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
     chrome.storage.local.set({'augmentor-harness':msg.harness}).then(()=>{resetHarnessPort();sendResponse({ok:true})});return true
   }
   if(msg?.type==='interaction/claim'){
-    const pending=state.harness==='codex'&&state.interactions.some(row=>row.id===msg.id)
+    const pending=['codex','ah','pi'].includes(state.harness)&&state.interactions.some(row=>row.id===msg.id)
     sendResponse({ok:!!pending&&approvalPresenters.claim(msg.id,sender)});return
   }
   if(msg?.type==='interaction/respond'){
-    if(state.harness==='codex'&&!approvalPresenters.owns(msg.id,sender)){sendResponse({ok:false,error:'This approval belongs to another Browser panel or has expired.'});return}
+    if(['codex','ah','pi'].includes(state.harness)&&!approvalPresenters.owns(msg.id,sender)){sendResponse({ok:false,error:'This approval belongs to another Browser panel or has expired.'});return}
     const row=state.interactions.find(row=>row.id===msg.id)
     if(!row){sendResponse({ok:false,error:'This request has expired.'});return}
     if(['dsh','codex'].includes(state.harness)){
@@ -229,6 +229,23 @@ function dispatchPanelMessage(msg, sender, sendResponse) {
       if(msg.action==='save'){state.selection=result.selection;saveSelection(result.selection);resetHarnessPort()}
       sendResponse({ok:true,result})
     }).catch(error=>sendResponse({ok:false,error:error.message}));return true
+  }
+  if(msg?.type==='permission'){
+    const sid=msg.sourceSession,port=state.port,harness=state.harness;
+    const method={session:'session.permission',select:'session.selectPermission'}[msg.action];
+    const valid=()=>state.port===port&&state.harness===harness&&['pi','ah'].includes(harness)&&state.capabilities.sessionPermissions===true&&state.phase==='ready'&&!state.panelViewSession&&sid===state.sessionId&&!chrome.runtime.getManifest().augmentorWorkspace?.sdkProtocol;
+    if(!['session','select'].includes(msg.action)||!valid()){sendResponse({ok:false,error:'Open a ready standalone Harness or Pi chat to manage its permissions.'});return}
+    const writing=msg.action==='select',creating=!state.sessionReady;
+    if((writing||creating)&&(state.running||state.mutating)){sendResponse({ok:false,error:'Finish the current action before changing permissions.'});return}
+    if(writing&&(!['read-only','workspace-write','danger-full-access'].includes(msg.preset)||typeof msg.expectedRevision!=='string')){sendResponse({ok:false,error:'Choose a permission mode from a fresh chat snapshot.'});return}
+    if(writing||creating)state.mutating=true;
+    ;(async()=>{
+      if(creating){await request('session.create',{sessionId:sid});if(!valid())throw Error('The conversation changed. Reopen Approval mode.');state.sessionReady=true}
+      if(!valid())throw Error('The conversation changed. Reopen Approval mode.');
+      const result=await request(method,{sessionId:sid,...(writing?{preset:msg.preset,expectedRevision:msg.expectedRevision}:{})});
+      if(!valid())throw Error('The conversation changed. Reopen Approval mode.');
+      sendResponse({ok:true,result});
+    })().catch(error=>sendResponse({ok:false,error:error.message})).finally(()=>{if(writing||creating)state.mutating=false});return true
   }
   if(msg?.type==='reasoning'){
     const methods={describe:'reasoning.describe',configure:'reasoning.configure',session:'session.reasoning',select:'session.selectReasoning',models:'augmentor/models'};

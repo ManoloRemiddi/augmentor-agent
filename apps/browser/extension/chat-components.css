@@ -288,3 +288,12 @@
   /* 0.1.30 (Phase 1): the Updates popover — installed vs latest per
      component, one action per row. Rows are rendered by sidepanel.js. */
 #setup-notice { margin:8px; padding:10px; border:1px solid var(--border2); border-radius:8px; color:var(--text); background:var(--layer1); cursor:pointer; }
+
+/* Current-chat permission and future defaults have separate, explicit scopes. */
+#access-menu { max-width: calc(100vw - 24px); max-height: calc(100vh - 24px); overflow-y: auto; }
+.access-scopes { display: flex; gap: 4px; padding: 4px; }
+.access-scope { flex: 1; border: 1px solid var(--border2); border-radius: 5px; padding: 6px; background: var(--bg); color: var(--text2); cursor: pointer; }
+.access-scope[aria-pressed=true] { border-color: var(--brand); color: var(--brand); }
+.access-status { padding: 4px 8px 8px; color: var(--text3); font-size: 11px; line-height: 1.4; }
+.access-opt:disabled { opacity: .55; cursor: default; }
+.access-opt .a-name, .access-opt .a-desc { display: block; }

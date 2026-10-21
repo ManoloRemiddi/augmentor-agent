@@ -11,7 +11,7 @@ async function fixture(t,wrong=false){
  profile.socket=join(root,'host.sock');const calls=[],sockets=new Set();
  const server=createServer(s=>{sockets.add(s);s.on('close',()=>sockets.delete(s));let buffer='';s.on('data',chunk=>{
   buffer+=chunk;let i;while((i=buffer.indexOf('\n'))>=0){const r=JSON.parse(buffer.slice(0,i));buffer=buffer.slice(i+1);calls.push(r);
-   const result=r.method==='host.hello'?{protocol:'augmentor-pi/1'}:r.method==='host.describe'?{protocol:'augmentor-pi/1',version:'fixture',stateDir:wrong?'different-profile':profile.state,configDir:profile.config,capabilities:{queue:true,reasoning:true}}:
+   const result=r.method==='host.hello'?{protocol:'augmentor-pi/1'}:r.method==='host.describe'?{protocol:'augmentor-pi/1',version:'fixture',stateDir:wrong?'different-profile':profile.state,configDir:profile.config,capabilities:{queue:true,reasoning:true,sessionPermissions:true}}:
     r.method==='models.list'?{groups:[{provider:'fixture',models:[{model:'authored'}]}],default:{provider:'fixture',model:'authored'}}:
     r.method==='chats.saved'?{saved:[]}:r.method==='session.list'?{items:[{sessionId:'browser-fixture',agentPreset:'augmentor-browser-pi'}]}:{accepted:true};
    s.write(JSON.stringify({id:r.id,result})+'\n');
@@ -31,7 +31,14 @@ async function fixture(t,wrong=false){
 test('Browser native host really selects AH, routes model/session/prompt RPC and streams its reply',async t=>{
  const f=await fixture(t);assert.equal((await f.call('augmentor/models')).result.default.model,'authored');
  const init=await f.call('initialize',{provider:'fixture',model:'authored'});assert.equal(init.result.serverInfo.harness,'ah');assert.equal(init.result.serverInfo.augmentor.chatCwd,f.profile.workspace);
+ assert.equal(init.result.serverInfo.capabilities.sessionPermissions,true);
  await f.call('session.create',{sessionId:'browser-fixture'});
+ await f.call('session.permission',{sessionId:'browser-fixture'});
+ await f.call('session.selectPermission',{sessionId:'browser-fixture',preset:'workspace-write',expectedRevision:'initial'});
+ assert.deepEqual(f.calls.find(r=>r.method==='session.selectPermission').params,{sessionId:'browser-fixture',preset:'workspace-write',expectedRevision:'initial'});
+ assert.match((await f.call('session.selectPermission',{sessionId:'unrelated',preset:'danger-full-access',expectedRevision:'initial'})).error.message,/not found/);
+ assert(!f.calls.some(r=>r.method==='session.selectPermission'&&r.params.sessionId==='unrelated'));
+
  const streamed=new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Missing backend stream')),5000);f.notifications.on('frame',r=>{if(r.method==='session.event'){clearTimeout(timer);resolve(r)}})});
  const result=await f.call('session.prompt',{sessionId:'browser-fixture',requestId:'once',content:[{type:'text',text:'authored request'}]});assert.equal(result.result.accepted,true);
  assert.equal(f.calls.filter(r=>r.method==='session.prompt').length,1);

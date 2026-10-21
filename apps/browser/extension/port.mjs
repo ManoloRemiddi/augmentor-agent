@@ -272,7 +272,7 @@ function scheduleReconnect(message) {
 }
 
 export function fail(message) {
-  if(state.harness==='codex'){approvalPresenters.clear();state.interactions=[]}
+  if(['codex','ah','pi'].includes(state.harness)){approvalPresenters.clear();state.interactions=[]}
   state.phase = 'error'
   state.error = message
   const old=state.port;state.port=null;old?.disconnect()

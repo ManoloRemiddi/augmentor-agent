@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Browser current-chat permissions](BROWSER-CHAT-PERMISSIONS.md) now show/change the open AH/Pi chat from More → Approval mode, with future defaults separate and full access confirmed. Single-document approval claims also cover AH/Pi, preventing duplicate prompts across panels. Source **31 regressions** and actual AH/Pi Chromium actions pass; compatible and exact sealed MX checks plus the actual installed code-folder/native-host action test pass on isolated synthetic data. MX client is selected and its unpacked extension files updated; **the owner must reload the already loaded extension once**. No owner permission/default, chat/history, runtime or speech changes. Small rollback retained; managed scratch removed, immutable unchanged files share storage. Mac source is common; installed Mac rollout is not claimed.
+
 [Effort picker labels are installed on MX, Air and Mini](HARNESS-CONFIGURED-MODELS.md#installed-on-mx-air-and-mini--october-20):
 the adaptation passed `label` where the original DSH UI requires `name`, rendering
 blank effort rows. Red Chromium reproduction and **20 passing checks** cover

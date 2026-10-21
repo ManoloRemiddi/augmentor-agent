@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Browser current-chat permissions](BROWSER-CHAT-PERMISSIONS.md): More → Approval mode changes this AH/Pi chat, with future defaults separate; real browser-action tests and MX installed qualification. Reload an already loaded extension once.
+
 [Selectable AH backend in Desktop and Browser](AH-DESKTOP-BROWSER.md) adds an
 explicit installed-Harness connection alongside DSH and legacy Pi, with separate
 conversation keys and no empty-profile fallback. Compatible MX Desktop is

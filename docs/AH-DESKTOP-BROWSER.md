@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Current-chat Browser permissions](BROWSER-CHAT-PERMISSIONS.md) supersede the old default-only Approval mode menu for AH/Pi. The MX update is selected and tested with real browser actions on isolated data; already loaded owner extensions need one reload.
+
 # Select Augmentor Harness in Desktop and Browser
 
 Desktop **Settings → More → Connections & Home → Agent engine** and Browser
