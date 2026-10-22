@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Android AH continuity preview](ANDROID-AH.md): EDGE-inspired touch controls reuse the shared Harness UI and the installed attested AH owner. A separate paired loopback carrier keeps its operator bearer host-side. The real Pixel 7a/Android 17 desktop → phone → desktop proof preserves the same session, shared drafts and exactly two marker writes; three completed turns and no replay were verified. New source adds pristine peer-draft reads and single-flight submission. The existing installed AH/Desktop/EDGE are unchanged; USB is physically qualified, while private VPN/radio, native APK, voice and other OS acceptance remain separate.
+
 [October 21 telemetry safeguards](TELEMETRY-AUDIT-2026-10-21.md): the running Linux
 memory container now disables Hugging Face/OTel reporting and loads cached models
 offline, retaining its image/data/model/resource contract and stopped rollback.

@@ -37,3 +37,16 @@ test('late draft reads cannot restore operator text after revocation and late ac
  const {store}=await fixture(t);store.setText('one',0,'private operator draft');const f=clientFixture(store);let release;f.controller.rpc=async()=>new Promise(r=>release=r);f.drafts.sync();while(!release)await new Promise(r=>setTimeout(r,1));f.controller.update({readOnly:true});release(store.describe('one'));await new Promise(r=>setTimeout(r,5));assert(!f.restored.some(x=>x.text==='private operator draft'));assert.equal(f.restored.at(-1).text,'');
  const controller=new DshPiController('authored');controller.update({sessionId:'one',phase:'ready',unconfirmed:{requestId:'one'}});controller.pending.set('one',{requestId:'one'});let done;controller.draftAcknowledge=()=>new Promise(r=>done=r);const ack=controller.clearUnconfirmed();controller.epoch++;controller.update({sessionId:'two',unconfirmed:{requestId:'two'}});controller.pending.set('two',{requestId:'two'});done();await ack;assert.equal(controller.state.unconfirmed.requestId,'two');assert(controller.pending.has('two'));assert(!controller.pending.has('one'));
 });
+
+test('a pristine composer reads a peer draft and settlement without writing or resubmitting',async t=>{
+ const {store}=await fixture(t),f=clientFixture(store);await loaded(f.drafts);
+ store.setText('one',0,'Desktop draft for the phone');await f.drafts.refreshSaved();assert.equal(f.restored.at(-1).text,'Desktop draft for the phone');
+ store.setText('one',store.describe('one').textRevision,'Phone edit for desktop');await f.drafts.refreshSaved();assert.equal(f.restored.at(-1).text,'Phone edit for desktop');
+ assert.equal(f.calls.filter(c=>c.method!=='draft.describe').length,0);
+});
+test('a late peer read cannot overwrite a locally edited or switched composer',async t=>{
+ const {store}=await fixture(t),f=clientFixture(store);await loaded(f.drafts);const rpc=f.controller.rpc;let release;
+ f.controller.rpc=async(m,p)=>m==='draft.describe'?new Promise(r=>release=r):rpc(m,p);
+ const read=f.drafts.refreshSaved();store.setText('one',0,'Peer text');f.drafts.slot('one').desired='Local text retained';release(store.describe('one'));await read;assert.equal(f.drafts.slot('one').desired,'Local text retained');assert.notEqual(f.restored.at(-1).text,'Peer text');
+ f.drafts.slot('one').desired=f.drafts.slot('one').remote.text;const switched=f.drafts.refreshSaved();f.controller.epoch++;f.controller.state.sessionId='two';release(store.describe('one'));await switched;assert.notEqual(f.restored.at(-1).text,'Peer text');
+});
