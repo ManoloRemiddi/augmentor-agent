@@ -4,6 +4,9 @@
 - [Immediate composer feedback and regression evidence](COMPOSER-SEND-FEEDBACK.md)
 # Documentation index
 
+[Named desktop agents](DESKTOP-AGENTS.md) records the new per-window DSH selection, state migration, permission boundaries, compatible Linux overlay, runtime evidence and pending Olares acceptance.
+
+
 - [Handy repair downloads — October 5](HANDY-DOWNLOADS-2026-10-05.md): published preview 3, merged startup/rendering repair, all-platform qualification, full-byte verification and live website adoption.
 - [Historical published Handy downloads — October 3](HANDY-DOWNLOADS-2026-10-03.md): matched Linux/Mac/Windows preview 2, verified public bytes, qualification and physical acceptance boundaries.
 

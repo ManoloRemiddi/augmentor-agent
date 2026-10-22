@@ -1,5 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import {ownsProductSession,profileForSession,profiles} from '../../services/workspaces/profiles.mjs'
+import {profiles} from '../../services/workspaces/profiles.mjs'
+import {ownsNativeSession} from '../../services/dsh/desktop-entries.mjs'
 // Shared product integration, mounted on DSH's host plane by guided setup.
 import {readFileSync} from 'node:fs'
 import {createHash,timingSafeEqual} from 'node:crypto'
@@ -55,7 +56,7 @@ export async function apply(ctx){
   try{url=new URL('http://'+req.headers.host)}catch{answer(403,{ok:false,error:'Host not allowed'});return}
   const host=url.hostname.replace(/^\[|\]$/g,'')
   if(!isIP(host)||!(host==='::1'||host.startsWith('127.'))||req.headers.origin&&req.headers.origin!==url.origin){answer(403,{ok:false,error:'Origin not allowed'});return}
-  if(req.method==='GET'){answer(200,{protocol:'augmentor-dsh/1',version:RELEASE.version,homeId,presets:[...allowed],exactFork:1,nativeInteractions:1,maintenanceAdmission:1});return}
+  if(req.method==='GET'){answer(200,{protocol:'augmentor-dsh/1',version:RELEASE.version,homeId,presets:[...allowed],exactFork:1,nativeInteractions:1,desktopAgents:1,maintenanceAdmission:1});return}
   if(req.method!=='POST'||!req.headers['content-type']?.startsWith('application/json')||!timingSafeEqual(hash(String(req.headers['x-augmentor-product-token']??'')),hash(token))){answer(403,{ok:false,error:'Authorized JSON request required'});return}
   try{
    let raw='';for await(const chunk of req){raw+=chunk;if(Buffer.byteLength(raw)>16384)throw Error('Request too large')}
@@ -89,7 +90,7 @@ export async function apply(ctx){
     return
    }
    if(!surface||!['state','save','unsave'].includes(p.action))throw Error('Unsupported product operation')
-   const sessions=(await ctx.sessionPersistence.list()).map(row=>row.header).filter(row=>ownsProductSession(row))
+   const sessions=(await ctx.sessionPersistence.list()).map(row=>row.header).filter(row=>ownsNativeSession(row,{retained:true}))
    if(p.action!=='state'){
     const row=sessions.find(row=>row.id===p.sessionId);if(!row?.cwd)throw Error('This conversation belongs to another role')
     const workspace=await ctx.workspaceRegistry.create(row.cwd)

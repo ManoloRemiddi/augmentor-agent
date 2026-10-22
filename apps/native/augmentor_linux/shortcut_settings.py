@@ -5,7 +5,8 @@ from .ui_scale import scaled
 from PySide6.QtWidgets import QWidget,QVBoxLayout,QHBoxLayout,QLabel,QPushButton,QKeySequenceEdit
 from PySide6.QtGui import QKeySequence
 from .shortcuts import current_keys,save_shortcut,display_key
-from .instances import current_name, SHORTCUT_INSTANCES
+from .instances import current_name
+from .agent_entries import entries
 from .settings_icons import settings_icon
 
 
@@ -13,7 +14,7 @@ class ShortcutSettings(QWidget):
     def __init__(self,window):
         super().__init__(window);self.owner=window;self.rows={}
         layout=QVBoxLayout(self);scaled(layout).setContentsMargins(0,0,0,0)
-        for name,label in SHORTCUT_INSTANCES:
+        for name,label in [(e['id'],e['name']) for e in entries()]:
             heading=QLabel(label+' — open / hide');layout.addWidget(heading)
             current=QLabel('Reading shortcut…');layout.addWidget(current)
             row=QHBoxLayout();editor=QKeySequenceEdit();editor.setMaximumSequenceLength(1);editor.setClearButtonEnabled(True)

@@ -14,7 +14,8 @@ from PySide6.QtGui import QKeySequence
 
 from .macos_shortcuts import ShortcutManager,FN_SPACE
 from .shortcut_activation import DesktopActivation
-from .instances import SHORTCUT_INSTANCES
+from .instances import validate_name
+from .agent_entries import entries
 
 
 LIMIT = 4096
@@ -61,7 +62,7 @@ def request(message):
 
 class ShortcutService:
     def __init__(self):
-        self.managers = {name: ShortcutManager(instance=name) for name, _ in SHORTCUT_INSTANCES}
+        self.managers = {e['id']: ShortcutManager(instance=e['id']) for e in entries()}
         self.activations = {name: DesktopActivation(instance=name) for name in self.managers}
         self.errors = {name: None for name in self.managers}
         self.manager = self.managers['main']  # Compatibility for main-only clients.
@@ -123,10 +124,23 @@ class ShortcutService:
     def dispatch(self, message):
         operation = message.get('operation')
         instance = message.get('instance', 'main')
-        if not isinstance(instance, str) or instance not in self.managers:
+        if not isinstance(instance, str):
             raise ValueError('Unknown shortcut window.')
+        validate_name(instance)
+        if instance not in self.managers:
+            # Save may precede the first registry commit. It grants only an OS binding.
+            if operation!='save' and instance not in {e['id'] for e in entries()}:raise ValueError('Unknown shortcut window.')
+            self.managers[instance]=ShortcutManager(instance=instance)
+            self.activations[instance]=DesktopActivation(instance=instance);self.errors[instance]=None
+            self.managers[instance].problem.connect(lambda text:self.report_problem(text,instance))
+            self.managers[instance].pressed.connect(lambda:self.activate(instance))
         manager = self.managers[instance]
         fields = set(message) - {'instance'}
+        if operation=='remove' and fields=={'operation'}:
+            from .macos_shortcuts import configuration
+            manager.close();configuration(instance).unlink(missing_ok=True)
+            del self.managers[instance];del self.activations[instance];del self.errors[instance]
+            return {'ok':True,'instance':instance}
         if operation == 'status' and fields == {'operation'}:
             with manager.lock:
                 active = manager.process is not None and manager.process.poll() is None

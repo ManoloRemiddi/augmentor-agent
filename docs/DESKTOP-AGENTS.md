@@ -1,0 +1,287 @@
+<!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
+
+# Named desktop agents
+
+Settings → Agents adds desktop entries that reference independently owned DSH
+presets. Entries have stable window IDs, display names, a preset ID, working
+folder, optional initial model and a private conversation-state binding. The UI
+reads `agentPresets.list` and the DSH model catalog separately. It never edits a
+persona, skill or tool definition. No desktop window or DSH agent starts until an entry is opened.
+
+The compatible installed settings frame exposes **More → Agents · named
+windows**. The shared source settings dialog exposes the same form. Select an
+entry, edit it and save; use Open / hide to recall it. Appearance applies to the
+window where Settings is open: open the desired entry before changing its skin.
+
+## State and migration
+
+The version-1 registry is `~/.config/augmentor/agents.json`, respecting
+`XDG_CONFIG_HOME` or an explicit `AUGMENTOR_AGENT_ENTRIES` override. Until its first
+write, it synthesizes the existing main/secondary entries. Their original session,
+model, preferences, appearance and shortcut files stay in place. Renames and model
+changes retain the conversation binding. The state file records the last applied
+entry model in an optional `entryModel` field: a changed configured model applies
+on reopening, while a later choice made in the chat remains selected when that
+configuration has not changed. Main/secondary entries without a configured model
+keep their existing state-file shape. A changed preset or working folder gets
+a new binding and retains the old binding in the registry. DSH conversation files
+are never moved or deleted. History → All agents exposes retained conversations;
+a subagent conversation or one outside the current preset/folder opens as history, with sending
+and branching disabled.
+
+Removal retains the DSH definition, conversation files and former binding, and
+removes only the entry and its owned OS shortcut. Remove a window from another
+window after closing it. The main entry remains the startup anchor and can be
+renamed or edited; other entries can be removed. Cosmetic preference files are
+retained rather than deleting unrelated personal data. IDs cannot be reused after
+removal. Generated IDs without a committed entry fail closed, including during
+shortcut/registry transactions; they never start the normal agent by fallback.
+Unconfigured historical instance names retain their existing compatibility. File writes are atomic, and concurrent saves require the displayed
+revision. Shortcut registration occurs after revision admission, with restoration
+if its accompanying registry commit fails.
+
+Custom entries always use DSH. A missing/broken preset blocks connection and new
+requests with an explicit unavailable message. No replacement preset is chosen.
+An already open window whose binding changes elsewhere refuses further mutation
+until reopened. Refresh preserves unsaved preset/model selections; unavailable
+models remain explicit and cannot be saved as a fallback.
+
+## Compatibility and authority
+
+Independent entries support typed chat, system dictation, model selection,
+branching, editing, saved chats and native DSH approval/question interactions.
+Branching and editing retain the exact source preset and working folder.
+The product bridge recognizes only active registered preset/folder pairs for
+native interactions and forks; retained pairs are also recognized for saved-chat
+metadata. This presentation ownership does not change `ownsProductSession`,
+which continues governing Augmentor memory and normal product authority.
+
+Augmentor conversational voice, personal identity/memory editing and prompt
+improvement are unavailable for independent entries. Global Augmentor approval
+settings cannot be changed from such an entry. DSH owns its agent permissions.
+Dictation remains an OS input feature and supplies text to the selected agent.
+Selecting a model with an agent's name does not select that agent.
+
+Arbitrary DSH presets preserve their DSH composition. Augmentor does not silently
+add a sandbox, tools or isolation to every preset. A definition previously
+relying on process-wide restrictions must be composed correctly by its DSH owner
+before sharing a server. Three optional, generic DSH composition helpers support
+that migration without importing private agent source:
+
+- `dsh-preset-file` registers an existing owner-authored `agent.cordis.yml` and
+  `preset.yml` directory. It uses the explicitly specified DSH runtime's YAML
+  parser and reloads file revisions. Missing/malformed replacements unregister
+  stale definitions. The UI remains a consumer of DSH's catalog.
+- `dsh-preset-boundary` masks inherited tools, publishes only an explicit grant
+  list and rejects wrong preset/folder calls, ungranted tools, a widened sandbox
+  or a changed approval policy. Its confined modes are workspace-write/read-only;
+  it preserves a narrower existing sandbox and requires approval `ask`.
+- `dsh-preset-environment` overlays shell environment in a fresh isolated shell
+  provider. It does not mutate the shared server environment. Use it beside that
+  preset's isolated shell, never against the root shared shell.
+
+The optional scoped-isolation helpers and real independent-preset fixture are
+qualified with DSH 0.2.0-rc.2. The current download/CI pin is DSH 0.1.5-rc.1;
+that older runtime skips the explicit 0.2 fixture with a version reason. It is not
+evidence for scoped isolation. The boundary fails closed without the DSH tool
+guard; do not migrate a privileged process-isolated role on an unqualified runtime.
+
+A scoped DSH group can isolate `skills`, `sandboxPolicy`, `approval` and `shell`,
+mount fresh providers and retain its own persona, skill directory, tools and
+hooks. The tool boundary supplements DSH's sandbox; it does not replace hooks or
+an external gateway's owner-approval requirements. These helpers do not implement
+another agent runtime or agent editor.
+
+## Shortcuts and platforms
+
+Linux uses the existing KDE KGlobalAccel owned desktop entries. macOS's background
+shortcut service and Windows's hotkey owner now accept registered stable IDs
+rather than only main/secondary. Their platform adapters still validate supported
+keys and reject conflicts. Physical Mac/Windows acceptance is separate from the
+passing shared/adapter tests.
+
+Capture the actual OS event. Fn is keyboard-dependent. On the tested MX Keys
+Mini, brief Fn+O and plain O produced the same Qt key 79, scan code 32, virtual key
+111 and no modifiers; Fn alone produced no event. Solaar also reported Fn as
+non-divertable. Fn+O cannot be registered separately through the current shortcut
+interface. Do not label plain O as Fn+O or silently assign a substitute. This
+entry's shortcut remains unassigned pending an owner choice or a supported
+keyboard-level mechanism.
+
+## Qualification — October 8, 2026
+
+The feature branch starts from public main `79784a5`. The owner's dirty canonical
+checkout and unrelated worktrees are preserved. The installed Linux baseline is
+compatible product 0.2.11, selected release `20261005-095559-8aa03c9b`, artifact
+SHA-256 `d0f0386d4b37cc41dbcf53d3ecf49be33e1b583b13afe15bf57d46fc73b002a8`.
+It contains the approved settings frame and specialist-workspace infrastructure
+that cannot be replaced wholesale by the current source 0.2.13 artifact.
+
+Source qualification: type/build checks pass; Node suite has 513 passes and two
+existing skips; native suite has 875 cases with 36 skips. Independently authored
+fixtures cover migration, retained bindings, stale revisions, shortcut conflicts,
+failed-commit restoration, strict preset/folder ownership and missing presets.
+The optional real-DSH test uses the installed 0.2.0-rc.2 runtime with an invented
+loopback model, proves separate effective personas/tools/permissions, rejects an
+inherited tool from the independent agent and successfully executes it from the
+sibling. No private Olares definition or real-system data appears in that test.
+
+Reproduce that runtime proof by setting `DSH_INSTALL_ROOT` to the installed DSH
+package directory and running `node --test tests/dsh-independent-presets.test.mjs`.
+Without the explicit runtime it is an opt-in skip, not runtime acceptance.
+
+The installed overlay recipe is `scripts/stage-native-agents-overlay.py`: copy an
+immutable compatible artifact to a fresh candidate, apply the feature and keep
+its product version/dependencies/approved UI. The candidate passes the eight new
+native cases and its Agents form has been visually inspected in the existing
+settings frame. Follow [managed deployments](DESKTOP-DEPLOYMENTS.md) for stage,
+activation and selected-versus-running evidence. This source qualification does
+not itself select a release or prove a live owner-model request.
+
+Olares-specific isolation verification and its integration on port 3080 remain
+pending. Two isolated fixture startup failures involved missing services and a
+duplicate filesystem provider, before any live Olares request. Its repository's
+`IMPLEMENT.md` requires asking after two failures, so that fixture remains paused
+for the owner's answer. No live Olares configuration, gateway safeguards or
+model-server settings have been changed. The existing dedicated launcher remains
+separate. Only a read-only status request is needed for eventual live acceptance.
+
+The first live Linux adoption exposed a public-launcher name mismatch in the new
+Open action. It is corrected to the installer-owned `augmentor-agent` entrypoint
+and covered by an installer-contract test. Primary startup also required waiting
+for the old systemd unit to finish exiting after guarded close; a successful
+`start` issued while that unit was still active had not launched a replacement.
+The old window closed cleanly and its saved conversation/model were preserved.
+
+Live read-only KDE inspection also found that the compatible developer artifact
+had its real main/secondary bindings under `com.augmentor.Agent.desktop`, while
+the old settings helper looked under the development namespace because it
+recognized only `release.json`. Managed `desktop-release.json` artifacts now
+resolve the installed namespace, preserving the existing Fn+Space bindings.
+The six KDE adapter cases pass, including managed namespace resolution and
+failed registry-commit restoration. No existing shortcut was reassigned.
+
+## Installed Linux evidence — October 8, 2026
+
+Implementation through `9c66a04e426f57939ff626aa59fa4eaca7219dcc` was initially staged and
+selected in compatible release `20261008-135552-66db887d`, artifact SHA-256
+`9b547979857b56952ff274ae7f006cb3551654b9040bb76b3c37f14e61291bcd`.
+Stage inventory/imports and authenticated version/catalog activation pass.
+Desktop and secondary both adopted it through acknowledged idle close/reopen and
+report online, model-ready, no restoration error and no pending update. Secondary
+was reopened through the actual new entry-opening function and the managed
+launcher. Mobile retains the previous running artifact and adopts the selection
+on reopening; its service and active page were preserved.
+
+Eight private settings/session files were compared with protected pre-adoption
+copies. Their settings, skins, model and conversation selections are preserved;
+primary placement was rewritten during normal close/reopen. Existing main and
+secondary KDE keys are unchanged. A read-only live availability check correctly
+reports the primary key as a conflict for another entry. Fn+O remains unassigned.
+No Agents registry has been written merely by upgrading; main/secondary are still
+synthesized from the original state.
+
+The regular port-3080 DSH product bridge now advertises `desktopAgents: 1`. Its
+profile row alone was backed up and redirected to the staged compatible module.
+An idle DSH restart was needed to load it. That loaded module's four presentation
+bridge files are byte-identical to the final selected release. No model-server
+settings, speech dependencies or Olares definition/launcher were changed. The
+regular catalog still has no registered Olares preset: its scoped isolation,
+registration and live read-only status demonstration remain explicitly pending.
+Completion must also verify its local-only model/telemetry rules, private shell
+environment, eight skills, nine gateway tools, filesystem confinement and guard
+hooks without dispatching any owner-only command.
+
+The implementation and evidence are published in
+[draft PR #44](https://github.com/ManoloRemiddi/augmentor-agent/pull/44).
+Hosted platform/package checks were pending at this checkpoint; this personal
+Linux adoption does not publish new downloads or certify physical Mac/Windows
+acceptance. The final native suite before the managed-namespace follow-up passes
+875 cases with 36 skips, and all six KDE cases pass after that follow-up. The
+Node suite passes 513 cases with two opt-in skips, including the real installed
+DSH fixture when its runtime is explicitly supplied.
+
+Private rollback preserves the original desktop selection and the backed-up DSH
+profile. Managed `rollback` selects the immediately preceding candidate; the
+original stable artifact remains selectable using `augmentor-update activate`.
+Backend rollback requires separately restoring its profile row while idle;
+desktop selection alone does not restore DSH configuration. Preserve newer
+conversations and registry revisions during any rollback.
+
+### Model-state follow-up — final selection
+
+The configured-model reopening correction in `98a961ae6cbad56358575e65f8f1b9668205fbc9`
+passes the full 877-case native suite (36 skips), the 513-pass Node suite (two
+opt-in skips) and all eight candidate entry cases. The test follows an existing
+conversation through a configured-model edit, reopening, a later chat-model
+choice and a second reopening; the conversation ID and later choice survive.
+
+This supersedes the initial selection above. Final selected/running Desktop and
+secondary release: `20261008-141416-242dacae`, compatible product 0.2.11, artifact
+SHA-256 `a2771ed09ba93c087f58a277cab0dcb88a3c250d44d19d840197c4e059f4b434`.
+Managed stage/activation and idle adoption pass; both windows are online and
+model-ready without restoration errors. All eight protected settings/session
+value comparisons still pass. The loaded presentation bridge remains identical
+to this final artifact. Mobile adoption and Olares-specific verification remain
+at the boundaries recorded above; no Olares preset is registered on port 3080 yet.
+
+
+### Entry boundary follow-up — current selection
+
+Implementation through `ef2d7f2` keeps child-agent conversations read-only in an
+independent window and refuses a generated desktop instance ID before its
+configuration is committed. This closes the shortcut-install/save interval
+without changing historical arbitrary-instance compatibility. The eight native
+entry cases pass against the final compatible candidate; all six KDE shortcut
+cases pass.
+
+Current selected/running Desktop and secondary release:
+`20261008-144156-6e698bc5`, compatible product 0.2.11, artifact SHA-256
+`1e2d40f63804d88acba8442eb716877d0a1bbfe6752ce243dba3640f5dc5cf29`.
+Managed stage/activation and guarded idle adoption pass. Both windows are online
+and model-ready without restoration errors. All eight protected value
+comparisons still pass, and the four loaded presentation bridge files match
+this selection. Main/secondary keys are preserved; Fn+O remains unassigned.
+Mobile keeps its original running artifact until reopening.
+
+The hosted Debian run found that the real independent-isolation fixture assumed
+DSH 0.2 modules while the public qualification lock remains 0.1.5-rc.1. The test
+now declares that version boundary explicitly. It passes on the owner's actual
+0.2.0-rc.2 runtime, and the local locked-0.1.5 Node suite passes 510 cases with
+five explained skips. The full common native suite previously passed 877 cases
+with 36 skips; the final state/ownership amendments pass the focused cases above.
+Fresh hosted checks remain required. Olares fixture/live acceptance remain
+paused under its repository's two-failure rule; no private Olares source was
+published and no live Olares definition or model server was changed.
+
+
+## Owner catalog cleanup — October 8, 2026
+
+The owner requested removal of obsolete selectable agents. A metadata-only audit
+of the connected DSH catalog, desktop state, application workspace registry and
+session headers identified eight obsolete registrations: legacy `augmentor`
+Browser and `augmentor-linux` Desktop, legacy `sponsor-desk`, `liangshen`, and
+four dated `augmentor-evidence-pilot-*` experiment definitions. The current
+Desktop/Browser product presets and YouTube/Sponsor workspace presets were
+retained. DSH's `standard`, `ptc`, `minimal`, `cordis` and current `standard-codex`
+default were also retained. Olares's installed definition is preserved; it remains
+outside the regular server catalog pending the integration documented above.
+
+The cleanup adds only `disabled: true` to the eight declaring rows in the private
+web profile patch. Parsed comparison confirms no other configuration changed.
+Private archive copies include the previous patch, retired definitions and
+catalog/session metadata; original definition directories and every conversation
+remain at their existing paths. The application workspace's legacy-preset history
+allowlist is unchanged. To restore a retired role, re-enable its declaring row
+under idle DSH maintenance; avoid restoring an entire older patch over later work.
+Private paths, credentials, persona content and session metadata are not published.
+
+The first verification ran before the restarted DSH API was ready; automatic
+rollback restored the original profile. The corrected readiness wait verified
+exact roster membership after the idle restart: 17 entries became 9, none broken,
+and the default remained `standard-codex`. All 1,090 conversation identity/role/
+folder bindings and all eight protected settings/session value comparisons pass.
+Desktop, secondary and Mobile report online/model-ready without restoration
+errors. This is a private DSH configuration cleanup; installed release selection,
+model-server configuration and speech dependencies are unchanged. Use **Refresh**
+in an already-open Agents form to reload its cached roster.

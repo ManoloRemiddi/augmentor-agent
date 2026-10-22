@@ -20,6 +20,8 @@ class HistoryDialog(QDialog):
         filters=QHBoxLayout()
         self.saved=QCheckBox('Saved only');self.all=QCheckBox('All agents');self.all.hide()
         filters.addWidget(self.saved);filters.addWidget(self.all);layout.addLayout(filters)
+        from .agent_entries import read
+        if getattr(getattr(window.controller,'client',None),'custom',False) or read()['retained']:self.all.show()
         self.list=QListWidget();layout.addWidget(self.list)
         self.note=QLabel('Loading history…');self.note.setWordWrap(True);layout.addWidget(self.note)
         buttons=QHBoxLayout()
@@ -43,7 +45,7 @@ class HistoryDialog(QDialog):
         self.list.clear();query=self.search.text().casefold()
         for row in self.rows:
             if row.get('archived') or row.get('blank'):continue
-            if not self.all.isChecked() and row.get('agentPreset')!=getattr(self.owner.controller,'preset','augmentor-linux-pi'):continue
+            if not self.all.isChecked() and not getattr(getattr(self.owner.controller,'client',None),'owns_session',lambda r:r.get('agentPreset')==getattr(self.owner.controller,'preset','augmentor-linux-pi'))(row):continue
             if self.saved.isChecked() and not row.get('saved'):continue
             title=str(row.get('title') or row['sessionId'])
             if query not in (title+' '+row['sessionId']).casefold():continue
@@ -150,10 +152,18 @@ class SettingsDialog(QDialog):
     def __init__(self,window):
         from .instances import current_name
         super().__init__(window);self.owner=window
-        self.setWindowTitle('Settings · '+('First agent' if current_name()=='main' else 'Second agent'));scaled(self).setMinimumWidth(400)
+        from .instances import window_label
+        self.setWindowTitle('Settings · '+window_label());scaled(self).setMinimumWidth(400)
         outer=QVBoxLayout(self);scroll=QScrollArea();scroll.setWidgetResizable(True);scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         content=QWidget();layout=QVBoxLayout(content);scroll.setWidget(content);content.setAutoFillBackground(False);outer.addWidget(scroll)
         self.resize(px(self,460),min(820,self.screen().availableGeometry().height()-80))
+        from .agents_settings import AgentsSettings
+        agents=QPushButton('Agents · named windows')
+        self.agents=None
+        def open_agents():
+            if self.agents is None:self.agents=AgentsSettings(window);layout.insertWidget(1,self.agents)
+            self.agents.setVisible(True)
+        agents.clicked.connect(open_agents);layout.addWidget(agents)
         from .settings_icons import settings_icon,settings_label
         from .voice_settings import VoiceSettingsDialog
         voice=QPushButton('Resonant Voice')
@@ -186,6 +196,10 @@ class SettingsDialog(QDialog):
         prompts=QPushButton('Prompt library');prompts.clicked.connect(window.open_prompt_library);layout.addWidget(prompts)
         from .memory import MemoryDialog
         memory=QPushButton('Memory');memory.clicked.connect(lambda:MemoryDialog(window).exec());layout.addWidget(memory)
+        if getattr(getattr(window.controller,'client',None),'custom',False):
+            for control in (voice,memory,engine):control.setEnabled(False)
+            memory.setToolTip('Augmentor personal memory is unavailable for independent DSH agents.')
+            voice.setToolTip('Use typed chat or dictation with this independent DSH agent.')
         from .support import SupportDialog
         support=QPushButton('Support report');support.clicked.connect(lambda:SupportDialog(window).exec());layout.addWidget(support)
         done=QPushButton('Done');done.clicked.connect(self.accept);outer.addWidget(done)
@@ -193,7 +207,7 @@ class SettingsDialog(QDialog):
             button.setIcon(settings_icon(name,window.accent))
 
     def capture_current(self):
-        return self.shortcuts.capture_current()
+        return (self.agents.capture_current() if self.agents else False) or self.shortcuts.capture_current()
 
 
 class PromptLibraryDialog(QDialog):
