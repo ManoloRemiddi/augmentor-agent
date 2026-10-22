@@ -24,6 +24,21 @@ export class DshDrafts {
  selected(sid,epoch){return this.controller.epoch===epoch&&this.controller.state.sessionId===sid&&this.controller.state.phase==='ready'&&!this.controller.state.readOnly;}
  restoreText(sid,text,references=[]){this.restoring=true;try{this.restore(sid,text,references);}finally{this.restoring=false;}}
  fail(sid,error){const s=this.slot(sid);s.blocked=error.message+' The draft is kept in this page. Copy unsaved text before reloading; no upload or prompt was retried.';if(sid===this.current&&!this.controller.state.readOnly)this.controller.update({error:s.blocked});this.changed();}
+ async refreshSaved(){
+  const sid=this.current,epoch=this.controller.epoch;if(!sid||this.loading||this.peerRead||!this.selected(sid,epoch))return;
+  const s=this.slot(sid),before=s.remote;
+  if(!before||s.blocked||s.textRunning||before.submission||s.desired!==before.text||!sameRefs(s.desiredRefs,before.references))return;
+  const unchanged=()=>this.selected(sid,epoch)&&s.remote===before&&!s.blocked&&!s.textRunning&&s.desired===before.text&&sameRefs(s.desiredRefs,before.references);
+  this.peerRead=true;
+  try{
+   const value=record(await this.controller.rpc('draft.describe',{sessionId:sid}));
+   if(!unchanged()||value.revision===before.revision||value.submission)return;
+   if(value.revision<before.revision)throw Error('The shared draft revision moved backwards.');
+   const items=await this.materialize(sid,value);if(!unchanged())return;
+   s.remote=value;s.desired=value.text;s.desiredRefs=value.references??[];
+   this.attachments.replaceLocal(sid,items);this.restoreText(sid,value.text,value.references??[]);this.changed();
+  }finally{this.peerRead=false;}
+ }
  async materialize(sid,value){const items=[];for(const saved of value.attachments){const response=await this.controller.fetcher('/api/drafts/file?'+new URLSearchParams({sessionId:sid,id:saved.id,sha256:saved.sha256}),{headers:{Authorization:'Bearer '+this.controller.token}});if(!response.ok)throw Error('Saved draft bytes could not be read.');const bytes=await response.arrayBuffer();if(bytes.byteLength!==saved.bytes||await digest(bytes)!==saved.sha256)throw Error('Saved draft bytes failed verification.');items.push({id:saved.id,kind:saved.kind,file:new File([bytes],saved.name,{type:saved.mediaType,lastModified:saved.lastModified}),saved,receipt:saved.kind==='image'?{receiptId:saved.part.receiptId,attachment:saved.part.attachment}:undefined});}return items;}
  async load(sid,epoch,readOnly){
   if(readOnly){if(this.controller.epoch===epoch&&this.current===sid){this.controller.update({unconfirmed:null});this.attachments.replaceLocal(sid,[]);this.loading=false;this.restoreText(sid,'');this.changed();}return;}

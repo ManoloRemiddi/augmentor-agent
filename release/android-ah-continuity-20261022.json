@@ -1,0 +1,53 @@
+{
+  "schema": "augmentor-android-ah-qualification/1",
+  "date": "2026-10-22",
+  "baseSource": "efd85b83",
+  "branch": "feat/android-ah-continuity",
+  "kind": "browser presentation and paired carrier preview; existing installed AH owner unchanged",
+  "physicalDevice": {
+    "model": "Pixel 7a",
+    "android": "17",
+    "browser": "Chrome",
+    "transport": "ADB USB reverse"
+  },
+  "checks": {
+    "typescriptAndBrowserBuild": "passed",
+    "focusedNodeCases": 28,
+    "failures": 0,
+    "markerWrites": 2,
+    "markerContents": [
+      "DESKTOP-ONE",
+      "PHONE-TWO"
+    ],
+    "roundTripHumanTurns": 3,
+    "finalDoubleTouchCheck": {
+      "humanAdmissions": 1,
+      "additionalToolCalls": 0
+    },
+    "totalHumanAdmissions": 4,
+    "totalToolCalls": 2,
+    "totalCompletedTurns": 4
+  },
+  "candidateManifestSHA256": "b92092969aff7f8ba1e2581a8ded423dfdd6f7b7385d88e96cd365bade65e036",
+  "sourceFiles": {
+    "apps/harness/dsh-app.jsx": "0ea27810cccbc101f06cbf8970941e756c699d18bfc86cb4357f65fcc7c71cbf",
+    "apps/harness/dsh-drafts.mjs": "7dcf07534e8201814aee60a5b5cb8c0dc89dac830ab0a8496594cc82e3fb9732",
+    "apps/harness/dsh-pi-controller.mjs": "956099d9f23e0b1ea6f5d3d845d9b41722c4f1ef2284084215e13fc429010cd0",
+    "apps/harness/agent-continuity.mjs": "0f17bc9776a76e6f013c9f0ef6e4c295f4b142f2d79988bd11cb8ceb96f1d007",
+    "apps/mobile-ah/server.mjs": "15e89be05136acbc98a4f54e5f016789fb4b7a04e6011e49222e9ce0af781414",
+    "apps/mobile-ah/connection.mjs": "caacb776da09b133cb226052650f6b50ff9df9ae18973cbdcfbc3372bae4f4c3",
+    "apps/mobile-ah/agent.html": "1a7fa2687c595dad2efdedaf65f7a021b8c27c4aa85dc7297de0bb85cd7c9a4f",
+    "apps/mobile-ah/agent.css": "639cd19fe8548f21592cd1f8894f1f5ad7fbee7102a2ef6410e7737ad9db7c02",
+    "apps/mobile-ah/pair.html": "24e95490749a6ad97d8b779a1b14feb705b47b80e1e77b6ca0f0e5937d679c01",
+    "apps/mobile-ah/pair.js": "393e227db8626538d7880822eaf7c31a52471842c60acd82101743c4d65f0c96"
+  },
+  "remaining": [
+    "administrator Tailscale Serve route and physical wireless/cellular acceptance",
+    "native APK",
+    "login/reboot service installation",
+    "physical speech",
+    "all advanced original menus and attachments",
+    "installed native Desktop and other operating systems"
+  ],
+  "privacy": "No owner credentials, profile bindings, transcripts or screenshots included."
+}

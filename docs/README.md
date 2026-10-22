@@ -1632,6 +1632,7 @@ for present behavior; uncompleted plan items are not feature claims.
 
 ## Source-level entrypoints and external repository
 
+- [Android Agent → existing AH: pairing, shared sessions and Pixel continuity proof](ANDROID-AH.md)
 - [Mobile remote Desktop](../apps/mobile/README.md), [Android internal host](../apps/mobile/android/README.md), [roadmap](MOBILE-REMOTE-PLAN.md), [validation](MOBILE-REMOTE-VALIDATION.md)
 - [Native desktop](../apps/native/README.md)
 - [Browser surface](../apps/browser/README.md) and its [agent conventions](../apps/browser/AGENTS.md)
