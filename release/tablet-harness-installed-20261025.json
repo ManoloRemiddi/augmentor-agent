@@ -1,0 +1,71 @@
+{
+  "schema": "augmentor-tablet-harness-evidence/1",
+  "date": "2026-10-25",
+  "sourceRef": "592ec36d",
+  "scope": "registered MX pilot Harness and private paired tablet gateway",
+  "productVersion": "0.2.13",
+  "installed": {
+    "review": "pilot",
+    "releaseId": "20261025-105801-5def1568",
+    "artifactSha256": "62963e266c97bb71dd7627d187cbd8b8af934c8c2f19f4c56178061d9962824b",
+    "baseArtifactSha256": "640f28b87cca94ccb5eefceb9eb1f1cf159dccf7846ab6ad87d2f9af8514ea36",
+    "selectedAndRunningMatch": true,
+    "preservedBaseOverlays": ["default provisioning", "macOS Search/Wiki"],
+    "enabledServices": ["Harness startup", "paired mobile gateway", "AH-scoped voice companion"],
+    "physicalRebootTested": false
+  },
+  "companion": {
+    "version": "0.1.22",
+    "packageSha256": "385f78d9ce0d280a77075540966aff6594e8e2864b4f9f92fcbdcf5c2b7dc777",
+    "tests": {"passed": 74, "skippedWindowsOnly": 3, "failed": 0},
+    "existingDesktopSpeechAndModelConfigurationPreserved": true
+  },
+  "tests": {
+    "buildCohort": {"passed": 80, "failed": 0, "skipped": 0},
+    "exactSealedPackage": {"passed": 47, "failed": 0, "skipped": 0},
+    "evidenceIncludes": ["real SDK context isolation", "separate drafts and working files", "delayed microphone permission", "no capture re-entry during finalization", "duplicate transcript and PCM rejection", "existing native and browser speech surfaces"]
+  },
+  "physicalDevice": {
+    "model": "Lenovo TB323FU",
+    "android": "16",
+    "transport": "Chrome over private Tailscale HTTPS",
+    "portraitRightSidebarCollapsed": true,
+    "landscapeRightSidebarExpanded": true,
+    "threeControlsAndFocusedEditorAboveFloatingKeyboardBothOrientations": true,
+    "unsentDraftSurvivedRotation": true,
+    "aiImproveDidNotSubmitConversationMessage": true,
+    "originalRotationPreferencesRestored": true,
+    "desktopTabletDesktopSameSession": {
+      "humanMessages": 3,
+      "completedTurns": 3,
+      "toolCalls": 0,
+      "repeatedSubmissions": 0,
+      "earlierTokenRetained": true
+    },
+    "independentQuickChats": {
+      "distinctWorkingDirectories": true,
+      "freshChatDidNotReceiveOtherChatToken": true,
+      "originalSessionsRetained": 132,
+      "currentSessions": 134
+    },
+    "voice": {
+      "ownerConfirmedRecognitionAndSpokenReplyBeforeFinalFix": true,
+      "ownerReportedAwkwardTapAndDelay": true,
+      "finalBuildCaptureAndDisabledTranscribingStateObserved": true,
+      "silentCaptureAdmittedNoExtraMessage": true,
+      "activeVoiceBridgesAtFinish": 0,
+      "finalBuildAcousticSmoothnessAccepted": false
+    }
+  },
+  "recognitionMeasurement": {
+    "input": "independently authored synthetic speech",
+    "durationSeconds": 5.45,
+    "localHostTranscriptionMs": 907,
+    "reservationMs": 446,
+    "recognizer": "existing Whisper small.en CPU",
+    "tabletEndToEndLatency": "not measured",
+    "onDeviceRecognitionImplemented": false
+  },
+  "retention": {"verifiedObsoleteArtifactsRemoved": 12, "additionalMobileCandidatesRetained": 2, "managedScratchRetained": false},
+  "remainingQualification": ["fresh owner acoustic feedback", "device-local recognizer and language benchmark", "installed macOS/Windows", "Pixel regression on this build", "hotspot and cellular transitions", "physical reboot", "background or locked-screen voice"]
+}

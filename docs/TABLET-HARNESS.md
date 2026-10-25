@@ -124,3 +124,50 @@ in the pruned production Python. A matching Debian QtTest module was used only b
 The shared implementation applies to Linux/macOS source; installed macOS/Windows,
 Pixel regression, hotspot/cellular transitions, all attachment/Office combinations
 and unrestricted arbitrary-failure exactly-once semantics are not qualified here.
+
+## Installed qualification
+
+The registered MX `pilot` review now selects and runs the separately sealed
+`20261025-105801-5def1568` artifact, built from feature commit `592ec36d` with the
+declared installed-base overlays. Its SHA-256 is
+`62963e266c97bb71dd7627d187cbd8b8af934c8c2f19f4c56178061d9962824b`.
+The final exact-package cohort passes 47 tests, without failures or skips,
+in addition to the 80-test build cohort. See the
+[installed receipt](../release/tablet-harness-installed-20261025.json).
+
+On the final build, physical Lenovo portrait hides the right sidebar; landscape
+opens it. All three controls and the active editor stay reachable above the
+floating keyboard in both orientations. A landscape draft survived rotation to
+portrait and one physical Send. The same test chat returned its earlier token
+on Desktop and then its tablet continuation on Desktop: exactly three human
+messages, three completed turns and zero tool calls. All 132 original saved
+conversations remain among the 134 current conversations.
+
+Physical microphone start and Finish displayed recording and disabled
+Transcribing states on the final build. Silent recording admitted no extra human
+message. Recording was explicitly closed after the test, and the device's original
+automatic-rotation preferences were restored. This validates the control state,
+not a new acoustic or end-to-end latency acceptance: the owner's spoken-reply
+confirmation and awkwardness report preceded this final fix.
+
+The private gateway and AH-scoped voice companion are enabled user services;
+the existing Desktop/DSH voice companion, Handy and model placement are unchanged.
+Current and needed rollback artifacts remain, and twelve verified obsolete test
+artifacts were removed. No scratch build is selected or retained.
+
+## On-device recognition follow-up
+
+Android provides native `isOnDeviceRecognitionAvailable` and
+`createOnDeviceSpeechRecognizer` APIs. Availability must be checked on the actual
+device and language; installed recognition services alone do not prove an offline
+model is ready. See the [Android API contract](https://developer.android.com/reference/android/speech/SpeechRecognizer).
+[Sherpa ONNX's Android examples](https://k2-fsa.github.io/sherpa/onnx/android/prebuilt-apk.html)
+also support offline recognition, including streaming and Qualcomm QNN variants.
+These are candidates for a device benchmark, not qualified integrations here.
+
+A device adapter should keep interim words local, show editable final text, and
+submit the final transcript through the same AH client/request identity once.
+Compare finalization time, recognition errors, battery use and first reply audio
+against the current CPU path before choosing a model. A faster recognizer cannot
+by itself remove network, conversational-model or reply-synthesis time. No Android
+wrapper or recognition model is installed by this change.
