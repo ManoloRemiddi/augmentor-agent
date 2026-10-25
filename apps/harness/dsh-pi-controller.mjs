@@ -17,7 +17,7 @@ export class DshPiController {
     const response=await this.fetcher('/api/rpc',{method:'POST',headers:{Authorization:'Bearer '+this.token,'Content-Type':'application/json'},body:JSON.stringify({id:crypto.randomUUID(),method,params}),...(signal?{signal}:{})});
     const body=await response.json();if(!response.ok||body.error){const error=Error(body.error?.message||'The local connection failed.');error.authoritative=!!body.error;throw error;}return body.result;
   }
-  async start(requestedSession){
+  async start(requestedSession,{strict=false}={}){
     const access=await this.fetcher('/api/access',{headers:{Authorization:'Bearer '+this.token}}).then(async r=>{const v=await r.json();if(!r.ok)throw Error(v.error?.message||'Open a fresh Harness link.');return v;});
     this.onAccess(access);
     const [host,catalog,list]=await Promise.all([this.rpc('host.describe'),this.rpc('models.list'),this.rpc('session.list')]);
@@ -25,6 +25,7 @@ export class DshPiController {
     this.update({modelsRevision:undefined,readOnly:access.mode==='read-only',catalog,workspace:host.workspace,workspaces,sessions:list.items,phase:'ready',attachmentLimits:host.attachmentLimits,capabilities:host.capabilities??{}});
     const selected=access.sessionId||requestedSession||sessionStorage.getItem('augmentor-harness-session');
     const available=list.items.filter(x=>access.mode==='read-only'||!workspaces?.archivedSessionIds?.includes(x.sessionId));
+    if(strict&&requestedSession&&!available.some(x=>x.sessionId===requestedSession))throw Error('The requested AH session is unavailable. Choose it explicitly; no other conversation was opened.');
     const row=available.find(x=>x.sessionId===selected)||available[0];
     if(row)await this.open(row.sessionId);
   }
@@ -280,9 +281,10 @@ export class DshPiController {
       }
     }finally{this.polling=false;}
   }
-  async create(cwd=this.state.workspace){
+  async create(cwd){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
     if(this.createFlight?.epoch===this.epoch&&this.createFlight.sessionId===this.state.sessionId)return null;
+    if(cwd===undefined&&this.state.capabilities?.isolatedUngrouped!==1)throw Error('This AH owner needs the isolated Ungrouped update. No project chat was created.');
     const selection=this.state.selection||this.state.catalog.default;if(!selection)throw Error('Choose a model first.');
     const sessionId=crypto.randomUUID(),flight={epoch:++this.epoch,sessionId:this.state.sessionId,previousPhase:this.state.phase,opening:false};this.createFlight=flight;
     const current=()=>this.createFlight===flight&&this.epoch===flight.epoch&&this.state.sessionId===flight.sessionId&&!this.state.readOnly;
@@ -290,7 +292,7 @@ export class DshPiController {
     // draft remains owned by that conversation while the new owner is prepared.
     this.update({phase:'loading',error:null});
     try{
-      const created=await this.rpc('session.create',{sessionId,selection,cwd});
+      const created=await this.rpc('session.create',{sessionId,selection,...(cwd===undefined?{ungrouped:true}:{cwd})});
       if(created?.sessionId!==sessionId)throw Error('The new conversation was not confirmed. Inspect the conversation list before trying again.');
       if(!current())return created;
       await this.refresh();if(!current())return created;
