@@ -29,7 +29,7 @@ shutil.copytree(source, work, ignore=shutil.ignore_patterns('.git', 'node_module
 for relative in ('node_modules', 'apps/harness/node_modules'):
     (work/relative).symlink_to((args.dependencies/relative).resolve(strict=True), target_is_directory=True)
 subprocess.run(['npm', 'run', 'build'], cwd=work, check=True)
-subprocess.run(['node', '--test', 'tests/pi-voice.test.mjs', 'tests/pi-voice-host.test.mjs', 'tests/pi-voice-surfaces.test.mjs', 'tests/pi-workspaces.test.mjs', 'tests/ungrouped-runtime.test.mjs', 'tests/tablet-harness.test.mjs', 'tests/harness-session-create.test.mjs', 'tests/mobile-ah.test.mjs', 'tests/harness-drafts.test.mjs', 'tests/harness-drafts-runtime.test.mjs', 'tests/harness-browser-access.test.mjs'], cwd=work, check=True)
+tests=subprocess.run(['node', '--test', 'tests/pi-voice.test.mjs', 'tests/pi-voice-host.test.mjs', 'tests/pi-voice-surfaces.test.mjs', 'tests/pi-workspaces.test.mjs', 'tests/ungrouped-runtime.test.mjs', 'tests/tablet-harness.test.mjs', 'tests/tablet-dictation-chromium.test.mjs', 'tests/harness-session-create.test.mjs', 'tests/mobile-ah.test.mjs', 'tests/harness-drafts.test.mjs', 'tests/harness-drafts-runtime.test.mjs', 'tests/harness-browser-access.test.mjs'], cwd=work)
 # Let actual SDK/HTTP test children finish their own joined shutdown. Keep the
 # helper's reserve and refusal policy; do not kill or reap unknown processes.
 spec=importlib.util.spec_from_file_location('build_hygiene',source/'scripts/harness-build-workspace.py')
@@ -40,6 +40,7 @@ for attempt in range(50):
     time.sleep(0.1)
 else:
     raise RuntimeError('A test caller still references managed scratch; inspect it before another build.')
+tests.check_returncode()
 shutil.copytree(work/'dist/harness-web', args.output/'web')
 for name in ('host.js','harness-server.js','harness-voice.js','ungrouped.js'):
     dst=args.output/'runtime'/name;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(work/'dist/runtime/src'/name,dst)

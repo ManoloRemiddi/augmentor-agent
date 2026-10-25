@@ -53,19 +53,39 @@ tablet. Bounded PCM sequences, an expiring client lease and bounded output preve
 unbounded buffering. Neither audio, accepted transcripts nor uncertain submissions
 are automatically replayed. Read-only inspection credentials cannot open voice.
 
-Tap Talk to begin; tap Finish & send once to finalize. Connecting, microphone
-startup, transcription and waiting for a reply have explicit disabled states.
-Repeated taps cannot begin another recording while finalization is pending. Late
-partials cannot replace the finalization status with Listening. Playback keeps its
+Hold Talk to record; release to transcribe into the existing editable message box.
+Release never sends a conversation message. Only the original explicit Send (or
+its keyboard shortcut) submits the draft, including any edits and attachments.
+Talk can add speech to an existing draft at its captured selection. The shared
+insertion contract fences editor revisions and chat/epoch ownership; if the draft
+changed, the transcript stays visible for explicit insertion rather than replacing
+newer text. Duplicate final events cannot insert twice.
+
+Mouse/touch pointer capture and Space/Enter key release end the recording.
+Pointer cancellation, focus loss during a hold and page hiding discard unfinished
+audio. Assistive click activation can toggle start/finish. Releasing before a slow
+permission/setup completes prevents a late microphone start. The held control
+stays enabled during setup so it can receive release; other input actions wait
+until dictation settles. An older owner without `browserDictationDraft: 1` refuses
+this UI's capture, avoiding an automatic-send fallback.
+
+Connecting, microphone startup, transcription and waiting for a sent reply have
+explicit busy states. Repeated presses cannot begin another recording while
+finalization is pending. Late partials cannot replace the finalization status with
+Listening. Playback keeps its
 Speaking state until server completion, speech idle and local audio drain agree.
-Stop speech interrupts playback without cancelling the AH task. Close voice
+Stop speech interrupts playback without cancelling the AH task; holding Talk
+also interrupts playback and starts a new draft recording. Close voice
 discards unfinished audio. Microphone tracks close when recording finishes.
 The companion's bounded utterance budget is retained. Manual foreground speech is
 implemented; hands-free, background capture and screen-lock continuation are not.
 
-Final transcripts enter the existing durable AH queue once with the canonical
-`resonant-voice:` identity and scoped voice admission. The companion does not run
-the conversational model. CPU recognition and the existing Breeze/Qwen device
+The audio relay returns final transcripts once and never calls `session.prompt`
+or reads/submits the conversational queue. Draft insertion uses the original
+shared persistence path. Explicit Send retains the normal durable draft/request
+identity and editable-text input mode, and the live scoped companion can still
+speak that admitted human turn's reply. The companion does not run the
+conversational model. CPU recognition and the existing Breeze/Qwen device
 placement, model choices and precision are preserved.
 
 The live MX deployment uses a separately packed Resonant Voice 0.1.22 scoped
@@ -125,7 +145,7 @@ The shared implementation applies to Linux/macOS source; installed macOS/Windows
 Pixel regression, hotspot/cellular transitions, all attachment/Office combinations
 and unrestricted arbitrary-failure exactly-once semantics are not qualified here.
 
-## Installed qualification
+## Earlier installed qualification — before hold-to-dictate correction
 
 The registered MX `pilot` review now selects and runs the separately sealed
 `20261025-105801-5def1568` artifact, built from feature commit `592ec36d` with the

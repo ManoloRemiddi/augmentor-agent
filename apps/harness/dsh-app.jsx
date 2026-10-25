@@ -171,6 +171,12 @@ editor.registerUpdateListener(({editorState})=>editorState.read(()=>{const previ
 function setDraft(value){const text=typeof value==='string'?value:value.text,refs=typeof value==='string'?[]:value.references??[];editor.update(()=>{const paragraph=$createParagraphNode();let offset=0;for(const ref of refs){if(ref.offset>offset)paragraph.append($createTextNode(text.slice(offset,ref.offset)));const chip=$createReferenceChipNode(ref);if(ref.invalid)chip.setInvalid(true);paragraph.append(chip);offset=ref.offset+ref.length;}if(offset<text.length)paragraph.append($createTextNode(text.slice(offset)));$getRoot().clear().append(paragraph);},{discrete:true});}
 const draftArchive=new DshDrafts(controller,{restore:(sid,text,references)=>{activeDraft=sid;setDraft({text,references});},attachments:attachmentDrafts});
 const dictationActions=dictationInsertion({scope:()=>JSON.stringify([activeDraft,controller.epoch]),revision:()=>draftRev,span:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},replace:(span,text)=>{let applied=false;editor.update(()=>{applied=$replaceDetectSpanWithText(span,text);},{discrete:true});return applied;}});
+tabletAudio.draft={captureInsertion:dictationActions.captureInsertion,insertText:(text,span)=>{
+ const current=composerProjection.detectText,left=current[span.start-1],right=current[span.end];
+ const prefix=left&&/\S/.test(left)&&!/^\s|^[,.;:!?]/.test(text)?' ':'';
+ const suffix=right&&/\S/.test(right)&&!/\s$/.test(text)?' ':'';
+ return dictationActions.insertText(prefix+text+suffix,span);
+}};
 const commandRows=[
   {name:'file',label:t.conversation('input.file'),description:'Attach files to this draft',icon:IconFolderCloseRegular},
   {name:'goal',...builtinRowFace({definitionId:'@deepseek-ai/dsh-command-goal'},t.command)},
@@ -197,7 +203,7 @@ const useLexicon=bind(commandMenu.lexicon),useMenuLauncher=bind(commandMenu.laun
 commandMenu.lexicon.subscribe(()=>rescanTextRefs(editor));
 const improvementScope=()=>{const s=controller.state;return JSON.stringify([s.sessionId,controller.epoch,s.selection,s.phase,s.readOnly,s.sessions.find(x=>x.sessionId===s.sessionId)?.running===true]);};
 const promptImprovement=new DshPromptImprovement({
-  read:()=>{const s=controller.state;return {text:draft.getSnapshot(),revision:draftRev,scope:improvementScope(),sessionId:s.sessionId,selection:s.selection,references:references().length,available:!s.readOnly&&s.phase==='ready'&&!!s.sessionId&&draftArchive.getSnapshot().ready&&!s.sessions.find(x=>x.sessionId===s.sessionId)?.running&&!attachmentDrafts.busy&&!s.unconfirmed&&!s.compactionPending&&!s.compaction?.blocked};},
+  read:()=>{const s=controller.state;return {text:draft.getSnapshot(),revision:draftRev,scope:improvementScope(),sessionId:s.sessionId,selection:s.selection,references:references().length,available:!tabletAudio.inputBusy()&&!s.readOnly&&s.phase==='ready'&&!!s.sessionId&&draftArchive.getSnapshot().ready&&!s.sessions.find(x=>x.sessionId===s.sessionId)?.running&&!attachmentDrafts.busy&&!s.unconfirmed&&!s.compactionPending&&!s.compaction?.blocked};},
   rpc:(method,params)=>controller.rpc(method,params),replace:setDraft,focus:()=>editor.focus(),notice:message=>controller.update({error:message}),
   animate:text=>{const input=editor.getRootElement();if(!input)throw Error('The draft editor is unavailable.');return startLetterRoll(input,{text});},
 });
@@ -205,12 +211,12 @@ controller.subscribe(()=>promptImprovement.sync());
 window.addEventListener('pagehide',()=>promptImprovement.cancel());
 const submissionGate=new SubmissionGate();
 const keyboard={editor,arbitrate:(key,composing)=>commandMenu.arbitrate(key,composing),space:()=>commandMenu.engine?.onSpace()??false,dismissPopup:()=>commandMenu.popup.dismiss(),bindFilePicker:fn=>{openFiles=fn;return()=>{if(openFiles===fn)openFiles=null;};},caretSpan:()=>composerProjection.selection||{start:composerProjection.detectText.length,end:composerProjection.detectText.length},paste:text=>editor.update(()=>{const selection=$getSelection();if($isRangeSelection(selection))selection.insertText(text);}),submit:mode=>submissionGate.run(()=>control.run(async()=>{
-  if(promptImprovement.getSnapshot().busy)return;
+  if(promptImprovement.getSnapshot().busy||tabletAudio.inputBusy())return;
   const text=draft.getSnapshot(),sid=controller.state.sessionId,items=[...attachmentDrafts.draft(sid).items],epoch=controller.epoch;if(attachmentDrafts.busy||!text.trim()&&!items.length)return;
   if(await commandMenu.adjudicate(text)!==undefined)return;
   if(sid!==controller.state.sessionId||draft.getSnapshot()!==text)throw Error('The conversation or draft changed; nothing was submitted.');
   attachmentDrafts.busy=true;attachmentDrafts.changed();
-  try{const parts=await attachmentDrafts.content(sid,items);if(sid!==controller.state.sessionId)throw Error('The selected conversation changed; the draft is preserved.');const requestId=await draftArchive.prepare(sid,text,mode,parts);if(sid!==controller.state.sessionId||epoch!==controller.epoch)throw Error('The selected conversation changed; no prompt was sent. Inspect the prepared draft before continuing.');await controller.send(text,mode,parts,requestId);await draftArchive.complete(sid,requestId);await controller.refresh();}
+  try{const parts=await attachmentDrafts.content(sid,items);if(sid!==controller.state.sessionId)throw Error('The selected conversation changed; the draft is preserved.');const requestId=await draftArchive.prepare(sid,text,mode,parts);if(sid!==controller.state.sessionId||epoch!==controller.epoch)throw Error('The selected conversation changed; no prompt was sent. Inspect the prepared draft before continuing.');const speaking=tabletAudio.sending(sid);try{await controller.send(text,mode,parts,requestId);}catch(error){if(speaking)await tabletAudio.close();throw error;}await draftArchive.complete(sid,requestId);await controller.refresh();}
   finally{attachmentDrafts.busy=false;attachmentDrafts.changed();}
 })),steerQueue:()=>void control.run(async()=>{for(const item of controller.state.queue?.items||[])if(item.canSteer)await controller.rpc('session.updateQueue',{sessionId:controller.state.sessionId,itemId:item.id,expectedTurnId:controller.state.queue.activeTurnId,action:{kind:'steer'}});})};
 
@@ -304,6 +310,7 @@ function QueueStatus({state}){
 
 function ImproveDraft(){
   const value=useSyncExternalStore(promptImprovement.subscribe,promptImprovement.getSnapshot),text=useDraft(x=>x),button=useRef(null);
+  useSyncExternalStore(tabletAudio.subscribe,tabletAudio.getSnapshot);
   useEffect(()=>()=>promptImprovement.cancel(),[]);
   useEffect(()=>{if(!value.busy)return;const card=button.current?.closest(agentMode?'.augmentor-agent-composer':'[data-composer-card]');const key=e=>{if(e.isComposing)return;if(e.key==='Enter'||e.key==='Escape'){e.preventDefault();e.stopPropagation();if(e.key==='Escape')promptImprovement.cancel();}};card?.addEventListener('keydown',key,true);return()=>card?.removeEventListener('keydown',key,true);},[value.busy]);
   const current=promptImprovement.deps.read(),label=value.busy?'Cancel prompt improvement':value.canUndo?'Undo prompt improvement':'Improve prompt';
@@ -319,15 +326,16 @@ function AgentComposer({input,state,disabled}){
  const inputState=input.useInput(x=>x),machineBusy=['adjudicating','submitting'].includes(inputState?.phase);
  const running=!!state.queue?.activeTurnId;
  const ready=!disabled&&!input.blocked&&!machineBusy&&connection.online&&!connection.reconnecting;
+ const press=()=>tabletAudio.press(async()=>{if(!controller.state.sessionId)await controller.create();if(!draftArchive.getSnapshot().ready)throw Error('Wait for the message box to finish loading before dictating.');});
  return <div className="augmentor-agent-composer">
   <div className="augmentor-agent-connection" role="status"><span>{connection.note}<br/><span data-agent-session>{state.sessionId||'Choose a session'}</span></span><button aria-label="Reconnect to AH" disabled={connection.reconnecting} onClick={()=>void agentContinuity.reconnect()}>↻</button></div>
   <InputBar {...input}/>
   {!state.readOnly&&<div className="augmentor-agent-actions">
-   <button className="augmentor-agent-talk" aria-label="Microphone" onMouseDown={e=>e.preventDefault()} aria-pressed={recording} disabled={audioButton.busy||!ready||rewrite.busy||!recording&&!!text.trim()||!recording&&attachmentDrafts.draft(state.sessionId).items.length>0} onClick={()=>void control.run(async()=>{if(!controller.state.sessionId)await controller.create();await tabletAudio.toggle();})}><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0Zm-3 6v1a6 6 0 0 0 12 0v-1M12 18v4m-4 0h8" fill="none" stroke="currentColor" strokeWidth="2"/></svg><span>{audioButton.label}</span></button>
-   <button aria-label={running?"Stop current turn":"Send to AH"} disabled={running?!connection.online:!ready||rewrite.busy||recording||!text.trim()&&!attachmentDrafts.draft(state.sessionId).items.length} onMouseDown={e=>e.preventDefault()} onClick={()=>running?input.stop():keyboard.submit('queue')}>{running?"■ Stop":"↑ Send"}</button>
+   <button className="augmentor-agent-talk" aria-label="Microphone" title="Hold to dictate; release to add editable text" onMouseDown={e=>e.preventDefault()} aria-pressed={audio.held||recording} disabled={!audio.held&&(audioButton.busy||!ready||rewrite.busy)} onPointerDown={e=>{if(e.button!==0)return;e.preventDefault();e.currentTarget.setPointerCapture(e.pointerId);void control.run(press);}} onPointerUp={e=>{e.preventDefault();void control.run(()=>tabletAudio.release());}} onPointerCancel={()=>void tabletAudio.close()} onLostPointerCapture={()=>{if(tabletAudio.getSnapshot().held)void tabletAudio.close();}} onContextMenu={e=>e.preventDefault()} onKeyDown={e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();if(!e.repeat)void control.run(press);}}} onKeyUp={e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();void control.run(()=>tabletAudio.release());}}} onBlur={()=>{if(tabletAudio.getSnapshot().held)void tabletAudio.close();}} onClick={e=>{if(e.detail===0)void control.run(()=>tabletAudio.getSnapshot().held?tabletAudio.release():press());}}><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0Zm-3 6v1a6 6 0 0 0 12 0v-1M12 18v4m-4 0h8" fill="none" stroke="currentColor" strokeWidth="2"/></svg><span>{audioButton.label}</span></button>
+   <button aria-label={running?"Stop current turn":"Send to AH"} disabled={running?!connection.online:!ready||rewrite.busy||tabletAudio.inputBusy()||!text.trim()&&!attachmentDrafts.draft(state.sessionId).items.length} onMouseDown={e=>e.preventDefault()} onClick={()=>running?input.stop():keyboard.submit('queue')}>{running?"■ Stop":"↑ Send"}</button>
    <ImproveDraft/>
   </div>}
-  {!state.readOnly&&<div className="augmentor-audio-status" role="status" title={audio.transcriptionMs===undefined?undefined:`Last transcription finalization: ${audio.transcriptionMs} ms`}>{audio.note}{audio.phase!=='off'&&audio.phase!=='error'&&<button aria-label="Close voice and discard unfinished recording" onClick={()=>void tabletAudio.close()}>Close voice</button>}</div>}
+  {!state.readOnly&&<div className="augmentor-audio-status" role="status" title={audio.transcriptionMs===undefined?undefined:`Last transcription finalization: ${audio.transcriptionMs} ms`}>{audio.note}{audio.pendingText&&<><p>{audio.pendingText}</p><button onMouseDown={e=>e.preventDefault()} onClick={()=>tabletAudio.insertPending()}>Insert transcript</button></>}{audio.phase==='speaking'&&<button onClick={()=>void control.run(()=>tabletAudio.stopSpeech())}>Stop speech</button>}{audio.phase!=='off'&&audio.phase!=='error'&&<button aria-label="Close voice and discard unfinished recording" onClick={()=>void tabletAudio.close()}>Close voice</button>}</div>}
  </div>;
 }
 

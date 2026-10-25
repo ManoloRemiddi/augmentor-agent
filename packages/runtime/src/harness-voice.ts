@@ -3,7 +3,7 @@ import {createRequire} from 'node:module';
 import {identifier,type Data} from '../../protocol/src/index.js';
 const {WebSocket}=createRequire(import.meta.url)('ws');
 type Call=(method:string,params:Data)=>Promise<any>;
-interface Seat {clientId:string;sessionId:string;openId:string;socket:any;events:Data[];bytes:number;seen:number;timer:ReturnType<typeof setInterval>;submitted:Set<string>;ready:boolean;recording:boolean;transcribing:boolean;captureEnded:boolean;audioSeq:number;opening:Promise<void>;closed:boolean}
+interface Seat {clientId:string;sessionId:string;openId:string;socket:any;events:Data[];bytes:number;seen:number;timer:ReturnType<typeof setInterval>;transcripts:Set<string>;ready:boolean;recording:boolean;transcribing:boolean;captureEnded:boolean;audioSeq:number;opening:Promise<void>;closed:boolean}
 /** Browser mic/speaker transport for the existing scoped companion. No desktop
  * audio devices, second agent loop, credentials in clients, or automatic replay. */
 export class HarnessVoice {
@@ -25,7 +25,7 @@ export class HarnessVoice {
   const clientId=identifier(p.clientId),sessionId=identifier(p.sessionId),openId=identifier(p.openId);
   if(action==='open'){
    if(this.seat)throw Error('Voice is already open or closing. Close it before opening another.');
-   const s:Seat={clientId,sessionId,openId,socket:undefined,events:[],bytes:0,seen:Date.now(),timer:undefined as any,submitted:new Set(),ready:false,recording:false,transcribing:false,captureEnded:false,audioSeq:0,opening:Promise.resolve(),closed:false};this.seat=s;
+   const s:Seat={clientId,sessionId,openId,socket:undefined,events:[],bytes:0,seen:Date.now(),timer:undefined as any,transcripts:new Set(),ready:false,recording:false,transcribing:false,captureEnded:false,audioSeq:0,opening:Promise.resolve(),closed:false};this.seat=s;
    s.timer=setInterval(()=>{if(Date.now()-s.seen>8000)void this.retire(s);},2000);s.timer.unref();
    s.opening=(async()=>{
     const ticket=await this.call('voice.ticket',{sessionId,surface:'linux',openId});
@@ -44,7 +44,13 @@ export class HarnessVoice {
       if(e.type==='timing'&&['asr-final','first-pcm'].includes(e.stage)&&Number.isFinite(e.elapsedMs))this.push(s,{type:'timing',stage:e.stage,elapsedMs:e.elapsedMs});
       if(e.type==='transcript'){
        if(typeof e.requestId!=='string'||!/^[a-f0-9-]{36}$/.test(e.requestId)||typeof e.text!=='string'||e.text.length>8192)throw Error('Invalid speech transcript.');
-       if(!s.submitted.has(e.requestId)){s.submitted.add(e.requestId);void this.submit(s,e).catch(error=>this.push(s,{type:'error',message:error.message}));}
+       // Recognition is draft input only. Only the composer's explicit Send
+       // can create conversational work, using its ordinary durable identity.
+       if(s.transcripts.has(e.requestId))return;
+       if(s.transcripts.size>=256)throw Error('Close voice before recording again.');
+       s.transcripts.add(e.requestId);
+       if(!e.text.trim()){this.push(s,{type:'empty-transcript'});return;}
+       this.push(s,{type:'transcript',requestId:e.requestId,text:e.text});return;
       }
       // Only protocol events, never service tickets or arbitrary diagnostic data.
       if(['ready','listening','recording-ended','transcript','transcript-partial','empty-transcript','speaking','speech-idle','turn-complete','clear','error'].includes(e.type))this.push(s,e);
@@ -69,14 +75,5 @@ export class HarnessVoice {
    s.socket.send(JSON.stringify({type:p.type}));return {accepted:true};
   }
   throw Error('Unknown voice operation.');
- }
- private async submit(s:Seat,e:Data){
-  if(s.closed)return;
-  const queue=await this.call('session.queue',{sessionId:s.sessionId});
-  if(s.closed)return;
-  if(queue.items.some((x:Data)=>x.canResolve))throw Error('Inspect unconfirmed input before speaking again.');
-  // Canonical speech identity is retained by AH. A lost reply is never retried.
-  try{await this.call('session.prompt',{sessionId:s.sessionId,requestId:'resonant-voice:'+e.requestId,inputMode:'voice',content:[{type:'text',text:e.text}],mode:queue.activeTurnId?'steer':'queue',resumeQueue:true,...(queue.activeTurnId?{expectedTurnId:queue.activeTurnId}:{})});}
-  catch{throw Error('Voice submission is unconfirmed. Inspect this conversation before sending again.');}
  }
 }

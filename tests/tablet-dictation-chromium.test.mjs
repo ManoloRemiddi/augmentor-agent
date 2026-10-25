@@ -1,0 +1,35 @@
+// Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+// Real Harness/Lexical, pointer events and SDK; fake browser devices and an
+// independently authored speech peer. No acoustic or decoder-performance claim.
+import test from 'node:test';import assert from 'node:assert/strict';import {spawn} from 'node:child_process';import {once} from 'node:events';
+import {mkdtemp,rm,mkdir,writeFile} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';
+import {piVoiceFixture} from './fixtures/pi-voice.mjs';import {until} from './fixtures/plans.mjs';import {chromiumPort} from './fixtures/chromium-ready.mjs';import {harnessCdp} from './fixtures/harness-cdp.mjs';import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
+
+test('mouse/touch release adds editable text in both layouts; only explicit Send admits the edited draft',{skip:process.platform!=='linux',timeout:60000},async t=>{
+ const f=await piVoiceFixture(t,{jobMode:{}}),sid='tablet-draft';await f.create(sid);const link=await f.link();
+ const profile=await mkdtemp(join(tmpdir(),'augmentor-tablet-dictation-'));let chrome,panel;
+ t.after(async()=>{panel?.close();if(chrome?.pid&&chrome.exitCode===null){const exited=once(chrome,'exit');chrome.kill('SIGTERM');await exited;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
+ chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream','--autoplay-policy=no-user-gesture-required','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+ let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'tablet Chromium');const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);for(const domain of ['Runtime','Log','Page','Network'])await panel.call(domain+'.enable');
+ await panel.call('Emulation.setDeviceMetricsOverride',{width:1105,height:700,deviceScaleFactor:1,mobile:false});await panel.navigate(link.url+'&session='+sid);
+ const mic='document.querySelector("button[aria-label=Microphone]")',editor='document.querySelector("[contenteditable=true]")',send='document.querySelector('+JSON.stringify('button[aria-label="Send to AH"]')+')';
+ await until(()=>panel.evaluate('Boolean('+editor+'&&'+mic+'&&!'+mic+'.disabled)'),'editable tablet composer');await harnessPointerClick(panel,editor,until);await panel.call('Input.insertText',{text:'Existing: '});
+ const capture=async touch=>{
+  const before=(await f.call('draft.describe',{sessionId:sid})).text;
+  const point=await panel.evaluate('(()=>{const r='+mic+'.getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()');
+  const pointer=type=>touch?panel.call('Input.dispatchTouchEvent',{type:type==='down'?'touchStart':'touchEnd',touchPoints:type==='down'?[{...point,id:1}]:[]}):panel.call('Input.dispatchMouseEvent',{type:type==='down'?'mousePressed':'mouseReleased',...point,button:'left',clickCount:1});
+  await pointer('down');try{await until(()=>panel.evaluate(mic+'.textContent.includes("Release to add text")'),'held recording');}catch(error){error.message+=' '+await panel.evaluate('JSON.stringify({audio:document.querySelector(".augmentor-audio-status")?.textContent,mic:'+mic+'?.outerHTML})');throw error;}assert.equal(f.requests.length,0);assert.equal((await f.call('session.history',{sessionId:sid})).events.filter(row=>row.event.type==='user/message').length,0);
+  await pointer('up');await until(async()=>{const text=(await f.call('draft.describe',{sessionId:sid})).text;return text!==before&&text.includes('Synthetic spoken request');},'released transcript persisted');
+  assert.equal(f.requests.length,0);assert.equal(await panel.evaluate(mic+'.getAttribute("aria-pressed")'),'false');assert.equal((await f.call('session.history',{sessionId:sid})).events.filter(row=>row.event.type==='user/message').length,0);
+ };
+ await capture(false);
+ await panel.call('Emulation.setDeviceMetricsOverride',{width:692,height:970,deviceScaleFactor:1,mobile:true});await panel.call('Emulation.setTouchEmulationEnabled',{enabled:true});await capture(true);
+ const text=(await f.call('draft.describe',{sessionId:sid})).text;assert(text.startsWith('Existing: '));assert.equal(text.match(/Synthetic spoken request/g).length,2);
+ const output=process.env.AUGMENTOR_TABLET_DICTATION_PROOF_OUTPUT;if(output){await mkdir(output,{recursive:true});await writeFile(join(output,'tablet-dictation-draft.png'),Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));}
+ // A deliberate edit is the text that Send admits. Recognition itself remains
+ // ordinary draft input, rather than claiming spoken-mode model provenance.
+ await panel.call('Emulation.setTouchEmulationEnabled',{enabled:false});await harnessPointerClick(panel,editor,until);await panel.call('Input.dispatchKeyEvent',{type:'keyDown',key:'a',code:'KeyA',windowsVirtualKeyCode:65,modifiers:2,commands:['selectAll']});await panel.call('Input.dispatchKeyEvent',{type:'keyUp',key:'a',code:'KeyA',windowsVirtualKeyCode:65,modifiers:0});await panel.call('Input.dispatchKeyEvent',{type:'keyDown',key:'Backspace',code:'Backspace',windowsVirtualKeyCode:8});await panel.call('Input.dispatchKeyEvent',{type:'keyUp',key:'Backspace',code:'Backspace',windowsVirtualKeyCode:8});await until(()=>panel.evaluate(editor+'.textContent===""'),'cleared editable draft');await harnessPointerClick(panel,editor,until);
+ const edited=JSON.stringify({kind:'worker-reply',reply:'Explicit edited Send verified.'});await panel.call('Input.insertText',{text:edited});try{await until(async()=>(await f.call('draft.describe',{sessionId:sid})).text===edited,'edited dictation draft');}catch(error){error.message+=' '+JSON.stringify({remote:await f.call('draft.describe',{sessionId:sid}),dom:await panel.evaluate('JSON.stringify({editor:'+editor+'?.innerText,focus:document.activeElement?.outerHTML,audio:document.querySelector(".augmentor-audio-status")?.textContent,body:document.body.innerText.slice(-1500)})'),errors:panel.errors});throw error;}await harnessPointerClick(panel,send,until);
+ await until(()=>f.requests.length===1,'one explicit model request');await f.settled(sid);const users=(await f.call('session.history',{sessionId:sid})).events.filter(row=>row.event.type==='user/message');assert.equal(users.length,1);assert.equal(users[0].event.data.inputMode,'text');assert.equal(users[0].event.data.content[0].text,edited);await until(()=>f.peer.spoken.includes('Explicit edited Send verified.'),'normal reply reaches the scoped speech observer');
+ assert.deepEqual(panel.errors.filter(row=>!(row.source==='deprecation'&&row.text.startsWith('The ScriptProcessorNode is deprecated.'))),[]);assert.deepEqual(panel.failedResponses,[]);
+});

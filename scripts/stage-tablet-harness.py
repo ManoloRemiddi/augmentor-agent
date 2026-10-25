@@ -38,7 +38,7 @@ def replace(old,new,count=1):
 replace("import { WorkspaceRegistry, workspacePath }", "import { ungroupedDirectory } from './ungrouped.js';\nimport { WorkspaceRegistry, workspacePath }")
 replace('[...this.metadata.values()].map(m => resolve(m.cwd))','[...this.metadata.values()].filter(m => !m.ungrouped).map(m => resolve(m.cwd))')
 replace('sessionId: m.id, cwd: m.cwd, agentPreset:', 'sessionId: m.id, cwd: m.cwd, ...(m.ungrouped ? { ungrouped: true } : {}), agentPreset:',3)
-replace('capabilities: { voice: true, voiceBridge: true,','capabilities: { browserAudio: 1, isolatedUngrouped: 1, voice: true, voiceBridge: true,')
+replace('capabilities: { voice: true, voiceBridge: true,','capabilities: { browserAudio: 1, browserDictationDraft: 1, isolatedUngrouped: 1, voice: true, voiceBridge: true,')
 replace('const cwd = resolve(text(p.cwd, 4096));',"""if (p.ungrouped !== undefined && p.ungrouped !== true) throw Error('Choose an explicit Ungrouped chat.');
                     if (p.ungrouped && p.cwd !== undefined) throw Error('An Ungrouped chat cannot inherit a project directory.');
                     const cwd = p.ungrouped ? ungroupedDirectory(this.dirs.state, sid) : resolve(text(p.cwd, 4096));""")
