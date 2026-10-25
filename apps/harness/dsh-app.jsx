@@ -1,4 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {HarnessAudio,voiceControl} from './harness-audio.mjs';
+import './tablet.css';
+import {bindResponsiveSidebar} from './responsive-sidebar.mjs';
 import {AgentContinuity,SubmissionGate} from './agent-continuity.mjs';
 import {DshPromptImprovement} from './dsh-improve-draft.mjs';
 import {startLetterRoll} from '../browser/extension/prompt-animation.mjs';
@@ -115,7 +118,7 @@ import {DshMetafolderProfile} from './dsh-metafolder-profile.mjs';
 import {MetafolderSidebar} from './dsh-metafolder.jsx';
 import './dsh-base.css';
 
-const agentMode=document.body.classList.contains('augmentor-agent');
+const agentMode=true;document.body.classList.add('augmentor-agent');
 if(agentMode){const size=()=>document.documentElement.style.setProperty('--agent-height',(visualViewport?.height??innerHeight)+'px');visualViewport?.addEventListener('resize',size);addEventListener('resize',size);size();}
 const hash=new URLSearchParams(location.hash.slice(1));
 let browserStore;try{browserStore=localStorage;}catch{}
@@ -126,6 +129,7 @@ history.replaceState(null,'',location.pathname);
 addEventListener('hashchange',()=>{const next=new URLSearchParams(location.hash.slice(1));if(next.has('token'))location.reload();else if(agentMode&&next.has('session')&&next.get('session')!==controller.state.sessionId)void control.run(async()=>{if(draftArchive.getSnapshot().ready)await draftArchive.flush();await controller.open(next.get('session'));history.replaceState(null,'',location.pathname);});});
 const controller=new DshPiController(token,fetch,access=>accessCredential.confirm(access));
 bindDictation(controller);
+const tabletAudio=new HarnessAudio(controller);
 const appearanceProfile=connectAppearance(controller);
 const metafolders=new DshMetafolderProfile(controller);
 const developerTools=new DshDeveloperTools(controller);developerTools.preference=new DeveloperToolsPreference(developerTools);
@@ -133,6 +137,7 @@ const contextPreferences=new DshContextPreferences(controller);contextSettings.a
 const contextModal=createDshContextModalBinding(controller);
 const layout=createLayoutStore().create(),workspaceView=createWorkspaceViewStore().create();
 const filePreviews=new DshFilePreviews(controller,layout,developerTools);bindContextNavigation(filePreviews);
+bindResponsiveSidebar(controller,filePreviews,window);
 const planReviews=bindPlanReview(filePreviews);
 const contextTab=bindContextSidebar(filePreviews,contextSettings,DshContextDashboard,DshContextFleet);
 const shortcuts=createWorkspaceShortcutControls(),duration=createTrajectoryDurationStore(),wrapping=createTrajectoryStringWrappingStore();
@@ -303,24 +308,26 @@ function ImproveDraft(){
   useEffect(()=>{if(!value.busy)return;const card=button.current?.closest(agentMode?'.augmentor-agent-composer':'[data-composer-card]');const key=e=>{if(e.isComposing)return;if(e.key==='Enter'||e.key==='Escape'){e.preventDefault();e.stopPropagation();if(e.key==='Escape')promptImprovement.cancel();}};card?.addEventListener('keydown',key,true);return()=>card?.removeEventListener('keydown',key,true);},[value.busy]);
   const current=promptImprovement.deps.read(),label=value.busy?'Cancel prompt improvement':value.canUndo?'Undo prompt improvement':'Improve prompt';
   const help=current.references?'Improve the text before adding reference chips.':text.length>6000?'Improve supports drafts up to 6,000 characters.':label;
-  return <><button ref={button} type="button" className="augmentor-improve-draft" aria-label={label} title={help} disabled={!value.busy&&!value.canUndo&&(!current.available||!text.trim()||text.length>6000||!!current.references)} onMouseDown={e=>e.preventDefault()} onClick={()=>void promptImprovement.run()}>{agentMode?(value.busy?'Cancel':value.canUndo?'Undo':'✦ Improve'):(value.busy?'×':value.canUndo?'↶':'✦')}</button><span className="augmentor-improve-status" role="status">{value.note}</span></>;
+  return <><button ref={button} type="button" className="augmentor-improve-draft" aria-label={label} title={help} disabled={!value.busy&&!value.canUndo&&(!current.available||!text.trim()||text.length>6000||!!current.references)} onMouseDown={e=>e.preventDefault()} onClick={()=>void promptImprovement.run()}>{agentMode?(value.busy?'Cancel':value.canUndo?'Undo':'✦ AI Improve'):(value.busy?'×':value.canUndo?'↶':'✦')}</button><span className="augmentor-improve-status" role="status">{value.note}</span></>;
 }
 
 const agentContinuity=new AgentContinuity(controller,{flush:()=>draftArchive.flush(),draftReady:()=>draftArchive.getSnapshot().ready});
 function AgentComposer({input,state,disabled}){
  const connection=useSyncExternalStore(agentContinuity.subscribe,agentContinuity.getSnapshot),text=useDraft(x=>x);
  const rewrite=useSyncExternalStore(promptImprovement.subscribe,promptImprovement.getSnapshot);
- const [recording,setRecording]=useState(false);
+ const audio=useSyncExternalStore(tabletAudio.subscribe,tabletAudio.getSnapshot),recording=audio.recording,audioButton=voiceControl(audio);
  const inputState=input.useInput(x=>x),machineBusy=['adjudicating','submitting'].includes(inputState?.phase);
+ const running=!!state.queue?.activeTurnId;
  const ready=!disabled&&!input.blocked&&!machineBusy&&connection.online&&!connection.reconnecting;
  return <div className="augmentor-agent-composer">
   <div className="augmentor-agent-connection" role="status"><span>{connection.note}<br/><span data-agent-session>{state.sessionId||'Choose a session'}</span></span><button aria-label="Reconnect to AH" disabled={connection.reconnecting} onClick={()=>void agentContinuity.reconnect()}>↻</button></div>
   <InputBar {...input}/>
-  {!state.readOnly&&state.sessionId&&<div className="augmentor-agent-actions">
-   <div className="augmentor-agent-talk"><OriginalDictation {...input} locked={!ready||rewrite.busy} onActiveChange={setRecording} openSettings={()=>settingsShell.actions.openSection('plugins')}/>{!recording&&<span className="agent-label">Talk</span>}</div>
-   <button aria-label="Send to AH" disabled={!ready||rewrite.busy||recording||!text.trim()&&!attachmentDrafts.draft(state.sessionId).items.length} onMouseDown={e=>e.preventDefault()} onClick={()=>keyboard.submit('queue')}>↑ Send</button>
+  {!state.readOnly&&<div className="augmentor-agent-actions">
+   <button className="augmentor-agent-talk" aria-label="Microphone" onMouseDown={e=>e.preventDefault()} aria-pressed={recording} disabled={audioButton.busy||!ready||rewrite.busy||!recording&&!!text.trim()||!recording&&attachmentDrafts.draft(state.sessionId).items.length>0} onClick={()=>void control.run(async()=>{if(!controller.state.sessionId)await controller.create();await tabletAudio.toggle();})}><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5a3 3 0 0 1 6 0v7a3 3 0 0 1-6 0Zm-3 6v1a6 6 0 0 0 12 0v-1M12 18v4m-4 0h8" fill="none" stroke="currentColor" strokeWidth="2"/></svg><span>{audioButton.label}</span></button>
+   <button aria-label={running?"Stop current turn":"Send to AH"} disabled={running?!connection.online:!ready||rewrite.busy||recording||!text.trim()&&!attachmentDrafts.draft(state.sessionId).items.length} onMouseDown={e=>e.preventDefault()} onClick={()=>running?input.stop():keyboard.submit('queue')}>{running?"■ Stop":"↑ Send"}</button>
    <ImproveDraft/>
   </div>}
+  {!state.readOnly&&<div className="augmentor-audio-status" role="status" title={audio.transcriptionMs===undefined?undefined:`Last transcription finalization: ${audio.transcriptionMs} ms`}>{audio.note}{audio.phase!=='off'&&audio.phase!=='error'&&<button aria-label="Close voice and discard unfinished recording" onClick={()=>void tabletAudio.close()}>Close voice</button>}</div>}
  </div>;
 }
 
@@ -344,7 +351,7 @@ function App(){
   const state=useSyncExternalStore(controller.subscribe,controller.getSnapshot),[view,setView]=useState(hash.get('view')==='trajectory'?'trajectory':'chat'),[dialog,setDialog]=useState(null);
   const hasFleetTab=fleetPreference||state.capabilities?.archivedDsh===true;
   const pickerCuration=React.useMemo(()=>({...state.catalog,unavailable:state.catalog.groups.flatMap(group=>group.models.filter(model=>model.available===false).map(model=>group.provider+'/'+model.model))}),[state.catalog]);
-  useEffect(()=>{document.title=state.readOnly?'Conversation inspector · Augmentor Harness':agentMode?'Augmentor Agent':'Augmentor Harness';},[state.readOnly]);
+  useEffect(()=>{document.title=state.readOnly?'Conversation inspector · Augmentor Harness':'Augmentor Harness';},[state.readOnly]);
   React.useLayoutEffect(()=>{if(!hasContextTab&&view==='context'||!hasFleetTab&&view==='fleet')setView('chat');contextModal.sync();if(state.phase!=='ready'||state.readOnly||contextPrefs.value.insightsEntry==='hide')layout.actions.selectPanel(null);});
   useEffect(()=>{commandMenu.deps.actions={export:scope=>sessionExports.download(scope.sessionId),compact:scope=>controller.compact(scope),file:()=>openFiles?.open(),goal:()=>setView('goal'),plan:scope=>controller.state.capabilities?.planMode?controller.setPlanMode(true,scope):setView('plan'),prompts:()=>setDialog({kind:'prompts'}),jobs:()=>setView('jobs'),context:(scope,segment,consume)=>contextModal.open(scope,segment,consume),inspect:scope=>window.open('/inspection#'+new URLSearchParams({token:controller.token,session:scope.sessionId}),'_blank','noopener,noreferrer')};},[]);
   const composed=useMemo(()=>projectDsh(state),[state.events,state.records,state.sessions,state.sessionId,state.phase,state.queue,state.goal,state.hasMore,state.payloads]);
@@ -361,7 +368,7 @@ function App(){
   const list=useMemo(()=>({projectionsBySession:{},ids:state.sessions.map(x=>x.sessionId),byId:Object.fromEntries(state.sessions.map(x=>[x.sessionId,{...x,id:x.sessionId,displayTitle:x.title||'New conversation',origin:'main',retainedBy:{mainView:x.sessionId===state.sessionId?1:0}}]))}),[state.sessions,state.sessionId]);
   const tabs=[{id:'chat',label:'Chat'},{id:'trajectory',label:'Trajectory'},...(hasContextTab?[{id:'context',label:'Context'}]:[]),...(hasFleetTab?[{id:'fleet',label:'Fleet'}]:[]),{id:'plan',label:'Plan'},{id:'goal',label:'Goal'},{id:'jobs',label:'Jobs'}];
   const useSession=selectorFace({...composed.session,blank:composed.session.blank&&view==='chat'&&!state.compactionPending&&!state.compaction?.blocked&&state.unconfirmed?.kind!=='compaction'}),useSessions=selectorFace(list),useWorkspaces=selectorFace(workspaces),useConversation=selectorFace(composed.conversation),useChat=selectorFace(composed.chat),useProjection=(name,selector=x=>x)=>selector(name==='imageLimits'?state.attachmentLimits:composed.projection[name]);
-  const open=sid=>{layout.actions.selectPanel(null);void control.run(()=>controller.open(sid));},startSession=cwd=>{layout.actions.selectPanel(null);void control.run(()=>controller.create(cwd||current?.cwd||state.workspace));};
+  const open=sid=>{layout.actions.selectPanel(null);void control.run(()=>controller.open(sid));},startSession=cwd=>{layout.actions.selectPanel(null);void control.run(()=>controller.create(cwd));};
   const restoreSession=sid=>controller.organize('restore',sid);
   const pinSession=(sid,action)=>void controller.organize(action,sid).then(result=>{if(action==='pin'){const snapshot=result.workspaces;workspaceView.actions.pinSessionOrder(sid,pinOrderAccounts(snapshot.items,sid),pinOrderSource(snapshot.items,list,snapshot));}}).catch(()=>notifyRow(action==='pin'?'pinFailed':'unpinFailed'));
   const archiveSession=sid=>void control.run(async()=>{const result=await controller.organize('archive',sid);if(result.confirmation)archiveRequest.set(result.confirmation);else notifyRow('archived',{sessionId:sid});});
@@ -402,7 +409,7 @@ function App(){
       case 'conversation.session.header':return <ConversationSessionHeader {...p} open={open} selectView={setView}/>;
       case 'conversation.session.header.utilities':return state.readOnly||!state.capabilities?.sessionExport?null:<SessionLogDownloadHeaderAction {...p} t={tr(exportEn)} useSessionLogDownload={useSessionLogDownload} useFeedbackAvailable={selector=>selector(false)} request={sid=>control.run(()=>sessionExports.download(sid))} dismiss={sessionExports.dismiss} openFeedback={noOp}/>;
       case 'conversation.session.header.actions':return <Button variant="ghost" disabled={state.readOnly} aria-label="Rename conversation" onClick={()=>setDialog({kind:'rename',sid:state.sessionId,title:current?.title||''})}><IconEditOutlineRegular/></Button>;
-      case 'conversation.hero.workspace':return <WorkspacePicker {...p} t={t.workspace} useDirectoryFlow={selectorFace(!state.readOnly)} createWorkspace={createWorkspace}/>;
+      case 'conversation.hero.workspace':if(current?.ungrouped)return <span className="augmentor-ungrouped-label">Ungrouped · Independent chat</span>;return <WorkspacePicker {...p} t={t.workspace} useDirectoryFlow={selectorFace(!state.readOnly)} createWorkspace={createWorkspace}/>;
       case 'conversation.workspace.directoryFlow':return DirectoryFlow(owner);
       case 'conversation.session':return <ConversationSession {...p}/>;
       case 'conversation.view':{
@@ -423,7 +430,7 @@ function App(){
       case 'conversation.chat.reasoning.body':return <MarkdownText text={owner.text} streaming={owner.running}/>;
       case 'conversation.input.dock':return <><QueueStatus state={state}/><QueueDock {...p} useSession={selectorFace({...composed.session,subagent:state.readOnly?{address:{mode:'read-only'}}:null})} updateQueue={(itemId,action)=>controller.updateQueue(itemId,action)} notify={(_,text)=>controller.update({error:text})} loadImage={loadImage}/>{!state.readOnly&&<GoalBar goal={state.goal?.goal} activation={state.goal?.activation} t={t.goal} onPause={()=>goalAction('pause')} onResume={()=>goalAction('resume')} onClear={()=>goalAction('clear')} onEdit={objective=>goalAction('edit',{objective,maxGoalRounds:state.goal?.goal?.maxGoalRounds})}/>}</>;
       case 'conversation.composer.bar':{
-        const disabled=state.readOnly||state.phase!=='ready'||!draftState.ready||!!state.unconfirmed||state.compactionPending||state.compaction?.blocked||attachmentDrafts.busy||owner.disabled;
+        const disabled=state.readOnly||state.phase!=='ready'||!draftState.ready||!!state.unconfirmed||state.compactionPending||state.compaction?.blocked||attachmentDrafts.busy||(owner.disabled&&!current?.ungrouped);
         const input={...p,submissionBlocked:improvementState.busy,contextMeterPlacement:'toolbar',placeholder:state.readOnly?'Read-only conversation':owner.variant==='hero'?'Describe what you want to build':'Message or run a task',disabled,keyboard,addFiles:attachmentDrafts.add,removeAttachment:attachmentDrafts.remove,retryFileUpload:attachmentDrafts.retry,stop:()=>void control.run(()=>controller.stop()),useBusyEnter:selectorFace('queue'),useFileUploads:selectorFace(attached.uploads),useNotices:selectorFace(undefined),useLexicon,useMenuLauncher,useStopShortcut:selectorFace(['Escape']),resolveDraftAttachments:ids=>attached.items.filter(x=>ids.includes(x.id)),toggleCommandMenu:span=>commandMenu.toggle(span)};
         return agentMode?<AgentComposer input={input} state={state} disabled={disabled}/>:<InputBar {...input}/>;
       }

@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Responsive tablet Harness and isolated Ungrouped chats](TABLET-HARNESS.md): one UI, persistent voice controls, independent quick chats and Lenovo qualification.
+
 [October 21 telemetry audit](TELEMETRY-AUDIT-2026-10-21.md): running memory
 telemetry/offline safeguards, Playwright Google-background-traffic correction,
 legacy community-tracker disablement, and qualified integration evidence/limits.

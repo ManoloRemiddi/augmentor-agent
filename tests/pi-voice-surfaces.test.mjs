@@ -16,7 +16,9 @@ const artifact=resolve(process.env.AUGMENTOR_PI_TEST_ROOT??'.');
 const fixtures=fileURLToPath(new URL('./fixtures/',import.meta.url));
 async function audioEnvironment(f){
  const site=join(f.root,'sitecustomize.py');await writeFile(site,'# Independently authored synthetic audio proof only.\nimport fake_audio\n');
- return {...f.env,AUGMENTOR_PI_NO_AUTOSTART:'1',AUGMENTOR_PI_WORKSPACE:f.workspace,AUGMENTOR_PI_BROWSER_WORKSPACE:f.workspace,AUGMENTOR_WINDOW_ID:'main',AUGMENTOR_WORKSPACE_PROFILE:'',AUGMENTOR_PYTHON:process.env.AUGMENTOR_PYTHON??'python3',PYTHONPATH:[f.root,join(fixtures,'codex'),join(artifact,'apps/native')].join(delimiter),QT_QPA_PLATFORM:'offscreen',AUGMENTOR_VOICE_TEST_AUDIO_LOG:join(f.root,'audio')};
+ const env={...f.env,AUGMENTOR_DICTATION_STATE:join(f.root,'dictation'),AUGMENTOR_PI_NO_AUTOSTART:'1',AUGMENTOR_PI_WORKSPACE:f.workspace,AUGMENTOR_PI_BROWSER_WORKSPACE:f.workspace,AUGMENTOR_WINDOW_ID:'main',AUGMENTOR_WORKSPACE_PROFILE:'',AUGMENTOR_PYTHON:process.env.AUGMENTOR_PYTHON??'python3',PYTHONPATH:[f.root,join(fixtures,'codex'),join(artifact,'apps/native')].join(delimiter),QT_QPA_PLATFORM:'offscreen',AUGMENTOR_VOICE_TEST_AUDIO_LOG:join(f.root,'audio')};
+ if(!f.dictationCleanupRegistered){f.dictationCleanupRegistered=true;f.beforeClose(async()=>{await promisify(execFile)(env.AUGMENTOR_PYTHON,['-c',"from augmentor_linux.dictation import request; request('shutdown', start=False)"],{env,timeout:5000}).catch(()=>{});});}
+ return env;
 }
 async function browser(t,f){
  const child=spawn(process.execPath,[join(artifact,'apps/browser/pi-bridge.mjs')],{env:await audioEnvironment(f),stdio:['pipe','pipe','pipe']});

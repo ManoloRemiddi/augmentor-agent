@@ -281,9 +281,10 @@ export class DshPiController {
       }
     }finally{this.polling=false;}
   }
-  async create(cwd=this.state.workspace){
+  async create(cwd){
     if(this.state.readOnly)throw Error('This conversation inspector is read-only.');
     if(this.createFlight?.epoch===this.epoch&&this.createFlight.sessionId===this.state.sessionId)return null;
+    if(cwd===undefined&&this.state.capabilities?.isolatedUngrouped!==1)throw Error('This AH owner needs the isolated Ungrouped update. No project chat was created.');
     const selection=this.state.selection||this.state.catalog.default;if(!selection)throw Error('Choose a model first.');
     const sessionId=crypto.randomUUID(),flight={epoch:++this.epoch,sessionId:this.state.sessionId,previousPhase:this.state.phase,opening:false};this.createFlight=flight;
     const current=()=>this.createFlight===flight&&this.epoch===flight.epoch&&this.state.sessionId===flight.sessionId&&!this.state.readOnly;
@@ -291,7 +292,7 @@ export class DshPiController {
     // draft remains owned by that conversation while the new owner is prepared.
     this.update({phase:'loading',error:null});
     try{
-      const created=await this.rpc('session.create',{sessionId,selection,cwd});
+      const created=await this.rpc('session.create',{sessionId,selection,...(cwd===undefined?{ungrouped:true}:{cwd})});
       if(created?.sessionId!==sessionId)throw Error('The new conversation was not confirmed. Inspect the conversation list before trying again.');
       if(!current())return created;
       await this.refresh();if(!current())return created;

@@ -3,7 +3,7 @@ import test from 'node:test';import assert from 'node:assert/strict';import {set
 import {DshPiController} from '../apps/harness/dsh-pi-controller.mjs';import {DshDrafts} from '../apps/harness/dsh-drafts.mjs';
 const deferred=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
 const selected={provider:'authored',model:'chosen'};
-function fixture(){const c=new DshPiController('authored');c.update({phase:'ready',sessionId:'older',selection:selected,workspace:'/authored',events:[{seq:1,type:'user/message',data:{content:[]}}]});return c;}
+function fixture(){const c=new DshPiController('authored');c.update({phase:'ready',sessionId:'older',selection:selected,workspace:'/authored',capabilities:{isolatedUngrouped:1},events:[{seq:1,type:'user/message',data:{content:[]}}]});return c;}
 
 test('New Session freezes outgoing admission synchronously and a duplicate cannot create another owner',async()=>{
  const c=fixture(),gate=deferred(),calls=[],opened=[];let requested;c.rpc=async(method,p)=>{calls.push({method,p});assert.equal(method,'session.create');requested=p;return gate.promise;};c.refresh=async()=>{};c.open=async sid=>{opened.push(sid);c.epoch++;c.update({sessionId:sid,phase:'ready'});};

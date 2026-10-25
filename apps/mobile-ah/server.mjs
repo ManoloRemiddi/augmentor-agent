@@ -42,7 +42,7 @@ export function createMobileAH({connection,state,assets,origins,port=8767,fetche
    if(req.method==='POST'&&url.pathname==='/mobile/logout'){sessions.delete(cookie(req));return reply(res,200,{ok:true},undefined,{'Set-Cookie':'augmentor_ah_mobile=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'});}
    // Proxy only fixed AH carriers. Its operator token never reaches the phone.
    const getAPI=new Set(['/api/access','/api/events','/api/appearance/revision','/api/drafts/file','/api/attachments/image','/api/preview/bytes','/api/preview/office','/api/preview/office-generation']);
-   const postAPI=new Set(['/api/rpc','/api/drafts/attachment','/api/attachments/upload','/api/dictation/catalog','/api/dictation/open','/api/dictation/heartbeat','/api/dictation/transcribe','/api/dictation/close']);
+   const postAPI=new Set(['/api/voice/open','/api/voice/events','/api/voice/audio','/api/voice/control','/api/voice/close','/api/rpc','/api/drafts/attachment','/api/attachments/upload','/api/dictation/catalog','/api/dictation/open','/api/dictation/heartbeat','/api/dictation/transcribe','/api/dictation/close']);
    if(req.method==='GET'&&getAPI.has(url.pathname)||req.method==='POST'&&postAPI.has(url.pathname)){
     const data=req.method==='POST'?await body(req,req.headers['content-type']==='application/json'?1048576:20*1024*1024+1024):undefined;
     const abort=new AbortController(),cancel=()=>{if(!res.writableEnded)abort.abort();};res.once('close',cancel);

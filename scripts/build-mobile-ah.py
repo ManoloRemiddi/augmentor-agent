@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-"""Build only a mobile presentation candidate inside managed scratch.
+"""Build a private tablet presentation and bounded runtime-overlay candidate.
 Run with harness-build-workspace.py. Existing installed AH is never rebuilt or selected.
 """
 import argparse
@@ -29,7 +29,7 @@ shutil.copytree(source, work, ignore=shutil.ignore_patterns('.git', 'node_module
 for relative in ('node_modules', 'apps/harness/node_modules'):
     (work/relative).symlink_to((args.dependencies/relative).resolve(strict=True), target_is_directory=True)
 subprocess.run(['npm', 'run', 'build'], cwd=work, check=True)
-subprocess.run(['node', '--test', 'tests/mobile-ah.test.mjs', 'tests/harness-drafts.test.mjs', 'tests/harness-drafts-runtime.test.mjs', 'tests/harness-browser-access.test.mjs'], cwd=work, check=True)
+subprocess.run(['node', '--test', 'tests/pi-voice.test.mjs', 'tests/pi-voice-host.test.mjs', 'tests/pi-voice-surfaces.test.mjs', 'tests/pi-workspaces.test.mjs', 'tests/ungrouped-runtime.test.mjs', 'tests/tablet-harness.test.mjs', 'tests/harness-session-create.test.mjs', 'tests/mobile-ah.test.mjs', 'tests/harness-drafts.test.mjs', 'tests/harness-drafts-runtime.test.mjs', 'tests/harness-browser-access.test.mjs'], cwd=work, check=True)
 # Let actual SDK/HTTP test children finish their own joined shutdown. Keep the
 # helper's reserve and refusal policy; do not kill or reap unknown processes.
 spec=importlib.util.spec_from_file_location('build_hygiene',source/'scripts/harness-build-workspace.py')
@@ -41,11 +41,13 @@ for attempt in range(50):
 else:
     raise RuntimeError('A test caller still references managed scratch; inspect it before another build.')
 shutil.copytree(work/'dist/harness-web', args.output/'web')
+for name in ('host.js','harness-server.js','harness-voice.js','ungrouped.js'):
+    dst=args.output/'runtime'/name;dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(work/'dist/runtime/src'/name,dst)
 # Keep a self-contained presentation gateway; no version-specific source launcher.
 for relative in ('apps/mobile-ah', 'scripts/ah-connection.py', 'apps/native/augmentor_linux/ah_connection.py'):
     src=work/relative;dst=args.output/relative
     if src.is_dir(): shutil.copytree(src,dst)
     else: dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
 files={str(p.relative_to(args.output)):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.output.rglob('*') if p.is_file()}
-(args.output/'manifest.json').write_text(json.dumps({'schema':'augmentor-mobile-ah-candidate/1','files':files},indent=2)+'\n')
-print('Built presentation-only candidate:', args.output)
+(args.output/'manifest.json').write_text(json.dumps({'schema':'augmentor-mobile-ah-candidate/1','productVersion':json.loads((source/'release/product.json').read_text())['version'],'files':files},indent=2)+'\n')
+print('Built tablet candidate:', args.output)

@@ -1,4 +1,5 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
+import {HarnessVoice} from './harness-voice.js';
 import {createServer, type IncomingMessage, type ServerResponse} from 'node:http';
 import {randomBytes, timingSafeEqual} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -43,6 +44,7 @@ export class HarnessServer {
   private sequence = 0;
   private base = '';
   private inspections=new Map<string,Extract<Access,{mode:'read-only'}>>();
+  private voice=new HarnessVoice((method,params)=>this.host.dispatch(method,params,'voice-http-'+randomBytes(16).toString('hex')));
   private server = createServer((req, res) => void this.handle(req, res));
   constructor(readonly host: Host, readonly assets = fileURLToPath(new URL('../../../apps/harness/', import.meta.url)), token=randomBytes(32).toString('hex')) {
     if(!/^[a-f0-9]{64}$/.test(token))throw Error('Use an exact private Harness operator credential.');
@@ -184,6 +186,12 @@ export class HarnessServer {
           }finally{req.removeListener('aborted',cancel);res.removeListener('close',cancel);}return;
         }
         if(req.method==='GET'&&url.pathname==='/api/access'){this.send(res,200,{mode:access.mode,...(access.mode==='read-only'?{sessionId:access.sessionId,expiresAt:access.expiresAt}:{})});return;}
+        if(url.pathname.startsWith('/api/voice/')){
+          if(access.mode!=='operator'||req.method!=='POST'||url.search)throw Error('Voice requires same-origin operator authority.');
+          const action=url.pathname.slice('/api/voice/'.length);
+          if(!['open','events','audio','control','close'].includes(action))throw Error('Unknown voice operation.');
+          const value=await this.host.receiveHarnessRequest(async()=>this.voice.operation(action,await this.body(req)));this.send(res,200,value);return;
+        }
         if(url.pathname.startsWith('/api/dictation/')){
           if(access.mode!=='operator'||req.method!=='POST')throw Error('Draft dictation requires operator authority.');
           const action=url.pathname.slice('/api/dictation/'.length);
@@ -365,7 +373,7 @@ export class HarnessServer {
         : {message: error instanceof Error ? error.message : 'Harness request failed'}});
     }
   }
-  async close() {
+  async close() {await this.voice.close();
     this.base=''; this.inspections.clear(); this.watches.clear(); this.frames = []; this.frameBytes = 0; this.evicted.clear();
     await new Promise<void>(resolve => {this.server.close(() => resolve()); this.server.closeAllConnections();});
   }

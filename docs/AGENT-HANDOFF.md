@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Responsive Lenovo Harness](TABLET-HARNESS.md) adds one responsive UI, Microphone/Send/Improve controls and independent Ungrouped work areas. New SDK-context and voice-finalization regressions accompany physical Lenovo rotation/isolation and owner speech feedback; see the guide for installed-versus-source scope and final receipt.
+
 [Android AH continuity preview](ANDROID-AH.md): EDGE-inspired touch controls reuse the shared Harness UI and the installed attested AH owner. A separate paired loopback carrier keeps its operator bearer host-side. The real Pixel 7a/Android 17 desktop → phone → desktop proof preserves the same session, shared drafts and exactly two marker writes; three completed turns and no replay were verified. New source adds pristine peer-draft reads and single-flight submission. The existing installed AH/Desktop/EDGE are unchanged; USB is physically qualified, while private VPN/radio, native APK, voice and other OS acceptance remain separate.
 
 [October 21 telemetry safeguards](TELEMETRY-AUDIT-2026-10-21.md): the running Linux

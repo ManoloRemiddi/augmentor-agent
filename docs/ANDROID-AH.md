@@ -1,6 +1,8 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 # Android Agent connected to the existing Augmentor Harness
 
+The [responsive tablet Harness](TABLET-HARNESS.md) supersedes the separate Agent presentation below. The October 22 qualification remains historical evidence.
+
 This is an opt-in browser presentation preview, not a new session engine or a
 native Android APK. AH remains the sole owner of sessions, tools, selected model,
 approvals and running work. The Android and desktop views attach to the same
