@@ -197,13 +197,13 @@ against the current CPU path before choosing a model. A faster recognizer cannot
 by itself remove network, conversational-model or reply-synthesis time. No Android
 wrapper or recognition model is installed by this change.
 
-## Installed hold-to-dictate correction — October 25, 2026
+## Initial hold-to-dictate installation — October 25, 2026
 
 This supersedes the automatic-send interaction in the earlier installed receipt.
 Feature commit `d62f9e40` is staged as `20261025-132556-b39f82c2`, artifact SHA-256
 `c387ce36cf5ceb48956d67fb93d01e2e0a31916a856fc53d03ff628324080ac2`.
-The registered MX pilot selects and runs that exact sealed package; the private
-mobile gateway selects its matching assets. The normal guarded registration path
+The registered MX pilot initially selected and ran that sealed package; the private
+mobile gateway selected its matching assets. The normal guarded registration path
 was used after a fresh private cold backup. All 134 conversations present before
 this correction are retained; no recording or prompt was replayed during update.
 
@@ -224,9 +224,40 @@ transcript cannot delete the selected draft text. Existing CPU recognition,
 Desktop/DSH speech, Handy and model placement are unchanged.
 
 The desktop page was refreshed to the corrected shared interface. The Lenovo
-remains connected over Wi-Fi, but its secure screen lock prevented a fresh
+remained connected over Wi-Fi, but its secure screen lock initially prevented a fresh
 physical hold/release check and page refresh. The owner was asked to unlock it;
-this receipt does not claim that physical check passed. Earlier orientation and
-acoustic results above describe the preceding build. The device's orientation
-preferences are restored after attempted checks. See the
+that first receipt did not claim the physical check passed. The follow-up below
+resolves that pending check and the newly observed landscape layering issue. See the
 [correction receipt](../release/tablet-dictation-installed-20261025.json).
+
+## Physical Lenovo acceptance and landscape layering — October 25, 2026
+
+The owner unlocked the Lenovo, and Chrome was refreshed and reconnected using the
+existing private pairing key. The actual microphone recognized an independently authored
+sentence played through the desktop speaker. Physical hold/release in portrait
+and landscape inserted recognition into the persisted editable draft, preserved
+earlier draft text and returned the control to Talk. The verification chat retained
+zero human messages and zero conversational turns throughout. A deliberate edit
+was saved, and that unsent edit survived rotation.
+
+The initial physical landscape screenshot exposed AI Improve and the editor's
+right edge behind the right pane while editing. A focused-composer stacking fix
+uses the stable `data-composer-seat` boundary. The added Chromium regression
+requires all three controls and the editor's right edge to receive hit tests with
+the landscape sidebar open. Final physical checks confirm all three controls
+receive touch in both orientations, including above the floating keyboard.
+
+Final feature ref `c456a14e` is selected and running as sealed release
+`20261025-145912-84d5c835`, SHA-256
+`e5ffeb33bdf8c214c217081a77b5f6c81bb51f1c954a61c00d1916c712b46e01`,
+with matching private gateway assets. The build cohort remains 82 passing checks;
+the exact sealed package passes 49, without failures or skips. All 134 prior
+conversations are retained, with one additional labelled verification chat.
+Only that test draft was cleared afterward; voice is closed and no task is running.
+Original charging-awake and rotation settings are restored, and the task-only
+browser inspection forward is removed. Needed rollback is retained; no managed
+scratch remains. No model/device setting changed.
+
+This qualifies physical capture, recognition, editable insertion, preservation
+and absence of automatic submission. It is not a general recognition-accuracy or
+end-to-end latency benchmark, or fresh owner acceptance of spoken-reply smoothness.
