@@ -229,7 +229,12 @@ that first receipt did not claim the physical check passed. The follow-up below
 resolves that pending check and the newly observed landscape layering issue. See the
 [correction receipt](../release/tablet-dictation-installed-20261025.json).
 
-## Physical Lenovo acceptance and landscape layering — October 25, 2026
+## Earlier physical voice checks and superseded layout — October 25, 2026
+
+The voice checks below describe the earlier build. The owner rejected its
+focus-driven floating editor/control placement; the bottom-composer correction
+in the next section supersedes that layout. These checks were technical evidence,
+not approval of that interaction design.
 
 The owner unlocked the Lenovo, and Chrome was refreshed and reconnected using the
 existing private pairing key. The actual microphone recognized an independently authored
@@ -246,7 +251,7 @@ requires all three controls and the editor's right edge to receive hit tests wit
 the landscape sidebar open. Final physical checks confirm all three controls
 receive touch in both orientations, including above the floating keyboard.
 
-Final feature ref `c456a14e` is selected and running as sealed release
+That earlier feature ref `c456a14e` was selected and running as sealed release
 `20261025-145912-84d5c835`, SHA-256
 `e5ffeb33bdf8c214c217081a77b5f6c81bb51f1c954a61c00d1916c712b46e01`,
 with matching private gateway assets. The build cohort remains 82 passing checks;
@@ -260,3 +265,30 @@ scratch remains. No model/device setting changed.
 This qualifies physical capture, recognition, editable insertion, preservation
 and absence of automatic submission. It is not a general recognition-accuracy or
 end-to-end latency benchmark, or fresh owner acceptance of spoken-reply smoothness.
+
+## Original bottom composer restored — October 25, 2026
+
+At the owner's direction, `ab7f1665` removes all focus-dependent fixed positioning
+and stacking rules. The original editor stays inside its existing input card;
+Talk, Send/Stop and AI Improve remain directly underneath in the bottom composer.
+Empty chats use the same bottom placement. There is one editor and one control
+row, with no floating input, top toolbar or keyboard workaround added on focus.
+Hold/release dictation, explicit Send, prompt improvement and session persistence
+are unchanged. Keyboard presentation remains with Android/Chrome.
+
+The MX pilot selects and runs sealed `20261025-191212-2ea08039`, artifact SHA-256
+`d91c30a1df5613e1b2ea4b1b20ada639a52e09aa52ea61cd075c52fc779db6e4`,
+with matching private mobile assets. Build 82 and exact-package 49 checks pass,
+without failures or skips. The original Chromium/SDK dictation test now also
+requires one editor, containment in the original card, controls below the card
+and bottom placement while focused, in portrait and landscape.
+
+Physical Lenovo checks cover the existing conversation and a fresh Ungrouped
+chat. Both orientations retain one editor inside the original card, a normal-flow
+button row below it and zero vertical movement of that row between focus and
+blur. A typed verification draft survives rotation without sending a message.
+All 135 prior chats remain; the additional empty verification chat is archived
+after its authored draft is cleared. Original device charging/rotation settings
+are restored and the task-only inspection forward removed. The desktop page is
+refreshed. Needed rollback remains and managed scratch is empty.
+See the [bottom-composer receipt](../release/tablet-bottom-composer-installed-20261025.json).
