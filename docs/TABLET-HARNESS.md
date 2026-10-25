@@ -18,15 +18,14 @@ draft, attachments, approvals and shared voice object stay mounted across rotati
 
 Microphone, Send/Stop and AI Improve are shared composer controls. Send changes
 to Stop during a running turn; stopping spoken playback remains a separate action.
-AI Improve uses the existing non-submitting draft/undo contract. On touch devices,
-the active editor and these same controls move above floating keyboards, which
-can report neither viewport resizing nor keyboard occlusion. There are no cloned
-buttons or alternate owners. The normal placement returns when editing ends.
-The focused composer stack is raised above the right pane, so its fixed controls
-and editor remain visible and receive touch across the landscape viewport.
-Qualification checks actual hit targets; visible element rectangles alone can
-miss a later sidebar painting over them. The rule uses the stable composer-seat
-attribute rather than generated CSS-module class names.
+AI Improve uses the existing non-submitting draft/undo contract. The original
+input card and the three controls remain together in the bottom composer in both
+orientations, including empty chats. Focusing the editor never moves it out of its
+card or lifts the buttons to the top of the window. There is one input and one
+control row. Android/Chrome retain their normal keyboard/viewport behaviour;
+floating keyboards do not trigger a second placement or overlay toolbar.
+Qualification checks the single input, containment in its original card, control
+order, bottom position and actual hit targets with the landscape sidebar open.
 
 ## Ungrouped means separate conversations
 

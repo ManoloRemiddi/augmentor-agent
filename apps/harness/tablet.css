@@ -24,15 +24,7 @@ html:has(body.augmentor-agent),body.augmentor-agent,body.augmentor-agent #root {
 .augmentor-ungrouped-label{font-size:14px;color:var(--dsw-alias-label-secondary);padding:8px 0}
 
 .augmentor-agent div:has(>.augmentor-ungrouped-label)>button{display:none}
-/* Floating Android keyboards report no occlusion/viewport change. Keep the
-   same three action elements above that keyboard while a touch editor owns
-   focus. No cloned controls or alternate session/voice component is mounted. */
-@media (pointer:coarse){
- /* The composer stack is a flex stacking context. Lift that owner as well as
-    its fixed children so a later right-sidebar pane cannot cover the controls. */
- .augmentor-agent [data-composer-seat]>div:has([contenteditable=true]:focus){z-index:100;}
- .augmentor-agent:has([contenteditable=true]:focus) .augmentor-agent-actions{position:fixed;top:6px;left:64px;right:8px;z-index:90;padding:6px;background:var(--dsw-alias-bg-base,#161819);border-radius:12px;box-shadow:0 4px 16px #0006;}
-}
-@media (pointer:coarse){
- .augmentor-agent [contenteditable=true]:focus{position:fixed;top:84px;left:76px;right:20px;width:auto!important;min-height:80px!important;max-height:min(28vh,220px);overflow:auto;z-index:91;box-sizing:border-box;padding:12px;border-radius:12px;background:var(--dsw-specific-input-major,#2b2c2d);box-shadow:0 4px 16px #0006;}
-}
+/* Keep the original input card and its three controls in one bottom composer,
+   including an empty chat. Focusing never floats or relocates its children. */
+.augmentor-agent [data-conversation-content][data-content-phase=hero]>[data-conversation-scroll]{justify-content:flex-end;}
+.augmentor-agent [data-conversation-content][data-content-phase=hero] [data-composer-seat]>div{padding-bottom:0;}
