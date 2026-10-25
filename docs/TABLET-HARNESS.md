@@ -22,6 +22,11 @@ AI Improve uses the existing non-submitting draft/undo contract. On touch device
 the active editor and these same controls move above floating keyboards, which
 can report neither viewport resizing nor keyboard occlusion. There are no cloned
 buttons or alternate owners. The normal placement returns when editing ends.
+The focused composer stack is raised above the right pane, so its fixed controls
+and editor remain visible and receive touch across the landscape viewport.
+Qualification checks actual hit targets; visible element rectangles alone can
+miss a later sidebar painting over them. The rule uses the stable composer-seat
+attribute rather than generated CSS-module class names.
 
 ## Ungrouped means separate conversations
 

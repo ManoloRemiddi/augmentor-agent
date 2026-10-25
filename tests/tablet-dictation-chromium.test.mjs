@@ -11,7 +11,7 @@ test('mouse/touch release adds editable text in both layouts; only explicit Send
  t.after(async()=>{panel?.close();if(chrome?.pid&&chrome.exitCode===null){const exited=once(chrome,'exit');chrome.kill('SIGTERM');await exited;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  chrome=spawn(process.env.CHROMIUM_BIN??'chromium',['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--no-first-run','--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream','--autoplay-policy=no-user-gesture-required','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
  let port;await until(async()=>{try{port=await chromiumPort(profile);return !!port;}catch{return false;}},'tablet Chromium');const target=(await fetch('http://127.0.0.1:'+port+'/json').then(r=>r.json())).find(row=>row.type==='page');panel=await harnessCdp(target.webSocketDebuggerUrl);for(const domain of ['Runtime','Log','Page','Network'])await panel.call(domain+'.enable');
- await panel.call('Emulation.setDeviceMetricsOverride',{width:1105,height:700,deviceScaleFactor:1,mobile:false});await panel.navigate(link.url+'&session='+sid);
+ await panel.call('Emulation.setDeviceMetricsOverride',{width:1105,height:700,deviceScaleFactor:1,mobile:false,screenOrientation:{type:'landscapePrimary',angle:90}});await panel.navigate(link.url+'&session='+sid);
  const mic='document.querySelector("button[aria-label=Microphone]")',editor='document.querySelector("[contenteditable=true]")',send='document.querySelector('+JSON.stringify('button[aria-label="Send to AH"]')+')';
  await until(()=>panel.evaluate('Boolean('+editor+'&&'+mic+'&&!'+mic+'.disabled)'),'editable tablet composer');await harnessPointerClick(panel,editor,until);await panel.call('Input.insertText',{text:'Existing: '});
  const capture=async touch=>{
@@ -23,8 +23,14 @@ test('mouse/touch release adds editable text in both layouts; only explicit Send
   assert.equal(f.requests.length,0);assert.equal(await panel.evaluate(mic+'.getAttribute("aria-pressed")'),'false');assert.equal((await f.call('session.history',{sessionId:sid})).events.filter(row=>row.event.type==='user/message').length,0);
  };
  await capture(false);
- await panel.call('Emulation.setDeviceMetricsOverride',{width:692,height:970,deviceScaleFactor:1,mobile:true});await panel.call('Emulation.setTouchEmulationEnabled',{enabled:true});await capture(true);
+ await panel.call('Emulation.setDeviceMetricsOverride',{width:692,height:970,deviceScaleFactor:1,mobile:true,screenOrientation:{type:'portraitPrimary',angle:0}});await panel.call('Emulation.setTouchEmulationEnabled',{enabled:true});await capture(true);
  const text=(await f.call('draft.describe',{sessionId:sid})).text;assert(text.startsWith('Existing: '));assert.equal(text.match(/Synthetic spoken request/g).length,2);
+ // Rectangles alone do not prove usability: the right pane used to paint over
+ // fixed controls owned by a lower composer stacking context on the tablet.
+ await panel.call('Emulation.setDeviceMetricsOverride',{width:1105,height:557,deviceScaleFactor:1,mobile:true,screenOrientation:{type:'landscapePrimary',angle:90}});await harnessPointerClick(panel,editor,until);
+ await until(()=>panel.evaluate('Array.from(document.querySelectorAll("button[aria-label=\\"Collapse right sidebar\\"]")).some(e=>{const r=e.getBoundingClientRect();return r.x>=0&&r.right<=innerWidth&&r.width>0;})'),'landscape right pane');
+ const occluded=await panel.evaluate('Array.from(document.querySelectorAll(".augmentor-agent-actions>button")).filter(e=>{const r=e.getBoundingClientRect();return !e.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2));}).map(e=>e.textContent)');assert.deepEqual(occluded,[],'all three focused controls must receive touch above the right pane');
+ assert(await panel.evaluate('(()=>{const e='+editor+',r=e.getBoundingClientRect();return e.contains(document.elementFromPoint(r.right-8,r.y+r.height/2));})()'),'the focused editor must remain visible over the right pane');
  const output=process.env.AUGMENTOR_TABLET_DICTATION_PROOF_OUTPUT;if(output){await mkdir(output,{recursive:true});await writeFile(join(output,'tablet-dictation-draft.png'),Buffer.from((await panel.call('Page.captureScreenshot',{format:'png'})).data,'base64'));}
  // A deliberate edit is the text that Send admits. Recognition itself remains
  // ordinary draft input, rather than claiming spoken-mode model provenance.

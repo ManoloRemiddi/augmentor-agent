@@ -28,6 +28,9 @@ html:has(body.augmentor-agent),body.augmentor-agent,body.augmentor-agent #root {
    same three action elements above that keyboard while a touch editor owns
    focus. No cloned controls or alternate session/voice component is mounted. */
 @media (pointer:coarse){
+ /* The composer stack is a flex stacking context. Lift that owner as well as
+    its fixed children so a later right-sidebar pane cannot cover the controls. */
+ .augmentor-agent [data-composer-seat]>div:has([contenteditable=true]:focus){z-index:100;}
  .augmentor-agent:has([contenteditable=true]:focus) .augmentor-agent-actions{position:fixed;top:6px;left:64px;right:8px;z-index:90;padding:6px;background:var(--dsw-alias-bg-base,#161819);border-radius:12px;box-shadow:0 4px 16px #0006;}
 }
 @media (pointer:coarse){
