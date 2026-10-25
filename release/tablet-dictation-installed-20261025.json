@@ -1,0 +1,48 @@
+{
+  "schema": "augmentor-tablet-dictation-evidence/1",
+  "date": "2026-10-25",
+  "sourceRef": "d62f9e40",
+  "supersedesInteractionIn": "tablet-harness-installed-20261025.json",
+  "productVersion": "0.2.13",
+  "installed": {
+    "review": "pilot",
+    "releaseId": "20261025-132556-b39f82c2",
+    "artifactSha256": "c387ce36cf5ceb48956d67fb93d01e2e0a31916a856fc53d03ff628324080ac2",
+    "baseArtifactSha256": "640f28b87cca94ccb5eefceb9eb1f1cf159dccf7846ab6ad87d2f9af8514ea36",
+    "selectedAndRunningMatch": true,
+    "editableDraftCapability": 1,
+    "matchingPrivateMobileAssetsSelected": true,
+    "freshColdBackupCreated": true,
+    "priorConversationsRetained": 134
+  },
+  "behavior": {
+    "holdTalkToRecord": true,
+    "releaseInsertsEditableDraft": true,
+    "existingDraftAndSelectionPreserved": true,
+    "conflictingTranscriptRetainedForExplicitInsertion": true,
+    "audioRelayCanSubmitConversationalWork": false,
+    "explicitSendUsesNormalDurableDraftRequest": true,
+    "speechObserverRetainedForExplicitlySentReply": true,
+    "releaseBeforeMicrophoneReadyPreventsLateCapture": true,
+    "olderOwnerRefusesCaptureWithoutDraftCapability": true
+  },
+  "validation": {
+    "buildCohort": {"passed": 82, "failed": 0, "skipped": 0},
+    "exactSealedPackage": {"passed": 49, "failed": 0, "skipped": 0},
+    "realChromiumHostAndSdk": {
+      "audio": "fake browser devices and independently authored scripted speech peer",
+      "mouseLandscapeRelease": "persisted editable transcript; zero model requests",
+      "touchPortraitRelease": "persisted editable transcript; zero model requests",
+      "editedExplicitSend": "one text-mode human message and one model request; reply reaches scoped speech observer"
+    },
+    "physicalLenovo": {
+      "wifiAdbConnected": true,
+      "freshHoldReleaseAcceptance": "pending owner unlock of secure screen",
+      "newPageLoadedOnTablet": false,
+      "orientationPreferencesRestored": true
+    }
+  },
+  "preserved": ["original Desktop/DSH speech companion", "CPU recognizer and VAD", "Handy", "Qwen and Breeze GPU/model settings", "saved chats and histories", "installed provisioning and macOS Search/Wiki overlays"],
+  "retention": {"obsoleteArtifactsRemoved": 3, "additionalMobileCandidatesRetained": 2, "managedScratchRetained": false},
+  "remainingQualification": ["physical Lenovo hold/release after unlock", "fresh acoustic feedback", "installed macOS/Windows", "on-device recognizer", "background and locked-screen speech"]
+}

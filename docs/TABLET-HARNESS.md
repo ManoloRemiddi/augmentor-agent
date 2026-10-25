@@ -191,3 +191,37 @@ Compare finalization time, recognition errors, battery use and first reply audio
 against the current CPU path before choosing a model. A faster recognizer cannot
 by itself remove network, conversational-model or reply-synthesis time. No Android
 wrapper or recognition model is installed by this change.
+
+## Installed hold-to-dictate correction — October 25, 2026
+
+This supersedes the automatic-send interaction in the earlier installed receipt.
+Feature commit `d62f9e40` is staged as `20261025-132556-b39f82c2`, artifact SHA-256
+`c387ce36cf5ceb48956d67fb93d01e2e0a31916a856fc53d03ff628324080ac2`.
+The registered MX pilot selects and runs that exact sealed package; the private
+mobile gateway selects its matching assets. The normal guarded registration path
+was used after a fresh private cold backup. All 134 conversations present before
+this correction are retained; no recording or prompt was replayed during update.
+
+The build cohort passes 82 tests and the exact sealed package passes 49, without
+failures or skips. The added real Chromium/Host/SDK test holds a mouse in landscape
+and a touch pointer in portrait. Each release inserts the scripted transcript into
+the original persisted draft with zero human messages/model requests. It preserves
+existing text, then edits the draft and presses the original Send exactly once;
+one ordinary text-mode human message is admitted and its reply reaches the scoped
+speech observer. This uses fake browser audio and an independent protocol peer,
+not a physical recognizer. The test accepts only the existing ScriptProcessor
+deprecation warning; unexpected browser errors and failed HTTP responses fail it.
+
+Unit/runtime checks additionally cover release during delayed microphone
+permission, duplicate final events, late partials, editor conflicts, session
+changes and absence of conversational calls from the audio relay. An empty
+transcript cannot delete the selected draft text. Existing CPU recognition,
+Desktop/DSH speech, Handy and model placement are unchanged.
+
+The desktop page was refreshed to the corrected shared interface. The Lenovo
+remains connected over Wi-Fi, but its secure screen lock prevented a fresh
+physical hold/release check and page refresh. The owner was asked to unlock it;
+this receipt does not claim that physical check passed. Earlier orientation and
+acoustic results above describe the preceding build. The device's orientation
+preferences are restored after attempted checks. See the
+[correction receipt](../release/tablet-dictation-installed-20261025.json).
