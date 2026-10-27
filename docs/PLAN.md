@@ -75,3 +75,9 @@ Use existing UI/helper regression tests where their behavior still applies. Add 
 - Pi owns agent conversations; Augmentor stores saved metadata and a durable display journal. Prompt Markdown files use revision hashes; imports preserve originals.
 - A detached single runtime is started/recovered by safe health probes under a file lock; no systemd dependency. The KDE launcher uses its own desktop ID.
 - Public/private GitHub visibility and release channel when publication is requested.
+
+## October 27 repair integration
+
+Owner authorizes tested repairs and deployment to Linux Desktop/Browser, personal Mac Mini and VZmore Windows, full application control without repeated action approvals, preserving models/sessions/drafts. Independent scope review actually ran successfully on `claude-opus-5-5` using the existing subscription. Lead accepts distinct reconciliation/repair/deployment gates, immutable staged artifacts, minimal SDK shell defaults and existing preview/jobs reuse. Explicit authorization covers both legacy and Harness and deliberate Chromium permission changes; no new OS/account access is inferred.
+
+Integration starts from deployed tablet ancestry `7ea6a36b`, retains `ab7f1665`, and merges current main, macOS Wiki, research, deployed memory relevance and EDGE capture without rewriting history. Conflict resolution preserves tablet capabilities, Mac Search/Wiki and both memory test families. Dirty old primary is preserved independently. Unfinished unrelated draft PRs remain separate. Full-control browser/desktop adapters require a separate design/change review and actual target verification. Builds use DATA and the required 64 GiB reserve.
