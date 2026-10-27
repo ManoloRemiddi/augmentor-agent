@@ -452,6 +452,10 @@
       "program/LibreOfficeDev.app/Contents/Resources/NOTICE": {
         "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
         "role": "notice"
+      },
+      "sources/core-source.json": {
+        "sha256": "39340edab26fd8f702380a0b9fedcfcc6a181793b46dd6d7dee01fa80a2458f0",
+        "role": "notice"
       }
     },
     "@deepseek-ai/libreoffice-kit-win32-x64@0.1.3": {

@@ -82,7 +82,7 @@ jobs:
           AUGMENTOR_EPHEMERAL_WINDOWS_RUNNER: '1'
         run: |
           $env:AUGMENTOR_PYTHON = "$PWD/outputs/runtime/python/python.exe"
-          & outputs/runtime/node/node.exe --test --test-reporter=tap --test-concurrency=4 tests/windows-shell-frames.test.mjs tests/pi-windows-jobs.test.mjs tests/jobs-registry.test.mjs tests/pi-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/host-jobs.log
+          & outputs/runtime/node/node.exe --test --test-reporter=tap --test-concurrency=1 tests/windows-shell-frames.test.mjs tests/pi-windows-jobs.test.mjs tests/jobs-registry.test.mjs tests/pi-jobs.test.mjs 2>&1 | Tee-Object -FilePath outputs/evidence/host-jobs.log
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
