@@ -77,6 +77,7 @@ pub struct Embedded {
     phase: Mutex<String>,
     problem: Mutex<Option<String>>,
     conversation: Mutex<Option<String>>,
+    draft: Mutex<Option<DraftCapture>>,
 }
 impl Embedded {
     fn new() -> Self {
@@ -88,7 +89,140 @@ impl Embedded {
             phase: Mutex::new("disabled".into()),
             problem: Mutex::new(None),
             conversation: Mutex::new(None),
+            draft: Mutex::new(None),
         }
+    }
+}
+// Direct draft capture bypasses history, clipboard, typing and auto-submit.
+struct DraftCapture {
+    token: String,
+    phase: String,
+    text: Option<String>,
+    error: Option<String>,
+    generation: u64,
+    worker: bool,
+}
+fn draft_cancel(app: &AppHandle) {
+    let state = app.state::<Embedded>();
+    let mut slot = state.draft.lock().unwrap();
+    if let Some(draft) = slot.as_mut() {
+        if draft.phase == "recording" || draft.phase == "transcribing" {
+            app.state::<Arc<AudioRecordingManager>>().cancel_recording();
+            draft.phase = "cancelled".into();
+            draft.text = None;
+        }
+    }
+}
+fn draft_request(app: &AppHandle, method: &str, token: String) -> Result<Value, String> {
+    let state = app.state::<Embedded>();
+    if token.len() != 32 || !token.bytes().all(|v| v.is_ascii_hexdigit()) {
+        return Err("Invalid draft capture token".into());
+    }
+    if method == "draft.start" {
+        if !state.enabled.load(Ordering::SeqCst) {
+            return Err("Enable system dictation first".into());
+        }
+        let mut slot = state.draft.lock().map_err(|_| "Capture unavailable")?;
+        if slot.is_some() {
+            return Err("Finish the previous draft capture first".into());
+        }
+        state
+            .holder
+            .compare_exchange(0, 4, Ordering::SeqCst, Ordering::SeqCst)
+            .map_err(|_| "Microphone is busy")?;
+        app.state::<Arc<TranscriptionManager>>()
+            .initiate_model_load();
+        let audio = app.state::<Arc<AudioRecordingManager>>();
+        let generation = audio.cancel_generation();
+        let ready =
+            audio.try_start_recording("augmentor-draft", crate::audio_toolkit::VadPolicy::Offline);
+        if !ready.map(|ready| ready.wait()).unwrap_or(false) {
+            audio.cancel_recording();
+            state.holder.store(0, Ordering::SeqCst);
+            return Err("Microphone could not start".into());
+        }
+        *slot = Some(DraftCapture {
+            token,
+            phase: "recording".into(),
+            text: None,
+            error: None,
+            generation,
+            worker: false,
+        });
+        return Ok(json!({"phase":"recording"}));
+    }
+    let mut slot = state.draft.lock().map_err(|_| "Capture unavailable")?;
+    let draft = slot
+        .as_mut()
+        .filter(|d| d.token == token)
+        .ok_or("Draft capture is no longer owned by this request")?;
+    match method {
+        "draft.poll" => Ok(
+            json!({"phase":draft.phase,"text":draft.text,"error":draft.error,"worker":draft.worker}),
+        ),
+        "draft.cancel" => {
+            if draft.phase == "recording" || draft.phase == "transcribing" {
+                app.state::<Arc<AudioRecordingManager>>().cancel_recording();
+            }
+            draft.phase = "cancelled".into();
+            draft.text = None;
+            Ok(json!({"phase":"cancelled"}))
+        }
+        "draft.release" => {
+            if draft.worker || draft.phase == "recording" {
+                return Err("Capture is still finishing".into());
+            }
+            *slot = None;
+            state
+                .holder
+                .compare_exchange(4, 0, Ordering::SeqCst, Ordering::SeqCst)
+                .ok();
+            Ok(json!({}))
+        }
+        "draft.stop" => {
+            if draft.phase != "recording" {
+                return Err("Draft capture is not recording".into());
+            }
+            draft.phase = "transcribing".into();
+            draft.worker = true;
+            let generation = draft.generation;
+            let handle = app.clone();
+            std::thread::spawn(move || {
+                let audio = handle.state::<Arc<AudioRecordingManager>>();
+                let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                    let samples = audio
+                        .stop_recording("augmentor-draft", generation)
+                        .ok_or_else(|| "Capture cancelled".to_string())?;
+                    if audio.was_cancelled_since(generation) {
+                        return Err("Capture cancelled".into());
+                    }
+                    handle
+                        .state::<Arc<TranscriptionManager>>()
+                        .transcribe(samples)
+                        .map_err(|e| e.to_string())
+                }))
+                .unwrap_or_else(|_| Err("Transcription worker stopped".into()));
+                let state = handle.state::<Embedded>();
+                let mut slot = state.draft.lock().unwrap();
+                if let Some(draft) = slot.as_mut().filter(|d| d.token == token) {
+                    draft.worker = false;
+                    if draft.phase != "cancelled" && !audio.was_cancelled_since(generation) {
+                        match result {
+                            Ok(text) => {
+                                draft.phase = "complete".into();
+                                draft.text = Some(text);
+                            }
+                            Err(error) => {
+                                draft.phase = "error".into();
+                                draft.error = Some(error);
+                            }
+                        }
+                    }
+                }
+            });
+            Ok(json!({"phase":"transcribing"}))
+        }
+        _ => Err("Unsupported draft capture operation".into()),
     }
 }
 struct Editing<'a>(&'a AtomicU8);
@@ -162,6 +296,7 @@ fn enable(app: &AppHandle, enabled: bool) -> Result<(), String> {
     let state = app.state::<Embedded>();
     if !enabled {
         state.enabled.store(false, Ordering::SeqCst);
+        draft_cancel(app);
         utils::cancel_current_operation(app);
         shortcut::suspend_all_shortcuts(app);
         app.state::<Arc<AudioRecordingManager>>()
@@ -216,6 +351,9 @@ async fn dispatch(app: &AppHandle, request: &Value) -> Result<Value, String> {
             .ok_or_else(|| format!("Invalid {key}"))
     };
     match method {
+        "draft.start" | "draft.stop" | "draft.poll" | "draft.cancel" | "draft.release" => {
+            draft_request(app, method, text("token")?)
+        }
         "status" => {
             let s = settings::get_settings(app);
             let mm = app.state::<Arc<ModelManager>>();
@@ -228,7 +366,7 @@ async fn dispatch(app: &AppHandle, request: &Value) -> Result<Value, String> {
                 "phase": if state.enabled.load(Ordering::SeqCst) && !available {"setup-needed"} else {phase.as_str()},
                 "revision":*state.revision.lock().map_err(|_| "State unavailable")?, "settings":public_settings(app),
                 "theme":state.theme.lock().map_err(|_| "State unavailable")?.clone(),
-                "error":state.problem.lock().map_err(|_| "State unavailable")?.clone(), "tray":false}),
+                "error":state.problem.lock().map_err(|_| "State unavailable")?.clone(), "tray":false, "direct_draft_capture":true}),
             )
         }
         "enable" => {
@@ -403,6 +541,7 @@ async fn dispatch(app: &AppHandle, request: &Value) -> Result<Value, String> {
         }
         "devices" => Ok(json!(commands::audio::get_available_microphones().await?)),
         "cancel" => {
+            draft_cancel(app);
             utils::cancel_current_operation(app);
             Ok(json!({}))
         }
@@ -515,6 +654,7 @@ pub fn start(app: &AppHandle) {
             });
         }
         // Parent loss must never leave capture or shortcuts running orphaned.
+        draft_cancel(&handle);
         utils::cancel_current_operation(&handle);
         handle.exit(0);
     });

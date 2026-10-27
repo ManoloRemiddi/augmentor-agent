@@ -2975,6 +2975,16 @@ SDK input compatibility source `2f40eb7801fa68e995a90c8dcb672efa46c7c9b1` runs p
 
 # Start here: agent handoff
 
+## October 15 EDGE direct draft capture — development
+
+[Direct capture contract](EDGE-DRAFT-DICTATION.md) adds token/PID-owned capture to
+the shared Handy component/broker for the companion EDGE surface. Six admission
+and cleanup cases plus 22 existing broker cases pass. Actual virtual-mic CPU ASR
+and compatible installed broker adoption passed; source `d1b7b1b` is in draft
+PR #47. Physical dictation works per the owner, but the companion touch/focus
+acceptance is still failing and under correction. No artifact was patched in
+place; preserve existing conversations and the unsent EDGE draft.
+
 15 October: [conversational memory relevance](MEMORY-CHECKIN-RELEVANCE.md) records
 the EDGE prompt investigation, generic-word recall correction, exact Linux-only
 backend artifact/HMR binding, failed legacy-file attempt and real-model pass.
