@@ -1,6 +1,6 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // The legacy 0.85.1 shrinkwrap bypasses npm overrides for its nested ws.
-// The qualified 1.1.0 SDK has no shrinkwrap and resolves the locked root ws.
+// The qualified 1.1.0 and 1.2.0 SDKs have no shrinkwrap and resolve the locked root ws.
 // Keep this gate explicit so future SDK upgrades cannot bypass review.
 import assert from 'node:assert/strict';
 import {existsSync, lstatSync, readFileSync, readlinkSync, rmSync} from 'node:fs';
@@ -15,7 +15,7 @@ const wsPath = rootRequire.resolve('ws/package.json');
 assert.equal(read(wsPath).version, '8.21.3', 'Install the locked root ws before preparing Pi');
 const sdk = path.join(root, 'node_modules/@earendil-works/pi-coding-agent');
 const sdkVersion = read(path.join(sdk, 'package.json')).version;
-assert.ok(['0.85.1', '1.1.0'].includes(sdkVersion), 'Review the ws dependency when upgrading Pi');
+assert.ok(['0.85.1', '1.1.0', '1.2.0'].includes(sdkVersion), 'Review the ws dependency when upgrading Pi');
 const nested = path.join(sdk, 'node_modules/ws');
 if (existsSync(nested)) {
   const version = read(path.join(nested, 'package.json')).version;

@@ -9,7 +9,7 @@ if(!process.argv[2])throw Error('Provide an explicit unselected Home dependency 
 const source=fileURLToPath(new URL('../../../',import.meta.url)),target=realpathSync(resolve(process.argv[2]));
 if(existsSync(join(target,'desktop-release.json'))||existsSync(join(target,'.git')))throw Error('Never modify a sealed release or source checkout.');
 const read=p=>JSON.parse(readFileSync(p,'utf8')),sha=p=>createHash('sha256').update(readFileSync(p)).digest('hex');
-for(const [name,version] of Object.entries({'@earendil-works/pi-coding-agent':'1.1.0','@earendil-works/pi-mcp':'1.1.0',typebox:'1.3.7',ws:'8.21.3'}))if(read(join(target,'node_modules',name,'package.json')).version!==version)throw Error('Unreviewed Home dependency '+name);
+for(const [name,version] of Object.entries({'@earendil-works/pi-coding-agent':'1.2.0','@earendil-works/pi-mcp':'1.2.0',typebox:'1.3.7',ws:'8.21.3'}))if(read(join(target,'node_modules',name,'package.json')).version!==version)throw Error('Unreviewed Home dependency '+name);
 if(read(join(target,'package.json')).name!=='@augmentor/home-pi-runtime')throw Error('Choose the Home Pi dependency prefix.');
 const family=read(join(source,existsSync(join(source,'family-package-lock.json'))?'family-package-lock.json':'package-lock.json')).packages;
 const installed=read(join(target,'package-lock.json')).packages;
@@ -31,4 +31,4 @@ mkdirSync(join(target,'licenses'),{recursive:true});writeFileSync(join(target,'l
 const licences=join(target,'licenses/photon');mkdirSync(licences,{recursive:true});cpSync(join(vendor,'third-party'),licences,{recursive:true});cpSync(join(vendor,'BUILD.json'),join(licences,'BUILD.json'));
 rmSync(join(target,'node_modules/@earendil-works/pi-coding-agent/dist/bundle'),{recursive:true,force:true});
 writeFileSync(join(target,'distribution-overrides.json'),JSON.stringify({photon:{npmVersion:record.npmVersion,source:record.source,changes:record.changes,wasmSha256:record.files['photon_rs_bg.wasm']}},null,2)+'\n');
-writeFileSync(join(target,'distribution-exclusions.json'),JSON.stringify([{name:'@earendil-works/pi-coding-agent',version:'1.1.0',path:'dist/bundle',reason:'unused CLI/RPC bundles; Home uses the public SDK'}],null,2)+'\n');
+writeFileSync(join(target,'distribution-exclusions.json'),JSON.stringify([{name:'@earendil-works/pi-coding-agent',version:'1.2.0',path:'dist/bundle',reason:'unused CLI/RPC bundles; Home uses the public SDK'}],null,2)+'\n');
