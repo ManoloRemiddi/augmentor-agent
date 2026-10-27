@@ -1497,7 +1497,7 @@ See [DSH 0.2 compatibility](DSH-0.2-COMPATIBILITY.md) for the separately qualifi
 - [Embedded Handy dictation](HANDY-INTEGRATION.md): implementation, reboot recovery, WebKitGTK recording repaint repair, themed pill, settings, OS adapters, licensing, build and qualification boundaries.
 - [Approved Handy integration plan](HANDY-INTEGRATION-PLAN.md).
 
-- [Application SDK foundation](APP-SDK.md): DSH integration protocol, tool grants, recoverable installation and experimental voice.
+- [Application SDK foundation](APP-SDK.md): DSH integration protocol, tool grants, recoverable installation, experimental voice and the embedded prompt-improvement boundary.
 
 See [embedded Browser and specialist workspaces](WORKSPACE-EMBEDDING.md) for the product-owned iframe host, dedicated role/tool composition, scoped memory and release lifecycle.
 

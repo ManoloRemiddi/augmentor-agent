@@ -1,6 +1,33 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 # Application SDK foundation
 
+## Embedded prompt improvement
+
+The input box's Improve Prompt action is a draft operation, available to SDK
+workspaces through `augmentor/surface` with exactly `action: "improve"`.
+It uses the selected model and shared prompt-improvement instructions to return
+an editable rewrite. It does not submit a chat turn or run application tools.
+Appearance, dictation administration, shared settings, model setup and updates
+remain denied through this route. The profile's tool and voice grants do not
+change. Existing draft-preservation and Undo behavior still apply.
+
+The 15 October correction removes an overly broad administration check that
+rejected this button before reaching the rewrite service. Shared JavaScript
+policy applies to Linux and macOS embedding; platform installation and real
+model execution remain separate qualification steps. Regression coverage in
+`tests/workspace-prompt-improvement.test.mjs` checks exact action matching,
+continued settings denial and the real native-message path with an isolated
+synthetic helper, without user configuration or provider credentials.
+
+Validation at `e8db4e2`: the canonical build and 17 focused rewrite, SDK policy,
+embedding and native-message checks passed. A compatible 0.2.11 managed overlay
+also passed the native-message regression. Live Linux embedding returned a
+rewrite through the selected provider and Undo restored the exact original
+draft; no chat prompt was sent. The source policy is shared with macOS, but an
+installed Mac was not exercised for this correction. Existing desktop windows,
+DSH, speech dependencies and model selections did not require a restart or
+configuration change; the embedding service adopted the newly staged release.
+
 The separate `augmentor-app-sdk` repository supplies the developer package.
 This repository owns the runtime contract `augmentor-app/1`, the maintained
 Browser interface, workspace permissions, memory binding and installation.
