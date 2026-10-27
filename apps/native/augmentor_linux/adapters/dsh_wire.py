@@ -211,9 +211,11 @@ class EventStream:
                 if frame.get('type')=='event' and frame['event']['seq']>cursor:
                     event=frame['event'];cursor=event['seq']
                 elif frame.get('type')=='assistant-stream' and frame['frame']['type']=='start':
-                    event={'type':'assistant/start','time':frame['frame']['time'],'data':{}}
+                    event={'type':'assistant/start','data':{}}
                 elif frame.get('type')=='assistant-stream' and frame['frame']['type']=='chunk':
-                    event={'type':'assistant/chunk','time':frame['frame']['time'],'data':{'chunk':frame['frame']['chunk']}}
+                    event={'type':'assistant/chunk','data':{'chunk':frame['frame']['chunk']}}
+                if event and frame.get('type')=='assistant-stream' and 'time' in frame['frame']:
+                    event['time']=frame['frame']['time']
                 if event:
                     self.on_frame({'type':'server-request','method':'session/event','payload':{'sessionId':self.session,'event':event}})
                     if event['type'] in ('turn/start','turn/end'):

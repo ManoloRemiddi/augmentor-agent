@@ -74,21 +74,33 @@ class ResponseProgressTests(unittest.TestCase):
         self.assertEqual(w.response_progress,'Submitting message…')
 
     def test_native_transport_delivers_stream_start_before_first_chunk(self):
+        self.check_native_stream({'time':1},{'time':2})
+
+    def test_untimed_dsh_stream_does_not_disconnect_or_lose_terminal_event(self):
+        for start,chunk in [({},{}),({'time':0},{}),({},{'time':2}),({'time':None},{'time':None})]:
+            with self.subTest(start=start,chunk=chunk):self.check_native_stream(start,chunk)
+
+    def check_native_stream(self,start,chunk):
         frames=[]
         sock=lambda name:SimpleNamespace(name=name,settimeout=lambda _:None,close=lambda:None)
         responses={
             '$events':iter([{'type':'ready','clientId':'fixture'}]),
             'session/control':iter([{'type':'baseline','value':{}}]),
             'session/follow':iter([{'type':'snapshot','cursor':0},
-                {'type':'assistant-stream','frame':{'type':'start','time':1}},
-                {'type':'assistant-stream','frame':{'type':'chunk','time':2,'chunk':{'type':'reasoning-delta','text':'Thought'}}}])}
+                {'type':'assistant-stream','frame':{'type':'start',**start}},
+                {'type':'assistant-stream','frame':{'type':'chunk',**chunk,'chunk':{'type':'reasoning-delta','text':'Thought'}}},
+                {'type':'assistant-stream','frame':{'type':'end','time':77}},
+                {'type':'event','event':{'seq':3,'type':'turn/end','time':99,'data':{}}}])}
         client=SimpleNamespace(remote=SimpleNamespace(stream=lambda name,args:sock(name),item=lambda socket:next(responses[socket.name])),call=lambda *args:{'items':[]})
         def receive(frame):
             frames.append(frame)
-            if frame.get('payload',{}).get('event',{}).get('type')=='assistant/chunk':stream.closed.set()
+            if frame.get('payload',{}).get('event',{}).get('type')=='turn/end':stream.closed.set()
         stream=EventStream(client,'fixture',receive,self.fail)
         with patch('augmentor_linux.adapters.dsh_wire.threading.Thread',return_value=Mock()):stream._run()
         self.assertIsNone(stream.failure)
         events=[f['payload']['event'] for f in frames if f.get('method')=='session/event']
-        self.assertEqual([e['type'] for e in events],['assistant/start','assistant/chunk'])
-        self.assertTrue(all('seq' not in e for e in events))
+        self.assertEqual([e['type'] for e in events],['assistant/start','assistant/chunk','turn/end'])
+        self.assertTrue(all('seq' not in e for e in events[:2]))
+        for event,stamp in zip(events,[start,chunk,{'time':99}]):
+            self.assertEqual({key:value for key,value in event.items() if key=='time'},stamp)
+        self.assertEqual(events[-1]['seq'],3)
