@@ -443,6 +443,16 @@ October 11 private MX [original Compact qualification](PI-COMPACTION.md#final-in
 
 # Consistent installed desktop releases
 
+## October 15: backend memory relevance correction only
+
+[Check-in relevance](MEMORY-CHECKIN-RELEVANCE.md#installed-linuxedge-qualification--15-october)
+records a separately staged 0.2.11 memory artifact used by the Linux/EDGE backend.
+Only the compiled context selector differs from the previous active memory
+component. Runtime inventory and a real-model replay pass. The current desktop
+selection, UI/speech dependencies and model are unchanged; Browser/workspace
+memory was not promoted. The earlier inactive legacy-file attempt is preserved
+as a failed qualification, with its file restored exactly.
+
 ## October 3: bounded companion lifetimes
 
 [Companion retirement and cleanup](LIFECYCLE.md#detached-companion-retirement--october-3)

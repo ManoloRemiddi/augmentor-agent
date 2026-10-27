@@ -56,6 +56,14 @@ evidence, physical voice, adoption and full migration/platform gates remain open
 
 # Context selection and controlled memory processing
 
+15 October follow-up: [conversational check relevance](MEMORY-CHECKIN-RELEVANCE.md)
+records generic testing/performance words pulling unrelated old work into a new
+chat. Source filtering and current-task guidance are corrected; exact deployment
+and real-model scope are recorded separately in that guide.
+
+Implemented and qualified in source on `productization/shared-memory-and-desktop`.
+Installed artifact identity and activation are recorded separately below.
+
 [Pi Native/Browser controls](PI-VOICE.md#native-and-browser-controls--october-16-2026)
 now supply the admitted mode through actual Controller/Browser worker paths.
 Synthetic end-to-end tests exercise spoken input, typed Send and spoken same-turn

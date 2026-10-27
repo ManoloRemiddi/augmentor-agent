@@ -50,3 +50,24 @@ test('pages remain a fallback when a scope has no eligible extracted claims',()=
  const value={work:{pages:[{name:'Current project state',content:'Atlas uses SQLite as its database.'}],items:[{text:'The unrelated renderer uses Vulkan.'}]}};
  const selected=selectContinuity(value,'Atlas database');assert.equal(selected.length,1);assert.equal(selected[0].content,'Atlas uses SQLite as its database.');
 });
+
+test('a conversational performance check does not recall unrelated historical tests',()=>{
+  const value={enabled:true,work:{pages:[{name:'Current project state',content:
+    '- Network speed: a download test returned a low rate.\n- Network performance testing remains unfinished.\n- Check the remote endpoint and repeat the test.'}]}};
+  for(const query of ["Okay, this is just a test to see how you're performing.",'Just checking your performance.',
+    'Hello, are you working?','This is a quick responsiveness test.']){
+    assert.equal(memoryContext(value,'text',query),'',query);
+    assert.equal(memoryContext(value,'voice',query),'',query);
+  }
+  assert.match(memoryContext(value,'text','Check the network download speed.'),/Network speed/);
+});
+
+test('generic check-ins preserve exact current-session boundaries and specific topic recall',()=>{
+  const value={enabled:true,userReceipts:[{seq:1,session:'fixture',role:'user',content:'Do not download files or change the server.'}],
+    work:{summary:'SQLite is the selected database.'}};
+  const checkin=memoryContext(value,'text','Just testing your response.');
+  assert.match(checkin,/Do not download files or change the server/);
+  assert.doesNotMatch(checkin,/SQLite/);
+  assert.match(checkin,/recalled unfinished work is not automatically/);
+  assert.match(memoryContext(value,'text','SQLite'),/SQLite is the selected database/);
+});

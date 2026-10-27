@@ -2975,6 +2975,12 @@ SDK input compatibility source `2f40eb7801fa68e995a90c8dcb672efa46c7c9b1` runs p
 
 # Start here: agent handoff
 
+15 October: [conversational memory relevance](MEMORY-CHECKIN-RELEVANCE.md) records
+the EDGE prompt investigation, generic-word recall correction, exact Linux-only
+backend artifact/HMR binding, failed legacy-file attempt and real-model pass.
+Desktop/model/speech selection and memory data are preserved; Browser adoption
+is separate. Runtime inventory is authoritative for DSH 0.2 preset bindings.
+
 The loaded Pi Chromium follow-up source `346b987283273ee9e59fcc2e8b9f925a46c3ae3f` now drives the actual extension/native host/Pi bridge with an isolated synthetic provider/page. Real snapshot/type/click/screenshot, identified template-expanded steering, Remove, reload, Stop/paused FIFO resume and exact Branch/Edit/unchanged-parent checks pass. It fixes streamed rendering re-disabling queue Send and adds trusted explicit Browser workspace isolation without changing the default. Full Node: 598 passes (2 platform skips, 600 cases); Browser: 108 passes; staged bundled-runtime/ownership/ws/loaded-extension: 52 passes. Native Python/runtime implementation is unchanged; the earlier 825 Python/Qt passes remain scoped evidence. [The owning qualification record](AUGMENTOR-HARNESS.md#loaded-pi-chromium-extension) records visual proof and the fixture interpreter-path repair. This supersedes the earlier loaded-Linux-Pi gap, while live providers, Mac/Windows/other browser and installed acceptance, live memory cutoff and every remaining P0/P1 gate stay open. Previous head `b16ff64be15374b2f284a0223985fe4f66f94cc5` has 12 hosted successes and three packaging jobs still in progress at recording, with no failure; fresh matching-head checks remain required. DSH and owner installations/settings are untouched.
 
 ## October 5 dictation repair downloads — live
