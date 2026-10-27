@@ -21,7 +21,7 @@ class BrowserExecutorTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory(prefix='ab-');self.addCleanup(self.temp.cleanup)
         # Let the platform adapter create an owner-private child. Windows
         # tempfile's inherited owner can be Administrators in an SSH session.
-        self.env=patch.dict(os.environ,{'AUGMENTOR_BROWSER_EXECUTOR_DIR':str(Path(self.temp.name)/'executors')});self.env.start();self.addCleanup(self.env.stop)
+        self.env=patch.dict(os.environ,{'AUGMENTOR_BROWSER_EXECUTOR_DIR':str(Path(self.temp.name).resolve()/'executors')});self.env.start();self.addCleanup(self.env.stop)
         self.children=[];self.requests=[]
         self.addCleanup(self.close)
     def close(self):
