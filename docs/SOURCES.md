@@ -503,6 +503,42 @@ package and lock agree on the MIT license; its original `LICENSE.md` SHA-256 is
 Real cryptographic identity checks and synthetic OpenAI transport pass on Linux.
 This does not qualify live sign-in, subscription eligibility or installed login.
 
+## Pi SDK 1.2.0 proposal — 27 October 2026
+
+This proposal branch moves the root and Pi Home `@earendil-works` pins from 1.1.0
+to exact published **1.2.0**, release tag
+`06a466935536f8c9bcacb2d5efc0fc021be1bdff`. 1.2.0 drops
+`@earendil-works/chord`, so seven family packages remain. Root ws stays at
+8.21.3, root TypeBox at 1.3.7, and the nested Pi TypeBox at 1.3.27. The
+`npm install --package-lock-only` update nests `pi-telemetry` under `pi-ai`, and
+`pi-codemode` and `pi-tui` under `pi-coding-agent`. Before this change they were
+hoisted.
+
+The only source changes follow the upstream `before_agent_start` union. A
+`messageType: "custom"` run gets no managed memory recall. Context provenance
+records the custom run's starting `message` instead of `prompt`/`images`. The
+execution-recovery and Home handlers change only `systemPrompt`, so they need no
+change. The reported `piVersion` is 1.2.0. The two vendored files,
+[prompt-templates](../packages/runtime/vendor/pi/SOURCE.md) and the
+configuration resolver, are byte-identical at v1.2.0 (same SHA-256 values), and
+the upstream LICENSE is unchanged. The vendored copies and notices therefore
+stay at their recorded 1.1.0 source.
+
+Busy-start is checked against source only. The Host job receipt uses
+`sendCustomMessage({triggerTurn:false})` while idle. If a run is starting, 1.2.0
+defers that message. The existing visibility check then leaves the receipt
+pending, and the next flush finds it without duplicating it. Plan mode's
+`!ctx.isIdle()` now also reports busy during run start. No code reads
+`pi mcp list --json` or `chord`.
+
+Tested on Olares, Node 24.21.0: `npm ci`, `npm run check`, a candidate build, the
+full `npm test` and the focused provenance file. Not tested: live busy-start and
+custom-message runs, providers, Home image preparation and every packaging or
+release path. `licenses/catalog.json` licence overrides, `release/quickjs/build.json`,
+`scripts/stage-production.py` and Home `prepare.mjs`'s root-family lookup still
+expect 1.1.0 or hoisted paths. They need a separate reviewed step before any
+staging. Release evidence files that record `piVersion` 1.1.0 remain historical.
+
 ## Pi Home — 15 October 2026
 
 The optional Home image uses the family's public Pi coding-agent/MCP SDK, with
