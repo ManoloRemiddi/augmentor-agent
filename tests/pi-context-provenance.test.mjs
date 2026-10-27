@@ -84,6 +84,17 @@ test('memory observation failures do not change composition and branch recall is
  const records=[];piMemoryContext(memory,false,row=>records.push(row))({on:(name,fn)=>handlers.set(name,fn)});
  assert.equal(await handlers.get('before_agent_start')({prompt:'branch',systemPrompt:'Base'}),undefined);assert.equal(recalls,1);assert.equal(records[0].status,'skipped-for-branch');assert.equal(records[0].context,'');
 });
+test('Pi 1.2 custom-message starts get no memory recall and record their starting message instead of a prompt',async t=>{
+ const handlers=new Map(),records=[];let recalls=0;const memory={session:'pi:fixture',recall:async()=>{recalls++;return memoryText;},close(){},activity:async()=>{}};
+ piMemoryContext(memory,true,row=>records.push(row))({on:(name,fn)=>handlers.set(name,fn)});
+ const message={role:'custom',customType:'fixture',content:'CUSTOM_START',display:false,timestamp:1},custom={type:'before_agent_start',messageType:'custom',message,systemPrompt:'Base',systemPromptOptions:{}};
+ assert.equal(await handlers.get('before_agent_start')(custom),undefined);assert.equal(recalls,0);assert.equal(records.length,0);
+ assert.equal((await handlers.get('before_agent_start')({type:'before_agent_start',messageType:'user',prompt:'question',systemPrompt:'Base'})).systemPrompt,'Base\n\n'+memoryText);assert.equal(recalls,1);
+ const f=setup(t),prep=new Map();f.provenance.attach({resourceLoader:{getSkills:()=>({skills:[]}),getPrompts:()=>({prompts:[]}),getAgentsFiles:()=>({agentsFiles:[]}),getExtensions:()=>({extensions:[]})}});
+ f.provenance.extension({on:(name,fn)=>prep.set(name,fn)});f.provenance.beginTurn();prep.get('before_agent_start')(custom);
+ const result=f.provenance.finish({}),preparation=result.payload.snapshots.preparation;
+ assert.equal(result.data.snapshots.preparation.state,'retained');assert.equal(preparation.messageType,'custom');assert.deepEqual(preparation.message,message);assert.equal('prompt' in preparation,false);assert.equal(preparation.systemPrompt,'Base');
+});
 test('native lineage retains edited/omitted source IDs and compaction provenance through the public projection',t=>{
  const f=setup(t),manager=SessionManager.inMemory(),user=manager.appendMessage({role:'user',content:'ORIGINAL_OMITTED_USER',timestamp:1}),tool=manager.appendMessage({role:'toolResult',toolCallId:'authored-call',toolName:'authored',content:[{type:'text',text:'ORIGINAL_LARGE_RESULT'}],isError:false,timestamp:2});
  manager.appendContextEdit(user,null);manager.appendContextEdit(tool,{content:[{type:'text',text:'SHORT_EFFECTIVE_RESULT'}]});
