@@ -184,6 +184,11 @@
       "file": "upstream/nodable-entities-3.1.0.txt",
       "url": "https://raw.githubusercontent.com/nodable/val-parsers/ac48e7ea591da372be023a481875c747535812b3/LICENSE",
       "sha256": "750cb3fb6362804957ef52caaf9b5c824015be44d494637330d7cd8834d31d40"
+    },
+    "gpl-3.0": {
+      "file": "GPL-3.0.txt",
+      "url": "https://www.gnu.org/licenses/gpl-3.0.txt",
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
     }
   },
   "overrides": {
@@ -324,7 +329,11 @@
     "@deepseek-ai/libreoffice-kit@0.1.5": "MPL-2.0",
     "@deepseek-ai/libreoffice-kit-wasm@0.1.5": "MPL-2.0",
     "@deepseek-ai/libreoffice-kit-darwin-arm64@0.1.3": "MPL-2.0",
-    "@img/sharp-libvips-darwin-arm64@1.3.4": "LGPL-3.0-or-later"
+    "@img/sharp-libvips-darwin-arm64@1.3.4": "LGPL-3.0-or-later",
+    "@img/sharp-win32-x64@0.35.5": "Apache-2.0 AND LGPL-3.0-or-later",
+    "@img/sharp-win32-arm64@0.35.5": "Apache-2.0 AND LGPL-3.0-or-later",
+    "@deepseek-ai/libreoffice-kit-win32-x64@0.1.3": "MPL-2.0",
+    "@deepseek-ai/libreoffice-kit-win32-arm64@0.1.3": "MPL-2.0"
   },
   "additionalNotices": {
     "@openai/codex@0.159.2": [
@@ -349,10 +358,12 @@
       "codex-0.159.2-notice"
     ],
     "@img/sharp-win32-x64@0.35.4": [
-      "lgpl-3.0"
+      "lgpl-3.0",
+      "gpl-3.0"
     ],
     "@img/sharp-win32-arm64@0.35.4": [
-      "lgpl-3.0"
+      "lgpl-3.0",
+      "gpl-3.0"
     ],
     "brotli@1.3.3": [
       "brotli-1.3.3-declaration",
@@ -364,6 +375,32 @@
     ],
     "fontkit@2.0.4": [
       "fontkit-2.0.4-declaration"
+    ],
+    "@img/sharp-win32-x64@0.35.5": [
+      "lgpl-3.0",
+      "gpl-3.0"
+    ],
+    "@img/sharp-win32-arm64@0.35.5": [
+      "lgpl-3.0",
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-darwin-arm64@1.3.3": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-darwin-x64@1.3.3": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-linux-x64@1.3.3": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-linux-arm64@1.3.3": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-linux-x64@1.3.4": [
+      "gpl-3.0"
+    ],
+    "@img/sharp-libvips-darwin-arm64@1.3.4": [
+      "gpl-3.0"
     ]
   },
   "packageNotices": {
@@ -371,6 +408,12 @@
       "README.md"
     ],
     "@img/sharp-win32-arm64@0.35.4": [
+      "README.md"
+    ],
+    "@img/sharp-win32-x64@0.35.5": [
+      "README.md"
+    ],
+    "@img/sharp-win32-arm64@0.35.5": [
       "README.md"
     ]
   },
@@ -408,6 +451,58 @@
       },
       "program/LibreOfficeDev.app/Contents/Resources/NOTICE": {
         "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
+        "role": "notice"
+      }
+    },
+    "@deepseek-ai/libreoffice-kit-win32-x64@0.1.3": {
+      "licenses/DeepSeek-Harness-MIT.txt": {
+        "sha256": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034",
+        "role": "notice"
+      },
+      "licenses/LibreOffice-MPL-2.0.txt": {
+        "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+        "role": "license"
+      },
+      "licenses/LibreOffice-third-party.html": {
+        "sha256": "6ef5eb44a3b8127960c27cb9c038fe89c221e139431ef33057c70811d91026ea",
+        "role": "notice"
+      },
+      "program/license.txt": {
+        "sha256": "9a7e34fbf3903507665e3ec7ca8b3d0c11f73bf2d5a0d754a079ab9f505bafef",
+        "role": "license"
+      },
+      "program/NOTICE": {
+        "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
+        "role": "notice"
+      },
+      "sources/core-source.json": {
+        "sha256": "39340edab26fd8f702380a0b9fedcfcc6a181793b46dd6d7dee01fa80a2458f0",
+        "role": "notice"
+      }
+    },
+    "@deepseek-ai/libreoffice-kit-win32-arm64@0.1.3": {
+      "licenses/DeepSeek-Harness-MIT.txt": {
+        "sha256": "69393380a3ec85c465dd4b22497a5de04c3408435126d8f50930d46de3886034",
+        "role": "notice"
+      },
+      "licenses/LibreOffice-MPL-2.0.txt": {
+        "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+        "role": "license"
+      },
+      "licenses/LibreOffice-third-party.html": {
+        "sha256": "6ef5eb44a3b8127960c27cb9c038fe89c221e139431ef33057c70811d91026ea",
+        "role": "notice"
+      },
+      "program/license.txt": {
+        "sha256": "9a7e34fbf3903507665e3ec7ca8b3d0c11f73bf2d5a0d754a079ab9f505bafef",
+        "role": "license"
+      },
+      "program/NOTICE": {
+        "sha256": "8d34210ebbfaee4ba258ef7b30c3044170f356ab82c8259c81b53860bcdeef7b",
+        "role": "notice"
+      },
+      "sources/core-source.json": {
+        "sha256": "39340edab26fd8f702380a0b9fedcfcc6a181793b46dd6d7dee01fa80a2458f0",
         "role": "notice"
       }
     }
