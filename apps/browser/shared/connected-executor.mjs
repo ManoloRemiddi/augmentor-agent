@@ -21,7 +21,7 @@ export function connectedBrowser(owner,params,signal){
   child.stdin.end(JSON.stringify({owner,params,expiresAt:Date.now()+23000}))
  })
 }
-export function registerConnectedBrowserHost(send,{busy=()=>false}={}){
+export function registerConnectedBrowserHost(send,{busy=()=>false,requiresReload=()=>false}={}){
  const child=spawn(pythonExecutable(),['-I','-X','utf8','-B',helper,'serve'],{windowsHide:true,stdio:['pipe','pipe','inherit'],env:componentEnvironment()})
  child.stdout.setEncoding('utf8')
  let buffer='',closed=false;const pending=new Set()
@@ -36,6 +36,7 @@ export function registerConnectedBrowserHost(send,{busy=()=>false}={}){
     const message=JSON.parse(raw);if(message.type!=='request')continue
     const id='connected-browser-'+message.id
     if(busy()||Date.now()>message.expiresAt){answer(message.id,'Browser is not ready, the request expired, or maintenance is active; no request was sent.');continue}
+    if(requiresReload()&&!['tabs_list','navigate','snapshot','screenshot','click','type'].includes(message.params?.action)){answer(message.id,'Reload the updated Augmentor extension to use this tool. The existing Browser chat and ordinary DOM tools remain available; no action was sent.');continue}
     pending.add(id);send({id,method:'browser/execute',params:{...message.params,owner:message.owner,expiresAt:message.expiresAt}})
    }catch{close();return}
   }

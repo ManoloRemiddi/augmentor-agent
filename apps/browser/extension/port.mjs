@@ -18,6 +18,7 @@
  * by id. The wire vocabulary is the shared one (see wire.mjs header).
  */
 import {stopTrusted} from './trusted-input.mjs'
+import {TOOL_REPAIR_BUILD} from './build.mjs'
 import {approvalPresenters} from './approval-presenters.mjs'
 import {
   state,
@@ -174,7 +175,7 @@ export function ensurePort() {
   // it is still in the catalog, else the catalog's default — the DSH app's
   // first-configured model), and only then initialize the runtime with it.
   ;(async () => {
-    const hello=await request('augmentor/handshake',{protocol:'augmentor/1',version:chrome.runtime.getManifest().version,extensionBuild:'tool-repair-20261027-1'})
+    const hello=await request('augmentor/handshake',{protocol:'augmentor/1',version:chrome.runtime.getManifest().version,extensionBuild:TOOL_REPAIR_BUILD})
     if(hello.protocol!=='augmentor/1'||hello.version!==chrome.runtime.getManifest().version)throw Error('Update the Augmentor extension and companion together, then reconnect.')
     const savedHarness=await new Promise(resolve=>chrome.storage.local.get(['augmentor-harness','augmentor-session-id','augmentor-model-selection'],resolve))
     state.harness=storedHarness(savedHarness)

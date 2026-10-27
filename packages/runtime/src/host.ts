@@ -752,7 +752,7 @@ export class Host {
     if(r){try{source==='user'?r.goals.stop():r.goals.disarm();}catch{r.goals.disarm();this.append(m,'runtime/warning',{message:'Goal state could not be paused. Continuation is disarmed; inspect the preserved native original.'});}}
     if(m.running&&r){if(r.preparingInput)r.interruptedInput=true;r.cancelled=true;r.execution?.cancel();for(const requestId of r.steering?.withdraw()??[])queue.withdrawSteer(requestId);r.session.abortCompaction();aborting=r.session.abort();}
     if(source==='user'||m.running)r?.observation?.record('control/stop',{wasRunning:m.running,source});this.desktopSpecialist.cancel('pi:'+m.id);this.interactions.cancel(m.id);
-    if(r)await r.memory.activity('stop');if(m.surface!=='browser')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(aborting)await aborting;await cancellingJobs;await stoppingVoice;return {accepted:!!aborting||cancellingCompaction||cancellingMcp||jobsWereRunning,paused:true};
+    if(r)await r.memory.activity('stop');if(process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0')await desktopControl('stop','pi:'+m.id).catch(()=>{});if(aborting)await aborting;await cancellingJobs;await stoppingVoice;return {accepted:!!aborting||cancellingCompaction||cancellingMcp||jobsWereRunning,paused:true};
   }
   private async steer(m:Meta,id:string,expectedTurnId:unknown){
     const r=this.loaded.get(m.id),turnId=promptIdentity(expectedTurnId),queue=this.queue(m);
@@ -934,7 +934,7 @@ export class Host {
       r.skillInputs.clear();r.phase='settling';
       try{r.goals.settle();}catch{r.goals.disarm();r.failed=true;this.append(m,'runtime/warning',{message:'Goal admission or pending pause could not be confirmed at settlement. Inspect its preserved original before resuming.'});}
       await r.memory.activity('stop');
-      r.execution?.end(r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed');this.interactions.settleOwner(m.id);if(m.surface!=='browser'&&!this.jobs.busyKind('desktop',m.id))await desktopControl('stop','pi:'+m.id).catch(()=>{});const reason=r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed';
+      r.execution?.end(r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed');this.interactions.settleOwner(m.id);if(process.env.AUGMENTOR_PI_LINUX_TOOLS!=='0'&&!this.jobs.busyKind('desktop',m.id))await desktopControl('stop','pi:'+m.id).catch(()=>{});const reason=r.cancelled?'aborted':failed||r.failed||r.execution?.incomplete?'error':'completed';
       // A terminal receipt is persisted before admitting another input. A crash
       // before this boundary produces an unknown receipt, never an automatic retry.
       const unknownInput=r.interruptedInput||attempted&&!r.initialDelivered&&!handled&&(r.cancelled||failed);r.preparingInput=false;

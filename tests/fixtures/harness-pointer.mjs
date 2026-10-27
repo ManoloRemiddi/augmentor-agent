@@ -5,6 +5,7 @@ export async function harnessPointerClick(panel,expression,until){
  // The owner-restored bottom composer has an explicit Send control; the old
  // supplier button remains hidden. Exercise the visible control with real input.
  expression=expression.replaceAll('Send message','Send to AH');
+ expression=expression.replaceAll('Stop generating','Stop current turn');
  let point,diagnostic;
  try{await until(async()=>{
   const result=await panel.evaluate(`(async()=>{

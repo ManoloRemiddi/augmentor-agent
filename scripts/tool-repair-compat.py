@@ -6,13 +6,12 @@ The caller verifies/clones its complete base, then this script accepts only the
 two inspected native-host baselines. Preserve runtime/dependency contracts,
 product versions, extension key/storage and unrelated client customizations.
 Seal, test and activate the resulting independent candidate with its OS installer.
+If publishing is interrupted, discard the candidate and re-clone its base.
 """
 import argparse
 import hashlib
 import json
-import os
 from pathlib import Path
-import shutil
 
 BASE_HOSTS={
  'linux':'3435592298dd4ec47820495bb54e43301a0487af17801836aed066531de37236',
@@ -43,12 +42,14 @@ def replace_once(text,old,new):
  return text.replace(old,new,1)
 
 def host_patch(text):
- text=replace_once(text,"import {surfaceRequest} from './shared/surface.mjs'","import {surfaceRequest} from './shared/surface.mjs'\nimport {registerConnectedBrowserHost} from './shared/connected-executor.mjs'")
+ text=replace_once(text,"import {surfaceRequest} from './shared/surface.mjs'","import {surfaceRequest} from './shared/surface.mjs'\nimport {registerConnectedBrowserHost} from './shared/connected-executor.mjs'\nimport {TOOL_REPAIR_BUILD} from './extension/build.mjs'")
+ text=replace_once(text,'compatible=false',"compatible=false,extensionBuild=''")
+ text=replace_once(text,"if(first.method==='augmentor/handshake'){","if(first.method==='augmentor/handshake'){extensionBuild=first.params?.extensionBuild??'';")
  busy='!compatible||closing||maintenance.paused' if 'function readFrames(' in text else '!compatible||closing' if 'closing=false' in text else '!compatible'
  reply_lines=[line for line in text.splitlines() if 'const reply=' in line]
  if len(reply_lines)!=1 or not reply_lines[0].rstrip().endswith(('}', '};')):raise ValueError('Use the inspected single-line native reply function.')
- text=replace_once(text,'const reply=value=>{',"const reply=value=>{if(value?.result?.protocol==='augmentor/1')value={...value,result:{...value.result,companionBuild:'tool-repair-20261027-1'}};")
- at=text.index('\n',text.index('const reply='));text=text[:at]+"\nconst connectedExecutor=registerConnectedBrowserHost(reply,{busy:()=>"+busy+"})"+text[at:]
+ text=replace_once(text,'const reply=value=>{',"const reply=value=>{if(value?.result?.protocol==='augmentor/1')value={...value,result:{...value.result,companionBuild:TOOL_REPAIR_BUILD}};")
+ at=text.index('\n',text.index('const reply='));text=text[:at]+"\nconst connectedExecutor=registerConnectedBrowserHost(reply,{busy:()=>"+busy+",requiresReload:()=>extensionBuild!==TOOL_REPAIR_BUILD})"+text[at:]
  if 'function readFrames(' in text:
   text=replace_once(text,'    if(closing)return','    if(closing)return\n    if(connectedExecutor.receive(first))return')
   text=replace_once(text,'if(!closing){closing=true;','if(!closing){closing=true;connectedExecutor.close();')
@@ -86,6 +87,9 @@ def legacy_host_patch(text):
  text=replace_once(text,'browserRecovery,','browserRecovery, SHELL_DEADLINE_GUIDANCE,')
  text=replace_once(text,"'browser_tabs_list', 'browser_screenshot', 'browser_snapshot'].includes(e.toolName)","'browser_tabs_list', 'browser_screenshot', 'browser_snapshot', 'browser_capabilities', 'browser_document_read', 'browser_stop'].includes(e.toolName)")
  text=replace_once(text,"...(m.surface === 'browser' ? [] : ['read', 'write', 'edit', 'bash', 'ls', 'find', 'grep'])", "...['read', 'write', 'edit', 'bash', 'ls', 'find', 'grep']")
+ import re
+ text,count=re.subn(r"if \(m\.surface !== 'browser'\)(?=\s*await desktopControl\()","if (process.env.AUGMENTOR_PI_LINUX_TOOLS !== '0')",text)
+ if count!=2:raise ValueError('The legacy desktop Stop boundaries differ: '+str(count))
  if "m.surface === 'browser' && ![" in text or "m.surface === 'browser' ? []" in text or 'piShellDeadlines(), this.policy(m)' not in text:raise ValueError('The compatible tool patch did not satisfy its postconditions.')
  return text
 
@@ -108,7 +112,7 @@ def apply(candidate,source,platform,source_ref):
  def copy(relative):publish(relative,(source/relative).read_bytes())
  publish('apps/browser/native-host.mjs',host_patch(host.read_text(encoding='utf-8')).encode())
  for relative in ['apps/browser/shared/connected-executor.mjs','apps/browser/shared/control-tools.mjs',
-  'apps/browser/extension/actions.mjs','apps/browser/extension/worktab.mjs','apps/browser/extension/trusted-input.mjs','apps/browser/extension/document-readback.mjs',
+  'apps/browser/extension/actions.mjs','apps/browser/extension/worktab.mjs','apps/browser/extension/trusted-input.mjs','apps/browser/extension/document-readback.mjs','apps/browser/extension/build.mjs',
   'services/browser/executor.py','services/desktop/service.py','services/desktop/client.py',
   'services/desktop/portal.py','services/desktop/screen_mapping.py','services/desktop/windows.py',
   'services/platform_adapters/locks.py','services/platform_adapters/private_files.py','services/platform_adapters/transport.py','services/platform_adapters/paths.py',
@@ -130,7 +134,8 @@ def apply(candidate,source,platform,source_ref):
   text+="\nchrome.action.onClicked.addListener(tab=>{if(tab.id!==undefined)void chrome.sidePanel.open({tabId:tab.id}).catch(()=>{})})\n"
   publish('apps/browser/extension/sw.js',text.encode())
  port=candidate/'apps/browser/extension/port.mjs';text=port.read_text(encoding='utf-8')
- text=replace_once(text,"{protocol:'augmentor/1',version:chrome.runtime.getManifest().version}","{protocol:'augmentor/1',version:chrome.runtime.getManifest().version,extensionBuild:'tool-repair-20261027-1'}")
+ text="import {TOOL_REPAIR_BUILD} from './build.mjs'\n"+text
+ text=replace_once(text,"{protocol:'augmentor/1',version:chrome.runtime.getManifest().version}","{protocol:'augmentor/1',version:chrome.runtime.getManifest().version,extensionBuild:TOOL_REPAIR_BUILD}")
  if "import {stopTrusted}" not in text:
   text="import {stopTrusted} from './trusted-input.mjs'\n"+text
   text=replace_once(text,'port.onDisconnect.addListener(() => {','port.onDisconnect.addListener(() => {\n    if(state.port!==port)return\n    void stopTrusted().catch(()=>{})')

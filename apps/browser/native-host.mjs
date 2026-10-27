@@ -5,6 +5,7 @@
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {surfaceRequest} from './shared/surface.mjs'
 import {registerConnectedBrowserHost} from './shared/connected-executor.mjs'
+import {TOOL_REPAIR_BUILD} from './extension/build.mjs'
 import {PRODUCT_PROTOCOL,HARNESS_CAPABILITIES} from '../../dist/contracts/src/index.js'
 import {RELEASE} from '../../dist/contracts/src/release.js'
 import {promptLibrary} from './shared/prompts.mjs'
@@ -19,11 +20,11 @@ import {describeWorkspace} from '../../services/workspaces/capabilities.mjs'
 import {guardWorkspaceMethod,voiceEnabled,SDK_PROTOCOL} from '../../services/workspaces/policy.mjs'
 import {fileURLToPath} from 'node:url'
 import {NativeBrowserMaintenance,connectBrowserOwner} from './shared/native-maintenance.mjs'
-let child,childClosed=false,closing=false,compatible=false
+let child,childClosed=false,closing=false,compatible=false,extensionBuild=''
 const pending=new Set()
 const childRequests=new Set(),childActions=new Set()
-const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;if(value?.result?.protocol===PRODUCT_PROTOCOL)value={...value,result:{...value.result,companionBuild:'tool-repair-20261027-1'}};const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
-const connectedExecutor=registerConnectedBrowserHost(reply,{busy:()=>!compatible||closing||maintenance.paused})
+const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;if(value?.result?.protocol===PRODUCT_PROTOCOL)value={...value,result:{...value.result,companionBuild:TOOL_REPAIR_BUILD}};const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
+const connectedExecutor=registerConnectedBrowserHost(reply,{busy:()=>!compatible||closing||maintenance.paused,requiresReload:()=>extensionBuild!==TOOL_REPAIR_BUILD})
 const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size+connectedExecutor.active,onCommit:()=>close(0)})
 const owner=process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT?connectBrowserOwner({
   endpoint:process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT,nonce:process.env.AUGMENTOR_BROWSER_OWNER_NONCE,
@@ -75,6 +76,7 @@ readFrames(process.stdin,first=>{
       reply({id:first.id,result:describeWorkspace(loadProfile())});return
     }
     if(first.method==='augmentor/handshake'){
+      extensionBuild=first.params?.extensionBuild??''
       compatible=first.params?.protocol===PRODUCT_PROTOCOL&&first.params?.version===RELEASE.version
       reply(compatible?{id:first.id,result:{protocol:PRODUCT_PROTOCOL,version:RELEASE.version}}:{id:first.id,error:{message:'Extension and companion versions differ. Update both Augmentor components, reload the extension, then reconnect.'}});return
     }

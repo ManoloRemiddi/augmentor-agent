@@ -101,7 +101,7 @@ class Handler(socketserver.StreamRequestHandler):
                 if not completed.wait(110):backend.cancel.set();raise RuntimeError('Desktop request timed out. Inspect the application before continuing.')
                 if 'error' in response:raise RuntimeError(response['error'])
                 result=response['result']
-            if method in ('status','connect'):result={**result,'build':BUILD}
+            if method=='status':result={**result,'build':BUILD}
             response={'ok':True,'result':result}
         except Exception as exc:response={'ok':False,'error':str(exc)[:600]}
         try:self.wfile.write((json.dumps(response)+'\n').encode())

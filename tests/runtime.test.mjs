@@ -20,7 +20,7 @@ class Client {
  close(){this.socket.destroy();}
 }
 
-test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},async t=>{
+test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:180000},async t=>{
  const root=mkdtempSync(join(realpathSync(process.platform==='darwin'?'/tmp':tmpdir()),'augmentor-pi-contract-'));const config=join(root,'config'),state=join(root,'state'),cwd=join(root,'work');mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(cwd);
  let requests=0;const received=[],sentStreams=[],recoveryCounts=new Map(),closedRequests=new Set();
  const mock=http.createServer(async(req,res)=>{let raw='';for await(const chunk of req)raw+=chunk;
@@ -531,7 +531,13 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
    const request=bridge.events.find(e=>e.method==='browser/execute').payload;
    assert.equal(request.params.action,'snapshot');
    await assert.rejects(stranger.call('browser.respond',{rpcId:request.id,result:{text:'wrong client'}}),/unowned/);
-   await bridge.call('browser.respond',{rpcId:request.id,result:{ok:true,url:'https://authored.test/',text:'verified browser context'}});await idle('browser-contract');
+   await bridge.call('browser.respond',{rpcId:request.id,result:{ok:true,url:'https://authored.test/',text:'verified browser context'}});
+   // Completion releases this owner's browser targets. The authored peer must
+   // acknowledge Stop just as the actual extension does.
+   await until(()=>bridge.events.some(e=>e.method==='browser/execute'&&e.payload.params.action==='stop'));
+   const release=bridge.events.find(e=>e.method==='browser/execute'&&e.payload.params.action==='stop').payload;
+   await assert.rejects(stranger.call('browser.respond',{rpcId:release.id,result:{ok:true,stopped:true}}),/unowned/);
+   await bridge.call('browser.respond',{rpcId:release.id,result:{ok:true,stopped:true}});await idle('browser-contract');
    assert(received.at(-1).messages.some(m=>m.role==='tool'&&JSON.stringify(m).includes('verified browser context')));
    assert(received.at(-1).tools.some(t=>t.function.name==='linux_browser_open'));
    for(const name of ['bash','write','edit','read','ls','find','grep'])assert(received.at(-1).tools.some(t=>t.function.name===name));

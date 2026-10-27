@@ -45,7 +45,7 @@ def records():
             if row.get('endpoint')!=str(file.with_suffix('.sock')):continue
             probe=LocalSocket();probe.settimeout(.3)
             try:probe.connect(row['endpoint'])
-            except (FileNotFoundError,ConnectionRefusedError):
+            except FileNotFoundError:
                 file.unlink(missing_ok=True);continue
             except (OSError,ValueError):continue
             finally:probe.close()
@@ -88,10 +88,11 @@ def request(value):
             row=descriptions[0];return {**row['capabilities'],'executorId':row['executorId'],'tabs':row['tabs']}
         if descriptions:return {'ok':True,'executors':descriptions}
     if params.get('action')=='stop':
+        errors=[]
         for row in rows:
             try:call(row,{**value,'params':params})
-            except (OSError,RuntimeError,ValueError):pass
-        return {'ok':True,'stopped':True}
+            except (OSError,RuntimeError,ValueError) as error:errors.append({'executorId':row['id'],'error':str(error)})
+        return {'ok':True,'stopped':not errors,**({'errors':errors} if errors else {})}
     if len(rows)!=1:raise RuntimeError('Choose executorId from browser_tabs_list to identify the intended connected browser.' if rows else 'No connected browser executor. Open the installed Augmentor extension in the intended browser.')
     return call(rows[0],{**value,'params':params})
 
@@ -125,6 +126,8 @@ def serve():
             except (BrokenPipeError,ConnectionError,OSError):pass
     server=ThreadingLocalServer(str(endpoint),Handler);server.daemon_threads=True
     if sys.platform!='win32':endpoint.chmod(0o600)
+    # ThreadingLocalServer has already bound/listened before publishing this
+    # record. A missing endpoint is stale; a refused backlog is not proof of it.
     record.write_text(json.dumps({'id':identity,'endpoint':str(endpoint),'pid':os.getpid()}));record.chmod(0o600)
     threading.Thread(target=server.serve_forever,daemon=True).start();emit({'type':'ready','id':identity})
     try:
