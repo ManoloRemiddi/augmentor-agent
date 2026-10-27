@@ -35,7 +35,8 @@ export class ContextProvenance {
   readonly extension:ExtensionFactory=pi=>{
     pi.on('input',event=>{this.save(this.run,'input',{text:event.text,images:event.images,source:event.source,streamingBehavior:event.streamingBehavior});});
     pi.on('before_agent_start',event=>{
-      this.save(this.run,'preparation',{prompt:event.prompt,images:event.images,systemPrompt:event.systemPrompt,systemPromptOptions:event.systemPromptOptions});
+      // Pi 1.2 custom-message runs carry their starting message instead of a prompt.
+      this.save(this.run,'preparation',event.messageType==='custom'?{messageType:event.messageType,message:event.message,systemPrompt:event.systemPrompt,systemPromptOptions:event.systemPromptOptions}:{prompt:event.prompt,images:event.images,systemPrompt:event.systemPrompt,systemPromptOptions:event.systemPromptOptions});
       this.catalog();
     });
   };

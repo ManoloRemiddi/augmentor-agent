@@ -10,6 +10,9 @@ export function managedPiMemory(memory:DualMemoryClient,recall=true,observe?:(co
  const extension=(pi:ExtensionAPI)=>{
   append=value=>pi.appendEntry(PI_MEMORY_SNAPSHOT_TYPE,value);
   pi.on('before_agent_start',async (event,ctx)=>{
+    // Pi 1.2 also starts runs from extension custom messages. They have no
+    // user prompt to recall against, so they receive no managed memory brief.
+    if(event.messageType==='custom'){contribution=undefined;return;}
     let mode=readMode();if(!['text','voice'].includes(mode))throw Error('Unsupported memory interaction mode.');
     let context='',nativeSnapshot:MemoryContribution['nativeSnapshot'];
     if(recall){
