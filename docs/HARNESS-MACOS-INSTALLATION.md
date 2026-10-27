@@ -10,13 +10,13 @@ checks pass on each machine. The original installation evidence remains historic
 
 ## Installed artifact and scope
 
-The 16 GiB MacBook Air and 32 GiB Mac Mini select the existing macOS artifact
+The original 16 GiB MacBook Air and 32 GiB Mac Mini installations selected the macOS artifact
 built from `38fabc4d8643a12994151c9f60b1406baaaa0809`, product 0.2.13,
 Pi 1.1.0, Node 24.19.0 and Python 3.12.13. Its application inventory SHA-256 is
 `7e16b745b1e2ba8d88452431406db8dbff212a65f3c3b5d16370984463c9a299`.
 The macOS defaults/Search implementation is tracked in
 [PR #51](https://github.com/ManoloRemiddi/augmentor-agent/pull/51).
-This documentation does not merge that branch or qualify a new application build.
+The later [authenticated research installation](WEB-RESEARCH.md#installed-acceptance--20-october-2026) supersedes that selection. The original installation evidence below remains historical; it does not merge the implementation branches.
 
 The Air received one existing arm64 application artifact over authenticated SSH;
 all 6,122 inventory files verified before activation. It has an independent,
@@ -67,10 +67,11 @@ models are pinned. Their private LAN endpoints require the relevant home network
 or an independently working remote route; installation does not create a public
 gateway.
 
-Wiki Tools/Skills remain disabled on macOS: their descriptor-relative filesystem
-and operation-receipt adapter still requires Linux qualification. Do not remove
-that platform guard merely to display an enabled plugin. Voice expansion and
-broader desktop/browser-extension adapter acceptance are separate work.
+Historical at the earlier Search/defaults installation: Wiki Tools/Skills were
+disabled on macOS pending a descriptor-relative adapter. The subsequent Wiki
+compatibility update is preserved by the [installed research update](WEB-RESEARCH.md#installed-acceptance--20-october-2026). That update does not constitute a new
+live Wiki qualification. Voice expansion and broader desktop/browser-extension
+adapter acceptance remain separate work.
 
 The owner explicitly deferred OpenAI/Codex subscription setup on both machines.
 Both pending SDK sign-ins were cancelled and model settings reconciled; neither

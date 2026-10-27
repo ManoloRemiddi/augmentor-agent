@@ -1689,4 +1689,8 @@ files available only in a developer's working directory.
 
 - [Actual Pi memory and gateway settlement](PI-MEMORY-LIVE.md): isolated controlled engine/Host proof, joined confirmation and retained live failures.
 
+- [Harness installation defaults](HARNESS-INSTALLATION-DEFAULTS.md) — existing macOS Search support and initial feature defaults.
+
+- [Shared web research](WEB-RESEARCH.md) — authenticated Tavily discovery/extraction, DSH binding, safe failures and three-installation qualification.
+
 - [Personal Air Agent Desktop/Browser installation and repository synchronization](MACBOOK-AIR-AGENT-INSTALLATION.md) — actual AH reply/restoration, preserved runtime, and remaining Comet loading step.
