@@ -1,7 +1,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Native orb, searchable catalog, and appearance surfaces."""
 import math
-from .ui_scale import scaled, px
+from .ui_scale import scaled, px, factor
 from PySide6.QtCore import Qt, QTimer, QRectF, Signal, QSize, QPointF, QEvent
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QRadialGradient
 from PySide6.QtWidgets import (QWidget, QPushButton, QLabel, QVBoxLayout, QHBoxLayout,
@@ -123,7 +123,7 @@ class ModelPicker(QPushButton):
         for group, rows in sections:
             heading = QListWidgetItem(group.upper())
             heading.setFlags(Qt.ItemFlag.NoItemFlags)
-            font = heading.font(); font.setBold(True); font.setPointSize(9); scaled(heading).setFont(font)
+            font = heading.font(); font.setBold(True); font.setPointSizeF(9 * factor(self.rows)); heading.setFont(font)
             self.rows.addItem(heading)
             for model in rows:
                 selected = self.selection and all(model[k] == self.selection.get(k) for k in ('provider','model'))
