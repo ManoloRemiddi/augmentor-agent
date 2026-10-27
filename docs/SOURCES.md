@@ -1,5 +1,10 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[The macOS Wiki adapter](HARNESS-WIKI-MACOS.md#adapter-and-source-contract)
+adds authored Python descriptor-relative IO and Darwin process/boot identity.
+Existing MIT Wiki Tools 0.14.0 / Wiki Skills 0.2.1 source selections and notices,
+Pi 1.1.0 and dependency locks remain unchanged.
+
 [Retained request stages and thinking](HARNESS-NATIVE-SETTINGS.md#retained-progress-thinking-and-current-cold-cut-map--october-17)
 adds selected public d943ad2/d4ab5fd behavior and 41e0441 callback dispatch, adapted
 to current scoped drafts/workspaces and maintenance/cancellation controls.

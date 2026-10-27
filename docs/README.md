@@ -1,5 +1,19 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Wiki on macOS](HARNESS-WIKI-MACOS.md) is now installed and enabled on both
+owner Macs: six original tools, nine approved skills and independent home-level
+vaults. Live model scaffold/write/query/lint, actual Plugins UI and automatic
+process recovery pass on each. Runtime **fda0cc3b**, full artifact
+**698b9581…e3083b**, **47,129** inputs; existing histories/models/browser addresses
+and verified private backups are preserved. Linux/macOS focused checks pass;
+protected Documents access, physical reboot and AH Codex sign-in are not claimed.
+[Portable evidence](../release/harness-wiki-macos-20261020.json).
+
+[Harness installation defaults](HARNESS-INSTALLATION-DEFAULTS.md) specifies the
+standard components, preserves saved choices and qualifies macOS Web Search/Fetch
+separately from the now-qualified [macOS Wiki adapter](HARNESS-WIKI-MACOS.md). Private local-model setup and actual
+owner activation remain distinct from application defaults.
+
 [Responsive tablet Harness and isolated Ungrouped chats](TABLET-HARNESS.md): one UI, persistent voice controls, independent quick chats and Lenovo qualification.
 
 [October 21 telemetry audit](TELEMETRY-AUDIT-2026-10-21.md): running memory

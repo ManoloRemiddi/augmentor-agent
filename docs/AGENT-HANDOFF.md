@@ -1,5 +1,30 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[Wiki on macOS](HARNESS-WIKI-MACOS.md) is now installed and enabled on both
+owner Macs: six original tools, nine approved skills and independent home-level
+vaults. Live model scaffold/write/query/lint, actual Plugins UI and automatic
+process recovery pass on each. Runtime **fda0cc3b**, full artifact
+**698b9581…e3083b**, **47,129** inputs; existing histories/models/browser addresses
+and verified private backups are preserved. Linux/macOS focused checks pass;
+protected Documents access, physical reboot and AH Codex sign-in are not claimed.
+[Portable evidence](../release/harness-wiki-macos-20261020.json).
+
+[Harness installation defaults](HARNESS-INSTALLATION-DEFAULTS.md) adds fresh-profile
+Metafolder/keyless Search provisioning without overwriting saved choices, and
+binds the existing public Search/Fetch implementation to native-workspace macOS
+sessions. Linux/macOS full source check/build and 40 focused cases each pass;
+live Mac search/fetch and two existing local-model connections pass. Metafolder
+is enabled and Prompt library/Improve controls are present in the owner's Mac UI.
+Runtime **38fabc4d** is now selected and running on the 32 GiB Apple-silicon Mac,
+artifact **7e16b745…3c9a299**. Guarded idle/draft-free activation and a cold backup
+preserve both conversations, 25 project files, the browser address and current
+model; graphical login/recovery jobs remain loaded. Actual UI verifies enabled
+Search/Metafolder, both pinned local providers and the built-in writing controls.
+Expanded focused checks pass **53 Mac / 52 Linux**; the guide records existing
+adapter failures and the missing Linux QtTest proof. At that earlier snapshot Wiki remained Linux-only; the
+[macOS Wiki port](HARNESS-WIKI-MACOS.md) above supersedes that limitation. Credentials and owner transcripts stay private.
+[Installation receipt](../release/harness-macos-defaults-20261020.json).
+
 [Original bottom composer restored](TABLET-HARNESS.md#original-bottom-composer-restored--october-25-2026), as explicitly requested by the owner: `ab7f1665`, selected/running MX pilot sealed `d91c30a1…9db6e4`. One original input card, with Talk/Send/AI Improve underneath at the bottom; focus never floats the editor or controls to the top. Build 82/exact-package 49 checks pass. Physical Lenovo portrait/landscape and fresh-chat checks confirm original-card containment, one editor and zero control-row movement on focus; typed text survives rotation and remains unsent. All 135 prior chats are retained; the additional verification chat is archived after clearing only its test draft. Device preferences restored. Hold-to-dictate/explicit Send and model settings are unchanged. [Installed receipt](../release/tablet-bottom-composer-installed-20261025.json).
 
 [Earlier hold-to-dictate checks](TABLET-HARNESS.md#earlier-physical-voice-checks-and-superseded-layout--october-25-2026) covered `c456a14e` on `d62f9e40`, sealed `e5ffeb33…b46e01`. Physical recognition and editable insertion passed in both orientations, without automatic conversational turns. The owner subsequently rejected the floating focus layout; the correction above supersedes its placement. [Earlier receipt](../release/tablet-dictation-installed-20261025.json).
@@ -2725,7 +2750,7 @@ Tested implementation source: **`ef130ebaac97f20f53bf443f8994d91a0d390deb`**, qu
 
 Public request-ID tracking now includes metadata/resources. Actual SDK baselines reproduced a resource auth error discarding a tool receipt and a tool auth error discarding a resource receipt; the final factory preserves both. The tested GET baseline retained its tool receipt but lacked a saved requirement, so it is not evidence of a reproduced GET receipt loss. HTTP JSON-RPC POST/GET authorization boundaries at the configured MCP URL protect admitted requests before SDK close handling; non-RPC refresh responses, even at that URL, are excluded. New tools during drain are refused before dispatch without queue/replay, and unauthorized cancellation cannot wait on its own POST. Native stays sequential; SDK parallel mode is selected only in the synthetic driver. Pre-dispatch token-provider exceptions and arbitrary stream/drop failures remain distinct unresolved work.
 
-Final product broader checks: **726 source Node cases/724 passes/two existing optional skips**, zero failures; ordinary unselected Node **24.19.0** stage: **104 passes**, zero failures/skips. A subsequent **fixture-only credential-directory correction** passes **39 focused cases in source and 39 in that stage**; compiled product bytes do not change. All **299 compiled files** match the stage. All **19,088 production dependency files**, **709 license files**, locks/catalog/generated records and Node/esbuild/Photon/QuickJS hashes match the preceding ordinary stage; strict Debian native scanning passes with **126 npm instances** and four native components. Build/type/shader/design/version, authored whitespace and tracked/history public-source checks pass. No dependency, supplier notice, native executable or copied source is added. The direct SDK driver remains in source and selects staged managed factories/public MCP exports. Current Python evidence is actual offscreen Qt integration; earlier Python unit suites stay tied to their recorded revisions. All final test processes exit normally. No synthetic broker matched the owned interpreter/server paths after completion; the verified owned Qt interpreter alias was removed.
+Final product broader checks: **726 source Node cases/724 passes/two existing optional skips**, zero failures; ordinary unselected Node **24.19.0** stage: **104 passes**, zero failures/skips. A subsequent **fixture-only credential-directory correction** passes **40 focused cases in source and 39 in that stage**; compiled product bytes do not change. All **299 compiled files** match the stage. All **19,088 production dependency files**, **709 license files**, locks/catalog/generated records and Node/esbuild/Photon/QuickJS hashes match the preceding ordinary stage; strict Debian native scanning passes with **126 npm instances** and four native components. Build/type/shader/design/version, authored whitespace and tracked/history public-source checks pass. No dependency, supplier notice, native executable or copied source is added. The direct SDK driver remains in source and selects staged managed factories/public MCP exports. Current Python evidence is actual offscreen Qt integration; earlier Python unit suites stay tied to their recorded revisions. All final test processes exit normally. No synthetic broker matched the owned interpreter/server paths after completion; the verified owned Qt interpreter alias was removed.
 
 Fixture corrections are explicit: initial metadata calls used codemode exposure and reached an unavailable root resource tool; direct exposure qualifies the actual resource pipeline. Rejected script results now print their real error strings rather than serializing errors as empty objects. The Native notice assertion follows the actual history `event.data` wrapper. A narrow fault injection throws only from the public SDK authorization-custom-entry append method; it is not proof of a physical disk fault. The first inventory comparison preceded generation of `native-components.json`; the actual strict scanner generates it before final byte comparison. These corrections do not change product execution modes or relax deadlines.
 

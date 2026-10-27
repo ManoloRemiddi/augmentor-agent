@@ -5,7 +5,7 @@ import http from 'node:http';
 import net from 'node:net';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,readdirSync,appendFileSync,rmSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,existsSync,statSync,readdirSync,appendFileSync,rmSync,realpathSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join,resolve} from 'node:path';
 import {randomUUID} from 'node:crypto';
@@ -21,7 +21,7 @@ class Client {
 }
 
 test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},async t=>{
- const root=mkdtempSync(join(tmpdir(),'augmentor-pi-contract-'));const config=join(root,'config'),state=join(root,'state'),cwd=join(root,'work');mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(cwd);
+ const root=mkdtempSync(join(realpathSync(process.platform==='darwin'?'/tmp':tmpdir()),'augmentor-pi-contract-'));const config=join(root,'config'),state=join(root,'state'),cwd=join(root,'work');mkdirSync(join(config,'agent'),{recursive:true});mkdirSync(cwd);
  let requests=0;const received=[],sentStreams=[],recoveryCounts=new Map(),closedRequests=new Set();
  const mock=http.createServer(async(req,res)=>{let raw='';for await(const chunk of req)raw+=chunk;
   if(req.url!='/v1/chat/completions'){res.writeHead(404).end();return;}
