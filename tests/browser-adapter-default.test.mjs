@@ -1,8 +1,8 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 import test from 'node:test';import assert from 'node:assert/strict';
 import {storedHarness} from '../apps/browser/extension/state.mjs';
-test('existing DSH profiles retain their harness and fresh profiles use the shared DSH agent',()=>{
- assert.equal(storedHarness({}),'dsh');
+test('existing DSH profiles retain their harness and fresh profiles use Augmentor Harness',()=>{
+ assert.equal(storedHarness({}),'ah');
  assert.equal(storedHarness({'augmentor-session-id':'original-dsh-chat'}),'dsh');
  assert.equal(storedHarness({'augmentor-model-selection':{provider:'saved',model:'saved'}}),'dsh');
  assert.equal(storedHarness({'augmentor-harness':'pi','augmentor-session-id':'original-dsh-chat'}),'pi');

@@ -77,6 +77,15 @@ jobs:
           $env:AUGMENTOR_PWSH = "$PWD/outputs/payload/powershell/pwsh.exe"
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-dsh.py --out outputs/payload/dsh --node "$PWD/outputs/payload/node/node.exe"
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Verify browser executor and native desktop contracts
+        run: |
+          $env:AUGMENTOR_PYTHON = "$PWD/outputs/payload/python/python.exe"
+          node --test tests/connected-browser.test.mjs tests/document-readback.test.mjs tests/trusted-input.test.mjs tests/shell-deadlines.test.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & outputs/payload/python/python.exe -Xutf8 -B -m unittest tests.test_browser_executor tests.test_windows_pipe tests.test_platform_locks tests.test_windows_identity tests.test_screen_mapping
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+      - name: Stage the complete application
+        run: |
           & outputs/payload/python/python.exe -I -Xutf8 -B scripts/stage-windows-application.py --root outputs/payload --arch ${{ matrix.arch }} --public-preview
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Verify complete sealed files and native public launcher rendering

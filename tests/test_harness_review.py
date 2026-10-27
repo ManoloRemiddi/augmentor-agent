@@ -59,6 +59,14 @@ class HarnessReviewTests(unittest.TestCase):
         with patch.dict(os.environ,{'OPENAI_API_KEY':'DO-NOT-FORWARD','AUGMENTOR_PI_STATE':'foreign','PI_CODING_AGENT_DIR':'foreign','PYTHONPATH':'foreign','LD_PRELOAD':'foreign','ANTHROPIC_API_KEY':'DO-NOT-FORWARD'}):env=self.tool.runtime_environment(self.profile,self.selection)
         for key in ['OPENAI_API_KEY','ANTHROPIC_API_KEY','PI_CODING_AGENT_DIR','PYTHONPATH','LD_PRELOAD']:self.assertNotIn(key,env)
         self.assertEqual(env['AUGMENTOR_PI_STATE'],self.profile['state']);self.assertEqual(env['AUGMENTOR_PI_LINUX_TOOLS'],'0');self.assertEqual(env['PI_TELEMETRY'],'0')
+    def test_graphical_runtime_is_not_replaced_by_private_profile_ipc(self):
+        with patch.dict(os.environ,{'XDG_RUNTIME_DIR':'/run/user/1234','WAYLAND_DISPLAY':'wayland-0'}):
+            env=self.tool.runtime_environment(self.profile,self.selection)
+        self.assertEqual(env['XDG_RUNTIME_DIR'],'/run/user/1234')
+        self.assertEqual(env['WAYLAND_DISPLAY'],'wayland-0')
+        self.assertEqual(env['AUGMENTOR_PI_SOCKET'],self.profile['socket'])
+        self.assertEqual(env['AUGMENTOR_PI_STATE'],self.profile['state'])
+
     def test_missing_socket_with_live_profile_does_not_attempt_restart(self):
         with patch.object(self.tool,'Owner',side_effect=FileNotFoundError),patch.object(self.tool,'live_profile',return_value=[123]),patch.object(self.tool.subprocess,'run') as run:
             with self.assertRaisesRegex(ValueError,'live process'):self.tool.open_review(self.entry)

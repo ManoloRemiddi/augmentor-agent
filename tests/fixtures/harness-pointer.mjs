@@ -2,6 +2,9 @@
 // Repeat preparation within the caller's deadline; never retry a dispatched click.
 // Original rail/dock controls can remain hit-testable while their positions move.
 export async function harnessPointerClick(panel,expression,until){
+ // The owner-restored bottom composer has an explicit Send control; the old
+ // supplier button remains hidden. Exercise the visible control with real input.
+ expression=expression.replaceAll('Send message','Send to AH');
  let point,diagnostic;
  try{await until(async()=>{
   const result=await panel.evaluate(`(async()=>{

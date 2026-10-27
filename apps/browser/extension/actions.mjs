@@ -18,6 +18,7 @@
  */
 import { readSnapshot, captureWorkTab } from './observation.mjs'
 import { state, log } from './state.mjs'
+import {trustedCapabilities,observeTrusted,trustedAction,stopTrusted,readGoogleDocument} from './trusted-input.mjs'
 import { workTab, readableWorkTab, inject, injectFiles, waitForLoad, focusedWindowId, isDshTab } from './worktab.mjs'
 import { overlayShow, overlayTextFor, pulseRgba } from './overlay.mjs'
 
@@ -30,9 +31,39 @@ function summarize(obj) {
   }
 }
 
+const ownerTargets=new Map()
+function targetContext(owner){
+ const panelOwner=(['pi','ah'].includes(state.harness)?'pi':state.harness)+':'+state.sessionId
+ if(!owner||owner===panelOwner)return state
+ let context=ownerTargets.get(owner)
+ if(!context){context={workTabId:null};ownerTargets.set(owner,context)}
+ return context
+}
 export async function handleBrowserAction(id, params) {
-  const t0 = Date.now()
+  const t0 = Date.now(),context=targetContext(params?.owner)
   try {
+    if(params?.expiresAt!==undefined&&Date.now()>params.expiresAt)throw Error('Browser request expired before execution.')
+    const owner=params?.owner??'browser:'+state.sessionId
+    if(params?.action==='capabilities')return await trustedCapabilities()
+    if(params?.action==='open_tab'){if(typeof params.url!=='string'||!/^https?:\/\//i.test(params.url))throw Error('Use an HTTP(S) URL.');const tab=await chrome.tabs.create({url:params.url,active:true});return {ok:true,tabId:tab.id,url:tab.url??params.url,dispatched:true,verified:false}}
+    if(params?.action==='stop'){ownerTargets.delete(owner);return await stopTrusted(owner)}
+    if(['observe_trusted','press_key','insert_text','pointer','document_read'].includes(params?.action)){
+      if(!Number.isInteger(params.tabId))throw Error('Choose an exact observed tabId.')
+      const tab=await chrome.tabs.get(params.tabId)
+      if(!/^https?:\/\//i.test(tab.url??'')||isDshTab(tab))throw Error('Choose the intended web work tab, preserving the agent chat.')
+      if(params.action==='document_read')return await readGoogleDocument(tab,params.format??'txt',params)
+      if(params.action==='observe_trusted'){
+        return await observeTrusted(tab,owner,async()=>{
+          const snapshot=await readSnapshot(tab,inject)
+          const editors=await inject(tab.id,()=>{
+            const path=el=>{const parts=[];for(let node=el;node&&node.nodeType===1;node=node.parentElement){if(node.id){parts.unshift('#'+CSS.escape(node.id));break}let index=1;for(let prior=node.previousElementSibling;prior;prior=prior.previousElementSibling)if(prior.tagName===node.tagName)index++;parts.unshift(node.tagName.toLowerCase()+':nth-of-type('+index+')')}return parts.join(' > ')}
+            return [...document.querySelectorAll('canvas,[role="textbox"],[contenteditable="true"],.kix-page')].filter(el=>{const r=el.getBoundingClientRect();return r.width>0&&r.height>0&&r.bottom>0&&r.right>0&&r.top<innerHeight&&r.left<innerWidth}).slice(0,30).map(el=>({selector:path(el),tag:el.tagName.toLowerCase(),role:el.getAttribute('role'),label:el.getAttribute('aria-label')??'',canvas:el.tagName==='CANVAS'||el.classList.contains('kix-page')}))
+          })
+          return {...snapshot,editors}
+        })
+      }
+      return await trustedAction(tab,owner,params)
+    }
     let out
     // An explicit observation is a read of that tab, not a change to the target
     // of subsequent navigation/click/type. A mistaken read must not hijack work.
@@ -45,7 +76,7 @@ export async function handleBrowserAction(id, params) {
     }
     if (['click', 'type'].includes(params?.action) && params.target !== undefined) {
       const target = params.target
-      const current = await readableWorkTab()
+      const current = await readableWorkTab(context)
       if (!target || !Number.isInteger(target.tabId) || typeof target.url !== 'string' || !Number.isFinite(target.documentEpoch) || current.id !== target.tabId || current.url !== target.url) {
         throw new Error('The observed work tab changed. Read a fresh snapshot before acting.')
       }
@@ -62,7 +93,7 @@ export async function handleBrowserAction(id, params) {
             url: t.url ?? null,
             title: t.title ?? null,
             active: !!t.active,
-            workTab: t.id === state.workTabId,
+            workTab: t.id === context.workTabId,
             focusedWindow: wid != null && !!t.active && t.windowId === wid,
             // The tab hosting the user's DSH web session: the agent never
             // navigates it (navigate opens a dedicated tab instead).
@@ -70,7 +101,7 @@ export async function handleBrowserAction(id, params) {
           })),
         }
         try {
-          overlayShow((await workTab()).id, overlayTextFor('tabs_list', params))
+          overlayShow((await workTab(context)).id, overlayTextFor('tabs_list', params))
         } catch { /* no workable tab — nothing to mark */ }
         break
       }
@@ -79,10 +110,10 @@ export async function handleBrowserAction(id, params) {
         if (!/^https?:\/\//i.test(url)) throw new Error(`refusing non-http(s) url: ${url}`)
         let tab
         try {
-          tab = await workTab()
+          tab = await workTab(context)
         } catch {
           tab = await chrome.tabs.create({ url, active: true })
-          state.workTabId = tab.id
+          context.workTabId = tab.id
           // Claim the new tab as the overlay tab NOW: its first document
           // fires 'loading' while it loads, and the early re-show above
           // will raise the veil there as soon as it can.
@@ -101,19 +132,19 @@ export async function handleBrowserAction(id, params) {
         break
       }
       case 'snapshot': {
-        const tab = observationTab ?? await readableWorkTab()
+        const tab = observationTab ?? await readableWorkTab(context)
         overlayShow(tab.id, overlayTextFor('snapshot', params))
         const {offset, controlOffset, linkOffset, scope} = params
         out = await readSnapshot(tab, inject, {offset, controlOffset, linkOffset, scope})
         break
       }
       case 'screenshot': {
-        const tab = observationTab ?? await readableWorkTab()
+        const tab = observationTab ?? await readableWorkTab(context)
         out = await captureWorkTab(tab, chrome, inject)
         break
       }
       case 'click': {
-        const tab = await readableWorkTab()
+        const tab = await readableWorkTab(context)
         overlayShow(tab.id, overlayTextFor('click', params))
         // F2 (audit): name/pulse/ripple live in dom-actions.js (injected
         // first — files + func can't mix in one executeScript call).
@@ -142,7 +173,7 @@ export async function handleBrowserAction(id, params) {
         break
       }
       case 'type': {
-        const tab = await readableWorkTab()
+        const tab = await readableWorkTab(context)
         overlayShow(tab.id, overlayTextFor('type', params))
         // F2 (audit): same dom-actions.js helpers as click (see there).
         await injectFiles(tab.id, ['dom-actions.js'])
@@ -195,7 +226,7 @@ export async function handleBrowserAction(id, params) {
       if (/no element matches selector/i.test(msg)) msg = "couldn't find that element on the page"
       else if (/new tab page/i.test(msg)) msg = 'this tab is empty — ask me to open a page first'
       else if (/DSH session/i.test(msg)) msg = 'this tab is your DSH session — I open a new tab for browser work'
-      overlayShow(state.workTabId ?? state.overlayTabId, `⚠ ${msg.slice(0, 70)}`)
+      overlayShow(context.workTabId ?? state.overlayTabId, `⚠ ${msg.slice(0, 70)}`)
     } catch {}
     return { ok: false, error: String(e?.message ?? e), ms: Date.now() - t0 }
   }

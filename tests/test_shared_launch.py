@@ -23,7 +23,7 @@ def load(name,path):
 @unittest.skipUnless(sys.platform=='linux','MX/Linux selected launch adapter')
 class SharedLaunchTests(unittest.TestCase):
     def setUp(self):
-        temporary=tempfile.TemporaryDirectory(prefix='authored-shared-launch-');self.addCleanup(temporary.cleanup);self.home=Path(temporary.name)
+        temporary=tempfile.TemporaryDirectory(prefix='sl-');self.addCleanup(temporary.cleanup);self.home=Path(temporary.name)
         env={'HOME':str(self.home),'XDG_DATA_HOME':str(self.home/'xdg-data'),'XDG_STATE_HOME':str(self.home/'xdg-state'),'XDG_CONFIG_HOME':str(self.home/'xdg-config'),'XDG_RUNTIME_DIR':str(self.home/'run')}
         for name in ('xdg-data','xdg-state','xdg-config','run'):(self.home/name).mkdir(mode=0o700)
         environment=patch.dict(os.environ,env);environment.start();self.addCleanup(environment.stop)

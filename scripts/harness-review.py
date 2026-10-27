@@ -216,9 +216,12 @@ class Owner:
         return status
 
 def runtime_environment(profile,selected):
-    base=('HOME','USER','LOGNAME','SHELL','PATH','LANG','LANGUAGE','TZ','TMPDIR','DISPLAY','WAYLAND_DISPLAY','XAUTHORITY','DBUS_SESSION_BUS_ADDRESS','XDG_SESSION_TYPE','XDG_CURRENT_DESKTOP','DESKTOP_SESSION','SSL_CERT_FILE','SSL_CERT_DIR','HTTP_PROXY','HTTPS_PROXY','NO_PROXY','http_proxy','https_proxy','no_proxy')
+    base=('HOME','USER','LOGNAME','SHELL','PATH','LANG','LANGUAGE','TZ','TMPDIR','DISPLAY','WAYLAND_DISPLAY','XAUTHORITY','XDG_RUNTIME_DIR','DBUS_SESSION_BUS_ADDRESS','XDG_SESSION_TYPE','XDG_CURRENT_DESKTOP','DESKTOP_SESSION','SSL_CERT_FILE','SSL_CERT_DIR','HTTP_PROXY','HTTPS_PROXY','NO_PROXY','http_proxy','https_proxy','no_proxy')
     env={k:v for k,v in os.environ.items() if k in base or k.startswith('LC_')}
-    env.update({'XDG_CONFIG_HOME':profile['xdgConfigHome'],'XDG_DATA_HOME':profile['xdgDataHome'],'XDG_STATE_HOME':profile['xdgStateHome'],'XDG_RUNTIME_DIR':profile['runtimeDir'],'AUGMENTOR_PI_CONFIG':profile['config'],'AUGMENTOR_PI_STATE':profile['state'],'AUGMENTOR_PI_SOCKET':profile['socket'],'AUGMENTOR_SHARED_STATE':profile['sharedState'],'AUGMENTOR_SHARED_DATA':profile['sharedData'],'AUGMENTOR_PI_WORKSPACE':profile['workspace'],'AUGMENTOR_PI_LLAMA_CPP_PROVIDERS':profile['llamaCppProviders'],'AUGMENTOR_PI_LINUX_TOOLS':'1' if profile['linuxTools'] else '0','AUGMENTOR_PI_NODE':selected['node'],'AUGMENTOR_PYTHON':selected['python'],'AUGMENTOR_HARNESS':'1','AUGMENTOR_HARNESS_PORT':str(profile['port']),'AUGMENTOR_DESKTOP_NO_AUTOSTART':'1','PI_TELEMETRY':'0','PI_SKIP_VERSION_CHECK':'1','PYTHONDONTWRITEBYTECODE':'1'})
+    env.update({'XDG_CONFIG_HOME':profile['xdgConfigHome'],'XDG_DATA_HOME':profile['xdgDataHome'],'XDG_STATE_HOME':profile['xdgStateHome'],'AUGMENTOR_PI_CONFIG':profile['config'],'AUGMENTOR_PI_STATE':profile['state'],'AUGMENTOR_PI_SOCKET':profile['socket'],'AUGMENTOR_SHARED_STATE':profile['sharedState'],'AUGMENTOR_SHARED_DATA':profile['sharedData'],'AUGMENTOR_PI_WORKSPACE':profile['workspace'],'AUGMENTOR_PI_LLAMA_CPP_PROVIDERS':profile['llamaCppProviders'],'AUGMENTOR_PI_LINUX_TOOLS':'1' if profile['linuxTools'] else '0','AUGMENTOR_PI_NODE':selected['node'],'AUGMENTOR_PYTHON':selected['python'],'AUGMENTOR_HARNESS':'1','AUGMENTOR_HARNESS_PORT':str(profile['port']),'PI_TELEMETRY':'0','PI_SKIP_VERSION_CHECK':'1','PYTHONDONTWRITEBYTECODE':'1'})
+    # Explicit profile IPC paths retain isolation; the graphical runtime owns
+    # Wayland, PipeWire and the native Desktop singleton.
+    if sys.platform=='linux':env.setdefault('XDG_RUNTIME_DIR', f'/run/user/{os.getuid()}')
     return env
 
 def private_link(value,profile):

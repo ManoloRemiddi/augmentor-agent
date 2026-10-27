@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[October 27 tool repair](TOOL-RELIABILITY.md) records shared personal control, trusted browser input, shell deadlines, platform adapters, actual reviews and qualification/deployment boundaries.
+
 [Wiki on macOS](HARNESS-WIKI-MACOS.md) is now installed and enabled on both
 owner Macs: six original tools, nine approved skills and independent home-level
 vaults. Live model scaffold/write/query/lint, actual Plugins UI and automatic

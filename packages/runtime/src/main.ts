@@ -5,6 +5,8 @@ import {join} from 'node:path';
 import {Host} from './host.js';
 import {HarnessServer} from './harness-server.js';
 import {savedHarnessAccess} from './harness-access.js';
+import {connectedBrowser} from '../../../apps/browser/shared/connected-executor.mjs';
+import {runDesktop} from '../../pi-linux/src/index.js';
 import {atomicJson,readJson,paths,statePath} from './storage.js';
 import {MAX_FRAME,PROTOCOL,request,type Data} from '../../protocol/src/index.js';
 import {localServer} from '../../platform/src/server.js';
@@ -83,6 +85,13 @@ await new Promise<void>((resolve,reject)=>{server.once('error',reject);server.li
 // launches therefore cannot both recover/prune the same profile.
 try{
   host=new Host((sid,frame)=>{harness?.publish(sid,frame);for(const [socket,session] of clients)if(session===sid)write(socket,{event:frame});},connected);
+  host.artifactOpener=async(sid,path,executorId,signal)=>{
+    await openHarness();const grant=await harness!.publishArtifact(sid,path,signal??new AbortController().signal);signal?.throwIfAborted();
+    let dispatch;
+    try{dispatch=await connectedBrowser('pi:'+sid,{action:'open_tab',url:grant.url,...(executorId?{executorId}:{})},signal);}
+    catch(error){if(!(error instanceof Error)||!/No connected browser executor/.test(error.message))throw error;dispatch=await runDesktop(host.backend,{action:'browser_open',url:grant.url},signal);if((dispatch as any)?.ok===false)throw Error((dispatch as any).error);}
+    return {...grant,dispatched:true,verified:false,dispatch,verification:'A new visible tab was requested. Inspect the loaded artifact before claiming success.'};
+  };
   await host.init();readyOwner!();
 }catch(error){failedOwner!(error);for(const socket of clients.keys())socket.destroy();server.close();unlinkOwnedSocket();throw error;}
 if(process.env.AUGMENTOR_HARNESS==='1')await openHarness();

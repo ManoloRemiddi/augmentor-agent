@@ -61,9 +61,9 @@ test('closing an automatically continued goal review disarms continuation while 
  await until(()=>{frame=f.frames.find(x=>x.method==='question/requested');return !!frame;},'goal plan review');assert.equal(f.requests.length,1);await f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{cancelled:true}});await f.settled(sid);
  const goal=await f.call('session.goal',{sessionId:sid});assert.equal(goal.activation,'disarmed');assert.equal(goal.goal.phase,'active');assert.equal(goal.goal.roundsStarted,1);assert.equal((await mode(f,sid)).active,true);assert.equal((await f.call('session.queue',{sessionId:sid})).items.length,0);assert.equal(f.requests.length,1);assert.equal(f.errors(),'');
 });
-test('Browser surface plan review uses the same SDK owner without native-tool grants',{timeout:60000},async t=>{
+test('Browser surface plan review uses the same SDK owner with shared tools under the existing execution policy',{timeout:60000},async t=>{
  const f=await planFixture(t,{planMode:true,policy:'read-only'}),sid='mode-browser';await f.call('session.create',{sessionId:sid,surface:'browser',cwd:f.workspace,selection:f.selection});await choose(f,sid,true);
- const frame=await review(f,sid);assert.equal(frame.payload.ownerId,sid);assert(policy(f.requests[0]));assert(!catalog(f.requests[0]).includes('write'));assert(!catalog(f.requests[0]).includes('linux_desktop_connect'));
+ const frame=await review(f,sid);assert.equal(frame.payload.ownerId,sid);assert(policy(f.requests[0]));assert(catalog(f.requests[0]).includes('write'));assert(!catalog(f.requests[0]).includes('linux_desktop_connect'));
  await f.call('interaction.respond',{sessionId:sid,rpcId:frame.rpcId,value:{answer:{answers:[{id:'plan-review',selected:['Approve']}]}}});await f.settled(sid);assert.equal(f.requests.length,2);assert.equal(policy(f.requests[1]),false);assert.deepEqual(catalog(f.requests[0]),catalog(f.requests[1]));assert.equal((await mode(f,sid)).active,false);assert.equal(f.errors(),'');
 });
 test('queued plan input changes mode only when its identified SDK request is admitted',{timeout:60000},async t=>{

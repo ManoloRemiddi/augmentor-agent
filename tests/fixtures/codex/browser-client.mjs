@@ -19,10 +19,10 @@ child.stdout.on('data', chunk => {
     else if (frame.method === 'browser/execute') {
       browserActions++;
       if (browserActions === 1) {
-        assert.deepEqual(frame.params, {action: 'snapshot', tabId: 7});
+        assert.deepEqual(frame.params, {action: 'snapshot', owner: 'codex:browser-tools-fixture', tabId: 7});
         write({id: frame.id, result: {ok: true, tabId: 7, documentEpoch: 1234, controls: [{selector: '#fixture'}], observation: 'readable', url: 'https://example.com/fixture', text: 'Synthetic browser observation fixture'}});
       } else {
-        assert.deepEqual(frame.params, {action: 'click', selector: '#fixture', target: {tabId: 7, url: 'https://example.com/fixture', documentEpoch: 1234}});
+        assert.deepEqual(frame.params, {action: 'click', owner: 'codex:browser-tools-fixture', selector: '#fixture', target: {tabId: 7, url: 'https://example.com/fixture', documentEpoch: 1234}});
         write({id: frame.id, result: {ok: true, fixtureClick: true}});
       }
     }

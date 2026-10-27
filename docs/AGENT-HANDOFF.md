@@ -1,5 +1,7 @@
 <!-- Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0 -->
 
+[October 27 tool repair](TOOL-RELIABILITY.md) records shared personal control, trusted browser input, shell deadlines, platform adapters, actual reviews and qualification/deployment boundaries.
+
 [Shared Tavily research](WEB-RESEARCH.md#installed-acceptance--20-october-2026) is installed on MX AH, original MX DSH, Mac mini AH and MacBook Air AH. AH source **44ae92b3**, DSH fetch-body adapter **1ea13f31**; full builds and 70 focused cases pass on Linux/Mac, eight adapter cases pass before/after sealing. Actual installed models search, fetch and cite both primary projects; failed links are explicit and recovery is recorded. Private keys/configuration, histories, models, Metafolders, cold backups and login startup are preserved. Existing Mac Wiki compatibility is carried forward. No new dependencies, paid plan, supplier source, physical reboot or new Wiki live qualification.
 
 [Personal Mac Harness installations](HARNESS-MACOS-INSTALLATION.md) retain the

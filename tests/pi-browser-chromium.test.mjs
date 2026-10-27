@@ -96,7 +96,7 @@ test('loaded Pi Browser executes tools and identified steering, restores paused 
  await settingsUntil('document.querySelector("#pi-reasoning-settings")&&!document.querySelector("#pi-reasoning-settings").disabled');
  await settingsIdle();await clickSetting('document.querySelector("#pi-reasoning-settings")');await settingsUntil('document.querySelector(".reasoning-dialog [role=status]")?.textContent.includes("Changes apply")');
  assert.equal(inputs.length,0);assert.equal((await message({type:'connect'})).capabilities.reasoning,true);await settingButton('Done');
- await page.call('Page.bringToFront');assert.match(await panel.evaluate('chrome.tabs.captureVisibleTab(undefined,{format:"jpeg"}).then(()=>"captured",error=>error.message)'),/activeTab|all_urls|permission/i);
+ await page.call('Page.bringToFront');assert.equal(await panel.evaluate('chrome.tabs.captureVisibleTab(undefined,{format:"jpeg"}).then(()=>"captured",error=>error.message)'), 'captured');
  const browserInfo=await fetch('http://127.0.0.1:'+port+'/json/version').then(response=>response.json()),browser=await cdp(browserInfo.webSocketDebuggerUrl);sockets.push(browser);
  const tabInfo=(await browser.call('Target.getTargets',{filter:[{type:'tab',exclude:false}]})).targetInfos.find(target=>target.url===base+'/page');assert(tabInfo);await browser.call('Extensions.triggerAction',{id:extensionId,targetId:tabInfo.targetId});
  assert.equal((await message({type:'prompt',text:'Inspect the fixture page, type once, click once and capture it.'})).accepted,true);

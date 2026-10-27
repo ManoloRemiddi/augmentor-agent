@@ -48,5 +48,5 @@ class HomeDialogTests(unittest.TestCase):
         with patch('augmentor_linux.home_settings.PromptClient.call',request):
             dialog=HomeDialog(window);dialog.url.setText('https://home.example.com');dialog.code.setText('fixture');dialog.pair()
             self.assertEqual(calls[-1][0],'home.connection.pair');self.assertEqual(dialog.code.text(),'')
-            self.assertFalse(dialog.connect.isEnabled());self.assertTrue(dialog.disconnect.isEnabled())
+            self.assertFalse(dialog.connect_button.isEnabled());self.assertTrue(dialog.disconnect_button.isEnabled())
             dialog.close();window.close()

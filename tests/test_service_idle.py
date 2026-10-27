@@ -126,7 +126,7 @@ runpy.run_path(sys.argv[2],run_name='__main__')
         import importlib.util
         spec=importlib.util.spec_from_file_location('live_watchdog',ROOT/'scripts/retire-test-companions.py')
         watchdog=importlib.util.module_from_spec(spec);spec.loader.exec_module(watchdog)
-        with tempfile.TemporaryDirectory(prefix='augmentor-pi-contract-') as directory:
+        with tempfile.TemporaryDirectory(prefix='augmentor-pi-contract-',dir='/tmp') as directory:
             root=Path(directory);process,endpoint=self.start('memory',root)
             rows=watchdog.snapshot();row=next(r for r in rows if r['pid']==process.pid)
             self.assertTrue(watchdog.eligible(row,rows))

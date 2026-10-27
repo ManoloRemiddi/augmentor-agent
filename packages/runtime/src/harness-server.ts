@@ -3,7 +3,7 @@ import {HarnessVoice} from './harness-voice.js';
 import {createServer, type IncomingMessage, type ServerResponse} from 'node:http';
 import {randomBytes, timingSafeEqual} from 'node:crypto';
 import {readFileSync} from 'node:fs';
-import {join} from 'node:path';
+import {join,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {Readable} from 'node:stream';
 import {pipeline} from 'node:stream/promises';
@@ -43,6 +43,7 @@ export class HarnessServer {
   private evicted = new Map<string, number>();
   private sequence = 0;
   private base = '';
+  private artifacts=new Map<string,{bytes:Buffer;mime:string;expiresAt:number}>();
   private inspections=new Map<string,Extract<Access,{mode:'read-only'}>>();
   private voice=new HarnessVoice((method,params)=>this.host.dispatch(method,params,'voice-http-'+randomBytes(16).toString('hex')));
   private server = createServer((req, res) => void this.handle(req, res));
@@ -60,6 +61,15 @@ export class HarnessServer {
     if (!address || typeof address === 'string') throw new Error('Harness has no loopback listener');
     this.base = 'http://127.0.0.1:' + address.port;
     return {url: this.base + '/#token=' + this.token, origin: this.base};
+  }
+  async publishArtifact(sessionId:string,path:string,signal:AbortSignal){
+    const extension=extname(path).toLowerCase();if(!['.html','.htm','.txt','.md'].includes(extension))throw Error('Use a generated HTML or text artifact.');
+    const file=await this.host.previewFile(sessionId,'bytes',{path},signal);if(file.bytes>4*1024*1024)throw Error('Artifact preview exceeds 4 MiB.');
+    for(const [key,row] of this.artifacts)if(row.expiresAt<Date.now())this.artifacts.delete(key);
+    if(this.artifacts.size>=32)throw Error('Close or wait for existing artifact previews before opening more.');
+    const token=randomBytes(32).toString('hex'),expiresAt=Date.now()+10*60*1000;
+    this.artifacts.set(token,{bytes:Buffer.from(file.data),mime:['.html','.htm'].includes(extension)?'text/html; charset=utf-8':'text/plain; charset=utf-8',expiresAt});
+    return {url:this.base+'/artifact/'+token,expiresAt,bytes:file.bytes,version:file.version,verified:false};
   }
   connected(sessionId: string) {
     const now = Date.now();
@@ -166,6 +176,12 @@ export class HarnessServer {
       }
       const url = new URL(req.url ?? '/', this.base);
       if (url.origin !== this.base) {this.send(res, 403, {error: {message: 'Invalid request origin'}}); return;}
+      if(url.pathname.startsWith('/artifact/')){
+        const token=url.pathname.slice('/artifact/'.length),artifact=this.artifacts.get(token);
+        if(req.method!=='GET'||url.search||!/^[a-f0-9]{64}$/.test(token)||!artifact||artifact.expiresAt<Date.now()){this.send(res,404,{error:{message:'Artifact preview expired or unavailable.'}});return;}
+        res.setHeader('Content-Security-Policy',"sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline' blob:; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; media-src data: blob:; connect-src 'none'; base-uri 'none'; frame-ancestors 'none'");
+        res.writeHead(200,{'Content-Type':artifact.mime});res.end(artifact.bytes);return;
+      }
       if(url.pathname.startsWith('/api/session.export/')){
         if(req.method!=='GET'||url.search||!/^\/api\/session\.export\/[a-f0-9]{64}$/.test(url.pathname))throw Error('Use an exact one-use conversation download link.');
         const abort=new AbortController(),cancel=()=>{if(!res.writableFinished)abort.abort(Error('Conversation download disconnected.'));};req.once('aborted',cancel);res.once('close',cancel);

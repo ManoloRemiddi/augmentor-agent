@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // License: MIT with Augmentor Resale Restriction — see LICENSE at the repository root.
 import {surfaceRequest} from './shared/surface.mjs'
+import {registerConnectedBrowserHost} from './shared/connected-executor.mjs'
 import {PRODUCT_PROTOCOL,HARNESS_CAPABILITIES} from '../../dist/contracts/src/index.js'
 import {RELEASE} from '../../dist/contracts/src/release.js'
 import {promptLibrary} from './shared/prompts.mjs'
@@ -22,7 +23,8 @@ let child,childClosed=false,closing=false,compatible=false
 const pending=new Set()
 const childRequests=new Set(),childActions=new Set()
 const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
-const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size,onCommit:()=>close(0)})
+const connectedExecutor=registerConnectedBrowserHost(reply,{busy:()=>!compatible||closing||maintenance.paused})
+const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size+connectedExecutor.active,onCommit:()=>close(0)})
 const owner=process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT?connectBrowserOwner({
   endpoint:process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT,nonce:process.env.AUGMENTOR_BROWSER_OWNER_NONCE,
   pid:Number(process.env.AUGMENTOR_BROWSER_OWNER_PID),root:process.env.AUGMENTOR_BROWSER_OWNER_ROOT,maintenance,
@@ -35,7 +37,7 @@ function finish(){
 function close(code=0){
   if(code)process.exitCode=code
   else process.exitCode??=0
-  if(!closing){closing=true;maintenance.close();process.stdin.destroy();child?.stdin.end()}
+  if(!closing){closing=true;connectedExecutor.close();maintenance.close();process.stdin.destroy();child?.stdin.end()}
   finish()
 }
 function shared(id,operation){
@@ -61,6 +63,7 @@ function readFrames(stream,receive){
 function childSend(value){const body=Buffer.from(JSON.stringify(value)),head=Buffer.alloc(4);head.writeUInt32LE(body.length);child.stdin.write(Buffer.concat([head,body]))}
 readFrames(process.stdin,first=>{
     if(closing)return
+    if(connectedExecutor.receive(first))return
     if(maintenance.receive(first))return
     if(first.method!==undefined&&maintenance.paused){reply({id:first.id,error:{message:'Augmentor maintenance is in progress. This request was not started.'}});return}
     if(child){

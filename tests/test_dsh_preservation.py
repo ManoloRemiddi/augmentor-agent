@@ -20,7 +20,7 @@ def sha(data):return hashlib.sha256(data).hexdigest()
 @unittest.skipUnless(sys.platform=='linux','MX preservation stage')
 class PreservationFixture(unittest.TestCase):
     def setUp(self):
-        temporary=tempfile.TemporaryDirectory(prefix='authored-dsh-preserve-',dir=os.environ.get('AUGMENTOR_BUILD_WORKSPACE'))
+        temporary=tempfile.TemporaryDirectory(prefix='dp-',dir=os.environ.get('AUGMENTOR_BUILD_WORKSPACE'))
         self.addCleanup(temporary.cleanup);self.base=Path(temporary.name)
         self.home=self.base/'home';self.old=self.base/'old café';self.incoming=self.base/'incoming';self.output=self.base/'review'
         self.profile=self.home/'profiles/web';self.target=self.profile/'augmentor-product';self.compat=self.base/'compat/browser'

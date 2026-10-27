@@ -23,7 +23,7 @@ from platform_adapters.private_files import descriptor
 @unittest.skipUnless(sys.platform in ('linux','win32'),'Native Windows and portable Linux transport qualification')
 class BrowserControlTests(unittest.TestCase):
     def setUp(self):
-        self.temp=tempfile.TemporaryDirectory(prefix='augmentor-browser-control-')
+        self.temp=tempfile.TemporaryDirectory(prefix='bc-')
         self.root=private_directory(Path(self.temp.name)/'private')
         self.observed=[];self.connections=[]
         self.ready=[]

@@ -35,7 +35,7 @@ test('original six Wiki tools and bundled skill execute through one Pi owner, pr
  const readonly=(await rpc('session.history',{sessionId:'wiki-readonly',maxMessages:100})).events.map(row=>row.event);assert(readonly.some(e=>e.type==='tool/result'&&JSON.stringify(e).includes('Read-only chat')));assert(readonly.some(e=>e.type==='tool/result'&&JSON.stringify(e).includes('wiki vault:')));
  for(const [p,bytes] of before)assert.deepEqual(await readFile(p),bytes);assert.equal((await readFile(link.requestLog,'utf8')).trim().split('\n').length,12);assert.equal(stderr,'');
  await rpc('session.create',{sessionId:'wiki-browser',surface:'browser',selection,cwd:link.workspace});await rpc('session.prompt',{sessionId:'wiki-browser',requestId:crypto.randomUUID(),content:[{type:'text',text:'WIKI_BROWSER_CATALOG'}]});await until(async()=>!(await rpc('session.list')).items.find(row=>row.sessionId==='wiki-browser').running,'browser settled');
- const browserRequests=(await readFile(link.requestLog,'utf8')).trim().split('\n').map(JSON.parse).slice(12);assert.equal(browserRequests.length,1);assert(!browserRequests[0].tools.some(tool=>tool.function.name.startsWith('wiki_')),'the native vault is not granted to a browser session');
+ const browserRequests=(await readFile(link.requestLog,'utf8')).trim().split('\n').map(JSON.parse).slice(12);assert.equal(browserRequests.length,1);assert(browserRequests[0].tools.some(tool=>tool.function.name==='wiki_query'),'Browser shares the owner’s approved Wiki tools');
 });
 
 test('an uncertain real Wiki archive stops its Pi owner before another request and preserves both source versions',{skip:!['linux','darwin'].includes(process.platform),timeout:30000},async t=>{

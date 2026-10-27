@@ -80,7 +80,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
   const completedTools=body.messages.filter(m=>m.role==='tool').length;
   const tool=reassessing||progressing?(completedTools<(reassessing?3:8)?'fixture_reassess':null):content.includes('NATIVE_BRANCH')?'read':content.includes('BUDGET_TEST')?'fixture_large':content.includes('EXCERPT_TEST')?'tool_result_excerpt':content.includes('DELEGATE_TEST')?'desktop_delegate':content.includes('BROWSER_TEST')?'browser_snapshot':content.includes('CLOCK')||content.includes('SHELL_CHANGE')?'bash':content.includes('WRITE')?'write':content.includes('QUESTION')?'ask_user':content.includes('PACKAGE')?'fixture_probe':null;
   if(tool&&(reassessing||progressing||body.messages.at(-1).role!=='tool')){
-    const args=tool==='read'?{path:join(cwd,'native-branch-note.txt')}:tool==='fixture_reassess'?{value:reassessing?'requested-'+completedTools:'different-'+completedTools}:tool==='tool_result_excerpt'?{entryId:content.match(/ENTRY=([a-f0-9]+)/)?.[1],find:'ORIGINAL_MIDDLE_SENTINEL',limit:24}:tool==='desktop_delegate'?{task:'Inspect the open window.',successCriteria:'Report the title.',constraints:'Do not change anything.'}:tool==='browser_snapshot'?{}:tool==='bash'?{command:content.includes('CLOCK')?"date '+%A, %B %d, %Y %H:%M:%S %Z'":'date > '+join(cwd,'shell-written.txt')}:tool==='write'?{path:join(cwd,content.includes('HARNESS')?'gui-written.txt':'written.txt'),content:'verified π'}:tool==='ask_user'?{question:'Choose a colour',options:['blue','green']}:{};
+    const args=tool==='read'?{path:join(cwd,'native-branch-note.txt')}:tool==='fixture_reassess'?{value:reassessing?'requested-'+completedTools:'different-'+completedTools}:tool==='tool_result_excerpt'?{entryId:content.match(/ENTRY=([a-f0-9]+)/)?.[1],find:'ORIGINAL_MIDDLE_SENTINEL',limit:24}:tool==='desktop_delegate'?{task:'Inspect the open window.',successCriteria:'Report the title.',constraints:'Do not change anything.'}:tool==='browser_snapshot'?{}:tool==='bash'?{command:content.includes('CLOCK')?"date '+%A, %B %d, %Y %H:%M:%S %Z'":'date > '+join(cwd,'shell-written.txt')}:tool==='write'?{path:join(cwd,content.includes('BROWSER_FILE')?'browser-written.txt':content.includes('HARNESS')?'gui-written.txt':'written.txt'),content:'verified π'}:tool==='ask_user'?{question:'Choose a colour',options:['blue','green']}:{};
     chunk({role:'assistant',tool_calls:[{index:0,id:'call_'+requests,type:'function',function:{name:tool,arguments:JSON.stringify(args)}}]});chunk({},'tool_calls');
   }else{if(content.includes('INSPECT'))chunk({reasoning_content:'Observed reasoning π'});chunk({role:'assistant',content:'Verified response π'});chunk({},'stop');}
   res.end('data: [DONE]\n\n');
@@ -533,10 +533,11 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
    await assert.rejects(stranger.call('browser.respond',{rpcId:request.id,result:{text:'wrong client'}}),/unowned/);
    await bridge.call('browser.respond',{rpcId:request.id,result:{text:'verified browser context'}});await idle('browser-contract');
    assert(received.at(-1).messages.some(m=>m.role==='tool'&&JSON.stringify(m).includes('verified browser context')));
-   assert(!received.at(-1).tools.some(t=>t.function.name==='linux_browser_open'));
-   assert(!received.at(-1).tools.some(t=>['bash','write','edit','read','ls','find','grep'].includes(t.function.name)));
-   await client.call('session.prompt',{sessionId:'browser-contract',content:[{type:'text',text:'WRITE'}]});await idle('browser-contract');
-   assert(!existsSync(join(cwd,'written.txt')),'An unadvertised OS tool ran from a browser chat');
+   assert(received.at(-1).tools.some(t=>t.function.name==='linux_browser_open'));
+   for(const name of ['bash','write','edit','read','ls','find','grep'])assert(received.at(-1).tools.some(t=>t.function.name===name));
+   const permission=await client.call('session.permission',{sessionId:'browser-contract'});await client.call('session.selectPermission',{sessionId:'browser-contract',preset:'danger-full-access',expectedRevision:permission.revision});
+   await client.call('session.prompt',{sessionId:'browser-contract',content:[{type:'text',text:'WRITE BROWSER_FILE'}]});await idle('browser-contract');
+   assert(existsSync(join(cwd,'browser-written.txt')),'Full-access Browser must execute the requested file tool');
   }finally{bridge.close();stranger.close();}
  });
  await t.test('native browser bridge denies Linux history, mutation and attachment',async()=>{

@@ -17,6 +17,7 @@
  * drops everything with the disconnect error, and the reply path settles
  * by id. The wire vocabulary is the shared one (see wire.mjs header).
  */
+import {stopTrusted} from './trusted-input.mjs'
 import {approvalPresenters} from './approval-presenters.mjs'
 import {
   state,
@@ -162,6 +163,7 @@ export function ensurePort() {
 
   port.onDisconnect.addListener(() => {
     if(state.port!==port)return
+    void stopTrusted().catch(()=>{})
     const err = chrome.runtime.lastError?.message
     log('port', { event: 'disconnect', error: err ?? null })
     fail(err ?? 'native host disconnected')
