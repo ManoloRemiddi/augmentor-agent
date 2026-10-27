@@ -14,7 +14,7 @@ import {harnessPointerClick} from './fixtures/harness-pointer.mjs';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label){const end=Date.now()+12000;let last;while(Date.now()<end){try{if(await fn())return;}catch(e){last=e;}await new Promise(resolve=>setTimeout(resolve,30));}throw Error(label+(last?' '+last.message:''));}
 
-test('MX picker shows and saves effort, opens at the top, saves ordered pins, hides models and contains the context meter',{skip:process.platform!=='linux',timeout:60000},async t=>{
+test('MX picker shows and saves effort, opens at the top, saves ordered pins, hides models and contains the context meter',{skip:!['linux','darwin'].includes(process.platform),timeout:60000},async t=>{
  const profile=await mkdtemp(join(tmpdir(),'augmentor-picker-'));let fixture,chrome,panel,link,output='',stderr='';
  t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));

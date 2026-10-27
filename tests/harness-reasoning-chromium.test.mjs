@@ -13,7 +13,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 import {harnessCdp} from './fixtures/harness-cdp.mjs';
 const source=fileURLToPath(new URL('../',import.meta.url));
 async function until(fn,label){const end=Date.now()+12000;let last;while(Date.now()<end){try{if(await fn())return;}catch(error){last=error;}await delay(30);}throw Error('Harness reasoning timeout: '+label+(last?' ('+last.message+')':''));}
-test('Harness reasoning controls persist effort, explicit adaptive routes and inspect actual request decisions',{skip:process.platform!=='linux',timeout:90000},async t=>{
+test('Harness reasoning controls persist effort, explicit adaptive routes and inspect actual request decisions',{skip:!['linux','darwin'].includes(process.platform),timeout:90000},async t=>{
  const profile=await mkdtemp(join(tmpdir(),'augmentor-thinking-chrome-'));let fixture,chrome,panel,output='',stderr='',link;
  t.after(async()=>{panel?.close();for(const child of [chrome,fixture])if(child?.pid&&child.exitCode===null){const ended=once(child,'exit');child.kill('SIGTERM');await ended;}await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:100});});
  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>!/^(AUGMENTOR_|DSH_|PI_)/.test(key)));for(const key of ['AUGMENTOR_PI_TEST_ROOT','AUGMENTOR_PYTHON'])if(process.env[key])env[key]=process.env[key];

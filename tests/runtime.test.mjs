@@ -88,7 +88,7 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:180000},
  const modelConfig={providers:{test:{baseUrl:`http://127.0.0.1:${mock.address().port}/v1`,api:'openai-completions',apiKey:'dummy',models:[{id:'reasoning',name:'Reasoning fixture',reasoning:true,input:['text'],contextWindow:32000,maxTokens:2048,compat:{supportsReasoningEffort:true}},{id:'test',name:'Test',reasoning:false,input:['text'],contextWindow:32000,maxTokens:2048},{id:'wide',name:'Wide fixture',reasoning:false,input:['text'],contextWindow:128000,maxTokens:32768},{id:'vision',name:'Vision fixture',reasoning:false,input:['text','image'],contextWindow:32000,maxTokens:2048}]}}};
  writeFileSync(join(config,'agent/models.json'),JSON.stringify(modelConfig));
  const networkLog=join(root,'network.jsonl');
- const env={...process.env,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_INTERACTION_TIMEOUT:'300',PI_OFFLINE:'1',AUGMENTOR_PI_TEST_NETWORK_LOG:networkLog,
+ const env={...process.env,AUGMENTOR_PI_CONFIG:config,AUGMENTOR_PI_STATE:state,AUGMENTOR_PI_SOCKET:join(state,'runtime.sock'),XDG_RUNTIME_DIR:join(root,'run'),AUGMENTOR_SHARED_STATE:join(root,'shared-state'),AUGMENTOR_SHARED_DATA:join(root,'shared-data'),AUGMENTOR_PI_INTERACTION_TIMEOUT:'300',PI_OFFLINE:'1',AUGMENTOR_PI_TEST_NETWORK_LOG:networkLog,
   NODE_OPTIONS:(process.env.NODE_OPTIONS||'')+' --import='+pathToFileURL(fileURLToPath(new URL('./fixtures/pi-network-audit.mjs',import.meta.url))).href};
  let child,client;let stderr='';
  const runtimeRoot=resolve(process.env.AUGMENTOR_PI_TEST_ROOT||'.');
