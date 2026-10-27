@@ -1,9 +1,9 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
-import test from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,rm,readdir} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';import {setTimeout as delay} from 'node:timers/promises';
+import test from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,rm,readdir,realpath} from 'node:fs/promises';import {tmpdir} from 'node:os';import {join} from 'node:path';import {setTimeout as delay} from 'node:timers/promises';
 import {connectedBrowser,registerConnectedBrowserHost} from '../apps/browser/shared/connected-executor.mjs';
 async function until(fn){for(let n=0;n<750;n++){if(await fn())return;await delay(20)}throw Error('Browser rendezvous timed out')}
 test('real native-host rendezvous preserves split Unicode, swallows duplicate replies and drains maintenance',async t=>{
- const root=await mkdtemp(join(tmpdir(),'abc-')),registry=join(root,'executors'),prior=process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR;process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR=registry;
+ const root=await realpath(await mkdtemp(join(tmpdir(),'abc-'))),registry=join(root,'executors'),prior=process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR;process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR=registry;
  let executor,busy=false;const frames=[],text='café 日本語 😀 '.repeat(10000)+'\ud83d';
  executor=registerConnectedBrowserHost(frame=>{frames.push(frame);const result=frame.params.action==='tabs_list'?{ok:true,tabs:[{id:7,url:'https://fixture.test/'}]}:frame.params.action==='capabilities'?{ok:true,trustedKeyboard:true}:{ok:true,text};setTimeout(()=>{const reply=frame.params.action==='insert_text'?{id:frame.id,error:'authored executor error'}:{id:frame.id,result};assert(executor.receive(reply));assert(executor.receive(reply));},0)},{busy:()=>busy});
  const registered=()=>readdir(registry).catch(error=>{if(error.code==='ENOENT')return [];throw error});
@@ -17,7 +17,7 @@ test('real native-host rendezvous preserves split Unicode, swallows duplicate re
 
 test('compatible native host captures executor replies before its selected engine child',{skip:!process.env.AUGMENTOR_COMPAT_ROOT,timeout:45000},async t=>{
  const {spawn}=await import('node:child_process');const {once}=await import('node:events');
- const root=await mkdtemp(join(tmpdir(),'anh-')),registry=join(root,'executors'),prior=process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR;process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR=registry;
+ const root=await realpath(await mkdtemp(join(tmpdir(),'anh-'))),registry=join(root,'executors'),prior=process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR;process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR=registry;
  const app=process.env.AUGMENTOR_COMPAT_ROOT,manifest=JSON.parse(await (await import('node:fs/promises')).readFile(join(app,'apps/browser/extension/manifest.json'))),env={...process.env,AUGMENTOR_WORKSPACE_PROFILE:'',AUGMENTOR_SHARED_STATE:join(root,'s'),AUGMENTOR_SHARED_DATA:join(root,'d')};
  const child=spawn(process.execPath,[join(app,'apps/browser/native-host.mjs')],{env,stdio:['pipe','pipe','pipe']});let buffer=Buffer.alloc(0),seq=0,error='';const pending=new Map(),executed=[];
  const write=frame=>{const bytes=Buffer.from(JSON.stringify(frame)),head=Buffer.alloc(4);head.writeUInt32LE(bytes.length);child.stdin.write(Buffer.concat([head,bytes]))};
