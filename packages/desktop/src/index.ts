@@ -14,7 +14,7 @@ export const definitions=[
 export function control(method:string,owner:string,params:unknown={},signal?:AbortSignal):Promise<any>{
  signal?.throwIfAborted();
  return new Promise((resolve,reject)=>{
-  const child=spawn(pythonExecutable(),[helper],{stdio:['pipe','pipe','ignore'],env:componentEnvironment()});let out='',settled=false,cancelling=false;
+  const child=spawn(pythonExecutable(),['-I','-X','utf8','-B',helper],{windowsHide:true,stdio:['pipe','pipe','inherit'],env:componentEnvironment()});child.stdout.setEncoding('utf8');let out='',settled=false,cancelling=false;
   const finish=(error:Error|null,value?:unknown)=>{if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);error?reject(error):resolve(value)};
   const abort=async()=>{if(cancelling||settled)return;cancelling=true;if(method!=='stop')await control('stop',owner).catch(()=>{});child.kill();finish(new Error('Desktop control stopped. Inspect the application before continuing.'))};
   const timer=setTimeout(abort,method==='stop'?8000:105000);signal?.addEventListener('abort',abort,{once:true});

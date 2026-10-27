@@ -531,12 +531,13 @@ test('Pi host protocol, lifecycle, policy and crash recovery', {timeout:120000},
    const request=bridge.events.find(e=>e.method==='browser/execute').payload;
    assert.equal(request.params.action,'snapshot');
    await assert.rejects(stranger.call('browser.respond',{rpcId:request.id,result:{text:'wrong client'}}),/unowned/);
-   await bridge.call('browser.respond',{rpcId:request.id,result:{text:'verified browser context'}});await idle('browser-contract');
+   await bridge.call('browser.respond',{rpcId:request.id,result:{ok:true,url:'https://authored.test/',text:'verified browser context'}});await idle('browser-contract');
    assert(received.at(-1).messages.some(m=>m.role==='tool'&&JSON.stringify(m).includes('verified browser context')));
    assert(received.at(-1).tools.some(t=>t.function.name==='linux_browser_open'));
    for(const name of ['bash','write','edit','read','ls','find','grep'])assert(received.at(-1).tools.some(t=>t.function.name===name));
    const permission=await client.call('session.permission',{sessionId:'browser-contract'});await client.call('session.selectPermission',{sessionId:'browser-contract',preset:'danger-full-access',expectedRevision:permission.revision});
-   await client.call('session.prompt',{sessionId:'browser-contract',content:[{type:'text',text:'WRITE BROWSER_FILE'}]});await idle('browser-contract');
+   await client.call('session.prompt',{sessionId:'browser-contract',content:[{type:'text',text:'WRITE BROWSER_FILE'}]});
+   try{await idle('browser-contract')}catch(error){t.diagnostic('Authored Browser continuation: '+JSON.stringify({events:bridge.events.filter(e=>e.method==='browser/execute').map(e=>e.payload?.params),lastRequests:received.slice(-2).map(body=>({lastUser:body.messages.findLast(m=>m.role==='user'),last:body.messages.at(-1)}))}));throw error}
    assert(existsSync(join(cwd,'browser-written.txt')),'Full-access Browser must execute the requested file tool');
   }finally{bridge.close();stranger.close();}
  });

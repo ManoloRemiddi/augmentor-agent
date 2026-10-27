@@ -19,6 +19,24 @@ BASE_HOSTS={
  'macos':'58b2eeadaf5fa7d23864bb4d081ef8160b1a9bc8a8900a8ce5828103133b9be8'
 }
 
+BASE_FILES={
+ 'linux':{
+  'apps/browser/native-host.mjs':BASE_HOSTS['linux'],
+  'dist/runtime/src/host.js':'a7402717d7c128a6bc46e84b3505ced1fcedec07f28dbd4d6f3ae413d172fcb8',
+  'adapters/dsh-desktop/index.mjs':'be6411860649b2d239fa29fcf9b1d6588d9f0290c104eef533af53eb26c6a3c8',
+  'apps/browser/extension/sw.js':'dd2439c8a029eafada0e76dea1b85dc63e761168d6cdb5037cd5451e4b6559a5',
+  'apps/browser/extension/port.mjs':'d3eaed45a5ef8072e8b8ab7941c663e1029e53f9d4b75d09ea71f973fbc97900',
+  'apps/browser/extension/manifest.json':'9117a26d155e2a03128aa1d757e5b6ce2bb199a9b408ac1f955a1b77254e5434'},
+ 'macos':{
+  'apps/browser/native-host.mjs':BASE_HOSTS['macos'],
+  'dist/runtime/src/host.js':'f21a8fa481e87b962d8a016e3cad3beb87e96104ba5c3bab57cbe479717faf87',
+  'adapters/dsh-desktop/index.mjs':'be6411860649b2d239fa29fcf9b1d6588d9f0290c104eef533af53eb26c6a3c8',
+  'apps/browser/extension/sw.js':'4bcd7d646e4f8f7571d62d86e0fa3f2415624db90f41f9a01a752a800375a028',
+  'apps/browser/extension/port.mjs':'21ff5916bf7fbfb56509639a399ffeea483bb05b48b752bf793d29bfaa42f72e',
+  'apps/browser/extension/manifest.json':'218943c10ca02e7a510c9b4186c3fbf1e2bf4f442a12d36104f4c856bc8444d7'}
+}
+
+
 def digest(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 def replace_once(text,old,new):
  if text.count(old)!=1:raise ValueError('The compatible source differs at a required patch boundary: '+old[:90])
@@ -27,6 +45,9 @@ def replace_once(text,old,new):
 def host_patch(text):
  text=replace_once(text,"import {surfaceRequest} from './shared/surface.mjs'","import {surfaceRequest} from './shared/surface.mjs'\nimport {registerConnectedBrowserHost} from './shared/connected-executor.mjs'")
  busy='!compatible||closing||maintenance.paused' if 'function readFrames(' in text else '!compatible||closing' if 'closing=false' in text else '!compatible'
+ reply_lines=[line for line in text.splitlines() if 'const reply=' in line]
+ if len(reply_lines)!=1 or not reply_lines[0].rstrip().endswith(('}', '};')):raise ValueError('Use the inspected single-line native reply function.')
+ text=replace_once(text,'const reply=value=>{',"const reply=value=>{if(value?.result?.protocol==='augmentor/1')value={...value,result:{...value.result,companionBuild:'tool-repair-20261027-1'}};")
  at=text.index('\n',text.index('const reply='));text=text[:at]+"\nconst connectedExecutor=registerConnectedBrowserHost(reply,{busy:()=>"+busy+"})"+text[at:]
  if 'function readFrames(' in text:
   text=replace_once(text,'    if(closing)return','    if(closing)return\n    if(connectedExecutor.receive(first))return')
@@ -50,13 +71,14 @@ def legacy_host_patch(text):
  # Add current browser/tool adapters and a default-only shell hook, not a new loop.
  if "m.surface === 'browser' ? [] : resources.sources" not in text:raise ValueError('The legacy runtime source was not reconciled.')
  text="import {piShellDeadlines,SHELL_DEADLINE_GUIDANCE} from './shell-deadlines.js';\n"+text
- lines=text.splitlines(True);result=[];skip=False
+ lines=text.splitlines(True);result=[];skip=False;removed=0
  for line in lines:
-  if "if (m.surface === 'browser' && ![" in line and 'includes(e.toolName)' in line:skip=True;continue
+  if "if (m.surface === 'browser' && ![" in line and 'includes(e.toolName)' in line:skip=True;removed+=1;continue
   if skip:
    if 'return { block:' not in line:raise ValueError('Unexpected legacy surface policy body.')
    skip=False;continue
   result.append(line)
+ if removed!=1 or skip:raise ValueError('The legacy surface policy boundary differs.')
  text=''.join(result)
  text=replace_once(text,"m.surface === 'browser' ? [] : resources.sources",'resources.sources');text=replace_once(text,"m.surface === 'browser' ? [] : resources.skills",'resources.skills')
  text=replace_once(text,'extensionFactories: [this.policy(m),','extensionFactories: [piShellDeadlines(), this.policy(m),')
@@ -64,7 +86,7 @@ def legacy_host_patch(text):
  text=replace_once(text,'browserRecovery,','browserRecovery, SHELL_DEADLINE_GUIDANCE,')
  text=replace_once(text,"'browser_tabs_list', 'browser_screenshot', 'browser_snapshot'].includes(e.toolName)","'browser_tabs_list', 'browser_screenshot', 'browser_snapshot', 'browser_capabilities', 'browser_document_read', 'browser_stop'].includes(e.toolName)")
  text=replace_once(text,"...(m.surface === 'browser' ? [] : ['read', 'write', 'edit', 'bash', 'ls', 'find', 'grep'])", "...['read', 'write', 'edit', 'bash', 'ls', 'find', 'grep']")
- if "m.surface === 'browser' ? []" in text or 'piShellDeadlines(), this.policy(m)' not in text:raise ValueError('The compatible tool patch did not satisfy its postconditions.')
+ if "m.surface === 'browser' && ![" in text or "m.surface === 'browser' ? []" in text or 'piShellDeadlines(), this.policy(m)' not in text:raise ValueError('The compatible tool patch did not satisfy its postconditions.')
  return text
 
 def apply(candidate,source,platform,source_ref):
@@ -74,16 +96,15 @@ def apply(candidate,source,platform,source_ref):
  if marker.get('schema')!='augmentor-independent-candidate/1' or marker.get('candidateRoot')!=str(candidate) or candidate==base or candidate.is_relative_to(base):raise ValueError('Use the recorded independent clone, never its selected base.')
  if candidate==source or candidate.is_relative_to(source):raise ValueError('Use a separate complete candidate, not the source checkout.')
  host=candidate/'apps/browser/native-host.mjs'
- if digest(host)!=BASE_HOSTS[platform]:raise ValueError('This client baseline was not reconciled; do not patch it by version label.')
- before={};changed={}
+ for relative,expected in BASE_FILES[platform].items():
+  if digest(candidate/relative)!=expected:raise ValueError('This client baseline was not reconciled: '+relative)
+ before={};changed={};staged={}
  def publish(relative,bytes):
   target=candidate/relative
   if target.exists() and target.read_bytes()==bytes:return
   before[relative]=digest(target) if target.exists() else None
-  target.parent.mkdir(parents=True,exist_ok=True)
-  # Atomic replacement also preserves a clone sharing unchanged immutable files.
-  temporary=target.with_name('.'+target.name+'.repair');temporary.write_bytes(bytes);temporary.replace(target)
-  changed[relative]=digest(target)
+  staged[relative]=bytes
+  changed[relative]=hashlib.sha256(bytes).hexdigest()
  def copy(relative):publish(relative,(source/relative).read_bytes())
  publish('apps/browser/native-host.mjs',host_patch(host.read_text(encoding='utf-8')).encode())
  for relative in ['apps/browser/shared/connected-executor.mjs','apps/browser/shared/control-tools.mjs',
@@ -109,17 +130,22 @@ def apply(candidate,source,platform,source_ref):
   text+="\nchrome.action.onClicked.addListener(tab=>{if(tab.id!==undefined)void chrome.sidePanel.open({tabId:tab.id}).catch(()=>{})})\n"
   publish('apps/browser/extension/sw.js',text.encode())
  port=candidate/'apps/browser/extension/port.mjs';text=port.read_text(encoding='utf-8')
+ text=replace_once(text,"{protocol:'augmentor/1',version:chrome.runtime.getManifest().version}","{protocol:'augmentor/1',version:chrome.runtime.getManifest().version,extensionBuild:'tool-repair-20261027-1'}")
  if "import {stopTrusted}" not in text:
   text="import {stopTrusted} from './trusted-input.mjs'\n"+text
   text=replace_once(text,'port.onDisconnect.addListener(() => {','port.onDisconnect.addListener(() => {\n    if(state.port!==port)return\n    void stopTrusted().catch(()=>{})')
-  publish('apps/browser/extension/port.mjs',text.encode())
+ publish('apps/browser/extension/port.mjs',text.encode())
  manifest=candidate/'apps/browser/extension/manifest.json';value=json.loads(manifest.read_text(encoding='utf-8'))
  if 'debugger' not in value['permissions']:value['permissions'].append('debugger')
  value['host_permissions']=['<all_urls>'];publish('apps/browser/extension/manifest.json',(json.dumps(value,indent=2)+'\n').encode())
  receipt={'schema':'augmentor-personal-tool-repair/1','platform':platform,'repairSource':source_ref,
   'baseNativeHostSha256':BASE_HOSTS[platform],'preservedVersion':json.loads((candidate/'package.json').read_text(encoding='utf-8'))['version'],
-  'before':before,'files':changed,'scope':'Bounded personal client overlay; not clean-commit or whole-product provenance. Seal/test/OS activation remain separate.'}
+  'before':dict(before),'files':dict(changed),'scope':'Bounded personal client overlay; not clean-commit or whole-product provenance. Seal/test/OS activation remain separate.'}
  publish('release/tool-repair-overlay.json',(json.dumps(receipt,indent=2)+'\n').encode())
+ # Validate every transform before the first candidate file is written.
+ for relative,data in staged.items():
+  target=candidate/relative;target.parent.mkdir(parents=True,exist_ok=True)
+  temporary=target.with_name('.'+target.name+'.repair');temporary.write_bytes(data);temporary.replace(target)
  return receipt
 
 if __name__=='__main__':

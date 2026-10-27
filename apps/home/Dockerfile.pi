@@ -8,6 +8,7 @@ COPY apps/harness/package.json apps/harness/package.json
 COPY scripts/prepare-ws.mjs scripts/prepare-ws.mjs
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY packages packages
+COPY apps/browser/shared apps/browser/shared
 COPY adapters/dsh-context-budget/evidence.mjs adapters/dsh-context-budget/evidence.d.mts adapters/dsh-context-budget/
 COPY adapters/dsh-compat/messages.mjs adapters/dsh-compat/
 COPY adapters/dsh-home adapters/dsh-home
@@ -40,6 +41,7 @@ COPY adapters/dsh-execution /app/adapters/dsh-execution
 COPY adapters/dsh-context-budget/evidence.mjs /app/adapters/dsh-context-budget/evidence.mjs
 COPY adapters/dsh-compat/messages.mjs /app/adapters/dsh-compat/messages.mjs
 COPY services /app/services
+COPY apps/browser/shared /app/apps/browser/shared
 COPY release/product.json /app/release/product.json
 COPY --from=build /app/dist /app/dist
 COPY LICENSE /app/LICENSE

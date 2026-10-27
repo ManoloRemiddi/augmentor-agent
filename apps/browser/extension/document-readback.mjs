@@ -47,6 +47,8 @@ export async function fetchDocument(endpoint,format,{offset=0,expectedSha256}={}
  const contentSha256=[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text)))].map(byte=>byte.toString(16).padStart(2,'0')).join('')
  if(expectedSha256!==undefined&&expectedSha256!==contentSha256)throw Error('The saved export changed between pages. Read again before claiming verification.')
  if(offset>text.length)throw Error('The document offset exceeds its current content.')
- const end=Math.min(text.length,offset+65536)
+ let end=Math.min(text.length,offset+65536)
+ // JSON permits lone surrogates, but keep a normal emoji whole across pages.
+ if(end<text.length&&text.charCodeAt(end-1)>=0xD800&&text.charCodeAt(end-1)<=0xDBFF)end--
  return {ok:true,offset,totalCharacters:text.length,...(end<text.length?{nextOffset:end}:{}),contentSha256,contentType:response.headers.get('content-type'),bytes:bytes.length,text:text.slice(offset,end),verification:'Exported saved document content. Compare the requested text or styles; input acknowledgement alone is not verification.'}
 }

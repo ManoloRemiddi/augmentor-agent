@@ -1,7 +1,7 @@
 // Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 // Exact independently staged client/locked SDK; authored loopback model and state.
 import test from 'node:test';import assert from 'node:assert/strict';import {createServer} from 'node:http';import {spawn} from 'node:child_process';import {once} from 'node:events';import {mkdtemp,mkdir,writeFile,readFile,rm} from 'node:fs/promises';import {join,resolve} from 'node:path';import {tmpdir} from 'node:os';import {setTimeout as delay} from 'node:timers/promises';
-import {PiConnection} from '../dist/client/src/socket.js';import {localConnect} from '../dist/platform/src/transport.js';
+import {PiConnection} from '../dist/client/src/socket.js';import {createConnection as localConnect} from 'node:net';
 async function until(fn,label){const end=Date.now()+15000;while(Date.now()<end){if(await fn())return;await delay(20)}throw Error('Compatibility timeout: '+label)}
 test('compatible client keeps its actual SDK, bounds foreground tools and gives Browser the requested file tools',{skip:!process.env.AUGMENTOR_COMPAT_ROOT,timeout:60000},async t=>{
  const app=resolve(process.env.AUGMENTOR_COMPAT_ROOT),overlay=JSON.parse(await readFile(join(app,'release/tool-repair-overlay.json')));assert.equal(overlay.schema,'augmentor-personal-tool-repair/1');

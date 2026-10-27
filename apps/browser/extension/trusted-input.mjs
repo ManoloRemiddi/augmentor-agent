@@ -24,7 +24,7 @@ async function command(tabId,method,params={}){
 export async function trustedCapabilities(){
  const debuggerGranted=!!chrome.debugger&&await chrome.permissions.contains({permissions:['debugger']})
  const persistentHostAccess=await chrome.permissions.contains({origins:['<all_urls>']})
- return {ok:true,browser:'connected user browser',basicDomInput:true,trustedKeyboard:debuggerGranted,trustedPointer:debuggerGranted,canvasTextInput:debuggerGranted,persistentScreenshotAccess:persistentHostAccess,documentReadback:'Google Docs export from the signed-in target tab',googleDocsAuthoring:debuggerGranted,liveGoogleDocsQualification:false,isolatedBrowser:false}
+ return {ok:true,extensionBuild:'tool-repair-20261027-1',browser:'connected user browser',basicDomInput:true,trustedKeyboard:debuggerGranted,trustedPointer:debuggerGranted,canvasTextInput:debuggerGranted,persistentScreenshotAccess:persistentHostAccess,documentReadback:'Google Docs export from the signed-in target tab',googleDocsAuthoring:debuggerGranted,liveGoogleDocsQualification:false,isolatedBrowser:false}
 }
 function serial(tabId,operation){const next=(queues.get(tabId)??Promise.resolve()).catch(()=>{}).then(operation);queues.set(tabId,next);void next.finally(()=>{if(queues.get(tabId)===next)queues.delete(tabId)}).catch(()=>{});return next}
 async function attach(tab,owner){

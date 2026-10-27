@@ -22,7 +22,7 @@ import {NativeBrowserMaintenance,connectBrowserOwner} from './shared/native-main
 let child,childClosed=false,closing=false,compatible=false
 const pending=new Set()
 const childRequests=new Set(),childActions=new Set()
-const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
+const reply=value=>{if(process.stdout.destroyed||process.stdout.writableEnded)return;if(value?.result?.protocol===PRODUCT_PROTOCOL)value={...value,result:{...value.result,companionBuild:'tool-repair-20261027-1'}};const b=Buffer.from(JSON.stringify(value)),h=Buffer.alloc(4);h.writeUInt32LE(b.length);process.stdout.write(Buffer.concat([h,b]))}
 const connectedExecutor=registerConnectedBrowserHost(reply,{busy:()=>!compatible||closing||maintenance.paused})
 const maintenance=new NativeBrowserMaintenance({send:reply,busy:()=>pending.size+childRequests.size+childActions.size+connectedExecutor.active,onCommit:()=>close(0)})
 const owner=process.env.AUGMENTOR_BROWSER_OWNER_ENDPOINT?connectBrowserOwner({

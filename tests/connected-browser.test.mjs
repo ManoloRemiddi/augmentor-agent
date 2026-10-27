@@ -4,12 +4,13 @@ import {connectedBrowser,registerConnectedBrowserHost} from '../apps/browser/sha
 async function until(fn){for(let n=0;n<200;n++){if(await fn())return;await delay(20)}throw Error('Browser rendezvous timed out')}
 test('real native-host rendezvous preserves split Unicode, swallows duplicate replies and drains maintenance',async t=>{
  const root=await mkdtemp(join(tmpdir(),'abc-')),prior=process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR;process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR=root;
- let executor,busy=false;const frames=[],text='café 日本語 😀 '.repeat(10000);
- executor=registerConnectedBrowserHost(frame=>{frames.push(frame);const result=frame.params.action==='tabs_list'?{ok:true,tabs:[{id:7,url:'https://fixture.test/'}]}:frame.params.action==='capabilities'?{ok:true,trustedKeyboard:true}:{ok:true,text};setTimeout(()=>{assert(executor.receive({id:frame.id,result}));assert(executor.receive({id:frame.id,result}));},0)},{busy:()=>busy});
+ let executor,busy=false;const frames=[],text='café 日本語 😀 '.repeat(10000)+'\ud83d';
+ executor=registerConnectedBrowserHost(frame=>{frames.push(frame);const result=frame.params.action==='tabs_list'?{ok:true,tabs:[{id:7,url:'https://fixture.test/'}]}:frame.params.action==='capabilities'?{ok:true,trustedKeyboard:true}:{ok:true,text};setTimeout(()=>{const reply=frame.params.action==='insert_text'?{id:frame.id,error:'authored executor error'}:{id:frame.id,result};assert(executor.receive(reply));assert(executor.receive(reply));},0)},{busy:()=>busy});
  t.after(async()=>{executor.close();await until(async()=>!(await readdir(root)).some(x=>x.endsWith('.json')));await rm(root,{recursive:true,force:true});if(prior===undefined)delete process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR;else process.env.AUGMENTOR_BROWSER_EXECUTOR_DIR=prior});
  await until(async()=>(await readdir(root)).some(x=>x.endsWith('.json')));
  const capabilities=await connectedBrowser('pi:authored',{action:'capabilities'});assert.equal(capabilities.tabs[0].id,7);assert.equal(capabilities.trustedKeyboard,true);
  const result=await connectedBrowser('pi:authored',{action:'document_read',tabId:7});assert.equal(result.text,text);assert.equal(executor.active,0);assert.equal(executor.receive({id:'unrelated',result:{}}),false);
+ await assert.rejects(connectedBrowser('pi:authored',{action:'insert_text',tabId:7,text:'never'}),/authored executor error/);
  busy=true;const count=frames.length;await assert.rejects(connectedBrowser('pi:authored',{action:'insert_text',tabId:7,text:'never'}),/maintenance/);assert.equal(frames.length,count);assert.equal(executor.active,0);
 });
 

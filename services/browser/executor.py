@@ -45,6 +45,8 @@ def records():
             if row.get('endpoint')!=str(file.with_suffix('.sock')):continue
             probe=LocalSocket();probe.settimeout(.3)
             try:probe.connect(row['endpoint'])
+            except (FileNotFoundError,ConnectionRefusedError):
+                file.unlink(missing_ok=True);continue
             except (OSError,ValueError):continue
             finally:probe.close()
             found.append(row)
@@ -119,7 +121,7 @@ def serve():
                 finally:
                     with guard:pending.pop(identity,None)
             except Exception as error:response={'ok':False,'error':str(error)[:500]}
-            try:self.wfile.write((json.dumps(response,ensure_ascii=False)+'\n').encode())
+            try:self.wfile.write((json.dumps(response,ensure_ascii=True)+'\n').encode())
             except (BrokenPipeError,ConnectionError,OSError):pass
     server=ThreadingLocalServer(str(endpoint),Handler);server.daemon_threads=True
     if sys.platform!='win32':endpoint.chmod(0o600)
@@ -156,5 +158,5 @@ if __name__=='__main__':
         try:
             raw=sys.stdin.read(LIMIT+1)
             if len(raw)>LIMIT:raise ValueError('Browser input exceeded its bound.')
-            print(json.dumps({'ok':True,'result':request(json.loads(raw))},ensure_ascii=False))
+            print(json.dumps({'ok':True,'result':request(json.loads(raw))},ensure_ascii=True))
         except Exception as error:print(json.dumps({'ok':False,'error':str(error)[:500]}))

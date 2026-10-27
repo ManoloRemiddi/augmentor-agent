@@ -16,7 +16,8 @@ import {privateDir,atomicJson} from '../../dist/runtime/src/storage.js';
 import {desktopJobPeer} from './desktop-job-peer.mjs';
 export async function until(fn,label,ms=15000){const end=Date.now()+ms;while(Date.now()<end){if(await fn())return;await delay(25);}throw Error('Plan fixture timeout: '+label);}
 export async function planFixture(t,{policy='danger-full-access',goalMode,jobMode,desktopMode,questionMode=false,planMode=false,permissionMode=false,forcePrompt=false,voiceMode,metricsMode=false,attachmentMode=false,localRouteMode}={}){
- const root=await realpath(process.platform==='win32'?privateDir(join(tmpdir(),'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(tmpdir(),'augmentor-plan-'))),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
+ const temporaryBase=process.platform==='darwin'?'/tmp':tmpdir();
+ const root=await realpath(process.platform==='win32'?privateDir(join(temporaryBase,'augmentor-plan-'+crypto.randomUUID())):await mkdtemp(join(temporaryBase,'augmentor-plan-'))),config=join(root,'config'),state=join(root,'state'),workspace=join(root,'work');
  const runtime=join(root,'runtime');for(const path of [join(config,'agent'),workspace,runtime])privateDir(path);
  const desktop=desktopMode?await desktopJobPeer(runtime,state,desktopMode):undefined;
  if(forcePrompt){const extension=join(root,'authored-force-prompt.mjs');await writeFile(extension,"export default pi=>pi.on('before_agent_start',event=>({systemPrompt:event.systemPrompt+'\\n\\nAUTHORED_FORCED_PROMPT'}));\n");atomicJson(join(config,'resources.json'),{sources:[extension],skills:[]});}

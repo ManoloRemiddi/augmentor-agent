@@ -57,6 +57,7 @@ class BrowserExecutorTests(unittest.TestCase):
         first=self.peer('first');second=self.peer('second')
         root=executor.directory();path=root/('b'*32+'.json');path.write_text(json.dumps({'id':'b'*32,'endpoint':str(path.with_suffix('.sock')),'pid':99999999}));path.chmod(0o600)
         self.assertEqual(len(executor.records()),2)
+        self.assertFalse(path.exists())
         self.assertTrue(self.request({'action':'stop'})['stopped'])
         self.assertEqual(len([r for r in self.requests if r['params']['action']=='stop']),2)
     def test_oversized_reply_fails_one_request_and_keeps_executor_alive(self):

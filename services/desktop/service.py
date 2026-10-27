@@ -2,6 +2,7 @@
 # Copyright © 2026 Manolo Remiddi · SPDX-License-Identifier: LicenseRef-Augmentor-MIT-Resale-1.0
 """Per-user desktop executor with an independent, always-visible Stop control."""
 import json
+import hashlib
 import os
 from pathlib import Path
 import re
@@ -22,6 +23,7 @@ else:
     from gi.repository import GLib
     from portal import Portal as Backend
 ROOT=Path(__file__).resolve().parents[2]
+BUILD={'root':str(ROOT),'serviceSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'python':sys.executable}
 sys.path.insert(0,str(ROOT/'services'))
 from platform_support import require_same_user
 from platform_adapters import locks as fcntl
@@ -99,6 +101,7 @@ class Handler(socketserver.StreamRequestHandler):
                 if not completed.wait(110):backend.cancel.set();raise RuntimeError('Desktop request timed out. Inspect the application before continuing.')
                 if 'error' in response:raise RuntimeError(response['error'])
                 result=response['result']
+            if method in ('status','connect'):result={**result,'build':BUILD}
             response={'ok':True,'result':result}
         except Exception as exc:response={'ok':False,'error':str(exc)[:600]}
         try:self.wfile.write((json.dumps(response)+'\n').encode())

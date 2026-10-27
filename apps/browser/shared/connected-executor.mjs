@@ -9,7 +9,7 @@ const helper=fileURLToPath(new URL('../../../services/browser/executor.py',impor
 export function connectedBrowser(owner,params,signal){
  signal?.throwIfAborted()
  return new Promise((resolve,reject)=>{
-  const child=spawn(pythonExecutable(),['-I','-X','utf8','-B',helper],{windowsHide:true,stdio:['pipe','pipe','ignore'],env:componentEnvironment()})
+  const child=spawn(pythonExecutable(),['-I','-X','utf8','-B',helper],{windowsHide:true,stdio:['pipe','pipe','inherit'],env:componentEnvironment()})
   child.stdout.setEncoding('utf8')
   let output='',settled=false
   const finish=(error,value)=>{if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);error?reject(error):resolve(value)}
@@ -22,7 +22,7 @@ export function connectedBrowser(owner,params,signal){
  })
 }
 export function registerConnectedBrowserHost(send,{busy=()=>false}={}){
- const child=spawn(pythonExecutable(),['-I','-X','utf8','-B',helper,'serve'],{windowsHide:true,stdio:['pipe','pipe','ignore'],env:componentEnvironment()})
+ const child=spawn(pythonExecutable(),['-I','-X','utf8','-B',helper,'serve'],{windowsHide:true,stdio:['pipe','pipe','inherit'],env:componentEnvironment()})
  child.stdout.setEncoding('utf8')
  let buffer='',closed=false;const pending=new Set()
  const answer=(id,error,result)=>{if(!closed&&!child.stdin.destroyed)child.stdin.write(JSON.stringify({id,error,result})+'\n')}
@@ -43,7 +43,7 @@ export function registerConnectedBrowserHost(send,{busy=()=>false}={}){
  child.on('error',()=>close());child.on('close',()=>close());child.stdin.on('error',()=>close())
  function receive(frame){
   if(typeof frame.id!=='string'||!frame.id.startsWith('connected-browser-'))return false
-  if(pending.delete(frame.id))answer(frame.id.slice('connected-browser-'.length),frame.error?.message,frame.result)
+  if(pending.delete(frame.id))answer(frame.id.slice('connected-browser-'.length),frame.error?(frame.error.message??String(frame.error)):undefined,frame.result)
   return true // Late/duplicate replies never leak into a harness child.
  }
  function close(){if(closed)return;closed=true;pending.clear();child.stdin.end();const timer=setTimeout(()=>child.kill(),3000);timer.unref?.();child.once('close',()=>clearTimeout(timer))}
