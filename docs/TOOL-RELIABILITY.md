@@ -95,12 +95,64 @@ decisions are in [the plan](PLAN.md#october-27-repair-integration). Later deskto
 review receipts also list Opus4.8 usage; no exclusive model-use claim is made.
 Initial Qt Unicode tests failed and were corrected before promotion.
 
-Strict TypeScript checking and full builds pass. The broad run completed 2,265
-cases: 2,190 pass, 39 fail and 36 skip at that intermediate source. Missing test
-Python/QtTest and separate browser-test dependencies were corrected. Most
-remaining GUI failures exercise earlier composer/sidebar/origin behavior;
-the owner-restored layout is preserved. A focused core rerun and corrected cases
-cover both policies, real SDK/browser tools, session continuation and crash
-recovery; record final counts and exact staged-source identities before activation.
-No incomplete suite is presented as a clean pass. Real Google Docs saved/style
-readback and installed extension adoption remain separate acceptance gates.
+Strict TypeScript checking and full builds pass. The broad Python run passes
+1,391 cases with 46 platform skips; the later response-stream cohort passes six
+cases. The broad Node run at the final control-repair source contains 2,271 cases:
+2,202 pass, 31 fail and 38 skip. Matching original GUI failure names also occur in
+the pre-repair integrated source under the same environment. This is evidence
+against a repair regression, not a claim that those tests are healthy.
+
+The exact modern Linux and Mac candidates each pass 57 runtime cases; retained
+model/effort UI checks pass on both, with the Linux queue proof separate. Actual
+registered Windows tools pass mixed Unicode/emoji input, selection/replacement,
+extended Home, stale-token rejection, Stop and three consecutive 256-codepoint
+runs. The normal x64 and ARM64 Windows preview installers pass staging, sealing,
+rendered Native launch and dictation checks. Source06c22298 also passes the real
+bundled-DSH/Qt integration on macOS14 and26, including approval, question, shared
+Browser pipe, exact fork and continuation.
+
+An additional native DSH bug was found in that integration: transient assistant
+frames can omit timestamps. Native Desktop now preserves supplied timestamps
+and omits absent ones, continuing through terminal events rather than disconnecting.
+The compatible Mac client retains its older progress UI and session projection.
+No SDK or model switch is needed for that correction.
+
+## Personal installed rollout
+
+Linux Native runs the sealed release `20261027-194219-2e1f637c`; its selected and
+running roots agree. Its control overlay retains SDK0.85.1 and product0.2.11;
+the modern Harness remains `20261027-170823-bf37ca77`, product0.2.13/SDK1.1.
+The Mac Native app remains in `/Applications/Augmentor Agent Desktop.app`, product
+0.2.12 with its existing SDK/UI/dependencies; its source06c22298 timestamp delta
+is separately recorded over the control overlay. The Mac Harness remains
+`20261027-tool-repair`, SDK1.1 with its actual retained model/effort UI.
+These are explicitly inventoried personal compatibility overlays, not clean
+whole-source bundles or version-number parity claims.
+
+The Mac's 14 original Native chats and 28 session files remain preserved, with
+identical model catalog and no configuration-file changes during the last update.
+Original modern-Harness conversations/journal prefixes on Linux and Mac are
+preserved. Linux's original 1,356 DSH sessions and 2,569 session files are retained.
+Cold backups and exact private receipts remain outside Git. Actual unchanged-model
+Native DSH write/read checks now pass on Linux (13.18s) and Mac (5.87s), with no
+stream errors and observed terminal events. Earlier actual modern-Harness model
+checks also pass on Linux and Mac. Authored diagnostics retain their own history.
+
+Personal future defaults and eligible root conversations are Full; protected
+archive/child scopes retain their explicit boundaries. The inactive classic Linux
+Pi profile was migrated under its real startup lock: 13 Ask scalars changed,
+nine Full records and all22 journals/model settings stayed unchanged. No old tool
+or model actions were replayed. Two maintained Linux DSH role pins and the private
+Docs skill were corrected with exact backups, preserving custom presets.
+
+Browser artifacts contain the repaired trusted-input/readback code and expanded
+manifest permissions. Actual owner-browser adoption remains a separate live
+check. macOS still reports Screen Recording disabled; Linux's first portal grant
+and mixed-monitor capture/input acceptance remain pending. Existing Accessibility
+on the Mac remains granted. Real Google Docs saved/style readback is not claimed.
+
+The CI matrix is not wholly green: Windows command-job fixtures still report
+memory-lease warnings/timing failures; broader qualification jobs have their own
+status. Linux public packaging intentionally retains its open Office source/rebuild
+qualification gate, and a separate cached-component installation timed out. These
+are retained limitations, not suppressed checks or public-release approval.

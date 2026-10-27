@@ -93,6 +93,15 @@ def legacy_host_patch(text):
  if "m.surface === 'browser' && ![" in text or "m.surface === 'browser' ? []" in text or 'piShellDeadlines(), this.policy(m)' not in text:raise ValueError('The compatible tool patch did not satisfy its postconditions.')
  return text
 
+def optional_dsh_times(text):
+ optional="**({'time':frame['frame']['time']} if 'time' in frame['frame'] else {})"
+ for kind,data in [('start','{}'),('chunk',"{'chunk':frame['frame']['chunk']}")]:
+  old=f"event={{'type':'assistant/{kind}','time':frame['frame']['time'],'data':{data}}}"
+  if old in text:text=replace_once(text,old,f"event={{'type':'assistant/{kind}','data':{data},{optional}}}")
+ if text.count("frame['frame']['time']")!=text.count(optional):raise ValueError('The compatible assistant timestamp boundary differs.')
+ compile(text,'compatible-dsh-wire','exec')
+ return text
+
 def apply(candidate,source,platform,source_ref):
  candidate=candidate.resolve(strict=True);source=source.resolve(strict=True)
  marker=json.loads((candidate/'.repair-candidate.json').read_text(encoding='utf-8'))
@@ -110,11 +119,15 @@ def apply(candidate,source,platform,source_ref):
   staged[relative]=bytes
   changed[relative]=hashlib.sha256(bytes).hexdigest()
  def copy(relative):publish(relative,(source/relative).read_bytes())
+ # Retain each older native UI's session projection while making transient
+ # assistant timestamps optional, as in the current shared DSH adapter.
+ wire='apps/native/augmentor_linux/adapters/dsh_wire.py'
+ if (candidate/wire).exists():publish(wire,optional_dsh_times((candidate/wire).read_text(encoding='utf-8')).encode())
  publish('apps/browser/native-host.mjs',host_patch(host.read_text(encoding='utf-8')).encode())
  for relative in ['apps/browser/shared/connected-executor.mjs','apps/browser/shared/control-tools.mjs',
   'apps/browser/extension/actions.mjs','apps/browser/extension/worktab.mjs','apps/browser/extension/trusted-input.mjs','apps/browser/extension/document-readback.mjs','apps/browser/extension/build.mjs',
   'services/browser/executor.py','services/desktop/service.py','services/desktop/client.py',
-  'services/desktop/portal.py','services/desktop/screen_mapping.py','services/desktop/windows.py',
+  'services/desktop/portal.py','services/desktop/screen_mapping.py','services/desktop/kwin.py','services/desktop/windows.py',
   'services/platform_adapters/locks.py','services/platform_adapters/private_files.py','services/platform_adapters/transport.py','services/platform_adapters/paths.py',
   'dist/desktop/src/index.js','dist/desktop/src/capabilities.js',
   'dist/pi-browser/src/index.js','dist/runtime/src/shell-deadlines.js',

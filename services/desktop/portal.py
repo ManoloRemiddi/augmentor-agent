@@ -13,7 +13,7 @@ gi.require_version('Gst','1.0')
 from gi.repository import Gio,GLib,Gst
 from kwin import KWin
 from capture_stream import receive_frame,rgb_frame_layout
-from screen_mapping import match_screen,select_stream
+from screen_mapping import TopologyError,bind_streams,topology,check_topology,select_stream
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from platform_adapters.paths import private_directory
 from platform_adapters.private_files import read_json,atomic_json
@@ -42,7 +42,7 @@ class Portal:
             self.call('org.freedesktop.host.portal.Registry','Register','(sa{sv})',('com.augmentor.Agent',{}));self.portal_registered=True
         except GLib.Error:pass
         self.restore_file=private_directory(Path(os.environ.get('XDG_CONFIG_HOME',Path.home()/'.config'))/'augmentor')/'desktop-sharing.json'
-        self.owner=None;self.session=None;self.fd=None;self.node=None;self.streams=[];self.snapshot=None;self.cancel=threading.Event();self.keys=[];self.button=None;self.symbol=None;self.focus_serial=0;self.focus_listener=None;self.request_path=None;self.generation=0;self.busy=threading.Lock();self.last_used=time.monotonic()
+        self.owner=None;self.session=None;self.fd=None;self.node=None;self.stream=None;self.streams=[];self.bindings={};self.topology=None;self.snapshot=None;self.cancel=threading.Event();self.keys=[];self.button=None;self.symbol=None;self.focus_serial=0;self.focus_listener=None;self.request_path=None;self.generation=0;self.busy=threading.Lock();self.last_used=time.monotonic()
         self.bus.signal_subscribe(NAME,'org.freedesktop.portal.Session','Closed',None,None,0,self.revoked)
     def revoked(self,c,s,path,i,m,args):
         if path==self.session:self.cancel.set();self.stop()
@@ -97,13 +97,17 @@ class Portal:
             if result.get('devices',0)&3!=3 or not result.get('streams'):raise RuntimeError('Keyboard, pointer and at least one screen must be shared together.')
             token=result.get('restore_token')
             self.persistence=isinstance(token,str) and bool(token)
-            if self.persistence:atomic_json(self.restore_file,{'version':1,'restoreToken':token})
             self.streams=result['streams']
-            for node,properties in self.streams:match_screen(properties,observed['screens'])
-            self.node,self.stream=self.streams[0]
+            selected=self.kwin.read(self.cancel)
+            self.bindings=bind_streams(self.streams,selected['screens']);self.topology=topology(selected['screens'])
             answer,fds=self.bus.call_with_unix_fd_list_sync(NAME,PATH,SC,'OpenPipeWireRemote',GLib.Variant('(oa{sv})',(self.session,{})),None,0,5000,None,None)
-            self.fd=fds.get(answer.unpack()[0]);self.last_used=time.monotonic();self.notify(True,'Augmentor controls the desktop')
+            self.fd=fds.get(answer.unpack()[0]);check_topology(self.kwin.read(self.cancel)['screens'],self.topology)
+            if self.cancel.is_set():raise RuntimeError('Desktop control stopped before sharing completed.')
+            if self.persistence:atomic_json(self.restore_file,{'version':1,'restoreToken':token})
+            self.last_used=time.monotonic();self.notify(True,'Augmentor controls the desktop')
             return self.status()
+        except TopologyError:
+            self.restore_file.unlink(missing_ok=True);self.stop();raise
         except Exception:self.stop();raise
     def status(self):return {'pid':os.getpid(),'busy':self.busy.locked(),'active':bool(self.owner),'sharing':bool(self.fd is not None),'owner':self.owner,'backend':'kde-wayland-portal','monitors':'selected-portal-streams','sharedScreens':len(self.streams),'persistentPermission':self.persistence}
     def stop(self):
@@ -114,7 +118,7 @@ class Portal:
         session,self.session=self.session,None
         keys,self.keys=self.keys,[];button,self.button=self.button,None
         symbol,self.symbol=self.symbol,None;fd,self.fd=self.fd,None
-        self.owner=None
+        self.owner=None;self.streams=[];self.node=None;self.stream=None;self.bindings={};self.topology=None;self.persistence=False
         if request:
             try:self.bus.call_sync(NAME,request,'org.freedesktop.portal.Request','Close',None,None,0,2000,None)
             except GLib.Error:pass
@@ -134,7 +138,8 @@ class Portal:
         self.last_used=time.monotonic()
     def capture(self,owner):
         self.verify(owner);self.snapshot=None;before=self.kwin.read(self.cancel)
-        self.node,self.stream,screen=select_stream(self.streams,before)
+        try:self.node,self.stream,screen=select_stream(self.streams,before,self.bindings,self.topology)
+        except TopologyError:self.stop();raise
         # The executor uses no screenshot file or clipboard. The harness may
         # retain the returned image in its model/tool conversation history.
         pipeline=Gst.parse_launch(f'pipewiresrc fd={self.fd} path={self.node} do-timestamp=true ! videoconvert ! video/x-raw,format=RGB ! appsink name=capture emit-signals=false max-buffers=1 drop=true sync=false')
@@ -155,13 +160,18 @@ class Portal:
             finally:buffer.unmap(mapping)
         finally:pipeline.set_state(Gst.State.NULL)
         after=self.kwin.read(self.cancel)
+        self.verify_topology(after)
         if not same_scene(before,after):raise RuntimeError('The active window changed during capture. Observe again.')
         token=uuid.uuid4().hex;self.snapshot={'token':token,'created':time.monotonic(),'node':self.node,'scene':after,'screen':screen,'width':image['width'],'height':image['height'],'focus':self.focus_info(after['window']['pid']),'focusSerial':self.focus_serial}
         return {'token':token,'window':after['window'],'screen':screen,'imageSize':{'width':image['width'],'height':image['height']},'image':image,'expiresInSeconds':30,'instructions':'Coordinates use the returned image pixels. One action consumes this observation; observe again to verify the result.'}
+    def verify_topology(self,scene):
+        try:check_topology(scene['screens'],self.topology)
+        except TopologyError:self.stop();raise
     def target(self,owner,token):
         self.verify(owner);snapshot=self.snapshot;self.snapshot=None
         if not snapshot or token!=snapshot['token'] or time.monotonic()-snapshot['created']>30:raise RuntimeError('Observation is stale or already used. Observe again; no action was replayed.')
-        if not same_scene(self.kwin.read(self.cancel),snapshot['scene']):raise RuntimeError('Active window, focus or screen geometry changed. No input was sent.')
+        current=self.kwin.read(self.cancel);self.verify_topology(current)
+        if not same_scene(current,snapshot['scene']):raise RuntimeError('Active window, focus or screen geometry changed. No input was sent.')
         return snapshot
     def focus_info(self,pid):
         self.focus_failure='The focused control is not accessible. Enable accessibility for this application before keyboard input.'
